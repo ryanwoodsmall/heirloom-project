@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_tty.c	1.27 (gritter) 12/1/04";
+static char sccsid[] = "@(#)ex_tty.c	1.28 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -310,7 +310,10 @@ setsize(void)
 	if (TCOLUMNS <= 4)
 		TCOLUMNS = 1000;
 	options[WINDOW].ovalue = options[WINDOW].odefault = l - 1;
-	if (defwind) options[WINDOW].ovalue = defwind;
+	if (defwind) {
+		options[WINDOW].ovalue = defwind;
+		l = defwind + 1;
+	}
 	options[SCROLL].ovalue = options[SCROLL].odefault = HC ? 11 : ((l-1) / 2);
 	if (i <= 0)
 		TLINES = 2;

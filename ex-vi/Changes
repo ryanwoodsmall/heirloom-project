@@ -26,9 +26,10 @@ Release ...
 * When moving up or down to a row with different column arrangement while
   the cursor is positioned over a multicolumn character, the leftmost
   character above the original position is chosen in the new row.
-* If both the '-t' and the '-c' option are given, the '-t' option is now
-  processed first, i.e. the command is executed at the position where the
-  tag was found.
+* If both the -t and the -c option are given, the -t option is now
+  processed first, i.e. the command is executed at the position where
+  the tag was found.
+* The -w option now also sets the scroll size for the 'z' command.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
