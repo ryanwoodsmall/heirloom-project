@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.67 (gritter) 11/6/04";
+static char sccsid[] = "@(#)sendout.c	2.68 (gritter) 11/7/04";
 #endif
 #endif /* not lint */
 
@@ -358,7 +358,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	char *tcs, *convhdr = NULL;
 #endif
 	enum mimeclean isclean;
-	enum sendaction convert;
+	enum conversion convert;
 	char *charset = NULL, *contenttype = NULL;
 
 	if ((nfo = Ftemp(&tempMail, "Rs", "w", 0600, 1)) == NULL) {

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.66 (gritter) 11/6/04";
+static char sccsid[] = "@(#)send.c	2.67 (gritter) 11/7/04";
 #endif
 #endif /* not lint */
 
@@ -240,7 +240,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 			if (dostat & 2)
 				xstatusput(zmp, obuf, prefix, stats);
 			if (doign != allignore)
-				out("\n", 1, obuf, SEND_MBOX, action,
+				out("\n", 1, obuf, SEND_MBOX, CONV_NONE,
 						prefix, prefixlen, stats);
 			break;
 		}
@@ -275,7 +275,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				if (dostat & 2)
 					xstatusput(zmp, obuf, prefix, stats);
 				if (doign != allignore)
-					out("\n", 1, obuf, SEND_MBOX, action,
+					out("\n", 1, obuf, SEND_MBOX, CONV_NONE,
 						prefix, prefixlen, stats);
 				break;
 			}
@@ -406,7 +406,7 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_TODISP_ALL:
 			if (level == 0 && count) {
 				cp = "[Binary content]\n\n";
-				out(cp, strlen(cp), obuf, SEND_MBOX, action,
+				out(cp, strlen(cp), obuf, SEND_MBOX, CONV_NONE,
 						prefix, prefixlen, stats);
 			}
 			/*FALLTHRU*/
@@ -480,7 +480,7 @@ skip:	switch (ip->m_mimecontent) {
 							"\n" : "",
 							np->m_partstring);
 						out(cp, strlen(cp), obuf,
-							SEND_MBOX, action,
+							SEND_MBOX, CONV_NONE,
 							prefix, prefixlen,
 							stats);
 						ac_free(cp);

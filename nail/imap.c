@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.208 (gritter) 11/6/04";
+static char sccsid[] = "@(#)imap.c	1.209 (gritter) 11/7/04";
 #endif
 #endif /* not lint */
 
@@ -100,7 +100,8 @@ static enum {
 	RESPONSE_TAGGED,
 	RESPONSE_DATA,
 	RESPONSE_FATAL,
-	RESPONSE_CONT
+	RESPONSE_CONT,
+	RESPONSE_ILLEGAL
 } response_type;
 
 static enum {
@@ -368,14 +369,14 @@ imap_response_parse(void)
 		while (*pp && *pp != ' ')
 			pp++;
 		if (*pp == '\0') {
-			response_type = RESPONSE_UNKNOWN;
+			response_type = RESPONSE_ILLEGAL;
 			break;
 		}
 		*pp++ = '\0';
 		while (*pp && *pp == ' ')
 			pp++;
 		if (*pp == '\0') {
-			response_type = RESPONSE_UNKNOWN;
+			response_type = RESPONSE_ILLEGAL;
 			break;
 		}
 		ip = &imapbuf[pp - parsebuf];
@@ -385,7 +386,7 @@ imap_response_parse(void)
 	}
 	responded_text = pp;
 	if (response_type != RESPONSE_CONT &&
-			response_type != RESPONSE_UNKNOWN &&
+			response_type != RESPONSE_ILLEGAL &&
 			response_status == RESPONSE_OTHER)
 		imap_other_get(pp);
 }
@@ -402,7 +403,7 @@ again:	if (sgetline(&imapbuf, &imapbufsize, NULL, &mp->mb_sock) > 0) {
 		if (verbose)
 			fputs(imapbuf, stderr);
 		imap_response_parse();
-		if (response_type == RESPONSE_UNKNOWN)
+		if (response_type == RESPONSE_ILLEGAL)
 			goto again;
 		if (response_type == RESPONSE_CONT)
 			return OKAY;
