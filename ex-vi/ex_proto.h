@@ -70,7 +70,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *	@(#)ex_proto.h	1.24 (gritter) 12/1/04
+ *	@(#)ex_proto.h	1.25 (gritter) 1/2/05
  */
 
 /*
@@ -475,6 +475,7 @@ extern void vshift(int);
 extern void vrep(register int);
 extern void vyankit(int);
 extern void setpk(void);
+extern void vkillDEL(void);
 /* ex_vops2.c */
 extern void bleep(register int, char *);
 extern int vdcMID(void);

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops.c	1.21 (gritter) 11/29/04";
+static char sccsid[] = "@(#)ex_vops.c	1.22 (gritter) 1/2/05";
 #endif
 #endif
 
@@ -1050,4 +1050,14 @@ setpk(void)
 		pkill[0] = cursor;
 		pkill[1] = wcursor;
 	}
+}
+
+/*
+ * Kill the last deleted part of a line so that "p" does not put it back.
+ * This is to be called from ex commands that delete some text.
+ */
+void
+vkillDEL(void)
+{
+	DEL[0] = 0;
 }

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmds.c	1.17 (gritter) 11/27/04";
+static char sccsid[] = "@(#)ex_cmds.c	1.18 (gritter) 1/2/05";
 #endif
 #endif
 
@@ -330,6 +330,7 @@ changdir:
 				YANKreg(c);
 			delete(0);
 			appendnone();
+			vkillDEL();
 			continue;
 
 /* edit */
@@ -817,6 +818,7 @@ wq:
 				YANKreg(c);
 			else
 				yank(0);
+			vkillDEL();
 			continue;
 
 /* z */

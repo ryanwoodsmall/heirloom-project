@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.42 (gritter) 12/1/04";
+static char sccsid[] = "@(#)ex_re.c	1.43 (gritter) 1/2/05";
 #endif
 #endif
 
@@ -517,15 +517,8 @@ confirmed(line *a)
 		return (1);
 	pofix();
 	pline(lineno(a));
-	if (inopen) {
-#ifndef	BIT8
+	if (inopen)
 		putchar('\n' | QUOTE);
-#else
-		if (Putchar == listchar)
-			putchar('$');
-		putchar('\n');
-#endif
-	}
 	c = column(loc1 - 1);
 	ugo(c - 1 + (inopen ? 1 : 0), ' ');
 	ugo(column(loc2 - 1) - c, '^');
