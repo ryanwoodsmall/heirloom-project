@@ -31,7 +31,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH SORT 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH SORT 1 "2/2/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 sort \- sort or merge files
 .SH SYNOPSIS
@@ -67,18 +67,8 @@ The behavior of
 is altered by the following options:
 .TP 5
 .B \-c
-Check that the input file is sorted according to the ordering rules;
-with
-.B /usr/5bin/sort
-and
-.BR /usr/5bin/s42/sort ,
-give no output unless the file is out of sort;
-with
-.B /usr/5bin/posix/sort
-and
-.BR /usr/5bin/posix2001/sort ,
-give no output in any case,
-set the exit status only.
+Check that the input file is sorted according to the ordering rules,
+give no output unless the file is out of sort.
 Only one input file may be given.
 .TP 5
 .B  \-m
@@ -173,6 +163,15 @@ Reverse the sense of comparisons.
 .BI \-t x
 `Tab character' separating fields is
 .IR x .
+With
+.B /usr/5bin/sort
+and
+.BI /usr/5bin/s42/sort ,
+the
+.I x
+argument is optional;
+if it is missing,
+the field separator is reset to the default.
 .PP
 The notation
 .BI + "pos1 " "\-\fIpos2"
@@ -227,7 +226,9 @@ option,
 which was introduced by POSIX.2,
 provides another method to specify sort keys.
 Start field and end field are separated by commas,
-and field and character numbers start at 1 instead of 0;
+field and character numbers start at 1 instead of 0,
+and, if no character position is specified for the end key,
+the last character of the field is used;
 otherwise, the meaning of field specifications is identical.
 .SH EXAMPLES
 Print in alphabetical order all the unique spellings

@@ -43,9 +43,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)sort_sus.sl	1.35 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)sort_sus.sl	1.36 (gritter) 2/2/05";
 #else
-static const char sccsid[] USED = "@(#)sort.sl	1.35 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)sort.sl	1.36 (gritter) 2/2/05";
 #endif
 
 #include <stdio.h>
@@ -180,7 +180,7 @@ nonprint_mb(const char *s)
 static int
 dict_sb(const char *s)
 {
-	return (*s == '\n' || isblank(*s & 0377) || isalpha(*s & 0377)) ? 0 : 1;
+	return (*s == '\n' || isblank(*s & 0377) || isalnum(*s & 0377)) ? 0 : 1;
 }
 
 static int
@@ -190,7 +190,7 @@ dict_mb(const char *s)
 	wchar_t	wc;
 
 	next(wc, s, n);
-	return (wc == '\n' || iswblank(wc) || iswalpha(wc)) ? 0 : n;
+	return (wc == '\n' || iswblank(wc) || iswalnum(wc)) ? 0 : n;
 }
 
 static struct	field {
@@ -202,6 +202,7 @@ static struct	field {
 	int bflg[2];
 	int m[2];
 	int n[2];
+	int posix;
 }	*fields;
 static struct field proto = {
 	nofold_sb,
@@ -211,7 +212,8 @@ static struct field proto = {
 	0,
 	{ 0, 0 },
 	{ 0, -1 },
-	{ 0, 0 }
+	{ 0, 0 },
+	0
 };
 static int	nfields;
 static int 	error = 1;
@@ -765,12 +767,10 @@ rline(struct merg *mp, const char *fn)
 static void
 disorder(const char *s, char *t)
 {
-#ifndef	SUS
 	register char *u;
 	for(u=t; *u!='\n';u++) ;
 	*u = 0;
 	diag(s,t);
-#endif	/* !SUS */
 	term(0);
 }
 
@@ -1157,11 +1157,12 @@ skip(const char *pp, struct field *fp, int j)
 {
 	register int i;
 	const char *p;
+	int	runs = 0;
 
 	p = pp;
 	if( (i=fp->m[j]) < 0)
 		return(eol(p));
-	if (mb_cur_max > 1) {
+loop:	if (mb_cur_max > 1) {
 		int	n;
 		wchar_t	wc;
 
@@ -1184,7 +1185,7 @@ skip(const char *pp, struct field *fp, int j)
 					else goto ret;
 			}
 		}
-		if(fp->bflg[j])
+		if(fp->bflg[j] && runs == 0)
 			while (next(wc, p, n), iswblank(wc))
 				p += n;
 	} else {	/* mb_cur_max == 1 */
@@ -1215,7 +1216,7 @@ skip(const char *pp, struct field *fp, int j)
 					else goto ret;
 			}
 		}
-		if(fp->bflg[j]) {
+		if(fp->bflg[j] && runs == 0) {
 			if (cblank)
 				while(*p == ' ' || *p == '\t')
 					p++;
@@ -1230,6 +1231,10 @@ skip(const char *pp, struct field *fp, int j)
 			p++;
 		else goto ret;
 	} 
+	if (fp->posix && fp->n[j] == 0 && j == 1 && runs++ == 0) {
+		i = 1;
+		goto loop;
+	}
 ret:
 	return(p);
 }
@@ -1254,7 +1259,7 @@ copyproto(void)
 }
 
 static int
-field(const char *s, const char *nxt, int k, int subst)
+field(const char *s, const char *nxt, int k, int posix)
 {
 	register struct field *p;
 	register int d;
@@ -1307,6 +1312,9 @@ field(const char *s, const char *nxt, int k, int subst)
 				arg = nxt;
 				cons = 1;
 			} else {
+#ifdef	SUS
+				inval();
+#endif	/* SUS */
 				tabchar = 0;
 				continue;
 			}
@@ -1340,11 +1348,16 @@ field(const char *s, const char *nxt, int k, int subst)
 		case '0': case '1': case '2': case '3':
 			  case '4': case '5': case '6':
 			  case '7': case '8': case '9':
-			if ((p->m[k+d] = number(&s) - subst) < 0)
-				inval();
+			if ((p->m[k+d] = number(&s) - posix) < 0) {
+				if (posix && k == 1 && d > 0 && p->m[k+d] == -1)
+					p->m[k+d] = 0;
+				else
+					inval();
+			}
 		}
 		compare = cmp;
 	}
+	p->posix = posix;
 	return cons;
 }
 
