@@ -77,7 +77,7 @@ char *copyright =
 "@(#) Copyright (c) 1980 Regents of the University of California.\n\
  All rights reserved.\n";
 
-static char sccsid[] = "@(#)ex.c	1.34 (gritter) 12/1/04";
+static char sccsid[] = "@(#)ex.c	1.35 (gritter) 2/13/05";
 #endif	/* DOSCCS */
 #endif	/* !lint */
 
@@ -467,13 +467,13 @@ arggroup:
 			break;
 
 		case 't':
-			if (ac > 1 && av[1][0] != '-' && av[1][0] != '+') {
-				ac--, av++;
+			if (av[0][2]) {
 				tflag = 1;
 				safecp(lasttag, av[0], sizeof lasttag,
 						"argument to -t too long");
-			}
-			else if (av[0][2]) {
+			} else if (ac > 1 && av[1][0] != '-' &&
+					av[1][0] != '+') {
+				ac--, av++;
 				tflag = 1;
 				safecp(lasttag, av[0], sizeof lasttag,
 						"argument to -t too long");
@@ -490,11 +490,12 @@ arggroup:
 			break;
 
 		case 'w':
-			if (ac > 1 && av[1][0] != '-' && av[1][0] != '+')
-				cp = av[1];
-			else if (av[0][2])
+			if (av[0][2])
 				cp = &av[0][2];
-			else
+			else if (ac > 1 && av[1][0] != '-' && av[1][0] != '+') {
+				cp = av[1];
+				ac--, av++;
+			} else
 				needarg('w');
 			defwind = atoi(cp);
 			break;

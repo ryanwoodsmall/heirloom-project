@@ -12,6 +12,7 @@ Release ...
 * The insertion of multicolumn characters and tab characters in multibyte
   locales now works with terminals that have the 'ic' but no 'im' termcap
   capability (Bugreport by Matthew Fischer).
+* The argument to the -w option is correctly recognized now.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
