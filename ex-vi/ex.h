@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	@(#)ex.h	1.50 (gritter) 2/13/05
+ *	@(#)ex.h	1.51 (gritter) 2/15/05
  */
 
 /*
@@ -333,6 +333,7 @@ extern	 struct	option options[NOPTS + 1];
  * -DISO8859_1 enables all characters >= 0240 regardless of
  *  LC_CTYPE.
  */
+#define	INVBIT		0x20000000
 #define	MULTICOL	0x40000000
 
 #if defined (MB)
@@ -343,7 +344,6 @@ extern	 struct	option options[NOPTS + 1];
 typedef int	cell;
 var	int	TRIM;
 var	int	QUOTE;
-#define	INVBIT	0x20000000
 #define	printable(c)	(((c)&INVBIT) == 0 && \
 		(mb_cur_max > 1 ? iswprint((c)&TRIM) : isprint((c)&TRIM)))
 #define	ext(c)		(((c) & 0177) == 0)

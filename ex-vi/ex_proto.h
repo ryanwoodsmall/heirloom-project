@@ -70,7 +70,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *	@(#)ex_proto.h	1.25 (gritter) 1/2/05
+ *	@(#)ex_proto.h	1.26 (gritter) 2/15/05
  */
 
 /*
@@ -187,8 +187,8 @@ extern void checkmodeline(char *);
 #ifdef	MB
 extern int mbtowi(int *c, const char *s, size_t n);
 extern int widthok(int c);
-extern int GETWC(char *);
 #endif	/* MB */
+extern int GETWC(char *);
 /* ex_put.c */
 extern int (*setlist(int))(int);
 extern void (*setnumb(int))(int);

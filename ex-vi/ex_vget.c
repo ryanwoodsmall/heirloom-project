@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vget.c	1.28 (gritter) 1/20/05";
+static char sccsid[] = "@(#)ex_vget.c	1.29 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -576,10 +576,10 @@ static void
 imacpush(int *ip, int canundo)
 {
 	char	buf[BUFSIZ], *bp = buf;
-	int	n;
 
 #ifdef	MB
 	do {
+		int	n;
 		n = wctomb(bp, *ip&TRIM);
 		bp += n;
 	} while (*ip++);
