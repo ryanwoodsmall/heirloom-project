@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.44 (gritter) 9/9/04";
+static char sccsid[] = "@(#)thread.c	1.46 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -754,9 +754,10 @@ colpm(m, cl, cc, uc)
 }
 
 void
-uncollapse1(m)
+uncollapse1(m, always)
 	struct message	*m;
+	int	always;
 {
-	if (mb.mb_threaded == 1)
+	if (mb.mb_threaded == 1 && (always || m->m_collapsed > 0))
 		colps(m, 0);
 }

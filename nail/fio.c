@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.57 (gritter) 9/9/04";
+static char sccsid[] = "@(#)fio.c	2.58 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -319,7 +319,7 @@ setdot(mp)
 		prevdot = dot;
 	dot = mp;
 	did_print_dot = 0;
-	uncollapse1(dot);
+	uncollapse1(dot, 0);
 	return dot;
 }
 

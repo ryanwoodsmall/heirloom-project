@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.217 (gritter) 9/9/04
+.\"     Sccsid: @(#)nail.1	2.218 (gritter) 9/9/04
 .\"
 .TH NAIL 1 "9/9/04" "nail 11.7pre" "User Commands"
 .SH NAME
@@ -1594,7 +1594,9 @@ Takes a message list
 and makes the message and all replies to it visible
 in header summaries again.
 When a message becomes the current message,
-it is automatically uncollapsed.
+it is automatically made visible.
+Also when a message with collapsed replies is printed,
+all of these are automatically uncollapsed.
 .TP
 .B undef
 Undefines each of the named macros.

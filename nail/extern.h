@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.99 (gritter) 9/8/04
+ *	Sccsid @(#)extern.h	2.100 (gritter) 9/9/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -419,4 +419,4 @@ long	nextprime __P((long));
 extern void	substdate __P((struct message *));
 int	ccollapse __P((void *));
 int	cuncollapse __P((void *));
-void	uncollapse1 __P((struct message *));
+void	uncollapse1 __P((struct message *, int));

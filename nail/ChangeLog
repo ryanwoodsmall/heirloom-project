@@ -1,6 +1,9 @@
 [11.7] released ...
 * A collapsed view of message threads was introduced. See the 'collapse'
   and 'uncollapse' commands, and the 'autocollapse' variable.
+* The 'z' command now always shifts the header summary by a full screen
+  of messages and is not disturbed by deleted, hidden, or killed messages
+  anymore.
 * Nail did not properly keep the mark for the current message if messages
   were expunged on an IMAP server.
 
