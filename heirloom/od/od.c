@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.15 (gritter) 7/24/04";
+static const char sccsid[] USED = "@(#)od.sl	1.16 (gritter) 12/4/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -140,6 +140,11 @@ static long long	limit = -1;	/* print no more bytes than limit */
 static long long	total;		/* total bytes of input */
 static long long	offset;		/* offset to print */
 static int		vflag;		/* print all lines */
+#ifdef	ADDONS
+static int		Cflag;		/* Cray -C option */
+#else	/* !ADDONS */
+#define	Cflag		0
+#endif	/* !ADDONS */
 static char		**files;	/* files to read */
 static const char	*skipstr;	/* skip format string for error msg */
 static FILE		*curfile;	/* current file */
@@ -450,7 +455,7 @@ put(const char *s)
 static void
 format(struct type *tp, struct buffer *b1, struct buffer *b2)
 {
-	char	buf[132];
+	char	buf[200];
 	int	i, j, n, l = 0;
 
 	switch (tp->t_fmt) {
@@ -586,6 +591,18 @@ format(struct type *tp, struct buffer *b1, struct buffer *b2)
 					break;
 				}
 			}
+		}
+	}
+	if (Cflag) {
+		static int	max;
+		int	c;
+		while (l < max)
+			buf[l++] = ' ';
+		max = l;
+		buf[l++] = ' ';
+		for (i = 0; i < b1->bu_cnt || i % 8; i++) {
+			c = i < b1->bu_cnt ? b1->bu_blk.b_c[i] & 0377 : '.';
+			buf[l++] = isprint(c) ? c : '.';
 		}
 	}
 	buf[l++] = '\n';
@@ -929,7 +946,7 @@ setlimit(const char *s)
 int
 main(int argc, char **argv)
 {
-	const char	optstring[] = ":A:bcdDfFj:N:oOsSt:vxX";
+	const char	optstring[] = ":A:bcCdDfFj:N:oOsSt:vxX";
 	int	i, newopt = 0;;
 
 	setlocale(LC_CTYPE, "");
@@ -1025,6 +1042,11 @@ main(int argc, char **argv)
 				"%s: option requires an argument -- %c\n",
 				progname, optopt);
 			usage();
+		case 'C':
+#ifdef	ADDONS
+			Cflag = 1;
+			break;
+#endif	/* ADDONS */
 		case '?':
 			fprintf(stderr, "%s: bad flag -%c\n",
 					progname, optopt);
