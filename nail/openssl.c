@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.12 (gritter) 9/23/04";
+static char sccsid[] = "@(#)openssl.c	1.13 (gritter) 9/24/04";
 #endif
 #endif /* not lint */
 
@@ -673,6 +673,8 @@ smime_cipher(name)
 			cipher = EVP_rc2_40_cbc();
 		else if (strcmp(cp, "rc2-64") == 0)
 			cipher = EVP_rc2_64_cbc();
+		else if (strcmp(cp, "des") == 0)
+			cipher = EVP_des_cbc();
 		else if (strcmp(cp, "des-ede3") == 0)
 			cipher = EVP_des_ede3_cbc();
 		else {

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.75 (gritter) 9/9/04";
+static char sccsid[] = "@(#)cmd1.c	2.76 (gritter) 9/26/04";
 #endif
 #endif /* not lint */
 
@@ -312,6 +312,8 @@ dispc(mp, a)
 		dispc = a[0];
 	if ((mp->m_flag & (MREAD|MNEW)) == 0)
 		dispc = a[1];
+	if (mp->m_flag & MJUNK)
+		dispc = a[13];
 	if (mp->m_flag & MSAVED)
 		dispc = a[4];
 	if (mp->m_flag & MPRESERVE)
@@ -592,7 +594,7 @@ printhead(mesg, f, threaded)
 
 	bsdflags = value("bsdcompat") != NULL || value("bsdflags") != NULL ||
 		getenv("SYSV3") != NULL;
-	strcpy(attrlist, bsdflags ? "NU  *HMFATK+-" : "NUROSPMFATK+-");
+	strcpy(attrlist, bsdflags ? "NU  *HMFATK+-J" : "NUROSPMFATK+-J");
 	if ((cp = value("attrlist")) != NULL) {
 		sz = strlen(cp);
 		if (sz > sizeof attrlist - 1)

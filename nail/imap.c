@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.200 (gritter) 9/24/04";
+static char sccsid[] = "@(#)imap.c	1.201 (gritter) 9/26/04";
 #endif
 #endif /* not lint */
 
@@ -1497,9 +1497,6 @@ imap_get(mp, m, need)
 			continue;
 		if (asccasestr(responded_other_text, resp) == NULL)
 			continue;
-		if ((cp = strrchr(responded_other_text, '{')) == NULL)
-			continue;
-		expected = atol(&cp[1]);
 		if (m->m_uid) {
 			if ((cp = asccasestr(responded_other_text, "UID "))) {
 				u = atol(&cp[4]);
@@ -1510,6 +1507,15 @@ imap_get(mp, m, need)
 			}
 		} else
 			n = responded_other_number;
+		if ((cp = strrchr(responded_other_text, '{')) == NULL) {
+			if (m->m_uid ? m->m_uid != u : n != number)
+				continue;
+			m->m_have |= HAVE_HEADER|HAVE_BODY;
+			m->m_xlines = m->m_lines;
+			m->m_xsize = m->m_size;
+			goto out;
+		}
+		expected = atol(&cp[1]);
 		if (m->m_uid ? n == 0 && m->m_uid != u : n != number) {
 			imap_fetchdata(mp, NULL, expected, need, NULL, 0, 0);
 			continue;

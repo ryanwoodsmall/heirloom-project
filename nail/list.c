@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.48 (gritter) 9/16/04";
+static char sccsid[] = "@(#)list.c	2.49 (gritter) 9/26/04";
 #endif
 #endif /* not lint */
 
@@ -143,6 +143,7 @@ getmsglist(buf, vector, flags)
 #define	CMANSWER	0100		/* Answered messages */
 #define	CMDRAFT		0200		/* Draft messages */
 #define	CMKILL		0400		/* Killed messages */
+#define	CMJUNK		01000		/* Junk messages */
 
 /*
  * The following table describes the letters which can follow
@@ -164,6 +165,7 @@ static struct coltab {
 	{ 'a',		CMANSWER,	MANSWERED,	MANSWERED },
 	{ 't',		CMDRAFT,	MDRAFTED,	MDRAFTED },
 	{ 'k',		CMKILL,		MKILL,		MKILL },
+	{ 'j',		CMJUNK,		MJUNK,		MJUNK },
 	{ 0,		0,		0,		0 }
 };
 

@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.241 (gritter) 9/23/04
+.\"     Sccsid: @(#)nail.1	2.244 (gritter) 9/26/04
 .\"
-.TH NAIL 1 "9/23/04" "nail 11.9" "User Commands"
+.TH NAIL 1 "9/26/04" "nail 11.9" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -297,6 +297,9 @@ All messages marked as draft.
 .TP
 .B :k
 All `killed' messages.
+.TP
+.B :j
+All messages classified as junk.
 .TP
 .B .
 The current message.
@@ -847,6 +850,13 @@ if given.
 If no directory is given,
 then changes to the user's login directory.
 .TP
+.B classify
+(cl) Takes a list of messages and
+examines their contents for characteristics of junk mail
+using Bayesian filtering.
+Messages considered to be junk are then marked as such.
+The junk mail database is not changed.
+.TP
 .B collapse
 (coll)
 Only applicable to threaded mode.
@@ -1124,6 +1134,12 @@ and sends each message to the named user.
 and prints their message headers,
 piped through the pager if the output does not fit on the screen.
 .TP
+.B good
+(go) Takes a list of messages
+and marks all of them as not being junk mail.
+Data from these messages is then inserted
+into the junk mail database for future classification.
+.TP
 .B headers
 (h) Lists the current range of headers,
 which is an 18-message group.
@@ -1225,6 +1241,12 @@ Not all IMAP servers support this command.
 .B inc
 Same as
 .IR newmail .
+.TP
+.B junk
+(j) Takes a list of messages
+and marks all of them as junk mail.
+Data from these messages is then inserted
+into the junk mail database for future classification.
 .TP
 .B kill
 (k) Takes a list of messages and `kills' them.
@@ -2421,9 +2443,10 @@ answered,
 draft,
 killed,
 start of a collapsed thread,
-collapsed.
-The default is `NUROSPMFATK+\-',
-or `NU\ \ *HMFATK+\-' if
+collapsed,
+classified as junk.
+The default is `NUROSPMFATK+\-J',
+or `NU\ \ *HMFATK+\-J' if
 .I bsdflags
 is set.
 .TP
@@ -2661,6 +2684,13 @@ in place of the normal tab character (^I).
 Be sure to quote the value
 if it contains spaces or tabs.
 .TP
+.B junkdb
+The location of the junk mail database.
+The string is treated as a folder name,
+as described for the
+.I folder
+command.
+.TP
 .B LISTER
 Pathname of the directory lister
 to use in the
@@ -2895,11 +2925,13 @@ Valid ciphers are
 (RC2 with 40 bits),
 .B rc2-64
 (RC2 with 64 bits),
+.B des
+(DES, 56 bits)
 and
 .B des-ede3
-(3DES).
+(3DES, 112/168 bits).
 The default is 3DES.
-It is not recommended to use the RC2 variants
+It is not recommended to use the other ciphers
 unless a recipient's client is actually unable to handle 3DES
 since they are comparatively weak;
 but even so, the recipient should upgrade his software in preference.
@@ -3906,6 +3938,82 @@ by sending as many criteria as possible
 in one large (\|) specification,
 because each single such specification
 will result in a separate network operation.
+.SS "Activating the Bayesian Filter"
+The Bayesian junk mail filter works
+by examining the words contained in messages.
+You decide yourself what a good and what a bad message is.
+Thus the resulting filter is your very personal one;
+once it is correctly set up,
+it will filter only messages similar to those
+previously specified by you.
+.PP
+To use the Bayesian filter,
+a location for the junk mail database must be defined first:
+.nf
+.sp
+    \fBset junkdb=\fI~/.junkdb\fR
+.sp
+.fi
+The junk mail database does not contain
+actual words extracted from messages,
+but hashed representations of them.
+A foreign person who can read the database
+could only examine the frequency of previously known words
+in your mail.
+.PP
+A set of good messages and junk messages must now be available;
+it is also possible to use the incoming new messages for this purpose,
+although it will of course take some time
+until the filter becomes useful then.
+Do not underestimate the amount of statistical data needed;
+some hundred messages are typically necessary
+to get satisfactory results,
+and many thousand messages for best operation.
+You have to pass the good messages to the
+.I good
+command,
+and the junk messages to the
+.I junk
+command.
+The number of good messages passed
+should not exceed the number of bad messages too much
+and vice-versa.
+Otherwise, words common to all kinds of messages
+might shift the detection mechanism too much in one direction.
+.PP
+Once a reasonable amount of statistics has been collected,
+new messages can be classified automatically.
+The
+.I classify
+command marks all messages that the filter considers to be junk,
+but it does not perform any action on them by default.
+It is recommended that you move these messages into a separate
+folder just for the case that false positives occur,
+or to pass them to the
+.I junk
+command later again to further improve the junk mail database.
+To automatically move incoming junk messages
+every time the inbox is opened,
+put lines like the following into your
+.I .scores
+file (or whatever name you gave to the file in the last example):
+.nf
+.sp
+    \fBdefine\fR \fIjunkfilter\fR {
+        \fBclassify (smaller \fI20000\fB) :n\fR
+        \fBmove :j\fR \fI+junk\fR
+    }
+    \fBset folder-hook-\fRimap://user@host/INBOX=\fIjunkfilter\fR
+.sp
+.fi
+Since the
+.I classify
+command must examine the entire text
+of all new messages in the respective folder,
+this will also cause all of them to be downloaded from the IMAP server.
+You should thus restrict the size of messages for automatic filtering.
+If server-based filtering is also available,
+you should try if that works for you first.
 .SS "Reading HTML mail"
 You need either the
 .I w3m

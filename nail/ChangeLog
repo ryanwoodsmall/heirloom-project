@@ -1,4 +1,8 @@
 [11.9] released ...
+* A Bayesian junk mail filter has been added. See the 'EXAMPLES' section of
+  the manual page for an introduction.
+* Fixed an IMAP response parsing bug which caused nail to hang on messages
+  that contained no text with many IMAP servers.
 * Empty lines within the command lists for account or macro definitions are
   now ignored.
 * An attempt to define a macro twice is now properly detected and results in

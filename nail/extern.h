@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.124 (gritter) 9/23/04
+ *	Sccsid @(#)extern.h	2.125 (gritter) 9/26/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -456,3 +456,6 @@ enum okay	imap_rename __P((const char *, const char *));
 enum okay	maildir_remove __P((const char *));
 enum okay	cache_remove __P((const char *));
 enum okay	cache_rename __P((const char *, const char *));
+int	cclassify __P((void *));
+int	cjunk __P((void *));
+int	cgood __P((void *));

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.78 (gritter) 9/19/04
+ *	Sccsid @(#)def.h	2.79 (gritter) 9/26/04
  */
 
 /*
@@ -104,7 +104,8 @@ enum conversion {
 	CONV_NONE,			/* no conversion */
 	CONV_7BIT,			/* no conversion, is 7bit */
 	CONV_TODISP,			/* convert in displayable form */
-	CONV_TOSRCH,			/* conver for IMAP search */
+	CONV_TOSRCH,			/* convert for IMAP search */
+	CONV_TOFLTR,			/* convert for filtering */
 	CONV_TOFILE,			/* convert for saving to a file */
 	CONV_QUOTE,			/* first part body only */
 	CONV_DECRYPT,			/* decrypt message */
@@ -255,7 +256,8 @@ enum mflag {
 	MUNDRAFT	= (1<<24),	/* message has been undrafted */
 	MDRAFTED	= (1<<25),	/* message is marked as `draft' */
 	MKILL		= (1<<26),	/* message has been killed */
-	MOLDMARK	= (1<<27)	/* messages was marked previously */
+	MOLDMARK	= (1<<27),	/* messages was marked previously */
+	MJUNK		= (1<<28)	/* message is classified as junk */
 };
 
 struct message {
