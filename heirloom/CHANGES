@@ -1,4 +1,5 @@
 Release ...
+* /usr/ucb/ps: Specifying -agx now has the same effect as specifying -ax.
 * Operate correctly if stat(2) returns a zero st_blksize field. This is the
   case for pipes on NetBSD 2.0 and resulted in no output when using tar to
   write to them.
