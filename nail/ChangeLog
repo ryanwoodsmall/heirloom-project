@@ -4,6 +4,10 @@
   the string interpreted as a shell command (contributed by Stephen Isard).
 * The ~p escape now includes recipients that are local files in its output
   (Bugreport by Bob Tennent).
+* The 'ungood' and 'unjunk' commands put the wrong marking on the messages
+  they were applied too (regardless of the database update they performed).
+  'Ungood' now marks a message as being junk, and 'unjunk' clears the junk
+  mark.
 
 [11.17] released 11/18/04
 * When the 'write' command was used to save attachments in releases after

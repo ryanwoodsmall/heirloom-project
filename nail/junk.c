@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.64 (gritter) 11/7/04";
+static char sccsid[] = "@(#)junk.c	1.65 (gritter) 11/29/04";
 #endif
 #endif /* not lint */
 
@@ -913,7 +913,7 @@ insert(int *msgvec, enum entry entry, int incr)
 			break;
 		}
 		u += incr;
-		if (entry == GOOD)
+		if (entry == GOOD && incr > 0 || entry == BAD && incr < 0)
 			message[*ip-1].m_flag &= ~MJUNK;
 		else
 			message[*ip-1].m_flag |= MJUNK;
