@@ -89,6 +89,8 @@ Release ...
 * find: Symbolic modes for -perm that include the sgid bit now work properly.
 * cp: The -f option does not disable the -i option in the POSIX personality
   and vice-versa.
+* df: Percentage values are now rounded to the next integer as demanded by
+  POSIX.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

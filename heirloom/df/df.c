@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.60 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.61 (gritter) 2/5/05";
 #else
-static const char sccsid[] USED = "@(#)df.sl	1.60 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)df.sl	1.61 (gritter) 2/5/05";
 #endif
 
 /*
@@ -85,6 +85,7 @@ typedef		unsigned long long	ull;
 
 static int	errcnt;			/* count of errors */
 static int	aflag = 1;		/* print all filesystems */
+static int	Pflag;			/* POSIX-style */
 #ifndef	UCB
 static int	fflag;			/* omit inodes in traditional form */
 static int	gflag;			/* print entire statvfs structure */
@@ -222,6 +223,22 @@ procnodes(const char *dir, struct statvfs *sv)
 #endif	/* __linux__ */
 
 /*
+ * Percentage computation according to POSIX.
+ */
+static int
+getpct(ull m, ull n)
+{
+	int	c;
+	double	d;
+
+	d = n ? m * 100. / n : 0;
+	c = d;
+	if (d - (int)d > 0)
+		c++;
+	return c;
+}
+
+/*
  * Print per-file-system statistics. Mdir is the mount point or a file
  * contained, mdev is the file system's (block) device.
  */
@@ -275,7 +292,8 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		return;
 	total = (ull)sv.f_blocks * sv.f_frsize / bsize;
 	avail = (ull)sv.f_bavail * sv.f_frsize / bsize;
-	used = total - (ull)sv.f_bfree * sv.f_frsize / bsize;
+	used = total - (Pflag ? (ull)sv.f_bavail : (ull)sv.f_bfree)
+		* sv.f_frsize / bsize;
 #ifdef	__linux__
 	/*
 	 * Try to estimate i-nodes for reiserfs filesystems. As the number
@@ -297,7 +315,7 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 #endif	/* __linux__ */
 	switch (format) {
 	case 'h':
-		percent = total ? used * 100 / total : 0;
+		percent = getpct(used, total);
 		if (strlen(mdev) > 20) {
 			printf("%s\n", mdev);
 			cp = "";
@@ -309,20 +327,20 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		break;
 	case 'P':
 	case 'k':
-		percent = total ? used * 100 / total : 0;
+		percent = getpct(used, total);
 		printf("%-18s  %10llu %10llu %10llu     %3llu%% %s\n",
 				mdev, total, used, avail, percent, mdir);
 		break;
 	case 'i':
 		used = sv.f_files - sv.f_ffree;
-		percent = sv.f_files ? used * 100 / sv.f_files : 0;
+		percent = getpct(used, sv.f_files);
 		printf("%-18s  %10llu %10llu %10llu   %3llu%% %s\n",
 				mdev, (ull)sv.f_files, used, (ull)sv.f_favail,
 				percent, mdir);
 		break;
 #ifndef	UCB
 	case 'v':
-		percent = total ? used * 100 / total : 0;
+		percent = getpct(used, total);
 		printf("%-10.10s %-18.18s %10llu %10llu %10llu %4u%%\n",
 				mdir, mdev, total, used, avail,
 				(unsigned)percent);
@@ -628,8 +646,10 @@ main(int argc, char **argv)
 			mtab = optarg;
 #endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
 			break;
-		case 'i':
 		case 'P':
+			Pflag = 1;
+			/*FALLTHRU*/
+		case 'i':
 			format = i;
 			break;
 		case 't':
@@ -720,9 +740,11 @@ main(int argc, char **argv)
 			else
 				format = i;
 			break;
+		case 'P':
+			Pflag = 1;
+			/*FALLTHRU*/
 		case 'i':
 		case 'n':
-		case 'P':
 		case 'v':
 			format = i;
 			break;
