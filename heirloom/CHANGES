@@ -96,6 +96,8 @@ Release ...
 * man: With the -k option, the exit status is now 0 if any matches have been
   found.
 * stty: If ispeed and ospeed are different, both are printed separately.
+* stty: If the system does not support split input/output speed, the 'ispeed'
+  and 'ospeed' operands have no effect.
 * tabs: The -T option had no effect. Its argument is now required.
 
 Release 050123

@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifndef	UCB
-static const char sccsid[] USED = "@(#)stty.sl	1.18 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)stty.sl	1.19 (gritter) 2/5/05";
 #else	/* UCB */
-static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.18 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.19 (gritter) 2/5/05";
 #endif	/* UCB */
 
 #include <sys/types.h>
@@ -810,6 +810,7 @@ set(void)
 {
 	int	i, gotcha, not;
 	const char	*ap;
+	struct termios	tc;
 
 	while (*args) {
 		for (i = 0; speeds[i].s_str; i++)
@@ -861,9 +862,15 @@ set(void)
 		if (strcmp(*args, "ispeed") == 0) {
 			if (*++args == NULL)
 				return;
-			for (i = 0; speeds[i].s_str; i++)
+			if (atol(*args) == 0) {
+				cfsetispeed(&ts, cfgetospeed(&ts));
+				goto next;
+			} else for (i = 0; speeds[i].s_str; i++)
 				if (strcmp(speeds[i].s_str, *args) == 0) {
-					cfsetispeed(&ts, speeds[i].s_val);
+					tc = ts;
+					cfsetispeed(&tc, speeds[i].s_val);
+					if (cfgetospeed(&tc)==cfgetospeed(&ts))
+						ts = tc;
 					goto next;
 				}
 			inval();
@@ -871,9 +878,15 @@ set(void)
 		if (strcmp(*args, "ospeed") == 0) {
 			if (*++args == NULL)
 				return;
-			for (i = 0; speeds[i].s_str; i++)
+			if (atol(*args) == 0) {
+				cfsetospeed(&ts, B0);
+				goto next;
+			} else for (i = 0; speeds[i].s_str; i++)
 				if (strcmp(speeds[i].s_str, *args) == 0) {
-					cfsetospeed(&ts, speeds[i].s_val);
+					tc = ts;
+					cfsetospeed(&tc, speeds[i].s_val);
+					if (cfgetispeed(&tc)==cfgetispeed(&ts))
+						ts = tc;
 					goto next;
 				}
 			inval();
