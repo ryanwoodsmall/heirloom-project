@@ -46,13 +46,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ls_su3.sl	1.72 (gritter) 1/24/05>";
+static const char sccsid[] USED = "@(#)ls_su3.sl	1.73 (gritter) 2/5/05>";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ls_sus.sl	1.72 (gritter) 1/24/05>";
+static const char sccsid[] USED = "@(#)ls_sus.sl	1.73 (gritter) 2/5/05>";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.72 (gritter) 1/24/05>";
+static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.73 (gritter) 2/5/05>";
 #else
-static const char sccsid[] USED = "@(#)ls.sl	1.72 (gritter) 1/24/05>";
+static const char sccsid[] USED = "@(#)ls.sl	1.73 (gritter) 2/5/05>";
 #endif
 
 /*
@@ -158,6 +158,14 @@ static int ex = 0;	/* Exit status to be. */
 static int istty;	/* Output is on a terminal. */
 static int tinfostat = -1;	/* terminfo is initalized */
 extern int sysv3;	/* emulate SYSV3 behavior */
+
+#ifdef	SU3
+static struct	visit {
+	ino_t	v_ino;
+	dev_t	v_dev;
+} *visited;
+static int	vismax;	/* number of members in visited */
+#endif	/* SU3 */
 
 static enum {
 	PER_LS	= 0,
@@ -1397,10 +1405,10 @@ enum state { BOTTOM, SINKING, FLOATING };
  * state: How "recursive" do we have to be.
  */
 static void
-listfiles(struct file *flist, enum depth depth, enum state state)
+listfiles(struct file *flist, enum depth depth, enum state state, int level)
 {
 	struct file *dlist = nil, **afl = &flist, **adl = &dlist, *fsav;
-	int nplin;
+	int nplin, t;
 	static int white = 1;	/* Nothing printed yet. */
 
 	/*
@@ -1428,16 +1436,49 @@ listfiles(struct file *flist, enum depth depth, enum state state)
 /* Basic disk block size is 512 except for one niche O.S. */
 
 			addpath(&didx, (*afl)->name);
-			if (status(path, &st) < 0
+			if ((t = status(path, &st)) < 0
 #ifdef S_IFLNK
 				&& (status == lstat || lstat(path, &st) < 0)
 #endif
 			) {
 				if (depth != SUBMERGED || errno != ENOENT)
 					report((*afl)->name);
+#ifdef	SU3
+			fail:
+#endif	/* SU3 */
 				delfile(popfile(afl));
 			} else {
-				if (((field & FL_MARK) || tinfostat == 1) &&
+#ifdef	SU3
+				if (t < 0 && errno == ELOOP && (present('H') ||
+							present('L'))) {
+					report((*afl)->name);
+					goto fail;
+				}
+				if (present('L')) {
+					int	i;
+					for (i = 0; i < level; i++) {
+						if (st.st_dev==visited[i].v_dev
+						    && st.st_ino==
+						      visited[i].v_ino) {
+							fprintf(stderr, "link "
+								"loop at %s\n",
+								path);
+							ex = 1;
+							goto fail;
+						}
+					}
+					if (level >= vismax) {
+						vismax += 20;
+						visited = srealloc(visited,
+								sizeof *visited
+								* vismax);
+					}
+					visited[level].v_dev = st.st_dev;
+					visited[level].v_ino = st.st_ino;
+				}
+#endif	/* SU3 */
+				if (((field & FL_MARK) || tinfostat == 1 ||
+						present('H')) &&
 						!present('L') &&
 						status != lstat &&
 						(st.st_mode & S_IFMT)
@@ -1514,7 +1555,8 @@ listfiles(struct file *flist, enum depth depth, enum state state)
 				if (depth != SURFACE1 || present('R'))
 					printf("%s:\n", path);
 				listfiles(flist, SUBMERGED,
-					state == FLOATING ? FLOATING : BOTTOM);
+					state == FLOATING ? FLOATING : BOTTOM,
+					level + 1);
 			}
 			delpath(didx);
 		}
@@ -1734,6 +1776,7 @@ main(int argc, char **argv)
 		}
 	}
 	listfiles(flist, depth,
-		(field & FL_DIR) ? BOTTOM : present('R') ? FLOATING : SINKING);
+		(field & FL_DIR) ? BOTTOM : present('R') ? FLOATING : SINKING,
+		0);
 	return ex;
 }
