@@ -21,8 +21,8 @@ as e.g. 'env MAILRC=/dev/null from=user@host nail -n' does.
 Nail has been built successfully in the following environments using
 the current configuration system:
 
-Linux           Kernel 2.2 and above; libc4, glibc 2.2 and above, diet libc;
-                gcc, Intel C
+Linux           Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
+                diet libc, uClibc; gcc, Intel C
 Solaris         2.6 and above; Sun C, gcc
 Open UNIX       8.0.0
 FreeBSD         4.9-RELEASE, 5.2.1-RELEASE
@@ -96,4 +96,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           9/22/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           10/25/04

@@ -20,6 +20,9 @@
   'unflag', and 'unkill' command now make their argument the current
   message. This is now also done by the 'score' command unless the new
   score of the message is negative.
+* Very old versions of OpenSSL are now detected by the configuration script.
+  OpenSSL code will not be included if the version is too old (Bugreport by
+  Thomas Voegtle).
 
 [11.12] released 10/21/04
 * Blank characters between MIME encoded words in header fields are now
