@@ -19,7 +19,7 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)intro.1.in	1.18 (gritter) 1/22/05
+.\" Sccsid @(#)intro.1.in	1.19 (gritter) 1/22/05
 .TH INTRO 1 "1/22/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 intro \- introduction to commands
@@ -183,12 +183,12 @@ display width computations etc.
 Multibyte character support
 was designed with special regard to the UTF-8 encoding.
 Additional supported encodings are
-EUC-JP, EUC-KR, Big5, Big5-HKSCS, and GBK.
+EUC-JP, EUC-KR, Big5, Big5-HKSCS, GB\ 2312, and GBK.
 Other encodings may also work,
 with the following restrictions:
 .IP \(en 2
 The character set must be a superset of ASCII
-(more specifically, of the International Reference Version of ISO 646).
+(more specifically, of the International Reference Version of ISO\ 646).
 All ASCII characters must be encoded
 as a single byte with the same value as the ASCII character.
 This excludes 7-bit encodings like UTF-7.
@@ -204,7 +204,7 @@ This excludes encodings whose sequences start
 with ASCII characters like TCVN 5712.
 .IP \(en 2
 Locking-shift encodings,
-like those that use ISO 2022 escape sequences,
+like those that use ISO\ 2022 escape sequences,
 are not supported.
 .PP
 Character comparison,
