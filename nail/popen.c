@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)popen.c	2.18 (gritter) 10/31/04";
+static char sccsid[] = "@(#)popen.c	2.19 (gritter) 12/26/04";
 #endif
 #endif /* not lint */
 
@@ -530,7 +530,7 @@ prepare_child(sigset_t *nset, int infd, int outfd)
 	if (outfd >= 0)
 		dup2(outfd, 1);
 	if (nset) {
-		for (i = 1; i <= NSIG; i++)
+		for (i = 1; i < NSIG; i++)
 			if (sigismember(nset, i))
 				safe_signal(i, SIG_IGN);
 		if (!sigismember(nset, SIGINT))

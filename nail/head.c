@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.13 (gritter) 10/21/04";
+static char sccsid[] = "@(#)head.c	2.14 (gritter) 12/25/04";
 #endif
 #endif /* not lint */
 
@@ -737,7 +737,7 @@ brk:	if (cstart == NULL) {
 			 * useful purpose when displaying, so they
 			 * are removed.
 			 */
-			return makeprint0(skin(name));
+			return prstr(skin(name));
 		return mime_fromaddr(name);
 	}
 	rp = rname = ac_alloc(cend - cstart + 1);
@@ -795,7 +795,7 @@ brk:	if (cstart == NULL) {
 		else
 			good++;
 	if (good*3 < nogood)
-		return makeprint0(skin(name));
+		return prstr(skin(name));
 	return rname;
 }
 

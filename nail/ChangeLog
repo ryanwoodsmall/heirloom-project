@@ -1,4 +1,13 @@
 [11.19] released ...
+* A 'chained-junk-tokens' variable was introduced for the Bayesian junk
+  mail filter. If set, the filter considers two-word tokens as described
+  in Jonathan A. Zdziarski's paper 'Advanced Language Classification using
+  Chained Tokens', <http://www.nuclearelephant.com/papers/chained.html>.
+* When running in an UTF-8 locale, unprintable characters are now replaced
+  by Unicode control pictures or the Unicode replacement character when
+  printing to a terminal.
+* The 'show' command now also avoids writing unprintable characters to a
+  terminal.
 * Only MIME-encode words in header fields if they start with '=?' or end
   with '?=' (instead of encoding any words containing '?', '=', or '_'),
   and declare them as 'us-ascii' if they do not contain any bytes with the

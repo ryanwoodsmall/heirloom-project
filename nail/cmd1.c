@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.88 (gritter) 12/3/04";
+static char sccsid[] = "@(#)cmd1.c	2.90 (gritter) 12/25/04";
 #endif
 #endif /* not lint */
 
@@ -411,7 +411,7 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 		if ((name = hfield("newsgroups", mp)) == NULL)
 			if ((name = hfield("article-id", mp)) == NULL)
 				name = "<>";
-		name = makeprint0(name);
+		name = prstr(name);
 	} else if (value("show-rcpt") == NULL) {
 		name = name1(mp, 0);
 		isaddr = 1;
@@ -434,7 +434,7 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 		if (value("showname"))
 			name = realname(name);
 		else {
-			name = makeprint0(skin(name));
+			name = prstr(skin(name));
 		}
 	}
 	for (fp = fmt; *fp; fp++) {
@@ -567,7 +567,6 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 					n -= 2;
 				if (subjline != NULL && n >= 0) {
 					/* pretty pathetic */
-					makeprint(subjline, n);
 					fprintf(f, B ? "\"%s\"" : "%s",
 						colalign(subjline, n, 0));
 				}
@@ -749,8 +748,8 @@ type1(int *msgvec, int doign, int page, int pipe, int decode,
 			fprintf(obuf, catgets(catd, CATSET, 17,
 				"Message %2d:\n"), *ip);
 		send(mp, obuf, doign ? ignore : 0, NULL,
-			decode || pipe && value("piperaw") ?
-				SEND_MBOX :
+			pipe && value("piperaw") ? SEND_MBOX :
+				decode ? SEND_SHOW :
 				doign ? SEND_TODISP : SEND_TODISP_ALL,
 			mstats);
 		if (pipe && value("page")) {

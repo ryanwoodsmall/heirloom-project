@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.77 (gritter) 12/3/04";
+static char sccsid[] = "@(#)aux.c	2.80 (gritter) 12/26/04";
 #endif
 #endif /* not lint */
 
@@ -61,6 +61,7 @@ static char sccsid[] = "@(#)aux.c	2.77 (gritter) 12/3/04";
 #include <time.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <limits.h>
 
 #include "md5.h"
 
@@ -1043,6 +1044,119 @@ cwrelse(struct cw *cw)
 {
 }
 #endif	/* !HAVE_FCHDIR */
+
+void
+makeprint(struct str *in, struct str *out)
+{
+	static int	print_all_chars = -1;
+	char	*inp, *outp;
+	size_t	msz, dist;
+
+	out->s = smalloc(msz = in->l + 1);
+	if (print_all_chars == -1)
+		print_all_chars = value("print-all-chars") != NULL;
+	if (print_all_chars) {
+		memcpy(out->s, in->s, in->l);
+		out->l = in->l;
+		out->s[out->l] = '\0';
+		return;
+	}
+	inp = in->s;
+	outp = out->s;
+#if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
+	if (mb_cur_max > 1) {
+		static int	utf8 = -1;
+		wchar_t	wc;
+		char	mb[MB_LEN_MAX+1];
+		int	i, n;
+		if (utf8 == -1) {
+			if (mbtowc(&wc, "\303\266", 2) == 2 && wc == 0xF6 &&
+					mbtowc(&wc, "\342\202\254", 3) == 3 &&
+					wc == 0x20AC)
+				utf8 = 1;
+			else
+				utf8 = 0;
+		}
+		out->l = 0;
+		while (inp < &in->s[in->l]) {
+			if (*inp & 0200)
+				n = mbtowc(&wc, inp, &in->s[in->l] - inp);
+			else {
+				wc = *inp;
+				n = 1;
+			}
+			if (n < 0) {
+				mbtowc(&wc, NULL, mb_cur_max);
+				wc = utf8 ? 0xFFFD : '?';
+				n = 1;
+			} else if (n == 0)
+				n = 1;
+			inp += n;
+			if (!iswprint(wc) && wc != '\n' && wc != '\r' &&
+					wc != '\b' && wc != '\t') {
+				if ((wc & ~(wchar_t)037) == 0)
+					wc = utf8 ? 0x2400 | wc : '?';
+				else if (wc == 0177)
+					wc = utf8 ? 0x2421 : '?';
+				else
+					wc = utf8 ? 0x2426 : '?';
+			}
+			if ((n = wctomb(mb, wc)) <= 0)
+				continue;
+			out->l += n;
+			if (out->l >= msz - 1) {
+				dist = outp - out->s;
+				out->s = srealloc(out->s, msz += 32);
+				outp = &out->s[dist];
+			}
+			for (i = 0; i < n; i++)
+				*outp++ = mb[i];
+		}
+	} else
+#endif	/* HAVE_MBTOWC && HAVE_WCTYPE_H */
+	{
+		int	c;
+		while (inp < &in->s[in->l]) {
+			c = *inp++ & 0377;
+			if (!isprint(c) && c != '\n' && c != '\r' &&
+					c != '\b' && c != '\t')
+				c = '?';
+			*outp++ = c;
+		}
+		out->l = in->l;
+	}
+	out->s[out->l] = '\0';
+}
+
+char *
+prstr(const char *s)
+{
+	struct str	in, out;
+	char	*rp;
+
+	in.s = (char *)s;
+	in.l = strlen(s);
+	makeprint(&in, &out);
+	rp = salloc(out.l + 1);
+	memcpy(rp, out.s, out.l);
+	rp[out.l] = '\0';
+	free(out.s);
+	return rp;
+}
+
+int
+prout(const char *s, size_t sz, FILE *fp)
+{
+	struct str	in, out;
+	int	n;
+
+	in.s = (char *)s;
+	in.l = sz;
+	makeprint(&in, &out);
+	n = fwrite(out.s, 1, out.l, fp);
+	free(out.s);
+	return n;
+}
 
 /*
  * Locale-independent character class functions.

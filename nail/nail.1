@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.285 (gritter) 12/23/04
+.\"     Sccsid: @(#)nail.1	2.286 (gritter) 12/27/04
 .\"
-.TH NAIL 1 "12/23/04" "nail 11.19" "User Commands"
+.TH NAIL 1 "12/27/04" "nail 11.19" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -2204,6 +2204,16 @@ Changes the output format of the
 .I set
 command to traditional BSD style.
 .TP
+.B chained-junk-tokens
+Normally, the Bayesian junk mail filter bases its classifications
+on single word tokens extracted from messages.
+If this option is set,
+adjacent words are combined to pairs,
+which are then used as additional tokens.
+This usually improves the accuracy of the filter,
+but also increases the junk mail database
+five- to tenfold.
+.TP
 .B datefield
 The date in a header summary
 is normally the date of the mailbox `From\ ' line of the message.
@@ -4145,6 +4155,13 @@ but hashed representations of them.
 A foreign person who can read the database
 could only examine the frequency of previously known words
 in your mail.
+.PP
+If you have sufficient disk space (several 10\ MB) available,
+it is recommended that you set the
+.I chained-junk-tokens
+option.
+The filter will then also consider two-word tokens,
+improving its accuracy.
 .PP
 A set of good messages and junk messages must now be available;
 it is also possible to use the incoming new messages for this purpose,

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.92 (gritter) 12/23/04
+ *	Sccsid @(#)def.h	2.93 (gritter) 12/25/04
  */
 
 /*
@@ -109,6 +109,7 @@ enum sendaction {
 	SEND_MBOX,			/* no conversion to perform */
 	SEND_TODISP,			/* convert to displayable form */
 	SEND_TODISP_ALL,		/* same, include all MIME parts */
+	SEND_SHOW,			/* convert to 'show' command form */
 	SEND_TOSRCH,			/* convert for IMAP SEARCH */
 	SEND_TOFLTR,			/* convert for junk mail filtering */
 	SEND_TOFILE,			/* convert for saving body to a file */

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.41 (gritter) 12/8/04";
+static char sccsid[] = "@(#)collect.c	2.42 (gritter) 12/25/04";
 #endif
 #endif /* not lint */
 
@@ -190,10 +190,8 @@ print_collf(FILE *collf, struct header *hp)
 	if (value("fullnames"))
 		gf |= GCOMMA;
 	puthead(hp, obuf, gf, SEND_TODISP, CONV_NONE, NULL, NULL);
-	while (fgetline(&lbuf, &linesize, &count, &linelen, collf, 1)) {
-		makeprint(lbuf, linelen);
-		fwrite(lbuf, sizeof *lbuf, linelen, obuf);
-	}
+	while (fgetline(&lbuf, &linesize, &count, &linelen, collf, 1))
+		prout(lbuf, linelen, obuf);
 	if (hp->h_attach != NULL) {
 		fputs(catgets(catd, CATSET, 63, "Attachments:"), obuf);
 		for (ap = hp->h_attach; ap != NULL; ap = ap->a_flink)

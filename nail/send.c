@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.76 (gritter) 12/9/04";
+static char sccsid[] = "@(#)send.c	2.78 (gritter) 12/26/04";
 #endif
 #endif /* not lint */
 
@@ -168,7 +168,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 	if (sz)
 		addstats(stats, 1, sz);
 	pf = 0;
-	if (action != SEND_MBOX)
+	if (action != SEND_MBOX && action != SEND_SHOW)
 		pf |= PARSE_DECRYPT|PARSE_PARTS;
 	if ((ip = parsemsg(mp, pf)) == NULL)
 		return -1;
@@ -204,7 +204,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	(void)&stats;
 	(void)&action;
 	if (ip->m_mimecontent == MIME_PKCS7 && ip->m_multipart &&
-			action != SEND_MBOX)
+			action != SEND_MBOX && action != SEND_SHOW)
 		goto skip;
 	dostat = 0;
 	if (level == 0) {
@@ -391,6 +391,7 @@ skip:	switch (ip->m_mimecontent) {
 			put_from_(obuf, ip->m_multipart);
 			/*FALLTHRU*/
 		case SEND_MBOX:
+		case SEND_SHOW:
 			break;
 		}
 		break;
@@ -416,7 +417,8 @@ skip:	switch (ip->m_mimecontent) {
 			return rt;
 		break;
 	case MIME_PKCS7:
-		if (action != SEND_MBOX && ip->m_multipart)
+		if (action != SEND_MBOX && action != SEND_SHOW &&
+				ip->m_multipart)
 			goto multi;
 		/*FALLTHRU*/
 	default:
@@ -442,6 +444,7 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_TOSRCH:
 		case SEND_DECRYPT:
 		case SEND_MBOX:
+		case SEND_SHOW:
 			break;
 		}
 		break;
@@ -514,6 +517,7 @@ skip:	switch (ip->m_mimecontent) {
 					putc('\0', obuf);
 					/*FALLTHRU*/
 				case SEND_MBOX:
+				case SEND_SHOW:
 				case SEND_TOSRCH:
 				case SEND_QUOTE:
 				case SEND_DECRYPT:
@@ -537,6 +541,7 @@ skip:	switch (ip->m_mimecontent) {
 			}
 			return rt;
 		case SEND_MBOX:
+		case SEND_SHOW:
 			break;
 		}
 	}
@@ -571,7 +576,8 @@ skip:	switch (ip->m_mimecontent) {
 	default:
 		convert = CONV_NONE;
 	}
-	if (action == SEND_DECRYPT || action == SEND_MBOX)
+	if (action == SEND_DECRYPT || action == SEND_MBOX ||
+			action == SEND_SHOW)
 		convert = CONV_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
@@ -603,7 +609,8 @@ skip:	switch (ip->m_mimecontent) {
 		pbuf = qbuf = obuf;
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
 		lineno++;
-		while (convert == CONV_FROMQP && line[linelen-2] == '=') {
+		while (convert == CONV_FROMQP && linelen >= 2 &&
+				line[linelen-2] == '=') {
 			char	*line2 = NULL;
 			size_t	linesize2 = 0, linelen2;
 			if (foldergets(&line2, &linesize2, &count, &linelen2,
@@ -909,7 +916,7 @@ out(char *buf, size_t len, FILE *fp,
 		}
 	}
 	sz += mime_write(buf, 1, len, fp,
-			action == SEND_MBOX ? SEND_MBOX: convert,
+			action == SEND_MBOX ? SEND_MBOX : convert,
 			action == SEND_TODISP || action == SEND_TODISP_ALL ||
 					action == SEND_QUOTE ||
 					action == SEND_QUOTE_ALL ?
@@ -917,7 +924,9 @@ out(char *buf, size_t len, FILE *fp,
 				action == SEND_TOSRCH ?
 					TD_ICONV :
 				action == SEND_TOFLTR ?
-					TD_DELCTRL : TD_NONE,
+					TD_DELCTRL :
+				action == SEND_SHOW ?
+					TD_ISPR : TD_NONE,
 			prefix, prefixlen);
 	lines = 0;
 	if (stats && stats[0] != -1) {

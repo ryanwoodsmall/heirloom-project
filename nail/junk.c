@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.66 (gritter) 12/23/04";
+static char sccsid[] = "@(#)junk.c	1.68 (gritter) 12/27/04";
 #endif
 #endif /* not lint */
 
@@ -119,6 +119,7 @@ static char	*super;
 static size_t	super_mmapped;
 static size_t	nodes_mmapped;
 static int	rw_map;
+static int	chained_tokens;
 
 /*
  * Version history
@@ -227,7 +228,8 @@ static FILE *dbfp(enum db db, int rw, int *compressed, char **fn);
 static char *lookup(unsigned long h1, unsigned long h2, int create);
 static unsigned long grow(unsigned long size);
 static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
-		struct lexstat *sp);
+		struct lexstat *sp, int *stop);
+static void join(char **buf, size_t *bufsize, const char *s1, const char *s2);
 static void add(const char *word, enum entry entry, struct lexstat *sp,
 		int incr);
 static enum okay scan(struct message *m, enum entry entry,
@@ -249,6 +251,7 @@ getdb(int rw)
 	long	n;
 	int	compressed;
 
+	chained_tokens = value("chained-junk-tokens") != NULL;
 	if ((sfp = dbfp(SUPER, rw, &compressed, &sname)) == (FILE *)-1)
 		return STOP;
 	if (sfp && !compressed) {
@@ -555,11 +558,12 @@ grow(unsigned long size)
 
 static char *
 nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
-		struct lexstat *sp)
+		struct lexstat *sp, int *stop)
 {
 	int	c, i, j, k;
 	char	*cp, *cq;
 
+	*stop = 0;
 loop:	sp->hadamp = 0;
 	if (sp->save) {
 		i = j = 0;
@@ -600,6 +604,7 @@ loop:	sp->hadamp = 0;
 		if (c == '\0' && table_version >= 1) {
 			sp->loc = HEADER;
 			sp->lastc = '\n';
+			*stop = 1;
 			continue;
 		}
 		if (c == '\b' && table_version >= 1) {
@@ -660,11 +665,13 @@ loop:	sp->hadamp = 0;
 				sp->field[k++] = '*';
 				sp->field[k] = '\0';
 				j = 0;
+				*stop = 1;
 				goto field;
 			} else if (c == '\n') {
 				j = 0;
 				sp->loc = BODY;
 				sp->html = HTML_NONE;
+				*stop = 1;
 			}
 		}
 		if (sp->url) {
@@ -680,6 +687,7 @@ loop:	sp->hadamp = 0;
 						 *cq == '.' || *cq == '-'))
 					*cp++ = *cq++;
 				*cp = '\0';
+				*stop = 1;
 				break;
 			}
 			SAVE(c)
@@ -771,6 +779,25 @@ out:	if (i > 0) {
 	return NULL;
 }
 
+#define	JOINCHECK	if (i >= *bufsize) \
+				*buf = srealloc(*buf, *bufsize += 32)
+static void
+join(char **buf, size_t *bufsize, const char *s1, const char *s2)
+{
+	int	i = 0;
+
+	while (*s1) {
+		JOINCHECK;
+		(*buf)[i++] = *s1++;
+	}
+	JOINCHECK;
+	(*buf)[i++] = ' ';
+	do {
+		JOINCHECK;
+		(*buf)[i++] = *s2;
+	} while (*s2++);
+}
+
 /*ARGSUSED3*/
 static void
 add(const char *word, enum entry entry, struct lexstat *sp, int incr)
@@ -806,9 +833,10 @@ scan(struct message *m, enum entry entry,
 		int arg)
 {
 	FILE	*fp;
-	char	*buf = NULL, *cp;
-	size_t	bufsize = 0, count;
+	char	*buf0 = NULL, *buf1 = NULL, *buf2 = NULL, **bp, *cp;
+	size_t	bufsize0 = 0, bufsize1 = 0, bufsize2 = 0, *zp, count;
 	struct lexstat	*sp;
+	int	stop;
 
 	if ((fp = Ftemp(&cp, "Ra", "w+", 0600, 1)) == NULL) {
 		perror("tempfile");
@@ -824,9 +852,20 @@ scan(struct message *m, enum entry entry,
 	rewind(fp);
 	sp = scalloc(1, sizeof *sp);
 	count = fsize(fp);
-	while (nextword(&buf, &bufsize, &count, fp, sp) != NULL)
-		(*func)(buf, entry, sp, arg);
-	free(buf);
+	bp = &buf0;
+	zp = &bufsize0;
+	while (nextword(bp, zp, &count, fp, sp, &stop) != NULL) {
+		(*func)(*bp, entry, sp, arg);
+		if (chained_tokens && buf0 && *buf0 && buf1 && *buf1 && !stop) {
+			join(&buf2, &bufsize2, bp == &buf1 ? buf0 : buf1, *bp);
+			(*func)(buf2, entry, sp, arg);
+		}
+		bp = bp == &buf1 ? &buf0 : &buf1;
+		zp = zp == &bufsize1 ? &bufsize0 : &bufsize1;
+	}
+	free(buf0);
+	free(buf1);
+	free(buf2);
 	free(sp);
 	Fclose(fp);
 	return OKAY;
@@ -1137,7 +1176,7 @@ cprobability(void *v)
 	used = getn(&super[OF_super_used]);
 	ngood = getn(&super[OF_super_ngood]);
 	nbad = getn(&super[OF_super_nbad]);
-	printf("Database statistics: words=%lu ngood=%lu nbad=%lu\n",
+	printf("Database statistics: tokens=%lu ngood=%lu nbad=%lu\n",
 			used, ngood, nbad);
 	do {
 		dbhash(*args, &h1, &h2);

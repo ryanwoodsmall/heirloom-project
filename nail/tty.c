@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.22 (gritter) 10/13/04";
+static char sccsid[] = "@(#)tty.c	2.23 (gritter) 12/25/04";
 #endif
 #endif /* not lint */
 
@@ -341,7 +341,7 @@ readtty(char *prefix, char *string)
 {
 	char *ret = NULL;
 	struct termios ttybuf;
-	sighandler_type saveint;
+	sighandler_type saveint = SIG_DFL;
 #ifndef TIOCSTI
 	sighandler_type savequit;
 #endif
