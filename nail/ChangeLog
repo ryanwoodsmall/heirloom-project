@@ -3,7 +3,7 @@
   only to header groups that contain at least one new or flagged message. This
   is useful for reading large mailing lists.
 * The attachment decoding functions have been rewritten. As a result, nail is
-  now able to decrypt encrypted parts of multipart messages.
+  now able to display encrypted parts of multipart messages.
 * In version 11.12, fcntl() read locking was erroneusly introduced for files
   other than system mailboxes too. It is now disabled for such files again.
 
