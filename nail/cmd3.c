@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.69 (gritter) 10/2/04";
+static char sccsid[] = "@(#)cmd3.c	2.70 (gritter) 10/23/04";
 #endif
 #endif /* not lint */
 
@@ -1249,6 +1249,7 @@ cflag(void *v)
 
 	for (ip = msgvec; *ip != 0; ip++) {
 		m = &message[*ip-1];
+		setdot(m);
 		if ((m->m_flag & (MFLAG|MFLAGGED)) == 0)
 			m->m_flag |= MFLAG|MFLAGGED;
 	}
@@ -1264,6 +1265,7 @@ cunflag(void *v)
 
 	for (ip = msgvec; *ip != 0; ip++) {
 		m = &message[*ip-1];
+		setdot(m);
 		if (m->m_flag & (MFLAG|MFLAGGED)) {
 			m->m_flag &= ~(MFLAG|MFLAGGED);
 			m->m_flag |= MUNFLAG;
@@ -1281,6 +1283,7 @@ canswered(void *v)
 
 	for (ip = msgvec; *ip != 0; ip++) {
 		m = &message[*ip-1];
+		setdot(m);
 		if ((m->m_flag & (MANSWER|MANSWERED)) == 0)
 			m->m_flag |= MANSWER|MANSWERED;
 	}
@@ -1296,6 +1299,7 @@ cunanswered(void *v)
 
 	for (ip = msgvec; *ip != 0; ip++) {
 		m = &message[*ip-1];
+		setdot(m);
 		if (m->m_flag & (MANSWER|MANSWERED)) {
 			m->m_flag &= ~(MANSWER|MANSWERED);
 			m->m_flag |= MUNANSWER;
@@ -1313,6 +1317,7 @@ cdraft(void *v)
 
 	for (ip = msgvec; *ip != 0; ip++) {
 		m = &message[*ip-1];
+		setdot(m);
 		if ((m->m_flag & (MDRAFT|MDRAFTED)) == 0)
 			m->m_flag |= MDRAFT|MDRAFTED;
 	}
@@ -1328,6 +1333,7 @@ cundraft(void *v)
 
 	for (ip = msgvec; *ip != 0; ip++) {
 		m = &message[*ip-1];
+		setdot(m);
 		if (m->m_flag & (MDRAFT|MDRAFTED)) {
 			m->m_flag &= ~(MDRAFT|MDRAFTED);
 			m->m_flag |= MUNDRAFT;
@@ -1431,6 +1437,8 @@ cscore(void *v)
 				m->m_flag |= MKILL;
 			else if (m->m_score > 0)
 				m->m_flag &= ~MKILL;
+			if (m->m_score >= 0)
+				setdot(m);
 		}
 	}
 	return 0;

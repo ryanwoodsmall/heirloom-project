@@ -1,4 +1,15 @@
-[11.12] released ...
+[11.13] released ...
+* For junk mail detection, the characters '_', '#', '&', and '%' are now
+  considered as word constituents. Also the '/' character is kept if it
+  occurs between digits, and the ';' character if a '&' was previously
+  encountered within the same word. To take advantage of these changes,
+  you have to delete your junk mail database and have to create it again.
+* The 'answered', 'classify, 'draft', 'flag', 'good', 'junk', 'undraft',
+  'unflag', and 'unkill' command now make their argument the current
+  message. This is now also done by the 'score' command unless the new
+  score of the message is negative.
+
+[11.12] released 10/21/04
 * Blank characters between MIME encoded words in header fields are now
   discarded for display purposes as demanded by RFC 2047.
 * Unless the 'fullnames' variable was set, nail did not generate 'To' header

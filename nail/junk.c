@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.39 (gritter) 10/15/04";
+static char sccsid[] = "@(#)junk.c	1.41 (gritter) 10/23/04";
 #endif
 #endif /* not lint */
 
@@ -142,6 +142,7 @@ struct lexstat {
 	int	price;
 	int	url;
 	int	lastc;
+	int	hadamp;
 	enum loc {
 		FROM_LINE	= 0,
 		HEADER		= 1,
@@ -150,11 +151,13 @@ struct lexstat {
 	char	field[LINESIZE];
 };
 
-#define	constituent(c, b, i, price) \
+#define	constituent(c, b, i, price, hadamp) \
 	((c) & 0200 || alnumchar(c) || (c) == '\'' || (c) == '"' || \
-		(c) == '$' || (c) == '!' || \
+		(c) == '$' || (c) == '!' || (c) == '_' || \
+		(c) == '#' || (c) == '%' || (c) == '&' || \
+		((c) == ';' && hadamp) || \
 		((c) == '-' && !(price)) || \
-		(((c) == '.' || (c) == ',') && \
+		(((c) == '.' || (c) == ',' || (c) == '/') && \
 		 (i) > 0 && digitchar((b)[(i)-1]&0377)))
 
 #define	url_xchar(c) \
@@ -419,6 +422,7 @@ nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 	int	c, i, j, k;
 	char	*cp, *cq;
 
+	sp->hadamp = 0;
 	if (sp->save) {
 		i = j = 0;
 		for (cp = sp->save; *cp; cp++) {
@@ -497,9 +501,11 @@ loop:	i = 0;
 				break;
 			}
 			SAVE(c)
-		} else if (constituent(c, *buf, i+j, sp->price) ||
+		} else if (constituent(c, *buf, i+j, sp->price, sp->hadamp) ||
 				sp->loc == HEADER && c == '.' &&
 				asccasecmp(sp->field, "subject*")) {
+			if (c == '&')
+				sp->hadamp = 1;
 			SAVE(c)
 		} else if (i > 0 && c == ':' && *count > 2) {
 			if ((c = getc(fp)) != '/') {
@@ -696,6 +702,7 @@ insert(int *msgvec, enum entry entry)
 		break;
 	}
 	for (ip = msgvec; *ip; ip++) {
+		setdot(&message[*ip-1]);
 		if (u == MAX4) {
 			fprintf(stderr, "Junk mail database overflow.\n");
 			break;
@@ -742,8 +749,10 @@ cclassify(void *v)
 	verbose = value("verbose") != NULL;
 	if (getdb() != OKAY)
 		return 1;
-	for (ip = msgvec; *ip; ip++)
+	for (ip = msgvec; *ip; ip++) {
+		setdot(&message[*ip-1]);
 		clsf(&message[*ip-1]);
+	}
 	free(super);
 	free(nodes);
 	return 0;
