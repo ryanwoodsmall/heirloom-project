@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap_search.c	1.23 (gritter) 10/2/04";
+static char sccsid[] = "@(#)imap_search.c	1.24 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -695,7 +695,7 @@ matchmsg(struct message *m, const char *what, int withheader)
 		return 0;
 	rm(tempFile);
 	Ftfree(&tempFile);
-	if (send_message(m, fp, NULL, NULL, CONV_TOSRCH, NULL) < 0)
+	if (send(m, fp, NULL, NULL, CONV_TOSRCH, NULL) < 0)
 		goto out;
 	fflush(fp);
 	rewind(fp);

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.135 (gritter) 10/30/04
+ *	Sccsid @(#)extern.h	2.136 (gritter) 10/30/04
  */
 
 /* aux.c */
@@ -430,7 +430,8 @@ enum okay makembox(void);
 /* send.c */
 char *foldergets(char **s, size_t *size, size_t *count, size_t *llen,
 		FILE *stream);
-int send_message(struct message *mp, FILE *obuf, struct ignoretab *doign,
+#define	send(a, b, c, d, e, f)	xsend(a, b, c, d, e, f)
+int send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 		char *prefix, enum conversion action, off_t *stats);
 /* sendout.c */
 char *makeboundary(void);

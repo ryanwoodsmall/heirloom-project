@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.17 (gritter) 10/9/04";
+static char sccsid[] = "@(#)openssl.c	1.18 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -65,7 +65,6 @@ static sigjmp_buf	ssljmp;
 #include <openssl/rand.h>
 
 #include "rcv.h"
-#include "extern.h"
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -79,6 +78,8 @@ static sigjmp_buf	ssljmp;
 #endif	/* HAVE_ARPA_INET_H */
 
 #include <dirent.h>
+
+#include "extern.h"
 
 /*
  * Mail -- a mail program

@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.31 (gritter) 10/13/04";
+static char sccsid[] = "@(#)nss.c	1.32 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -42,7 +42,6 @@ static char sccsid[] = "@(#)nss.c	1.31 (gritter) 10/13/04";
 #ifdef	USE_NSS
 
 #include "rcv.h"
-#include "extern.h"
 
 #include <setjmp.h>
 #include <termios.h>
@@ -65,6 +64,8 @@ static sigjmp_buf	nssjmp;
 #include <smime.h>
 #include <ciferfam.h>
 #include <private/pprio.h>
+
+#include "extern.h"
 
 static char *password_cb(PK11SlotInfo *slot, PRBool retry, void *arg);
 static SECStatus bad_cert_cb(void *arg, PRFileDesc *fd);
@@ -922,11 +923,9 @@ loop:	if ((ct = hfield("content-type", m)) == NULL)
 					password_cb, "Pass phrase:",
 					NULL, NULL)) == NULL) {
 		fprintf(stderr, "Cannot start decoder.\n");
-		free(boundary);
 		return NULL;
 	}
 	if ((fp = setinput(&mb, m, NEED_BODY)) == NULL) {
-		free(boundary);
 		return NULL;
 	}
 	count = m->m_size;
@@ -943,7 +942,6 @@ loop:	if ((ct = hfield("content-type", m)) == NULL)
 				if (part >= 3) {
 					fprintf(stderr, "Message %d has too "
 							"many parts.\n", n);
-					free(boundary);
 					free(buf);
 					return NULL;
 				}
@@ -974,7 +972,6 @@ loop:	if ((ct = hfield("content-type", m)) == NULL)
 			binary = 1;
 	}
 	free(buf);
-	free(boundary);
 	if ((*msg = NSS_CMSDecoder_Finish(decctx)) == NULL) {
 		fprintf(stderr, "Failed to decode signature for message %d.\n",
 				n);
@@ -1009,11 +1006,9 @@ getdig(struct message *m, int n, SECItem ***digests,
 	boundlen = strlen(boundary);
 	if ((digctx = NSS_CMSDigestContext_StartMultiple(algids)) == NULL) {
 		fprintf(stderr, "Cannot start digest computation.\n");
-		free(boundary);
 		return STOP;
 	}
 	if ((fp = setinput(&mb, m, NEED_BODY)) == NULL) {
-		free(boundary);
 		return STOP;
 	}
 	count = m->m_size;
@@ -1047,7 +1042,6 @@ getdig(struct message *m, int n, SECItem ***digests,
 		}
 	}
 	free(buf);
-	free(boundary);
 	if (NSS_CMSDigestContext_FinishMultiple(digctx,
 				*poolp, digests) != SECSuccess) {
 		fprintf(stderr, "Error creating digest for message %d\n", n);

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.31 (gritter) 10/2/04";
+static char sccsid[] = "@(#)collect.c	2.32 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -549,8 +549,8 @@ collect(struct header *hp, int printheaders, struct message *mp,
 		cp = value("indentprefix");
 		if (cp != NULL && *cp == '\0')
 			cp = "\t";
-		send_message(mp, collf, quoteig, cp, CONV_QUOTE, NULL);
-		send_message(mp, stdout, quoteig, cp, CONV_QUOTE, NULL);
+		send(mp, collf, quoteig, cp, CONV_QUOTE, NULL);
+		send(mp, stdout, quoteig, cp, CONV_QUOTE, NULL);
 	}
 
 	if ((cp = value("escape")) != NULL)
@@ -1078,7 +1078,7 @@ forward(char *ms, FILE *fp, int f)
 
 		touch(mp);
 		printf(" %d", *msgvec);
-		if (send_message(mp, fp, ig, tabst, CONV_QUOTE, NULL) < 0) {
+		if (send(mp, fp, ig, tabst, CONV_QUOTE, NULL) < 0) {
 			perror(catgets(catd, CATSET, 70,
 					"temporary mail file"));
 			return(-1);

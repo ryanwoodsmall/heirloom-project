@@ -38,12 +38,11 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.29 (gritter) 10/2/04";
+static char sccsid[] = "@(#)smtp.c	2.30 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
 #include "rcv.h"
-#include "extern.h"
 
 #include <sys/utsname.h>
 #ifdef	HAVE_SOCKETS
@@ -56,6 +55,7 @@ static char sccsid[] = "@(#)smtp.c	2.29 (gritter) 10/2/04";
 #endif	/* HAVE_SOCKETS */
 #include <unistd.h>
 
+#include "extern.h"
 #include "md5.h"
 
 /*

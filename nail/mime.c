@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.38 (gritter) 10/24/04";
+static char sccsid[]  = "@(#)mime.c	2.39 (gritter) 10/30/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -590,18 +590,11 @@ is_this_enc(const char *line, const char *encoding)
 }
 
 /*
- * Get the mime encoding from a Content-Transfer-Encoding header line.
+ * Get the mime encoding from a Content-Transfer-Encoding header field.
  */
 enum mimeenc 
-mime_getenc(char *h)
+mime_getenc(char *p)
 {
-	char *p;
-
-	if ((p = strchr(h, ':')) == NULL)
-		return MIME_NONE;
-	p++;
-	while (*p && whitechar(*p & 0377))
-		p++;
 	if (is_this_enc(p, "7bit"))
 		return MIME_7B;
 	if (is_this_enc(p, "8bit"))
@@ -619,15 +612,10 @@ mime_getenc(char *h)
  * Get the mime content from a Content-Type header line.
  */
 int 
-mime_getcontent(char *h)
+mime_getcontent(char *s)
 {
-	char *p, *q, *r, *s;
+	char *p, *q, *r;
 
-	if ((s = strchr(h, ':')) == NULL)
-		return 1;
-	s++;
-	while (*s && whitechar(*s & 0377))
-		s++;
 	if (*s == '"')
 		s++;
 	r = salloc(strlen(s) + 1);
@@ -649,6 +637,9 @@ mime_getcontent(char *h)
 		return MIME_MESSAGE;
 	if (strncmp(r, "multipart/", 10) == 0)
 		return MIME_MULTI;
+	if (strncmp(r, "application/x-pkcs7-mime", 24) == 0 ||
+				strncmp(r, "application/pkcs7-mime", 22) == 0)
+		return MIME_PKCS7;
 	return MIME_UNKNOWN;
 }
 
@@ -731,7 +722,7 @@ mime_getboundary(char *h)
 	if ((p = mime_getparam("boundary", h)) == NULL)
 		return NULL;
 	sz = strlen(p);
-	q = smalloc(sz + 3);
+	q = salloc(sz + 3);
 	memcpy(q, "--", 2);
 	memcpy(q + 2, p, sz);
 	*(q + sz + 2) = '\0';

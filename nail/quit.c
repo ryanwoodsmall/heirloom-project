@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)quit.c	2.24 (gritter) 10/2/04";
+static char sccsid[] = "@(#)quit.c	2.25 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -98,7 +98,7 @@ writeback(FILE *res, FILE *obuf)
 	for (mp = &message[0]; mp < &message[msgCount]; mp++)
 		if ((mp->m_flag&MPRESERVE)||(mp->m_flag&MTOUCH)==0) {
 			p++;
-			if (send_message(mp, obuf, (struct ignoretab *)0,
+			if (send(mp, obuf, (struct ignoretab *)0,
 						NULL, CONV_NONE, NULL) < 0) {
 				perror(mailname);
 				fseek(obuf, 0L, SEEK_SET);
@@ -421,7 +421,7 @@ makembox(void)
 					imap_thisaccount(mbox)) {
 				if (imap_copy(mp, mp-message+1, mbox) == STOP)
 					goto err;
-			} else if (send_message(mp, obuf, saveignore,
+			} else if (send(mp, obuf, saveignore,
 						NULL, CONV_NONE, NULL) < 0) {
 				perror(mbox);
 			err:	if (ibuf)
@@ -553,7 +553,7 @@ edstop(void)
 		if ((mp->m_flag & MDELETED) != 0)
 			continue;
 		c++;
-		if (send_message(mp, obuf, (struct ignoretab *) NULL,
+		if (send(mp, obuf, (struct ignoretab *) NULL,
 					NULL, CONV_NONE, NULL) < 0) {
 			perror(mailname);
 			relsesigs();

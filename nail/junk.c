@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.54 (gritter) 10/25/04";
+static char sccsid[] = "@(#)junk.c	1.55 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -708,7 +708,7 @@ scan(struct message *m, enum entry entry,
 	}
 	rm(cp);
 	Ftfree(&cp);
-	if (send_message(m, fp, NULL, NULL, CONV_TOFLTR, NULL) < 0) {
+	if (send(m, fp, NULL, NULL, CONV_TOFLTR, NULL) < 0) {
 		Fclose(fp);
 		return STOP;
 	}

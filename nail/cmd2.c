@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.38 (gritter) 10/2/04";
+static char sccsid[] = "@(#)cmd2.c	2.39 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -373,7 +373,7 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 			}
 			mstats[0] = -1;
 			mstats[1] = mp->m_xsize;
-		} else if (send_message(mp, obuf, ignore, NULL,
+		} else if (send(mp, obuf, ignore, NULL,
 					convert, mstats) < 0) {
 			perror(file);
 			Fclose(obuf);
