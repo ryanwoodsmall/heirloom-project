@@ -1,7 +1,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, November 2002.
  *
- * Sccsid @(#)regexec.c	1.6 (gritter) 9/22/03
+ * Sccsid @(#)regexec.c	1.7 (gritter) 2/6/05
  */
 /*  UNIX(R) Regular Expresssion Library
  *
@@ -36,7 +36,7 @@ regexec(const regex_t *ep, const char *s, size_t n, regmatch_t *mp, int flg)
 	Exec ex;
 	int ret;
 
-	ex.flags = flg | (ep->re_flags & (REG_NEWLINE | REG_ICASE));
+	ex.flags = flg | (ep->re_flags & (REG_NEWLINE|REG_ICASE|REG_AVOIDNULL));
 	ex.str = (const unsigned char *)s;
 	ex.match = mp;
 	ex.mb_cur_max = ep->re_mb_cur_max;
