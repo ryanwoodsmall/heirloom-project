@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)intro.1.in	1.17 (gritter) 12/8/04
-.TH INTRO 1 "12/8/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)intro.1.in	1.18 (gritter) 1/22/05
+.TH INTRO 1 "1/22/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 intro \- introduction to commands
 .SH DESCRIPTION
@@ -164,11 +164,11 @@ Input lines of unlimited length are generally accepted
 (as long as enough memory is available);
 most utilities are also able to handle binary input data
 (i.\|e. ASCII NUL characters in the input stream).
-.SS "Multibyte character sets"
+.SS "Multibyte character encodings"
 The
 .I Heirloom Toolchest
-includes support for multibyte character sets;
-if the system's C library supports this
+includes support for multibyte character encodings;
+if the underlying C library supports this
 and the
 .I LC_CTYPE
 locale
@@ -182,24 +182,46 @@ display width computations etc.
 .PP
 Multibyte character support
 was designed with special regard to the UTF-8 encoding.
+Additional supported encodings are
+EUC-JP, EUC-KR, Big5, Big5-HKSCS, and GBK.
 Other encodings may also work,
 with the following restrictions:
 .IP \(en 2
-The first byte of each multibyte character
-must have the highest bit set,
-i.\|e. it must not be an ASCII character.
-.IP \(en 2
-All ASCII characters must be represented
+The character set must be a superset of ASCII
+(more specifically, of the International Reference Version of ISO 646).
+All ASCII characters must be encoded
 as a single byte with the same value as the ASCII character.
+This excludes 7-bit encodings like UTF-7.
 In addition,
 the C language implementation
 must map each ASCII character
 to a wide character with the same value.
 .IP \(en 2
-Locking-shift encodings are not supported.
+The first byte of each multibyte character
+must have the highest bit set,
+i.\|e. it must not be an ASCII character.
+This excludes encodings whose sequences start
+with ASCII characters like TCVN 5712.
+.IP \(en 2
+Locking-shift encodings,
+like those that use ISO 2022 escape sequences,
+are not supported.
+.PP
+Character comparison,
+regular expression matching
+and similar tasks are generally performed
+on the character representation obtained
+from the locale processing of the C library.
+A glyph formed by the application of combining characters
+to a base character
+will thus not normally be considered equal
+to the same glyph represented by a single base character.
+For string comparison,
+the results depend on the collation mechanism of the locale,
+which might or might not respect such relations.
 .PP
 Processing of multibyte character encodings
-is notably slower than that of singlebyte character encodings.
+is often notably slower than that of singlebyte character encodings.
 Since many widely-used languages
 (especially European ones based on Latin letters)
 contain few multibyte characters if encoded in UTF-8,
@@ -207,49 +229,44 @@ and since experience shows that large amounts of textual data
 tend to be machine generated and to contain mostly ASCII characters
 (e.\|g. log files),
 while international language texts
-are mostly created by humans and tend to be much smaller,
-processing of multibyte characters
+are mostly created by humans and tend to be smaller,
+processing of text in multibyte locales
 has generally been optimized
-for ASCII text, even in multibyte locales.
+for ASCII text.
+The performance penalty for using a multibyte locale
+is thus usually low
+if no or few multibyte characters actually occur in the data processed.
 .PP
 A problem with multibyte encodings
 that does not normally occur in singlebyte encodings
 is that of illegal byte sequences.
 In a singlebyte locale,
 each byte is treated as a character entity
-even if its value is not mapped to a character.
-For example, characters with the highest bit set
+even if its value is not defined in the coded character set.
+For example, bytes with their highest bit set
 are simply passed through in the default `C' or `POSIX' locale,
 and can appear in option arguments as well as in input data.
 In multibyte locales however,
 byte sequences that do not form a valid character
 cannot be handled this way,
-because it is not clear which bytes are to be grouped together.
-For example, suppose that the `\e200' character
-introduces a multibyte sequence
-but cannot appear as its second or following byte.
-If a sequence of four such characters `\e200\e200\e200\e200' is found
-in a string to be matched in the input processed by a utility,
-it is unclear whether it should match a sequence of six such characters.
+because it is not always clear which bytes are to be grouped together.
+As an example, suppose that the `\e200' byte introduces a multibyte sequence.
+If this byte occurs in a string to be matched by a utility
+but is not followed by a valid continuation byte,
+it is unclear if it should match
+any byte sequence containing this byte,
+including valid ones that form a character,
+or if matches should be restricted
+to occurences in other incomplete sequences.
 For this reason,
 this implementation generally treats illegal byte sequences
 in command line arguments or programming scripts
 as syntax errors.
-It does not issue a warning if such sequences
-appear in input data, however,
-since experience shows this to happen quite often,
-and a utility unable to process such input
-would be of little practical value.
-.PP
-As singlebyte character encodings
-are processed faster and less error-prone,
-it is recommended that such encodings are used
-wherever possible.
-While UTF-8 is a good encoding for data exchange,
-mixed-language texts or texts that contain special glyphs,
-most texts in European languages can be represented
-in a singlebyte encoding,
-e.\|g. one of the ISO-8859 family.
-Doing so for storage and processing on a Unix system
-and converting to UTF-8 for transfer only
-will be the best method in many cases.
+Utilities do not issue a warning or even terminate with an error
+if such sequences appear in input data, though,
+since this frequently occurs in practice
+when processing binary or foreign-locale files.
+In most cases, the sequences are passed to the output unaltered.
+That data is accepted or generated by a utility
+can thus not be taken as an indication
+for its validity in respect to the current character encoding.
