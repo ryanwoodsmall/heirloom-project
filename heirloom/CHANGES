@@ -1,4 +1,4 @@
-Release ...
+Release 050309
 * find: The -anewer and -cnewer primaries were introduced.
 * ps: The /usr/ucb version now uses eight columns for the USER field as the
   historic versions do (Bugreport by Matthew Fischer).

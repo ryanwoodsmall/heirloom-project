@@ -44,11 +44,11 @@ install:
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SU3BIN)/$$i $(ROOT); \
 	done
-	for i in cp csplit date egrep fgrep find grep id mkdir nawk pg; \
+	for i in csplit date egrep fgrep find grep id mkdir nawk pg; \
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
-	for i in basename chmod du file lc ln ls more mv nohup od page pax pr rm rmdir sort touch tr who; \
+	for i in basename chmod du file lc ls more nohup od page pax pr rm rmdir sort touch tr who; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done

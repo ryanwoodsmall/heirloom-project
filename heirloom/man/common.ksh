@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.32 (gritter) 2/5/05
+#	Sccsid common.ksh	1.33 (gritter) 2/15/05
 #
 
 #
@@ -277,7 +277,7 @@ trydir() {
 }
 
 #
-# Called when a signal is catched.
+# Called when a signal is caught.
 #
 cleanup() {
 	test -n "$texts" && rm -f $texts
