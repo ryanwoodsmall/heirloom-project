@@ -200,12 +200,12 @@ To build using NSS, you need both the NSS and the NSPR libraries/include
 files from the Mozilla project. If you are using a Linux distribution,
 chances are that you can install appropriate RPMs from your vendor, e.g.
 
-mozilla-nss-1.6
-mozilla-nss-devel-1.6
-mozilla-nspr-devel-1.6
-mozilla-nspr-1.6
+mozilla-nss-1.7.3
+mozilla-nss-devel-1.7.3
+mozilla-nspr-devel-1.7.3
+mozilla-nspr-1.7.3
 
-for Fedora Core Release 2. Note that you can install these without installing
+for Fedora Core Release 3. Note that you can install these without installing
 the RPM for the Mozilla main application. Thus it is no problem if you prefer
 to use a more recent Mozilla installation in /opt or so. NSS and NSPR are not
 updated as often as the Mozilla end-user applications in recent times (but you
@@ -237,4 +237,4 @@ simply assumes that you want to build NSS if it manages to build the test
 executable.
 
 
-        Gunnar Ritter                                   11/8/04
+        Gunnar Ritter                                   11/11/04

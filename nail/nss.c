@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.32 (gritter) 10/30/04";
+static char sccsid[] = "@(#)nss.c	1.33 (gritter) 11/11/04";
 #endif
 #endif /* not lint */
 
@@ -474,7 +474,7 @@ smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 	char	*cp;
 	struct str	in, out;
 	FILE	*yp;
-	long	size = m->m_size;
+	long	size;
 	int	i, nlevels;
 	int	binary = 0;
 
@@ -495,6 +495,7 @@ smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 		fprintf(stderr, "Cannot start decoder.\n");
 		return NULL;
 	}
+	size = m->m_size;
 	if ((smime_split(yp, &hp, &bp, size, 1)) == STOP)
 		return NULL;
 	count = fsize(bp);

@@ -36,7 +36,7 @@ UCBINSTALL	= /usr/ucb/install
 
 # If you want to include SSL support using Mozilla NSS instead of OpenSSL,
 # set something like the following paths. (You might also need to set LDFLAGS).
-#MOZINC		= /usr/include/mozilla-1.6
+#MOZINC		= /usr/include/mozilla-1.7.3
 #INCLUDES	= -I$(MOZINC)/nspr -I$(MOZINC)/nss
 # These paths are suitable to activate NSS support on Solaris, provided that
 # the packages SUNWmoznss, SUNWmoznss-devel, SUNWmoznspr, and SUNWmoznspr-devel
