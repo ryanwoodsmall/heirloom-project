@@ -32,6 +32,8 @@ Release ...
   longer exits but continues with the next file.
 * od: When reading from standard input with the -N option, the file pointer
   is now left after the last byte read.
+* xargs: The combination of the -n and -x options did not work properly.
+* xargs: Exit codes were aligned with POSIX.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

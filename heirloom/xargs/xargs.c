@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)xargs.sl	1.12 (gritter) 10/13/04";
+static const char sccsid[] USED = "@(#)xargs.sl	1.13 (gritter) 2/1/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -360,17 +360,17 @@ run(const char **args)
 		/*NOTREACHED*/
 	case 0:
 		execvp(args[0], (char **)args);
-		_exit(255);
+		_exit(errno == ENOENT ? 127 : 126);
 	default:
 		while (wait(&status) != pid);
 		if (status && ((WIFEXITED(status)&&WEXITSTATUS(status)==255) ||
 				WIFSIGNALED(status))) {
 			fprintf(stderr, "%s: %s not executed or returned -1\n",
 					progname, args[0]);
-			exit(127);
+			exit(125);
 		}
 		if (status)
-			errcnt |= 1;
+			errcnt |= WIFEXITED(status) ? WEXITSTATUS(status) : 1;
 	}
 }
 
@@ -463,7 +463,7 @@ addarg(const char *s, int always)
 					a_vec[a_cur++] = s;
 				else
 					toolong = 1;
-			doit:	if (nflag && xflag && a_csz + sz > nflag)
+			doit:	if (nflag && xflag && a_cnt > nflag)
 					overflow();
 				if (lflag && xflag && !always)
 					overflow();
