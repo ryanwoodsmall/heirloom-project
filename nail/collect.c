@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.33 (gritter) 10/31/04";
+static char sccsid[] = "@(#)collect.c	2.34 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -415,6 +415,7 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	int getfields;
 	sigset_t oset, nset;
 	long count;
+	enum conversion	convert;
 	const char tildehelp[] =
 "-------------------- ~ ESCAPES ----------------------------\n\
 ~~              Quote a single tilde\n\
@@ -525,12 +526,14 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	 */
 	if (mp != NULL && (quote = value("quote")) != NULL) {
 		quoteig = allignore;
+		convert = CONV_QUOTE;
 		if (strcmp(quote, "noheading") == 0) {
 			/*EMPTY*/
 		} else if (strcmp(quote, "headers") == 0) {
 			quoteig = ignore;
 		} else if (strcmp(quote, "allheaders") == 0) {
-			quoteig = (struct ignoretab *) NULL;
+			quoteig = NULL;
+			convert = CONV_QUOTE_ALL;
 		} else {
 			cp = hfield("from", mp);
 			if (cp != NULL) {
@@ -549,8 +552,8 @@ collect(struct header *hp, int printheaders, struct message *mp,
 		cp = value("indentprefix");
 		if (cp != NULL && *cp == '\0')
 			cp = "\t";
-		send(mp, collf, quoteig, cp, CONV_QUOTE, NULL);
-		send(mp, stdout, quoteig, cp, CONV_QUOTE, NULL);
+		send(mp, collf, quoteig, cp, convert, NULL);
+		send(mp, stdout, quoteig, cp, convert, NULL);
 	}
 
 	if ((cp = value("escape")) != NULL)
@@ -1051,6 +1054,7 @@ forward(char *ms, FILE *fp, int f)
 	int *msgvec;
 	struct ignoretab *ig;
 	char *tabst;
+	enum conversion	convert;
 
 	/*LINTED*/
 	msgvec = (int *)salloc((msgCount+1) * sizeof *msgvec);
@@ -1072,13 +1076,14 @@ forward(char *ms, FILE *fp, int f)
 	else if ((tabst = value("indentprefix")) == NULL)
 		tabst = "\t";
 	ig = upperchar(f) ? (struct ignoretab *)NULL : ignore;
+	convert = upperchar(f) ? CONV_QUOTE_ALL : CONV_QUOTE;
 	printf(catgets(catd, CATSET, 69, "Interpolating:"));
 	for (; *msgvec != 0; msgvec++) {
 		struct message *mp = message + *msgvec - 1;
 
 		touch(mp);
 		printf(" %d", *msgvec);
-		if (send(mp, fp, ig, tabst, CONV_QUOTE, NULL) < 0) {
+		if (send(mp, fp, ig, tabst, convert, NULL) < 0) {
 			perror(catgets(catd, CATSET, 70,
 					"temporary mail file"));
 			return(-1);

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.55 (gritter) 11/1/04";
+static char sccsid[] = "@(#)send.c	2.57 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -144,9 +144,14 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 	sz = 0;
 	if (mp->m_flag & MNOFROM) {
 		if (doign != allignore)
-			sz = fprintf(obuf, "From %s %s\n", fakefrom(mp),
-					fakedate(mp->m_time));
+			sz = fprintf(obuf, "%sFrom %s %s\n",
+					prefix ? prefix : "",
+					fakefrom(mp), fakedate(mp->m_time));
 	} else {
+		if (prefix) {
+			fputs(prefix, obuf);
+			sz += strlen(prefix);
+		}
 		while (count && (c = getc(ibuf)) != EOF) {
 			if (doign != allignore)
 				putc(c, obuf);
@@ -217,6 +222,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		}
 	isenc = 0;
 	convert = action == CONV_TODISP || action == CONV_QUOTE ||
+			action == CONV_QUOTE_ALL ||
 			action == CONV_TOSRCH || action == CONV_TOFLTR ?
 		CONV_FROMHDR : CONV_NONE;
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
@@ -232,10 +238,9 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				statusput(zmp, obuf, prefix, stats);
 			if (dostat & 2)
 				xstatusput(zmp, obuf, prefix, stats);
-			if (doign != allignore) {
-				putc('\n', obuf);
-				addstats(stats, 1, 1);
-			}
+			if (doign != allignore)
+				out("\n", 1, obuf, CONV_NONE, action,
+						prefix, prefixlen, stats);
 			break;
 		}
 		if (infld && blankchar(line[0]&0377)) {
@@ -268,10 +273,9 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 					statusput(zmp, obuf, prefix, stats);
 				if (dostat & 2)
 					xstatusput(zmp, obuf, prefix, stats);
-				if (doign != allignore) {
-					putc('\n', obuf);
-					addstats(stats, 1, 1);
-				}
+				if (doign != allignore)
+					out("\n", 1, obuf, CONV_NONE, action,
+						prefix, prefixlen, stats);
 				break;
 			}
 			/*
@@ -328,6 +332,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 			start = line;
 			len = linelen;
 			if (action == CONV_TODISP || action == CONV_QUOTE ||
+					action == CONV_QUOTE_ALL ||
 					action == CONV_TOSRCH ||
 					action == CONV_TOFLTR) {
 				/*
@@ -363,6 +368,7 @@ skip:	switch (ip->m_mimecontent) {
 			/*FALLTHRU*/
 		case CONV_TODISP:
 		case CONV_QUOTE:
+		case CONV_QUOTE_ALL:
 		case CONV_TOSRCH:
 		case CONV_DECRYPT:
 			goto multi;
@@ -424,6 +430,7 @@ skip:	switch (ip->m_mimecontent) {
 		switch (action) {
 		case CONV_TODISP:
 		case CONV_QUOTE:
+		case CONV_QUOTE_ALL:
 		case CONV_TOFILE:
 		case CONV_TOSRCH:
 		case CONV_TOFLTR:
@@ -443,17 +450,25 @@ skip:	switch (ip->m_mimecontent) {
 						continue;
 					break;
 				case CONV_TODISP:
+				case CONV_QUOTE_ALL:
 					if ((ip->m_mimecontent == MIME_MULTI ||
 							ip->m_mimecontent ==
 							MIME_ALTERNATIVE) &&
 							np->m_partstring) {
-						len = fprintf(obuf,
+						len = strlen(np->m_partstring) +
+							40;
+						cp = ac_alloc(len);
+						snprintf(cp, len,
 							"%sPart %s:\n", level ||
 							strcmp(np->m_partstring,
 								"1") ?
 							"\n" : "",
 							np->m_partstring);
-						addstats(stats, 1, len);
+						out(cp, strlen(cp), obuf,
+							CONV_NONE, action,
+							prefix, prefixlen,
+							stats);
+						ac_free(cp);
 					}
 					break;
 				case CONV_TOFLTR:
@@ -510,7 +525,7 @@ skip:	switch (ip->m_mimecontent) {
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
 	if (action == CONV_TODISP || action == CONV_QUOTE ||
-			action == CONV_TOSRCH) {
+			action == CONV_QUOTE_ALL || action == CONV_TOSRCH) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if (asccasecmp(tcs, ip->m_charset) &&
@@ -520,10 +535,11 @@ skip:	switch (ip->m_mimecontent) {
 			iconvd = (iconv_t)-1;
 	}
 #endif	/* HAVE_ICONV */
-	if (action == CONV_TODISP || action == CONV_QUOTE) {
+	if (action == CONV_TODISP || action == CONV_QUOTE ||
+			action == CONV_QUOTE_ALL) {
 		qbuf = obuf;
 		pbuf = getpipetype(ip->m_ct_type_plain, &qbuf,
-				action == CONV_QUOTE);
+			action == CONV_QUOTE || action == CONV_QUOTE_ALL);
 		if (pbuf != qbuf) {
 			oldpipe = safe_signal(SIGPIPE, onpipe);
 			if (sigsetjmp(pipejmp, 1))

@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.266 (gritter) 11/1/04
+.\"     Sccsid: @(#)nail.1	2.267 (gritter) 11/1/04
 .\"
 .TH NAIL 1 "11/1/04" "nail 11.14" "User Commands"
 .SH NAME
@@ -1897,10 +1897,12 @@ read in the current message.
 Message headers currently being ignored
 (by the ignore or retain command)
 are not included.
+For MIME multipart messages,
+only the first printable part is included.
 .TP
 .BI ~F messages
-Identical to ~f,
-except all message headers are included.
+Identical to ~f, except all message headers and
+all MIME parts are included.
 .TP
 .B ~h
 Edit the message header fields
@@ -1925,9 +1927,12 @@ read the current message.
 Message headers currently being ignored
 (by the ignore or retain command)
 are not included.
+For MIME multipart messages,
+only the first printable part is included.
 .TP
 .BI ~M messages
-Identical to ~m, except all message headers are included.
+Identical to ~m, except all message headers and
+all MIME parts are included.
 .TP
 .B ~p
 Print out the message collected so far,
@@ -2921,6 +2926,7 @@ are printed above the message body,
 thus \fIquote\fR acts like an automatic ~m command then.
 If the string \fIallheaders\fR is assigned,
 all headers are printed above the message body,
+and all MIME parts are included,
 thus \fIquote\fR acts like an automatic ~M command then.
 .TP
 .B record

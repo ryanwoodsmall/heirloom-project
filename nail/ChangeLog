@@ -7,6 +7,8 @@
 * For MIME messages of type 'multipart/alternative', only the text/plain part
   is displayed now if one is present. The 'print-alternatives' variable can
   be set to print all parts, as it was done previously.
+* The ~F and ~M escapes now cause all parts of MIME multipart messages to be
+  included in the message being composed.
 * A 'show' command was introduced to make the raw MIME-encoded message text
   visible.
 * Modifications to messages made using the 'edit' and 'visual' commands do

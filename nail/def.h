@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.85 (gritter) 11/1/04
+ *	Sccsid @(#)def.h	2.86 (gritter) 11/1/04
  */
 
 /*
@@ -99,7 +99,8 @@ enum conversion {
 	CONV_TOSRCH,			/* convert for IMAP search */
 	CONV_TOFLTR,			/* convert for filtering */
 	CONV_TOFILE,			/* convert for saving to a file */
-	CONV_QUOTE,			/* first part body only */
+	CONV_QUOTE,			/* quote, first part body only */
+	CONV_QUOTE_ALL,			/* quote, all parts */
 	CONV_DECRYPT,			/* decrypt message */
 	CONV_FROMQP,			/* convert from quoted-printable */
 	CONV_TOQP,			/* convert to quoted-printable */
