@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.51 (gritter) 10/31/04";
+static char sccsid[] = "@(#)send.c	2.52 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -443,6 +443,9 @@ skip:	switch (ip->m_mimecontent) {
 						addstats(stats, 1, len);
 					}
 					break;
+				case CONV_TOFLTR:
+					putc('\0', obuf);
+					/*FALLTHRU*/
 				default:
 					break;
 				}
