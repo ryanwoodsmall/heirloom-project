@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)rm_sus.sl	2.18 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)rm_sus.sl	2.19 (gritter) 12/18/04";
 #else
-static const char sccsid[] USED = "@(#)rm.sl	2.18 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)rm.sl	2.19 (gritter) 12/18/04";
 #endif
 
 #include	<sys/types.h>
@@ -373,12 +373,12 @@ main(int argc, char **argv)
 		switch (i) {
 		case 'f':
 			fflag = 1;
-#ifndef	SUS
+#ifdef	SUS
 			iflag = 0;
 #endif
 			break;
 		case 'i':
-#ifndef	SUS
+#ifdef	SUS
 			fflag = 0;
 #endif
 			iflag = 1;
