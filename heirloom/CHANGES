@@ -5,7 +5,9 @@ Release ...
   '-f' and '-i' options; if both were given, the traditional version behaved
   as documented for the POSIX one and vice-versa.
 * pg: Compute the width of non-printable characters that correspond to a
-  multibyte sequence correctly.
+  multibyte sequence correctly. In UTF-8 locales, non-printable characters
+  are now substituted by Unicode control pictures or the Unicode replacement
+  character.
 
 Release 041214
 * Traditional and POSIX options as well as extensions are now marked as such

@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.50 (gritter) 12/15/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.51 (gritter) 12/20/04";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.50 (gritter) 12/15/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.51 (gritter) 12/20/04";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -91,7 +91,8 @@ static int	mb_cur_max;		/* MB_CUR_MAX acceleration */
 
 typedef	wint_t	w_type;
 
-#define	width(wc)	(mb_cur_max > 1 ? iswprint(wc) ? wcwidth(wc) : -1 : 1)
+#define	width(wc)	(mb_cur_max > 1 ? iswprint(wc) ? \
+				wcwidth(wc) : utf8 ? 1 : -1 : 1)
 
 /*
  * Get next character from string s and store it in wc; n is set to
@@ -141,6 +142,9 @@ previous(const char *mb, const char *bottom, w_type *wp)
 	*wp = lastwc;
 	return (char *)lastp;
 }
+
+static int	utf8;
+
 #else	/* !ENABLE_WIDECHAR */
 typedef	int	w_type;
 #define	next(wc, s, n)	((wc) = *(s) & 0377, (n) = 1)
@@ -157,6 +161,9 @@ previous(const char *mb, const char *bottom, w_type *wp)
 	return (char *)(mb > bottom ? (*wp = mb[-1], &mb[-1]) :
 			(*wp = EOF, bottom));
 }
+
+#define	utf8	0
+
 #endif	/* !ENABLE_WIDECHAR */
 
 #define	TABSIZE		8		/* spaces consumed by tab character */
@@ -993,27 +1000,61 @@ colb(char *s, char *end)
 }
 
 /*
- * Convert nonprintable characters to spaces.
+ * Output a line, substituting nonprintable characters.
  */
 static void
-makeprint(char *s, char *end)
+print1(const char *s, const char *end)
 {
+	char	buf[10], *bp;
 	w_type	wc;
 	int	m, n;
 
+	bp = buf;
 	while (s < end) {
 		next(wc, s, n);
 		if ((mb_cur_max > 1 ? !iswprint(wc) : !isprint(wc)) &&
 				wc != '\n' && wc != '\r' &&
 				wc != '\b' && wc != '\t') {
-			if (seqstart(*s&0377) && (m = known_sequence(s)) > 0)
+			if (seqstart(*s&0377) && (m = known_sequence(s)) > 0) {
 				s += m - n;
-			else
+				for (m = 0; m < n; m++) {
+					*bp++ = s[m];
+					if (bp-buf >= sizeof buf - mb_cur_max) {
+						write(1, buf, bp - buf);
+						bp = buf;
+					}
+				}
+			} else if (utf8) {
+				if (wc == WEOF) {
+					*bp++ = 0357;
+					*bp++ = 0277;
+					*bp++ = 0275;
+				} else {
+					*bp++ = 0342;
+					*bp++ = 0220;
+					if (wc == 0177)
+						*bp++ = 0241;
+					else if (wc & ~(w_type)037)
+						*bp++ = 0246;
+					else
+						*bp++ = 0200 + wc;
+				}
+			} else {
 				for (m = 0; m < n; m++)
-					s[m] = '?';
+					*bp++ = '?';
+			}
+		} else {
+			for (m = 0; m < n; m++)
+				*bp++ = s[m];
 		}
 		s += n;
+		if (bp - buf >= sizeof buf - mb_cur_max) {
+			write(1, buf, bp - buf);
+			bp = buf;
+		}
 	}
+	if (bp > buf)
+		write(1, buf, bp - buf);
 }
 
 /*
@@ -1642,9 +1683,8 @@ printline(void)
 		dline = pagelen;
 	} else {
 		sz = endline(ttycols, b, &b[llen]);
-		makeprint(b, &b[sz]);
 		specjump = 1;
-		write(1, b, sz);
+		print1(b, &b[sz]);
 		if (b[sz-1] != '\n' && line != eofline)
 			write(1, "\n", 1);
 		specjump = 0;
@@ -2199,9 +2239,17 @@ main(int argc, char **argv)
 		helpscreen = catgets(catd, 1, 21, helpscreen);
 		fill_sequences();
 	}
-	mb_cur_max = MB_CUR_MAX;
 	if (argc == 0)
 		return 0;
+#ifdef	ENABLE_WIDECHAR
+	if ((mb_cur_max = MB_CUR_MAX) > 1) {
+		wchar_t	wc;
+		if (mbtowc(&wc, "\303\266", 2) == 2 && wc == 0xF6 &&
+				mbtowc(&wc, "\342\202\254", 3) == 3 &&
+				wc == 0x20AC)
+			utf8 = 1;
+	}
+#endif	/* ENABLE_WIDECHAR */
 	for (arg = 1; argv[arg]; arg++) {
 		if (*argv[arg] == '+')
 			continue;
