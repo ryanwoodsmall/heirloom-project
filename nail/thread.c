@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.49 (gritter) 9/9/04";
+static char sccsid[] = "@(#)thread.c	1.50 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -382,7 +382,7 @@ makethreads(m, count, newmail)
 		m[i].m_child = m[i].m_younger = m[i].m_elder =
 			m[i].m_parent = NULL;
 		m[i].m_level = 0;
-		if (!newmail)
+		if (!newmail && !(inhook&2))
 			m[i].m_collapsed = 0;
 	}
 	/*
@@ -560,7 +560,7 @@ sort(vp)
 	free(mb.mb_sorted);
 	mb.mb_sorted = sstrdup(args[0]);
 	if (method == SORT_THREAD)
-		return thread(vp && vp != (void *)-1 ? msgvec : NULL);
+		return thread(vp && vp != (void *)-1 ? msgvec : vp);
 	ms = ac_alloc(sizeof *ms * msgCount);
 	switch (method) {
 	case SORT_SUBJECT:
