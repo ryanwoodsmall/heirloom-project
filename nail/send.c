@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.49 (gritter) 10/31/04";
+static char sccsid[] = "@(#)send.c	2.50 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -412,15 +412,23 @@ skip:	switch (ip->m_mimecontent) {
 		case CONV_TOFLTR:
 		case CONV_DECRYPT:
 		multi:	for (np = ip->m_multipart; np; np = np->m_nextpart) {
+				if (np->m_mimecontent == MIME_DISCARD &&
+						action != CONV_DECRYPT)
+					continue;
 				switch (action) {
 				case CONV_TOFILE:
-					if (level == 0 && np == ip->m_multipart)
+					if (np->m_partstring &&
+							strcmp(np->m_partstring,
+								"1") == 0)
 						break;
+					stats = NULL;
 					if ((obuf = newfile(np)) == NULL)
 						continue;
 					break;
 				case CONV_QUOTE:
-					if (np != ip->m_multipart)
+					if (np->m_partstring == NULL)
+						continue;
+					if (strcmp(np->m_partstring, "1"))
 						return rt;
 					break;
 				case CONV_TODISP:
