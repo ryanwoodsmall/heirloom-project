@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.34 (gritter) 11/17/04";
+static char sccsid[] = "@(#)nss.c	1.35 (gritter) 2/10/05";
 #endif
 #endif /* not lint */
 
@@ -305,6 +305,8 @@ ssl_open(const char *server, struct sock *sp, const char *uhp)
 	return OKAY;
 }
 
+#include "nsserr.c"
+
 void
 nss_gen_err(const char *fmt, ...)
 {
@@ -315,14 +317,13 @@ nss_gen_err(const char *fmt, ...)
 	va_start(ap, fmt);
 	vfprintf(stderr, fmt, ap);
 	va_end(ap);
-	PR_GetError();
 	if ((len = PR_GetErrorTextLength()) > 0) {
 		text = ac_alloc(len);
 		if (PR_GetErrorText(text) > 0)
-			fprintf(stderr, ": %s", text);
+			fprintf(stderr, ": %s\n", text);
 		ac_free(text);
-	}
-	fputc('\n', stderr);
+	} else
+		fprintf(stderr, ": %s\n", nss_strerror(PR_GetError()));
 }
 
 FILE *

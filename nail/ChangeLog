@@ -3,7 +3,7 @@
   server anymore (Bugreport by Matthew Fischer.)
 * When replying to a message part for which a 'pipe-type/subtype'
   variable was set, quotes were inserted in the text sent to the pipe
-  instead of in the output received from it.
+  instead of in the output received from it (since v. 11.14 or so).
 * A message that is already marked as answered is not marked again if
   it is replied to and the 'markanswered' variable is set.
 * Nail no longer generates an error if renaming a message in a maildir
@@ -14,6 +14,7 @@
   nail you ever installed, you should correct this by hand since the
   file is not overwritten by 'make install'. (Bugreport by Matthew
   Fischer.)
+* Mozilla NSS error reports are more detailed now.
 
 [11.20] released 1/13/05
 * A 'forward-as-attachment' variable has been introduced. If it is set,
