@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed1.c	1.40 (gritter) 10/13/04>	*/
+/*	Sccsid @(#)sed1.c	1.41 (gritter) 2/2/05>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -112,6 +112,7 @@ static int	jflag;
 static int	delflag;
 static long long	lnum;
 static char	ibuf[512];
+static int	ibrd;
 static int	mflag;
 static int	f = -1;
 static int	spend;
@@ -603,6 +604,8 @@ command(struct reptr *ipc)
 			}
 			if(A(aptr) > abuf)	arout();
 			fclose(stdout);
+			if (ibrd > 0)
+				lseek(f, -ibrd, SEEK_CUR);
 			exit(0);
 		case RCOM:
 
@@ -725,18 +728,21 @@ gline(int addr)
 					f = -1;
 				} else
 					return(-1);
-			}
+			} else
+				ibrd += c;
 			p2 = ibuf;
 			ebp = ibuf+c;
 		}
 		if ((c = *p2++ & 0377) == '\n') {
+			ibrd--;
 			if(needdol && p2 >=  ebp) {
 				if(f<0||(c = read(f, ibuf, sizeof ibuf)) <= 0) {
 					close(f);
 					f = -1;
 					if(eargc == 0)
 							dolflag = 1;
-				}
+				} else
+					ibrd += c;
 
 				p2 = ibuf;
 				ebp = ibuf + c;
@@ -746,6 +752,7 @@ gline(int addr)
 		if(c1 >= lbend)
 			growsp(NULL);
 		linebuf[c1++] = (char)c;
+		ibrd--;
 	}
 	lnum++;
 	if(c1 >= lbend)

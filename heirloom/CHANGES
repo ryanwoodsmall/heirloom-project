@@ -43,6 +43,8 @@ Release ...
 * ed: When a hangup signal is received, ed exits with failure status now.
 * ed: The address '0' is now accepted as '1' for the 'c' and 'i' commands
   for the POSIX.1-2001 version.
+* sed: If the input is seekable and the 'q' command is used, the file
+  pointer is now left after the last line processed.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
