@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Sccsid @(#)makeconfig	1.34 (gritter) 10/25/04
+# Sccsid @(#)makeconfig	1.35 (gritter) 11/1/04
 #
 
 tmp=___build$$
@@ -146,9 +146,18 @@ int main(void)
 
 link_check 'for fchdir()' '#define HAVE_FCHDIR' <<\!
 #include <unistd.h>
-int main()
+int main(void)
 {
 	fchdir(0);
+	return 0;
+}
+!
+
+link_check 'for mmap()' '#define HAVE_MMAP' <<\!
+#include <sys/mman.h>
+int main(void)
+{
+	mmap(0, 0, 0, 0, 0, 0);
 	return 0;
 }
 !
