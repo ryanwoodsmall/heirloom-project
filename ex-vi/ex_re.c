@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.55 (gritter) 2/20/05";
+static char sccsid[] = "@(#)ex_re.c	1.56 (gritter) 3/25/05";
 #endif
 #endif
 
@@ -1305,6 +1305,7 @@ execute(int gf, line *addr)
 			compile1();
 		if (value(IGNORECASE))
 			loconv(linebuf, linebuf);
+		locs = 0;
 	}
 	circf = re.Circfl;
 	return step(p, re.Expbuf);
