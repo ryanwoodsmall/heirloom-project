@@ -1,4 +1,8 @@
 Release ...
+* basename, csplit, ed, grep, nl, pg, sed: The multibyte locale code of the
+  traditional regular expression matching functions could lead to segmentation
+  faults and missing matches with some input sequences because of an
+  uninitialized variable.
 * grep: A '-z' option is now available; it decompresses compressed files and
   looks for the pattern in the plain text.
 * rm: The traditional and POSIX versions have been fixed with regard to the
