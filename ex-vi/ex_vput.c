@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.46 (gritter) 2/3/05";
+static char sccsid[] = "@(#)ex_vput.c	1.47 (gritter) 2/4/05";
 #endif
 #endif
 
@@ -1396,7 +1396,7 @@ def:
 		if (insmode && (!IM || !*IM))
 #endif	/* !notdef */
 		{
-			n = colsc(c);
+			n = colsc(c&TRIM);
 			for (m = 0; m < n; m++)
 				vputp(IC, DEPTH(vcline));
 		}
