@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.49 (gritter) 2/19/05";
+static char sccsid[] = "@(#)ex_re.c	1.50 (gritter) 2/19/05";
 #endif
 #endif
 
@@ -872,7 +872,7 @@ refree(struct regexp *rp)
 {
 	struct regexp *r1 = NULL, *r2 = NULL;
 	
-	if (rp->Re_used == 0)
+	if (rp->Expbuf == 0)
 		return;
 	if (rp == &re) {
 		r1 = &scanre;
@@ -884,14 +884,14 @@ refree(struct regexp *rp)
 		r1 = &re;
 		r2 = &scanre;
 	}
-	if ((r1->Re_used == 0 || rp->Re_ident != r1->Re_ident) &&
-			(r2->Re_used == 0 || rp->Re_ident != r2->Re_ident))
+	if ((r1->Expbuf == 0 || rp->Re_ident != r1->Re_ident) &&
+			(r2->Expbuf == 0 || rp->Re_ident != r2->Re_ident)) {
 #ifdef	UXRE
 		regfree(rp->Expbuf);
-#else	/* !UXRE */
+#endif	/* UXRE */
 		free(rp->Expbuf);
-#endif	/* !UXRE */
-	rp->Re_used = 0;
+	}
+	rp->Expbuf = 0;
 }
 
 struct regexp *
@@ -952,7 +952,7 @@ compile(int eof, int oknl)
 			"Missing closing delimiter@for regular expression"));
 		if (c != eof)
 			ungetchar(c);
-		if (re.Re_used == 0)
+		if (re.Expbuf == 0)
 			error(catgets(catd, 1, 137,
 			"No previous re|No previous regular expression"));
 		return eof;
@@ -1158,7 +1158,7 @@ complex:		cerror(catgets(catd, 1, 139,
 		goto complex;
 	if (value(IGNORECASE))
 		loconv(re.Patbuf, re.Patbuf);
-	if (_compile(re.Patbuf, re.Expbuf, &((char *)re.Expbuf)[n], '\0') == 0) {
+	if (_compile(re.Patbuf, re.Expbuf, &((char *)re.Expbuf)[n], '\0')==0) {
 		char	*cp;
 		free(re.Expbuf);
 		switch (regerrno) {
@@ -1210,7 +1210,6 @@ complex:		cerror(catgets(catd, 1, 139,
 	re.Circfl = circf;
 	re.Nbra = nbra;
 #endif	/* !UXRE */
-	re.Re_used = 1;
 	re.Re_ident++;
 	return eof;
 }
