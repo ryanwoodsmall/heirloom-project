@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ed.1	1.43 (gritter) 2/1/05
+.\" Sccsid @(#)ed.1	1.44 (gritter) 2/2/05
 .\" Parts taken from ed(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH ED 1 "2/1/05" "Heirloom Toolchest" "User Commands"
+.TH ED 1 "2/2/05" "Heirloom Toolchest" "User Commands"
 .if t .ds q \(aa
 .if n .ds q '
 .SH NAME
@@ -465,6 +465,9 @@ command deletes the addressed lines, then accepts input
 text which replaces these lines.
 `\fB.\fR' is left at the last line input; if there were none,
 it is left at the line preceding the deleted lines.
+For
+.BR /usr/5bin/posix2001/ed ,
+a `0' as the first address is identical to `1'.
 .TP 5
 \fR(\|\fI.\|\fB,\|\fI.\|\fR)\|\fBd\fR
 The delete command deletes the addressed lines from the buffer.
@@ -564,6 +567,9 @@ This command differs from the
 .I a
 command only in the placement of the
 text.
+For
+.BR /usr/5bin/posix2001/ed ,
+a `0' as the first address is identical to `1'.
 .TP 5
 \fR(\|\fI.\|\fB,\|\fI.+1\fR)\|\fBj\fR
 This command joins the addressed lines into a single line;
