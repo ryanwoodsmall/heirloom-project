@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.51 (gritter) 1/8/05>	*/
+/*	Sccsid @(#)grep.c	1.52 (gritter) 2/5/05>	*/
 
 /*
  * Code common to all grep flavors.
@@ -388,7 +388,7 @@ grep(struct iblok *ip)
 		if (hadnl = (ip->ib_cur < ip->ib_end && *lastnl == '\n'))
 			if (range(ip, lastnl))
 				break;
-		if (lastnl < ip->ib_end - 1) {
+		if (lastnl < ip->ib_end - hadnl) {
 			/*
 			 * Copy the partial line from file buffer to line
 			 * buffer. Allocate enough space to zero-terminate

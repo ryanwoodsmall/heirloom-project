@@ -17,6 +17,8 @@ Release ...
   POSIX.1-2001.
 * tr: The -C option from POSIX.1-2001 has been added.
 * dd: With 'conv=unblock', the last block was not converted.
+* grep: The content of a file that consisted only of a single byte other than
+  a newline was never matched.
 * csplit, ed, expr, grep, nl, pax, pg, sed: The POSIX versions no longer
   accept reverted ranges like '[b-a]' in regular expressions.
 * touch: If one of -a or -m but no time specification was given, both
