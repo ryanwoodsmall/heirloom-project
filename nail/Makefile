@@ -22,7 +22,7 @@ UCBINSTALL	= /usr/ucb/install
 #CFLAGS		=
 #CPPFLAGS	=
 #LDFLAGS		=
-#WARN		= -Wall -Wno-parentheses -Werror
+WARN		= -Wall -Wno-parentheses -Werror
 
 # Some RedHat versions need INCLUDES = -I/usr/kerberos/include to compile
 # with OpenSSL, or to compile with GSSAPI authentication included. In the
@@ -30,7 +30,7 @@ UCBINSTALL	= /usr/ucb/install
 #INCLUDES	= -I/usr/kerberos/include
 #LDFLAGS	= -L/usr/kerberos/lib
 
-SHELL		= /bin/sh
+SHELL		= /sbin/sh
 
 # If you know that the IPv6 functions work on your machine, you can enable
 # them here.
