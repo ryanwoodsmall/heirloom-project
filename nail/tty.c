@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.17 (gritter) 8/8/04";
+static char sccsid[] = "@(#)tty.c	2.19 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -402,4 +402,18 @@ out2:
 #endif
 	safe_signal(SIGINT, saveint);
 	return ret;
+}
+
+int
+yorn(msg)
+	char	*msg;
+{
+	char	*cp;
+
+	if (value("interactive") == NULL)
+		return 1;
+	do
+		cp = readtty(msg, NULL);
+	while (*cp != 'y' && *cp != 'Y' && *cp != 'n' && *cp != 'N');
+	return *cp == 'y' || *cp == 'Y';
 }

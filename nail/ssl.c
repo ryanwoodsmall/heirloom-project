@@ -38,66 +38,18 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ssl.c	1.6 (gritter) 9/16/04";
+static char sccsid[] = "@(#)ssl.c	1.34 (gritter) 9/23/04";
 #endif
 #endif /* not lint */
 
 #include "config.h"
 
-#ifdef	HAVE_SOCKETS
 #ifdef	USE_SSL
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/x509v3.h>
-#include <openssl/x509.h>
-#include <openssl/rand.h>
 
 #include "rcv.h"
 #include "extern.h"
-#include <errno.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <time.h>
 
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#ifdef	HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif	/* HAVE_ARPA_INET_H */
-
-#include <termios.h>
-
-/*
- * Mail -- a mail program
- *
- * SSL functions
- */
-
-/*
- * OpenSSL client implementation according to: John Viega, Matt Messier,
- * Pravir Chandra: Network Security with OpenSSL. Sebastopol, CA 2002.
- */
-
-static enum {
-	VRFY_IGNORE,
-	VRFY_WARN,
-	VRFY_ASK,
-	VRFY_STRICT
-} ssl_vrfy_level;
-
-static int	verbose;
-
-static void ssl_set_vrfy_level __P((const char *));
-static enum okay ssl_vrfy_decide __P((void));
-static int ssl_rand_init __P((void));
-static SSL_METHOD *ssl_select_method __P((const char *));
-static int ssl_verify_cb __P((int, X509_STORE_CTX *));
-static void ssl_load_verifications __P((struct sock *));
-static void ssl_certificate __P((struct sock *, const char *));
-static enum okay ssl_check_host __P((const char *, struct sock *));
-
-static void
+void
 ssl_set_vrfy_level(uhp)
 	const char *uhp;
 {
@@ -127,7 +79,7 @@ ssl_set_vrfy_level(uhp)
 	}
 }
 
-static enum okay
+enum okay
 ssl_vrfy_decide()
 {
 	enum okay ok = STOP;
@@ -159,47 +111,10 @@ ssl_vrfy_decide()
 	return ok;
 }
 
-static int
-ssl_rand_init()
+char *
+ssl_method_string(uhp)
+	const char	*uhp;
 {
-	char *cp;
-	int state = 0;
-
-	if ((cp = value("ssl-rand-egd")) != NULL) {
-		cp = expand(cp);
-		if (RAND_egd(cp) == -1) {
-			fprintf(stderr, catgets(catd, CATSET, 245,
-				"entropy daemon at \"%s\" not available\n"),
-					cp);
-		} else
-			state = 1;
-	} else if ((cp = value("ssl-rand-file")) != NULL) {
-		cp = expand(cp);
-		if (RAND_load_file(cp, 1024) == -1) {
-			fprintf(stderr, catgets(catd, CATSET, 246,
-				"entropy file at \"%s\" not available\n"), cp);
-		} else {
-			struct stat st;
-
-			if (stat(cp, &st) == 0 && S_ISREG(st.st_mode) &&
-					access(cp, W_OK) == 0) {
-				if (RAND_write_file(cp) == -1) {
-					fprintf(stderr, catgets(catd, CATSET,
-								247,
-				"writing entropy data to \"%s\" failed\n"), cp);
-				}
-			}
-			state = 1;
-		}
-	}
-	return state;
-}
-
-static SSL_METHOD *
-ssl_select_method(uhp)
-	const char *uhp;
-{
-	SSL_METHOD *method;
 	char *cp, *mtvar;
 
 	mtvar = ac_alloc(strlen(uhp) + 12);
@@ -208,239 +123,278 @@ ssl_select_method(uhp)
 	if ((cp = value(mtvar)) == NULL)
 		cp = value("ssl-method");
 	ac_free(mtvar);
-	if (cp != NULL) {
-		if (equal(cp, "ssl2"))
-			method = SSLv2_client_method();
-		else if (equal(cp, "ssl3"))
-			method = SSLv3_client_method();
-		else if (equal(cp, "tls1"))
-			method = TLSv1_client_method();
-		else {
-			fprintf(stderr, catgets(catd, CATSET, 244,
-					"Invalid SSL method \"%s\"\n"), cp);
-			method = SSLv23_client_method();
-		}
-	} else
-		method = SSLv23_client_method();
-	return method;
-}
-
-static int
-ssl_verify_cb(int success, X509_STORE_CTX *store)
-{
-	if (success == 0) {
-		char data[256];
-		X509 *cert = X509_STORE_CTX_get_current_cert(store);
-		int depth = X509_STORE_CTX_get_error_depth(store);
-		int err = X509_STORE_CTX_get_error(store);
-
-		fprintf(stderr, catgets(catd, CATSET, 229,
-				"Error with certificate at depth: %i\n"),
-				depth);
-		X509_NAME_oneline(X509_get_issuer_name(cert), data,
-				sizeof data);
-		fprintf(stderr, catgets(catd, CATSET, 230, " issuer = %s\n"),
-				data);
-		X509_NAME_oneline(X509_get_subject_name(cert), data,
-				sizeof data);
-		fprintf(stderr, catgets(catd, CATSET, 231, " subject = %s\n"),
-				data);
-		fprintf(stderr, catgets(catd, CATSET, 232, " err %i: %s\n"),
-				err, X509_verify_cert_error_string(err));
-		if (ssl_vrfy_decide() != OKAY)
-			return 0;
-	}
-	return 1;
-}
-
-static void
-ssl_load_verifications(sp)
-	struct sock *sp;
-{
-	char *ca_dir, *ca_file;
-
-	if (ssl_vrfy_level == VRFY_IGNORE)
-		return;
-	if ((ca_dir = value("ssl-ca-dir")) != NULL)
-		ca_dir = expand(ca_dir);
-	if ((ca_file = value("ssl-ca-file")) != NULL)
-		ca_file = expand(ca_file);
-	if (ca_dir || ca_file) {
-		if (SSL_CTX_load_verify_locations(sp->s_ctx,
-					ca_file, ca_dir) != 1) {
-			fprintf(stderr, catgets(catd, CATSET, 233,
-						"Error loading"));
-			if (ca_dir) {
-				fprintf(stderr, catgets(catd, CATSET, 234,
-							" %s"), ca_dir);
-				if (ca_file)
-					fprintf(stderr, catgets(catd, CATSET,
-							235, " or"));
-			}
-			if (ca_file)
-				fprintf(stderr, catgets(catd, CATSET, 236,
-						" %s"), ca_file);
-			fprintf(stderr, catgets(catd, CATSET, 237, "\n"));
-		}
-	}
-	if (value("ssl-no-default-ca") == NULL) {
-		if (SSL_CTX_set_default_verify_paths(sp->s_ctx) != 1)
-			fprintf(stderr, catgets(catd, CATSET, 243,
-				"Error loading default CA locations\n"));
-	}
-	SSL_CTX_set_verify(sp->s_ctx, SSL_VERIFY_PEER, ssl_verify_cb);
-}
-
-static void
-ssl_certificate(sp, uhp)
-	struct sock *sp;
-	const char *uhp;
-{
-	char *certvar, *keyvar, *cert, *key;
-
-	certvar = ac_alloc(strlen(uhp) + 10);
-	strcpy(certvar, "ssl-cert-");
-	strcpy(&certvar[9], uhp);
-	if ((cert = value(certvar)) != NULL ||
-			(cert = value("ssl-cert")) != NULL) {
-		cert = expand(cert);
-		if (SSL_CTX_use_certificate_chain_file(sp->s_ctx, cert) == 1) {
-			keyvar = ac_alloc(strlen(uhp) + 9);
-			strcpy(keyvar, "ssl-key-");
-			if ((key = value(keyvar)) == NULL &&
-					(key = value("ssl-key")) == NULL)
-				key = cert;
-			else
-				key = expand(key);
-			if (SSL_CTX_use_PrivateKey_file(sp->s_ctx, key,
-						SSL_FILETYPE_PEM) != 1)
-				fprintf(stderr, catgets(catd, CATSET, 238,
-				"cannot load private key from file %s\n"),
-						key);
-			ac_free(keyvar);
-		} else
-			fprintf(stderr, catgets(catd, CATSET, 239,
-				"cannot load certificate from file %s\n"),
-					cert);
-	}
-	ac_free(certvar);
-}
-
-static enum okay
-ssl_check_host(server, sp)
-	const char *server;
-	struct sock *sp;
-{
-	X509 *cert;
-	X509_NAME *subj;
-	char data[256];
-	/*GENERAL_NAMES*/STACK	*gens;
-	GENERAL_NAME	*gen;
-	int	i;
-
-	if ((cert = SSL_get_peer_certificate(sp->s_ssl)) == NULL) {
-		fprintf(stderr, catgets(catd, CATSET, 248,
-				"no certificate from \"%s\"\n"), server);
-		return STOP;
-	}
-	gens = X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
-	if (gens != NULL) {
-		for (i = 0; i < sk_GENERAL_NAME_num(gens); i++) {
-			gen = sk_GENERAL_NAME_value(gens, i);
-			if (gen->type == GEN_DNS) {
-				if (verbose)
-					fprintf(stderr,
-						"Comparing DNS name: \"%s\"\n",
-						gen->d.ia5->data);
-				if (!asccasecmp(gen->d.ia5->data,
-							(char *)server))
-					goto found;
-			}
-		}
-	}
-	if ((subj = X509_get_subject_name(cert)) != NULL &&
-			X509_NAME_get_text_by_NID(subj, NID_commonName,
-				data, sizeof data) > 0) {
-		data[sizeof data - 1] = 0;
-		if (verbose)
-			fprintf(stderr, "Comparing common name: \"%s\"\n",
-					data);
-		if (asccasecmp(data, server) == 0)
-			goto found;
-	}
-	X509_free(cert);
-	return STOP;
-found:	X509_free(cert);
-	return OKAY;
+	return cp;
 }
 
 enum okay
-ssl_open(server, sp, uhp)
-	const char *server;
-	struct sock *sp;
-	const char *uhp;
+smime_split(ip, hp, bp, xcount, keep)
+	FILE	*ip;
+	FILE	**hp, **bp;
+	long	xcount;
+	int	keep;
 {
-	static int initialized, rand_init;
-	char *cp;
-	long options;
+	char	*buf, *hn, *bn;
+	char	*savedfields = NULL;
+	size_t	bufsize, buflen, count, savedsize = 0;
+	int	c;
 
-	verbose = value("verbose") != NULL;
-	if (initialized == 0) {
-		SSL_library_init();
-		initialized = 1;
-	}
-	if (rand_init == 0)
-		rand_init = ssl_rand_init();
-	ssl_set_vrfy_level(uhp);
-	if ((sp->s_ctx = SSL_CTX_new(ssl_select_method(uhp))) == NULL) {
-		ssl_gen_err(catgets(catd, CATSET, 261, "SSL_CTX_new() failed"));
+	if ((*hp = Ftemp(&hn, "Rh", "w+", 0600, 1)) == NULL ||
+			(*bp = Ftemp(&bn, "Rb", "w+", 0600, 1)) == NULL) {
+		perror("tempfile");
 		return STOP;
 	}
-#ifdef	SSL_MODE_AUTO_RETRY
-	/* available with OpenSSL 0.9.6 or later */
-	SSL_CTX_set_mode(sp->s_ctx, SSL_MODE_AUTO_RETRY);
-#endif	/* SSL_MODE_AUTO_RETRY */
-	options = SSL_OP_ALL;
-	if (value("ssl-v2-allow") == NULL)
-		options |= SSL_OP_NO_SSLv2;
-	SSL_CTX_set_options(sp->s_ctx, options);
-	ssl_load_verifications(sp);
-	ssl_certificate(sp, uhp);
-	if ((cp = value("ssl-cipher-list")) != NULL) {
-		if (SSL_CTX_set_cipher_list(sp->s_ctx, cp) != 1)
-			fprintf(stderr, catgets(catd, CATSET, 240,
-					"invalid ciphers: %s\n"), cp);
-	}
-	if ((sp->s_ssl = SSL_new(sp->s_ctx)) == NULL) {
-		ssl_gen_err(catgets(catd, CATSET, 262, "SSL_new() failed"));
-		return STOP;
-	}
-	SSL_set_fd(sp->s_ssl, sp->s_fd);
-	if (SSL_connect(sp->s_ssl) < 0) {
-		ssl_gen_err(catgets(catd, CATSET, 263,
-				"could not initiate SSL/TLS connection"));
-		return STOP;
-	}
-	if (ssl_vrfy_level != VRFY_IGNORE) {
-		if (ssl_check_host(server, sp) != OKAY) {
-			fprintf(stderr, catgets(catd, CATSET, 249,
-				"host certificate does not match \"%s\"\n"),
-				server);
-			if (ssl_vrfy_decide() != OKAY)
-				return STOP;
+	rm(hn);
+	rm(bn);
+	Ftfree(&hn);
+	Ftfree(&bn);
+	buf = smalloc(bufsize = LINESIZE);
+	savedfields = smalloc(savedsize = 1);
+	*savedfields = '\0';
+	if (xcount < 0)
+		count = fsize(ip);
+	else
+		count = xcount;
+	while (fgetline(&buf, &bufsize, &count, &buflen, ip, 0) != NULL &&
+			*buf != '\n') {
+		if (ascncasecmp(buf, "content-", 8) == 0) {
+			if (keep)
+				fputs("X-Encoded-", *hp);
+			for (;;) {
+				savedsize += buflen;
+				savedfields = srealloc(savedfields, savedsize);
+				strcat(savedfields, buf);
+				if (keep)
+					fwrite(buf, sizeof *buf, buflen, *hp);
+				c = getc(ip);
+				ungetc(c, ip);
+				if (!blankchar(c))
+					break;
+				fgetline(&buf, &bufsize, &count, &buflen,
+						ip, 0);
+			}
+			continue;
 		}
+		fwrite(buf, sizeof *buf, buflen, *hp);
 	}
+	fflush(*hp);
+	rewind(*hp);
+	fputs(savedfields, *bp);
+	putc('\n', *bp);
+	while (fgetline(&buf, &bufsize, &count, &buflen, ip, 0) != NULL)
+		fwrite(buf, sizeof *buf, buflen, *bp);
+	fflush(*bp);
+	rewind(*bp);
+	free(buf);
 	return OKAY;
 }
 
-void
-ssl_gen_err(msg)
-	const char *msg;
+FILE *
+smime_sign_assemble(hp, bp, sp)
+	FILE	*hp, *bp, *sp;
 {
-	SSL_load_error_strings();
-	fprintf(stderr, "%s: %s\n", msg,
-		ERR_error_string(ERR_get_error(), NULL));
+	char	*boundary, *cp;
+	FILE	*op;
+	int	c, lastc = EOF;
+
+	if ((op = Ftemp(&cp, "Rs", "w+", 0600, 1)) == NULL) {
+		perror("tempfile");
+		return NULL;
+	}
+	rm(cp);
+	Ftfree(&cp);
+	boundary = makeboundary();
+	while ((c = getc(hp)) != EOF) {
+		if (c == '\n' && lastc == '\n')
+			break;
+		putc(c, op);
+		lastc = c;
+	}
+	fprintf(op, "Content-Type: multipart/signed;\n"
+		" protocol=application/x-pkcs7-signature; micalg=sha1;\n"
+		" boundary=\"%s\"\n\n", boundary);
+	fprintf(op, "This is an S/MIME signed message.\n\n--%s\n",
+			boundary);
+	while ((c = getc(bp)) != EOF)
+		putc(c, op);
+	fprintf(op, "\n--%s\n", boundary);
+	fputs("Content-Type: application/x-pkcs7-signature; "
+			"name=\"smime.p7s\"\n"
+		"Content-Transfer-Encoding: base64\n"
+		"Content-Disposition: attachment; filename=\"smime.p7s\"\n\n",
+		op);
+	while ((c = getc(sp)) != EOF) {
+		if (c == '-') {
+			while ((c = getc(sp)) != EOF && c != '\n');
+			continue;
+		}
+		putc(c, op);
+	}
+	fprintf(op, "\n--%s--\n", boundary);
+	Fclose(hp);
+	Fclose(bp);
+	Fclose(sp);
+	fflush(op);
+	if (ferror(op)) {
+		perror("signed output data");
+		Fclose(op);
+		return NULL;
+	}
+	rewind(op);
+	return op;
 }
 
+FILE *
+smime_encrypt_assemble(hp, yp)
+	FILE	*hp, *yp;
+{
+	char	*cp;
+	FILE	*op;
+	int	c, lastc = EOF;
+
+	if ((op = Ftemp(&cp, "Rs", "w+", 0600, 1)) == NULL) {
+		perror("tempfile");
+		return NULL;
+	}
+	rm(cp);
+	Ftfree(&cp);
+	while ((c = getc(hp)) != EOF) {
+		if (c == '\n' && lastc == '\n')
+			break;
+		putc(c, op);
+		lastc = c;
+	}
+	fprintf(op, "Content-Type: application/x-pkcs7-mime; "
+			"name=\"smime.p7m\"\n"
+		"Content-Transfer-Encoding: base64\n"
+		"Content-Disposition: attachment; "
+			"filename=\"smime.p7m\"\n\n");
+	while ((c = getc(yp)) != EOF) {
+		if (c == '-') {
+			while ((c = getc(yp)) != EOF && c != '\n');
+			continue;
+		}
+		putc(c, op);
+	}
+	Fclose(hp);
+	Fclose(yp);
+	fflush(op);
+	if (ferror(op)) {
+		perror("encrypted output data");
+		Fclose(op);
+		return NULL;
+	}
+	rewind(op);
+	return op;
+}
+
+struct message *
+smime_decrypt_assemble(m, hp, bp)
+	struct message	*m;
+	FILE	*hp, *bp;
+{
+	int	binary = 0, lastnl = 0;
+	char	*buf = NULL, *cp;
+	size_t	bufsize = 0, buflen, count;
+	long	lines = 0, octets = 0;
+	struct message	*x;
+	off_t	offset;
+
+	x = salloc(sizeof *x);
+	*x = *m;
+	fflush(mb.mb_otf);
+	fseek(mb.mb_otf, 0L, SEEK_END);
+	offset = ftell(mb.mb_otf);
+	count = fsize(hp);
+	while (fgetline(&buf, &bufsize, &count, &buflen, hp, 0) != NULL) {
+		if (buf[0] == '\n')
+			break;
+		if ((cp = thisfield(buf, "content-transfer-encoding")) != NULL)
+			if (ascncasecmp(cp, "binary", 7) == 0)
+				binary = 1;
+		fwrite(buf, sizeof *buf, buflen, mb.mb_otf);
+		octets += buflen;
+		lines++;
+	}
+	octets += mkdate(mb.mb_otf, "X-Decoding-Date");
+	lines++;
+	count = fsize(bp);
+	while (fgetline(&buf, &bufsize, &count, &buflen, bp, 0) != NULL) {
+		lines++;
+		if (!binary && buf[buflen-1] == '\n' && buf[buflen-2] == '\r')
+			buf[--buflen-1] = '\n';
+		fwrite(buf, sizeof *buf, buflen, mb.mb_otf);
+		octets += buflen;
+		if (buf[0] == '\n')
+			lastnl++;
+		else if (buf[buflen-1] == '\n')
+			lastnl = 1;
+		else
+			lastnl = 0;
+	}
+	while (!binary && lastnl < 2) {
+		putc('\n', mb.mb_otf);
+		lines++;
+		octets++;
+		lastnl++;
+	}
+	Fclose(hp);
+	Fclose(bp);
+	free(buf);
+	fflush(mb.mb_otf);
+	if (ferror(mb.mb_otf)) {
+		perror("decrypted output data");
+		return NULL;
+	}
+	x->m_size = x->m_xsize = octets;
+	x->m_lines = x->m_xlines = lines;
+	x->m_block = nail_blockof(offset);
+	x->m_offset = nail_offsetof(offset);
+	return x;
+}
+
+int
+ccertsave(v)
+	void	*v;
+{
+	int	*ip;
+	int	f, *msgvec;
+	char	*file = NULL, *str = v;
+	int	val = 0;
+	FILE	*fp;
+
+	msgvec = salloc((msgCount + 2) * sizeof *msgvec);
+	if ((file = laststring(str, &f, 1)) == NULL) {
+		fprintf(stderr, "No file to save certificate given.\n");
+		return 1;
+	}
+	if (!f) {
+		*msgvec = first(0, MMNORM);
+		if (*msgvec == 0) {
+			if (inhook)
+				return 0;
+			fprintf(stderr,
+				"No messages to get certificates from.\n");
+			return 1;
+		}
+		msgvec[1] = 0;
+	} else if (getmsglist(str, msgvec, 0) < 0)
+		return 1;
+	if (*msgvec == 0) {
+		if (inhook)
+			return 0;
+		fprintf(stderr, "No applicable messages.\n");
+		return 1;
+	}
+	if ((fp = Fopen(file, "a")) == NULL) {
+		perror(file);
+		return 1;
+	}
+	for (ip = msgvec; *ip && ip-msgvec < msgCount; ip++)
+		if (smime_certsave(&message[*ip-1], *ip, fp) != OKAY)
+			val = 1;
+	Fclose(fp);
+	if (val == 0)
+		printf("Certificate(s) saved.\n");
+	return val;
+}
 #endif	/* USE_SSL */
-#endif	/* HAVE_SOCKETS */

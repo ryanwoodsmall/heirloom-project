@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)pop3.c	2.34 (gritter) 9/15/04";
+static char sccsid[] = "@(#)pop3.c	2.36 (gritter) 9/18/04";
 #endif
 #endif /* not lint */
 
@@ -318,7 +318,7 @@ retry:	if (xuser == NULL) {
 	} else
 		user = xuser;
 	if (pass == NULL) {
-		if ((pass = getpassword(&otio, &reset_tio)) == NULL)
+		if ((pass = getpassword(&otio, &reset_tio, NULL)) == NULL)
 			return STOP;
 	}
 	catp = savecat(ts, pass);
@@ -393,7 +393,7 @@ pop3_user(mp, xuser, pass, uhp, xserver)
 	} else
 		server = (char *)xserver;
 #ifdef	USE_SSL
-	if (mp->mb_sock.s_ssl == NULL && pop3_use_starttls(uhp)) {
+	if (mp->mb_sock.s_use_ssl == 0 && pop3_use_starttls(uhp)) {
 		POP3_OUT("STLS\r\n", MB_COMD)
 		POP3_ANSWER()
 		if (ssl_open(server, &mp->mb_sock, uhp) != OKAY)
@@ -416,7 +416,7 @@ retry:	if (xuser == NULL) {
 	POP3_OUT(o, MB_COMD)
 	POP3_ANSWER()
 	if (pass == NULL) {
-		if ((pass = getpassword(&otio, &reset_tio)) == NULL)
+		if ((pass = getpassword(&otio, &reset_tio, NULL)) == NULL)
 			return STOP;
 	}
 	if (pop3_pass(mp, pass) == STOP) {

@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.220 (gritter) 9/14/04
+.\"     Sccsid: @(#)nail.1	2.240 (gritter) 9/22/04
 .\"
-.TH NAIL 1 "9/14/04" "nail 11.7pre" "User Commands"
+.TH NAIL 1 "9/22/04" "nail 11.8" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -72,7 +72,7 @@ is intended to provide the functionality of the POSIX
 .B mailx
 command,
 and offers extensions
-for MIME messages, IMAP, POP3 and SMTP.
+for MIME, IMAP, POP3, SMTP, and S/MIME.
 .I Nail
 provides enhanced
 features for interactive use, such as caching and disconnected
@@ -115,10 +115,12 @@ If yes, return an exit status of zero,
 else, a non-zero value.
 .TP
 \fB\-f\fR [\fIfile\fR]
-Read in the contents of your mbox
+Read in the contents of the user's mbox
 (or the specified file)
 for processing;
-when you quit, \fInail\fR writes
+when
+.I nail
+is quit, it writes
 undeleted messages back
 to this file.
 The string \fIfile\fR is handled
@@ -214,29 +216,29 @@ To send a message to one or more people,
 \fInail\fR can be invoked with arguments
 which are the names of people
 to whom the mail will be sent.
-You are then expected to type in your message,
+The user is then expected to type in his message,
 followed by an `control-D' at the beginning of a line.
 The section below Replying to
 or originating mail,
 describes some features of \fInail\fR
-available to help you compose your letter.
+available to help when composing letters.
 .SS "Reading mail"
 In normal usage \fInail\fR is given no arguments
-and checks your mail out of the post office,
+and checks the user's mail out of the post office,
 then prints out a one line header
 of each message found.
 The current message is initially
 the first message (numbered 1)
 and can be printed using the print command
 which can be abbreviated `p').
-You can move among the messages
-much as you move between lines in
+The user can move among the messages
+much as he moves between lines in
 .IR ed (1),
 with the commands `+' and `\-' moving backwards and forwards,
 and simple numbers.
 .SS "Disposing of mail"
 After examining a message
-you can delete `d') the message
+the user can delete `d') the message
 or reply `r') to it.
 Deletion causes the \fInail\fR program
 to forget about the message.
@@ -536,13 +538,15 @@ command with the search criteria first
 to check for appropriate messages,
 and to read each single message then by typing `\fB`\fR' repeatedly.
 .SS "Replying to or originating mail"
-You can use the reply command
+The
+.I reply
+command can be used
 to set up a response to a message,
 sending it back to the person who it was from.
-Text you then type in,
+Text the user types in then,
 up to an end-of-file,
 defines the contents of the message.
-While you are composing a message,
+While the user is composing a message,
 \fInail\fR treats lines beginning with the character `~' specially.
 For instance, typing `~m' (alone on a line)
 will place a copy of the current message into the response
@@ -551,15 +555,15 @@ right shifting it by a tabstop
 Other escapes will set up subject fields,
 add and delete recipients to the message,
 attach files to it
-and allow you to escape to an editor
+and allow the user to escape to an editor
 to revise the message
 or to a shell to run some commands.
 (These options are given in the summary below.)
 .SS "Ending a mail processing session"
-You can end a \fInail\fR session
+The user can end a \fInail\fR session
 with the quit (`q') command.
 Messages which have been examined
-go to your mbox file
+go to the user's mbox file
 unless they have been deleted
 in which case they are discarded.
 Unexamined messages go back
@@ -568,7 +572,7 @@ to the post office.
 .SS "Personal and systemwide distribution lists"
 It is also possible to create
 a personal distribution lists so that,
-for instance, you can send mail
+for instance, the user can send mail
 to `\fIcohorts\fR' and have it go
 to a group of people.
 Such lists can be defined by placing a line like
@@ -577,7 +581,7 @@ Such lists can be defined by placing a line like
         \fBalias\fI cohorts bill ozalp jkf mark kridle@ucbcory\fR
 
 .fi
-in the file .mailrc in your home directory.
+in the file .mailrc in the user's home directory.
 The current list of such aliases
 can be displayed with the alias command in \fInail\fR.
 System wide distribution lists can be created
@@ -586,7 +590,7 @@ by editing /etc/aliases, see
 and
 .IR sendmail (8);
 these are kept in a different syntax.
-In mail you send,
+In mail the user sends,
 personal aliases will be expanded
 in mail sent to others so that
 they will be able to reply to the recipients.
@@ -796,10 +800,10 @@ creates a new alias or changes an old one.
 .TP
 .B alternates
 (alt) The alternates command is useful
-if you have accounts on several machines.
+if the user has accounts on several machines.
 It can be used to inform \fInail\fR
-that the listed addresses are really you.
-When you reply to messages,
+that the listed addresses all belong to the invoking user.
+When he replies to messages,
 \fInail\fR will not send a copy of the message
 to any of the addresses
 listed on the alternates list.
@@ -826,6 +830,16 @@ command).
 .TP
 .B cd
 Same as chdir.
+.TP
+.B certsave
+Only applicable to S/MIME signed messages.
+Takes a message list and a file name
+and saves the certificates contained within the message signatures
+to the named file in both human-readable and PEM format.
+The certificates can later be used to send encrypted messages
+to the messages' originators by setting the
+.I smime-encrypt-user@host
+variable.
 .TP
 .B chdir
 (ch) Changes the user's working directory to that specified,
@@ -854,7 +868,7 @@ variable for more information.
 .I save
 does,
 except that it does not mark the messages
-it is used on for deletion when you quit.
+it is used on for deletion when the user quits.
 Compressed files and IMAP mailboxes are handled as described for the
 .I folder
 command.
@@ -862,6 +876,19 @@ command.
 .B Copy
 (C) Similar to
 .IR copy ,
+but saves the messages in a file named after the local part
+of the sender address of the first message.
+.TP
+.B decrypt
+(dec) For unencrypted messages,
+this command is identical to
+.IR copy .
+Encrypted messages are first decrypted, if possible,
+and then copied.
+.TP
+.B Decrypt
+(Dec) Similar to
+.IR decrypt ,
 but saves the messages in a file named after the local part
 of the sender address of the first message.
 .TP
@@ -988,19 +1015,19 @@ lists the folders on the base level of the current IMAP server.
 .B folder
 (fold) The folder command switches
 to a new mail file or folder.
-With no arguments, it tells you
-which file you are currently reading.
-If you give it an argument,
+With no arguments, it tells the user
+which file he is currently reading.
+If an argument is given,
 it will write out changes
-(such as deletions) you have made
+(such as deletions) the user has made
 in the current file and read in
 the new file.
 Some special conventions are recognized for the name.
 \fB#\fR means the previous file,
-\fB%\fR means your system mailbox,
+\fB%\fR means the invoking user's system mailbox,
 \fB%\fIuser\fR means \fIuser's\fR system mailbox,
-\fB&\fR means your mbox file,
-and \fB+\fIfile\fI means a \fIfile\fR in your folder directory.
+\fB&\fR means the invoking user's mbox file,
+and \fB+\fIfile\fI means a \fIfile\fR in the folder directory.
 \fB%:\fIfilespec\fR expands to the same value as \fIfilespec\fR,
 but the file is handled as a system mailbox
 e.\ g. by the mbox and save commands.
@@ -1123,9 +1150,9 @@ not the current one.
 .B if
 Commands in \fInail\fR's startup files
 can be executed conditionally
-depending on whether you are sending
+depending on whether the user is sending
 or receiving mail with the if command.
-For example, you can do:
+For example:
 .nf
 
         \fBif \fIreceive\fR
@@ -1153,7 +1180,7 @@ and
 .B ignore
 Add the list of header fields named to the ignored list.
 Header fields in the ignore list are not printed
-on your terminal when you print a message.
+on the terminal when a message is printed.
 This command is very handy for suppression
 of certain machine-generated header fields.
 The Type and Print commands can be used
@@ -1176,10 +1203,6 @@ Useful IMAP commands are:
 Takes the name of an IMAP mailbox as an argument
 and creates it.
 .TP
-.B delete
-Takes the name of an IMAP mailbox as an argument
-and deletes it.
-.TP
 .B getquotaroot
 .\" RFC 2087
 Takes the name of an IMAP mailbox as an argument
@@ -1197,10 +1220,6 @@ inner parentheses separate them.
 For each namespace,
 a namespace prefix and a hierarchy separator is listed.
 Not all IMAP servers support this command.
-.TP
-.B rename
-Takes the name of an existing IMAP mailbox as the first argument
-and renames it to the name given as second argument.
 .RE
 .TP
 .B inc
@@ -1238,9 +1257,13 @@ and sends mail to those people.
 .TP
 .B mbox
 Indicate that a list of messages be sent
-to mbox in your home directory when you quit.
+to mbox in the user's home directory when
+.I nail
+is quit.
 This is the default action for messages
-if you do not have the hold option set.
+if unless the
+.I hold
+option is set.
 .TP
 .B move
 (mv) Acts like
@@ -1321,6 +1344,8 @@ on the user's terminal.
 If the message is a MIME multipart message,
 all parts with a content type of `text' or `message' are shown,
 the other are hidden except for their headers.
+Messages are decrypted and converted to the terminal character set
+if necessary.
 .TP
 .B quit
 (q) Terminates the session, saving all undeleted,
@@ -1336,6 +1361,18 @@ A return to the Shell is effected,
 unless the rewrite of edit file fails,
 in which case the user can escape
 with the exit command.
+.TP
+.B remove
+(rem) Removes the named folders.
+The user is asked for confirmation
+in interactive mode.
+.TP
+.B rename
+(ren) Takes the name of an existing folder
+and the name for the new folder
+and renames the first to the second one.
+Both folders must be of the same type
+and must be located on the current server for IMAP.
 .TP
 .B Reply
 (R) Reply to originator.
@@ -1384,7 +1421,7 @@ Same as
 .B retain
 Add the list of header fields named to the retained list.
 Only the header fields in the retain list are shown
-on your terminal when you print a message.
+on the terminal when a message is printed.
 All other header fields are suppressed.
 The Type and Print commands can be used
 to print a message in its entirety.
@@ -1665,6 +1702,17 @@ print a header summary.
 (unth) Same as
 .IR unsort .
 .TP
+.B verify
+(ver)
+Takes a message list and verifies each message.
+If a message is not an S/MIME signed message,
+verification will fail for it.
+The verification process checks
+if the message was signed using a valid certificate,
+if the message sender's email address matches
+one of those contained within the certificate,
+and if the message content has been altered.
+.TP
 .B visual
 (v) Takes a message list and invokes the display editor
 on each message.
@@ -1672,7 +1720,7 @@ on each message.
 .B write
 (w) For conventional messages,
 the body without all headers is written.
-The output is converted
+The output is decrypted and converted
 to its native format, if necessary.
 If the output file exists,
 the text is appended.\(emIf a message is in MIME multipart format,
@@ -1772,13 +1820,13 @@ but do not make the names visible in the Cc: line
 Add the given names to the list of carbon copy recipients.
 .TP
 .B ~d
-Read the file `dead.letter' from your home directory
+Read the file `dead.letter' from the user's home directory
 into the message.
 .TP
 .B ~e
 Invoke the text editor on the message collected so far.
 After the editing session is finished,
-you may continue appending text
+the user may continue appending text
 to the message.
 .TP
 .BI ~f messages
@@ -1830,7 +1878,7 @@ it is piped through the pager.
 .B ~q
 Abort the message being sent,
 copying the message to
-`dead.letter' in your home directory
+`dead.letter' in the user's home directory
 if save is set.
 .TP
 .BI ~r filename
@@ -1848,9 +1896,9 @@ Invoke an alternate editor
 on the message collected so far.
 Usually, the alternate editor
 will be a screen editor.
-After you quit the editor,
-you may resume appending text
-to the end of your message.
+After the editor is quit,
+the user may resume appending text
+to the end of the message.
 .TP
 .BI ~w filename
 Write the message onto the named file.
@@ -1880,9 +1928,9 @@ Identical to ~:.
 .BI ~~ string
 Insert the string of text in the message
 prefaced by a single ~.
-If you have changed the escape character,
-then you should double that character
-in order to send it.
+If the escape character has been changed,
+that character must be doubled
+in order to send it at the beginning of a line.
 .SS "Variable options"
 Options are controlled via set and unset commands,
 see their entries for a syntax description.
@@ -1910,9 +1958,9 @@ rather than prepended.
 This should always be set.
 .TP
 .BR ask \ or \ asksub
-Causes \fInail\fR to prompt you for the subject
-of each message you send.
-If you respond with simply a newline,
+Causes \fInail\fR to prompt for the subject
+of each message sent.
+If the user responds with simply a newline,
 no subject field will be sent.
 .TP
 .B askatend
@@ -1924,7 +1972,7 @@ If set, \fInail\fR asks for files to attach at the end of each message.
 Responding with a newline indicates not to include an attachment.
 .TP
 .B askcc
-Causes you to be prompted
+Causes the user to be prompted
 for additional carbon copy recipients
 (at the end of each message if
 .I askatend
@@ -1932,10 +1980,10 @@ or
 .I bsdcompat
 is set).
 Responding with a newline
-indicates your satisfaction with the current list.
+indicates the user's satisfaction with the current list.
 .TP
 .B askbcc
-Causes you to be prompted
+Causes the user to be prompted
 for additional blind carbon copy recipients
 (at the end of each message if
 .I askatend
@@ -1943,7 +1991,15 @@ or
 .I bsdcompat
 is set).
 Responding with a newline
-indicates your satisfaction with the current list.
+indicates the user's satisfaction with the current list.
+.TP
+.B asksign
+Causes the user to be prompted
+if the message is to be signed
+at the end of each message.
+The
+.I smime-sign
+variable is ignored when this variable is set.
 .TP
 .B autocollapse
 Causes threads to be collapsed automatically when
@@ -2048,7 +2104,7 @@ but other accounts are not affected.
 .B dot
 The binary option dot causes \fInail\fR to interpret
 a period alone on a line
-as the terminator of a message you are sending.
+as the terminator of a message the user is sending.
 .TP
 .B editheaders
 When a message is edited while being composed,
@@ -2095,7 +2151,7 @@ This option is used to hold messages
 in the system mailbox by default.
 .TP
 .B ignore
-Causes interrupt signals from your terminal
+Causes interrupt signals from the terminal
 to be ignored and echoed as @'s.
 .TP
 .B ignoreeof
@@ -2118,7 +2174,7 @@ Activates
 for a specific account.
 .TP
 .B keep
-This option causes \fInail\fR to truncate your system mailbox
+This option causes \fInail\fR to truncate the user's system mailbox
 instead of deleting it when it is empty.
 This should always be set,
 since it prevents malicious users
@@ -2126,12 +2182,14 @@ from creating fake mail folders
 in a world-writable spool directory.
 .TP
 .B keepsave
-When you save a message,
-\fInail\fR usually discards it
+When a message is saved,
+it is usually discarded
 from the originating folder
-when you quit.
-To retain all saved messages,
-set this option.
+when
+.I nail
+is quit.
+Setting this option
+causes all saved message to be retained.
 .TP
 .B markanswered
 When a message is replied to
@@ -2248,10 +2306,10 @@ Suppresses the printing of the version when first invoked.
 Reverses the sense of reply and Reply commands.
 .TP
 .B save
-When you abort a message
+When the user aborts a message
 with two RUBOUT (interrupt characters)
 \fInail\fR copies the partial letter
-to the file `dead.letter' in your home directory.
+to the file `dead.letter' in the home directory.
 This option is set by default.
 .TP
 .B searchheaders
@@ -2282,6 +2340,27 @@ in the header field summary and in message specifications.
 Causes the recipient of the message to be shown in the header summary
 if the message was sent by the user.
 .TP
+.B smime-force-encryption
+Causes
+.I nail
+to refuse sending unencrypted messages.
+.TP
+.B smime-sign
+If this variable is set,
+outgoing messages are S/MIME signed with the user's private key.
+Signing a message enables a recipient to verify
+that the sender used a valid certificate,
+that the email addresses in the certificate
+match those in the message header,
+and that the message content has not been altered.
+It does not change the message text,
+and people will be able to read the message as usual.
+.TP
+.B smime-no-default-ca
+Do not load the default CA locations
+when verifying S/MIME signed messages.
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
 .B smtp-use-starttls
 Causes \fInail\fR to issue a STARTTLS command
 to make an SMTP session SSL/TLS encrypted.
@@ -2293,6 +2372,7 @@ whether a server supports it or not.
 .B ssl-no-default-ca
 Do not load the default CA locations
 to verify SSL/TLS server certificates.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-v2-allow
 Accept SSLv2 connections.
@@ -2421,7 +2501,7 @@ refer to files below that directory.
 If the directory name begins with a `/',
 \fInail\fR considers it to be an absolute pathname;
 otherwise, the folder directory is found
-relative to your home directory.
+relative to the user's home directory.
 .IP
 The directory name may also refer to an IMAP account;
 any names that begin with `+'
@@ -2489,9 +2569,9 @@ this address is handled as if it were in the alternates list.
 .\" and its value differs from \fIlocalhost\fR.
 If the machine's hostname is not valid at the Internet
 (for example at a dialup machine),
-you have to set this variable
-or
+either this variable or
 .I hostname
+have to be set
 to get correct Message-ID header fields.
 .TP
 .B headline
@@ -2632,6 +2712,34 @@ newly created local folders will be in
 .I maildir
 format.
 .TP
+.B nss-config-dir
+A directory that contains the files
+.RI cert N .db
+to retrieve certificates,
+.RI key N .db
+to retrieve private keys,
+and secmod.db,
+where
+.I N
+is a digit.
+These are usually taken from Mozilla installations,
+so an appropriate value might be
+`~/.mozilla/firefox/default.clm'.
+.I Nail
+opens these files read-only
+and does not modify them.
+However, if the files are modified by Mozilla
+while
+.I nail
+is running,
+it will print a `Bad database' message.
+It may be necessary to create copies of these files
+that are exclusively used by
+.I nail
+then.
+Only applicable if S/MIME and SSL/TLS support is built using
+Network Security Services (NSS).
+.TP
 .B ORGANIZATION
 The value to put into the \fI`Organization:'\fR field of the message header.
 .TP
@@ -2726,11 +2834,11 @@ as if they were in the alternates list.
 .B screen
 When \fInail\fR initially prints the message headers,
 it determines the number to print
-by looking at the speed of your terminal.
-The faster your terminal, the more it prints.
+by looking at the speed of the terminal.
+The faster the terminal, the more it prints.
 This option overrides this calculation
 and specifies how many message headers
-you want printed.
+are printed.
 This number is also used
 for scrolling with the z command.
 .TP
@@ -2763,6 +2871,128 @@ The file's content is then appended to each singlepart message
 and to the first part of each multipart message.
 Be warned that there is no possibility
 to edit the signature for an individual message.
+.TP
+.B smime-ca-dir
+Specifies a directory with CA certificates for verification
+of S/MIME signed messages.
+The format is the same as described in
+.IR SSL_CTX_load_verify_locations (3).
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
+.B smime-ca-file
+Specifies a file with CA certificates for verification
+of S/MIME signed messages.
+The format is the same as described in
+.IR SSL_CTX_load_verify_locations (3).
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
+\fBsmime-cipher-\fIuser@host\fR
+Specifies a cipher to use when generating S/MIME encrypted messages
+for
+.IR user@host .
+Valid ciphers are
+.B rc2-40
+(RC2 with 40 bits),
+.B rc2-64
+(RC2 with 64 bits),
+and
+.B des-ede3
+(3DES).
+The default is 3DES.
+It is not recommended to use the RC2 variants
+unless a recipient's client is actually unable to handle 3DES
+since they are comparatively weak;
+but even so, the recipient should upgrade his software in preference.
+.TP
+.B smime-crl-file
+Specifies a file that contains a CRL in PEM format
+to use when verifying S/MIME messages.
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
+.B smime-crl-dir
+Specifies a directory that contains files with CRLs in PEM format
+to use when verifying S/MIME messages.
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
+\fBsmime-encrypt-\fIuser@host\fR
+If this variable is set,
+messages to
+.I user@host
+are encrypted before sending.
+If S/MIME support is built using OpenSSL,
+the value of the variable must be set to the name of a file
+that contains a certificate in PEM format.
+If S/MIME support is built using NSS,
+the value of this variable is ignored,
+but if multiple certificates for
+.I user@host
+are available, the
+.I smime-nickname-user@host
+variable should be set.
+Otherwise a certificate for the recipient
+is automatically retrieved from the certificate database,
+if possible.
+.IP
+If a message is sent to multiple recipients,
+each of them for whom a corresponding variable is set
+will receive an individually encrypted message;
+other recipients will continue to receive the message in plain text
+unless the
+.I smime-force-encryption
+variable is set.
+It is recommended to sign encrypted messages,
+i.\|e. to also set the
+.I smime-sign
+variable.
+.TP
+\fBsmime-nickname-\fIuser@host\fR
+Specifies the nickname of a certificate
+to be used when encrypting messages for
+.I user@host .
+Only applicable if S/MIME support is built using NSS.
+.TP
+.B smime-sign-cert
+Points to a file in PEM format
+that contains the user's private key
+as well as his certificate.
+Both are used with S/MIME
+for signing and decrypting messages.
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
+\fBsmime-sign-cert-\fIuser@host\fR
+Overrides
+.I smime-sign-cert
+for the specific addresses.
+When signing messages and the value of the
+.I from
+variable is set
+to
+.IR user@host ,
+the specific file is used.
+When decrypting messages,
+their recipient fields (To: and Cc:) are searched for addresses
+for which such a variable is set.
+.I Nail
+always uses the first address that matches,
+so if the same message is sent to more than one
+of the user's addresses using different encryption keys,
+decryption might fail.
+Only applicable if S/MIME support is built using OpenSSL.
+.TP
+.B smime-sign-nickname
+Specifies that the named certificate be used for signing mail.
+If this variable is not set,
+but a single certificate matching the current
+.I from
+address is found in the database,
+that one is used automatically.
+Only applicable if S/MIME support is built using NSS.
+.TP
+\fBsmime-sign-nickname-\fIuser@host\fR
+Overrides
+.I smime-sign-nickname
+for a specific address.
+Only applicable if S/MIME support is built using NSS.
 .TP
 .B smtp
 Normally, \fInail\fR invokes
@@ -2833,21 +3063,26 @@ depending on the
 variable.
 .TP
 .B ssl-ca-dir
-Specifies a directory with CA certificates for verification.
+Specifies a directory with CA certificates for verification
+of SSL/TLS server certificates.
 See
 .IR SSL_CTX_load_verify_locations (3)
 for more information.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-ca-file
-Specifies a file with CA certificates for verification.
+Specifies a file with CA certificates for verification
+of SSL/TLS server certificates.
 See
 .IR SSL_CTX_load_verify_locations (3)
 for more information.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-cert
 Sets the file name 
 for a SSL/TLS client certificate
 required by some servers.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 \fBssl-cert-\fIuser\fB@\fIhost\fR
 Sets an account-specific file name
@@ -2856,16 +3091,29 @@ required by some servers.
 Overrides
 .I ssl-cert
 for the specified account.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-cipher-list
 Specifies a list of ciphers for SSL/TLS connections.
 See ciphers(1) for more information.
+Only applicable if SSL/TLS support is built using OpenSSL.
+.TP
+.B ssl-crl-file
+Specifies a file that contains a CRL in PEM format
+to use when verifying SSL/TLS server certificates.
+Only applicable if SSL/TLS support is built using OpenSSL.
+.TP
+.B ssl-crl-dir
+Specifies a directory that contains files with CRLs in PEM format
+to use when verifying SSL/TLS server certificates.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-key
 Sets the file name
 for the private key of a SSL/TLS client certificate.
 If unset, the name of the certificate file is used.
 The file is expected to be in PEM format.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 \fBssl-key-\fIuser\fB@\fIhost\fR
 Sets an account-specific file name
@@ -2873,6 +3121,7 @@ for the private key of a SSL/TLS client certificate.
 Overrides
 .I ssl-key
 for the specified account.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-method
 Selects a SSL/TLS protocol version;
@@ -2896,6 +3145,7 @@ see
 .IR RAND_load_file (3).
 If the file is a regular file writable by the invoking user,
 new data is written to it after it has been loaded.
+Only applicable if SSL/TLS support is built using OpenSSL.
 .TP
 .B ssl-verify
 Sets the action to be performed if an error occurs
@@ -3358,8 +3608,12 @@ command line option with
 .fi
 (This string is not necessarily the same as your Internet mail address.)
 You can replace `imaps://' with `imap://'
-if the server does not support SSL/TLS,
-or use `pop3s://' or `pop3://' if the server does not offer IMAP.
+if the server does not support SSL/TLS.
+(If SSL/TLS support is built using NSS, the
+.I nss-config-dir
+variable must be set before a connection can be initiated,
+see above).
+Use `pop3s://' or `pop3://' if the server does not offer IMAP.
 You should use IMAP if you can, though;
 first because it requires fewer network operations than POP3
 to get the contents of the mailbox
@@ -3580,10 +3834,10 @@ Contact your ISP
 if you need a client certificate
 or if verification of the server certificate fails.
 If the failed certificate is indeed valid,
-fetch its CA certificate by executing
+fetch its CA certificate by executing the shell command
 .nf
 
-    \fBopenssl s_client </dev/null \-showcerts \-connect \e
+    $ \fBopenssl s_client </dev/null \-showcerts \-connect \e
            \fIserver.myisp.example\fB:\fIimaps\fB 2>&1 | tee \fIlog\fR
 
 .fi
@@ -3687,6 +3941,223 @@ Automatical command execution like this
 can compromise your system security,
 in particular if you stay not always informed
 about such issues.
+.SS "Signed and encrypted messages with S/MIME"
+S/MIME provides two central mechanisms:
+message signing and message encryption.
+A signed message contains some data in addition
+to the regular text.
+The data can be used to verify
+that the message was sent using a valid certificate,
+that the sender's address in the message header
+matches that in the certificate,
+and that the message text has not been altered.
+Signing a message does not change its regular text;
+it can be read regardless of whether the recipient's software
+is able to handle S/MIME.
+It is thus usually possible to sign all outgoing messages
+if so desired.\(emEncryption, in contrast,
+makes the message text invisible for all people
+except those who have access to the secret decryption key.
+To encrypt a message,
+the specific recipient's public encryption key must be known.
+It is thus not possible to send encrypted mail to people
+unless their key has been retrieved
+from either previous communication or public key directories.
+A message should always be signed before it is encrypted.
+Otherwise, it is still possible that the encrypted message text
+is altered.
+.PP
+A central concept to S/MIME is that of the certification authority (CA).
+A CA is a trusted institution that issues certificates.
+For each of these certificates,
+it can be verified that it really originates from the CA,
+provided that the CA's own certificate is previously known.
+A set of CA certificates is usually delivered with OpenSSL
+and installed on your system.
+If you trust the source of your OpenSSL software installation,
+this offers reasonable security for S/MIME on the Internet.
+In general, a certificate cannot be more secure
+than the method its CA certificate has been retrieved with, though.
+Thus if you download a CA certificate from the Internet,
+you can only trust the messages you verify using that certificate
+as much as you trust the download process.
+.PP
+The first thing you need for participating in S/MIME message exchange
+is your personal certificate,
+including a private key.
+The certificate contains public information,
+in particular your name and your email address,
+and the public key that is used by others
+to encrypt messages for you,
+and to verify signed messages they supposedly received from you.
+The certificate is included in each signed message you send.
+The private key must be kept secret.
+It is used to decrypt messages that were
+previously encrypted with your public key,
+and to sign messages.
+.PP
+For personal use,
+it is recommended that you get a S/MIME certificate
+from one of the major CAs on the Internet using your WWW browser.
+(Many CAs offer such certificates for free.)
+You will usually receive
+a combined certificate and private key
+in PKCS#12 format which
+.I nail
+does not directly accept
+if S/MIME support is built using OpenSSL.
+To convert it to PEM format,
+use the following shell command:
+.nf
+.sp
+    $ \fBopenssl pkcs12 \-in \fIcert.p12\fB \-out \fIcert.pem\fB \-clcerts \e
+        \-nodes\fR
+.sp
+.fi
+If you omit the
+.I \-nodes
+parameter,
+you can specifiy an additional
+.I "PEM pass phrase"
+for protecting the private key.
+.I Nail
+will then ask you for that pass phrase
+each time it signs or decrypts a message.
+You can then use
+.nf
+.sp
+    \fBset smime-sign-cert-\fImyname@myisp.example\fB=\fIcert.pem\fR
+.sp
+.fi
+to make this private key and certificate known to
+.IR nail .
+.PP
+If S/MIME support is built using NSS,
+the PKCS#12 file must be installed using Mozilla
+(provided that
+.I nss-config-dir
+is set appropriately,
+see above),
+and no further action is necessary
+unless multiple user certificates
+for the same email address are installed.
+In this case,
+the
+.I smime-sign-nickname
+variable has to be set appropriately.
+.PP
+You can now sign outgoing messages.
+Just use
+.nf
+.sp
+    \fBset smime-sign\fR
+.sp
+.fi
+to do so.
+.PP
+From each signed message you send,
+the recipient can fetch your certificate
+and use it to send encrypted mail back to you.
+Accordingly if somebody sends you a signed message,
+you can do the same.
+First use the
+.I verify
+command to check the validity of the certificate.
+After that,
+retrieve the certificate and tell
+.I nail
+that it should use it for encryption:
+.nf
+.sp
+    \fBcertsave\fI filename\fR
+    \fBset smime-encrypt-\fIuser@host\fB=\fIfilename\fR
+.sp
+.fi
+If S/MIME support is built using NSS,
+the saved certificate must be installed using Mozilla.
+The value of the
+.I smime-encrypt-user@host
+is ignored then,
+but if multiple certificates for the recipient are available,
+the
+.I smime-nickname-user@host
+variable must be set.
+.PP
+You should carefully consider
+if you prefer to store encrypted messages in decrypted form.
+If you do, anybody who has access to your mail folders can read them,
+but if you do not,
+you might be unable to read them yourself later
+if you happen to lose your private key.
+The
+.I decrypt
+command saves messages in decrypted form,
+while the
+.IR save ,
+.IR copy ,
+and
+.I move
+commands leave them encrypted.
+.PP
+Note that neither S/MIME signing nor encryption
+applies to message subjects or other header fields.
+Thus they may not contain sensitive information
+for encrypted messages,
+and cannot be trusted even if the message content
+has been verified.
+.SS "Using CRLs with S/MIME or SSL/TLS"
+Certification authorities (CAs) issue
+certificate revocation lists (CRLs) on a regular basis.
+These lists contain the serial numbers of certificates
+that have been declared invalid after they have been issued.
+Such usually happens
+because the private key for the certificate has been compromised,
+because the owner of the certificate has left
+the organization that is mentioned in the certificate,
+etc.
+To seriously use S/MIME or SSL/TLS verification,
+an up-to-date CRL is required for each trusted CA.
+There is otherwise no method
+to distinguish between valid and invalidated certificates.
+.I Nail
+currently offers no mechanism to fetch CRLs,
+or to access them on the Internet,
+so you have to retrieve them by some external mechanism.
+.PP
+If S/MIME and SSL/TLS support are built using OpenSSL,
+.I nail
+accepts CRLs in PEM format only;
+CRLs in DER format must be converted,
+e.\|g. with the shell command
+.nf
+.sp
+    $ \fBopenssl crl \-inform DER \-in \fIcrl.der\fB \-out \fIcrl.pem\fR
+.sp
+.fi
+To tell
+.I nail
+about the CRLs,
+a directory
+that contains all CRL files
+(and no other files)
+must be created.
+The
+.I smime-crl-dir
+or
+.I ssl-crl-dir
+variables, respectively,
+must then be set to point to that directory.
+After that,
+.I nail
+requires a CRL to be present
+for each CA that is used
+to verify a certificate.
+.PP
+If S/MIME and SSL/TLS support are built using NSS,
+CRLs can be imported in Mozilla applications
+(provided that
+.I nss-config-dir
+is set appropriately).
 .SH "SEE ALSO"
 fmt(1),
 newaliases(1),
@@ -3796,6 +4267,7 @@ and with a server that does,
 the `exit' command will not cause the message status to be reset.
 The `newmail' command and the `newmail' variable
 have no effect.
+It is not possible to rename or to remove POP3 mailboxes.
 .PP
 An unencrypted IMAP or POP3 message download
 can be interrupted from the terminal,
@@ -3836,8 +4308,6 @@ mode is to configure a local SMTP server
 such that it sends outgoing mail
 as soon as an external network connection is available again,
 i.\|e. to advise it to do that from a network startup script.
-.PP
-There is no support for SSL/TLS certificate revocation lists (CRLs) yet.
 .PP
 \fINail\fR is intended to be
 a MIME-conformant mail user agent,

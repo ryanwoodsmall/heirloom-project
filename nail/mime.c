@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.21 (gritter) 8/19/04";
+static char sccsid[]  = "@(#)mime.c	2.24 (gritter) 9/22/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -897,11 +897,12 @@ gettextconversion()
 }
 
 int
-get_mime_convert(fp, contenttype, charset, isclean)
+get_mime_convert(fp, contenttype, charset, isclean, dosign)
 FILE *fp;
 char **contenttype;
 char **charset;
 enum mimeclean *isclean;
+int	dosign;
 {
 	int convert;
 
@@ -912,7 +913,7 @@ enum mimeclean *isclean;
 				ascncasecmp(*contenttype, "text/", 5) == 0)
 			*contenttype = "application/octet-stream";
 		*charset = NULL;
-	} else if (*isclean & MIME_LONGLINES)
+	} else if (*isclean & MIME_LONGLINES || dosign)
 		convert = CONV_TOQP;
 	else if (*isclean & MIME_HIGHBIT)
 		convert = gettextconversion();
@@ -998,8 +999,11 @@ int (*mustquote)(int);
 	sz = in->l;
 	upper = in->s + in->l;
 	for (p = in->s, l = 0; p < upper; p++) {
-		if (mustquote(*p) 
-				|| (*(p + 1) == '\n' && blankchar(*p & 0377))) {
+		if (mustquote(*p) ||
+				*(p + 1) == '\n' && blankchar(*p & 0377) ||
+				*p == ' ' && l == 4 &&
+				p[-4] == 'F' && p[-3] == 'r' &&
+				p[-2] == 'o' && p[-1] == 'm') {
 			if (l >= 69) {
 				sz += 2;
 				fwrite("=\n", sizeof (char), 2, fo);
@@ -1042,7 +1046,7 @@ int (*mustquote)(int);
 	upper = in->s + in->l;
 	for (p = in->s; p < upper; p++) {
 		if (mustquote(*p) ||
-				(*(p + 1) == '\n' && blankchar(*p & 0377))) {
+				*(p + 1) == '\n' && blankchar(*p & 0377)) {
 			out->l += 2;
 			*q++ = '=';
 			ctohex(*p, q);

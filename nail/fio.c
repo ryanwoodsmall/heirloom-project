@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.59 (gritter) 9/14/04";
+static char sccsid[] = "@(#)fio.c	2.63 (gritter) 9/19/04";
 #endif
 #endif /* not lint */
 
@@ -51,7 +51,10 @@ static char sccsid[] = "@(#)fio.c	2.59 (gritter) 9/14/04";
 #endif	/* HAVE_WORDEXP */
 #include <unistd.h>
 
-#ifdef	USE_SSL
+#if defined (USE_NSS)
+#include <nss.h>
+#include <ssl.h>
+#elif defined (USE_OPENSSL)
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509v3.h>
@@ -844,8 +847,15 @@ sclose(sp)
 	if (sp->s_fd > 0) {
 		if (sp->s_onclose != NULL)
 			(*sp->s_onclose)();
-#ifdef	USE_SSL
-		if (sp->s_ssl) {
+#if defined (USE_NSS)
+		if (sp->s_use_ssl) {
+			sp->s_use_ssl = 0;
+			i = PR_Close(sp->s_prfd) == PR_SUCCESS ? 0 : -1;
+			sp->s_prfd = NULL;
+		} else
+#elif defined (USE_OPENSSL)
+		if (sp->s_use_ssl) {
+			sp->s_use_ssl = 0;
 			SSL_shutdown(sp->s_ssl);
 			SSL_free(sp->s_ssl);
 			sp->s_ssl = NULL;
@@ -853,7 +863,9 @@ sclose(sp)
 			sp->s_ctx = NULL;
 		}
 #endif	/* USE_SSL */
-		i = close(sp->s_fd);
+		{
+			i = close(sp->s_fd);
+		}
 		sp->s_fd = -1;
 		return i;
 	}
@@ -919,8 +931,12 @@ swrite1(sp, data, sz, use_buffer)
 	}
 	if (sz == 0)
 		return OKAY;
-#ifdef	USE_SSL
-	if (sp->s_ssl) {
+#if defined (USE_NSS)
+	if (sp->s_use_ssl) {
+		x = PR_Write(sp->s_prfd, data, sz);
+	} else
+#elif defined (USE_OPENSSL)
+	if (sp->s_use_ssl) {
 ssl_retry:	x = SSL_write(sp->s_ssl, data, sz);
 		if (x < 0) {
 			switch (SSL_get_error(sp->s_ssl, x)) {
@@ -938,12 +954,13 @@ ssl_retry:	x = SSL_write(sp->s_ssl, data, sz);
 		char	o[512];
 		snprintf(o, sizeof o, "%s write error",
 				sp->s_desc ? sp->s_desc : "socket");
-#ifdef	USE_SSL
-		(sp->s_ssl ? ssl_gen_err : perror)
-#else	/* USE_SSL */
-		perror
-#endif	/* USE_SSL */
-			(o);
+#if defined (USE_NSS)
+		sp->s_use_ssl ? nss_gen_err(o) : perror(o);
+#elif defined (USE_OPENSSL)
+		sp->s_use_ssl ? ssl_gen_err(o) : perror(o);
+#else	/* !USE_SSL */
+		perror(o);
+#endif	/* !USE_SSL */
 		if (x < 0)
 			sclose(sp);
 		return STOP;
@@ -971,8 +988,24 @@ sgetline(line, linesize, linelen, sp)
 		}
 		if (sp->s_rbufptr == NULL ||
 				sp->s_rbufptr >= &sp->s_rbuf[sp->s_rsz]) {
-#ifdef	USE_SSL
-			if (sp->s_ssl) {
+#if defined (USE_NSS)
+			if (sp->s_use_ssl) {
+				if ((sp->s_rsz = PR_Read(sp->s_prfd,
+						sp->s_rbuf,
+						sizeof sp->s_rbuf)) <= 0) {
+					if (sp->s_rsz < 0) {
+						char	o[512];
+						snprintf(o, sizeof o,
+							sp->s_desc ?
+								sp->s_desc :
+								"socket");
+						nss_gen_err(o);
+					}
+					break;
+				}
+			} else
+#elif defined (USE_OPENSSL)
+			if (sp->s_use_ssl) {
 		ssl_retry:	if ((sp->s_rsz = SSL_read(sp->s_ssl,
 						sp->s_rbuf,
 						sizeof sp->s_rbuf)) <= 0) {
@@ -1141,7 +1174,7 @@ sopen(xserver, sp, use_ssl, uhp, portstr, verbose)
 		fputs(catgets(catd, CATSET, 193, " connected.\n"), stderr);
 	memset(sp, 0, sizeof *sp);
 	sp->s_fd = sockfd;
-#ifdef	USE_SSL
+#if defined (USE_SSL)
 	if (use_ssl) {
 		enum okay ok;
 

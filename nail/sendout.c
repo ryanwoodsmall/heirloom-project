@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.42 (gritter) 9/10/04";
+static char sccsid[] = "@(#)sendout.c	2.52 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -59,20 +59,19 @@ static char sccsid[] = "@(#)sendout.c	2.42 (gritter) 9/10/04";
 static const char	randfile[] = "/dev/urandom";
 static char	*send_boundary;
 
-static char	*makeboundary __P((void));
 static char	*getencoding __P((int));
 static struct name	*fixhead __P((struct header *, struct name *,
 				enum gfield));
 static int	put_signature __P((FILE *, int));
-static int	attach_file __P((struct attachment *, FILE *));
+static int	attach_file __P((struct attachment *, FILE *, int));
 static int	make_multipart __P((struct header *, int, FILE *, FILE *,
-			const char *, const char *));
-static FILE	*infix __P((struct header *, FILE *));
+			const char *, const char *, int));
+static FILE	*infix __P((struct header *, FILE *, int));
 static int	savemail __P((char [], FILE *));
 static int	sendmail_internal __P((void *, int));
+static enum okay	transfer __P((struct name *, struct name *, FILE *));
 static enum okay	start_mta __P((struct name *, struct name *, FILE *));
 static void	message_id __P((FILE *));
-static void	date_field __P((FILE *));
 static int	fmt __P((char *, struct name *, FILE *, int, int, int));
 static int	infix_fw __P((FILE *, FILE *, struct message *,
 			struct name *, int));
@@ -82,7 +81,7 @@ static int	infix_fw __P((FILE *, FILE *, struct message *,
 /*
  * Generate a boundary for MIME multipart messages.
  */
-static char *
+char *
 makeboundary()
 {
 	int i, bd;
@@ -254,9 +253,10 @@ int convert;
  * Write an attachment to the file buffer, converting to MIME.
  */
 static int
-attach_file(ap, fo)
+attach_file(ap, fo, dosign)
 struct attachment *ap;
 FILE *fo;
+int	dosign;
 {
 	FILE *fi;
 	char *charset = NULL, *contenttype = NULL, *basename;
@@ -279,7 +279,8 @@ FILE *fo;
 		contenttype = ap->a_content_type;
 	else
 		contenttype = mime_filecontent(basename);
-	convert = get_mime_convert(fi, &contenttype, &charset, &isclean);
+	convert = get_mime_convert(fi, &contenttype, &charset, &isclean,
+			dosign);
 	fprintf(fo,
 		"\n--%s\n"
 		"Content-Type: %s",
@@ -333,12 +334,13 @@ FILE *fo;
  * Generate the body of a MIME multipart message.
  */
 static int
-make_multipart(hp, convert, fi, fo, contenttype, charset)
+make_multipart(hp, convert, fi, fo, contenttype, charset, dosign)
 struct header *hp;
 FILE *fi, *fo;
 const char *contenttype;
 const char *charset;
 int convert;
+int	dosign;
 {
 	struct attachment *att;
 
@@ -385,7 +387,7 @@ int convert;
 			put_signature(fo, convert);
 	}
 	for (att = hp->h_attach; att != NULL; att = att->a_flink)
-		if (attach_file(att, fo) != 0)
+		if (attach_file(att, fo, dosign) != 0)
 			return -1;
 	/* the final boundary with two attached dashes */
 	fprintf(fo, "\n--%s--\n", send_boundary);
@@ -397,9 +399,10 @@ int convert;
  * and return the new file.
  */
 static FILE *
-infix(hp, fi)
+infix(hp, fi, dosign)
 	struct header *hp;
 	FILE *fi;
+	int	dosign;
 {
 	FILE *nfo, *nfi;
 	char *tempMail;
@@ -421,7 +424,8 @@ infix(hp, fi)
 	}
 	rm(tempMail);
 	Ftfree(&tempMail);
-	convert = get_mime_convert(fi, &contenttype, &charset, &isclean);
+	convert = get_mime_convert(fi, &contenttype, &charset,
+			&isclean, dosign);
 #ifdef	HAVE_ICONV
 	tcs = gettcharset();
 	if (((isclean & MIME_HASNUL) == 0 && (isclean & MIME_HIGHBIT) &&
@@ -466,7 +470,7 @@ infix(hp, fi)
 #endif
 	if (hp->h_attach != NULL) {
 		if (make_multipart(hp, convert, fi, nfo,
-					contenttype, charset) != 0) {
+					contenttype, charset, dosign) != 0) {
 			Fclose(nfo);
 			Fclose(nfi);
 #ifdef	HAVE_ICONV
@@ -707,6 +711,53 @@ Sendmail(v)
 	return sendmail_internal(v, 1);
 }
 
+static enum okay
+transfer(to, mailargs, input)
+struct name	*to, *mailargs;
+FILE	*input;
+{
+	char	o[LINESIZE], *cp;
+	struct name	*np, *nt;
+	int	cnt = 0;
+	FILE	*ef;
+	enum okay	ok = OKAY;
+
+	np = to;
+	while (np) {
+		snprintf(o, sizeof o, "smime-encrypt-%s", np->n_name);
+		if ((cp = value(o)) != NULL) {
+			if ((ef = smime_encrypt(input, cp, np->n_name)) != 0) {
+				nt = nalloc(np->n_name,
+					np->n_type & ~(GFULL|GSKIN));
+				if (start_mta(nt, mailargs, ef) != OKAY)
+					ok = STOP;
+				Fclose(ef);
+			} else {
+				fprintf(stderr, "Message not sent to <%s>\n",
+						np->n_name);
+				senderr++;
+			}
+			rewind(input);
+			if (np->n_flink)
+				np->n_flink->n_blink = np->n_blink;
+			if (np->n_blink)
+				np->n_blink->n_flink = np->n_flink;
+			if (np == to)
+				to = np->n_flink;
+			np = np->n_flink;
+		} else {
+			cnt++;
+			np = np->n_flink;
+		}
+	}
+	if (cnt) {
+		if (value("smime-force-encryption") ||
+				start_mta(to, mailargs, input) != OKAY)
+			ok = STOP;
+	}
+	return ok;
+}
+
 /*
  * Start the Mail Transfer Agent
  * mailing to namelist and stdin redirected to input.
@@ -800,6 +851,7 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 	struct name *to;
 	FILE *mtf, *nmtf;
 	enum okay	ok = STOP;
+	int	dosign = -1;
 
 #ifdef	notdef
 	if ((hp->h_to = checkaddrs(hp->h_to)) == NULL) {
@@ -817,13 +869,16 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 		if (((value("bsdcompat") || value("askatend"))
 					&& (value("askcc") != NULL ||
 					value("askbcc") != NULL)) ||
-				value("askattach") != NULL) {
+				value("askattach") != NULL ||
+				value("asksign") != NULL) {
 			if (value("askcc") != NULL)
 				grabh(hp, GCC, 1);
 			if (value("askbcc") != NULL)
 				grabh(hp, GBCC, 1);
 			if (value("askattach") != NULL)
 				hp->h_attach = edit_attachments(hp->h_attach);
+			if (value("asksign") != NULL)
+				dosign = yorn("Sign this message (y/n)? ");
 		} else {
 			printf(catgets(catd, CATSET, 183, "EOT\n"));
 			fflush(stdout);
@@ -837,6 +892,12 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 			printf(catgets(catd, CATSET, 185,
 				"Null message body; hope that's ok\n"));
 	}
+	if (dosign < 0) {
+		if (value("smime-sign") != NULL)
+			dosign = 1;
+		else
+			dosign = 0;
+	}
 	/*
 	 * Now, take the user names from the combined
 	 * to and cc lists and do all the alias
@@ -848,10 +909,10 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 		senderr++;
 	}
 	to = fixhead(hp, to, GCC|GBCC|GREPLYTO);
-	if ((nmtf = infix(hp, mtf)) == NULL) {
+	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
 		/* fprintf(stderr, ". . . message lost, sorry.\n"); */
 		perror("");
-		senderr++;
+	fail:	senderr++;
 		rewind(mtf);
 		savedeadletter(mtf);
 		fputs(catgets(catd, CATSET, 187,
@@ -859,6 +920,12 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 		return STOP;
 	}
 	mtf = nmtf;
+	if (dosign) {
+		if ((nmtf = smime_sign(mtf)) == NULL)
+			goto fail;
+		Fclose(mtf);
+		mtf = nmtf;
+	}
 	/*
 	 * Look through the recipient list for names with /'s
 	 * in them which we write to as files directly.
@@ -899,7 +966,7 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 			goto out;
 		}
 	}
-	ok = start_mta(to, hp->h_smopts, mtf);
+	ok = transfer(to, hp->h_smopts, mtf);
 out:
 	Fclose(mtf);
 	return ok;
@@ -967,9 +1034,10 @@ const char *month_names[] = {
  * because numeric timezones are easier to read and because $TZ is
  * not set on most GNU systems.
  */
-static void
-date_field(fo)
+int
+mkdate(fo, field)
 FILE *fo;
+const char	*field;
 {
 	time_t t;
 	struct tm *tmptr;
@@ -983,7 +1051,8 @@ FILE *fo;
 	tmptr = localtime(&t);
 	if (tmptr->tm_isdst > 0)
 		tzdiff_hour++;
-	fprintf(fo, "Date: %s, %02d %s %04d %02d:%02d:%02d %+03d%02d\n",
+	return fprintf(fo, "%s: %s, %02d %s %04d %02d:%02d:%02d %+03d%02d\n",
+			field,
 			weekday_names[tmptr->tm_wday],
 			tmptr->tm_mday, month_names[tmptr->tm_mon],
 			tmptr->tm_year + 1900, tmptr->tm_hour,
@@ -1031,7 +1100,7 @@ puthead(hp, fo, w, convert, contenttype, charset)
 		stealthmua = 0;
 	gotcha = 0;
 	if (w & GDATE) {
-		date_field(fo), gotcha++;
+		mkdate(fo, "Date"), gotcha++;
 	}
 	if (w & GIDENT) {
 		addr = myaddr();
@@ -1229,7 +1298,7 @@ int add_resent;
 	if (count > 0) {
 		if (add_resent) {
 				fputs("Resent-", fo);
-			date_field(fo);
+			mkdate(fo, "Date");
 			cp = myaddr();
 			if (cp != NULL) {
 				if (mime_name_invalid(cp, 1)) {
@@ -1347,7 +1416,7 @@ int add_resent;
 		savedeadletter(nfi);
 	to = elide(to);
 	if (count(to) != 0)
-		ok = start_mta(to, head.h_smopts, nfi);
+		ok = transfer(to, head.h_smopts, nfi);
 	else
 		ok = OKAY;
 	Fclose(nfi);

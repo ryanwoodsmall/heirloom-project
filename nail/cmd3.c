@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.65 (gritter) 9/14/04";
+static char sccsid[] = "@(#)cmd3.c	2.67 (gritter) 9/23/04";
 #endif
 #endif /* not lint */
 
@@ -46,6 +46,7 @@ static char sccsid[] = "@(#)cmd3.c	2.65 (gritter) 9/14/04";
 #include "rcv.h"
 #include "extern.h"
 #include <unistd.h>
+#include <errno.h>
 
 /*
  * Mail -- a mail program
@@ -1516,4 +1517,128 @@ cnoop(v)
 		break;
 	}
 	return 0;
+}
+
+int
+cremove(v)
+	void	*v;
+{
+	char	vb[LINESIZE];
+	char	**args = v;
+	char	*name;
+	int	ec = 0;
+
+	if (*args == NULL) {
+		fprintf(stderr, "Syntax is: remove mailbox ...\n");
+		return 1;
+	}
+	do {
+		name = expand(*args);
+		if (strcmp(name, mailname) == 0) {
+			fprintf(stderr,
+				"Cannot remove current mailbox \"%s\".\n",
+				name);
+			ec |= 1;
+			continue;
+		}
+		snprintf(vb, sizeof vb, "Remove \"%s\" (y/n) ? ", name);
+		if (yorn(vb) == 0)
+			continue;
+		switch (which_protocol(name)) {
+		case PROTO_FILE:
+			if (unlink(name) < 0) {	/* do not handle .gz .bz2 */
+				perror(name);
+				ec |= 1;
+			}
+			break;
+		case PROTO_POP3:
+			fprintf(stderr, "Cannot remove POP3 mailbox \"%s\".\n",
+					name);
+			ec |= 1;
+			break;
+		case PROTO_IMAP:
+			if (imap_remove(name) != OKAY)
+				ec |= 1;
+			break;
+		case PROTO_MAILDIR:
+			if (maildir_remove(name) != OKAY)
+				ec |= 1;
+			break;
+		case PROTO_UNKNOWN:
+			fprintf(stderr,
+				"Unknown protocol in \"%s\". Not removed.\n",
+				name);
+			ec |= 1;
+		}
+	} while (*++args);
+	return ec;
+}
+
+int
+crename(v)
+	void	*v;
+{
+	char	**args = v, *old, *new;
+	enum protocol	oldp, newp;
+	int	ec = 0;
+
+	if (args[0] == NULL || args[1] == NULL || args[2] != NULL) {
+		fprintf(stderr, "Syntax: rename old new\n");
+		return 1;
+	}
+	old = expand(args[0]);
+	oldp = which_protocol(old);
+	new = expand(args[1]);
+	newp = which_protocol(new);
+	if (strcmp(old, mailname) == 0 || strcmp(new, mailname) == 0) {
+		fprintf(stderr, "Cannot rename current mailbox \"%s\".\n", old);
+		return 1;
+	}
+	if ((oldp == PROTO_IMAP || newp == PROTO_IMAP) && oldp != newp) {
+		fprintf(stderr, "Can only rename folders of same type.\n");
+		return 1;
+	}
+	if (newp == PROTO_POP3)
+		goto nopop3;
+	switch (oldp) {
+	case PROTO_FILE:
+		if (link(old, new) < 0) {
+			switch (errno) {
+			case EACCES:
+			case EEXIST:
+			case ENAMETOOLONG:
+			case ENOENT:
+			case ENOSPC:
+			case EXDEV:
+				perror(new);
+				break;
+			default:
+				perror(old);
+			}
+			ec |= 1;
+		} else if (unlink(old) < 0) {
+			perror(old);
+			ec |= 1;
+		}
+		break;
+	case PROTO_MAILDIR:
+		if (rename(old, new) < 0) {
+			perror(old);
+			ec |= 1;
+		}
+		break;
+	case PROTO_POP3:
+	nopop3:	fprintf(stderr, "Cannot rename POP3 mailboxes.\n");
+		ec |= 1;
+		break;
+	case PROTO_IMAP:
+		if (imap_rename(old, new) != OKAY)
+			ec |= 1;
+		break;
+	case PROTO_UNKNOWN:
+		fprintf(stderr, "Unknown protocol in \"%s\" and \"%s\". "
+				"Not renamed.\n", old, new);
+		ec |= 1;
+	}
+	return ec;
 }

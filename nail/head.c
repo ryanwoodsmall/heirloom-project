@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.8 (gritter) 9/6/04";
+static char sccsid[] = "@(#)head.c	2.9 (gritter) 9/20/04";
 #endif
 #endif /* not lint */
 
@@ -54,7 +54,6 @@ static char sccsid[] = "@(#)head.c	2.8 (gritter) 9/6/04";
 static char	*copyin __P((char *, char **));
 static char	*nextword __P((char *, char *));
 static int	gethfield __P((FILE *, char **, size_t *, int, char **));
-static char	*is_hfield __P((char [], char[], char *));
 static int	charcount __P((char *, int));
 
 /*
@@ -296,7 +295,7 @@ extract_header(fp, hp)
 	char *linebuf = NULL;
 	size_t linesize = 0;
 	int seenfields = 0;
-	char *colon, *cp;
+	char *colon, *cp, *value;
 	struct header nh;
 	struct header *hq = &nh;
 	int lc, c;
@@ -305,22 +304,22 @@ extract_header(fp, hp)
 	for (lc = 0; readline(fp, &linebuf, &linesize) > 0; lc++);
 	rewind(fp);
 	while ((lc = gethfield(fp, &linebuf, &linesize, lc, &colon)) >= 0) {
-		if (is_hfield(linebuf, colon, "to") != NULL) {
+		if ((value = thisfield(linebuf, "to")) != NULL) {
 			seenfields++;
 			hq->h_to = checkaddrs(cat(hq->h_to,
-					sextract(&colon[1], GTO|GFULL)));
-		} else if (is_hfield(linebuf, colon, "cc") != NULL) {
+					sextract(value, GTO|GFULL)));
+		} else if ((value = thisfield(linebuf, "cc")) != NULL) {
 			seenfields++;
 			hq->h_cc = checkaddrs(cat(hq->h_cc,
-					sextract(&colon[1], GCC|GFULL)));
-		} else if (is_hfield(linebuf, colon, "bcc") != NULL) {
+					sextract(value, GCC|GFULL)));
+		} else if ((value = thisfield(linebuf, "bcc")) != NULL) {
 			seenfields++;
 			hq->h_bcc = checkaddrs(cat(hq->h_bcc,
-					sextract(&colon[1], GBCC|GFULL)));
-		} else if (is_hfield(linebuf, colon, "subject") != NULL ||
-				is_hfield(linebuf, colon, "subj") != NULL) {
+					sextract(value, GBCC|GFULL)));
+		} else if ((value = thisfield(linebuf, "subject")) != NULL ||
+				(value = thisfield(linebuf, "subj")) != NULL) {
 			seenfields++;
-			for (cp = &colon[1]; blankchar(*cp & 0377); cp++);
+			for (cp = value; blankchar(*cp & 0377); cp++);
 			hq->h_subject = hq->h_subject ?
 				save2str(hq->h_subject, cp) :
 				savestr(cp);
@@ -391,7 +390,7 @@ hfield_mult(field, mp, mult)
 				free(linebuf);
 			return oldhfield;
 		}
-		if ((hfield = is_hfield(linebuf, colon, field)) != NULL) {
+		if ((hfield = thisfield(linebuf, field)) != NULL) {
 			oldhfield = save2str(hfield, oldhfield);
 			if (mult == 0)
 				break;
@@ -478,21 +477,23 @@ gethfield(f, linebuf, linesize, rem, colon)
  * Check whether the passed line is a header line of
  * the desired breed.  Return the field body, or 0.
  */
-static char *
-is_hfield(linebuf, colon, field)
-	char linebuf[], field[];
-	char *colon;
+char *
+thisfield(linebuf, field)
+	const char *linebuf, *field;
 {
-	char *cp = colon;
-
-	*cp = 0;
-	if (asccasecmp(linebuf, field) != 0) {
-		*cp = ':';
-		return 0;
+	while (lowerconv(*linebuf&0377) == lowerconv(*field&0377)) {
+		linebuf++;
+		field++;
 	}
-	*cp = ':';
-	for (cp++; blankchar(*cp & 0377); cp++);
-	return cp;
+	if (*field != '\0')
+		return NULL;
+	while (blankchar(*linebuf&0377))
+		linebuf++;
+	if (*linebuf++ != ':')
+		return NULL;
+	while (blankchar(*linebuf&0377))
+		linebuf++;
+	return (char *)linebuf;
 }
 
 /*

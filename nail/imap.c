@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.196 (gritter) 9/15/04";
+static char sccsid[] = "@(#)imap.c	1.199 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -241,6 +241,9 @@ static enum okay	imap_appenduid __P((struct mailbox *, FILE *, time_t,
 static enum okay	imap_appenduid_cached __P((struct mailbox *, FILE *));
 static enum okay	imap_search2 __P((struct mailbox *, struct message *,
 				int, const char *, int));
+static enum okay	imap_remove1 __P((struct mailbox *, const char *));
+static enum okay	imap_rename1 __P((struct mailbox *, const char *,
+				const char *));
 static char	*imap_strex __P((const char *, char **));
 static enum okay	check_expunged __P((void));
 
@@ -756,7 +759,7 @@ imap_preauth(mp, xserver, uhp)
 	} else
 		server = (char *)xserver;
 #ifdef	USE_SSL
-	if (mp->mb_sock.s_ssl == NULL && imap_use_starttls(uhp)) {
+	if (mp->mb_sock.s_use_ssl == 0 && imap_use_starttls(uhp)) {
 		FILE	*queuefp = NULL;
 		char	o[LINESIZE];
 
@@ -862,7 +865,7 @@ retry:	if (xuser == NULL) {
 	} else
 		user = xuser;
 	if (xpass == NULL) {
-		if ((pass = getpassword(&otio, &reset_tio)) == NULL)
+		if ((pass = getpassword(&otio, &reset_tio, NULL)) == NULL)
 			return STOP;
 	} else
 		pass = xpass;
@@ -899,7 +902,7 @@ retry:	if (xuser == NULL) {
 	} else
 		user = xuser;
 	if (xpass == NULL) {
-		if ((pass = getpassword(&otio, &reset_tio)) == NULL)
+		if ((pass = getpassword(&otio, &reset_tio, NULL)) == NULL)
 			return STOP;
 	} else
 		pass = xpass;
@@ -2928,6 +2931,124 @@ imap_thisaccount(cp)
 }
 
 enum okay
+imap_remove(name)
+	const char	*name;
+{
+	sighandler_type saveint, savepipe;
+	enum okay	ok = STOP;
+
+	(void)&saveint;
+	(void)&savepipe;
+	(void)&ok;
+	verbose = value("verbose") != NULL;
+	if (mb.mb_type != MB_IMAP) {
+		fprintf(stderr, "Refusing to remove \"%s\" "
+				"in disconnected mode.\n", name);
+		return STOP;
+	}
+	if (!imap_thisaccount(name)) {
+		fprintf(stderr, "Can only remove mailboxes on current IMAP "
+				"server: \"%s\" not removed.\n", name);
+		return STOP;
+	}
+	imaplock = 1;
+	saveint = safe_signal(SIGINT, SIG_IGN);
+	savepipe = safe_signal(SIGPIPE, SIG_IGN);
+	if (sigsetjmp(imapjmp, 1) == 0) {
+		if (saveint != SIG_IGN)
+			safe_signal(SIGINT, imapcatch);
+		if (savepipe != SIG_IGN)
+			safe_signal(SIGPIPE, imapcatch);
+		ok = imap_remove1(&mb, protfile(name));
+	}
+	safe_signal(SIGINT, saveint);
+	safe_signal(SIGPIPE, savepipe);
+	imaplock = 0;
+	if (ok == OKAY)
+		ok = cache_remove(name);
+	return ok;
+}
+
+static enum okay
+imap_remove1(mp, name)
+	struct mailbox	*mp;
+	const char	*name;
+{
+	FILE	*queuefp = NULL;
+	char	*o;
+	int	os;
+	enum okay	ok = STOP;
+
+	o = ac_alloc(os = 2*strlen(name) + 100);
+	snprintf(o, os, "%s DELETE %s\r\n", tag(1), imap_quotestr(name));
+	IMAP_OUT(o, MB_COMD, goto out)
+	while (mp->mb_active & MB_COMD)
+		ok = imap_answer(mp, 1);
+out:	ac_free(o);
+	return ok;
+}
+
+enum okay
+imap_rename(old, new)
+	const char	*old, *new;
+{
+	sighandler_type saveint, savepipe;
+	enum okay	ok = STOP;
+
+	(void)&saveint;
+	(void)&savepipe;
+	(void)&ok;
+	verbose = value("verbose") != NULL;
+	if (mb.mb_type != MB_IMAP) {
+		fprintf(stderr, "Refusing to rename mailboxes "
+				"in disconnected mode.\n");
+		return STOP;
+	}
+	if (!imap_thisaccount(old) || !imap_thisaccount(new)) {
+		fprintf(stderr, "Can only rename mailboxes on current IMAP "
+				"server: \"%s\" not renamed to \"%s\".\n",
+				old, new);
+		return STOP;
+	}
+	imaplock = 1;
+	saveint = safe_signal(SIGINT, SIG_IGN);
+	savepipe = safe_signal(SIGPIPE, SIG_IGN);
+	if (sigsetjmp(imapjmp, 1) == 0) {
+		if (saveint != SIG_IGN)
+			safe_signal(SIGINT, imapcatch);
+		if (savepipe != SIG_IGN)
+			safe_signal(SIGPIPE, imapcatch);
+		ok = imap_rename1(&mb, protfile(old), protfile(new));
+	}
+	safe_signal(SIGINT, saveint);
+	safe_signal(SIGPIPE, savepipe);
+	imaplock = 0;
+	if (ok == OKAY)
+		ok = cache_rename(old, new);
+	return ok;
+}
+
+static enum okay
+imap_rename1(mp, old, new)
+	struct mailbox	*mp;
+	const char	*old, *new;
+{
+	FILE	*queuefp = NULL;
+	char	*o;
+	int	os;
+	enum okay	ok = STOP;
+
+	o = ac_alloc(os = 2*strlen(old) + 2*strlen(new) + 100);
+	snprintf(o, os, "%s RENAME %s %s\r\n", tag(1),
+			imap_quotestr(old), imap_quotestr(new));
+	IMAP_OUT(o, MB_COMD, goto out)
+	while (mp->mb_active & MB_COMD)
+		ok = imap_answer(mp, 1);
+out:	ac_free(o);
+	return ok;
+}
+
+enum okay
 imap_dequeue(mp, fp)
 	struct mailbox	*mp;
 	FILE	*fp;
@@ -3239,6 +3360,7 @@ imap_unread(m, n)
 	return STOP;
 }
 
+/*ARGSUSED*/
 enum okay
 imap_append(server, fp)
 	const char *server;
@@ -3252,6 +3374,24 @@ void
 imap_folders()
 {
 	noimap();
+}
+
+/*ARGSUSED*/
+enum okay
+imap_remove(name)
+	const char	*name;
+{
+	noimap();
+	return STOP;
+}
+
+/*ARGSUSED*/
+enum okay
+imap_rename(old, new)
+	const char	*old, *new;
+{
+	noimap();
+	return STOP;
 }
 
 enum okay

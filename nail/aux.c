@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.65 (gritter) 9/6/04";
+static char sccsid[] = "@(#)aux.c	2.67 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -233,7 +233,8 @@ argcount(argv)
  */
 void
 i_strcpy(dest, src, size)
-	char *dest, *src;
+	char *dest;
+	const char	*src;
 	int size;
 {
 	char *max;
@@ -244,6 +245,19 @@ i_strcpy(dest, src, size)
 		if (*src++ == '\0')
 			break;
 	}
+}
+
+char *
+i_strdup(src)
+	const char	*src;
+{
+	int	sz;
+	char	*dest;
+
+	sz = strlen(src) + 1;
+	dest = salloc(sz);
+	i_strcpy(dest, src, sz);
+	return dest;
 }
 
 /*
@@ -836,9 +850,10 @@ getuser()
 }
 
 char *
-getpassword(otio, reset_tio)
+getpassword(otio, reset_tio, query)
 	struct termios	*otio;
 	int	*reset_tio;
+	const char	*query;
 {
 	struct termios	tio;
 	char *line = NULL, *pass;
@@ -846,7 +861,7 @@ getpassword(otio, reset_tio)
 	int	i;
 
 	if (is_a_tty[0]) {
-		fputs("Password: ", stdout);
+		fputs(query ? query : "Password:", stdout);
 		fflush(stdout);
 		tcgetattr(0, &tio);
 		*otio = tio;

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Sccsid @(#)makeconfig	1.26 (gritter) 9/4/04
+# Sccsid @(#)makeconfig	1.32 (gritter) 9/22/04
 #
 
 tmp=___build$$
@@ -298,7 +298,20 @@ int main()
 #}
 #!
 
-link_check 'for OpenSSL' '#define USE_SSL' '-lssl -lcrypto' <<\!
+link_check 'for Network Security Services (NSS)' '#define USE_SSL
+#define USE_NSS' '-lsmime3 -lnss3 -lssl3' <<\! || \
+		link_check 'for OpenSSL' '#define USE_SSL
+#define USE_OPENSSL' '-lssl -lcrypto' <<\%
+#include <private/pprio.h>
+#include <smime.h>
+
+int main()
+{
+	PR_ImportTCPSocket(0);
+	NSS_CMSSignerInfo_AddSMIMECaps(0);
+	return 0;
+}
+!
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509v3.h>
@@ -310,7 +323,7 @@ int main()
 	SSLv23_client_method();
 	return 0;
 }
-!
+%
 
 cat >$tmp2.c <<\!
 #include <gssapi/gssapi.h>
@@ -377,8 +390,11 @@ cat >$tmp2.c <<\!
 #ifdef	USE_GSSAPI
 : + IMAP GSSAPI authentication
 #endif
-#ifdef	USE_SSL
-: + SSL/TLS (network transport authentication and encryption)
+#if defined (USE_NSS)
+: + S/MIME and SSL/TLS using Network Security Services (NSS)
+#endif
+#if defined (USE_OPENSSL)
+: + S/MIME and SSL/TLS using OpenSSL
 #endif
 :
 :The following optional features are disabled:

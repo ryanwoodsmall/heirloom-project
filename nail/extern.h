@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.101 (gritter) 9/9/04
+ *	Sccsid @(#)extern.h	2.124 (gritter) 9/23/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -45,10 +45,10 @@ struct name *sextract __P((char [], int));
 struct name *nalloc __P((char [], int));
 struct name *outof __P((struct name *, FILE *, struct header *));
 struct name *usermap __P((struct name *));
-FILE	*safe_fopen __P((char *, char *, int *));
-FILE	*Fdopen __P((int, char *));
-FILE	*Fopen __P((char *, char *));
-FILE	*Popen __P((char *, char *, char *, int));
+FILE	*safe_fopen __P((const char *, const char *, int *));
+FILE	*Fdopen __P((int, const char *));
+FILE	*Fopen __P((const char *, const char *));
+FILE	*Popen __P((const char *, const char *, const char *, int));
 FILE	*collect __P((struct header *, int, struct message*, char *, int));
 char	*detract __P((struct name *, enum gfield));
 char	*expand __P((char *));
@@ -69,8 +69,8 @@ char	*skip_comment __P((const char *));
 char	*skin __P((char *));
 char	*realname __P((char *));
 char	*username __P((void));
-char	*value __P((char []));
-char	*vcopy __P((char []));
+char	*value __P((const char []));
+char	*vcopy __P((const char []));
 int	 Fclose __P((FILE *));
 int	 More __P((void *));
 int	 Pclose __P((FILE *));
@@ -118,7 +118,7 @@ int	 from __P((void *));
 off_t	 fsize __P((FILE *));
 int	 getfold __P((char *, int));
 int	 getmsglist __P((char *, int *, int));
-int	 getrawlist __P((char [], size_t, char **, int, int));
+int	 getrawlist __P((const char [], size_t, char **, int, int));
 int	 getuserid __P((char []));
 int	 grabh __P((struct header *, enum gfield, int));
 int	 group __P((void *));
@@ -137,7 +137,8 @@ int	 is_dir __P((char []));
 int	 is_fileaddr __P((char *));
 int	 is_head __P((char *, size_t));
 int	 is_ign __P((char *, size_t, struct ignoretab []));
-void	 i_strcpy __P((char *, char *, int));
+void	 i_strcpy __P((char *, const char *, int));
+char	*i_strdup __P((const char *));
 void	 load __P((char *));
 int	 mail __P((struct name *,
 	    struct name *, struct name *, struct name *,
@@ -211,7 +212,8 @@ void	 sigchild __P((int));
 int	 source __P((void *));
 void	 spreserve __P((void));
 void	 sreset __P((void));
-int	 start_command __P((char *, sigset_t *, int, int, char *, char *, char *));
+int	 start_command __P((const char *, sigset_t *, int, int,
+			const char *, const char *, const char *));
 int	 stouch __P((void *));
 int	 cwrite __P((void *));
 void	 tinit __P((void));
@@ -274,7 +276,7 @@ int	readline_restart __P((FILE *, char **, size_t *, size_t));
 int	asccasecmp __P((const char *, const char *));
 int	ascncasecmp __P((const char *, const char *, size_t));
 char	*asccasestr __P((const char *, const char *));
-int	get_mime_convert __P((FILE *, char **, char **, enum mimeclean *));
+int	get_mime_convert __P((FILE *, char **, char **, enum mimeclean *, int));
 void	newline_appended __P((void));
 int	newmail __P((void *));
 int	pop3_setfile __P((const char *, int, int));
@@ -323,13 +325,27 @@ time_t	unixtime __P((char *));
 void	extract_header __P((FILE *, struct header *));
 char	*need_hdrconv __P((struct header *, enum gfield));
 char	*savecat __P((const char *, const char *));
-FILE	*Zopen __P((char *, char *, int *));
+FILE	*Zopen __P((const char *, const char *, int *));
 char	*strtob64 __P((const char *));
 void	*memtob64 __P((const void *, size_t));
 #ifdef	USE_SSL
 enum okay ssl_open __P((const char *, struct sock *, const char *));
-void ssl_gen_err __P((const char *));
+void ssl_set_vrfy_level __P((const char *));
+enum okay ssl_vrfy_decide __P((void));
+char     *ssl_method_string __P((const char *));
+enum okay        smime_split __P((FILE *, FILE **, FILE **, long, int));
+FILE     *smime_sign_assemble __P((FILE *, FILE *, FILE *));
+FILE     *smime_encrypt_assemble __P((FILE *, FILE *));
+struct message     *smime_decrypt_assemble __P((struct message *,
+			FILE *, FILE *));
+enum okay	smime_certsave __P((struct message *, int, FILE *));
 #endif	/* USE_SSL */
+#ifdef	USE_OPENSSL
+void ssl_gen_err(const char *, ...);
+#endif	/* USE_OPENSSL */
+#ifdef	USE_NSS
+void nss_gen_err(const char *, ...);
+#endif	/* USE_NSS */
 time_t	combinetime __P((int, int, int, int, int, int));
 char	*protbase __P((const char *));
 const char	*protfile __P((const char *));
@@ -372,7 +388,7 @@ struct message	*this_in_thread __P((struct message *, long));
 char	*md5tohex __P((const void *));
 char	*cram_md5_string __P((const char *, const char *, const char *));
 char	*getuser __P((void));
-char	*getpassword __P((struct termios *, int *));
+char	*getpassword __P((struct termios *, int *, const char *));
 int	cconnect __P((void *));
 int	cdisconnect __P((void *));
 void	transflags __P((struct message *, long, int));
@@ -421,3 +437,22 @@ extern void	substdate __P((struct message *));
 int	ccollapse __P((void *));
 int	cuncollapse __P((void *));
 void	uncollapse1 __P((struct message *, int));
+FILE	*smime_sign __P((FILE *));
+char	*makeboundary __P((void));
+int	cverify __P((void *));
+FILE	*smime_encrypt __P((FILE *, const char *, const char *));
+struct message	*smime_decrypt __P((struct message *,
+			const char *, const char *, int));
+int	mkdate __P((FILE *, const char *));
+int	cdecrypt __P((void *));
+int	cDecrypt __P((void *));
+int	ccertsave __P((void *));
+char	*thisfield __P((const char *, const char *));
+int	yorn __P((char *));
+int	crename __P((void *));
+int	cremove __P((void *));
+enum okay	imap_remove __P((const char *));
+enum okay	imap_rename __P((const char *, const char *));
+enum okay	maildir_remove __P((const char *));
+enum okay	cache_remove __P((const char *));
+enum okay	cache_rename __P((const char *, const char *));

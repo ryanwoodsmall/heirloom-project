@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.23 (gritter) 9/5/04";
+static char sccsid[] = "@(#)send.c	2.33 (gritter) 9/23/04";
 #endif
 #endif /* not lint */
 
@@ -120,6 +120,7 @@ static const struct hdrline	*start_of_field_of_hdr __P((const struct
 			hdrline *, const char *));
 static char	*unfold_hdr __P((const struct hdrline *, const char *));
 static char	*field_of_hdr __P((const struct hdrline *, char *));
+static char	*spec_of_hdr __P((const struct hdrline *, char *));
 static char	*param_of_hdr __P((const struct hdrline *, char *, char *));
 static void	onpipe __P((int));
 static void	exchange __P((char **, size_t *, size_t *,
@@ -763,6 +764,25 @@ field_of_hdr(ph, field)
 const struct hdrline *ph;
 char *field;
 {
+	char *unfolded_field, *cp, *cq;
+
+	if ((unfolded_field = unfold_hdr(ph, field)) == NULL)
+		return NULL;
+	cp = strchr(unfolded_field, ':');
+	*cp++ = '\0';
+	while (blankchar(*cp&0377))
+		cp++;
+	cq = &cp[strlen(cp)];
+	while (cq > cp && spacechar(cq[-1]&0377))
+		*--cq = '\0';
+	return cp;
+}
+
+static char *
+spec_of_hdr(ph, field)
+const struct hdrline *ph;
+char *field;
+{
 	const char *unfolded_field;
 	char *unfolded_fake, *cp;
 
@@ -985,7 +1005,7 @@ send_multi_parseheader:
 			write_hdr(ph, obuf, action, doign, prefix, prefixlen, 0,
 					NULL, obuf == origobuf ? stats : NULL);
 			unfolded_ct = unfold_hdr(ph, "content-type");
-			if ((scontent = field_of_hdr(ph, "content-type")) !=
+			if ((scontent = spec_of_hdr(ph, "content-type")) !=
 					NULL)
 				new_content = mime_getcontent(unfolded_ct);
 			if (new_content == MIME_MULTI) {
@@ -1192,7 +1212,7 @@ send_multi_end:
  * Adjust the status: field if need be.
  * If doign is given, suppress ignored header fields.
  * prefix is a string to prepend to each output line.
- * action = data destination (CONV_NONE,_TOFILE,_TODISP,_QUOTE).
+ * action = data destination (CONV_NONE,_TOFILE,_TODISP,_QUOTE,_DECRYPT).
  * stats[0] is line count, stats[1] is character count. stats may be NULL.
  * Note that stats[0] is valid for CONV_NONE only.
  */
@@ -1208,7 +1228,7 @@ send_message(mp, obuf, doign, prefix, action, stats)
 	FILE *ibuf, *pbuf = obuf, *qbuf = obuf, *origobuf = obuf;
 	struct sendmsg *pm;
 	char *line = NULL;
-	char *cp, *cp2;
+	char *cp, *cp2, *cp3;
 	char *scontent = NULL;
 	int prefixlen = 0;
 	size_t length, count;
@@ -1221,6 +1241,8 @@ send_message(mp, obuf, doign, prefix, action, stats)
 	struct hdrline *ph;
 	size_t sz, linesize = 0;
 	long	lines;
+	off_t	offs;
+	struct message	*xmp;
 
 	(void)&pbuf;
 	(void)&pm;
@@ -1252,7 +1274,8 @@ send_message(mp, obuf, doign, prefix, action, stats)
 	if ((mp->m_flag & MNOFROM) == 0) {
 		if ((ibuf = setinput(&mb, mp, NEED_BODY)) == NULL)
 			return -1;
-		pm = open_sendmsg(ibuf, mp->m_size, action != CONV_NONE);
+		pm = open_sendmsg(ibuf, mp->m_size,
+				action != CONV_NONE && action != CONV_DECRYPT);
 		if ((cp = read_sendmsg(pm, &line, &linesize, &length, NULL, 0,
 					0, &lines)) != NULL &&
 				doign != allignore) {
@@ -1278,18 +1301,42 @@ send_message(mp, obuf, doign, prefix, action, stats)
 					fakedate(mp->m_time));
 		if ((ibuf = setinput(&mb, mp, NEED_BODY)) == NULL)
 			return -1;
-		pm = open_sendmsg(ibuf, mp->m_size, action != CONV_NONE);
+		pm = open_sendmsg(ibuf, mp->m_size,
+				action != CONV_NONE && action != CONV_DECRYPT);
+		length = 0;
 	}
 send_parseheader:
+	offs = ftell(ibuf);
 	ph = NULL;
 	read_hdr(&ph, pm, 0);
+	if (action != CONV_NONE &&
+			(cp = spec_of_hdr(ph, "content-type")) != NULL &&
+			(strcmp(cp, "application/x-pkcs7-mime") == 0 ||
+			 strcmp(cp, "application/pkcs7-mime") == 0)) {
+		cp2 = field_of_hdr(ph, "to");
+		cp3 = field_of_hdr(ph, "cc");
+		fseek(ibuf, offs, SEEK_SET);
+		if ((xmp = smime_decrypt(mp, cp2, cp3, 0)) != NULL) {
+			mp = xmp;
+			close_sendmsg(pm);
+			pm = open_sendmsg(ibuf, mp->m_size,
+					action != CONV_NONE &&
+					action != CONV_DECRYPT);
+			if ((ibuf = setinput(&mb, mp, NEED_BODY)) == NULL)
+				return -1;
+			if ((mp->m_flag&MNOFROM) == 0)
+				read_sendmsg(pm, &line, &linesize, &length,
+						NULL, 0, 0, &lines);
+			goto send_parseheader;
+		}
+	}
 	write_hdr(ph, obuf, action, doign, prefix, prefixlen, mainhdr, mp,
 			obuf == origobuf ? stats : NULL);
-	if (action != CONV_NONE) {
+	if (action != CONV_NONE && action != CONV_DECRYPT) {
 		char *unfolded_ct, *unfolded_cte;
 
 		unfolded_ct = unfold_hdr(ph, "content-type");
-		if ((scontent = field_of_hdr(ph, "content-type")) != NULL)
+		if ((scontent = spec_of_hdr(ph, "content-type")) != NULL)
 			mime_content = mime_getcontent(unfolded_ct);
 		if (mime_content == MIME_MULTI)
 			b0.b_str = mime_getboundary(unfolded_ct);

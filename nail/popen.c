@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)popen.c	2.14 (gritter) 9/6/04";
+static char sccsid[] = "@(#)popen.c	2.15 (gritter) 9/16/04";
 #endif
 #endif /* not lint */
 
@@ -86,7 +86,8 @@ static struct child	*child;
 static struct child	*findchild __P((int));
 static void	delchild __P((struct child *));
 static int	file_pid __P((FILE *));
-static void	register_file __P((FILE *, int, int, int, int, char *, long));
+static void	register_file __P((FILE *, int, int, int, int,
+			const char *, long));
 static enum okay	unregister_file __P((FILE *));
 static int	decompress __P((int, int, int));
 static int	wait_command __P((int));
@@ -143,7 +144,7 @@ scan_mode(mode, omode)
 
 FILE *
 safe_fopen(file, mode, omode)
-	char *file, *mode;
+	const char *file, *mode;
 	int	*omode;
 {
 	int  fd;
@@ -157,7 +158,7 @@ safe_fopen(file, mode, omode)
 
 FILE *
 Fopen(file, mode)
-	char *file, *mode;
+	const char *file, *mode;
 {
 	FILE *fp;
 	int omode;
@@ -172,7 +173,7 @@ Fopen(file, mode)
 FILE *
 Fdopen(fd, mode)
 	int fd;
-	char *mode;
+	const char *mode;
 {
 	FILE *fp;
 	int	omode;
@@ -199,12 +200,12 @@ Fclose(fp)
 
 FILE *
 Zopen(file, mode, compression)
-	char *file, *mode;
+	const char *file, *mode;
 	int *compression;
 {
 	int	input;
 	FILE	*output;
-	char	*rp;
+	const char	*rp;
 	int	omode;
 	char	*tempfn;
 	int	bits;
@@ -284,7 +285,7 @@ open:	if ((output = Ftemp(&tempfn, "Rz", "w+", 0600, 0)) == NULL) {
 
 FILE *
 Popen(cmd, mode, shell, newfd1)
-char *cmd, *mode, *shell;
+const char *cmd, *mode, *shell;
 int newfd1;
 {
 	int p[2];
@@ -367,7 +368,7 @@ static void
 register_file(fp, omode, pipe, pid, compressed, realfile, offset)
 	FILE *fp;
 	int omode, pipe, pid, compressed;
-	char *realfile;
+	const char *realfile;
 	long offset;
 {
 	struct fp *fpp;
@@ -505,10 +506,10 @@ run_command(cmd, mask, infd, outfd, a0, a1, a2)
 /*VARARGS4*/
 int
 start_command(cmd, mask, infd, outfd, a0, a1, a2)
-	char *cmd;
+	const char *cmd;
 	sigset_t *mask;
 	int infd, outfd;
-	char *a0, *a1, *a2;
+	const char *a0, *a1, *a2;
 {
 	int pid;
 
@@ -521,9 +522,9 @@ start_command(cmd, mask, infd, outfd, a0, a1, a2)
 		int i = getrawlist(cmd, strlen(cmd),
 				argv, sizeof argv / sizeof *argv, 0);
 
-		if ((argv[i++] = a0) != NULL &&
-		    (argv[i++] = a1) != NULL &&
-		    (argv[i++] = a2) != NULL)
+		if ((argv[i++] = (char *)a0) != NULL &&
+		    (argv[i++] = (char *)a1) != NULL &&
+		    (argv[i++] = (char *)a2) != NULL)
 			argv[i] = NULL;
 		prepare_child(mask, infd, outfd);
 		execvp(argv[0], argv);

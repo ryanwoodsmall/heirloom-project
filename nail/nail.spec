@@ -1,4 +1,8 @@
-# Sccsid @(#)nail.spec	1.26 (gritter) 9/5/04
+# Sccsid @(#)nail.spec	1.29 (gritter) 9/20/04
+
+%define	use_nss	0
+%define	mozilla_version	1.6
+
 Summary: An enhanced implementation of the mailx command
 Name: nail
 Version: 11.5
@@ -10,6 +14,14 @@ URL: <http://nail.sourceforge.net>
 Vendor: Gunnar Ritter <Gunnar.Ritter@pluto.uni-freiburg.de>
 Packager: Didar Hussain <dhs@rediffmail.com>
 BuildRoot: %{_tmppath}/%{name}-root
+
+%if %{use_nss}
+Requires: mozilla-nss
+Requires: mozilla-nspr
+BuildRequires: mozilla-nss-devel
+BuildRequires: mozilla-nspr-devel
+BuildRequires: /usr/include/mozilla-%{mozilla_version}/nss/cms.h
+%endif
 
 %description
 Nail is derived from Berkeley Mail and is intended provide the 
@@ -33,22 +45,28 @@ and receiving mail.
 %define	makeflags	PREFIX=%{prefix} BINDIR=%{bindir} MANDIR=%{mandir} SYSCONFDIR=%{sysconfdir} MAILRC=%{mailrc} MAILSPOOL=%{mailspool} SENDMAIL=%{sendmail} UCBINSTALL=%{ucbinstall} CFLAGS="%{cflags}"
 
 %prep
-# Some RedHat releases refuse to compile with OpenSSL unless
-# -I/usr/kerberos/include is given. To compile with GSSAPI authentication
-# included, they also need -L/usr/kerberos/lib.
-test -d /usr/kerberos/include &&INCLUDES=-I/usr/kerberos/include export INCLUDES
-test -d /usr/kerberos/lib &&LDFLAGS=-L/usr/kerberos/lib export LDFLAGS
-rm -rf %{buildroot}
 %setup
 
 %build
-test -d /usr/kerberos/include &&INCLUDES=-I/usr/kerberos/include export INCLUDES
-test -d /usr/kerberos/lib &&LDFLAGS=-L/usr/kerberos/lib export LDFLAGS
+rm -rf %{buildroot}
+
+# Some RedHat releases refuse to compile with OpenSSL unless
+# -I/usr/kerberos/include is given. To compile with GSSAPI authentication
+# included, they also need -L/usr/kerberos/lib.
+test -d /usr/kerberos/include &&
+	INCLUDES="$INCLUDES -I/usr/kerberos/include" export INCLUDES
+test -d /usr/kerberos/lib &&
+	LDFLAGS="$LDFLAGS -L/usr/kerberos/lib" export LDFLAGS
+
+%if %{use_nss}
+INCLUDES="$INCLUDES -I/usr/include/mozilla-%{mozilla_version}/nspr"
+INCLUDES="$INCLUDES -I/usr/include/mozilla-%{mozilla_version}/nss"
+export INCLUDES
+%endif
+
 make %{makeflags}
 
 %install
-test -d /usr/kerberos/include &&INCLUDES=-I/usr/kerberos/include export INCLUDES
-test -d /usr/kerberos/lib &&LDFLAGS=-L/usr/kerberos/lib export LDFLAGS
 make DESTDIR=%{buildroot} %{makeflags} install
 gzip -9 %{buildroot}/usr/share/man/man1/nail.1
 

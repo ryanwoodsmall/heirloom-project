@@ -2,7 +2,7 @@ Welcome to nail, a mail user agent for Unix systems!
 
 Nail is derived from Berkeley Mail and is intended provide the
 functionality of the POSIX mailx command with additional support
-for MIME messages, IMAP, POP3, and SMTP. It provides enhanced
+for MIME, IMAP, POP3, SMTP, and S/MIME. It provides enhanced
 features for interactive use, such as caching and disconnected
 operation for IMAP, message threading, scoring, and filtering.
 It is also usable as a mail batch language, both for sending
@@ -16,7 +16,7 @@ configuration files to match your needs. You _really_ should do this or
 at least install the template because most of the built-in defaults still
 have the compatibility values of twenty-five years ago. For batch usage,
 it is recommended to pass the configuration as environment variables only,
-as e.g. 'MAILRC=/dev/null from=user@host nail -n' does.
+as e.g. 'env MAILRC=/dev/null from=user@host nail -n' does.
 
 Nail has been built successfully in the following environments using
 the current configuration system:
@@ -96,4 +96,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           9/9/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           9/22/04

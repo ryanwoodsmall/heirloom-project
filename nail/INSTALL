@@ -68,7 +68,7 @@ CPPFLAGS        Flags for the C preprocessor.
 
 INCLUDES        A list of additional include file directories, as
                 '-I/usr/local/include'. Use this to locate the include
-                files for OpenSSL or iconv(3) if they are not present
+                files for NSS, OpenSSL, or iconv(3), if they are not present
                 in the standard include directories. Also, some versions
                 of RedHat Linux need -I/usr/kerberos/include to compile
                 with OpenSSL, or to compile with GSSAPI authentication
@@ -76,11 +76,12 @@ INCLUDES        A list of additional include file directories, as
 
 LDFLAGS         Flags for the linker. To compile with GSSAPI authentication
                 included, some RedHat versions need -L/usr/kerberos/lib.
-                Also use this to specify the OpenSSL library path.
+                Also use this to specify the NSS or OpenSSL library path.
 
 LIBS            A list of additional libraries such as '-lfoo'. -lsocket,
-                -lnsl, -lssl, -lcrypto, and -liconv are automatically
-                included by makeconfig and should not be put into this.
+                -lnsl, -lssl, -lcrypto, -liconv, and NSS libraries are
+		automatically included by makeconfig and should not be
+		put into this.
 
 As usual with Makefile variables, you can pass these values to make in
 the environment or on the command line. Thus if you want to avoid to edit
@@ -89,6 +90,7 @@ of general use (such as CFLAGS) in .profile. Note that passing flags on
 the command line does not override those specified in the Makefile itself
 with several commercial versions of make in combination with the recursive
 make calls that are executed at configuration time.
+
 
 Transition remarks concerning the old configure system
 ======================================================
@@ -130,6 +132,7 @@ If you intend to build nail packages, a look at 'nail.spec' might
 be helpful - even if you don't use RPM, the process is likely to
 be similar.
 
+
 Why autoconf/automake are no longer used
 ========================================
 
@@ -163,4 +166,66 @@ anyway.)
 
 In short, everything is better now.
 
-        Gunnar Ritter                                   8/30/04
+
+Building S/MIME and SSL/TLS support using Mozilla NSS
+=====================================================
+
+It is possible to build encryption support using Mozilla NSS instead
+of OpenSSL. Doing so has both advantages and disadvantages:
+
+- With NSS, nail can use the same key and certificate databases as the
+  Mozilla applications (Mozilla Suite, Firefox, Thunderbird). This makes
+  it possible to install and configure certificates at one central location.
+  Note that running nail and Mozilla at the same time from one certificate
+  directory may result in 'Bad database' errors in nail if Mozilla modifies
+  the configuration files (nail never modifies them). If you encounter such
+  problems, create a copy of the .db files for exclusive use with nail.
+
+- OpenSSL offers more transparent control over certificates. While it is
+  possible to modify the NSS databases using command line utilities (see
+  <http://www.mozilla.org/projects/security/pki/nss/tools/>), it is
+  certainly easier to use PEM files along with descriptions in OpenSSL if
+  direct control is desired (e.g. for batch use).
+
+- NSS supports S/MIME in both versions 2 and 3, OpenSSL currently only
+  supports version 2.
+
+- Building OpenSSL is much easier than building NSS for use with non-Mozilla
+  applications like nail.
+
+To build using NSS, you need both the NSS and the NSPR libraries/include
+files from the Mozilla project. If you are using a Linux distribution,
+chances are that you can install appropriate RPMs from your vendor, e.g.
+
+mozilla-nss-1.6
+mozilla-nss-devel-1.6
+mozilla-nspr-devel-1.6
+mozilla-nspr-1.6
+
+for Fedora Core Release 2. Note that you can install these without installing
+the RPM for the Mozilla main application. Thus it is no problem if you prefer
+to use a more recent Mozilla installation in /opt or so. NSS and NSPR are not
+updated as often as the Mozilla end-user applications in recent times (but you
+should watch for possible future security fixes regardless, of course.)
+
+If you have these RPMs installed, you can uncomment the marked lines in either
+the Makefile or in nail.spec. Nail should then build cleanly with NSS support
+included, and that's all.
+
+If you want to use NSS without RPMS, you can get binary or source .tar.gz
+archives from the Mozilla project pages:
+
+<http://www.mozilla.org/projects/security/pki/nss/>
+<http://www.mozilla.org/projects/nspr/>
+
+Or you can use the files from a Mozilla application build directory if you
+are building Mozilla Suite, Firefox, Thunderbird etc. from source. Just set
+the INCLUDES and LDFLAGS variables appropriately.
+
+If both NSS and OpenSSL are available, NSS is used. This is just because
+NSS is normally not found without special action, and thus the build process
+simply assumes that you want to build NSS if it manages to build the test
+executable.
+
+
+        Gunnar Ritter                                   9/20/04

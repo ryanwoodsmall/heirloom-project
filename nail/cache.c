@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.55 (gritter) 9/8/04";
+static char sccsid[] = "@(#)cache.c	1.56 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -63,7 +63,8 @@ static char sccsid[] = "@(#)cache.c	1.55 (gritter) 9/8/04";
  * A cache for IMAP.
  */
 
-static char	*encname __P((struct mailbox *, const char *, int));
+static char	*encname __P((struct mailbox *, const char *, int,
+			const char *));
 static char	*encuid __P((struct mailbox *, unsigned long));
 static FILE	*clean __P((struct mailbox *, struct cw *));
 static unsigned long	*builds __P((long *));
@@ -104,16 +105,16 @@ static const char	README5[] = "\n\
 For more information about nail(1), visit <http://nail.sourceforge.net>.\n";
 
 static char *
-encname(mp, name, same)
+encname(mp, name, same, box)
 	struct mailbox	*mp;
-	const char	*name;
+	const char	*name, *box;
 	int	same;
 {
 	char	*cachedir, *eaccount, *emailbox, *ename, *res;
 	int	resz;
 
 	ename = strenc(name);
-	if (mp->mb_cache_directory && same) {
+	if (mp->mb_cache_directory && same && box == NULL) {
 		res = salloc(resz = strlen(mp->mb_cache_directory) +
 				strlen(ename) + 2);
 		snprintf(res, resz, "%s%s%s", mp->mb_cache_directory,
@@ -123,7 +124,9 @@ encname(mp, name, same)
 			return NULL;
 		cachedir = expand(cachedir);
 		eaccount = strenc(mp->mb_imap_account);
-		if (asccasecmp(mp->mb_imap_mailbox, "INBOX"))
+		if (box)
+			emailbox = strenc(box);
+		else if (asccasecmp(mp->mb_imap_mailbox, "INBOX"))
 			emailbox = strenc(mp->mb_imap_mailbox);
 		else
 			emailbox = "INBOX";
@@ -144,7 +147,7 @@ encuid(mp, uid)
 	char	buf[30];
 
 	snprintf(buf, sizeof buf, "%lu", uid);
-	return encname(mp, buf, 1);
+	return encname(mp, buf, 1, NULL);
 }
 
 enum okay
@@ -373,10 +376,10 @@ initcache(mp)
 
 	free(mp->mb_cache_directory);
 	mp->mb_cache_directory = NULL;
-	if ((name = encname(mp, "", 1)) == NULL)
+	if ((name = encname(mp, "", 1, NULL)) == NULL)
 		return;
 	mp->mb_cache_directory = sstrdup(name);
-	if ((uvname = encname(mp, "UIDVALIDITY", 1)) == NULL)
+	if ((uvname = encname(mp, "UIDVALIDITY", 1, NULL)) == NULL)
 		return;
 	if (cwget(&cw) == STOP)
 		return;
@@ -408,7 +411,7 @@ purgecache(mp, m, mc)
 	char	*name;
 	struct cw	cw;
 
-	if ((name = encname(mp, "", 1)) == NULL)
+	if ((name = encname(mp, "", 1, NULL)) == NULL)
 		return;
 	if (cwget(&cw) == STOP)
 		return;
@@ -592,7 +595,7 @@ cache_setptr(transparent)
 	}
 	free(mb.mb_cache_directory);
 	mb.mb_cache_directory = NULL;
-	if ((name = encname(&mb, "", 1)) == NULL)
+	if ((name = encname(&mb, "", 1, NULL)) == NULL)
 		return STOP;
 	mb.mb_cache_directory = sstrdup(name);
 	if (cwget(&cw) == STOP)
@@ -660,6 +663,70 @@ cache_list(mp, base, strip, fp)
 	return OKAY;
 }
 
+enum okay
+cache_remove(name)
+	const char	*name;
+{
+	struct stat	st;
+	DIR	*dirfd;
+	struct dirent	*dp;
+	char	*path;
+	int	pathsize, pathend, n;
+	char	*dir;
+
+	if ((dir = encname(&mb, "", 0, protfile(name))) == NULL)
+		return OKAY;
+	pathend = strlen(dir);
+	path = smalloc(pathsize = pathend + 30);
+	strcpy(path, dir);
+	path[pathend++] = '/';
+	path[pathend] = '\0';
+	if ((dirfd = opendir(path)) == NULL) {
+		free(path);
+		return OKAY;
+	}
+	while ((dp = readdir(dirfd)) != NULL) {
+		if (dp->d_name[0] == '.' &&
+				(dp->d_name[1] == '\0' ||
+				 (dp->d_name[1] == '.' &&
+				  dp->d_name[2] == '\0')))
+			continue;
+		n = strlen(dp->d_name);
+		if (pathend + n + 1 > pathsize)
+			path = srealloc(path, pathsize = pathend + n + 30);
+		strcpy(&path[pathend], dp->d_name);
+		if (stat(path, &st) < 0 || (st.st_mode&S_IFMT) != S_IFREG)
+			continue;
+		if (unlink(path) < 0) {
+			perror(path);
+			closedir(dirfd);
+			free(path);
+			return STOP;
+		}
+	}
+	closedir(dirfd);
+	path[pathend] = '\0';
+	rmdir(path);	/* no error on failure, might contain submailboxes */
+	free(path);
+	return OKAY;
+}
+
+enum okay
+cache_rename(old, new)
+	const char	*old, *new;
+{
+	char	*olddir, *newdir;
+
+	if ((olddir = encname(&mb, "", 0, protfile(old))) == NULL ||
+			(newdir = encname(&mb, "", 0, protfile(new))) == NULL)
+		return OKAY;
+	if (rename(olddir, newdir) < 0) {
+		perror(olddir);
+		return STOP;
+	}
+	return OKAY;
+}
+
 unsigned long
 cached_uidvalidity(mp)
 	struct mailbox	*mp;
@@ -668,7 +735,7 @@ cached_uidvalidity(mp)
 	char	*uvname;
 	unsigned long	uv;
 
-	if ((uvname = encname(mp, "UIDVALIDITY", 1)) == NULL)
+	if ((uvname = encname(mp, "UIDVALIDITY", 1, NULL)) == NULL)
 		return 0;
 	if ((uvfp = Fopen(uvname, "r")) == NULL ||
 			(fcntl_lock(fileno(uvfp), F_RDLCK), 0) ||
@@ -687,7 +754,7 @@ cache_queue1(mp, mode, xname)
 	char	*name;
 	FILE	*fp;
 
-	if ((name = encname(mp, "QUEUE", 0)) == NULL)
+	if ((name = encname(mp, "QUEUE", 0, NULL)) == NULL)
 		return NULL;
 	if ((fp = Fopen(name, mode)) != NULL)
 		fcntl_lock(fileno(fp), F_WRLCK);
@@ -756,7 +823,7 @@ dequeue1(mp)
 					mp->mb_imap_mailbox);
 			goto save;
 		}
-		if ((uvname = encname(mp, "UIDVALIDITY", 0)) == NULL ||
+		if ((uvname = encname(mp, "UIDVALIDITY", 0, NULL)) == NULL ||
 				(uvfp = Fopen(uvname, "r")) == NULL ||
 				(fcntl_lock(fileno(uvfp), F_RDLCK), 0) ||
 				fscanf(uvfp, "%lu", &uv) != 1 ||

@@ -1,3 +1,19 @@
+[11.8] released 9/23/04
+* Support for S/MIME has been added. Introductory documentation is available
+  in the 'EXAMPLES' section of the manual page.
+* It is now possible to use Mozilla NSS instead of OpenSSL for both S/MIME
+  and SSL/TLS. This makes it possible to use Mozilla to manage the certificate
+  databases. See the INSTALL file for futher details. Note to redistributors:
+  The new file nss.c is governed by the Mozilla Public License (MPL), so make
+  sure that you comply to it (or delete that file and do not use NSS).
+* Certificate revocation lists (CRLs) can now be used with S/MIME and SSL/TLS
+  in combination with OpenSSL (for NSS, no special support is necessary).
+* New 'remove' and 'rename' commands for mailboxes are available.
+* Variable names that contain an '@' are now converted to all-lowercase
+  internally. Thus in variable names like disconnected-user@host,
+  imap-auth-user@host, password-user@host, smtp-auth-user@host, the case
+  of the user@host part does not matter anymore.
+
 [11.7] released 9/16/04
 * A collapsed view of message threads was introduced. See the 'collapse'
   and 'uncollapse' commands, and the 'autocollapse' variable.

@@ -20,22 +20,7 @@ need them and cannot wait, contribute code.
 - The MIME capabilities of IMAP could be used so that not entire messages
   are downloaded all the time, but just the parts that are actually needed.
 
-- Different authentication methods could be implemented.
-
-- Real interfaces for the tasks now handled by the generic 'imap' command
-  could be created. These are just the tasks normally handled with shell
-  commands for local mailboxes; '!rm' for 'imap delete', '!quota' for 'imap
-  getquotaroot', '!ls' or '!find' for 'imap list', '!mv' for 'imap rename'
-  etc. so this is why Mail/mailx/nail does not have builtin commands for
-  them. Also the IMAP commands are partially obscure ('list' can get in
-  an infinite loop).
-
-  Another challenge is that those interfaces should also work with regular
-  mailboxes, and should be sufficiently extensible to work with future
-  protocols or protocol extensions.
-
-  Probably at least commands for 'rename' and 'delete' should be added to
-  transparently update the IMAP cache.
+- SASL authentication methods could be implemented.
 
 ------------------------------------------------------------------------
 
@@ -59,17 +44,6 @@ requiring any further libraries (i. e. your code is optional)
 and b) your code works for all kinds of terminals, not just
 VT100/ANSI ones.
 
-There will certainly be support for signed and encrypted messages
-one day, but in the current situation (two standards with dozens
-of incompatible implementations, PKI effectively not working) it
-seems not to be much more than a geek toy. I will code this once
-there is true interoperability and one can do something practically
-useful with it, like signing legal documents (in fact, one could
-do this today in Germany, but the infrastructure is mostly missing
-so it's not worth much yet). If you need it before this day and
-write the code yourself, I would be thankful for the contribution,
-though.
-
 Nail will not support 'Return-Receipt-To' or 'Disposition-Notification-To'
 header fields, neither for the sending nor for the receiving part.
 For the sending part it plainly doesn't work because one wants to
@@ -79,4 +53,4 @@ window. For the receiving part, it is simply annoying. If you want
 a confirmation, ask the recipient to send one in the body of the
 message.
 
-	Gunnar Ritter					9/4/04
+	Gunnar Ritter					9/22/04

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)glob.h	2.18 (gritter) 9/14/04
+ *	Sccsid @(#)glob.h	2.19 (gritter) 9/19/04
  */
 
 /*
@@ -103,6 +103,10 @@ _E int	imap_created_mailbox;		/* hack to get feedback from imap */
 _E int	unset_allow_undefined;		/* allow to unset undefined variables */
 _E int	inhook;				/* currently executing a hook */
 _E int	starting;			/* still in startup code */
+
+#ifdef	USE_SSL
+_E enum ssl_vrfy_level	ssl_vrfy_level;	/* SSL verification level */
+#endif
 
 #ifdef	HAVE_ICONV
 _E iconv_t iconvd;

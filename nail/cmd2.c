@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.35 (gritter) 9/14/04";
+static char sccsid[] = "@(#)cmd2.c	2.36 (gritter) 9/17/04";
 #endif
 #endif /* not lint */
 
@@ -230,6 +230,27 @@ cMove(v)
 	char *str = v;
 
 	return save1(str, 0, "move", saveignore, CONV_NONE, 1, 1);
+}
+
+/*
+ * Decrypt and copy a message to a file.
+ */
+int
+cdecrypt(v)
+	void *v;
+{
+	char *str = v;
+
+	return save1(str, 0, "decrypt", saveignore, CONV_DECRYPT, 0, 0);
+}
+
+int
+cDecrypt(v)
+	void *v;
+{
+	char *str = v;
+
+	return save1(str, 0, "decrypt", saveignore, CONV_DECRYPT, 1, 0);
 }
 
 /*

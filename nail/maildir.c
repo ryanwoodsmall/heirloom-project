@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.10 (gritter) 9/9/04";
+static char sccsid[] = "@(#)maildir.c	1.11 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -82,6 +82,7 @@ static enum okay	trycreate __P((const char *));
 static enum okay	mkmaildir __P((const char *));
 static struct message	*mdlook __P((const char *, struct message *));
 static void	mktable __P((void));
+static enum okay	subdir_remove __P((const char *, const char *));
 
 int
 maildir_setfile(name, newmail, isedit)
@@ -802,4 +803,71 @@ mktable()
 	mdtable = scalloc(mdprime, sizeof *mdtable);
 	for (i = 0; i < msgCount; i++)
 		mdlook(&message[i].m_maildir_file[4], &message[i]);
+}
+
+static enum okay
+subdir_remove(name, sub)
+	const char	*name, *sub;
+{
+	char	*path;
+	int	pathsize, pathend, namelen, sublen, n;
+	DIR	*dirfd;
+	struct dirent	*dp;
+
+	namelen = strlen(name);
+	sublen = strlen(sub);
+	path = smalloc(pathsize = namelen + sublen + 30);
+	strcpy(path, name);
+	path[namelen] = '/';
+	strcpy(&path[namelen+1], sub);
+	path[namelen+sublen+1] = '/';
+	path[pathend = namelen + sublen + 2] = '\0';
+	if ((dirfd = opendir(path)) == NULL) {
+		perror(path);
+		free(path);
+		return STOP;
+	}
+	while ((dp = readdir(dirfd)) != NULL) {
+		if (dp->d_name[0] == '.' &&
+				(dp->d_name[1] == '\0' ||
+				 (dp->d_name[1] == '.' &&
+				  dp->d_name[2] == '\0')))
+			continue;
+		if (dp->d_name[0] == '.')
+			continue;
+		n = strlen(dp->d_name);
+		if (pathend + n + 1 > pathsize)
+			path = srealloc(path, pathsize = pathend + n + 30);
+		strcpy(&path[pathend], dp->d_name);
+		if (unlink(path) < 0) {
+			perror(path);
+			closedir(dirfd);
+			free(path);
+			return STOP;
+		}
+	}
+	closedir(dirfd);
+	path[pathend] = '\0';
+	if (rmdir(path) < 0) {
+		perror(path);
+		free(path);
+		return STOP;
+	}
+	free(path);
+	return OKAY;
+}
+
+enum okay
+maildir_remove(name)
+	const char	*name;
+{
+	if (subdir_remove(name, "tmp") == STOP ||
+			subdir_remove(name, "new") == STOP ||
+			subdir_remove(name, "cur") == STOP)
+		return STOP;
+	if (rmdir(name) < 0) {
+		perror(name);
+		return STOP;
+	}
+	return OKAY;
 }

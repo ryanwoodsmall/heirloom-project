@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)vars.c	2.5 (gritter) 8/1/04";
+static char sccsid[] = "@(#)vars.c	2.8 (gritter) 9/22/04";
 #endif
 #endif /* not lint */
 
@@ -51,9 +51,32 @@ static char sccsid[] = "@(#)vars.c	2.5 (gritter) 8/1/04";
  * Variable handling stuff.
  */
 
+static char	*canonify __P((const char *));
 static void	vfree __P((char *));
-static struct var	*lookup __P((char []));
+static struct var	*lookup __P((const char []));
 static void	remove_grouplist __P((struct grouphead *));
+
+/*
+ * If a variable name begins with a lowercase-character and contains at
+ * least one '@', it is converted to all-lowercase. This is necessary
+ * for lookups of names based on email addresses.
+ *
+ * Following the standard, only the part following the last '@' should
+ * be lower-cased, but practice has established otherwise here.
+ */
+static char *
+canonify(vn)
+	const char	*vn;
+{
+	const char	*vp;
+
+	if (upperchar(*vn&0377))
+		return (char *)vn;
+	for (vp = vn; *vp && *vp != '@'; vp++);
+	if (*vp == '@')
+		return i_strdup(vn);
+	return (char *)vn;
+}
 
 /*
  * Assign a value to a variable.
@@ -65,6 +88,7 @@ assign(name, value)
 	struct var *vp;
 	int h;
 
+	name = canonify(name);
 	h = hash(name);
 	vp = lookup(name);
 	if (vp == NULL) {
@@ -98,7 +122,7 @@ vfree(cp)
 
 char *
 vcopy(str)
-	char str[];
+	const char str[];
 {
 	char *new;
 	unsigned len;
@@ -118,13 +142,18 @@ vcopy(str)
 
 char *
 value(name)
-	char name[];
+	const char name[];
 {
 	struct var *vp;
+	char	*vs;
 
-	if ((vp = lookup(name)) == NULL)
-		return(getenv(name));
-	return(vp->v_value);
+	name = canonify(name);
+	if ((vp = lookup(name)) == NULL) {
+		if ((vs = getenv(name)) != NULL && *vs)
+			vs = savestr(vs);
+		return vs;
+	}
+	return vp->v_value;
 }
 
 /*
@@ -134,7 +163,7 @@ value(name)
 
 static struct var *
 lookup(name)
-	char name[];
+	const char name[];
 {
 	struct var *vp;
 
@@ -207,6 +236,7 @@ unset_internal(name)
 	struct var *vp, *vp2;
 	int h;
 
+	name = canonify(name);
 	if ((vp2 = lookup(name)) == NULL) {
 		if (!sourcing && !unset_allow_undefined) {
 			printf(catgets(catd, CATSET, 203,
