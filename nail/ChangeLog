@@ -20,6 +20,8 @@
 * If the 'inc'/'newmail' commands were executed on an IMAP connection that
   was already closed by the server, nail did not catch SIGPIPE properly and
   was terminated.
+* IMAP or POP3 servers that erroneously send a Unix 'From ' line at the
+  beginning of message headers are now handled gracefully.
 
 [11.6] released 9/7/04
 * An IMAP performance improvement introduced in release 11.5 lead to an

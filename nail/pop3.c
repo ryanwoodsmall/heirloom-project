@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)pop3.c	2.33 (gritter) 9/6/04";
+static char sccsid[] = "@(#)pop3.c	2.34 (gritter) 9/15/04";
 #endif
 #endif /* not lint */
 
@@ -721,7 +721,6 @@ retry:	switch (need) {
 			mp->mb_active &= ~MB_MULT;
 			break;
 		}
-		lines++;
 		if (line[0] == '.') {
 			lp = &line[1];
 			linelen--;
@@ -735,12 +734,20 @@ retry:	switch (need) {
 		 * second as '>From ' may also come from a server of the
 		 * first type as actual data. So do what is absolutely
 		 * necessary only - mask 'From '.
+		 *
+		 * If the line is the first line of the message header, it
+		 * is likely a real 'From ' line. In this case, it is just
+		 * ignored since it violates all standards.
 		 */
 		if (lp[0] == 'F' && lp[1] == 'r' && lp[2] == 'o' &&
 				lp[3] == 'm' && lp[4] == ' ') {
-			fputc('>', mp->mb_otf);
-			size++;
+			if (lines != 0) {
+				fputc('>', mp->mb_otf);
+				size++;
+			} else
+				continue;
 		}
+		lines++;
 		if (lp[linelen-1] == '\n' && (linelen == 1 ||
 					lp[linelen-2] == '\r')) {
 			emptyline = linelen <= 2;
