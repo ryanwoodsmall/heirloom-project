@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.70 (gritter) 12/28/04";
+static char sccsid[] = "@(#)junk.c	1.71 (gritter) 12/29/04";
 #endif
 #endif /* not lint */
 
@@ -1051,8 +1051,8 @@ clsf(struct message *m)
 		if (verbose)
 			fprintf(stderr, "Probe %2d: \"%s\", hash=%lu:%lu "
 				"prob=%.4g dist=%.4g\n",
-				i+1,
-				best[i].word, best[i].hash1, best[i].hash2,
+				i+1, prstr(best[i].word),
+				best[i].hash1, best[i].hash2,
 				best[i].prob, best[i].dist);
 		a *= best[i].prob;
 		b *= 1 - best[i].prob;
@@ -1085,7 +1085,7 @@ rate(const char *word, enum entry entry, struct lexstat *sp, int unused)
 		fprintf(stderr, "h=%lu:%lu g=%u b=%u p=%.4g %s\n", h1, h2,
 				n ? get(&n[OF_node_good]) : 0,
 				n ? get(&n[OF_node_bad]) : 0,
-				p, word);
+				p, prstr(word));
 	if (p == 0)
 		return;
 	d = p >= MID ? p - MID : MID - p;

@@ -7,7 +7,7 @@
   by Unicode control pictures or the Unicode replacement character when
   printing to a terminal.
 * The 'show' command now also avoids writing unprintable characters to a
-  terminal.
+  terminal. Same for the 'classify' command with the 'verbose' option set.
 * Only MIME-encode words in header fields if they start with '=?' or end
   with '?=' (instead of encoding any words containing '?', '=', or '_'),
   and declare them as 'us-ascii' if they do not contain any bytes with the
