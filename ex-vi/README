@@ -95,7 +95,8 @@ HP HP-UX	B.11.23
 FreeBSD		5.3
 NetBSD		2.0
 
-It has been tested with xterm patch #192 and rxvt-unicode 4.2.
+It has been tested with xterm patch #192, rxvt-unicode 4.2, and
+mlterm 2.9.1.
 
 To use UTF-8 locales in ex mode, the terminal must be put in 'stty iutf8'
 mode on Linux if it does not perform this automatically. Otherwise, typing
@@ -103,7 +104,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						12/31/04
+Gunnar Ritter						1/1/05
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>
