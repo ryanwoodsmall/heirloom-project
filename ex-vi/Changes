@@ -19,6 +19,8 @@ Release ...
   characters now.
 * Handle character case conversions with the '~' vi command correctly if the
   length of the converted multibyte sequence is smaller than the original one.
+* Multibyte sequences that correspond to an unprintable character are now
+  printed as multiple octal escape sequences.
 * Fixed an old vi bug: If a vi command that yanked or deleted part of a line
   was followed by an ex command that also yanked or deleted some text, a
   following 'p' vi command pasted the text affected by the former vi command.

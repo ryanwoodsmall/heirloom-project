@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_subr.c	1.32 (gritter) 12/2/04";
+static char sccsid[] = "@(#)ex_subr.c	1.33 (gritter) 1/12/05";
 #endif
 #endif
 
@@ -560,6 +560,22 @@ printof(int c)
 	char *nums = "01234567";
 	int d;
 
+#ifdef	MB
+	if (mb_cur_max > 1 && (c & INVBIT) == 0 && c & ~0177) {
+		char	mb[MB_LEN_MAX];
+		int	i, n, x = EOF;
+		if ((n = wctomb(mb, c & TRIM)) <= 0) {
+			n = 1;
+			*mb = 0;
+		}
+		for (i = 0; i < n; i++) {
+			x = printof(mb[i] | INVBIT);
+			if (i+1 < n)
+				normchar(x);
+		}
+		return x;
+	}
+#endif	/* MB */
 	c &= 0377;
 	if (c < 040 || c == DELETE) {
 		normchar('^');
