@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.26 (gritter) 12/2/04";
+static char sccsid[] = "@(#)ex_put.c	1.27 (gritter) 1/13/05";
 #endif
 #endif
 
@@ -751,13 +751,17 @@ dontcr:
 				i = ' ';
 			if(i & QUOTE)	/* mjm: no sign extension on 3B */
 				i = ' ';
-			if (i != MULTICOL) {
-				if (insmode && ND)
-					tputs(ND, 0, plodput);
+			if ((insmode || i == MULTICOL) && ND)
+				tputs(ND, 0, plodput);
+			else if (i == MULTICOL) {
+				if (BS && BC)
+					tputs(BC, 0, plodput);
 				else
-					plodput(i);
-			}
-			outcol++;
+					plodput('\b');
+				plodput(vtube[outline][outcol-1]);
+			} else
+				plodput(i);
+			outcol += i == MULTICOL ? 1 : colsc(i);
 		}
 		if (plodcnt < 0)
 			goto out;

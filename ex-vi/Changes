@@ -2,6 +2,8 @@ Release ...
 * When a multicolumn character was replaced by another multicolumn character
   in insert mode, the display was not updated appropriately with terminals
   other than xterm.
+* Various rendering errors happened with multicolumn characters if they
+  started at an even column (counting from 1 upwards).
 * When a multicolumn character was inserted and then replaced, the visual
   screen representation was sometimes not updated accordingly.
 * Undoing the replacement of a multicolumn character by a singlecolumn

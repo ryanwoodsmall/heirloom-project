@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.40 (gritter) 1/11/05";
+static char sccsid[] = "@(#)ex_vput.c	1.41 (gritter) 1/13/05";
 #endif
 #endif
 
@@ -373,7 +373,7 @@ vgoto(register int y, register int x)
 		x %= WCOLS;
 	}
 #ifdef	MB
-	else if (y >= 0 && mb_cur_max > 1 && !insmode) {
+	if (y >= 0 && mb_cur_max > 1 && !insmode) {
 		while (x > 0 && (vtube[y][x]&(MULTICOL|TRIM)) == MULTICOL)
 			x--;
 	}
@@ -589,7 +589,6 @@ vinschar(int c)
 
 	insmc1 = colsc(c) - 1;
 	if ((!IM || !EI) && ((hold & HOLDQIK) || !value(REDRAW) || value(SLOWOPEN))) {
-		int	(*OO)() = Outchar;
 		/*
 		 * Don't want to try to use terminal
 		 * insert mode, or to try to fake it.
@@ -600,13 +599,7 @@ vinschar(int c)
 			vgotab();
 			return c;
 		}
-		/*
-		 * This indicates to vputchar() that it has to set MULTICOL
-		 * bits but must not call us recursively.
-		 */
-		Outchar = NULL;
 		vputchar(c);
-		Outchar = OO;
 		if (insmc1 == 0 && (vtube0[destcol]&(TRIM|MULTICOL))==MULTICOL)
 			vtube0[destcol] = INVBIT;
 		if (DEPTH(vcline) * WCOLS + !value(REDRAW) >
@@ -690,22 +683,15 @@ vinschar(int c)
 	 * rather we can just typeover.
 	 */
 	if (inssiz + insmc1 <= doomed) {
-		int	(*OO)() = Outchar;
 		endim();
 		if (inscol + insmc0 != linend)
 			doomed -= inssiz + insmc1;
 		if (insmc1 == 0 && c != '\t' &&
 				vtube0[inscol+insmc0] & MULTICOL)
 			vtube0[inscol+insmc0] = INVBIT;
-		/*
-		 * This indicates to vputchar() that it has to set MULTICOL
-		 * bits but must not call us recursively.
-		 */
-		Outchar = NULL;
 		do
 			vputchar(c);
 		while (--inssiz);
-		Outchar = OO;
 		return c;
 	}
 
@@ -1062,10 +1048,10 @@ viin(int c)
 	vigotoCL(inscol);
 	remdoom = doomed;
 	for (i = inssiz; i > 0; i--) {
-		if (remdoom > 0) {
+		if (remdoom > insmc1) {
 			remdoom--;
 			endim();
-		} else if (noim)
+		} else if (noim || remdoom == insmc1)
 			endim();
 		else if (IM && EI) {
 			vcsync();
@@ -1074,7 +1060,7 @@ viin(int c)
 		vputchar(c);
 	}
 
-	if (!IM || !EI) {
+	if (!IM || !EI || remdoom == insmc1) {
 		/*
 		 * We are a dumb terminal; brute force update
 		 * the rest of the line; this is very much an n^^2 process,
@@ -1428,23 +1414,15 @@ def:
 		}
 	}
 #ifdef	MB
-	if (mb_cur_max > 1 && (hold & HOLDPUPD) == 0 &&
-			Outchar != vinschar && (d = colsc(c&TRIM)) > 1) {
+	if (mb_cur_max > 1 && (d = colsc(c&TRIM)) > 1) {
 		if ((*tp&MULTICOL) == 0) {
-			*tp |= MULTICOL;
-			if (Outchar) {
-				while (--d)
-					(*Outchar)(MULTICOL);
-			} else {
-				/*
-				 * This occurs when replacing characters,
-				 * or in open mode.
-				 */
-				while (--d) {
+			if ((hold & HOLDPUPD) == 0)
+				*tp |= MULTICOL;
+			while (--d) {
+				if ((hold & HOLDPUPD) == 0)
 					*++tp = MULTICOL;
-					destcol++;
-					outcol++;
-				}
+				destcol++;
+				outcol++;
 			}
 		}
 	}
