@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.91 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.92 (gritter) 2/13/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.91 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.92 (gritter) 2/13/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.91 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.92 (gritter) 2/13/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.91 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.92 (gritter) 2/13/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -1774,6 +1774,16 @@ dosub(int really)
 	}
 	i = loc2 - linebuf;
 	loc2 = j + linebuf;
+#if defined (SUS) || defined (SU3) || defined (S42)
+	if (loc1 == &linebuf[i]) {
+		int	n;
+		wchar_t	wc;
+		if (mb_cur_max > 1 && (n = mbtowc(&wc, loc2, mb_cur_max)) > 0)
+			loc2 += n;
+		else
+			loc2++;
+	}
+#endif	/* SUS || SU3 || S42 */
 	while (genbuf[j++] = linebuf[i++])
 		if (j >= LBSIZE)
 			growlb("line too long");
@@ -1885,17 +1895,6 @@ execute(int gf, long *addr, int subst)
 		p2 = genbuf;
 		while (*p1++ = *p2++)
 			;
-#if defined (SUS) || defined (S42) || defined (SU3)
-		if (loc1 == loc2) {
-			int	n;
-			wchar_t	wc;
-			if (mb_cur_max > 1 &&
-					(n = mbtowc(&wc, loc2, mb_cur_max)) > 0)
-				loc2 += n;
-			else
-				loc2++;
-		}
-#endif
 		locs = p1 = loc2;
 	} else {
 		if (addr==zero)

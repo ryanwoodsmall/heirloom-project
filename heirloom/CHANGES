@@ -8,6 +8,8 @@ Release ...
   as a time specification if it starts with a digit, regardless of the
   following characters.
 * join: If a join field does not exist, substitute the empty string for it.
+* ed: With the SVID4 and POSIX versions, matches of zero length in substitute
+  commands do no longer lead to endless loops.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
