@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.30 (gritter) 10/21/04";
+static char sccsid[]  = "@(#)mime.c	2.32 (gritter) 10/21/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -89,7 +89,7 @@ static int gettextconversion(void);
 static char *ctohex(int c, char *hex);
 static size_t mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int));
 static void mime_str_toqp(struct str *in, struct str *out,
-		int (*mustquote)(int));
+		int (*mustquote)(int), int inhdr);
 static void mime_fromqp(struct str *in, struct str *out, int ishdr);
 static size_t mime_write_tohdr(struct str *in, FILE *fo);
 static size_t convhdra(char *str, size_t len, FILE *fp);
@@ -118,6 +118,8 @@ mustquote_hdr(int c)
 {
 	if (c != '\n' && (c < 040 || c >= 0177))
 		return 1;
+	if (c == '=' || c == '?' || c == '_')
+		return 1;
 	return 0;
 }
 
@@ -128,7 +130,7 @@ static int
 mustquote_inhdrq(int c)
 {
 	if (c != '\n'
-		&& (c < 040 || c == '=' || c == '?' || c == '_' || c >= 0177))
+		&& (c <= 040 || c == '=' || c == '?' || c == '_' || c >= 0177))
 		return 1;
 	return 0;
 }
@@ -933,7 +935,7 @@ mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int))
 	sz = in->l;
 	upper = in->s + in->l;
 	for (p = in->s, l = 0; p < upper; p++) {
-		if (mustquote(*p) ||
+		if (mustquote(*p&0377) ||
 				*(p + 1) == '\n' && blankchar(*p & 0377) ||
 				*p == ' ' && l == 4 &&
 				p[-4] == 'F' && p[-3] == 'r' &&
@@ -968,7 +970,7 @@ mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int))
  * The mustquote function determines whether a character must be quoted.
  */
 static void 
-mime_str_toqp(struct str *in, struct str *out, int (*mustquote)(int))
+mime_str_toqp(struct str *in, struct str *out, int (*mustquote)(int), int inhdr)
 {
 	char *p, *q, *upper;
 
@@ -977,12 +979,16 @@ mime_str_toqp(struct str *in, struct str *out, int (*mustquote)(int))
 	out->l = in->l;
 	upper = in->s + in->l;
 	for (p = in->s; p < upper; p++) {
-		if (mustquote(*p) ||
-				*(p + 1) == '\n' && blankchar(*p & 0377)) {
-			out->l += 2;
-			*q++ = '=';
-			ctohex(*p&0377, q);
-			q += 2;
+		if (mustquote(*p&0377) || p+1 < upper && *(p + 1) == '\n' &&
+				blankchar(*p & 0377)) {
+			if (inhdr && *p == ' ') {
+				*q++ = '_';
+			} else {
+				out->l += 2;
+				*q++ = '=';
+				ctohex(*p&0377, q);
+				q += 2;
+			}
 		} else {
 			*q++ = *p;
 		}
@@ -1165,7 +1171,7 @@ fromhdr_end:
 static size_t
 mime_write_tohdr(struct str *in, FILE *fo)
 {
-	char *upper, *wbeg, *wend, *charset;
+	char *upper, *wbeg, *wend, *charset, *lastwordend = NULL;
 	struct str cin, cout;
 	size_t sz = 0, col = 0, wr, charsetlen;
 	int mustquote,
@@ -1227,15 +1233,16 @@ mime_write_tohdr(struct str *in, FILE *fo)
 			for (wend = wbeg;
 				wend < upper && !whitechar(*wend & 0377);
 					wend++) {
-				if (mustquote_hdr(*wend))
+				if (mustquote_hdr(*wend&0377))
 					mustquote++;
 			}
 			if (mustquote) {
 				for (;;) {
-					cin.s = wbeg;
-					cin.l = wend - wbeg;
+					cin.s = lastwordend ? lastwordend :
+						wbeg;
+					cin.l = wend - cin.s;
 					mime_str_toqp(&cin, &cout,
-							mustquote_inhdrq);
+							mustquote_inhdrq, 1);
 					if ((wr = cout.l + charsetlen + 7)
 							< maxcol - col) {
 						fprintf(fo, "=?%s?Q?",
@@ -1259,6 +1266,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 						free(cout.s);
 					}
 				}
+				lastwordend = wend;
 			} else {
 				if (col && wend - wbeg > maxcol - col) {
 					fwrite("\n ", sizeof (char), 2, fo);
@@ -1269,6 +1277,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				wr = fwrite(wbeg, sizeof *wbeg,
 						wend - wbeg, fo);
 				sz += wr, col += wr;
+				lastwordend = NULL;
 			}
 		}
 	}
