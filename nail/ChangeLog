@@ -1,3 +1,10 @@
+[11.9] released ...
+* Empty lines within the command lists for account or macro definitions are
+  now ignored.
+* An attempt to define a macro twice is now properly detected and results in
+  an error.
+* Nail now builds without socket (networking) support again.
+
 [11.8] released 9/23/04
 * Support for S/MIME has been added. Introductory documentation is available
   in the 'EXAMPLES' section of the manual page.

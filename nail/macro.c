@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)macro.c	1.8 (gritter) 9/6/04";
+static char sccsid[] = "@(#)macro.c	1.10 (gritter) 9/24/04";
 #endif
 #endif /* not lint */
 
@@ -260,9 +260,17 @@ maexec(mp)
 
 	unset_allow_undefined = 1;
 	for (lp = mp->ma_contents; lp; lp = lp->l_next) {
-		cp = copy = smalloc(lp->l_linesize);
-		for (sp = lp->l_line; sp < &lp->l_line[lp->l_linesize]; sp++)
+		sp = lp->l_line;
+		while (sp < &lp->l_line[lp->l_linesize] &&
+				(blankchar(*sp&0377) || *sp == '\n' ||
+				 *sp == '\0'))
+			sp++;
+		if (sp == &lp->l_line[lp->l_linesize])
+			continue;
+		cp = copy = smalloc(lp->l_linesize + (lp->l_line - sp));
+		do
 			*cp++ = *sp != '\n' ? *sp : ' ';
+		while (++sp < &lp->l_line[lp->l_linesize]);
 		r = execute(copy, 0, lp->l_linesize);
 		free(copy);
 	}
@@ -300,7 +308,7 @@ malook(name, data, table)
 	}
 	if (data) {
 		if (mp != NULL)
-			return NULL;
+			return mp;
 		data->ma_next = table[h];
 		table[h] = data;
 	}

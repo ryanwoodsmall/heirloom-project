@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.199 (gritter) 9/22/04";
+static char sccsid[] = "@(#)imap.c	1.200 (gritter) 9/24/04";
 #endif
 #endif /* not lint */
 
@@ -3370,8 +3370,11 @@ imap_append(server, fp)
 	return STOP;
 }
 
+/*ARGSUSED*/
 void
-imap_folders()
+imap_folders(name, strip)
+	const char	*name;
+	int	strip;
 {
 	noimap();
 }
