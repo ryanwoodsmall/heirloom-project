@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.16 (gritter) 9/30/04";
+static char sccsid[] = "@(#)junk.c	1.21 (gritter) 10/1/04";
 #endif
 #endif /* not lint */
 
@@ -115,6 +115,7 @@ static struct super {
 struct lexstat {
 	int	price;
 	int	inbody;
+	int	url;
 	int	lastc;
 	char	field[LINESIZE];
 };
@@ -125,6 +126,13 @@ struct lexstat {
 		((c) == '-' && !(price)) || \
 		(((c) == '.' || (c) == ',') && \
 		 (i) > 0 && digitchar((b)[(i)-1]&0377)))
+
+#define	url_xchar(c) \
+	(((c)&0200) == 0 && ((c)&037) != (c) && (c) != 0177 && \
+	 !spacechar(c) && (c) != '{' && (c) != '}' && (c) != '|' && \
+	 (c) != '\\' && (c) != '^' && (c) != '~' && (c) != '[' && \
+	 (c) != ']' && (c) != '`' && (c) != '<' && (c) != '>' && \
+	 (c) != '#' && (c) != '"')
 
 enum db {
 	SUPER = 0,
@@ -300,6 +308,11 @@ lookup(hash, create)
 	if (create) {
 		if (used >= size) {
 			incr = size > 0xffff ? 0xffff : size;
+			if (size + incr > 0xffff0000) {
+				fprintf(stderr,
+					"Junk mail database overflow.\n");
+				return NULL;
+			}
 			nodes = srealloc(nodes, (size+incr) * sizeof *nodes);
 			memset(&nodes[size], 0, incr * sizeof *nodes);
 			size += incr;
@@ -317,6 +330,12 @@ lookup(hash, create)
 		return NULL;
 }
 
+#define	SAVE(c)	{ \
+	if (i+j >= (long)*bufsize-4) \
+		*buf = srealloc(*buf, *bufsize += 32); \
+	(*buf)[j+i++] = (c); \
+}
+
 static char *
 nextword(buf, bufsize, count, fp, sp)
 	char	**buf;
@@ -325,26 +344,23 @@ nextword(buf, bufsize, count, fp, sp)
 	struct lexstat	*sp;
 {
 	int	c, i, j, k;
-	char	*pfx;
+	char	*cp, *cq;
 
 loop:	i = 0;
 	j = 0;
-	pfx = NULL;
 	if (sp->inbody == 0 && sp->field[0]) {
-	field:	pfx = sp->field;
+	field:	cp = sp->field;
 		do {
-			c = *pfx&0377;
-			goto put;
-		pfx:	pfx++;
-		} while (*pfx);
-		pfx = NULL;
+			c = *cp&0377;
+			SAVE(c)
+			cp++;
+		} while (*cp);
 		j = i;
 		i = 0;
 	}
 	if (sp->price) {
 		sp->price = 0;
-		c = '$';
-		goto put;
+		SAVE('$')
 	}
 	while (*count > 0 && (c = getc(fp)) != EOF) {
 		(*count)--;
@@ -375,12 +391,43 @@ loop:	i = 0;
 			}
 		}
 		sp->lastc = c;
-		if (constituent(c, *buf, i+j, sp->price)) {
-		put:	if (i+j >= (long)*bufsize-4)
-				*buf = srealloc(*buf, *bufsize += 32);
-			(*buf)[j+i++] = c;
-			if (pfx)
-				goto pfx;
+		if (sp->url) {
+			if (!url_xchar(c)) {
+				sp->url = 0;
+				goto brk;
+			}
+			SAVE(c)
+		} else if (constituent(c, *buf, i+j, sp->price)) {
+			SAVE(c)
+		} else if (i > 0 && c == ':' && *count > 2) {
+			if ((c = getc(fp)) != '/') {
+				ungetc(c, fp);
+				goto brk;
+			}
+			(*count)--;
+			if ((c = getc(fp)) != '/') {
+				ungetc(c, fp);
+				goto brk;
+			}
+			(*count)--;
+			sp->url = 1;
+			(*buf)[i+j] = '\0';
+			cp = savestr(*buf);
+			j = i = 0;
+			for (cq = "URL*"; *cq; cq++) {
+				SAVE(*cq&0377)
+			}
+			j = i;
+			i = 0;
+			do {
+				if (alnumchar(*cp&0377)) {
+					SAVE(*cp&0377)
+				} else
+					i = 0;
+			} while (*++cp);
+			for (cq = "://"; *cq; cq++) {
+				SAVE(*cq&0377)
+			}
 		} else if (i > 0 && ((*buf)[i+j-1] == ',' ||
 				 (*buf)[i+j-1] == '.') && !digitchar(c)) {
 			i--;
@@ -388,7 +435,7 @@ loop:	i = 0;
 			(*count)++;
 			break;
 		} else if (i > 0) {
-			if (i < 2)
+		brk:	if (i < 2)
 				i = 0;
 			else {
 				break;
@@ -411,6 +458,7 @@ loop:	i = 0;
 		if (sp->inbody == 0 &&
 				(asccasecmp(sp->field, "message-id*") == 0 ||
 				 asccasecmp(sp->field, "references*") == 0 ||
+				 asccasecmp(sp->field, "date*") == 0 ||
 				 asccasecmp(sp->field, "received*") == 0 &&
 				 	2*c > i))
 			goto loop;
@@ -537,12 +585,16 @@ insert(msgvec, entry)
 		break;
 	}
 	for (ip = msgvec; *ip; ip++) {
+		if (u == 0xffffffff) {
+			fprintf(stderr, "Junk mail database overflow.\n");
+			break;
+		}
+		u++;
 		if (entry == GOOD)
 			message[*ip-1].m_flag &= ~MJUNK;
 		else
 			message[*ip-1].m_flag |= MJUNK;
 		scan(&message[*ip-1], entry, add);
-		u++;
 	}
 	switch (entry) {
 	case GOOD:
@@ -594,7 +646,7 @@ static struct {
 	float	dist;
 	float	prob;
 	char	*word;
-	unsigned	hash;
+	unsigned long	hash;
 } best[BEST];
 
 static void
@@ -622,7 +674,7 @@ clsf(m)
 		if (best[i].prob == -1)
 			break;
 		if (verbose)
-			fprintf(stderr, "Probe %2d: \"%s\", hash=%u "
+			fprintf(stderr, "Probe %2d: \"%s\", hash=%lu "
 				"prob=%g dist=%g\n",
 				i+1,
 				best[i].word, best[i].hash,

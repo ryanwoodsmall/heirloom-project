@@ -6,7 +6,10 @@
 * Empty lines within the command lists for account or macro definitions are
   now ignored.
 * An attempt to define a macro twice is now properly detected and results in
-  an error.
+  an error message.
+* Nail was reported to hang sporadically when sending multipart messages on
+  HP-UX. A possible reason for such problems on systems without /dev/urandom
+  has been eliminated (Bugreport by Patrick Briggs).
 * Nail now builds without socket (networking) support again.
 
 [11.8] released 9/23/04

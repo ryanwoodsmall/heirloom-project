@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.52 (gritter) 9/22/04";
+static char sccsid[] = "@(#)sendout.c	2.53 (gritter) 10/1/04";
 #endif
 #endif /* not lint */
 
@@ -84,7 +84,7 @@ static int	infix_fw __P((FILE *, FILE *, struct message *,
 char *
 makeboundary()
 {
-	int i, bd;
+	int i, j, bd;
 	static unsigned msgc;
 	static pid_t pid;
 	static char bound[73];
@@ -111,8 +111,11 @@ makeboundary()
 		srand((unsigned)msgc);
 		for (i = 0; i < BOUNDARRAY; i++) {
 			r[i] = 1L;
-			while (r[i] < 60466176L)
-				r[i] *= (unsigned long)rand();
+			while (r[i] < 60466176L) {
+				j = rand();
+				if (j != 0)
+					r[i] *= (unsigned long)j;
+			}
 		}
 	}
 	snprintf(bound, 73,
