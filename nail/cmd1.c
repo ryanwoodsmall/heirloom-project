@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.80 (gritter) 10/30/04";
+static char sccsid[] = "@(#)cmd1.c	2.81 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -88,6 +88,7 @@ headers(void *v)
 	int g, k, n, mesg, flag = 0, lastg = 1;
 	struct message *mp, *mq, *lastmq = NULL;
 	int size;
+	enum mflag	fl = MNEW|MFLAGGED;
 
 	size = screensize();
 	n = msgvec[0];	/* n == {-2, -1, 0}: called from scroll() */
@@ -105,18 +106,18 @@ headers(void *v)
 			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0) {
 				if (g % size == 0)
 					mq = mp;
-				if (n==-2 && mp->m_flag&MNEW && g<k+size) {
+				if (mp->m_flag&fl) {
 					lastg = g;
 					lastmq = mq;
 				}
 				if (n>0 && mp==&message[n-1] ||
 						n==0 && g==k ||
 						n==-2 && g==k+size && lastmq ||
-						n<0 && g>=k && mp->m_flag&MNEW)
+						n<0 && g>=k && mp->m_flag&fl)
 					break;
 				g++;
 			}
-		if (n==-2 && lastmq) {
+		if (lastmq && (n==-2 || n==-1 && mp==&message[msgCount])) {
 			g = lastg;
 			mq = lastmq;
 		}
@@ -149,18 +150,18 @@ headers(void *v)
 					 mp == &message[n-1])) {
 				if (g % size == 0)
 					mq = mp;
-				if (n==-2 && mp->m_flag&MNEW && g<k+size) {
+				if (mp->m_flag&fl) {
 					lastg = g;
 					lastmq = mq;
 				}
 				if (n>0 && mp==&message[n-1] ||
 						n==0 && g==k ||
 						n==-2 && g==k+size && lastmq ||
-						n<0 && g>=k && mp->m_flag&MNEW)
+						n<0 && g>=k && mp->m_flag&fl)
 					break;
 				g++;
 			}
-		if (n==-2 && lastmq) {
+		if (lastmq && (n==-2 || n==-1 && mp==&message[msgCount])) {
 			g = lastg;
 			mq = lastmq;
 		}
