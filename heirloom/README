@@ -278,11 +278,11 @@ the following to be sure not to report a feature:
   Toolchest is oriented on System V behavior. Verify that real System V
   derivatives behave differently before reporting.
 
-- If you are using the POSIX.2 personality and the specification says
-  something different, it is likely to be a bug. But be careful to read
-  the specification itself; there are quite a few incompatibilities to
-  the wording of POSIX.2 even in certified systems, so you cannot rely
-  on a vendor's implementation or documentation here.
+- If you are using one of the POSIX personalities and the specification
+  says something different, it is likely to be a bug. But be careful to
+  read the respective specification itself; some incompatibilities to
+  the wording of the specification may even exist in certified systems,
+  so you cannot rely on a vendor's implementation or documentation here.
 
 If you went through these statements and you're still sure that it is
 a bug, report it.
@@ -291,4 +291,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           1/23/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           2/2/05
