@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)mapmalloc.c	1.3 (gritter) 2/20/05
+ *	Sccsid @(#)mapmalloc.c	1.4 (gritter) 2/20/05
  */
 
 #ifdef	VMUNIX
@@ -87,6 +87,7 @@ botch(char *s)
 	abort();
 }
 static int allock(void *);
+#ifdef	debugprint
 void dump(const char *msg, uintptr_t t)
 {
 	const char hex[] = "0123456789ABCDEF";
@@ -99,6 +100,9 @@ void dump(const char *msg, uintptr_t t)
 	}
 	write(2, "\n", 1);
 }
+#else
+#define	dump(a, b)
+#endif
 #else
 #define ASSERT(p)
 #define	dump(a, b)
@@ -151,7 +155,7 @@ static	struct pool *pool0;
 union store { union store *ptr;
 	      struct pool *pool;
 	      ALIGN dummy[NALIGN];
-	      /*int calloc;*/	/*calloc clears an array of integers*/
+	      INT callocsp;	/*calloc clears an array of integers*/
 };
 
 struct pool {
@@ -177,7 +181,7 @@ map(void *addr, size_t len)
 	int flags = 0;
 	static int fd = -1;
 
-	if (fd==-1&&((fd=open("/dev/zero",O_RDWR))<0||
+	if (fd==-1 && ((fd=open("/dev/zero",O_RDWR))<0 ||
 			fcntl(fd,F_SETFD,FD_CLOEXEC)<0))
 		return(MAP_FAILED);
 #else	/* MAP_ANON */
@@ -197,17 +201,17 @@ malloc(size_t nbytes)
 	struct pool *o;
 	register int nw;
 	static int temp;	/*coroutines assume no auto*/
-	static size_t poolblock = 32768;
+	static size_t poolblock = 0100000;
 
 	if (nbytes == 0)
 		nbytes = 1;
-	if(pool0==0||pool0==MAP_FAILED) {	/*first time*/
-		if((pool0 = map(NULL, poolblock)) == MAP_FAILED) {
+	if(pool0==0 || pool0==MAP_FAILED) {	/*first time*/
+		if((pool0=map(NULL, poolblock))==MAP_FAILED) {
 			errno = ENOMEM;
 			return(NULL);
 		}
 		pool0->Brk = (char *)pool0->Dummy;
-		pool0->End = (char *)pool0 + poolblock;
+		pool0->End = (char *)pool0+poolblock;
 	}
 	o = pool0;
 first:	if(allocs[0].ptr==0) {	/*first time for this pool*/
@@ -223,8 +227,11 @@ first:	if(allocs[0].ptr==0) {	/*first time for this pool*/
 		for(temp=0; ; ) {
 			if(!testbusy(p->ptr)) {
 				while(!testbusy((q=p->ptr)->ptr)) {
+					int ua = p->ptr==allocp;
 					ASSERT(q>p&&q<alloct);
 					p->ptr = q->ptr;
+					if (ua)
+						allocp = p->ptr;
 				}
 				if(q>=p+nw && p+nw>=p)
 					goto found;
@@ -334,7 +341,7 @@ realloc(void *ap, size_t nbytes)
 		free(p);
 	onw = p[-2].ptr - p;
 	o = p[-1].pool;
-	q = (union store *)malloc(nbytes);
+	q = malloc(nbytes);
 	if(q==NULL || q==p)
 		return(q);
 	s = p;
@@ -344,7 +351,7 @@ realloc(void *ap, size_t nbytes)
 		onw = nw;
 	while(onw--!=0)
 		*t++ = *s++;
-	if(q<p && q+nw>=p)
+	if(q<p && q+nw>=p && p[-1].pool==q[-1].pool)
 		(q+(q+nw-p))->ptr = allocx;
 	return(q);
 }
@@ -363,10 +370,9 @@ allock(void *ao)
 			x++;
 	}
 	ASSERT(p==alloct);
-	return(x==1|p==allocp);
-#else
-	return(1);
+	ASSERT(x==1|p==allocp);
 #endif
+	return(1);
 }
 #endif
 

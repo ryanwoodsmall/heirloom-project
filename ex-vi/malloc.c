@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	@(#)malloc.c	1.18 (gritter) 2/18/05
+ *	@(#)malloc.c	1.19 (gritter) 2/20/05
  */
 
 #ifdef	VMUNIX
@@ -127,7 +127,7 @@ static int allock(void);
 
 union store { union store *ptr;
 	      ALIGN dummy[NALIGN];
-	      /*int calloc;*/	/*calloc clears an array of integers*/
+	      INT callocsp;	/*calloc clears an array of integers*/
 };
 
 static	union store allocs[2];	/*initial arena*/
@@ -178,8 +178,11 @@ malloc(size_t nbytes)
 		for(temp=0; ; ) {
 			if(!testbusy(p->ptr)) {
 				while(!testbusy((q=p->ptr)->ptr)) {
+					int ua = p->ptr==allocp;
 					ASSERT(q>p&&q<alloct);
 					p->ptr = q->ptr;
+					if (ua)
+						allocp = p->ptr;
 				}
 				if(q>=p+nw && p+nw>=p)
 					goto found;
@@ -229,7 +232,7 @@ found:
 void
 free(register void *ap)
 {
-	register union store *p = (union store *)ap;
+	register union store *p = ap;
 
 	if (ap == NULL)
 		return;
@@ -263,11 +266,11 @@ realloc(void *ap, size_t nbytes)
 		return NULL;
 	}
 	if(testbusy(p[-1].ptr))
-		free((char *)p);
+		free(p);
 	onw = p[-1].ptr - p;
-	q = (union store *)malloc(nbytes);
+	q = malloc(nbytes);
 	if(q==NULL || q==p)
-		return((char *)q);
+		return(q);
 	s = p;
 	t = q;
 	nw = (nbytes+WORD-1)/WORD;
@@ -277,7 +280,7 @@ realloc(void *ap, size_t nbytes)
 		*t++ = *s++;
 	if(q<p && q+nw>=p)
 		(q+(q+nw-p))->ptr = allocx;
-	return((char *)q);
+	return(q);
 }
 
 #ifdef debug

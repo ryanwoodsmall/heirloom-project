@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.54 (gritter) 2/20/05";
+static char sccsid[] = "@(#)ex_re.c	1.55 (gritter) 2/20/05";
 #endif
 #endif
 
@@ -981,12 +981,8 @@ compile1(void)
 			cp = "Badly formed re|Missing closing delimiter "
 				"for regular expression";
 			break;
-		case 41:
-			cp = "No remembered search string.";
-			break;
 		case 42:
-			cp = "Unmatched \\( or \\)|More \\('s than \\)'s in "
-				"regular expression or vice-versa";
+			cp = "\\( \\) Imbalance";
 			break;
 		case 43:
 			cp = "Awash in \\('s!|Too many \\('d subexressions "
@@ -1005,7 +1001,8 @@ compile1(void)
 			cp = "Missing ]";
 			break;
 		case 67:
-			cp = "Illegal byte sequence.";
+			cp = "Illegal byte sequence|Regular expression "
+				"has illegal byte sequence";
 			break;
 		default:
 			cp = "Unknown regexp error code!!";
