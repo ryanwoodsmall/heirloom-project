@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.73 (gritter) 9/9/04";
+static char sccsid[] = "@(#)cmd1.c	2.74 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -105,8 +105,7 @@ headers(v)
 					break;
 				g++;
 			}
-		if (mp >= &message[msgCount])
-			screen = g / size;
+		screen = g / size;
 		mp = mq;
 		mesg = mp - &message[0];
 		if (dot != &message[n-1]) {
@@ -138,8 +137,7 @@ headers(v)
 					break;
 				g++;
 			}
-		if (mp == NULL)
-			screen = g / size;
+		screen = g / size;
 		mp = mq;
 		if (dot != &message[n-1]) {
 			for (mq = mp; mq; mq = next_in_thread(mq))
