@@ -5,7 +5,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)diff.sl	1.41 (gritter) 3/26/05";
+static const char sccsid[] USED = "@(#)diff.sl	1.42 (gritter) 3/27/05";
 
 /*
 diff.h:
@@ -13,7 +13,7 @@ diff.h:
 diff.c:
 	diff.c	1.22 (gritter) 3/26/05
 diffdir.c:
-	diffdir.c	1.27 (gritter) 11/7/04
+	diffdir.c	1.28 (gritter) 3/27/05
 diffreg.c:
 	diffreg.c	1.28 (gritter) 3/26/05
 */

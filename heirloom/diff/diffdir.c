@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffdir.c	1.27 (gritter) 11/7/04>	*/
+/*	Sccsid @(#)diffdir.c	1.28 (gritter) 3/27/05>	*/
 /*	from 4.3BSD diffdir.c	4.9 (Berkeley) 8/28/84	*/
 
 #include "diff.h"
@@ -562,7 +562,7 @@ calldiff(const char *wantpr, char **argv)
 {
 	int pid, cstatus, cstatus2, pv[2];
 
-	if (wantpr == NULL) {
+	if (wantpr == NULL && hflag == 0) {
 		stackdiff(argv);
 		return;
 	}
