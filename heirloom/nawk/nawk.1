@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)nawk.1	1.20 (gritter) 1/24/05
+.\" Sccsid @(#)nawk.1	1.21 (gritter) 2/6/05
 .\" Derived from awk.1, Bell Labs:
 .\"
 .\" Copyright (C) Lucent Technologies 1997
@@ -23,7 +23,7 @@
 .\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 .\" ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 .\" THIS SOFTWARE.
-.TH NAWK 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH NAWK 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 nawk \- pattern scanning and processing language
 .SH SYNOPSIS
@@ -63,8 +63,8 @@ of the form
 .I var=value
 is treated as an assignment, not a filename,
 and is executed at the time it would have been opened if it were a filename
-.RB ( /usr/5bin/s42/nawk ,
-.BR /usr/5bin/posix/nawk ,
+.RB ( /usr/5bin/s42/awk ,
+.BR /usr/5bin/posix/awk ,
 and
 .B /usr/5bin/posix2001/awk
 only).
@@ -370,7 +370,7 @@ full regular expressions with
 .B /usr/5bin/nawk
 and
 extended regular expressions with
-.BR /usr/5bin/s42/nawk ,
+.BR /usr/5bin/s42/awk ,
 .BR /usr/5bin/posix/awk ,
 and
 .BR /usr/5bin/posix2001/awk ;
@@ -388,6 +388,9 @@ is a constant regular expression;
 any string (constant or variable) may be used
 as a regular expression, except in the position of an isolated regular expression
 in a pattern.
+For
+.BR /usr/5bin/posix2001/awk ,
+regular expressions may be part of arithmetic expressions.
 .PP
 A pattern may consist of two patterns separated by a comma;
 in this case, the action is performed for all lines
@@ -438,7 +441,7 @@ argument array, assignable;
 non-null members are taken as filenames
 .TP 10
 .B CONVFMT
-.RB ( /usr/5bin/s42/nawk ,
+.RB ( /usr/5bin/s42/awk ,
 .BR /usr/5bin/posix2001/awk ,
 and
 .B /usr/5bin/posix/awk

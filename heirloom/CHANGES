@@ -78,6 +78,8 @@ Release ...
   personality, contrary to the documentation.
 * nawk: printf("%u") did not work if the argument was larger that INT_MAX.
 * nawk: RLENGTH was not set correctly for matches of zero length.
+* nawk: The POSIX.1-2001 version accepts regular expressions as parts of
+  arithmetic expressions, e.g. "x = /p/ * 2".
 * file: The POSIX version does not exit with an error status if a file could
   not be opened.
 * cpio, pax: The -plL (or -rwlL for pax) option combination now works; it

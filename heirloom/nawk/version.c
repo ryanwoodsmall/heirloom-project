@@ -1,10 +1,13 @@
 #include "awk.h"
-#ifndef	SUS
-const char version[] = "@(#)nawk.sl  1.42 (gritter) 2/4/05";
-int	posix = 0;
-#else
-const char version[] = "@(#)awk_sus.sl  1.42 (gritter) 2/4/05";
+#if defined (SU3)
+const char version[] = "@(#)awk_su3.sl  1.43 (gritter) 2/6/05";
 int	posix = 1;
+#elif defined (SUS)
+const char version[] = "@(#)awk_sus.sl  1.43 (gritter) 2/6/05";
+int	posix = 1;
+#else
+const char version[] = "@(#)nawk.sl  1.43 (gritter) 2/6/05";
+int	posix = 0;
 #endif
 /*
 awk.g.y:
