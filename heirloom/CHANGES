@@ -34,6 +34,14 @@ Release ...
   is now left after the last byte read.
 * xargs: The combination of the -n and -x options did not work properly.
 * xargs: Exit codes were aligned with POSIX.
+* ed: If no new text is given for a 'c' command, the current line is now
+  positioned for the POSIX versions as demanded by the standard.
+* ed: Can write empty files now.
+* ed: An unterminated 's' command inside a 'g' command is now handled
+  properly.
+* ed: The 'G' command accepts the 'l' and 'n suffices now.
+* ed: When a hangup signal is received, ed exits with failure status now.
+* ed: The address '0' is now accepted as '1' for the 'c' and 'i' commands.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
