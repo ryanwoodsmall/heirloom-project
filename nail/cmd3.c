@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.77 (gritter) 1/3/05";
+static char sccsid[] = "@(#)cmd3.c	2.78 (gritter) 1/7/05";
 #endif
 #endif /* not lint */
 
@@ -55,7 +55,7 @@ static char sccsid[] = "@(#)cmd3.c	2.77 (gritter) 1/3/05";
  */
 
 static int bangexp(char **str, size_t *size);
-static void make_ref(struct message *mp, struct header *head);
+static void make_ref_and_cs(struct message *mp, struct header *head);
 static int (*respond_or_Respond(int c))(int *, int);
 static int respond_internal(int *msgvec, int recipient_record);
 static char *reedit(char *subj);
@@ -223,9 +223,9 @@ schdir(void *v)
 }
 
 static void 
-make_ref(struct message *mp, struct header *head)
+make_ref_and_cs(struct message *mp, struct header *head)
 {
-	char *oldref, *oldmsgid, *newref;
+	char *oldref, *oldmsgid, *newref, *cp;
 	size_t reflen;
 	unsigned i;
 	struct name *n;
@@ -265,6 +265,9 @@ make_ref(struct message *mp, struct header *head)
 	}
 	n->n_blink = NULL;
 	head->h_ref = n;
+	if (value("reply-in-same-charset") != NULL &&
+			(cp = hfield("content-type", mp)) != NULL)
+		head->h_charset = mime_getparam("charset", cp);
 }
 
 static int
@@ -359,7 +362,7 @@ respond_internal(int *msgvec, int recipient_record)
 		np = delete_alternates(np);
 		head.h_cc = np;
 	}
-	make_ref(mp, &head);
+	make_ref_and_cs(mp, &head);
 	if (mail1(&head, 1, mp, NULL, recipient_record, 0, 0) == OKAY &&
 			value("markanswered"))
 		mp->m_flag |= MANSWER|MANSWERED;
@@ -964,7 +967,7 @@ Respond_internal(int *msgvec, int recipient_record)
 	if ((head.h_subject = hfield("subject", mp)) == NULL)
 		head.h_subject = hfield("subj", mp);
 	head.h_subject = reedit(head.h_subject);
-	make_ref(mp, &head);
+	make_ref_and_cs(mp, &head);
 	if (mail1(&head, 1, mp, NULL, recipient_record, 0, 0) == OKAY &&
 			value("markanswered"))
 		mp->m_flag |= MANSWER|MANSWERED;

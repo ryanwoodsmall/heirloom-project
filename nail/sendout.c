@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.76 (gritter) 1/6/05";
+static char sccsid[] = "@(#)sendout.c	2.77 (gritter) 1/7/05";
 #endif
 #endif /* not lint */
 
@@ -916,13 +916,22 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 		senderr++;
 	}
 	to = fixhead(hp, to, GCC|GBCC|GREPLYTO);
-	wantcharset = NULL;
+	if (hp->h_charset) {
+		wantcharset = hp->h_charset;
+		goto try;
+	}
+hloop:	wantcharset = NULL;
 	if ((charsets = value("sendcharsets")) != NULL) {
 		wantcharset = savestr(charsets);
 	loop:	if ((ncs = strchr(wantcharset, ',')) != NULL)
 			*ncs++ = '\0';
 	}
-	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
+try:	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
+		if (hp->h_charset && (errno == EILSEQ || errno == EINVAL)) {
+			rewind(mtf);
+			hp->h_charset = NULL;
+			goto hloop;
+		}
 		if (ncs && *ncs && (errno == EILSEQ || errno == EINVAL)) {
 			rewind(mtf);
 			wantcharset = ncs;

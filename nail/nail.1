@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.290 (gritter) 1/6/05
+.\"     Sccsid: @(#)nail.1	2.291 (gritter) 1/7/05
 .\"
-.TH NAIL 1 "1/6/05" "nail 11.20" "User Commands"
+.TH NAIL 1 "1/7/05" "nail 11.20" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -2489,6 +2489,16 @@ and
 commands save messages to the
 .I record
 folder as it is normally only done for newly composed messages.
+.TP
+.B reply-in-same-charset
+If this variable is set,
+.I nail
+first tries to use the same character set
+of the original message for replies.
+If this fails,
+the
+.I sendcharsets
+variable is evaluated as usual.
 .TP
 .B Replyall
 Reverses the sense of reply and Reply commands.

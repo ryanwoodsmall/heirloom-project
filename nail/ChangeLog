@@ -11,6 +11,8 @@
   in its body but not in its header, the characters were replaced by
   question marks and the message was sent, instead of being rejected
   (Bugreport by Suresh Ramasubramanian).
+* A 'reply-in-same-charset' variable has been introduced. If it is set,
+  nail tries to reply in the character set of the original message first.
 * When the header of an outgoing message contained a non-ASCII character
   but the body did not, the name of the international character set was
   used for declaring the content-type of the body too. Us-ascii is now

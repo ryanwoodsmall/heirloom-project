@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.95 (gritter) 1/6/05
+ *	Sccsid @(#)def.h	2.96 (gritter) 1/7/05
  */
 
 /*
@@ -417,6 +417,7 @@ struct header {
 	struct name *h_ref;		/* References */
 	struct name *h_smopts;		/* Sendmail options */
 	struct attachment *h_attach;	/* MIME attachments */
+	char	*h_charset;		/* preferred charset */
 };
 
 /*
