@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.33 (gritter) 10/21/04";
+static char sccsid[]  = "@(#)mime.c	2.35 (gritter) 10/21/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -1183,7 +1183,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 	for (wbeg = in->s, mustquote = 0; wbeg < upper; wbeg++)
 		if (mustquote_hdr(*wbeg))
 			mustquote++;
-	if (0&&2 * mustquote > in->l) {
+	if (2 * mustquote > in->l) {
 		/*
 		 * Print the entire field in base64.
 		 */
@@ -1225,8 +1225,9 @@ mime_write_tohdr(struct str *in, FILE *fo)
 		for (wbeg = in->s; wbeg < upper; wbeg = wend) {
 			lastspc = NULL;
 			while (wbeg < upper && whitechar(*wbeg & 0377)) {
-				lastspc = wbeg++;
-				sz++, col++;
+				lastspc = lastspc ? lastspc : wbeg;
+				wbeg++;
+				col++;
 			}
 			if (wbeg == upper)
 				break;
@@ -1252,7 +1253,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 									&0377,
 									fo);
 								lastspc++,
-								sz++, col++;
+								sz++;
 							}
 						fprintf(fo, "=?%s?Q?",
 								charset);
@@ -1298,7 +1299,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				if (lastspc)
 					while (lastspc < wbeg) {
 						putc(*lastspc&0377, fo);
-						lastspc++, sz++, col++;
+						lastspc++, sz++;
 					}
 				wr = fwrite(wbeg, sizeof *wbeg,
 						wend - wbeg, fo);
