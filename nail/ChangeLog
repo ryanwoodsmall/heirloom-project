@@ -6,6 +6,9 @@
   with the 'sendcharsets' variable. It can contain multiple values, with
   the first appropriate one being used to send the message. The 'charset'
   variable is still accepted but has been removed from the documentation.
+* If 'sendcharsets' contains more than one character set name, the '~@'
+  tilde escape now asks about character sets for individual attachments
+  if it is invoked without arguments.
 * If neither the 'sendcharsets' nor the 'charset' variable is set, the
   character set for outgoing messages that contain non-ASCII characters is
   now 'utf-8' instead of 'iso-8859-1'.

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.96 (gritter) 1/7/05
+ *	Sccsid @(#)def.h	2.97 (gritter) 1/10/05
  */
 
 /*
@@ -446,6 +446,7 @@ struct attachment {
 	char	*a_content_disposition;	/* content disposition */
 	char	*a_content_id;		/* content id */
 	char	*a_content_description;	/* content description */
+	char	*a_charset;		/* character set */
 	int	a_msgno;		/* message number */
 };
 

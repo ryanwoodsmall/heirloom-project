@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.43 (gritter) 1/3/05";
+static char sccsid[] = "@(#)collect.c	2.44 (gritter) 1/10/05";
 #endif
 #endif /* not lint */
 
@@ -257,7 +257,7 @@ include_file(FILE *fbuf, char *name, int *linecount, int *charcount, int echo)
 static struct attachment *
 read_attachment_data(struct attachment *ap, unsigned number)
 {
-	char prefix[80];
+	char prefix[80], *cp;
 
 	if (ap == NULL)
 		ap = csalloc(1, sizeof *ap);
@@ -273,6 +273,12 @@ read_attachment_data(struct attachment *ap, unsigned number)
 		if (access(ap->a_name, R_OK) == 0)
 			break;
 		perror(ap->a_name);
+	}
+	if (ap->a_name && (value("attachment-ask-charset") ||
+			(cp = value("sendcharsets")) != NULL &&
+			strchr(cp, ',') != NULL)) {
+		snprintf(prefix, sizeof prefix, "#%u\tcharset: ", number);
+		ap->a_charset = readtty(prefix, ap->a_charset);
 	}
 	/*
 	 * The "attachment-ask-content-*" variables are left undocumented

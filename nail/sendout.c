@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.78 (gritter) 1/10/05";
+static char sccsid[] = "@(#)sendout.c	2.79 (gritter) 1/10/05";
 #endif
 #endif /* not lint */
 
@@ -245,7 +245,8 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 	if (charset == NULL)
 		putc('\n', fo);
 	else
-		fprintf(fo, ";\n charset=%s\n", charset);
+		fprintf(fo, ";\n charset=%s\n", ap->a_charset ?
+				ap->a_charset : charset);
 	if (ap->a_content_disposition == NULL)
 		ap->a_content_disposition = "attachment";
 	fprintf(fo, "Content-Transfer-Encoding: %s\n"
