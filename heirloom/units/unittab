@@ -32,7 +32,7 @@
 / OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 / EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /
-/ Sccsid @(#)unittab.sl	1.8 (gritter) 12/29/04
+/ Sccsid @(#)unittab.sl	1.9 (gritter) 12/31/04
 /
 / dimensions
 m			*a*
@@ -283,37 +283,6 @@ markka			finlandmarkka
 poundsterling		britainpound
 / cruzeiro		brazilcruzeiro
 
-/ Currency signs in UTF-8 and other international encodings
-/
-/ Euro sign in Windows-1252 character set. The euro sign in ISO-8859-15 is
-/ not accepted to avoid confusion since it has the same value as the generic
-/ currency sign in ISO-8859-1.
-�			euro
-/ Euro sign in UTF-8 character set.
-€			euro
-/ Pound sign in ISO-8859-1.
-�			britainpound
-/ Pound sign in UTF-8.
-£			britainpound
-/ Lira sign in UTF-8.
-₤			italylira
-/ Cent sign in UTF-8.
-¢			centidollar
-/ Yen sign in UTF-8.
-¥			japanyen
-/ French franc sign in UTF-8.
-₣			francefranc
-/ Mill sign in UTF-8.
-₥			0.1 usdollar
-/ Peseta sign in UTF-8.
-₧			spainpeseta
-/ Rupee sign in UTF-8.
-₨			indiarupee
-/ Drachma sign in UTF-8.
-₯			greecedrachma
-/ German penny sign in UTF-8.
-₰			.01 germanymark
-
 / PDP-11
 
 baud			bit/sec
@@ -555,3 +524,56 @@ wey			40 bu
 weymass			252 lb
 Xunit			1.00202-13m
 k			1.38047-16 erg/degC
+
+/ Some signs in UTF-8 and other international encodings
+/
+/ Euro sign in Windows-1252 character set. The euro sign in ISO-8859-15 is
+/ not accepted to avoid confusion since it has the same value as the generic
+/ currency sign in ISO-8859-1.
+�			euro
+/ Euro sign in UTF-8 character set.
+€			euro
+/ Pound sign in ISO-8859-1.
+�			britainpound
+/ Pound sign in UTF-8.
+£			britainpound
+/ Lira sign in UTF-8.
+₤			italylira
+/ Cent sign in UTF-8.
+¢			centidollar
+/ Yen sign in UTF-8.
+¥			japanyen
+/ French franc sign in UTF-8.
+₣			francefranc
+/ Mill sign in UTF-8.
+₥			0.1 usdollar
+/ Peseta sign in UTF-8.
+₧			spainpeseta
+/ Rupee sign in UTF-8.
+₨			indiarupee
+/ Drachma sign in UTF-8.
+₯			greecedrachma
+/ German penny sign in UTF-8.
+₰			.01 germanymark
+/ Degree Celsius sign in UTF-8.
+℃			degC
+/ Degree Fahrenheit in UTF-8.
+/ ℉
+/ Planck constant in UTF-8.
+/ ℎ
+/ Planck constant over two pi in UTF-8.
+/ ℏ
+/ Liter sign in UTF-8.
+ℓ			liter
+/ L B bar (pound) sign in UTF-8.
+℔			pound
+/ Ounce sign in UTF-8.
+℥			ounce
+/ Ohm sign in UTF-8.
+Ω			ohm
+/ Siemens sign in UTF-8.
+℧			siemens
+/ Angstrom sign in UTF-8.
+Å			angstrom
+/ pi sign in UTF-8.
+π			pi
