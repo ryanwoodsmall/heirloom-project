@@ -15,6 +15,8 @@ Release ...
   POSIX.1-2001 version. The SVID personalities also do no longer require it.
 * pax: The -H option from POSIX.1-2001 has been added; pax does not follow
   symbolic links on the command line anymore unless this option is present.
+* pax: The POSIX.1-2001 version terminates immediately when it detects a
+  symbolic link loop with the -L option.
 * tr: The -C option from POSIX.1-2001 has been added.
 * dd: With 'conv=unblock', the last block was not converted.
 * grep: The content of a file that consisted only of a single byte other than
@@ -72,7 +74,7 @@ Release ...
 * bc: Passing arrays to functions works properly now.
 * bc, dc: Output for obase>16 does not end with trailing spaces anymore.
 * bc: The '-=' operator did not work.
-* nawk: CONVFMT was used in the System V personality but not in the POSIX
+* nawk: CONVFMT was used in the SVID personality but not in the POSIX
   personality, contrary to the documentation.
 * nawk: printf("%u") did not work if the argument was larger that INT_MAX.
 * nawk: RLENGTH was not set correctly for matches of zero length.
@@ -110,6 +112,8 @@ Release ...
 * tabs: The -T option had no effect. Its argument is now required.
 * wc: Use a column-aligned output format for the POSIX version too since the
   standard does not actually disallow it.
+* csplit, ed, grep, nl, pax, pg, sed: The POSIX.1-2001 versions try to avoid
+  null matches with BRE subexpressions.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
