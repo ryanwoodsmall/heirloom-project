@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.52 (gritter) 12/20/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.53 (gritter) 12/20/04";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.52 (gritter) 12/20/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.53 (gritter) 12/20/04";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1007,7 +1007,7 @@ print1(const char *s, const char *end)
 {
 	char	buf[200], *bp;
 	w_type	wc;
-	int	m, n;
+	int	i, m, n;
 
 	bp = buf;
 	while (s < end) {
@@ -1016,14 +1016,14 @@ print1(const char *s, const char *end)
 				wc != '\n' && wc != '\r' &&
 				wc != '\b' && wc != '\t') {
 			if (seqstart(*s&0377) && (m = known_sequence(s)) > 0) {
-				s += m - n;
-				for (m = 0; m < n; m++) {
-					*bp++ = s[m];
+				for (i = 0; i < m; i++) {
+					*bp++ = s[i];
 					if (bp-buf >= sizeof buf - mb_cur_max) {
 						write(1, buf, bp - buf);
 						bp = buf;
 					}
 				}
+				s += m - n;
 			} else if (utf8) {
 				if (wc == WEOF) {
 					*bp++ = 0357;
@@ -1040,12 +1040,12 @@ print1(const char *s, const char *end)
 						*bp++ = 0200 + wc;
 				}
 			} else {
-				for (m = 0; m < n; m++)
+				for (i = 0; i < n; i++)
 					*bp++ = '?';
 			}
 		} else {
-			for (m = 0; m < n; m++)
-				*bp++ = s[m];
+			for (i = 0; i < n; i++)
+				*bp++ = s[i];
 		}
 		s += n;
 		if (bp - buf >= sizeof buf - mb_cur_max) {
