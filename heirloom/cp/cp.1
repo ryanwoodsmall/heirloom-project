@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)cp.1	1.20 (gritter) 12/12/04
+.\" Sccsid @(#)cp.1	1.22 (gritter) 1/24/05
 .\" Parts taken from cp(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,12 +32,12 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CP 1 "12/12/04" "Heirloom Toolchest" "User Commands"
+.TH CP 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cp \- copy files
 .SH SYNOPSIS
 \fBcp\fR
-[\fB\-dDfiprRs\fR] [\fB\-b\ \fIsize\fR]
+[\fB\-dDfiHLpPrRs\fR] [\fB\-b\ \fIsize\fR]
 \fIfile1\fR [\fIfile2\fR .\ .\ .\ ] \fItarget\fR
 .SH DESCRIPTION
 .I File1
@@ -74,9 +74,10 @@ if standard input is not a terminal.
 Overrides the
 .B \-f
 option in
-.B /usr/5bin/s42/cp
+.BR /usr/5bin/s42/cp ,
+.BR /usr/5bin/posix/cp ,
 and
-.BR /usr/5bin/posix/cp .
+.BR /usr/5bin/posix2001/cp .
 .TP
 .B \-p
 .B Cp
@@ -86,7 +87,8 @@ and file permission bits.
 Failing to preserve these modes
 is always considered an error,
 but only
-.B /usr/5bin/s42/cp
+.BR /usr/5bin/s42/cp ,
+.BR /usr/5bin/posix2001/cp ,
 and
 .B /usr/5bin/posix/cp
 will print an error message.
@@ -107,9 +109,10 @@ will try to unlink that file and proceed.
 Overrides the
 .B \-i
 option in
-.B /usr/5bin/s42/cp
+.BR /usr/5bin/s42/cp ,
+.BR /usr/5bin/posix/cp ,
 and
-.BR /usr/5bin/posix/cp .
+.BR /usr/5bin/posix2001/cp .
 .TP
 .B \-R
 The source file operands may be directories
@@ -121,6 +124,26 @@ and symbolic links encountered during traversal
 are recreated in the target hierarchy.
 If a symbolic link is given as an operand,
 its target is copied.
+.PP
+The following options have been added by POSIX.1-2001:
+.TP
+.B \-H
+With the
+.I \-R
+option, follow symbolic links given as operands,
+but do not follow symbolic links encountered during traversal
+of the source hierarchy.
+This is the default.
+.TP
+.B \-L
+With the
+.I \-R
+option, follow all symbolic links.
+.TP
+.B \-P
+With the
+.I \-R
+option, do not follow any symbolic links.
 .PP
 The following options are extensions:
 .TP

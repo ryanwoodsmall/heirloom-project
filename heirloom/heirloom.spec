@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom.spec	1.28 (gritter) 12/4/04
+# Sccsid @(#)heirloom.spec	1.29 (gritter) 1/24/05
 #
 Summary: Heirloom Toolchest: A collection of standard Unix utilities
 Name: heirloom
@@ -34,6 +34,7 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 %define	sv3bin		%{defbin}
 %define	s42bin		%{defbin}/s42
 %define	susbin		%{defbin}/posix
+%define	su3bin		%{defbin}/posix2001
 %define	ucbbin		%{usr}/ucb
 %define	deflib		%{usr}/5lib
 %define	defsbin		%{defbin}
@@ -62,7 +63,7 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 #
 # Combine the settings defined above.
 #
-%define	p_flags	SHELL=/bin/sh ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} UCBBIN=%{ucbbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
+%define	p_flags	SHELL=/bin/sh ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} SU3BIN=%{su3bin} UCBBIN=%{ucbbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
 %define	c_flags	CC=%{xcc} CFLAGS2=%{cflags2} CFLAGSS=%{cflagss} CFLAGSU=%{cflagsu} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LCURS=%{lcurs} LIBZ=%{libz} USE_ZLIB=%{use_zlib} LIBBZ2=%{libbz2} USE_BZLIB=%{use_bzlib} TTYGRP= YACC=%{yacc}
 %define	makeflags %{p_flags} %{c_flags}
 

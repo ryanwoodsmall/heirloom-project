@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.25 (gritter) 12/26/04
-.TH PAX 1 "12/26/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pax.1	1.26 (gritter) 1/23/05
+.TH PAX 1 "1/23/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
 .SH SYNOPSIS
@@ -39,14 +39,14 @@ pax \- portable archive interchange
 [\fB\-x\ \fIhdr\fR] [\fIpatterns\fR]
 .HP
 .ad l
-\fBpax\fR \fB\-w\fR[\fBadituvLX\fR] [\fB\-b\ \fIsize\fR]
+\fBpax\fR \fB\-w\fR[\fBadiHtuvLX\fR] [\fB\-b\ \fIsize\fR]
 [\fB\-f\ \fIfile\fR]
 [\fB\-o\ \fIoptions\fR]
 [\fB\-s\ \fIreplstr\fR]
 [\fB\-x\ \fIhdr\fR] [\fIfiles\fR]
 .HP
 .ad l
-\fBpax\fR \fB\-rw\fR[\fBdiklntuvLX\fR]
+\fBpax\fR \fB\-rw\fR[\fBdiHklntuvLX\fR]
 [\fB\-p\ \fIpriv\fR] [\fB\-s\ \fIreplstr\fR]
 [\fIfiles\fR] \fIdirectory\fR
 .br
@@ -208,6 +208,13 @@ option instead of standard input
 or written with the
 .I \-w
 option instead of standard output.
+.TP
+.B \-H
+Follow symbolic links given on the command line when reading files with
+.I \-w
+or
+.IR \-rw ,
+but do not follow symbolic links encountered during directory traversal.
 .TP
 .B \-i
 Rename files interactively.

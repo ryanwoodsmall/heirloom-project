@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)nl.1	1.8 (gritter) 10/11/03
-.TH NL 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)nl.1	1.9 (gritter) 1/24/05
+.TH NL 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 nl \- line numbering filter
 .SH SYNOPSIS
@@ -101,7 +101,8 @@ Regular expressions are as in
 .IR ed (1);
 .B /usr/5bin/nl
 uses simple regular expressions,
-.B /usr/5bin/posix/nl
+.BR /usr/5bin/posix/nl ,
+.BR /usr/5bin/posix2001/nl ,
 and
 .B /usr/5bin/s42/nl
 use basic regular expressions.
@@ -210,8 +211,10 @@ option and option argument must not be separated;
 if an option is not immediately followed by its argument,
 the default value is used.
 .B /usr/5bin/posix/nl
-requires an option argument
-and accepts it regardless of space between option and argument.
+and
+.B /usr/5bin/posix2001/nl
+require an option argument
+and accept it regardless of space between option and argument.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

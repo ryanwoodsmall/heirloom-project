@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)nohup.1	1.5 (gritter) 10/11/03
+.\" Sccsid @(#)nohup.1	1.6 (gritter) 1/24/05
 .\" Parts taken from nice(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH NOHUP 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.TH NOHUP 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 nohup \- run a command immune to hangups
 .SH SYNOPSIS
@@ -60,7 +60,9 @@ they are created with mode 666 for
 and
 .B /usr/5bin/s42/nohup
 or with mode 600 for
-.BR /usr/5bin/posix/nohup .
+.B /usr/5bin/posix/nohup
+and
+.BR /usr/5bin/posix2001/nohup .
 If standard error is not re-directed by the user to a non-tty file,
 it will be sent to the same file as standard output.
 .SH "ENVIRONMENT VARIABLES"

@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ls.1	1.30 (gritter) 12/9/04
+.\" Sccsid @(#)ls.1	1.31 (gritter) 1/24/05
 .\" Parts taken from ls(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,16 +32,16 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH LS 1 "12/9/04" "Heirloom Toolchest" "User Commands"
+.TH LS 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ls, lc \- list contents of directory
 .SH SYNOPSIS
 \fBls\fR
-[\fB\-abcCdfFgilLmnopqrRstux1hSUX\fR]
+[\fB\-abcCdfFgHilLmnopqrRstux1hSUX\fR]
 [\fIfile\fR ...]
 .br
 \fBlc\fR
-[\fB\-abcCdfFgilLmnopqrRstux1hSUX\fR]
+[\fB\-abcCdfFgHilLmnopqrRstux1hSUX\fR]
 [\fIfile\fR ...]
 .SH DESCRIPTION
 For each directory argument,
@@ -116,8 +116,15 @@ lfB l.
 \&=	socket
 >	door
 .TE
-.sp
 .RE
+.IP
+Symbolic links specified as arguments are not followed with this option in
+.B /usr/5bin/posix2001/ls
+unless the
+.I \-H
+or
+.I \-L
+option is also present.
 .TP
 .B  \-g
 Give group ID, but omit owner ID in long listing
@@ -135,9 +142,19 @@ for each file.
 (See below.)
 If the file is a special file the size field will instead contain
 the major and minor device numbers.
+Symbolic links specified as arguments are not followed with this option
+unless the
+.I \-H
+or
+.I \-L
+option is also present.
 .TP
 .B \-L
-Follow symbolic links in arguments.
+Follow symbolic links in arguments,
+and,
+with the
+.I \-R
+option, symbolic links encountered during directory traversal.
 .TP
 .B \-m
 Files are listed across the page, separated by commas.
@@ -194,6 +211,11 @@ Prints filenames in multiple columns sorted across the page.
 Print one filename per output line.
 This is the default
 if standard output does not refer to a terminal.
+.PP
+The following option was introduced with POSIX.1-2001:
+.TP
+.B \-H
+Follow symbolic links given as arguments.
 .PP
 The following options are available as extensions:
 .TP
@@ -272,7 +294,7 @@ if mandatory locking is enabled for the file
 T}
 L	T{
 if mandatory locking is enabled for the file
-(with \fB/usr/5bin/posix/ls\fR).
+(with \fB/usr/5bin/posix/ls\fR and \fB/usr/5bin/posix2001/ls\fR).
 T}
 .TE
 .PP

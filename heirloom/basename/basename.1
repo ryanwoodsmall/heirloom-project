@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)basename.1	1.5 (gritter) 10/11/03
-.TH BASENAME 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)basename.1	1.6 (gritter) 1/24/05
+.TH BASENAME 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 basename \- return non-directory portion of a pathname
 .SH SYNOPSIS
@@ -48,7 +48,9 @@ as a simple regular expression
 as described in
 .IR ed (1);
 .B /usr/5bin/posix/basename
-treats it as a fixed string.
+and
+.B /usr/5bin/posix2001/basename
+treat it as a fixed string.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

@@ -10,6 +10,7 @@ maninst: maninst.sh mk.config
 		s,@SV3BIN@,$(SV3BIN),g; \
 		s,@S42BIN@,$(S42BIN),g; \
 		s,@SUSBIN@,$(SUSBIN),g; \
+		s,@SU3BIN@,$(SU3BIN),g; \
 		s,@UCBBIN@,$(UCBBIN),g'
 	chmod 755 maninst
 

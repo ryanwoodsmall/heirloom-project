@@ -45,12 +45,14 @@
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)ls_sus.sl	1.71 (gritter) 12/8/04>";
+#if defined (SU3)
+static const char sccsid[] USED = "@(#)ls_su3.sl	1.72 (gritter) 1/24/05>";
+#elif defined (SUS)
+static const char sccsid[] USED = "@(#)ls_sus.sl	1.72 (gritter) 1/24/05>";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.71 (gritter) 12/8/04>";
+static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.72 (gritter) 1/24/05>";
 #else
-static const char sccsid[] USED = "@(#)ls.sl	1.71 (gritter) 12/8/04>";
+static const char sccsid[] USED = "@(#)ls.sl	1.72 (gritter) 1/24/05>";
 #endif
 
 /*
@@ -167,11 +169,11 @@ static struct {
 } personalities[] = {
 	/* orig: acdfgilnqrstu1ACFLMRTX */
 #ifdef	UCB
-	{ ":1RaAdClgrtucFqisfLSUXh" },	/* PER_LS */
+	{ ":1RaAdClgrtucFqisfLSUXhH" },	/* PER_LS */
 #else	/* !UCB */
-	{ "1RadCxmnlogrtucpFbqisfLSUXh" },	/* PER_LS */
+	{ "1RadCxmnlogrtucpFbqisfLSUXhH" },	/* PER_LS */
 #endif	/* !UCB */
-	{ "1RadCxmnlogrtucpFbqiOfLSXh" }	/* PER_DIR */
+	{ "1RadCxmnlogrtucpFbqiOfLSXhH" }	/* PER_DIR */
 };
 
 /* Safer versions of malloc and realloc: */
@@ -462,11 +464,11 @@ permissions(struct file *f)
 		rwx[6] = f->mode&(S_IXGRP>>0) ? 's' :
 #ifndef	UCB
 			(f->mode & S_IFMT) != S_IFDIR ?
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 			'L'
-#else	/* !SUS */
+#else	/* !SUS, !SU3 */
 			'l'
-#endif	/* !SUS */
+#endif	/* !SUS, !SU3 */
 			:
 #endif	/* !UCB */
 			'S'
@@ -1412,8 +1414,13 @@ listfiles(struct file *flist, enum depth depth, enum state state)
 			int didx;
 #ifdef S_IFLNK
 			int (*status)(const char *file, struct stat *stp) =
-				(depth == SURFACE1 && (field & FL_LONG) == 0)
-					|| present('L') ? stat : lstat;
+				depth == SURFACE1 && (field & FL_LONG) == 0
+#ifdef	SU3
+						&& !present('F')
+#endif	/* SU3 */
+					|| present('L')
+					|| present('H') && depth != SUBMERGED ?
+						stat : lstat;
 #else
 #define status	stat
 #endif
@@ -1585,7 +1592,15 @@ main(int argc, char **argv)
 			flags[i] = 1;
 			flags['C'] = 0;
 			break;
-#ifdef	SUS
+		case 'L':
+			flags[i] = 1;
+			flags['H'] = 0;
+			break;
+		case 'H':
+			flags[i] = 1;
+			flags['L'] = 0;
+			break;
+#if defined (SUS) || defined (SU3)
 		case 'C':
 			flags[i] = 1;
 			flags['l'] = flags['m'] = flags['x'] = flags ['o'] =
@@ -1620,7 +1635,7 @@ main(int argc, char **argv)
 			flags[i] = 1;
 			flags['m'] = flags['C'] = flags ['x'] = 0;
 			break;
-#endif	/* !SUS */
+#endif	/* !SUS, !SU3 */
 		default:
 			flags[i] = 1;
 		}

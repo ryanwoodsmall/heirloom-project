@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)mkdir.1	1.12 (gritter) 10/11/03
+.\" Sccsid @(#)mkdir.1	1.13 (gritter) 1/24/05
 .\" Parts taken from mkdir(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH MKDIR 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.TH MKDIR 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 mkdir \- make a directory
 .SH SYNOPSIS
@@ -70,9 +70,10 @@ newly created parent directories have the specified mode
 with
 .BR /usr/5bin/mkdir ;
 with
-.B /usr/5bin/s42/mkdir
-and
+.BR /usr/5bin/s42/mkdir ,
 .BR /usr/5bin/posix/mkdir ,
+and
+.BR /usr/5bin/posix2001/mkdir ,
 the default mode minus umask plus write and execute permission
 for the invoking user is always applied.
 .PP

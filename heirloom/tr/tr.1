@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)tr.1	1.16 (gritter) 1/7/05
+.\" Sccsid @(#)tr.1	1.18 (gritter) 1/24/05
 .\" Parts taken from tr(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TR 1 "1/7/05" "Heirloom Toolchest" "User Commands"
+.TH TR 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tr \- translate characters
 .SH SYNOPSIS
-\fBtr\fR [\fB\-cds\fR] [\fIstring1\fR [\fIstring2\fR]]
+\fBtr\fR [\fB\-cCds\fR] [\fIstring1\fR [\fIstring2\fR]]
 .SH DESCRIPTION
 .I Tr
 copies the standard input to the standard output with 
@@ -72,6 +72,15 @@ in
 .I string2
 to single characters.
 .PP
+The following option has been introduced by POSIX.1-2001:
+.TP
+.B \-C
+complements the set of characters in
+.I string1
+like
+.IR \-c ,
+but orders ranges according to the collation sequence.
+.PP
 In either string the following character sequences are
 treated specially:
 .TP 8
@@ -103,9 +112,13 @@ to
 in increasing byte order,
 or with a multibyte character set,
 in increasing wide character order.
+With the
+.I \-C
+option,
+characters are ordered according to the collation sequence.
 .TP 8
 \fIa\fB\-\fIz\fR
-(/usr/5bin/posix/tr)
+(/usr/5bin/posix/tr, /usr/5bin/posix2001/tr)
 means a range of characters from
 .I a
 to
@@ -113,6 +126,10 @@ to
 in increasing byte order,
 or with a multibyte character set,
 in increasing wide character order.
+With the
+.I \-C
+option,
+characters are ordered according to the collation sequence.
 .TP 8
 \fB[:\fIclass\fB:]\fR
 means all characters that belong to character class
@@ -121,6 +138,10 @@ in the current LC_CTYPE locale
 in increasing byte order,
 or with a multibyte character set,
 in increasing wide character order.
+With the
+.I \-C
+option,
+characters are ordered according to the collation sequence.
 If both \fB[:upper:]\fR and \fB[:lower:]\fR appear
 at the same position in either string,
 upper-case characters are mapped to lower-case characters
@@ -175,6 +196,8 @@ to protect `\e' and '[' from the Shell.
 /usr/5bin/s42/tr \-cs \'[A\-Z][a\-z]\' \'[\e012*]\' <file1 >file2
 .IP \& 2
 /usr/5bin/posix/tr \-cs A\-Za\-z \'[\e012*]\' <file1 >file2
+.IP \& 2
+/usr/5bin/posix2001/tr \-cs A\-Za\-z \'[\e012*]\' <file1 >file2
 .SH "SEE ALSO"
 ed(1),
 ascii(7),
@@ -199,7 +222,12 @@ or
 they always delete NUL from input.
 .PP
 The LC_COLLATE variable is not respected;
-equivalence classes consist of exactly one character.
+equivalence classes consist of exactly one character,
+and the
+.I \-c
+and
+.I \-C
+options produce identical results.
 .PP
 Portable programs must prefix the
 .RB ` [ '

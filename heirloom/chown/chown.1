@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)chown.1	1.7 (gritter) 12/6/04
+.\" Sccsid @(#)chown.1	1.8 (gritter) 1/24/05
 .\" Parts taken from chown(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,13 +32,13 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CHOWN 1 "12/6/04" "Heirloom Toolchest" "User Commands"
+.TH CHOWN 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 chown, chgrp \- change owner or group
 .SH SYNOPSIS
-\fBchown\fR [\fB\-hR\fR] \fIowner\fR[:\fIgroup\fR] \fIfile\fR ...
+\fBchown\fR [\fB\-hHLPR\fR] \fIowner\fR[:\fIgroup\fR] \fIfile\fR ...
 .PP
-\fBchgrp\fR [\fB\-hR\fR] \fIgroup \fIfile\fR ...
+\fBchgrp\fR [\fB\-hHLPR\fR] \fIgroup \fIfile\fR ...
 .SH DESCRIPTION
 .B Chown
 changes the owner of the
@@ -94,6 +94,31 @@ depends on the
 .B \-h
 option,
 but the link is not followed otherwise.
+.PP
+The following options have been introduced by POSIX.1-2001:
+.TP
+.B \-H
+With the
+.I \-R
+option, if a symbolic link given on the command line
+points to a directory,
+follow that symbolic link
+and change owner and group in the files below,
+but do not handle any other symbolic links specially.
+.TP
+.B \-L
+With the
+.I \-R
+option, whenever a symbolic link is encountered
+that points to a directory,
+follow the symbolic link
+and change owner and group in the files below,
+.TP
+.B \-P
+With the
+.I \-P
+option, do not follow any symbolic links,
+but change owner and group of the links themselves.
 .SH FILES
 .B /etc/passwd
 .br

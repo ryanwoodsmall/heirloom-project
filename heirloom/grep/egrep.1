@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)egrep.1	1.40 (gritter) 1/8/05
+.\" Sccsid @(#)egrep.1	1.41 (gritter) 1/24/05
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EGREP 1 "1/8/05" "Heirloom Toolchest" "User Commands"
+.TH EGREP 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 egrep \- search a file for a pattern using full regular expressions
 .SH SYNOPSIS
@@ -83,7 +83,9 @@ unless the expression includes multi-character collating elements,
 which cause the use of a nondeterministic algorithm.
 .PP
 .B /usr/5bin/s42/egrep
-is identical to
+and
+.B /usr/5bin/posix2001/egrep
+are identical to
 .BR /usr/5bin/posix/egrep .
 .SS "Full Regular Expressions"
 .PP

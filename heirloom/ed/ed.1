@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ed.1	1.41 (gritter) 12/14/04
+.\" Sccsid @(#)ed.1	1.42 (gritter) 1/24/05
 .\" Parts taken from ed(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH ED 1 "12/14/04" "Heirloom Toolchest" "User Commands"
+.TH ED 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .if t .ds q \(aa
 .if n .ds q '
 .SH NAME
@@ -147,9 +147,10 @@ the word `character' means any character but newline.
 .B /usr/5bin/ed
 uses simple regular expressions,
 whereas
-.B /usr/5bin/s42/ed
+.BR /usr/5bin/s42/ed ,
+.BR /usr/5bin/posix/ed ,
 and
-.B /usr/5bin/posix/ed
+.B /usr/5bin/posix2001/ed
 use basic regular expressions.
 .SS "Simple Regular Expressions"
 .IP 1.
@@ -583,9 +584,10 @@ prints the addressed lines in an unambiguous way:
 .B /usr/5bin/ed
 prints
 non-graphic control characters in three-digit octal;
-.B /usr/5bin/s42/ed
+.BR /usr/5bin/s42/ed ,
+.BR /usr/5bin/posix/ed ,
 and
-.B /usr/5bin/posix/ed
+.B /usr/5bin/posix2001/ed
 print control characters as C-style escape sequences
 or in three-digit octal.
 Long lines are folded.

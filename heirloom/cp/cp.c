@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.69 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.70 (gritter) 1/23/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.69 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)cp.sl	1.70 (gritter) 1/23/05";
 #endif
 
 #include	<sys/types.h>
@@ -104,6 +104,7 @@ static int	pflag;			/* preserve owner and times */
 static int	rflag;			/* recursive, read FIFOs */
 static int	Rflag;			/* recursive, recreate FIFOs */
 static int	sflag;			/* make symlinks / show statistics */
+static int	HLPflag;		/* -H, -L, or -P */
 static int	ontty;			/* stdin is a terminal */
 static mode_t	umsk;			/* current umask */
 static uid_t	myuid;			/* current uid */
@@ -932,7 +933,9 @@ cpmv(const char *src, const char *tgt, struct stat *dsp, int level,
 	struct stat sst;
 
 	if (commoncheck(src, tgt, dsp, &sst,
-			Rflag && level == 0 ? pers == PERS_MV ? lstat : stat :
+			Rflag && level == 0 ?
+				pers == PERS_MV || HLPflag == 'P' ?
+					lstat : stat :
 			statfn) != OKAY)
 		return;
 	if (pers == PERS_MV && level == 0) {
@@ -1088,7 +1091,7 @@ getfl(void)
 		go = ln;
 	} else {
 		pers = PERS_CP;
-		optstring = "b:dDfiprRs";
+		optstring = "b:dDfiHLpPrRs";
 		go = cpmv;
 	}
 	return optstring;
@@ -1147,6 +1150,11 @@ main(int argc, char **argv)
 		case 's':
 			sflag = 1;
 			break;
+		case 'H':
+		case 'L':
+		case 'P':
+			HLPflag = i;
+			break;
 		default:
 			illegal = 1;
 		}
@@ -1169,7 +1177,7 @@ main(int argc, char **argv)
 	mygid = getegid();
 	inull = scalloc(1, sizeof *inull);
 	inull->i_lln = inull->i_rln = inull;
-	statfn = (Rflag || pers == PERS_LN ? lstat : stat);
+	statfn = (Rflag && HLPflag != 'L' || pers == PERS_LN ? lstat : stat);
 	if (lstat(argv[argc-1], &dst) == 0) {
 		if ((dst.st_mode&S_IFMT) != S_IFLNK ||
 				stat(argv[argc-1], &ust) < 0)

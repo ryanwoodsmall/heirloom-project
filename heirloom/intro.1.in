@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)intro.1.in	1.19 (gritter) 1/22/05
-.TH INTRO 1 "1/22/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)intro.1.in	1.20 (gritter) 1/24/05
+.TH INTRO 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 intro \- introduction to commands
 .SH DESCRIPTION
@@ -60,7 +60,7 @@ or Solaris 2 system.
 Utilities in
 .B /usr/5bin
 are modeled after this specification and related system environments.
-If extensions introduced in POSIX.2 (see below)
+If extensions introduced in POSIX.2 or POSIX.1-2001 (see below)
 did not provoke conflicts with the behavior at this level,
 they were incorporated in these utilities as well.
 This is the most traditional personality
@@ -85,7 +85,7 @@ This specification corresponds to a System V Release 4.2 MP system.
 Utilities in
 .B /usr/5bin/s42
 are modeled after this specification and related system environments.
-If extensions introduced in POSIX.2 (see below)
+If extensions introduced in POSIX.2 or POSIX.1-2001 (see below)
 did not provoke conflicts with the behavior at this level,
 they were incorporated in these utilities as well.
 The most essential difference between this and the SVID3 personality
@@ -109,6 +109,19 @@ found in the environments described above
 are also present in these utilities.
 Use this personality if you need POSIX.2 features
 in preference to traditional System V ones.
+.IP \(en
+ISO/IEC 9945-1:2001 / ANSI/IEEE Std 1003.1-2001 (POSIX.1-2001),
+with the extensions of
+The Single UNIX Specification, Version 3 (The Open Group, 2001).
+Utilities in
+.B /usr/5bin/posix2001
+are intended to fully comply to this specification
+even in cases of conflict with historical behavior.
+Non-conflicting extensions to POSIX.1-2001
+found in the environments described above
+are also present in these utilities.
+Use this personality if you need POSIX.1-2001 features
+in preference to traditional System V ones.
 .PP
 To use the
 .IR "Heirloom Toolchest" ,
@@ -131,7 +144,7 @@ The manual pages generally note
 which behavior corresponds to which utility version.
 They also mark whether options and arguments
 were part of System V,
-were introduced with POSIX.2,
+were introduced with POSIX.2 or POSIX.1-2001,
 or if they are extensions provided by the Heirloom Toolchest,
 (possibly oriented at extensions introduced by other vendors).
 Such extensions are subject to change without a grace period;

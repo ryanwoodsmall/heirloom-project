@@ -1,6 +1,6 @@
 #!/sbin/sh
 
-# Sccsid @(#)maninst.sh	1.6 (gritter) 6/4/04
+# Sccsid @(#)maninst.sh	1.7 (gritter) 1/24/05
 
 usage() {
 	echo "usage: $1 [-c] [-g group] [-m mode] [-o owner] file destination" >&2
@@ -29,6 +29,8 @@ test $# != 3 || usage $0
 	s,@.DEFBIN.@,@DEFBIN@,g
 	t
 	s,/usr/5bin/s42,@S42BIN@,g
+	t
+	s,/usr/5bin/posix2001,@SU3BIN@,g
 	t
 	s,/usr/5bin/posix,@SUSBIN@,g
 	t

@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)mv.1	1.14 (gritter) 12/12/04
+.\" Sccsid @(#)mv.1	1.15 (gritter) 1/24/05
 .\" Parts taken from cp(1) and mv(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH MV 1 "12/12/04" "Heirloom Toolchest" "User Commands"
+.TH MV 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 mv \- move or rename files and directories
 .SH SYNOPSIS
@@ -91,7 +91,9 @@ file do not permit writing.
 Overrides the
 .B \-i
 option in
-.BR /usr/5bin/posix/mv .
+.B /usr/5bin/posix/mv
+and
+.BR /usr/5bin/posix2001/mv .
 .TP
 .B \-i
 .B mv
@@ -106,7 +108,9 @@ if standard input is not a terminal.
 Overrides the
 .B \-f
 option in
-.BR /usr/5bin/posix/mv .
+.B /usr/5bin/posix/mv
+and
+.BR /usr/5bin/posix2001/mv .
 .PP
 The following option is an extension:
 .TP
@@ -159,6 +163,8 @@ Failing to preserve these modes
 is not considered an error,
 only
 .B /usr/5bin/posix/mv
+and
+.B /usr/5bin/posix2001/mv
 will print an error message.
 Special files
 such as block and character devices,

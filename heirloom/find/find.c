@@ -44,10 +44,12 @@
 #else
 #define	USED
 #endif
-#ifndef	SUS
-static const char sccsid[] USED = "@(#)find.sl	1.32 (gritter) 1/9/05";
+#if defined (SU3)
+static const char sccsid[] USED = "@(#)find_su3.sl	1.34 (gritter) 1/24/05";
+#elif defined (SUS)
+static const char sccsid[] USED = "@(#)find_sus.sl	1.34 (gritter) 1/24/05";
 #else
-static const char sccsid[] USED = "@(#)find_sus.sl	1.32 (gritter) 1/9/05";
+static const char sccsid[] USED = "@(#)find.sl	1.34 (gritter) 1/24/05";
 #endif
 
 #include <stdio.h>
@@ -67,7 +69,7 @@ static const char sccsid[] USED = "@(#)find_sus.sl	1.32 (gritter) 1/9/05";
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 #include <fnmatch.h>
 #endif
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
@@ -175,6 +177,7 @@ static int	Print = 1;	/* implicit -print */
 static int	Prune;		/* -prune at this point */
 static int	Mount;		/* -mount, -xdev */
 static int	Execplus;	/* have a -exec command {} + node */
+static int	HLflag;		/* -H or -L option given */
 static char	*Statfs;	/* result of statfs() on FreeBSD */
 static int	incomplete;	/* encountered an incomplete statement */
 extern int	sysv3;
@@ -244,6 +247,7 @@ main(int argc, char **argv)
 	struct anode nlist = { null, { 0 }, { 0 } };
 	int paths;
 	register char *sp = 0;
+	int	i, j;
 
 	time(&Now);
 	umask(um = umask(0));
@@ -252,6 +256,23 @@ main(int argc, char **argv)
 	setlocale(LC_CTYPE, "");
 	if (getenv("SYSV3") != NULL)
 		sysv3 = 1;
+	for (i = 1; i < argc; i++) {
+		if (argv[i][0] != '-' || argv[i][1] == '\0')
+			break;
+		if (argv[i][1] == '-') {
+			i++;
+			break;
+		}
+		for (j = 1; argv[i][j]; j++)
+			if (argv[i][j] != 'H' && argv[i][j] != 'L')
+				goto brk;
+		for (j = 1; argv[i][j]; j++)
+			HLflag = argv[i][j];
+	}
+brk:	if (HLflag == 'L')
+		statfn = stat;
+	argc -= i - 1;
+	argv += i - 1;
 	Argc = argc; Argv = argv;
 	if(argc<2) {
 		pr("insufficient number of arguments");
@@ -412,7 +433,7 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		while (*b == '-')
 			b++;
 		n.F = perm, n.l.per = newmode(b, 0), n.r.s = s;
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 		if (s == '-')
 			n.l.per &= 07777;
 #endif
@@ -525,13 +546,13 @@ static int not(register struct anode *p)
 {
 	return( !((*p->l.L->F)(p->l.L)));
 }
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 static int glob(register struct anode *p)
 {
 	extern int gmatch(const char *, const char *);
 	return(gmatch(Fname, p->l.pat));
 }
-#else	/* SUS */
+#else	/* SUS, SU3 */
 static int glob(register struct anode *p)
 {
 	int	val;
@@ -548,7 +569,7 @@ static int glob(register struct anode *p)
 #endif	/* __GLIBC__ */
 	return val;
 }
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 /*ARGSUSED*/
 static int print(register struct anode *p)
 {
@@ -936,7 +957,7 @@ static int descend(char *fname, struct anode *exlist, int level)
 
 	if(statfn(fname, &Statb)<0) {
 		if (statfn != lstat && lstat(fname, &Statb) == 0)
-			c1 = "cannot follow symbolic link %s: %s";
+		nof:	c1 = "cannot follow symbolic link %s: %s";
 		else if (sysv3)
 			c1 = "stat() failed: %s: %s";
 		else if (errno == ENOENT || errno == ENOTDIR)
@@ -944,15 +965,19 @@ static int descend(char *fname, struct anode *exlist, int level)
 		else
 			c1 = "stat() error %s: %s";
 		pr(c1, Pathname, strerror(errno));
-		status |= 18;
+		status = 18;
 		return(0);
+	}
+	if (level == 0 && HLflag == 'H' && (Statb.st_mode&S_IFMT) == S_IFLNK) {
+		if (stat(fname, &Statb) < 0)
+			goto nof;
 	}
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if (Statfs != NULL) {
 		static struct statfs	sf;
 		if (statfs(fname, &sf) < 0) {
 			pr("statfs() error %s: %s", Pathname, strerror(errno));
-			status |= 18;
+			status = 18;
 			return(0);
 		}
 		Statfs = sf.f_fstypename;
@@ -980,8 +1005,13 @@ static int descend(char *fname, struct anode *exlist, int level)
 	if (statfn != lstat) {
 		for (i = 0; i < level; i++)
 			if (Statb.st_dev == visited[i].v_dev &&
-					Statb.st_ino == visited[i].v_ino)
+					Statb.st_ino == visited[i].v_ino) {
+#ifdef	SU3
+				pr("Symbolic link loop at %s", Pathname);
+				status = 18;
+#endif	/* SU3 */
 				goto reg;
+			}
 	}
 	if (level >= vismax) {
 		vismax += 20;
@@ -1022,7 +1052,7 @@ static int descend1(char *fname, struct anode *exlist, int level)
 	oflags |= O_DIRECTORY;
 #endif
 #ifdef	O_NOFOLLOW
-	if (statfn == lstat)
+	if (statfn == lstat && (HLflag != 'H' || level > 0))
 		oflags |= O_NOFOLLOW;
 #endif
 	if ((dir = open(fname, oflags)) < 0 ||
@@ -1041,7 +1071,7 @@ static int descend1(char *fname, struct anode *exlist, int level)
 			 */
 			return 0;
 		pr("cannot open %s: %s", Pathname, strerror(errno));
-		status |= 18;
+		status = 18;
 		return 0;
 	}
 	if ((db = getdb_alloc(Pathname, dir)) == NULL) {
@@ -1071,7 +1101,7 @@ static int descend1(char *fname, struct anode *exlist, int level)
 	getdb_free(db);
 	if (err) {
 		pr("cannot read dir %s: %s", Pathname, strerror(errno));
-		status |= 18;
+		status = 18;
 	}
 	close(dir);
 	visited[level].v_fd = -1;

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pax.sl	1.16 (gritter) 6/1/04";
+static const char sccsid[] USED = "@(#)pax.sl	1.17 (gritter) 1/23/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -57,6 +57,7 @@ static int		filec;
 static struct iblok	*filinp;
 static char		*path;
 static size_t		pathsz;
+static int		pax_Hflag;
 
 static void		setpres(const char *);
 static size_t		ofiles_pax(char **, size_t *);
@@ -66,7 +67,7 @@ static void		parsesub(char *);
 void
 flags(int ac, char **av)
 {
-	const char	optstring[] = "rwab:cdf:ikKlLno:p:s:tuvx:X";
+	const char	optstring[] = "rwab:cdf:HikKlLno:p:s:tuvx:X";
 	int	i;
 	int	illegal = 0;
 
@@ -106,6 +107,9 @@ flags(int ac, char **av)
 			break;
 		case 'f':
 			Oflag = Iflag = optarg;
+			break;
+		case 'H':
+			pax_Hflag = 1;
 			break;
 		case 'i':
 			rflag = 1;
@@ -291,6 +295,7 @@ nextfile(void)
 	size_t	linsiz = 0, linlen;
 
 	if (filinp) {
+		pax_Hflag = 0;
 		if ((linlen=ib_getlin(filinp, &line, &linsiz, srealloc)) == 0) {
 			filinp = NULL;
 			return NULL;
@@ -358,6 +363,8 @@ ofiles_pax(char **name, size_t *namsiz)
 							* dts);
 				}
 				pend[dti+1] = catpath(pend[dti], dp->d_name);
+				if (pax_Hflag)
+					Lflag = dti < 0;
 				if ((Lflag ? stat : lstat)(path, &st) < 0) {
 					emsg(2, "Error with %s of \"%s\"",
 							lflag? "stat" : "lstat",
@@ -371,8 +378,13 @@ ofiles_pax(char **name, size_t *namsiz)
 							if (st.st_dev ==
 								curdev[i] &&
 								st.st_ino ==
-								curino[i])
-								break;
+								curino[i]) {
+							    msg(4, 1,
+								"Symbolic link "
+								"loop at "
+								"\"%s\"\n",
+								path);
+							}
 						if (i <= dti)
 							break;
 					}
@@ -392,10 +404,15 @@ ofiles_pax(char **name, size_t *namsiz)
 				path[pend[dti]] = '\0';
 				closedir(dt[dti]);
 				dt[dti--] = NULL;
+				if (pax_Hflag)
+					Lflag = dti < 0;
 				break;
 			}
 		} else {
-			while ((nf = nextfile()) != NULL && stat(nf, &st) < 0) {
+			if (pax_Hflag)
+				Lflag = 1;
+			while ((nf = nextfile()) != NULL &&
+					(Lflag ? stat : lstat)(nf, &st) < 0) {
 				emsg(2, "Error with stat of \"%s\"", nf);
 				errcnt++;
 			}

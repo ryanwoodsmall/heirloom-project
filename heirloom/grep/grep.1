@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)grep.1	1.34 (gritter) 1/8/05
+.\" Sccsid @(#)grep.1	1.35 (gritter) 1/24/05
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH GREP 1 "1/8/05" "Heirloom Toolchest" "User Commands"
+.TH GREP 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 grep \- search a file for a pattern
 .SH SYNOPSIS
@@ -91,7 +91,9 @@ backreferences, word delimiters, and multi-character collating elements
 cause a nondeterministic algorithm to be used.
 .PP
 .B /usr/5bin/s42/grep
-is identical to
+and
+.B /usr/5bin/posix2001/grep
+are identical to
 .BR /usr/5bin/posix/grep .
 .PP
 See the description of

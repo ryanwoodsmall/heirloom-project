@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)du_sus.sl	1.37 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)du_sus.sl	1.38 (gritter) 1/23/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/du.sl	1.37 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/du.sl	1.38 (gritter) 1/23/05";
 #else
-static const char sccsid[] USED = "@(#)du.sl	1.37 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)du.sl	1.38 (gritter) 1/23/05";
 #endif
 
 #include	<sys/types.h>
@@ -106,6 +106,7 @@ static int		rflag = 1;	/* write error messages */
 static int		rflag;		/* write error messages */
 #endif	/* !SUS, !UCB */
 static int		oflag;		/* do not add subdirs */
+static int		HLflag;		/* -H or -L flag */
 static long		maxdepth;	/* max depth of recursion */
 static long long	*dtots;		/* size of directories on recursion */
 static struct dslot	*d0;		/* start of devices table */
@@ -376,8 +377,10 @@ static void
 descend(size_t pend, const char *base, const int olddir, int ssub, int level)
 {
 	struct stat	st;
+	int	(*statfn)(const char *, struct stat *);
 
-	if (lstat(base, &st) < 0) {
+	statfn = HLflag == 'L' || level == 0 && HLflag == 'H' ? stat : lstat;
+	if (statfn(base, &st) < 0) {
 		pnerror(errno, path);
 		return;
 	}
@@ -394,15 +397,24 @@ descend(size_t pend, const char *base, const int olddir, int ssub, int level)
 		struct direc	*dp;
 		struct getdb	*db = NULL;
 		int	df, err;
+		int	oflag = O_RDONLY;
 
-		if ((df = open(base, O_RDONLY
+		if (HLflag == 'L' && multilink(&st)) {
+			if (lstat(base, &st) < 0) {
+				pnerror(errno, path);
+				return;
+			}
+			hpfix(st.st_blocks);
+			goto done;
+		}
 #ifdef	O_DIRECTORY
-						| O_DIRECTORY
+		oflag |= O_DIRECTORY;
 #endif
 #ifdef	O_NOFOLLOW
-						| O_NOFOLLOW
+		if (statfn == lstat)
+			oflag |= O_NOFOLLOW;
 #endif
-			      		)) < 0 ||
+		if ((df = open(base, oflag)) < 0 ||
 				(db = getdb_alloc(base, df)) == NULL) {
 			if (errno == EMFILE) {
 				int	sres;
@@ -488,7 +500,7 @@ du(const char *fn)
 	struct stat st;
 	int	i, startfd;
 
-	if (lstat(fn, &st) < 0) {
+	if ((HLflag ? stat : lstat)(fn, &st) < 0) {
 		pnerror(errno, fn);
 		return;
 	}
@@ -541,13 +553,17 @@ main(int argc, char **argv)
 #ifdef	UCB
 	kflag = 1;
 #endif
-	while ((i = getopt(argc, argv, "ahkosrx")) != EOF) {
+	while ((i = getopt(argc, argv, "ahHkLosrx")) != EOF) {
 		switch (i) {
 		case 'a':
 			aflag = 1;
 			break;
 		case 'h':
 			hflag = 1;
+			break;
+		case 'H':
+		case 'L':
+			HLflag = i;
 			break;
 		case 'k':
 			kflag = 1;

@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/chown.sl	1.12 (gritter) 12/5/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/chown.sl	1.13 (gritter) 1/24/05";
 #else
-static const char sccsid[] USED = "@(#)chown.sl	1.12 (gritter) 12/5/04";
+static const char sccsid[] USED = "@(#)chown.sl	1.13 (gritter) 1/24/05";
 #endif
 
 #include	<sys/types.h>
@@ -67,14 +67,13 @@ static unsigned	errcnt;			/* count of errors */
 static int	fflag;			/* force (don't report errors) */
 static int	hflag;			/* use lchown */
 static int	Rflag;			/* recursive */
+static int	HLPflag;		/* -H, -L, -P */
 static char	*progname;		/* argv[0] to main() */
 static char	*owner;
 static char	*group;
 static uid_t	myeuid;
 static uid_t	new_uid;
 static gid_t	new_gid;
-static int	(*chownfn)(const char *, uid_t, gid_t);
-static int	(*statfn)(const char *, struct stat *);
 
 static void *
 srealloc(void *vp, size_t nbytes)
@@ -138,10 +137,14 @@ setpath(const char *base, char **file, char **filend,
 }
 
 static void
-dochown(const char *path)
+dochown(const char *path, int level)
 {
 	struct stat ost, nst, lst;
+	int	(*chownfn)(const char *, uid_t, gid_t);
+	int	(*statfn)(const char *, struct stat *);
 
+	chownfn = hflag || Rflag && HLPflag == 'P' ? lchown : chown;
+	statfn = hflag || Rflag && HLPflag == 'P' ? lstat : stat;
 	if (statfn(path, &ost) < 0) {
 		eprintf(0, "%s: cannot access %s: %s\n",
 				progname, path, strerror(errno));
@@ -151,7 +154,7 @@ dochown(const char *path)
 				group ? new_gid : ost.st_gid) < 0) {
 		eprintf(0, "%s: cannot chown %s: %s\n",
 				progname, path, strerror(errno));
-		return;
+		goto failed;
 	}
 	if ((ost.st_mode & S_ISUID) || (ost.st_mode & (S_ISGID|S_IXGRP))
 				== (S_ISGID|S_IXGRP)) {
@@ -177,10 +180,11 @@ dochown(const char *path)
 			}
 		}
 	} else
-		nst = ost;
+	failed:	nst = ost;
 	if (Rflag == 0)
 		return;
-	if (statfn != lstat) {
+	if (statfn != lstat && (HLPflag != 'H' || level > 0)
+			&& HLPflag != 'L') {
 		if (lstat(path, &lst) < 0) {
 			eprintf(0, "%s: cannot lstat %s: %s\n",
 					progname, path, strerror(errno));
@@ -206,7 +210,7 @@ dochown(const char *path)
 						 dp->d_name[2] == '\0')))
 				continue;
 			setpath(dp->d_name, &copy, &cend, slen, &sz, &ss);
-			dochown(copy);
+			dochown(copy, level + 1);
 		}
 		free(copy);
 		closedir(Dp);
@@ -279,9 +283,9 @@ int
 main(int argc, char **argv)
 {
 #ifdef	UCB
-	const char	optstring[] = "fhR";
+	const char	optstring[] = "fhHLPR";
 #else
-	const char	optstring[] = "hR";
+	const char	optstring[] = "hHLPR";
 #endif
 	int i;
 
@@ -302,6 +306,11 @@ main(int argc, char **argv)
 		case 'R':
 			Rflag = 1;
 			break;
+		case 'H':
+		case 'L':
+		case 'P':
+			HLPflag = i;
+			break;
 		default:
 			usage();
 		}
@@ -311,10 +320,8 @@ main(int argc, char **argv)
 	getowner(argv[optind++]);
 	if (optind >= argc)
 		usage();
-	chownfn = hflag ? lchown : chown;
-	statfn = hflag ? lstat : stat;
 	myeuid = geteuid();
 	while (optind < argc)
-		dochown(argv[optind++]);
+		dochown(argv[optind++], 0);
 	return errcnt;
 }

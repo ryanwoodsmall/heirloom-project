@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)du.1b	1.10 (gritter) 12/9/04
+.\" Sccsid @(#)du.1b	1.11 (gritter) 1/23/05
 .\" Parts taken from du(1), Unix 32V:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH DU 1B "12/9/04" "Heirloom Toolchest" "BSD System Compatibility"
+.TH DU 1B "1/23/05" "Heirloom Toolchest" "BSD System Compatibility"
 .SH NAME
 du \- (BSD) summarize disk usage
 .SH SYNOPSIS
-\fBdu\fR [\fB\-asxo\fR] [\fIname\fR ...]
+\fBdu\fR [\fB\-ahHLsxo\fR] [\fIname\fR ...]
 .SH DESCRIPTION
 .I Du
 gives the number of blocks (1024 bytes) contained in all files
@@ -67,6 +67,18 @@ The following option has been introduced by POSIX.2:
 .B \-x
 Do not cross device boundaries
 when descending a directory hierarchy.
+.PP
+The following options have been introduced by POSIX.1-2001:
+.TP
+.B \-H
+Follow symbolic links given on the command line
+and count the size of the files they refer to,
+but do not follow symbolic links found during directory traversal
+and count the sizes of these symbolic links themselves.
+.TP
+.B \-L
+Always follow symbolic links
+and count the sizes of the files they refer to.
 .PP
 The following options are extensions:
 .TP

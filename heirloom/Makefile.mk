@@ -13,6 +13,7 @@ install:
 	test -d $(ROOT)$(SV3BIN) || mkdir -p $(ROOT)$(SV3BIN)
 	test -d $(ROOT)$(S42BIN) || mkdir -p $(ROOT)$(S42BIN)
 	test -d $(ROOT)$(SUSBIN) || mkdir -p $(ROOT)$(SUSBIN)
+	test -d $(ROOT)$(SU3BIN) || mkdir -p $(ROOT)$(SU3BIN)
 	test -d $(ROOT)$(DEFSBIN) || mkdir -p $(ROOT)$(DEFSBIN)
 	test -d $(ROOT)$(UCBBIN) || mkdir -p $(ROOT)$(UCBBIN)
 	for i in 1 1b 1m 2 3 4 5 6 7 8; \
@@ -28,20 +29,30 @@ install:
 	sh build/crossln $(ROOT)$(DEFBIN)/oawk $(ROOT)$(SV3BIN)/awk $(ROOT)
 	sh build/crossln $(ROOT)$(S42BIN)/nawk $(ROOT)$(S42BIN)/awk $(ROOT)
 	sh build/crossln $(ROOT)$(SUSBIN)/nawk $(ROOT)$(SUSBIN)/awk $(ROOT)
+	sh build/crossln $(ROOT)$(SU3BIN)/nawk $(ROOT)$(SU3BIN)/awk $(ROOT)
 	rm -f $(ROOT)$(MANDIR)/man1/awk.1
-	if test $(DEFBIN) = $(S42BIN) -o $(DEFBIN) = $(SUSBIN); \
+	if test $(DEFBIN) = $(S42BIN) -o $(DEFBIN) = $(SUSBIN) \
+		-o $(DEFBIN) = $(SU3BIN) ; \
 	then \
 		$(LNS) nawk.1 $(ROOT)$(MANDIR)/man1/awk.1 ; \
 	else \
 		$(LNS) oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 ; \
 	fi
+	for i in basename chmod cp csplit date du ed egrep expr fgrep grep id ln mkdir mv nawk nl nohup pg pr ps rm rmdir sed sort touch tr wc who; \
+	do \
+		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SU3BIN)/$$i $(ROOT); \
+	done
 	for i in cp csplit date egrep fgrep find grep id mkdir nawk pg; \
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
-	for i in basename chmod du lc ln ls more mv nohup page pr rm rmdir sort touch tr who; \
+	for i in basename chmod du lc ln ls more mv nohup page pr rm rmdir sort touch tr who xargs; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
+	done
+	for i xargs; \
+	do \
+		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(SUSBIN)/$$i $(ROOT); \
 	done
 	for i in apropos expand hostname man printenv renice tcopy ul unexpand uptime users w whoami whatis; \
 	do \

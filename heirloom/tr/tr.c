@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	1.29 (gritter) 1/9/05";
+static const char sccsid[] USED = "@(#)tr_sus.sl	1.30 (gritter) 1/23/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.29 (gritter) 1/9/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.30 (gritter) 1/23/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	1.29 (gritter) 1/9/05";
+static const char sccsid[] USED = "@(#)tr.sl	1.30 (gritter) 1/23/05";
 #endif
 
 #include	<unistd.h>
@@ -904,7 +904,7 @@ tr_mb(void)
 int
 main(int argc, char **argv)
 {
-	const char	optstring[] = ":cds";
+	const char	optstring[] = ":cCds";
 	char	*string1, *string2;
 	int	i;
 
@@ -922,6 +922,7 @@ main(int argc, char **argv)
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
 		case 'c':
+		case 'C':
 			cflag = 1;
 			break;
 		case 'd':

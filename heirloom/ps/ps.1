@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1	1.43 (gritter) 12/27/04
+.\" Sccsid @(#)ps.1	1.44 (gritter) 1/24/05
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH PS 1 "12/27/04" "Heirloom Toolchest" "User Commands"
+.TH PS 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ps \- process status
 .SH SYNOPSIS
@@ -52,7 +52,9 @@ prints certain indicia about active processes.
 If no options are specified,
 all processes on the current terminal are selected;
 .B /usr/5bin/posix/ps
-further restricts this to processes owned by the invoking user.
+and
+.B /usr/5bin/posix2001/ps
+further restrict this to processes owned by the invoking user.
 The selection can be changed
 by adding
 .I criteria
@@ -108,7 +110,9 @@ all processes that belong to one of the process groups ids in
 .I pgrplist
 are selected;
 for
-.BR /usr/5bin/posix/ps ,
+.B /usr/5bin/posix/ps
+and
+.BR /usr/5bin/posix2001/ps ,
 all processes that belong to one of the session ids in
 .IR group .
 .TP 12
@@ -164,7 +168,9 @@ The real user id is used with
 and
 .BR /usr/5bin/s42/ps ,
 the effective user id with
-.BR /usr/5bin/posix/ps .
+.B /usr/5bin/posix/ps
+and
+.BR /usr/5bin/posix2001/ps .
 .PP
 The following options have been introduced by POSIX.2:
 .TP 12
@@ -267,7 +273,8 @@ S	(l)	The state of the process:
 l2 l2 l s s.
 UID	(f,l)	T{
 The real user ID of the process owner,
-or, for \fB/usr/5bin/posix/ps\fR,
+or, for \fB/usr/5bin/posix/ps\fR
+and \fB/usr/5bin/posix2001/ps\fR,
 the effective user ID.
 With the \fB\-l\fR
 option,
@@ -333,7 +340,8 @@ The command name;
 with the \fB\-f\fR option,
 the command line.
 The heading `CMD' is printed
-for \fB/usr/5bin/posix/ps\fR;
+for \fB/usr/5bin/posix/ps\fR
+and \fB/usr/5bin/posix2001/ps\fR;
 the heading `COMMAND' is printed
 if the \fBSYSV3\fR
 environment variable is set

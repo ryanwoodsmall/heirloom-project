@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)pr.1	1.7 (gritter) 10/11/03
+.\" Sccsid @(#)pr.1	1.8 (gritter) 1/24/05
 .\" Parts taken from pr(1), Unix 32V:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH PR 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.TH PR 1 "1/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pr \- print files
 .SH SYNOPSIS
@@ -101,7 +101,9 @@ of multi-column output.
 This option is the same as
 .B \-f
 with
-.BR /usr/5bin/posix/pr .
+.B /usr/5bin/posix/pr
+and
+.BR /usr/5bin/posix2001/pr .
 .TP
 .BI  \-h " header"
 Take the next argument as a page header.
@@ -116,7 +118,9 @@ If the non-numeric character
 is present,
 it is taken instead as tab character on output.
 For
-.BR /usr/5bin/posix/pr ,
+.B /usr/5bin/posix/pr
+and
+.BR /usr/5bin/posix2001/pr ,
 single space characters preceding a column alignment are not replaced.
 .TP
 .BI \-l n
