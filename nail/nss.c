@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.35 (gritter) 2/10/05";
+static char sccsid[] = "@(#)nss.c	1.37 (gritter) 2/12/05";
 #endif
 #endif /* not lint */
 
@@ -67,6 +67,8 @@ static sigjmp_buf	nssjmp;
 #include <private/pprio.h>
 
 #include "extern.h"
+
+#include "nsserr.c"
 
 static char *password_cb(PK11SlotInfo *slot, PRBool retry, void *arg);
 static SECStatus bad_cert_cb(void *arg, PRFileDesc *fd);
@@ -117,80 +119,9 @@ static const char *
 bad_cert_str(void)
 {
 	int	ec;
-	char	*es, eb[40];
 
 	ec = PORT_GetError();
-	switch (ec) {
-	case SEC_ERROR_INVALID_AVA:
-		es = "Invalid AVA";
-		break;
-	case SEC_ERROR_INVALID_TIME:
-		es = "Invalid time";
-		break;
-	case SEC_ERROR_BAD_SIGNATURE:
-		es = "Bad signature";
-		break;
-	case SEC_ERROR_EXPIRED_CERTIFICATE:
-		es = "Certificate expired";
-		break;
-	case SEC_ERROR_UNKNOWN_ISSUER:
-		es = "Unknown issuer";
-		break;
-	case SEC_ERROR_UNTRUSTED_CERT:
-		es = "Untrusted certificate";
-		break;
-	case SEC_ERROR_CERT_VALID:
-		return SECSuccess;
-	case SEC_ERROR_EXPIRED_ISSUER_CERTIFICATE:
-		es = "Issuer certificate expired";
-		break;
-	case SEC_ERROR_CRL_EXPIRED:
-		es = "CRL expired";
-		break;
-	case SEC_ERROR_CRL_BAD_SIGNATURE:
-		es = "Bad CRL signature";
-		break;
-	case SEC_ERROR_EXTENSION_VALUE_INVALID:
-		es = "Extension value invalid";
-		break;
-	case SEC_ERROR_CERT_USAGES_INVALID:
-		es = "Invalid certificate usage";
-		break;
-	case SEC_ERROR_UNKNOWN_CRITICAL_EXTENSION:
-		es = "Unknown critical extension in certificate";
-		break;
-	case SEC_ERROR_IO:
-		es = "I/O error";
-		break;
-	case SEC_ERROR_LIBRARY_FAILURE:
-		es = "Library failure";
-		break;
-	case SEC_ERROR_BAD_DATA:
-		es = "Bad data";
-		break;
-	case SEC_ERROR_REVOKED_CERTIFICATE:
-		es = "Revoked certificate";
-		break;
-	case SEC_ERROR_BAD_DATABASE:
-		es = "Bad database";
-		break;
-	case SEC_ERROR_UNTRUSTED_ISSUER:
-		es = "Untrusted issuer";
-		break;
-	case SEC_ERROR_DUPLICATE_CERT:
-		es = "Duplicate certificate";
-		break;
-	case SEC_ERROR_DUPLICATE_CERT_NAME:
-		es = "Duplicate certificate name";
-		break;
-	case SEC_ERROR_CA_CERT_INVALID:
-		es = "CA certificate invalid";
-		break;
-	default:
-		snprintf(eb, sizeof eb, "Unknown error %d", ec);
-		es = eb;
-	}
-	return es;
+	return nss_strerror(ec);
 }
 
 static enum okay
@@ -305,8 +236,6 @@ ssl_open(const char *server, struct sock *sp, const char *uhp)
 	return OKAY;
 }
 
-#include "nsserr.c"
-
 void
 nss_gen_err(const char *fmt, ...)
 {
@@ -323,7 +252,7 @@ nss_gen_err(const char *fmt, ...)
 			fprintf(stderr, ": %s\n", text);
 		ac_free(text);
 	} else
-		fprintf(stderr, ": %s\n", nss_strerror(PR_GetError()));
+		fprintf(stderr, ": %s.\n", nss_strerror(PR_GetError()));
 }
 
 FILE *
