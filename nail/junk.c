@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.43 (gritter) 10/24/04";
+static char sccsid[] = "@(#)junk.c	1.44 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -486,7 +486,13 @@ loop:	i = 0;
 				*sp->tagp = '\0';
 				if (!asccasecmp(sp->tag, "a") ||
 						!asccasecmp(sp->tag, "img") ||
-						!asccasecmp(sp->tag, "font"))
+						!asccasecmp(sp->tag, "font") ||
+						!asccasecmp(sp->tag, "span") ||
+						!asccasecmp(sp->tag, "meta") ||
+						!asccasecmp(sp->tag, "table") ||
+						!asccasecmp(sp->tag, "tr") ||
+						!asccasecmp(sp->tag, "td") ||
+						!asccasecmp(sp->tag, "p"))
 					sp->html = HTML_TEXT;
 				else
 					sp->html = HTML_SKIP;
