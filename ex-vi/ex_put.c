@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.29 (gritter) 1/20/05";
+static char sccsid[] = "@(#)ex_put.c	1.30 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -973,6 +973,7 @@ putch(int c)
 		if (c == 0)
 			return MULTICOL;
 	}
+	c &= ~INVBIT;	/* strip '~' | INVBIT multicolumn filler */
 #ifdef	MB
 	if (mb_cur_max > 1 && c & ~(wchar_t)0177) {
 		char	mb[MB_LEN_MAX];
