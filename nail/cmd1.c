@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.74 (gritter) 9/9/04";
+static char sccsid[] = "@(#)cmd1.c	2.75 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -130,7 +130,8 @@ headers(v)
 		mq = threadroot;
 		for (mp = threadroot; mp; mp = next_in_thread(mp))
 			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0 &&
-					mp->m_collapsed <= 0) {
+					(mp->m_collapsed <= 0 ||
+					 mp == &message[n-1])) {
 				if (g % size == 0)
 					mq = mp;
 				if (n ? mp == &message[n-1] : g == k)
@@ -149,7 +150,8 @@ headers(v)
 		}
 		while (mp) {
 			if ((mp->m_flag & (MDELETED|MHIDDEN|MKILL)) == 0 &&
-					mp->m_collapsed <= 0) {
+					(mp->m_collapsed <= 0 ||
+					 mp == &message[n-1])) {
 				if (flag++ >= size)
 					break;
 				printhead(mp - &message[0] + 1, stdout,
