@@ -32,10 +32,12 @@
 #else
 #define	USED
 #endif
-#ifdef	SUS
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.73 (gritter) 2/24/05";
+#if defined (SUS)
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.75 (gritter) 2/28/05";
+#elif defined (S42)
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.75 (gritter) 2/28/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.73 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.75 (gritter) 2/28/05";
 #endif
 
 #include	<sys/types.h>
@@ -184,11 +186,11 @@ Usage: %s [-f] [-i] f1 f2\n\
 		break;
 	case PERS_LN:
 		{
-#ifdef	SUS
+#if defined (SUS)
 			const char nstr[] = "";
-#else
+#else	/* !SUS */
 			const char nstr[] = "[-n] ";
-#endif
+#endif	/* !SUS */
 			fprintf(stderr, "\
 Usage: %s [-f] %s[-s] f1 f2\n\
        %s [-f] %s[-s] f1 ... fn d1\n\
@@ -355,22 +357,22 @@ permissions(const char *path, const struct stat *ssp)
 		ut.actime = ssp->st_atime;
 		ut.modtime = ssp->st_mtime;
 		if (utime(path, &ut) < 0) {
-#ifdef	SUS
+#if defined (SUS)
 			fprintf(stderr, "%s: cannot set times for %s\n%s: %s\n",
 					progname, path,
 					progname, strerror(errno));
-#endif
+#endif /* SUS */
 			if (pers != PERS_MV)
 				errcnt |= 010;
 		}
 		if (myuid == 0) {
 			if (chown(path, ssp->st_uid, ssp->st_gid) < 0) {
-#ifdef	SUS
+#if defined (SUS)
 				fprintf(stderr,
 			"%s: cannot change owner and group of %s\n%s: %s\n",
 					progname, path,
 					progname, strerror(errno));
-#endif
+#endif	/* SUS */
 				if (pers != PERS_MV)
 					errcnt |= 010;
 				mode &= ~(mode_t)(S_ISUID|S_ISGID);
@@ -380,11 +382,11 @@ permissions(const char *path, const struct stat *ssp)
 	} else
 		mode = check_suid(ssp, mode & ~umsk);
 	if (chmod(path, mode) < 0) {
-#ifdef	SUS
+#if defined (SUS)
 		fprintf(stderr, "%s: cannot set permissions for %s\n%s: %s\n",
 				progname, path,
 				progname, strerror(errno));
-#endif
+#endif	/* SUS */
 		if (pers != PERS_MV)
 			errcnt |= 010;
 	}
@@ -615,16 +617,16 @@ static void
 ignoring(const char *type, const char *path)
 {
 	fprintf(stderr, "%s: %signoring %s %s\n", progname,
-#ifdef	SUS
+#if defined (SUS)
 			"",
-#else
+#else	/* !SUS */
 			"warning: ",
-#endif
+#endif	/* !SUS */
 			type, path);
-#ifdef	SUS
+#if defined (SUS)
 	if (pers == PERS_MV)
 		errcnt |= 020;
-#endif
+#endif	/* SUS */
 }
 
 static enum okay
@@ -695,12 +697,12 @@ symlinkcopy(const char *src, const struct stat *ssp,
 		return;
 	}
 	if (myuid == 0 && lchown(tgt, ssp->st_uid, ssp->st_gid) < 0) {
-#ifdef	SUS
+#if defined (SUS)
 		fprintf(stderr,
 			"%s: cannot change owner and group of %s\n%s: %s\n",
 				progname, tgt,
 				progname, strerror(errno));
-#endif
+#endif	/* SUS */
 		if (pers != PERS_MV)
 			errcnt |= 010;
 	}
@@ -966,6 +968,14 @@ cpmv(const char *src, const char *tgt, struct stat *dsp, int level,
 			errcnt |= 01;
 			return;
 		}
+#if !defined (SUS)
+		if (pers == PERS_CP && dsp != NULL && iflag) {
+			fprintf(stderr, "%s: overwrite %s? ",
+					progname, tgt);
+			if (confirm() != OKAY)
+				return;
+		}
+#endif	/* !SUS */
 		if (dsp == NULL) {
 			if (mkdir(tgt, check_suid(&sst,
 					sst.st_mode&07777 | S_IRWXU)) < 0) {
@@ -1093,9 +1103,9 @@ getfl(void)
 	} else if (progname[0] == 'l' && progname[1] == 'n') {
 		pers = PERS_LN;
 		optstring = "fns";
-#ifdef	SUS
+#if defined (SUS)
 		nflag = 1;
-#endif
+#endif	/* SUS */
 		go = ln;
 	} else {
 		pers = PERS_CP;
@@ -1133,17 +1143,17 @@ main(int argc, char **argv)
 			break;
 		case 'f':
 			fflag = 1;
-#ifdef	SUS
+#if defined (SUS)
 			if (pers == PERS_MV)
 				iflag = 0;
-#endif
+#endif	/* SUS */
 			break;
 		case 'i':
 			iflag = 1;
-#ifdef	SUS
+#if defined (SUS)
 			if (pers == PERS_MV)
 				fflag = 0;
-#endif
+#endif	/* SUS */
 			break;
 		case 'n':
 			nflag = 1;
@@ -1179,10 +1189,15 @@ main(int argc, char **argv)
 		usage();
 	umask(umsk = umask(0));
 	ontty = isatty(0);
-#ifndef	SUS
+#if defined (SUS)
+	/* nothing */
+#elif defined (S42)
+	if (pers == PERS_MV && !ontty)
+		iflag = 0;
+#else	/* !SUS, !S42 */
 	if (!ontty)
 		iflag = 0;
-#endif
+#endif	/* !SUS, !S42 */
 	myuid = geteuid();
 	mygid = getegid();
 	inull = scalloc(1, sizeof *inull);

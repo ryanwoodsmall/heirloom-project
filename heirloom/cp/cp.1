@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)cp.1	1.23 (gritter) 2/5/05
+.\" Sccsid @(#)cp.1	1.25 (gritter) 2/28/05
 .\" Parts taken from cp(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CP 1 "2/5/05" "Heirloom Toolchest" "User Commands"
+.TH CP 1 "2/28/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cp \- copy files
 .SH SYNOPSIS
@@ -56,24 +56,35 @@ is a directory,
 one or more files are copied
 into the directory with their original file-names.
 .PP
-.B Cp
+.I Cp
 refuses to copy a file onto itself.
 .PP
 The
-.B cp
+.I cp
 command accepts the following options:
 .TP
 .B \-i
-.B Cp
+.I Cp
 will ask for confirmation
-before overwriting an existing target.
+before overwriting an existing target file.
+For
+.B /usr/5bin/cp
+and
+.BR /usr/5bin/s42/cp ,
+.I cp
+will also ask for confirmation before overwriting a directory
+with the
+.I \-r
+or
+.I \-R
+option.
 For
 .BR /usr/5bin/cp ,
 this flag will be automatically disabled
 if standard input is not a terminal.
 .TP
 .B \-p
-.B Cp
+.I Cp
 will try to preserve access and modification times,
 user and group ownerships,
 and file permission bits.
@@ -97,7 +108,7 @@ The following options have been added by POSIX.2:
 .TP
 .B \-f
 If overwriting a target file fails,
-.B cp
+.I cp
 will try to unlink that file and proceed.
 .TP
 .B \-R

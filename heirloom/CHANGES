@@ -21,6 +21,11 @@ Release ...
   (simple) regular expressions.
 * find: The expression '-type D' matches Solaris door files.
 * copy, cp, cpio, file, find, ls: Handle HP-UX network special files.
+* cp: If both the -i and the -r or -R option are given, the traditional
+  versions prompt for confirmation before copying to an existing directory.
+* cp: A SVID4 version was introduced which behaves like the SVID3 version
+  in the above respect but does not disable -i if standard input is not a
+  terminal.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
