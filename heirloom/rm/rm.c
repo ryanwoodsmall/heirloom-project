@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)rm_sus.sl	2.19 (gritter) 12/18/04";
+static const char sccsid[] USED = "@(#)rm_sus.sl	2.21 (gritter) 12/29/04";
 #else
-static const char sccsid[] USED = "@(#)rm.sl	2.19 (gritter) 12/18/04";
+static const char sccsid[] USED = "@(#)rm.sl	2.21 (gritter) 12/29/04";
 #endif
 
 #include	<sys/types.h>
@@ -361,7 +361,7 @@ dotdot(const char *s)
 int
 main(int argc, char **argv)
 {
-	int i, startfd = -1;
+	int i, startfd = -1, illegal = 0;
 
 #ifdef	__GLIBC__
 	putenv("POSIXLY_CORRECT=1");
@@ -388,11 +388,15 @@ main(int argc, char **argv)
 			rflag = 1;
 			break;
 		default:
-			usage();
+			illegal = 1;
 		}
 	}
+	if (illegal)
+		usage();
 #ifndef	SUS
-	if (argv[optind] && argv[optind][0] == '-' && argv[optind][1] == '\0')
+	if (argv[optind] && argv[optind][0] == '-' && argv[optind][1] == '\0' &&
+			(argv[optind-1][0] != '-' || argv[optind-1][1] != '-' ||
+			 argv[optind-1][2] != '\0'))
 		optind++;
 #endif
 	if (optind >= argc)

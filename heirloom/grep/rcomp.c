@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)rcomp.c	1.24 (gritter) 1/10/04>	*/
+/*	Sccsid @(#)rcomp.c	1.25 (gritter) 12/19/04>	*/
 
 /*
  * Code involving POSIX.2 regcomp()/regexpr() routines.
@@ -36,12 +36,14 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<mbtowi.h>
 
 static int	emptypat;
 
 #ifdef	UXRE
 #include	<regdfa.h>
 static int	rc_range(struct iblok *, char *);
+static int	rc_rangew(struct iblok *, char *);
 #endif
 
 /*
@@ -138,8 +140,8 @@ rc_build(void)
 	if ((rerror = regcomp(e->e_exp, pat, rflags)) != 0)
 		rc_error(e, rerror);
 	free(pat);
-	if (!mbcode && !xflag && e->e_exp->re_flags & REG_DFA)
-		range = rc_range;
+	if (!xflag && e->e_exp->re_flags & REG_DFA)
+		range = mbcode ? rc_rangew : rc_range;
 #else	/* !UXRE */
 	if (iflag)
 		rflags |= REG_ICASE;
@@ -253,6 +255,82 @@ rc_range(struct iblok *ip, char *last)
 			}
 		}
 		if (*p++ == '\n') {
+			if (vflag) {
+				p--;
+				goto succeed;
+			}
+			if ((ip->ib_cur = p) > last)
+				return 0;
+			lineno++;
+			if (dp->acc[cstat = dp->anybol])
+				goto found;
+		}
+		brk2:;
+	}
+}
+
+/*
+ * Range search for multibyte locales using the modified UNIX(R) Regular
+ * Expression Library DFA.
+ */
+static int
+rc_rangew(struct iblok *ip, char *last)
+{
+	char	*p;
+	int	n, cstat, nstat;
+	wint_t	wc;
+	Dfa	*dp = e0->e_exp->re_dfa;
+
+	p = ip->ib_cur;
+	lineno++;
+	cstat = dp->anybol;
+	if (dp->acc[cstat])
+		goto found;
+	for (;;) {
+		if (*p & 0200) {
+			if ((n = mbtowi(&wc, p, last + 1 - p)) < 0) {
+				n = 1;
+				wc = WEOF;
+			}
+		} else {
+			wc = *p;
+			n = 1;
+		}
+		if ((wc & ~(wchar_t)(NCHAR-1)) != 0 ||
+				(nstat = dp->trans[cstat][wc]) == 0) {
+			/*
+			 * '\0' is used to indicate end-of-line. If a '\0'
+			 * character appears in input, it matches '$' but
+			 * the DFA remains in dead state afterwards; there
+			 * is thus no need to handle this condition
+			 * specially to get the same behavior as in plain
+			 * regexec().
+			 */
+			if (wc == '\n')
+				wc = '\0';
+			if ((nstat = regtrans(dp, cstat, wc, mb_cur_max)) == 0)
+				goto fail;
+			dp->trans[cstat]['\n'] = dp->trans[cstat]['\0'];
+		}
+		if (dp->acc[cstat = nstat - 1]) {
+		found:	for (;;) {
+				if (vflag == 0) {
+		succeed:		outline(ip, last, p - ip->ib_cur);
+					if (qflag || lflag)
+						return 1;
+				} else {
+		fail:			ip->ib_cur = p;
+					while (*ip->ib_cur++ != '\n');
+				}
+				if ((p = ip->ib_cur) > last)
+					return 0;
+				lineno++;
+				if (dp->acc[cstat = dp->anybol] == 0)
+					goto brk2;
+			}
+		}
+		p += n;
+		if (p[-n] == '\n') {
 			if (vflag) {
 				p--;
 				goto succeed;

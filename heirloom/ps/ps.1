@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1	1.42 (gritter) 12/9/04
+.\" Sccsid @(#)ps.1	1.43 (gritter) 12/27/04
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH PS 1 "12/9/04" "Heirloom Toolchest" "User Commands"
+.TH PS 1 "12/27/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ps \- process status
 .SH SYNOPSIS
@@ -399,6 +399,10 @@ The first eight characters of the executable file for the process.
 .ad b
 T}
 .TE
+.PP
+For those properties that correspond to user or group names,
+the numeric id is printed
+if the name does not fit into the column width.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

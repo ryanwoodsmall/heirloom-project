@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.53 (gritter) 12/20/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.54 (gritter) 12/28/04";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.53 (gritter) 12/20/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.54 (gritter) 12/28/04";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1685,7 +1685,7 @@ printline(void)
 		sz = endline(ttycols, b, &b[llen]);
 		specjump = 1;
 		print1(b, &b[sz]);
-		if (b[sz-1] != '\n' && line != eofline)
+		if (b[sz-1] != '\n')
 			write(1, "\n", 1);
 		specjump = 0;
 	}

@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.23 (gritter) 4/16/04
-.TH PAX 1 "4/16/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pax.1	1.25 (gritter) 12/26/04
+.TH PAX 1 "12/26/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
 .SH SYNOPSIS
@@ -253,7 +253,7 @@ only the first occurence of
 a file that occurs more than once in the archive
 is selected, the following are ignored.
 .TP
-\fB-o\ \fIoption\fB,\fR[\fIoption\fB,\fR\|...]
+\fB\-o\ \fIoption\fB,\fR[\fIoption\fB,\fR\|...]
 Specifies options as described for \fI\-x pax\fR.
 .TP
 \fB\-p\ \fIstring\fR
@@ -787,7 +787,7 @@ to the directory
 preserving all file attributes:
 .RS 2
 .sp
-pax -rw -pe work savedfiles
+pax \-rw \-pe work savedfiles
 .RE
 .PP
 Self-extracting zip archives are not automatically recognized,
@@ -796,7 +796,7 @@ but can normally be read using the
 option, as with
 .RS 2
 .sp
-pax \-rK -x zip -f archive.exe
+pax \-rK \-x zip \-f archive.exe
 .sp
 .RE
 .SH "ENVIRONMENT VARIABLES"

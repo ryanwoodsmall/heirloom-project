@@ -32,7 +32,7 @@
 / OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 / EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /
-/ Sccsid @(#)unittab.sl	1.7 (gritter) 11/6/04
+/ Sccsid @(#)unittab.sl	1.8 (gritter) 12/29/04
 /
 / dimensions
 m			*a*
@@ -211,12 +211,6 @@ lux			cd sr/m2
 / Money
 
 EUR			euro
-/ Euro sign in Windows-1252 character set. The euro sign in ISO-8859-15 is
-/ not accepted to avoid confusion since it has the same value as the generic
-/ currency sign in ISO-8859-1.
-�			euro
-/ Euro sign in UTF-8 character set.
-€			euro
 / Euro-based fixed conversions.
 belgiumfranc		1|40.3399 EUR
 germanymark		1|1.95583 EUR
@@ -237,10 +231,6 @@ greecedrachma		1|340.75 EUR
 australiadollar		1|1.6956 EUR
 / brazilcruzeiro
 britainpound		1|.6984 EUR
-/ Pound sign in ISO-8859-1.
-�			britainpound
-/ Pound sign in UTF-8.
-£			britainpound
 canadadollar		1|1.5528 EUR
 / colombiapeso
 denmarkkrone		1|7.4320 EUR
@@ -292,6 +282,37 @@ markka			finlandmarkka
 / sucre			equadorsucre
 poundsterling		britainpound
 / cruzeiro		brazilcruzeiro
+
+/ Currency signs in UTF-8 and other international encodings
+/
+/ Euro sign in Windows-1252 character set. The euro sign in ISO-8859-15 is
+/ not accepted to avoid confusion since it has the same value as the generic
+/ currency sign in ISO-8859-1.
+�			euro
+/ Euro sign in UTF-8 character set.
+€			euro
+/ Pound sign in ISO-8859-1.
+�			britainpound
+/ Pound sign in UTF-8.
+£			britainpound
+/ Lira sign in UTF-8.
+₤			italylira
+/ Cent sign in UTF-8.
+¢			centidollar
+/ Yen sign in UTF-8.
+¥			japanyen
+/ French franc sign in UTF-8.
+₣			francefranc
+/ Mill sign in UTF-8.
+₥			0.1 usdollar
+/ Peseta sign in UTF-8.
+₧			spainpeseta
+/ Rupee sign in UTF-8.
+₨			indiarupee
+/ Drachma sign in UTF-8.
+₯			greecedrachma
+/ German penny sign in UTF-8.
+₰			.01 germanymark
 
 / PDP-11
 

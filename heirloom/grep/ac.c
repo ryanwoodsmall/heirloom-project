@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)fgrep.sl	2.8 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)fgrep.sl	2.9 (gritter) 12/19/04";
 
 #include <sys/types.h>
 #include <string.h>
@@ -76,6 +76,7 @@ static void	ac_build(void);
 static int	ac_match(const char *, size_t);
 static int	ac_matchw(const char *, size_t);
 static int	ac_range(struct iblok *, char *);
+static int	ac_rangew(struct iblok *, char *);
 static void	cgotofn(void);
 static void	check(int, int);
 static void	woverflo(void);
@@ -110,8 +111,8 @@ ac_build(void)
 	}
 	cgotofn();
 	cfail();
-	if (!iflag && !mbcode)
-		range = ac_range;
+	if (!iflag)
+		range = mbcode ? ac_rangew : ac_range;
 }
 
 static int
@@ -318,6 +319,92 @@ ac_matchw(const char *line, size_t sz)
 				z = *p;
 				n = 1;
 			}
+		}
+	}
+}
+
+static int
+ac_rangew(struct iblok *ip, char *last)
+{
+	register char *p;
+	wint_t	z;
+	register struct words *c;
+	int failed, n = 0;
+
+	p = ip->ib_cur;
+	lineno++;
+	failed = 0;
+	c = w;
+	for (;;) {
+		nstate:
+			if (*p & 0200) {
+				if ((n = mbtowi(&z, p, last + 1 - p)) < 0) {
+					n = 1;
+					z = WEOF;
+				}
+			} else {
+				z = *p;
+				n = 1;
+			}
+			if (c->inp == z) {
+				c = c->nst;
+			}
+			else if (c->link != 0) {
+				c = c->link;
+				goto nstate;
+			}
+			else {
+				c = c->fail;
+				failed = 1;
+				if (c==0) {
+					c = w;
+					istate:
+					if (c->inp == z) {
+						c = c->nst;
+					}
+					else if (c->link != 0) {
+						c = c->link;
+						goto istate;
+					}
+				}
+				else goto nstate;
+			}
+		if (c->out) {
+			if (xflag) {
+				register char *ep = p;
+				while (*ep != '\n')
+					ep++;
+				if ((failed || ep > p) && vflag == 0) {
+					ip->ib_cur = &ep[1];
+					goto nogood;
+				}
+			}
+			if (vflag == 0) {
+		succeed:	outline(ip, last, p - ip->ib_cur);
+				if (qflag || lflag)
+					return 1;
+			} else {
+				ip->ib_cur = p;
+				while (*ip->ib_cur++ != '\n');
+			}
+		nogood:	if ((p = ip->ib_cur) > last)
+				return 0;
+			lineno++;
+			c = w;
+			failed = 0;
+			continue;
+		}
+		p += n;
+		if (p[-n] == '\n') {
+			if (vflag) {
+				p--;
+				goto succeed;
+			}
+			if ((ip->ib_cur = p) > last)
+				return 0;
+			lineno++;
+			c = w;
+			failed = 0;
 		}
 	}
 }

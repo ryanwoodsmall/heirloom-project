@@ -46,7 +46,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)file.sl	1.27 (gritter) 12/5/04";
+static const char sccsid[] USED = "@(#)file.sl	1.29 (gritter) 12/29/04";
 
 #ifdef	__GLIBC__
 #include <sys/sysmacros.h>
@@ -152,6 +152,7 @@ static void	pritem(struct match *, int);
 static void	fmterr(const char *, int);
 static int	tar(void);
 static int	sccs(void);
+static int	utf8(void);
 static int	endianess(void);
 static int	redirect(const char *, const char *);
 
@@ -327,7 +328,8 @@ rd:	in = read(ifile, buf, sizeof buf);
 		j = i;
 		while(buf[i++] != '\n'){
 			if(i - j > 255){
-				printf("data\n"); 
+				if (!utf8())
+					printf("data\n"); 
 				goto out;
 			}
 			if(i >= in)goto notc;
@@ -416,7 +418,8 @@ notas:
 			printf("troff output\n");
 			goto out;
 		}
-		printf("data\n"); 
+		if (!utf8())
+			printf("data\n"); 
 		goto out; 
 	}
 	if (mbuf.st_mode&0111)
@@ -991,6 +994,44 @@ sccs(void)
 			digitchar(buf[4]&0377) && digitchar(buf[5]&0377) &&
 			digitchar(buf[6]&0377) && buf[7] == '\n') {
 		printf("sccs\n");
+		return 1;
+	}
+	return 0;
+}
+
+static int
+utf8(void)
+{
+	int	c, d, i, j, n;
+	int	found = 0;
+
+	for (i = 0; i < in; i++) {
+		if ((c = buf[i] & 0377) & 0200) {
+			if (c == (c & 037 | 0300))
+				n = 1;
+			else if (c == (c & 017 | 0340))
+				n = 2;
+			else if (c == (c & 07 | 0360))
+				n = 3;
+			else if (c == (c & 03 | 0370))
+				n = 4;
+			else if (c == (c & 01 | 0374))
+				n = 5;
+			else
+				return 0;
+			if (i + n >= in)
+				break;
+			for (j = 1; j <= n; j++) {
+				d = buf[i+j] & 0377;
+				if (d != (d & 077 | 0200))
+					return 0;
+			}
+			i += n;
+			found++;
+		}
+	}
+	if (found) {
+		printf("utf-8 text\n");
 		return 1;
 	}
 	return 0;

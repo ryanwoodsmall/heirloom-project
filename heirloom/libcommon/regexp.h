@@ -45,7 +45,7 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.49 (gritter) 12/24/04";
+	"@(#)regexp.sl	1.50 (gritter) 12/25/04";
 
 #ifndef	__dietlibc__
 #define	REGEXP_H_WCHARS
@@ -744,8 +744,12 @@ regexp_h_pop(struct regexp_h_stack **sp, const char ***sc,
 	if (*sp == NULL)
 		return regexp_h_firstwc;
 	if (*sc == &(*sp)->s_ptr[0]) {
-		if ((*sp = (*sp)->s_prv) == NULL)
+		if ((*sp)->s_prv == NULL) {
+			regexp_h_free(*sp);
+			*sp = NULL;
 			return regexp_h_firstwc;
+		}
+		*sp = (*sp)->s_prv;
 		regexp_h_free((*sp)->s_nxt);
 		(*sp)->s_nxt = NULL ;
 		*sc = &(*sp)->s_ptr[REGEXP_H_STAKBLOK];

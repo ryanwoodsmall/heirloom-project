@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)rm.1	1.11 (gritter) 12/6/04
+.\" Sccsid @(#)rm.1	1.13 (gritter) 12/29/04
 .\" Parts taken from rm(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH RM 1 "12/6/04" "Heirloom Toolchest" "User Commands"
+.TH RM 1 "12/29/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 rm \- remove directory entries
 .SH SYNOPSIS
@@ -118,4 +118,14 @@ rmdir(2)
 .SH NOTES
 It is forbidden to remove the files `.' and `..'
 merely to avoid the antisocial consequences
-of inadvertently doing something like `rm -r .*'.
+of inadvertently doing something like `rm \-r .*'.
+.PP
+With
+.B /usr/5bin/rm
+and
+.BR /usr/5bin/s42/rm ,
+a single `\-' can be used to indicate the end of the options list,
+as with `rm \- \-file'.
+If `\-\-' is used to terminate the options list, though,
+a following `\-' will be interpreted as a file name,
+so `rm \-\- \-' will remove the file `\-'.

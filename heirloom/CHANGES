@@ -1,10 +1,11 @@
 Release ...
-* basename, csplit, ed, grep, nl, pg, sed: The multibyte locale code of the
-  traditional regular expression matching functions could lead to segmentation
-  faults and missing matches with some input sequences because of an
-  uninitialized variable.
 * grep: A '-z' option is now available; it decompresses compressed files and
   looks for the pattern in the plain text.
+* file: Recognizes UTF-8 encoded text now.
+* basename, csplit, ed, grep, nl, pg, sed: The multibyte locale code of the
+  traditional regular expression matching functions lead to segmentation
+  faults and missing matches with some input sequences because of an
+  uninitialized variable.
 * rm: The traditional and POSIX versions have been fixed with regard to the
   '-f' and '-i' options; if both were given, the traditional version behaved
   as documented for the POSIX one and vice-versa.
@@ -12,6 +13,13 @@ Release ...
   multibyte sequence correctly. In UTF-8 locales, non-printable characters
   are now substituted by Unicode control pictures or the Unicode replacement
   character.
+* pg: Always print the '(EOF):' prompt on a new line, even if the input file
+  does not end with a newline character.
+* ps: If a user or group name is printed with property for the -o option and
+  the name does not fit into the column width, the numeric id is now written
+  instead.
+* rm: For the traditional command versions, 'rm -- -' now tries to remove a
+  file named '-'.
 
 Release 041214
 * Traditional and POSIX options as well as extensions are now marked as such

@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.101 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.102 (gritter) 12/27/04";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.101 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.102 (gritter) 12/27/04";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.101 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.102 (gritter) 12/27/04";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.101 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)ps.sl	2.102 (gritter) 12/27/04";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.101 (gritter) 12/12/04";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.102 (gritter) 12/27/04";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
@@ -725,6 +725,24 @@ hasnonprint(const char *s)
 	return 0;
 }
 
+static int
+colwidth(const char *s)
+{
+	wint_t	wc;
+	int	i, n, w = 0;
+
+	while (*s) {
+		next(wc, s, n);
+		s += n;
+		if (mb_cur_max > 1)
+			i = iswprint(wc) ? wcwidth(wc) : 0;
+		else
+			i = isprint(wc) != 0;
+		w += i;
+	}
+	return w;
+}
+
 static void
 cleanline(struct proc *p)
 {
@@ -840,12 +858,15 @@ putid(unsigned long val, unsigned len, struct trenod **troot,
 			tp->t_num = val;
 			treput(tp, troot);
 		} else
+		numeric:
 #ifdef	UCB
 			return printf("%-*lu", len, val);
 #else
 			return printf("%*lu", len, val);
 #endif
 	}
+	if (oflag && colwidth(tp->t_str) > len)
+		goto numeric;
 #ifdef	UCB
 	return printf("%-*s", len, tp->t_str);
 #else
