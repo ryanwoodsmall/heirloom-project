@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.74 (gritter) 1/6/05";
+static char sccsid[] = "@(#)sendout.c	2.75 (gritter) 1/6/05";
 #endif
 #endif /* not lint */
 
@@ -102,7 +102,7 @@ getencoding(enum conversion convert)
 	switch (convert) {
 	case CONV_7BIT:
 		return "7bit";
-	case CONV_NONE:
+	case CONV_8BIT:
 		return "8bit";
 	case CONV_TOQP:
 		return "quoted-printable";
@@ -477,7 +477,6 @@ infix(struct header *hp, FILE *fi, int dosign)
 					TD_ICONV, NULL, (size_t)0) == 0) {
 				Fclose(nfo);
 				Fclose(nfi);
-				perror("read");
 #ifdef	HAVE_ICONV
 				if (iconvd != (iconv_t)-1) {
 					iconv_close(iconvd);
@@ -492,7 +491,6 @@ infix(struct header *hp, FILE *fi, int dosign)
 		if (ferror(fi)) {
 			Fclose(nfo);
 			Fclose(nfi);
-			perror("read");
 #ifdef	HAVE_ICONV
 			if (iconvd != (iconv_t)-1) {
 				iconv_close(iconvd);
@@ -913,7 +911,8 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 			*ncs++ = '\0';
 	}
 	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
-		if (ncs && *ncs) {
+		if (ncs && *ncs && (errno == EILSEQ || errno == EINVAL)) {
+			rewind(mtf);
 			wantcharset = ncs;
 			goto loop;
 		}

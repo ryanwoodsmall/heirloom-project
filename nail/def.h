@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.94 (gritter) 1/3/05
+ *	Sccsid @(#)def.h	2.95 (gritter) 1/6/05
  */
 
 /*
@@ -97,6 +97,7 @@ enum conversion {
 	CONV_7BIT,			/* no conversion, is 7bit */
 	CONV_FROMQP,			/* convert from quoted-printable */
 	CONV_TOQP,			/* convert to quoted-printable */
+	CONV_8BIT,			/* convert to 8bit (iconv) */
 	CONV_FROMB64,			/* convert from base64 */
 	CONV_FROMB64_T,			/* convert from base64/text */
 	CONV_TOB64,			/* convert to base64 */

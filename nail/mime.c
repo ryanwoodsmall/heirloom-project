@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.52 (gritter) 1/6/05";
+static char sccsid[]  = "@(#)mime.c	2.53 (gritter) 1/6/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -758,15 +758,15 @@ gettextconversion(void)
 	int convert;
 
 	if ((p = value("encoding")) == NULL)
-		return CONV_NONE;
+		return CONV_8BIT;
 	if (equal(p, "quoted-printable"))
 		convert = CONV_TOQP;
 	else if (equal(p, "8bit"))
-		convert = CONV_NONE;
+		convert = CONV_8BIT;
 	else {
 		fprintf(stderr, catgets(catd, CATSET, 177,
 			"Warning: invalid encoding %s, using 8bit\n"), p);
-		convert = CONV_NONE;
+		convert = CONV_8BIT;
 	}
 	return convert;
 }
@@ -1529,8 +1529,9 @@ mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
 #ifdef	HAVE_ICONV
 	if (csize < sizeof mptr && (dflags & TD_ICONV)
 			&& iconvd != (iconv_t)-1
-			&& (convert == CONV_TOQP || convert == CONV_TOB64
-				|| convert == CONV_TOHDR)) {
+			&& (convert == CONV_TOQP || convert == CONV_8BIT ||
+				convert == CONV_TOB64 ||
+				convert == CONV_TOHDR)) {
 		inleft = csize;
 		outleft = sizeof mptr;
 		nptr = mptr;
@@ -1560,6 +1561,10 @@ mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
 		break;
 	case CONV_TOQP:
 		sz = mime_write_toqp(&in, f, mustquote_body);
+		break;
+	case CONV_8BIT:
+		sz = prefixwrite(in.s, sizeof *in.s, in.l, f,
+				prefix, prefixlen);
 		break;
 	case CONV_FROMB64_T:
 		is_text = 1;

@@ -6,6 +6,11 @@
   with the 'sendcharsets' variable. It can contain multiple values, with
   the first appropriate one being used to send the message. The 'charset'
   variable is still accepted but has been removed from the documentation.
+* When the 'encoding' variable was set to '8bit' and a message contained
+  characters that were not representable in the outgoing character set
+  in its body but not in its header, the characters were replaced by
+  question marks and the message was sent, instead of being rejected
+  (Bugreport by Suresh Ramasubramanian).
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
 
