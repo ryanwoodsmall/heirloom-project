@@ -89,7 +89,7 @@ byte sequence that is entered at the terminal has been completed.
 The multibyte code is known to work with UTF-8 locales on the following
 systems:
 
-Linux		glibc 2.3.3
+Linux		glibc 2.2.2 and later
 Sun Solaris	9 and later
 HP HP-UX	B.11.23
 FreeBSD		5.3
@@ -103,7 +103,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						12/30/04
+Gunnar Ritter						12/31/04
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>
