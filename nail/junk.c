@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.7 (gritter) 9/27/04";
+static char sccsid[] = "@(#)junk.c	1.8 (gritter) 9/27/04";
 #endif
 #endif /* not lint */
 
@@ -169,11 +169,15 @@ putdb(db, table)
 	struct element	*table;
 {
 	FILE	*fp;
+	sighandler_type	saveint;
 
 	if ((fp = dbfp(db, 1)) == NULL || fp == (FILE *)-1)
 		return;
-	if (fseek(fp, DBHEAD + db * SIZE * sizeof *table, SEEK_SET) == 0)
+	if (fseek(fp, DBHEAD + db * SIZE * sizeof *table, SEEK_SET) == 0) {
+		saveint = safe_signal(SIGINT, SIG_IGN);
 		fwrite(table, sizeof *table, SIZE, fp);
+		safe_signal(SIGINT, saveint);
+	}
 	Fclose(fp);
 }
 
@@ -202,6 +206,7 @@ putst(sp)
 {
 	FILE	*fp;
 	time_t	now;
+	sighandler_type	saveint;
 
 	if ((fp = dbfp(STAT, 1)) == NULL || fp == (FILE *)-1)
 		return;
@@ -209,8 +214,11 @@ putst(sp)
 	fprintf(fp, "Junk mail database last updated by %s on %s",
 			version, ctime(&now));
 	if (fseek(fp, DBHEAD + 3 * SIZE * sizeof (struct element),
-				SEEK_SET) == 0)
+				SEEK_SET) == 0) {
+		saveint = safe_signal(SIGINT, SIG_IGN);
 		fwrite(sp, sizeof *sp, 1, fp);
+		safe_signal(SIGINT, saveint);
+	}
 	Fclose(fp);
 }
 

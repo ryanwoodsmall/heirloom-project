@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.245 (gritter) 9/27/04
+.\"     Sccsid: @(#)nail.1	2.247 (gritter) 9/27/04
 .\"
 .TH NAIL 1 "9/27/04" "nail 11.9" "User Commands"
 .SH NAME
@@ -2419,9 +2419,10 @@ Setting the option verbose is the same
 as using the \-v flag on the command line.
 When \fInail\fR runs in verbose mode,
 details of the actual message delivery
-and protocol conversations for IMAP, POP3, and SMTP
-are displayed on the user's terminal.
-This is sometimes useful to debug problems with specific servers.
+and protocol conversations for IMAP, POP3, and SMTP,
+as well as of other internal processes,
+are displayed on the user's terminal,
+This is sometimes useful to debug problems.
 .I Nail
 prints all data that is sent to remote servers in clear texts,
 including passwords,
@@ -3942,7 +3943,7 @@ by sending as many criteria as possible
 in one large (\|) specification,
 because each single such specification
 will result in a separate network operation.
-.SS "Activating the Bayesian Filter"
+.SS "Activating the Bayesian filter"
 The Bayesian junk mail filter works
 by examining the words contained in messages.
 You decide yourself what a good and what a bad message is.
@@ -4018,6 +4019,18 @@ this will also cause all of them to be downloaded from the IMAP server.
 You should thus restrict the size of messages for automatic filtering.
 If server-based filtering is also available,
 you should try if that works for you first.
+.PP
+If you set the
+.I verbose
+option before running the
+.I classify
+command,
+.I nail
+prints the words it uses for calculating the junk status
+along with their statistical probabilities.
+This can help you to find out
+why some messages are not classified
+as you would like them to be.
 .SS "Reading HTML mail"
 You need either the
 .I w3m

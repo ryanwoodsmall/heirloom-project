@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.35 (gritter) 9/26/04";
+static char sccsid[] = "@(#)send.c	2.36 (gritter) 9/27/04";
 #endif
 #endif /* not lint */
 
@@ -639,8 +639,7 @@ off_t *stats;
 					CONV_FROMHDR : CONV_NONE,
 				action == CONV_TODISP ?
 					TD_ISPR|TD_ICONV :
-					action == CONV_TOSRCH ||
-							action == CONV_TOFLTR ?
+					action == CONV_TOSRCH ?
 						TD_ICONV : TD_NONE,
 				prefix, prefixlen);
 		addstats(stats, 1, sz);
@@ -705,8 +704,7 @@ off_t *stats;
 					CONV_FROMHDR : CONV_NONE,
 				action == CONV_TODISP ?
 					TD_ISPR|TD_ICONV :
-					action == CONV_TOSRCH ||
-							action == CONV_TOFLTR ?
+					action == CONV_TOSRCH ?
 						TD_ICONV : TD_NONE,
 				prefix, prefixlen);
 		if (ferror(obuf))
@@ -1071,8 +1069,7 @@ send_multi_parseheader:
 					iconv_close(iconvd);
 				if (action == CONV_TODISP ||
 						action == CONV_QUOTE ||
-						action == CONV_TOSRCH ||
-						action == CONV_TOFLTR) {
+						action == CONV_TOSRCH) {
 					if (iconvd != (iconv_t)-1)
 						iconv_close(iconvd);
 					if (asccasecmp(tcs, cs)
@@ -1140,8 +1137,7 @@ send_multi_parseheader:
 					 action == CONV_TODISP ||
 						action == CONV_QUOTE ?
 					 TD_ISPR|TD_ICONV :
-					 	action == CONV_TOSRCH ||
-						action == CONV_TOFLTR ?
+					 	action == CONV_TOSRCH ?
 							TD_ICONV : TD_NONE,
 					pbuf == qbuf ? prefix : NULL,
 					pbuf == qbuf ? prefixlen : 0);
@@ -1294,8 +1290,7 @@ send_message(mp, obuf, doign, prefix, action, stats)
 					CONV_FROMHDR : CONV_NONE,
 				action == CONV_TODISP ?
 					TD_ISPR|TD_ICONV :
-					action == CONV_TOSRCH ||
-							action == CONV_TOFLTR ?
+					action == CONV_TOSRCH ?
 						TD_ICONV : TD_NONE,
 				prefix, prefixlen);
 			if (obuf == origobuf)
@@ -1428,8 +1423,7 @@ send_parseheader:
 		cs = us_ascii;
 #ifdef	HAVE_ICONV
 	if (action == CONV_TODISP || action == CONV_QUOTE ||
-			action == CONV_TOSRCH ||
-			action == CONV_TOFLTR) {
+			action == CONV_TOSRCH) {
 		if (iconvd != (iconv_t)-1)
 				iconv_close(iconvd);
 		if (asccasecmp(tcs, cs) && asccasecmp(us_ascii, cs))
@@ -1461,8 +1455,7 @@ send_parseheader:
 				 pbuf, convert, action == CONV_TODISP ||
 					action == CONV_QUOTE ?
 						TD_ISPR|TD_ICONV :
-						action == CONV_TOSRCH ||
-						action == CONV_TOFLTR ?
+						action == CONV_TOSRCH ?
 							TD_ICONV : TD_NONE,
 					pbuf == qbuf ? prefix : NULL,
 					pbuf == qbuf ? prefixlen : 0);
