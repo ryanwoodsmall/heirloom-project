@@ -31,10 +31,13 @@ flex            <http://www.gnu.org/software/flex>. Unix lex cannot
                 be used here.
 a yacc command  The commercial vendors' yacc, Berkeley yacc, and bison
                 are all okay.
-GNU or AIX make <http://www.gnu.org/software/make>. The build system
-                is designed to be portable, but in practice, other make
-                commands have been found to be so flawed that none of
-                them has worked yet.
+make            Implementations known to work are GNU make, AIX make,
+                and NetBSD make. The build system is designed to be
+                portable, but in practice, other make commands have
+                been found to be so flawed that none of them has worked
+                yet. GNU make <http://www.gnu.org/software/make> is
+                recommended if the vendor-supplied make command fails
+                to work.
 
 The following prerequisites are optional:
 
@@ -288,4 +291,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           1/15/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           1/23/05
