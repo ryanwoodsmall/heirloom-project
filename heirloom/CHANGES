@@ -1,4 +1,4 @@
-Release ...
+Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
   dynamically reset from 0x10FFFF to 0xFFFF if memory is sparse. The size of
   the corresponding hash table has been raised to reduce computing time.
