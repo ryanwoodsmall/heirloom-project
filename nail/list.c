@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.57 (gritter) 12/30/04";
+static char sccsid[] = "@(#)list.c	2.58 (gritter) 1/2/05";
 #endif
 #endif /* not lint */
 
@@ -55,7 +55,7 @@ static char sccsid[] = "@(#)list.c	2.57 (gritter) 12/30/04";
  * Message list handling.
  */
 
-enum idtype {
+enum idfield {
 	ID_REFERENCES,
 	ID_IN_REPLY_TO
 };
@@ -69,7 +69,7 @@ static int scan(char **sp);
 static void regret(int token);
 static void scaninit(void);
 static int matchsender(char *str, int mesg, int allnet);
-static int matchmid(char *id, enum idtype idtype, int mesg);
+static int matchmid(char *id, enum idfield idfield, int mesg);
 static int matchsubj(char *str, int mesg);
 static void unmark(int mesg);
 static int metamess(int meta, int f);
@@ -204,7 +204,7 @@ markall(char *buf, int f)
 	char **namelist, *bufp, *id = NULL, *cp;
 	int tok, beg, mc, star, other, valdot, colmod, colresult, topen, tback;
 	size_t nmlsize;
-	enum idtype	idtype = ID_REFERENCES;
+	enum idfield	idfield = ID_REFERENCES;
 
 	lexstring = ac_alloc(STRINGLEN = 2 * strlen(buf) + 1);
 	valdot = dot - &message[0] + 1;
@@ -387,13 +387,13 @@ number:
 					while (np->n_flink != NULL)
 						np = np->n_flink;
 					id = savestr(np->n_name);
-					idtype = ID_REFERENCES;
+					idfield = ID_REFERENCES;
 				}
 			}
 			if (id == NULL && (cp = hfield("in-reply-to", dot))
 					!= NULL) {
 				id = savestr(cp);
-				idtype = ID_IN_REPLY_TO;
+				idfield = ID_IN_REPLY_TO;
 			}
 			if (id == NULL) {
 				printf(catgets(catd, CATSET, 227,
@@ -484,7 +484,7 @@ number:
 					}
 				}
 			}
-			if (mc == 0 && id && matchmid(id, idtype, i))
+			if (mc == 0 && id && matchmid(id, idfield, i))
 				mc++;
 			if (mc == 0)
 				unmark(i);
@@ -971,13 +971,13 @@ matchsender(char *str, int mesg, int allnet)
 }
 
 static int 
-matchmid(char *id, enum idtype idtype, int mesg)
+matchmid(char *id, enum idfield idfield, int mesg)
 {
 	struct name	*np;
 	char *cp;
 
 	if ((cp = hfield("message-id", &message[mesg - 1])) != NULL) {
-		switch (idtype) {
+		switch (idfield) {
 		case ID_REFERENCES:
 			return msgidcmp(id, cp) == 0;
 		case ID_IN_REPLY_TO:

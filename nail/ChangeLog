@@ -1,3 +1,7 @@
+[11.20] released ...
+* Resolved a symbol conflict with SVR4 systems like Solaris that lead to
+  failed builds because of a redeclaration of 'enum idtype'.
+
 [11.19] released 1/2/05
 * A 'chained-junk-tokens' variable was introduced for the Bayesian junk
   mail filter. If set, the filter considers two-word tokens as described
