@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.291 (gritter) 3/8/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.292 (gritter) 3/12/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -2157,7 +2157,8 @@ getbuf(char **bufp, size_t *sizep, size_t best)
 	if (size != best) {
 		if (buf)
 			free(buf);
-		if ((buf = svalloc(size = best, 0)) == NULL)
+		size = best;
+		if (size == 0 || (buf = svalloc(size, 0)) == NULL)
 			buf = svalloc(size = 512, 1);
 	}
 	*bufp = buf;

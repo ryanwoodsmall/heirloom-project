@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tail.sl	1.22 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)tail.sl	1.23 (gritter) 3/12/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -62,6 +62,8 @@ static const char sccsid[] USED = "@(#)tail.sl	1.22 (gritter) 2/2/05";
 #include	<limits.h>
 #include	<ctype.h>
 #include	"atoll.h"
+
+#define	check0(n)	((n) > 0 ? (n) : 512)
 
 enum	from {
 	FR_BEGIN,
@@ -140,7 +142,7 @@ tailf(int fd, struct stat *sp)
 	size_t	bufsize;
 	ssize_t	sz;
 
-	buf = srealloc(NULL, bufsize = sp->st_blksize);
+	buf = srealloc(NULL, bufsize = check0(sp->st_blksize));
 	for (;;) {
 		poll(NULL, 0, 1000);
 		while ((sz = read(fd, buf, bufsize)) > 0)
@@ -157,7 +159,7 @@ copy(int fd, struct stat *sp)
 	size_t	bufsize;
 	ssize_t	sz;
 
-	buf = srealloc(NULL, bufsize = sp->st_blksize);
+	buf = srealloc(NULL, bufsize = check0(sp->st_blksize));
 	while ((sz = read(fd, buf, bufsize)) > 0)
 		bwrite(1, buf, sz);
 	free(buf);
@@ -350,7 +352,7 @@ begintail(struct count *cnt, int fd, struct stat *sp)
 	int	sz;
 	long long	n;
 
-	buf = srealloc(NULL, bufsize = sp->st_blksize);
+	buf = srealloc(NULL, bufsize = check0(sp->st_blksize));
 	if (cnt->c_off > 0) {
 		if (cnt->c_typ == 'l') {
 			n = cnt->c_off;
@@ -495,7 +497,7 @@ optend:
 		fprintf(stderr, "%s: cannot stat stdout\n", progname);
 		exit(8);
 	}
-	outblk = st.st_blksize;
+	outblk = check0(st.st_blksize);
 	if (optind < argc) {
 		if ((fd = open(argv[optind], O_RDONLY)) < 0) {
 			fprintf(stderr, "%s: cannot open input\n", progname);

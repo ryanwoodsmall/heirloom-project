@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)copy.sl	1.13 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)copy.sl	1.14 (gritter) 3/12/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -365,7 +365,8 @@ fdcopy(const char *src, const struct stat *sp, int sfd,
 #endif	/* __linux__ */
 	if (pagesize == 0 && (pagesize = sysconf(_SC_PAGESIZE)) <= 0)
 		pagesize = 4096;
-	blksize = sp->st_blksize;
+	if ((blksize = sp->st_blksize) <= 0)
+		blksize = 512;
 	if (bufsize < blksize) {
 		free(buf);
 		if ((buf = memalign(pagesize, blksize)) == NULL)

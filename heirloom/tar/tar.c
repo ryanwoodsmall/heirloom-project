@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.170 (gritter) 3/1/05";
+static const char sccsid[] USED = "@(#)tar.sl	1.171 (gritter) 3/12/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -2709,6 +2709,8 @@ domtstat(void)
 	if (twice == 0 && bflag == 0 && tapeblock < 0) {
 		if ((nblock = mtstat.st_blksize >> 9) > NBLOCK)
 			nblock = NBLOCK;
+		else if (nblock <= 0)
+			nblock = 1;
 		else if ((mtstat.st_mode&S_IFMT) != S_IFCHR)
 			bflag = B_AUTO;
 	}

@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)ib_alloc.c	1.4 (gritter) 7/16/04	*/
+/*	Sccsid @(#)ib_alloc.c	1.5 (gritter) 3/12/05	*/
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -46,7 +46,7 @@ ib_alloc(int fd, unsigned blksize)
 	if (blksize == 0) {
 		if (fstat(fd, &st) < 0)
 			return NULL;
-		blksize = st.st_blksize;
+		blksize = st.st_blksize > 0 ? st.st_blksize : 512;
 	}
 	if ((ip = calloc(1, sizeof *ip)) == NULL)
 		return NULL;

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/install.sl	1.10 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/install.sl	1.11 (gritter) 3/12/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -152,7 +152,8 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 	ssize_t	rsz, wo, wt;
 
 	if ((bufsize = ssp->st_blksize) < dsp->st_blksize)
-		bufsize = dsp->st_blksize;
+		if ((bufsize = dsp->st_blksize) <= 0)
+			bufsize = 512;
 	buf = smalloc(bufsize);
 	while ((rsz = read(sfd, buf, bufsize)) > 0) {
 		wt = 0;

@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.77 (gritter) 3/8/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.78 (gritter) 3/12/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.77 (gritter) 3/8/05";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.78 (gritter) 3/12/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.77 (gritter) 3/8/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.78 (gritter) 3/12/05";
 #endif
 
 #include	<sys/types.h>
@@ -399,8 +399,10 @@ balign(const struct stat *ssp, const struct stat *dsp,
 	int	n, m;
 	size_t	s;
 
-	n = (ssp->st_mode&S_IFMT) == S_IFREG ? ssp->st_blksize : 512;
-	m = (dsp->st_mode&S_IFMT) == S_IFREG ? dsp->st_blksize : 512;
+	n = (ssp->st_mode&S_IFMT) == S_IFREG && ssp->st_blksize >= 0 ?
+		ssp->st_blksize : 512;
+	m = (dsp->st_mode&S_IFMT) == S_IFREG && dsp->st_blksize >= 0 ?
+		dsp->st_blksize : 512;
 	if (prefd <= size && prefd % n == 0 && prefd % m == 0)
 		return prefd;
 	else if (n % m == 0)
