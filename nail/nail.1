@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.277 (gritter) 11/7/04
+.\"     Sccsid: @(#)nail.1	2.278 (gritter) 11/9/04
 .\"
-.TH NAIL 1 "11/7/04" "nail 11.15" "User Commands"
+.TH NAIL 1 "11/9/04" "nail 11.15" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -4082,6 +4082,12 @@ command,
 and the junk messages to the
 .I junk
 command.
+If you ever accidentally mark a good message as junk or vice-versa,
+call the
+.I ungood
+or
+.I unjunk
+command to correct this.
 .PP
 Once a reasonable amount of statistics has been collected,
 new messages can be classified automatically.
@@ -4108,15 +4114,6 @@ file (or whatever name you gave to the file in the last example):
     \fBset folder-hook-\fRimap://user@host/INBOX=\fIjunkfilter\fR
 .sp
 .fi
-Since the
-.I classify
-command must examine the entire text
-of all new messages in the respective folder,
-this will also cause all of them to be downloaded from the IMAP server.
-You should thus restrict the size of messages for automatic filtering.
-If server-based filtering is also available,
-you should try if that works for you first.
-.PP
 If you set the
 .I verbose
 option before running the
@@ -4132,6 +4129,25 @@ To see the statistical probability of a given word,
 use the
 .I probability
 command.
+.PP
+If a junk message was not recognized as such,
+use the
+.I junk
+command to correct this.
+Also if you encounter a false positive
+(a good message that was wrongly classified as junk),
+pass it to the
+.I good
+command.
+.PP
+Since the
+.I classify
+command must examine the entire text
+of all new messages in the respective folder,
+this will also cause all of them to be downloaded from the IMAP server.
+You should thus restrict the size of messages for automatic filtering.
+If server-based filtering is also available,
+you might try if that works for you first.
 .SS "Reading HTML mail"
 You need either the
 .I w3m

@@ -1,4 +1,4 @@
-[11.15] released ...
+[11.15] released 11/10/04
 * The compilation process was fixed to work without CPPFLAGS=-D_GNU_SOURCE on
   Linux/glibc again, although mremap() is not available then. It is therefore
   recommended to use CPPFLAGS=-D_GNU_SOURCE with Linux/glibc. (Bugreports by
