@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.36 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.37 (gritter) 2/5/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.36 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.37 (gritter) 2/5/05";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.36 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)find.sl	1.37 (gritter) 2/5/05";
 #endif
 
 #include <stdio.h>
@@ -957,7 +957,7 @@ static int descend(char *fname, struct anode *exlist, int level)
 
 	if(statfn(fname, &Statb)<0) {
 		if (statfn != lstat && lstat(fname, &Statb) == 0)
-			c1 = "cannot follow symbolic link %s: %s";
+		nof:	c1 = "cannot follow symbolic link %s: %s";
 		else if (sysv3)
 			c1 = "stat() failed: %s: %s";
 		else if (errno == ENOENT || errno == ENOTDIR)
@@ -972,6 +972,8 @@ static int descend(char *fname, struct anode *exlist, int level)
 		struct stat	nst;
 		if (stat(fname, &nst) == 0)
 			Statb = nst;
+		else if (errno == ELOOP)
+			goto nof;
 	}
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if (Statfs != NULL) {
