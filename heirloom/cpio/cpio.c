@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.294 (gritter) 3/19/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.295 (gritter) 3/19/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -840,6 +840,7 @@ static int	passdata(struct file *, const char *, int);
 static int	passfile(const char *, struct stat *);
 static int	filein(struct file *, int (*)(struct file *, const char *, int),
 			char *);
+static int	linkunlink(const char *, const char *);
 static void	tunlink(char **);
 static int	filet(struct file *, int (*)(struct file *, const char *, int));
 static void	filev(struct file *);
@@ -2827,16 +2828,20 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 					free(name);
 				name = symblink;
 			}
-			if (link(name, tgt) == 0) {
+			if (linkunlink(name, tgt) == 0) {
+				if (vflag)
+					fprintf(stderr, "%s\n", tgt);
 				if (name != f->f_name)
 					free(name);
 				return 0;
 			}
 			if (name != f->f_name)
 				free(name);
-		} else if (link(f->f_name, tgt) == 0)
+		} else if (linkunlink(f->f_name, tgt) == 0) {
+			if (vflag)
+				fprintf(stderr, "%s\n", tgt);
 			return 0;
-		emsg(3, "Cannot link \"%s\" and \"%s\"", f->f_name, tgt);
+		}
 cantlink:	errcnt += 1;
 	}
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && f->f_st.st_nlink > 1 &&
@@ -2862,21 +2867,15 @@ cantlink:	errcnt += 1;
 		 */
 		chmod(tgt, 0600);
 	} else if (fmttype & TYP_TAR && f->f_st.st_nlink > 1) {
-		if (link(f->f_lnam, f->f_name) == 0) {
+		if (linkunlink(f->f_lnam, f->f_name) == 0) {
 			if (fmttype & TYP_USTAR && f->f_st.st_size > 0)
 				chmod(tgt, 0600);
 			else {
-				if (vflag) {
-					if (pax == PAX_TYPE_CPIO)
-						printf("%s linked to %s\n",
-							f->f_lnam, f->f_name);
+				if (vflag)
 					fprintf(stderr, "%s\n", f->f_name);
-				}
 				return 0;
 			}
 		} else {
-			emsg(3, "Cannot link \"%s\" and \"%s\"",
-					f->f_lnam, f->f_name);
 			goto restore;
 		}
 	} else if (new == 0 && (f->f_st.st_mode&S_IFMT) != S_IFDIR) {
@@ -2970,6 +2969,25 @@ restore:
 		cur_tfile = cur_ofile = NULL;
 	}
 	return failure;
+}
+
+static int
+linkunlink(const char *path1, const char *path2)
+{
+	int	twice = 0;
+
+	do {
+		if (link(path1, path2) == 0) {
+			if (vflag && pax == PAX_TYPE_CPIO)
+				printf("%s linked to %s\n", path1, path2);
+			return 0;
+		}
+		if (errno == EEXIST && unlink(path2) < 0)
+			emsg(3, sysv3 ? "cannot unlink <%s>" :
+					"Error cannot unlink \"%s\"", path2);
+	} while (twice++ == 0);
+	emsg(3, "Cannot link \"%s\" and \"%s\"", path1, path2);
+	return -1;
 }
 
 static void
@@ -3332,16 +3350,10 @@ canlink(const char *path, struct stat *st, int really)
 			 */
 			if (fmttype & TYP_NCPIO && ip->i_nlk == 0)
 				return 0;
-			if (link(ip->i_name, path) == 0) {
-				if (vflag && pax == PAX_TYPE_CPIO)
-					printf("%s linked to %s\n",
-							ip->i_name, path);
+			if (linkunlink(ip->i_name, path) == 0)
 				return 1;
-			} else {
-				emsg(3, "Cannot link \"%s\" and \"%s\"",
-						ip->i_name, path);
+			else
 				return -1;
-			}
 		} else {
 			printf(" == %s", ip->i_name);
 			return 1;
