@@ -15,6 +15,8 @@
   reported by Thomas Wolff).
 * When new mail arrives in an IMAP mailbox, the current message is now
   properly advanced by the 'next' command if it has been printed before.
+* If neither the host name nor the user's email address can be determined,
+  no Message-ID fields are generated.
 
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
