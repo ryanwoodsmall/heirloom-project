@@ -4,6 +4,9 @@ Release ...
   historic versions do (Bugreport by Matthew Fischer).
 * od: When the -C option was used with an empty input file, a division by
   zero caused a core dump (Patch by Matthew Fischer).
+* touch: For the SVID versions, the first non-option argument is treated
+  as a time specification if it starts with a digit, regardless of the
+  following characters.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

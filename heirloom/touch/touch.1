@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)touch.1	1.17 (gritter) 1/24/05
-.TH TOUCH 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)touch.1	1.18 (gritter) 2/10/05
+.TH TOUCH 1 "2/10/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 touch \- update file access and modification times
 .SH SYNOPSIS
@@ -42,7 +42,11 @@ If neither the
 nor the
 .B \-t
 option is used to specify a time value
-and the first non-option argument consists of exactly eight or ten digits,
+and the first non-option argument begins with a digit,
+and it consists of exactly eight or ten digits with
+.B /usr/5bin/posix/touch
+and
+.BR /usr/5bin/posix2001/touch ,
 the times of the files are set to the given time.
 .PP
 The meaning of fields in time specifications is as follows:

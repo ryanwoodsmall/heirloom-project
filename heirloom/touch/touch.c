@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)touch_sus.sl	1.18 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)touch_sus.sl	1.19 (gritter) 2/10/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)touch.sl	1.18 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)touch.sl	1.19 (gritter) 2/10/05";
 #endif	/* !SUS */
 
 #include	<sys/types.h>
@@ -278,7 +278,6 @@ usage(void)
 int
 main(int argc, char **argv)
 {
-	char *cp;
 	int i;
 
 #ifdef	__GLIBC__
@@ -320,10 +319,16 @@ main(int argc, char **argv)
 		}
 	}
 	if (nacc == (time_t)-1 && nmod == (time_t)-1 && argv[optind]
+#ifdef	SUS
 			&& argv[optind + 1]) {
+		char	*cp;
 		for (cp = argv[optind]; *cp && isdigit(*cp & 0377); cp++);
 		if (*cp == '\0' && (cp - argv[optind] == 8 ||
 					cp - argv[optind] == 10))
+#else	/* !SUS */
+			) {
+		if (isdigit(argv[optind][0]))
+#endif	/* !SUS */
 			otime(argv[optind++]);
 	}
 	if (nacc == (time_t)-1 && nmod == (time_t)-1 && aflag == 0 &&
@@ -335,8 +340,10 @@ main(int argc, char **argv)
 		nmod = now;
 	if (aflag == 0 && mflag == 0)
 		aflag = mflag = 1;
+#ifdef	SUS
 	if (optind >= argc)
 		usage();
+#endif	/* SUS */
 	for (i = optind; i < argc; i++)
 		touch(argv[i]);
 	return errcnt < 0100 ? errcnt : 077;
