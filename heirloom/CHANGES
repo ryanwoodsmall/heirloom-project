@@ -87,6 +87,8 @@ Release ...
   matched an archive entry but that entry was not selected due to '-u'.
 * pax: If link() fails, no separate copy of an archive entry is created.
 * find: Symbolic modes for -perm that include the sgid bit now work properly.
+* cp: The -f option does not disable the -i option in the POSIX personality
+  and vice-versa.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.71 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.72 (gritter) 2/5/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.71 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.72 (gritter) 2/5/05";
 #endif
 
 #include	<sys/types.h>
@@ -1130,13 +1130,15 @@ main(int argc, char **argv)
 		case 'f':
 			fflag = 1;
 #ifdef	SUS
-			iflag = 0;
+			if (pers == PERS_MV)
+				iflag = 0;
 #endif
 			break;
 		case 'i':
 			iflag = 1;
 #ifdef	SUS
-			fflag = 0;
+			if (pers == PERS_MV)
+				fflag = 0;
 #endif
 			break;
 		case 'n':
