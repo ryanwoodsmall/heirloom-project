@@ -1,0 +1,214 @@
+.\"
+.\" Copyright (c) 1980, 1993
+.\" 	The Regents of the University of California.  All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\" 	This product includes software developed by the University of
+.\" 	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"
+.\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\"   Redistributions of source code and documentation must retain the
+.\"    above copyright notice, this list of conditions and the following
+.\"    disclaimer.
+.\"   Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"   All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"      This product includes software developed or owned by Caldera
+.\"      International, Inc.
+.\"   Neither the name of Caldera International, Inc. nor the names of
+.\"    other contributors may be used to endorse or promote products
+.\"    derived from this software without specific prior written permission.
+.\"
+.\" USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
+.\" INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+.\" BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+.\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+.\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+.\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.\"	Sccsid @(#)mail.1	1.8 (gritter) 1/11/03
+.\"	from binmail.1	6.1 (Berkeley) 4/29/85
+.\"
+.TH MAIL 1 "1/11/03" "Heirloom Toolchest" "User Commands"
+.AT 3
+.SH NAME
+mail \- send or receive mail among users
+.SH SYNOPSIS
+\fBmail\fR [\fB\-epqr\fR] [\fB\-f\fI\ file\fR]
+.br
+\fBmail\fR [\fB\-t\fR] \fIperson\fR ...
+.LP
+.SH DESCRIPTION
+.PP
+.I mail
+with no argument prints a user's mail, message-by-message,
+in last-in, first-out order.
+For each message, it reads a line from the standard input
+to direct disposition of the message.
+.TP
+newline
+Go on to next message.
+.TP
+d
+Delete message and go on to the next.
+.TP
+p
+Print message again.
+.TP
+\-
+Go back to previous message.
+.TP
+s [\fIfile\fR] ...
+Save the message in the named
+.I files
+(`mbox' default).
+.TP
+w [\fIfile\fR] ...
+Save the message, without a header, in the named
+.I files
+(`mbox' default).
+.TP
+m [\fIperson\fR] ...
+Mail the message to the named
+.I persons
+(yourself is default).
+.TP
+EOT (control-D)
+Put unexamined mail back in the mailbox and stop.
+.TP
+q
+Same as EOT.
+.TP
+.RI ! command
+Escape to the Shell to do
+.IR command .
+.TP
+*
+Print a command summary.
+.PP
+When
+.I persons
+are named,
+.I mail
+takes the standard input up to an end-of-file (or a line with just `.')
+and adds it to each
+.I person's
+`mail' file.  The message is preceded by the sender's name and a postmark.
+Lines that look like postmarks are prepended with `>'.  A
+.I person
+is either a user name recognized by
+.IR  login (1),
+an internet address (see
+.IR mailaddr (7),
+or a recipient on a UUCP remote system, with the login name prefixed 
+by the system name and exclamation mark (see
+.IR uucp (1C)).
+.PP
+The
+.B \-e
+option checks for the existence of mail only
+and causes
+.B mail
+to exit successfully if mail is present.
+.PP
+The
+.B \-f
+option causes the named file, for example, `mbox',
+to be printed as if it were the mail file.
+.PP
+The
+.B \-p
+option causes all messages to be printed
+without prompting for disposition.
+.PP
+An interrupt normally terminates the 
+.I mail
+command; the mail file is unchanged.
+The
+.B \-q
+option tells
+.I mail
+to continue after interrupts.
+.PP
+The
+.B \-r
+option displays the mail messages in first-in, first-out order.
+.PP
+The
+.B \-t
+option causes a `To:' header field to be created
+with the names of all recipients.
+.PP
+When a user logs in he is informed of the presence of mail.
+.SH FILES
+.\".ta \w'/var/mail/*.lock 'u
+.TP
+.B /etc/passwd
+to identify sender and locate persons
+.\".li
+.TP
+.B
+/var/mail/*
+incoming mail for user *
+.TP
+.B mbox	
+saved mail
+.TP
+.B /tmp/ma*
+temp file
+.TP
+.B /var/mail/*.lock
+lock for mail directory
+.TP
+.B dead.letter
+unmailable text
+.SH "ENVIRONMENT VARIABLES"
+.TP
+.B MAIL
+User's mail file.
+.SH "SEE ALSO"
+mailx(1),
+write(1),
+uucp(1C),
+uux(1C),
+mailaddr(7),
+sendmail(8)
+.SH NOTES
+Race conditions sometimes result in a failure to remove a lock file.

@@ -1,0 +1,182 @@
+.\"
+.\" Copyright (c) 2003 Gunnar Ritter
+.\"
+.\" This software is provided 'as-is', without any express or implied
+.\" warranty. In no event will the authors be held liable for any damages
+.\" arising from the use of this software.
+.\"
+.\" Permission is granted to anyone to use this software for any purpose,
+.\" including commercial applications, and to alter it and redistribute
+.\" it freely, subject to the following restrictions:
+.\"
+.\" 1. The origin of this software must not be misrepresented; you must not
+.\"    claim that you wrote the original software. If you use this software
+.\"    in a product, an acknowledgment in the product documentation would be
+.\"    appreciated but is not required.
+.\"
+.\" 2. Altered source versions must be plainly marked as such, and must not be
+.\"    misrepresented as being the original software.
+.\"
+.\" 3. This notice may not be removed or altered from any source distribution.
+.\"
+.\" Sccsid @(#)newform.1	1.6 (gritter) 5/10/03
+.TH NEWFORM 1 "5/10/03" "Heirloom Toolchest" "User Commands"
+.SH NAME
+newform \- change the format of a text file
+.SH SYNOPSIS
+.HP
+.ad l
+.nh
+\fBnewform\fR [\fB\-s\fR]
+[\fB\-i\fR[\fItabspec\fR]]
+[\fB\-o\fR[\fItabspec\fR]]
+[\fB\-f\fR]
+[\fB\-p\fR[\fIn\fR]]
+[\fB\-a\fR[\fIn\fR]]
+[\fB\-c\fR[\fIchar\fR]]
+[\fB\-e\fR[\fIn\fR]]
+[\fB\-b\fR[\fIn\fR]]
+[\fB\-l\fR[\fIn\fR]]
+[\fIfile\fR\ ...]
+.br
+.ad b
+.hy 1
+.SH DESCRIPTION
+.I Newform
+reads its input
+.IR files , 
+or standard input if no file argument is present,
+and writes them to standard output
+after changing the format of each line
+as specified by the options.
+.PP
+The order of options is significant;
+.I newform
+performs the conversions on each line
+in the order indicated by the options
+(except for the
+.B \-s
+option).
+The
+.I file
+arguments may appear between options,
+but all options apply to each
+.IR file .
+Each option must be given
+as an argument of its own.
+.PP
+The following options are valid:
+.TP 12
+.B \-s
+Shear characters of the line
+up to the first tabulator character,
+perform all other processing on the remaining characters,
+and append the sheared characters to the end of the line thereafter.
+If more than eight characters precede the first tabulator,
+the eighth character is replaced by a `*'
+and further preceding characters are discarded.
+.TP 12
+\fB\-i\fR[\fItabspec\fR]
+Replace tabulators found in the line by spaces
+according to
+.IR tabspec .
+The format of
+.I tabspec
+is the same as for the
+.IR tabs (1)
+utility;
+thus `\-i\-c2'
+selects tabulators according to the COBOL compact format.
+If
+.I tabspec
+is omitted,
+it defaults to
+.B \-8
+(i.\|e. set a tab stop at every eight positions).
+Backspaces found in the line
+decrease the column count by one.
+.TP 12
+\fB\-o\fR[\fItabspec\fR]
+Replace sequences of one or more spaces by tabulators
+according to
+.I tabspec
+if possible;
+otherwise as described for
+.IR \-i .
+.TP 12
+.B \-f
+Print the last applied output tabulator specification
+(as specified by
+.BR \-o )
+in
+.IR fspec (5)
+format
+before producing output for the first line.
+.TP 12
+\fB\-p\fR[\fIn\fR]
+If the current line is shorter (in characters, not column positions)
+than the width as described for
+.IR \-l ,
+prepend the appropriate number of spaces
+(or of the character previously specified with
+.IR \-c )
+to the characters currently in the line.
+If
+.I n
+is specified,
+prepend
+.I n
+characters to all short lines.
+.TP 12
+\fB\-a\fR[\fIn\fR]
+Append characters to short lines,
+otherwise as described for
+.IR \-p .
+.TP 12
+\fB\-c\fR[\fIchar\fR]
+Set the padding character used with
+.I \-p
+and
+.I \-a
+to
+.IR char .
+The default is the space character.
+.TP 12
+\fB\-b\fR[\fIn\fR]
+If the current line exceeds the width (in characters)
+as described for
+.IR \-l ,
+discard the appropriate number of characters
+to make the line fit,
+or
+.I n
+characters if specified.
+.TP 12
+\fB\-e\fR[\fIn\fR]
+Truncate long lines at the end,
+otherwise as described for
+.IR \-b .
+.TP 12
+\fB\-l\fR[\fIn\fR]
+Set the desired line width to
+.IR n .
+If
+.I n
+is omitted,
+the line width is set to 72;
+if no
+.I \-l
+option was specified,
+the line width defaults to 80.
+.SH "ENVIRONMENT VARIABLES"
+.TP
+.BR LANG ", " LC_ALL
+See
+.IR locale (7).
+.TP
+.B LC_CTYPE
+Determines the mapping of bytes to characters
+and the width of characters.
+.SH "SEE ALSO"
+tabs(1),
+fspec(5)

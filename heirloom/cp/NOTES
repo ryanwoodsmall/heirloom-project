@@ -1,0 +1,46 @@
+Notes for the cp, ln and mv commands
+====================================
+
+Contrasting to the implementations found on most commercial Unix
+systems, this 'mv' preserves hard links inside a moved directory
+tree and can thus safely be used to transfer directories to different
+file systems. Now that the functionality is in the source code anyway,
+it seemed to make sense to provide it with the 'cp' command also. It
+thus provides an undocumented '-d' option that preserves hard links
+when '-r' or '-R' is used instead of creating a different file for
+each link encountered. Since no System V related standard or
+implementation was found that provides this functionality, '-d'
+was chosen to match GNU cp. In GNU cp, however, '-d' also has the
+effect of copying symbolic links instead of following them, which
+is the default in our implementation with '-R' anyway. AT&T cp on
+the other hand uses '-d' to copy symbolic links only and does not
+retain hard links. Thus this option will remain undocumented until
+there is some kind of interoperability consensus; the canonical
+System V method to copy preserving hard links
+
+        find source -depth | cpio -pdmu target
+
+will remain the recommended way with this tool collection for now.
+
+
+If compiled with -DADDONS, cp supports three additional options:
+
+-b number       lets the user select the buffer size. There can be no
+                general recommendation about performance as the best
+                value is highly machine dependent.
+
+-D              uses direct i/o (see O_DIRECT in open(2)). It seems
+                that this method is always much slower than standard
+                copying. As the file data is not read in the operating
+                system cache, it can be used to perform something like
+                a 'nice' copy though, i. e. a slow copy that has least
+                impact on other processes.
+
+-s              prints statistics about each regular file copied.
+
+The -a (copy extended attributes), -t (use realtime section), and -P/-z
+(pad file size) options could also be implemented, but I don't use XFS
+and don't bother about ACLs, so I won't do it. I would accept a patch
+if someone does care, though.
+
+        Gunnar Ritter                                           11/6/04
