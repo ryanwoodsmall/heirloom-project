@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)mapmalloc.c	1.1 (gritter) 2/18/05
+ *	Sccsid @(#)mapmalloc.c	1.2 (gritter) 2/18/05
  */
 
 #ifdef	VMUNIX
@@ -50,14 +50,12 @@
 #define	MAP_FAILED	((void *)-1)
 #endif	/* !MAP_FAILED */
 
-#include "config.h"
+#ifndef	MAP_ANON
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif	/* !MAP_ANON */
 
-#ifdef	LANGMSG
-#include <nl_types.h>
-extern	nl_catd	catd;
-#else
-#define	catgets(a, b, c, d)	(d)
-#endif
+#include "config.h"
 
 /*
  * Since ex makes use of sbrk(), the C library's version of malloc()
@@ -122,6 +120,10 @@ void dump(const char *msg, uintptr_t t)
  *	has a pointer to first
  *	idle blocks are coalesced during space search
  *
+ *	this variant uses mmap() instead of sbrk()
+ *	mmap() is used to allocate pools of increasing size
+ *	memory is then allocated from the first possible pool
+ *
  *	a different implementation may need to redefine
  *	ALIGN, NALIGN, BLOCK, BUSY, INT
  *	where INT is integer type to which a pointer can be cast
@@ -139,8 +141,6 @@ void dump(const char *msg, uintptr_t t)
 #define	testbusy(p)	((INT)(p)&BUSY)
 #define	setbusy(p)	(union store *)((INT)(p)|BUSY)
 #define	clearbusy(p)	(union store *)((INT)(p)&~BUSY)
-
-static	long POOLBLOCK = 32768;
 
 static	struct pool *pool0;
 
@@ -167,23 +167,23 @@ struct pool {
 #define	allocx	(o->Allocx)
 
 static void *
-map(void *addr, long len)
+map(void *addr, size_t len)
 {
 #ifndef	MAP_ANON
-	int	flags = 0;
+	int flags = 0;
 	static int fd = -1;
 
-	if (fd == -1 && ((fd = open("/dev/zero", O_RDWR)) < 0 ||
-				fcntl(fd, F_SETFD, FD_CLOEXEC) < 0))
-		return 0;
+	if (fd==-1&&((fd=open("/dev/zero",O_RDWR))<0||
+			fcntl(fd,F_SETFD,FD_CLOEXEC)<0))
+		return(MAP_FAILED);
 #else	/* MAP_ANON */
-	int	flags = MAP_ANON;
-	int	fd = -1;
+	int flags = MAP_ANON;
+	int fd = -1;
 #endif	/* MAP_ANON */
 	flags |= MAP_PRIVATE;
 	if (addr)
 		flags |= MAP_FIXED;
-	return mmap(addr, len, PROT_READ|PROT_WRITE, flags, fd, 0);
+	return(mmap(addr,len,PROT_READ|PROT_WRITE,flags,fd,0));
 }
 
 void *
@@ -193,19 +193,20 @@ malloc(size_t nbytes)
 	struct pool *o;
 	register int nw;
 	static int temp;	/*coroutines assume no auto*/
+	static size_t poolblock = 32768;
 
 	if (nbytes == 0)
 		nbytes = 1;
 	if(pool0==0||pool0==MAP_FAILED) {	/*first time*/
-		if((pool0 = map(NULL, POOLBLOCK)) == MAP_FAILED) {
+		if((pool0 = map(NULL, poolblock)) == MAP_FAILED) {
 			errno = ENOMEM;
-			return 0;
+			return(NULL);
 		}
 		pool0->Brk = (char *)pool0->Dummy;
-		pool0->End = (char *)pool0 + POOLBLOCK;
+		pool0->End = (char *)pool0 + poolblock;
 	}
 	o = pool0;
-first:	if(allocs[0].ptr==0) {	/*first time*/
+first:	if(allocs[0].ptr==0) {	/*first time for this pool*/
 		allocs[0].ptr = setbusy(&allocs[1]);
 		allocs[1].ptr = setbusy(&allocs[0]);
 		alloct = &allocs[1];
@@ -239,22 +240,22 @@ first:	if(allocs[0].ptr==0) {	/*first time*/
 		q = (void *)o->Brk;
 		if(q+temp+GRANULE < q) {
 			errno = ENOMEM;
-			return(0);
+			return(NULL);
 		}
 		if(o->Brk+temp*WORD>=o->End) {
-			long	new;
-			if (o->Next != 0 && o->Next != MAP_FAILED) {
+			size_t new;
+			if(o->Next!=0&&o->Next!=MAP_FAILED) {
 				o = o->Next;
 				goto first;
 			}
-			POOLBLOCK *= 2;
-			new = (((nw*WORD)+POOLBLOCK)/POOLBLOCK)*POOLBLOCK;
-			if ((o->Next = map(0,new)) == MAP_FAILED) {
-				POOLBLOCK /= 2;
-				new=(((nw*WORD)+POOLBLOCK)/POOLBLOCK)*POOLBLOCK;
-				if ((o->Next = map(0,new)) == MAP_FAILED) {
+			poolblock += poolblock/(poolblock&(poolblock-1) ? 3:2);
+			new = (((nw*WORD)+poolblock)/poolblock)*poolblock;
+			if ((o->Next=map(0,new))==MAP_FAILED) {
+				poolblock /= 4;
+				new=(((nw*WORD)+poolblock)/poolblock)*poolblock;
+				if ((o->Next=map(0,new))==MAP_FAILED) {
 					errno = ENOMEM;
-					return(0);
+					return(NULL);
 				}
 			}
 			o = o->Next;
@@ -319,9 +320,9 @@ realloc(void *ap, size_t nbytes)
 	register size_t nw;
 	size_t onw;
 
-	if (p == NULL)
-		return malloc(nbytes);
-	if (nbytes == 0) {
+	if (p==NULL)
+		return(malloc(nbytes));
+	if (nbytes==0) {
 		free(p);
 		return NULL;
 	}
@@ -378,7 +379,7 @@ calloc(size_t num, size_t size)
 
 	num *= size;
 	mp = malloc(num);
-	if(mp == NULL)
+	if(mp==NULL)
 		return(NULL);
 	q = (INT *) mp;
 	m = (num+CHARPERINT-1)/CHARPERINT;
