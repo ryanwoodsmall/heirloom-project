@@ -46,13 +46,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ls_su3.sl	1.75 (gritter) 3/10/05>";
+static const char sccsid[] USED = "@(#)ls_su3.sl	1.76 (gritter) 3/10/05>";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ls_sus.sl	1.75 (gritter) 3/10/05>";
+static const char sccsid[] USED = "@(#)ls_sus.sl	1.76 (gritter) 3/10/05>";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.75 (gritter) 3/10/05>";
+static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.76 (gritter) 3/10/05>";
 #else
-static const char sccsid[] USED = "@(#)ls.sl	1.75 (gritter) 3/10/05>";
+static const char sccsid[] USED = "@(#)ls.sl	1.76 (gritter) 3/10/05>";
 #endif
 
 /*
@@ -1252,7 +1252,8 @@ print1(struct file *f, int col, int doit)
 			sz = f->size ? f->size : PATH_MAX;
 			buf = salloc(sz + 1);
 			addpath(&didx, f->name);
-			r = readlink(path, buf, sz);
+			if ((r = readlink(path, buf, sz)) < 0)
+				r = 0;
 			delpath(didx);
 			buf[r] = 0;
 			printf(" -> ");
