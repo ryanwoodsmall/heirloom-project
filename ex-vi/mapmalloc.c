@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)mapmalloc.c	1.2 (gritter) 2/18/05
+ *	Sccsid @(#)mapmalloc.c	1.3 (gritter) 2/20/05
  */
 
 #ifdef	VMUNIX
@@ -51,8 +51,12 @@
 #endif	/* !MAP_FAILED */
 
 #ifndef	MAP_ANON
+#ifdef	MAP_ANONYMOUS
+#define	MAP_ANON	MAP_ANONYMOUS
+#else	/* !MAP_ANONYMOUS */
 #include <sys/stat.h>
 #include <fcntl.h>
+#endif	/* !MAP_ANONYMOUS */
 #endif	/* !MAP_ANON */
 
 #include "config.h"
