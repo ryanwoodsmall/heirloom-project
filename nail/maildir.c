@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.15 (gritter) 10/12/04";
+static char sccsid[] = "@(#)maildir.c	1.16 (gritter) 1/20/05";
 #endif
 #endif /* not lint */
 
@@ -485,6 +485,8 @@ move(struct message *m)
 
 	fn = mkname(0, m->m_flag, &m->m_maildir_file[4]);
 	new = savecat("cur/", fn);
+	if (strcmp(m->m_maildir_file, new) == 0)
+		return;
 	if (link(m->m_maildir_file, new) < 0) {
 		fprintf(stderr, "Cannot link \"%s/%s\" to \"%s/%s\": "
 				"message %d not touched.\n",
