@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cut.sl	1.16 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)cut.sl	1.18 (gritter) 2/1/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -174,7 +174,7 @@ setlist(const char *s)
 			n = LONG_MAX;
 			lp = &n;
 			s++;
-		} else if (*s == ',' || *s == ' ' || *s == '\0') {
+		} else if (*s == ',' || *s == ' ' || *s == '\t' || *s == '\0') {
 			if (m)
 				addrange(m, n);
 			mnreset();
@@ -282,7 +282,8 @@ cutf(struct iblok *ip)
 			n = 1;
 		}
 		if (cp == NULL || wc == '\n' || wc == wcdelim) {
-			if (have(i) || (!sflag && i == 1 &&
+			if (have(i) && (gotcha || wc == wcdelim) ||
+					(!sflag && i == 1 &&
 						(cp == NULL || wc == '\n'))) {
 				if (gotcha)
 					for (m = 0; mbdelim[m]; m++)

@@ -22,6 +22,10 @@ Release ...
 * touch: If one of -a or -m but no time specification was given, both
   access and modification time were set to the current time.
 * sed: The length of labels is limited to 8 characters instead of 7 bytes now.
+* cut: If the -s option was specified but the first field was included in the
+  list to the -f option, lines without the delimiter character were printed.
+* cut: The -b, -c, and -f options did not accept the tabulator character as
+  a field specification separator.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
