@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.297 (gritter) 3/4/05
+.\"     Sccsid: @(#)nail.1	2.298 (gritter) 3/17/05
 .\"
-.TH NAIL 1 "3/4/05" "nail 11.22" "User Commands"
+.TH NAIL 1 "3/17/05" "nail 11.22" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -1169,6 +1169,9 @@ The
 and
 .I fwdretain
 commands specify which header fields are included in the new message.
+Only the first part of a multipart message is included unless the
+.I forward-as-attachment
+option is set.
 .TP
 .B Forward
 (Fwd)
@@ -1186,6 +1189,9 @@ piped through the pager if the output does not fit on the screen.
 Specifies which header fields are to be ignored with the
 .I forward
 command.
+This command has no effect when the
+.I forward-as-attachment
+option is set.
 .TP
 .B fwdretain
 Specifies which header fields are to be retained with the
@@ -1194,6 +1200,9 @@ command.
 .I fwdretain
 overrides
 .IR fwdignore .
+This command has no effect when the
+.I forward-as-attachment
+option is set.
 .TP
 .B good
 (go) Takes a list of messages
@@ -2331,6 +2340,13 @@ messages are sent as MIME
 .I message/rfc822
 attachments,
 and all of their parts are included.
+The
+.I fwdignore
+and
+.I fwdretain
+options are ignored when the
+.I forward-as-attachment
+option is set.
 .TP
 .B fullnames
 When replying to a message,
