@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)awk.lx.l	1.9 (gritter) 7/13/04>
+   Sccsid @(#)awk.lx.l	1.10 (gritter) 12/4/04>
  */
 /* UNIX(R) Regular Expression Tools
  
@@ -59,7 +59,7 @@
 /*		copyright	"%c%"	*/
 
 /*	from unixsrc:usr/src/common/cmd/awk/awk.lx.l /main/uw7_nj/1	*/
-/*	from $Header$	*/
+/*	from RCS Header: awk.lx.l 1.2 91/06/25 	*/
 
 /*%Start A str sc reg comment*/
 /*%X A str sc reg comment*/

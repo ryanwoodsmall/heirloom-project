@@ -1,4 +1,4 @@
-SHELL = /bin/sh
+SHELL = /sbin/sh
 
 SUBDIRS = build libwchar libcommon libuxre _install \
 	banner basename bc \

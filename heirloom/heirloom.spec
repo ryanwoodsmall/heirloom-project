@@ -1,9 +1,9 @@
 #
-# Sccsid @(#)heirloom.spec	1.27 (gritter) 10/14/04
+# Sccsid @(#)heirloom.spec	1.28 (gritter) 12/4/04
 #
 Summary: Heirloom Toolchest: A collection of standard Unix utilities
 Name: heirloom
-Version: 041204
+Version: 040306
 Release: 1
 License: Other
 Source: %{name}-%{version}.tar.bz2
