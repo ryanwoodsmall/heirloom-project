@@ -1,4 +1,8 @@
 [11.16] released ...
+* When a header field line that started and ended with a MIME encoded word
+  followed a line that ended with a MIME encoded word, the newline character
+  preceding the next header field was erroneously omitted when a message was
+  displayed since version 11.14.
 * When S/MIME support was built using Mozilla NSS, the verification of an
   encrypted message that had not yet been downloaded from an IMAP or POP3
   server failed at the first attempt.

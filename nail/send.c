@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.68 (gritter) 11/8/04";
+static char sccsid[] = "@(#)send.c	2.69 (gritter) 11/11/04";
 #endif
 #endif /* not lint */
 
@@ -244,6 +244,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 						prefix, prefixlen, stats);
 			break;
 		}
+		isenc = 0;
 		if (infld && blankchar(line[0]&0377)) {
 			/*
 			 * If this line is a continuation (via space or tab)
@@ -255,7 +256,6 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 					cp[0] == '=' && cp[1] == '?')
 				isenc |= 1;
 		} else {
-			isenc = 0;
 			/*
 			 * Pick up the header field if we have one.
 			 */
