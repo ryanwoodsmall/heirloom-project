@@ -19,6 +19,8 @@
   command will advance to the next message as if the current one had been
   printed, as it has been the case with traditional mailx (Bugreport by
   Michael Sipser).
+* Files in maildir folders are now read in the order obtained from
+  readdir().
 
 [11.20] released 1/13/05
 * A 'forward-as-attachment' variable has been introduced. If it is set,

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.16 (gritter) 1/20/05";
+static char sccsid[] = "@(#)maildir.c	1.17 (gritter) 2/16/05";
 #endif
 #endif /* not lint */
 
@@ -171,6 +171,8 @@ maildir_setfile1(const char *name, int newmail, int omsgCount)
 	if ((i = subdir(name, "new", newmail)) != 0)
 		return i;
 	append(name, NULL, NULL);
+	for (i = newmail?omsgCount:0; i < msgCount; i++)
+		readin(name, &message[i]);
 	if (newmail) {
 		if (msgCount > omsgCount)
 			qsort(&message[omsgCount],
@@ -180,8 +182,6 @@ maildir_setfile1(const char *name, int newmail, int omsgCount)
 		if (msgCount)
 			qsort(message, msgCount, sizeof *message, mdcmp);
 	}
-	for (i = newmail?omsgCount:0; i < msgCount; i++)
-		readin(name, &message[i]);
 	return msgCount;
 }
 
