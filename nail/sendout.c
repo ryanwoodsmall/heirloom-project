@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.75 (gritter) 1/6/05";
+static char sccsid[] = "@(#)sendout.c	2.76 (gritter) 1/6/05";
 #endif
 #endif /* not lint */
 
@@ -401,19 +401,16 @@ infix(struct header *hp, FILE *fi, int dosign)
 			&isclean, dosign);
 #ifdef	HAVE_ICONV
 	tcs = gettcharset();
-	if (((isclean & MIME_HASNUL) == 0 && (isclean & MIME_HIGHBIT) &&
-				strcmp(charset, tcs)) ||
-			(convhdr = need_hdrconv(hp,
-				GTO|GSUBJECT|GCC|GBCC|GREPLYTO|GIDENT)) != 0) {
-		if (convhdr)
-			charset = convhdr;
+	if ((convhdr = need_hdrconv(hp,
+				GTO|GSUBJECT|GCC|GBCC|GREPLYTO|GIDENT)) != 0 &&
+			strcmp(convhdr, tcs)) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
-		if ((iconvd = iconv_open_ft(charset, tcs)) == (iconv_t)-1
+		if ((iconvd = iconv_open_ft(convhdr, tcs)) == (iconv_t)-1
 				&& errno != 0) {
 			if (errno == EINVAL)
 				fprintf(stderr, catgets(catd, CATSET, 179,
-			"Cannot convert from %s to %s\n"), tcs, charset);
+			"Cannot convert from %s to %s\n"), tcs, convhdr);
 			else
 				perror("iconv_open");
 			Fclose(nfo);
@@ -439,6 +436,21 @@ infix(struct header *hp, FILE *fi, int dosign)
 	if (convhdr && iconvd != (iconv_t)-1) {
 		iconv_close(iconvd);
 		iconvd = (iconv_t)-1;
+	}
+	if ((isclean & MIME_HASNUL) == 0 && isclean & MIME_HIGHBIT &&
+			strcmp(charset, tcs)) {
+		if (iconvd != (iconv_t)-1)
+			iconv_close(iconvd);
+		if ((iconvd = iconv_open_ft(charset, tcs)) == (iconv_t)-1
+				&& errno != 0) {
+			if (errno == EINVAL)
+				fprintf(stderr, catgets(catd, CATSET, 179,
+			"Cannot convert from %s to %s\n"), tcs, charset);
+			else
+				perror("iconv_open");
+			Fclose(nfo);
+			return NULL;
+		}
 	}
 #endif
 	if (hp->h_attach != NULL) {

@@ -11,6 +11,10 @@
   in its body but not in its header, the characters were replaced by
   question marks and the message was sent, instead of being rejected
   (Bugreport by Suresh Ramasubramanian).
+* When the header of an outgoing message contained a non-ASCII character
+  but the body did not, the name of the international character set was
+  used for declaring the content-type of the body too. Us-ascii is now
+  used for the body in such cases.
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
 
