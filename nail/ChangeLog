@@ -12,6 +12,9 @@
   with '?=' (instead of encoding any words containing '?', '=', or '_'),
   and declare them as 'us-ascii' if they do not contain any bytes with the
   highest bit set (Bugreport by Suresh Ramasubramanian).
+* Fixed a junk mail tokenizer bug which caused the remainder of a message
+  to be ignored if a period occurred at the first position following another
+  token boundary.
 
 [11.18] released 12/9/04
 * When the 'write' command asks for an attachment filename and a '|' is

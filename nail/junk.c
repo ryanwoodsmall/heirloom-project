@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.68 (gritter) 12/27/04";
+static char sccsid[] = "@(#)junk.c	1.69 (gritter) 12/28/04";
 #endif
 #endif /* not lint */
 
@@ -563,8 +563,8 @@ nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 	int	c, i, j, k;
 	char	*cp, *cq;
 
-	*stop = 0;
-loop:	sp->hadamp = 0;
+loop:	*stop = 0;
+	sp->hadamp = 0;
 	if (sp->save) {
 		i = j = 0;
 		for (cp = sp->save; *cp; cp++) {
@@ -726,7 +726,7 @@ loop:	sp->hadamp = 0;
 			for (cq = "://"; *cq; cq++) {
 				SAVE(*cq&0377)
 			}
-		} else if (i > 0 && ((*buf)[i+j-1] == ',' ||
+		} else if (i > 1 && ((*buf)[i+j-1] == ',' ||
 				 (*buf)[i+j-1] == '.') && !digitchar(c)) {
 			i--;
 			ungetc(c, fp);
