@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.74 (gritter) 10/9/04";
+static char sccsid[] = "@(#)aux.c	2.75 (gritter) 10/19/04";
 #endif
 #endif /* not lint */
 
@@ -852,6 +852,7 @@ transflags(struct message *omessage, long omsgCount, int transparent)
 		else
 			nmp++;
 	}
+	dot = newdot;
 	setdot(newdot);
 	prevdot = newprevdot;
 	free(omessage);

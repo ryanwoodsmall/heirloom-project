@@ -11,6 +11,8 @@
   '%25'. (Bugreport by Thomas Wolff.)
 * The system mailbox is now locked using fcntl(2) for reading too (Problem
   reported by Thomas Wolff).
+* When new mail arrives in an IMAP mailbox, the current message is now
+  properly advanced by the 'next' command if it has been printed before.
 
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
