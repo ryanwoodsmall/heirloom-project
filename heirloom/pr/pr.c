@@ -48,9 +48,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)pr_sus.sl	1.27 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)pr_sus.sl	1.28 (gritter) 2/3/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)pr.sl	1.27 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)pr.sl	1.28 (gritter) 2/3/05";
 #endif	/* !SUS */
 
 #include <stdio.h>
@@ -114,7 +114,7 @@ static int	nofile;
 static char	isclosed[10];
 static struct iblok	*ifile[10];
 static const char	**lastarg;
-static wint_t	*peekc;
+static wint_t	*peekc, *peek2c;
 static long long	fpage;
 static long long	page;
 static int	colw;
@@ -266,6 +266,10 @@ main(int argc, char **argv)
 					*av = NULL;
 					ac--;
 				}
+#ifdef	SUS
+				else
+					usage(0);
+#endif	/* SUS */
 				continue;
 
 			case 's':
@@ -327,7 +331,8 @@ main(int argc, char **argv)
 	if ((icol = calloc(NCOL, sizeof *icol)) == NULL ||
 			(scol = calloc(NCOL, sizeof *scol)) == NULL ||
 			(colp = calloc(NCOL, sizeof *colp)) == NULL ||
-			(peekc = calloc(NCOL, sizeof *peekc)) == NULL) {
+			(peekc = calloc(NCOL, sizeof *peekc)) == NULL ||
+			(peek2c = calloc(NCOL, sizeof *peek2c)) == NULL) {
 		free(buffer);
 		fprintf(stderr, "%s: No room for columns.\n", progname);
 		exit(1);
@@ -522,6 +527,8 @@ print(const char *fp, const char **argp)
 	page = 1;
 	for (i = 0; i<NCOL; i++)
 		scol[i] = icol[i] = 0;
+	if (buffer)
+		*buffer = 0;
 	colp[ncol] = buffer;
 	while ((mflg||aflg)&&nofile || (!mflg&&!aflg)&&tpgetc(ncol)!=WEOF) {
 		if (pflg >= 0) {
@@ -594,7 +601,7 @@ putpage(void)
 	register int lastcol, i;
 	register wint_t c = 0;
 	register wint_t *cp;
-	int j, k, l, xplength;
+	int j, k, l, xplength, content;
 
 	if (ncol==0) {
 		while (line<plength) {
@@ -665,13 +672,22 @@ putpage(void)
 	l = 0;
 	k = xplength - line;
 	while (line<xplength) {
+		content = 0;
+		if (mflg && !aflg) {
+			for (i=0; i<=ncol; i++) {
+				c = pgetc(i);
+				peek2c[i] = c;
+				if (c!='\0' && c!='\n')
+					content = i+1;
+			}
+		}
 		l++;
 		lastcol = colw+numwidth;
 		for (i=0; i<oflg; i++)
 			put(' ');
 		for (i=0; i<ncol; i++) {
 			c = pgetc(i);
-			if ((mflg==0||i==0) && nflg.c_u && c!=0) {
+			if ((mflg==0||content&&i==0) && nflg.c_u && c!=0) {
 				cnt++;
 				putnum((aflg||mflg) ? cnt : ocnt + l + k*i);
 			}
@@ -684,6 +700,14 @@ putpage(void)
 				if (aflg || mflg && nofile <= 0)
 					break;
 				continue;
+			}
+			if (aflg) {
+				c = pgetc(i+1);
+				peek2c[i+1] = c;
+				if (c == 0) {
+					put('\n');
+					continue;
+				}
 			}
 			if (tabc)
 				put(tabc);
@@ -796,7 +820,11 @@ pgetc(int ai)
 	int i;
 
 	i = aflg?0:ai;
-	if (peekc[i]) {
+	if (peek2c[ai]) {
+		c = peek2c[ai];
+		peek2c[ai] = 0;
+		return c;
+	} else if (peekc[i]) {
 		c = peekc[i];
 		peekc[i] = 0;
 	} else {
@@ -887,7 +915,7 @@ put(wint_t ac)
 	while(nspace) {
 		if (iflg.c_u && nspace >= (ns=iflg.c_g-(col-nspace)%iflg.c_g)
 #ifdef	SUS
-				&& ns > 1
+				&& (ns > 1 || nspace > 1)
 #endif	/* SUS */
 				) {
 			nspace -= ns;
