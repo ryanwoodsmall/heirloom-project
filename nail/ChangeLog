@@ -1,3 +1,10 @@
+[11.21] released ...
+* The new 'sendcharsets' variable was incorrectly named 'charsets' in
+  nail.rc in the last version. If nail 11.20 was the first version of
+  nail you ever installed, you should correct this by hand since the
+  file is not overwritten by 'make install'. (Bugreport by Matthew
+  Fischer.)
+
 [11.20] released 1/13/05
 * A 'forward-as-attachment' variable has been introduced. If it is set,
   the 'forward' command uses a MIME 'message/rfc822' attachment for the

@@ -3,7 +3,7 @@
 # This file is not overwritten when 'make install' is run in
 # the nail build process again.
 
-# Sccsid @(#)nail.rc	2.8 (gritter) 1/6/05
+# Sccsid @(#)nail.rc	2.9 (gritter) 1/15/05
 
 # Do not forward to mbox by default since this is likely to be
 # irritating for most users today.
@@ -38,7 +38,7 @@ set quote
 
 # Outgoing messages are sent in ISO-8859-1 if all their characters are
 # representable in it, otherwise in UTF-8.
-set charsets=iso-8859-1,utf-8
+set sendcharsets=iso-8859-1,utf-8
 
 # Display sender's real names in header summaries.
 set showname
