@@ -35,7 +35,7 @@ Linux           Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
                 diet libc, uClibc; gcc, Intel C
 Solaris         2.6 and above; Sun C, gcc
 Open UNIX       8.0.0
-FreeBSD         4.9-RELEASE, 5.2.1-RELEASE
+FreeBSD         4.9 and above
 HP-UX           B.11.11, B.11.23
 Tru64 UNIX      4.0G, 5.1B
 NetBSD          1.6
@@ -43,6 +43,8 @@ AIX             5.1
 UNICOS          9.0.2.2
 EP/IX           2.2.1AA; /svr4/bin/cc
 OpenBSD         3.3
+Darwin		6.8
+Mac OS X	10.2 Server
 
 If your system does not appear in this list, just try it out. Whether
 it works or not, you should contact the development list and report the
@@ -141,4 +143,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/2/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/5/04

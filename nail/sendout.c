@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.65 (gritter) 11/3/04";
+static char sccsid[] = "@(#)sendout.c	2.66 (gritter) 11/5/04";
 #endif
 #endif /* not lint */
 
@@ -87,7 +87,7 @@ makeboundary(void)
 	time_t	now;
 
 	time(&now);
-	snprintf(bound, sizeof bound, "=_%lx.%s", now, getrandstring(48));
+	snprintf(bound, sizeof bound, "=_%lx.%s", (long)now, getrandstring(48));
 	send_boundary = bound;
 	return send_boundary;
 }
@@ -917,10 +917,10 @@ message_id(FILE *fo)
 	time(&now);
 	if ((cp = value("hostname")) != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s@%s>\n",
-				now, getrandstring(24), cp);
+				(long)now, getrandstring(24), cp);
 	else if ((cp = skin(myaddr())) != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s%%%s>\n",
-				now, getrandstring(16), cp);
+				(long)now, getrandstring(16), cp);
 }
 
 static const char *weekday_names[] = {

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Sccsid @(#)makeconfig	1.37 (gritter) 11/4/04
+# Sccsid @(#)makeconfig	1.38 (gritter) 11/5/04
 #
 
 tmp=___build$$
@@ -154,6 +154,7 @@ int main(void)
 !
 
 link_check 'for mmap()' '#define HAVE_MMAP' <<\!
+#include <sys/types.h>
 #include <sys/mman.h>
 int main(void)
 {
@@ -163,6 +164,7 @@ int main(void)
 !
 
 link_check 'for mremap()' '#define HAVE_MREMAP' <<\!
+#include <sys/types.h>
 #include <sys/mman.h>
 int main(void)
 {

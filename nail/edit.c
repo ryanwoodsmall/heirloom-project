@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)edit.c	2.20 (gritter) 11/3/04";
+static char sccsid[] = "@(#)edit.c	2.21 (gritter) 11/5/04";
 #endif
 #endif /* not lint */
 
@@ -121,7 +121,8 @@ edit1(int *msgvec, int type)
 		sigint = safe_signal(SIGINT, SIG_IGN);
 		fp = run_editor(fp, mp->m_size, type,
 				(mb.mb_perm & MB_EDIT) == 0 || !wb,
-				NULL, mp, wb ? SEND_MBOX : SEND_TODISP_ALL);
+				NULL, mp, wb ? SEND_MBOX : SEND_TODISP_ALL,
+				sigint);
 		if (fp != NULL) {
 			fseek(mb.mb_otf, 0L, SEEK_END);
 			size = ftell(mb.mb_otf);
@@ -156,7 +157,8 @@ edit1(int *msgvec, int type)
  */
 FILE *
 run_editor(FILE *fp, off_t size, int type, int readonly,
-		struct header *hp, struct message *mp, enum sendaction action)
+		struct header *hp, struct message *mp, enum sendaction action,
+		sighandler_type oldint)
 {
 	FILE *nf = NULL;
 	int t;
@@ -164,6 +166,7 @@ run_editor(FILE *fp, off_t size, int type, int readonly,
 	char *edit;
 	struct stat statb;
 	char *tempEdit;
+	sigset_t	set;
 
 	if ((nf = Ftemp(&tempEdit, "Re", "w", readonly ? 0400 : 0600, 1))
 			== NULL) {
@@ -206,7 +209,9 @@ run_editor(FILE *fp, off_t size, int type, int readonly,
 	nf = NULL;
 	if ((edit = value(type == 'e' ? "EDITOR" : "VISUAL")) == NULL)
 		edit = type == 'e' ? "ed" : "vi";
-	if (run_command(edit, 0, -1, -1, tempEdit, NULL, NULL) < 0) {
+	sigemptyset(&set);
+	if (run_command(edit, oldint != SIG_IGN ? &set : NULL, -1, -1,
+				tempEdit, NULL, NULL) < 0) {
 		unlink(tempEdit);
 		Ftfree(&tempEdit);
 		goto out;
