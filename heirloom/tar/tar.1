@@ -32,8 +32,8 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\" Sccsid @(#)tar.1	1.44 (gritter) 12/5/04
-.TH TAR 1 "12/5/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)tar.1	1.45 (gritter) 1/29/05
+.TH TAR 1 "1/29/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tar \- tape archiver
 .SH SYNOPSIS
@@ -166,7 +166,7 @@ can be used as the head or tail of a filter chain.
 .I Tar
 can also be used to move hierarchies with the command
 .sp
-    cd fromdir; tar cf - . | (cd todir; tar xfp -)
+    cd fromdir; tar cf \- . | (cd todir; tar xfp \-)
 .TP 10
 .B b
 causes
