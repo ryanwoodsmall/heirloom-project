@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.192 (gritter) 9/9/04";
+static char sccsid[] = "@(#)imap.c	1.193 (gritter) 9/14/04";
 #endif
 #endif /* not lint */
 
@@ -1978,7 +1978,7 @@ imap_newmail(autoinc)
 	if (autoinc && had_exists < 0 && had_expunge < 0) {
 		verbose = value("verbose") != NULL;
 		imaplock = 1;
-		imap_noop1(&mb);
+		imap_noop();
 		imaplock = 0;
 	}
 	if (had_exists == msgCount && had_expunge < 0)

@@ -17,6 +17,9 @@
   aborted by '~q' or '~x' or if a send error was detected.
 * If the initial connection setup to an IMAP server is interrupted or if
   authentication fails, folder hooks are no longer executed.
+* If the 'inc'/'newmail' commands were executed on an IMAP connection that
+  was already closed by the server, nail did not catch SIGPIPE properly and
+  was terminated.
 
 [11.6] released 9/7/04
 * An IMAP performance improvement introduced in release 11.5 lead to an
