@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.58 (gritter) 11/1/04";
+static char sccsid[] = "@(#)junk.c	1.59 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -57,6 +57,9 @@ static char sccsid[] = "@(#)junk.c	1.58 (gritter) 11/1/04";
 #define	mmap(a, b, c, d, e, f)	MAP_FAILED
 #define	munmap(a, b)
 #endif	/* !HAVE_MMAP */
+#ifndef	HAVE_MREMAP
+#define	mremap(a, b, c, d)	MAP_FAILED
+#endif	/* !HAVE_MREMAP */
 
 #ifndef	MAP_FAILED
 #define	MAP_FAILED	((void *)-1)
@@ -223,6 +226,7 @@ static void putdb(void);
 static void relsedb(void);
 static FILE *dbfp(enum db db, int rw, int *compressed);
 static char *lookup(unsigned long h1, unsigned long h2, int create);
+static unsigned long grow(unsigned long size);
 static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 		struct lexstat *sp);
 static void add(const char *word, enum entry entry, struct lexstat *sp);
@@ -461,7 +465,7 @@ static char *
 lookup(unsigned long h1, unsigned long h2, int create)
 {
 	char	*n, *lastn = NULL;
-	unsigned long	c, lastc = MAX4, used, size, incr;
+	unsigned long	c, lastc = MAX4, used, size;
 
 	used = getn(&super[OF_super_used]);
 	size = getn(&super[OF_super_size]);
@@ -479,38 +483,8 @@ lookup(unsigned long h1, unsigned long h2, int create)
 	}
 	if (create) {
 		if (used >= size) {
-			incr = size > MAX2 ? MAX2 : size;
-			if (size + incr > MAX4-MAX2) {
-			oflo:	fprintf(stderr,
-					"Junk mail database overflow.\n");
+			if ((size = grow(size)) == 0)
 				return NULL;
-			}
-			if (nodes_mmapped) {
-				void	*onodes;
-
-				if (lseek(fileno(nfp),
-						(size+incr)*SIZEOF_node-1,
-						SEEK_SET) == (off_t)-1 ||
-						write(fileno(nfp),"\0",1) != 1)
-					goto oflo;
-				onodes = nodes;
-				if ((nodes = mmap(NULL, (size+incr)*SIZEOF_node,
-						rw_map!=O_RDONLY ?
-							PROT_READ|PROT_WRITE :
-							PROT_READ,
-						MAP_SHARED, fileno(nfp), 0))
-						== MAP_FAILED)
-					goto oflo;
-				munmap(onodes, nodes_mmapped);
-				nodes_mmapped = (size+incr)*SIZEOF_node;
-			} else {
-				nodes = srealloc(nodes,
-						(size+incr)*SIZEOF_node);
-				memset(&nodes[size*SIZEOF_node], 0,
-						incr*SIZEOF_node);
-			}
-			size += incr;
-			putn(&super[OF_super_size], size);
 			lastn = &nodes[lastc*SIZEOF_node];
 		}
 		n = &nodes[used*SIZEOF_node];
@@ -526,6 +500,44 @@ lookup(unsigned long h1, unsigned long h2, int create)
 		return n;
 	} else
 		return NULL;
+}
+
+static unsigned long
+grow(unsigned long size)
+{
+	unsigned long	incr, newsize;
+	void	*onodes;
+
+	incr = size > MAX2 ? MAX2 : size;
+	newsize = size + incr;
+	if (newsize > MAX4-MAX2) {
+	oflo:	fprintf(stderr, "Junk mail database overflow.\n");
+		return 0;
+	}
+	if (nodes_mmapped) {
+		if (lseek(fileno(nfp), newsize*SIZEOF_node-1, SEEK_SET)
+				== (off_t)-1 || write(fileno(nfp),"\0",1) != 1)
+			goto oflo;
+		onodes = nodes;
+		if ((nodes = mremap(nodes, nodes_mmapped, newsize*SIZEOF_node,
+				MREMAP_MAYMOVE)) == MAP_FAILED) {
+			if ((nodes = mmap(NULL, newsize*SIZEOF_node,
+						rw_map!=O_RDONLY ?
+							PROT_READ|PROT_WRITE :
+							PROT_READ,
+						MAP_SHARED, fileno(nfp), 0))
+					== MAP_FAILED)
+				goto oflo;
+			munmap(onodes, nodes_mmapped);
+		}
+		nodes_mmapped = newsize*SIZEOF_node;
+	} else {
+		nodes = srealloc(nodes, newsize*SIZEOF_node);
+		memset(&nodes[size*SIZEOF_node], 0, incr*SIZEOF_node);
+	}
+	size = newsize;
+	putn(&super[OF_super_size], size);
+	return size;
 }
 
 #define	SAVE(c)	{ \

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.60 (gritter) 11/1/04";
+static char sccsid[] = "@(#)send.c	2.61 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -534,7 +534,7 @@ skip:	switch (ip->m_mimecontent) {
 		convert = CONV_NONE;
 	}
 	if (action == ACT_DECRYPT || action == ACT_NONE)
-		convert = ACT_NONE;
+		convert = CONV_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
 	if (action == ACT_TODISP || action == ACT_TODISP_ALL ||
