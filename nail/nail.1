@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.254 (gritter) 10/19/04
+.\"     Sccsid: @(#)nail.1	2.255 (gritter) 10/19/04
 .\"
 .TH NAIL 1 "10/19/04" "nail 11.12" "User Commands"
 .SH NAME
@@ -1078,9 +1078,9 @@ and
 (POP3 with SSL/TLS encryption).
 If
 .I user
-contains special characters like `/', `@', or `%',
+contains special characters, in particular `/' or `%',
 they must be escaped in URL notation,
-like `%2F', `%40', or `%25'.
+as `%2F' or `%25'.
 The optional
 .I file
 part applies to IMAP only;
