@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.51 (gritter) 12/20/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.52 (gritter) 12/20/04";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.51 (gritter) 12/20/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.52 (gritter) 12/20/04";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1005,7 +1005,7 @@ colb(char *s, char *end)
 static void
 print1(const char *s, const char *end)
 {
-	char	buf[10], *bp;
+	char	buf[200], *bp;
 	w_type	wc;
 	int	m, n;
 
