@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.42 (gritter) 10/2/04";
+static char sccsid[] = "@(#)main.c	2.43 (gritter) 12/2/04";
 #endif	/* DOSCCS */
 #endif /* not lint */
 

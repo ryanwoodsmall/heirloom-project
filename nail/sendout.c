@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.71 (gritter) 12/2/04";
+static char sccsid[] = "@(#)sendout.c	2.72 (gritter) 12/2/04";
 #endif
 #endif /* not lint */
 
@@ -617,7 +617,7 @@ mail(struct name *to, struct name *cc, struct name *bcc,
 	}
 	head.h_attach = attach;
 	head.h_smopts = smopts;
-	mail1(&head, 0, NULL, quotefile, recipient_record, tflag);
+	mail1(&head, 0, NULL, quotefile, recipient_record, 0, tflag);
 	if (subject != NULL)
 		free(out.s);
 	return(0);
@@ -635,7 +635,7 @@ sendmail_internal(void *v, int recipient_record)
 
 	memset(&head, 0, sizeof head);
 	head.h_to = extract(str, GTO|GFULL);
-	mail1(&head, 0, NULL, NULL, recipient_record, 0);
+	mail1(&head, 0, NULL, NULL, recipient_record, 0, 0);
 	return(0);
 }
 
@@ -816,7 +816,7 @@ mightrecord(FILE *fp, struct name *to, int recipient_record)
  */
 enum okay 
 mail1(struct header *hp, int printheaders, struct message *quote,
-		char *quotefile, int recipient_record, int tflag)
+		char *quotefile, int recipient_record, int doprefix, int tflag)
 {
 	struct name *to;
 	FILE *mtf, *nmtf;
@@ -833,7 +833,8 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 	 * Collect user's mail from standard input.
 	 * Get the result as mtf.
 	 */
-	if ((mtf = collect(hp, printheaders, quote, quotefile, tflag)) == NULL)
+	if ((mtf = collect(hp, printheaders, quote, quotefile, doprefix,
+					tflag)) == NULL)
 		return STOP;
 	if (value("interactive") != NULL) {
 		if (((value("bsdcompat") || value("askatend"))

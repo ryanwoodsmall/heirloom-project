@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.282 (gritter) 12/2/04
+.\"     Sccsid: @(#)nail.1	2.284 (gritter) 12/2/04
 .\"
 .TH NAIL 1 "12/2/04" "nail 11.18" "User Commands"
 .SH NAME
@@ -1132,10 +1132,44 @@ and
 .I Replyall
 variables.
 .TP
+.B forward
+(fwd)
+Takes a message and the address of a recipient
+and forwards the message to him.
+The text of the original message is included in the new one,
+with the value of the
+.I fwdheading
+variable printed before.
+The
+.I fwdignore
+and
+.I fwdretain
+commands specify which header fields are included in the new message.
+.TP
+.B Forward
+(Fwd)
+Similar to
+.IR forward ,
+but saves the message in a file named after
+the local part of the recipient's address.
+.TP
 .B from
 (f) Takes a list of messages
 and prints their message headers,
 piped through the pager if the output does not fit on the screen.
+.TP
+.B fwdignore
+Specifies which header fields are to be ignored with the
+.I forward
+command.
+.TP
+.B fwdretain
+Specifies which header fields are to be retained with the
+.I forward
+command.
+.I fwdretain
+overrides
+.IR fwdignore .
 .TP
 .B good
 (go) Takes a list of messages
@@ -1396,6 +1430,14 @@ A return to the Shell is effected,
 unless the rewrite of edit file fails,
 in which case the user can escape
 with the exit command.
+.TP
+.B redirect
+(red) Same as
+.IR resend .
+.TP
+.B Redirect
+(Red) Same as
+.IR Resend .
 .TP
 .B remove
 (rem) Removes the named folders.
@@ -1707,6 +1749,18 @@ as a draft.
 .TP
 .B unflag
 Takes a message list and marks each message as not being `flagged'.
+.TP
+.B unfwdignore
+Removes the header field names
+from the list of ignored fields for the
+.I forward
+command.
+.TP
+.B unfwdretain
+Removes the header field names
+from the list of retained fields for the
+.I forward
+command.
 .TP
 .B ungood
 Takes a message list and undoes the effect of a
@@ -2704,6 +2758,15 @@ either this variable or
 .I hostname
 have to be set
 to get correct Message-ID header fields.
+.TP
+.B fwdheading
+The string to print before the text of a message
+with the
+.I forward
+command.
+Defaults to ``-------- Original Message --------'' if unset.
+If it is set to the empty string,
+no heading is printed.
 .TP
 .B headline
 A format string to use for the header summary,

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.42 (gritter) 11/17/04";
+static char sccsid[] = "@(#)cmd2.c	2.43 (gritter) 12/2/04";
 #endif
 #endif /* not lint */
 
@@ -668,6 +668,22 @@ saveigfield(void *v)
 	return ignore1(list, saveignore, "ignored");
 }
 
+int 
+fwdretfield(void *v)
+{
+	char **list = v;
+
+	return ignore1(list, fwdignore + 1, "retained");
+}
+
+int 
+fwdigfield(void *v)
+{
+	char **list = v;
+
+	return ignore1(list, fwdignore, "ignored");
+}
+
 static int 
 ignore1(char **list, struct ignoretab *tab, char *which)
 {
@@ -760,6 +776,18 @@ int
 unsaveretain(void *v)
 {
 	return unignore1((char **)v, saveignore + 1, "retained");
+}
+
+int 
+unfwdignore(void *v)
+{
+	return unignore1((char **)v, fwdignore, "ignored");
+}
+
+int 
+unfwdretain(void *v)
+{
+	return unignore1((char **)v, fwdignore + 1, "retained");
 }
 
 static void 

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.148 (gritter) 11/7/04
+ *	Sccsid @(#)extern.h	2.150 (gritter) 12/2/04
  */
 
 /* aux.c */
@@ -149,10 +149,14 @@ int retfield(void *v);
 int igfield(void *v);
 int saveretfield(void *v);
 int saveigfield(void *v);
+int fwdretfield(void *v);
+int fwdigfield(void *v);
 int unignore(void *v);
 int unretain(void *v);
 int unsaveignore(void *v);
 int unsaveretain(void *v);
+int unfwdignore(void *v);
+int unfwdretain(void *v);
 /* cmd3.c */
 int shell(void *v);
 int dosh(void *v);
@@ -177,6 +181,8 @@ int cfile(void *v);
 int echo(void *v);
 int Respond(void *v);
 int Followup(void *v);
+int forwardcmd(void *v);
+int Forwardcmd(void *v);
 int ifcmd(void *v);
 int elsecmd(void *v);
 int endifcmd(void *v);
@@ -206,7 +212,7 @@ int crename(void *v);
 struct attachment *edit_attachments(struct attachment *attach);
 struct attachment *add_attachment(struct attachment *attach, const char *file);
 FILE *collect(struct header *hp, int printheaders, struct message *mp,
-		char *quotefile, int tflag);
+		char *quotefile, int doprefix, int tflag);
 void savedeadletter(FILE *fp);
 /* dotlock.c */
 int fcntl_lock(int fd, int type);
@@ -450,7 +456,7 @@ int mail(struct name *to, struct name *cc, struct name *bcc,
 int sendmail(void *v);
 int Sendmail(void *v);
 enum okay mail1(struct header *hp, int printheaders, struct message *quote,
-		char *quotefile, int recipient_record, int tflag);
+		char *quotefile, int recipient_record, int doprefix, int tflag);
 int mkdate(FILE *fo, const char *field);
 int puthead(struct header *hp, FILE *fo, enum gfield w,
 		enum sendaction action, enum conversion convert,

@@ -11,6 +11,15 @@
 * A 'record-resent' variable has been introduced. If it is set, the 'resend'
   and 'Resend' commands save messages to the 'record' folder. (Proposed by
   Bob Tennent.)
+* 'redirect' and 'Redirect' are available as aliases for 'resend' and
+  'Resend', respectively (proposed by Bob Tennent).
+* A 'forward' command has been introduced that behaves more like the
+  forwarding mechanisms of other contemporary mail user agents. Along with
+  it, there are 'fwdignore', 'fwdretain', 'unfwdignore', and 'unfwdretain'
+  commands, and a 'fwdheading' variable. The 'forward' command is probably
+  only useful with a 'fwdretain' command executed before. Such a command is
+  executed by default in /etc/nail.rc for new installations; for other sites,
+  it is recommended that it be added manually.
 
 [11.17] released 11/18/04
 * When the 'write' command was used to save attachments in releases after

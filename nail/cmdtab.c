@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmdtab.c	2.48 (gritter) 11/8/04";
+static char sccsid[] = "@(#)cmdtab.c	2.50 (gritter) 12/2/04";
 #endif
 #endif /* not lint */
 
@@ -116,9 +116,13 @@ const struct cmd cmdtab[] = {
 	{ "respondall",	respondall,	A|R|I|MSGLIST,	0,	MMNDEL },
 	{ "respondsender", respondsender, A|R|I|MSGLIST,0,	MMNDEL },
 	{ "Resend",	Resendcmd,	A|R|STRLIST,	0,	MMNDEL },
+	{ "Redirect",	Resendcmd,	A|R|STRLIST,	0,	MMNDEL },
 	{ "resend",	resendcmd,	A|R|STRLIST,	0,	MMNDEL },
-	{ "Forward",	Resendcmd,	A|R|STRLIST,	0,	MMNDEL },
-	{ "forward",	resendcmd,	A|R|STRLIST,	0,	MMNDEL },
+	{ "redirect",	resendcmd,	A|R|STRLIST,	0,	MMNDEL },
+	{ "Forward",	Forwardcmd,	A|R|STRLIST,	0,	MMNDEL },
+	{ "Fwd",	Forwardcmd,	A|R|STRLIST,	0,	MMNDEL },
+	{ "forward",	forwardcmd,	A|R|STRLIST,	0,	MMNDEL },
+	{ "fwd",	forwardcmd,	A|R|STRLIST,	0,	MMNDEL },
 	{ "edit",	editor,		A|I|MSGLIST,	0,	MMNORM },
 	{ "echo",	echo,		M|ECHOLIST,	0,	1000 },
 	{ "quit",	quitcmd,	NOLIST,		0,	0 },
@@ -195,6 +199,11 @@ const struct cmd cmdtab[] = {
 	{ "Show",	show,		A|MSGLIST,	0,	MMNDEL },
 	{ "seen",	seen,		A|M|MSGLIST,	0,	MMNDEL },
 	{ "Seen",	seen,		A|M|MSGLIST,	0,	MMNDEL },
+	{ "fwdignore",	fwdigfield,	M|RAWLIST,	0,	1000 },
+	{ "fwddiscard",fwdigfield,	M|RAWLIST,	0,	1000 },
+	{ "fwdretain",	fwdretfield,	M|RAWLIST,	0,	1000 },
+	{ "unfwdignore", unfwdignore,	M|RAWLIST,	0,	1000 },
+	{ "unfwdretain", unfwdretain,	M|RAWLIST,	0,	1000 },
 /*	{ "Header",	Header,		STRLIST,	0,	1000 },	*/
 #ifdef	DEBUG_COMMANDS
 	{ "core",	core,		M|NOLIST,	0,	0 },

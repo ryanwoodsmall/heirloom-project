@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.73 (gritter) 11/6/04";
+static char sccsid[] = "@(#)cmd3.c	2.75 (gritter) 12/2/04";
 #endif
 #endif /* not lint */
 
@@ -59,6 +59,7 @@ static void make_ref(struct message *mp, struct header *head);
 static int (*respond_or_Respond(int c))(int *, int);
 static int respond_internal(int *msgvec, int recipient_record);
 static char *reedit(char *subj);
+static char *fwdedit(char *subj);
 static void onpipe(int signo);
 static void asort(char **list);
 static int diction(const void *a, const void *b);
@@ -359,7 +360,7 @@ respond_internal(int *msgvec, int recipient_record)
 		head.h_cc = np;
 	}
 	make_ref(mp, &head);
-	if (mail1(&head, 1, mp, NULL, recipient_record, 0) == OKAY &&
+	if (mail1(&head, 1, mp, NULL, recipient_record, 0, 0) == OKAY &&
 			value("markanswered"))
 		mp->m_flag |= MANSWER|MANSWERED;
 	return(0);
@@ -388,6 +389,93 @@ reedit(char *subj)
 	strcpy(newsubj, "Re: ");
 	strcpy(newsubj + 4, out.s);
 	return newsubj;
+}
+
+/*
+ * Forward a message to a new recipient, in the sense of RFC 2822.
+ */
+static int
+forward1(char *str, int recipient_record)
+{
+	int	*msgvec, f;
+	char	*recipient;
+	struct message	*mp;
+	struct header	head;
+
+	msgvec = salloc((msgCount + 2) * sizeof *msgvec);
+	if ((recipient = laststring(str, &f, 0)) == NULL) {
+		puts(catgets(catd, CATSET, 47, "No recipient specified."));
+		return 1;
+	}
+	if (!f) {
+		*msgvec = first(0, MMNORM);
+		if (*msgvec == 0) {
+			if (inhook)
+				return 0;
+			printf("No messages to forward.\n");
+			return 1;
+		}
+		msgvec[1] = 0;
+	}
+	if (f && getmsglist(str, msgvec, 0) < 0)
+		return 1;
+	if (*msgvec == 0) {
+		if (inhook)
+			return 0;
+		printf("No applicable messages.\n");
+		return 1;
+	}
+	if (msgvec[1] != 0) {
+		printf("Cannot forward multiple messages at once\n");
+		return 1;
+	}
+	mp = &message[*msgvec - 1];
+	touch(mp);
+	setdot(mp);
+	memset(&head, 0, sizeof head);
+	if ((head.h_to = sextract(recipient,
+			GTO | (value("fullnames") ? GFULL : GSKIN))) == NULL)
+		return 1;
+	if ((head.h_subject = hfield("subject", mp)) == NULL)
+		head.h_subject = hfield("subj", mp);
+	head.h_subject = fwdedit(head.h_subject);
+	mail1(&head, 1, mp, NULL, recipient_record, 1, 0);
+	return 0;
+}
+
+/*
+ * Modify the subject we are replying to to begin with Fwd:.
+ */
+static char *
+fwdedit(char *subj)
+{
+	char *newsubj;
+
+	if (subj == NULL || *subj == '\0')
+		return NULL;
+	newsubj = salloc(strlen(subj) + 6);
+	strcpy(newsubj, "Fwd: ");
+	strcpy(&newsubj[5], subj);
+	return newsubj;
+}
+
+/*
+ * The 'forward' command.
+ */
+int
+forwardcmd(void *v)
+{
+	return forward1(v, 0);
+}
+
+/*
+ * Similar to forward, saving the message in a file named after the
+ * first recipient.
+ */
+int
+Forwardcmd(void *v)
+{
+	return forward1(v, 1);
 }
 
 /*
@@ -864,7 +952,7 @@ Respond_internal(int *msgvec, int recipient_record)
 		head.h_subject = hfield("subj", mp);
 	head.h_subject = reedit(head.h_subject);
 	make_ref(mp, &head);
-	if (mail1(&head, 1, mp, NULL, recipient_record, 0) == OKAY &&
+	if (mail1(&head, 1, mp, NULL, recipient_record, 0, 0) == OKAY &&
 			value("markanswered"))
 		mp->m_flag |= MANSWER|MANSWERED;
 	return 0;

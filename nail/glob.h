@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)glob.h	2.21 (gritter) 11/6/04
+ *	Sccsid @(#)glob.h	2.22 (gritter) 12/2/04
  */
 
 /*
@@ -84,6 +84,7 @@ _E struct ignoretab ignore[2];		/* ignored and retained fields
 _E struct ignoretab saveignore[2];	/* ignored and retained fields
 					   on save to folder */
 _E struct ignoretab allignore[2];	/* special, ignore all headers */
+_E struct ignoretab fwdignore[2];	/* fields to ignore for forwarding */
 _E char	**altnames;			/* List of alternate names for user */
 _E int	debug;				/* Debug flag set */
 _E int	scrnwidth;			/* Screen width, or best guess */
