@@ -14,6 +14,9 @@
   last byte just written. Previously, stale data could have remained after
   this point, which was no problem for nail itself, but could make zcat(1)
   fail on the file.
+* In the junk mail database, hashes of 56 bits are now used to represent
+  words. A side-effect is that it is possible to test for occurences of
+  given words with a higher certainty.
 * To take advantage of the changes to the junk mail recognition method,
   you have to delete your junk mail database and have to create it again.
 * The new 'probability' command prints the junk statistics for given words.

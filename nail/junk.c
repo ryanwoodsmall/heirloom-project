@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.53 (gritter) 10/25/04";
+static char sccsid[] = "@(#)junk.c	1.54 (gritter) 10/25/04";
 #endif
 #endif /* not lint */
 
@@ -71,17 +71,10 @@ static char sccsid[] = "@(#)junk.c	1.53 (gritter) 10/25/04";
 
 /*
  * The dictionary consists of two files forming a hash table. The hash
- * consists of the first 32 bits of the result of applying MD5 to the
+ * consists of the first 56 bits of the result of applying MD5 to the
  * input word. This scheme ensures that collisions are unlikely enough
- * to make junk detection work, since the number of actually important
- * words is relatively small. (Experiments indicated that it still
- * worked acceptably even if only 19 bits were used.)
- *
- * On the other hand, using 32 bits makes it nearly impossible to derive
- * reasonably well chosen secret tokens like passwords from the database,
- * since e.g. all six-character ASCII alphanumeric words already map to
- * each possible hash thirteen times. Testing for occurences of randomly
- * chosen tokens will therefore likely not give useful results.
+ * to make junk detection work; according to the birthday paradox, a
+ * 50 % probability for one single collision is reached at 2^28 entries.
  *
  * To make the chain structure independent from input, the MD5 input is
  * xor'ed with a random number. This makes it impossible that someone uses
@@ -93,7 +86,8 @@ static char sccsid[] = "@(#)junk.c	1.53 (gritter) 10/25/04";
 #define	OF_node_next	4	/* bit-negated table index of next node */
 #define	OF_node_good	8	/* number of times this appeared in good msgs */
 #define	OF_node_bad	11	/* number of times this appeared in bad msgs */
-#define	OF_node_prob	14	/* transformed floating-point probability */
+#define	OF_node_prob_O	14	/* table_version<1: precomputed probability */
+#define	OF_node_hash2	14	/* upper 3 bytes of MD5 hash */
 static char	*nodes;
 
 #define	SIZEOF_super	262164
@@ -111,6 +105,7 @@ static char	*super;
  * ---------------
  * 0	Initial version
  * 1	Fixed the mangling; it was ineffective in version 0.
+ *      Hash extended to 56 bits.
  */
 static int	table_version;
 #define	current_table_version	1
@@ -209,17 +204,18 @@ static int	_debug;
 static enum okay getdb(void);
 static void putdb(void);
 static FILE *dbfp(enum db db, int rw, int *compressed);
-static char *lookup(unsigned long hash, int create);
+static char *lookup(unsigned long h1, unsigned long h2, int create);
 static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 		struct lexstat *sp);
 static void add(const char *word, enum entry entry, struct lexstat *sp);
 static enum okay scan(struct message *m, enum entry entry,
 		void (*func)(const char *, enum entry, struct lexstat *));
 static void recompute(void);
+static float getprob(char *n);
 static int insert(int *msgvec, enum entry entry);
 static void clsf(struct message *m);
 static void rate(const char *word, enum entry entry, struct lexstat *sp);
-static unsigned long dbhash(const char *word);
+static void dbhash(const char *word, unsigned long *h1, unsigned long *h2);
 static void mkmangle(void);
 
 static enum okay 
@@ -395,17 +391,19 @@ okay:	ac_free(fn);
 }
 
 static char *
-lookup(unsigned long hash, int create)
+lookup(unsigned long h1, unsigned long h2, int create)
 {
 	char	*n, *lastn = NULL;
 	unsigned long	c, lastc = MAX4, used, size, incr;
 
 	used = getn(&super[OF_super_used]);
 	size = getn(&super[OF_super_size]);
-	c = ~getn(&super[OF_super_bucket + (hash&MAX2)*SIZEOF_entry]);
+	c = ~getn(&super[OF_super_bucket + (h1&MAX2)*SIZEOF_entry]);
 	n = &nodes[c*SIZEOF_node];
 	while (c < used) {
-		if (getn(&n[OF_node_hash]) == hash)
+		if (getn(&n[OF_node_hash]) == h1 &&
+				(table_version < 1 ? 1 :
+				get(&n[OF_node_hash2]) == h2))
 			return n;
 		lastc = c;
 		lastn = n;
@@ -427,11 +425,12 @@ lookup(unsigned long hash, int create)
 			lastn = &nodes[lastc*SIZEOF_node];
 		}
 		n = &nodes[used*SIZEOF_node];
-		putn(&n[OF_node_hash], hash);
+		putn(&n[OF_node_hash], h1);
+		put(&n[OF_node_hash2], h2);
 		if (lastc < used)
 			putn(&lastn[OF_node_next], ~used);
 		else
-			putn(&super[OF_super_bucket + (hash&MAX2)*SIZEOF_entry],
+			putn(&super[OF_super_bucket + (h1&MAX2)*SIZEOF_entry],
 					~used);
 		used++;
 		putn(&super[OF_super_used], used);
@@ -491,12 +490,12 @@ loop:	sp->hadamp = 0;
 	}
 	while (*count > 0 && (c = getc(fp)) != EOF) {
 		(*count)--;
-		if (c == '\0') {
+		if (c == '\0' && table_version >= 1) {
 			sp->loc = HEADER;
 			sp->lastc = '\n';
 			continue;
 		}
-		if (c == '\b') {
+		if (c == '\b' && table_version >= 1) {
 			sp->html = HTML_TEXT;
 			continue;
 		}
@@ -670,11 +669,11 @@ static void
 add(const char *word, enum entry entry, struct lexstat *sp)
 {
 	unsigned	c;
-	unsigned long	h;
+	unsigned long	h1, h2;
 	char	*n;
 
-	h = dbhash(word);
-	if ((n = lookup(h, 1)) != NULL) {
+	dbhash(word, &h1, &h2);
+	if ((n = lookup(h1, h2, 1)) != NULL) {
 		switch (entry) {
 		case GOOD:
 			c = get(&n[OF_node_good]);
@@ -725,16 +724,30 @@ scan(struct message *m, enum entry entry,
 	return OKAY;
 }
 
-static void 
+static void
 recompute(void)
 {
 	unsigned long	used, i;
-	unsigned long	ngood, nbad;
-	unsigned	g, b, p;
+	unsigned	s;
 	char	*n;
-	float	d, BOT, TOP;
+	float	p;
 
 	used = getn(&super[OF_super_used]);
+	for (i = 0; i < used; i++) {
+		n = &nodes[i*SIZEOF_node];
+		p = getprob(n);
+		s = f2s(p);
+		put(&n[OF_node_prob_O], s);
+	}
+}
+
+static float
+getprob(char *n)
+{
+	unsigned long	ngood, nbad;
+	unsigned	g, b;
+	float	p, BOT, TOP;
+
 	ngood = getn(&super[OF_super_ngood]);
 	nbad = getn(&super[OF_super_nbad]);
 	if (ngood + nbad >= 18000) {
@@ -747,27 +760,19 @@ recompute(void)
 		BOT = .01;
 		TOP = .99;
 	}
-	for (i = 0; i < used; i++) {
-		n = &nodes[i*SIZEOF_node];
-		g = get(&n[OF_node_good]) * 2;
-		b = get(&n[OF_node_bad]);
-		if (g + b >= 5) {
-			d = smin(1.0, nbad ? (float)b/nbad : 0.0) /
-				(smin(1.0, ngood ? (float)g/ngood : 0.0) +
-				 smin(1.0, nbad ? (float)b/nbad : 0.0));
-			d = smin(TOP, d);
-			d = smax(BOT, d);
-			p = f2s(d);
-			/*fprintf(stderr,
-				"i=%u g=%u b=%u d=%g p=%u re=%g "
-				"ngood=%lu nbad=%lu\n",
-				i, g, b, d, p, s2f(p), ngood, nbad);*/
-		} else if (g == 0 && b == 0)
-			p = f2s(DFL);
-		else
-			p = 0;
-		put(&n[OF_node_prob], p);
-	}
+	g = get(&n[OF_node_good]) * 2;
+	b = get(&n[OF_node_bad]);
+	if (g + b >= 5) {
+		p = smin(1.0, nbad ? (float)b/nbad : 0.0) /
+			(smin(1.0, ngood ? (float)g/ngood : 0.0) +
+			 smin(1.0, nbad ? (float)b/nbad : 0.0));
+		p = smin(TOP, p);
+		p = smax(BOT, p);
+	} else if (g == 0 && b == 0)
+		p = DFL;
+	else
+		p = 0;
+	return p;
 }
 
 static int 
@@ -808,7 +813,8 @@ insert(int *msgvec, enum entry entry)
 		putn(&super[OF_super_nbad], u);
 		break;
 	}
-	recompute();
+	if (table_version < 1)
+		recompute();
 	putdb();
 	free(super);
 	free(nodes);
@@ -850,7 +856,8 @@ static struct {
 	float	dist;
 	float	prob;
 	char	*word;
-	unsigned long	hash;
+	unsigned long	hash1;
+	unsigned long	hash2;
 	enum loc	loc;
 } best[BEST];
 
@@ -878,10 +885,10 @@ clsf(struct message *m)
 		if (best[i].prob == -1)
 			break;
 		if (verbose)
-			fprintf(stderr, "Probe %2d: \"%s\", hash=%lu "
+			fprintf(stderr, "Probe %2d: \"%s\", hash=%lu:%lu "
 				"prob=%.4g dist=%.4g\n",
 				i+1,
-				best[i].word, best[i].hash,
+				best[i].word, best[i].hash1, best[i].hash2,
 				best[i].prob, best[i].dist);
 		a *= best[i].prob;
 		b *= 1 - best[i].prob;
@@ -900,19 +907,17 @@ static void
 rate(const char *word, enum entry entry, struct lexstat *sp)
 {
 	char	*n;
-	unsigned long	h;
-	unsigned	s;
+	unsigned long	h1, h2;
 	float	p, d;
 	int	i, j;
 
-	h = dbhash(word);
-	if ((n = lookup(h, 0)) != NULL) {
-		s = get(&n[OF_node_prob]);
-		p = s2f(s);
+	dbhash(word, &h1, &h2);
+	if ((n = lookup(h1, h2, 0)) != NULL) {
+		p = getprob(n);
 	} else
 		p = DFL;
 	if (_debug)
-		fprintf(stderr, "h=%lu g=%u b=%u p=%.4g %s\n", h,
+		fprintf(stderr, "h=%lu:%lu g=%u b=%u p=%.4g %s\n", h1, h2,
 				n ? get(&n[OF_node_good]) : 0,
 				n ? get(&n[OF_node_bad]) : 0,
 				p, word);
@@ -921,7 +926,7 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 	d = p >= MID ? p - MID : MID - p;
 	if (d >= best[BEST-1].dist)
 		for (i = 0; i < BEST; i++) {
-			if (h == best[i].hash)
+			if (h1 == best[i].hash1 && h2 == best[i].hash2)
 				break;
 			/*
 			 * This selection prefers words from the end of the
@@ -936,18 +941,18 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 				best[i].dist = d;
 				best[i].prob = p;
 				best[i].word = savestr(word);
-				best[i].hash = h;
+				best[i].hash1 = h1;
+				best[i].hash2 = h2;
 				best[i].loc = sp->loc;
 				break;
 			}
 		}
 }
 
-static unsigned long
-dbhash(const char *word)
+static void
+dbhash(const char *word, unsigned long *h1, unsigned long *h2)
 {
 	unsigned char	digest[16];
-	unsigned long	h;
 	MD5_CTX	ctx;
 
 	MD5Init(&ctx);
@@ -955,10 +960,12 @@ dbhash(const char *word)
 	if (table_version >= 1)
 		MD5Update(&ctx, (unsigned char *)&super[OF_super_mangle], 4);
 	MD5Final(digest, &ctx);
-	h = getn(digest);
-	if (table_version < 1)	/* this did nothing useful, fixed above */
-		h ^= getn(&super[OF_super_mangle]);
-	return h;
+	*h1 = getn(digest);
+	if (table_version < 1) {
+		*h1 ^= getn(&super[OF_super_mangle]);
+		*h2 = 0;
+	} else
+		*h2 = get(&digest[4]);
 }
 
 /*
@@ -994,8 +1001,8 @@ cprobability(void *v)
 {
 	char	**args = v;
 	unsigned long	used, ngood, nbad;
-	unsigned long	h;
-	unsigned	s, g, b;
+	unsigned long	h1, h2;
+	unsigned	g, b;
 	float	p, d;
 	char	*n;
 
@@ -1011,14 +1018,13 @@ cprobability(void *v)
 	printf("Database statistics: words=%lu ngood=%lu nbad=%lu\n",
 			used, ngood, nbad);
 	do {
-		h = dbhash(*args);
-		printf("\"%s\", hash=%lu ", *args, h);
-		if ((n = lookup(h, 0)) != NULL) {
+		dbhash(*args, &h1, &h2);
+		printf("\"%s\", hash=%lu:%lu ", *args, h1, h2);
+		if ((n = lookup(h1, h2, 0)) != NULL) {
 			g = get(&n[OF_node_good]);
 			b = get(&n[OF_node_bad]);
 			printf("good=%u bad=%u ", g, b);
-			s = get(&n[OF_node_prob]);
-			p = s2f(s);
+			p = getprob(n);
 			if (p != 0) {
 				d = p >= MID ? p - MID : MID - p;
 				printf("prob=%.4g dist=%.4g", p, d);
