@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.90 (gritter) 12/25/04";
+static char sccsid[] = "@(#)cmd1.c	2.91 (gritter) 2/12/05";
 #endif
 #endif /* not lint */
 
@@ -1038,6 +1038,10 @@ stouch(void *v)
 		setdot(&message[*ip-1]);
 		dot->m_flag |= MTOUCH;
 		dot->m_flag &= ~MPRESERVE;
+		/*
+		 * POSIX interpretation necessary.
+		 */
+		did_print_dot = 1;
 	}
 	return(0);
 }
@@ -1055,6 +1059,10 @@ mboxit(void *v)
 		setdot(&message[*ip-1]);
 		dot->m_flag |= MTOUCH|MBOX;
 		dot->m_flag &= ~MPRESERVE;
+		/*
+		 * POSIX interpretation necessary.
+		 */
+		did_print_dot = 1;
 	}
 	return(0);
 }

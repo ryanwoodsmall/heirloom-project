@@ -15,6 +15,10 @@
   file is not overwritten by 'make install'. (Bugreport by Matthew
   Fischer.)
 * Mozilla NSS error reports are more detailed now.
+* For the 'touch', 'mbox', 'unread', and 'new' commands, a following 'next'
+  command will advance to the next message as if the current one had been
+  printed, as it has been the case with traditional mailx (Bugreport by
+  Michael Sipser).
 
 [11.20] released 1/13/05
 * A 'forward-as-attachment' variable has been introduced. If it is set,

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.79 (gritter) 1/20/05";
+static char sccsid[] = "@(#)cmd3.c	2.80 (gritter) 2/12/05";
 #endif
 #endif /* not lint */
 
@@ -516,6 +516,9 @@ preserve(void *v)
 		mp->m_flag |= MPRESERVE;
 		mp->m_flag &= ~MBOX;
 		setdot(mp);
+		/*
+		 * This is now Austin Group Request XCU #20.
+		 */
 		did_print_dot = 1;
 	}
 	return(0);
@@ -536,6 +539,10 @@ unread(void *v)
 		dot->m_flag |= MSTATUS;
 		if (mb.mb_type == MB_IMAP || mb.mb_type == MB_CACHE)
 			imap_unread(&message[*ip-1], *ip);
+		/*
+		 * The "unread" command is not part of POSIX mailx.
+		 */
+		did_print_dot = 1;
 	}
 	return(0);
 }
