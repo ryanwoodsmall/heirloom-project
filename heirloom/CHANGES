@@ -1,6 +1,8 @@
 Release ...
 * ls: If the target file name contained in a symbolic link is empty, print
   nothing (instead of "?") with the -l option etc.
+* It is now possible to use hard links at installation. The symbolic links
+  which are used by default are shorter now.
 
 Release 050309
 * find: The -anewer and -cnewer primaries were introduced.

@@ -8,7 +8,9 @@ clean:
 
 MRPROPER = intro.1
 
-install:
+install: links directories
+
+directories:
 	test -d $(ROOT)$(DEFBIN) || mkdir -p $(ROOT)$(DEFBIN)
 	test -d $(ROOT)$(DEFLIB) || mkdir -p $(ROOT)$(DEFLIB)
 	test -d $(ROOT)$(SV3BIN) || mkdir -p $(ROOT)$(SV3BIN)
@@ -24,22 +26,12 @@ install:
 			mkdir -p $(ROOT)$(MANDIR)/man$$i; \
 	done
 	test -d $(ROOT)$(DFLDIR) || mkdir -p $(ROOT)$(DFLDIR)
+
+links:
 	for i in install ; \
 	do \
 		sh build/crossln $(ROOT)$(UCBBIN)/$$i $(ROOT)$(DEFBIN)/$$i $(ROOT); \
 	done
-	sh build/crossln $(ROOT)$(DEFBIN)/oawk $(ROOT)$(SV3BIN)/awk $(ROOT)
-	sh build/crossln $(ROOT)$(S42BIN)/nawk $(ROOT)$(S42BIN)/awk $(ROOT)
-	sh build/crossln $(ROOT)$(SUSBIN)/nawk $(ROOT)$(SUSBIN)/awk $(ROOT)
-	sh build/crossln $(ROOT)$(SU3BIN)/nawk $(ROOT)$(SU3BIN)/awk $(ROOT)
-	rm -f $(ROOT)$(MANDIR)/man1/awk.1
-	if test $(DEFBIN) = $(S42BIN) -o $(DEFBIN) = $(SUSBIN) \
-		-o $(DEFBIN) = $(SU3BIN) ; \
-	then \
-		sh build/crossln $(ROOT)$(MANDIR)/man1/nawk.1 $(ROOT)$(MANDIR)/man1/awk.1 $(ROOT); \
-	else \
-		sh build/crossln $(ROOT)$(MANDIR)/man1/oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 $(ROOT); \
-	fi
 	for i in basename chmod cp date du file id ln mkdir mv nohup pr ps rm rmdir sort touch tr wc who; \
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SU3BIN)/$$i $(ROOT); \
@@ -66,4 +58,16 @@ install:
 	done
 	sh build/crossln $(ROOT)$(SV3BIN)/more $(ROOT)$(UCBBIN)/more $(ROOT)
 	sh build/crossln $(ROOT)$(DEFSBIN)/catman $(ROOT)$(UCBBIN)/catman $(ROOT)
+	sh build/crossln $(ROOT)$(DEFBIN)/oawk $(ROOT)$(SV3BIN)/awk $(ROOT)
+	sh build/crossln $(ROOT)$(S42BIN)/nawk $(ROOT)$(S42BIN)/awk $(ROOT)
+	sh build/crossln $(ROOT)$(SUSBIN)/nawk $(ROOT)$(SUSBIN)/awk $(ROOT)
+	sh build/crossln $(ROOT)$(SU3BIN)/nawk $(ROOT)$(SU3BIN)/awk $(ROOT)
+	rm -f $(ROOT)$(MANDIR)/man1/awk.1
+	if test $(DEFBIN) = $(S42BIN) -o $(DEFBIN) = $(SUSBIN) \
+		-o $(DEFBIN) = $(SU3BIN) ; \
+	then \
+		sh build/crossln $(ROOT)$(MANDIR)/man1/nawk.1 $(ROOT)$(MANDIR)/man1/awk.1 $(ROOT); \
+	else \
+		sh build/crossln $(ROOT)$(MANDIR)/man1/oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 $(ROOT); \
+	fi
 	$(SHELL) build/maninst -c -m 644 intro.1 $(ROOT)$(MANDIR)/man1/intro.1

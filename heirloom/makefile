@@ -32,11 +32,12 @@ makefiles: Makefile $(SUBDIRS:=/Makefile)
 Makefile $(SUBDIRS:=/Makefile): build/mk.head build/mk.config build/mk.tail
 
 install:
-	$(MAKE) -f Makefile install
+	$(MAKE) -f Makefile directories
 	+ for i in $(SUBDIRS) ;\
 	do	\
 		(cd "$$i" && $(MAKE) $@) || exit ; \
 	done
+	$(MAKE) -f Makefile links
 
 mrproper:
 	rm -f .foo .FOO Makefile
