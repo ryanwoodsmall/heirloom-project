@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.33 (gritter) 10/3/04";
+static char sccsid[] = "@(#)junk.c	1.34 (gritter) 10/3/04";
 #endif
 #endif /* not lint */
 
@@ -383,7 +383,8 @@ lookup(unsigned long hash, int create)
 #define	SAVE(c)	{ \
 	if (i+j >= (long)*bufsize-4) \
 		*buf = srealloc(*buf, *bufsize += 32); \
-	(*buf)[j+i++] = (c); \
+	(*buf)[j+i] = (c); \
+	i += (*buf)[j+i] != '\0'; \
 }
 
 static char *
