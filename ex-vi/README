@@ -98,11 +98,11 @@ It has been tested on xterm patch #192, rxvt-unicode 4.2, mlterm 2.9.1, and
 xiterm 0.5.
 
 Successful operation is known for the following encodings: UTF-8, EUC-JP,
-EUC-KR, Big5, Big5-HKSCS, GBK. vi does not support locking-shift encodings
-like those that use ISO 2022 escape sequences. It also requires that the
-first byte of any multibyte character has the highest bit set. This excludes
-7-bit encodings like UTF-7, and encodings whose sequences start with ASCII
-characters like TCVN 5712.
+EUC-KR, Big5, Big5-HKSCS, GB 2312, GBK. vi does not support locking-shift
+encodings like those that use ISO 2022 escape sequences. It also requires
+that the first byte of any multibyte character has the highest bit set.
+This excludes 7-bit encodings like UTF-7, and encodings whose sequences
+start with ASCII characters like TCVN 5712.
 
 To use UTF-8 locales in ex mode, the terminal should be put in 'stty iutf8'
 mode on Linux if it does not perform this automatically. Otherwise, typing
