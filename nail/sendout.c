@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.60 (gritter) 10/21/04";
+static char sccsid[] = "@(#)sendout.c	2.61 (gritter) 10/21/04";
 #endif
 #endif /* not lint */
 
@@ -1058,7 +1058,7 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
-		} else {
+		} else if (*hp->h_subject) {
 			if (mime_write(hp->h_subject, sizeof *hp->h_subject,
 					strlen(hp->h_subject),
 					fo, convert == CONV_TODISP ?

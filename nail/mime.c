@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.35 (gritter) 10/21/04";
+static char sccsid[]  = "@(#)mime.c	2.36 (gritter) 10/21/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -1229,8 +1229,15 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				wbeg++;
 				col++;
 			}
-			if (wbeg == upper)
+			if (wbeg == upper) {
+				if (lastspc)
+					while (lastspc < wbeg) {
+						putc(*lastspc&0377, fo);
+							lastspc++,
+							sz++;
+						}
 				break;
+			}
 			mustquote = 0;
 			for (wend = wbeg;
 				wend < upper && !whitechar(*wend & 0377);

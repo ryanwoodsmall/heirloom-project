@@ -17,6 +17,7 @@
   properly advanced by the 'next' command if it has been printed before.
 * If neither the host name nor the user's email address can be determined,
   no Message-ID fields are generated.
+* The empty string is now accepted as a message subject for sending.
 
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
