@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.9 (gritter) 9/27/04";
+static char sccsid[] = "@(#)junk.c	1.12 (gritter) 9/27/04";
 #endif
 #endif /* not lint */
 
@@ -63,6 +63,7 @@ static char sccsid[] = "@(#)junk.c	1.9 (gritter) 9/27/04";
 #define	SHIFT	12
 #define	MASK	((1<<(31-SHIFT))-1)
 #define	SIZE	(MASK+1)
+#define	STATS	4
 
 #define	BOT	.01
 #define	TOP	.99
@@ -87,23 +88,17 @@ struct element {
 
 #define	s2f(s)	((float)(s) / 0xffffU)
 
-struct statistics {
-	char	head[128];
-	char	ngood[4];
-	char	nbad[4];
-};
-
 #define	getn(p)	\
-	((unsigned long)((p)[0]&0377) + \
-	 ((unsigned long)((p)[1]&0377) << 8) + \
-	 ((unsigned long)((p)[2]&0377) << 16) + \
-	 ((unsigned long)((p)[3]&0377) << 24))
+	((unsigned long)(((char *)(p))[0]&0377) + \
+	 ((unsigned long)(((char *)(p))[1]&0377) << 8) + \
+	 ((unsigned long)(((char *)(p))[2]&0377) << 16) + \
+	 ((unsigned long)(((char *)(p))[3]&0377) << 24))
 
 #define	putn(p, n) \
-	((p)[0] = (n) & 0x000000ffUL, \
-	 (p)[1] = ((n) & 0x0000ff00UL) >> 8, \
-	 (p)[2] = ((n) & 0x00ff0000UL) >> 16, \
-	 (p)[3] = ((n) & 0xff000000UL) >> 24)
+	(((char *)(p))[0] = (n) & 0x000000ffUL, \
+	 ((char *)(p))[1] = ((n) & 0x0000ff00UL) >> 8, \
+	 ((char *)(p))[2] = ((n) & 0x00ff0000UL) >> 16, \
+	 ((char *)(p))[3] = ((n) & 0xff000000UL) >> 24)
 
 struct lexstat {
 	int	price;
@@ -124,8 +119,7 @@ struct lexstat {
 enum db {
 	GOOD = 0,
 	BAD  = 1,
-	PROB = 2,
-	STAT = 3
+	PROB = 2
 };
 
 static int	verbose;
@@ -133,16 +127,13 @@ static int	verbose;
 static int	insert __P((int *, enum db));
 static struct element	*getdb __P((enum db));
 static void	putdb __P((enum db, struct element *));
-static struct statistics	*getst __P((void));
-static void	putst __P((struct statistics *));
 static FILE	*dbfp __P((enum db, int));
 static enum okay	scan __P((struct message *, struct element *,
 	void (*) __P((const char *, struct element *))));
 static void	add __P((const char *, struct element *));
 static char	*nextword __P((char **, size_t *, size_t *,
 			FILE *, struct lexstat *));
-static void	recompute __P((struct element *, struct element *,
-			unsigned long, unsigned long));
+static void	recompute __P((struct element *, struct element *));
 static void	clsf __P((struct message *, struct element *));
 static void	rate __P((const char *, struct element *));
 static unsigned	dbhash __P((const char *));
@@ -159,11 +150,12 @@ getdb(db)
 		return NULL;
 	if (fp)
 		zp = zalloc(fp);
-	table = smalloc(SIZE * sizeof *table);
-	if (fp == NULL || zread(zp, (char *)table, SIZE * sizeof *table) !=
-			SIZE * sizeof *table ||
+	table = smalloc(SIZE * sizeof *table + STATS);
+	if (fp == NULL || zread(zp, (char *)table,
+				SIZE * sizeof *table + STATS) !=
+			SIZE * sizeof *table + STATS ||
 			ferror(fp))
-		memset(table, 0, sizeof *table * SIZE);
+		memset(table, 0, sizeof *table * SIZE + STATS);
 	if (zp)
 		zfree(zp);
 	if (fp)
@@ -184,45 +176,9 @@ putdb(db, table)
 		return;
 	zp = zalloc(fp);
 	saveint = safe_signal(SIGINT, SIG_IGN);
-	zwrite(zp, (char *)table, SIZE * sizeof *table);
+	zwrite(zp, (char *)table, SIZE * sizeof *table + STATS);
 	safe_signal(SIGINT, saveint);
 	zfree(zp);
-	Fclose(fp);
-}
-
-static struct statistics *
-getst()
-{
-	FILE	*fp;
-	struct statistics	*sp;
-
-	if ((fp = dbfp(STAT, 0)) == (FILE *)-1)
-		return NULL;
-	sp = smalloc(sizeof *sp);
-	if (fp == NULL || fread(sp, sizeof *sp, 1, fp) != 1)
-		memset(sp, 0, sizeof *sp);
-	if (fp)
-		Fclose(fp);
-	return sp;
-}
-
-static void
-putst(sp)
-	struct statistics	*sp;
-{
-	FILE	*fp;
-	time_t	now;
-	sighandler_type	saveint;
-
-	if ((fp = dbfp(STAT, 1)) == NULL || fp == (FILE *)-1)
-		return;
-	time(&now);
-	snprintf(sp->head, sizeof sp->head,
-			"Junk mail database last updated by %s on %s",
-			version, ctime(&now));
-	saveint = safe_signal(SIGINT, SIG_IGN);
-	fwrite(sp, sizeof *sp, 1, fp);
-	safe_signal(SIGINT, saveint);
 	Fclose(fp);
 }
 
@@ -235,7 +191,7 @@ dbfp(db, rw)
 	char	*dir, *fn;
 	struct flock	flp;
 	const char *const	sf[] = {
-		"good.Z", "bad.Z", "prob.Z", "stat.bin"
+		"good.Z", "bad.Z", "prob.Z"
 	};
 	int	n;
 
@@ -288,10 +244,8 @@ nextword(buf, bufsize, count, fp, sp)
 		pfx:	pfx++;
 		} while (*pfx);
 		pfx = NULL;
-		j = i+1;
-		i = -1;
-		c = '*';
-		goto put;
+		j = i;
+		i = 0;
 	}
 	if (sp->price) {
 		sp->price = 0;
@@ -305,7 +259,7 @@ nextword(buf, bufsize, count, fp, sp)
 		if (sp->inbody == 0 && sp->lastc == '\n') {
 			if (!spacechar(c)) {
 				k = 0;
-				while (k < sizeof sp->field - 2) {
+				while (k < sizeof sp->field - 3) {
 					sp->field[k++] = c;
 					sp->lastc = c;
 					if (*count <= 0 ||
@@ -317,6 +271,7 @@ nextword(buf, bufsize, count, fp, sp)
 					}
 					(*count)--;
 				}
+				sp->field[k++] = '*';
 				sp->field[k] = '\0';
 				j = 0;
 				goto field;
@@ -401,19 +356,20 @@ scan(m, table, func)
 }
 
 static void
-recompute(good, bad, ngood, nbad)
+recompute(good, bad)
 	struct element	*good, *bad;
-	unsigned long	ngood, nbad;
 {
 	struct element	*prob;
-	struct statistics	*sp;
+	unsigned long	ngood, nbad;
 	unsigned	g, b, n, p;
 	float	d;
 
 	if (good == NULL && (good = getdb(GOOD)) == NULL ||
 			bad == NULL && (bad = getdb(BAD)) == NULL)
 		return;
-	prob = scalloc(sizeof *prob, SIZE);
+	ngood = getn(&good[SIZE]);
+	nbad = getn(&bad[SIZE]);
+	prob = scalloc(sizeof *prob, SIZE + STATS);
 	for (n = 0; n < SIZE; n++) {
 		g = get(&good[n]) * 2;
 		b = get(&bad[n]);
@@ -434,15 +390,10 @@ recompute(good, bad, ngood, nbad)
 			p = 0;
 		put(&prob[n], p);
 	}
-	sp = scalloc(1, sizeof *sp);
-	putn(sp->ngood, ngood);
-	putn(sp->nbad, nbad);
 	putdb(PROB, prob);
-	putst(sp);
 	free(good);
 	free(bad);
 	free(prob);
-	free(sp);
 }
 
 static int
@@ -452,30 +403,24 @@ insert(msgvec, db)
 {
 	struct element	*table;
 	int	*ip;
-	unsigned long	ngood, nbad;
-	struct statistics	*sp;
+	unsigned long	n;
 
 	verbose = value("verbose") != NULL;
-	if ((table = getdb(db)) == NULL || (sp = getst()) == NULL)
+	if ((table = getdb(db)) == NULL)
 		return 1;
-	ngood = getn(sp->ngood);
-	nbad = getn(sp->nbad);
-	free(sp);
+	n = getn(&table[SIZE]);
 	for (ip = msgvec; *ip; ip++) {
 		if (db == GOOD)
 			message[*ip-1].m_flag &= ~MJUNK;
 		else
 			message[*ip-1].m_flag |= MJUNK;
-		if (scan(&message[*ip-1], table, add) == OKAY) {
-			if (db == GOOD && ngood < 0xffffffffUL)
-				ngood++;
-			else if (nbad < 0xffffffffUL)
-				nbad++;
-		}
+		if (scan(&message[*ip-1], table, add) == OKAY)
+			if (n < 0xffffffffUL)
+				n++;
 	}
+	putn(&table[SIZE], n);
 	putdb(db, table);
-	recompute(db == GOOD ? table : NULL, db == BAD ? table : NULL,
-			ngood, nbad);
+	recompute(db == GOOD ? table : NULL, db == BAD ? table : NULL);
 	return 0;
 }
 
@@ -543,8 +488,8 @@ clsf(m, table)
 		if (best[i].prob == -1)
 			break;
 		if (verbose)
-			fprintf(stderr, "Probe %d: \"%s\", hash=%u, "
-				"probability=%g, distance=%g\n",
+			fprintf(stderr, "Probe %2d: \"%s\", hash=%u "
+				"prob=%g dist=%g\n",
 				i+1,
 				best[i].word, best[i].hash,
 				best[i].prob, best[i].dist);
