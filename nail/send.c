@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.79 (gritter) 1/3/05";
+static char sccsid[] = "@(#)send.c	2.80 (gritter) 1/26/05";
 #endif
 #endif /* not lint */
 
@@ -605,10 +605,10 @@ skip:	switch (ip->m_mimecontent) {
 	if ((action == SEND_TODISP || action == SEND_TODISP_ALL ||
 			action == SEND_QUOTE || action == SEND_QUOTE_ALL) &&
 			pipecmd != NULL) {
-		action = SEND_TOFILE;
 		qbuf = obuf;
 		pbuf = getpipefile(pipecmd, &qbuf,
 			action == SEND_QUOTE || action == SEND_QUOTE_ALL);
+		action = SEND_TOFILE;
 		if (pbuf != qbuf) {
 			oldpipe = safe_signal(SIGPIPE, onpipe);
 			if (sigsetjmp(pipejmp, 1))
@@ -633,7 +633,8 @@ skip:	switch (ip->m_mimecontent) {
 			free(line2);
 		}
 		out(line, linelen, pbuf, convert, action,
-				prefix, prefixlen,
+				pbuf == origobuf ? prefix : NULL,
+				pbuf == origobuf ? prefixlen : 0,
 				pbuf == origobuf ? stats : NULL);
 		if (ferror(pbuf)) {
 			rt = -1;

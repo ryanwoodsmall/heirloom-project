@@ -1,6 +1,9 @@
 [11.21] released ...
 * When mail is sent using SMTP, 'Bcc:' fields are not passed to the
   server anymore (Bugreport by Matthew Fischer.)
+* When replying to a message part for which a 'pipe-type/subtype'
+  variable was set, quotes were inserted in the text sent to the pipe
+  instead of in the output received from it.
 * A message that is already marked as answered is not marked again if
   it is replied to and the 'markanswered' variable is set.
 * Nail no longer generates an error if renaming a message in a maildir
