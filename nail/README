@@ -31,20 +31,22 @@ today, but are still being kept for compatibility.
 Nail has been built successfully in the following environments using
 the current configuration system:
 
-Linux           Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
-                diet libc, uClibc; gcc, Intel C
-Solaris         2.6 and above; Sun C, gcc
-Open UNIX       8.0.0
-FreeBSD         4.9 and above
-HP-UX           B.11.11, B.11.23
-Tru64 UNIX      4.0G, 5.1B
-NetBSD          1.6
-AIX             5.1
-UNICOS          9.0.2.2
-EP/IX           2.2.1AA; /svr4/bin/cc
-OpenBSD         3.3
-Darwin		6.8
-Mac OS X	10.2 Server
+Linux               Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
+                    diet libc, uClibc; gcc, Intel C
+Sun Solaris         2.6 and above; Sun C, gcc
+Open UNIX           8.0.0
+FreeBSD             4.9 and above
+HP HP-UX            B.11.11, B.11.23
+Digital/HP          Tru64 UNIX 4.0G, 5.1B
+NetBSD              1.6
+IBM AIX             5.1
+Cray UNICOS         9.0.2.2
+Control Data EP/IX  2.2.1AA; /svr4/bin/cc
+OpenBSD             3.3
+Apple Darwin        6.8
+Apple Mac OS X      10.2 Server
+NEC UX/4800         Release11.5 Rev.A
+NEC SUPER-UX        10.2
 
 If your system does not appear in this list, just try it out. Whether
 it works or not, you should contact the development list and report the
@@ -143,4 +145,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/5/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/6/04

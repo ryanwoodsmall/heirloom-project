@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.143 (gritter) 11/6/04
+ *	Sccsid @(#)extern.h	2.144 (gritter) 11/6/04
  */
 
 /* aux.c */
@@ -170,7 +170,7 @@ int set(void *v);
 int unset(void *v);
 int group(void *v);
 int ungroup(void *v);
-int file(void *v);
+int cfile(void *v);
 int echo(void *v);
 int Respond(void *v);
 int Followup(void *v);

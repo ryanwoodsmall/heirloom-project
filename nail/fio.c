@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.67 (gritter) 10/19/04";
+static char sccsid[] = "@(#)fio.c	2.68 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -1078,7 +1078,7 @@ sopen(const char *xserver, struct sock *sp, int use_ssl,
 	freeaddrinfo(res0);
 #else	/* !HAVE_IPv6_FUNCS */
 	if (port == 0) {
-		if ((ep = getservbyname(portstr, "tcp")) == NULL) {
+		if ((ep = getservbyname((char *)portstr, "tcp")) == NULL) {
 			if (equal(portstr, "smtp"))
 				port = htons(25);
 			else if (equal(portstr, "smtps"))

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.70 (gritter) 10/23/04";
+static char sccsid[] = "@(#)cmd3.c	2.71 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -695,7 +695,7 @@ diction(const void *a, const void *b)
  * the current file.
  */
 int 
-file(void *v)
+cfile(void *v)
 {
 	char **argv = v;
 
