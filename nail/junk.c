@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.30 (gritter) 10/2/04";
+static char sccsid[] = "@(#)junk.c	1.31 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -338,8 +338,8 @@ okay:	ac_free(fn);
 static struct node *
 lookup(unsigned long hash, int create)
 {
-	struct node	*n;
-	unsigned long	c, used, size, incr;
+	struct node	*n, *lastn = NULL;
+	unsigned long	c, lastc = MAX4, used, size, incr;
 
 	used = getn(super->used);
 	size = getn(super->size);
@@ -348,6 +348,8 @@ lookup(unsigned long hash, int create)
 	while (c < used) {
 		if (getn(n->hash) == hash)
 			return n;
+		lastc = c;
+		lastn = n;
 		c = ~getn(n->next);
 		n = &nodes[c];
 	}
@@ -366,9 +368,10 @@ lookup(unsigned long hash, int create)
 		}
 		n = &nodes[used];
 		putn(n->hash, hash);
-		c = ~getn(super->bucket[hash & MAX2]);
-		putn(n->next, ~c);
-		putn(super->bucket[hash & MAX2], ~used);
+		if (lastc < used)
+			putn(lastn->next, ~used);
+		else
+			putn(super->bucket[hash & MAX2], ~used);
 		used++;
 		putn(super->used, used);
 		return n;
