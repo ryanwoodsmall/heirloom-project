@@ -1,7 +1,9 @@
 Release ...
 * find: The -anewer and -cnewer primaries were introduced.
 * ps: The /usr/ucb version now uses eight columns for the USER field as the
-  historic versions do (Bugreport by by Matthew Fischer).
+  historic versions do (Bugreport by Matthew Fischer).
+* od: When the -C option was used with an empty input file, a division by
+  zero caused a core dump (Patch by Matthew Fischer).
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

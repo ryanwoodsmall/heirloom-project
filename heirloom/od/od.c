@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)od_sus.sl	1.24 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)od_sus.sl	1.25 (gritter) 2/10/05";
 #else
-static const char sccsid[] USED = "@(#)od.sl	1.24 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)od.sl	1.25 (gritter) 2/10/05";
 #endif
 
 #include	<unistd.h>
@@ -595,7 +595,7 @@ format(struct type *tp, struct buffer *b1, struct buffer *b2)
 			}
 		}
 	}
-	if (Cflag) {
+	if (Cflag && b1->bu_cnt > 0) {
 		static int	max;
 		int	c;
 		if (max == 0)
