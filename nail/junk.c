@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.22 (gritter) 10/1/04";
+static char sccsid[] = "@(#)junk.c	1.23 (gritter) 10/1/04";
 #endif
 #endif /* not lint */
 
@@ -114,9 +114,13 @@ static struct super {
 
 struct lexstat {
 	int	price;
-	int	inbody;
 	int	url;
 	int	lastc;
+	enum {
+		FROM_LINE	= 0,
+		HEADER		= 1,
+		BODY		= 2
+	} loc;
 	char	field[LINESIZE];
 };
 
@@ -346,9 +350,17 @@ nextword(buf, bufsize, count, fp, sp)
 	int	c, i, j, k;
 	char	*cp, *cq;
 
+	if (sp->loc == FROM_LINE)
+		while (*count > 0 && (c = getc(fp)) != EOF) {
+			sp->lastc = c;
+			if (c == '\n') {
+				sp->loc = HEADER;
+				break;
+			}
+		}
 loop:	i = 0;
 	j = 0;
-	if (sp->inbody == 0 && sp->field[0]) {
+	if (sp->loc == HEADER && sp->field[0]) {
 	field:	cp = sp->field;
 		do {
 			c = *cp&0377;
@@ -366,7 +378,7 @@ loop:	i = 0;
 		(*count)--;
 		if (c == '$' && i == 0)
 			sp->price = 1;
-		if (sp->inbody == 0 && sp->lastc == '\n') {
+		if (sp->loc == HEADER && sp->lastc == '\n') {
 			if (!spacechar(c)) {
 				k = 0;
 				while (k < sizeof sp->field - 3) {
@@ -387,7 +399,7 @@ loop:	i = 0;
 				goto field;
 			} else if (c == '\n') {
 				j = 0;
-				sp->inbody = 1;
+				sp->loc = BODY;
 			}
 		}
 		sp->lastc = c;
@@ -398,7 +410,7 @@ loop:	i = 0;
 			}
 			SAVE(c)
 		} else if (constituent(c, *buf, i+j, sp->price) ||
-				sp->inbody == 0 && c == '.' &&
+				sp->loc == HEADER && c == '.' &&
 				asccasecmp(sp->field, "subject*")) {
 			SAVE(c)
 		} else if (i > 0 && c == ':' && *count > 2) {
@@ -457,7 +469,7 @@ loop:	i = 0;
 			}
 		if (c == i)
 			goto loop;
-		if (sp->inbody == 0 &&
+		if (sp->loc == HEADER &&
 				(asccasecmp(sp->field, "message-id*") == 0 ||
 				 asccasecmp(sp->field, "references*") == 0 ||
 				 asccasecmp(sp->field, "in-reply-to*") == 0 ||
