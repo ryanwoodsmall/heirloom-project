@@ -118,8 +118,8 @@ freebsd:
 	XO5FL= XO6FL= GNUFL= YACC=yacc
 
 netbsd:
-	$(MAKE) LKVM=-lkvm \
-	XO5FL= XO6FL= GNUFL= YACC=yacc LCURS=-ltermcap CPPFLAGS=-D_USE_TERMCAP
+	$(MAKE) LKVM=-lkvm WERROR= \
+	XO5FL= XO6FL= GNUFL= YACC=yacc LCURS=-ltermcap CPPFLAGS=-DUSE_TERMCAP
 
 pie:
 	$(MAKE) \
