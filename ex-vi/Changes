@@ -17,7 +17,8 @@ Release ...
 * The argument to the -w option is correctly recognized now.
 * If the SHELL environment variable is set to the empty string, it is now
   ignored.
-* A non-null exit status is now returned if a file could not be opened.
+* A non-null exit status is now returned if a file could not be opened, or
+  if an invalid address is given for a command.
 * If the match for a substitution is of length zero, a line overflow is
   now avoided when compiled with the 'UNIX(R) Regular Expression Library'.
 * When moving left while the cursor is positioned over a multicolumn
@@ -30,6 +31,8 @@ Release ...
   processed first, i.e. the command is executed at the position where
   the tag was found.
 * The -w option now also sets the scroll size for the 'z' command.
+* When the name of a nonexisting file is given with the 'edit' ex command,
+  the command now succeeds and prints a "[New file]" message.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now

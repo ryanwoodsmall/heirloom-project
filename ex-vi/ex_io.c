@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_io.c	1.38 (gritter) 2/13/05";
+static char sccsid[] = "@(#)ex_io.c	1.39 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -421,8 +421,11 @@ rop(int c)
 			 * If the user just did "ex foo" he is probably
 			 * creating a new file.  Don't be an error, since
 			 * this is ugly, and it screws up the + option.
+			 *
+			 * POSIX.2 specifies that this be done for all
+			 * "edit" commands, not just for the first one.
 			 */
-			if (!seenprompt) {
+			if (1 || !seenprompt) {
 				printf(catgets(catd, 1, 90, " [New file]"));
 				noonl();
 				return;

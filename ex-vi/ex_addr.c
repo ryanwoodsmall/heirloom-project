@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_addr.c	1.9 (gritter) 11/23/04";
+static char sccsid[] = "@(#)ex_addr.c	1.10 (gritter) 2/17/05";
 #endif
 #endif /* not lint */
 
@@ -123,6 +123,7 @@ setdot1(void)
 		addr1 = addr2 = dot;
 	if (addr1 > addr2) {
 		notempty();
+		failed = 1;
 		error(catgets(catd, 1, 6,
 			"Addr1 > addr2|First address exceeds second"));
 	}
@@ -197,9 +198,11 @@ void
 setnoaddr(void)
 {
 
-	if (addr2 != 0)
+	if (addr2 != 0) {
+		failed = 1;
 		error(catgets(catd, 1, 8,
 				"No address allowed@on this command"));
+	}
 }
 
 /*
@@ -366,12 +369,16 @@ error(catgets(catd, 1, 11, "No match to TOP|Address search hit TOP without match
 			if (addr != zero)
 				notempty();
 			addr += lastsign;
-			if (addr < zero)
+			if (addr < zero) {
+				failed = 1;
 				error(catgets(catd, 1, 15,
 				"Negative address@- first buffer line is 1"));
-			if (addr > dol)
+			}
+			if (addr > dol) {
+				failed = 1;
 				error(catgets(catd, 1, 16,
 					"Not that many lines@in buffer"));
+			}
 			return (addr);
 		}
 	}
