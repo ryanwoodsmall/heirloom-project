@@ -7,7 +7,7 @@
  */
 
 /*	from Unix 7th Edition and Unix 32V sed	*/
-/*	Sccsid @(#)sed.h	1.30 (gritter) 7/24/04	*/
+/*	Sccsid @(#)sed.h	1.31 (gritter) 2/1/05	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -164,7 +164,7 @@ struct	reptr {
 extern struct	reptr *ptrspace;
 
 struct label {
-	char	asc[9];
+	char	asc[8*MB_LEN_MAX + 1];
 	int	chain;
 	int	address;
 };

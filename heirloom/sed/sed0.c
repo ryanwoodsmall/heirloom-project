@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed0.c	1.60 (gritter) 1/31/05>	*/
+/*	Sccsid @(#)sed0.c	1.62 (gritter) 2/1/05>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -331,7 +331,8 @@ swit:
 
 				tp = L(lab)->asc;
 				while((*tp++ = *cp++))
-					if(tp >= &(L(lab)->asc[8]))
+					if(tp >= &(L(lab)->asc[sizeof
+								L(lab)->asc]))
 						fatal(LTL, linebuf);
 				*--tp = '\0';
 
@@ -412,7 +413,8 @@ jtcommon:
 				}
 				tp = L(lab)->asc;
 				while((*tp++ = *cp++))
-					if(tp >= &(L(lab)->asc[8]))
+					if(tp >= &(L(lab)->asc[sizeof
+								L(lab)->asc]))
 						fatal(LTL, linebuf);
 				cp--;
 				*--tp = '\0';
