@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.39 (gritter) 1/11/05";
+static char sccsid[] = "@(#)ex_vput.c	1.40 (gritter) 1/11/05";
 #endif
 #endif
 
@@ -587,6 +587,7 @@ vinschar(int c)
 	char	*OIM;
 	bool	OXN;
 
+	insmc1 = colsc(c) - 1;
 	if ((!IM || !EI) && ((hold & HOLDQIK) || !value(REDRAW) || value(SLOWOPEN))) {
 		int	(*OO)() = Outchar;
 		/*
@@ -606,6 +607,8 @@ vinschar(int c)
 		Outchar = NULL;
 		vputchar(c);
 		Outchar = OO;
+		if (insmc1 == 0 && (vtube0[destcol]&(TRIM|MULTICOL))==MULTICOL)
+			vtube0[destcol] = INVBIT;
 		if (DEPTH(vcline) * WCOLS + !value(REDRAW) >
 		    (destline - LINE(vcline)) * WCOLS + destcol)
 			return c;
@@ -630,7 +633,6 @@ vinschar(int c)
 		}
 		return c;
 	}
-	insmc1 = colsc(c) - 1;
 	/*
 	 * Compute the number of positions in the line image of the
 	 * current line.  This is done from the physical image
@@ -1080,12 +1082,13 @@ viin(int c)
 		 *
 		 * You asked for it, you get it.
 		 */
-		tp = vtube0 + inscol + doomed;
-		for (i = inscol + doomed; i < tabstart; i++)
+		tp = vtube0 + inscol + insmc0 + doomed;
+		for (i = inscol + insmc0 + doomed; i < tabstart; i++)
 			vputchar(*tp++);
 		hold = oldhold;
-		vigotoCL(tabstart + inssiz - doomed);
-		for (i = tabsize - (inssiz - doomed) + shft; i > 0; i--)
+		vigotoCL(tabstart + inssiz + insmc0 - doomed);
+		for (i = tabsize - (inssiz - insmc0 - doomed) + shft;
+				i > 0; i--)
 			vputchar(' ' | QUOTE);
 	} else {
 		if (!IN) {
