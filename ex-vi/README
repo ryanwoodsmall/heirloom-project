@@ -90,7 +90,7 @@ The multibyte code is known to work on the following systems:
 
 Linux		glibc 2.2.2 and later
 Sun Solaris	9 and later
-HP HP-UX	B.11.23
+HP HP-UX	B.11.11 and later
 FreeBSD		5.3
 NetBSD		2.0
 
@@ -110,7 +110,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						1/22/05
+Gunnar Ritter						1/29/05
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>
