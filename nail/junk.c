@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.12 (gritter) 9/27/04";
+static char sccsid[] = "@(#)junk.c	1.15 (gritter) 9/30/04";
 #endif
 #endif /* not lint */
 
@@ -60,33 +60,44 @@ static char sccsid[] = "@(#)junk.c	1.12 (gritter) 9/27/04";
  * Bayesian Filtering", January 2003, <http://www.paulgraham.com/better.html>.
  */
 
-#define	SHIFT	12
-#define	MASK	((1<<(31-SHIFT))-1)
-#define	SIZE	(MASK+1)
-#define	STATS	4
-
 #define	BOT	.01
 #define	TOP	.99
 #define	DFL	.40
 #define	THR	.9
 #define	MID	.5
 
-struct element {
-	char	c[2];
-};
+static struct node {
+	char	hash[4];
+	char	next[4];
+	char	good[3];
+	char	bad[3];
+	char	prob[3];
+} *nodes;
+
+static struct super {
+	char	size[4];
+	char	used[4];
+	char	ngood[4];
+	char	nbad[4];
+	char	bucket[65536][4];
+} *super;
 
 #define	get(e)	\
-	((unsigned)((e)->c[0]&0377) + ((unsigned)((e)->c[1]&0377) << 8))
+	((unsigned)(((char *)(e))[0]&0377) + \
+	 ((unsigned)(((char *)(e))[1]&0377) << 8) + \
+	 ((unsigned)(((char *)(e))[2]&0377) << 16))
 
 #define	put(e, n) \
-	((e)->c[0] = (n) & 0x00ff, (e)->c[1] = ((n) & 0xff00) >> 8)
+	(((char *)(e))[0] = (n) & 0x0000ff, \
+	 ((char *)(e))[1] = ((n) & 0x00ff00) >> 8, \
+	 ((char *)(e))[2] = ((n) & 0xff0000) >> 16)
 
 #define	smin(a, b)	((a) < (b) ? (a) : (b))
 #define	smax(a, b)	((a) < (b) ? (b) : (a))
 
-#define	f2s(d)	(smin(((unsigned)((d) * 0xffffU)), 0xffffU))
+#define	f2s(d)	(smin(((unsigned)((d) * 0xffffffU)), 0xffffffU))
 
-#define	s2f(s)	((float)(s) / 0xffffU)
+#define	s2f(s)	((float)(s) / 0xffffffU)
 
 #define	getn(p)	\
 	((unsigned long)(((char *)(p))[0]&0377) + \
@@ -114,72 +125,108 @@ struct lexstat {
 		(((c) == '.' || (c) == ',') && \
 		 (i) > 0 && digitchar((b)[(i)-1]&0377)))
 
-#define	DBHEAD	4096
-
 enum db {
+	SUPER = 0,
+	NODES = 1
+};
+
+enum entry {
 	GOOD = 0,
-	BAD  = 1,
-	PROB = 2
+	BAD  = 1
 };
 
 static int	verbose;
 
-static int	insert __P((int *, enum db));
-static struct element	*getdb __P((enum db));
-static void	putdb __P((enum db, struct element *));
+static int	insert __P((int *, enum entry));
+static enum okay	getdb __P((void));
+static void	putdb __P((void));
 static FILE	*dbfp __P((enum db, int));
-static enum okay	scan __P((struct message *, struct element *,
-	void (*) __P((const char *, struct element *))));
-static void	add __P((const char *, struct element *));
+static enum okay	scan __P((struct message *, enum entry,
+	void (*) __P((const char *, enum entry))));
+static void	add __P((const char *, enum entry));
 static char	*nextword __P((char **, size_t *, size_t *,
 			FILE *, struct lexstat *));
-static void	recompute __P((struct element *, struct element *));
-static void	clsf __P((struct message *, struct element *));
-static void	rate __P((const char *, struct element *));
-static unsigned	dbhash __P((const char *));
+static void	recompute __P((void));
+static void	clsf __P((struct message *));
+static void	rate __P((const char *, enum entry));
+static unsigned	long	dbhash __P((const char *));
+static struct node	*lookup __P((unsigned long, int));
 
-static struct element *
-getdb(db)
-	enum db	db;
+static enum okay
+getdb()
 {
-	FILE	*fp;
-	struct element	*table;
+	FILE	*sfp, *nfp;
 	void	*zp = NULL;
+	long	n;
 
-	if ((fp = dbfp(db, 0)) == (FILE *)-1)
-		return NULL;
-	if (fp)
-		zp = zalloc(fp);
-	table = smalloc(SIZE * sizeof *table + STATS);
-	if (fp == NULL || zread(zp, (char *)table,
-				SIZE * sizeof *table + STATS) !=
-			SIZE * sizeof *table + STATS ||
-			ferror(fp))
-		memset(table, 0, sizeof *table * SIZE + STATS);
-	if (zp)
+	if ((sfp = dbfp(SUPER, 0)) == (FILE *)-1)
+		return STOP;
+	super = smalloc(sizeof *super);
+	if (sfp) {
+		zp = zalloc(sfp);
+		if (zread(zp, (char *)super, sizeof *super)
+				!= sizeof *super ||
+				ferror(sfp)) {
+			fprintf(stderr, "Error reading junk mail database.\n");
+			memset(super, 0, sizeof *super);
+			zfree(zp);
+			Fclose(sfp);
+			sfp = NULL;
+		} else
+			zfree(zp);
+	} else
+		memset(super, 0, sizeof *super);
+	if ((n = getn(super->size)) == 0) {
+		n = 1;
+		putn(super->size, 1);
+	}
+	nodes = smalloc(n * sizeof *nodes);
+	if (sfp && (nfp = dbfp(NODES, 0)) != NULL) {
+		if (nfp == (FILE *)-1) {
+			Fclose(sfp);
+			free(super);
+			free(nodes);
+			return STOP;
+		}
+		zp = zalloc(nfp);
+		if (zread(zp, (char *)nodes, n * sizeof *nodes)
+				!= n * sizeof *nodes ||
+				ferror(nfp)) {
+			fprintf(stderr, "Error reading junk mail database.\n");
+			memset(nodes, 0, n * sizeof *nodes);
+			memset(super, 0, sizeof *super);
+			putn(super->size, n);
+		}
 		zfree(zp);
-	if (fp)
-		Fclose(fp);
-	return table;
+		Fclose(nfp);
+	} else
+		memset(nodes, 0, n * sizeof *nodes);
+	if (sfp)
+		Fclose(sfp);
+	return OKAY;
 }
 
 static void
-putdb(db, table)
-	enum db	db;
-	struct element	*table;
+putdb()
 {
-	FILE	*fp;
+	FILE	*sfp, *nfp;
 	sighandler_type	saveint;
 	void	*zp;
 
-	if ((fp = dbfp(db, 1)) == NULL || fp == (FILE *)-1)
+	if ((sfp = dbfp(SUPER, 1)) == NULL || sfp == (FILE *)-1)
 		return;
-	zp = zalloc(fp);
+	if ((nfp = dbfp(NODES, 1)) == NULL || nfp == (FILE *)-1)
+		return;
 	saveint = safe_signal(SIGINT, SIG_IGN);
-	zwrite(zp, (char *)table, SIZE * sizeof *table + STATS);
-	safe_signal(SIGINT, saveint);
+	zp = zalloc(sfp);
+	zwrite(zp, (char *)super, sizeof *super);
 	zfree(zp);
-	Fclose(fp);
+	zp = zalloc(nfp);
+	zwrite(zp, (char *)nodes, getn(super->size) * sizeof *nodes);
+	zfree(zp);
+	safe_signal(SIGINT, saveint);
+	Fclose(sfp);
+	Fclose(nfp);
 }
 
 static FILE *
@@ -191,7 +238,7 @@ dbfp(db, rw)
 	char	*dir, *fn;
 	struct flock	flp;
 	const char *const	sf[] = {
-		"good.Z", "bad.Z", "prob.Z"
+		"super.Z", "nodes.Z"
 	};
 	int	n;
 
@@ -226,6 +273,44 @@ dbfp(db, rw)
 	return fp;
 }
 
+static struct node *
+lookup(hash, create)
+	unsigned long	hash;
+	int	create;
+{
+	struct node	*n;
+	unsigned long	c, used, size, incr;
+
+	used = getn(super->used);
+	size = getn(super->size);
+	c = ~getn(super->bucket[hash & 0xffff]);
+	n = &nodes[c];
+	while (c < used) {
+		if (getn(n->hash) == hash)
+			return n;
+		c = ~getn(n->next);
+		n = &nodes[c];
+	}
+	if (create) {
+		if (used >= size) {
+			incr = size > 0xffff ? 0xffff : size;
+			nodes = srealloc(nodes, (size+incr) * sizeof *nodes);
+			memset(&nodes[size], 0, incr * sizeof *nodes);
+			size += incr;
+			putn(super->size, size);
+		}
+		n = &nodes[used];
+		putn(n->hash, hash);
+		c = ~getn(super->bucket[hash & 0xffff]);
+		putn(n->next, ~c);
+		putn(super->bucket[hash & 0xffff], ~used);
+		used++;
+		putn(super->used, used);
+		return n;
+	} else
+		return NULL;
+}
+
 static char *
 nextword(buf, bufsize, count, fp, sp)
 	char	**buf;
@@ -233,9 +318,12 @@ nextword(buf, bufsize, count, fp, sp)
 	FILE	*fp;
 	struct lexstat	*sp;
 {
-	int	c, i = 0, j = 0, k;
-	char	*pfx = NULL;
+	int	c, i, j, k;
+	char	*pfx;
 
+loop:	i = 0;
+	j = 0;
+	pfx = NULL;
 	if (sp->inbody == 0 && sp->field[0]) {
 	field:	pfx = sp->field;
 		do {
@@ -303,30 +391,63 @@ nextword(buf, bufsize, count, fp, sp)
 	}
 	if (i > 0) {
 		(*buf)[i+j] = '\0';
+		c = 0;
+		for (k = 0; k < i; k++)
+			if (digitchar((*buf)[k+j]&0377))
+				c++;
+			else if (!alphachar((*buf)[k+j]&0377) &&
+					(*buf)[k+j] != '$') {
+				c = 0;
+				break;
+			}
+		if (c == i)
+			goto loop;
+		if (sp->inbody == 0 &&
+				(asccasecmp(sp->field, "message-id*") == 0 ||
+				 asccasecmp(sp->field, "references*") == 0 ||
+				 asccasecmp(sp->field, "received*") == 0 &&
+				 	2*c > i))
+			goto loop;
 		return *buf;
 	}
 	return NULL;
 }
 
 static void
-add(word, table)
+add(word, entry)
 	const char	*word;
-	struct element	*table;
+	enum entry	entry;
 {
-	unsigned	h, n;
+	unsigned	c;
+	unsigned long	h;
+	struct node	*n;
 
 	h = dbhash(word);
-	n = get(&table[h]);
-	if (n < 0xffff)
-		n++;
-	put(&table[h], n);
+	if ((n = lookup(h, 1)) != NULL) {
+		switch (entry) {
+		case GOOD:
+			c = get(n->good);
+			if (c < 0xffffff) {
+				c++;
+				put(n->good, c);
+			}
+			break;
+		case BAD:
+			c = get(n->bad);
+			if (c < 0xffffff) {
+				c++;
+				put(n->bad, c);
+			}
+			break;
+		}
+	}
 }
 
 static enum okay
-scan(m, table, func)
+scan(m, entry, func)
 	struct message	*m;
-	struct element	*table;
-	void	(*func) __P((const char *, struct element *));
+	enum entry	entry;
+	void	(*func) __P((const char *, enum entry));
 {
 	FILE	*fp;
 	char	*buf = NULL, *cp;
@@ -348,7 +469,7 @@ scan(m, table, func)
 	sp = scalloc(1, sizeof *sp);
 	count = fsize(fp);
 	while (nextword(&buf, &bufsize, &count, fp, sp) != NULL)
-		(*func)(buf, table);
+		(*func)(buf, entry);
 	free(buf);
 	free(sp);
 	Fclose(fp);
@@ -356,23 +477,21 @@ scan(m, table, func)
 }
 
 static void
-recompute(good, bad)
-	struct element	*good, *bad;
+recompute()
 {
-	struct element	*prob;
+	unsigned long	used, i;
 	unsigned long	ngood, nbad;
-	unsigned	g, b, n, p;
+	unsigned	g, b, p;
+	struct node	*n;
 	float	d;
 
-	if (good == NULL && (good = getdb(GOOD)) == NULL ||
-			bad == NULL && (bad = getdb(BAD)) == NULL)
-		return;
-	ngood = getn(&good[SIZE]);
-	nbad = getn(&bad[SIZE]);
-	prob = scalloc(sizeof *prob, SIZE + STATS);
-	for (n = 0; n < SIZE; n++) {
-		g = get(&good[n]) * 2;
-		b = get(&bad[n]);
+	used = getn(super->used);
+	ngood = getn(super->ngood);
+	nbad = getn(super->nbad);
+	for (i = 0; i < used; i++) {
+		n = &nodes[i];
+		g = get(n->good) * 2;
+		b = get(n->bad);
 		if (g + b >= 5) {
 			d = smin(1.0, nbad ? (float)b/nbad : 0.0) /
 				(smin(1.0, ngood ? (float)g/ngood : 0.0) +
@@ -381,46 +500,56 @@ recompute(good, bad)
 			d = smax(BOT, d);
 			p = f2s(d);
 			/*fprintf(stderr,
-				"n=%u g=%u b=%u d=%g p=%u re=%g "
+				"i=%u g=%u b=%u d=%g p=%u re=%g "
 				"ngood=%lu nbad=%lu\n",
-				n, g, b, d, p, s2f(p), ngood, nbad);*/
+				i, g, b, d, p, s2f(p), ngood, nbad);*/
 		} else if (g == 0 && b == 0)
 			p = f2s(DFL);
 		else
 			p = 0;
-		put(&prob[n], p);
+		put(n->prob, p);
 	}
-	putdb(PROB, prob);
-	free(good);
-	free(bad);
-	free(prob);
 }
 
 static int
-insert(msgvec, db)
+insert(msgvec, entry)
 	int	*msgvec;
-	enum db	db;
+	enum entry	entry;
 {
-	struct element	*table;
 	int	*ip;
-	unsigned long	n;
+	unsigned long	u = 0;
 
 	verbose = value("verbose") != NULL;
-	if ((table = getdb(db)) == NULL)
+	if (getdb() != OKAY)
 		return 1;
-	n = getn(&table[SIZE]);
+	switch (entry) {
+	case GOOD:
+		u = getn(super->ngood);
+		break;
+	case BAD:
+		u = getn(super->nbad);
+		break;
+	}
 	for (ip = msgvec; *ip; ip++) {
-		if (db == GOOD)
+		if (entry == GOOD)
 			message[*ip-1].m_flag &= ~MJUNK;
 		else
 			message[*ip-1].m_flag |= MJUNK;
-		if (scan(&message[*ip-1], table, add) == OKAY)
-			if (n < 0xffffffffUL)
-				n++;
+		scan(&message[*ip-1], entry, add);
+		u++;
 	}
-	putn(&table[SIZE], n);
-	putdb(db, table);
-	recompute(db == GOOD ? table : NULL, db == BAD ? table : NULL);
+	switch (entry) {
+	case GOOD:
+		putn(super->ngood, u);
+		break;
+	case BAD:
+		putn(super->nbad, u);
+		break;
+	}
+	recompute();
+	putdb();
+	free(super);
+	free(nodes);
 	return 0;
 }
 
@@ -443,14 +572,14 @@ cclassify(v)
 	void	*v;
 {
 	int	*msgvec = v, *ip;
-	struct element	*table;
 
 	verbose = value("verbose") != NULL;
-	if ((table = getdb(PROB)) == NULL)
+	if (getdb() != OKAY)
 		return 1;
 	for (ip = msgvec; *ip; ip++)
-		clsf(&message[*ip-1], table);
-	free(table);
+		clsf(&message[*ip-1]);
+	free(super);
+	free(nodes);
 	return 0;
 }
 
@@ -463,9 +592,8 @@ static struct {
 } best[BEST];
 
 static void
-clsf(m, table)
+clsf(m)
 	struct message	*m;
-	struct element	*table;
 {
 	int	i;
 	float	a = 1, b = 1, r;
@@ -476,7 +604,7 @@ clsf(m, table)
 		best[i].dist = 0;
 		best[i].prob = -1;
 	}
-	if (scan(m, table, rate) != OKAY)
+	if (scan(m, -1, rate) != OKAY)
 		return;
 	if (best[0].prob == -1) {
 		if (verbose)
@@ -506,18 +634,24 @@ clsf(m, table)
 		m->m_flag &= ~MJUNK;
 }
 
+/*ARGSUSED2*/
 static void
-rate(word, table)
+rate(word, entry)
 	const char	*word;
-	struct element	*table;
+	enum entry	entry;
 {
-	unsigned	h, s;
+	struct node	*n;
+	unsigned long	h;
+	unsigned	s;
 	float	p, d;
 	int	i, j;
 
 	h = dbhash(word);
-	s = get(&table[h]);
-	p = s2f(s);
+	if ((n = lookup(h, 0)) != NULL) {
+		s = get(n->prob);
+		p = s2f(s);
+	} else
+		p = DFL;
 	if (p == 0)
 		return;
 	d = p >= MID ? p - MID : MID - p;
@@ -537,7 +671,7 @@ rate(word, table)
 		}
 }
 
-static unsigned
+static unsigned long
 dbhash(word)
 	const char	*word;
 {
@@ -548,6 +682,6 @@ dbhash(word)
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char *)word, strlen(word));
 	MD5Final(digest, &ctx);
-	h = getn(digest) & MASK;
+	h = getn(digest);
 	return h;
 }
