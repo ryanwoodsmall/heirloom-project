@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.54 (gritter) 12/28/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.55 (gritter) 1/8/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.54 (gritter) 12/28/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.55 (gritter) 1/8/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1145,12 +1145,17 @@ plaincopy(FILE *f, const char *name)
 #endif
 
 /*
+ * Signals that EOF follows the last read line.
+ */
+static int	eofnext;
+
+/*
  * Read a line from fp, allocating storage as needed.
  */
 static char *
 fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp, int *colchar)
 {
-	int	c, n = 0;
+	int	c = EOF, n = 0;
 	const int	incr = 4096;
 
 	if (*line == NULL || *linesize < (incr << 1) + 1)
@@ -1190,6 +1195,13 @@ fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp, int *colchar)
 	(*line)[n] = '\0';
 	if (llen)
 		*llen = n;
+	eofnext = 0;
+	if (c != EOF) {
+		if ((c = getc(fp)) != EOF)
+			ungetc(c, fp);
+		else
+			eofnext = 1;
+	}
 	return *line;
 }
 
@@ -2015,7 +2027,7 @@ pgfile(FILE *f, const char *name)
 			line = bline;
 		} else if (llen > 0)
 			printline();
-		if (dline >= pagelen || eof) {
+		if (dline >= pagelen && !eofnext || eof) {
 			if (eof && jumpcmd) {
 				oneof();
 				continue;

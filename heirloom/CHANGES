@@ -5,6 +5,10 @@ Release ...
 * grep: With the -r option, directory loops caused by symbolic links are now
   detected and avoided. The -R option does no longer follow symbolic links
   that point to directories.
+* pg: If the end of file was located immediately after the line displayed
+  before the prompt, the same screen was displayed twice, once with the
+  regular prompt and then with '(EOF):'. The end-of-file condition is now
+  detected earlier, and the prompt is changed earlier accordingly.
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and
