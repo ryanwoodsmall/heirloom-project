@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffreg.c	1.28 (gritter) 3/26/05>	*/
+/*	Sccsid @(#)diffreg.c	1.29 (gritter) 3/27/05>	*/
 /*	from 4.3BSD diffreg.c 4.16 3/29/86	*/
 
 #include "diff.h"
@@ -1567,16 +1567,17 @@ missnl(int f)
 
 /*
  * Find and dump the name of the C function with the -p option. The
- * search begins at line a.
+ * search begins at line sa.
  */
 static void
-pdump(long a)
+pdump(long sa)
 {
 #define	psize	40
 	static char	lbuf[psize*MB_LEN_MAX+1];
 	char	mbuf[MB_LEN_MAX+1];
 	int	c, i, j;
 	wchar_t	wc;
+	long	a = sa;
 
 	while (a-- > pstart) {
 		if (saveJ[a+1] == 0)
@@ -1617,7 +1618,7 @@ pdump(long a)
 			break;
 		}
 	}
-	pstart = a+1;
+	pstart = sa;
 	if (plast) {
 		putchar(' ');
 		for (i = 0; lbuf[i]; i++)
