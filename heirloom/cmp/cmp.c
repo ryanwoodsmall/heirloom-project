@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cmp.sl	1.17 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)cmp.sl	1.18 (gritter) 1/5/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -155,12 +155,12 @@ bread(struct file *f)
 static int
 wprnt(struct file *f1, struct file *f2)
 {
-	long long	offs = offset(f1);
+	long long	offs = offset(f1) - 1;
 	int	mod = offs % 8;
 	int	eof = 0, diff, max;
 
-	f1->f_cur -= mod;
-	f2->f_cur -= mod;
+	f1->f_cur -= mod + 1;
+	f2->f_cur -= mod + 1;
 	if (f1->f_cur + 9 > f1->f_max && f1->f_eof)
 		eof |= 1;
 	if (f2->f_cur + 9 > f2->f_max && f2->f_eof)

@@ -26,6 +26,8 @@ Release ...
 * od: Accept '-j 0' and do not skip anything then; if both '-j' and '-N' are
   given, format the given number of bytes as specified by POSIX and do not
   substract the skip count from it (Bugreport by Andreas Hofmeister).
+* cmp: If the -w flag was given and the difference was located at the last
+  byte of an eight-byte group, the immediately following group was printed.
 
 Release 041214
 * Traditional and POSIX options as well as extensions are now marked as such
