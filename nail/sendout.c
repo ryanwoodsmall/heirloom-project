@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.61 (gritter) 10/21/04";
+static char sccsid[] = "@(#)sendout.c	2.62 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -87,7 +87,7 @@ makeboundary(void)
 	time_t	now;
 
 	time(&now);
-	snprintf(bound, sizeof bound, "=_%lx.%s", now, getrandstring(32));
+	snprintf(bound, sizeof bound, "=_%lx.%s", now, getrandstring(48));
 	send_boundary = bound;
 	return send_boundary;
 }
