@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.105 (gritter) 3/13/05";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.106 (gritter) 3/16/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.105 (gritter) 3/13/05";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.106 (gritter) 3/16/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.105 (gritter) 3/13/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.106 (gritter) 3/16/05";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.105 (gritter) 3/13/05";
+static const char sccsid[] USED = "@(#)ps.sl	2.106 (gritter) 3/16/05";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.105 (gritter) 3/13/05";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.106 (gritter) 3/16/05";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
@@ -1821,9 +1821,11 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 	struct dirent	*dp;
 	unsigned long	val;
 	char	*x;
+	int	fd;
 
 	if (chdir(dir) == 0 &&
-			chdir("task") == 0 &&
+			(fd = open("task", O_RDONLY)) >= 0 &&
+			fchdir(fd) == 0 &&
 			(Dp = opendir(".")) != NULL) {
 		while ((dp = readdir(Dp)) != NULL) {
 			if (dp->d_name[0] == '.' && (dp->d_name[1]=='\0' ||
@@ -1833,6 +1835,13 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 			val = strtoul(dp->d_name, &x, 10);
 			if (*x != 0)
 				continue;
+			if (fchdir(fd) < 0) {
+				fprintf(stderr,
+					"%s: cannot chdir to %s/%s/task\n",
+					progname, PROCDIR, dir);
+				errcnt = 1;
+				break;
+			}
 			if (getproc(dp->d_name, p, val, val) == OKAY) {
 				postproc(p);
 				if (selectproc(p) == OKAY) {
@@ -1842,6 +1851,7 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 			}
 		}
 		closedir(Dp);
+		close(fd);
 		return OKAY;
 	} else {
 		chdir_to_proc();
