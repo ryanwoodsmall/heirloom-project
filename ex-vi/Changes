@@ -6,6 +6,8 @@ Release ...
   screen representation was sometimes not updated accordingly.
 * Undoing the replacement of a multicolumn character by a singlecolumn
   character twice made the singlecolumn character invisible.
+* Visual 'U' followed by 'u' lead to garbage on the screen when multibyte
+  characters were present on the changed line.
 * The '\u', '\l', '\U', and '\L' substitution sequences work with multibyte
   characters now.
 * Handle character case conversions with the '~' vi command correctly if the

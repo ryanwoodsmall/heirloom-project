@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.38 (gritter) 1/10/05";
+static char sccsid[] = "@(#)ex_vput.c	1.39 (gritter) 1/11/05";
 #endif
 #endif
 
@@ -691,11 +691,10 @@ vinschar(int c)
 		int	(*OO)() = Outchar;
 		endim();
 		if (inscol + insmc0 != linend)
-			doomed -= inssiz + insmc0;
+			doomed -= inssiz + insmc1;
 		if (insmc1 == 0 && c != '\t' &&
 				vtube0[inscol+insmc0] & MULTICOL)
-			cellcpy(&vtube0[inscol+insmc0],
-					&vtube0[inscol+insmc0+1]);
+			vtube0[inscol+insmc0] = INVBIT;
 		/*
 		 * This indicates to vputchar() that it has to set MULTICOL
 		 * bits but must not call us recursively.

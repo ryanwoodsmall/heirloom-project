@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops.c	1.24 (gritter) 1/10/05";
+static char sccsid[] = "@(#)ex_vops.c	1.25 (gritter) 1/11/05";
 #endif
 #endif
 
@@ -225,8 +225,12 @@ vundo (
 		OO = Outchar; Outchar = vinschar; hold |= HOLDQIK;
 		vprepins();
 		temp[vUA2 - linebuf] = 0;
-		for (cp = &temp[vUA1 - linebuf]; *cp;)
-			putchar(*cp++);
+		for (cp = &temp[vUA1 - linebuf]; *cp;) {
+			int	c, n;
+			nextc(c, cp, n);
+			cp += n;
+			putchar(c);
+		}
 		Outchar = OO; hold = oldhold;
 		endim();
 		physdc(cindent(), cindent() + doomed);
