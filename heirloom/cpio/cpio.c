@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.286 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.287 (gritter) 2/6/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1032,11 +1032,19 @@ copyout(int (*copyfn)(const char *, struct stat *))
 		 * We thus ignore them and do not even issue a warning,
 		 * because that would only displace more important messages
 		 * on a terminal and confuse people who just want to copy
-		 * directory hierarchies.
+		 * directory hierarchies.--But for pax, POSIX requires us
+		 * to fail!
 		 */
 		if ((st.st_mode&S_IFMT) == S_IFSOCK ||
-				(st.st_mode&S_IFMT) == S_IFDOOR)
+				(st.st_mode&S_IFMT) == S_IFDOOR) {
+			if (pax) {
+				msg(2, 0, "Cannot handle %s \"%s\".\n",
+					(st.st_mode&S_IFMT) == S_IFSOCK ?
+						"socket" : "door", np);
+				errcnt++;
+			}
 			continue;
+		}
 		if (pax_track(np, st.st_mtime) == 0)
 			continue;
 		if ((fmttype == FMT_ZIP ||
