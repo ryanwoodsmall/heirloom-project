@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	1.28 (gritter) 1/7/05";
+static const char sccsid[] USED = "@(#)tr_sus.sl	1.29 (gritter) 1/9/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.28 (gritter) 1/7/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.29 (gritter) 1/9/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	1.28 (gritter) 1/7/05";
+static const char sccsid[] USED = "@(#)tr.sl	1.29 (gritter) 1/9/05";
 #endif
 
 #include	<unistd.h>
@@ -96,18 +96,19 @@ struct	item {			/* hash table item */
 	wint_t		i_out;	/* translated character (if any) */
 };
 
-#define	HBITS		14
+#define	HBITS		14	/* bits in hash table */
+#define	CCNT		256	/* characters in direct table */
 
 struct	store {			/* check for presence of characters */
 	struct item	**s_htab;	/* hash table with wide characters */
-	char		s_ctab[256];	/* singlebyte characters */
+	wint_t		s_ctab[CCNT];	/* singlebyte characters */
 	struct elem	*s_chain;	/* list of :class: elements */
 	int		s_compl;	/* complement values */
 };
 
 struct	trans {			/* translate characters */
 	struct item	**t_htab;	/* hash table with wide characters */
-	char		t_ctab[256];	/* singlebyte characters */
+	wint_t		t_ctab[CCNT];	/* singlebyte characters */
 	struct elem	*t_chain;	/* list of :class: elements */
 };
 
@@ -297,6 +298,7 @@ mktrans(const char *s1, const char *s2, int compl)
 	struct arg	*a1, *a2;
 	struct elem	*e1, *e2;
 	struct elem	*r1 = NULL, *r2 = NULL;
+	int	c;
 
 	if (s1 == NULL || s2 == NULL)
 		return NULL;
@@ -304,18 +306,13 @@ mktrans(const char *s1, const char *s2, int compl)
 	a2 = mkarg(s2, 0, 2);
 	tp = scalloc(1, sizeof *tp);
 	tp->t_htab = scalloc(1<<hbits, sizeof *tp->t_htab);
-	if (!multibyte) {
-		int	c;
-
-		for (c = 0; c <= 255; c++)
-			tp->t_ctab[c] = (char)c;
-	}
+	for (c = 0; c < CCNT; c++)
+		tp->t_ctab[c] = c;
 	while ((e1 = next(a1, &r1,0 )) != NULL &&
 			(e2 = next(a2, &r2, AUTOREP)) != NULL) {
 	retry:	if (e1->e_type == E_CHAR && e2->e_type == E_CHAR) {
-			if (!multibyte)
-				tp->t_ctab[e1->e_data.e_chr] =
-					(char)e2->e_data.e_chr;
+			if (e1->e_data.e_chr < CCNT)
+				tp->t_ctab[e1->e_data.e_chr] = e2->e_data.e_chr;
 			ip = lookup(e1->e_data.e_chr, tp->t_htab, 1);
 			if (ip != OOM)
 				ip->i_out = e2->e_data.e_chr;
@@ -323,26 +320,34 @@ mktrans(const char *s1, const char *s2, int compl)
 			free(e2);
 		} else if ((e1->e_type == E_UPPER && e2->e_type == E_LOWER) ||
 		    (e1->e_type == E_LOWER && e2->e_type == E_UPPER)) {
-			if (!multibyte) {
-				int	c, d;
+			wint_t	c, d;
 
-				for (c = 0; c <= 255; c++) {
-					d = c;
-					switch (e2->e_type) {
-					case E_LOWER:
+			for (c = 0; c < CCNT; c++) {
+				d = c;
+				switch (e2->e_type) {
+				case E_LOWER:
+					if (multibyte) {
+						if (iswupper(c))
+							d = towlower(c);
+					} else {
 						if (isupper(c))
 							d = tolower(c);
-						break;
-					case E_UPPER:
+					}
+					break;
+				case E_UPPER:
+					if (multibyte) {
+						if (iswlower(c))
+							d = towupper(c);
+					} else {
 						if (islower(c))
 							d = toupper(c);
-						break;
-					default:
-						/* make compiler happy */
-						break;
 					}
-					tp->t_ctab[c] = (char)d;
+					break;
+				default:
+					/* make compiler happy */
+					break;
 				}
+				tp->t_ctab[c] = d;
 			}
 			e2->e_nxt = tp->t_chain;
 			tp->t_chain = e2;
@@ -399,34 +404,34 @@ mkstore(const char *s, int compl)
 	sp = scalloc(1, sizeof *sp);
 	sp->s_htab = scalloc(1<<hbits, sizeof *sp->s_htab);
 	sp->s_compl = compl;
-	if (compl && !multibyte) {
-		int	c;
+	if (compl) {
+		wint_t	c;
 
-		for (c = 0; c <= 255; c++)
+		for (c = 0; c < CCNT; c++)
 			sp->s_ctab[c] = 1;
 	}
 	ap = mkarg(s, 0, 0);
 	while ((ep = next(ap, NULL, 0)) != NULL) {
 		switch (ep->e_type) {
 		case E_CHAR:
-			if (!multibyte)
+			if (ep->e_data.e_chr < CCNT)
 				sp->s_ctab[ep->e_data.e_chr] = compl == 0;
 			lookup(ep->e_data.e_chr, sp->s_htab, 1);
 			free(ep);
 			break;
-		default:
-			if (!multibyte) {
-				int	c;
-				wint_t	wc;
+		default: {
+			int	c;
+			wint_t	wc;
 
-				for (c = 1; c <= 255; c++) {
-					if ((wc = btowc(c)) != WEOF &&
-					    iswctype(wc, ep->e_data.e_class))
-						sp->s_ctab[c] = compl == 0;
-				}
+			for (c = 1; c < CCNT; c++) {
+				wc = multibyte ? c : btowc(c);
+				if (wc != WEOF &&
+				    iswctype(wc, ep->e_data.e_class))
+					sp->s_ctab[c] = compl == 0;
 			}
 			ep->e_nxt = sp->s_chain;
 			sp->s_chain = ep;
+		    }
 		}
 	}
 	return sp;
@@ -827,11 +832,37 @@ tr_mb(void)
 	int	n, i;
 
 	while ((cp = ib_getw(input, &wc, &n)) != NULL) {
-		if (wc != WEOF) {
+		if ((wc & ~(wint_t)0177) == 0) {
 #ifndef	SUS
 			if (wc == '\0')
 				continue;
 #endif	/* !SUS */
+			if (transtab) {
+				wc = transtab->t_ctab[wc];
+#ifndef	SUS
+				if (wc == '\0')
+					continue;
+#endif	/* !SUS */
+			} else if (deltab && deltab->s_ctab[wc])
+				continue;
+			if (squeeztab && wc == lastwc && squeeztab->s_ctab[wc])
+				continue;
+			lastwc = wc;
+			if (wc & ~(wint_t)0177) {
+				if ((i = wctomb(mb, wc)) >= 0) {
+					op = mb;
+					while (i--) {
+						putchar(*op & 0377);
+						op++;
+					}
+				} else {
+					putchar(*cp);
+					lastwc = *cp;
+				}
+			} else
+				putchar(wc);
+			continue;
+		} else if (wc != WEOF) {
 			if (transtab) {
 				wc = dotrans(wd = wc, transtab);
 				if (wc == '\0') {
@@ -863,7 +894,7 @@ tr_mb(void)
 			i = n;
 		}
 		while (i--) {
-			putchar(*op);
+			putchar(*op & 0377);
 			op++;
 		}
 	}
