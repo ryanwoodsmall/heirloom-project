@@ -8,7 +8,8 @@
   fields of the main header.
 * For junk mail detection, most HTML tags are now ignored, similar to the
   proposal in Paul Graham's 'Better Bayesian Filtering'. Also, the top and
-  bottom probabilities are now .0001 and .9999.
+  bottom probabilities are now adjusted to the number of messages used for
+  building the database.
 * When the junk mail database is updated, it is now truncated beyond the
   last byte just written. Previously, stale data could have remained after
   this point, which was no problem for nail itself, but could make zcat(1)

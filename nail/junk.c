@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.52 (gritter) 10/25/04";
+static char sccsid[] = "@(#)junk.c	1.53 (gritter) 10/25/04";
 #endif
 #endif /* not lint */
 
@@ -61,12 +61,6 @@ static char sccsid[] = "@(#)junk.c	1.52 (gritter) 10/25/04";
  * Bayesian Filtering", January 2003, <http://www.paulgraham.com/better.html>.
  */
 
-#define	BOT0	.01
-#define	BOT1	.0001
-static float	BOT;
-#define	TOP0	.99
-#define	TOP1	.9999
-static float	TOP;
 #define	DFL	.40
 #define	THR	.9
 #define	MID	.5
@@ -292,8 +286,6 @@ getdb(void)
 		memset(nodes, 0, n * SIZEOF_node);
 	if (sfp)
 		Fclose(sfp);
-	BOT = table_version < 1 ? BOT0 : BOT1;
-	TOP = table_version < 1 ? TOP0 : TOP1;
 	return OKAY;
 }
 
@@ -740,11 +732,21 @@ recompute(void)
 	unsigned long	ngood, nbad;
 	unsigned	g, b, p;
 	char	*n;
-	float	d;
+	float	d, BOT, TOP;
 
 	used = getn(&super[OF_super_used]);
 	ngood = getn(&super[OF_super_ngood]);
 	nbad = getn(&super[OF_super_nbad]);
+	if (ngood + nbad >= 18000) {
+		BOT = .0001;
+		TOP = .9999;
+	} else if (ngood + nbad >= 9000) {
+		BOT = .001;
+		TOP = .999;
+	} else {
+		BOT = .01;
+		TOP = .99;
+	}
 	for (i = 0; i < used; i++) {
 		n = &nodes[i*SIZEOF_node];
 		g = get(&n[OF_node_good]) * 2;
@@ -877,7 +879,7 @@ clsf(struct message *m)
 			break;
 		if (verbose)
 			fprintf(stderr, "Probe %2d: \"%s\", hash=%lu "
-				"prob=%.4f dist=%.4f\n",
+				"prob=%.4g dist=%.4g\n",
 				i+1,
 				best[i].word, best[i].hash,
 				best[i].prob, best[i].dist);
@@ -910,7 +912,7 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 	} else
 		p = DFL;
 	if (_debug)
-		fprintf(stderr, "h=%lu g=%u b=%u p=%.4f %s\n", h,
+		fprintf(stderr, "h=%lu g=%u b=%u p=%.4g %s\n", h,
 				n ? get(&n[OF_node_good]) : 0,
 				n ? get(&n[OF_node_bad]) : 0,
 				p, word);
@@ -1019,7 +1021,7 @@ cprobability(void *v)
 			p = s2f(s);
 			if (p != 0) {
 				d = p >= MID ? p - MID : MID - p;
-				printf("prob=%.4f dist=%.4f", p, d);
+				printf("prob=%.4g dist=%.4g", p, d);
 			} else
 				printf("too infrequent");
 		} else
