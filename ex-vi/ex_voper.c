@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_voper.c	1.24 (gritter) 1/11/05";
+static char sccsid[] = "@(#)ex_voper.c	1.25 (gritter) 1/19/05";
 #endif
 #endif
 
@@ -525,7 +525,8 @@ deleteit:
 			goto errlab;
 		vmacchng(1);
 		while (cnt > 0 && !margin()) {
-			wcursor += skipright(linebuf, wcursor);
+			wcursor += dir > 0 ? skipright(linebuf, wcursor) :
+				skipleft(linebuf, wcursor);
 			cnt--;
 		}
 		opf = deleteop;
