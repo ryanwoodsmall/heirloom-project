@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.49 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.50 (gritter) 12/15/04";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.49 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.50 (gritter) 12/15/04";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -91,7 +91,7 @@ static int	mb_cur_max;		/* MB_CUR_MAX acceleration */
 
 typedef	wint_t	w_type;
 
-#define	width(wc)	(mb_cur_max > 1 && iswprint(wc) ? wcwidth(wc) : 1)
+#define	width(wc)	(mb_cur_max > 1 ? iswprint(wc) ? wcwidth(wc) : -1 : 1)
 
 /*
  * Get next character from string s and store it in wc; n is set to

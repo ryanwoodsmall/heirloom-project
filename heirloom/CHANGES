@@ -1,3 +1,7 @@
+Release ...
+* pg: Compute the width of non-printable characters that correspond to a
+  multibyte sequence correctly.
+
 Release 041214
 * Traditional and POSIX options as well as extensions are now marked as such
   in the manual pages.
