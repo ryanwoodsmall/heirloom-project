@@ -47,7 +47,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pr.sl	1.26 (gritter) 12/12/04";
+#if defined (SUS)
+static const char sccsid[] USED = "@(#)pr_sus.sl	1.27 (gritter) 1/24/05";
+#else	/* !SUS */
+static const char sccsid[] USED = "@(#)pr.sl	1.27 (gritter) 1/24/05";
+#endif	/* !SUS */
 
 #include <stdio.h>
 #include <signal.h>
