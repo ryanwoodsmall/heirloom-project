@@ -29,10 +29,12 @@
 #else
 #define	USED
 #endif
-#ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.60 (gritter) 1/31/05";
+#if defined (SU3)
+static const char sccsid[] USED = "@(#)pg_su3.sl	2.61 (gritter) 2/6/05";
+#elif defined (SUS)
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.61 (gritter) 2/6/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.60 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.61 (gritter) 2/6/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -49,11 +51,11 @@ static const char sccsid[] USED = "@(#)pg.sl	2.60 (gritter) 1/31/05";
 #endif
 #include <termios.h>
 #include <fcntl.h>
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 #include <regex.h>
-#else	/* !SUS */
+#else	/* !SUS, !SU3 */
 #include <regexpr.h>
-#endif	/* !SUS */
+#endif	/* !SUS, !SU3 */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -1260,12 +1262,12 @@ static size_t	llen;
  * Location of last match, regular expression buffer,
  * and whether a remembered search string is available.
  */
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 static char	*re;
-#else	/* SUS */
+#else	/* SUS, SU3 */
 static regex_t	re;
 static char	*loc1;
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 static int	remembered;
 /*
  * fbuf		an exact copy of the input file as it gets read
@@ -1325,7 +1327,7 @@ skipping(int direction)
 /*
  * Compile a pattern.
  */
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 static int
 comple(const char *pattern)
 {
@@ -1384,7 +1386,7 @@ comple(const char *pattern)
 	remembered = 1;
 	return OKAY;
 }
-#else	/* SUS */
+#else	/* SUS, SU3 */
 static int
 comple(const char *pattern)
 {
@@ -1397,6 +1399,9 @@ comple(const char *pattern)
 #ifdef	REG_ONESUB
 				| REG_ONESUB	/* need one match location */
 #endif	/* REG_ONESUB */
+#if defined (SU3) && defined (REG_AVOIDNULL)
+				| REG_AVOIDNULL	/* avoid null matches */
+#endif	/* SU3 && REG_AVOIDNULL */
 			;
 
 	if (remembered)
@@ -1414,7 +1419,7 @@ comple(const char *pattern)
 	remembered = 1;
 	return OKAY;
 }
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 
 /*
  * Initial search from command line argument.
@@ -1477,10 +1482,10 @@ searchfw(void)
 		colb(b, &b[llen]);
 	else if (b[llen-1] == '\n')
 		b[llen-1] = '\0';
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 	if (step(b, re))
 		searchcount--;
-#else	/* SUS */
+#else	/* SUS, SU3 */
 	{
 		regmatch_t	loc;
 		if (regexec(&re, b, 1, &loc, 0) == 0)
@@ -1488,7 +1493,7 @@ searchfw(void)
 		else
 			loc1 = &b[loc.rm_so];
 	}
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 	if (searchcount == 0) {
 		sz = 0;
 		while (sz += endline(ttycols, &b[sz], &b[llen]), &b[sz] < loc1)
@@ -1563,10 +1568,10 @@ searchbw(void)
 			colb(b, &b[llen]);
 		else if (b[llen-1] == '\n')
 			b[llen-1] = '\0';
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 		if (step(b, re))
 			searchcount--;
-#else	/* SUS */
+#else	/* SUS, SU3 */
 		{
 			regmatch_t	loc;
 			if (regexec(&re, b, 1, &loc, 0) == 0)
@@ -1574,7 +1579,7 @@ searchbw(void)
 			else
 				loc1 = &b[loc.rm_so];
 		}
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 		if (searchcount == 0) {
 			foundbw();
 			return OKAY;

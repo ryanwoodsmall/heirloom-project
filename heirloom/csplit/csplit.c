@@ -32,7 +32,13 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)csplit.sl	1.8 (gritter) 2/3/05";
+#if defined (SU3)
+static const char sccsid[] USED = "@(#)csplit_su3.sl	1.9 (gritter) 2/6/05";
+#elif defined (SUS)
+static const char sccsid[] USED = "@(#)csplit_sus.sl	1.9 (gritter) 2/6/05";
+#else
+static const char sccsid[] USED = "@(#)csplit.sl	1.9 (gritter) 2/6/05";
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +63,7 @@ static const char sccsid[] USED = "@(#)csplit.sl	1.8 (gritter) 2/3/05";
 #endif
 #endif
 
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 #include <regex.h>
 #else
 #include <regexpr.h>
@@ -72,7 +78,7 @@ static struct	arg {
 	long long	a_once;
 	const char	*a_op;
 	const char	*a_rp;
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 	regex_t		*a_re;
 #else
 	char		*a_re;
@@ -109,7 +115,7 @@ main(int argc, char **argv)
 	char	*fn;
 
 	progname = basename(argv[0]);
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 	setlocale(LC_COLLATE, "");
 #endif
 	setlocale(LC_CTYPE, "");
@@ -174,6 +180,9 @@ scan(char *s)
 	static int	ncur = -1;
 	long long	c;
 	char	*sp, *x;
+#if defined (SUS) || defined (SU3)
+	int	reflags;
+#endif
 
 	if (*s != '{') {
 		args[++ncur] = scalloc(1, sizeof *args[ncur]);
@@ -194,13 +203,16 @@ scan(char *s)
 		args[ncur]->a_nx = strtoll(&sp[1], &x, 10);
 		if (*x != '\0')
 			msg(1, "%s: illegal offset", s);
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 		args[ncur]->a_re = smalloc(sizeof *args[ncur]->a_re);
-		if (regcomp(args[ncur]->a_re, &s[1],
-				REG_ANGLES|REG_NOSUB) != 0)
-#else
+		reflags = REG_ANGLES|REG_NOSUB;
+#if defined (SU3)
+		reflags |= REG_AVOIDNULL;
+#endif	/* SU3 */
+		if (regcomp(args[ncur]->a_re, &s[1], reflags) != 0)
+#else	/* !SUS, !SU3 */
 		if ((args[ncur]->a_re = compile(&s[1], 0, 0)) == 0)
-#endif
+#endif	/* !SUS, !SU3 */
 			msg(1, "%s: Illegal Regular Expression", s);
 		break;
 	default:
@@ -331,7 +343,7 @@ match(const char *line, long long lineno, long long *noffp, int *skip)
 			if (--args[ncur]->a_no > 0)
 				return 0;
 		} else {
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 			if (regexec(args[ncur]->a_re, line, 0, NULL, 0) != 0)
 #else
 			if (step(line, args[ncur]->a_re) == 0)

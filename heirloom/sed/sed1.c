@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed1.c	1.41 (gritter) 2/2/05>	*/
+/*	Sccsid @(#)sed1.c	1.42 (gritter) 2/6/05>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -44,7 +44,7 @@
 #include	<wctype.h>
 #include "sed.h"
 
-#if !defined (SUS) && !defined(S42)
+#if !defined (SUS) && !defined (SU3) && !defined(S42)
 #define	INIT		extern char *cp, *badp; \
 			register char *sp = cp;
 #define	GETC()		(*sp++)
@@ -55,7 +55,7 @@
 
 #define	regexp_h_malloc(n)	smalloc(n)
 #include <regexp.h>
-#endif	/* !SUS && !S42 */
+#endif	/* !SUS && !SU3 && !S42 */
 
 #ifndef	CCEOF
 #ifdef	CEOF
@@ -67,7 +67,7 @@
 
 int ceof = CCEOF;
 
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 static const char	*trans[]  = {
 	"\\00",
 	"\\01",
@@ -102,7 +102,7 @@ static const char	*trans[]  = {
 	"\\36",
 	"\\37"
 };
-#endif	/* !SUS */
+#endif	/* !SUS, !SU3 */
 
 static char	*cbp;
 static char	*ebp;
@@ -133,7 +133,7 @@ static void nout(wint_t);
 static void wout(wint_t);
 static void lout(int);
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 #define	NBRA	9
 int	sed;
 int	nbra;
@@ -175,7 +175,7 @@ step(char *line, char *pattern)
 	}
 	return res == 0;
 }
-#endif	/* SUS || S42 */
+#endif	/* SUS || SU3 || S42 */
 
 static int	lcomlen;
 static int	Braslist[NBRA];
@@ -262,20 +262,20 @@ execute(const char *file)
 					}
 					if(p2) {
 						ipc->inar = 1;
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 						goto ichk;
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 					}
 				} else if(match(p1, 0, 0)) {
 					if(p2) {
 						ipc->inar = 1;
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 					ichk:	if (*p2 == CLNUM) {
 							c = glno(&p2[1]);
 							if (lnum >= tlno[c])
 								ipc->inar = 0;
 						}
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 					}
 				} else {
 					if(ipc->negfl)
@@ -328,7 +328,7 @@ match(char *expbuf, int gf, int needloc)
 
 	if(gf) {
 		if(*expbuf)	return(0);
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 		if (loc1 == loc2) {
 			int	n;
 			wchar_t	wc;
@@ -547,9 +547,9 @@ command(struct reptr *ipc)
 				c = fetch(&lp);
 				lcom(c, invchar == 0);
 			}
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 			putc('$', stdout);
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 			putc('\n', stdout);
 			break;
 
@@ -801,7 +801,7 @@ lcom(wint_t c, int valid)
 		oout(c);
 		return;
 	}
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 	switch (c) {
 	case '\\':
 		mout("\\\\");
@@ -825,12 +825,12 @@ lcom(wint_t c, int valid)
 		mout("\\v");
 		return;
 	}
-#else	/* !SUS */
+#else	/* !SUS, !SU3 */
 	if (c < 040) {
 		mout(trans[c]);
 		return;
 	}
-#endif	/* !SUS */
+#endif	/* !SUS, !SU3 */
 	if (multibyte) {
 		if (iswprint(c))
 			wout(c);

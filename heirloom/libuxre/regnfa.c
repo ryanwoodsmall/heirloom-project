@@ -1,7 +1,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, November 2002.
  *
- * Sccsid @(#)regnfa.c	1.7 (gritter) 9/22/03
+ * Sccsid @(#)regnfa.c	1.8 (gritter) 2/6/05
  */
 /*  UNIX(R) Regular Expresssion Library
  *
@@ -978,14 +978,34 @@ libuxre_regnfaexec(Nfa *np, Exec *xp)
 			for (n = 1; n < xp->nmatch; n++)
 			{
 				ssize_t nlen;
+				int	use;
 
+				if (xp->flags & REG_AVOIDNULL) {
+					/*
+					* This is to to satisfy POSIX.1-2001
+					* XBD pp. 172-173 ll. 6127-6129, whose
+					* translation is "do not match null
+					* expressions if there is a choice".
+					* See also POSIX.2 interpretation #43
+					* in which the question was raised.
+					*
+					* The first subexpression of "\(x*\)*"
+					* must thus match the string "xxx".
+					*/
+					use = cp->rm[n].rm_eo -
+							cp->rm[n].rm_so >=
+						xp->match[n].rm_eo -
+							xp->match[n].rm_so ||
+						xp->match[n].rm_so < 0;
+				} else
+					use = 1;
 				/*
 				* Choose the rightmost ROP_LP as that
 				* maximizes the gap from before.
 				*/
 				len = xp->match[n].rm_so;
 				nlen = cp->rm[n].rm_so;
-				if (len < nlen)
+				if (len < nlen && use)
 					goto record;
 				if (len > nlen)
 					break;
@@ -995,7 +1015,7 @@ libuxre_regnfaexec(Nfa *np, Exec *xp)
 				*/
 				len = xp->match[n].rm_eo;
 				nlen = cp->rm[n].rm_eo;
-				if (len < nlen)
+				if (len < nlen && use)
 					goto record;
 				if (len > nlen)
 					break;

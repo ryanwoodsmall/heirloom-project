@@ -33,11 +33,13 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)nl_s42.sl	1.16 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)nl_s42.sl	1.17 (gritter) 2/6/05";
+#elif defined (SU3)
+static const char sccsid[] USED = "@(#)nl_su3.sl	1.17 (gritter) 2/6/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)nl_sus.sl	1.16 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)nl_sus.sl	1.17 (gritter) 2/6/05";
 #else
-static const char sccsid[] USED = "@(#)nl.sl	1.16 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)nl.sl	1.17 (gritter) 2/6/05";
 #endif
 
 #include	<unistd.h>
@@ -48,7 +50,7 @@ static const char sccsid[] USED = "@(#)nl.sl	1.16 (gritter) 1/31/05";
 #include	<wchar.h>
 #include	<locale.h>
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 #include	<regex.h>
 #else
 #include	<regexpr.h>
@@ -61,7 +63,7 @@ struct	type {
 	int	t_chr;
 	int	t_type;
 	int	t_def;
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 	regex_t	t_re;
 #else
 	char	*t_ep;
@@ -127,7 +129,7 @@ invalid(int c, const char *s)
 	exit(2);
 }
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 static int
 regemap(int i)
 {
@@ -160,22 +162,29 @@ regemap(int i)
 		return i + 100;
 	}
 }
-#endif	/* SUS || S42 */
+#endif	/* SUS || SU3 || S42 */
 
 static void
 settype(struct type *tp, const char *s)
 {
 	int	i;
+#if defined (SUS) || defined (SU3) || defined (S42)
+	int	reflags;
+#endif
 
 	switch (s[0]) {
 	case 'p':
-#if defined (SUS) || defined (S42)
-		if ((i=regcomp(&tp->t_re, &s[1], REG_ANGLES))!=0) {
+#if defined (SUS) || defined (SU3) || defined (S42)
+		reflags = REG_ANGLES;
+#if defined (SU3)
+		reflags |= REG_AVOIDNULL;
+#endif	/* SU3 */
+		if ((i=regcomp(&tp->t_re, &s[1], reflags))!=0) {
 			i = regemap(i);
-#else	/* !SUS, !S42 */
+#else	/* !SUS, !SU3, !S42 */
 		if ((tp->t_ep = compile(&s[1], 0, 0)) == 0) {
 			i = regerrno;
-#endif	/* !SUS, !S42 */
+#endif	/* !SUS, !SU3, !S42 */
 			fprintf(stderr, "%d This is the error code\n", i);
 			fprintf(stderr, "Illegal Regular Expression\n");
 			exit(2);
@@ -252,10 +261,10 @@ setsep(int c, const char *s)
 	sep = s;
 }
 
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 #define	arg()	(av[0][2] ? &av[0][2] : (ac-- > 0 ? (av++, (char *)av[0]) : \
 					(invalid(av[0][1], ""), (char *)NULL)))
-#else	/* !SUS */
+#else	/* !SUS, !SU3 */
 #define	arg()	&av[0][2]
 #endif
 
@@ -264,7 +273,7 @@ scan(int ac, char **av)
 {
 	while (ac-- > 0) {
 		if (av[0][0] == '-' && av[0][1] != '\0') {
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 		nxt:
 #endif
 			switch (av[0][1]) {
@@ -292,7 +301,7 @@ scan(int ac, char **av)
 			case 'p':
 				pflag = 1;
 				if (av[0][2]) {
-#ifdef	SUS
+#if defined (SUS) || defined (SU3)
 					(av[0])++;
 					goto nxt;
 #else
@@ -475,7 +484,7 @@ decide(char *lp, size_t l, struct type *curtp, int blank)
 	case 'p':
 		if ((tmp = lp[l-1]) == '\n')
 			lp[l-1] = '\0';
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 		gotcha = regexec(&curtp->t_re, lp, 0, NULL, 0) == 0;
 #else
 		gotcha = step(lp, curtp->t_ep) != 0;

@@ -1,7 +1,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, November 2002.
  *
- * Sccsid @(#)regex.h	1.12 (gritter) 9/22/03
+ * Sccsid @(#)regex.h	1.13 (gritter) 2/6/05
  */
 /*  UNIX(R) Regular Expresssion Library
  *
@@ -68,7 +68,7 @@
 	/*
 	* Additional regcomp() flags.
 	* Some of these assume that int is >16 bits!
-	* Beware: 0x10000000 and above are used in re.h.
+	* Beware: 0x20000000 and above are used in re.h.
 	*/
 #define REG_ONESUB	0x0000800 /* regexec() only needs pmatch[0] */
 #define REG_MTPARENFAIL	0x0001000 /* take empty \(\) or () as match failure */
@@ -87,6 +87,7 @@
 #define	REG_ADDITIVE	0x2000000 /* a+*b means + and * additive, ^+ is valid */
 #define	REG_NOI18N	0x4000000 /* disable I18N features ([::] etc.) */
 #define	REG_OLDESC	0x8000000 /* recognize \b \f \n \r \t \123 only */
+#define	REG_AVOIDNULL	0x10000000/* avoid null subexpression matches */
 #define REG_OLDBRE	(REG_BADRANGE | REG_ANGLES | REG_ESCNL)
 #define REG_OLDERE	(REG_OR | REG_PLUS | REG_QUEST | REG_NOBRACES | \
 				REG_PARENS | REG_ANCHORS | REG_ODDRANGE | \

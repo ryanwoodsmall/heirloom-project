@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)rcomp.c	1.26 (gritter) 1/31/05>	*/
+/*	Sccsid @(#)rcomp.c	1.27 (gritter) 2/6/05>	*/
 
 /*
  * Code involving POSIX.2 regcomp()/regexpr() routines.
@@ -128,8 +128,11 @@ rc_build(void)
 	if (Eflag)
 		rflags |= (sus ? REG_EXTENDED : REG_OLDERE|REG_NOI18N) |
 			REG_MTPARENBAD;
-	else
+	else {
 		rflags |= REG_ANGLES;
+		if (sus >= 3)
+			rflags |= REG_AVOIDNULL;
+	}
 	if (xflag)
 		rflags |= REG_ONESUB;
 	else

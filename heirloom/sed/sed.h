@@ -7,7 +7,7 @@
  */
 
 /*	from Unix 7th Edition and Unix 32V sed	*/
-/*	Sccsid @(#)sed.h	1.31 (gritter) 2/1/05	*/
+/*	Sccsid @(#)sed.h	1.32 (gritter) 2/6/05	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -47,9 +47,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 #include <regex.h>
-#endif	/* SUS || S42 */
+#endif	/* SUS || SU3 || S42 */
 
 #ifdef	__GLIBC__
 #ifdef	_IO_getc_unlocked
@@ -65,12 +65,12 @@
 #define	CEND	16
 #define	CLNUM	14
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 struct	re_emu {
 	char	*r_dummy;
 	regex_t	r_preg;
 };
-#endif	/* SUS || S42 */
+#endif	/* SUS || SU3 || S42 */
 
 extern int	circf, ceof, nbra, sed;
 

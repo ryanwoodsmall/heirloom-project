@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ed.1	1.44 (gritter) 2/2/05
+.\" Sccsid @(#)ed.1	1.45 (gritter) 2/6/05
 .\" Parts taken from ed(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH ED 1 "2/2/05" "Heirloom Toolchest" "User Commands"
+.TH ED 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .if t .ds q \(aa
 .if n .ds q '
 .SH NAME
@@ -264,6 +264,10 @@ The special character \fB*\fR, as described in 5.,
 and the interval expressions described in 6.
 can also be applied to subexpressions
 as described in 9.
+For POSIX.1-2001 utilities such as
+.BR /usr/5bin/posix2001/ed ,
+subexpressions do not match the empty string
+if there is a possible longer match.
 .IP 16.
 In bracket expressions as described in 4.,
 the following character sequences are considered special:

@@ -45,13 +45,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)expr_s42.sl	1.26 (gritter) 2/3/05";
+static const char sccsid[] USED = "@(#)expr_s42.sl	1.27 (gritter) 2/6/05";
 static int	sus = 0;
+#elif defined (SU3)
+static const char sccsid[] USED = "@(#)expr_su3.sl	1.27 (gritter) 2/6/05";
+static int	sus = 3;
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)expr_sus.sl	1.26 (gritter) 2/3/05";
+static const char sccsid[] USED = "@(#)expr_sus.sl	1.27 (gritter) 2/6/05";
 static int	sus = 1;
 #else
-static const char sccsid[] USED = "@(#)expr.sl	1.26 (gritter) 2/3/05";
+static const char sccsid[] USED = "@(#)expr.sl	1.27 (gritter) 2/6/05";
 static int	sus = 0;
 #endif
 
@@ -100,12 +103,12 @@ static char	*substr(char *, const char *, const char *);
 static char	*length(const char *);
 static char	*eindex(const char *, const char *);
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 #include	<regex.h>
 static int	nbra;
-#else	/* !SUS, !S42 */
+#else	/* !SUS, !SU3, !S42 */
 #include	<regexpr.h>
-#endif	/* !SUS, !S42 */
+#endif	/* !SUS, !SU3, !S42 */
 %}
 
 /* Yacc productions for "expr" command: */
@@ -317,7 +320,7 @@ match(char *s, char *p)
 	return rv;
 }
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 static int
 ematch(char *s, register char *p)
 {
@@ -328,6 +331,9 @@ ematch(char *s, register char *p)
 
 #ifdef	REG_ANGLES
 	reflags |= REG_ANGLES;
+#endif
+#if defined (SU3) && defined (REG_AVOIDNULL)
+	reflags |= REG_AVOIDNULL;
 #endif
 	if ((num = regcomp(&re, p, reflags)) != 0)
 		errxx(0);
@@ -345,7 +351,7 @@ ematch(char *s, register char *p)
 	regfree(&re);
 	return val;
 }
-#else	/* !SUS, !S42 */
+#else	/* !SUS, !SU3, !S42 */
 static int
 ematch(char *s, register char *p)
 {
@@ -370,7 +376,7 @@ ematch(char *s, register char *p)
 	free(expbuf);
 	return(val);
 }
-#endif	/* !SUS, !S42 */
+#endif	/* !SUS, !SU3, !S42 */
 
 /*ARGSUSED*/
 static void

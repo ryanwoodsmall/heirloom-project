@@ -1,7 +1,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, November 2002.
  *
- * Sccsid @(#)re.h	1.14 (gritter) 10/18/03
+ * Sccsid @(#)re.h	1.15 (gritter) 2/6/05
  */
 /*  UNIX(R) Regular Expresssion Library
  *
@@ -102,9 +102,9 @@ typedef struct
 	/*
 	* These must be distinct from the flags in <regex.h>.
 	*/
-#define REG_NFA		0x10000000
-#define REG_DFA		0x20000000
-#define REG_GOTBKT	0x40000000
+#define REG_NFA		0x20000000
+#define REG_DFA		0x40000000
+#define REG_GOTBKT	0x80000000
 
 #define BRACE_INF	USHRT_MAX
 #define BRACE_MAX	5100	/* arbitrary number < SHRT_MAX */

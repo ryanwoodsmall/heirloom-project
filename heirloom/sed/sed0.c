@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed0.c	1.62 (gritter) 2/1/05>	*/
+/*	Sccsid @(#)sed0.c	1.63 (gritter) 2/6/05>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -140,9 +140,9 @@ main(int argc, char **argv)
 #ifdef	__GLIBC__
 	putenv("POSIXLY_CORRECT=1");
 #endif	/* __GLIBC__ */
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 	setlocale(LC_COLLATE, "");
-#endif	/* SUS || S42 */
+#endif	/* SUS || SU3 || S42 */
 	setlocale(LC_CTYPE, "");
 	multibyte = MB_CUR_MAX > 1;
 	ycomp = multibyte ? ycomp_mb : ycomp_sb;
@@ -455,13 +455,13 @@ jtcommon:
 				P(rep)->command = RCOM;
 				if(P(rep)->ad2)
 					fatal(AD1MES, linebuf);
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 				if(*cp++ != ' ')
 					fatal(CGMES, linebuf);
-#else	/* SUS */
+#else	/* SUS, SU3 */
 				while (*cp == ' ' || *cp == '\t')
 					cp++;
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 				text(&P(rep)->bptr.re1);
 				break;
 
@@ -515,7 +515,7 @@ jtcommon:
 					}
 					goto sloop;
 				}
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 				if (P(rep)->gfl > 0 && P(rep)->gfl > 512)
 			fatal("Suffix too large - 512 max: %s", linebuf);
 #endif
@@ -1018,7 +1018,7 @@ scalloc(size_t nmemb, size_t size)
 	return p;
 }
 
-#if defined (SUS) || defined (S42)
+#if defined (SUS) || defined (SU3) || defined (S42)
 static char *
 sed_compile(char **ep)
 {
@@ -1105,6 +1105,9 @@ sed_compile(char **ep)
 #ifdef	REG_ANGLES
 		reflags |= REG_ANGLES;
 #endif	/* REG_ANGLES */
+#if defined (SU3) && defined (REG_AVOIDNULL)
+		reflags |= REG_AVOIDNULL;
+#endif	/* SU3 && AVOIDNULL */
 		if (regcomp(&re->r_preg, pat, reflags) != 0)
 			re = (struct re_emu *)badp;
 	} else
@@ -1114,7 +1117,7 @@ sed_compile(char **ep)
 		p++;
 	return p;
 }
-#else	/* !SUS, !S42 */
+#else	/* !SUS, !SU3, !S42 */
 static char *
 sed_compile(char **ep)
 {
@@ -1134,7 +1137,7 @@ sed_compile(char **ep)
 	**ep = circf;
 	return p;
 }
-#endif	/* !SUS, !S42 */
+#endif	/* !SUS, !SU3, !S42 */
 
 wint_t
 wc_get(char **sc, int move)
@@ -1225,13 +1228,13 @@ wfile(void)
 {
 	int	i;
 
-#ifndef	SUS
+#if !defined (SUS) && !defined (SU3)
 	if(*cp++ != ' ')
 		fatal(CGMES, linebuf);
-#else	/* SUS */
+#else	/* SUS, SU3 */
 	while (*cp == ' ' || *cp == '\t')
 		cp++;
-#endif	/* SUS */
+#endif	/* SUS, SU3 */
 
 	text(&fname[nfiles]);
 	for(i = nfiles - 1; i >= 0; i--)

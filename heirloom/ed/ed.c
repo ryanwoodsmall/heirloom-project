@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.90 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.91 (gritter) 2/6/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.90 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.91 (gritter) 2/6/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.90 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.91 (gritter) 2/6/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.90 (gritter) 2/2/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.91 (gritter) 2/6/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -2678,6 +2678,9 @@ compile(char *unused, char *ep, const char *endbuf, int seof)
 
 #ifdef	REG_ANGLES
 		reflags |= REG_ANGLES;
+#endif
+#if defined (SU3) && defined (REG_AVOIDNULL)
+		reflags |= REG_AVOIDNULL;
 #endif
 		if (op[0])
 			regfree(rp);
