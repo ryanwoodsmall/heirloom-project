@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ls.1	1.32 (gritter) 2/24/05
+.\" Sccsid @(#)ls.1	1.33 (gritter) 2/24/05
 .\" Parts taken from ls(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -259,6 +259,7 @@ S	if the entry is a socket;
 s	if the entry is a \s-1XENIX\s0 semaphore;
 m	if the entry is a \s-1XENIX\s0 shared data (memory) file;
 D	if the entry is a Solaris door;
+n	if the entry is a HP-UX network special file;
 \-	if the entry is a plain file.
 .TE
 .PP
@@ -338,7 +339,10 @@ yellow/bold	if the file is a special file;
 yellow	if the file is a named pipe;
 cyan	if the file is a symbolic link;
 magenta/bold	if the file is a socket or a Solaris door;
-magenta	if the file is a XENIX special file;
+magenta	T{
+if the file is a XENIX special file
+or a HP-UX network special file;
+T}
 green/bold	if the file is executable.
 .TE
 .sp

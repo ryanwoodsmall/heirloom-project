@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.72 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.73 (gritter) 2/24/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.72 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.73 (gritter) 2/24/05";
 #endif
 
 #include	<sys/types.h>
@@ -63,6 +63,9 @@ static const char sccsid[] USED = "@(#)cp.sl	1.72 (gritter) 2/5/05";
 #endif
 #ifndef	S_IFNAM
 #define	S_IFNAM		0x5000		/* XENIX special named file */
+#endif
+#ifndef	S_IFNWK
+#define	S_IFNWK		0x9000		/* HP-UX network special file */
 #endif
 
 static enum {
@@ -743,6 +746,7 @@ specialcopy(const char *src, const struct stat *ssp,
 	case S_IFCHR:
 	case S_IFBLK:
 	case S_IFNAM:
+	case S_IFNWK:
 		devicecopy(src, ssp, tgt, dsp);
 		break;
 	case S_IFLNK:

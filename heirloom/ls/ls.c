@@ -46,13 +46,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ls_su3.sl	1.73 (gritter) 2/5/05>";
+static const char sccsid[] USED = "@(#)ls_su3.sl	1.74 (gritter) 2/24/05>";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ls_sus.sl	1.73 (gritter) 2/5/05>";
+static const char sccsid[] USED = "@(#)ls_sus.sl	1.74 (gritter) 2/24/05>";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.73 (gritter) 2/5/05>";
+static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.74 (gritter) 2/24/05>";
 #else
-static const char sccsid[] USED = "@(#)ls.sl	1.73 (gritter) 2/5/05>";
+static const char sccsid[] USED = "@(#)ls.sl	1.74 (gritter) 2/24/05>";
 #endif
 
 /*
@@ -67,7 +67,17 @@ static const char sccsid[] USED = "@(#)ls.sl	1.73 (gritter) 2/5/05>";
  * letter.  This is done so that ls can list any future file or device type
  * other than symlinks, without recompilation.  (Yes it's dirty.)
  */
-static char ifmt_c[] = "?pcCd?bB-?l?SD??";
+static char ifmt_c[] = "-pc-d-b--nl-SD--";
+/*                       S_IFIFO
+ *                        S_IFCHR
+ *                          S_IFDIR
+ *                            S_IFBLK
+ *                              S_IFREG
+ *                               S_IFNWK
+ *                                S_IFLNK
+ *                                  S_IFSOCK
+ *                                   S_IFDOOR
+ */
 
 #define ifmt(mode)	ifmt_c[((mode) >> 12) & 0xF]
 
@@ -123,6 +133,9 @@ static char ifmt_c[] = "?pcCd?bB-?l?SD??";
 #endif
 #ifndef	S_IFDOOR
 #define	S_IFDOOR	0xD000	/* Solaris door */
+#endif
+#ifndef	S_IFNWK
+#define	S_IFNWK		0x9000	/* HP-UX network special */
 #endif
 
 #if !__minix
@@ -957,6 +970,10 @@ printname(const char *name, struct file *f, int doit)
 #endif
 #ifdef	S_IFNAM
 		} else if ((f->mode & S_IFMT) == S_IFNAM) {
+			color = fc_get(FC_MAGENTA);
+#endif
+#ifdef	S_IFNWK
+		} else if ((f->mode & S_IFMT) == S_IFNWK) {
 			color = fc_get(FC_MAGENTA);
 #endif
 #ifdef	S_IFIFO

@@ -20,6 +20,7 @@ Release ...
 * The value 255 is now accepted in interval expressions in traditional
   (simple) regular expressions.
 * find: The expression '-type D' matches Solaris door files.
+* copy, cp, cpio, file, find, ls: Handle HP-UX network special files.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.288 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.289 (gritter) 2/24/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -147,6 +147,9 @@ static const char sccsid[] USED = "@(#)cpio.sl	1.288 (gritter) 2/6/05";
 #endif
 #ifndef	S_INSHD
 #define	S_INSHD		0x2		/* XENIX shared data subtype of IFNAM */
+#endif
+#ifndef	S_IFNWK
+#define	S_IFNWK		0110000		/* HP-UX network special file */
 #endif
 
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
@@ -2936,6 +2939,7 @@ cantlink:	errcnt += 1;
 	case S_IFCHR:
 	case S_IFIFO:
 	case S_IFNAM:
+	case S_IFNWK:
 		if (mknod(tgt, f->f_st.st_mode&(S_IFMT|0777),
 					f->f_st.st_rdev) < 0) {
 			emsg(3, "Cannot mknod() \"%s\"", tgt);
@@ -3039,7 +3043,8 @@ filev(struct file *f)
 	}
 	if (sysv3 || (f->f_st.st_mode&S_IFMT)!=S_IFCHR &&
 			(f->f_st.st_mode&S_IFMT)!=S_IFBLK &&
-			(f->f_st.st_mode&S_IFMT)!=S_IFNAM)
+			(f->f_st.st_mode&S_IFMT)!=S_IFNAM &&
+			(f->f_st.st_mode&S_IFMT)!=S_IFNWK)
 		printf(pax != PAX_TYPE_CPIO ? "%8llu" :
 				sysv3 ? "%7llu" : " %-7llu", f->f_dsize);
 	else
@@ -3074,6 +3079,8 @@ typec(struct stat *st)
 		return 'b';
 	case S_IFIFO:
 		return 'p';
+	case S_IFNWK:
+		return 'n';
 	case S_IFNAM:
 		switch (st->st_rdev) {
 		case S_INSEM:
@@ -4306,7 +4313,8 @@ skipfile(struct file *f)
 			(f->f_st.st_mode&S_IFMT) == S_IFCHR ||
 			(f->f_st.st_mode&S_IFMT) == S_IFBLK ||
 			(f->f_st.st_mode&S_IFMT) == S_IFIFO ||
-			(f->f_st.st_mode&S_IFMT) == S_IFNAM))
+			(f->f_st.st_mode&S_IFMT) == S_IFNAM ||
+			(f->f_st.st_mode&S_IFMT) == S_IFNWK))
 		return 0;
 	if (fmttype == FMT_ZIP && f->f_gflag & FG_DESC)
 		return zipread(f, f->f_name, -1, 0);
@@ -4342,6 +4350,7 @@ skipdata(struct file *f, int (*copydata)(struct file *, const char *, int))
 	case S_IFCHR:
 	case S_IFIFO:
 	case S_IFNAM:
+	case S_IFNWK:
 		if (fmttype != FMT_ZIP)
 			break;
 		/*FALLTHRU*/

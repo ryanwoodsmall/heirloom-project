@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.40 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.41 (gritter) 2/24/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.40 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.41 (gritter) 2/24/05";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.40 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)find.sl	1.41 (gritter) 2/24/05";
 #endif
 
 #include <stdio.h>
@@ -96,7 +96,11 @@ static const char sccsid[] USED = "@(#)find.sl	1.40 (gritter) 2/24/05";
 
 #ifndef	S_IFDOOR
 #define	S_IFDOOR	0xD000
-#endif	/* !S_IFDOOR */
+#endif
+
+#ifndef	S_IFNWK
+#define	S_IFNWK		0x9000
+#endif
 
 #undef	ctime
 #define	ctime	find_ctime
@@ -453,6 +457,7 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		    i=='D' ? S_IFDOOR :
 		    i=='f' ? S_IFREG :
 		    i=='l' ? S_IFLNK :
+		    i=='n' ? S_IFNWK :
 		    i=='p' ? S_IFIFO :
 		    i=='s' ? S_IFSOCK :
 		    0;

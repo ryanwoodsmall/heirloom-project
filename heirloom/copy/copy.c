@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)copy.sl	1.12 (gritter) 12/5/04";
+static const char sccsid[] USED = "@(#)copy.sl	1.13 (gritter) 2/24/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -56,6 +56,9 @@ static const char sccsid[] USED = "@(#)copy.sl	1.12 (gritter) 12/5/04";
 #endif
 #ifndef	S_IFNAM
 #define	S_IFNAM		0x5000
+#endif
+#ifndef	S_IFNWK
+#define	S_IFNWK		0x9000
 #endif
 
 #ifdef	__GLIBC__	/* old glibcs don't know _XOPEN_SOURCE=600L yet */
@@ -282,6 +285,7 @@ copy(const char *src, const char *dst, int level)
 	case S_IFBLK:
 	case S_IFCHR:
 	case S_IFNAM:
+	case S_IFNWK:
 	case S_IFREG:
 	case S_IFLNK:
 	reg:	if (aflag) {

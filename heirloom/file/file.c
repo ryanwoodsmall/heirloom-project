@@ -47,9 +47,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)file_sus.sl	1.30 (gritter) 2/4/05";
+static const char sccsid[] USED = "@(#)file_sus.sl	1.31 (gritter) 2/24/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)file.sl	1.30 (gritter) 2/4/05";
+static const char sccsid[] USED = "@(#)file.sl	1.31 (gritter) 2/24/05";
 #endif	/* !SUS */
 
 #ifdef	__GLIBC__
@@ -82,6 +82,9 @@ static const char sccsid[] USED = "@(#)file.sl	1.30 (gritter) 2/4/05";
 #endif
 #ifndef	S_INSHD
 #define	S_INSHD		0x2		/* XENIX shared data subtype of IFNAM */
+#endif
+#ifndef	S_IFNWK
+#define	S_IFNWK		0x9000		/* HP-UX network special file */
 #endif
 static int in;
 static int i  = 0;
@@ -266,6 +269,10 @@ type(const char *file)
 
 	case S_IFDOOR:
 		printf("door\n");
+		return;
+
+	case S_IFNWK:
+		printf("network\n");
 		return;
 
 	case S_IFNAM:
