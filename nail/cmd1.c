@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.92 (gritter) 3/4/05";
+static char sccsid[] = "@(#)cmd1.c	2.93 (gritter) 3/4/05";
 #endif
 #endif /* not lint */
 
@@ -654,9 +654,9 @@ putindent(FILE *fp, struct message *mp, int maxwidth)
 	}
 	for (indent = 0; indent < mp->m_level && indent < maxwidth; indent++) {
 		if (indent < maxwidth - 1)
-			putuc(us[indent], cs[indent] & 0377);
+			putuc(us[indent], cs[indent] & 0377, fp);
 		else
-			putuc(0x21B8, '^');
+			putuc(0x21B8, '^', fp);
 	}
 	ac_free(us);
 	return indent;

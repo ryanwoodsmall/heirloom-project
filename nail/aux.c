@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.81 (gritter) 3/4/05";
+static char sccsid[] = "@(#)aux.c	2.82 (gritter) 3/4/05";
 #endif
 #endif /* not lint */
 
@@ -1153,7 +1153,7 @@ prout(const char *s, size_t sz, FILE *fp)
  * Print out a Unicode character or a substitute for it.
  */
 int
-putuc(int u, int c)
+putuc(int u, int c, FILE *fp)
 {
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
 	if (utf8 && u & ~(wchar_t)0177) {
@@ -1161,15 +1161,15 @@ putuc(int u, int c)
 		int	i, n, r = 0;
 		if ((n = wctomb(mb, u)) > 0) {
 			for (i = 0; i < n; i++)
-				r += putchar(mb[i] & 0377) != EOF;
+				r += putc(mb[i] & 0377, fp) != EOF;
 			return r;
 		} else if (n == 0)
-			return putchar('\0') != EOF;
+			return putc('\0', fp) != EOF;
 		else
 			return 0;
 	} else
 #endif	/* HAVE_MBTOWC && HAVE_WCTYPE_H */
-		return putchar(c) != EOF;
+		return putc(c, fp) != EOF;
 }
 
 /*
