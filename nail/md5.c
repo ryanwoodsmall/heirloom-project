@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Derived from RFC 1321:
@@ -31,7 +31,7 @@ These notices must be retained in any copies of any part of this
 documentation and/or software.
  */
 
-/*	Sccsid @(#)md5.c	1.5 (gritter) 8/13/04	*/
+/*	Sccsid @(#)md5.c	1.7 (gritter) 10/2/04	*/
 
 #include "rcv.h"
 #include "md5.h"
@@ -56,9 +56,9 @@ documentation and/or software.
 #define S43 15
 #define S44 21
 
-static void	MD5Transform __P((md5_type[4], unsigned char[64]));
-static void	Encode __P((unsigned char *, md5_type *, unsigned int));
-static void	Decode __P((md5_type *, unsigned char *, unsigned int));
+static void MD5Transform(md5_type state[], unsigned char block[]);
+static void Encode(unsigned char *output, md5_type *input, unsigned int len);
+static void Decode(md5_type *output, unsigned char *input, unsigned int len);
 
 static unsigned char PADDING[64] = {
   0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -110,9 +110,10 @@ static unsigned char PADDING[64] = {
 /*
  * MD5 initialization. Begins an MD5 operation, writing a new context.
  */
-void
-MD5Init(context)
-	MD5_CTX *context;	/* context */
+void 
+MD5Init (
+    MD5_CTX *context	/* context */
+)
 {
 	context->count[0] = context->count[1] = 0;
 	/*
@@ -129,11 +130,12 @@ MD5Init(context)
  * operation, processing another message block, and updating the
  * context.
  */
-void
-MD5Update(context, input, inputLen)
-	MD5_CTX	*context;		/* context */
-	unsigned char *input;		/* input block */
-	unsigned int inputLen;		/* length of input block */
+void 
+MD5Update (
+    MD5_CTX *context,		/* context */
+    unsigned char *input,		/* input block */
+    unsigned int inputLen		/* length of input block */
+)
 {
 	unsigned int i, index, partLen;
 
@@ -170,10 +172,11 @@ MD5Update(context, input, inputLen)
  * MD5 finalization. Ends an MD5 message-digest	operation, writing the
  * the message digest and zeroizing the context.
  */
-void
-MD5Final(digest, context)
-	unsigned char	digest[16];	/* message digest */
-	MD5_CTX	*context;		/* context */
+void 
+MD5Final (
+    unsigned char digest[16],	/* message digest */
+    MD5_CTX *context		/* context */
+)
 {
 	unsigned char	bits[8];
 	unsigned int	index, padLen;
@@ -201,10 +204,8 @@ MD5Final(digest, context)
 
 /* MD5 basic transformation. Transforms	state based on block.
  */
-static void
-MD5Transform(state, block)
-	md5_type	state[4];
-	unsigned char	block[64];
+static void 
+MD5Transform(md5_type state[4], unsigned char block[64])
 {
 	md5_type	a = state[0], b	= state[1], c = state[2], d = state[3],
 				x[16];
@@ -298,11 +299,8 @@ MD5Transform(state, block)
  * Encodes input (md5_type) into output (unsigned char). Assumes len is
  * a multiple of 4.
  */
-static void
-Encode(output, input, len)
-	unsigned char	*output;
-	md5_type	*input;
-	unsigned int	len;
+static void 
+Encode(unsigned char *output, md5_type *input, unsigned int len)
 {
 	unsigned int i, j;
 
@@ -318,11 +316,8 @@ Encode(output, input, len)
  * Decodes input (unsigned char) into output (md5_type). Assumes len is
  * a multiple of 4.
  */
-static void
-Decode(output, input, len)
-	md5_type	*output;
-	unsigned char	*input;
-	unsigned int	len;
+static void 
+Decode(md5_type *output, unsigned char *input, unsigned int len)
 {
 	unsigned int	i, j;
 

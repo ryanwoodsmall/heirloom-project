@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)edit.c	2.13 (gritter) 9/4/04";
+static char sccsid[] = "@(#)edit.c	2.15 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -52,14 +52,14 @@ static char sccsid[] = "@(#)edit.c	2.13 (gritter) 9/4/04";
  *
  * Perform message editing functions.
  */
-static int	edit1 __P((int *, int));
+
+static int edit1(int *msgvec, int type);
 
 /*
  * Edit a message list.
  */
 int
-editor(v)
-	void *v;
+editor(void *v)
 {
 	int *msgvec = v;
 
@@ -69,9 +69,8 @@ editor(v)
 /*
  * Invoke the visual editor on a message list.
  */
-int
-visual(v)
-	void *v;
+int 
+visual(void *v)
 {
 	int *msgvec = v;
 
@@ -83,10 +82,8 @@ visual(v)
  * (which should not exist) and forking an editor on it.
  * We get the editor from the stuff above.
  */
-static int
-edit1(msgvec, type)
-	int *msgvec;
-	int type;
+static int 
+edit1(int *msgvec, int type)
 {
 	int c;
 	int i;
@@ -167,12 +164,8 @@ edit1(msgvec, type)
  * "Type" is 'e' for ed, 'v' for vi.
  */
 FILE *
-run_editor(fp, size, type, readonly, fromline, hp)
-	FILE *fp;
-	off_t size;
-	int type, readonly;
-	char *fromline;
-	struct header *hp;
+run_editor(FILE *fp, off_t size, int type, int readonly, char *fromline,
+		struct header *hp)
 {
 	FILE *nf = NULL;
 	int t;

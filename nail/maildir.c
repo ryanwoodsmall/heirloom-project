@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.11 (gritter) 9/22/04";
+static char sccsid[] = "@(#)maildir.c	1.14 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -66,28 +66,26 @@ static long	mdprime;
 
 static sigjmp_buf	maildirjmp;
 
-static int	maildir_setfile1 __P((const char *, int, int));
-static int	subdir __P((const char *, const char *, int));
-static void	cleantmp __P((const char *));
-static void	maildircatch __P((int));
-static void	append __P((const char *, const char *, const char *));
-static void	readin __P((const char *, struct message *));
-static int	mdcmp __P((const void *, const void *));
-static void	maildir_update __P((void));
-static void	move __P((struct message *));
-static char	*mkname __P((time_t, enum mflag, const char *));
-static enum okay	maildir_append1 __P((const char *, FILE *, off_t,
-				long, enum mflag));
-static enum okay	trycreate __P((const char *));
-static enum okay	mkmaildir __P((const char *));
-static struct message	*mdlook __P((const char *, struct message *));
-static void	mktable __P((void));
-static enum okay	subdir_remove __P((const char *, const char *));
+static int maildir_setfile1(const char *name, int newmail, int omsgCount);
+static int mdcmp(const void *a, const void *b);
+static int subdir(const char *name, const char *sub, int newmail);
+static void cleantmp(const char *name);
+static void append(const char *name, const char *sub, const char *fn);
+static void readin(const char *name, struct message *m);
+static void maildir_update(void);
+static void move(struct message *m);
+static char *mkname(time_t t, enum mflag f, const char *pref);
+static void maildircatch(int s);
+static enum okay maildir_append1(const char *name, FILE *fp, off_t off1,
+		long size, enum mflag flag);
+static enum okay trycreate(const char *name);
+static enum okay mkmaildir(const char *name);
+static struct message *mdlook(const char *name, struct message *data);
+static void mktable(void);
+static enum okay subdir_remove(const char *name, const char *sub);
 
-int
-maildir_setfile(name, newmail, isedit)
-	const char	*name;
-	int	newmail, isedit;
+int 
+maildir_setfile(const char *name, int newmail, int isedit)
 {
 	sighandler_type	saveint;
 	struct cw	cw;
@@ -160,10 +158,8 @@ maildir_setfile(name, newmail, isedit)
 	return 0;
 }
 
-static int
-maildir_setfile1(name, newmail, omsgCount)
-	const char	*name;
-	int	newmail, omsgCount;
+static int 
+maildir_setfile1(const char *name, int newmail, int omsgCount)
 {
 	int	i;
 
@@ -196,9 +192,8 @@ maildir_setfile1(name, newmail, omsgCount)
  * a maildir folder by 'copy *', the order of the messages in nail will
  * not change.
  */
-static int
-mdcmp(a, b)
-	const void	*a, *b;
+static int 
+mdcmp(const void *a, const void *b)
 {
 	long	i;
 
@@ -209,10 +204,8 @@ mdcmp(a, b)
 	return i;
 }
 
-static int
-subdir(name, sub, newmail)
-	const char	*name, *sub;
-	int	newmail;
+static int 
+subdir(const char *name, const char *sub, int newmail)
 {
 	DIR	*dirfd;
 	struct dirent	*dp;
@@ -239,9 +232,8 @@ subdir(name, sub, newmail)
 	return 0;
 }
 
-static void
-cleantmp(name)
-	const char	*name;
+static void 
+cleantmp(const char *name)
 {
 	struct stat	st;
 	DIR	*dirfd;
@@ -276,9 +268,8 @@ cleantmp(name)
 	closedir(dirfd);
 }
 
-static void
-append(name, sub, fn)
-	const char	*name, *sub, *fn;
+static void 
+append(const char *name, const char *sub, const char *fn)
 {
 	struct message	*m;
 	size_t	sz;
@@ -333,10 +324,8 @@ append(name, sub, fn)
 	return;
 }
 
-static void
-readin(name, m)
-	const char	*name;
-	struct message	*m;
+static void 
+readin(const char *name, struct message *m)
 {
 	char	*buf, *bp;
 	size_t	bufsize, buflen, count;
@@ -414,7 +403,7 @@ maildir_quit(void)
 	cwrelse(&cw);
 }
 
-void
+static void
 maildir_update(void)
 {
 	FILE	*readstat = NULL;
@@ -489,9 +478,8 @@ free:	for (m = &message[0]; m < &message[msgCount]; m++)
 		free(m->m_maildir_file);
 }
 
-static void
-move(m)
-	struct message	*m;
+static void 
+move(struct message *m)
 {
 	char	*fn, *new;
 
@@ -511,10 +499,7 @@ move(m)
 }
 
 static char *
-mkname(t, f, pref)
-	time_t	t;
-	enum mflag	f;
-	const char	*pref;
+mkname(time_t t, enum mflag f, const char *pref)
 {
 	static unsigned long	count;
 	static pid_t	mypid;
@@ -577,17 +562,14 @@ mkname(t, f, pref)
 	return cp;
 }
 
-static void
-maildircatch(s)
-	int	s;
+static void 
+maildircatch(int s)
 {
 	siglongjmp(maildirjmp, s);
 }
 
 enum okay
-maildir_append(name, fp)
-	const char	*name;
-	FILE	*fp;
+maildir_append(const char *name, FILE *fp)
 {
 	char	*buf, *bp, *lp;
 	size_t	bufsize, buflen, count;
@@ -661,12 +643,8 @@ maildir_append(name, fp)
 }
 
 static enum okay
-maildir_append1(name, fp, off1, size, flag)
-	const char	*name;
-	FILE	*fp;
-	off_t	off1;
-	long	size;
-	enum mflag	flag;
+maildir_append1(const char *name, FILE *fp, off_t off1, long size,
+		enum mflag flag)
 {
 	const int	attempts = 43200;
 	struct stat	st;
@@ -720,9 +698,8 @@ maildir_append1(name, fp, off1, size, flag)
 	return OKAY;
 }
 
-static enum okay
-trycreate(name)
-	const char	*name;
+static enum okay 
+trycreate(const char *name)
 {
 	struct stat	st;
 
@@ -739,9 +716,8 @@ trycreate(name)
 	return OKAY;
 }
 
-static enum okay
-mkmaildir(name)
-	const char	*name;
+static enum okay 
+mkmaildir(const char *name)
 {
 	char	*np;
 	size_t	sz;
@@ -765,9 +741,7 @@ mkmaildir(name)
 }
 
 static struct message *
-mdlook(name, data)
-	const char	*name;
-	struct message	*data;
+mdlook(const char *name, struct message *data)
 {
 	struct mditem	*md;
 	unsigned	c, h, n = 0;
@@ -794,8 +768,8 @@ mdlook(name, data)
 	return md->md_data ? md->md_data : NULL;
 }
 
-static void
-mktable()
+static void 
+mktable(void)
 {
 	int	i;
 
@@ -805,9 +779,8 @@ mktable()
 		mdlook(&message[i].m_maildir_file[4], &message[i]);
 }
 
-static enum okay
-subdir_remove(name, sub)
-	const char	*name, *sub;
+static enum okay 
+subdir_remove(const char *name, const char *sub)
 {
 	char	*path;
 	int	pathsize, pathend, namelen, sublen, n;
@@ -857,9 +830,8 @@ subdir_remove(name, sub)
 	return OKAY;
 }
 
-enum okay
-maildir_remove(name)
-	const char	*name;
+enum okay 
+maildir_remove(const char *name)
 {
 	if (subdir_remove(name, "tmp") == STOP ||
 			subdir_remove(name, "new") == STOP ||

@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.201 (gritter) 9/26/04";
+static char sccsid[] = "@(#)imap.c	1.204 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -168,88 +168,93 @@ static volatile int	imaplock;
 
 static int	same_imap_account;
 
-static void	imap_timer_off __P((void));
-static void	imap_other_get __P((char *));
-static void	imap_response_get __P((const char **));
-static void	imap_response_parse __P((void));
-static enum okay	imap_answer __P((struct mailbox *, int));
-static enum okay	imap_finish __P((struct mailbox *));
-static void	imapcatch __P((int));
-static enum okay	imap_noop1 __P((struct mailbox *));
-static void	imapalarm __P((int));
-static void	rec_queue __P((enum rec_type, unsigned long));
-static enum okay	rec_dequeue __P((void));
-static void	rec_rmqueue __P((void));
-static enum okay	imap_preauth __P((struct mailbox *, const char *,
-				const char *));
-static enum okay	imap_capability __P((struct mailbox *));
-static enum okay	imap_auth __P((struct mailbox *, const char *, char *,
-				const char *));
-static enum okay	imap_login __P((struct mailbox *, char *,
-				const char *));
-static enum okay	imap_cram_md5 __P((struct mailbox *, char *,
-				const char *));
+static void imap_other_get(char *pp);
+static void imap_response_get(const char **cp);
+static void imap_response_parse(void);
+static enum okay imap_answer(struct mailbox *mp, int errprnt);
+static enum okay imap_parse_list(void);
+static enum okay imap_finish(struct mailbox *mp);
+static void imap_timer_off(void);
+static void imapcatch(int s);
+static enum okay imap_noop1(struct mailbox *mp);
+static void rec_queue(enum rec_type type, unsigned long count);
+static enum okay rec_dequeue(void);
+static void rec_rmqueue(void);
+static void imapalarm(int s);
+static int imap_use_starttls(const char *uhp);
+static enum okay imap_preauth(struct mailbox *mp, const char *xserver,
+		const char *uhp);
+static enum okay imap_capability(struct mailbox *mp);
+static enum okay imap_auth(struct mailbox *mp, const char *uhp,
+		char *xuser, const char *pass);
+static enum okay imap_cram_md5(struct mailbox *mp,
+		char *xuser, const char *xpass);
+static enum okay imap_login(struct mailbox *mp, char *xuser, const char *xpass);
 #ifdef	USE_GSSAPI
-static enum okay	imap_gss __P((struct mailbox *, char *));
+static enum okay imap_gss(struct mailbox *mp, char *user);
 #endif	/* USE_GSSAPI */
-static enum okay	imap_flags __P((struct mailbox *, unsigned, unsigned));
-static void	imap_init __P((struct mailbox *, int));
-static void	imap_setptr __P((struct mailbox *, int, int, int *));
-static char	*imap_have_password __P((const char *));
-static void	imap_split __P((char **, const char **, int *, const char **,
-			char **, char **, const char **, char **));
-static int	imap_fetchdata __P((struct mailbox *, struct message *, size_t,
-			int, const char *, size_t, long));
-static enum okay	imap_get __P((struct mailbox *, struct message *,
-				enum needspec));
-static void	commitmsg __P((struct mailbox *, struct message *,
-				struct message, enum havespec));
-static enum okay	imap_fetchheaders __P((struct mailbox *,
-				struct message *, int, int));
-static int	imap_setfile1 __P((const char *, int, int, int));
-static enum okay	imap_exit __P((struct mailbox *));
-static enum okay	imap_delete __P((struct mailbox *, int,
-				struct message *));
-static enum okay	imap_close __P((struct mailbox *));
-static enum okay	imap_update __P((struct mailbox *));
-static enum okay	imap_store __P((struct mailbox *,
-				struct message *, int, int, const char *, int));
-static enum okay	imap_unstore __P((struct message *, int, const char *));
-static const char	*tag __P((int));
-static char	*imap_putflags __P((int));
-static void	imap_getflags __P((const char *, char **, enum mflag *));
-static enum okay	imap_append1 __P((struct mailbox *, const char *,
-				FILE *, off_t, long, enum mflag, time_t));
-static enum okay	imap_append0 __P((struct mailbox *, const char *,
-				FILE *));
-static enum okay	imap_parse_list __P((void));
-static enum okay	imap_list1 __P((struct mailbox *, const char *,
-				struct list_item **, struct list_item **, int));
-static enum okay	imap_list __P((struct mailbox *, const char *, int,
-				FILE *));
-static void	dopr __P((FILE *));
-static enum okay	imap_copy1 __P((struct mailbox *, struct message *,
-				int, const char *));
-static enum okay	imap_copyuid_parse __P((const char *, unsigned long *,
-				unsigned long *, unsigned long *));
-static enum okay	imap_appenduid_parse __P((const char *, unsigned long *,
-				unsigned long *));
-static enum okay	imap_copyuid __P((struct mailbox *, struct message *,
-				const char *));
-static enum okay	imap_appenduid __P((struct mailbox *, FILE *, time_t,
-				long, long, long, long, int, const char *));
-static enum okay	imap_appenduid_cached __P((struct mailbox *, FILE *));
-static enum okay	imap_search2 __P((struct mailbox *, struct message *,
-				int, const char *, int));
-static enum okay	imap_remove1 __P((struct mailbox *, const char *));
-static enum okay	imap_rename1 __P((struct mailbox *, const char *,
-				const char *));
-static char	*imap_strex __P((const char *, char **));
-static enum okay	check_expunged __P((void));
+static enum okay imap_flags(struct mailbox *mp, unsigned X, unsigned Y);
+static void imap_init(struct mailbox *mp, int n);
+static void imap_setptr(struct mailbox *mp, int newmail, int transparent,
+		int *prevcount);
+static char *imap_have_password(const char *server);
+static void imap_split(char **server, const char **sp, int *use_ssl,
+		const char **cp, char **uhp, char **mbx,
+		const char **pass, char **user);
+static int imap_setfile1(const char *xserver, int newmail, int isedit,
+		int transparent);
+static int imap_fetchdata(struct mailbox *mp, struct message *m,
+		size_t expected, int need,
+		const char *head, size_t headsize, long headlines);
+static void imap_putstr(struct mailbox *mp, struct message *m,
+		const char *str,
+		const char *head, size_t headsize, long headlines);
+static enum okay imap_get(struct mailbox *mp, struct message *m,
+		enum needspec need);
+static void commitmsg(struct mailbox *mp, struct message *to,
+		struct message from, enum havespec have);
+static enum okay imap_fetchheaders(struct mailbox *mp, struct message *m,
+		int bot, int top);
+static enum okay imap_exit(struct mailbox *mp);
+static enum okay imap_delete(struct mailbox *mp, int n, struct message *m);
+static enum okay imap_close(struct mailbox *mp);
+static enum okay imap_update(struct mailbox *mp);
+static enum okay imap_store(struct mailbox *mp, struct message *m,
+		int n, int c, const char *sp, int needstat);
+static enum okay imap_unstore(struct message *m, int n, const char *flag);
+static const char *tag(int new);
+static char *imap_putflags(int f);
+static void imap_getflags(const char *cp, char **xp, enum mflag *f);
+static enum okay imap_append1(struct mailbox *mp, const char *name, FILE *fp,
+		off_t off1, long xsize, enum mflag flag, time_t t);
+static enum okay imap_append0(struct mailbox *mp, const char *name, FILE *fp);
+static enum okay imap_list1(struct mailbox *mp, const char *base,
+		struct list_item **list, struct list_item **lend, int level);
+static enum okay imap_list(struct mailbox *mp, const char *base,
+		int strip, FILE *fp);
+static void dopr(FILE *fp);
+static enum okay imap_copy1(struct mailbox *mp, struct message *m, int n,
+		const char *name);
+static enum okay imap_copyuid_parse(const char *cp, unsigned long *uidvalidity,
+		unsigned long *olduid, unsigned long *newuid);
+static enum okay imap_appenduid_parse(const char *cp,
+		unsigned long *uidvalidity, unsigned long *uid);
+static enum okay imap_copyuid(struct mailbox *mp, struct message *m,
+		const char *name);
+static enum okay imap_appenduid(struct mailbox *mp, FILE *fp, time_t t,
+		long off1, long xsize, long size, long lines,
+		int flag, const char *name);
+static enum okay imap_appenduid_cached(struct mailbox *mp, FILE *fp);
+static enum okay imap_search2(struct mailbox *mp, struct message *m,
+		int count, const char *spec, int f);
+static enum okay imap_remove1(struct mailbox *mp, const char *name);
+static enum okay imap_rename1(struct mailbox *mp, const char *old,
+		const char *new);
+static char *imap_strex(const char *cp, char **xp);
+static enum okay check_expunged(void);
 
-static void
-imap_other_get(pp)
-	char *pp;
+static void 
+imap_other_get(char *pp)
 {
 	char	*xp;
 
@@ -293,9 +298,8 @@ imap_other_get(pp)
 	responded_other_text = pp;
 }
 
-static void
-imap_response_get(cp)
-	const char **cp;
+static void 
+imap_response_get(const char **cp)
 {
 	if (ascncasecmp(*cp, "OK ", 3) == 0) {
 		*cp += 3;
@@ -316,8 +320,8 @@ imap_response_get(cp)
 		response_status = RESPONSE_OTHER;
 }
 
-static void
-imap_response_parse()
+static void 
+imap_response_parse(void)
 {
 	static char	*parsebuf;
 	static size_t	parsebufsize;
@@ -384,10 +388,8 @@ imap_response_parse()
 		imap_other_get(pp);
 }
 
-static enum okay
-imap_answer(mp, errprnt)
-	struct mailbox *mp;
-	int errprnt;
+static enum okay 
+imap_answer(struct mailbox *mp, int errprnt)
 {
 	int sz, i, complete;
 	enum okay ok = STOP;
@@ -462,8 +464,8 @@ again:	if ((sz = sgetline(&imapbuf, &imapbufsize, NULL, &mp->mb_sock)) > 0) {
 	return ok;
 }
 
-static enum okay
-imap_parse_list()
+static enum okay 
+imap_parse_list(void)
 {
 	char	*cp;
 
@@ -519,17 +521,16 @@ imap_parse_list()
 	return OKAY;
 }
 
-static enum okay
-imap_finish(mp)
-	struct mailbox *mp;
+static enum okay 
+imap_finish(struct mailbox *mp)
 {
 	while (mp->mb_sock.s_fd > 0 && mp->mb_active & MB_COMD)
 		imap_answer(mp, 1);
 	return OKAY;
 }
 
-static void
-imap_timer_off()
+static void 
+imap_timer_off(void)
 {
 	if (imapkeepalive > 0) {
 		alarm(0);
@@ -537,9 +538,8 @@ imap_timer_off()
 	}
 }
 
-static void
-imapcatch(s)
-	int s;
+static void 
+imapcatch(int s)
 {
 	if (reset_tio)
 		tcsetattr(0, TCSADRAIN, &otio);
@@ -555,9 +555,8 @@ imapcatch(s)
 	siglongjmp(imapjmp, 1);
 }
 
-static enum okay
-imap_noop1(mp)
-	struct mailbox *mp;
+static enum okay 
+imap_noop1(struct mailbox *mp)
 {
 	char	o[LINESIZE];
 	FILE	*queuefp = NULL;
@@ -568,8 +567,8 @@ imap_noop1(mp)
 	return OKAY;
 }
 
-enum okay
-imap_noop()
+enum okay 
+imap_noop(void)
 {
 	sighandler_type	saveint, savepipe;
 	enum okay	ok = STOP;
@@ -596,10 +595,8 @@ imap_noop()
 	return ok;
 }
 
-static void
-rec_queue(type, count)
-	enum rec_type	type;
-	unsigned long	count;
+static void 
+rec_queue(enum rec_type type, unsigned long count)
 {
 	struct record	*rp;
 
@@ -613,8 +610,8 @@ rec_queue(type, count)
 		record = recend = rp;
 }
 
-static enum okay
-rec_dequeue()
+static enum okay 
+rec_dequeue(void)
 {
 	struct message	*omessage;
 	enum okay	ok = OKAY;
@@ -686,8 +683,8 @@ rec_dequeue()
 	return ok;
 }
 
-static void
-rec_rmqueue()
+static void 
+rec_rmqueue(void)
 {
 	struct record	*rp, *rq = NULL;
 
@@ -700,9 +697,8 @@ rec_rmqueue()
 }
 
 /*ARGSUSED*/
-static void
-imapalarm(s)
-	int s;
+static void 
+imapalarm(int s)
 {
 	sighandler_type	saveint;
 	sighandler_type savepipe;
@@ -731,9 +727,8 @@ brk:	alarm(imapkeepalive);
 out:	imaplock--;
 }
 
-static int
-imap_use_starttls(uhp)
-	const char	*uhp;
+static int 
+imap_use_starttls(const char *uhp)
 {
 	char	*var;
 
@@ -743,10 +738,8 @@ imap_use_starttls(uhp)
 	return value(var) != NULL;
 }
 
-static enum okay
-imap_preauth(mp, xserver, uhp)
-	struct mailbox	*mp;
-	const char	*xserver, *uhp;
+static enum okay 
+imap_preauth(struct mailbox *mp, const char *xserver, const char *uhp)
 {
 	char	*server, *cp;
 
@@ -779,9 +772,8 @@ imap_preauth(mp, xserver, uhp)
 	return OKAY;
 }
 
-static enum okay
-imap_capability(mp)
-	struct mailbox	*mp;
+static enum okay 
+imap_capability(struct mailbox *mp)
 {
 	char	o[LINESIZE];
 	FILE	*queuefp = NULL;
@@ -810,11 +802,8 @@ imap_capability(mp)
 	return ok;
 }
 
-static enum okay
-imap_auth(mp, uhp, xuser, pass)
-	struct mailbox *mp;
-	char *xuser;
-	const char *uhp, *pass;
+static enum okay 
+imap_auth(struct mailbox *mp, const char *uhp, char *xuser, const char *pass)
 {
 	char	*var;
 	char	*auth;
@@ -847,11 +836,8 @@ imap_auth(mp, uhp, xuser, pass)
 /*
  * Implementation of RFC 2194.
  */
-static enum okay
-imap_cram_md5(mp, xuser, xpass)
-	struct mailbox *mp;
-	char *xuser;
-	const char *xpass;
+static enum okay 
+imap_cram_md5(struct mailbox *mp, char *xuser, const char *xpass)
 {
 	char o[LINESIZE];
 	const char	*user, *pass;
@@ -885,11 +871,8 @@ retry:	if (xuser == NULL) {
 	return ok;
 }
 
-static enum okay
-imap_login(mp, xuser, xpass)
-	struct mailbox *mp;
-	char *xuser;
-	const char *xpass;
+static enum okay 
+imap_login(struct mailbox *mp, char *xuser, const char *xpass)
 {
 	char o[LINESIZE];
 	const char	*user, *pass;
@@ -923,11 +906,7 @@ retry:	if (xuser == NULL) {
 #endif	/* USE_GSSAPI */
 
 enum okay
-imap_select(mp, size, count, mbx)
-	struct mailbox *mp;
-	off_t *size;
-	int *count;
-	const char *mbx;
+imap_select(struct mailbox *mp, off_t *size, int *count, const char *mbx)
 {
 	enum okay ok = OKAY;
 	char	*cp;
@@ -952,10 +931,8 @@ imap_select(mp, size, count, mbx)
 	return ok;
 }
 
-static enum okay
-imap_flags(mp, X, Y)
-	struct mailbox *mp;
-	unsigned	X, Y;
+static enum okay 
+imap_flags(struct mailbox *mp, unsigned X, unsigned Y)
 {
 	char o[LINESIZE];
 	FILE	*queuefp = NULL;
@@ -1021,10 +998,8 @@ imap_flags(mp, X, Y)
 	return OKAY;
 }
 
-static void
-imap_init(mp, n)
-	struct mailbox *mp;
-	int n;
+static void 
+imap_init(struct mailbox *mp, int n)
 {
 	struct message *m = &message[n];
 
@@ -1033,11 +1008,8 @@ imap_init(mp, n)
 	m->m_offset = 0;
 }
 
-static void
-imap_setptr(mp, newmail, transparent, prevcount)
-	struct mailbox *mp;
-	int newmail, transparent;
-	int *prevcount;
+static void 
+imap_setptr(struct mailbox *mp, int newmail, int transparent, int *prevcount)
 {
 	struct message	*omessage = 0;
 	int i, omsgCount = 0;
@@ -1088,8 +1060,7 @@ imap_setptr(mp, newmail, transparent, prevcount)
 }
 
 static char *
-imap_have_password(server)
-	const char *server;
+imap_have_password(const char *server)
 {
 	char *var, *cp;
 
@@ -1138,18 +1109,14 @@ imap_split(char **server, const char **sp, int *use_ssl, const char **cp,
 	}
 }
 
-int
-imap_setfile(xserver, newmail, isedit)
-	const char *xserver;
-	int newmail, isedit;
+int 
+imap_setfile(const char *xserver, int newmail, int isedit)
 {
 	return imap_setfile1(xserver, newmail, isedit, 0);
 }
 
-static int
-imap_setfile1(xserver, newmail, isedit, transparent)
-	const char *xserver;
-	int newmail, isedit, transparent;
+static int 
+imap_setfile1(const char *xserver, int newmail, int isedit, int transparent)
 {
 	struct sock	so;
 	sighandler_type	saveint;
@@ -1302,14 +1269,9 @@ done:	setmsize(msgCount);
 }
 
 static int
-imap_fetchdata(mp, m, expected, need, head, headsize, headlines)
-	struct	mailbox *mp;
-	struct	message *m;
-	size_t	expected;
-	int	need;
-	const char	*head;
-	size_t	headsize;
-	long	headlines;
+imap_fetchdata(struct mailbox *mp, struct message *m, size_t expected,
+		int need,
+		const char *head, size_t headsize, long headlines)
 {
 	char	*line = NULL, *lp;
 	size_t	linesize = 0, linelen, size = 0;
@@ -1393,15 +1355,41 @@ imap_fetchdata(mp, m, expected, need, head, headsize, headlines)
 	return excess;
 }
 
-static enum okay
-imap_get(mp, m, need)
-	struct mailbox *mp;
-	struct message *m;
-	enum needspec need;
+static void
+imap_putstr(struct mailbox *mp, struct message *m, const char *str,
+		const char *head, size_t headsize, long headlines)
+{
+	off_t	offset;
+	size_t	len;
+
+	len = strlen(str);
+	fseek(mp->mb_otf, 0L, SEEK_END);
+	offset = ftell(mp->mb_otf);
+	if (head)
+		fwrite(head, 1, headsize, mp->mb_otf);
+	if (len > 0) {
+		fwrite(str, 1, len, mp->mb_otf);
+		fputc('\n', mp->mb_otf);
+		len++;
+	}
+	fflush(mp->mb_otf);
+	if (m != NULL) {
+		m->m_size = headsize + len;
+		m->m_lines = headlines + 1;
+		m->m_block = nail_blockof(offset);
+		m->m_offset = nail_offsetof(offset);
+		m->m_have |= HAVE_HEADER|HAVE_BODY;
+		m->m_xlines = m->m_lines;
+		m->m_xsize = m->m_size;
+	}
+}
+
+static enum okay 
+imap_get(struct mailbox *mp, struct message *m, enum needspec need)
 {
 	sighandler_type	saveint = SIG_IGN;
 	sighandler_type savepipe = SIG_IGN;
-	char o[LINESIZE], *cp = NULL, *item = NULL, *resp = NULL;
+	char o[LINESIZE], *cp = NULL, *item = NULL, *resp = NULL, *loc = NULL;
 	size_t expected, headsize = 0;
 	int number = m - message + 1;
 	enum okay ok = STOP;
@@ -1417,6 +1405,7 @@ imap_get(mp, m, need)
 	(void)&number;
 	(void)&need;
 	(void)&cp;
+	(void)&loc;
 	(void)&ok;
 	(void)&headsize;
 	(void)&head;
@@ -1495,7 +1484,7 @@ imap_get(mp, m, need)
 		if (response_status != RESPONSE_OTHER ||
 				response_other != MESSAGE_DATA_FETCH)
 			continue;
-		if (asccasestr(responded_other_text, resp) == NULL)
+		if ((loc = asccasestr(responded_other_text, resp)) == NULL)
 			continue;
 		if (m->m_uid) {
 			if ((cp = asccasestr(responded_other_text, "UID "))) {
@@ -1510,9 +1499,15 @@ imap_get(mp, m, need)
 		if ((cp = strrchr(responded_other_text, '{')) == NULL) {
 			if (m->m_uid ? m->m_uid != u : n != number)
 				continue;
-			m->m_have |= HAVE_HEADER|HAVE_BODY;
-			m->m_xlines = m->m_lines;
-			m->m_xsize = m->m_size;
+			if ((cp = strchr(loc, '"')) != NULL) {
+				cp = imap_unquotestr(cp);
+				imap_putstr(mp, m, cp,
+						head, headsize, headlines);
+			} else {
+				m->m_have |= HAVE_HEADER|HAVE_BODY;
+				m->m_xlines = m->m_lines;
+				m->m_xsize = m->m_size;
+			}
 			goto out;
 		}
 		expected = atol(&cp[1]);
@@ -1553,26 +1548,22 @@ out:	while (mp->mb_active & MB_COMD)
 	return ok;
 }
 
-enum okay
-imap_header(m)
-	struct message *m;
+enum okay 
+imap_header(struct message *m)
 {
 	return imap_get(&mb, m, NEED_HEADER);
 }
 
 
-enum okay
-imap_body(m)
-	struct message *m;
+enum okay 
+imap_body(struct message *m)
 {
 	return imap_get(&mb, m, NEED_BODY);
 }
 
-static void
-commitmsg(mp, to, from, have)
-	struct mailbox *mp;
-	struct message *to, from;
-	enum havespec	have;
+static void 
+commitmsg(struct mailbox *mp, struct message *to,
+		struct message from, enum havespec have)
 {
 	to->m_size = from.m_size;
 	to->m_lines = from.m_lines;
@@ -1586,11 +1577,13 @@ commitmsg(mp, to, from, have)
 	putcache(mp, to);
 }
 
-static enum okay
-imap_fetchheaders(mp, m, bot, top)
-	struct mailbox	*mp;
-	struct message	*m;
-	int	bot, top;	/* bot > top */
+static enum okay 
+imap_fetchheaders (
+    struct mailbox *mp,
+    struct message *m,
+    int bot,
+    int top	/* bot > top */
+)
 {
 	char	o[LINESIZE], *cp;
 	struct message	mt;
@@ -1667,9 +1660,8 @@ imap_fetchheaders(mp, m, bot, top)
 	return ok;
 }
 
-void
-imap_getheaders(bot, top)
-	int bot, top;
+void 
+imap_getheaders(int bot, int top)
 {
 	sighandler_type	saveint, savepipe;
 	enum okay	ok = STOP;
@@ -1722,9 +1714,8 @@ imap_getheaders(bot, top)
 	imaplock = 0;
 }
 
-static enum okay
-imap_exit(mp)
-	struct mailbox *mp;
+static enum okay 
+imap_exit(struct mailbox *mp)
 {
 	char	o[LINESIZE];
 	FILE	*queuefp = NULL;
@@ -1737,11 +1728,8 @@ imap_exit(mp)
 	return OKAY;
 }
 
-static enum okay
-imap_delete(mp, n, m)
-	struct mailbox *mp;
-	int n;
-	struct message *m;
+static enum okay 
+imap_delete(struct mailbox *mp, int n, struct message *m)
 {
 	imap_store(mp, m, n, '+', "\\Deleted", 0);
 	if (mp->mb_type == MB_IMAP)
@@ -1749,9 +1737,8 @@ imap_delete(mp, n, m)
 	return OKAY;
 }
 
-static enum okay
-imap_close(mp)
-	struct mailbox *mp;
+static enum okay 
+imap_close(struct mailbox *mp)
 {
 	char	o[LINESIZE];
 	FILE	*queuefp = NULL;
@@ -1762,9 +1749,8 @@ imap_close(mp)
 	return OKAY;
 }
 
-static enum okay
-imap_update(mp)
-	struct mailbox *mp;
+static enum okay 
+imap_update(struct mailbox *mp)
 {
 	FILE *readstat = NULL;
 	struct message *m;
@@ -1868,8 +1854,8 @@ bypass:	if (readstat != NULL)
 	return OKAY;
 }
 
-void
-imap_quit()
+void 
+imap_quit(void)
 {
 	sighandler_type	saveint;
 	sighandler_type savepipe;
@@ -1906,12 +1892,9 @@ imap_quit()
 	imaplock = 0;
 }
 
-static enum okay
-imap_store(mp, m, n, c, sp, needstat)
-	struct mailbox *mp;
-	struct message *m;
-	int n, c, needstat;
-	const char *sp;
+static enum okay 
+imap_store(struct mailbox *mp, struct message *m, int n,
+		int c, const char *sp, int needstat)
 {
 	char	o[LINESIZE];
 	FILE	*queuefp = NULL;
@@ -1939,27 +1922,20 @@ imap_store(mp, m, n, c, sp, needstat)
 	return OKAY;
 }
 
-enum okay
-imap_undelete(m, n)
-	struct message *m;
-	int n;
+enum okay 
+imap_undelete(struct message *m, int n)
 {
 	return imap_unstore(m, n, "\\Deleted");
 }
 
-enum okay
-imap_unread(m, n)
-	struct message *m;
-	int n;
+enum okay 
+imap_unread(struct message *m, int n)
 {
 	return imap_unstore(m, n, "\\Seen");
 }
 
-static enum okay
-imap_unstore(m, n, flag)
-	struct message *m;
-	int n;
-	const char	*flag;
+static enum okay 
+imap_unstore(struct message *m, int n, const char *flag)
 {
 	sighandler_type	saveint, savepipe;
 	enum okay	ok = STOP;
@@ -1996,9 +1972,8 @@ tag(int new)
 	return ts;
 }
 
-int
-imap_imap(vp)
-	void *vp;
+int 
+imap_imap(void *vp)
 {
 	sighandler_type	saveint, savepipe;
 	char	o[LINESIZE];
@@ -2035,9 +2010,8 @@ out:	safe_signal(SIGINT, saveint);
 	return ok != OKAY;
 }
 
-int
-imap_newmail(autoinc)
-	int	autoinc;
+int 
+imap_newmail(int autoinc)
 {
 	if (autoinc && had_exists < 0 && had_expunge < 0) {
 		verbose = value("verbose") != NULL;
@@ -2057,8 +2031,7 @@ imap_newmail(autoinc)
 }
 
 static char *
-imap_putflags(f)
-	int	f;
+imap_putflags(int f)
 {
 	const char	*cp;
 	char	*buf, *bp;
@@ -2097,11 +2070,8 @@ imap_putflags(f)
 	return buf;
 }
 
-static void
-imap_getflags(cp, xp, f)
-	const char	*cp;
-	char	**xp;
-	enum mflag	*f;
+static void 
+imap_getflags(const char *cp, char **xp, enum mflag *f)
 {
 	while (*cp != ')') {
 		if (*cp == '\\') {
@@ -2125,14 +2095,8 @@ imap_getflags(cp, xp, f)
 }
 
 static enum okay
-imap_append1(mp, name, fp, off1, xsize, flag, t)
-	struct mailbox *mp;
-	const char *name;
-	FILE *fp;
-	off_t off1;
-	long xsize;
-	enum mflag flag;
-	time_t t;
+imap_append1(struct mailbox *mp, const char *name, FILE *fp,
+		off_t off1, long xsize, enum mflag flag, time_t t)
 {
 	char	o[LINESIZE];
 	char	*buf;
@@ -2220,10 +2184,7 @@ out:	if (queuefp != NULL)
 }
 
 static enum okay
-imap_append0(mp, name, fp)
-	struct mailbox *mp;
-	const char *name;
-	FILE *fp;
+imap_append0(struct mailbox *mp, const char *name, FILE *fp)
 {
 	char	*buf, *bp, *lp;
 	size_t	bufsize, buflen, count;
@@ -2299,9 +2260,7 @@ imap_append0(mp, name, fp)
 }
 
 enum okay
-imap_append(xserver, fp)
-	const char *xserver;
-	FILE *fp;
+imap_append(const char *xserver, FILE *fp)
 {
 	sighandler_type	saveint, savepipe;
 	char	*server, *uhp, *mbx, *user;
@@ -2364,12 +2323,9 @@ out:	safe_signal(SIGINT, saveint);
 	return ok;
 }
 
-static enum okay
-imap_list1(mp, base, list, lend, level)
-	struct mailbox *mp;
-	const char *base;
-	struct list_item	**list, **lend;
-	int	level;
+static enum okay 
+imap_list1(struct mailbox *mp, const char *base, struct list_item **list,
+		struct list_item **lend, int level)
 {
 	char	o[LINESIZE];
 	enum okay	ok = STOP;
@@ -2407,11 +2363,7 @@ imap_list1(mp, base, list, lend, level)
 }
 
 static enum okay
-imap_list(mp, base, strip, fp)
-	struct mailbox	*mp;
-	const char	*base;
-	int	strip;
-	FILE	*fp;
+imap_list(struct mailbox *mp, const char *base, int strip, FILE *fp)
 {
 	struct list_item	*list, *lend, *lp, *lx, *ly;
 	int	n;
@@ -2458,10 +2410,8 @@ imap_list(mp, base, strip, fp)
 	return OKAY;
 }
 
-void
-imap_folders(name, strip)
-	const char	*name;
-	int	strip;
+void 
+imap_folders(const char *name, int strip)
 {
 	sighandler_type	saveint, savepipe;
 	const char	*fold, *cp, *sp;
@@ -2514,8 +2464,7 @@ out:
 }
 
 static void
-dopr(fp)
-	FILE	*fp;
+dopr(FILE *fp)
 {
 	char	o[LINESIZE], *tempfn;
 	int	c;
@@ -2550,12 +2499,8 @@ dopr(fp)
 	Fclose(out);
 }
 
-static enum okay
-imap_copy1(mp, m, n, name)
-	struct mailbox *mp;
-	struct message *m;
-	int n;
-	const char *name;
+static enum okay 
+imap_copy1(struct mailbox *mp, struct message *m, int n, const char *name)
 {
 	char	o[LINESIZE];
 	const char	*qname;
@@ -2636,11 +2581,8 @@ out:	if ((m->m_flag&(MREAD|MSTATUS)) == (MREAD|MSTATUS))
 	return ok;
 }
 
-enum okay
-imap_copy(m, n, name)
-	struct message *m;
-	int n;
-	const char *name;
+enum okay 
+imap_copy(struct message *m, int n, const char *name)
 {
 	sighandler_type	saveint, savepipe;
 	enum okay	ok = STOP;
@@ -2665,10 +2607,9 @@ imap_copy(m, n, name)
 	return ok;
 }
 
-static enum okay
-imap_copyuid_parse(cp, uidvalidity, olduid, newuid)
-	const char	*cp;
-	unsigned long	*uidvalidity, *olduid, *newuid;
+static enum okay 
+imap_copyuid_parse(const char *cp, unsigned long *uidvalidity,
+		unsigned long *olduid, unsigned long *newuid)
 {
 	char	*xp, *yp, *zp;
 
@@ -2679,10 +2620,9 @@ imap_copyuid_parse(cp, uidvalidity, olduid, newuid)
 		yp > xp && *yp == ' ' && zp > yp && *zp == ']';
 }
 
-static enum okay
-imap_appenduid_parse(cp, uidvalidity, uid)
-	const char	*cp;
-	unsigned long	*uidvalidity, *uid;
+static enum okay 
+imap_appenduid_parse(const char *cp, unsigned long *uidvalidity,
+		unsigned long *uid)
 {
 	char	*xp, *yp;
 
@@ -2692,11 +2632,8 @@ imap_appenduid_parse(cp, uidvalidity, uid)
 		yp > xp && *yp == ']';
 }
 
-static enum okay
-imap_copyuid(mp, m, name)
-	struct mailbox	*mp;
-	struct message	*m;
-	const char	*name;
+static enum okay 
+imap_copyuid(struct mailbox *mp, struct message *m, const char *name)
 {
 	const char	*cp;
 	unsigned long	uidvalidity, olduid, newuid;
@@ -2728,13 +2665,8 @@ imap_copyuid(mp, m, name)
 }
 
 static enum okay
-imap_appenduid(mp, fp, t, off1, xsize, size, lines, flag, name)
-	struct mailbox	*mp;
-	FILE	*fp;
-	time_t	t;
-	long	off1, xsize, size, lines;
-	int	flag;
-	const char	*name;
+imap_appenduid(struct mailbox *mp, FILE *fp, time_t t, long off1,
+		long xsize, long size, long lines, int flag, const char *name)
 {
 	const char	*cp;
 	unsigned long	uidvalidity, uid;
@@ -2766,9 +2698,7 @@ imap_appenduid(mp, fp, t, off1, xsize, size, lines, flag, name)
 }
 
 static enum okay
-imap_appenduid_cached(mp, fp)
-	struct mailbox	*mp;
-	FILE	*fp;
+imap_appenduid_cached(struct mailbox *mp, FILE *fp)
 {
 	FILE	*tp = NULL;
 	time_t	t;
@@ -2825,12 +2755,9 @@ stop:	free(buf);
 	return ok;
 }
 
-static enum okay
-imap_search2(mp, m, count, spec, f)
-	struct mailbox	*mp;
-	struct message	*m;
-	int	count, f;
-	const char	*spec;
+static enum okay 
+imap_search2(struct mailbox *mp, struct message *m, int count,
+		const char *spec, int f)
 {
 	char	*o;
 	size_t	osize;
@@ -2894,10 +2821,8 @@ out:	ac_free(o);
 	return ok;
 }
 
-enum okay
-imap_search1(spec, f)
-	const char	*spec;
-	int	f;
+enum okay 
+imap_search1(const char *spec, int f)
 {
 	sighandler_type	saveint, savepipe;
 	enum okay	ok = STOP;
@@ -2924,9 +2849,8 @@ imap_search1(spec, f)
 	return ok;
 }
 
-int
-imap_thisaccount(cp)
-	const char *cp;
+int 
+imap_thisaccount(const char *cp)
 {
 	if (mb.mb_type != MB_CACHE && mb.mb_type != MB_IMAP)
 		return 0;
@@ -2936,9 +2860,8 @@ imap_thisaccount(cp)
 	return strcmp(protbase(cp), mb.mb_imap_account) == 0;
 }
 
-enum okay
-imap_remove(name)
-	const char	*name;
+enum okay 
+imap_remove(const char *name)
 {
 	sighandler_type saveint, savepipe;
 	enum okay	ok = STOP;
@@ -2975,10 +2898,8 @@ imap_remove(name)
 	return ok;
 }
 
-static enum okay
-imap_remove1(mp, name)
-	struct mailbox	*mp;
-	const char	*name;
+static enum okay 
+imap_remove1(struct mailbox *mp, const char *name)
 {
 	FILE	*queuefp = NULL;
 	char	*o;
@@ -2994,9 +2915,8 @@ out:	ac_free(o);
 	return ok;
 }
 
-enum okay
-imap_rename(old, new)
-	const char	*old, *new;
+enum okay 
+imap_rename(const char *old, const char *new)
 {
 	sighandler_type saveint, savepipe;
 	enum okay	ok = STOP;
@@ -3034,10 +2954,8 @@ imap_rename(old, new)
 	return ok;
 }
 
-static enum okay
-imap_rename1(mp, old, new)
-	struct mailbox	*mp;
-	const char	*old, *new;
+static enum okay 
+imap_rename1(struct mailbox *mp, const char *old, const char *new)
 {
 	FILE	*queuefp = NULL;
 	char	*o;
@@ -3055,9 +2973,7 @@ out:	ac_free(o);
 }
 
 enum okay
-imap_dequeue(mp, fp)
-	struct mailbox	*mp;
-	FILE	*fp;
+imap_dequeue(struct mailbox *mp, FILE *fp)
 {
 	FILE	*queuefp = NULL;
 	char	o[LINESIZE], *newname;
@@ -3174,9 +3090,7 @@ imap_dequeue(mp, fp)
 }
 
 static char *
-imap_strex(cp, xp)
-	const char	*cp;
-	char	**xp;
+imap_strex(const char *cp, char **xp)
 {
 	const char	*cq;
 	char	*n;
@@ -3199,8 +3113,8 @@ imap_strex(cp, xp)
 	return n;
 }
 
-static enum okay
-check_expunged()
+static enum okay 
+check_expunged(void)
 {
 	if (expunged_messages > 0) {
 		fprintf(stderr,
@@ -3211,9 +3125,8 @@ check_expunged()
 }
 
 /*ARGSUSED*/
-int
-cconnect(vp)
-	void	*vp;
+int 
+cconnect(void *vp)
 {
 	char	*cp, *cq;
 	int	omsgCount = msgCount;
@@ -3241,9 +3154,8 @@ cconnect(vp)
 	return 0;
 }
 
-int
-cdisconnect(vp)
-	void	*vp;
+int 
+cdisconnect(void *vp)
 {
 	int	*msgvec = vp;
 
@@ -3265,9 +3177,8 @@ cdisconnect(vp)
 	}
 	return 0;
 }
-int
-ccache(vp)
-	void	*vp;
+int 
+ccache(void *vp)
 {
 	int	*msgvec = vp, *ip;
 	struct message	*mp;
@@ -3288,176 +3199,151 @@ ccache(vp)
 	return 0;
 }
 #else	/* !HAVE_SOCKETS */
-static void
-noimap()
+static void 
+noimap(void)
 {
 	fprintf(stderr, catgets(catd, CATSET, 216,
 				"No IMAP support compiled in.\n"));
 }
 
-int
-imap_setfile(server, newmail, isedit)
-	const char *server;
+int 
+imap_setfile(const char *server, int newmail, int isedit)
 {
 	noimap();
 	return -1;
 }
 
-enum okay
-imap_header(mp)
-	struct message *mp;
+enum okay 
+imap_header(struct message *mp)
 {
 	noimap();
 	return STOP;
 }
 
-enum okay
-imap_body(mp)
-	struct message *mp;
+enum okay 
+imap_body(struct message *mp)
 {
 	noimap();
 	return STOP;
 }
 
-void
-imap_getheaders(bot, top)
-	int bot, top;
+void 
+imap_getheaders(int bot, int top)
 {
 }
 
-void
-imap_quit()
+void 
+imap_quit(void)
 {
 	noimap();
 }
 
 /*ARGSUSED*/
-int
-imap_imap(vp)
-	void *vp;
+int 
+imap_imap(void *vp)
 {
 	noimap();
 	return 1;
 }
 
 /*ARGSUSED*/
-int
-imap_newmail(dummy)
-	int	dummy;
+int 
+imap_newmail(int dummy)
 {
 	return 0;
 }
 
 /*ARGSUSED*/
-enum okay
-imap_undelete(m, n)
-	struct message *m;
-	int n;
+enum okay 
+imap_undelete(struct message *m, int n)
+{
+	return STOP;
+}
+
+/*ARGSUSED*/
+enum okay 
+imap_unread(struct message *m, int n)
 {
 	return STOP;
 }
 
 /*ARGSUSED*/
 enum okay
-imap_unread(m, n)
-	struct message *m;
-	int n;
-{
-	return STOP;
-}
-
-/*ARGSUSED*/
-enum okay
-imap_append(server, fp)
-	const char *server;
-	FILE *fp;
+imap_append(const char *server, FILE *fp)
 {
 	noimap();
 	return STOP;
 }
 
 /*ARGSUSED*/
-void
-imap_folders(name, strip)
-	const char	*name;
-	int	strip;
+void 
+imap_folders(const char *name, int strip)
 {
 	noimap();
 }
 
 /*ARGSUSED*/
-enum okay
-imap_remove(name)
-	const char	*name;
+enum okay 
+imap_remove(const char *name)
 {
 	noimap();
 	return STOP;
 }
 
 /*ARGSUSED*/
-enum okay
-imap_rename(old, new)
-	const char	*old, *new;
+enum okay 
+imap_rename(const char *old, const char *new)
 {
 	noimap();
 	return STOP;
 }
 
-enum okay
-imap_copy(m, n, name)
-	struct message *m;
-	int n;
-	const char *name;
+enum okay 
+imap_copy(struct message *m, int n, const char *name)
 {
 	noimap();
 	return STOP;
 }
 
 /*ARGSUSED*/
-enum okay
-imap_search1(spec, f)
-	const char	*spec;
-	int	f;
+enum okay 
+imap_search1(const char *spec, int f)
 {
 	return STOP;
 }
 
-int
-imap_thisaccount(cp)
-	const char *cp;
+int 
+imap_thisaccount(const char *cp)
 {
 	return 0;
 }
 
-enum okay
-imap_noop()
+enum okay 
+imap_noop(void)
 {
 	noimap();
 	return STOP;
 }
 
 /*ARGSUSED*/
-int
-cconnect(vp)
-	void	*vp;
+int 
+cconnect(void *vp)
 {
 	noimap();
 	return 1;
 }
 
 /*ARGSUSED*/
-int
-cdisconnect(vp)
-	void	*vp;
+int 
+cdisconnect(void *vp)
 {
 	noimap();
 	return 1;
 }
 
 /*ARGSUSED*/
-int
-ccache(vp)
-	void	*vp;
+int 
+ccache(void *vp)
 {
 	noimap();
 	return 1;
@@ -3465,8 +3351,7 @@ ccache(vp)
 #endif	/* HAVE_SOCKETS */
 
 time_t
-imap_read_date_time(cp)
-	const char *cp;
+imap_read_date_time(const char *cp)
 {
 	time_t	t;
 	int	i, year, month, day, hour, minute, second;
@@ -3517,8 +3402,7 @@ invalid:
 }
 
 time_t
-imap_read_date(cp)
-	const char	*cp;
+imap_read_date(const char *cp)
 {
 	time_t	t;
 	int	year, month, day, i, tzdiff;
@@ -3554,8 +3438,7 @@ imap_read_date(cp)
 }
 
 const char *
-imap_make_date_time(t)
-	time_t t;
+imap_make_date_time(time_t t)
 {
 	static char	s[30];
 	struct tm	*tmptr;
@@ -3581,8 +3464,7 @@ imap_make_date_time(t)
 }
 
 char *
-imap_quotestr(s)
-	const char *s;
+imap_quotestr(const char *s)
 {
 	char	*n, *np;
 
@@ -3599,8 +3481,7 @@ imap_quotestr(s)
 }
 
 char *
-imap_unquotestr(s)
-	const char *s;
+imap_unquotestr(const char *s)
 {
 	char	*n, *np;
 

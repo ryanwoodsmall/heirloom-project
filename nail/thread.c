@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.50 (gritter) 9/9/04";
+static char sccsid[] = "@(#)thread.c	1.52 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -72,26 +72,24 @@ struct msort {
 	int	ms_n;
 };
 
-static unsigned	mhash __P((const char *, int));
-static struct mitem	*mlook __P((char *, struct mitem *, struct message *,
-				int));
-static void	adopt __P((struct message *, struct message *, int));
-static struct message *interlink __P((struct message *, long, int));
-static void	finalize __P((struct message *));
-static int	mlonglt __P((const void *, const void *));
-static int	mcharlt __P((const void *, const void *));
-static int	mfloatlt __P((const void *, const void *));
-static void	lookup __P((struct message *, struct mitem *, int));
-static void	makethreads __P((struct message *, long, int));
-static char	*skipre __P((const char *));
-static int	colpt __P((int *, int));
-static void	colps __P((struct message *, int));
-static void	colpm __P((struct message *, int, int *, int *));
+static unsigned mhash(const char *cp, int mprime);
+static struct mitem *mlook(char *id, struct mitem *mt, struct message *mdata,
+		int mprime);
+static void adopt(struct message *parent, struct message *child, int dist);
+static struct message *interlink(struct message *m, long count, int newmail);
+static void finalize(struct message *mp);
+static int mlonglt(const void *a, const void *b);
+static int mfloatlt(const void *a, const void *b);
+static int mcharlt(const void *a, const void *b);
+static void lookup(struct message *m, struct mitem *mi, int mprime);
+static void makethreads(struct message *m, long count, int newmail);
+static char *skipre(const char *cp);
+static int colpt(int *msgvec, int cl);
+static void colps(struct message *b, int cl);
+static void colpm(struct message *m, int cl, int *cc, int *uc);
 
-static unsigned
-mhash(cp, mprime)
-	const char	*cp;
-	int	mprime;
+static unsigned 
+mhash(const char *cp, int mprime)
 {
 
 	unsigned	h = 0, g;
@@ -118,11 +116,7 @@ mhash(cp, mprime)
 }
 
 static struct mitem *
-mlook(id, mt, mdata, mprime)
-	char	*id;
-	struct mitem	*mt;
-	struct message	*mdata;
-	int	mprime;
+mlook(char *id, struct mitem *mt, struct message *mdata, int mprime)
 {
 	struct mitem	*mp;
 	unsigned	h, c, n = 0;
@@ -195,10 +189,8 @@ mlook(id, mt, mdata, mprime)
  * which is connected to them by m_parent links. The first reply to a
  * message gets the m_child link.
  */
-static void
-adopt(parent, child, dist)
-	struct message	*parent, *child;
-	int	dist;
+static void 
+adopt(struct message *parent, struct message *child, int dist)
 {
 	struct message	*mp, *mq;
 
@@ -233,10 +225,7 @@ adopt(parent, child, dist)
  * links.
  */
 static struct message *
-interlink(m, count, newmail)
-	struct message	*m;
-	long	count;
-	int	newmail;
+interlink(struct message *m, long count, int newmail)
 {
 	int	i;
 	long	n;
@@ -268,9 +257,8 @@ interlink(m, count, newmail)
 	return root;
 }
 
-static void
-finalize(mp)
-	struct message	*mp;
+static void 
+finalize(struct message *mp)
 {
 	long	n;
 
@@ -281,9 +269,8 @@ finalize(mp)
 	}
 }
 
-static int
-mlonglt(a, b)
-	const void	*a, *b;
+static int 
+mlonglt(const void *a, const void *b)
 {
 	int	i;
 
@@ -294,9 +281,8 @@ mlonglt(a, b)
 	return i;
 }
 
-static int
-mfloatlt(a, b)
-	const void	*a, *b;
+static int 
+mfloatlt(const void *a, const void *b)
 {
 	float	i;
 
@@ -307,9 +293,8 @@ mfloatlt(a, b)
 	return i > 0 ? 1 : i < 0 ? -1 : 0;
 }
 
-static int
-mcharlt(a, b)
-	const void	*a, *b;
+static int 
+mcharlt(const void *a, const void *b)
 {
 	int	i;
 
@@ -321,11 +306,8 @@ mcharlt(a, b)
 }
 
 
-static void
-lookup(m, mi, mprime)
-	struct message	*m;
-	struct mitem	*mi;
-	int	mprime;
+static void 
+lookup(struct message *m, struct mitem *mi, int mprime)
 {
 	struct name	*np;
 	struct mitem	*ip;
@@ -357,11 +339,8 @@ lookup(m, mi, mprime)
 	}
 }
 
-static void
-makethreads(m, count, newmail)
-	struct message	*m;
-	long	count;
-	int	newmail;
+static void 
+makethreads(struct message *m, long count, int newmail)
 {
 	struct mitem	*mt;
 	char	*cp;
@@ -402,9 +381,8 @@ makethreads(m, count, newmail)
 	mb.mb_threaded = 1;
 }
 
-int
-thread(vp)
-	void	*vp;
+int 
+thread(void *vp)
 {
 	if (mb.mb_threaded != 1 || vp == NULL || vp == (void *)-1) {
 		if (mb.mb_type == MB_IMAP)
@@ -418,9 +396,8 @@ thread(vp)
 	return 0;
 }
 
-int
-unthread(vp)
-	void	*vp;
+int 
+unthread(void *vp)
 {
 	struct message	*m;
 
@@ -435,8 +412,7 @@ unthread(vp)
 }
 
 struct message *
-next_in_thread(mp)
-	struct message	*mp;
+next_in_thread(struct message *mp)
 {
 	if (mp->m_child)
 		return mp->m_child;
@@ -451,8 +427,7 @@ next_in_thread(mp)
 }
 
 struct message *
-prev_in_thread(mp)
-	struct message	*mp;
+prev_in_thread(struct message *mp)
 {
 	if (mp->m_elder) {
 		mp = mp->m_elder;
@@ -467,9 +442,7 @@ prev_in_thread(mp)
 }
 
 struct message *
-this_in_thread(mp, n)
-	struct message	*mp;
-	long	n;
+this_in_thread(struct message *mp, long n)
 {
 	struct message	*mq;
 
@@ -500,9 +473,8 @@ this_in_thread(mp, n)
  * Sorted mode is internally just a variant of threaded mode with all
  * m_parent and m_child links being NULL.
  */
-int
-sort(vp)
-	void	*vp;
+int 
+sort(void *vp)
 {
 	enum method {
 		SORT_SUBJECT,
@@ -517,7 +489,7 @@ sort(vp)
 	struct {
 		const char	*me_name;
 		enum method	me_method;
-		int	(*me_func) __P((const void *, const void *));
+		int	(*me_func)(const void *, const void *);
 	} methnames[] = {
 		{ "date",	SORT_DATE,	mlonglt },
 		{ "from",	SORT_FROM,	mcharlt },
@@ -530,7 +502,7 @@ sort(vp)
 		{ NULL,		-1,		NULL }
 	};
 	char	**args = (char **)vp, *cp, *_args[2];
-	int	(*func) __P((const void *, const void *));
+	int	(*func)(const void *, const void *);
 	struct msort	*ms;
 	struct str	in, out;
 	int	i, n, msgvec[2];
@@ -651,8 +623,7 @@ sort(vp)
 }
 
 static char *
-skipre(cp)
-	const char	*cp;
+skipre(const char *cp)
 {
 	if (lowerconv(cp[0]&0377) == 'r' &&
 			lowerconv(cp[1]&0377) == 'e' &&
@@ -665,24 +636,20 @@ skipre(cp)
 	return (char *)cp;
 }
 
-int
-ccollapse(v)
-	void	*v;
+int 
+ccollapse(void *v)
 {
 	return colpt(v, 1);
 }
 
-int
-cuncollapse(v)
-	void	*v;
+int 
+cuncollapse(void *v)
 {
 	return colpt(v, 0);
 }
 
-static int
-colpt(msgvec, cl)
-	int	*msgvec;
-	int	cl;
+static int 
+colpt(int *msgvec, int cl)
 {
 	int	*ip;
 
@@ -695,10 +662,8 @@ colpt(msgvec, cl)
 	return 0;
 }
 
-static void
-colps(b, cl)
-	struct message	*b;
-	int	cl;
+static void 
+colps(struct message *b, int cl)
 {
 	struct message	*m;
 	int	cc = 0, uc = 0;
@@ -731,11 +696,8 @@ colps(b, cl)
 	}
 }
 
-static void
-colpm(m, cl, cc, uc)
-	struct message	*m;
-	int	cl;
-	int	*cc, *uc;
+static void 
+colpm(struct message *m, int cl, int *cc, int *uc)
 {
 	if (cl) {
 		if (m->m_collapsed > 0)
@@ -758,10 +720,8 @@ colpm(m, cl, cc, uc)
 	}
 }
 
-void
-uncollapse1(m, always)
-	struct message	*m;
-	int	always;
+void 
+uncollapse1(struct message *m, int always)
 {
 	if (mb.mb_threaded == 1 && (always || m->m_collapsed > 0))
 		colps(m, 0);

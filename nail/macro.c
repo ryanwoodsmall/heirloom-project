@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)macro.c	1.10 (gritter) 9/24/04";
+static char sccsid[] = "@(#)macro.c	1.12 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -74,19 +74,18 @@ struct macro {
 static struct macro	*macros[MAPRIME];
 static struct macro	*accounts[MAPRIME];
 
-static void	undef1 __P((const char *, struct macro **));
-static int	closingangle __P((const char *));
-static int	maexec __P((struct macro *));
 #define	mahash(cp)	(pjw(cp) % MAPRIME)
-static struct macro	*malook __P((const char *, struct macro *,
-				struct macro **));
-static void	list0 __P((FILE *, struct line *));
-static int	list1 __P((FILE *, struct macro **));
-static void	freelines __P((struct line *));
+static void undef1(const char *name, struct macro **table);
+static int maexec(struct macro *mp);
+static int closingangle(const char *cp);
+static struct macro *malook(const char *name, struct macro *data,
+		struct macro **table);
+static void freelines(struct line *lp);
+static void list0(FILE *fp, struct line *lp);
+static int list1(FILE *fp, struct macro **table);
 
-int
-cdefine(v)
-	void	*v;
+int 
+cdefine(void *v)
 {
 	char	**args = v;
 
@@ -101,10 +100,8 @@ cdefine(v)
 	return define1(args[0], 0);
 }
 
-int
-define1(name, account)
-	const char	*name;
-	int	account;
+int 
+define1(const char *name, int account)
 {
 	struct macro	*mp;
 	struct line	*lp, *lst = NULL, *lnd = NULL;
@@ -165,9 +162,8 @@ define1(name, account)
 	return 0;
 }
 
-int
-cundef(v)
-	void	*v;
+int 
+cundef(void *v)
 {
 	char	**args = v;
 
@@ -181,10 +177,8 @@ cundef(v)
 	return 0;
 }
 
-static void
-undef1(name, table)
-	const char	*name;
-	struct macro	**table;
+static void 
+undef1(const char *name, struct macro **table)
 {
 	struct macro	*mp;
 
@@ -195,9 +189,8 @@ undef1(name, table)
 	}
 }
 
-int
-ccall(v)
-	void	*v;
+int 
+ccall(void *v)
 {
 	char	**args = v;
 	struct macro	*mp;
@@ -213,9 +206,8 @@ ccall(v)
 	return maexec(mp);
 }
 
-int
-callaccount(name)
-	const char	*name;
+int 
+callaccount(const char *name)
 {
 	struct macro	*mp;
 
@@ -224,10 +216,8 @@ callaccount(name)
 	return maexec(mp);
 }
 
-int
-callhook(name, newmail)
-	const char	*name;
-	int	newmail;
+int 
+callhook(const char *name, int newmail)
 {
 	struct macro	*mp;
 	char	*var, *cp;
@@ -249,9 +239,8 @@ callhook(name, newmail)
 	return r;
 }
 
-static int
-maexec(mp)
-	struct macro	*mp;
+static int 
+maexec(struct macro *mp)
 {
 	struct line	*lp;
 	const char	*sp;
@@ -278,9 +267,8 @@ maexec(mp)
 	return r;
 }
 
-static int
-closingangle(cp)
-	const char	*cp;
+static int 
+closingangle(const char *cp)
 {
 	while (spacechar(*cp&0377))
 		cp++;
@@ -292,10 +280,7 @@ closingangle(cp)
 }
 
 static struct macro *
-malook(name, data, table)
-	const char	*name;
-	struct macro	*data;
-	struct macro	**table;
+malook(const char *name, struct macro *data, struct macro **table)
 {
 	struct macro	*mp;
 	unsigned	h;
@@ -315,9 +300,8 @@ malook(name, data, table)
 	return mp;
 }
 
-static void
-freelines(lp)
-	struct line	*lp;
+static void 
+freelines(struct line *lp)
 {
 	struct line	*lq = NULL;
 
@@ -331,16 +315,13 @@ freelines(lp)
 }
 
 int
-listaccounts(fp)
-	FILE	*fp;
+listaccounts(FILE *fp)
 {
 	return list1(fp, accounts);
 }
 
 static void
-list0(fp, lp)
-	FILE	*fp;
-	struct line	*lp;
+list0(FILE *fp, struct line *lp)
 {
 	const char	*sp;
 	int	c;
@@ -356,9 +337,7 @@ list0(fp, lp)
 }
 
 static int
-list1(fp, table)
-	FILE	*fp;
-	struct macro	**table;
+list1(FILE *fp, struct macro **table)
 {
 	struct macro	**mp, *mq;
 	struct line	*lp;
@@ -381,9 +360,8 @@ list1(fp, table)
 }
 
 /*ARGSUSED*/
-int
-cdefines(v)
-	void	*v;
+int 
+cdefines(void *v)
 {
 	FILE	*fp;
 	char	*cp;
@@ -402,9 +380,8 @@ cdefines(v)
 	return 0;
 }
 
-void
-delaccount(name)
-	const char	*name;
+void 
+delaccount(const char *name)
 {
 	undef1(name, accounts);
 }

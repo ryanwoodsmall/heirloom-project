@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2002
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.13 (gritter) 9/24/04";
+static char sccsid[] = "@(#)openssl.c	1.15 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -96,29 +96,33 @@ static int	rand_init;
 static int	message_number;
 static int	verify_error_found;
 
-static int ssl_rand_init __P((void));
-static int ssl_verify_cb __P((int, X509_STORE_CTX *));
-static int	ssl_password_cb __P((char *, int, int, void *));
-static int	smime_verify __P((struct message *, int,
-			STACK *, X509_STORE *));
-static void	ssl_init __P((void));
-static FILE	*smime_sign_cert __P((const char *, const char *, int));
-static EVP_CIPHER	*smime_cipher __P((const char *));
-static enum okay	load_crls __P((X509_STORE *,
-				const char *, const char *));
-static void	sslcatch __P((int));
+static void sslcatch(int s);
+static int ssl_rand_init(void);
+static void ssl_init(void);
+static int ssl_verify_cb(int success, X509_STORE_CTX *store);
+static SSL_METHOD *ssl_select_method(const char *uhp);
+static void ssl_load_verifications(struct sock *sp);
+static void ssl_certificate(struct sock *sp, const char *uhp);
+static enum okay ssl_check_host(const char *server, struct sock *sp);
+static int smime_verify(struct message *m, int n, STACK *chain,
+		X509_STORE *store);
+static EVP_CIPHER *smime_cipher(const char *name);
+static int ssl_password_cb(char *buf, int size, int rwflag, void *userdata);
+static FILE *smime_sign_cert(const char *xname, const char *xname2, int warn);
+static enum okay load_crl1(X509_STORE *store, const char *name);
+static enum okay load_crls(X509_STORE *store, const char *vfile,
+		const char *vdir);
 
-static void
-sslcatch(s)
-	int	s;
+static void 
+sslcatch(int s)
 {
 	if (reset_tio)
 		tcsetattr(0, TCSADRAIN, &otio);
 	siglongjmp(ssljmp, s);
 }
 
-static int
-ssl_rand_init()
+static int 
+ssl_rand_init(void)
 {
 	char *cp;
 	int state = 0;
@@ -153,8 +157,8 @@ ssl_rand_init()
 	return state;
 }
 
-static void
-ssl_init()
+static void 
+ssl_init(void)
 {
 	verbose = value("verbose") != NULL;
 	if (initialized == 0) {
@@ -196,14 +200,8 @@ ssl_verify_cb(int success, X509_STORE_CTX *store)
 	return 1;
 }
 
-static SSL_METHOD *ssl_select_method __P((const char *));
-static void ssl_load_verifications __P((struct sock *));
-static void ssl_certificate __P((struct sock *, const char *));
-static enum okay ssl_check_host __P((const char *, struct sock *));
-
 static SSL_METHOD *
-ssl_select_method(uhp)
-	const char *uhp;
+ssl_select_method(const char *uhp)
 {
 	SSL_METHOD *method;
 	char	*cp;
@@ -226,9 +224,8 @@ ssl_select_method(uhp)
 	return method;
 }
 
-static void
-ssl_load_verifications(sp)
-	struct sock *sp;
+static void 
+ssl_load_verifications(struct sock *sp)
 {
 	char *ca_dir, *ca_file;
 	X509_STORE	*store;
@@ -269,10 +266,8 @@ ssl_load_verifications(sp)
 	load_crls(store, "ssl-crl-file", "ssl-crl-dir");
 }
 
-static void
-ssl_certificate(sp, uhp)
-	struct sock *sp;
-	const char *uhp;
+static void 
+ssl_certificate(struct sock *sp, const char *uhp)
 {
 	char *certvar, *keyvar, *cert, *key;
 
@@ -304,10 +299,8 @@ ssl_certificate(sp, uhp)
 	ac_free(certvar);
 }
 
-static enum okay
-ssl_check_host(server, sp)
-	const char *server;
-	struct sock *sp;
+static enum okay 
+ssl_check_host(const char *server, struct sock *sp)
 {
 	X509 *cert;
 	X509_NAME *subj;
@@ -352,11 +345,8 @@ found:	X509_free(cert);
 	return OKAY;
 }
 
-enum okay
-ssl_open(server, sp, uhp)
-	const char *server;
-	struct sock *sp;
-	const char *uhp;
+enum okay 
+ssl_open(const char *server, struct sock *sp, const char *uhp)
 {
 	char *cp;
 	long options;
@@ -419,8 +409,7 @@ ssl_gen_err(const char *fmt, ...)
 }
 
 FILE *
-smime_sign(ip)
-	FILE	*ip;
+smime_sign(FILE *ip)
 {
 	FILE	*sp, *fp, *bp, *hp;
 	char	*cp;
@@ -499,11 +488,7 @@ smime_sign(ip)
 }
 
 static int
-smime_verify(m, n, chain, store)
-	struct message	*m;
-	int	n;
-	STACK	*chain;
-	X509_STORE	*store;
+smime_verify(struct message *m, int n, STACK *chain, X509_STORE *store)
 {
 	struct message	*x;
 	char	*cp, *from, *to, *cc, *cnttype;
@@ -615,9 +600,8 @@ found:	if (verify_error_found == 0)
 	return verify_error_found;
 }
 
-int
-cverify(vp)
-	void	*vp;
+int 
+cverify(void *vp)
 {
 	int	*msgvec = vp, *ip;
 	int	ec = 0;
@@ -659,8 +643,7 @@ cverify(vp)
 }
 
 static EVP_CIPHER *
-smime_cipher(name)
-	const char	*name;
+smime_cipher(const char *name)
 {
 	const EVP_CIPHER	*cipher;
 	char	*vn, *cp;
@@ -688,9 +671,7 @@ smime_cipher(name)
 }
 
 FILE *
-smime_encrypt(ip, certfile, to)
-	FILE	*ip;
-	const char	*certfile, *to;
+smime_encrypt(FILE *ip, const char *certfile, const char *to)
 {
 	FILE	*yp, *fp, *bp, *hp;
 	char	*cp;
@@ -757,11 +738,7 @@ smime_encrypt(ip, certfile, to)
 }
 
 struct message *
-smime_decrypt(m, to, cc, signcall)
-	struct message	*m;
-	const char	*to;
-	const char	*cc;
-	int	signcall;
+smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 {
 	FILE	*fp, *bp, *hp, *op;
 	char	*cp;
@@ -876,12 +853,8 @@ smime_decrypt(m, to, cc, signcall)
 }
 
 /*ARGSUSED4*/
-static int
-ssl_password_cb(buf, size, rwflag, userdata)
-	char	*buf;
-	int	size;
-	int	rwflag;
-	void	*userdata;
+static int 
+ssl_password_cb(char *buf, int size, int rwflag, void *userdata)
 {
 	sighandler_type	saveint;
 	char	*pass = NULL;
@@ -906,9 +879,7 @@ ssl_password_cb(buf, size, rwflag, userdata)
 }
 
 static FILE *
-smime_sign_cert(xname, xname2, warn)
-	const char	*xname, *xname2;
-	int	warn;
+smime_sign_cert(const char *xname, const char *xname2, int warn)
 {
 	char	*vn, *cp;
 	int	vs;
@@ -955,10 +926,7 @@ open:	cp = expand(cp);
 }
 
 enum okay
-smime_certsave(m, n, op)
-	struct message	*m;
-	int	n;
-	FILE	*op;
+smime_certsave(struct message *m, int n, FILE *op)
 {
 	struct message	*x;
 	char	*cp, *to, *cc, *cnttype;
@@ -1030,11 +998,8 @@ loop:	to = hfield("to", m);
 }
 
 #if defined (X509_V_FLAG_CRL_CHECK) && defined (X509_V_FLAG_CRL_CHECK_ALL)
-static enum okay	load_crl1 __P((X509_STORE *, const char *));
-static enum okay
-load_crl1(store, name)
-	X509_STORE	*store;
-	const char	*name;
+static enum okay 
+load_crl1(X509_STORE *store, const char *name)
 {
 	X509_LOOKUP	*lookup;
 
@@ -1053,10 +1018,8 @@ load_crl1(store, name)
 }
 #endif	/* new OpenSSL */
 
-static enum okay
-load_crls(store, vfile, vdir)
-	X509_STORE	*store;
-	const char	*vfile, *vdir;
+static enum okay 
+load_crls(X509_STORE *store, const char *vfile, const char *vdir)
 {
 	char	*crl_file, *crl_dir;
 #if defined (X509_V_FLAG_CRL_CHECK) && defined (X509_V_FLAG_CRL_CHECK_ALL)
@@ -1133,17 +1096,15 @@ nosmime(void)
 
 /*ARGSUSED*/
 FILE *
-smime_sign(fp)
-	FILE	*fp;
+smime_sign(FILE *fp)
 {
 	nosmime();
 	return NULL;
 }
 
 /*ARGSUSED*/
-int
-cverify(vp)
-	void	*vp;
+int 
+cverify(void *vp)
 {
 	nosmime();
 	return 1;
@@ -1151,9 +1112,7 @@ cverify(vp)
 
 /*ARGSUSED*/
 FILE *
-smime_encrypt(fp, certfile, to)
-	FILE	*fp;
-	const char	*certfile, *to;
+smime_encrypt(FILE *fp, const char *certfile, const char *to)
 {
 	nosmime();
 	return NULL;
@@ -1161,19 +1120,15 @@ smime_encrypt(fp, certfile, to)
 
 /*ARGSUSED*/
 struct message *
-smime_decrypt(m, to, cc, signcall)
-	struct message	*m;
-	const char	*to, *cc;
-	int	signcall;
+smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 {
 	nosmime();
 	return NULL;
 }
 
 /*ARGSUSED*/
-int
-ccertsave(v)
-	void	*v;
+int 
+ccertsave(void *v)
 {
 	nosmime();
 	return 1;

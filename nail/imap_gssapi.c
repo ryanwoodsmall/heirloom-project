@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -69,7 +69,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap_gssapi.c	1.7 (gritter) 9/1/04";
+static char sccsid[] = "@(#)imap_gssapi.c	1.9 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -89,11 +89,11 @@ static char sccsid[] = "@(#)imap_gssapi.c	1.7 (gritter) 9/1/04";
 #include <gssapi.h>
 #endif	/* GSSAPI_REG_INCLUDE */
 
+static void imap_gss_error1(const char *s, OM_uint32 code, int type);
+static void imap_gss_error(const char *s, OM_uint32 maj_stat,
+		OM_uint32 min_stat);
 static void
-imap_gss_error1(s, code, type)
-	const char	*s;
-	OM_uint32	code;
-	int	type;
+imap_gss_error1(const char *s, OM_uint32 code, int type)
 {
 	OM_uint32	maj_stat, min_stat;
 	gss_buffer_desc	msg = GSS_C_EMPTY_BUFFER;
@@ -116,18 +116,14 @@ imap_gss_error1(s, code, type)
 }
 
 static void
-imap_gss_error(s, maj_stat, min_stat)
-	const char	*s;
-	OM_uint32	maj_stat, min_stat;
+imap_gss_error(const char *s, OM_uint32 maj_stat, OM_uint32 min_stat)
 {
 	imap_gss_error1(s, maj_stat, GSS_C_GSS_CODE);
 	imap_gss_error1(s, min_stat, GSS_C_MECH_CODE);
 }
 
-static enum okay
-imap_gss(mp, user)
-	struct mailbox *mp;
-	char *user;
+static enum okay 
+imap_gss(struct mailbox *mp, char *user)
 {
 	gss_buffer_desc	send_tok, recv_tok, *token_ptr;
 	gss_name_t	target_name;

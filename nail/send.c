@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.36 (gritter) 9/27/04";
+static char sccsid[] = "@(#)send.c	2.38 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -88,51 +88,51 @@ enum {
 			   unread_sendmsg called */
 };
 
-static void	addstats __P((off_t *, off_t, off_t));
-static void	print_partnumber __P((FILE *, struct boundary *,
-			struct boundary *, off_t *));
-static char	*newfilename __P((char *, struct boundary *,
-			struct boundary *, char *));
-static void	statusput __P((const struct message *, FILE *,
-			char *, off_t *));
-static void	xstatusput __P((const struct message *, FILE *,
-			char *, off_t *));
-static struct boundary	*get_top_boundary __P((struct boundary *));
-static struct boundary	*bound_alloc __P((struct boundary *));
-static void	bound_free __P((struct boundary *));
-static FILE	*getpipetype __P((char *, FILE **, int));
-static void	pipecpy __P((FILE *, FILE *, FILE *, char *, size_t, off_t *));
-static void	put_from_ __P((FILE *));
-static struct sendmsg	*open_sendmsg __P((FILE *, size_t, int));
-static void	close_sendmsg __P((struct sendmsg *));
-static char	*read_sendmsg __P((struct sendmsg *, char **, size_t *,
-			size_t *, long *, int, int, long *));
-static void	unread_sendmsg __P((struct sendmsg *, long *));
-static void	del_hdr __P((struct hdrline *));
-static int	read_hdr __P((struct hdrline **ph, struct sendmsg *pm,
-			int allowempty));
-static int	write_hdr __P((const struct hdrline *ph, FILE *obuf, int action,
-			struct ignoretab *doign, char *prefix, int prefixlen,
-			int rewritestatus, const struct message *mp,
-			off_t *stats));
-static void	addline_hdr __P((struct hdrline **, char *, size_t));
-static const struct hdrline	*start_of_field_of_hdr __P((const struct
-			hdrline *, const char *));
-static char	*unfold_hdr __P((const struct hdrline *, const char *));
-static char	*field_of_hdr __P((const struct hdrline *, char *));
-static char	*spec_of_hdr __P((const struct hdrline *, char *));
-static char	*param_of_hdr __P((const struct hdrline *, char *, char *));
-static void	onpipe __P((int));
-static void	exchange __P((char **, size_t *, size_t *,
-			char **, size_t *, size_t *));
-static int	send_multipart __P((struct sendmsg *, FILE *,
-			struct ignoretab *, char *, int, enum conversion, int,
-			struct boundary *, off_t *));
 
+static void addstats(off_t *stats, off_t lines, off_t bytes);
+static void print_partnumber(FILE *obuf, struct boundary *b,
+		struct boundary *b0, off_t *stats);
+static char *newfilename(char *f, struct boundary *b, struct boundary *b0,
+		char *content_type);
+static void statusput(const struct message *mp, FILE *obuf, char *prefix,
+		off_t *stats);
+static void xstatusput(const struct message *mp, FILE *obuf, char *prefix,
+		off_t *stats);
+static struct boundary *get_top_boundary(struct boundary *b);
+static struct boundary *bound_alloc(struct boundary *bprev);
+static void bound_free(struct boundary *b);
+static FILE *getpipetype(char *content, FILE **qbuf, int quote);
+static void pipecpy(FILE *pipebuf, FILE *outbuf, FILE *origobuf,
+		char *prefix, size_t prefixlen, off_t *stats);
+static void put_from_(FILE *fp);
+static struct sendmsg *open_sendmsg(FILE *ibuf, size_t count, int unmask_from);
+static void close_sendmsg(struct sendmsg *pm);
+static char *read_sendmsg(struct sendmsg *pm, char **s, size_t *size,
+		size_t *ex_llen, long *ex_count, int appendnl,
+		int fromqp, long *ex_lines);
+static void unread_sendmsg(struct sendmsg *pm, long *ex_count);
+static void del_hdr(struct hdrline *ph);
+static void addline_hdr(struct hdrline **p0, char *line, size_t linelen);
+static int read_hdr(struct hdrline **ph, struct sendmsg *pm, int allowempty);
+static int write_hdr(const struct hdrline *ph, FILE *obuf, int action,
+		struct ignoretab *doign, char *prefix, int prefixlen,
+		int rewritestatus, const struct message *mp, off_t *stats);
+static const struct hdrline *start_of_field_of_hdr(const struct hdrline *ph,
+		const char *field);
+static char *unfold_hdr(const struct hdrline *ph, const char *field);
+static char *field_of_hdr(const struct hdrline *ph, char *field);
+static char *spec_of_hdr(const struct hdrline *ph, char *field);
+static char *param_of_hdr(const struct hdrline *ph, char *field, char *param);
+static void onpipe(int signo);
+static void exchange(char **line1, size_t *linesize1, size_t *linelen1,
+		char **line2, size_t *linesize2, size_t *linelen2);
+static int send_multipart(struct sendmsg *pm, FILE *obuf,
+		struct ignoretab *doign, char *prefix, int prefixlen,
+		enum conversion convert, int action, struct boundary *b0,
+		off_t *stats);
 
 static void
-addstats(stats, lines, bytes)
-off_t *stats, lines, bytes;
+addstats(off_t *stats, off_t lines, off_t bytes)
 {
 	if (stats) {
 		if (stats[0] >= 0)
@@ -145,10 +145,8 @@ off_t *stats, lines, bytes;
  * Print the part number indicated by b0.
  */
 static void
-print_partnumber(obuf, b, b0, stats)
-FILE *obuf;
-struct boundary *b, *b0;
-off_t *stats;
+print_partnumber(FILE *obuf, struct boundary *b, struct boundary *b0,
+		off_t *stats)
 {
 	struct boundary *bc;
 	char buf[20];
@@ -174,9 +172,8 @@ off_t *stats;
  * Get a filename based on f.
  */
 static char *
-newfilename(f, b, b0, content_type)
-char *f, *content_type;
-struct boundary *b, *b0;
+newfilename(char *f, struct boundary *b, struct boundary *b0,
+		char *content_type)
 {
 	struct str in, out;
 
@@ -208,10 +205,7 @@ struct boundary *b, *b0;
  * This is fgetline for mbox lines.
  */
 char *
-foldergets(s, size, count, llen, stream)
-char **s;
-size_t *size, *count, *llen;
-FILE *stream;
+foldergets(char **s, size_t *size, size_t *count, size_t *llen, FILE *stream)
 {
 	char *p, *top;
 
@@ -237,11 +231,7 @@ FILE *stream;
  * Output a reasonable looking status field.
  */
 static void
-statusput(mp, obuf, prefix, stats)
-	const struct message *mp;
-	FILE *obuf;
-	char *prefix;
-	off_t *stats;
+statusput(const struct message *mp, FILE *obuf, char *prefix, off_t *stats)
 {
 	char statout[3];
 	char *cp = statout;
@@ -258,11 +248,7 @@ statusput(mp, obuf, prefix, stats)
 }
 
 static void
-xstatusput(mp, obuf, prefix, stats)
-	const struct message *mp;
-	FILE *obuf;
-	char *prefix;
-	off_t *stats;
+xstatusput(const struct message *mp, FILE *obuf, char *prefix, off_t *stats)
 {
 	char xstatout[4];
 	char *xp = xstatout;
@@ -284,8 +270,7 @@ xstatusput(mp, obuf, prefix, stats)
  * Get the innermost multipart boundary.
  */
 static struct boundary *
-get_top_boundary(b)
-struct boundary *b;
+get_top_boundary(struct boundary *b)
 {
 	while (b->b_nlink != NULL)
 		b = b->b_nlink;
@@ -296,8 +281,7 @@ struct boundary *b;
  * Allocate a multipart boundary.
  */
 static struct boundary *
-bound_alloc(bprev)
-struct boundary *bprev;
+bound_alloc(struct boundary *bprev)
 {
 	struct boundary *b;
 
@@ -313,9 +297,8 @@ struct boundary *bprev;
 /*
  * Delete all sub-boundaries below the given boundary.
  */
-static void
-bound_free(b)
-struct boundary *b;
+static void 
+bound_free(struct boundary *b)
 {
 	struct boundary *bn;
 
@@ -331,10 +314,7 @@ struct boundary *b;
 }
 
 static FILE *
-getpipetype(content, qbuf, quote)
-char *content;
-FILE **qbuf;
-int quote;
+getpipetype(char *content, FILE **qbuf, int quote)
 {
 	char *penv, *pipecmd, *shell, *cp, *cq;
 	FILE *rbuf = *qbuf;
@@ -376,11 +356,8 @@ int quote;
 }
 
 static void
-pipecpy(pipebuf, outbuf, origobuf, prefix, prefixlen, stats)
-FILE *pipebuf, *outbuf, *origobuf;
-char *prefix;
-size_t prefixlen;
-off_t *stats;
+pipecpy(FILE *pipebuf, FILE *outbuf, FILE *origobuf,
+		char *prefix, size_t prefixlen, off_t *stats)
 {
 	char *line = NULL;
 	size_t linesize = 0, linelen, sz, count;
@@ -410,10 +387,7 @@ put_from_(FILE *fp)
 }
 
 static struct sendmsg *
-open_sendmsg(ibuf, count, unmask_from)
-FILE *ibuf;
-size_t count;
-int unmask_from;
+open_sendmsg(FILE *ibuf, size_t count, int unmask_from)
 {
 	struct sendmsg *pm;
 
@@ -428,23 +402,16 @@ int unmask_from;
 	return pm;
 }
 
-static void
-close_sendmsg(pm)
-struct sendmsg *pm;
+static void 
+close_sendmsg(struct sendmsg *pm)
 {
 	free(pm->sm_line);
 	free(pm);
 }
 
 static char *
-read_sendmsg(pm, s, size, ex_llen, ex_count, appendnl, fromqp, ex_lines)
-	struct sendmsg *pm;
-	char **s;
-	size_t *size;
-	size_t *ex_llen;
-	long *ex_count;
-	int appendnl, fromqp;
-	long *ex_lines;
+read_sendmsg(struct sendmsg *pm, char **s, size_t *size, size_t *ex_llen,
+		long *ex_count, int appendnl, int fromqp, long *ex_lines)
 {
 	size_t in_llen, in_pos = 0;
 	long	lines = 0;
@@ -507,19 +474,16 @@ next:	if (pm->sm_unread) {
 	return *s;
 }
 
-static void
-unread_sendmsg(pm, ex_count)
-struct sendmsg *pm;
-long *ex_count;
+static void 
+unread_sendmsg(struct sendmsg *pm, long *ex_count)
 {
 	pm->sm_unread = 1;
 	if (ex_count)
 		*ex_count += pm->sm_llen;
 }
 
-static void
-del_hdr(ph)
-struct hdrline *ph;
+static void 
+del_hdr(struct hdrline *ph)
 {
 	struct hdrline *pn;
 
@@ -534,10 +498,7 @@ struct hdrline *ph;
 }
 
 static void
-addline_hdr(p0, line, linelen)
-struct hdrline **p0;
-char *line;
-size_t linelen;
+addline_hdr(struct hdrline **p0, char *line, size_t linelen)
 {
 	struct hdrline *ph, *pp;
 
@@ -554,11 +515,8 @@ size_t linelen;
 		*p0 = ph;
 }
 
-static int
-read_hdr(ph, pm, allowempty)
-struct hdrline **ph;
-struct sendmsg *pm;
-int allowempty;
+static int 
+read_hdr(struct hdrline **ph, struct sendmsg *pm, int allowempty)
 {
 	char *line = NULL, *cp;
 	size_t lineno = 0, linesize = 0, linelen;
@@ -599,16 +557,14 @@ int allowempty;
 }
 
 static int
-write_hdr(ph, obuf, action, doign, prefix, prefixlen, rewritestatus, mp, stats)
-const struct hdrline *ph;
-FILE *obuf;
-int action;
-struct ignoretab *doign;
-char *prefix;
-int prefixlen;
+write_hdr(const struct hdrline *ph, FILE *obuf, int action,
+		struct ignoretab *doign,
+		char *prefix, int prefixlen,
+		int rewritestatus, const struct message *mp, off_t *stats)
+#ifdef	notdef
 int rewritestatus;	/* == 1 in main header only */
 const struct message *mp;	/* can be NULL if rewritestatus == 0 */
-off_t *stats;
+#endif
 {
 	int ignoring = 0;
 	size_t sz;
@@ -715,9 +671,7 @@ off_t *stats;
 }
 
 static const struct hdrline *
-start_of_field_of_hdr(ph, field)
-const struct hdrline *ph;
-const char *field;
+start_of_field_of_hdr(const struct hdrline *ph, const char *field)
 {
 	char *cp;
 	size_t sz = strlen(field);
@@ -735,9 +689,7 @@ const char *field;
 }
 
 static char *
-unfold_hdr(ph, field)
-const struct hdrline *ph;
-const char *field;
+unfold_hdr(const struct hdrline *ph, const char *field)
 {
 	const struct hdrline *pp, *pq;
 	size_t totlen = 0;
@@ -762,9 +714,7 @@ const char *field;
 }
 
 static char *
-field_of_hdr(ph, field)
-const struct hdrline *ph;
-char *field;
+field_of_hdr(const struct hdrline *ph, char *field)
 {
 	char *unfolded_field, *cp, *cq;
 
@@ -781,9 +731,7 @@ char *field;
 }
 
 static char *
-spec_of_hdr(ph, field)
-const struct hdrline *ph;
-char *field;
+spec_of_hdr(const struct hdrline *ph, char *field)
 {
 	const char *unfolded_field;
 	char *unfolded_fake, *cp;
@@ -800,10 +748,7 @@ char *field;
 }
 
 static char *
-param_of_hdr(ph, field, param)
-const struct hdrline *ph;
-char *field;
-char *param;
+param_of_hdr(const struct hdrline *ph, char *field, char *param)
 {
 	char *unfolded_field;
 
@@ -815,17 +760,15 @@ char *param;
 static sigjmp_buf	pipejmp;
 
 /*ARGSUSED*/
-static void
-onpipe(signo)
-int signo;
+static void 
+onpipe(int signo)
 {
 	siglongjmp(pipejmp, 1);
 }
 
 static void
-exchange(line1, linesize1, linelen1, line2, linesize2, linelen2)
-char **line1, **line2;
-size_t *linesize1, *linelen1, *linesize2, *linelen2;
+exchange(char **line1, size_t *linesize1, size_t *linelen1,
+		char **line2, size_t *linesize2, size_t *linelen2)
 {
 	char *tmp_line;
 	size_t tmp_size, tmp_len;
@@ -839,16 +782,10 @@ size_t *linesize1, *linelen1, *linesize2, *linelen2;
  * Send the body of a MIME multipart message.
  */
 static int
-send_multipart(pm, obuf, doign, prefix, prefixlen,
-		convert, action, b0, stats)
-struct sendmsg *pm;
-FILE *obuf;
-struct ignoretab *doign;
-char *prefix;
-struct boundary *b0;
-off_t *stats;
-enum conversion convert;
-int action, prefixlen;
+send_multipart(struct sendmsg *pm, FILE *obuf, struct ignoretab *doign,
+		char *prefix, int prefixlen,
+		enum conversion convert, int action, struct boundary *b0,
+		off_t *stats)
 {
 	enum mimecontent mime_content = MIME_TEXT, new_content = MIME_TEXT;
 	FILE *oldobuf = (FILE *)-1, *origobuf = (FILE *)-1, *pbuf = obuf,
@@ -1221,13 +1158,8 @@ send_multi_end:
  * Note that stats[0] is valid for CONV_NONE only.
  */
 int
-send_message(mp, obuf, doign, prefix, action, stats)
-	struct message *mp;
-	FILE *obuf;
-	struct ignoretab *doign;
-	char *prefix;
-	off_t *stats;
-	enum conversion action;
+send_message(struct message *mp, FILE *obuf, struct ignoretab *doign,
+		char *prefix, enum conversion action, off_t *stats)
 {
 	FILE *ibuf, *pbuf = obuf, *qbuf = obuf, *origobuf = obuf;
 	struct sendmsg *pm;

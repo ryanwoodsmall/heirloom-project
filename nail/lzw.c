@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*-
  * Copyright (c) 1985, 1986, 1992, 1993
@@ -60,12 +60,10 @@
  *
  * Adopted for nail by Gunnar Ritter.
  *
- * Sccsid @(#)lzw.c	1.6 (gritter) 8/7/04
+ * Sccsid @(#)lzw.c	1.9 (gritter) 10/2/04
  */
 
 #include "config.h"
-
-#ifdef	HAVE_SOCKETS
 
 #include "rcv.h"
 #include "extern.h"
@@ -196,10 +194,10 @@ struct s_zstate {
 #define	FIRST	257		/* First free entry. */
 #define	CLEAR	256		/* Table clear output code. */
 
-static int	cl_block __P((struct s_zstate *));
-static void	cl_hash __P((struct s_zstate *, count_int));
-static code_int	getcode __P((struct s_zstate *));
-static int	output __P((struct s_zstate *, code_int));
+static int output(struct s_zstate *zs, code_int ocode);
+static code_int getcode(struct s_zstate *zs);
+static int cl_block(struct s_zstate *zs);
+static void cl_hash(struct s_zstate *zs, count_int cl_hsize);
 
 /*-
  * Algorithm from "A Technique for High Performance Data Compression",
@@ -227,11 +225,8 @@ static int	output __P((struct s_zstate *, code_int));
  * file size for noticeable speed improvement on small files.  Please direct
  * questions about this implementation to ames!jaw.
  */
-int
-zwrite(cookie, wbp, num)
-	void *cookie;
-	const char *wbp;
-	int num;
+int 
+zwrite(void *cookie, const char *wbp, int num)
 {
 	code_int i;
 	int c, disp;
@@ -319,9 +314,8 @@ nomatch:	if (output(zs, (code_int) ent) == -1)
 	return (num);
 }
 
-int
-zfree(cookie)
-	void *cookie;
+int 
+zfree(void *cookie)
 {
 	struct s_zstate *zs;
 
@@ -361,10 +355,8 @@ static char_type lmask[9] =
 static char_type rmask[9] =
 	{0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff};
 
-static int
-output(zs, ocode)
-	struct s_zstate *zs;
-	code_int ocode;
+static int 
+output(struct s_zstate *zs, code_int ocode)
 {
 	int r_off;
 	unsigned bits;
@@ -451,11 +443,8 @@ output(zs, ocode)
  * compressed file.  The tables used herein are shared with those of the
  * compress() routine.  See the definitions above.
  */
-int
-zread(cookie, rbp, num)
-	void *cookie;
-	char *rbp;
-	int num;
+int 
+zread(void *cookie, char *rbp, int num)
 {
 	unsigned count;
 	struct s_zstate *zs;
@@ -560,9 +549,8 @@ eof:	return (num - count);
  * Outputs:
  * 	code or -1 is returned.
  */
-static code_int
-getcode(zs)
-	struct s_zstate *zs;
+static code_int 
+getcode(struct s_zstate *zs)
 {
 	code_int gcode;
 	int r_off, bits;
@@ -619,9 +607,10 @@ getcode(zs)
 	return (gcode);
 }
 
-static int
-cl_block(zs)			/* Table clear for block compress. */
-	struct s_zstate *zs;
+static int 
+cl_block (			/* Table clear for block compress. */
+    struct s_zstate *zs
+)
 {
 	long rat;
 
@@ -648,10 +637,11 @@ cl_block(zs)			/* Table clear for block compress. */
 	return (0);
 }
 
-static void
-cl_hash(zs, cl_hsize)			/* Reset code table. */
-	struct s_zstate *zs;
-	count_int cl_hsize;
+static void 
+cl_hash (			/* Reset code table. */
+    struct s_zstate *zs,
+    count_int cl_hsize
+)
 {
 	count_int *htab_p;
 	long i, m1;
@@ -684,8 +674,7 @@ cl_hash(zs, cl_hsize)			/* Reset code table. */
 
 #undef	fp
 void *
-zalloc(fp)
-	FILE	*fp;
+zalloc(FILE *fp)
 {
 #define	bits	BITS
 	struct s_zstate *zs;
@@ -707,5 +696,3 @@ zalloc(fp)
 	zs->zs_fp = fp;
 	return zs;
 }
-
-#endif	/* HAVE_SOCKETS */

@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1996 Christos Zoulas.  All rights reserved.
@@ -34,7 +34,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)dotlock.c	2.5 (gritter) 8/1/04";
+static char sccsid[] = "@(#)dotlock.c	2.7 (gritter) 10/2/04";
 #endif
 #endif
 
@@ -52,13 +52,13 @@ static char sccsid[] = "@(#)dotlock.c	2.5 (gritter) 8/1/04";
 #define O_SYNC	0
 #endif
 
-static int	perhaps_setgid __P((const char *name, gid_t gid));
-static int	maildir_access __P((const char *));
+static int maildir_access(const char *fname);
+static int perhaps_setgid(const char *name, gid_t gid);
+static int create_exclusive(const char *fname);
 
 /* Check if we can write a lock file at all */
-static int
-maildir_access(fname)
-const char *fname;
+static int 
+maildir_access(const char *fname)
 {
 	char path[MAXPATHLEN];
 	char *p;
@@ -76,9 +76,7 @@ const char *fname;
  * Set the gid if the path is in the normal mail spool
  */
 static int
-perhaps_setgid(name, gid)
-const char *name;
-gid_t gid;
+perhaps_setgid(const char *name, gid_t gid)
 {
 	char safepath[]= MAILSPOOL;
 
@@ -88,8 +86,6 @@ gid_t gid;
 	return (setgid (gid));
 }
 
-
-static int create_exclusive __P((const char *));
 
 #define	APID_SZ	40	/* sufficient for storign 128 bits pids */
 /*
@@ -102,9 +98,8 @@ static int create_exclusive __P((const char *));
  * - unlink the mostly unique filename
  * - if the link count was 2, then we are ok; else we've failed.
  */
-static int
-create_exclusive(fname)
-	const char *fname;
+static int 
+create_exclusive(const char *fname)
 {
 	char path[MAXPATHLEN];
 	char *hostname;
@@ -191,9 +186,8 @@ bad:
 	return -1;
 }
 
-int
-fcntl_lock(fd, type)
-	int fd, type;
+int 
+fcntl_lock(int fd, int type)
 {
 	struct flock flp;
 
@@ -205,12 +199,14 @@ fcntl_lock(fd, type)
 }
 
 int
-dot_lock(fname, fd, pollinterval, fp, msg)
+dot_lock(const char *fname, int fd, int pollinterval, FILE *fp, const char *msg)
+#ifdef	notdef
 	const char *fname;	/* Pathname to lock */
 	int fd;			/* File descriptor for fname, for fcntl lock */
 	int pollinterval;	/* Interval to check for lock, -1 return */
 	FILE *fp;		/* File to print message */
 	const char *msg;	/* Message to print */
+#endif
 {
 	char path[MAXPATHLEN];
 	sigset_t nset, oset;
@@ -263,9 +259,8 @@ dot_lock(fname, fd, pollinterval, fp, msg)
         return -1;
 }
 
-void
-dot_unlock(fname)
-	const char *fname;
+void 
+dot_unlock(const char *fname)
 {
 	char path[MAXPATHLEN];
 

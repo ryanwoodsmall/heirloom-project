@@ -10,7 +10,12 @@
 * Nail was reported to hang sporadically when sending multipart messages on
   HP-UX. A possible reason for such problems on systems without /dev/urandom
   has been eliminated (Bugreport by Patrick Briggs).
+* Fixed a small internal stack overflow that occured regardless of input
+  data and lead to segmentation faults on some platforms when the header
+  summary was printed, depending on the stack layout.
 * Nail now builds without socket (networking) support again.
+* Function declarations and definitions have been converted to ANSI C. This
+  should cause no problems since the code used ANSI C features anyway before.
 
 [11.8] released 9/23/04
 * Support for S/MIME has been added. Introductory documentation is available

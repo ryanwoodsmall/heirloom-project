@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.67 (gritter) 9/23/04";
+static char sccsid[] = "@(#)cmd3.c	2.69 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -53,31 +53,29 @@ static char sccsid[] = "@(#)cmd3.c	2.67 (gritter) 9/23/04";
  *
  * Still more user commands.
  */
-static int	file1 __P((char *));
-static int	diction __P((const void *, const void *));
-static int	bangexp __P((char **, size_t *));
-static void	make_ref __P((struct message *, struct header *));
-static int	respond_internal __P((int *, int));
-static char	*reedit __P((char *));
-static void	asort __P((char **));
-static int	Respond_internal __P((int [], int));
-static int	forward1 __P((void *, int));
-static void	onpipe __P((int));
-static enum okay	delete_shortcut __P((const char *));
-#ifdef	__STDC__
-static int	(*respond_or_Respond(int c))(int *, int);
-#else
-static int	(*respond_or_Respond())();
-#endif
-static float	huge __P((void));
+
+static int bangexp(char **str, size_t *size);
+static void make_ref(struct message *mp, struct header *head);
+static int (*respond_or_Respond(int c))(int *, int);
+static int respond_internal(int *msgvec, int recipient_record);
+static char *reedit(char *subj);
+static void onpipe(int signo);
+static void asort(char **list);
+static int diction(const void *a, const void *b);
+static int file1(char *name);
+static int shellecho(const char *cp);
+static int Respond_internal(int *msgvec, int recipient_record);
+static int forward1(void *v, int add_resent);
+static void list_shortcuts(void);
+static enum okay delete_shortcut(const char *str);
+static float huge(void);
 
 /*
  * Process a shell escape by saving signals, ignoring signals,
  * and forking a sh -c
  */
-int
-shell(v)
-	void *v;
+int 
+shell(void *v)
 {
 	char *str = v;
 	sighandler_type sigint = safe_signal(SIGINT, SIG_IGN);
@@ -102,9 +100,8 @@ shell(v)
  * Fork an interactive shell.
  */
 /*ARGSUSED*/
-int
-dosh(v)
-	void *v;
+int 
+dosh(void *v)
 {
 	sighandler_type sigint = safe_signal(SIGINT, SIG_IGN);
 	char *shell;
@@ -126,9 +123,7 @@ static char	*lastbang;
 static size_t	lastbangsize;
 
 static int
-bangexp(str, size)
-	char **str;
-	size_t *size;
+bangexp(char **str, size_t *size)
 {
 	char *bangbuf;
 	int changed = 0;
@@ -173,9 +168,8 @@ bangexp(str, size)
 }
 
 /*ARGSUSED*/
-int
-help(v)
-	void *v;
+int 
+help(void *v)
 {
 	const char *helptext =
 "               %s commands\n\
@@ -209,9 +203,8 @@ separated by spaces.  If omitted, %s uses the last message typed.\n";
 /*
  * Change user's working directory.
  */
-int
-schdir(v)
-	void *v;
+int 
+schdir(void *v)
 {
 	char **arglist = v;
 	char *cp;
@@ -228,10 +221,8 @@ schdir(v)
 	return 0;
 }
 
-static void
-make_ref(mp, head)
-struct message *mp;
-struct header *head;
+static void 
+make_ref(struct message *mp, struct header *head)
 {
 	char *oldref, *oldmsgid, *newref;
 	size_t reflen;
@@ -275,13 +266,8 @@ struct header *head;
 	head->h_ref = n;
 }
 
-#ifdef	__STDC__
 static int
 (*respond_or_Respond(int c))(int *, int)
-#else
-static int
-(*respond_or_Respond(c))()
-#endif
 {
 	int opt = 0;
 
@@ -290,44 +276,38 @@ static int
 	return ((opt == 1) ^ (c == 'R')) ? Respond_internal : respond_internal;
 }
 
-int
-respond(v)
-	void *v;
+int 
+respond(void *v)
 {
 	return (respond_or_Respond('r'))((int *)v, 0);
 }
 
-int
-respondall(v)
-	void *v;
+int 
+respondall(void *v)
 {
 	return respond_internal((int *)v, 0);
 }
 
-int
-respondsender(v)
-	void *v;
+int 
+respondsender(void *v)
 {
 	return Respond_internal((int *)v, 0);
 }
 
-int
-followup(v)
-	void *v;
+int 
+followup(void *v)
 {
 	return (respond_or_Respond('r'))((int *)v, 1);
 }
 
-int
-followupall(v)
-	void *v;
+int 
+followupall(void *v)
 {
 	return respond_internal((int *)v, 1);
 }
 
-int
-followupsender(v)
-	void *v;
+int 
+followupsender(void *v)
 {
 	return Respond_internal((int *)v, 1);
 }
@@ -336,10 +316,8 @@ followupsender(v)
  * Reply to a list of messages.  Extract each name from the
  * message header and send them off to mail1()
  */
-static int
-respond_internal(msgvec, recipient_record)
-	int *msgvec;
-	int recipient_record;
+static int 
+respond_internal(int *msgvec, int recipient_record)
 {
 	struct message *mp;
 	char *cp, *rcv;
@@ -392,8 +370,7 @@ respond_internal(msgvec, recipient_record)
  * it does not already.
  */
 static char *
-reedit(subj)
-	char *subj;
+reedit(char *subj)
 {
 	char *newsubj;
 	struct str in, out;
@@ -417,9 +394,8 @@ reedit(subj)
  * Preserve the named messages, so that they will be sent
  * back to the system mailbox.
  */
-int
-preserve(v)
-	void *v;
+int 
+preserve(void *v)
 {
 	int *msgvec = v;
 	struct message *mp;
@@ -444,9 +420,8 @@ preserve(v)
 /*
  * Mark all given messages as unread.
  */
-int
-unread(v)
-	void *v;
+int 
+unread(void *v)
 {
 	int	*msgvec = v;
 	int *ip;
@@ -464,9 +439,8 @@ unread(v)
 /*
  * Print the size of each message.
  */
-int
-messize(v)
-	void *v;
+int 
+messize(void *v)
 {
 	int *msgvec = v;
 	struct message *mp;
@@ -490,9 +464,8 @@ messize(v)
  * by returning an error.
  */
 /*ARGSUSED*/
-int
-rexit(v)
-	void *v;
+int 
+rexit(void *v)
 {
 	if (sourcing)
 		return(1);
@@ -503,9 +476,8 @@ rexit(v)
 static sigjmp_buf	pipejmp;
 
 /*ARGSUSED*/
-static void
-onpipe(signo)
-	int signo;
+static void 
+onpipe(int signo)
 {
 	siglongjmp(pipejmp, 1);
 }
@@ -514,9 +486,8 @@ onpipe(signo)
  * Set or display a variable value.  Syntax is similar to that
  * of sh.
  */
-int
-set(v)
-	void *v;
+int 
+set(void *v)
 {
 	char **arglist = v;
 	struct var *vp;
@@ -605,9 +576,8 @@ endpipe:
 /*
  * Unset a bunch of variable values.
  */
-int
-unset(v)
-	void *v;
+int 
+unset(void *v)
 {
 	int errs;
 	char **ap;
@@ -621,9 +591,8 @@ unset(v)
 /*
  * Put add users to a group.
  */
-int
-group(v)
-	void *v;
+int 
+group(void *v)
 {
 	char **argv = v;
 	struct grouphead *gh;
@@ -679,9 +648,8 @@ group(v)
 /*
  * Delete the passed groups.
  */
-int
-ungroup(v)
-	void *v;
+int 
+ungroup(void *v)
 {
 	char **argv = v;
 
@@ -700,9 +668,8 @@ ungroup(v)
  * Sort the passed string vecotor into ascending dictionary
  * order.
  */
-static void
-asort(list)
-	char **list;
+static void 
+asort(char **list)
 {
 	char **ap;
 
@@ -717,9 +684,8 @@ asort(list)
  * Do a dictionary order comparison of the arguments from
  * qsort.
  */
-static int
-diction(a, b)
-	const void *a, *b;
+static int 
+diction(const void *a, const void *b)
 {
 	return(strcmp(*(char **)a, *(char **)b));
 }
@@ -728,9 +694,8 @@ diction(a, b)
  * Change to another file.  With no argument, print information about
  * the current file.
  */
-int
-file(v)
-	void *v;
+int 
+file(void *v)
 {
 	char **argv = v;
 
@@ -742,9 +707,8 @@ file(v)
 	return file1(*argv);
 }
 
-static int
-file1(name)
-	char	*name;
+static int 
+file1(char *name)
 {
 	int	i;
 
@@ -820,9 +784,8 @@ shellecho(const char *cp)
 /*
  * Expand file names like echo
  */
-int
-echo(v)
-	void *v;
+int 
+echo(void *v)
 {
 	char **argv = v;
 	char **ap;
@@ -842,16 +805,14 @@ echo(v)
 	return 0;
 }
 
-int
-Respond(v)
-	void *v;
+int 
+Respond(void *v)
 {
 	return (respond_or_Respond('R'))((int *)v, 0);
 }
 
-int
-Followup(v)
-	void *v;
+int 
+Followup(void *v)
 {
 	return (respond_or_Respond('R'))((int *)v, 1);
 }
@@ -861,10 +822,8 @@ Followup(v)
  * and not messing around with the To: and Cc: lists as in normal
  * reply.
  */
-static int
-Respond_internal(msgvec, recipient_record)
-	int msgvec[];
-	int recipient_record;
+static int 
+Respond_internal(int *msgvec, int recipient_record)
 {
 	struct header head;
 	struct message *mp;
@@ -899,9 +858,8 @@ Respond_internal(msgvec, recipient_record)
  * Conditional commands.  These allow one to parameterize one's
  * .mailrc and do some things if sending, others if receiving.
  */
-int
-ifcmd(v)
-	void *v;
+int 
+ifcmd(void *v)
 {
 	char **argv = v;
 	char *cp;
@@ -938,9 +896,8 @@ ifcmd(v)
  * flip over the conditional flag.
  */
 /*ARGSUSED*/
-int
-elsecmd(v)
-	void *v;
+int 
+elsecmd(void *v)
 {
 
 	switch (cond) {
@@ -974,9 +931,8 @@ elsecmd(v)
  * End of if statement.  Just set cond back to anything.
  */
 /*ARGSUSED*/
-int
-endifcmd(v)
-	void *v;
+int 
+endifcmd(void *v)
 {
 
 	if (cond == CANY) {
@@ -991,9 +947,8 @@ endifcmd(v)
 /*
  * Set the list of alternate names.
  */
-int
-alternates(v)
-	void *v;
+int 
+alternates(void *v)
 {
 	char **namelist = v;
 	int c;
@@ -1023,10 +978,8 @@ alternates(v)
 /*
  * Do the real work of forwarding.
  */
-static int
-forward1(v, add_resent)
-void *v;
-int add_resent;
+static int 
+forward1(void *v, int add_resent)
 {
 	char *name, *str;
 	struct name *to;
@@ -1071,9 +1024,8 @@ int add_resent;
 /*
  * Forward a message list to a third person.
  */
-int
-forwardcmd(v)
-void *v;
+int 
+forwardcmd(void *v)
 {
 	return forward1(v, 1);
 }
@@ -1081,9 +1033,8 @@ void *v;
 /*
  * Forward a message list to a third person without adding headers.
  */
-int
-Forwardcmd(v)
-void *v;
+int 
+Forwardcmd(void *v)
 {
 	return forward1(v, 0);
 }
@@ -1093,9 +1044,8 @@ void *v;
  * mail back.
  */
 /*ARGSUSED*/
-int
-newmail(v)
-void *v;
+int 
+newmail(void *v)
 {
 	int val = 1, mdot;
 
@@ -1107,8 +1057,8 @@ void *v;
 	return val;
 }
 
-static void
-list_shortcuts()
+static void 
+list_shortcuts(void)
 {
 	struct shortcut *s;
 
@@ -1116,9 +1066,8 @@ list_shortcuts()
 		printf("%s=%s\n", s->sh_short, s->sh_long);
 }
 
-int
-shortcut(v)
-	void *v;
+int 
+shortcut(void *v)
 {
 	char **args = (char **)v;
 	struct shortcut *s;
@@ -1151,8 +1100,7 @@ shortcut(v)
 }
 
 struct shortcut *
-get_shortcut(str)
-	const char *str;
+get_shortcut(const char *str)
 {
 	struct shortcut *s;
 
@@ -1162,9 +1110,8 @@ get_shortcut(str)
 	return s;
 }
 
-static enum okay
-delete_shortcut(str)
-	const char *str;
+static enum okay 
+delete_shortcut(const char *str)
 {
 	struct shortcut *sp, *sq;
 
@@ -1183,9 +1130,8 @@ delete_shortcut(str)
 	return STOP;
 }
 
-int
-unshortcut(v)
-	void *v;
+int 
+unshortcut(void *v)
 {
 	char **args = (char **)v;
 	int errs = 0;
@@ -1215,8 +1161,7 @@ struct oldaccount {
 static struct oldaccount	*oldaccounts;
 
 struct oldaccount *
-get_oldaccount(name)
-	const char *name;
+get_oldaccount(const char *name)
 {
 	struct oldaccount	*a;
 
@@ -1226,9 +1171,8 @@ get_oldaccount(name)
 	return a;
 }
 
-int
-account(v)
-	void *v;
+int 
+account(void *v)
 {
 	char	**args = (char **)v;
 	struct oldaccount	*a;
@@ -1296,9 +1240,8 @@ account(v)
 	return 0;
 }
 
-int
-cflag(v)
-	void	*v;
+int 
+cflag(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1312,9 +1255,8 @@ cflag(v)
 	return 0;
 }
 
-int
-cunflag(v)
-	void	*v;
+int 
+cunflag(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1330,9 +1272,8 @@ cunflag(v)
 	return 0;
 }
 
-int
-canswered(v)
-	void	*v;
+int 
+canswered(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1346,9 +1287,8 @@ canswered(v)
 	return 0;
 }
 
-int
-cunanswered(v)
-	void	*v;
+int 
+cunanswered(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1364,9 +1304,8 @@ cunanswered(v)
 	return 0;
 }
 
-int
-cdraft(v)
-	void	*v;
+int 
+cdraft(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1380,9 +1319,8 @@ cdraft(v)
 	return 0;
 }
 
-int
-cundraft(v)
-	void	*v;
+int 
+cundraft(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1398,8 +1336,8 @@ cundraft(v)
 	return 0;
 }
 
-static float
-huge()
+static float 
+huge(void)
 {
 	/*
 	 * This is not perfect, but correct for machines with a 32-bit
@@ -1415,9 +1353,8 @@ huge()
 	return u.f;
 }
 
-int
-ckill(v)
-	void	*v;
+int 
+ckill(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1431,9 +1368,8 @@ ckill(v)
 	return 0;
 }
 
-int
-cunkill(v)
-	void	*v;
+int 
+cunkill(void *v)
 {
 	struct message	*m;
 	int	*msgvec = v;
@@ -1447,9 +1383,8 @@ cunkill(v)
 	return 0;
 }
 
-int
-cscore(v)
-	void	*v;
+int 
+cscore(void *v)
 {
 	char	*str = v;
 	char	*sscore, *xp;
@@ -1502,9 +1437,8 @@ cscore(v)
 }
 
 /*ARGSUSED*/
-int
-cnoop(v)
-	void	*v;
+int 
+cnoop(void *v)
 {
 	switch (mb.mb_type) {
 	case MB_IMAP:
@@ -1519,9 +1453,8 @@ cnoop(v)
 	return 0;
 }
 
-int
-cremove(v)
-	void	*v;
+int 
+cremove(void *v)
 {
 	char	vb[LINESIZE];
 	char	**args = v;
@@ -1574,9 +1507,8 @@ cremove(v)
 	return ec;
 }
 
-int
-crename(v)
-	void	*v;
+int 
+crename(void *v)
 {
 	char	**args = v, *old, *new;
 	enum protocol	oldp, newp;

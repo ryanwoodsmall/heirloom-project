@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.79 (gritter) 9/26/04
+ *	Sccsid @(#)def.h	2.80 (gritter) 10/2/04
  */
 
 /*
@@ -70,21 +70,13 @@
 
 #define	equal(a, b)	(strcmp(a,b)==0)/* A nice function to string compare */
 
-#ifndef	__P
-#ifdef	__STDC__
-#define	__P(a)	a
-#else
-#define	__P(a)	()
-#endif
-#endif
-
 #ifdef	HAVE_CATGETS
 #define	CATSET	1
 #else	/* !HAVE_CATGETS */
 #define	catgets(a, b, c, d)	(d)
 #endif	/* !HAVE_CATGETS */
 
-typedef void (*sighandler_type) __P((int));
+typedef void (*sighandler_type)(int);
 
 enum okay {
 	STOP = 0,
@@ -174,7 +166,7 @@ struct sock {				/* data associated with a socket */
 	char	*s_rbufptr;		/* read pointer to s_rbuf */
 	int	s_rsz;			/* size of last read in s_rbuf */
 	char	*s_desc;		/* description of error messages */
-	void	(*s_onclose) __P((void));	/* execute on close */
+	void	(*s_onclose)(void);	/* execute on close */
 };
 
 struct mailbox {
@@ -326,7 +318,7 @@ enum argtype {
  */
 struct cmd {
 	char	*c_name;		/* Name of command */
-	int	(*c_func) __P((void *));/* Implementor of the command */
+	int	(*c_func)(void *);	/* Implementor of the command */
 	enum argtype	c_argtype;	/* Type of arglist (see below) */
 	short	c_msgflag;		/* Required flags of messages */
 	short	c_msgmask;		/* Relevant flags of messages */

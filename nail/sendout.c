@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.53 (gritter) 10/1/04";
+static char sccsid[] = "@(#)sendout.c	2.55 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -59,22 +59,23 @@ static char sccsid[] = "@(#)sendout.c	2.53 (gritter) 10/1/04";
 static const char	randfile[] = "/dev/urandom";
 static char	*send_boundary;
 
-static char	*getencoding __P((int));
-static struct name	*fixhead __P((struct header *, struct name *,
-				enum gfield));
-static int	put_signature __P((FILE *, int));
-static int	attach_file __P((struct attachment *, FILE *, int));
-static int	make_multipart __P((struct header *, int, FILE *, FILE *,
-			const char *, const char *, int));
-static FILE	*infix __P((struct header *, FILE *, int));
-static int	savemail __P((char [], FILE *));
-static int	sendmail_internal __P((void *, int));
-static enum okay	transfer __P((struct name *, struct name *, FILE *));
-static enum okay	start_mta __P((struct name *, struct name *, FILE *));
-static void	message_id __P((FILE *));
-static int	fmt __P((char *, struct name *, FILE *, int, int, int));
-static int	infix_fw __P((FILE *, FILE *, struct message *,
-			struct name *, int));
+static char *getencoding(int convert);
+static struct name *fixhead(struct header *hp, struct name *tolist,
+		enum gfield addauto);
+static int put_signature(FILE *fo, int convert);
+static int attach_file(struct attachment *ap, FILE *fo, int dosign);
+static int make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
+		const char *contenttype, const char *charset, int dosign);
+static FILE *infix(struct header *hp, FILE *fi, int dosign);
+static int savemail(char *name, FILE *fi);
+static int sendmail_internal(void *v, int recipient_record);
+static enum okay transfer(struct name *to, struct name *mailargs, FILE *input);
+static enum okay start_mta(struct name *to, struct name *mailargs, FILE *input);
+static void message_id(FILE *fo);
+static int fmt(char *str, struct name *np, FILE *fo, int comma,
+		int dropinvalid, int domime);
+static int infix_fw(FILE *fi, FILE *fo, struct message *mp,
+		struct name *to, int add_resent);
 
 #define	BOUNDARRAY	8
 
@@ -82,7 +83,7 @@ static int	infix_fw __P((FILE *, FILE *, struct message *,
  * Generate a boundary for MIME multipart messages.
  */
 char *
-makeboundary()
+makeboundary(void)
 {
 	int i, j, bd;
 	static unsigned msgc;
@@ -136,8 +137,7 @@ makeboundary()
  * Get an encoding flag based on the given string.
  */
 static char *
-getencoding(convert)
-	int convert;
+getencoding(int convert)
 {
 	switch (convert) {
 	case CONV_7BIT:
@@ -158,10 +158,7 @@ getencoding(convert)
  * the distribution list into the appropriate fields.
  */
 static struct name *
-fixhead(hp, tolist, addauto)
-	struct header *hp;
-	struct name *tolist;
-	enum gfield addauto;
+fixhead(struct header *hp, struct name *tolist, enum gfield addauto)
 {
 	struct name *np;
 	char	*cp;
@@ -214,9 +211,7 @@ fixhead(hp, tolist, addauto)
  * Put the signature file at fo.
  */
 static int
-put_signature(fo, convert)
-FILE *fo;
-int convert;
+put_signature(FILE *fo, int convert)
 {
 	char *sig, buf[INFIX_BUF], c = '\n';
 	FILE *fsig;
@@ -256,10 +251,7 @@ int convert;
  * Write an attachment to the file buffer, converting to MIME.
  */
 static int
-attach_file(ap, fo, dosign)
-struct attachment *ap;
-FILE *fo;
-int	dosign;
+attach_file(struct attachment *ap, FILE *fo, int dosign)
 {
 	FILE *fi;
 	char *charset = NULL, *contenttype = NULL, *basename;
@@ -337,13 +329,8 @@ int	dosign;
  * Generate the body of a MIME multipart message.
  */
 static int
-make_multipart(hp, convert, fi, fo, contenttype, charset, dosign)
-struct header *hp;
-FILE *fi, *fo;
-const char *contenttype;
-const char *charset;
-int convert;
-int	dosign;
+make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
+		const char *contenttype, const char *charset, int dosign)
 {
 	struct attachment *att;
 
@@ -402,10 +389,7 @@ int	dosign;
  * and return the new file.
  */
 static FILE *
-infix(hp, fi, dosign)
-	struct header *hp;
-	FILE *fi;
-	int	dosign;
+infix(struct header *hp, FILE *fi, int dosign)
 {
 	FILE *nfo, *nfi;
 	char *tempMail;
@@ -560,9 +544,7 @@ infix(hp, fi, dosign)
 
 /*ARGSUSED*/
 static int
-savemail(name, fi)
-	char name[];
-	FILE *fi;
+savemail(char *name, FILE *fi)
 {
 	FILE *fo;
 	char *buf;
@@ -651,12 +633,10 @@ savemail(name, fi)
  * Interface between the argument list and the mail1 routine
  * which does all the dirty work.
  */
-int
-mail(to, cc, bcc, smopts, subject, attach, quotefile, recipient_record, tflag)
-	struct name *to, *cc, *bcc, *smopts;
-	struct attachment *attach;
-	char *subject, *quotefile;
-	int recipient_record, tflag;
+int 
+mail(struct name *to, struct name *cc, struct name *bcc,
+		struct name *smopts, char *subject, struct attachment *attach,
+		char *quotefile, int recipient_record, int tflag)
 {
 	struct header head;
 	struct str in, out;
@@ -686,10 +666,8 @@ mail(to, cc, bcc, smopts, subject, attach, quotefile, recipient_record, tflag)
  * Send mail to a bunch of user names.  The interface is through
  * the mail routine below.
  */
-static int
-sendmail_internal(v, recipient_record)
-	void *v;
-	int recipient_record;
+static int 
+sendmail_internal(void *v, int recipient_record)
 {
 	char *str = v;
 	struct header head;
@@ -700,24 +678,20 @@ sendmail_internal(v, recipient_record)
 	return(0);
 }
 
-int
-sendmail(v)
-	void *v;
+int 
+sendmail(void *v)
 {
 	return sendmail_internal(v, 0);
 }
 
-int
-Sendmail(v)
-	void *v;
+int 
+Sendmail(void *v)
 {
 	return sendmail_internal(v, 1);
 }
 
 static enum okay
-transfer(to, mailargs, input)
-struct name	*to, *mailargs;
-FILE	*input;
+transfer(struct name *to, struct name *mailargs, FILE *input)
 {
 	char	o[LINESIZE], *cp;
 	struct name	*np, *nt;
@@ -766,9 +740,7 @@ FILE	*input;
  * mailing to namelist and stdin redirected to input.
  */
 static enum okay
-start_mta(to, mailargs, input)
-struct name *to, *mailargs;
-FILE* input;
+start_mta(struct name *to, struct name *mailargs, FILE *input)
 {
 	char **args = NULL, **t;
 	pid_t pid;
@@ -842,13 +814,9 @@ FILE* input;
  * Mail a message on standard input to the people indicated
  * in the passed header.  (Internal interface).
  */
-enum okay
-mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
-	struct header *hp;
-	int printheaders;
-	struct message *quote;
-	char *quotefile;
-	int recipient_record, tflag;
+enum okay 
+mail1(struct header *hp, int printheaders, struct message *quote,
+		char *quotefile, int recipient_record, int tflag)
 {
 	char *cp, *cq, *ep;
 	struct name *to;
@@ -980,8 +948,7 @@ out:
  * Use either the host name or the host part of the from address.
  */
 static void
-message_id(fo)
-FILE *fo;
+message_id(FILE *fo)
 {
 	static unsigned long msgc;
 	time_t t;
@@ -1038,9 +1005,7 @@ const char *month_names[] = {
  * not set on most GNU systems.
  */
 int
-mkdate(fo, field)
-FILE *fo;
-const char	*field;
+mkdate(FILE *fo, const char *field)
 {
 	time_t t;
 	struct tm *tmptr;
@@ -1084,12 +1049,8 @@ const char	*field;
  * passed file buffer.
  */
 int
-puthead(hp, fo, w, convert, contenttype, charset)
-	struct header *hp;
-	FILE *fo;
-	enum gfield w;
-	char *contenttype, *charset;
-	int convert;
+puthead(struct header *hp, FILE *fo, enum gfield w,
+		int convert, char *contenttype, char *charset)
 {
 	int gotcha;
 	char *addr/*, *cp*/;
@@ -1218,11 +1179,8 @@ puthead(hp, fo, w, convert, contenttype, charset)
  * Format the given header line to not exceed 72 characters.
  */
 static int
-fmt(str, np, fo, comma, dropinvalid, domime)
-	char *str;
-	struct name *np;
-	FILE *fo;
-	int comma, dropinvalid, domime;
+fmt(char *str, struct name *np, FILE *fo, int comma, int dropinvalid,
+		int domime)
 {
 	int col, len, count = 0;
 	int is_to = 0;
@@ -1270,11 +1228,8 @@ fmt(str, np, fo, comma, dropinvalid, domime)
  * Rewrite a message for forwarding, adding the Resent-Headers.
  */
 static int
-infix_fw(fi, fo, mp, to, add_resent)
-FILE *fi, *fo;
-struct message *mp;
-struct name *to;
-int add_resent;
+infix_fw(FILE *fi, FILE *fo, struct message *mp, struct name *to,
+		int add_resent)
 {
 	size_t count;
 	char *buf = NULL, *cp/*, *cp2*/;
@@ -1369,11 +1324,8 @@ int add_resent;
 	return 0;
 }
 
-int
-forward_msg(mp, to, add_resent)
-struct message *mp;
-struct name *to;
-int add_resent;
+int 
+forward_msg(struct message *mp, struct name *to, int add_resent)
 {
 	FILE *ibuf, *nfo, *nfi;
 	char *tempMail;

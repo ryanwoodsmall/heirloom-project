@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)names.c	2.16 (gritter) 8/8/04";
+static char sccsid[] = "@(#)names.c	2.18 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -55,13 +55,15 @@ static char sccsid[] = "@(#)names.c	2.16 (gritter) 8/8/04";
 #include <time.h>
 #include <unistd.h>
 
-static struct name	*tailof __P((struct name *));
-static struct name	*extract1 __P((char [], int, char [], int));
-static char	*yankword __P((char *, char [], char [], int));
-static struct name	*gexpand __P((struct name *, struct grouphead *,
-				int, int));
-static struct name	*put __P((struct name *, struct name *));
-static struct name	*delname __P((struct name *, char []));
+static struct name *tailof(struct name *name);
+static struct name *extract1(char *line, int ntype, char *separators,
+		int copypfx);
+static char *yankword(char *ap, char *wbuf, char *separators, int copypfx);
+static int same_name(char *n1, char *n2);
+static struct name *gexpand(struct name *nlist, struct grouphead *gh,
+		int metoo, int ntype);
+static struct name *put(struct name *list, struct name *node);
+static struct name *delname(struct name *np, char *name);
 
 /*
  * Allocate a single element of a name list,
@@ -69,9 +71,7 @@ static struct name	*delname __P((struct name *, char []));
  * name and return it.
  */
 struct name *
-nalloc(str, ntype)
-	char str[];
-	int ntype;
+nalloc(char *str, int ntype)
 {
 	struct name *np;
 	struct str	in, out;
@@ -102,8 +102,7 @@ nalloc(str, ntype)
  * Find the tail of a list and return it.
  */
 static struct name *
-tailof(name)
-	struct name *name;
+tailof(struct name *name)
 {
 	struct name *np;
 
@@ -121,17 +120,13 @@ tailof(name)
  * Return the list or NULL if none found.
  */
 struct name *
-extract(line, ntype)
-	char line[];
-	int ntype;
+extract(char *line, int ntype)
 {
 	return extract1(line, ntype, " \t,(", 0);
 }
 
 struct name *
-sextract(line, ntype)
-	char line[];
-	int ntype;
+sextract(char *line, int ntype)
 {
 	if (line && strpbrk(line, ",\"\\(<"))
 		return extract1(line, ntype, ",", 1);
@@ -140,9 +135,7 @@ sextract(line, ntype)
 }
 
 static struct name *
-extract1(line, ntype, separators, copypfx)
-	char line[], separators[];
-	int ntype, copypfx;
+extract1(char *line, int ntype, char *separators, int copypfx)
 {
 	char *cp, *nbuf;
 	struct name *top, *np, *t;
@@ -170,9 +163,7 @@ extract1(line, ntype, separators, copypfx)
  * Turn a list of names into a string of the same names.
  */
 char *
-detract(np, ntype)
-	struct name *np;
-	enum gfield ntype;
+detract(struct name *np, enum gfield ntype)
 {
 	int s;
 	char *cp, *top;
@@ -218,9 +209,7 @@ detract(np, ntype)
  * Throw away things between ()'s, and take anything between <>.
  */
 static char *
-yankword(ap, wbuf, separators, copypfx)
-	char *ap, wbuf[], separators[];
-	int copypfx;
+yankword(char *ap, char *wbuf, char *separators, int copypfx)
 {
 	char *cp, *pp, *wp;
 
@@ -270,10 +259,7 @@ yankword(ap, wbuf, separators, copypfx)
  */
 /*ARGSUSED 3*/
 struct name *
-outof(names, fo, hp)
-	struct name *names;
-	FILE *fo;
-	struct header *hp;
+outof(struct name *names, FILE *fo, struct header *hp)
 {
 	int c, lastc;
 	struct name *np, *top;
@@ -417,9 +403,8 @@ cant:
  * If any of the network metacharacters precedes any slashes, it can't
  * be a filename.  We cheat with .'s to allow path names like ./...
  */
-int
-is_fileaddr(name)
-	char *name;
+int 
+is_fileaddr(char *name)
 {
 	char *cp;
 
@@ -463,8 +448,7 @@ same_name(char *n1, char *n2)
  */
 
 struct name *
-usermap(names)
-	struct name *names;
+usermap(struct name *names)
 {
 	struct name *new, *np, *cp;
 	struct grouphead *gh;
@@ -498,10 +482,7 @@ usermap(names)
  */
 
 static struct name *
-gexpand(nlist, gh, metoo, ntype)
-	struct name *nlist;
-	struct grouphead *gh;
-	int metoo, ntype;
+gexpand(struct name *nlist, struct grouphead *gh, int metoo, int ntype)
 {
 	struct group *gp;
 	struct grouphead *ngh;
@@ -546,8 +527,7 @@ skip:
  * Concatenate the two passed name lists, return the result.
  */
 struct name *
-cat(n1, n2)
-	struct name *n1, *n2;
+cat(struct name *n1, struct name *n2)
 {
 	struct name *tail;
 
@@ -566,8 +546,7 @@ cat(n1, n2)
  * Return an error if the name list won't fit.
  */
 char **
-unpack(np)
-	struct name *np;
+unpack(struct name *np)
 {
 	char **ap, **top;
 	struct name *n;
@@ -612,8 +591,7 @@ unpack(np)
  * Return the head of the new list.
  */
 struct name *
-elide(names)
-	struct name *names;
+elide(struct name *names)
 {
 	struct name *np, *t, *new;
 	struct name *x;
@@ -711,8 +689,7 @@ elide(names)
  * the list.
  */
 static struct name *
-put(list, node)
-	struct name *list, *node;
+put(struct name *list, struct name *node)
 {
 	node->n_flink = list;
 	node->n_blink = NULL;
@@ -725,9 +702,8 @@ put(list, node)
  * Determine the number of undeleted elements in
  * a name list and return it.
  */
-int
-count(np)
-	struct name *np;
+int 
+count(struct name *np)
 {
 	int c;
 
@@ -741,9 +717,7 @@ count(np)
  * Delete the given name from a namelist.
  */
 static struct name *
-delname(np, name)
-	struct name *np;
-	char name[];
+delname(struct name *np, char *name)
 {
 	struct name *p;
 
@@ -773,8 +747,7 @@ delname(np, name)
 
 /*
 void
-prettyprint(name)
-	struct name *name;
+prettyprint(struct name *name)
 {
 	struct name *np;
 

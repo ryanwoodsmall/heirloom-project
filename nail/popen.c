@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)popen.c	2.15 (gritter) 9/16/04";
+static char sccsid[] = "@(#)popen.c	2.17 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -83,22 +83,23 @@ struct child {
 	struct child *link;
 };
 static struct child	*child;
-static struct child	*findchild __P((int));
-static void	delchild __P((struct child *));
-static int	file_pid __P((FILE *));
-static void	register_file __P((FILE *, int, int, int, int,
-			const char *, long));
-static enum okay	unregister_file __P((FILE *));
-static int	decompress __P((int, int, int));
-static int	wait_command __P((int));
+
+static int scan_mode(const char *mode, int *omode);
+static void register_file(FILE *fp, int omode, int pipe, int pid,
+		int compressed, const char *realfile, long offset);
+static enum okay compress(struct fp *fpp);
+static int decompress(int compression, int input, int output);
+static enum okay unregister_file(FILE *fp);
+static int file_pid(FILE *fp);
+static int wait_command(int pid);
+static struct child *findchild(int pid);
+static void delchild(struct child *cp);
 
 /*
  * Provide BSD-like signal() on all systems.
  */
 sighandler_type
-safe_signal(signum, handler)
-int signum;
-sighandler_type handler;
+safe_signal(int signum, sighandler_type handler)
 {
 	struct sigaction nact, oact;
 
@@ -113,10 +114,8 @@ sighandler_type handler;
 	return oact.sa_handler;
 }
 
-static int
-scan_mode(mode, omode)
-	const char *mode;
-	int	*omode;
+static int 
+scan_mode(const char *mode, int *omode)
 {
 
 	if (!strcmp(mode, "r")) {
@@ -143,9 +142,7 @@ scan_mode(mode, omode)
 }
 
 FILE *
-safe_fopen(file, mode, omode)
-	const char *file, *mode;
-	int	*omode;
+safe_fopen(const char *file, const char *mode, int *omode)
 {
 	int  fd;
 
@@ -157,8 +154,7 @@ safe_fopen(file, mode, omode)
 }
 
 FILE *
-Fopen(file, mode)
-	const char *file, *mode;
+Fopen(const char *file, const char *mode)
 {
 	FILE *fp;
 	int omode;
@@ -171,9 +167,7 @@ Fopen(file, mode)
 }
 
 FILE *
-Fdopen(fd, mode)
-	int fd;
-	const char *mode;
+Fdopen(int fd, const char *mode)
 {
 	FILE *fp;
 	int	omode;
@@ -187,8 +181,7 @@ Fdopen(fd, mode)
 }
 
 int
-Fclose(fp)
-	FILE *fp;
+Fclose(FILE *fp)
 {
 	int	i = 0;
 	if (unregister_file(fp) == OKAY)
@@ -199,9 +192,7 @@ Fclose(fp)
 }
 
 FILE *
-Zopen(file, mode, compression)
-	const char *file, *mode;
-	int *compression;
+Zopen(const char *file, const char *mode, int *compression)
 {
 	int	input;
 	FILE	*output;
@@ -284,9 +275,7 @@ open:	if ((output = Ftemp(&tempfn, "Rz", "w+", 0600, 0)) == NULL) {
 }
 
 FILE *
-Popen(cmd, mode, shell, newfd1)
-const char *cmd, *mode, *shell;
-int newfd1;
+Popen(const char *cmd, const char *mode, const char *shell, int newfd1)
 {
 	int p[2];
 	int myside, hisside, fd0, fd1;
@@ -333,8 +322,7 @@ int newfd1;
 }
 
 int
-Pclose(ptr)
-	FILE *ptr;
+Pclose(FILE *ptr)
 {
 	int i;
 	sigset_t nset, oset;
@@ -353,8 +341,8 @@ Pclose(ptr)
 	return i;
 }
 
-void
-close_all_files()
+void 
+close_all_files(void)
 {
 
 	while (fp_head)
@@ -365,11 +353,8 @@ close_all_files()
 }
 
 static void
-register_file(fp, omode, pipe, pid, compressed, realfile, offset)
-	FILE *fp;
-	int omode, pipe, pid, compressed;
-	const char *realfile;
-	long offset;
+register_file(FILE *fp, int omode, int pipe, int pid, int compressed,
+		const char *realfile, long offset)
 {
 	struct fp *fpp;
 
@@ -450,8 +435,7 @@ decompress(int compression, int input, int output)
 }
 
 static enum okay
-unregister_file(fp)
-	FILE *fp;
+unregister_file(FILE *fp)
 {
 	struct fp **pp, *p;
 	enum okay	ok = OKAY;
@@ -470,8 +454,7 @@ unregister_file(fp)
 }
 
 static int
-file_pid(fp)
-	FILE *fp;
+file_pid(FILE *fp)
 {
 	struct fp *p;
 
@@ -490,11 +473,8 @@ file_pid(fp)
  */
 /*VARARGS4*/
 int
-run_command(cmd, mask, infd, outfd, a0, a1, a2)
-	char *cmd;
-	sigset_t *mask;
-	int infd, outfd;
-	char *a0, *a1, *a2;
+run_command(char *cmd, sigset_t *mask, int infd, int outfd,
+		char *a0, char *a1, char *a2)
 {
 	int pid;
 
@@ -505,11 +485,8 @@ run_command(cmd, mask, infd, outfd, a0, a1, a2)
 
 /*VARARGS4*/
 int
-start_command(cmd, mask, infd, outfd, a0, a1, a2)
-	const char *cmd;
-	sigset_t *mask;
-	int infd, outfd;
-	const char *a0, *a1, *a2;
+start_command(const char *cmd, sigset_t *mask, int infd, int outfd,
+		const char *a0, const char *a1, const char *a2)
 {
 	int pid;
 
@@ -535,9 +512,7 @@ start_command(cmd, mask, infd, outfd, a0, a1, a2)
 }
 
 void
-prepare_child(nset, infd, outfd)
-	sigset_t *nset;
-	int infd, outfd;
+prepare_child(sigset_t *nset, int infd, int outfd)
 {
 	int i;
 	sigset_t fset;
@@ -561,9 +536,8 @@ prepare_child(nset, infd, outfd)
 	sigprocmask(SIG_UNBLOCK, &fset, (sigset_t *)NULL);
 }
 
-static int
-wait_command(pid)
-	int pid;
+static int 
+wait_command(int pid)
 {
 
 	if (wait_child(pid) < 0 && (value("bsdcompat") || value("bsdmsgs"))) {
@@ -574,8 +548,7 @@ wait_command(pid)
 }
 
 static struct child *
-findchild(pid)
-	int pid;
+findchild(int pid)
 {
 	struct child **cpp;
 
@@ -591,9 +564,8 @@ findchild(pid)
 	return *cpp;
 }
 
-static void
-delchild(cp)
-	struct child *cp;
+static void 
+delchild(struct child *cp)
 {
 	struct child **cpp;
 
@@ -604,9 +576,8 @@ delchild(cp)
 }
 
 /*ARGSUSED*/
-void
-sigchild(signo)
-	int signo;
+void 
+sigchild(int signo)
 {
 	int pid;
 	int status;
@@ -631,9 +602,8 @@ int wait_status;
 /*
  * Mark a child as don't care.
  */
-void
-free_child(pid)
-	int pid;
+void 
+free_child(int pid)
 {
 	sigset_t nset, oset;
 	struct child *cp = findchild(pid);
@@ -656,9 +626,8 @@ free_child(pid)
  * This version is correct code, but causes harm on some loosing
  * systems. So we use the second one instead.
  */
-int
-wait_child(pid)
-	int pid;
+int 
+wait_child(int pid)
 {
 	sigset_t nset, oset;
 	struct child *cp = findchild(pid);
@@ -677,9 +646,8 @@ wait_child(pid)
 	return -1;
 }
 #endif
-int
-wait_child(pid)
-int pid;
+int 
+wait_child(int pid)
 {
 	pid_t term;
 	struct child *cp;

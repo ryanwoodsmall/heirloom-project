@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.247 (gritter) 9/27/04
+.\"     Sccsid: @(#)nail.1	2.249 (gritter) 10/2/04
 .\"
-.TH NAIL 1 "9/27/04" "nail 11.9" "User Commands"
+.TH NAIL 1 "10/2/04" "nail 11.9" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -2691,10 +2691,19 @@ if it contains spaces or tabs.
 .TP
 .B junkdb
 The location of the junk mail database.
-The string is treated as a folder name,
+The string is treated like a folder name,
 as described for the
 .I folder
 command.
+.IP
+The files in the junk mail database are normally stored in
+.IR compress (1)
+format for saving space.
+If processing time is considered more important,
+.IR uncompress (1)
+can be used to store them in plain form.
+.I Nail
+will then work using the uncompressed files.
 .TP
 .B LISTER
 Pathname of the directory lister
@@ -3923,8 +3932,9 @@ even if the surrounding discussion is annoying;
 but you normally would not see mail from `badguy@poornet',
 unless he participates in the important discussion.
 Messages that are marked with five or more plus characters
-in their `X-Spam-Flag' field are moved
-to the folder `junk' in the
+in their `X-Spam-Flag' field
+(inserted by some server-side filtering software)
+are moved to the folder `junk' in the
 .I folder
 directory.
 .PP
@@ -4230,6 +4240,9 @@ Thus they may not contain sensitive information
 for encrypted messages,
 and cannot be trusted even if the message content
 has been verified.
+When sending signed messages,
+it is recommended to repeat any important header information
+in the message text.
 .SS "Using CRLs with S/MIME or SSL/TLS"
 Certification authorities (CAs) issue
 certificate revocation lists (CRLs) on a regular basis.

@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Changes Copyright (c) 2004
@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.28 (gritter) 9/23/04";
+static char sccsid[] = "@(#)nss.c	1.30 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -66,30 +66,26 @@ static sigjmp_buf	nssjmp;
 #include <ciferfam.h>
 #include <private/pprio.h>
 
-static enum okay	nss_init __P((void));
-static void	nss_select_method __P((const char *));
-static SECStatus	bad_cert_cb __P((void *, PRFileDesc *));
-static const char	*bad_cert_str __P((void));
-static char	*password_cb __P((PK11SlotInfo *, PRBool, void *));
-static CERTCertificate	*get_signer_cert __P((char *));
-static FILE	*encode __P((FILE *, FILE **, FILE **, NSSCMSMessage *,
-				void (*)(void *, const char *, unsigned long)));
-static void	decoder_cb __P((void *, const char *, unsigned long));
-static void	base64_cb __P((void *, const char *, unsigned long));
-static int	verify1 __P((struct message *, int));
-static struct message	*getsig __P((struct message *, int, NSSCMSMessage **));
-static enum okay	getdig __P((struct message *, int,
-				SECItem ***, PLArenaPool **,
-				SECAlgorithmID **));
-static void	dumpcert __P((CERTCertificate *, FILE *));
-static enum okay	getcipher __P((const char *, SECOidTag *, int *));
-static void	nsscatch __P((int));
+static char *password_cb(PK11SlotInfo *slot, PRBool retry, void *arg);
+static SECStatus bad_cert_cb(void *arg, PRFileDesc *fd);
+static const char *bad_cert_str(void);
+static enum okay nss_init(void);
+static void nss_select_method(const char *uhp);
+static CERTCertificate *get_signer_cert(char *addr);
+static FILE *encode(FILE *ip, FILE **hp, FILE **bp, NSSCMSMessage *msg,
+		void (*cb)(void *, const char *, unsigned long));
+static void decoder_cb(void *arg, const char *buf, unsigned long len);
+static void base64_cb(void *arg, const char *buf, unsigned long len);
+static int verify1(struct message *m, int n);
+static struct message *getsig(struct message *m, int n, NSSCMSMessage **msg);
+static enum okay getdig(struct message *m, int n, SECItem ***digests,
+		PLArenaPool **poolp, SECAlgorithmID **algids);
+static void nsscatch(int s);
+static void dumpcert(CERTCertificate *cert, FILE *op);
+static enum okay getcipher(const char *to, SECOidTag *alg, int *key);
 
 static char *
-password_cb(slot, retry, arg)
-	PK11SlotInfo	*slot;
-	PRBool	retry;
-	void	*arg;
+password_cb(PK11SlotInfo *slot, PRBool retry, void *arg)
 {
 	sighandler_type	saveint;
 	char	*pass = NULL;
@@ -109,16 +105,14 @@ password_cb(slot, retry, arg)
 }
 
 static SECStatus
-bad_cert_cb(arg, fd)
-	void	*arg;
-	PRFileDesc	*fd;
+bad_cert_cb(void *arg, PRFileDesc *fd)
 {
 	fprintf(stderr, "Error in certificate: %s.\n", bad_cert_str());
 	return ssl_vrfy_decide() == OKAY ? SECSuccess : SECFailure;
 }
 
 static const char *
-bad_cert_str()
+bad_cert_str(void)
 {
 	int	ec;
 	char	*es, eb[40];
@@ -224,8 +218,7 @@ nss_init(void)
 }
 
 static void
-nss_select_method(uhp)
-	const char	*uhp;
+nss_select_method(const char *uhp)
 {
 	char	*cp;
 	enum {
@@ -256,10 +249,7 @@ nss_select_method(uhp)
 }
 
 enum okay
-ssl_open(server, sp, uhp)
-	const char	*server;
-	struct sock	*sp;
-	const char	*uhp;
+ssl_open(const char *server, struct sock *sp, const char *uhp)
 {
 	PRFileDesc	*fdp, *fdc;
 
@@ -315,8 +305,7 @@ nss_gen_err(const char *fmt, ...)
 }
 
 FILE *
-smime_sign(ip)
-	FILE	*ip;
+smime_sign(FILE *ip)
 {
 	NSSCMSMessage	*msg;
 	NSSCMSContentInfo	*content;
@@ -388,8 +377,7 @@ smime_sign(ip)
 }
 
 int
-cverify(vp)
-	void	*vp;
+cverify(void *vp)
 {
 	int	*msgvec = vp, *ip;
 	int	ec = 0;
@@ -405,9 +393,7 @@ cverify(vp)
 }
 
 FILE *
-smime_encrypt(ip, ignored, to)
-	FILE	*ip;
-	const char	*ignored, *to;
+smime_encrypt(FILE *ip, const char *ignored, const char *to)
 {
 	NSSCMSMessage	*msg;
 	NSSCMSContentInfo	*content;
@@ -477,10 +463,7 @@ smime_encrypt(ip, ignored, to)
 }
 
 struct message *
-smime_decrypt(m, to, cc, signcall)
-	struct message	*m;
-	const char	*to, *cc;
-	int	signcall;
+smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 {
 	NSSCMSDecoderContext	*ctx;
 	NSSCMSMessage	*msg;
@@ -593,8 +576,7 @@ smime_decrypt(m, to, cc, signcall)
 }
 
 static CERTCertificate *
-get_signer_cert(addr)
-	char	*addr;
+get_signer_cert(char *addr)
 {
 	CERTCertDBHandle	*handle;
 	CERTCertList	*list;
@@ -659,11 +641,8 @@ get_signer_cert(addr)
 }
 
 static FILE *
-encode(ip, hp, bp, msg, cb)
-	FILE	*ip;
-	FILE	**hp, **bp;
-	NSSCMSMessage	*msg;
-	void	(*cb) __P((void *, const char *, unsigned long));
+encode(FILE *ip, FILE **hp, FILE **bp, NSSCMSMessage *msg,
+		void    (*cb)(void *, const char *, unsigned long))
 {
 	NSSCMSEncoderContext	*ctx;
 	char	*buf = NULL, *cp;
@@ -717,20 +696,14 @@ encode(ip, hp, bp, msg, cb)
 }
 
 static void
-decoder_cb(arg, buf, len)
-	void	*arg;
-	const char	*buf;
-	unsigned long	len;
+decoder_cb(void *arg, const char *buf, unsigned long len)
 {
 	if (arg && buf)
 		fwrite(buf, 1, len, arg);
 }
 
 static void
-base64_cb(arg, buf, len)
-	void	*arg;
-	const char	*buf;
-	unsigned long	len;
+base64_cb(void *arg, const char *buf, unsigned long len)
 {
 	static char	back[972];
 	static int	fill;
@@ -755,9 +728,7 @@ base64_cb(arg, buf, len)
 }
 
 static int
-verify1(m, n)
-	struct message	*m;
-	int	n;
+verify1(struct message *m, int n)
 {
 	SECItem	**digests;
 	NSSCMSMessage	*msg;
@@ -910,10 +881,7 @@ verify1(m, n)
 }
 
 static struct message *
-getsig(m, n, msg)
-	struct message	*m;
-	int	n;
-	NSSCMSMessage	**msg;
+getsig(struct message *m, int n, NSSCMSMessage **msg)
 {
 	struct message	*x;
 	char	*ct, *pt, *boundary = NULL, *cte;
@@ -1016,12 +984,8 @@ loop:	if ((ct = hfield("content-type", m)) == NULL)
 }
 
 static enum okay
-getdig(m, n, digests, poolp, algids)
-	struct message	*m;
-	int	n;
-	SECItem	***digests;
-	PLArenaPool	**poolp;
-	SECAlgorithmID	**algids;
+getdig(struct message *m, int n, SECItem ***digests,
+		PLArenaPool **poolp, SECAlgorithmID **algids)
 {
 	char	*ct, *pt, *boundary;
 	char	*buf = NULL;
@@ -1091,8 +1055,7 @@ getdig(m, n, digests, poolp, algids)
 }
 
 static void
-nsscatch(s)
-	int	s;
+nsscatch(int s)
 {
 	if (reset_tio)
 		tcsetattr(0, TCSADRAIN, &otio);
@@ -1100,10 +1063,7 @@ nsscatch(s)
 }
 
 enum okay
-smime_certsave(m, n, op)
-	struct message	*m;
-	int	n;
-	FILE	*op;
+smime_certsave(struct message *m, int n, FILE *op)
 {
 	NSSCMSMessage	*msg;
 	CERTCertDBHandle	*handle;
@@ -1183,9 +1143,7 @@ smime_certsave(m, n, op)
 }
 
 static void
-dumpcert(cert, op)
-	CERTCertificate	*cert;
-	FILE	*op;
+dumpcert(CERTCertificate *cert, FILE *op)
 {
 	fprintf(op, "subject=%s\n", cert->subjectName);
 	fprintf(op, "issuer=%s\n", cert->issuerName);
@@ -1197,10 +1155,7 @@ dumpcert(cert, op)
 }
 
 static enum okay
-getcipher(to, alg, key)
-	const char	*to;
-	SECOidTag	*alg;
-	int	*key;
+getcipher(const char *to, SECOidTag *alg, int *key)
 {
 	char	*vn, *cp;
 	int	vs;

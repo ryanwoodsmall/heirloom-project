@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.36 (gritter) 9/17/04";
+static char sccsid[] = "@(#)cmd2.c	2.38 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -52,18 +52,16 @@ static char sccsid[] = "@(#)cmd2.c	2.36 (gritter) 9/17/04";
  *
  * More user commands.
  */
-static int	igcomp __P((const void *, const void *));
-static int	save1 __P((char [], int, char *, struct ignoretab *, int, int,
-			int));
-static char	*snarf __P((char [], int *, int));
-static int	delm __P((int []));
-#ifdef	DEBUG_COMMANDS
-static void	clob1 __P((int));
-#endif
-static int	ignore1 __P((char *[], struct ignoretab *, char *));
-static int	igshow __P((struct ignoretab *, char *));
-static void	unignore_one __P((const char *, struct ignoretab *));
-static int	unignore1 __P((char *[], struct ignoretab *, char *));
+
+static int save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
+		int convert, int sender_record, int domove);
+static char *snarf(char *linebuf, int *flag, int usembox);
+static int delm(int *msgvec);
+static int ignore1(char **list, struct ignoretab *tab, char *which);
+static int igshow(struct ignoretab *tab, char *which);
+static int igcomp(const void *l, const void *r);
+static void unignore_one(const char *name, struct ignoretab *tab);
+static int unignore1(char **list, struct ignoretab *tab, char *which);
 
 /*
  * If any arguments were given, go to the next applicable argument
@@ -71,8 +69,7 @@ static int	unignore1 __P((char *[], struct ignoretab *, char *));
  * If given as first command with no arguments, print first message.
  */
 int
-next(v)
-	void *v;
+next(void *v)
 {
 	int *msgvec = v;
 	struct message *mp;
@@ -172,18 +169,16 @@ hitit:
  * Save a message in a file.  Mark the message as saved
  * so we can discard when the user quits.
  */
-int
-save(v)
-	void *v;
+int 
+save(void *v)
 {
 	char *str = v;
 
 	return save1(str, 1, "save", saveignore, CONV_NONE, 0, 0);
 }
 
-int
-Save(v)
-	void *v;
+int 
+Save(void *v)
 {
 	char *str = v;
 
@@ -193,18 +188,16 @@ Save(v)
 /*
  * Copy a message to a file without affected its saved-ness
  */
-int
-copycmd(v)
-	void *v;
+int 
+copycmd(void *v)
 {
 	char *str = v;
 
 	return save1(str, 0, "copy", saveignore, CONV_NONE, 0, 0);
 }
 
-int
-Copycmd(v)
-	void *v;
+int 
+Copycmd(void *v)
 {
 	char *str = v;
 
@@ -214,18 +207,16 @@ Copycmd(v)
 /*
  * Move a message to a file.
  */
-int
-cmove(v)
-	void *v;
+int 
+cmove(void *v)
 {
 	char *str = v;
 
 	return save1(str, 0, "move", saveignore, CONV_NONE, 0, 1);
 }
 
-int
-cMove(v)
-	void *v;
+int 
+cMove(void *v)
 {
 	char *str = v;
 
@@ -235,18 +226,16 @@ cMove(v)
 /*
  * Decrypt and copy a message to a file.
  */
-int
-cdecrypt(v)
-	void *v;
+int 
+cdecrypt(void *v)
 {
 	char *str = v;
 
 	return save1(str, 0, "decrypt", saveignore, CONV_DECRYPT, 0, 0);
 }
 
-int
-cDecrypt(v)
-	void *v;
+int 
+cDecrypt(void *v)
 {
 	char *str = v;
 
@@ -257,14 +246,9 @@ cDecrypt(v)
  * Save/copy the indicated messages at the end of the passed file name.
  * If mark is true, mark the message "saved."
  */
-static int
-save1(str, mark, cmd, ignore, convert, sender_record, domove)
-	char str[];
-	int mark;
-	char *cmd;
-	struct ignoretab *ignore;
-	int convert;
-	int sender_record, domove;
+static int 
+save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
+		int convert, int sender_record, int domove)
 {
 	int *ip;
 	struct message *mp;
@@ -441,9 +425,8 @@ save1(str, mark, cmd, ignore, convert, sender_record, domove)
  * file name, minus header and trailing blank line.
  * This is the MIME save function.
  */
-int
-cwrite(v)
-	void *v;
+int 
+cwrite(void *v)
 {
 	char *str = v;
 
@@ -460,10 +443,7 @@ cwrite(v)
  */
 
 static char *
-snarf(linebuf, flag, usembox)
-	char linebuf[];
-	int *flag;
-	int usembox;
+snarf(char *linebuf, int *flag, int usembox)
 {
 	char *cp;
 
@@ -484,9 +464,8 @@ snarf(linebuf, flag, usembox)
 /*
  * Delete messages.
  */
-int
-delete(v)
-	void *v;
+int 
+delete(void *v)
 {
 	int *msgvec = v;
 	delm(msgvec);
@@ -496,9 +475,8 @@ delete(v)
 /*
  * Delete messages, then type the new dot.
  */
-int
-deltype(v)
-	void *v;
+int 
+deltype(void *v)
 {
 	int *msgvec = v;
 	int list[2];
@@ -523,9 +501,8 @@ deltype(v)
  * Set dot to some nice place afterwards.
  * Internal interface.
  */
-static int
-delm(msgvec)
-	int *msgvec;
+static int 
+delm(int *msgvec)
 {
 	struct message *mp;
 	int *ip;
@@ -562,9 +539,8 @@ delm(msgvec)
 /*
  * Undelete the indicated messages.
  */
-int
-undeletecmd(v)
-	void *v;
+int 
+undeletecmd(void *v)
 {
 	int *msgvec = v;
 	struct message *mp;
@@ -586,9 +562,8 @@ undeletecmd(v)
  * Interactively dump core on "core"
  */
 /*ARGSUSED*/
-int
-core(v)
-	void *v;
+int 
+core(void *v)
 {
 	int pid;
 #ifdef	WCOREDUMP
@@ -618,9 +593,8 @@ core(v)
 /*
  * Clobber as many bytes of stack as the user requests.
  */
-int
-clobber(v)
-	void *v;
+int 
+clobber(void *v)
 {
 	char **argv = v;
 	int times;
@@ -636,9 +610,8 @@ clobber(v)
 /*
  * Clobber the stack.
  */
-static void
-clob1(n)
-	int n;
+static void 
+clob1(int n)
 {
 	char buf[512];
 	char *cp;
@@ -655,9 +628,8 @@ clob1(n)
  * Add the given header fields to the retained list.
  * If no arguments, print the current list of retained fields.
  */
-int
-retfield(v)
-	void *v;
+int 
+retfield(void *v)
 {
 	char **list = v;
 
@@ -668,38 +640,32 @@ retfield(v)
  * Add the given header fields to the ignored list.
  * If no arguments, print the current list of ignored fields.
  */
-int
-igfield(v)
-	void *v;
+int 
+igfield(void *v)
 {
 	char **list = v;
 
 	return ignore1(list, ignore, "ignored");
 }
 
-int
-saveretfield(v)
-	void *v;
+int 
+saveretfield(void *v)
 {
 	char **list = v;
 
 	return ignore1(list, saveignore + 1, "retained");
 }
 
-int
-saveigfield(v)
-	void *v;
+int 
+saveigfield(void *v)
 {
 	char **list = v;
 
 	return ignore1(list, saveignore, "ignored");
 }
 
-static int
-ignore1(list, tab, which)
-	char *list[];
-	struct ignoretab *tab;
-	char *which;
+static int 
+ignore1(char **list, struct ignoretab *tab, char *which)
 {
 	int h;
 	struct ignore *igp;
@@ -734,10 +700,8 @@ ignore1(list, tab, which)
 /*
  * Print out all currently retained fields.
  */
-static int
-igshow(tab, which)
-	struct ignoretab *tab;
-	char *which;
+static int 
+igshow(struct ignoretab *tab, char *which)
 {
 	int h;
 	struct ignore *igp;
@@ -764,45 +728,38 @@ igshow(tab, which)
 /*
  * Compare two names for sorting ignored field list.
  */
-static int
-igcomp(l, r)
-	const void *l, *r;
+static int 
+igcomp(const void *l, const void *r)
 {
 	return (strcmp(*(char **)l, *(char **)r));
 }
 
-int
-unignore(v)
-	void *v;
+int 
+unignore(void *v)
 {
 	return unignore1((char **)v, ignore, "ignored");
 }
 
-int
-unretain(v)
-	void *v;
+int 
+unretain(void *v)
 {
 	return unignore1((char **)v, ignore + 1, "retained");
 }
 
-int
-unsaveignore(v)
-	void *v;
+int 
+unsaveignore(void *v)
 {
 	return unignore1((char **)v, saveignore, "ignored");
 }
 
-int
-unsaveretain(v)
-	void *v;
+int 
+unsaveretain(void *v)
 {
 	return unignore1((char **)v, saveignore + 1, "retained");
 }
 
-static void
-unignore_one(name, tab)
-	const char *name;
-	struct ignoretab *tab;
+static void 
+unignore_one(const char *name, struct ignoretab *tab)
 {
 	struct ignore *ip, *iq = NULL;
 	int h = hash(name);
@@ -821,11 +778,8 @@ unignore_one(name, tab)
 	}
 }
 
-static int
-unignore1(list, tab, which)
-	char *list[];
-	struct ignoretab *tab;
-	char *which;
+static int 
+unignore1(char **list, struct ignoretab *tab, char *which)
 {
 	if (tab->i_count == 0) {
 		printf(catgets(catd, CATSET, 34,

@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.56 (gritter) 9/22/04";
+static char sccsid[] = "@(#)cache.c	1.58 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -63,17 +63,17 @@ static char sccsid[] = "@(#)cache.c	1.56 (gritter) 9/22/04";
  * A cache for IMAP.
  */
 
-static char	*encname __P((struct mailbox *, const char *, int,
-			const char *));
-static char	*encuid __P((struct mailbox *, unsigned long));
-static FILE	*clean __P((struct mailbox *, struct cw *));
-static unsigned long	*builds __P((long *));
-static void	purge __P((struct mailbox *, struct message *, long,
-				struct cw *, const char *));
-static int	longlt __P((const void *, const void *));
-static void	remve __P((unsigned long));
-static FILE	*cache_queue1 __P((struct mailbox *, char *, char **));
-static enum okay	dequeue1 __P((struct mailbox *));
+static char *encname(struct mailbox *mp, const char *name, int same,
+		const char *box);
+static char *encuid(struct mailbox *mp, unsigned long uid);
+static FILE *clean(struct mailbox *mp, struct cw *cw);
+static unsigned long *builds(long *contentelem);
+static void purge(struct mailbox *mp, struct message *m, long mc,
+		struct cw *cw, const char *name);
+static int longlt(const void *a, const void *b);
+static void remve(unsigned long n);
+static FILE *cache_queue1(struct mailbox *mp, char *mode, char **xname);
+static enum okay dequeue1(struct mailbox *mp);
 
 static const char	infofmt[] = "%c %lu %u %lu %lu";
 #define	INITSKIP	128L
@@ -105,10 +105,7 @@ static const char	README5[] = "\n\
 For more information about nail(1), visit <http://nail.sourceforge.net>.\n";
 
 static char *
-encname(mp, name, same, box)
-	struct mailbox	*mp;
-	const char	*name, *box;
-	int	same;
+encname(struct mailbox *mp, const char *name, int same, const char *box)
 {
 	char	*cachedir, *eaccount, *emailbox, *ename, *res;
 	int	resz;
@@ -140,9 +137,7 @@ encname(mp, name, same, box)
 }
 
 static char *
-encuid(mp, uid)
-	struct mailbox	*mp;
-	unsigned long	uid;
+encuid(struct mailbox *mp, unsigned long uid)
 {
 	char	buf[30];
 
@@ -150,12 +145,9 @@ encuid(mp, uid)
 	return encname(mp, buf, 1, NULL);
 }
 
-enum okay
-getcache1(mp, m, need, setflags)
-	struct mailbox *mp;
-	struct message	*m;
-	enum needspec	need;
-	int	setflags;
+enum okay 
+getcache1(struct mailbox *mp, struct message *m, enum needspec need,
+		int setflags)
 {
 	FILE	*fp;
 	long	n = 0, size = 0, xsize, xtime, xlines = -1, lines = 0;
@@ -258,19 +250,14 @@ fail:
 	return STOP;
 }
 
-enum okay
-getcache(mp, m, need)
-	struct mailbox *mp;
-	struct message	*m;
-	enum needspec	need;
+enum okay 
+getcache(struct mailbox *mp, struct message *m, enum needspec need)
 {
 	return getcache1(mp, m, need, 0);
 }
 
-void
-putcache(mp, m)
-	struct mailbox	*mp;
-	struct message	*m;
+void 
+putcache(struct mailbox *mp, struct message *m)
 {
 	FILE	*ibuf, *obuf;
 	char	*name, ob;
@@ -365,9 +352,8 @@ out:	if (Fclose(obuf) != 0) {
 	fseek(mp->mb_itf, oldoffset, SEEK_SET);
 }
 
-void
-initcache(mp)
-	struct mailbox	*mp;
+void 
+initcache(struct mailbox *mp)
 {
 	char	*name, *uvname;
 	FILE	*uvfp;
@@ -402,11 +388,8 @@ initcache(mp)
 out:	cwrelse(&cw);
 }
 
-void
-purgecache(mp, m, mc)
-	struct mailbox	*mp;
-	struct message	*m;
-	long	mc;
+void 
+purgecache(struct mailbox *mp, struct message *m, long mc)
 {
 	char	*name;
 	struct cw	cw;
@@ -420,9 +403,7 @@ purgecache(mp, m, mc)
 }
 
 static FILE *
-clean(mp, cw)
-	struct mailbox	*mp;
-	struct cw	*cw;
+clean(struct mailbox *mp, struct cw *cw)
 {
 	char	*cachedir, *eaccount, *emailbox, *buf;
 	int	bufsz;
@@ -513,13 +494,9 @@ builds(long *contentelem)
 	return contents;
 }
 
-static void
-purge(mp, m, mc, cw, name)
-	struct mailbox	*mp;
-	struct message	*m;
-	long	mc;
-	struct cw	*cw;
-	const char	*name;
+static void 
+purge(struct mailbox *mp, struct message *m, long mc, struct cw *cw,
+		const char *name)
 {
 	unsigned long	*contents;
 	long	i, j, contentelem;
@@ -547,16 +524,14 @@ purge(mp, m, mc, cw, name)
 	free(contents);
 }
 
-static int
-longlt(a, b)
-	const void	*a, *b;
+static int 
+longlt(const void *a, const void *b)
 {
 	return *(long *)a - *(long *)b;
 }
 
-static void
-remve(n)
-	unsigned long	n;
+static void 
+remve(unsigned long n)
 {
 	char	buf[30];
 
@@ -564,10 +539,8 @@ remve(n)
 	unlink(buf);
 }
 
-void
-delcache(mp, m)
-	struct mailbox	*mp;
-	struct message	*m;
+void 
+delcache(struct mailbox *mp, struct message *m)
 {
 	char	*fn;
 
@@ -576,9 +549,8 @@ delcache(mp, m)
 		m->m_flag |= MUNLINKED;
 }
 
-enum okay
-cache_setptr(transparent)
-	int	transparent;
+enum okay 
+cache_setptr(int transparent)
 {
 	int	i;
 	struct cw	cw;
@@ -628,11 +600,7 @@ cache_setptr(transparent)
 }
 
 enum okay
-cache_list(mp, base, strip, fp)
-	struct mailbox	*mp;
-	const char	*base;
-	int	strip;
-	FILE	*fp;
+cache_list(struct mailbox *mp, const char *base, int strip, FILE *fp)
 {
 	char	*name, *cachedir, *eaccount;
 	DIR	*dirfd;
@@ -663,9 +631,8 @@ cache_list(mp, base, strip, fp)
 	return OKAY;
 }
 
-enum okay
-cache_remove(name)
-	const char	*name;
+enum okay 
+cache_remove(const char *name)
 {
 	struct stat	st;
 	DIR	*dirfd;
@@ -711,9 +678,8 @@ cache_remove(name)
 	return OKAY;
 }
 
-enum okay
-cache_rename(old, new)
-	const char	*old, *new;
+enum okay 
+cache_rename(const char *old, const char *new)
 {
 	char	*olddir, *newdir;
 
@@ -727,9 +693,8 @@ cache_rename(old, new)
 	return OKAY;
 }
 
-unsigned long
-cached_uidvalidity(mp)
-	struct mailbox	*mp;
+unsigned long 
+cached_uidvalidity(struct mailbox *mp)
 {
 	FILE	*uvfp;
 	char	*uvname;
@@ -746,10 +711,7 @@ cached_uidvalidity(mp)
 }
 
 static FILE *
-cache_queue1(mp, mode, xname)
-	struct mailbox	*mp;
-	char	*mode;
-	char	**xname;
+cache_queue1(struct mailbox *mp, char *mode, char **xname)
 {
 	char	*name;
 	FILE	*fp;
@@ -764,8 +726,7 @@ cache_queue1(mp, mode, xname)
 }
 
 FILE *
-cache_queue(mp)
-	struct mailbox	*mp;
+cache_queue(struct mailbox *mp)
 {
 	FILE	*fp;
 
@@ -776,9 +737,8 @@ cache_queue(mp)
 	return fp;
 }
 
-enum okay
-cache_dequeue(mp)
-	struct mailbox	*mp;
+enum okay 
+cache_dequeue(struct mailbox *mp)
 {
 	int	bufsz;
 	char	*cachedir, *eaccount, *buf, *oldbox;
@@ -805,9 +765,8 @@ cache_dequeue(mp)
 	return OKAY;
 }
 
-static enum okay
-dequeue1(mp)
-	struct mailbox	*mp;
+static enum okay 
+dequeue1(struct mailbox *mp)
 {
 	FILE	*fp = NULL, *uvfp = NULL;
 	char	*qname, *uvname;

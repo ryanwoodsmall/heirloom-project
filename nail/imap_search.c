@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap_search.c	1.21 (gritter) 9/5/04";
+static char sccsid[] = "@(#)imap_search.c	1.23 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -156,23 +156,21 @@ static struct itnode {
 
 static const char	*begin;
 
-static enum okay	itparse __P((const char *, char **, int));
-static enum okay	itscan __P((const char *, char **));
-static enum okay	itsplit __P((const char *, char **));
-static enum okay	itstring __P((void **, const char *, char **));
-static int	itexecute __P((struct mailbox *,
-			struct message *, int, struct itnode *));
-static int	matchfield __P((struct message *, const char *, const char *));
-static int	matchenvelope __P((struct message *, const char *,
-			const char *));
-static char	*mkenvelope __P((struct name *));
-static int	matchmsg __P((struct message *, const char *, int));
-static const char	*around __P((const char *));
+static enum okay itparse(const char *spec, char **xp, int sub);
+static enum okay itscan(const char *spec, char **xp);
+static enum okay itsplit(const char *spec, char **xp);
+static enum okay itstring(void **tp, const char *spec, char **xp);
+static int itexecute(struct mailbox *mp, struct message *m,
+		int c, struct itnode *n);
+static int matchfield(struct message *m, const char *field, const char *what);
+static int matchenvelope(struct message *m, const char *field,
+		const char *what);
+static char *mkenvelope(struct name *np);
+static int matchmsg(struct message *m, const char *what, int withheader);
+static const char *around(const char *cp);
 
-enum okay
-imap_search(spec, f)
-	const char	*spec;
-	int	f;
+enum okay 
+imap_search(const char *spec, int f)
 {
 	static char	*lastspec;
 	char	*xp;
@@ -203,11 +201,8 @@ imap_search(spec, f)
 	return OKAY;
 }
 
-static enum okay
-itparse(spec, xp, sub)
-	const char	*spec;
-	char	**xp;
-	int sub;
+static enum okay 
+itparse(const char *spec, char **xp, int sub)
 {
 	int	level = 0;
 	struct itnode	n, *z, *_ittree;
@@ -296,10 +291,8 @@ itparse(spec, xp, sub)
 	return ok;
 }
 
-static enum okay
-itscan(spec, xp)
-	const char	*spec;
-	char	**xp;
+static enum okay 
+itscan(const char *spec, char **xp)
 {
 	int	i, n;
 
@@ -352,10 +345,8 @@ itscan(spec, xp)
 	return STOP;
 }
 
-static enum okay
-itsplit(spec, xp)
-	const char	*spec;
-	char	**xp;
+static enum okay 
+itsplit(const char *spec, char **xp)
 {
 	char	*cp;
 	time_t	t;
@@ -435,11 +426,8 @@ itsplit(spec, xp)
 	}
 }
 
-static enum okay
-itstring(tp, spec, xp)
-	const char	*spec;
-	void	**tp;
-	char	**xp;
+static enum okay 
+itstring(void **tp, const char *spec, char **xp)
 {
 	int	inquote = 0;
 	char	*ap;
@@ -468,12 +456,8 @@ itstring(tp, spec, xp)
 	return OKAY;
 }
 
-static int
-itexecute(mp, m, c, n)
-	struct mailbox	*mp;
-	struct message	*m;
-	int	c;
-	struct itnode	*n;
+static int 
+itexecute(struct mailbox *mp, struct message *m, int c, struct itnode *n)
 {
 	char	*cp, *line = NULL;
 	size_t	linesize = 0;
@@ -586,10 +570,8 @@ itexecute(mp, m, c, n)
 	}
 }
 
-static int
-matchfield(m, field, what)
-	struct message	*m;
-	const char	*field, *what;
+static int 
+matchfield(struct message *m, const char *field, const char *what)
 {
 	struct str	in, out;
 	int	i;
@@ -604,10 +586,8 @@ matchfield(m, field, what)
 	return i;
 }
 
-static int
-matchenvelope(m, field, what)
-	struct message	*m;
-	const char	*field, *what;
+static int 
+matchenvelope(struct message *m, const char *field, const char *what)
 {
 	struct name	*np;
 	char	*cp;
@@ -627,8 +607,7 @@ matchenvelope(m, field, what)
 }
 
 static char *
-mkenvelope(np)
-	struct name	*np;
+mkenvelope(struct name *np)
 {
 	size_t	epsize;
 	char	*ep;
@@ -704,11 +683,8 @@ done:	*rp = '\0';
 	return ep;
 }
 
-static int
-matchmsg(m, what, withheader)
-	struct message	*m;
-	const char	*what;
-	int	withheader;
+static int 
+matchmsg(struct message *m, const char *what, int withheader)
 {
 	char	*tempFile, *line = NULL;
 	size_t	linesize, linelen, count;
@@ -744,8 +720,7 @@ out:
 
 #define	SURROUNDING	16
 static const char *
-around(cp)
-	const char	*cp;
+around(const char *cp)
 {
 	int	i;
 	static char	ab[2*SURROUNDING+1];

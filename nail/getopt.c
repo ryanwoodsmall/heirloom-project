@@ -4,7 +4,7 @@
  * Gunnar Ritter, Freiburg i. Br., Germany, March 2002.
  */
 
-/*	Sccsid @(#)getopt.c	1.5 (gritter) 8/7/04	*/
+/*	Sccsid @(#)getopt.c	1.6 (gritter) 10/2/04	*/
 
 #include	"config.h"
 #include	<sys/types.h>

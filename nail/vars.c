@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)vars.c	2.8 (gritter) 9/22/04";
+static char sccsid[] = "@(#)vars.c	2.10 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -51,10 +51,10 @@ static char sccsid[] = "@(#)vars.c	2.8 (gritter) 9/22/04";
  * Variable handling stuff.
  */
 
-static char	*canonify __P((const char *));
-static void	vfree __P((char *));
-static struct var	*lookup __P((const char []));
-static void	remove_grouplist __P((struct grouphead *));
+static char *canonify(const char *vn);
+static void vfree(char *cp);
+static struct var *lookup(const char *name);
+static void remove_grouplist(struct grouphead *gh);
 
 /*
  * If a variable name begins with a lowercase-character and contains at
@@ -65,8 +65,7 @@ static void	remove_grouplist __P((struct grouphead *));
  * be lower-cased, but practice has established otherwise here.
  */
 static char *
-canonify(vn)
-	const char	*vn;
+canonify(const char *vn)
 {
 	const char	*vp;
 
@@ -81,9 +80,8 @@ canonify(vn)
 /*
  * Assign a value to a variable.
  */
-void
-assign(name, value)
-	char name[], value[];
+void 
+assign(char *name, char *value)
 {
 	struct var *vp;
 	int h;
@@ -107,9 +105,8 @@ assign(name, value)
  * strings whose value is "" since they are expected to be frequent.
  * Thus, we cannot free same!
  */
-static void
-vfree(cp)
-	char *cp;
+static void 
+vfree(char *cp)
 {
 	if (*cp)
 		free(cp);
@@ -121,8 +118,7 @@ vfree(cp)
  */
 
 char *
-vcopy(str)
-	const char str[];
+vcopy(const char *str)
 {
 	char *new;
 	unsigned len;
@@ -141,8 +137,7 @@ vcopy(str)
  */
 
 char *
-value(name)
-	const char name[];
+value(const char *name)
 {
 	struct var *vp;
 	char	*vs;
@@ -162,8 +157,7 @@ value(name)
  */
 
 static struct var *
-lookup(name)
-	const char name[];
+lookup(const char *name)
 {
 	struct var *vp;
 
@@ -178,8 +172,7 @@ lookup(name)
  */
 
 struct grouphead *
-findgroup(name)
-	char name[];
+findgroup(char *name)
 {
 	struct grouphead *gh;
 
@@ -192,9 +185,8 @@ findgroup(name)
 /*
  * Print a group out on stdout
  */
-void
-printgroup(name)
-	char name[];
+void 
+printgroup(char *name)
 {
 	struct grouphead *gh;
 	struct group *gp;
@@ -214,9 +206,8 @@ printgroup(name)
  * Hash the passed string and return an index into
  * the variable or group hash table.
  */
-int
-hash(name)
-	const char *name;
+int 
+hash(const char *name)
 {
 	int h = 0;
 
@@ -229,9 +220,8 @@ hash(name)
 	return (h % HSHSIZE);
 }
 
-int
-unset_internal(name)
-	char *name;
+int 
+unset_internal(char *name)
 {
 	struct var *vp, *vp2;
 	int h;

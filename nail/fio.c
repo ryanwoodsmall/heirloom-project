@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.63 (gritter) 9/19/04";
+static char sccsid[] = "@(#)fio.c	2.66 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -78,21 +78,20 @@ static char sccsid[] = "@(#)fio.c	2.63 (gritter) 9/19/04";
  *
  * File I/O.
  */
-static void	makemessage __P((void));
-static void	append __P((struct message *));
-static char	*globname __P((char *));
-static size_t	length_of_line __P((const char *, size_t));
-static char	*fgetline_byone __P((char **, size_t *, size_t *,
-			FILE *, int, size_t));
-static enum okay	get_header __P((struct message *));
+
+static void makemessage(void);
+static void append(struct message *mp);
+static char *globname(char *name);
+static size_t length_of_line(const char *line, size_t linesize);
+static char *fgetline_byone(char **line, size_t *linesize, size_t *llen,
+		FILE *fp, int appendnl, size_t n);
+static enum okay get_header(struct message *mp);
 
 /*
  * Set up the input pointers while copying the mail file into /tmp.
  */
 void
-setptr(ibuf, offset)
-	FILE *ibuf;
-	off_t offset;
+setptr(FILE *ibuf, off_t offset)
 {
 	int c;
 	size_t count;
@@ -197,10 +196,7 @@ setptr(ibuf, offset)
  * characters written, including the newline.
  */
 int
-putline(obuf, linebuf, count)
-	FILE *obuf;
-	char *linebuf;
-	size_t count;
+putline(FILE *obuf, char *linebuf, size_t count)
 {
 	fwrite(linebuf, sizeof *linebuf, count, obuf);
 	putc('\n', obuf);
@@ -217,11 +213,7 @@ putline(obuf, linebuf, count)
  * n is the number of characters already read.
  */
 int
-readline_restart(ibuf, linebuf, linesize, n)
-	FILE *ibuf;
-	char **linebuf;
-	size_t *linesize;
-	size_t n;
+readline_restart(FILE *ibuf, char **linebuf, size_t *linesize, size_t n)
 {
 	long sz;
 
@@ -279,10 +271,7 @@ again:
  * passed message pointer.
  */
 FILE *
-setinput(mp, m, need)
-	struct mailbox *mp;
-	struct message *m;
-	enum needspec need;
+setinput(struct mailbox *mp, struct message *m, enum needspec need)
 {
 	enum okay ok = STOP;
 
@@ -315,8 +304,7 @@ setinput(mp, m, need)
 }
 
 struct message *
-setdot(mp)
-	struct message *mp;
+setdot(struct message *mp)
 {
 	if (dot != mp)
 		prevdot = dot;
@@ -331,7 +319,7 @@ setdot(mp)
  * a dynamically allocated message structure.
  */
 static void
-makemessage()
+makemessage(void)
 {
 	if (msgCount == 0)
 		append(NULL);
@@ -344,8 +332,7 @@ makemessage()
  * Append the passed message descriptor onto the message structure.
  */
 static void
-append(mp)
-	struct message *mp;
+append(struct message *mp)
 {
 	if (msgCount + 1 >= msgspace)
 		message = srealloc(message, (msgspace += 64) * sizeof *message);
@@ -357,8 +344,7 @@ append(mp)
  * Delete a file, but only if the file is a plain file.
  */
 int
-rm(name)
-	char *name;
+rm(char *name)
 {
 	struct stat sb;
 
@@ -377,7 +363,7 @@ static sigset_t nset, oset;
  * Hold signals SIGHUP, SIGINT, and SIGQUIT.
  */
 void
-holdsigs()
+holdsigs(void)
 {
 
 	if (sigdepth++ == 0) {
@@ -393,7 +379,7 @@ holdsigs()
  * Release signals SIGHUP, SIGINT, and SIGQUIT.
  */
 void
-relsesigs()
+relsesigs(void)
 {
 
 	if (--sigdepth == 0)
@@ -405,8 +391,7 @@ relsesigs()
  * the passed buffer.
  */
 off_t
-fsize(iob)
-	FILE *iob;
+fsize(FILE *iob)
 {
 	struct stat sbuf;
 
@@ -427,8 +412,7 @@ fsize(iob)
  * Return the file name as a dynamic string.
  */
 char *
-expand(name)
-	char *name;
+expand(char *name)
 {
 	char xname[PATHSIZE];
 	char foldbuf[PATHSIZE];
@@ -491,8 +475,7 @@ next:
 }
 
 static char *
-globname(name)
-	char *name;
+globname(char *name)
 {
 #ifdef	HAVE_WORDEXP
 	wordexp_t we;
@@ -607,9 +590,7 @@ again:
  * Determine the current folder directory name.
  */
 int
-getfold(name, size)
-	char *name;
-	int size;
+getfold(char *name, int size)
 {
 	char *folder;
 	enum protocol	p;
@@ -630,7 +611,7 @@ getfold(name, size)
  * Return the name of the dead.letter file.
  */
 char *
-getdeadletter()
+getdeadletter(void)
 {
 	char *cp;
 
@@ -654,9 +635,7 @@ getdeadletter()
  * newline or the last character read.
  */
 static size_t
-length_of_line(line, linesize)
-const char *line;
-size_t linesize;
+length_of_line(const char *line, size_t linesize)
 {
 	register size_t i;
 
@@ -681,11 +660,8 @@ size_t linesize;
  * appendnl - always terminate line with \n, append if necessary.
  */
 char *
-fgetline(line, linesize, count, llen, fp, appendnl)
-char **line;
-size_t *linesize, *count, *llen;
-FILE *fp;
-int appendnl;
+fgetline(char **line, size_t *linesize, size_t *count, size_t *llen,
+		FILE *fp, int appendnl)
 {
 	long i_llen, sz;
 
@@ -732,12 +708,8 @@ int appendnl;
  * Read a line, one character at once.
  */
 static char *
-fgetline_byone(line, linesize, llen, fp, appendnl, n)
-char **line;
-size_t *linesize, *llen;
-FILE *fp;
-int appendnl;
-size_t n;
+fgetline_byone(char **line, size_t *linesize, size_t *llen,
+		FILE *fp, int appendnl, size_t n)
 {
 	int c;
 
@@ -770,7 +742,7 @@ size_t n;
 }
 
 void
-newline_appended()
+newline_appended(void)
 {
 	fprintf(stderr, catgets(catd, CATSET, 208,
 			"warning: incomplete line - newline appended\n"));
@@ -778,8 +750,7 @@ newline_appended()
 }
 
 static enum okay
-get_header(mp)
-	struct message *mp;
+get_header(struct message *mp)
 {
 	switch (mb.mb_type) {
 	case MB_FILE:
@@ -798,8 +769,7 @@ get_header(mp)
 }
 
 enum okay
-get_body(mp)
-	struct message *mp;
+get_body(struct message *mp)
 {
 	switch (mb.mb_type) {
 	case MB_FILE:
@@ -818,11 +788,10 @@ get_body(mp)
 }
 
 #ifdef	HAVE_SOCKETS
+static long xwrite(int fd, const char *data, size_t sz);
+
 static long
-xwrite(fd, data, sz)
-	int fd;
-	const char *data;
-	size_t sz;
+xwrite(int fd, const char *data, size_t sz)
 {
 	long wo, wt = 0;
 
@@ -839,8 +808,7 @@ xwrite(fd, data, sz)
 }
 
 int
-sclose(sp)
-	struct sock *sp;
+sclose(struct sock *sp)
 {
 	int	i;
 
@@ -874,18 +842,13 @@ sclose(sp)
 }
 
 enum okay
-swrite(sp, data)
-	struct sock	*sp;
-	const char	*data;
+swrite(struct sock *sp, const char *data)
 {
 	return swrite1(sp, data, strlen(data), 0);
 }
 
 enum okay
-swrite1(sp, data, sz, use_buffer)
-	struct sock	*sp;
-	const char	*data;
-	int	sz, use_buffer;
+swrite1(struct sock *sp, const char *data, int sz, int use_buffer)
 {
 	int	x;
 
@@ -969,10 +932,7 @@ ssl_retry:	x = SSL_write(sp->s_ssl, data, sz);
 }
 
 int
-sgetline(line, linesize, linelen, sp)
-	char	**line;
-	size_t	*linesize, *linelen;
-	struct sock	*sp;
+sgetline(char **line, size_t *linesize, size_t *linelen, struct sock *sp)
 {
 	char	*lp = *line;
 
@@ -1054,13 +1014,8 @@ sgetline(line, linesize, linelen, sp)
 }
 
 enum okay
-sopen(xserver, sp, use_ssl, uhp, portstr, verbose)
-	const char	*xserver;
-	struct sock	*sp;
-	int	use_ssl;
-	const char	*uhp;
-	const char	*portstr;
-	int	verbose;
+sopen(const char *xserver, struct sock *sp, int use_ssl,
+		const char *uhp, const char *portstr, int verbose)
 {
 #ifdef	HAVE_IPv6_FUNCS
 	char	hbuf[NI_MAXHOST];

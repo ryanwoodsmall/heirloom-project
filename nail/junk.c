@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2004
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.26 (gritter) 10/2/04";
+static char sccsid[] = "@(#)junk.c	1.30 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -66,6 +66,10 @@ static char sccsid[] = "@(#)junk.c	1.26 (gritter) 10/2/04";
 #define	DFL	.40
 #define	THR	.9
 #define	MID	.5
+
+#define	MAX2	0x0000ffff
+#define	MAX3	0x00ffffffUL
+#define	MAX4	0xffffffffUL
 
 static struct node {
 	char	hash[4];
@@ -97,9 +101,9 @@ static struct super {
 #define	smin(a, b)	((a) < (b) ? (a) : (b))
 #define	smax(a, b)	((a) < (b) ? (b) : (a))
 
-#define	f2s(d)	(smin(((unsigned)((d) * 0xffffffU)), 0xffffffU))
+#define	f2s(d)	(smin(((unsigned)((d) * MAX3)), MAX3))
 
-#define	s2f(s)	((float)(s) / 0xffffffU)
+#define	s2f(s)	((float)(s) / MAX3)
 
 #define	getn(p)	\
 	((unsigned long)(((char *)(p))[0]&0377) + \
@@ -162,24 +166,24 @@ them in flat form.\n";
 
 static int	verbose;
 
-static int	insert __P((int *, enum entry));
-static enum okay	getdb __P((void));
-static void	putdb __P((void));
-static FILE	*dbfp __P((enum db, int, int *));
-static enum okay	scan __P((struct message *, enum entry,
-	void (*) __P((const char *, enum entry, struct lexstat *))));
-static void	add __P((const char *, enum entry, struct lexstat *));
-static char	*nextword __P((char **, size_t *, size_t *,
-			FILE *, struct lexstat *));
-static void	recompute __P((void));
-static void	clsf __P((struct message *));
-static void	rate __P((const char *, enum entry, struct lexstat *));
-static unsigned	long	dbhash __P((const char *));
-static struct node	*lookup __P((unsigned long, int));
-static void	mkshuffle __P((void));
+static enum okay getdb(void);
+static void putdb(void);
+static FILE *dbfp(enum db db, int rw, int *compressed);
+static struct node *lookup(unsigned long hash, int create);
+static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
+		struct lexstat *sp);
+static void add(const char *word, enum entry entry, struct lexstat *sp);
+static enum okay scan(struct message *m, enum entry entry,
+		void (*func)(const char *, enum entry, struct lexstat *));
+static void recompute(void);
+static int insert(int *msgvec, enum entry entry);
+static void clsf(struct message *m);
+static void rate(const char *word, enum entry entry, struct lexstat *sp);
+static unsigned long dbhash(const char *word);
+static void mkshuffle(void);
 
-static enum okay
-getdb()
+static enum okay 
+getdb(void)
 {
 	FILE	*sfp, *nfp;
 	void	*zp = NULL;
@@ -243,8 +247,8 @@ getdb()
 	return OKAY;
 }
 
-static void
-putdb()
+static void 
+putdb(void)
 {
 	FILE	*sfp, *nfp;
 	sighandler_type	saveint;
@@ -274,10 +278,7 @@ putdb()
 }
 
 static FILE *
-dbfp(db, rw, compressed)
-	enum db	db;
-	int	rw;
-	int	*compressed;
+dbfp(enum db db, int rw, int *compressed)
 {
 	FILE	*fp, *rp;
 	char	*dir, *fn;
@@ -335,16 +336,14 @@ okay:	ac_free(fn);
 }
 
 static struct node *
-lookup(hash, create)
-	unsigned long	hash;
-	int	create;
+lookup(unsigned long hash, int create)
 {
 	struct node	*n;
 	unsigned long	c, used, size, incr;
 
 	used = getn(super->used);
 	size = getn(super->size);
-	c = ~getn(super->bucket[hash & 0xffff]);
+	c = ~getn(super->bucket[hash & MAX2]);
 	n = &nodes[c];
 	while (c < used) {
 		if (getn(n->hash) == hash)
@@ -354,8 +353,8 @@ lookup(hash, create)
 	}
 	if (create) {
 		if (used >= size) {
-			incr = size > 0xffff ? 0xffff : size;
-			if (size + incr > 0xffff0000) {
+			incr = size > MAX2 ? MAX2 : size;
+			if (size + incr > MAX4-MAX2) {
 				fprintf(stderr,
 					"Junk mail database overflow.\n");
 				return NULL;
@@ -367,9 +366,9 @@ lookup(hash, create)
 		}
 		n = &nodes[used];
 		putn(n->hash, hash);
-		c = ~getn(super->bucket[hash & 0xffff]);
+		c = ~getn(super->bucket[hash & MAX2]);
 		putn(n->next, ~c);
-		putn(super->bucket[hash & 0xffff], ~used);
+		putn(super->bucket[hash & MAX2], ~used);
 		used++;
 		putn(super->used, used);
 		return n;
@@ -384,11 +383,8 @@ lookup(hash, create)
 }
 
 static char *
-nextword(buf, bufsize, count, fp, sp)
-	char	**buf;
-	size_t	*bufsize, *count;
-	FILE	*fp;
-	struct lexstat	*sp;
+nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
+		struct lexstat *sp)
 {
 	int	c, i, j, k;
 	char	*cp, *cq;
@@ -533,10 +529,7 @@ loop:	i = 0;
 
 /*ARGSUSED3*/
 static void
-add(word, entry, sp)
-	const char	*word;
-	enum entry	entry;
-	struct lexstat	*sp;
+add(const char *word, enum entry entry, struct lexstat *sp)
 {
 	unsigned	c;
 	unsigned long	h;
@@ -547,14 +540,14 @@ add(word, entry, sp)
 		switch (entry) {
 		case GOOD:
 			c = get(n->good);
-			if (c < 0xffffff) {
+			if (c < MAX3) {
 				c++;
 				put(n->good, c);
 			}
 			break;
 		case BAD:
 			c = get(n->bad);
-			if (c < 0xffffff) {
+			if (c < MAX3) {
 				c++;
 				put(n->bad, c);
 			}
@@ -563,11 +556,9 @@ add(word, entry, sp)
 	}
 }
 
-static enum okay
-scan(m, entry, func)
-	struct message	*m;
-	enum entry	entry;
-	void	(*func) __P((const char *, enum entry, struct lexstat *));
+static enum okay 
+scan(struct message *m, enum entry entry,
+		void (*func)(const char *, enum entry, struct lexstat *))
 {
 	FILE	*fp;
 	char	*buf = NULL, *cp;
@@ -596,8 +587,8 @@ scan(m, entry, func)
 	return OKAY;
 }
 
-static void
-recompute()
+static void 
+recompute(void)
 {
 	unsigned long	used, i;
 	unsigned long	ngood, nbad;
@@ -631,10 +622,8 @@ recompute()
 	}
 }
 
-static int
-insert(msgvec, entry)
-	int	*msgvec;
-	enum entry	entry;
+static int 
+insert(int *msgvec, enum entry entry)
 {
 	int	*ip;
 	unsigned long	u = 0;
@@ -651,7 +640,7 @@ insert(msgvec, entry)
 		break;
 	}
 	for (ip = msgvec; *ip; ip++) {
-		if (u == 0xffffffff) {
+		if (u == MAX4) {
 			fprintf(stderr, "Junk mail database overflow.\n");
 			break;
 		}
@@ -677,23 +666,20 @@ insert(msgvec, entry)
 	return 0;
 }
 
-int
-cgood(v)
-	void	*v;
+int 
+cgood(void *v)
 {
 	return insert(v, GOOD);
 }
 
-int
-cjunk(v)
-	void	*v;
+int 
+cjunk(void *v)
 {
 	return insert(v, BAD);
 }
 
-int
-cclassify(v)
-	void	*v;
+int 
+cclassify(void *v)
 {
 	int	*msgvec = v, *ip;
 
@@ -716,9 +702,8 @@ static struct {
 	enum loc	loc;
 } best[BEST];
 
-static void
-clsf(m)
-	struct message	*m;
+static void 
+clsf(struct message *m)
 {
 	int	i;
 	float	a = 1, b = 1, r;
@@ -760,10 +745,7 @@ clsf(m)
 }
 
 static void
-rate(word, entry, sp)
-	const char	*word;
-	enum entry	entry;
-	struct lexstat	*sp;
+rate(const char *word, enum entry entry, struct lexstat *sp)
 {
 	struct node	*n;
 	unsigned long	h;
@@ -799,8 +781,7 @@ rate(word, entry, sp)
 }
 
 static unsigned long
-dbhash(word)
-	const char	*word;
+dbhash(const char *word)
 {
 	unsigned char	digest[16];
 	unsigned	h;
@@ -813,8 +794,8 @@ dbhash(word)
 	return h;
 }
 
-static void
-mkshuffle()
+static void 
+mkshuffle(void)
 {
 	union {
 		time_t	t;

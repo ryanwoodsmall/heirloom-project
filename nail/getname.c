@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)getname.c	2.2 (gritter) 6/13/04";
+static char sccsid[] = "@(#)getname.c	2.4 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -52,8 +52,7 @@ static char sccsid[] = "@(#)getname.c	2.2 (gritter) 6/13/04";
  * Search the passwd file for a uid.  Return name on success, NULL on failure
  */
 char *
-getname(uid)
-	int uid;
+getname(int uid)
 {
 	struct passwd *pw;
 
@@ -66,9 +65,8 @@ getname(uid)
  * Convert the passed name to a user id and return it.  Return -1
  * on error.
  */
-int
-getuserid(name)
-	char name[];
+int 
+getuserid(char *name)
 {
 	struct passwd *pw;
 

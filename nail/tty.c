@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.19 (gritter) 9/22/04";
+static char sccsid[] = "@(#)tty.c	2.21 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -64,17 +64,16 @@ static	int		ttyset;		/* We must now do erase/kill */
 #endif
 static	long		vdis;		/* _POSIX_VDISABLE char */
 
+static void ttystop(int s);
+static void ttyint(int s);
 static int safe_getc(FILE *ibuf);
-static void	ttyint __P((int));
-static void	ttystop __P((int));
-static char	*rtty_internal __P((char *, char *));
+static char *rtty_internal(char *pr, char *src);
 
 /*
  * Receipt continuation.
  */
-static void
-ttystop(s)
-	int s;
+static void 
+ttystop(int s)
 {
 	sighandler_type old_action = safe_signal(s, SIG_DFL);
 	sigset_t nset;
@@ -89,9 +88,8 @@ ttystop(s)
 }
 
 /*ARGSUSED*/
-static void
-ttyint(s)
-	int s;
+static void 
+ttyint(int s)
 {
 	siglongjmp(intjmp, 1);
 }
@@ -102,8 +100,7 @@ ttyint(s)
  * bypass it by read() then.
  */
 static int
-safe_getc(ibuf)
-FILE *ibuf;
+safe_getc(FILE *ibuf)
 {
 	if (fileno(ibuf) == 0 && is_a_tty[0]) {
 		char c;
@@ -126,8 +123,7 @@ again:
  * be read.
  */
 static char *
-rtty_internal(pr, src)
-	char *pr, *src;
+rtty_internal(char *pr, char *src)
 {
 	char ch, canonb[LINESIZE];
 	int c;
@@ -243,11 +239,8 @@ redo:
 						hp->h_subject); \
 			}
 
-int
-grabh(hp, gflags, subjfirst)
-	struct header *hp;
-	enum gfield gflags;
-	int subjfirst;
+int 
+grabh(struct header *hp, enum gfield gflags, int subjfirst)
 {
 	struct termios ttybuf;
 	sighandler_type saveint;
@@ -342,8 +335,7 @@ out:
  */
 
 char *
-readtty(prefix, string)
-char *prefix, *string;
+readtty(char *prefix, char *string)
 {
 	char *ret = NULL;
 	struct termios ttybuf;
@@ -404,9 +396,8 @@ out2:
 	return ret;
 }
 
-int
-yorn(msg)
-	char	*msg;
+int 
+yorn(char *msg)
 {
 	char	*cp;
 

@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.49 (gritter) 9/26/04";
+static char sccsid[] = "@(#)list.c	2.51 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -54,18 +54,20 @@ static char sccsid[] = "@(#)list.c	2.49 (gritter) 9/26/04";
  *
  * Message list handling.
  */
-static char	**add_to_namelist __P((char ***, size_t *, char **, char *));
-static int	markall __P((char [], int));
-static int	evalcol __P((int));
-static int	check __P((int, int));
-static int	scan __P((char **));
-static void	regret __P((int));
-static void	scaninit __P((void));
-static int	matchsender __P((char *, int, int));
-static int	matchmid __P((char *, int));
-static int	matchsubj __P((char *, int));
-static void	unmark __P((int));
-static int	metamess __P((int, int));
+
+static char **add_to_namelist(char ***namelist, size_t *nmlsize,
+		char **np, char *string);
+static int markall(char *buf, int f);
+static int evalcol(int col);
+static int check(int mesg, int f);
+static int scan(char **sp);
+static void regret(int token);
+static void scaninit(void);
+static int matchsender(char *str, int mesg, int allnet);
+static int matchmid(char *id, int mesg);
+static int matchsubj(char *str, int mesg);
+static void unmark(int mesg);
+static int metamess(int meta, int f);
 
 static size_t	STRINGLEN;
 
@@ -83,10 +85,8 @@ static int	threadflag;		/* mark entire threads */
  *
  * Returns the count of messages picked up or -1 on error.
  */
-int
-getmsglist(buf, vector, flags)
-	char *buf;
-	int *vector, flags;
+int 
+getmsglist(char *buf, int *vector, int flags)
 {
 	int *ip;
 	struct message *mp;
@@ -172,11 +172,7 @@ static struct coltab {
 static	int	lastcolmod;
 
 static char **
-add_to_namelist(namelist, nmlsize, np, string)
-	char ***namelist;
-	size_t *nmlsize;
-	char **np;
-	char *string;
+add_to_namelist(char ***namelist, size_t *nmlsize, char **np, char *string)
 {
 	size_t idx;
 
@@ -194,10 +190,8 @@ add_to_namelist(namelist, nmlsize, np, string)
 					goto out; \
 				}
 
-static int
-markall(buf, f)
-	char buf[];
-	int f;
+static int 
+markall(char *buf, int f)
 {
 	char **np, **nq;
 	int i, retval;
@@ -554,9 +548,8 @@ out:
  * Turn the character after a colon modifier into a bit
  * value.
  */
-static int
-evalcol(col)
-	int col;
+static int 
+evalcol(int col)
 {
 	struct coltab *colp;
 
@@ -573,9 +566,8 @@ evalcol(col)
  * If f is MDELETED, then either kind will do.  Otherwise, the message
  * has to be undeleted.
  */
-static int
-check(mesg, f)
-	int mesg, f;
+static int 
+check(int mesg, int f)
 {
 	struct message *mp;
 
@@ -599,12 +591,8 @@ check(mesg, f)
  * for a RAWLIST.
  */
 int
-getrawlist(line, linesize, argv, argc, echolist)
-	const char line[];
-	size_t linesize;
-	char **argv;
-	int  argc;
-	int echolist;
+getrawlist(const char *line, size_t linesize, char **argv, int argc,
+		int echolist)
 {
 	char c, *cp2, quotec;
 	const char	*cp;
@@ -729,9 +717,8 @@ static struct lex {
 	{ 0,	0 }
 };
 
-static int
-scan(sp)
-	char **sp;
+static int 
+scan(char **sp)
 {
 	char *cp, *cp2;
 	int c, level, inquote;
@@ -894,9 +881,8 @@ scan(sp)
 /*
  * Unscan the named token by pushing it onto the regret stack.
  */
-static void
-regret(token)
-	int token;
+static void 
+regret(int token)
 {
 	if (++regretp >= REGDEP)
 		panic(catgets(catd, CATSET, 128, "Too many regrets"));
@@ -909,8 +895,8 @@ regret(token)
 /*
  * Reset all the scanner global variables.
  */
-static void
-scaninit()
+static void 
+scaninit(void)
 {
 	regretp = -1;
 	threadflag = 0;
@@ -920,9 +906,8 @@ scaninit()
  * Find the first message whose flags & m == f  and return
  * its message number.
  */
-int
-first(f, m)
-	int f, m;
+int 
+first(int f, int m)
 {
 	struct message *mp;
 
@@ -947,10 +932,8 @@ first(f, m)
  * See if the passed name sent the passed message number.  Return true
  * if so.
  */
-static int
-matchsender(str, mesg, allnet)
-	char *str;
-	int mesg, allnet;
+static int 
+matchsender(char *str, int mesg, int allnet)
 {
 	if (allnet) {
 		char *cp = nameof(&message[mesg - 1], 0);
@@ -968,10 +951,8 @@ matchsender(str, mesg, allnet)
 			(name1(&message[mesg - 1], 0)));
 }
 
-static int
-matchmid(id, mesg)
-	char *id;
-	int mesg;
+static int 
+matchmid(char *id, int mesg)
 {
 	char *cp;
 
@@ -991,10 +972,8 @@ matchmid(id, mesg)
 
 static char lastscan[128];
 
-static int
-matchsubj(str, mesg)
-	char *str;
-	int mesg;
+static int 
+matchsubj(char *str, int mesg)
 {
 	struct message *mp;
 	char *cp, *cp2;
@@ -1036,9 +1015,8 @@ matchsubj(str, mesg)
 /*
  * Mark the named message by setting its mark bit.
  */
-void
-mark(mesg, f)
-	int mesg, f;
+void 
+mark(int mesg, int f)
 {
 	struct message	*mp;
 	int i;
@@ -1065,9 +1043,8 @@ mark(mesg, f)
 /*
  * Unmark the named message.
  */
-static void
-unmark(mesg)
-	int mesg;
+static void 
+unmark(int mesg)
 {
 	int i;
 
@@ -1081,9 +1058,8 @@ unmark(mesg)
 /*
  * Return the message number corresponding to the passed meta character.
  */
-static int
-metamess(meta, f)
-	int meta, f;
+static int 
+metamess(int meta, int f)
 {
 	int c, m;
 	struct message *mp;

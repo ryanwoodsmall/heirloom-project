@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.40 (gritter) 9/14/04";
+static char sccsid[] = "@(#)main.c	2.42 (gritter) 10/2/04";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -80,13 +80,11 @@ static char sccsid[] = "@(#)main.c	2.40 (gritter) 9/14/04";
 static sigjmp_buf	hdrjmp;
 char	*progname;
 
-static void	hdrstop __P((int));
-static void	setscreensize __P((int));
+static void hdrstop(int signo);
+static void setscreensize(int dummy);
 
-int
-main(argc, argv)
-	int argc;
-	char *argv[];
+int 
+main(int argc, char *argv[])
 {
 	const char optstr[] = "A:BHFINVT:a:b:c:dDefh:inqr:s:tu:v~";
 	int i, existonly = 0, headersonly = 0, sendflag = 0;
@@ -474,9 +472,8 @@ usage:
  * Interrupt printing of the headers.
  */
 /*ARGSUSED*/
-static void
-hdrstop(signo)
-	int signo;
+static void 
+hdrstop(int signo)
 {
 
 	fflush(stdout);
@@ -493,9 +490,8 @@ hdrstop(signo)
  * Width is either 80 or ws_col;
  */
 /*ARGSUSED*/
-static void
-setscreensize(dummy)
-	int dummy;
+static void 
+setscreensize(int dummy)
 {
 	struct termios tbuf;
 #ifdef	TIOCGWINSZ

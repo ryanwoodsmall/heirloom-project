@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2000
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.27 (gritter) 9/18/04";
+static char sccsid[] = "@(#)smtp.c	2.29 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -72,8 +72,7 @@ static int verbose;
  * Return our hostname.
  */
 char *
-nodename(mayoverride)
-	int	mayoverride;
+nodename(int mayoverride)
 {
 	static char *hostname;
 	char *hn;
@@ -122,7 +121,7 @@ nodename(mayoverride)
  * Return the user's From: address.
  */
 char *
-myaddr()
+myaddr(void)
 {
 	char *cp, *hn;
 	static char *addr;
@@ -147,14 +146,13 @@ myaddr()
 
 #ifdef	HAVE_SOCKETS
 
-static char	*auth_var __P((const char *, const char *));
-static int	read_smtp __P((struct sock *, int));
-static int	talk_smtp __P((struct name *, FILE *, struct sock *,
-			char *, char *));
+static char *auth_var(const char *type, const char *addr);
+static int read_smtp(struct sock *sp, int value);
+static int talk_smtp(struct name *to, FILE *fi, struct sock *sp,
+		char *server, char *uhp);
 
 static char *
-auth_var(type, addr)
-	const char *type, *addr;
+auth_var(const char *type, const char *addr)
 {
 	char	*var, *cp;
 	int	len;
@@ -178,10 +176,8 @@ static size_t	smtpbufsize;
 /*
  * Get the SMTP server's answer, expecting value.
  */
-static int
-read_smtp(sp, value)
-struct sock *sp;
-int value;
+static int 
+read_smtp(struct sock *sp, int value)
 {
 	int ret;
 	int len;
@@ -227,11 +223,8 @@ int value;
  * Talk to a SMTP server.
  */
 static int
-talk_smtp(to, fi, sp, server, uhp)
-struct name *to;
-FILE *fi;
-struct sock *sp;
-char *server, *uhp;
+talk_smtp(struct name *to, FILE *fi, struct sock *sp,
+		char *server, char *uhp)
 {
 	struct name *n;
 	char *b = NULL, o[LINESIZE];
@@ -347,10 +340,7 @@ char *server, *uhp;
  * Connect to a SMTP server.
  */
 int
-smtp_mta(server, to, fi)
-char *server;
-struct name *to;
-FILE *fi;
+smtp_mta(char *server, struct name *to, FILE *fi)
 {
 	struct sock	so;
 	int	use_ssl, ret;
@@ -382,10 +372,7 @@ FILE *fi;
 }
 #else	/* !HAVE_SOCKETS */
 int
-smtp_mta(server, to, fi)
-char *server;
-struct name *to;
-FILE *fi;
+smtp_mta(char *server, struct name *to, FILE *fi)
 {
 	fputs(catgets(catd, CATSET, 194,
 			"No SMTP support compiled in.\n"), stderr);

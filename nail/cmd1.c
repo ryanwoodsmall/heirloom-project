@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*-
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.76 (gritter) 9/26/04";
+static char sccsid[] = "@(#)cmd1.c	2.79 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -60,13 +60,17 @@ static char sccsid[] = "@(#)cmd1.c	2.76 (gritter) 9/26/04";
  */
 
 static int screen;
-static void	brokpipe __P((int));
-static int	pipe1 __P((char *, int));
-static int	type1 __P((int *, int, int, int, char *, off_t *));
-static void	hprf __P((const char *, int, FILE *, int, const char *));
+static void onpipe(int signo);
+static int dispc(struct message *mp, const char *a);
+static void hprf(const char *fmt, int mesg, FILE *f, int threaded,
+		const char *attrlist);
+static int type1(int *msgvec, int doign, int page, int pipe, char *cmd,
+		off_t *tstats);
+static int pipe1(char *str, int doign);
+static void brokpipe(int signo);
 
 char *
-get_pager()
+get_pager(void)
 {
 	char *cp;
 
@@ -76,9 +80,8 @@ get_pager()
 	return cp;
 }
 
-int
-headers(v)
-	void *v;
+int 
+headers(void *v)
 {
 	int *msgvec = v;
 	int g, k, n, mesg, flag = 0;
@@ -170,9 +173,8 @@ headers(v)
 /*
  * Scroll to the next/previous screen
  */
-int
-scroll(v)
-	void *v;
+int 
+scroll(void *v)
 {
 	char *arg = v;
 	int size;
@@ -227,8 +229,8 @@ scroll_forward:
 /*
  * Compute screen size.
  */
-int
-screensize()
+int 
+screensize(void)
 {
 	int s;
 	char *cp;
@@ -241,9 +243,8 @@ screensize()
 static sigjmp_buf	pipejmp;
 
 /*ARGSUSED*/
-static void
-onpipe(signo)
-	int signo;
+static void 
+onpipe(int signo)
 {
 	siglongjmp(pipejmp, 1);
 }
@@ -252,9 +253,8 @@ onpipe(signo)
  * Print out the headlines for each message
  * in the passed message list.
  */
-int
-from(v)
-	void *v;
+int 
+from(void *v)
 {
 	int *msgvec = v;
 	int *ip, n;
@@ -290,10 +290,8 @@ endpipe:
 	return(0);
 }
 
-static int
-dispc(mp, a)
-	struct message	*mp;
-	const char	*a;
+static int 
+dispc(struct message *mp, const char *a)
 {
 	int	dispc = ' ';
 
@@ -332,10 +330,7 @@ dispc(mp, a)
 }
 
 static void
-hprf(fmt, mesg, f, threaded, attrlist)
-	const char	*fmt, *attrlist;
-	int	mesg, threaded;
-	FILE	*f;
+hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 {
 	struct message	*mp = &message[mesg-1];
 	char	*headline = NULL, *subjline, *name, *cp, *pbuf = NULL;
@@ -585,12 +580,10 @@ hprf(fmt, mesg, f, threaded, attrlist)
  * This is a slight improvement to the standard one.
  */
 void
-printhead(mesg, f, threaded)
-	int mesg, threaded;
-	FILE *f;
+printhead(int mesg, FILE *f, int threaded)
 {
 	int bsdflags, bsdheadline, sz;
-	char	*fmt, attrlist[12], *cp;
+	char	*fmt, attrlist[30], *cp;
 
 	bsdflags = value("bsdcompat") != NULL || value("bsdflags") != NULL ||
 		getenv("SYSV3") != NULL;
@@ -614,9 +607,8 @@ printhead(mesg, f, threaded)
  * Print out the value of dot.
  */
 /*ARGSUSED*/
-int
-pdot(v)
-	void *v;
+int 
+pdot(void *v)
 {
 	printf(catgets(catd, CATSET, 13, "%d\n"),
 			(int)(dot - &message[0] + 1));
@@ -627,9 +619,8 @@ pdot(v)
  * Print out all the possible commands.
  */
 /*ARGSUSED*/
-int
-pcmdlist(v)
-	void *v;
+int 
+pcmdlist(void *v)
 {
 	extern const struct cmd cmdtab[];
 	const struct cmd *cp;
@@ -656,11 +647,7 @@ pcmdlist(v)
 static sigjmp_buf	pipestop;
 
 static int
-type1(msgvec, doign, page, pipe, cmd, tstats)
-int *msgvec;
-char *cmd;
-int doign, page, pipe;
-off_t *tstats;
+type1(int *msgvec, int doign, int page, int pipe, char *cmd, off_t *tstats)
 {
 	int *ip;
 	struct message *mp;
@@ -751,10 +738,7 @@ close_pipe:
  * Get the last, possibly quoted part of linebuf.
  */
 char *
-laststring(linebuf, flag, strip)
-char *linebuf;
-int *flag;
-int strip;
+laststring(char *linebuf, int *flag, int strip)
 {
 	char *cp, *p;
 	char quoted;
@@ -819,10 +803,8 @@ int strip;
 /*
  * Pipe the messages requested.
  */
-static int
-pipe1(str, doign)
-char *str;
-int doign;
+static int 
+pipe1(char *str, int doign)
 {
 	char *cmd;
 	int f, *msgvec, ret;
@@ -871,9 +853,8 @@ int doign;
 /*
  * Paginate messages, honor ignored fields.
  */
-int
-more(v)
-	void *v;
+int 
+more(void *v)
 {
 	int *msgvec = v;
 	return (type1(msgvec, 1, 1, 0, NULL, NULL));
@@ -882,9 +863,8 @@ more(v)
 /*
  * Paginate messages, even printing ignored fields.
  */
-int
-More(v)
-	void *v;
+int 
+More(void *v)
 {
 	int *msgvec = v;
 
@@ -894,9 +874,8 @@ More(v)
 /*
  * Type out messages, honor ignored fields.
  */
-int
-type(v)
-	void *v;
+int 
+type(void *v)
 {
 	int *msgvec = v;
 
@@ -906,9 +885,8 @@ type(v)
 /*
  * Type out messages, even printing ignored fields.
  */
-int
-Type(v)
-	void *v;
+int 
+Type(void *v)
 {
 	int *msgvec = v;
 
@@ -918,9 +896,8 @@ Type(v)
 /*
  * Pipe messages, honor ignored fields.
  */
-int
-pipecmd(v)
-void *v;
+int 
+pipecmd(void *v)
 {
 	char *str = v;
 	return(pipe1(str, 1));
@@ -928,9 +905,8 @@ void *v;
 /*
  * Pipe messages, not respecting ignored fields.
  */
-int
-Pipecmd(v)
-void *v;
+int 
+Pipecmd(void *v)
 {
 	char *str = v;
 	return(pipe1(str, 0));
@@ -941,9 +917,8 @@ void *v;
  * probably caused by quitting more.
  */
 /*ARGSUSED*/
-static void
-brokpipe(signo)
-	int signo;
+static void 
+brokpipe(int signo)
 {
 	siglongjmp(pipestop, 1);
 }
@@ -953,9 +928,8 @@ brokpipe(signo)
  * The number of lines is taken from the variable "toplines"
  * and defaults to 5.
  */
-int
-top(v)
-	void *v;
+int 
+top(void *v)
 {
 	int *msgvec = v;
 	int *ip;
@@ -1005,9 +979,8 @@ top(v)
  * Touch all the given messages so that they will
  * get mboxed.
  */
-int
-stouch(v)
-	void *v;
+int 
+stouch(void *v)
 {
 	int *msgvec = v;
 	int *ip;
@@ -1023,9 +996,8 @@ stouch(v)
 /*
  * Make sure all passed messages get mboxed.
  */
-int
-mboxit(v)
-	void *v;
+int 
+mboxit(void *v)
 {
 	int *msgvec = v;
 	int *ip;
@@ -1041,9 +1013,8 @@ mboxit(v)
 /*
  * List the folders the user currently has.
  */
-int
-folders(v)
-	void *v;
+int 
+folders(void *v)
 {
 	char	**argv = v;
 	char dirname[PATHSIZE];

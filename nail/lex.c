@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.72 (gritter) 9/9/04";
+static char sccsid[] = "@(#)lex.c	2.74 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -57,10 +57,10 @@ static char sccsid[] = "@(#)lex.c	2.72 (gritter) 9/9/04";
 
 static char	*prompt;
 
-static const struct cmd	*lex __P((char []));
-static void	intr __P((int));
-static void	stop __P((int));
-static void	hangup __P((int));
+static const struct cmd *lex(char *Word);
+static void intr(int s);
+static void stop(int s);
+static void hangup(int s);
 
 /*
  * Set up editing on the given file name.
@@ -71,9 +71,7 @@ static void	hangup __P((int));
  * newmail: Check for new mail in the current folder only.
  */
 int
-setfile(name, newmail)
-	char *name;
-	int newmail;
+setfile(char *name, int newmail)
 {
 	FILE *ibuf;
 	int i, compressed = 0;
@@ -228,9 +226,8 @@ nomail:				fprintf(stderr, catgets(catd, CATSET, 88,
 }
 
 
-int
-newmailinfo(omsgCount)
-	int	omsgCount;
+int 
+newmailinfo(int omsgCount)
 {
 	int	mdot;
 	int	i;
@@ -270,8 +267,8 @@ static int	reset_on_stop;			/* do a reset() if stopped */
  * Interpret user commands one by one.  If standard input is not a tty,
  * print no prompt.
  */
-void
-commands()
+void 
+commands(void)
 {
 	int eofloop = 0;
 	int n, x;
@@ -378,10 +375,7 @@ commands()
  * Contxt is non-zero if called while composing mail.
  */
 int
-execute(linebuf, contxt, linesize)
-	char linebuf[];
-	int contxt;
-	size_t linesize;
+execute(char *linebuf, int contxt, size_t linesize)
 {
 	char *word;
 	char *arglist[MAXARGC];
@@ -614,9 +608,8 @@ out:
  * Set the size of the message vector used to construct argument
  * lists to message list functions.
  */
-void
-setmsize(sz)
-	int sz;
+void 
+setmsize(int sz)
 {
 
 	if (msgvec != 0)
@@ -630,8 +623,7 @@ setmsize(sz)
  */
 
 static const struct cmd *
-lex(Word)
-	char Word[];
+lex(char *Word)
 {
 	extern const struct cmd cmdtab[];
 	const struct cmd *cp;
@@ -653,9 +645,8 @@ lex(Word)
 static int	inithdr;		/* am printing startup headers */
 
 /*ARGSUSED*/
-static void
-intr(s)
-	int s;
+static void 
+intr(int s)
 {
 
 	noreset = 0;
@@ -678,9 +669,8 @@ intr(s)
 /*
  * When we wake up after ^Z, reprint the prompt.
  */
-static void
-stop(s)
-	int s;
+static void 
+stop(int s)
 {
 	sighandler_type old_action = safe_signal(s, SIG_DFL);
 	sigset_t nset;
@@ -701,9 +691,8 @@ stop(s)
  * Branch here on hangup signal and simulate "exit".
  */
 /*ARGSUSED*/
-static void
-hangup(s)
-	int s;
+static void 
+hangup(int s)
 {
 
 	/* nothing to do? */
@@ -714,9 +703,8 @@ hangup(s)
  * Announce the presence of the current Mail version,
  * give the message count, and print a header listing.
  */
-void
-announce(printheaders)
-	int printheaders;
+void 
+announce(int printheaders)
 {
 	int vec[2], mdot;
 
@@ -735,8 +723,8 @@ announce(printheaders)
  * Announce information about the file we are editing.
  * Return a likely place to set dot.
  */
-int
-newfileinfo()
+int 
+newfileinfo(void)
 {
 	struct message *mp;
 	int u, n, mdot, d, s, hidden, killed, moved;
@@ -799,9 +787,8 @@ newfileinfo()
 	return(mdot);
 }
 
-int
-getmdot(newmail)
-	int	newmail;
+int 
+getmdot(int newmail)
 {
 	struct message	*mp;
 	char	*cp;
@@ -879,9 +866,8 @@ getmdot(newmail)
  */
 
 /*ARGSUSED*/
-int
-pversion(v)
-	void *v;
+int 
+pversion(void *v)
 {
 	printf(catgets(catd, CATSET, 111, "Version %s\n"), version);
 	return(0);
@@ -890,9 +876,8 @@ pversion(v)
 /*
  * Load a file of user definitions.
  */
-void
-load(name)
-	char *name;
+void 
+load(char *name)
 {
 	FILE *in, *oldin;
 
@@ -909,9 +894,8 @@ load(name)
 	Fclose(in);
 }
 
-void
-initbox(name)
-	const char *name;
+void 
+initbox(const char *name)
 {
 	char *tempMesg;
 	int dummy;

@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2000
@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.24 (gritter) 9/22/04";
+static char sccsid[]  = "@(#)mime.c	2.26 (gritter) 10/2/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -66,43 +66,44 @@ static char *mimetypes_world = "/etc/mime.types";
 static char *mimetypes_user = "~/.mime.types";
 char *us_ascii = "us-ascii";
 
-static int	mustquote_body __P((int));
-static int	mustquote_hdr __P((int));
-static int	mustquote_inhdrq __P((int));
+static int mustquote_body(int c);
+static int mustquote_hdr(int c);
+static int mustquote_inhdrq(int c);
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
-static size_t	xmbstowcs __P((wchar_t *, const char *, size_t));
+static size_t xmbstowcs(wchar_t *pwcs, const char *s, size_t nwcs);
 #endif
-static char	*getcharset __P((int));
-static int	has_highbit __P((const char *));
+static char *getcharset(int isclean);
+static int has_highbit(register const char *s);
 #ifdef	HAVE_ICONV
-static void	uppercopy __P((char *, const char *));
-static void	stripdash __P((char *));
-static size_t	iconv_ft __P((iconv_t, char **, size_t *, char **, size_t *));
-static void	invalid_seq __P((int));
-#endif
-static int	is_this_enc __P((const char *, const char *));
-static char	*mime_tline __P((char *, char *));
-static char	*mime_type __P((char *, char *));
-static int	gettextconversion __P((void));
-static enum mimeclean	mime_isclean __P((FILE*));
-static char	*ctohex __P((int, char *));
-static size_t	mime_write_toqp __P((struct str *, FILE *, int (*)(int)));
-static void	mime_str_toqp __P((struct str *, struct str *, int (*)(int)));
-static void	mime_fromqp __P((struct str *, struct str *, int));
-static size_t	mime_write_tohdr __P((struct str *, FILE *));
-static size_t	convhdra __P((char *, size_t, FILE *));
-static void	addstr __P((char **, size_t *, size_t *, char *, size_t));
-static void	addconv __P((char **, size_t *, size_t *, char *, size_t));
-static size_t	mime_write_tohdr_a __P((struct str *, FILE *));
-static size_t	fwrite_td __P((void *, size_t, size_t, FILE *, enum tdflags,
-			char *, size_t));
+static void uppercopy(char *dest, const char *src);
+static void stripdash(char *p);
+static size_t iconv_ft(iconv_t cd, char **inb, size_t *inbleft,
+		char **outb, size_t *outbleft);
+static void invalid_seq(int c);
+#endif	/* HAVE_ICONV */
+static int is_this_enc(const char *line, const char *encoding);
+static char *mime_tline(char *x, char *l);
+static char *mime_type(char *ext, char *filename);
+static enum mimeclean mime_isclean(FILE *f);
+static int gettextconversion(void);
+static char *ctohex(int c, char *hex);
+static size_t mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int));
+static void mime_str_toqp(struct str *in, struct str *out,
+		int (*mustquote)(int));
+static void mime_fromqp(struct str *in, struct str *out, int ishdr);
+static size_t mime_write_tohdr(struct str *in, FILE *fo);
+static size_t convhdra(char *str, size_t len, FILE *fp);
+static size_t mime_write_tohdr_a(struct str *in, FILE *f);
+static void addstr(char **buf, size_t *sz, size_t *pos, char *str, size_t len);
+static void addconv(char **buf, size_t *sz, size_t *pos, char *str, size_t len);
+static size_t fwrite_td(void *ptr, size_t size, size_t nmemb, FILE *f,
+		enum tdflags flags, char *prefix, size_t prefixlen);
 
 /*
  * Check if c must be quoted inside a message's body.
  */
-static int
-mustquote_body(c)
-	int c;
+static int 
+mustquote_body(int c)
 {
 	if (c != '\n' && (c < 040 || c == '=' || c >= 0177))
 		return 1;
@@ -112,9 +113,8 @@ mustquote_body(c)
 /*
  * Check if c must be quoted inside a message's header.
  */
-static int
-mustquote_hdr(c)
-	int c;
+static int 
+mustquote_hdr(int c)
 {
 	if (c != '\n' && (c < 040 || c >= 0177))
 		return 1;
@@ -124,9 +124,8 @@ mustquote_hdr(c)
 /*
  * Check if c must be quoted inside a quoting in a message's header.
  */
-static int
-mustquote_inhdrq(c)
-	int c;
+static int 
+mustquote_inhdrq(int c)
 {
 	if (c != '\n'
 		&& (c < 040 || c == '=' || c == '?' || c == '_' || c >= 0177))
@@ -139,10 +138,7 @@ mustquote_inhdrq(c)
  * A mbstowcs()-alike function that transparently handles invalid sequences.
  */
 static size_t
-xmbstowcs(pwcs, s, nwcs)
-register wchar_t *pwcs;
-register const char *s;
-size_t nwcs;
+xmbstowcs(wchar_t *pwcs, const char *s, size_t nwcs)
 {
 	size_t n = nwcs;
 	register int c;
@@ -168,9 +164,7 @@ size_t nwcs;
  * Replace non-printable characters in s with question marks.
  */
 size_t
-makeprint(s, l)
-char *s;
-size_t l;
+makeprint(char *s, size_t l)
 {
 	size_t sz;
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
@@ -234,8 +228,7 @@ size_t l;
 }
 
 char *
-makeprint0(s)
-	char *s;
+makeprint0(char *s)
 {
 	makeprint(s, strlen(s));
 	return s;
@@ -244,10 +237,8 @@ makeprint0(s)
 /*
  * Check if a name's address part contains invalid characters.
  */
-int
-mime_name_invalid(name, putmsg)
-char *name;
-int putmsg;
+int 
+mime_name_invalid(char *name, int putmsg)
 {
 	char *addr, *p;
 	int in_quote = 0, in_domain = 0, err = 0, hadat = 0;
@@ -319,8 +310,7 @@ int putmsg;
  * Check all addresses in np and delete invalid ones.
  */
 struct name *
-checkaddrs(np)
-struct name *np;
+checkaddrs(struct name *np)
 {
 	struct name *n = np;
 
@@ -344,8 +334,7 @@ static char defcharset[] = "iso-8859-1";
  * Get the character set dependant on the conversion.
  */
 static char *
-getcharset(isclean)
-	int isclean;
+getcharset(int isclean)
 {
 	char *charset;
 
@@ -371,7 +360,7 @@ getcharset(isclean)
  * Get the setting of the terminal's character set.
  */
 char *
-gettcharset()
+gettcharset(void)
 {
 	char *t;
 
@@ -381,9 +370,8 @@ gettcharset()
 	return t;
 }
 
-static int
-has_highbit(s)
-	register const char *s;
+static int 
+has_highbit(const char *s)
 {
 	if (s) {
 		do
@@ -395,9 +383,7 @@ has_highbit(s)
 }
 
 char *
-need_hdrconv(hp, w)
-	struct header *hp;
-	enum gfield w;
+need_hdrconv(struct header *hp, enum gfield w)
 {
 	struct name *np;
 
@@ -441,10 +427,8 @@ needs:	return getcharset(MIME_HIGHBIT);
 /*
  * Convert a string, upper-casing the characters.
  */
-static void
-uppercopy(dest, src)
-char *dest;
-const char *src;
+static void 
+uppercopy(char *dest, const char *src)
 {
 	do
 		*dest++ = upperconv(*src & 0377);
@@ -454,9 +438,8 @@ const char *src;
 /*
  * Strip dashes.
  */
-static void
-stripdash(p)
-char *p;
+static void 
+stripdash(char *p)
 {
 	char *q = p;
 
@@ -471,8 +454,7 @@ char *p;
  * naming conventions.
  */
 iconv_t
-iconv_open_ft(tocode, fromcode)
-const char *tocode, *fromcode;
+iconv_open_ft(const char *tocode, const char *fromcode)
 {
 	iconv_t id;
 	char *t, *f;
@@ -539,11 +521,7 @@ const char *tocode, *fromcode;
  * Fault-tolerant iconv() function.
  */
 static size_t
-iconv_ft(cd, inb, inbleft, outb, outbleft)
-iconv_t cd;
-char **inb;
-size_t *inbleft, *outbleft;
-char **outb;
+iconv_ft(iconv_t cd, char **inb, size_t *inbleft, char **outb, size_t *outbleft)
 {
 	size_t sz = 0;
 
@@ -571,9 +549,8 @@ char **outb;
  * Print an error because of an invalid character sequence.
  */
 /*ARGSUSED*/
-static void
-invalid_seq(c)
-char c;
+static void 
+invalid_seq(int c)
 {
 	/*fprintf(stderr, "iconv: cannot convert %c\n", c);*/
 }
@@ -599,9 +576,8 @@ is_this_enc(const char *line, const char *encoding)
 /*
  * Get the mime encoding from a Content-Transfer-Encoding header line.
  */
-enum mimeenc
-mime_getenc(h)
-char *h;
+enum mimeenc 
+mime_getenc(char *h)
 {
 	char *p;
 
@@ -626,9 +602,8 @@ char *h;
 /*
  * Get the mime content from a Content-Type header line.
  */
-int
-mime_getcontent(h)
-char *h;
+int 
+mime_getcontent(char *h)
 {
 	char *p, *q, *r, *s;
 
@@ -663,8 +638,7 @@ char *h;
  * Get a mime style parameter from a header line.
  */
 char *
-mime_getparam(param, h)
-char *param, *h;
+mime_getparam(char *param, char *h)
 {
 	char *p = h, *q, *r;
 	int c;
@@ -731,8 +705,7 @@ char *param, *h;
  * Get the boundary out of a Content-Type: multipart/xyz header field.
  */
 char *
-mime_getboundary(h)
-char *h;
+mime_getboundary(char *h)
 {
 	char *p, *q;
 	size_t sz;
@@ -751,8 +724,7 @@ char *h;
  * Get a line like "text/html html" and look if x matches the extension.
  */
 static char *
-mime_tline(x, l)
-char *x, *l;
+mime_tline(char *x, char *l)
 {
 	char *type, *n;
 	int match = 0;
@@ -794,8 +766,7 @@ char *x, *l;
  * Check the given MIME type file for extension ext.
  */
 static char *
-mime_type(ext, filename)
-char *ext, *filename;
+mime_type(char *ext, char *filename)
 {
 	FILE *f;
 	char *line = NULL;
@@ -818,8 +789,7 @@ char *ext, *filename;
  * Return the Content-Type matching the extension of name.
  */
 char *
-mime_filecontent(name)
-char *name;
+mime_filecontent(char *name)
 {
 	char *ext, *content;
 
@@ -836,8 +806,7 @@ char *name;
  * Check file contents.
  */
 static enum mimeclean
-mime_isclean(f)
-FILE *f;
+mime_isclean(FILE *f)
 {
 	long initial_pos;
 	unsigned curlen = 1, maxlen = 0;
@@ -876,8 +845,8 @@ FILE *f;
 /*
  * Get the conversion that matches the encoding specified in the environment.
  */
-static int
-gettextconversion()
+static int 
+gettextconversion(void)
 {
 	char *p;
 	int convert;
@@ -897,12 +866,8 @@ gettextconversion()
 }
 
 int
-get_mime_convert(fp, contenttype, charset, isclean, dosign)
-FILE *fp;
-char **contenttype;
-char **charset;
-enum mimeclean *isclean;
-int	dosign;
+get_mime_convert(FILE *fp, char **contenttype, char **charset,
+		enum mimeclean *isclean, int dosign)
 {
 	int convert;
 
@@ -941,9 +906,7 @@ int	dosign;
  * The caller has to ensure that the size of b is sufficient.
  */
 char *
-itostr(base, i, b)
-unsigned base, i;
-char *b;
+itostr(unsigned base, unsigned i, char *b)
 {
 	char *p, *q, c;
 	
@@ -966,9 +929,7 @@ char *b;
  * Convert c to a hexadecimal character string and store it in hex.
  */
 static char *
-ctohex(c, hex)
-unsigned char c;
-char *hex;
+ctohex(int c, char *hex)
 {
 	unsigned char d;
 
@@ -987,10 +948,7 @@ char *hex;
  * The mustquote function determines whether a character must be quoted.
  */
 static size_t
-mime_write_toqp(in, fo, mustquote)
-struct str *in;
-FILE *fo;
-int (*mustquote)(int);
+mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int))
 {
 	char *p, *upper, *h, hex[3];
 	int l;
@@ -1033,10 +991,8 @@ int (*mustquote)(int);
  * Write to a stringstruct converting to quoted-printable.
  * The mustquote function determines whether a character must be quoted.
  */
-static void
-mime_str_toqp(in, out, mustquote)
-struct str *in, *out;
-int (*mustquote)(int);
+static void 
+mime_str_toqp(struct str *in, struct str *out, int (*mustquote)(int))
 {
 	char *p, *q, *upper;
 
@@ -1061,10 +1017,8 @@ int (*mustquote)(int);
 /*
  * Write to a stringstruct converting from quoted-printable.
  */
-static void
-mime_fromqp(in, out, ishdr)
-struct str *in, *out;
-int ishdr;
+static void 
+mime_fromqp(struct str *in, struct str *out, int ishdr)
 {
 	char *p, *q, *upper;
 	char quote[4];
@@ -1108,10 +1062,8 @@ int ishdr;
 /*
  * Convert header fields from RFC 1522 format
  */
-void
-mime_fromhdr(in, out, flags)
-struct str *in, *out;
-enum tdflags flags;
+void 
+mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 {
 	char *p, *q, *op, *upper, *cs, *cbeg, *tcs;
 	struct str cin, cout;
@@ -1230,9 +1182,7 @@ fromhdr_end:
  * Convert header fields to RFC 1522 format and write to the file fo.
  */
 static size_t
-mime_write_tohdr(in, fo)
-struct str *in;
-FILE *fo;
+mime_write_tohdr(struct str *in, FILE *fo)
 {
 	char *upper, *wbeg, *wend, *charset;
 	struct str cin, cout;
@@ -1349,10 +1299,7 @@ FILE *fo;
  * doing charset and header conversion.
  */
 static size_t
-convhdra(str, len, fp)
-	char	*str;
-	size_t	len;
-	FILE	*fp;
+convhdra(char *str, size_t len, FILE *fp)
 {
 #ifdef	HAVE_ICONV
 	char	*ip, *op;
@@ -1397,9 +1344,7 @@ convhdra(str, len, fp)
  * Write an address to a header field.
  */
 static size_t
-mime_write_tohdr_a(in, f)
-struct str *in;
-FILE *f;
+mime_write_tohdr_a(struct str *in, FILE *f)
 {
 	char	*cp, *lastcp;
 	size_t	sz = 0;
@@ -1437,11 +1382,7 @@ FILE *f;
 }
 
 static void
-addstr(buf, sz, pos, str, len)
-	char **buf;
-	size_t *sz, *pos;
-	char *str;
-	size_t len;
+addstr(char **buf, size_t *sz, size_t *pos, char *str, size_t len)
 {
 	*buf = srealloc(*buf, *sz += len);
 	memcpy(&(*buf)[*pos], str, len);
@@ -1449,11 +1390,7 @@ addstr(buf, sz, pos, str, len)
 }
 
 static void
-addconv(buf, sz, pos, str, len)
-	char **buf;
-	size_t *sz, *pos;
-	char *str;
-	size_t len;
+addconv(char **buf, size_t *sz, size_t *pos, char *str, size_t len)
 {
 	struct str	in, out;
 
@@ -1468,8 +1405,7 @@ addconv(buf, sz, pos, str, len)
  * Interpret MIME strings in parts of an address field.
  */
 char *
-mime_fromaddr(name)
-	char *name;
+mime_fromaddr(char *name)
 {
 	char	*cp, *lastcp;
 	char	*res = NULL;
@@ -1515,11 +1451,8 @@ mime_fromaddr(name)
  * fwrite whilst adding prefix, if present.
  */
 size_t
-prefixwrite(ptr, size, nmemb, f, prefix, prefixlen)
-void *ptr;
-size_t size, nmemb, prefixlen;
-FILE *f;
-char *prefix;
+prefixwrite(void *ptr, size_t size, size_t nmemb, FILE *f,
+		char *prefix, size_t prefixlen)
 {
 	static FILE *lastf;
 	static char lastc = '\n';
@@ -1562,12 +1495,8 @@ char *prefix;
  * fwrite while checking for displayability.
  */
 static size_t
-fwrite_td(ptr, size, nmemb, f, flags, prefix, prefixlen)
-void *ptr;
-char *prefix;
-size_t size, nmemb, prefixlen;
-FILE *f;
-enum tdflags flags;
+fwrite_td(void *ptr, size_t size, size_t nmemb, FILE *f, enum tdflags flags,
+		char *prefix, size_t prefixlen)
 {
 	char *upper;
 	size_t sz, csize;
@@ -1619,13 +1548,9 @@ enum tdflags flags;
  * fwrite performing the given MIME conversion.
  */
 size_t
-mime_write(ptr, size, nmemb, f, convert, dflags, prefix, prefixlen)
-void *ptr;
-size_t size, nmemb, prefixlen;
-char *prefix;
-FILE *f;
-enum conversion convert;
-enum tdflags dflags;
+mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
+		enum conversion convert, enum tdflags dflags,
+		char *prefix, size_t prefixlen)
 {
 	struct str in, out;
 	size_t sz, csize;

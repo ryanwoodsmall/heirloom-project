@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)v7.local.c	2.7 (gritter) 7/26/04";
+static char sccsid[] = "@(#)v7.local.c	2.9 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -61,9 +61,7 @@ static char sccsid[] = "@(#)v7.local.c	2.7 (gritter) 7/26/04";
  * mail is queued).
  */
 void
-findmail(user, force, buf, size)
-	char *user, *buf;
-	int size, force;
+findmail(char *user, int force, char *buf, int size)
 {
 	char *mbox, *cp;
 
@@ -82,8 +80,8 @@ findmail(user, force, buf, size)
 /*
  * Get rid of the queued mail.
  */
-void
-demail()
+void 
+demail(void)
 {
 
 	if (value("keep") != NULL || rm(mailname) < 0)
@@ -94,7 +92,7 @@ demail()
  * Discover user login name.
  */
 char *
-username()
+username(void)
 {
 	char *np;
 	uid_t uid;

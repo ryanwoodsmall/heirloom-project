@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.9 (gritter) 9/20/04";
+static char sccsid[] = "@(#)head.c	2.11 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -51,10 +51,13 @@ static char sccsid[] = "@(#)head.c	2.9 (gritter) 9/20/04";
  *
  * Routines for processing and detecting headlines.
  */
-static char	*copyin __P((char *, char **));
-static char	*nextword __P((char *, char *));
-static int	gethfield __P((FILE *, char **, size_t *, int, char **));
-static int	charcount __P((char *, int));
+
+static char *copyin(char *src, char **space);
+static char *nextword(char *wp, char *wbuf);
+static int gethfield(FILE *f, char **linebuf, size_t *linesize, int rem,
+		char **colon);
+static int msgidnextc(const char **cp, int *status);
+static int charcount(char *str, int c);
 
 /*
  * See if the passed line buffer is a mail header.
@@ -64,9 +67,7 @@ static int	charcount __P((char *, int));
  */
 /*ARGSUSED 2*/
 int
-is_head(linebuf, linelen)
-	char *linebuf;
-	size_t linelen;
+is_head(char *linebuf, size_t linelen)
 {
 	char *cp;
 
@@ -84,10 +85,7 @@ is_head(linebuf, linelen)
  * structure.  Actually, it scans.
  */
 void
-parse(line, linelen, hl, pbuf)
-	char *line, *pbuf;
-	size_t linelen;
-	struct headline *hl;
+parse(char *line, size_t linelen, struct headline *hl, char *pbuf)
 {
 	char *cp;
 	char *sp;
@@ -124,9 +122,7 @@ parse(line, linelen, hl, pbuf)
  * the left string into it.
  */
 static char *
-copyin(src, space)
-	char *src;
-	char **space;
+copyin(char *src, char **space)
 {
 	char *cp;
 	char *top;
@@ -139,7 +135,7 @@ copyin(src, space)
 }
 
 #ifdef	notdef
-static int	cmatch __P((char *, char *));
+static int	cmatch(char *, char *);
 /*
  * Test to see if the passed string is a ctime(3) generated
  * date string as documented in the manual.  The template
@@ -185,9 +181,8 @@ static char  *tmztype[] = {
 	NULL,
 };
 
-static int
-is_date(date)
-	char date[];
+static int 
+is_date(char *date)
 {
 	int ret = 0, form = 0;
 
@@ -204,9 +199,8 @@ is_date(date)
  * Match the given string (cp) against the given template (tp).
  * Return 1 if they match, 0 if they don't
  */
-static int
-cmatch(cp, tp)
-	char *cp, *tp;
+static int 
+cmatch(char *cp, char *tp)
 {
 	int c;
 
@@ -259,8 +253,7 @@ cmatch(cp, tp)
  * or NULL if none follow.
  */
 static char *
-nextword(wp, wbuf)
-	char *wp, *wbuf;
+nextword(char *wp, char *wbuf)
 {
 	int c;
 
@@ -288,9 +281,7 @@ nextword(wp, wbuf)
 }
 
 void
-extract_header(fp, hp)
-	FILE *fp;
-	struct header *hp;
+extract_header(FILE *fp, struct header *hp)
 {
 	char *linebuf = NULL;
 	size_t linesize = 0;
@@ -360,10 +351,7 @@ extract_header(fp, hp)
  * field only, the content of all matching header fields else.
  */
 char *
-hfield_mult(field, mp, mult)
-	char field[];
-	struct message *mp;
-	int mult;
+hfield_mult(char *field, struct message *mp, int mult)
 {
 	FILE *ibuf;
 	char *linebuf = NULL;
@@ -408,12 +396,7 @@ hfield_mult(field, mp, mult)
  * Must deal with \ continuations & other such fraud.
  */
 static int
-gethfield(f, linebuf, linesize, rem, colon)
-	FILE *f;
-	char **linebuf;
-	size_t *linesize;
-	int rem;
-	char **colon;
+gethfield(FILE *f, char **linebuf, size_t *linesize, int rem, char **colon)
 {
 	char *line2 = NULL;
 	size_t line2size = 0;
@@ -478,8 +461,7 @@ gethfield(f, linebuf, linesize, rem, colon)
  * the desired breed.  Return the field body, or 0.
  */
 char *
-thisfield(linebuf, field)
-	const char *linebuf, *field;
+thisfield(const char *linebuf, const char *field)
 {
 	while (lowerconv(*linebuf&0377) == lowerconv(*field&0377)) {
 		linebuf++;
@@ -502,9 +484,7 @@ thisfield(linebuf, field)
  * before returning it.
  */
 char *
-nameof(mp, reptype)
-	struct message *mp;
-	int reptype;
+nameof(struct message *mp, int reptype)
 {
 	char *cp, *cp2;
 
@@ -525,8 +505,7 @@ nameof(mp, reptype)
  * Ignore it.
  */
 char *
-skip_comment(cp)
-	const char *cp;
+skip_comment(const char *cp)
 {
 	int nesting = 1;
 
@@ -585,8 +564,7 @@ routeaddr(const char *name)
  * of "host-phrase."
  */
 char *
-skin(name)
-	char *name;
+skin(char *name)
 {
 	int c;
 	char *cp, *cp2;
@@ -700,8 +678,7 @@ skin(name)
  * Fetch the real name from an internet mail address field.
  */
 char *
-realname(name)
-	char	*name;
+realname(char *name)
 {
 	char	*cstart = NULL, *cend = NULL, *cp, *cq;
 	char	*rname, *rp;
@@ -825,9 +802,7 @@ brk:	if (cstart == NULL) {
  *	2 -- get sender's name for Reply
  */
 char *
-name1(mp, reptype)
-	struct message *mp;
-	int reptype;
+name1(struct message *mp, int reptype)
 {
 	char *namebuf;
 	size_t namesize;
@@ -900,10 +875,8 @@ out:
 	return cp;
 }
 
-static int
-msgidnextc(cp, status)
-	const char	**cp;
-	int	*status;
+static int 
+msgidnextc(const char **cp, int *status)
 {
 	int	c;
 
@@ -944,9 +917,8 @@ msgidnextc(cp, status)
 	}
 }
 
-int
-msgidcmp(s1, s2)
-	const char	*s1, *s2;
+int 
+msgidcmp(const char *s1, const char *s2)
 {
 	int	q1 = 0, q2 = 0;
 	int	c1, c2;
@@ -963,10 +935,8 @@ msgidcmp(s1, s2)
 /*
  * Count the occurances of c in str
  */
-static int
-charcount(str, c)
-	char *str;
-	int c;
+static int 
+charcount(char *str, int c)
 {
 	char *cp;
 	int i;
@@ -981,10 +951,7 @@ charcount(str, c)
  * See if the given header field is supposed to be ignored.
  */
 int
-is_ign(field, fieldlen, ignore)
-	char *field;
-	size_t fieldlen;
-	struct ignoretab ignore[2];
+is_ign(char *field, size_t fieldlen, struct ignoretab ignore[2])
 {
 	char *realfld;
 	int ret;
@@ -1007,10 +974,8 @@ is_ign(field, fieldlen, ignore)
 	return ret;
 }
 
-int
-member(realfield, table)
-	char *realfield;
-	struct ignoretab *table;
+int 
+member(char *realfield, struct ignoretab *table)
 {
 	struct ignore *igp;
 
@@ -1025,8 +990,7 @@ member(realfield, table)
  * Fake Sender for From_ lines if missing, e. g. with POP3.
  */
 char *
-fakefrom(mp)
-	struct message *mp;
+fakefrom(struct message *mp)
 {
 	char *name;
 
@@ -1039,8 +1003,7 @@ fakefrom(mp)
 }
 
 char *
-fakedate(t)
-	time_t t;
+fakedate(time_t t)
 {
 	char *cp, *cq;
 
@@ -1051,8 +1014,7 @@ fakedate(t)
 }
 
 char *
-nexttoken(cp)
-	char *cp;
+nexttoken(char *cp)
 {
 	for (;;) {
 		if (*cp == '\0')
@@ -1086,8 +1048,7 @@ nexttoken(cp)
  *               0    5   10   15   20
  */
 time_t
-unixtime(from)
-	char *from;
+unixtime(char *from)
 {
 	char	*fp, *xp;
 	time_t	t;
@@ -1139,8 +1100,7 @@ invalid:
 }
 
 time_t
-rfctime(date)
-	char *date;
+rfctime(char *date)
 {
 	char *cp = date, *x;
 	time_t t;
@@ -1212,8 +1172,7 @@ invalid:
 #define	leapyear(year)	((year % 100 ? year : year / 100) % 4 == 0)
 
 time_t
-combinetime(year, month, day, hour, minute, second)
-	int year, month, day, hour, minute, second;
+combinetime(int year, int month, int day, int hour, int minute, int second)
 {
 	time_t t;
 
@@ -1252,9 +1211,8 @@ combinetime(year, month, day, hour, minute, second)
 	return t;
 }
 
-void
-substdate(m)
-	struct message *m;
+void 
+substdate(struct message *m)
 {
 	char *cp;
 	time_t now;

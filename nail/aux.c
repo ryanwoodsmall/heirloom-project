@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.67 (gritter) 9/22/04";
+static char sccsid[] = "@(#)aux.c	2.69 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -74,8 +74,7 @@ static char sccsid[] = "@(#)aux.c	2.67 (gritter) 9/22/04";
  * Return a pointer to a dynamic copy of the argument.
  */
 char *
-savestr(str)
-	const char *str;
+savestr(const char *str)
 {
 	char *new;
 	int size = strlen(str) + 1;
@@ -89,8 +88,7 @@ savestr(str)
  * Make a copy of new argument incorporating old one.
  */
 char *
-save2str(str, old)
-	const char *str, *old;
+save2str(const char *str, const char *old)
 {
 	char *new;
 	int newsize = strlen(str) + 1;
@@ -107,9 +105,7 @@ save2str(str, old)
 }
 
 char *
-savecat(s1, s2)
-const char *s1;
-const char *s2;
+savecat(const char *s1, const char *s2)
 {
 	const char	*cp;
 	char	*ns, *np;
@@ -123,35 +119,19 @@ const char *s2;
 	return ns;
 }
 
-#ifdef	__STDC__
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
-
 
 #ifndef	HAVE_SNPRINTF
 /*
  * Lazy vsprintf wrapper.
  */
 int
-#ifdef	__STDC__
 snprintf(char *str, size_t size, const char *format, ...)
-#else
-snprintf(str, size, format, va_alist)
-char *str;
-size_t size;
-const char *format;
-va_dcl
-#endif
 {
 	va_list ap;
 	int ret;
-#ifdef	__STDC__
+
 	va_start(ap, format);
-#else
-	va_start(ap);
-#endif
 	ret = vsprintf(str, format, ap);
 	va_end(ap);
 	return ret;
@@ -162,20 +142,11 @@ va_dcl
  * Announce a fatal error and die.
  */
 void
-#ifdef	__STDC__
 panic(const char *format, ...)
-#else
-panic(format, va_alist)
-	char *format;
-        va_dcl
-#endif
 {
 	va_list ap;
-#ifdef	__STDC__
+
 	va_start(ap, format);
-#else
-	va_start(ap);
-#endif
 	fprintf(stderr, catgets(catd, CATSET, 1, "panic: "));
 	vfprintf(stderr, format, ap);
 	va_end(ap);
@@ -189,9 +160,8 @@ panic(format, va_alist)
  * Touched messages have the effect of not being sent
  * back to the system mailbox on exit.
  */
-void
-touch(mp)
-	struct message *mp;
+void 
+touch(struct message *mp)
 {
 
 	mp->m_flag |= MTOUCH;
@@ -203,9 +173,8 @@ touch(mp)
  * Test to see if the passed file name is a directory.
  * Return true if it is.
  */
-int
-is_dir(name)
-	char name[];
+int 
+is_dir(char *name)
 {
 	struct stat sbuf;
 
@@ -217,9 +186,8 @@ is_dir(name)
 /*
  * Count the number of arguments in the given string raw list.
  */
-int
-argcount(argv)
-	char **argv;
+int 
+argcount(char **argv)
 {
 	char **ap;
 
@@ -231,11 +199,8 @@ argcount(argv)
 /*
  * Copy a string, lowercasing it as we go.
  */
-void
-i_strcpy(dest, src, size)
-	char *dest;
-	const char	*src;
-	int size;
+void 
+i_strcpy(char *dest, const char *src, int size)
 {
 	char *max;
 
@@ -248,8 +213,7 @@ i_strcpy(dest, src, size)
 }
 
 char *
-i_strdup(src)
-	const char	*src;
+i_strdup(const char *src)
 {
 	int	sz;
 	char	*dest;
@@ -263,9 +227,8 @@ i_strdup(src)
 /*
  * Convert a string to lowercase, in-place and with multibyte-aware.
  */
-void
-makelow(cp)
-	char	*cp;
+void 
+makelow(char *cp)
 {
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
 	if (mb_cur_max > 1) {
@@ -294,9 +257,8 @@ makelow(cp)
 	}
 }
 
-int
-substr(str, sub)
-	const char	*str, *sub;
+int 
+substr(const char *str, const char *sub)
 {
 	const char	*cp, *backup;
 
@@ -348,10 +310,7 @@ substr(str, sub)
 }
 
 char *
-colalign(cp, col, fill)
-	const char	*cp;
-	int	col;
-	int	fill;
+colalign(const char *cp, int col, int fill)
 {
 	int	n, sz;
 	char	*nb, *np;
@@ -391,8 +350,7 @@ colalign(cp, col, fill)
 }
 
 void
-try_pager(fp)
-	FILE	*fp;
+try_pager(FILE *fp)
 {
 	long	lines = 0;
 	int	c;
@@ -431,9 +389,8 @@ struct sstack {
  * Set the global flag "sourcing" so that others will realize
  * that they are no longer reading from a tty (in all probability).
  */
-int
-source(v)
-	void *v;
+int 
+source(void *v)
 {
 	char **arglist = v;
 	FILE *fi;
@@ -466,8 +423,8 @@ source(v)
  * Pop the current input back to the previous level.
  * Update the "sourcing" flag as appropriate.
  */
-int
-unstack()
+int 
+unstack(void)
 {
 	if (ssp <= 0) {
 		printf(catgets(catd, CATSET, 4,
@@ -491,9 +448,8 @@ unstack()
  * Touch the indicated file.
  * This is nifty for the shell.
  */
-void
-alter(name)
-	char *name;
+void 
+alter(char *name)
 {
 	struct stat sb;
 	struct utimbuf utb;
@@ -509,9 +465,8 @@ alter(name)
  * Examine the passed line buffer and
  * return true if it is all blanks and tabs.
  */
-int
-blankline(linebuf)
-	char linebuf[];
+int 
+blankline(char *linebuf)
 {
 	char *cp;
 
@@ -524,9 +479,8 @@ blankline(linebuf)
 /*
  * Are any of the characters in the two strings the same?
  */
-int
-anyof(s1, s2)
-	char *s1, *s2;
+int 
+anyof(char *s1, char *s2)
 {
 
 	while (*s1)
@@ -539,9 +493,8 @@ anyof(s1, s2)
  * Determine if as1 is a valid prefix of as2.
  * Return true if yep.
  */
-int
-is_prefix(as1, as2)
-	const char *as1, *as2;
+int 
+is_prefix(const char *as1, const char *as2)
 {
 	const char *s1, *s2;
 
@@ -554,8 +507,7 @@ is_prefix(as1, as2)
 }
 
 char *
-last_at_before_slash(sp)
-	const char	*sp;
+last_at_before_slash(const char *sp)
 {
 	const char	*cp;
 
@@ -566,9 +518,8 @@ last_at_before_slash(sp)
 	return *cp == '@' ? (char *)cp : NULL;
 }
 
-enum protocol
-which_protocol(name)
-	const char *name;
+enum protocol 
+which_protocol(const char *name)
 {
 	register const char *cp;
 	char	*np;
@@ -636,8 +587,7 @@ which_protocol(name)
 }
 
 const char *
-protfile(xcp)
-	const char *xcp;
+protfile(const char *xcp)
 {
 	const char	*cp = xcp;
 	int	state = 0;
@@ -657,8 +607,7 @@ protfile(xcp)
 }
 
 char *
-protbase(cp)
-	const char *cp;
+protbase(const char *cp)
 {
 	char	*n = salloc(strlen(cp) + 1);
 	char	*np = n;
@@ -677,9 +626,8 @@ protbase(cp)
 	return n;
 }
 
-int
-disconnected(file)
-	const char	*file;
+int 
+disconnected(const char *file)
 {
 	char	*cp, *cq, *vp;
 	int	vs, r;
@@ -702,9 +650,8 @@ disconnected(file)
 	return r;
 }
 
-unsigned
-pjw(cp)
-	const char	*cp;
+unsigned 
+pjw(const char *cp)
 {
 	unsigned	h = 0, g;
 
@@ -719,9 +666,8 @@ pjw(cp)
 	return h;
 }
 
-long
-nextprime(n)
-	long	n;
+long 
+nextprime(long n)
 {
 	const long	primes[] = {
 			509, 1021, 2039, 4093, 8191, 16381, 32749, 65521,
@@ -745,8 +691,7 @@ nextprime(n)
 #define	hexchar(n)	((n)>9 ? (n)-10+'a' : (n)+'0')
 
 char *
-strenc(cp)
-	const char *cp;
+strenc(const char *cp)
 {
 	char	*n, *np;
 
@@ -768,8 +713,7 @@ strenc(cp)
 }
 
 char *
-strdec(cp)
-	const char *cp;
+strdec(const char *cp)
 {
 	char	*n, *np;
 
@@ -787,8 +731,7 @@ strdec(cp)
 }
 
 char *
-md5tohex(vp)
-	const void	*vp;
+md5tohex(const void *vp)
 {
 	char	*hex;
 	const char	*cp = vp;
@@ -804,8 +747,7 @@ md5tohex(vp)
 }
 
 char *
-cram_md5_string(user, pass, b64)
-	const char	*user, *pass, *b64;
+cram_md5_string(const char *user, const char *pass, const char *b64)
 {
 	struct str	in, out;
 	char	digest[16], *cp, *sp, *rp, *xp;
@@ -830,7 +772,7 @@ cram_md5_string(user, pass, b64)
 }
 
 char *
-getuser()
+getuser(void)
 {
 	char *line = NULL, *user;
 	size_t linesize = 0;
@@ -850,10 +792,7 @@ getuser()
 }
 
 char *
-getpassword(otio, reset_tio, query)
-	struct termios	*otio;
-	int	*reset_tio;
-	const char	*query;
+getpassword(struct termios *otio, int *reset_tio, const char *query)
 {
 	struct termios	tio;
 	char *line = NULL, *pass;
@@ -885,11 +824,8 @@ getpassword(otio, reset_tio, query)
 	return pass;
 }
 
-void
-transflags(omessage, omsgCount, transparent)
-	struct message	*omessage;
-	long	omsgCount;
-	int	transparent;
+void 
+transflags(struct message *omessage, long omsgCount, int transparent)
 {
 	struct message	*omp, *nmp, *newdot, *newprevdot;
 	int	hf;
@@ -921,15 +857,14 @@ transflags(omessage, omsgCount, transparent)
 	free(omessage);
 }
 
-void
-out_of_memory()
+void 
+out_of_memory(void)
 {
 	panic("no memory");
 }
 
 void *
-smalloc(s)
-size_t s;
+smalloc(size_t s)
 {
 	void *p;
 
@@ -941,9 +876,7 @@ size_t s;
 }
 
 void *
-srealloc(v, s)
-void *v;
-size_t s;
+srealloc(void *v, size_t s)
 {
 	void *r;
 
@@ -957,8 +890,7 @@ size_t s;
 }
 
 void *
-scalloc(nmemb, size)
-size_t nmemb, size;
+scalloc(size_t nmemb, size_t size)
 {
 	void *vp;
 
@@ -970,9 +902,7 @@ size_t nmemb, size;
 }
 
 char *
-sstpcpy(dst, src)
-char *dst;
-const char *src;
+sstpcpy(char *dst, const char *src)
 {
 	while ((*dst = *src++) != '\0')
 		dst++;
@@ -980,8 +910,7 @@ const char *src;
 }
 
 char *
-sstrdup(cp)
-const char *cp;
+sstrdup(const char *cp)
 {
 	char	*dp;
 	
@@ -993,9 +922,8 @@ const char *cp;
 		return NULL;
 }
 
-enum okay
-makedir(name)
-	const char	*name;
+enum okay 
+makedir(const char *name)
 {
 	int	e;
 	struct stat	st;
@@ -1012,9 +940,8 @@ makedir(name)
 }
 
 #ifdef	HAVE_FCHDIR
-enum okay
-cwget(cw)
-	struct cw	*cw;
+enum okay 
+cwget(struct cw *cw)
 {
 	if ((cw->cw_fd = open(".", O_RDONLY)) < 0)
 		return STOP;
@@ -1025,34 +952,30 @@ cwget(cw)
 	return OKAY;
 }
 
-enum okay
-cwret(cw)
-	struct cw	*cw;
+enum okay 
+cwret(struct cw *cw)
 {
 	if (fchdir(cw->cw_fd) < 0)
 		return STOP;
 	return OKAY;
 }
 
-void
-cwrelse(cw)
-	struct cw	*cw;
+void 
+cwrelse(struct cw *cw)
 {
 	close(cw->cw_fd);
 }
 #else	/* !HAVE_FCHDIR */
-enum okay
-cwget(cw)
-	struct cw	*cw;
+enum okay 
+cwget(struct cw *cw)
 {
 	if (getcwd(cw->cw_wd, sizeof cw->cw_wd) == NULL || chdir(cw->cw_wd) < 0)
 		return STOP;
 	return OKAY;
 }
 
-enum okay
-cwret(cw)
-	struct cw	*cw;
+enum okay 
+cwret(struct cw *cw)
 {
 	if (chdir(cw->cw_wd) < 0)
 		return STOP;
@@ -1060,9 +983,8 @@ cwret(cw)
 }
 
 /*ARGSUSED*/
-void
-cwrelse(cw)
-	struct cw	*cw;
+void 
+cwrelse(struct cw *cw)
 {
 }
 #endif	/* !HAVE_FCHDIR */
@@ -1070,9 +992,8 @@ cwrelse(cw)
 /*
  * Locale-independent character class functions.
  */
-int
-asccasecmp(s1, s2)
-const char *s1, *s2;
+int 
+asccasecmp(const char *s1, const char *s2)
 {
 	register int cmp;
 
@@ -1084,9 +1005,7 @@ const char *s1, *s2;
 }
 
 int
-ascncasecmp(s1, s2, sz)
-const char *s1, *s2;
-size_t sz;
+ascncasecmp(const char *s1, const char *s2, size_t sz)
 {
 	register int cmp;
 	size_t i = 1;
@@ -1101,8 +1020,7 @@ size_t sz;
 }
 
 char *
-asccasestr(haystack, xneedle)
-const char *haystack, *xneedle;
+asccasestr(const char *haystack, const char *xneedle)
 {
 	char	*needle, *NEEDLE;
 	int	i, sz;

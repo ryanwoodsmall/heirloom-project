@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * These base64 routines are derived from the metamail-2.7 sources which
@@ -23,7 +23,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)base64.c	2.8 (gritter) 8/9/04";
+static char sccsid[] = "@(#)base64.c	2.10 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -51,15 +51,13 @@ static const signed char b64index[] = {
 
 #define char64(c)  ((c) < 0 ? -1 : b64index[(int)(c)])
 
-static signed char	*ctob64 __P((unsigned char *, int));
+static signed char *ctob64(unsigned char *p, int pad);
 
 /*
  * Convert three characters to base64.
  */
 static signed char *
-ctob64(p, pad)
-unsigned char *p;
-int pad;
+ctob64(unsigned char *p, int pad)
 {
 	static signed char b64[4];
 
@@ -78,16 +76,13 @@ int pad;
 }
 
 char *
-strtob64(p)
-	const char *p;
+strtob64(const char *p)
 {
 	return memtob64(p, strlen(p));
 }
 
 void *
-memtob64(vp, isz)
-	const void *vp;
-	size_t	isz;
+memtob64(const void *vp, size_t isz)
 {
 	char	q[3];
 	const char	*p = vp;
@@ -122,10 +117,7 @@ memtob64(vp, isz)
  * e.g. at 972 character bounds.
  */
 size_t
-mime_write_tob64(in, fo, is_header)
-struct str *in;
-FILE *fo;
-int is_header;
+mime_write_tob64(struct str *in, FILE *fo, int is_header)
 {
 	char *p, *upper, q[3];
 	signed char *h;
@@ -157,10 +149,8 @@ int is_header;
 /*
  * Decode from base64.
  */
-void
-mime_fromb64(in, out, is_text)
-struct str *in, *out;
-int is_text;
+void 
+mime_fromb64(struct str *in, struct str *out, int is_text)
 {
 	char *p, *q, *upper;
 	signed char c, d, e, f, g;
@@ -246,10 +236,7 @@ int is_text;
  * As we have only one buffer, this function is not reentrant.
  */
 void
-mime_fromb64_b(in, out, is_text, f)
-struct str *in, *out;
-FILE *f;
-int is_text;
+mime_fromb64_b(struct str *in, struct str *out, int is_text, FILE *f)
 {
 	static signed char b[4];
 	static int n;

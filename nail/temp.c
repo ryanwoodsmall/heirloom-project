@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)temp.c	2.5 (gritter) 8/1/04";
+static char sccsid[] = "@(#)temp.c	2.7 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -63,10 +63,7 @@ static char	*tmpdir;
  * The permissions for the newly created file are given in bits.
  */
 FILE *
-Ftemp(fn, prefix, mode, bits, register_file)
-char **fn;
-char *prefix, *mode;
-int bits, register_file;
+Ftemp(char **fn, char *prefix, char *mode, int bits, int register_file)
 {
 	FILE *fp;
 	int fd;
@@ -115,8 +112,8 @@ Ftfree(char **fn)
 	free(cp);
 }
 
-void
-tinit()
+void 
+tinit(void)
 {
 	char *cp;
 

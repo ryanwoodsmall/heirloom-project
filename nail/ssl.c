@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2002
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ssl.c	1.34 (gritter) 9/23/04";
+static char sccsid[] = "@(#)ssl.c	1.36 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -49,9 +49,8 @@ static char sccsid[] = "@(#)ssl.c	1.34 (gritter) 9/23/04";
 #include "rcv.h"
 #include "extern.h"
 
-void
-ssl_set_vrfy_level(uhp)
-	const char *uhp;
+void 
+ssl_set_vrfy_level(const char *uhp)
 {
 	char *cp;
 	char *vrvar;
@@ -79,8 +78,8 @@ ssl_set_vrfy_level(uhp)
 	}
 }
 
-enum okay
-ssl_vrfy_decide()
+enum okay 
+ssl_vrfy_decide(void)
 {
 	enum okay ok = STOP;
 
@@ -112,8 +111,7 @@ ssl_vrfy_decide()
 }
 
 char *
-ssl_method_string(uhp)
-	const char	*uhp;
+ssl_method_string(const char *uhp)
 {
 	char *cp, *mtvar;
 
@@ -127,11 +125,7 @@ ssl_method_string(uhp)
 }
 
 enum okay
-smime_split(ip, hp, bp, xcount, keep)
-	FILE	*ip;
-	FILE	**hp, **bp;
-	long	xcount;
-	int	keep;
+smime_split(FILE *ip, FILE **hp, FILE **bp, long xcount, int keep)
 {
 	char	*buf, *hn, *bn;
 	char	*savedfields = NULL;
@@ -189,8 +183,7 @@ smime_split(ip, hp, bp, xcount, keep)
 }
 
 FILE *
-smime_sign_assemble(hp, bp, sp)
-	FILE	*hp, *bp, *sp;
+smime_sign_assemble(FILE *hp, FILE *bp, FILE *sp)
 {
 	char	*boundary, *cp;
 	FILE	*op;
@@ -244,8 +237,7 @@ smime_sign_assemble(hp, bp, sp)
 }
 
 FILE *
-smime_encrypt_assemble(hp, yp)
-	FILE	*hp, *yp;
+smime_encrypt_assemble(FILE *hp, FILE *yp)
 {
 	char	*cp;
 	FILE	*op;
@@ -288,9 +280,7 @@ smime_encrypt_assemble(hp, yp)
 }
 
 struct message *
-smime_decrypt_assemble(m, hp, bp)
-	struct message	*m;
-	FILE	*hp, *bp;
+smime_decrypt_assemble(struct message *m, FILE *hp, FILE *bp)
 {
 	int	binary = 0, lastnl = 0;
 	char	*buf = NULL, *cp;
@@ -352,9 +342,8 @@ smime_decrypt_assemble(m, hp, bp)
 	return x;
 }
 
-int
-ccertsave(v)
-	void	*v;
+int 
+ccertsave(void *v)
 {
 	int	*ip;
 	int	f, *msgvec;

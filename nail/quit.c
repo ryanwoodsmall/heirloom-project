@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)quit.c	2.22 (gritter) 9/14/04";
+static char sccsid[] = "@(#)quit.c	2.24 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -56,15 +56,16 @@ static char sccsid[] = "@(#)quit.c	2.22 (gritter) 9/14/04";
  *
  * Termination processing.
  */
-static void	edstop __P((void));
+
+static int writeback(FILE *res, FILE *obuf);
+static void edstop(void);
 
 /*
  * The "quit" command.
  */
 /*ARGSUSED*/
-int
-quitcmd(v)
-	void *v;
+int 
+quitcmd(void *v)
 {
 	/*
 	 * If we are sourcing, then return 1 so execute() can handle it.
@@ -82,8 +83,7 @@ quitcmd(v)
  * Incorporate the any new mail that we found.
  */
 static int
-writeback(res, obuf)
-	FILE *res, *obuf;
+writeback(FILE *res, FILE *obuf)
 {
 	struct message *mp;
 	int p, c;
@@ -135,8 +135,8 @@ writeback(res, obuf)
  * Save all untouched messages back in the system mailbox.
  * Remove the system mailbox, if none saved there.
  */
-void
-quit()
+void 
+quit(void)
 {
 	int p, modify, anystat;
 	FILE *fbuf, *rbuf, *readstat = NULL, *abuf;
@@ -323,8 +323,8 @@ newmail:
 /*
  * Adjust the message flags in each message.
  */
-int
-holdbits()
+int 
+holdbits(void)
 {
 	struct message *mp;
 	int anystat, autohold, holdbit, nohold;
@@ -358,8 +358,8 @@ holdbits()
  * just copy saveable entries at the end.
  */
 
-enum okay
-makembox()
+enum okay 
+makembox(void)
 {
 	struct message *mp;
 	char *mbox, *tempQuit;
@@ -473,8 +473,8 @@ makembox()
  * Terminate an editing session by attempting to write out the user's
  * file from the temporary.  Save any new stuff appended to the file.
  */
-static void
-edstop()
+static void 
+edstop(void)
 {
 	int gotcha, c;
 	struct message *mp;

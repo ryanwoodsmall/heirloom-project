@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.29 (gritter) 9/4/04";
+static char sccsid[] = "@(#)collect.c	2.31 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -79,27 +79,28 @@ static	sigjmp_buf	collabort;	/* To end collection with error */
 
 static	sigjmp_buf pipejmp;		/* On broken pipe */
 
-static struct attachment	*read_attachment_data __P((struct attachment *,
-					unsigned));
-static void	insertcommand __P((FILE *, char *));
-static int	exwrite __P((char [], FILE *, int));
-static enum okay	makeheader __P((FILE *, struct header *));
-static void	mesedit __P((int, struct header *));
-static void	mespipe __P((char []));
-static int	forward __P((char [], FILE *, int));
-static void	collhup __P((int));
-static int	include_file __P((FILE *, char *, int *, int *, int));
-static void	collint __P((int));
-static void	collstop __P((int));
-static struct attachment	*append_attachments __P((struct attachment *,
-					char *));
-static void	onpipe __P((int));
-static int	putesc __P((const char *, FILE *));
+static void onpipe(int signo);
+static void insertcommand(FILE *fp, char *cmd);
+static void print_collf(FILE *collf, struct header *hp);
+static int include_file(FILE *fbuf, char *name, int *linecount,
+		int *charcount, int echo);
+static struct attachment *read_attachment_data(struct attachment *ap,
+		unsigned number);
+static struct attachment *append_attachments(struct attachment *attach,
+		char *names);
+static int exwrite(char *name, FILE *fp, int f);
+static enum okay makeheader(FILE *fp, struct header *hp);
+static void mesedit(int c, struct header *hp);
+static void mespipe(char *cmd);
+static int forward(char *ms, FILE *fp, int f);
+static void collstop(int s);
+static void collint(int s);
+static void collhup(int s);
+static int putesc(const char *s, FILE *stream);
 
 /*ARGSUSED*/
-static void
-onpipe(signo)
-	int signo;
+static void 
+onpipe(int signo)
 {
 	siglongjmp(pipejmp, 1);
 }
@@ -108,9 +109,7 @@ onpipe(signo)
  * Execute cmd and insert its standard output into fp.
  */
 static void
-insertcommand(fp, cmd)
-FILE *fp;
-char *cmd;
+insertcommand(FILE *fp, char *cmd)
 {
 	FILE *obuf = NULL;
 	char *cp;
@@ -140,9 +139,7 @@ endpipe:
  * ~p command.
  */
 static void
-print_collf(collf, hp)
-FILE *collf;
-struct header *hp;
+print_collf(FILE *collf, struct header *hp)
 {
 	char *lbuf = NULL;
 	FILE *obuf = stdout;
@@ -214,11 +211,7 @@ endpipe:
 }
 
 static int
-include_file(fbuf, name, linecount, charcount, echo)
-FILE *fbuf;
-char *name;
-int *linecount, *charcount;
-int echo;
+include_file(FILE *fbuf, char *name, int *linecount, int *charcount, int echo)
 {
 	char *interactive, *linebuf = NULL;
 	size_t linesize = 0, linelen, count;
@@ -258,9 +251,7 @@ int echo;
  * attachment. NULL is returned if no file name is given.
  */
 static struct attachment *
-read_attachment_data(ap, number)
-	struct attachment *ap;
-	unsigned number;
+read_attachment_data(struct attachment *ap, unsigned number)
 {
 	char prefix[80];
 
@@ -315,8 +306,7 @@ read_attachment_data(ap, number)
  * Interactively edit the attachment list.
  */
 struct attachment *
-edit_attachments(attach)
-	struct attachment *attach;
+edit_attachments(struct attachment *attach)
 {
 	struct attachment *ap, *nap;
 	unsigned attno = 1;
@@ -351,9 +341,7 @@ edit_attachments(attach)
  * Put the given file to the end of the attachment list.
  */
 struct attachment *
-add_attachment(attach, file)
-	struct attachment *attach;
-	const char *file;
+add_attachment(struct attachment *attach, const char *file)
 {
 	struct attachment *ap, *nap;
 
@@ -384,9 +372,7 @@ add_attachment(attach, file)
  * the attachment list.
  */
 static struct attachment *
-append_attachments(attach, names)
-	struct attachment *attach;
-	char *names;
+append_attachments(struct attachment *attach, char *names)
 {
 	char *cp;
 	int c;
@@ -416,12 +402,8 @@ append_attachments(attach, names)
 }
 
 FILE *
-collect(hp, printheaders, mp, quotefile, tflag)
-	struct header *hp;
-	int printheaders;
-	struct message *mp;
-	char *quotefile;
-	int tflag;
+collect(struct header *hp, int printheaders, struct message *mp,
+		char *quotefile, int tflag)
 {
 	FILE *fbuf;
 	struct ignoretab *quoteig;
@@ -924,10 +906,7 @@ out:
  * Write a file, ex-like if f set.
  */
 static int
-exwrite(name, fp, f)
-	char name[];
-	FILE *fp;
-	int f;
+exwrite(char *name, FILE *fp, int f)
 {
 	FILE *of;
 	int c;
@@ -962,9 +941,7 @@ exwrite(name, fp, f)
 }
 
 static enum okay
-makeheader(fp, hp)
-	FILE *fp;
-	struct header *hp;
+makeheader(FILE *fp, struct header *hp)
 {
 	char *tempEdit;
 	FILE *nf;
@@ -993,10 +970,8 @@ makeheader(fp, hp)
  * Edit the message being collected on fp.
  * On return, make the edit file the new temp file.
  */
-static void
-mesedit(c, hp)
-	int c;
-	struct header *hp;
+static void 
+mesedit(int c, struct header *hp)
 {
 	sighandler_type sigint = safe_signal(SIGINT, SIG_IGN);
 	FILE *nf = run_editor(collf, (off_t)-1, c, 0, NULL, hp);
@@ -1020,9 +995,8 @@ mesedit(c, hp)
  * New message collected from stdout.
  * Sh -c must return 0 to accept the new message.
  */
-static void
-mespipe(cmd)
-	char cmd[];
+static void 
+mespipe(char *cmd)
 {
 	FILE *nf;
 	sighandler_type sigint = safe_signal(SIGINT, SIG_IGN);
@@ -1072,10 +1046,7 @@ out:
  * should shift over and 'f' if not.
  */
 static int
-forward(ms, fp, f)
-	char ms[];
-	FILE *fp;
-	int f;
+forward(char *ms, FILE *fp, int f)
 {
 	int *msgvec;
 	struct ignoretab *ig;
@@ -1121,9 +1092,8 @@ forward(ms, fp, f)
  * Print (continue) when continued after ^Z.
  */
 /*ARGSUSED*/
-static void
-collstop(s)
-	int s;
+static void 
+collstop(int s)
 {
 	sighandler_type old_action = safe_signal(s, SIG_DFL);
 	sigset_t nset;
@@ -1146,9 +1116,8 @@ collstop(s)
  * Then jump out of the collection loop.
  */
 /*ARGSUSED*/
-static void
-collint(s)
-	int s;
+static void 
+collint(int s)
 {
 	/*
 	 * the control flow is subtle, because we can be called from ~q.
@@ -1171,9 +1140,8 @@ collint(s)
 }
 
 /*ARGSUSED*/
-static void
-collhup(s)
-	int s;
+static void 
+collhup(int s)
 {
 	rewind(collf);
 	savedeadletter(collf);
@@ -1185,8 +1153,7 @@ collhup(s)
 }
 
 void
-savedeadletter(fp)
-	FILE *fp;
+savedeadletter(FILE *fp)
 {
 	FILE *dbuf;
 	int c;

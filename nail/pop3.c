@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 2002
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)pop3.c	2.36 (gritter) 9/18/04";
+static char sccsid[] = "@(#)pop3.c	2.38 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -81,35 +81,36 @@ static struct termios	otio;
 static int	pop3keepalive;
 static volatile int	pop3lock;
 
-static void pop3_timer_off __P((void));
-static enum okay pop3_answer __P((struct mailbox *));
-static enum okay pop3_finish __P((struct mailbox *));
-static void pop3catch __P((int));
-static enum okay pop3_noop1 __P((struct mailbox *));
-static void pop3alarm __P((int));
-static enum okay pop3_pass __P((struct mailbox *, const char *));
-static enum okay pop3_user __P((struct mailbox *, char *, const char *,
-			const char *, const char *));
-static char *pop3_find_timestamp __P((const char *));
-static int pop3_use_starttls __P((const char *));
-static int pop3_use_apop __P((const char *));
-static enum okay pop3_apop __P((struct mailbox *, char *, const char *,
-			const char *));
-static enum okay pop3_apop1 __P((struct mailbox *, const char *, const char *));
-static enum okay pop3_stat __P((struct mailbox *, off_t *, int *));
-static enum okay pop3_list __P((struct mailbox *, int, size_t *));
-static void pop3_init __P((struct mailbox *, int));
-static void pop3_dates __P ((struct mailbox *));
-static void pop3_setptr __P((struct mailbox *));
-static char *pop3_have_password __P((const char *));
-static enum okay pop3_get __P((struct mailbox *, struct message *,
-			enum needspec));
-static enum okay pop3_exit __P((struct mailbox *));
-static enum okay pop3_delete __P((struct mailbox *, int));
-static enum okay pop3_update __P((struct mailbox *));
+static void pop3_timer_off(void);
+static enum okay pop3_answer(struct mailbox *mp);
+static enum okay pop3_finish(struct mailbox *mp);
+static void pop3catch(int s);
+static enum okay pop3_noop1(struct mailbox *mp);
+static void pop3alarm(int s);
+static enum okay pop3_pass(struct mailbox *mp, const char *pass);
+static char *pop3_find_timestamp(const char *bp);
+static enum okay pop3_apop(struct mailbox *mp, char *xuser, const char *pass,
+		const char *ts);
+static enum okay pop3_apop1(struct mailbox *mp,
+		const char *user, const char *xp);
+static int pop3_use_starttls(const char *uhp);
+static int pop3_use_apop(const char *uhp);
+static enum okay pop3_user(struct mailbox *mp, char *xuser, const char *pass,
+		const char *uhp, const char *xserver);
+static enum okay pop3_stat(struct mailbox *mp, off_t *size, int *count);
+static enum okay pop3_list(struct mailbox *mp, int n, size_t *size);
+static void pop3_init(struct mailbox *mp, int n);
+static void pop3_dates(struct mailbox *mp);
+static void pop3_setptr(struct mailbox *mp);
+static char *pop3_have_password(const char *server);
+static enum okay pop3_get(struct mailbox *mp, struct message *m,
+		enum needspec need);
+static enum okay pop3_exit(struct mailbox *mp);
+static enum okay pop3_delete(struct mailbox *mp, int n);
+static enum okay pop3_update(struct mailbox *mp);
 
-static void
-pop3_timer_off()
+static void 
+pop3_timer_off(void)
 {
 	if (pop3keepalive > 0) {
 		alarm(0);
@@ -117,9 +118,8 @@ pop3_timer_off()
 	}
 }
 
-static enum okay
-pop3_answer(mp)
-	struct mailbox *mp;
+static enum okay 
+pop3_answer(struct mailbox *mp)
 {
 	int sz;
 	enum okay ok = STOP;
@@ -166,18 +166,16 @@ retry:	if ((sz = sgetline(&pop3buf, &pop3bufsize, NULL, &mp->mb_sock)) > 0) {
 	return ok;
 }
 
-static enum okay
-pop3_finish(mp)
-	struct mailbox *mp;
+static enum okay 
+pop3_finish(struct mailbox *mp)
 {
 	while (mp->mb_sock.s_fd > 0 && mp->mb_active != MB_NONE)
 		pop3_answer(mp);
 	return OKAY;
 }
 
-static void
-pop3catch(s)
-	int s;
+static void 
+pop3catch(int s)
 {
 	if (reset_tio)
 		tcsetattr(0, TCSADRAIN, &otio);
@@ -193,17 +191,16 @@ pop3catch(s)
 	siglongjmp(pop3jmp, 1);
 }
 
-static enum okay
-pop3_noop1(mp)
-	struct mailbox *mp;
+static enum okay 
+pop3_noop1(struct mailbox *mp)
 {
 	POP3_OUT("NOOP\r\n", MB_COMD)
 	POP3_ANSWER()
 	return OKAY;
 }
 
-enum okay
-pop3_noop()
+enum okay 
+pop3_noop(void)
 {
 	enum okay	ok = STOP;
 	sighandler_type	saveint, savepipe;
@@ -229,9 +226,8 @@ pop3_noop()
 }
 
 /*ARGSUSED*/
-static void
-pop3alarm(s)
-	int s;
+static void 
+pop3alarm(int s)
 {
 	sighandler_type	saveint;
 	sighandler_type savepipe;
@@ -260,10 +256,8 @@ brk:	alarm(pop3keepalive);
 out:	pop3lock--;
 }
 
-static enum okay
-pop3_pass(mp, pass)
-	struct mailbox *mp;
-	const char *pass;
+static enum okay 
+pop3_pass(struct mailbox *mp, const char *pass)
 {
 	char o[LINESIZE];
 
@@ -274,8 +268,7 @@ pop3_pass(mp, pass)
 }
 
 static char *
-pop3_find_timestamp(bp)
-	const char	*bp;
+pop3_find_timestamp(const char *bp)
 {
 	const char	*cp, *ep;
 	char	*rp;
@@ -302,11 +295,8 @@ pop3_find_timestamp(bp)
 	return rp;
 }
 
-static enum okay
-pop3_apop(mp, xuser, pass, ts)
-	struct mailbox	*mp;
-	char	*xuser;
-	const char	*pass, *ts;
+static enum okay 
+pop3_apop(struct mailbox *mp, char *xuser, const char *pass, const char *ts)
 {
 	char	*user, *catp, *xp;
 	unsigned char	digest[16];
@@ -333,10 +323,8 @@ retry:	if (xuser == NULL) {
 	return OKAY;
 }
 
-static enum okay
-pop3_apop1(mp, user, xp)
-	struct mailbox	*mp;
-	const char	*user, *xp;
+static enum okay 
+pop3_apop1(struct mailbox *mp, const char *user, const char *xp)
 {
 	char	o[LINESIZE];
 
@@ -346,9 +334,8 @@ pop3_apop1(mp, user, xp)
 	return OKAY;
 }
 
-static int
-pop3_use_starttls(uhp)
-	const char	*uhp;
+static int 
+pop3_use_starttls(const char *uhp)
 {
 	char	*var;
 
@@ -358,9 +345,8 @@ pop3_use_starttls(uhp)
 	return value(var) != NULL;
 }
 
-static int
-pop3_use_apop(uhp)
-	const char	*uhp;
+static int 
+pop3_use_apop(const char *uhp)
 {
 	char	*var;
 
@@ -370,11 +356,9 @@ pop3_use_apop(uhp)
 	return value(var) != NULL;
 }
 
-static enum okay
-pop3_user(mp, xuser, pass, uhp, xserver)
-	struct mailbox *mp;
-	char *xuser;
-	const char *pass, *uhp, *xserver;
+static enum okay 
+pop3_user(struct mailbox *mp, char *xuser, const char *pass,
+		const char *uhp, const char *xserver)
 {
 	char o[LINESIZE], *user, *ts = NULL, *server, *cp;
 
@@ -427,10 +411,7 @@ retry:	if (xuser == NULL) {
 }
 
 static enum okay
-pop3_stat(mp, size, count)
-	struct mailbox *mp;
-	off_t *size;
-	int *count;
+pop3_stat(struct mailbox *mp, off_t *size, int *count)
 {
 	char *cp;
 	enum okay ok = OKAY;
@@ -459,10 +440,7 @@ pop3_stat(mp, size, count)
 }
 
 static enum okay
-pop3_list(mp, n, size)
-	struct mailbox *mp;
-	int n;
-	size_t *size;
+pop3_list(struct mailbox *mp, int n, size_t *size)
 {
 	char o[LINESIZE], *cp;
 
@@ -483,10 +461,8 @@ pop3_list(mp, n, size)
 	return OKAY;
 }
 
-static void
-pop3_init(mp, n)
-	struct mailbox *mp;
-	int n;
+static void 
+pop3_init(struct mailbox *mp, int n)
 {
 	struct message *m = &message[n];
 	char *cp;
@@ -507,9 +483,8 @@ pop3_init(mp, n)
 }
 
 /*ARGSUSED*/
-static void
-pop3_dates(mp)
-	struct mailbox *mp;
+static void 
+pop3_dates(struct mailbox *mp)
 {
 	int	i;
 
@@ -517,9 +492,8 @@ pop3_dates(mp)
 		substdate(&message[i]);
 }
 
-static void
-pop3_setptr(mp)
-	struct mailbox *mp;
+static void 
+pop3_setptr(struct mailbox *mp)
 {
 	int i;
 
@@ -533,8 +507,7 @@ pop3_setptr(mp)
 }
 
 static char *
-pop3_have_password(server)
-	const char *server;
+pop3_have_password(const char *server)
 {
 	char *var, *cp;
 
@@ -547,10 +520,8 @@ pop3_have_password(server)
 	return cp;
 }
 
-int
-pop3_setfile(server, newmail, isedit)
-	const char *server;
-	int newmail, isedit;
+int 
+pop3_setfile(const char *server, int newmail, int isedit)
 {
 	struct sock	so;
 	sighandler_type	saveint;
@@ -650,11 +621,8 @@ pop3_setfile(server, newmail, isedit)
 	return 0;
 }
 
-static enum okay
-pop3_get(mp, m, need)
-	struct mailbox *mp;
-	struct message *m;
-	enum needspec need;
+static enum okay 
+pop3_get(struct mailbox *mp, struct message *m, enum needspec need)
 {
 	sighandler_type	saveint = SIG_IGN;
 	sighandler_type savepipe = SIG_IGN;
@@ -797,34 +765,29 @@ retry:	switch (need) {
 	return OKAY;
 }
 
-enum okay
-pop3_header(m)
-	struct message *m;
+enum okay 
+pop3_header(struct message *m)
 {
 	return pop3_get(&mb, m, NEED_HEADER);
 }
 
 
-enum okay
-pop3_body(m)
-	struct message *m;
+enum okay 
+pop3_body(struct message *m)
 {
 	return pop3_get(&mb, m, NEED_BODY);
 }
 
-static enum okay
-pop3_exit(mp)
-	struct mailbox *mp;
+static enum okay 
+pop3_exit(struct mailbox *mp)
 {
 	POP3_OUT("QUIT\r\n", MB_COMD)
 	POP3_ANSWER()
 	return OKAY;
 }
 
-static enum okay
-pop3_delete(mp, n)
-	struct mailbox *mp;
-	int n;
+static enum okay 
+pop3_delete(struct mailbox *mp, int n)
 {
 	char o[LINESIZE];
 
@@ -834,9 +797,8 @@ pop3_delete(mp, n)
 	return OKAY;
 }
 
-static enum okay
-pop3_update(mp)
-	struct mailbox *mp;
+static enum okay 
+pop3_update(struct mailbox *mp)
 {
 	FILE *readstat = NULL;
 	struct message *m;
@@ -894,8 +856,8 @@ pop3_update(mp)
 	return OKAY;
 }
 
-void
-pop3_quit()
+void 
+pop3_quit(void)
 {
 	sighandler_type	saveint;
 	sighandler_type savepipe;
@@ -927,45 +889,42 @@ pop3_quit()
 	pop3lock = 0;
 }
 #else	/* !HAVE_SOCKETS */
-static void
-nopop3()
+static void 
+nopop3(void)
 {
 	fprintf(stderr, catgets(catd, CATSET, 216,
 				"No POP3 support compiled in.\n"));
 }
 
-int
-pop3_setfile(server, newmail, isedit)
-	const char *server;
+int 
+pop3_setfile(const char *server, int newmail, int isedit)
 {
 	nopop3();
 	return -1;
 }
 
-enum okay
-pop3_header(mp)
-	struct message *mp;
+enum okay 
+pop3_header(struct message *mp)
 {
 	nopop3();
 	return STOP;
 }
 
-enum okay
-pop3_body(mp)
-	struct message *mp;
+enum okay 
+pop3_body(struct message *mp)
 {
 	nopop3();
 	return STOP;
 }
 
-void
-pop3_quit()
+void 
+pop3_quit(void)
 {
 	nopop3();
 }
 
-enum okay
-pop3_noop()
+enum okay 
+pop3_noop(void)
 {
 	nopop3();
 	return STOP;

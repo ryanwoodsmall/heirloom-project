@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Derived from:
@@ -30,7 +30,7 @@ Appendix -- Sample Code
    vectors (the code is based on MD5 code as described in [MD5]).
 */
 
-/*	Sccsid @(#)hmac.c	1.5 (gritter) 8/13/04	*/
+/*	Sccsid @(#)hmac.c	1.7 (gritter) 10/2/04	*/
 
 #include "rcv.h"
 #include "md5.h"
@@ -39,13 +39,14 @@ Appendix -- Sample Code
 ** Function: hmac_md5
 */
 
-void
-hmac_md5(text, text_len, key, key_len, digest)
-	unsigned char	*text;		/* pointer to data stream */
-	int		text_len;	/* length of data stream */
-	unsigned char	*key;		/* pointer to authentication key */
-	int		key_len;	/* length of authentication key */
-	void		*digest;	/* caller digest to be filled in */
+void 
+hmac_md5 (
+    unsigned char *text,		/* pointer to data stream */
+    int text_len,	/* length of data stream */
+    unsigned char *key,		/* pointer to authentication key */
+    int key_len,	/* length of authentication key */
+    void *digest	/* caller digest to be filled in */
+)
 
 {
 	MD5_CTX context;

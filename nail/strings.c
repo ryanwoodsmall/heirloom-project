@@ -1,7 +1,7 @@
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
- * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
 /*
  * Copyright (c) 1980, 1993
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)strings.c	2.3 (gritter) 9/1/04";
+static char sccsid[] = "@(#)strings.c	2.5 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -62,8 +62,7 @@ static char sccsid[] = "@(#)strings.c	2.3 (gritter) 9/1/04";
  */
 
 void *
-salloc(size)
-	size_t size;
+salloc(size_t size)
 {
 	char *t;
 	int s;
@@ -96,8 +95,7 @@ salloc(size)
 }
 
 void *
-csalloc(nmemb, size)
-	size_t	nmemb, size;
+csalloc(size_t nmemb, size_t size)
 {
 	void	*vp;
 
@@ -111,8 +109,8 @@ csalloc(nmemb, size)
  * Called to free all strings allocated
  * since last reset.
  */
-void
-sreset()
+void 
+sreset(void)
 {
 	struct strings *sp;
 	int string_index;
@@ -133,8 +131,8 @@ sreset()
  * Make the string area permanent.
  * Meant to be called in main, after initialization.
  */
-void
-spreserve()
+void 
+spreserve(void)
 {
 	struct strings *sp;
 
