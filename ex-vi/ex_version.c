@@ -70,7 +70,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Sccsid @(#)ex_version.c	1.108 (gritter) 1/2/05
+ * Sccsid @(#)ex_version.c	1.109 (gritter) 1/2/05
  */
 
 #include "ex.h"

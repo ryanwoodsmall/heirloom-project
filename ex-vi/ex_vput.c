@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.33 (gritter) 12/2/04";
+static char sccsid[] = "@(#)ex_vput.c	1.34 (gritter) 1/2/05";
 #endif
 #endif
 
@@ -677,6 +677,7 @@ vinschar(int c)
 	 * rather we can just typeover.
 	 */
 	if (inssiz + insmc1 <= doomed) {
+		int	(*OO)() = Outchar;
 		endim();
 		if (inscol + insmc0 != linend)
 			doomed -= inssiz + insmc1;
@@ -684,9 +685,15 @@ vinschar(int c)
 				vtube0[inscol+insmc0] & MULTICOL)
 			cellcpy(&vtube0[inscol+insmc0+1],
 					&vtube0[inscol+insmc0+2]);
+		/*
+		 * This indicates to vputchar() that it has to set MULTICOL
+		 * bits but must not call us recursively.
+		 */
+		Outchar = NULL;
 		do
 			vputchar(c);
 		while (--inssiz);
+		Outchar = OO;
 		return c;
 	}
 
@@ -1412,8 +1419,19 @@ def:
 			Outchar != vinschar && (d = colsc(c&TRIM)) > 1) {
 		if ((*tp&MULTICOL) == 0) {
 			*tp |= MULTICOL;
-			while (--d)
-				(*Outchar)(MULTICOL);
+			if (Outchar) {
+				while (--d)
+					(*Outchar)(MULTICOL);
+			} else {
+				/*
+				 * This occurs when replacing characters.
+				 */
+				while (--d) {
+					*++tp = MULTICOL;
+					destcol++;
+					outcol++;
+				}
+			}
 		}
 	}
 #endif	/* MB */

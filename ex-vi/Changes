@@ -1,4 +1,7 @@
 Release ...
+* When a multicolumn character was replaced by another multicolumn character
+  in insert mode, the display was not updated appropriately with terminals
+  other than xterm.
 * Handle character case conversions with the '~' vi command correctly if the
   length of the converted multibyte sequence is smaller than the original one.
 
