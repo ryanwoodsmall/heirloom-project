@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pax_su3.sl	1.23 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pax_su3.sl	1.24 (gritter) 2/7/05";
 #else
-static const char sccsid[] USED = "@(#)pax.sl	1.23 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.24 (gritter) 2/7/05";
 #endif
 
 #include <sys/types.h>
@@ -256,8 +256,8 @@ usage(void)
 {
 	fprintf(stderr, "USAGE:\n\
 \t%s [-cdnvK] [-b size] [-f file] [-s replstr] [-x hdr] [patterns]\n\
-\t%s -r[cdiknuvK] [-b size] [-f file] "/*[-o options] */"[-p priv] [-s replstr] [-x hdr] [patterns]\n\
-\t%s -w[adituvLX] [-b size] [-f file] [-o options] [-s replstr] [-x hdr] [files]\n\
+\t%s -r[cdiknuvK] [-b size] [-f file] [-p priv] [-s replstr] [-x hdr] [patterns]\n\
+\t%s -w[adituvLX] [-b size] [-f file] [-s replstr] [-x hdr] [files]\n\
 \t%s -rw[diklntuvLX] [-p priv] [-s replstr] [files] directory\n",
 		progname, progname, progname, progname);
 	exit(1);
