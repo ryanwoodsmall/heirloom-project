@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.5 (gritter) 9/26/04";
+static char sccsid[] = "@(#)junk.c	1.7 (gritter) 9/27/04";
 #endif
 #endif /* not lint */
 
@@ -49,6 +49,7 @@ static char sccsid[] = "@(#)junk.c	1.5 (gritter) 9/26/04";
 #include <fcntl.h>
 #include <limits.h>
 #include <time.h>
+#include "md5.h"
 
 /*
  * Mail -- a mail program
@@ -81,9 +82,9 @@ struct element {
 #define	smin(a, b)	((a) < (b) ? (a) : (b))
 #define	smax(a, b)	((a) < (b) ? (b) : (a))
 
-#define	d2s(d)	(smin(((unsigned)((d) * 0xffffU)), 0xffffU))
+#define	f2s(d)	(smin(((unsigned)((d) * 0xffffU)), 0xffffU))
 
-#define	s2d(s)	((double)(s) / 0xffffU)
+#define	s2f(s)	((float)(s) / 0xffffU)
 
 struct statistics {
 	char	ngood[4];
@@ -141,6 +142,7 @@ static char	*nextword __P((char **, size_t *, size_t *,
 static void	recompute __P((unsigned long, unsigned long));
 static void	clsf __P((struct message *, struct element *));
 static void	rate __P((const char *, struct element *));
+static unsigned	dbhash __P((const char *));
 
 static struct element *
 getdb(db)
@@ -333,7 +335,7 @@ add(word, table)
 {
 	unsigned	h, n;
 
-	h = pjw(word) & MASK;
+	h = dbhash(word);
 	n = get(&table[h]);
 	if (n < 0xffff)
 		n++;
@@ -380,7 +382,7 @@ recompute(ngood, nbad)
 	struct element	*good, *bad, *prob;
 	struct statistics	*sp;
 	unsigned	g, b, n, p;
-	double	d;
+	float	d;
 
 	if ((good = getdb(GOOD)) == NULL || (bad = getdb(BAD)) == NULL)
 		return;
@@ -389,18 +391,18 @@ recompute(ngood, nbad)
 		g = get(&good[n]) * 2;
 		b = get(&bad[n]);
 		if (g + b >= 5) {
-			d = smin(1.0, nbad ? (double)b/nbad : 0.0) /
-				(smin(1.0, ngood ? (double)g/ngood : 0.0) +
-				 smin(1.0, nbad ? (double)b/nbad : 0.0));
+			d = smin(1.0, nbad ? (float)b/nbad : 0.0) /
+				(smin(1.0, ngood ? (float)g/ngood : 0.0) +
+				 smin(1.0, nbad ? (float)b/nbad : 0.0));
 			d = smin(TOP, d);
 			d = smax(BOT, d);
-			p = d2s(d);
+			p = f2s(d);
 			/*fprintf(stderr,
 				"n=%u g=%u b=%u d=%g p=%u re=%g "
 				"ngood=%lu nbad=%lu\n",
-				n, g, b, d, p, s2d(p), ngood, nbad);*/
+				n, g, b, d, p, s2f(p), ngood, nbad);*/
 		} else if (g == 0 && b == 0)
-			p = d2s(DFL);
+			p = f2s(DFL);
 		else
 			p = 0;
 		put(&prob[n], p);
@@ -482,8 +484,8 @@ cclassify(v)
 
 #define	BEST	15
 static struct {
-	double	dist;
-	double	prob;
+	float	dist;
+	float	prob;
 	char	*word;
 	unsigned	hash;
 } best[BEST];
@@ -494,7 +496,7 @@ clsf(m, table)
 	struct element	*table;
 {
 	int	i;
-	double	a = 1, b = 1, r;
+	float	a = 1, b = 1, r;
 
 	if (verbose)
 		fprintf(stderr, "Examining message %d\n", m - &message[0] + 1);
@@ -538,12 +540,12 @@ rate(word, table)
 	struct element	*table;
 {
 	unsigned	h, s;
-	double	p, d;
+	float	p, d;
 	int	i, j;
 
-	h = pjw(word) & MASK;
+	h = dbhash(word);
 	s = get(&table[h]);
-	p = s2d(s);
+	p = s2f(s);
 	if (p == 0)
 		return;
 	d = p >= MID ? p - MID : MID - p;
@@ -561,4 +563,19 @@ rate(word, table)
 				break;
 			}
 		}
+}
+
+static unsigned
+dbhash(word)
+	const char	*word;
+{
+	unsigned char	digest[16];
+	unsigned	h;
+	MD5_CTX	ctx;
+
+	MD5Init(&ctx);
+	MD5Update(&ctx, (unsigned char *)word, strlen(word));
+	MD5Final(digest, &ctx);
+	h = getn(digest) & MASK;
+	return h;
 }
