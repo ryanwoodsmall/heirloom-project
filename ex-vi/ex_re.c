@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.53 (gritter) 2/20/05";
+static char sccsid[] = "%W% (gritter) %G%";
 #endif
 #endif
 
@@ -131,10 +131,11 @@ loconv(register char *dst, register const char *src)
 		wchar_t wc;
 		int len, i, nlen;
 
-		while (*src) {
+		for (;;) {
 			if ((*src & 0200) == 0) {
 				*dst++ = tolower(*src);
-				src++;
+				if (*src++ == '\0')
+					break;
 			} else if ((len = mbtowc(&wc, src, mb_cur_max)) <= 0) {
 				*dst++ = *src++;
 			} else {
@@ -160,10 +161,9 @@ loconv(register char *dst, register const char *src)
 	} else
 #endif	/* MB */
 	{
-		while (*src) {
+		do
 			*dst++ = tolower(*src & 0377);
-			src++;
-		}
+		while (*src++);
 	}
 	return dst - odst;
 }
@@ -936,12 +936,16 @@ compile1(void)
 	if ((n = regcomp(re.Expbuf, re.Patbuf, re.Flags)) != 0) {
 		switch (n) {
 		case REG_EBRACK:
+			free(re.Expbuf);
+			re.Expbuf = 0;
 			cerror(catgets(catd, 1, 154, "Missing ]"));
 			/*NOTREACHED*/
 			break;
 		default:
 			regerror(n, re.Expbuf, &re.Patbuf[1],
 					sizeof re.Patbuf - 1);
+			free(re.Expbuf);
+			re.Expbuf = 0;
 			cerror(&re.Patbuf[1]);
 		}
 	}
@@ -961,6 +965,7 @@ compile1(void)
 	if (r == 0) {
 		char	*cp;
 		free(re.Expbuf);
+		re.Expbuf = 0;
 		switch (regerrno) {
 		case 11:
 			cp = "Range endpoint too large|Range endpoint "
