@@ -22,6 +22,8 @@
   other than system mailboxes too. It is now disabled for such files again.
 * If the junk mail database is stored in uncompressed format, mmap() is now
   used to access it if possible.
+* Recipients that are file names are now removed from the Cc: and Bcc: fields
+  of outgoing mail too, as it was already done for To:.
 
 [11.13] released 10/27/04
 * Backslashes outside a quoted command argument are now handled properly.

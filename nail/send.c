@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.59 (gritter) 11/1/04";
+static char sccsid[] = "@(#)send.c	2.60 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -196,6 +196,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	(void)&oldpipe;
 	(void)&rt;
 	(void)&obuf;
+	(void)&stats;
 	if (ip->m_mimecontent == MIME_PKCS7 && ip->m_multipart &&
 			action != ACT_NONE)
 		goto skip;

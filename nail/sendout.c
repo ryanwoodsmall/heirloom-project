@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.63 (gritter) 11/1/04";
+static char sccsid[] = "@(#)sendout.c	2.64 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -1124,8 +1124,10 @@ fmt(char *str, struct name *np, FILE *fo, int comma, int dropinvalid,
 	col = strlen(str);
 	if (col) {
 		fwrite(str, sizeof *str, strlen(str), fo);
-		if ((col == 3 && asccasecmp(str, "to:") == 0) ||
-			(col == 10 && asccasecmp(str, "Resent-To:") == 0))
+		if (col == 3 && asccasecmp(str, "to:") == 0 ||
+			col == 3 && asccasecmp(str, "cc:") == 0 ||
+			col == 4 && asccasecmp(str, "bcc:") == 0 ||
+			col == 10 && asccasecmp(str, "Resent-To:") == 0)
 			is_to = 1;
 	}
 	for (; np != NULL; np = np->n_flink) {
