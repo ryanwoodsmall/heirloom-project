@@ -9,6 +9,9 @@
   Messages from the old mailbox now go to the mbox on the old account.
 * Nail did not properly keep the mark for the current message if messages
   were expunged on an IMAP server.
+* The 'move'/'Move' command now sets the current message to the first
+  undeleted message following the last message it moved, like the 'delete'
+  command.
 * The 'markanswered' variable has been fixed to be effective with the
   'Reply' command too, and not to mark messages if the reply has been
   aborted by '~q' or '~x' or if a send error was detected.

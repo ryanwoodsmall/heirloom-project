@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.34 (gritter) 9/6/04";
+static char sccsid[] = "@(#)cmd2.c	2.35 (gritter) 9/14/04";
 #endif
 #endif /* not lint */
 
@@ -255,7 +255,7 @@ save1(str, mark, cmd, ignore, convert, sender_record, domove)
 	off_t mstats[2], tstats[2];
 	int compressed = 0;
 	enum protocol prot;
-	int success = 1;
+	int success = 1, last = 0;
 
 	/*LINTED*/
 	msgvec = (int *)salloc((msgCount + 2) * sizeof *msgvec);
@@ -377,8 +377,10 @@ save1(str, mark, cmd, ignore, convert, sender_record, domove)
 		touch(mp);
 		if (mark)
 			mp->m_flag |= MSAVED;
-		if (domove)
+		if (domove) {
 			mp->m_flag |= MDELETED|MSAVED;
+			last = *ip;
+		}
 		tstats[0] += mstats[0];
 		tstats[1] += mstats[1];
 	}
@@ -405,6 +407,11 @@ save1(str, mark, cmd, ignore, convert, sender_record, domove)
 			mp = &message[*ip - 1];
 			mp->m_flag &= ~MSAVED;
 		}
+	if (domove && last) {
+		setdot(&message[last-1]);
+		last = first(0, MDELETED);
+		setdot(&message[last ? last-1 : 0]);
+	}
 	return(success == 0);
 }
 
