@@ -17,6 +17,8 @@ Release ...
   previous file mode contained bits set within the umask.
 * fmt: Trailing blanks were left on lines with multibyte characters (Patch
   by Matthew Fischer).
+* The value 255 is now accepted in interval expressions in traditional
+  (simple) regular expressions.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

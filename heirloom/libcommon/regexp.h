@@ -45,7 +45,7 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.50 (gritter) 12/25/04";
+	"@(#)regexp.sl	1.51 (gritter) 2/19/05";
 
 #ifndef	__dietlibc__
 #define	REGEXP_H_WCHARS
@@ -70,6 +70,7 @@ static const char regexp_h_sccsid[] REGEXP_H_USED =
 
 #define	STAR	01
 #define RNGE	03
+#define	REGEXP_H_LEAST	0100
 
 #ifdef	REGEXP_H_WCHARS
 #define	CMB	0200
@@ -164,7 +165,7 @@ regexp_h_static unsigned char	bittab[] = {
 };
 static int	regexp_h_advance(register const char *lp,
 			register const char *ep);
-static void	regexp_h_getrnge(register const char *str);
+static void	regexp_h_getrnge(register const char *str, int least);
 
 static const char	*regexp_h_bol;	/* beginning of input line (for \<) */
 
@@ -522,15 +523,16 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 					else
 						ERROR(16);
 				} while(((c = GETC()) != '\\') && (c != ','));
-				if (i >= 255)
+				if (i > 255)
 					ERROR(11);
 				*ep++ = i;
 				if (c == ',') {
 					if(cflg++)
 						ERROR(44);
-					if((c = GETC()) == '\\')
+					if((c = GETC()) == '\\') {
 						*ep++ = (char)255;
-					else {
+						*lastep |= REGEXP_H_LEAST;
+					} else {
 						UNGETC(c);
 						goto nlim; /* get 2'nd number */
 					}
@@ -778,7 +780,7 @@ static int
 regexp_h_advance(const char *lp, const char *ep)
 {
 	register const char *curlp;
-	int c;
+	int c, least;
 #ifdef	REGEXP_H_WCHARS
 	int d;
 	struct regexp_h_stack	*sb = NULL, *sp = NULL;
@@ -787,7 +789,7 @@ regexp_h_advance(const char *lp, const char *ep)
 	char *bbeg;
 	int ct;
 
-	for (;;) switch (*ep++ & 0377) {
+	for (;;) switch (least = *ep++ & 0377, least & ~REGEXP_H_LEAST) {
 
 	case CCHR:
 #ifdef	REGEXP_H_WCHARS
@@ -900,7 +902,7 @@ regexp_h_advance(const char *lp, const char *ep)
 
 	case CCHR|RNGE:
 		c = *ep++;
-		regexp_h_getrnge(ep);
+		regexp_h_getrnge(ep, least);
 		while(low--)
 			if(*lp++ != c)
 				return(0);
@@ -923,7 +925,7 @@ regexp_h_advance(const char *lp, const char *ep)
 	case CCH2|RNGE:
 	case CCH3|RNGE:
 		c = regexp_h_fetch(ep, 0);
-		regexp_h_getrnge(ep);
+		regexp_h_getrnge(ep, least);
 		while (low--)
 			if (regexp_h_fetch(lp, 1) != c)
 				return 0;
@@ -942,7 +944,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #endif	/* REGEXP_H_WCHARS */
 
 	case CDOT|RNGE:
-		regexp_h_getrnge(ep);
+		regexp_h_getrnge(ep, least);
 		while(low--)
 			if(*lp++ == '\0')
 				return(0);
@@ -961,7 +963,7 @@ regexp_h_advance(const char *lp, const char *ep)
 
 #ifdef	REGEXP_H_WCHARS
 	case CDOT|RNGE|CMB:
-		regexp_h_getrnge(ep);
+		regexp_h_getrnge(ep, least);
 		while (low--)
 			if ((c = regexp_h_fetch(lp, 1)) == L'\0' || c == WEOF)
 				return 0;
@@ -980,7 +982,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #endif	/* REGEXP_H_WCHARS */
 
 	case CCL|RNGE:
-		regexp_h_getrnge(ep + 32);
+		regexp_h_getrnge(ep + 32, least);
 		while(low--) {
 			c = *lp++ & 0377;
 			if(!ISTHERE(c))
@@ -1003,7 +1005,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #ifdef	REGEXP_H_WCHARS
 	case CCL|RNGE|CMB:
 	case CNCL|RNGE|CMB:
-		regexp_h_getrnge(ep + (*ep & 0377) + 17);
+		regexp_h_getrnge(ep + (*ep & 0377) + 17, least);
 		while (low--) {
 			c = regexp_h_fetch(lp, 1);
 			if (!regexp_h_cclass(ep, c,
@@ -1139,10 +1141,10 @@ regexp_h_advance(const char *lp, const char *ep)
 }
 
 static void
-regexp_h_getrnge(register const char *str)
+regexp_h_getrnge(register const char *str, int least)
 {
 	low = *str++ & 0377;
-	size = (*str & 0377) == 255 ? /*20000*/INT_MAX : (*str & 0377) - low;
+	size = least & REGEXP_H_LEAST ? /*20000*/INT_MAX : (*str & 0377) - low;
 }
 
 int

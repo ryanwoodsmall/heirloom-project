@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ed.1	1.46 (gritter) 2/17/05
+.\" Sccsid @(#)ed.1	1.47 (gritter) 2/19/05
 .\" Parts taken from ed(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH ED 1 "2/17/05" "Heirloom Toolchest" "User Commands"
+.TH ED 1 "2/19/05" "Heirloom Toolchest" "User Commands"
 .if t .ds q \(aa
 .if n .ds q '
 .SH NAME
@@ -199,7 +199,7 @@ forms an \fIinterval expression\fR that
 matches a sequence of \fIm\fR through \fIn\fR matches, inclusive,
 of the regular expression.
 The values of \fIm\fR and \fIn\fR must be non-negative
-and smaller than 255.
+and smaller than 256.
 The form \fB\e{\fIm\fB\e}\fR matches exactly \fIm\fR occurrences,
 \fB\e{\fIm\fB,\e}\fR matches at least \fIm\fR occurrences.
 .IP 7.
