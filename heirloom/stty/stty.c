@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifndef	UCB
-static const char sccsid[] USED = "@(#)stty.sl	1.17 (gritter) 12/13/04";
+static const char sccsid[] USED = "@(#)stty.sl	1.18 (gritter) 2/5/05";
 #else	/* UCB */
-static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.17 (gritter) 12/13/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.18 (gritter) 2/5/05";
 #endif	/* UCB */
 
 #include <sys/types.h>
@@ -527,7 +527,7 @@ static void	getattr(int);
 static void	list(int, int);
 static int	listmode(tcflag_t, struct mode, int, int);
 static int	listchar(cc_t *, struct mode, int, int);
-static const char	*baudrate(struct termios *);
+static const char	*baudrate(speed_t c);
 static void	set(void);
 static void	setmod(tcflag_t *, struct mode, int);
 static void	setchr(cc_t *, struct mode);
@@ -659,8 +659,15 @@ static void
 list(int aflag, int hflag)
 {
 	int	i, d = 0;
+	speed_t	is, os;
 
-	printf("speed %s baud;", baudrate(&ts));
+	is = cfgetispeed(&ts);
+	os = cfgetospeed(&ts);
+	if (is == os)
+		printf("speed %s baud;", baudrate(is));
+	else
+		printf("ispeed %s baud; ospeed %s baud;",
+				baudrate(is), baudrate(os));
 	if (aflag == 0) {
 		for (i = 0; modes[i].m_name; i++) {
 			if (modes[i].m_type == M_PCFLAG)
@@ -788,12 +795,10 @@ listchar(cc_t *cc, struct mode m, int aflag, int space)
 }
 
 static const char *
-baudrate(struct termios *tp)
+baudrate(speed_t c)
 {
-	speed_t	c;
 	int	i;
 
-	c = cfgetospeed(tp);
 	for (i = 0; speeds[i].s_str; i++)
 		if (speeds[i].s_val == c)
 			return speeds[i].s_str;
@@ -1393,7 +1398,7 @@ hlist(int aflag)
 static void
 speed(void)
 {
-	printf("%s\n", baudrate(&ts));
+	printf("%s\n", baudrate(cfgetospeed(&ts)));
 }
 
 static void
