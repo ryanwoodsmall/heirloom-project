@@ -1,4 +1,4 @@
-[11.19] released ...
+[11.19] released 1/2/05
 * A 'chained-junk-tokens' variable was introduced for the Bayesian junk
   mail filter. If set, the filter considers two-word tokens as described
   in Jonathan A. Zdziarski's paper 'Advanced Language Classification using
