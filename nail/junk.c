@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.69 (gritter) 12/28/04";
+static char sccsid[] = "@(#)junk.c	1.70 (gritter) 12/28/04";
 #endif
 #endif /* not lint */
 
@@ -75,6 +75,10 @@ static char sccsid[] = "@(#)junk.c	1.69 (gritter) 12/28/04";
  * Junk classification, mostly according to Paul Graham's "A Plan for Spam",
  * August 2002, <http://www.paulgraham.com/spam.html>, and his "Better
  * Bayesian Filtering", January 2003, <http://www.paulgraham.com/better.html>.
+ *
+ * Chained tokens according to Jonathan A. Zdziarski's "Advanced Language
+ * Classification using Chained Tokens", February 2004,
+ * <http://www.nuclearelephant.com/papers/chained.html>.
  */
 
 #define	DFL	.40
