@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)run.c	1.27 (gritter) 12/4/04>
+   Sccsid @(#)run.c	1.28 (gritter) 12/25/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -701,7 +701,7 @@ Cell *substr(Node **a, int nnn)
 			tempfree(z, "");
 		}
 		x = gettemp("");
-		setsval(x, "");
+		setsval(x, (unsigned char *)"");
 		return(x);
 	}
 	m = getfval(y);
@@ -984,7 +984,7 @@ Cell *arith(Node **a, int n)
 		if (j >= 0 && modf(j, &v) == 0.0)	/* pos integer exponent */
 			i = ipow(i, (int) j);
 		else
-			i = errcheck(pow(i, j), "pow");
+			i = errcheck(pow(i, j), (unsigned char *)"pow");
 		break;
 	default:	/* can't happen */
 		error(MM_ERROR, ":66:Illegal arithmetic operator %d", n);
@@ -1076,7 +1076,7 @@ Cell *assign(Node **a, int n)
 		if (yf >= 0 && modf(yf, &v) == 0.0)	/* pos integer exponent */
 			xf = ipow(xf, (int) yf);
 		else
-			xf = errcheck(pow(xf, yf), "pow");
+			xf = errcheck(pow(xf, yf), (unsigned char *)"pow");
 		break;
 	default:
 		error(MM_ERROR, ":69:Illegal assignment operator %d", n);
@@ -1431,13 +1431,13 @@ Cell *bltin(Node **a, int n)
 	case FLENGTH:
 		u = (Awkfloat) chrlen(getsval(x)); break;
 	case FLOG:
-		u = errcheck(log(getfval(x)), "log"); break;
+		u = errcheck(log(getfval(x)), (unsigned char *)"log"); break;
 	case FINT:
 		modf(getfval(x), &u); break;
 	case FEXP:
-		u = errcheck(exp(getfval(x)), "exp"); break;
+		u = errcheck(exp(getfval(x)), (unsigned char *)"exp"); break;
 	case FSQRT:
-		u = errcheck(sqrt(getfval(x)), "sqrt"); break;
+		u = errcheck(sqrt(getfval(x)), (unsigned char *)"sqrt"); break;
 	case FSIN:
 		u = sin(getfval(x)); break;
 	case FCOS:

@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)main.c	1.13 (gritter) 12/4/04>
+   Sccsid @(#)main.c	1.14 (gritter) 12/19/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -83,9 +83,9 @@ int main(int argc, unsigned char *argv[], unsigned char *envp[])
 	(void)setlabel(label);
 	/*version = (char*) gettxt(":31", "version Oct 11, 1989");*/
  	if (argc == 1) {
-		if (posix)
+		if (0 /* posix */)
 			pfmt(stderr, MM_ERROR, ":32:Incorrect usage\n");
-		pfmt(stderr, MM_ACTION | (posix ? 0 : MM_NOSTD),
+		pfmt(stderr, MM_ACTION | (0 /* posix */ ? 0 : MM_NOSTD),
 			":210107:Usage: %s [-f programfile | 'program'] [-Ffieldsep] [-v var=value] [files]\n",
 			cmdname);
 		exit(1);

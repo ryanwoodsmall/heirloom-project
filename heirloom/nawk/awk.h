@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)awk.h	1.22 (gritter) 12/4/04>
+   Sccsid @(#)awk.h	1.23 (gritter) 12/25/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -105,9 +105,13 @@ typedef struct {		/* symbol table array */
 
 #define	NSYMTAB	50	/* initial size of a symbol table */
 extern Array	*symtab, *makesymtab(int);
-extern Cell	*setsymtab(unsigned char *, unsigned char *, Awkfloat,
+#define	setsymtab(n, s, f, t, tp)	ssetsymtab((unsigned char *)n, \
+						(unsigned char *)s, \
+						f, t, tp)
+extern Cell	*ssetsymtab(unsigned char *, unsigned char *, Awkfloat,
 			unsigned, Array *);
-extern Cell	*lookup(unsigned char *, Array *);
+#define	lookup(s, tp)	slookup((unsigned char *)s, tp)
+extern Cell	*slookup(unsigned char *, Array *);
 
 extern Cell	*recloc;	/* location of input record */
 extern Cell	*nrloc;		/* NR */
@@ -370,13 +374,14 @@ extern void	envinit(unsigned char **);
 extern Array	*makesymtab(int);
 extern void	freesymtab(Cell *);
 extern void	freeelem(Cell *, unsigned char *);
-extern Cell	*setsymtab(unsigned char *, unsigned char *,
+extern Cell	*ssetsymtab(unsigned char *, unsigned char *,
 			Awkfloat, unsigned, Array *);
-extern Cell	*lookup(unsigned char *, Array *);
+extern Cell	*slookup(unsigned char *, Array *);
 extern Awkfloat	setfval(Cell *, Awkfloat);
 extern void	funnyvar(Cell *, char *);
 extern unsigned char	*setsval(Cell *, unsigned char *);
 extern Awkfloat	r_getfval(Cell *);
 extern unsigned char	*r_getsval(Cell *);
-extern unsigned char	*tostring(const unsigned char *);
+#define	tostring(s)	stostring((unsigned char *)s)
+extern unsigned char	*stostring(const unsigned char *);
 extern unsigned char	*qstring(unsigned char *, int);
