@@ -42,6 +42,8 @@ Release ...
 * The 'substitute' ex command can now be abbreviated as 'sub', 'subst' etc.
 * A new version of mapmalloc.c that is derived from Unix 7th Edition code
   has been introduced.
+* If the 'next!' ex command is given and the autowrite option is set, the
+  current file is not written anymore.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now

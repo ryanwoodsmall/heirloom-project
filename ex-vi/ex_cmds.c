@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmds.c	1.21 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_cmds.c	1.22 (gritter) 2/18/05";
 #endif
 #endif
 
@@ -466,7 +466,8 @@ casek:
 /* next */
 			tail("next");
 			setnoaddr();
-			ckaw();
+			if (!exclam())
+				ckaw();
 			ignore(quickly());
 			if (getargs())
 				makargs();
