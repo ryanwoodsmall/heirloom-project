@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.102 (gritter) 12/27/04";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.103 (gritter) 1/19/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.102 (gritter) 12/27/04";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.103 (gritter) 1/19/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.102 (gritter) 12/27/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.103 (gritter) 1/19/05";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.102 (gritter) 12/27/04";
+static const char sccsid[] USED = "@(#)ps.sl	2.103 (gritter) 1/19/05";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.102 (gritter) 12/27/04";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.103 (gritter) 1/19/05";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
@@ -932,6 +932,8 @@ time2(long t, unsigned len, int format)
 	char	buf[40];
 	int	days, hours, minutes, seconds;
 
+	if (t < 0)
+		t = 0;
 	if (format == 2)
 		snprintf(buf, sizeof buf, "%2lu:%02lu.%ld", t / 600,
 				(t/10) % 60,
@@ -967,7 +969,7 @@ time3(time_t t, unsigned len)
 		width++;
 	}
 	tp = localtime(&t);
-	if (now - t > 86400) {
+	if (now > t && now - t > 86400) {
 		nl_item	val;
 
 		switch (tp->tm_mon) {

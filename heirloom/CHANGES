@@ -15,6 +15,8 @@ Release ...
   by Matthew Fischer).
 * more: Fixed underlining of multibyte characters (Bugreport by Matthew
   Fischer).
+* ps: -o etime sometimes printed output like '00:00:4294967295' with
+  recently started processes (Bugreport by Matthew Fischer).
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and
