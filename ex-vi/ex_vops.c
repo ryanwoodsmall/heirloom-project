@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops.c	1.25 (gritter) 1/11/05";
+static char sccsid[] = "@(#)ex_vops.c	1.26 (gritter) 1/13/05";
 #endif
 #endif
 
@@ -671,9 +671,10 @@ smallchange:
 	if (state == HARDOPEN) 
 		bleep(i, cp);
 	else {
-		int	c, n;
+		int	c, d, n;
 		vcursbef(wcursor);
-		nextc(c, cursor, n);
+		d = skipleft(linebuf, wcursor);
+		nextc(c, &wcursor[d], n);
 		if (colsc(c) > 1)
 			putchar(' ');
 		putchar('$');

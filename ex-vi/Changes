@@ -13,6 +13,8 @@ Release ...
   the end of the new text.
 * Visual 'U' followed by 'u' lead to garbage on the screen when multibyte
   characters were present on the changed line.
+* The position of '$' when changing text was fixed for cases where the first
+  changed character had multiple columns but the last one had not.
 * The handling of multicolumn characters was fixed for terminals without the
   IM (insert mode) capability. It is unlikely that such terminals actually
   exist, but vi will use the corresponding code for open mode if a termcap
