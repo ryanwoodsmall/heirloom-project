@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	1.26 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)tr_sus.sl	1.27 (gritter) 1/7/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.26 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.27 (gritter) 1/7/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	1.26 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)tr.sl	1.27 (gritter) 1/7/05";
 #endif
 
 #include	<unistd.h>
@@ -849,7 +849,7 @@ main(int argc, char **argv)
 	/*setlocale(LC_COLLATE, "");*/
 	setlocale(LC_CTYPE, "");
 	multibyte = MB_CUR_MAX > 1;
-	borderc = multibyte ? 0x10FFFF : 255;
+	borderc = multibyte ? /*0x10FFFF*/ 0xFFFF : 255;
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
 		case 'c':

@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)tr.1	1.14 (gritter) 12/19/04
+.\" Sccsid @(#)tr.1	1.15 (gritter) 1/7/05
 .\" Parts taken from tr(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TR 1 "12/19/04" "Heirloom Toolchest" "User Commands"
+.TH TR 1 "1/7/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tr \- translate characters
 .SH SYNOPSIS
@@ -181,7 +181,7 @@ ascii(7),
 locale(7)
 .SH NOTES
 In multibyte locales,
-characters with a wide character value greater than 0x10FFFF
+characters with a wide character value greater than 0xFFFF \"0x10FFFF
 are not fully supported with the
 .B \-c
 option
