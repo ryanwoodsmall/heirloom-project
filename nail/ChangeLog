@@ -3,16 +3,18 @@
 * For junk mail detection, the characters '_', '#', '&', and '%' are now
   considered as word constituents. Also the '/' character is kept if it
   occurs between digits, and the ';' character if a '&' was previously
-  encountered within the same word. To take advantage of these changes,
-  you have to delete your junk mail database and have to create it again.
+  encountered within the same word.
 * For junk mail detection, fields of MIME part headers are now handled like
   fields of the main header.
 * For junk mail detection, most HTML tags are now ignored, similar to the
-  proposal in Paul Graham's 'Better Bayesian Filtering'.
+  proposal in Paul Graham's 'Better Bayesian Filtering'. Also, the top and
+  bottom probabilities are now .0001 and .9999.
 * When the junk mail database is updated, it is now truncated beyond the
   last byte just written. Previously, stale data could have remained after
   this point, which was no problem for nail itself, but could make zcat(1)
   fail on the file.
+* To take advantage of the changes to the junk mail recognition method,
+  you have to delete your junk mail database and have to create it again.
 * The new 'probability' command prints the junk statistics for given words.
 * The 'answered', 'classify, 'draft', 'flag', 'good', 'junk', 'undraft',
   'unflag', and 'unkill' command now make their argument the current

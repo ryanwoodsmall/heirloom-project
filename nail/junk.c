@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.50 (gritter) 10/25/04";
+static char sccsid[] = "@(#)junk.c	1.51 (gritter) 10/25/04";
 #endif
 #endif /* not lint */
 
@@ -61,8 +61,12 @@ static char sccsid[] = "@(#)junk.c	1.50 (gritter) 10/25/04";
  * Bayesian Filtering", January 2003, <http://www.paulgraham.com/better.html>.
  */
 
-#define	BOT	.01
-#define	TOP	.99
+#define	BOT0	.01
+#define	BOT1	.0001
+static float	BOT;
+#define	TOP0	.99
+#define	TOP1	.9999
+static float	TOP;
 #define	DFL	.40
 #define	THR	.9
 #define	MID	.5
@@ -288,6 +292,8 @@ getdb(void)
 		memset(nodes, 0, n * SIZEOF_node);
 	if (sfp)
 		Fclose(sfp);
+	BOT = table_version < 1 ? BOT0 : BOT1;
+	TOP = table_version < 1 ? TOP0 : TOP1;
 	return OKAY;
 }
 
