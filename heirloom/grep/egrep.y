@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)egrep.sl	2.20 (gritter) 12/5/04";
+static const char sccsid[] USED = "@(#)egrep.sl	2.21 (gritter) 12/17/04";
 %}
 
 /*
@@ -725,7 +725,7 @@ init(void)
 {
 	Eflag = 1;
 	eg_select();
-	options = "bce:f:hilnrRvy";
+	options = "bce:f:hilnrRvyz";
 }
 
 void
