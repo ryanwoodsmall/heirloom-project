@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)edit.c	2.17 (gritter) 10/31/04";
+static char sccsid[] = "@(#)edit.c	2.18 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -121,7 +121,7 @@ edit1(int *msgvec, int type)
 		sigint = safe_signal(SIGINT, SIG_IGN);
 		fp = run_editor(fp, mp->m_size, type,
 				(mb.mb_perm & MB_EDIT) == 0 || !wb,
-				NULL, mp, wb ? CONV_NONE : CONV_TODISP);
+				NULL, mp, wb ? CONV_NONE : CONV_TODISP_ALL);
 		if (fp != NULL) {
 			fseek(mb.mb_otf, 0L, SEEK_END);
 			size = ftell(mb.mb_otf);

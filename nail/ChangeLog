@@ -5,8 +5,9 @@
 * The attachment decoding functions have been rewritten. As a result, nail is
   now able to decrypt and display encrypted parts of multipart messages.
 * For MIME messages of type 'multipart/alternative', only the text/plain part
-  is displayed now if one is present. The 'print-alternatives' variable can
-  be set to print all parts, as it was done previously.
+  is displayed now if one is present with the 'print'-like commands. The
+  'print-alternatives' variable can be set to print all parts, as it was
+  done previously. The 'Print'-like commands always print all parts.
 * The ~F and ~M escapes now cause all parts of MIME multipart messages to be
   included in the message being composed.
 * A 'show' command was introduced to make the raw MIME-encoded message text

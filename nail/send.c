@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.57 (gritter) 11/1/04";
+static char sccsid[] = "@(#)send.c	2.58 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -221,8 +221,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				break;
 		}
 	isenc = 0;
-	convert = action == CONV_TODISP || action == CONV_QUOTE ||
-			action == CONV_QUOTE_ALL ||
+	convert = action == CONV_TODISP || action == CONV_TODISP_ALL ||
+			action == CONV_QUOTE || action == CONV_QUOTE_ALL ||
 			action == CONV_TOSRCH || action == CONV_TOFLTR ?
 		CONV_FROMHDR : CONV_NONE;
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
@@ -331,7 +331,9 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		if (!ignoring) {
 			start = line;
 			len = linelen;
-			if (action == CONV_TODISP || action == CONV_QUOTE ||
+			if (action == CONV_TODISP ||
+					action == CONV_TODISP_ALL ||
+					action == CONV_QUOTE ||
 					action == CONV_QUOTE_ALL ||
 					action == CONV_TOSRCH ||
 					action == CONV_TOFLTR) {
@@ -367,6 +369,7 @@ skip:	switch (ip->m_mimecontent) {
 			putc('\0', obuf);
 			/*FALLTHRU*/
 		case CONV_TODISP:
+		case CONV_TODISP_ALL:
 		case CONV_QUOTE:
 		case CONV_QUOTE_ALL:
 		case CONV_TOSRCH:
@@ -397,6 +400,7 @@ skip:	switch (ip->m_mimecontent) {
 	default:
 		switch (action) {
 		case CONV_TODISP:
+		case CONV_TODISP_ALL:
 			if (level == 0 && count) {
 				cp = "[Binary content]\n\n";
 				out(cp, strlen(cp), obuf, CONV_NONE, action,
@@ -429,6 +433,7 @@ skip:	switch (ip->m_mimecontent) {
 	case MIME_MULTI:
 		switch (action) {
 		case CONV_TODISP:
+		case CONV_TODISP_ALL:
 		case CONV_QUOTE:
 		case CONV_QUOTE_ALL:
 		case CONV_TOFILE:
@@ -450,6 +455,7 @@ skip:	switch (ip->m_mimecontent) {
 						continue;
 					break;
 				case CONV_TODISP:
+				case CONV_TODISP_ALL:
 				case CONV_QUOTE_ALL:
 					if ((ip->m_mimecontent == MIME_MULTI ||
 							ip->m_mimecontent ==
@@ -524,8 +530,9 @@ skip:	switch (ip->m_mimecontent) {
 		convert = CONV_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
-	if (action == CONV_TODISP || action == CONV_QUOTE ||
-			action == CONV_QUOTE_ALL || action == CONV_TOSRCH) {
+	if (action == CONV_TODISP || action == CONV_TODISP_ALL ||
+			action == CONV_QUOTE || action == CONV_QUOTE_ALL ||
+			action == CONV_TOSRCH) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if (asccasecmp(tcs, ip->m_charset) &&
@@ -535,8 +542,8 @@ skip:	switch (ip->m_mimecontent) {
 			iconvd = (iconv_t)-1;
 	}
 #endif	/* HAVE_ICONV */
-	if (action == CONV_TODISP || action == CONV_QUOTE ||
-			action == CONV_QUOTE_ALL) {
+	if (action == CONV_TODISP || action == CONV_TODISP_ALL ||
+			action == CONV_QUOTE || action == CONV_QUOTE_ALL) {
 		qbuf = obuf;
 		pbuf = getpipetype(ip->m_ct_type_plain, &qbuf,
 			action == CONV_QUOTE || action == CONV_QUOTE_ALL);
@@ -830,7 +837,9 @@ out(char *buf, size_t len, FILE *fp,
 	}
 	sz += mime_write(buf, 1, len, fp,
 			action == CONV_NONE ? CONV_NONE: convert,
-			action == CONV_TODISP ?
+			action == CONV_TODISP || action == CONV_TODISP_ALL ||
+					action == CONV_QUOTE ||
+					action == CONV_QUOTE_ALL ?
 				TD_ISPR|TD_ICONV :
 				action == CONV_TOSRCH ?
 					TD_ICONV :

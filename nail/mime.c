@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.41 (gritter) 11/1/04";
+static char sccsid[]  = "@(#)mime.c	2.42 (gritter) 11/1/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 

@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.267 (gritter) 11/1/04
+.\"     Sccsid: @(#)nail.1	2.268 (gritter) 11/1/04
 .\"
 .TH NAIL 1 "11/1/04" "nail 11.14" "User Commands"
 .SH NAME
@@ -1349,7 +1349,10 @@ Otherwise, no operation is performed.
 (Pi) Like
 .I pipe
 but also
-pipes ignored header fields.
+pipes ignored header fields
+and all parts of MIME
+.I multipart/alternative
+messages.
 .TP
 .B pipe
 (pi) Takes a message list and a shell command
@@ -1368,7 +1371,10 @@ every message is followed by a formfeed character.
 (P) Like
 .I print
 but also
-prints out ignored header fields.
+prints out ignored header fields
+and all parts of MIME
+.I multipart/alternative
+messages.
 See also
 .IR print ,
 .IR ignore ,

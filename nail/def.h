@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.86 (gritter) 11/1/04
+ *	Sccsid @(#)def.h	2.87 (gritter) 11/1/04
  */
 
 /*
@@ -96,6 +96,7 @@ enum conversion {
 	CONV_NONE,			/* no conversion */
 	CONV_7BIT,			/* no conversion, is 7bit */
 	CONV_TODISP,			/* convert in displayable form */
+	CONV_TODISP_ALL,		/* same, include all parts */
 	CONV_TOSRCH,			/* convert for IMAP search */
 	CONV_TOFLTR,			/* convert for filtering */
 	CONV_TOFILE,			/* convert for saving to a file */
