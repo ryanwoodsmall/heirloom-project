@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)wc.1	1.18 (gritter) 1/24/05
-.TH WC 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)wc.1	1.19 (gritter) 2/6/05
+.TH WC 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 wc \- word count
 .SH SYNOPSIS
@@ -62,21 +62,19 @@ This option was introduced by POSIX.2.
 .TP
 .B \-w
 Print the number of words.
-.SS /usr/5bin/wc
-A word is a non-zero-length string of characters
-including at least one graphical character,
-delimited by blank or newline characters.
-Output is aligned at eight columns
-and separated by as many space characters as necessary.
-.SS /usr/5bin/s42/wc
-A word is a non-zero-length string of characters
-including at least one graphical character,
-delimited by blank or newline characters.
-Output columns are separated by a single space character.
-.SS /usr/5bin/posix/wc, /usr/5bin/posix2001/wc
-A word is a non-zero-length string of characters
-delimited by white space.
-Output columns are separated by a single space character.
+With
+.B /usr/5bin/wc
+and
+.BR /usr/5bin/s42/wc ,
+a word is a string of characters
+that contains at least one graphical character
+and is delimited by blank or newline characters.
+With
+.B /usr/5bin/posix/wc
+and
+.BR /usr/5bin/posix2001/wc ,
+a word is a nonempty string of characters
+that is delimited by white space.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .B "LANG, LC_ALL"

@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)wc_s42.sl	1.40 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)wc_s42.sl	1.41 (gritter) 2/6/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)wc_sus.sl	1.40 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)wc_sus.sl	1.41 (gritter) 2/6/05";
 #else
-static const char sccsid[] USED = "@(#)wc.sl	1.40 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)wc.sl	1.41 (gritter) 2/6/05";
 #endif
 
 #include	<sys/types.h>
@@ -72,7 +72,7 @@ static long long	chart;		/* total character count */
 static long long	bytet;		/* total byte count */
 static long long	wordt;		/* total word count */
 static long long	linet;		/* total line count */
-#if defined (SUS) || defined (S42)
+#if defined (S42)
 static int		putspace;	/* wrote space to output line */
 #endif
 static char		*progname;	/* argv0 to main */
@@ -86,13 +86,13 @@ static void		usage(void);
 static void
 report(unsigned long long count)
 {
-#if defined (SUS) || defined (S42)
+#if defined (S42)
 	if (putspace++)
 		printf(" ");
 	printf("%llu", count);
-#else	/* !SUS, !S42 */
+#else	/* !S42 */
 	printf("%7llu ", count);
-#endif	/* !SUS, !S42 */
+#endif	/* !S42 */
 }
 
 #ifdef	SUS
@@ -267,7 +267,7 @@ fpwc(int fd)
 	ib_free(ip);
 	if (illflag)
 		usage();
-#if defined (SUS) || defined (S42)
+#if defined (S42)
 	putspace = 0;
 #endif
 	if (lflag)
@@ -360,7 +360,7 @@ main(int argc, char **argv)
 		while (optind < argc)
 			ac += filewc(argv[optind++]);
 		if (ac > 1) {
-#if defined (SUS) || defined (S42)
+#if defined (S42)
 			putspace = 0;
 #endif
 			if (lflag)
