@@ -1,8 +1,11 @@
 [11.15] released ...
 * The compilation process was fixed to work without CPPFLAGS=-D_GNU_SOURCE on
   Linux/glibc again, although mremap() is not available then. It is therefore
-  recommended to use CPPFLAGS=-D_GNU_SOURCE with Linux/glibc. (Bugreport by
-  Stephen Isard.)
+  recommended to use CPPFLAGS=-D_GNU_SOURCE with Linux/glibc. (Bugreports by
+  Stephen Isard, Laurens Blankers, Bob Tennent.)
+* Since many versions of Linux do not correctly update the modification time
+  of a file with mmap(), utime() is now called to force an update when the
+  junk mail database is changed.
 
 [11.14] released 11/4/04
 * A 'Z' command was introduced. It is similar to the 'z' command, but scrolls

@@ -1,4 +1,4 @@
-#define	V	"11.14"
+#define	V	"11.15pre"
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.256 (gritter) 11/4/04";
+static char sccsid[] = "@(#)version.c	2.257 (gritter) 11/5/04";
 #endif
 #endif /* not lint */
 
@@ -48,11 +48,11 @@ static char sccsid[] = "@(#)version.c	2.256 (gritter) 11/4/04";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = "nail " V " 11/4/04";
+const char *version = "nail " V " 11/5/04";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)nail " V " 11/4/04";
+= "@(#)nail " V " 11/5/04";
 #endif	/* !lint */

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.61 (gritter) 11/3/04";
+static char sccsid[] = "@(#)junk.c	1.62 (gritter) 11/5/04";
 #endif
 #endif /* not lint */
 
@@ -50,6 +50,7 @@ static char sccsid[] = "@(#)junk.c	1.61 (gritter) 11/3/04";
 #include <limits.h>
 #include <time.h>
 #include <unistd.h>
+#include <utime.h>
 
 #ifdef	HAVE_MMAP
 #include <sys/mman.h>
@@ -220,11 +221,12 @@ them in flat form.\n";
 static int	verbose;
 static int	_debug;
 static FILE	*sfp, *nfp;
+static char	*sname, *nname;
 
 static enum okay getdb(int rw);
 static void putdb(void);
 static void relsedb(void);
-static FILE *dbfp(enum db db, int rw, int *compressed);
+static FILE *dbfp(enum db db, int rw, int *compressed, char **fn);
 static char *lookup(unsigned long h1, unsigned long h2, int create);
 static unsigned long grow(unsigned long size);
 static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
@@ -247,7 +249,7 @@ getdb(int rw)
 	long	n;
 	int	compressed;
 
-	if ((sfp = dbfp(SUPER, rw, &compressed)) == (FILE *)-1)
+	if ((sfp = dbfp(SUPER, rw, &compressed, &sname)) == (FILE *)-1)
 		return STOP;
 	if (sfp && !compressed) {
 		super = mmap(NULL, SIZEOF_super,
@@ -285,7 +287,7 @@ skip:	if ((n = getn(&super[OF_super_size])) == 0) {
 		n = 1;
 		putn(&super[OF_super_size], 1);
 	}
-	if (sfp && (nfp = dbfp(NODES, rw, &compressed)) != NULL) {
+	if (sfp && (nfp = dbfp(NODES, rw, &compressed, &nname)) != NULL) {
 		if (nfp == (FILE *)-1) {
 			relsedb();
 			return STOP;
@@ -337,15 +339,19 @@ putdb(void)
 	void	*zp;
 	int	scomp, ncomp;
 
-	if (!super_mmapped && (sfp = dbfp(SUPER, O_WRONLY, &scomp)) == NULL ||
-			sfp == (FILE *)-1)
+	if (!super_mmapped && (sfp = dbfp(SUPER, O_WRONLY, &scomp, &sname))
+			== NULL || sfp == (FILE *)-1)
 		return;
-	if (!nodes_mmapped && (nfp = dbfp(NODES, O_WRONLY, &ncomp)) == NULL ||
-			nfp == (FILE *)-1)
+	if (!nodes_mmapped && (nfp = dbfp(NODES, O_WRONLY, &ncomp, &nname))
+			== NULL || nfp == (FILE *)-1)
 		return;
 	saveint = safe_signal(SIGINT, SIG_IGN);
+	/*
+	 * Use utime() with mmap() since Linux does not update st_mtime
+	 * reliably otherwise.
+	 */
 	if (super_mmapped)
-		/*EMPTY*/;
+		utime(sname, NULL);
 	else if (scomp) {
 		zp = zalloc(sfp);
 		zwrite(zp, super, SIZEOF_super);
@@ -354,7 +360,7 @@ putdb(void)
 	} else
 		fwrite(super, 1, SIZEOF_super, sfp);
 	if (nodes_mmapped)
-		/*EMPTY*/;
+		utime(nname, NULL);
 	else if (ncomp) {
 		zp = zalloc(nfp);
 		zwrite(zp, nodes, getn(&super[OF_super_size]) * SIZEOF_node);
@@ -390,10 +396,10 @@ relsedb(void)
 }
 
 static FILE *
-dbfp(enum db db, int rw, int *compressed)
+dbfp(enum db db, int rw, int *compressed, char **fn)
 {
 	FILE	*fp, *rp;
-	char	*dir, *fn;
+	char	*dir;
 	struct flock	flp;
 	char *sfx[][2] = {
 		{ "super",	"nodes" },
@@ -421,24 +427,23 @@ dbfp(enum db db, int rw, int *compressed)
 		table_version = current_table_version;
 loop:	sf = sfx[table_version];
 	zf = zfx[table_version];
-	fn = ac_alloc((n = strlen(dir)) + 40);
-	strcpy(fn, dir);
-	fn[n] = '/';
+	*fn = salloc((n = strlen(dir)) + 40);
+	strcpy(*fn, dir);
+	(*fn)[n] = '/';
 	*compressed = 0;
-	strcpy(&fn[n+1], sf[db]);
-	if ((fp = Fopen(fn, rw!=O_RDONLY ? "r+" : "r")) != NULL)
+	strcpy(&(*fn)[n+1], sf[db]);
+	if ((fp = Fopen(*fn, rw!=O_RDONLY ? "r+" : "r")) != NULL)
 		goto okay;
 	*compressed = 1;
-	strcpy(&fn[n+1], zf[db]);
-	if ((fp = Fopen(fn, rw ? "r+" : "r")) == NULL &&
-			rw==O_WRONLY ? (fp = Fopen(fn, "w+")) == NULL : 0) {
-		fprintf(stderr, "Cannot open junk mail database \"%s\".\n", fn);
-		ac_free(fn);
+	strcpy(&(*fn)[n+1], zf[db]);
+	if ((fp = Fopen(*fn, rw ? "r+" : "r")) == NULL &&
+			rw==O_WRONLY ? (fp = Fopen(*fn, "w+")) == NULL : 0) {
+		fprintf(stderr, "Cannot open junk mail database \"%s\".\n",*fn);
 		return NULL;
 	}
 	if (rw==O_WRONLY) {
-		strcpy(&fn[n+1], "README");
-		if (access(fn, F_OK) < 0 && (rp = Fopen(fn, "w")) != NULL) {
+		strcpy(&(*fn)[n+1], "README");
+		if (access(*fn, F_OK) < 0 && (rp = Fopen(*fn, "w")) != NULL) {
 			fputs(README1, rp);
 			fputs(README2, rp);
 			Fclose(rp);
@@ -450,8 +455,7 @@ loop:	sf = sfx[table_version];
 		} else
 			table_version = current_table_version;
 	}
-okay:	ac_free(fn);
-	if (fp) {
+okay:	if (fp) {
 		flp.l_type = rw!=O_RDONLY ? F_WRLCK : F_RDLCK;
 		flp.l_start = 0;
 		flp.l_len = 0;
