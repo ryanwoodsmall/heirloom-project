@@ -14,6 +14,9 @@
   in its body but not in its header, the characters were replaced by
   question marks and the message was sent, instead of being rejected
   (Bugreport by Suresh Ramasubramanian).
+* When sending messages in 8bit, conversions from a multibyte terminal
+  character set failed because multibyte input characters where split
+  across two conversion buffers if they spanned across buffer boundaries.
 * A 'reply-in-same-charset' variable has been introduced. If it is set,
   nail tries to reply in the character set of the original message first.
 * When the header of an outgoing message contained a non-ASCII character

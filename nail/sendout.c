@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.77 (gritter) 1/7/05";
+static char sccsid[] = "@(#)sendout.c	2.78 (gritter) 1/10/05";
 #endif
 #endif /* not lint */
 
@@ -327,12 +327,20 @@ make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
 				"Content-Disposition: inline\n\n",
 				getencoding(convert));
 		buf = smalloc(bufsize = INFIX_BUF);
-		if (convert == CONV_TOQP) {
+		if (convert == CONV_TOQP
+#ifdef	HAVE_ICONV
+				|| iconvd != (iconv_t)-1
+#endif	/* HAVE_ICONV */
+				) {
 			fflush(fi);
 			count = fsize(fi);
 		}
 		for (;;) {
-			if (convert == CONV_TOQP) {
+			if (convert == CONV_TOQP
+#ifdef	HAVE_ICONV
+					|| iconvd != (iconv_t)-1
+#endif	/* HAVE_ICONV */
+					) {
 				if (fgetline(&buf, &bufsize, &count, &sz, fi, 0)
 						== NULL)
 					break;
@@ -403,7 +411,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	tcs = gettcharset();
 	if ((convhdr = need_hdrconv(hp,
 				GTO|GSUBJECT|GCC|GBCC|GREPLYTO|GIDENT)) != 0 &&
-			strcmp(convhdr, tcs)) {
+			asccasecmp(convhdr, tcs)) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if ((iconvd = iconv_open_ft(convhdr, tcs)) == (iconv_t)-1
@@ -438,7 +446,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 		iconvd = (iconv_t)-1;
 	}
 	if ((isclean & MIME_HASNUL) == 0 && isclean & MIME_HIGHBIT &&
-			strcmp(charset, tcs)) {
+			asccasecmp(charset, tcs)) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if ((iconvd = iconv_open_ft(charset, tcs)) == (iconv_t)-1
@@ -470,13 +478,21 @@ infix(struct header *hp, FILE *fi, int dosign)
 		size_t sz, bufsize, count;
 		char *buf;
 
-		if (convert == CONV_TOQP) {
+		if (convert == CONV_TOQP
+#ifdef	HAVE_ICONV
+				|| iconvd != (iconv_t)-1
+#endif	/* HAVE_ICONV */
+				) {
 			fflush(fi);
 			count = fsize(fi);
 		}
 		buf = smalloc(bufsize = INFIX_BUF);
 		for (;;) {
-			if (convert == CONV_TOQP) {
+			if (convert == CONV_TOQP
+#ifdef	HAVE_ICONV
+					|| iconvd != (iconv_t)-1
+#endif	/* HAVE_ICONV */
+					) {
 				if (fgetline(&buf, &bufsize, &count, &sz, fi, 0)
 						== NULL)
 					break;
