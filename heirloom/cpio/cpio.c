@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.285 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.286 (gritter) 2/6/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -928,6 +928,7 @@ static void	addrec(char **, long *, long *,
 			const char *, const char *, long long);
 static void	paxnam(struct tar_header *, const char *);
 static char	*sequence(void);
+static char	*joinpath(const char *, char *);
 
 size_t		(*ofiles)(char **, size_t *) = ofiles_cpio;
 void		(*prtime)(time_t) = prtime_cpio;
@@ -1018,10 +1019,12 @@ copyout(int (*copyfn)(const char *, struct stat *))
 			errcnt++;
 			continue;
 		}
-		if (Lflag && stat(np, &st) < 0) {
-			emsg(2, "Cannot follow \"%s\"", np);
-			errcnt++;
-			continue;
+		if (Lflag && (st.st_mode&S_IFMT) == S_IFLNK) {
+			if (stat(np, &st) < 0) {
+				emsg(2, "Cannot follow \"%s\"", np);
+				errcnt++;
+				continue;
+			}
 		}
 		/*
 		 * These file types are essentially useless in an archive
@@ -2738,7 +2741,7 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 	struct stat	nst;
 	char	*temp = NULL;
 	size_t	len;
-	int	fd, i;
+	int	fd, i, j;
 	int	failure = 2;
 
 	if (fmttype == FMT_ZIP && (f->f_st.st_mode&S_IFMT) != S_IFREG &&
@@ -2801,12 +2804,49 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 	else if (Vflag)
 		prdot(0);
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && lflag) {
-		if (link(f->f_name, tgt) == 0) {
+		if (Lflag) {
+			char	*symblink, *name;
+			struct stat	xst;
+			name = f->f_name;
+			for (;;) {
+				if (lstat(name, &xst) < 0) {
+					emsg(3, "Cannot lstat \"%s\"", name);
+					if (name != f->f_name)
+						free(name);
+					goto cantlink;
+				}
+				if ((xst.st_mode&S_IFMT) != S_IFLNK)
+					break;
+				i = xst.st_size ? xst.st_size : PATH_MAX;
+				symblink = smalloc(i+1);
+				if ((j = readlink(name, symblink, i)) < 0) {
+					emsg(3, "Cannot read symbolic link "
+						"\"%s\"", name);
+					free(symblink);
+					if (name != f->f_name)
+						free(name);
+					goto cantlink;
+				}
+				symblink[j] = '\0';
+				symblink = joinpath(name, symblink);
+				if (name != f->f_name)
+					free(name);
+				name = symblink;
+			}
+			if (link(name, tgt) == 0) {
+				tunlink(&temp);
+				if (name != f->f_name)
+					free(name);
+				return 0;
+			}
+			if (name != f->f_name)
+				free(name);
+		} else if (link(f->f_name, tgt) == 0) {
 			tunlink(&temp);
 			return 0;
 		}
 		emsg(3, "Cannot link \"%s\" and \"%s\"", f->f_name, tgt);
-		errcnt += 1;
+cantlink:	errcnt += 1;
 	}
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && f->f_st.st_nlink > 1 &&
 			(fmttype & TYP_CPIO || fmttype == FMT_ZIP
@@ -6768,4 +6808,32 @@ pax_options(char *s, int warn)
 		}
 	} while (*s++);
 	return val;
+}
+
+/*
+ * Given a symbolic link "base" and the result of readlink "name", form
+ * a valid path name for the link target.
+ */
+static char *
+joinpath(const char *base, char *name)
+{
+	const char	*bp = NULL, *cp;
+	char	*new, *np;
+
+	if (*name == '/')
+		return name;
+	for (cp = base; *cp; cp++)
+		if (*cp == '/')
+			bp = cp;
+	if (bp == NULL)
+		return name;
+	np = new = smalloc(bp - base + strlen(name) + 2);
+	for (cp = base; cp < bp; cp++)
+		*np++ = *cp;
+	*np++ = '/';
+	for (cp = name; *cp; cp++)
+		*np++ = *cp;
+	*np = '\0';
+	free(name);
+	return new;
 }

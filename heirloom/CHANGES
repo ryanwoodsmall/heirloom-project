@@ -80,6 +80,8 @@ Release ...
 * nawk: RLENGTH was not set correctly for matches of zero length.
 * file: The POSIX version does not exit with an error status if a file could
   not be opened.
+* cpio, pax: The -plL (or -rwlL for pax) option combination now works; it
+  creates links to the targets of all symbolic links in the source hierarchy.
 * pax: The -pa and -pme option combinations now work.
 * pax: The -po option works for users other than root (but only affects the
   group ownerships then).
