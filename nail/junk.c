@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.62 (gritter) 11/5/04";
+static char sccsid[] = "@(#)junk.c	1.63 (gritter) 11/7/04";
 #endif
 #endif /* not lint */
 
@@ -231,14 +231,17 @@ static char *lookup(unsigned long h1, unsigned long h2, int create);
 static unsigned long grow(unsigned long size);
 static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 		struct lexstat *sp);
-static void add(const char *word, enum entry entry, struct lexstat *sp);
+static void add(const char *word, enum entry entry, struct lexstat *sp,
+		int incr);
 static enum okay scan(struct message *m, enum entry entry,
-		void (*func)(const char *, enum entry, struct lexstat *));
+		void (*func)(const char *, enum entry, struct lexstat *, int),
+		int arg);
 static void recompute(void);
 static float getprob(char *n);
-static int insert(int *msgvec, enum entry entry);
+static int insert(int *msgvec, enum entry entry, int incr);
 static void clsf(struct message *m);
-static void rate(const char *word, enum entry entry, struct lexstat *sp);
+static void rate(const char *word, enum entry entry, struct lexstat *sp,
+		int unused);
 static void dbhash(const char *word, unsigned long *h1, unsigned long *h2);
 static void mkmangle(void);
 
@@ -773,7 +776,7 @@ out:	if (i > 0) {
 
 /*ARGSUSED3*/
 static void
-add(const char *word, enum entry entry, struct lexstat *sp)
+add(const char *word, enum entry entry, struct lexstat *sp, int incr)
 {
 	unsigned	c;
 	unsigned long	h1, h2;
@@ -784,15 +787,15 @@ add(const char *word, enum entry entry, struct lexstat *sp)
 		switch (entry) {
 		case GOOD:
 			c = get(&n[OF_node_good]);
-			if (c < MAX3) {
-				c++;
+			if (incr>0 && c<MAX3-incr || incr<0 && c>=-incr) {
+				c += incr;
 				put(&n[OF_node_good], c);
 			}
 			break;
 		case BAD:
 			c = get(&n[OF_node_bad]);
-			if (c < MAX3) {
-				c++;
+			if (incr>0 && c<MAX3-incr || incr<0 && c>=-incr) {
+				c += incr;
 				put(&n[OF_node_bad], c);
 			}
 			break;
@@ -802,7 +805,8 @@ add(const char *word, enum entry entry, struct lexstat *sp)
 
 static enum okay 
 scan(struct message *m, enum entry entry,
-		void (*func)(const char *, enum entry, struct lexstat *))
+		void (*func)(const char *, enum entry, struct lexstat *, int),
+		int arg)
 {
 	FILE	*fp;
 	char	*buf = NULL, *cp;
@@ -824,7 +828,7 @@ scan(struct message *m, enum entry entry,
 	sp = scalloc(1, sizeof *sp);
 	count = fsize(fp);
 	while (nextword(&buf, &bufsize, &count, fp, sp) != NULL)
-		(*func)(buf, entry, sp);
+		(*func)(buf, entry, sp, arg);
 	free(buf);
 	free(sp);
 	Fclose(fp);
@@ -883,7 +887,7 @@ getprob(char *n)
 }
 
 static int 
-insert(int *msgvec, enum entry entry)
+insert(int *msgvec, enum entry entry, int incr)
 {
 	int	*ip;
 	unsigned long	u = 0;
@@ -901,16 +905,19 @@ insert(int *msgvec, enum entry entry)
 	}
 	for (ip = msgvec; *ip; ip++) {
 		setdot(&message[*ip-1]);
-		if (u == MAX4) {
+		if (incr > 0 && u == MAX4-incr+1) {
 			fprintf(stderr, "Junk mail database overflow.\n");
 			break;
+		} else if (incr < 0 && -incr > u) {
+			fprintf(stderr, "Junk mail database underflow.\n");
+			break;
 		}
-		u++;
+		u += incr;
 		if (entry == GOOD)
 			message[*ip-1].m_flag &= ~MJUNK;
 		else
 			message[*ip-1].m_flag |= MJUNK;
-		scan(&message[*ip-1], entry, add);
+		scan(&message[*ip-1], entry, add, incr);
 	}
 	switch (entry) {
 	case GOOD:
@@ -927,16 +934,28 @@ insert(int *msgvec, enum entry entry)
 	return 0;
 }
 
-int 
+int
 cgood(void *v)
 {
-	return insert(v, GOOD);
+	return insert(v, GOOD, 1);
 }
 
-int 
+int
 cjunk(void *v)
 {
-	return insert(v, BAD);
+	return insert(v, BAD, 1);
+}
+
+int
+cungood(void *v)
+{
+	return insert(v, GOOD, -1);
+}
+
+int
+cunjunk(void *v)
+{
+	return insert(v, BAD, -1);
 }
 
 int 
@@ -978,7 +997,7 @@ clsf(struct message *m)
 		best[i].dist = 0;
 		best[i].prob = -1;
 	}
-	if (scan(m, -1, rate) != OKAY)
+	if (scan(m, -1, rate, 0) != OKAY)
 		return;
 	if (best[0].prob == -1) {
 		if (verbose)
@@ -1008,8 +1027,9 @@ clsf(struct message *m)
 		m->m_flag &= ~MJUNK;
 }
 
+/*ARGSUSED4*/
 static void
-rate(const char *word, enum entry entry, struct lexstat *sp)
+rate(const char *word, enum entry entry, struct lexstat *sp, int unused)
 {
 	char	*n;
 	unsigned long	h1, h2;

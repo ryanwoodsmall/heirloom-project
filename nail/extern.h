@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.146 (gritter) 11/6/04
+ *	Sccsid @(#)extern.h	2.147 (gritter) 11/7/04
  */
 
 /* aux.c */
@@ -305,6 +305,8 @@ enum okay imap_search(const char *spec, int f);
 /* junk.c */
 int cgood(void *v);
 int cjunk(void *v);
+int cungood(void *v);
+int cunjunk(void *v);
 int cclassify(void *v);
 int cprobability(void *v);
 /* lex.c */
