@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cmp.sl	1.14 (gritter) 7/24/04";
+static const char sccsid[] USED = "@(#)cmp.sl	1.15 (gritter) 12/4/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -48,6 +48,11 @@ static const char sccsid[] USED = "@(#)cmp.sl	1.14 (gritter) 7/24/04";
 
 #include	"atoll.h"
 #include	"memalign.h"
+
+#ifdef	__GLIBC__
+#undef	putchar
+#define	putchar(c)	putc_unlocked(c, stdout)
+#endif	/* __GLIBC__ */
 
 #define	BLKSIZE		8192
 #define	IOSIZE		(SSIZE_MAX > BLKSIZE ? BLKSIZE : SSIZE_MAX)
@@ -66,6 +71,11 @@ struct	file {
 static unsigned	errcnt;			/* count of errors */
 static int	lflag;			/* write differing bytes */
 static int	sflag;			/* write nothing */
+#ifdef	ADDONS
+static int	wflag;			/* word mode (Cray) */
+#else	/* !ADDONS */
+#define	wflag	0
+#endif	/* !ADDONS */
 static char	*progname;		/* argv[0] to main() */
 
 static void
@@ -82,6 +92,31 @@ eofon(struct file *f)
 	if (sflag == 0)
 		fprintf(stderr, "%s: EOF on %s\n", progname, f->f_nam);
 	exit(1);
+}
+
+static void
+printbe64(const char *s, int max)
+{
+	int	i;
+	unsigned long long	u = 0;
+
+	for (i = 0; i < max; i++)
+		u += (unsigned long long)(s[i]&0377) << 8*(7-i);
+	printf("%022llo", u);
+}
+
+static void
+printbytes(const char *s, int max)
+{
+	int	i, c;
+
+	for (i = 0; i < 8; i++) {
+		c = s[i] & 0377;
+		if (i >= max || c < ' ' || c > '~')
+			putchar('_');
+		else
+			putchar(c);
+	}
 }
 
 static ssize_t
@@ -110,6 +145,8 @@ bread(struct file *f)
 	f->f_cur = f->f_buf;
 	f->f_max = &f->f_buf[rsz];
 	f->f_off += rsz;
+	if (wflag && f->f_max < &f->f_buf[sizeof f->f_buf])
+		memset(f->f_max, 0, &f->f_buf[sizeof f->f_buf] - f->f_max);
 	return rsz > 0 ? *f->f_cur++ & 0377 : EOF;
 }
 
@@ -118,6 +155,46 @@ bread(struct file *f)
 
 #define	getchr(f)	(f->f_cur < f->f_max ? *f->f_cur++ & 0377 : \
 				f->f_eof ? EOF : bread(f))
+
+static int
+wprnt(struct file *f1, struct file *f2)
+{
+	long long	offs = offset(f1);
+	int	mod = offs % 8;
+	int	eof = 0, diff, max;
+
+	f1->f_cur -= mod;
+	f2->f_cur -= mod;
+	if (f1->f_cur + 9 > f1->f_max && f1->f_eof)
+		eof |= 1;
+	if (f2->f_cur + 9 > f2->f_max && f2->f_eof)
+		eof |= 2;
+	diff = eof ? (f1->f_max - f1->f_buf) - (f2->f_max - f2->f_buf) : 0;
+	if (diff < 0)
+		max = f1->f_max - f1->f_cur;
+	else if (diff > 0)
+		max = f2->f_max - f2->f_cur;
+	else
+		max = 8;
+	printf("%011llo: ", offs / 8);
+	printbe64(f1->f_cur, max);
+	putchar(' ');
+	printbe64(f2->f_cur, max);
+	putchar(' ');
+	printbytes(f1->f_cur, max);
+	putchar(' ');
+	printbytes(f2->f_cur, max);
+	putchar('\n');
+	if (eof) {
+		if (diff > 0)
+			eofon(f2);
+		else if (diff < 0)
+			eofon(f1);
+	}
+	f1->f_cur += 9;
+	f2->f_cur += 9;
+	return eof;
+}
 
 static void
 cmp(struct file *f1, struct file *f2)
@@ -159,7 +236,11 @@ equal:
 				break;
 		} else {
 different:
-			if (c1 == EOF)
+			if (wflag) {
+				errcnt = 1;
+				if (wprnt(f1, f2) != 0)
+					break;
+			} else if (c1 == EOF)
 				eofon(f1);
 			else if (c2 == EOF)
 				eofon(f2);
@@ -240,7 +321,7 @@ int
 main(int argc, char **argv)
 {
 	struct file	*f1, *f2;
-	const char	optstring[] = "ls";
+	const char	optstring[] = "lsw";
 	int	i;
 
 #ifdef	__GLIBC__
@@ -255,6 +336,11 @@ main(int argc, char **argv)
 		case 's':
 			sflag = 1;
 			break;
+#ifdef	ADDONS
+		case 'w':
+			wflag = 1;
+			break;
+#endif
 		default:
 			usage();
 		}
