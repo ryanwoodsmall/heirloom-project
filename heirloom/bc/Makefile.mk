@@ -4,7 +4,7 @@ bc: bc.o
 	$(LD) $(LDFLAGS) bc.o $(LCOMMON) $(LIBS) -o bc
 
 bc.o: bc.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) -DDC='"$(DEFBIN)/dc"' -DLIBB='"$(DEFLIB)/lib.b"' -c bc.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) -DDC='"$(SV3BIN)/dc"' -DLIBB='"$(DEFLIB)/lib.b"' -c bc.c
 
 bc.c: bc.y
 	$(YACC) $<

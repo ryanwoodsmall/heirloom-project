@@ -60,6 +60,14 @@ Release ...
 * csplit: If the last operand was of the form '%re%', lines following its
   match were not written to an output file.
 * pr: Various output formatting bugs have been fixed.
+* bc, dc: Long lines are now properly broken with scale=10.
+* bc: Error messages are now printed to standard error (instead of standard
+  output).
+* bc: Uninitialized array values are now printed as '0' (instead of a
+  string of multipe nulls with machine-dependent length).
+* bc: Passing arrays to functions works properly now.
+* bc, dc: Output for obase>16 does not end with trailing spaces anymore.
+* bc: The '-=' operator did not work.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

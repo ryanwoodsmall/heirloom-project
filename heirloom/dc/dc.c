@@ -42,7 +42,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*	Sccsid @(#)dc.c	1.19 (gritter) 12/6/04>	*/
+/*	Sccsid @(#)dc.c	1.20 (gritter) 2/4/05>	*/
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -451,8 +451,8 @@ casediv:
 			p = pop();
 			EMPTY;
 			if(c >= ARRAYST){
-				q = copy(p,PTRSZ);
-				for(n = 0;n < PTRSZ-1;n++)sputc(q,0);
+				q = copy(p,length(p));
+				for(n = 0;n < PTRSZ;n++)sputc(q,0);
 				release(p);
 				p = q;
 			}
@@ -579,8 +579,8 @@ sempty:
 					}
 				}
 			}
-			q = salloc(PTRSZ);
-			putwd(q, (struct blk *)0);
+			q = salloc(1);
+			sputc(q, 0);
 			pushp(q);
 			continue;
 		case 'x':
@@ -635,7 +635,7 @@ execute:
 }
 
 struct blk *
-dcdiv(struct blk *ddivd,struct blk *ddivr)
+div(struct blk *ddivd,struct blk *ddivr)
 {
 	int divsign,remsign,offset,divcarry = 0;
 	int carry, dig = 0,magic,d = 0,dd;
@@ -824,7 +824,7 @@ removr(struct blk *p,int n)
 }
 
 struct blk *
-dcsqrt(struct blk *p)
+sqrt(struct blk *p)
 {
 	struct blk *t;
 	struct blk *r,*q,*s;
@@ -875,7 +875,7 @@ dcsqrt(struct blk *p)
 }
 
 struct blk *
-dcexp(struct blk *base,struct blk *ex)
+exp(struct blk *base,struct blk *ex)
 {
 	register struct blk *r,*e,*p;
 	struct blk *e1,*t,*cp;
@@ -978,7 +978,7 @@ init(int argc,char **argv)
 	readptr = &readstk[0];
 	k=0;
 	sp = sptr = &symlst[0];
-	while(sptr < &symlst[TBLSZ-1]){
+	while(sptr < &symlst[TBLSZ]){
 		sptr->next = ++sp;
 		sptr++;
 	}
@@ -1295,7 +1295,7 @@ print(struct blk *hptr)
 		q = dcdiv(p,basptr);
 		release(p);
 		p = q;
-		(*outdit)(rem,0);
+		(*outdit)(rem,0,1);
 	}
 	release(p);
 	fsfile(strptr);
@@ -1313,7 +1313,7 @@ print(struct blk *hptr)
 		release(dec);
 		dec = getdec(q,sc);
 		p = removc(q,sc);
-		(*outdit)(p,1);
+		(*outdit)(p,1,ct+1<dout);
 	}while(++ct < dout);
 	release(dec);
 	rewind(strptr);
@@ -1358,15 +1358,16 @@ void
 tenot(struct blk *p,int sc)
 {
 	register int c,f;
+	char	b[3];
 
 	fsfile(p);
 	f=0;
 	while((sfbeg(p) == 0) && ((p->rd-p->beg-1)*2 >= sc)){
 		c = sbackc(p);
-		if((c<10) && (f == 1))printf("0%d",c);
-		else printf("%d",c);
+		if((c<10) && (f == 1))snprintf(b, sizeof b, "0%d",c);
+		else snprintf(b, sizeof b, "%d",c);
 		f=1;
-		TEST2;
+		TEST2(b);
 	}
 	if(sc == 0){
 		printf("\n");
@@ -1375,8 +1376,8 @@ tenot(struct blk *p,int sc)
 	}
 	if((p->rd-p->beg)*2 > sc){
 		c = sbackc(p);
-		printf("%d.",c/10);
-		TEST2;
+		snprintf(b, sizeof b, "%d.",c/10);
+		TEST2(b);
 		OUTC(c%10 +'0');
 		sc--;
 	}
@@ -1391,10 +1392,10 @@ tenot(struct blk *p,int sc)
 	}
 	while(sc > 1){
 		c = sbackc(p);
-		if(c<10)printf("0%d",c);
-		else printf("%d",c);
+		if(c<10)snprintf(b, sizeof b, "0%d",c);
+		else snprintf(b, sizeof b, "%d",c);
 		sc -= 2;
-		TEST2;
+		TEST2(b);
 	}
 	if(sc == 1){
 		OUTC(sbackc(p)/10 +'0');
@@ -1424,7 +1425,7 @@ oneot(struct blk *p,int sc,char ch)
 }
 
 void
-hexot(struct blk *p,int flg)
+hexot(struct blk *p,int flg,int unused)
 {
 	register int c;
 	rewind(p);
@@ -1444,7 +1445,7 @@ hexot(struct blk *p,int flg)
 }
 
 void
-bigot(struct blk *p,int flg)
+bigot(struct blk *p,int flg,int putspc)
 {
 	register struct blk *t,*q;
 	register int l = 0;
@@ -1491,7 +1492,8 @@ bigot(struct blk *p,int flg)
 			sputc(strptr,'-');
 		}
 	}
-	sputc(strptr,' ');
+	if (putspc)
+		sputc(strptr,' ');
 	return;
 }
 

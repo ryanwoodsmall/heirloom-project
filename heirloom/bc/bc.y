@@ -50,7 +50,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bc.sl	1.21 (gritter) 7/17/04";
+static const char sccsid[] USED = "@(#)bc.sl	1.22 (gritter) 2/4/05";
 #include <unistd.h>
 #include <signal.h>
 #include <limits.h>
@@ -488,7 +488,7 @@ restart:
 			  gotit:     peekc = -1; return(c);
 		  }
 	case '+':	return( cpeek( '+', INCR, cpeek( '=', EQPL, '+') ) );
-	case '-':	return( cpeek( '-', DECR, cpeek( '?', EQMI, '-') ) ) ;
+	case '-':	return( cpeek( '-', DECR, cpeek( '=', EQMI, '-') ) ) ;
 	case '<':	return( cpeek( '=', LE, '<' ) );
 	case '>':	return( cpeek( '=', GE, '>' ) );
 	case '!':	return( cpeek( '=', NE, '!' ) );
@@ -611,8 +611,8 @@ conout(intptr_t p, intptr_t s) {
 static void
 yyerror(const char *s) {
 	if(ifile > sargc)ss="teletype";
-	printf("c[%s on line %d, %s]pc\n", s ,ss?ln+1:0,ss?ss:"command line");
-	fflush(stdout);
+	fprintf(stderr, "%s on line %d, %s\n",
+		s ,ss?ln+1:0,ss?ss:"command line");
 	cp = cary;
 	crs = rcrs;
 	bindx = 0;

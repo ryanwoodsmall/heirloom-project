@@ -33,7 +33,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)dc.h	1.8 (gritter) 5/1/04>	*/
+/*	Sccsid @(#)dc.h	1.9 (gritter) 2/4/05>	*/
 
 #include	<stdlib.h>
 #include	<signal.h>
@@ -55,7 +55,7 @@
 #define create(p)	(p)->rd = (p)->wt = (p)->beg
 #define fsfile(p)	(p)->rd = (p)->wt
 #define truncate(p)	(p)->wt = (p)->rd
-#define sfeof(p)	(((p)->rd==(p)->wt)?1:0)
+#define sfeof(p)	(((p)->rd>=(p)->wt)?1:0)
 #define sfbeg(p)	(((p)->rd==(p)->beg)?1:0)
 #define sungetc(p,c)	*(--(p)->rd)=c
 #ifdef interdata
@@ -74,8 +74,8 @@
 #define salterc(p,c)	{if((p)->rd==(p)->last)more(p); *(p)->rd++ = c; if((p)->rd>(p)->wt)(p)->wt=(p)->rd;}
 #define sunputc(p)	(*( (p)->rd = --(p)->wt))
 #define zero(p)	for(pp=(p)->beg;pp<(p)->last;)*pp++='\0'
-#define OUTC(x) {printf("%c",x); if(--count == 0){printf("\\\n"); count=ll;} }
-#define TEST2	{if((count -= 2) <=0){printf("\\\n");count=ll;}}
+#define OUTC(x) {int _c = (x); if (_c) {printf("%c",_c); if(--count == 0){printf("\\\n"); count=ll;} } }
+#define TEST2(b)	{ OUTC(b[0] & 0377); OUTC(b[1] & 0377); }
 #define EMPTY if(stkerr != 0){printf("stack empty\n"); continue; }
 #define EMPTYR(x) if(stkerr!=0){pushp(x);printf("stack empty\n");continue;}
 #define EMPTYS if(stkerr != 0){printf("stack empty\n"); return(1);}
@@ -129,20 +129,23 @@ long	all;
 long	headmor;
 long	obase;
 int	fw,fw1,ll;
-int	(*outdit)(struct blk *, int);
+int	(*outdit)(struct blk *, int, int);
 int	logo;
 int	log_10;
 int	count;
 char	*pp;
 char	*dummy;
 
-extern int main(int, char *[]);
+#define	div(a, b)	dcdiv(a, b)
+#define	sqrt(a)		dcsqrt(a)
+#define	exp(a, b)	dcexp(a, b)
+#define	getwd(a)	dcgetwd(a)
 extern void commnds(void);
-extern struct blk *dcdiv(struct blk *, struct blk *);
+extern struct blk *div(struct blk *, struct blk *);
 extern int dscale(void);
 extern struct blk *removr(struct blk *, int);
-extern struct blk *dcsqrt(struct blk *);
-extern struct blk *dcexp(struct blk *, struct blk *);
+extern struct blk *sqrt(struct blk *);
+extern struct blk *exp(struct blk *, struct blk *);
 extern void init(int, char *[]);
 extern void onintr(int);
 extern void pushp(struct blk *);
@@ -158,8 +161,8 @@ extern void print(struct blk *);
 extern struct blk *getdec(struct blk *, int);
 extern void tenot(struct blk *, int);
 extern void oneot(struct blk *, int, char);
-extern void hexot(struct blk *, int);
-extern void bigot(struct blk *, int);
+extern void hexot(struct blk *, int, int);
+extern void bigot(struct blk *, int, int);
 extern struct blk *add(struct blk *, struct blk *);
 extern int eqk(void);
 extern struct blk *removc(struct blk *, int);
@@ -181,7 +184,7 @@ extern void ospace(char *);
 extern void garbage(char *);
 extern void redef(struct blk *);
 extern void release(register struct blk *);
-extern struct blk *dcgetwd(struct blk *);
+extern struct blk *getwd(struct blk *);
 extern void putwd(struct blk *, struct blk *);
 extern struct blk *lookwd(struct blk *);
 extern char *nalloc(register char *, unsigned);
