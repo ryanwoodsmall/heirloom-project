@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.100 (gritter) 9/9/04
+ *	Sccsid @(#)extern.h	2.101 (gritter) 9/9/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -142,7 +142,8 @@ void	 load __P((char *));
 int	 mail __P((struct name *,
 	    struct name *, struct name *, struct name *,
 	   	 char *, struct attachment *, char *, int, int));
-void	 mail1 __P((struct header *, int, struct message *, char *, int, int));
+enum okay	 mail1 __P((struct header *, int, struct message *,
+			char *, int, int));
 int	 mboxit __P((void *));
 int	 member __P((char *, struct ignoretab *));
 int	 messize __P((void *));

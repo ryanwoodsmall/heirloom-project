@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.63 (gritter) 9/5/04";
+static char sccsid[] = "@(#)cmd3.c	2.64 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -379,8 +379,8 @@ respond_internal(msgvec, recipient_record)
 		head.h_cc = np;
 	}
 	make_ref(mp, &head);
-	mail1(&head, 1, mp, NULL, recipient_record, 0);
-	if (value("markanswered"))
+	if (mail1(&head, 1, mp, NULL, recipient_record, 0) == OKAY &&
+			value("markanswered"))
 		mp->m_flag |= MANSWER|MANSWERED;
 	return(0);
 }
@@ -878,7 +878,9 @@ Respond_internal(msgvec, recipient_record)
 		head.h_subject = hfield("subj", mp);
 	head.h_subject = reedit(head.h_subject);
 	make_ref(mp, &head);
-	mail1(&head, 1, mp, NULL, recipient_record, 0);
+	if (mail1(&head, 1, mp, NULL, recipient_record, 0) == OKAY &&
+			value("markanswered"))
+		mp->m_flag |= MANSWER|MANSWERED;
 	return 0;
 }
 

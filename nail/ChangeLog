@@ -6,6 +6,9 @@
   anymore.
 * Nail did not properly keep the mark for the current message if messages
   were expunged on an IMAP server.
+* The 'markanswered' variable has been fixed to be effective with the
+  'Reply' command too, and not to mark messages if the reply has been
+  aborted by '~q' or '~x' or if a send error was detected.
 
 [11.6] released 9/7/04
 * An IMAP performance improvement introduced in release 11.5 lead to an

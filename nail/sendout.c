@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.40 (gritter) 9/6/04";
+static char sccsid[] = "@(#)sendout.c	2.41 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -70,7 +70,7 @@ static int	make_multipart __P((struct header *, int, FILE *, FILE *,
 static FILE	*infix __P((struct header *, FILE *));
 static int	savemail __P((char [], FILE *));
 static int	sendmail_internal __P((void *, int));
-static int	start_mta __P((struct name *, struct name *, FILE *));
+static enum okay	start_mta __P((struct name *, struct name *, FILE *));
 static void	message_id __P((FILE *));
 static void	date_field __P((FILE *));
 static int	fmt __P((char *, struct name *, FILE *, int, int, int));
@@ -711,7 +711,7 @@ Sendmail(v)
  * Start the Mail Transfer Agent
  * mailing to namelist and stdin redirected to input.
  */
-static int
+static enum okay
 start_mta(to, mailargs, input)
 struct name *to, *mailargs;
 FILE* input;
@@ -720,6 +720,7 @@ FILE* input;
 	pid_t pid;
 	sigset_t nset;
 	char *cp, *smtp;
+	enum okay	ok = STOP;
 
 	if ((smtp = value("smtp")) == NULL) {
 		args = unpack(cat(mailargs, to));
@@ -729,10 +730,10 @@ FILE* input;
 			for (t = args; *t != NULL; t++)
 				printf(" \"%s\"", *t);
 			printf("\n");
-			return 0;
+			return OKAY;
 		}
 	} else if (debug || value("debug"))
-		return 0;
+		return OKAY;
 	/*
 	 * Fork, set up the temporary mail file as standard
 	 * input for "mail", and exec with the user list we generated
@@ -742,7 +743,7 @@ FILE* input;
 		perror("fork");
 		savedeadletter(input);
 		senderr++;
-		return 1;
+		return STOP;
 	}
 	if (pid == 0) {
 		sigemptyset(&nset);
@@ -772,18 +773,22 @@ FILE* input;
 		_exit(1);
 	}
 	if (value("verbose") != NULL || value("sendwait")) {
-		if (wait_child(pid) < 0)
+		if (wait_child(pid) == 0)
+			ok = OKAY;
+		else
 			senderr++;
-	} else
+	} else {
+		ok = OKAY;
 		free_child(pid);
-	return 0;
+	}
+	return ok;
 }
 
 /*
  * Mail a message on standard input to the people indicated
  * in the passed header.  (Internal interface).
  */
-void
+enum okay
 mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 	struct header *hp;
 	int printheaders;
@@ -794,11 +799,12 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 	char *cp, *cq, *ep;
 	struct name *to;
 	FILE *mtf, *nmtf;
+	enum okay	ok = STOP;
 
 #ifdef	notdef
 	if ((hp->h_to = checkaddrs(hp->h_to)) == NULL) {
 		senderr++;
-		return;
+		return STOP;
 	}
 #endif
 	/*
@@ -806,7 +812,7 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 	 * Get the result as mtf.
 	 */
 	if ((mtf = collect(hp, printheaders, quote, quotefile, tflag)) == NULL)
-		return;
+		return STOP;
 	if (value("interactive") != NULL) {
 		if (((value("bsdcompat") || value("askatend"))
 					&& (value("askcc") != NULL ||
@@ -850,7 +856,7 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 		savedeadletter(mtf);
 		fputs(catgets(catd, CATSET, 187,
 				". . . message not sent.\n"), stderr);
-		return;
+		return STOP;
 	}
 	mtf = nmtf;
 	/*
@@ -861,8 +867,10 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 	if (senderr)
 		savedeadletter(mtf);
 	to = elide(to);
-	if (count(to) == 0)
+	if (count(to) == 0) {
+		ok = OKAY;
 		goto out;
+	}
 	if (recipient_record) {
 		cq = skin(to->n_name);
 		cp = salloc(strlen(cq) + 1);
@@ -891,9 +899,10 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 			goto out;
 		}
 	}
-	start_mta(to, hp->h_smopts, mtf);
+	ok = start_mta(to, hp->h_smopts, mtf) == 0;
 out:
 	Fclose(mtf);
+	return ok;
 }
 
 /*
@@ -1297,6 +1306,7 @@ int add_resent;
 	FILE *ibuf, *nfo, *nfi;
 	char *tempMail;
 	struct header head;
+	enum okay	ok;
 
 	memset(&head, 0, sizeof head);
 	if ((to = checkaddrs(to)) == NULL) {
@@ -1337,7 +1347,9 @@ int add_resent;
 		savedeadletter(nfi);
 	to = elide(to);
 	if (count(to) != 0)
-		start_mta(to, head.h_smopts, nfi);
+		ok = start_mta(to, head.h_smopts, nfi);
+	else
+		ok = OKAY;
 	Fclose(nfi);
-	return 0;
+	return ok;
 }
