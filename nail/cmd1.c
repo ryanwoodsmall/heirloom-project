@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.72 (gritter) 9/9/04";
+static char sccsid[] = "@(#)cmd1.c	2.73 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -86,9 +86,7 @@ headers(v)
 	int size;
 
 	size = screensize();
-	n = msgvec[0];
-	if (n != 0)
-		screen = ((mb.mb_threaded?message[n-1].m_threadpos:n)-1)/size;
+	n = msgvec[0];	/* n == 0: called from scroll() */
 	if (screen < 0)
 		screen = 0;
 	k = screen * size;
@@ -101,15 +99,15 @@ headers(v)
 		mq = &message[0];
 		for (mp = &message[0]; mp < &message[msgCount]; mp++)
 			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0) {
-				if (g++ == k)
-					break;
 				if (g % size == 0)
 					mq = mp;
+				if (n ? mp == &message[n-1] : g == k)
+					break;
+				g++;
 			}
-		if (mp >= &message[msgCount]) {
-			mp = mq;
+		if (mp >= &message[msgCount])
 			screen = g / size;
-		}
+		mp = mq;
 		mesg = mp - &message[0];
 		if (dot != &message[n-1]) {
 			for (mq = mp; mq < &message[msgCount]; mq++)
@@ -134,15 +132,15 @@ headers(v)
 		for (mp = threadroot; mp; mp = next_in_thread(mp))
 			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0 &&
 					mp->m_collapsed <= 0) {
-				if (g++ == k)
-					break;
 				if (g % size == 0)
 					mq = mp;
+				if (n ? mp == &message[n-1] : g == k)
+					break;
+				g++;
 			}
-		if (mp == NULL) {
-			mp = mq;
+		if (mp == NULL)
 			screen = g / size;
-		}
+		mp = mq;
 		if (dot != &message[n-1]) {
 			for (mq = mp; mq; mq = next_in_thread(mq))
 				if ((mq->m_flag&(MDELETED|MHIDDEN|MKILL))==0 &&

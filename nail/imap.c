@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.189 (gritter) 9/7/04";
+static char sccsid[] = "@(#)imap.c	1.190 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -1275,7 +1275,7 @@ done:	setmsize(msgCount);
 		purgecache(&mb, message, msgCount);
 	if ((newmail || transparent) && mb.mb_sorted) {
 		mb.mb_threaded = 0;
-		sort(NULL);
+		sort((void *)-1);
 	}
 	if (!newmail && !edit && msgCount == 0) {
 		if ((mb.mb_type == MB_IMAP || mb.mb_type == MB_CACHE) &&

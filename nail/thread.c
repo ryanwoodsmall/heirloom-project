@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.46 (gritter) 9/9/04";
+static char sccsid[] = "@(#)thread.c	1.47 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -76,13 +76,13 @@ static unsigned	mhash __P((const char *, int));
 static struct mitem	*mlook __P((char *, struct mitem *, struct message *,
 				int));
 static void	adopt __P((struct message *, struct message *, int));
-static struct message *interlink __P((struct message *, long));
+static struct message *interlink __P((struct message *, long, int));
 static void	finalize __P((struct message *));
 static int	mlonglt __P((const void *, const void *));
 static int	mcharlt __P((const void *, const void *));
 static int	mfloatlt __P((const void *, const void *));
 static void	lookup __P((struct message *, struct mitem *, int));
-static void	makethreads __P((struct message *, long));
+static void	makethreads __P((struct message *, long, int));
 static char	*skipre __P((const char *));
 static int	colpt __P((int *, int));
 static void	colps __P((struct message *, int));
@@ -233,15 +233,16 @@ adopt(parent, child, dist)
  * links.
  */
 static struct message *
-interlink(m, count)
+interlink(m, count, newmail)
 	struct message	*m;
 	long	count;
+	int	newmail;
 {
 	int	i;
 	long	n;
 	struct msort	*ms;
 	struct message	*root;
-	int	autocollapse = value("autocollapse") != NULL;
+	int	autocollapse = !newmail && value("autocollapse") != NULL;
 
 	ms = smalloc(sizeof *ms * count);
 	for (n = 0, i = 0; i < count; i++) {
@@ -356,9 +357,10 @@ lookup(m, mi, mprime)
 }
 
 static void
-makethreads(m, count)
+makethreads(m, count, newmail)
 	struct message	*m;
 	long	count;
+	int	newmail;
 {
 	struct mitem	*mt;
 	char	*cp;
@@ -379,7 +381,8 @@ makethreads(m, count)
 		m[i].m_child = m[i].m_younger = m[i].m_elder =
 			m[i].m_parent = NULL;
 		m[i].m_level = 0;
-		m[i].m_collapsed = 0;
+		if (!newmail)
+			m[i].m_collapsed = 0;
 	}
 	/*
 	 * Most folders contain the eldest messages first. Traversing
@@ -392,7 +395,7 @@ makethreads(m, count)
 	 */
 	for (i = count-1; i >= 0; i--)
 		lookup(&m[i], mt, mprime);
-	threadroot = interlink(m, count);
+	threadroot = interlink(m, count, newmail);
 	finalize(threadroot);
 	free(mt);
 	mb.mb_threaded = 1;
@@ -402,14 +405,14 @@ int
 thread(vp)
 	void	*vp;
 {
-	if (mb.mb_threaded != 1 || vp == NULL) {
+	if (mb.mb_threaded != 1 || vp == NULL || vp == (void *)-1) {
 		if (mb.mb_type == MB_IMAP)
 			imap_getheaders(1, msgCount);
-		makethreads(message, msgCount);
+		makethreads(message, msgCount, vp == (void *)-1);
 		free(mb.mb_sorted);
 		mb.mb_sorted = sstrdup("thread");
 	}
-	if (vp && !inhook && value("header"))
+	if (vp && vp != (void *)-1 && !inhook && value("header"))
 		return headers(vp);
 	return 0;
 }
@@ -535,7 +538,7 @@ sort(vp)
 
 	msgvec[0] = dot - &message[0] + 1;
 	msgvec[1] = 0;
-	if (vp == NULL) {
+	if (vp == NULL || vp == (void *)-1) {
 		_args[0] = savestr(mb.mb_sorted);
 		_args[1] = NULL;
 		args = _args;
@@ -556,7 +559,7 @@ sort(vp)
 	free(mb.mb_sorted);
 	mb.mb_sorted = sstrdup(args[0]);
 	if (method == SORT_THREAD)
-		return thread(vp ? msgvec : NULL);
+		return thread(vp && vp != (void *)-1 ? msgvec : NULL);
 	ms = ac_alloc(sizeof *ms * msgCount);
 	switch (method) {
 	case SORT_SUBJECT:
@@ -642,7 +645,8 @@ sort(vp)
 	finalize(threadroot);
 	mb.mb_threaded = 2;
 	ac_free(ms);
-	return vp && !inhook && value("header") ? headers(msgvec) : 0;
+	return vp && vp != (void *)-1 && !inhook &&
+		value("header") ? headers(msgvec) : 0;
 }
 
 static char *

@@ -23,7 +23,7 @@ the current configuration system:
 
 Linux           Kernel 2.2 and above; libc4, glibc 2.2 and above, diet libc;
                 gcc, Intel C
-Solaris         8 and above; Sun C, gcc
+Solaris         2.6 and above; Sun C, gcc
 Open UNIX       8.0.0
 FreeBSD         4.9-RELEASE, 5.2.1-RELEASE
 HP-UX           B.11.11, B.11.23
@@ -96,4 +96,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           9/5/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           9/9/04

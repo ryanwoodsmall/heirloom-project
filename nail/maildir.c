@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.9 (gritter) 9/7/04";
+static char sccsid[] = "@(#)maildir.c	1.10 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -145,7 +145,7 @@ maildir_setfile(name, newmail, isedit)
 	setmsize(msgCount);
 	if (newmail && mb.mb_sorted && msgCount > omsgCount) {
 		mb.mb_threaded = 0;
-		sort(NULL);
+		sort((void *)-1);
 	}
 	if (!newmail)
 		sawcom = 0;

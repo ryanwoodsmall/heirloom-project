@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.71 (gritter) 9/8/04";
+static char sccsid[] = "@(#)lex.c	2.72 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -206,7 +206,7 @@ setfile(name, newmail)
 	setmsize(msgCount);
 	if (newmail && mb.mb_sorted) {
 		mb.mb_threaded = 0;
-		sort(NULL);
+		sort((void *)-1);
 	}
 	Fclose(ibuf);
 	relsesigs();
@@ -807,12 +807,14 @@ getmdot(newmail)
 	char	*cp;
 	int	mdot;
 
-	if (value("autothread"))
-		thread(NULL);
-	else if ((cp = value("autosort")) != NULL) {
-		free(mb.mb_sorted);
-		mb.mb_sorted = sstrdup(cp);
-		sort(NULL);
+	if (!newmail) {
+		if (value("autothread"))
+			thread(NULL);
+		else if ((cp = value("autosort")) != NULL) {
+			free(mb.mb_sorted);
+			mb.mb_sorted = sstrdup(cp);
+			sort(NULL);
+		}
 	}
 	if (mb.mb_type == MB_VOID)
 		return 1;
