@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffreg.c	1.26 (gritter) 3/26/05>	*/
+/*	Sccsid @(#)diffreg.c	1.28 (gritter) 3/26/05>	*/
 /*	from 4.3BSD diffreg.c 4.16 3/29/86	*/
 
 #include "diff.h"
@@ -183,6 +183,7 @@ static long	*J;		/* will be overlaid on class */
 static off_t	*ixold;		/* will be overlaid on klist */
 static off_t	*ixnew;		/* will be overlaid on file[1] */
 static int	(*chrtran)(int);/* translation for case-folding */
+static long	pstart;		/* start of last search for -p */
 static long	plast;		/* match of last search for -p */
 static long	*saveJ;		/* saved J for -p */
 
@@ -381,7 +382,7 @@ notsame:
 		check_mb();
 	else
 		check_sb();
-	plast = 0;
+	pstart = plast = 0;
 	output();
 	status = anychange;
 same:
@@ -1577,7 +1578,7 @@ pdump(long a)
 	int	c, i, j;
 	wchar_t	wc;
 
-	while (a-->plast) {
+	while (a-- > pstart) {
 		if (saveJ[a+1] == 0)
 			continue;
 		fseeko(input[0], ixold[a], SEEK_SET);
@@ -1616,6 +1617,7 @@ pdump(long a)
 			break;
 		}
 	}
+	pstart = a+1;
 	if (plast) {
 		putchar(' ');
 		for (i = 0; lbuf[i]; i++)
