@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.63 (gritter) 11/3/04";
+static char sccsid[] = "@(#)send.c	2.64 (gritter) 11/5/04";
 #endif
 #endif /* not lint */
 
@@ -680,7 +680,7 @@ parsemultipart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 	offs = ftell(ibuf);
 	newpart(ip, &np, offs, NULL);
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
-		if (linelen >= boundlen + 1 &&
+		if (lines > 0 && linelen >= boundlen + 1 &&
 				strncmp(line, boundary, boundlen) == 0) {
 			if (line[boundlen] == '\n') {
 				offs = ftell(ibuf);

@@ -10,6 +10,9 @@
 * Since many versions of Linux do not correctly update the modification time
   of a file with mmap(), utime() is now called to force an update when the
   junk mail database is changed.
+* When a malformed MIME multipart message is encountered that contains the
+  boundary string on two immediately following lines, the second line is no
+  longer treated as the begin of a new part.
 
 [11.14] released 11/4/04
 * A 'Z' command was introduced. It is similar to the 'z' command, but scrolls
