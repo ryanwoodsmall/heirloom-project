@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.90 (gritter) 11/6/04
+ *	Sccsid @(#)def.h	2.91 (gritter) 11/26/04
  */
 
 /*
@@ -394,7 +394,8 @@ enum gfield {
 	GDATE	= 8192,		/* Date: header */
 	GFULL	= 16384,	/* include full names */
 	GSKIN	= 32768,	/* skin names */
-	GREPLYTO= 65536		/* a Reply-To field */
+	GREPLYTO= 65536,	/* a Reply-To field */
+	GFILES	= 131072	/* include filename addresses */
 };
 
 #define	GMASK	(GTO|GSUBJECT|GCC|GBCC|GREPLYTO)/* Mask of places from whence */

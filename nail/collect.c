@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.38 (gritter) 11/6/04";
+static char sccsid[] = "@(#)collect.c	2.39 (gritter) 11/26/04";
 #endif
 #endif /* not lint */
 
@@ -186,7 +186,7 @@ print_collf(FILE *collf, struct header *hp)
 	}
 	fprintf(obuf, catgets(catd, CATSET, 62,
 				"-------\nMessage contains:\n"));
-	gf = GTO|GSUBJECT|GCC|GBCC|GNL|GREPLYTO;
+	gf = GTO|GSUBJECT|GCC|GBCC|GNL|GREPLYTO|GFILES;
 	if (value("fullnames"))
 		gf |= GCOMMA;
 	puthead(hp, obuf, gf, SEND_TODISP, CONV_NONE, NULL, NULL);

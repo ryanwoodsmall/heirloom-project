@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.69 (gritter) 11/17/04";
+static char sccsid[] = "@(#)sendout.c	2.70 (gritter) 11/26/04";
 #endif
 #endif /* not lint */
 
@@ -965,14 +965,14 @@ mkdate(FILE *fo, const char *field)
 #define	FMT_CC_AND_BCC	{ \
 				if (hp->h_cc != NULL && w & GCC) { \
 					if (fmt("Cc:", hp->h_cc, fo, \
-							w&GCOMMA, 0, \
+							w&(GCOMMA|GFILES), 0, \
 							action!=SEND_TODISP)) \
 						return 1; \
 					gotcha++; \
 				} \
 				if (hp->h_bcc != NULL && w & GBCC) { \
 					if (fmt("Bcc:", hp->h_bcc, fo, \
-							w&GCOMMA, 0, \
+							w&(GCOMMA|GFILES), 0, \
 							action!=SEND_TODISP)) \
 						return 1; \
 					gotcha++; \
@@ -1037,13 +1037,14 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		}
 	}
 	if (hp->h_replyto != NULL && w & GREPLYTO) {
-		if (fmt("Reply-To:", hp->h_replyto, fo, w&GCOMMA, 0,
+		if (fmt("Reply-To:", hp->h_replyto, fo, w&(GCOMMA|GFILES), 0,
 					action != SEND_TODISP))
 			return 1;
 		gotcha++;
 	}
 	if (hp->h_to != NULL && w & GTO) {
-		if (fmt("To:", hp->h_to, fo, w&GCOMMA, 0,action!=SEND_TODISP))
+		if (fmt("To:", hp->h_to, fo, w&(GCOMMA|GFILES), 0,
+					action!=SEND_TODISP))
 			return 1;
 		gotcha++;
 	}
@@ -1114,20 +1115,21 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
  * Format the given header line to not exceed 72 characters.
  */
 static int
-fmt(char *str, struct name *np, FILE *fo, int comma, int dropinvalid,
+fmt(char *str, struct name *np, FILE *fo, int flags, int dropinvalid,
 		int domime)
 {
 	int col, len, count = 0;
-	int is_to = 0;
+	int is_to = 0, comma;
 
-	comma = comma ? 1 : 0;
+	comma = flags&GCOMMA ? 1 : 0;
 	col = strlen(str);
 	if (col) {
 		fwrite(str, sizeof *str, strlen(str), fo);
-		if (col == 3 && asccasecmp(str, "to:") == 0 ||
-			col == 3 && asccasecmp(str, "cc:") == 0 ||
-			col == 4 && asccasecmp(str, "bcc:") == 0 ||
-			col == 10 && asccasecmp(str, "Resent-To:") == 0)
+		if ((flags&GFILES) == 0 &&
+				col == 3 && asccasecmp(str, "to:") == 0 ||
+				col == 3 && asccasecmp(str, "cc:") == 0 ||
+				col == 4 && asccasecmp(str, "bcc:") == 0 ||
+				col == 10 && asccasecmp(str, "Resent-To:") == 0)
 			is_to = 1;
 	}
 	for (; np != NULL; np = np->n_flink) {
