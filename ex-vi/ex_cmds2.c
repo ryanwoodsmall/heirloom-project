@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmds2.c	1.17 (gritter) 12/1/04";
+static char sccsid[] = "@(#)ex_cmds2.c	1.18 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -157,7 +157,7 @@ error0(void)
 			dingdong();
 		return;
 	}
-	if (input) {
+	if (input && exitoneof) {
 		input = strend(input) - 1;
 		if (*input == '\n')
 			setlastchar('\n');
@@ -218,7 +218,8 @@ error1(char *str)
 		putNFL();
 	if (die)
 		exitex(1);
-	lseek(0, (off_t)0, SEEK_END);
+	if (exitoneof)
+		lseek(0, (off_t)0, SEEK_END);
 	if (inglobal)
 		setlastchar('\n');
 	while (lastchar() != '\n' && lastchar() != EOF)

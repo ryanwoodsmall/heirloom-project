@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmdsub.c	1.27 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_cmdsub.c	1.28 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -561,6 +561,7 @@ tagfind(bool quick)
 	char *fn, *fne;
 	struct stat sbuf;
 	char *savefirstpat = NULL;
+	int	ofailed;
 #ifdef FASTTAG
 	int ft_iof;
 	char ft_iofbuf[MAXBSIZE];
@@ -570,6 +571,8 @@ tagfind(bool quick)
 
 	omagic = value(MAGIC);
 	owrapscan = value(WRAPSCAN);
+	ofailed = failed;
+	failed = 1;
 	if (!skipend()) {
 		register char *lp = lasttag;
 
@@ -752,6 +755,7 @@ badtags:
 			if (tflag)
 				value(WRAPSCAN) = 1;
 			commands(1, 1);
+			failed = ofailed;
 			peekc = d;
 			globp = oglobp;
 			value(MAGIC) = omagic;

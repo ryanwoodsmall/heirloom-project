@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmds.c	1.18 (gritter) 1/2/05";
+static char sccsid[] = "@(#)ex_cmds.c	1.20 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -97,7 +97,7 @@ int	poffset;
  * processing and call command routines to do the real work.
  */
 void 
-commands(int noprompt, int exitoneof)
+commands(int noprompt, int _exitoneof)
 {
 	register line *addr;
 	register int c;
@@ -110,6 +110,7 @@ commands(int noprompt, int exitoneof)
 	resetflav();
 	nochng();
 	for (;;) {
+		exitoneof = _exitoneof;
 		/*
 		 * If dot at last command
 		 * ended up at zero, advance to one if there is a such.
@@ -834,8 +835,11 @@ wq:
 			c = getchar();
 			if (c=='\n' || c=='\r')
 				ungetchar(c);
-			if (any(c, "@*\n\r"))
+			if (any(c, "@*\n\r")) {
 				c = lastmac;
+				if (c == 0)
+					failed = 1;
+			}
 			if (isupper(c))
 				c = tolower(c);
 			if (!islower(c))
