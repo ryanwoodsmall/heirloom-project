@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.58 (gritter) 1/2/05";
+static char sccsid[] = "@(#)list.c	2.59 (gritter) 3/5/05";
 #endif
 #endif /* not lint */
 
@@ -381,7 +381,13 @@ number:
 		case TCOMMA:
 			if (mb.mb_type == MB_IMAP && gotheaders++ == 0)
 				imap_getheaders(1, msgCount);
-			if ((cp = hfield("references", dot)) != NULL) {
+			if (id == NULL && (cp = hfield("in-reply-to", dot))
+					!= NULL) {
+				id = savestr(cp);
+				idfield = ID_IN_REPLY_TO;
+			}
+			if (id == NULL && (cp = hfield("references", dot))
+					!= NULL) {
 				struct name	*np;
 				if ((np = extract(cp, GREF)) != NULL) {
 					while (np->n_flink != NULL)
@@ -389,11 +395,6 @@ number:
 					id = savestr(np->n_name);
 					idfield = ID_REFERENCES;
 				}
-			}
-			if (id == NULL && (cp = hfield("in-reply-to", dot))
-					!= NULL) {
-				id = savestr(cp);
-				idfield = ID_IN_REPLY_TO;
 			}
 			if (id == NULL) {
 				printf(catgets(catd, CATSET, 227,

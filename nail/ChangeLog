@@ -1,9 +1,11 @@
 [11.22] released ...
+* In threaded mode, the thread structure is now shown using line-drawing
+  characters in the header summary. (This looks best on a UTF-8 terminal.)
+* If a message contains both a 'References' and an 'In-Reply-To' header
+  field, 'In-Reply-To' is now preferred for threading and the ',' address.
 * When a message part of content-type text/anything is written with the
   pipe-type/subtype mechanism, it is now converted to the character encoding
   of the locale (as it was before 11.14 or so).
-* In threaded mode, the thread structure is now shown using line-drawing
-  characters in the header summary.
 * When using a hostname with a port number attached with SMTP STARTTLS,
   strip the port number for correct host name verification (Bugreport by
   Gary E. Rafe).

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.54 (gritter) 12/29/04";
+static char sccsid[] = "@(#)thread.c	1.55 (gritter) 3/5/05";
 #endif
 #endif /* not lint */
 
@@ -88,11 +88,15 @@ static int colpt(int *msgvec, int cl);
 static void colps(struct message *b, int cl);
 static void colpm(struct message *m, int cl, int *cc, int *uc);
 
+/*
+ * Return the hash value for a message id modulo mprime, or mprime
+ * if the passed string does not look like a message-id.
+ */
 static unsigned 
 mhash(const char *cp, int mprime)
 {
 
-	unsigned	h = 0, g;
+	unsigned	h = 0, g, at = 0;
 
 	cp--;
 	while (*++cp) {
@@ -106,15 +110,23 @@ mhash(const char *cp, int mprime)
 		}
 		if (*cp == '"' || *cp == '\\')
 			continue;
+		if (*cp == '@')
+			at++;
 		h = ((h << 4) & 0xffffffff) + lowerconv(*cp & 0377);
 		if ((g = h & 0xf0000000) != 0) {
 			h = h ^ (g >> 24);
 			h = h ^ g;
 		}
 	}
-	return h % mprime;
+	return at ? h % mprime : mprime;
 }
 
+#define	NOT_AN_ID	((struct mitem *)-1)
+
+/*
+ * Look up a message id. Returns NOT_AN_ID if the passed string does
+ * not look like a message-id.
+ */
 static struct mitem *
 mlook(char *id, struct mitem *mt, struct message *mdata, int mprime)
 {
@@ -125,8 +137,11 @@ mlook(char *id, struct mitem *mt, struct message *mdata, int mprime)
 		return NULL;
 	if (mdata && mdata->m_idhash)
 		h = ~mdata->m_idhash;
-	else
+	else {
 		h = mhash(id, mprime);
+		if (h == mprime)
+			return NOT_AN_ID;
+	}
 	mp = &mt[c = h];
 	while (mp->mi_id != NULL) {
 		if (msgidcmp(mp->mi_id, id) == 0)
@@ -315,6 +330,16 @@ lookup(struct message *m, struct mitem *mi, int mprime)
 	if (m->m_flag & MHIDDEN)
 		return;
 	dist = 1;
+	if ((cp = hfield("in-reply-to", m)) != NULL) {
+		if ((np = extract(cp, GREF)) != NULL)
+			do {
+				if ((ip = mlook(np->n_name, mi, NULL, mprime))
+						!= NULL && ip != NOT_AN_ID) {
+					adopt(ip->mi_data, m, 1);
+					return;
+				}
+			} while ((np = np->n_flink) != NULL);
+	}
 	if ((cp = hfield("references", m)) != NULL) {
 		if ((np = extract(cp, GREF)) != NULL) {
 			while (np->n_flink != NULL)
@@ -322,22 +347,14 @@ lookup(struct message *m, struct mitem *mi, int mprime)
 			do {
 				if ((ip = mlook(np->n_name, mi, NULL, mprime))
 						!= NULL) {
+					if (ip == NOT_AN_ID)
+						continue; /* skip dist++ */
 					adopt(ip->mi_data, m, dist);
 					return;
 				}
 				dist++;
 			} while ((np = np->n_blink) != NULL);
 		}
-	}
-	if ((cp = hfield("in-reply-to", m)) != NULL) {
-		if ((np = extract(cp, GREF)) != NULL)
-			do {
-				if ((ip = mlook(np->n_name, mi, NULL, mprime))
-						!= NULL) {
-					adopt(ip->mi_data, m, 1);
-					return;
-				}
-			} while ((np = np->n_flink) != NULL);
 	}
 }
 
