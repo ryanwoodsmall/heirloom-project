@@ -242,18 +242,18 @@ Extending the Heirloom Toolchest
 
 If you want to add an extension to a utility, just go on and do it - as
 you've read in the section above, accessibility for hacking is intended
-to be easy. If you want to have it included in my version, however, read
-on here. The Heirloom Toolchest provides the traditional Unix utilities,
-but not much beyond. And it will remain this way. While I've included a
-few extensions that are in really wide use today and are justified since
-it would be difficult to get their functionality by other means (such as
-diff -u), I will not add extensions just for the convenience of people.
-For example, the Heirloom Toolchest 'grep' command will not support the
-'-r' option of GNU grep, because one can have the same result by using
-'find' in addition and can put that in a small script if one deems it
-too much to type. In general, chances are quite low that I will accept
-your extension for my version. But that doesn't mean that you should
-not do it for yourself.
+to be easy. For my version, though, the concept is to have not too many
+extensions. I sometimes include extensions because the functionality is
+really expected these days (such as diff -u), adds a real advantage for
+interactive use (such as colored output for ls), or is widely used for
+convenience and does not add much overhead (such as grep -r). I am not
+much interested in extensions that change the behavior of tools for use
+in scripts, though. Such extensions lead to subtly incompatible shell
+scripts, and these should be avoided by all means. It is much better to
+make a fresh start by creating a new utility with a different name for
+such cases. Such utilities are then beyond the scope of this collection.
+In general, chances are rather low that I will accept your extension for
+my version. But that doesn't mean that you should not do it for yourself.
 
 Reporting bugs
 ==============
@@ -288,4 +288,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           12/12/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           1/15/05
