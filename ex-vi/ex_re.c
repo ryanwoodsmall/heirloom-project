@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.48 (gritter) 2/19/05";
+static char sccsid[] = "@(#)ex_re.c	1.49 (gritter) 2/19/05";
 #endif
 #endif
 
@@ -88,6 +88,8 @@ static char sccsid[] = "@(#)ex_re.c	1.48 (gritter) 2/19/05";
 
 char	*braslist[NBRA];
 char	*braelist[NBRA];
+char	*loc1;
+char	*loc2;
 
 #else	/* !UXRE */
 static int	regerrno;
