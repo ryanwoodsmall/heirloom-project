@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.43 (gritter) 1/2/05";
+static char sccsid[] = "@(#)ex_re.c	1.44 (gritter) 1/9/05";
 #endif
 #endif
 
@@ -576,7 +576,7 @@ void
 dosub(void)
 {
 	register char *lp, *sp, *rp;
-	int c;
+	int c, n;
 #ifdef	BIT8
 	register char *qp;
 	int q;
@@ -591,10 +591,13 @@ dosub(void)
 	while (lp < loc1)
 		*sp++ = *lp++;
 	casecnt = 0;
-	while (c = *rp++) {
+	while (*rp) {
+		nextc(c, rp, n);
+		rp += n;
 #ifdef	BIT8
 		c &= TRIM;
-		q = *qp++;
+		q = *qp;
+		qp += n;
 #endif
 		/* ^V <return> from vi to split lines */
 		if (c == '\r')
@@ -649,17 +652,29 @@ dosub(void)
 				goto ovflo;
 			continue;
 		}
-#ifndef	BIT8
-		if (casecnt)
-			*sp++ = fixcase(c & TRIM);
-		else
-			*sp++ = c & TRIM;
-#else
-		if (casecnt)
-			*sp++ = fixcase(c);
-		else
-			*sp++ = c;
-#endif
+#ifdef	MB
+		if (mb_cur_max > 1) {
+			char	mb[MB_CUR_MAX+1];
+			int	i, m;
+			if (casecnt)
+				c = fixcase(c & TRIM);
+			if (c & INVBIT || (m = wctomb(mb, c)) <= 0) {
+				*mb = rp[-n];
+				m = 1;
+			}
+			for (i = 0; i < m; i++) {
+				*sp++ = mb[i];
+				if (sp >= &genbuf[LBSIZE])
+					goto ovflo;
+			}
+		} else
+#endif	/* MB */
+		{
+			if (casecnt)
+				*sp++ = fixcase(c & TRIM);
+			else
+				*sp++ = c & TRIM;
+		}
 		if (sp >= &genbuf[LBSIZE])
 ovflo:
 			error(catgets(catd, 1, 130,
@@ -680,23 +695,62 @@ fixcase(register int c)
 	if (casecnt == 0)
 		return (c);
 	casecnt--;
-	if (destuc) {
-		if (islower(c))
-			c = toupper(c);
+#ifdef	MB
+	if (c & INVBIT)
+		return (c);
+	if (mb_cur_max > 1) {
+		if (destuc) {
+			if (iswlower(c))
+				c = towupper(c);
+		} else
+			if (iswupper(c))
+				c = towlower(c);
 	} else
-		if (isupper(c))
-			c = tolower(c);
+#endif	/* MB */
+	{
+		if (destuc) {
+			if (islower(c))
+				c = toupper(c);
+		} else
+			if (isupper(c))
+				c = tolower(c);
+	}
 	return (c);
 }
 
 char *
 place(register char *sp, register char *l1, register char *l2)
 {
-
 	while (l1 < l2) {
-		*sp++ = fixcase(*l1++);
-		if (sp >= &genbuf[LBSIZE])
-			return (0);
+#ifdef	MB
+		if (mb_cur_max > 1) {
+			char	mb[MB_LEN_MAX+1];
+			int	c, i, m, n;
+
+			nextc(c, l1, m);
+			if (c & INVBIT) {
+				m = n = 1;
+				*mb = *l1;
+			} else {
+				c = fixcase(c);
+				if ((n = wctomb(mb, c)) <= 0) {
+					n = 1;
+					*mb = *l1;
+				}
+			}
+			l1 += m;
+			for (i = 0; i < n; i++) {
+				*sp++ = mb[i];
+				if (sp >= &genbuf[LBSIZE])
+					return (0);
+			}
+		} else
+#endif	/* MB */
+		{
+			*sp++ = fixcase(*l1++);
+			if (sp >= &genbuf[LBSIZE])
+				return (0);
+		}
 	}
 	return (sp);
 }
