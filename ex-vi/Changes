@@ -20,6 +20,12 @@ Release ...
 * A non-null exit status is now returned if a file could not be opened.
 * If the match for a substitution is of length zero, a line overflow is
   now avoided when compiled with the 'UNIX(R) Regular Expression Library'.
+* When moving left while the cursor is positioned over a multicolumn
+  character at the end of the line, the bell is rung now (Bugreport by
+  Matthew Fischer).
+* When moving up or down to a row with different column arrangement while
+  the cursor is positioned over a multicolumn character, the leftmost
+  character above the original position is chosen in the new row.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now

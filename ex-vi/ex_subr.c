@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_subr.c	1.36 (gritter) 2/15/05";
+static char sccsid[] = "@(#)ex_subr.c	1.37 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -83,6 +83,8 @@ static char sccsid[] = "@(#)ex_subr.c	1.36 (gritter) 2/15/05";
 #include "ex_re.h"
 #include "ex_tty.h"
 #include "ex_vis.h"
+
+static short	lastsc;
 
 /*
  * Random routines, in alphabetical order.
@@ -135,6 +137,12 @@ column(register char *cp)
 	if (cp == 0)
 		cp = &linebuf[LBSIZE - 2];
 	return (qcolumn(cp, NULL));
+}
+
+int
+lcolumn(register char *cp)
+{
+	return column(cp) - (lastsc - 1);
 }
 
 /*
@@ -659,20 +667,19 @@ qcolumn(register char *lim, register char *gp)
 int 
 qcount(int c)
 {
-	int	sc;
-
 	if (c == '\t') {
 		vcntcol += value(TABSTOP) - vcntcol % value(TABSTOP);
+		lastsc = 1;
 		return c;
 	}
 	/*
 	 * Take account of filler characters inserted at the end of
 	 * the visual line if a multi-column character does not fit.
 	 */
-	sc = colsc(c);
-	while (vcntcol < WCOLS && vcntcol + sc - 1 >= WCOLS)
+	lastsc = colsc(c&TRIM&~MULTICOL);
+	while (vcntcol < WCOLS && vcntcol + lastsc - 1 >= WCOLS)
 		vcntcol++;
-	vcntcol += c & MULTICOL ? 1 : sc;
+	vcntcol += c & MULTICOL ? 1 : lastsc;
 	return c;
 }
 

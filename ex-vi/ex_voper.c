@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_voper.c	1.25 (gritter) 1/19/05";
+static char sccsid[] = "@(#)ex_voper.c	1.27 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -586,7 +586,7 @@ errlab:
 	case CTRL('p'):
 		wdot = dot - cnt;
 		if (vmoving == 0)
-			vmoving = 1, vmovcol = column(cursor);
+			vmoving = 1, vmovcol = lcolumn(cursor);
 		wcursor = 0;
 		break;
 
@@ -635,7 +635,7 @@ errlab:
 	case NL:
 		wdot = dot + cnt;
 		if (vmoving == 0)
-			vmoving = 1, vmovcol = column(cursor);
+			vmoving = 1, vmovcol = lcolumn(cursor);
 		wcursor = 0;
 		break;
 
@@ -960,7 +960,7 @@ edge(void)
 	if (linebuf[0] == 0)
 		return (1);
 	if (dir == 1)
-		return (wcursor[1] == 0);
+		return (wcursor[skipright(linebuf, wcursor)] == 0);
 	else
 		return (wcursor == linebuf);
 }

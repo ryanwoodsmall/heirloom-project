@@ -70,7 +70,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *	@(#)ex_proto.h	1.26 (gritter) 2/15/05
+ *	@(#)ex_proto.h	1.27 (gritter) 2/15/05
  */
 
 /*
@@ -259,6 +259,7 @@ extern int any(int, register char *);
 extern int backtab(register int);
 extern void change(void);
 extern int column(register char *);
+extern int lcolumn(register char *);
 extern void comment(void);
 extern void Copy(register char *, register char *, register int);
 extern void copyw(register line *, register line *, register int);

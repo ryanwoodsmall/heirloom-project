@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.48 (gritter) 2/15/05";
+static char sccsid[] = "@(#)ex_vput.c	1.49 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -588,7 +588,7 @@ vinschar(int c)
 	register cell *tp;
 	char	*OIM;
 	bool	OXN;
-	int	noim;
+	int	noim, filler = 0;
 
 	insmc1 = colsc(c) - 1;
 	if ((!IM || !EI) && ((hold & HOLDQIK) || !value(REDRAW) || value(SLOWOPEN))) {
@@ -747,6 +747,11 @@ vinschar(int c)
 	noim = 0;
 #ifdef	MB
 	if (mb_cur_max > 1) {
+		if (destcol + 1 + insmc1 == WCOLS + 1) {
+			noim = 1;
+			if (insmc1 == 1 && insmc0 == 0)
+				filler = 1;
+		}
 		for (i = inscol; vtube0[i]; i++)
 			if (i + 1 >= WCOLS && vtube0[i] & MULTICOL) {
 				noim = 1;
@@ -796,7 +801,7 @@ vinschar(int c)
 	 * Now put the cursor in its final resting place.
 	 */
 	destline = LINE(vcline);
-	destcol = inscol + inssiz + insmc1;
+	destcol = inscol + inssiz + insmc1 + filler;
 	vcsync();
 	if (IM != OIM) {
 		IM = OIM;
