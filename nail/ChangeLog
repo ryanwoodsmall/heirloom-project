@@ -1,4 +1,4 @@
-[11.13] released ...
+[11.13] released 10/27/04
 * Backslashes outside a quoted command argument are now handled properly.
 * For junk mail detection, the characters '_', '#', '&', and '%' are now
   considered as word constituents. Also the '/' character is kept if it
