@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.75 (gritter) 2/28/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.76 (gritter) 2/28/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.75 (gritter) 2/28/05";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.76 (gritter) 2/28/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.75 (gritter) 2/28/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.76 (gritter) 2/28/05";
 #endif
 
 #include	<sys/types.h>
@@ -357,22 +357,22 @@ permissions(const char *path, const struct stat *ssp)
 		ut.actime = ssp->st_atime;
 		ut.modtime = ssp->st_mtime;
 		if (utime(path, &ut) < 0) {
-#if defined (SUS)
+#if defined (SUS) || defined (S42)
 			fprintf(stderr, "%s: cannot set times for %s\n%s: %s\n",
 					progname, path,
 					progname, strerror(errno));
-#endif /* SUS */
+#endif /* SUS || S42 */
 			if (pers != PERS_MV)
 				errcnt |= 010;
 		}
 		if (myuid == 0) {
 			if (chown(path, ssp->st_uid, ssp->st_gid) < 0) {
-#if defined (SUS)
+#if defined (SUS) || defined (S42)
 				fprintf(stderr,
 			"%s: cannot change owner and group of %s\n%s: %s\n",
 					progname, path,
 					progname, strerror(errno));
-#endif	/* SUS */
+#endif	/* SUS || S42 */
 				if (pers != PERS_MV)
 					errcnt |= 010;
 				mode &= ~(mode_t)(S_ISUID|S_ISGID);
@@ -382,11 +382,11 @@ permissions(const char *path, const struct stat *ssp)
 	} else
 		mode = check_suid(ssp, mode & ~umsk);
 	if (chmod(path, mode) < 0) {
-#if defined (SUS)
+#if defined (SUS) || defined (S42)
 		fprintf(stderr, "%s: cannot set permissions for %s\n%s: %s\n",
 				progname, path,
 				progname, strerror(errno));
-#endif	/* SUS */
+#endif	/* SUS || S42 */
 		if (pers != PERS_MV)
 			errcnt |= 010;
 	}
