@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.24 (gritter) 10/2/04";
+static char sccsid[] = "@(#)junk.c	1.25 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -473,6 +473,8 @@ loop:	i = 0;
 				(asccasecmp(sp->field, "message-id*") == 0 ||
 				 asccasecmp(sp->field, "references*") == 0 ||
 				 asccasecmp(sp->field, "in-reply-to*") == 0 ||
+				 asccasecmp(sp->field, "status*") == 0 ||
+				 asccasecmp(sp->field, "x-status*") == 0 ||
 				 asccasecmp(sp->field, "date*") == 0 ||
 				 asccasecmp(sp->field, "delivery-date*") == 0 ||
 				 ascncasecmp(sp->field, "x-spam", 6) == 0 ||
