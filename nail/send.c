@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.72 (gritter) 11/18/04";
+static char sccsid[] = "@(#)send.c	2.74 (gritter) 11/23/04";
 #endif
 #endif /* not lint */
 
@@ -46,6 +46,7 @@ static char sccsid[] = "@(#)send.c	2.72 (gritter) 11/18/04";
 #include "extern.h"
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 /*
  * Mail -- a mail program
@@ -60,6 +61,7 @@ enum parseflags {
 };
 
 static void onpipe(int signo);
+extern void brokpipe(int signo);
 static int sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		struct ignoretab *doign, char *prefix, size_t prefixlen,
 		enum sendaction action, off_t *stats, int level);
@@ -79,7 +81,8 @@ static size_t out(char *buf, size_t len, FILE *fp,
 		enum conversion convert, enum sendaction action,
 		char *prefix, size_t prefixlen, off_t *stats);
 static void addstats(off_t *stats, off_t lines, off_t bytes);
-static FILE *newfile(struct mimepart *ip);
+static FILE *newfile(struct mimepart *ip, int *ispipe,
+		sighandler_type *oldpipe);
 static char *getpipecmd(char *content);
 static FILE *getpipefile(char *cmd, FILE **qbuf, int quote);
 static void pipecpy(FILE *pipebuf, FILE *outbuf, FILE *origobuf,
@@ -190,6 +193,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	sighandler_type	oldpipe = SIG_DFL;
 	int	rt = 0;
 	long	lineno = 0;
+	int ispipe = 0;
 
 	(void)&ibuf;
 	(void)&pbuf;
@@ -198,6 +202,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	(void)&rt;
 	(void)&obuf;
 	(void)&stats;
+	(void)&action;
 	if (ip->m_mimecontent == MIME_PKCS7 && ip->m_multipart &&
 			action != SEND_MBOX)
 		goto skip;
@@ -476,7 +481,8 @@ skip:	switch (ip->m_mimecontent) {
 								"1") == 0)
 						break;
 					stats = NULL;
-					if ((obuf = newfile(np)) == NULL)
+					if ((obuf = newfile(np, &ispipe,
+							&oldpipe)) == NULL)
 						continue;
 					break;
 				case SEND_TODISP:
@@ -519,8 +525,15 @@ skip:	switch (ip->m_mimecontent) {
 					rt = -1;
 				else if (action == SEND_QUOTE)
 					break;
-				if (action == SEND_TOFILE && obuf != origobuf)
-					Fclose(obuf);
+				if (action == SEND_TOFILE && obuf != origobuf) {
+					if (ispipe == 0)
+						Fclose(obuf);
+					else {
+						safe_signal(SIGPIPE, SIG_IGN);
+						Pclose(obuf);
+						safe_signal(SIGPIPE, oldpipe);
+					}
+				}
 			}
 			return rt;
 		case SEND_MBOX:
@@ -917,12 +930,13 @@ addstats(off_t *stats, off_t lines, off_t bytes)
  * Get a file for an attachment.
  */
 static FILE *
-newfile(struct mimepart *ip)
+newfile(struct mimepart *ip, int *ispipe, sighandler_type *oldpipe)
 {
 	char	*f = ip->m_filename;
 	struct str	in, out;
 	FILE	*fp;
 
+	*ispipe = 0;
 	if (f != NULL && f != (char *)-1) {
 		in.s = f;
 		in.l = strlen(f);
@@ -940,8 +954,24 @@ newfile(struct mimepart *ip)
 	}
 	if (f == NULL || f == (char *)-1)
 		return NULL;
-	if ((fp = Fopen(f, "w")) == NULL)
-		fprintf(stderr, "Cannot open %s\n", f);
+
+	if (*f == '|') {
+		char *cp;
+		cp = value("SHELL");
+		if (cp == NULL)
+			cp = SHELL;
+		fp = Popen(f+1, "w", cp, 1);
+		if (fp == NULL) {
+			perror(f);
+			fp = stdout;
+		} else {
+			*oldpipe = safe_signal(SIGPIPE, brokpipe);
+			*ispipe = 1;
+		}
+	} else {
+		if ((fp = Fopen(f, "w")) == NULL)
+			fprintf(stderr, "Cannot open %s\n", f);
+	}
 	return fp;
 }
 

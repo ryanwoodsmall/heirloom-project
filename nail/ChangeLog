@@ -1,3 +1,8 @@
+[11.18] released ...
+* When the 'write' command asks for an attachment filename and a '|' is
+  given as the first character, the attachment is piped to the rest of
+  the string interpreted as a shell command (contributed by Stephen Isard).
+
 [11.17] released 11/18/04
 * When the 'write' command was used to save attachments in releases after
   11.14, the output file was not properly closed. Since writes to that file

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.86 (gritter) 11/3/04";
+static char sccsid[] = "@(#)cmd1.c	2.87 (gritter) 11/23/04";
 #endif
 #endif /* not lint */
 
@@ -68,7 +68,7 @@ static void hprf(const char *fmt, int mesg, FILE *f, int threaded,
 static int type1(int *msgvec, int doign, int page, int pipe, int decode,
 		char *cmd, off_t *tstats);
 static int pipe1(char *str, int doign);
-static void brokpipe(int signo);
+void brokpipe(int signo);
 
 char *
 get_pager(void)
@@ -967,7 +967,7 @@ Pipecmd(void *v)
  * probably caused by quitting more.
  */
 /*ARGSUSED*/
-static void 
+void
 brokpipe(int signo)
 {
 	siglongjmp(pipestop, 1);
