@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)od.1	1.9 (gritter) 12/10/04
+.\" Sccsid @(#)od.1	1.10 (gritter) 2/6/05
 .\" Parts taken from od(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH OD 1 "12/10/04" "Heirloom Toolchest" "User Commands"
+.TH OD 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 od \- octal dump
 .SH SYNOPSIS
@@ -143,8 +143,10 @@ decimal.
 If `\fBb\fR' is appended, the offset is interpreted in
 blocks of 512 bytes.
 If the file argument is omitted,
-the offset argument must be preceded 
-.RB ` + '.
+the offset argument must be preceded by
+.RB ` + '
+with
+.BR /usr/5bin/posix/od .
 .PP
 The following options have been introduced by POSIX.2.
 If any of these options is present,

@@ -11,6 +11,8 @@ Release ...
 * cp: The -H, -L, and -P options from POSIX.1-2001 have been added.
 * du, find: The -H and -L options from POSIX.1-2001 have been added.
 * ls: The -H option from POSIX.1-2001 has been added.
+* od: A leading '+' is not required to introduce an offset argument for the
+  POSIX.1-2001 version. The SVID personalities also do no longer require it.
 * pax: The -H option from POSIX.1-2001 has been added; pax does not follow
   symbolic links on the command line anymore unless this option is present.
   If pax detects a symbolic link loop, it now terminates for alignment with

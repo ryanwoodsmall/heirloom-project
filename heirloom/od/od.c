@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.22 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)od.sl	1.23 (gritter) 2/6/05";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -1053,7 +1053,11 @@ main(int argc, char **argv)
 		}
 	}
 	if (newopt == 0 && ((optind>=argc-2 && argc &&argv[argc-1][0] == '+') ||
+#ifndef	SUS
+				(optind>=argc-2 && argc &&
+#else	/* SUS */
 				(optind == argc-1 &&
+#endif	/* SUS */
 				digitchar(argv[argc-1][0] & 0377))) &&
 			setoffset(argv[argc-1]) >= 0) {
 		argc--;
