@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.42 (gritter) 1/16/05";
+static char sccsid[] = "@(#)ex_vput.c	1.43 (gritter) 1/20/05";
 #endif
 #endif
 
@@ -268,7 +268,7 @@ vcursat(register char *cp)
 	if (cp <= linebuf && linebuf[0] == 0)
 		vgotoCL(value(NUMBER) << 3);
 	else
-		vgotoCL(column(cp - 1));
+		vgotoCL(column(cp + skipleft(linebuf, cp)));
 }
 
 /*

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vget.c	1.27 (gritter) 1/16/05";
+static char sccsid[] = "@(#)ex_vget.c	1.28 (gritter) 1/20/05";
 #endif
 #endif
 
@@ -168,9 +168,8 @@ readwc(int fd, int *cp)
 		}
 		if (pbuf[idx][0] & 0200) {
 			sz = 1;
-			while (pbuf[idx][i-1] & 0200 && i < mb_cur_max &&
-					(sz = mbrtowc(&wc, pbuf[idx], i,
-					      &state[idx])) == (size_t)-2) {
+			while ((sz = mbrtowc(&wc, pbuf[idx], i, &state[idx]))
+					== (size_t)-2 && i < mb_cur_max) {
 				if ((c = read(fd, &b, 1)) <= 0) {
 					incompl[idx] = 1;
 					break;
