@@ -11,6 +11,8 @@
 * When S/MIME support was built using Mozilla NSS, the verification of an
   encrypted message that had not yet been downloaded from an IMAP or POP3
   server failed at the first attempt.
+* Previous versions refused to write messages or attachments to /dev/null
+  on some Solaris versions.
 
 [11.15] released 11/10/04
 * The compilation process was fixed to work without CPPFLAGS=-D_GNU_SOURCE on

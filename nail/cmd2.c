@@ -38,13 +38,14 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.41 (gritter) 11/3/04";
+static char sccsid[] = "@(#)cmd2.c	2.42 (gritter) 11/17/04";
 #endif
 #endif /* not lint */
 
 #include "rcv.h"
 #include "extern.h"
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 /*
@@ -250,6 +251,7 @@ static int
 save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 		int convert, int sender_record, int domove)
 {
+	struct stat	st;
 	int *ip;
 	struct message *mp;
 	char *file = NULL, *disp = "";
@@ -330,7 +332,9 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 			newfile = 0;
 			disp = catgets(catd, CATSET, 25, "[Appended]");
 		}
-		if (!newfile && fseek(obuf, -2L, SEEK_END) == 0) {
+		if (!newfile && fstat(fileno(obuf), &st) &&
+				S_ISREG(st.st_mode) &&
+				fseek(obuf, -2L, SEEK_END) == 0) {
 			char buf[2];
 			int prependnl = 0;
 
