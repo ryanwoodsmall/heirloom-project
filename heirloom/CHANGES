@@ -23,6 +23,9 @@ Release ...
 * grep (traditional), nawk: Handle character case conversions correctly if
   the length of the converted multibyte sequence is smaller than the original
   one.
+* od: Accept '-j 0' and do not skip anything then; if both '-j' and '-N' are
+  given, format the given number of bytes as specified by POSIX and do not
+  substract the skip count from it (Bugreport by Andreas Hofmeister).
 
 Release 041214
 * Traditional and POSIX options as well as extensions are now marked as such

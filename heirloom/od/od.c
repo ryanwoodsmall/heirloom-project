@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.19 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)od.sl	1.20 (gritter) 1/2/05";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -261,10 +261,10 @@ doskip(void)
 			continue;
 		}
 		total++;
-		if (limit > 0 && total > limit)
-			exit(0);
 		skip--;
 	}
+	if (limit >= 0)
+		limit += total;
 }
 
 /*
@@ -859,7 +859,7 @@ setskip(const char *s)
 	int	mult = 1;
 
 	skipstr = s;
-	if (*s == '0') {
+	if (s[0] == '0' && s[1]) {
 		s++;
 		if (*s == 'x' || *s == 'X') {
 			s++;
