@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.51 (gritter) 2/19/05";
+static char sccsid[] = "@(#)ex_re.c	1.52 (gritter) 2/20/05";
 #endif
 #endif
 
@@ -927,9 +927,9 @@ compile1(void)
 	refree(&re);
 	re.Flags = value(IGNORECASE) ? REG_ICASE : 0;
 #ifdef	UXRE
-	re.Flags |= REG_ANGLES | REG_BADRANGE;
+	re.Flags |= REG_ANGLES;
 #ifndef	NO_BE_BACKSLASH
-	re.Flags |= REG_BKTESCAPE;
+	re.Flags |= REG_BKTESCAPE | REG_BADRANGE;
 #endif	/* !NO_BE_BACKSLASH */
 	if (re.Expbuf == NULL)
 		re.Expbuf = calloc(1, sizeof (regex_t));
