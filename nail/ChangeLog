@@ -4,6 +4,9 @@
 * The 'z' command now always shifts the header summary by a full screen
   of messages and is not disturbed by deleted, hidden, or killed messages
   anymore.
+* When an 'account' command was executed and messages were sent to mbox
+  when the old mailbox was quit, the mbox on the new account was used.
+  Messages from the old mailbox now go to the mbox on the old account.
 * Nail did not properly keep the mark for the current message if messages
   were expunged on an IMAP server.
 * The 'markanswered' variable has been fixed to be effective with the

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)quit.c	2.21 (gritter) 9/6/04";
+static char sccsid[] = "@(#)quit.c	2.22 (gritter) 9/14/04";
 #endif
 #endif /* not lint */
 
@@ -367,7 +367,7 @@ makembox()
 	FILE *ibuf = NULL, *obuf, *abuf;
 	enum protocol	prot;
 
-	mbox = expand("&");
+	mbox = mboxname;
 	mcount = 0;
 	if (value("append") == NULL) {
 		if ((obuf = Ftemp(&tempQuit, "Rm", "w", 0600, 1)) == NULL) {

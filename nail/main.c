@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.39 (gritter) 9/6/04";
+static char sccsid[] = "@(#)main.c	2.40 (gritter) 9/14/04";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -465,6 +465,7 @@ usage:
 		safe_signal(SIGINT, SIG_IGN);
 		safe_signal(SIGQUIT, SIG_IGN);
 	}
+	strncpy(mboxname, expand("&"), sizeof mboxname)[sizeof mboxname-1]='\0';
 	quit();
 	return exit_status;
 }

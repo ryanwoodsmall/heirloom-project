@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)glob.h	2.17 (gritter) 9/5/04
+ *	Sccsid @(#)glob.h	2.18 (gritter) 9/14/04
  */
 
 /*
@@ -65,6 +65,7 @@ _E struct mailbox mb;			/* Current mailbox */
 _E int	image;				/* File descriptor for image of msg */
 _E FILE	*input;				/* Current command input file */
 _E char	mailname[PATHSIZE];		/* Name of current file */
+_E char	mboxname[PATHSIZE];		/* Name of mbox */
 _E char	prevfile[PATHSIZE];		/* Name of previous file */
 _E char	*homedir;			/* Path name of home directory */
 _E char *progname;			/* our name */
