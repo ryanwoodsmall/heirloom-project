@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmdsub.c	1.26 (gritter) 12/1/04";
+static char sccsid[] = "@(#)ex_cmdsub.c	1.27 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -560,6 +560,7 @@ tagfind(bool quick)
 	int owrapscan;
 	char *fn, *fne;
 	struct stat sbuf;
+	char *savefirstpat = NULL;
 #ifdef FASTTAG
 	int ft_iof;
 	char ft_iofbuf[MAXBSIZE];
@@ -711,6 +712,8 @@ badtags:
 			if (strcmp(filebuf, savedfile) || !edited) {
 				char cmdbuf2[sizeof filebuf + 10];
 
+				savefirstpat = firstpat;
+				firstpat = NULL;
 				/* Different file.  Do autowrite & get it. */
 				if (!quick) {
 					ckaw();
@@ -730,6 +733,7 @@ badtags:
 				if (tflag)
 					value(WRAPSCAN) = owrapscan;
 				samef = 0;
+				firstpat = savefirstpat;
 			}
 
 			/*
@@ -753,6 +757,8 @@ badtags:
 			value(MAGIC) = omagic;
 			if (tflag) {
 				value(WRAPSCAN) = owrapscan;
+				if (savefirstpat)
+					globp = savefirstpat;
 				tflag = 0;
 			}
 			return;
