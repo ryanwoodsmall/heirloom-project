@@ -24,6 +24,9 @@
   used to access it if possible.
 * Recipients that are file names are now removed from the Cc: and Bcc: fields
   of outgoing mail too, as it was already done for To:.
+* If S/MIME support was built using OpenSSL and an encrypted message was tried
+  to be decrypted without an appropriate private key, nail dumped core due to
+  a NULL pointer dereference. It now fails sanely.
 
 [11.13] released 10/27/04
 * Backslashes outside a quoted command argument are now handled properly.

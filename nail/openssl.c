@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.18 (gritter) 10/30/04";
+static char sccsid[] = "@(#)openssl.c	1.19 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -831,9 +831,15 @@ smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 		fprintf(hp, "X-Encryption-Cipher: none\n");
 		fflush(hp);
 		rewind(hp);
+	} else if (pkey == NULL) {
+		fprintf(stderr, "No appropriate private key found.\n");
+		goto err2;
+	} else if (cert == NULL) {
+		fprintf(stderr, "No appropriate certificate found.\n");
+		goto err2;
 	} else if (PKCS7_decrypt(pkcs7, pkey, cert, ob, 0) != 1) {
 	err:	ssl_gen_err("Error decrypting PKCS#7 object");
-		BIO_free(bb);
+	err2:	BIO_free(bb);
 		BIO_free(ob);
 		Fclose(op);
 		Fclose(bp);
