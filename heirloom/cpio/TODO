@@ -32,7 +32,7 @@ relies on the sequential positioning of several files separated by
 file marks). No sane person would want to use such a format on Unix
 today, except perhaps as a wrapper for a single archive file on tape.
 Moreover, many fields of this format are too small today, e. g. there
-cannot be more than 999.999 blocks in a volume.
+cannot be more than 999,999 blocks in a volume.
 
 As a result, there are no plans to implement ANSI standard tape labels
 in cpio and pax. There is a Unix implementation called 'ansitar' that
@@ -44,7 +44,7 @@ Microsoft CAB file format
 -------------------------
 
 Since this format requires that the number of files and the total size
-of the archive be stored at the very beginning of the archive, it does
+of the archive are stored at the very beginning of the archive, it does
 not fit within a sequential access archiving scheme as that of cpio and
 pax. Writing such an archive to a pipe would require to write the whole
 archive to a temporary file first, setting the numbers at the beginning
@@ -60,4 +60,4 @@ in many more environments and does not exhibit any of the weaknesses of
 the CAB design.
 
 
-	Gunnar Ritter						3/28/04
+	Gunnar Ritter						2/14/05
