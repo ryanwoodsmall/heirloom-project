@@ -1,4 +1,4 @@
-[11.22] released ...
+[11.22] released 3/20/05
 * In threaded mode, the thread structure is now shown using line-drawing
   characters in the header summary. (This looks best on a UTF-8 terminal.)
 * If a message contains both a 'References' and an 'In-Reply-To' header
