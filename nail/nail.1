@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.209 (gritter) 9/5/04
+.\"     Sccsid: @(#)nail.1	2.210 (gritter) 9/5/04
 .\"
-.TH NAIL 1 "9/5/04" "nail 11.5" "User Commands"
+.TH NAIL 1 "9/5/04" "nail 11.6" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -757,16 +757,14 @@ A synonym for the \fIpipe\fR command.
 .B account
 (ac) Creates, selects or lists
 an email account.
-An account is formed by a group of variables.
+An account is formed by a group of commands,
+primarily of those to set variables.
 With two or more arguments,
 the first argument gives an account name,
-and the following arguments create a group of variables.
+and the following arguments create a group of commands.
 With one argument,
-the previously created group of variables
-for the account name is activated
-as described for the
-.I set
-command,
+the previously created group of commands
+for the account name is executed,
 and a
 .I folder
 command is executed for the system mailbox or inbox
@@ -776,11 +774,12 @@ the list of accounts is printed.
 As an example,
 .sp
 .nf
-    \fBaccount\fI myisp\fR \e
-        folder=imaps://mylogin@imap.myisp.example \e
-        record=+Sent \e
-        from="myname@myisp.example (My Name)" \e
-        smtp=smtp.myisp.example
+    \fBaccount\fI myisp\fR \fB{\fR
+        set folder=imaps://mylogin@imap.myisp.example
+        set record=+Sent
+        set from="myname@myisp.example (My Name)"
+        set smtp=smtp.myisp.example
+    \fB}\fR
 .fi
 .sp
 creates an account named `myisp'
@@ -3383,9 +3382,10 @@ You can put the following in
 .IR ~/.nailrc :
 .sp
 .nf
-    \fBaccount \fImyisp \fR\e
-        \fBfolder=imaps://\fImylogin\fB@\fIserver.myisp.example \fR\e
-        \fBrecord=+\fISent \fBMBOX=+\fImbox \fBoutfolder\fR
+    \fBaccount \fImyisp \fB{\fR
+        set \fBfolder=imaps://\fImylogin\fB@\fIserver.myisp.example\fR
+        set \fBrecord=+\fISent \fBMBOX=+\fImbox \fBoutfolder\fR
+    \fB}\fR
 .fi
 .sp
 and can then access incoming mail for this account by invoking

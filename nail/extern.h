@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.91 (gritter) 9/4/04
+ *	Sccsid @(#)extern.h	2.92 (gritter) 9/5/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -316,7 +316,6 @@ int	shortcut __P((void *));
 int	unshortcut __P((void *));
 struct shortcut	*get_shortcut __P((const char *));
 int	account __P((void *));
-struct account	*get_account __P((const char *));
 void	out_of_memory __P((void));
 time_t	rfctime __P((char *));
 time_t	unixtime __P((char *));
@@ -393,8 +392,12 @@ int	cunkill __P((void *));
 int	cundraft __P((void *));
 int	cscore __P((void *));
 int	cdefine __P((void *));
+int	define1 __P((const char *, int));
 int	cundef __P((void *));
+void	delaccount __P((const char *));
 int	ccall __P((void *));
+int	callaccount __P((const char *));
+int	listaccounts __P((void));
 int	callhook __P((const char *, int));
 int	cmove __P((void *));
 int	cMove __P((void *));

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.71 (gritter) 9/4/04
+ *	Sccsid @(#)def.h	2.72 (gritter) 9/5/04
  */
 
 /*
@@ -482,15 +482,6 @@ struct shortcut {
 };
 
 /*
- * For the 'account' functionality.
- */
-struct account {
-	struct account	*ac_next;	/* next account in list */
-	char	*ac_name;		/* name of account */
-	char	**ac_vars;		/* variables to set */
-};
-
-/*
  * Kludges to handle the change from setexit / reset to setjmp / longjmp
  */
 
@@ -568,3 +559,5 @@ extern const unsigned char	class_char[];
 #undef	putchar
 #define	putchar(c)	putc_unlocked((c), stdout)
 #endif	/* __GLIBC__ */
+
+#define	CBAD		(-15555)

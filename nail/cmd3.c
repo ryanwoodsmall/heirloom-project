@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.60 (gritter) 9/5/04";
+static char sccsid[] = "@(#)cmd3.c	2.61 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -1193,16 +1193,22 @@ unshortcut(v)
 	return errs;
 }
 
-static struct account	*accounts;
+struct oldaccount {
+	struct oldaccount	*ac_next;	/* next account in list */
+	char	*ac_name;			/* name of account */
+	char	**ac_vars;			/* variables to set */
+};
 
-struct account *
-get_account(name)
+static struct oldaccount	*oldaccounts;
+
+struct oldaccount *
+get_oldaccount(name)
 	const char *name;
 {
-	struct account	*a;
+	struct oldaccount	*a;
 
-	for (a = accounts; a; a = a->ac_next)
-		if (strcmp(name, a->ac_name) == 0)
+	for (a = oldaccounts; a; a = a->ac_next)
+		if (a->ac_name && strcmp(name, a->ac_name) == 0)
 			break;
 	return a;
 }
@@ -1212,29 +1218,40 @@ account(v)
 	void *v;
 {
 	char	**args = (char **)v;
-	struct account	*a;
+	struct oldaccount	*a;
 	int	i;
 
 	if (args[0] == NULL) {
-		for (a = accounts; a; a = a->ac_next) {
-			printf("%s:\n", a->ac_name);
-			for (i = 0; a->ac_vars[i]; i++)
-				printf("\t%s\n", a->ac_vars[i]);
-		}
+		listaccounts();
+		for (a = oldaccounts; a; a = a->ac_next)
+			if (a->ac_name)
+				puts(a->ac_name);
 		return 0;
 	}
-	if ((a = get_account(args[0])) == NULL) {
+	if (args[1] && args[1][0] == '{' && args[1][1] == '\0') {
+		if (args[2] != NULL) {
+			fprintf(stderr, "Syntax is: account <name> {\n");
+			return 1;
+		}
+		if ((a = get_oldaccount(args[0])) != NULL)
+			a->ac_name = NULL;
+		return define1(args[0], 1);
+	}
+	if ((a = get_oldaccount(args[0])) == NULL) {
 		if (args[1]) {
 			a = scalloc(1, sizeof *a);
-			a->ac_next = accounts;
-			accounts = a;
+			a->ac_next = oldaccounts;
+			oldaccounts = a;
 		} else {
+			if ((i = callaccount(args[0])) != CBAD)
+				goto setf;
 			printf("Account %s does not exist.\n", args[0]);
 			return 1;
 		}
 	}
-	a->ac_name = sstrdup(args[0]);
 	if (args[1]) {
+		delaccount(args[0]);
+		a->ac_name = sstrdup(args[0]);
 		for (i = 1; args[i]; i++);
 		a->ac_vars = scalloc(i, sizeof *a->ac_vars);
 		for (i = 0; args[i+1]; i++)
@@ -1243,7 +1260,7 @@ account(v)
 		unset_allow_undefined = 1;
 		set(a->ac_vars);
 		unset_allow_undefined = 0;
-		if (!starting) {
+	setf:	if (!starting) {
 			char	*av[2] = { "%", NULL };
 			return file(av);
 		}

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)macro.c	1.4 (gritter) 9/4/04";
+static char sccsid[] = "@(#)macro.c	1.5 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -53,6 +53,8 @@ static char sccsid[] = "@(#)macro.c	1.4 (gritter) 9/4/04";
  * Macros.
  */
 
+#define	MAPRIME		29
+
 struct line {
 	struct line	*l_next;
 	char	*l_line;
@@ -63,12 +65,21 @@ struct macro {
 	struct macro	*ma_next;
 	char	*ma_name;
 	struct line	*ma_contents;
+	enum maflags {
+		MA_NOFLAGS,
+		MA_ACCOUNT
+	} ma_flags;
 };
 
+static struct macro	*macros[MAPRIME];
+static struct macro	*accounts[MAPRIME];
+
+static void	undef1 __P((const char *, struct macro **));
 static int	closingangle __P((const char *));
 static int	maexec __P((struct macro *));
 static unsigned	mahash __P((const char *));
-static struct macro	*malook __P((const char *, struct macro *));
+static struct macro	*malook __P((const char *, struct macro *,
+				struct macro **));
 static void	freelines __P((struct line *));
 
 int
@@ -76,11 +87,6 @@ cdefine(v)
 	void	*v;
 {
 	char	**args = v;
-	struct macro	*mp;
-	struct line	*lp, *lst = NULL, *lnd = NULL;
-	char	*linebuf = NULL;
-	size_t	linesize = 0;
-	int	n;
 
 	if (args[0] == NULL) {
 		fprintf(stderr, "Missing macro name to define.\n");
@@ -90,8 +96,23 @@ cdefine(v)
 		fprintf(stderr, "Syntax is: define <name> {\n");
 		return 1;
 	}
+	return define1(args[0], 0);
+}
+
+int
+define1(name, account)
+	const char	*name;
+	int	account;
+{
+	struct macro	*mp;
+	struct line	*lp, *lst = NULL, *lnd = NULL;
+	char	*linebuf = NULL;
+	size_t	linesize = 0;
+	int	n;
 	mp = scalloc(1, sizeof *mp);
-	mp->ma_name = sstrdup(*args);
+	mp->ma_name = sstrdup(name);
+	if (account)
+		mp->ma_flags |= MA_ACCOUNT;
 	for (;;) {
 		n = 0;
 		for (;;) {
@@ -103,7 +124,8 @@ cdefine(v)
 			linebuf[n-1] = ' ';
 		}
 		if (n < 0) {
-			fprintf(stderr, "Unterminated macro: \"%s\".\n",
+			fprintf(stderr, "Unterminated %s definition: \"%s\".\n",
+					account ? "account" : "macro",
 					mp->ma_name);
 			if (sourcing)
 				unstack();
@@ -124,13 +146,18 @@ cdefine(v)
 			lst = lnd = lp;
 	}
 	mp->ma_contents = lst;
-	if (malook(mp->ma_name, mp) != NULL) {
-		fprintf(stderr, "A macro named \"%s\" already exists.\n",
+	if (malook(mp->ma_name, mp, account ? accounts : macros) != NULL) {
+		if (!account) {
+			fprintf(stderr,
+				"A macro named \"%s\" already exists.\n",
 				mp->ma_name);
-		freelines(mp->ma_contents);
-		free(mp->ma_name);
-		free(mp);
-		return 1;
+			freelines(mp->ma_contents);
+			free(mp->ma_name);
+			free(mp);
+			return 1;
+		}
+		undef1(mp->ma_name, accounts);
+		malook(mp->ma_name, mp, accounts);
 	}
 	return 0;
 }
@@ -140,20 +167,29 @@ cundef(v)
 	void	*v;
 {
 	char	**args = v;
-	struct macro	*mp;
 
 	if (*args == NULL) {
 		fprintf(stderr, "Missing macro name to undef.\n");
 		return 1;
 	}
-	do {
-		if ((mp = malook(*args, NULL)) != NULL) {
-			freelines(mp->ma_contents);
-			free(mp->ma_name);
-			mp->ma_name = NULL;
-		}
-	} while (*++args);
+	do
+		undef1(*args, macros);
+	while (*++args);
 	return 0;
+}
+
+static void
+undef1(name, table)
+	const char	*name;
+	struct macro	**table;
+{
+	struct macro	*mp;
+
+	if ((mp = malook(name, NULL, table)) != NULL) {
+		freelines(mp->ma_contents);
+		free(mp->ma_name);
+		mp->ma_name = NULL;
+	}
 }
 
 int
@@ -167,10 +203,21 @@ ccall(v)
 		fprintf(stderr, "Syntax is: call <name>\n");
 		return 1;
 	}
-	if ((mp = malook(*args, NULL)) == NULL) {
+	if ((mp = malook(*args, NULL, macros)) == NULL) {
 		fprintf(stderr, "Undefined macro called: \"%s\"\n", *args);
 		return 1;
 	}
+	return maexec(mp);
+}
+
+int
+callaccount(name)
+	const char	*name;
+{
+	struct macro	*mp;
+
+	if ((mp = malook(name, NULL, accounts)) == NULL)
+		return CBAD;
 	return maexec(mp);
 }
 
@@ -187,7 +234,7 @@ callhook(name, newmail)
 	snprintf(var, len, "folder-hook-%s", name);
 	if ((cp = value(var)) == NULL && (cp = value("folder-hook")) == NULL)
 		return 0;
-	if ((mp = malook(cp, NULL)) == NULL) {
+	if ((mp = malook(cp, NULL, macros)) == NULL) {
 		fprintf(stderr, "Cannot call hook for folder \"%s\": "
 				"Macro \"%s\" does not exist.\n",
 				name, cp);
@@ -207,12 +254,14 @@ maexec(mp)
 	char	*copy;
 	int	r = 0;
 
+	unset_allow_undefined = 1;
 	for (lp = mp->ma_contents; lp; lp = lp->l_next) {
 		copy = smalloc(lp->l_linesize);
 		memcpy(copy, lp->l_line, lp->l_linesize);
 		r = execute(copy, 0, lp->l_linesize);
 		free(copy);
 	}
+	unset_allow_undefined = 0;
 	return r;
 }
 
@@ -228,8 +277,6 @@ closingangle(cp)
 		cp++;
 	return *cp == '\0';
 }
-
-#define	MAPRIME		29
 
 static unsigned
 mahash(cp)
@@ -249,11 +296,11 @@ mahash(cp)
 }
 
 static struct macro *
-malook(name, data)
+malook(name, data, table)
 	const char	*name;
 	struct macro	*data;
+	struct macro	**table;
 {
-	static struct macro	*table[MAPRIME];
 	struct macro	*mp;
 	unsigned	h;
 
@@ -285,4 +332,23 @@ freelines(lp)
 		lp = lp->l_next;
 	}
 	free(lq);
+}
+
+int
+listaccounts()
+{
+	struct macro	**mp, *mq;
+
+	for (mp = accounts; mp < &accounts[MAPRIME]; mp++)
+		for (mq = *mp; mq; mq = mq->ma_next)
+			if (mq->ma_name)
+				puts(mq->ma_name);
+	return 0;
+}
+
+void
+delaccount(name)
+	const char	*name;
+{
+	undef1(name, accounts);
 }

@@ -1,3 +1,10 @@
+[11.6] released ...
+* The 'account' command was changed; its syntax and semantics are similar
+  to the 'define' command now. This change is downwards compatible, and
+  old 'account' definitions are still accepted.
+* It is not an error to 'unset' an undefined variable from within a 'call'
+  command or folder hook now.
+
 [11.5] released 9/5/04
 ***************************************************************************
 * A mailing list has been created to discuss future nail developments and *
