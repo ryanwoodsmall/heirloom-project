@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)man.1	1.17 (gritter) 10/29/03
+.\" Sccsid @(#)man.1	1.18 (gritter) 2/5/05
 .\" Parts taken from intro(0), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH MAN 1 "10/29/03" "Heirloom Toolchest" "User Commands"
+.TH MAN 1 "2/5/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 man \- find and display reference manual pages
 .SH SYNOPSIS
@@ -40,7 +40,9 @@ man \- find and display reference manual pages
 .ad l
 .nh
 \fBman\fR [\fB\-\fR] [\fB\-M\fI\ path\fR]
-[\fB\-T\fI\ macro-package\fR] [\fB\-adlt\fR]
+[\fB\-T\fI\ macro-package\fR] [\fB\-adlptw\fR]
+[\fB\-m\fI\ system\fR]
+[\fB\-s\fI\ section\fR]
 [[\fIsection\fR]\ \fItitle\fR\ .\ .\ .]
 \fItitle\fR\ .\ .\ .
 .PP
@@ -92,19 +94,6 @@ The
 .B man
 command accepts the following options:
 .TP 12
-.B \-a
-Finds and displays all entries for each given
-.IR title ,
-not just the first one.
-.TP 12
-.B \-d
-Uses the current directory as the location
-of the manual page
-instead of searching in the manual search path.
-The complete file name of a manual page source in troff format
-must be specified with this option
-instead of the page title.
-.TP 12
 .BI \-f \ file
 Searches for manual entries related to the given
 .I files
@@ -125,22 +114,11 @@ This also needs a
 .B windex
 database.
 .TP 12
-.B \-l
-Lists the titles of all matching entries instead of manual page
-contents.
-.TP 12
 .BI \-M \ path
 Uses the given
 .I path
 as the manual search path, overriding both the configuration file
 and the environment. The format of this path is described below.
-.\".TP 12
-.\".BI \-s \ section
-.\"Restricts the search to entries of the given
-.\".IR section .
-.\"Multiple section names may be specified, separated by commas;
-.\"the order in which matches are displayed is not necessarily the
-.\"one given at this point.
 .TP 12
 .B \-t
 If an entry is in
@@ -153,6 +131,50 @@ Use the specified
 macro package instead of the standard
 .I \-man
 set.
+.PP
+The following options are accepted as extensions:
+.TP 12
+.B \-a
+Finds and displays all entries for each given
+.IR title ,
+not just the first one.
+.TP 12
+.B \-d
+Uses a file name relative to current directory as the location
+of the manual page
+instead of searching in the manual search path.
+The complete file name of a manual page source in troff format
+must be specified with this option
+instead of the page title.
+.TP 12
+.B \-l
+Lists the titles of all matching entries instead of manual page
+contents.
+.TP 12
+\fB\-m\ \fIsystem\fR
+For each entry in the manual search path,
+a directory named
+.I system
+below it is searched for manual pages.
+Thus to make the manual pages of other systems accessible,
+they can be put into separate subdirectories
+within the system default manual directory.
+.TP 12
+.B \-p
+Prints debugging messages instead of the formatted manual page.
+.TP 12
+.BI \-s \ section
+Provides an alternate method to restrict the search
+to specific sections of the manual.
+This is useful if the section name
+would otherwise be interpreted as a page name.
+Multiple section names may be specified, separated by commas;
+the order in which matches are displayed is not necessarily the
+one given at this point.
+.TP 12
+.B \-w
+Prints the full path name of the respective manual page(s)
+instead of their contents.
 .SS "Manual Structure"
 The manual is divided into
 eight sections:

@@ -25,7 +25,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 
-# Sccsid @(#)man.ksh	1.44 (gritter) 7/13/04
+# Sccsid @(#)man.ksh	1.46 (gritter) 2/5/05
 
 if test "x$BASH_VERSION" != x
 then

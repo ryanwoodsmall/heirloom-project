@@ -93,6 +93,8 @@ Release ...
   and vice-versa.
 * df: Percentage values are now rounded to the next integer as demanded by
   POSIX.
+* man: With the -k option, the exit status is now 0 if any matches have been
+  found.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

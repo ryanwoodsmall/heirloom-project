@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.30 (gritter) 11/7/04
+#	Sccsid common.ksh	1.32 (gritter) 2/5/05
 #
 
 #
@@ -10,6 +10,7 @@
 # names to search for.
 #
 whatpropos() {
+	status=1
 	case "$1" in
 	apropos)
 		cmd=apropos
@@ -47,26 +48,26 @@ whatpropos() {
 			then
 				case "$cmd" in
 				apropos)
-					egrep -i "$name" windex
+					egrep -i "$name" windex && status=0
 					;;
 				whatis)
-					egrep "^$name[ 	]+" windex
+					egrep "^$name[ 	]+" windex && status=0
 					;;
 				esac
 			elif test -r whatis
 			then
 				case "$cmd" in
 				apropos)
-					egrep -i "$name" whatis
+					egrep -i "$name" whatis && status=0
 					;;
 				whatis)
-					egrep "^$name[ 	]+\(" whatis
+					egrep "^$name[ 	]+\(" whatis && status=0
 					;;
 				esac
 			fi
 		done
 	done
-	exit
+	exit $status
 }
 
 #
@@ -297,7 +298,7 @@ usage() {
 		echo "usage:	$progname [-p] [-n] [-w] [-M path] [-T man] [sections]" >&2
 		;;
 	*)
-		echo "Usage:	$progname [-] [-adlt] [-M path] [-T man] [ section ] name ..." >&2
+		echo "Usage:	$progname [-] [-t] [-M path] [-T man] [ section ] name ..." >&2
 		echo "	$progname -k keyword ..." >&2
 		echo "	$progname -f file ..." >&2
 		;;
