@@ -14,6 +14,7 @@ Release ...
 * ln: When the existing file is a symbolic link, its target file is now hard
   linked with the SVID4 and POSIX versions.
 * cpio: Print information about hard links with the -iv options.
+* cpio: If link() fails, no separate copy of an archive entry is created.
 * It is now possible to use hard links between installed files. The symbolic
   links which are used by default are shorter now.
 

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.293 (gritter) 3/19/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.294 (gritter) 3/19/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -2756,14 +2756,14 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 	struct stat	nst;
 	char	*temp = NULL;
 	size_t	len;
-	int	fd, i, j;
+	int	fd, i, j, new;
 	int	failure = 2;
 
 	if (fmttype == FMT_ZIP && (f->f_st.st_mode&S_IFMT) != S_IFREG &&
 			(f->f_st.st_mode&S_IFMT) != S_IFLNK &&
 			(f->f_csize > 0 || f->f_gflag & FG_DESC))
 		skipfile(f);
-	if (lstat(tgt, &nst) == 0) {
+	if ((new = lstat(tgt, &nst)) == 0) {
 		if (action == 'p' && f->f_st.st_dev == nst.st_dev &&
 				f->f_st.st_ino == nst.st_ino) {
 			msg(3, 0, sysv3 ?
@@ -2788,25 +2788,6 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 						tgt);
 				else
 					failure = 0;
-				goto skip;
-			}
-			len = strlen(tgt);
-			temp = smalloc(len + 7);
-			strcpy(temp, tgt);
-			strcpy(&temp[len], "XXXXXX");
-			if ((fd = mkstemp(temp)) < 0 || close(fd) < 0) {
-				emsg(3, "Cannot create temporary file");
-				if (fd < 0) {
-					free(temp);
-					temp = NULL;
-				}
-				goto skip;
-			}
-			cur_ofile = tgt;
-			cur_tfile = temp;
-			if (rename(tgt, temp) < 0) {
-				emsg(3, "Cannot rename current \"%s\"", tgt);
-				tunlink(&temp);
 				goto skip;
 			}
 		}
@@ -2847,17 +2828,14 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 				name = symblink;
 			}
 			if (link(name, tgt) == 0) {
-				tunlink(&temp);
 				if (name != f->f_name)
 					free(name);
 				return 0;
 			}
 			if (name != f->f_name)
 				free(name);
-		} else if (link(f->f_name, tgt) == 0) {
-			tunlink(&temp);
+		} else if (link(f->f_name, tgt) == 0)
 			return 0;
-		}
 		emsg(3, "Cannot link \"%s\" and \"%s\"", f->f_name, tgt);
 cantlink:	errcnt += 1;
 	}
@@ -2865,10 +2843,7 @@ cantlink:	errcnt += 1;
 			(fmttype & TYP_CPIO || fmttype == FMT_ZIP
 			 || action == 'p') &&
 			(i = canlink(tgt, &f->f_st, 1)) != 0) {
-		if (vflag)
-			fprintf(stderr, "%s\n", f->f_name);
-		tunlink(&temp);
-		if (pax != PAX_TYPE_CPIO && i < 0)
+		if (i < 0)
 			goto skip;
 		/*
 		 * At this point, hard links in SVR4 cpio format have
@@ -2877,37 +2852,54 @@ cantlink:	errcnt += 1;
 		 * overwrite the data here.
 		 */
 		if (fmttype & TYP_NCPIO && f->f_st.st_size == 0 ||
-				(f->f_st.st_mode&S_IFMT) != S_IFREG)
+				(f->f_st.st_mode&S_IFMT) != S_IFREG) {
+			if (vflag)
+				fprintf(stderr, "%s\n", f->f_name);
 			return 0;
+		}
 		/*
 		 * Make sure we can creat() this file later.
 		 */
 		chmod(tgt, 0600);
 	} else if (fmttype & TYP_TAR && f->f_st.st_nlink > 1) {
-		if (vflag) {
-			if (pax == PAX_TYPE_CPIO)
-				printf("%s linked to %s\n",
-						f->f_lnam, f->f_name);
-			fprintf(stderr, "%s\n", f->f_name);
-		}
 		if (link(f->f_lnam, f->f_name) == 0) {
-			tunlink(&temp);
 			if (fmttype & TYP_USTAR && f->f_st.st_size > 0)
 				chmod(tgt, 0600);
-			else
+			else {
+				if (vflag) {
+					if (pax == PAX_TYPE_CPIO)
+						printf("%s linked to %s\n",
+							f->f_lnam, f->f_name);
+					fprintf(stderr, "%s\n", f->f_name);
+				}
 				return 0;
+			}
 		} else {
 			emsg(3, "Cannot link \"%s\" and \"%s\"",
 					f->f_lnam, f->f_name);
-			if (fmttype & TYP_USTAR && (!formatforced ||
-					fmttype == FMT_PAX)
-					&& f->f_st.st_size > 0)
-				errcnt++;
-			else
-				goto restore;
+			goto restore;
 		}
-	} else if (vflag)
-		fprintf(stderr, "%s\n", f->f_name);
+	} else if (new == 0 && (f->f_st.st_mode&S_IFMT) != S_IFDIR) {
+		len = strlen(tgt);
+		temp = smalloc(len + 7);
+		strcpy(temp, tgt);
+		strcpy(&temp[len], "XXXXXX");
+		if ((fd = mkstemp(temp)) < 0 || close(fd) < 0) {
+			emsg(3, "Cannot create temporary file");
+			if (fd < 0) {
+				free(temp);
+				temp = NULL;
+			}
+			goto skip;
+		}
+		cur_ofile = tgt;
+		cur_tfile = temp;
+		if (rename(tgt, temp) < 0) {
+			emsg(3, "Cannot rename current \"%s\"", tgt);
+			tunlink(&temp);
+			goto skip;
+		}
+	}
 	switch (f->f_st.st_mode & S_IFMT) {
 	case S_IFDIR:
 		if (!dflag) {
@@ -2923,7 +2915,7 @@ cantlink:	errcnt += 1;
 		break;
 	case S_IFLNK:
 		if (symlink(f->f_lnam, tgt) < 0) {
-			emsg(3, "Cannot create symbolic link \"%s\"", tgt);
+			emsg(3, "Cannot create \"%s\"", tgt);
 			goto restore;
 		}
 		break;
@@ -2961,6 +2953,8 @@ cantlink:	errcnt += 1;
 		msg(-1, 0, "Impossible file type\n");
 		goto skip;
 	}
+	if (vflag)
+		fprintf(stderr, "%s\n", f->f_name);
 	tunlink(&temp);
 	return setattr(tgt, &f->f_st);
 skip:	if (copydata == indata)
@@ -3343,8 +3337,7 @@ canlink(const char *path, struct stat *st, int really)
 					printf("%s linked to %s\n",
 							ip->i_name, path);
 				return 1;
-			}
-			else if (pax != PAX_TYPE_CPIO) {
+			} else {
 				emsg(3, "Cannot link \"%s\" and \"%s\"",
 						ip->i_name, path);
 				return -1;
