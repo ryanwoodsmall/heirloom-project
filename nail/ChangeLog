@@ -1,4 +1,4 @@
-[11.14] released ...
+[11.14] released 11/4/04
 * A 'Z' command was introduced. It is similar to the 'z' command, but scrolls
   only to header groups that contain at least one new or flagged message. This
   is useful for reading large mailing lists.

@@ -22,6 +22,14 @@ need them and cannot wait, contribute code.
 
 - SASL authentication methods could be implemented.
 
+- The deletion code (more general, all STORE code) should be able to
+  generate requests for ranges of messages to speed up operation.
+
+- The interrupt handling should be improved; the first SIGINT should
+  cause a direct return to the command loop, possibly after an outstanding
+  network operation has been completed, and a second SIGINT should cancel
+  the network operation itself.
+
 ------------------------------------------------------------------------
 
 The POP3 client supports USER/PASS and APOP authentications only. If you
@@ -56,4 +64,4 @@ window. For the receiving part, it is simply annoying. If you want
 a confirmation, ask the recipient to send one in the body of the
 message.
 
-	Gunnar Ritter					10/19/04
+	Gunnar Ritter					11/4/04
