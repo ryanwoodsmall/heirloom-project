@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.65 (gritter) 11/5/04";
+static char sccsid[] = "@(#)send.c	2.66 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -87,7 +87,7 @@ static void statusput(const struct message *mp, FILE *obuf,
 		char *prefix, off_t *stats);
 static void xstatusput(const struct message *mp, FILE *obuf,
 		char *prefix, off_t *stats);
-static void put_from_(FILE *fp);
+static void put_from_(FILE *fp, struct mimepart *ip);
 
 static sigjmp_buf	pipejmp;
 
@@ -373,11 +373,13 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_TODISP_ALL:
 		case SEND_QUOTE:
 		case SEND_QUOTE_ALL:
+			put_from_(obuf, ip->m_multipart);
+			/*FALLTHRU*/
 		case SEND_TOSRCH:
 		case SEND_DECRYPT:
 			goto multi;
 		case SEND_TOFILE:
-			put_from_(obuf);
+			put_from_(obuf, ip->m_multipart);
 			/*FALLTHRU*/
 		case SEND_MBOX:
 			break;
@@ -435,6 +437,7 @@ skip:	switch (ip->m_mimecontent) {
 				}
 		/*FALLTHRU*/
 	case MIME_MULTI:
+	case MIME_DIGEST:
 		switch (action) {
 		case SEND_TODISP:
 		case SEND_TODISP_ALL:
@@ -463,7 +466,9 @@ skip:	switch (ip->m_mimecontent) {
 				case SEND_QUOTE_ALL:
 					if ((ip->m_mimecontent == MIME_MULTI ||
 							ip->m_mimecontent ==
-							MIME_ALTERNATIVE) &&
+							MIME_ALTERNATIVE ||
+							ip->m_mimecontent ==
+							MIME_DIGEST) &&
 							np->m_partstring) {
 						len = strlen(np->m_partstring) +
 							40;
@@ -618,7 +623,9 @@ parsepart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 		ip->m_ct_type_plain = savestr(ip->m_ct_type);
 		if ((cp = strchr(ip->m_ct_type_plain, ';')) != NULL)
 			*cp = '\0';
-	} else
+	} else if (ip->m_parent && ip->m_parent->m_mimecontent == MIME_DIGEST)
+		ip->m_ct_type_plain = "message/rfc822";
+	else
 		ip->m_ct_type_plain = "text/plain";
 	ip->m_mimecontent = mime_getcontent(ip->m_ct_type_plain);
 	if (ip->m_ct_type)
@@ -634,6 +641,10 @@ parsepart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 		if (ip->m_ct_type != NULL)
 			ip->m_filename = mime_getparam("name", ip->m_ct_type);
 	if (pf & PARSE_PARTS) {
+		if (level > 9999) {
+			fprintf(stderr, "MIME content too deeply nested.\n");
+			return STOP;
+		}
 		switch (ip->m_mimecontent) {
 		case MIME_PKCS7:
 			if (pf & PARSE_DECRYPT) {
@@ -645,6 +656,7 @@ parsepart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 			break;
 		case MIME_MULTI:
 		case MIME_ALTERNATIVE:
+		case MIME_DIGEST:
 			parsemultipart(zmp, ip, pf, level);
 			break;
 		case MIME_822:
@@ -739,6 +751,7 @@ newpart(struct mimepart *ip, struct mimepart **np, off_t offs, int *part)
 			snprintf((*np)->m_partstring, sz, "%u", *part);
 	} else
 		(*np)->m_mimecontent = MIME_DISCARD;
+	(*np)->m_parent = ip;
 	if (ip->m_multipart) {
 		for (pp = ip->m_multipart; pp->m_nextpart; pp = pp->m_nextpart);
 		pp->m_nextpart = *np;
@@ -761,7 +774,7 @@ static void
 parse822(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 		int level)
 {
-	int	c, lastc = EOF;
+	int	c, lastc = '\n';
 	size_t	count;
 	FILE	*ibuf;
 	off_t	offs;
@@ -790,7 +803,10 @@ parse822(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 	np->m_size = np->m_xsize = count;
 	np->m_lines = np->m_xlines = lines;
 	np->m_partstring = ip->m_partstring;
+	np->m_parent = ip;
 	ip->m_multipart = np;
+	substdate((struct message *)np);
+	np->m_from = fakefrom((struct message *)np);
 	parsepart(zmp, np, pf, level+1);
 }
 
@@ -816,8 +832,10 @@ parsepkcs7(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 		np->m_lines = xmp->m_lines;
 		np->m_xlines = xmp->m_xlines;
 		np->m_partstring = ip->m_partstring;
-		if (parsepart(zmp, np, pf, level+1) == OKAY)
+		if (parsepart(zmp, np, pf, level+1) == OKAY) {
+			np->m_parent = ip;
 			ip->m_multipart = np;
+		}
 	}
 }
 
@@ -1009,12 +1027,16 @@ xstatusput(const struct message *mp, FILE *obuf, char *prefix, off_t *stats)
 }
 
 static void
-put_from_(FILE *fp)
+put_from_(FILE *fp, struct mimepart *ip)
 {
-	time_t now;
+	time_t	now;
 
-	time(&now);
-	fprintf(fp, "From %s %s", myname, ctime(&now));
+	if (ip && ip->m_from)
+		fprintf(fp, "From %s %s\n", ip->m_from, fakedate(ip->m_time));
+	else {
+		time(&now);
+		fprintf(fp, "From %s %s", myname, ctime(&now));
+	}
 }
 
 /*

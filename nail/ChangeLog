@@ -13,6 +13,9 @@
 * Since many versions of Linux do not correctly update the modification time
   of a file with mmap(), utime() is now called to force an update when the
   junk mail database is changed.
+* A mbox-style "From " line is now generated when a "message/rfc822" MIME
+  part is printed.
+* The 'multipart/digest' MIME content type is now properly handled.
 * When a malformed MIME multipart message is encountered that contains the
   boundary string on two immediately following lines, the second line is no
   longer treated as the begin of a new part.

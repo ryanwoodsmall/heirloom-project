@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.43 (gritter) 11/1/04";
+static char sccsid[]  = "@(#)mime.c	2.44 (gritter) 11/6/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -629,6 +629,8 @@ mime_getcontent(char *s)
 		return MIME_MESSAGE;
 	if (asccasecmp(s, "multipart/alternative") == 0)
 		return MIME_ALTERNATIVE;
+	if (asccasecmp(s, "multipart/digest") == 0)
+		return MIME_DIGEST;
 	if (ascncasecmp(s, "multipart/", 10) == 0)
 		return MIME_MULTI;
 	if (asccasecmp(s, "application/x-pkcs7-mime") == 0 ||

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.89 (gritter) 11/3/04
+ *	Sccsid @(#)def.h	2.90 (gritter) 11/6/04
  */
 
 /*
@@ -126,6 +126,7 @@ enum mimecontent {
 	MIME_TEXT_HTML,			/* text/html content */
 	MIME_TEXT,			/* other text/ content */
 	MIME_ALTERNATIVE,		/* multipart/alternative content */
+	MIME_DIGEST,			/* multipart/digest content */
 	MIME_MULTI,			/* other multipart/ content */
 	MIME_PKCS7,			/* PKCS7 content */
 	MIME_DISCARD			/* content is discarded */
@@ -272,8 +273,11 @@ struct mimepart {
 	size_t	m_xsize;		/* Bytes in the full part */
 	long	m_lines;		/* Lines in the message */
 	long	m_xlines;		/* Lines in the full message */
+	time_t	m_time;			/* time the message was sent */
+	char	*m_from;		/* message sender */
 	struct mimepart	*m_nextpart;	/* next part at same level */
 	struct mimepart	*m_multipart;	/* parts of multipart */
+	struct mimepart	*m_parent;	/* enclosing multipart part */
 	char	*m_ct_type;		/* content-type */
 	char	*m_ct_type_plain;	/* content-type without specs */
 	enum mimecontent	m_mimecontent;	/* same in enum */
