@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.79 (gritter) 11/6/04";
+static char sccsid[] = "@(#)lex.c	2.80 (gritter) 1/8/05";
 #endif
 #endif /* not lint */
 
@@ -821,6 +821,7 @@ getmdot(int newmail)
 	struct message	*mp;
 	char	*cp;
 	int	mdot;
+	enum mflag	avoid = MHIDDEN|MKILL|MDELETED;
 
 	if (!newmail) {
 		if (value("autothread"))
@@ -835,7 +836,7 @@ getmdot(int newmail)
 		return 1;
 	if (newmail)
 		for (mp = &message[0]; mp < &message[msgCount]; mp++)
-			if ((mp->m_flag & (MNEWEST|MHIDDEN|MKILL)) == MNEWEST)
+			if ((mp->m_flag & (MNEWEST|avoid)) == MNEWEST)
 				break;
 	if (!newmail || mp >= &message[msgCount]) {
 		for (mp = mb.mb_threaded ? threadroot : &message[0];
@@ -843,7 +844,7 @@ getmdot(int newmail)
 					mp != NULL : mp < &message[msgCount];
 				mb.mb_threaded ?
 					mp = next_in_thread(mp) : mp++)
-			if ((mp->m_flag & (MNEW|MHIDDEN|MKILL)) == MNEW)
+			if ((mp->m_flag & (MNEW|avoid)) == MNEW)
 				break;
 	}
 	if (mb.mb_threaded ? mp == NULL : mp >= &message[msgCount])
@@ -858,7 +859,7 @@ getmdot(int newmail)
 				mb.mb_threaded ? mp != NULL:
 					mp < &message[msgCount];
 				mb.mb_threaded ? mp = next_in_thread(mp) : mp++)
-			if ((mp->m_flag & (MREAD|MHIDDEN|MKILL)) == 0)
+			if ((mp->m_flag & (MREAD|avoid)) == 0)
 				break;
 	if (mb.mb_threaded ? mp != NULL : mp < &message[msgCount])
 		mdot = mp - &message[0] + 1;
@@ -866,23 +867,23 @@ getmdot(int newmail)
 		if (mb.mb_threaded) {
 			for (mp = this_in_thread(threadroot, -1); mp;
 					mp = prev_in_thread(mp))
-				if ((mp->m_flag & (MHIDDEN|MKILL)) == 0)
+				if ((mp->m_flag & avoid) == 0)
 					break;
 			mdot = mp ? mp - &message[0] + 1 : msgCount;
 		} else {
 			for (mp = &message[msgCount-1]; mp >= &message[0]; mp--)
-				if ((mp->m_flag & (MHIDDEN|MKILL)) == 0)
+				if ((mp->m_flag & avoid) == 0)
 					break;
 			mdot = mp >= &message[0] ? mp-&message[0]+1 : msgCount;
 		}
 	} else if (mb.mb_threaded) {
 		for (mp = threadroot; mp; mp = next_in_thread(mp))
-			if ((mp->m_flag & (MHIDDEN|MKILL)) == 0)
+			if ((mp->m_flag & avoid) == 0)
 				break;
 		mdot = mp ? mp - &message[0] + 1 : 1;
 	} else {
 		for (mp = &message[0]; mp < &message[msgCount]; mp++)
-			if ((mp->m_flag & (MHIDDEN|MKILL)) == 0)
+			if ((mp->m_flag & avoid) == 0)
 				break;
 		mdot = mp < &message[msgCount] ? mp-&message[0]+1 : 1;
 	}

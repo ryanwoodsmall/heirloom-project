@@ -26,6 +26,10 @@
   set and outgoing character set was performed for it.
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
+* When announcing messages after a folder open or a 'newmail' command, a
+  deleted message can no longer become the current message unless all the
+  messages have been deleted. This applies to message deleted by the
+  'folder-hook' mechanism in particular.
 
 [11.19] released 1/2/05
 * A 'chained-junk-tokens' variable was introduced for the Bayesian junk
