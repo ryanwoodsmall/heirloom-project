@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)file.1	1.7 (gritter) 12/5/04
+.\" Sccsid @(#)file.1	1.8 (gritter) 2/6/05
 .\" Parts taken from file(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH FILE 1 "12/5/04" "Heirloom Toolchest" "User Commands"
+.TH FILE 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 file \- determine file type
 .SH SYNOPSIS
@@ -103,3 +103,12 @@ Causes the text of some messages to be changed.
 often makes mistakes.
 In particular it often suggests that
 command files are C programs.
+.PP
+.I File
+does not currently accept the
+.BR \-d ,
+.BR \-i ,
+\fB\-M \fIfile\fR,
+and
+\fB\-m \fIfile\fR
+options from POSIX.1-2001.

@@ -18,7 +18,7 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.29 (gritter) 2/6/05
+.\" Sccsid @(#)pax.1	1.30 (gritter) 2/6/05
 .TH PAX 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
@@ -902,3 +902,14 @@ The
 .I \-s
 option can be used to substitute relative for absolute path names
 and vice-versa.
+.PP
+.I Pax
+does not currently accept the
+\fB\-o delete\fR,
+\fB\-o exthdr.name\fR,
+\fB\-o globexthdr.name\fR,
+\fB\-o invalid\fR,
+\fB\-o listopt\fR,
+and
+\fB\-o keyword\fR
+options from POSIX.1-2001.
