@@ -57,6 +57,8 @@ Release ...
   treated as a string now.
 * expr: With the POSIX versions, single string arguments that are valid
   decimal numbers are converted to their canonical form (e.g. -0001 to -1).
+* csplit: If the last operand was of the form '%re%', lines following its
+  match were not written to an output file.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

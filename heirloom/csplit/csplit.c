@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)csplit.sl	1.7 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)csplit.sl	1.8 (gritter) 2/3/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -371,8 +371,10 @@ match(const char *line, long long lineno, long long *noffp, int *skip)
 				*noffp = -args[ncur]->a_nx;
 			else
 				*noffp = 0;
-		} else
+		} else {
 			*noffp = 0;
+			*skip = 0;
+		}
 	}
 	return 1 + ((lineno==1&&ncur==0) || args[ncur]==0 ||
 			args[ncur]->a_re==0 || args[ncur]->a_nx < 0);
