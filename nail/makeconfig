@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Sccsid @(#)makeconfig	1.38 (gritter) 11/5/04
+# Sccsid @(#)makeconfig	1.39 (gritter) 11/8/04
 #
 
 tmp=___build$$
@@ -317,7 +317,7 @@ int main(void)
 #!
 
 link_check 'for Network Security Services (NSS)' '#define USE_SSL
-#define USE_NSS' '-lsmime3 -lnss3 -lssl3' <<\! || \
+#define USE_NSS' '-lsmime3 -lnss3 -lssl3 -lnspr4 -lplc4' <<\! || \
 		link_check 'for sufficiently recent OpenSSL' '#define USE_SSL
 #define USE_OPENSSL' '-lssl -lcrypto' <<\%
 #include <private/pprio.h>

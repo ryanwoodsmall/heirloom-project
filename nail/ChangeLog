@@ -29,6 +29,8 @@
 * When a malformed MIME multipart message is encountered that contains the
   boundary string on two immediately following lines, the second line is no
   longer treated as the begin of a new part.
+* The makeconfig script and the installation instructions now include support
+  for building nail with Mozilla NSS on Solaris.
 
 [11.14] released 11/4/04
 * A 'Z' command was introduced. It is similar to the 'z' command, but scrolls
