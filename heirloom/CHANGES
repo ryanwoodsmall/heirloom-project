@@ -11,6 +11,8 @@ Release ...
 * ls: If the target file name contained in a symbolic link is empty, print
   nothing (instead of "?") with the -l option etc.
 * df: Specifying the name of a mounted device as argument works again.
+* ln: When the existing file is a symbolic link, its target file is now hard
+  linked with the SVID4 and POSIX versions.
 * It is now possible to use hard links between installed files. The symbolic
   links which are used by default are shorter now.
 

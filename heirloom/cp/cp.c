@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.78 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.79 (gritter) 3/17/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.78 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.79 (gritter) 3/17/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.78 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.79 (gritter) 3/17/05";
 #endif
 
 #include	<sys/types.h>
@@ -59,6 +59,7 @@ static const char sccsid[] USED = "@(#)cp.sl	1.78 (gritter) 3/12/05";
 #include	<utime.h>
 #include	"sfile.h"
 #include	"memalign.h"
+#include	"alloca.h"
 
 #ifndef	S_IFDOOR
 #define	S_IFDOOR	0xD000		/* Solaris door */
@@ -1051,6 +1052,18 @@ ln(const char *src, const char *tgt, struct stat *dsp, int level,
 		errcnt |= 01;
 		return;
 	}
+#if (defined (SUS) || defined (S42)) && (defined (__linux__) || defined (__sun))
+	if (sflag == 0) {
+		char	*rpbuf = alloca(PATH_MAX+1);
+		if (realpath(src, rpbuf) == NULL) {
+			fprintf(stderr, "%s: cannot access %s\n",
+					progname, src);
+			errcnt |= 01;
+			return;
+		}
+		src = rpbuf;
+	}
+#endif	/* (SUS || S42) && (__linux__ || __sun) */
 	if (dsp
 #if !defined (SUS)
 			&& !sflag
@@ -1204,7 +1217,11 @@ main(int argc, char **argv)
 	mygid = getegid();
 	inull = scalloc(1, sizeof *inull);
 	inull->i_lln = inull->i_rln = inull;
-	statfn = (Rflag && HLPflag != 'L' || pers == PERS_LN ? lstat : stat);
+	statfn = (Rflag && HLPflag != 'L'
+#if !defined (SUS) && !defined (S42)
+			|| pers == PERS_LN
+#endif	/* !SUS && !S42 */
+			? lstat : stat);
 	if (lstat(argv[argc-1], &dst) == 0) {
 		if ((dst.st_mode&S_IFMT) != S_IFLNK ||
 				stat(argv[argc-1], &ust) < 0)
