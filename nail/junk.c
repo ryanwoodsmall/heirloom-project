@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.59 (gritter) 11/1/04";
+static char sccsid[] = "@(#)junk.c	1.60 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -526,8 +526,10 @@ grow(unsigned long size)
 							PROT_READ|PROT_WRITE :
 							PROT_READ,
 						MAP_SHARED, fileno(nfp), 0))
-					== MAP_FAILED)
+					== MAP_FAILED) {
+				nodes = onodes;
 				goto oflo;
+			}
 			munmap(onodes, nodes_mmapped);
 		}
 		nodes_mmapped = newsize*SIZEOF_node;
