@@ -1,10 +1,11 @@
 Release ...
+* If a line began with a tabulator and another tabulator was inserted with
+  the cursor located on the first tabulator, the display was not updated
+  appropriately since the last revision (Bugreport by Matthew Fischer). (P)
 * Fixed a segmentation fault that occured in multibyte locales when operation
   was continued after vi had been stopped by ^Z, with the cursor positioned
   in a line longer than the terminal width as the last line of the current
   screen.
-* In a multibyte locale, when operation was continued after vi had been
-  stopped by ^Z with the cursor positioned at the last line of the screen
 * Made it work for Big5 locales (Patches by Matthew Fischer).
 * Fixed a problem with the 'r' command in EUC-JP and Big5 locales (Bugreport
   by Matthew Fischer).

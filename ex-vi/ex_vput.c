@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.44 (gritter) 1/22/05";
+static char sccsid[] = "@(#)ex_vput.c	1.45 (gritter) 1/22/05";
 #endif
 #endif
 
@@ -1055,7 +1055,7 @@ viin(int c)
 		if (remdoom > insmc1) {
 			remdoom--;
 			endim();
-		} else if (noim || remdoom == insmc1)
+		} else if (noim || insmc1 && remdoom == insmc1)
 			endim();
 		else if (IM && EI) {
 			vcsync();
@@ -1064,7 +1064,7 @@ viin(int c)
 		vputchar(c);
 	}
 
-	if (!IM || !EI || remdoom == insmc1) {
+	if (!IM || !EI || remdoom && remdoom == insmc1) {
 		/*
 		 * We are a dumb terminal; brute force update
 		 * the rest of the line; this is very much an n^^2 process,
