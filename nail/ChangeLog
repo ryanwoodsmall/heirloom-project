@@ -3,6 +3,9 @@
   followed a line that ended with a MIME encoded word, the newline character
   preceding the next header field was erroneously omitted when a message was
   displayed since version 11.14.
+* If a header fields contains a MIME encoded word and a large string of
+  ASCII characters at another point, the large string is encoded as multiple
+  encoded words to comply to RFC 2047.
 * When S/MIME support was built using Mozilla NSS, the verification of an
   encrypted message that had not yet been downloaded from an IMAP or POP3
   server failed at the first attempt.

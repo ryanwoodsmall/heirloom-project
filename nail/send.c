@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.69 (gritter) 11/11/04";
+static char sccsid[] = "@(#)send.c	2.70 (gritter) 11/11/04";
 #endif
 #endif /* not lint */
 
@@ -244,17 +244,19 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 						prefix, prefixlen, stats);
 			break;
 		}
-		isenc = 0;
+		isenc &= ~1;
 		if (infld && blankchar(line[0]&0377)) {
 			/*
 			 * If this line is a continuation (via space or tab)
 			 * of a previous header field, determine if the start
 			 * of the line is a MIME encoded word.
 			 */
-			for (cp = line; blankchar(*cp&0377); cp++);
-			if (cp > line && linelen - (cp - line) > 8 &&
-					cp[0] == '=' && cp[1] == '?')
-				isenc |= 1;
+			if (isenc & 2) {
+				for (cp = line; blankchar(*cp&0377); cp++);
+				if (cp > line && linelen - (cp - line) > 8 &&
+						cp[0] == '=' && cp[1] == '?')
+					isenc |= 1;
+			}
 		} else {
 			/*
 			 * Pick up the header field if we have one.
@@ -315,6 +317,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		/*
 		 * Determine if the end of the line is a MIME encoded word.
 		 */
+		isenc &= ~2;
 		if (count && (c = getc(ibuf)) != EOF) {
 			if (blankchar(c)) {
 				if (linelen > 0 && line[linelen-1] == '\n')
@@ -343,7 +346,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				 * words follow on continuing lines.
 				 */
 				if (isenc & 1)
-					while (blankchar(*start&0377)) {
+					while (len>0&&blankchar(*start&0377)) {
 						start++;
 						len--;
 					}

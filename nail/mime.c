@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.45 (gritter) 11/6/04";
+static char sccsid[]  = "@(#)mime.c	2.48 (gritter) 11/11/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -1056,7 +1056,7 @@ mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 	char *p, *q, *op, *upper, *cs, *cbeg, *tcs, *lastwordend = NULL;
 	struct str cin, cout;
 	int convert;
-	size_t maxstor;
+	size_t maxstor, lastoutl = 0;
 #ifdef	HAVE_ICONV
 	iconv_t fhicd = (iconv_t)-1;
 #endif
@@ -1116,8 +1116,10 @@ mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 					mime_fromqp(&cin, &cout, 1);
 					break;
 			}
-			if (lastwordend)
+			if (lastwordend) {
 				q = lastwordend;
+				out->l = lastoutl;
+			}
 #ifdef	HAVE_ICONV
 			if ((flags & TD_ICONV) && fhicd != (iconv_t)-1) {
 				char *iptr, *mptr, *nptr, *uptr;
@@ -1149,6 +1151,7 @@ mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 #endif
 			free(cout.s);
 			lastwordend = q;
+			lastoutl = out->l;
 		} else {
 notmime:
 			p = op;
@@ -1182,16 +1185,16 @@ mime_write_tohdr(struct str *in, FILE *fo)
 	char *upper, *wbeg, *wend, *charset, *lastwordend = NULL, *lastspc;
 	struct str cin, cout;
 	size_t sz = 0, col = 0, wr, charsetlen;
-	int mustquote,
+	int quoteany, mustquote, broken,
 		maxcol = 65 /* there is the header field's name, too */;
 
 	upper = in->s + in->l;
 	charset = getcharset(MIME_HIGHBIT);
 	charsetlen = strlen(charset);
-	for (wbeg = in->s, mustquote = 0; wbeg < upper; wbeg++)
+	for (wbeg = in->s, quoteany = 0; wbeg < upper; wbeg++)
 		if (mustquote_hdr(*wbeg))
-			mustquote++;
-	if (2 * mustquote > in->l) {
+			quoteany++;
+	if (2 * quoteany > in->l) {
 		/*
 		 * Print the entire field in base64.
 		 */
@@ -1230,12 +1233,14 @@ mime_write_tohdr(struct str *in, FILE *fo)
 		/*
 		 * Print the field word-wise in quoted-printable.
 		 */
+		broken = 0;
 		for (wbeg = in->s; wbeg < upper; wbeg = wend) {
 			lastspc = NULL;
 			while (wbeg < upper && whitechar(*wbeg & 0377)) {
 				lastspc = lastspc ? lastspc : wbeg;
 				wbeg++;
 				col++;
+				broken = 0;
 			}
 			if (wbeg == upper) {
 				if (lastspc)
@@ -1253,7 +1258,8 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				if (mustquote_hdr(*wend&0377))
 					mustquote++;
 			}
-			if (mustquote) {
+			if (mustquote || broken || (wend - wbeg) >= 74 &&
+					quoteany) {
 				for (;;) {
 					cin.s = lastwordend ? lastwordend :
 						wbeg;
@@ -1279,6 +1285,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 						free(cout.s);
 						break;
 					} else {
+						broken = 1;
 						if (col) {
 							putc('\n', fo);
 							sz++;
