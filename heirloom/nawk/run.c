@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)run.c	1.30 (gritter) 1/1/05>
+   Sccsid @(#)run.c	1.31 (gritter) 2/4/05>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -832,7 +832,7 @@ int format(unsigned char **buf, int *bufsize, const unsigned char *s, Node *a)
 			*++t = '\0';
 			break;
 		case 'o': case 'x': case 'X': case 'u':
-			flag = *(s-1) == 'l' ? 2 : 3;
+			flag = *(s-1) == 'l' ? 12 : 13;
 			break;
 		case 's':
 			/*
@@ -873,6 +873,12 @@ int format(unsigned char **buf, int *bufsize, const unsigned char *s, Node *a)
 			break;
 		case 3:	growsprintf(buf, &p, bufsize, (char *)fmt,
 					(int) getfval(x));
+			break;
+		case 12:growsprintf(buf, &p, bufsize, (char *)fmt,
+					(unsigned long) getfval(x));
+			break;
+		case 13:growsprintf(buf, &p, bufsize, (char *)fmt,
+					(unsigned int) getfval(x));
 			break;
 		case 4:	growsprintf(buf, &p, bufsize, (char *)fmt, getsval(x));
 			break;
@@ -1914,9 +1920,9 @@ int chrlen(const unsigned char *s)
 int chrdist(const unsigned char *s, const unsigned char *end)
 {
 	wchar_t wc;
-	int m = 1, n;
+	int m = 0, n;
 
-	while (next(wc, s, n), s < end) {
+	while (next(wc, s, n), s <= end) {
 		s += n;
 		m++;
 	}

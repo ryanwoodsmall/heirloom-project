@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)tran.c	1.15 (gritter) 12/25/04>
+   Sccsid @(#)tran.c	1.16 (gritter) 2/4/05>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -414,7 +414,7 @@ unsigned char *r_getsval(register Cell *vp)
 			vp->tval |= STR;
 		} else {
 			snprintf((char *)s, sizeof s,
-					(char *)(posix ? *OFMT : *CONVFMT),
+					(char *)(posix ? *CONVFMT : *OFMT),
 					vp->fval);
 			/*
 			* In case CONVFMT is changed by the program,
