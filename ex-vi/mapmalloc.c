@@ -5,7 +5,7 @@
  * September 2001.
  */
 
-/*	Sccsid @(#)mapmalloc.c	1.14 (gritter) 11/26/04	*/
+/*	Sccsid @(#)mapmalloc.c	1.15 (gritter) 2/17/05	*/
 
 /* ====================================================================
  * Copyright (c) 1999-2000 Ralf S. Engelschall. All rights reserved.
@@ -508,7 +508,7 @@ realloc(char *ptr, size_t usize)
 	}
 	if ((vp = malloc(usize)) == NULL)
 		return NULL;
-	memcpy(vp, ptr, usize);
+	memcpy(vp, ptr, mc->mc_usize);
 	free(ptr);
 	return vp;
 }

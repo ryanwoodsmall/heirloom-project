@@ -40,6 +40,9 @@ Release ...
 * Ex does not exit on errors immediately anymore if standard input is not
   a terminal but a pipe or regular file.
 * The 'substitute' ex command can now be abbreviated as 'sub', 'subst' etc.
+* Fixed an error in the realloc() function in mapmalloc.c that sometimes
+  caused memory to be overwritten because memcpy(new, old, size) was called
+  with the size of 'new' if 'new' was larger than 'old'.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
