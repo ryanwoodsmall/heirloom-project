@@ -72,7 +72,7 @@
 #
 #	from Makefile	7.13.1.3 (2.11BSD GTE) 1996/10/23
 #
-#	@(#)Makefile	1.46 (gritter) 12/4/04
+#	@(#)Makefile	1.47 (gritter) 2/19/05
 #
 
 #
@@ -118,7 +118,8 @@ INSTALL		= /usr/ucb/install
 #     testing the internationalization code against the older version and
 #     should not normally be removed.
 # Add -DNO_BE_BACKSLASH to make backslash a regular character inside RE
-#     bracket expressions.
+#     bracket expressions. This is required for POSIX conformance but
+#     conflicts with historical practice for ex.
 #
 # Some historic comments:
 #

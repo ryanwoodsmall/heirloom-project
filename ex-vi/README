@@ -32,7 +32,7 @@ Then type 'make' and 'make install'.
 It is possible to build a RPM file directly from the source distribution
 by executing
 
-	rpmbuild -tb ex-<version>.tar.bz2
+        rpmbuild -tb ex-<version>.tar.bz2
 
 Note that the RPM spec installs the binary in /usr/5bin by default to
 avoid conflicts with vendor files in /usr/bin. The default locations
@@ -40,18 +40,19 @@ match those of the Heirloom Toolchest <http://heirloom.sourceforge.net>.
 
 The following systems have been reported to compile this code:
 
-Linux		Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
-		diet libc, uClibc; gcc, Intel C
-Sun Solaris	2.5.1 and above
-Open UNIX	8.0.0
-UnixWare	7.1.1, 7.0.1, 2.1.2
-HP HP-UX	B.11.23, B.11.11, B.11.00, B.10.20
-HP Tru64 UNIX	4.0G, 5.1B
-IBM AIX		5.1, 4.3
-NEC SUPER-UX	10.2
-NEC UX/4800	Release11.5 Rev.A
-FreeBSD		3.1, 4.5, 5.x
-NetBSD		1.6, 2.0
+Linux               Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
+                    diet libc, uClibc
+Sun Solaris         2.5.1 and above
+Caldera Open UNIX   8.0.0
+SCO UnixWare        7.1.1, 7.0.1, 2.1.2
+HP HP-UX            B.11.23, B.11.11, B.11.00, B.10.20
+HP Tru64 UNIX       4.0G, 5.1B
+IBM AIX             5.1, 4.3
+NEC SUPER-UX        10.2
+NEC UX/4800         Release11.5 Rev.A
+Control Data EP/IX  2.2.1AA
+FreeBSD             3.1, 4.5, 5.x
+NetBSD              1.6, 2.0
 
 Reports about other Unix systems are welcome, whether successful or not
 (in the latter case add a detailed description). This port of vi is only
@@ -88,11 +89,11 @@ byte sequence that is entered at the terminal has been completed.
 
 The multibyte code is known to work on the following systems:
 
-Linux		glibc 2.2.2 and later
-Sun Solaris	9 and later
-HP HP-UX	B.11.11 and later
-FreeBSD		5.3
-NetBSD		2.0
+Linux           glibc 2.2.2 and later
+Sun Solaris     9 and later
+HP HP-UX        B.11.11 and later
+FreeBSD         5.3
+NetBSD          2.0
 
 It has been tested on xterm patch #192, rxvt-unicode 4.2, mlterm 2.9.1, and
 xiterm 0.5.
@@ -110,7 +111,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						2/15/05
+Gunnar Ritter                                           2/19/05
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>

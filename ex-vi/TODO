@@ -7,24 +7,10 @@ TODO list for ex
     equivalence class, and since there is no access to the basic
     collation sequence, LC_COLLATE locales are completely ignored.
 
-- There may be other unresolved POSIX.2 demands I did not notice yet.
-    Please write me if you find one. You can get SUSv2 from The Open
-    Group <http://www.UNIX-systems.org/> for $0, it contains nearly the
-    same text for ex/vi as POSIX.2 and is a good reference manual.
-
 - SVr4 ex probably has some silent features that this one should have too.
-
-- SUSv3 / POSIX.1-200x ex/vi support.
-    I did not yet decide whether this is worth implementing. It requires
-    a lot of mostly small changes that make vi more nvi-like in general.
-    If SUSv3 has as little success in the Open Source world as its
-    predecessors, it might be better to ignore it and stay on the
-    officially obsolete SUSv2 / POSIX.2 level.
 
 - The traditional regular expression code in ex_re.c could be updated to
     work with multibyte characters. This would mostly involve to take the
     code from libcommon/regexp.h of the Heirloom Toolchest.
 
-- Translated message catalogues.
-
-Gunnar Ritter						12/2/04
+Gunnar Ritter						2/19/05

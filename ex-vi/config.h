@@ -70,7 +70,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	@(#)config.h	1.11 (gritter) 12/1/04
+ *	@(#)config.h	1.12 (gritter) 2/19/05
  */
 
 /*
@@ -84,10 +84,10 @@
  * bytes are allocated on the stack each time you go into visual
  * and then never freed by the system.  Thus if you have no terminals
  * which are larger than 24 * 80 you may well want to make TUBESIZE
- * smaller.  TUBECOLS should stay at 160 since this defines the maximum
- * length of opening on hardcopies and allows two lines of open on
- * terminals like adm3's (glass tty's) where it switches to pseudo
- * hardcopy mode when a line gets longer than 80 characters.
+ * smaller.  TUBECOLS should stay at 160 at least since this defines
+ * the maximum length of opening on hardcopies and allows two lines
+ * of open on terminals like adm3's (glass tty's) where it switches
+ * to pseudo hardcopy mode when a line gets longer than 80 characters.
  */
 #ifndef VMUNIX
 #define TUBELINES       70      /* Number of screen lines for visual */
@@ -115,9 +115,15 @@
 #endif	/* VMUNIX */
 
 /*
- * Intptr_t was introduced by SUSv2, and it is highly necessary to achieve
- * portability between various processors. It is a signed integer type
- * capable of holding pointers: sizeof(intptr_t) == sizeof(char *).
+ * The following types are usually predefined on modern platforms; it
+ * is only necessary to define them manually if compilation errors occur.
+ */
+
+/*
+ * The intptr_t type was introduced by SUSv2 and C99. It is a signed
+ * integer type capable of holding pointers:
+ *
+ *       sizeof(intptr_t) == sizeof(void *).
  *
  * Type  Environment Typical systems
  * int   IP16        PDP11, 80286
@@ -129,4 +135,12 @@
  */
 #ifdef	notdef
 typedef int	intptr_t;
+#endif
+
+/*
+ * The ssize_t type should be the same as the return type of read()
+ * and write().
+ */
+#ifdef	notdef
+typedef	int	ssize_t;
 #endif
