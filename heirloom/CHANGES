@@ -33,6 +33,7 @@ Release ...
   passed to the terminal buffer properly.
 * cpio: Accept smaller zip64 extra headers which are created by some other
   zip archivers.
+* cp: The default i/o buffer size with the -D option is now 1 MB.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

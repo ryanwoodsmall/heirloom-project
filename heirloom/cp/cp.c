@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.76 (gritter) 2/28/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.77 (gritter) 3/8/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.76 (gritter) 2/28/05";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.77 (gritter) 3/8/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.76 (gritter) 2/28/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.77 (gritter) 3/8/05";
 #endif
 
 #include	<sys/types.h>
@@ -453,7 +453,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 		blksize = bflag;
 #ifdef	O_DIRECT
 	else if (Dflag)
-		blksize = balign(ssp, dsp, ssp->st_size, 196608);
+		blksize = balign(ssp, dsp, ssp->st_size, 1048576);
 #endif	/* O_DIRECT */
 	else
 		blksize = balign(ssp, dsp, ssp->st_size, 4096);
