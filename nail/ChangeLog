@@ -10,6 +10,10 @@
   no longer ignored in its process. With most editor implementations, this
   does not make any difference since they enable interrupts themselves again;
   however, traditional implementations of 'ed' do not.
+* The 'forward' command has been renamed to 'resend' for alignment with the
+  terminology of RFC 2822; it is still available under its old name for at
+  least a transition period. Also, 'Resent-From:' and related fields are now
+  prepended to older fields as specified.
 * Since many versions of Linux do not correctly update the modification time
   of a file with mmap(), utime() is now called to force an update when the
   junk mail database is changed.

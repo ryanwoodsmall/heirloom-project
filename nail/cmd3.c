@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.71 (gritter) 11/6/04";
+static char sccsid[] = "@(#)cmd3.c	2.72 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -65,7 +65,7 @@ static int diction(const void *a, const void *b);
 static int file1(char *name);
 static int shellecho(const char *cp);
 static int Respond_internal(int *msgvec, int recipient_record);
-static int forward1(void *v, int add_resent);
+static int resend1(void *v, int add_resent);
 static void list_shortcuts(void);
 static enum okay delete_shortcut(const char *str);
 static float huge(void);
@@ -976,10 +976,10 @@ alternates(void *v)
 }
 
 /*
- * Do the real work of forwarding.
+ * Do the real work of resending.
  */
 static int 
-forward1(void *v, int add_resent)
+resend1(void *v, int add_resent)
 {
 	char *name, *str;
 	struct name *to;
@@ -1015,28 +1015,28 @@ forward1(void *v, int add_resent)
 	sn = nalloc(name, GTO);
 	to = usermap(sn);
 	for (ip = msgvec; *ip && ip - msgvec < msgCount; ip++) {
-		if (forward_msg(&message[*ip - 1], to, add_resent) != 0)
+		if (resend_msg(&message[*ip - 1], to, add_resent) != 0)
 			return 1;
 	}
 	return 0;
 }
 
 /*
- * Forward a message list to a third person.
+ * Resend a message list to a third person.
  */
 int 
-forwardcmd(void *v)
+resendcmd(void *v)
 {
-	return forward1(v, 1);
+	return resend1(v, 1);
 }
 
 /*
- * Forward a message list to a third person without adding headers.
+ * Resend a message list to a third person without adding headers.
  */
 int 
-Forwardcmd(void *v)
+Resendcmd(void *v)
 {
-	return forward1(v, 0);
+	return resend1(v, 0);
 }
 
 /*

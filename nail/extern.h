@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.144 (gritter) 11/6/04
+ *	Sccsid @(#)extern.h	2.145 (gritter) 11/6/04
  */
 
 /* aux.c */
@@ -178,8 +178,8 @@ int ifcmd(void *v);
 int elsecmd(void *v);
 int endifcmd(void *v);
 int alternates(void *v);
-int forwardcmd(void *v);
-int Forwardcmd(void *v);
+int resendcmd(void *v);
+int Resendcmd(void *v);
 int newmail(void *v);
 int shortcut(void *v);
 struct shortcut *get_shortcut(const char *str);
@@ -450,7 +450,7 @@ int mkdate(FILE *fo, const char *field);
 int puthead(struct header *hp, FILE *fo, enum gfield w,
 		enum sendaction action, enum conversion convert,
 		char *contenttype, char *charset);
-int forward_msg(struct message *mp, struct name *to, int add_resent);
+int resend_msg(struct message *mp, struct name *to, int add_resent);
 /* smtp.c */
 char *nodename(int mayoverride);
 char *myaddr(void);

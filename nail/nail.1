@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.273 (gritter) 11/6/04
+.\"     Sccsid: @(#)nail.1	2.274 (gritter) 11/6/04
 .\"
 .TH NAIL 1 "11/6/04" "nail 11.15" "User Commands"
 .SH NAME
@@ -1132,18 +1132,6 @@ and
 .I Replyall
 variables.
 .TP
-.B Forward
-(For) Like
-.IR forward ,
-but does not add any header lines.
-This is not a way to hide the sender's identity,
-but useful for sending a message again
-to the same recipients.
-.TP
-.B forward
-(for) Takes a list of messages and a user name
-and sends each message to the named user.
-.TP
 .B from
 (f) Takes a list of messages
 and prints their message headers,
@@ -1448,6 +1436,20 @@ but responds to the sender only regardless of the
 and
 .I Replyall
 variables.
+.TP
+.B Resend
+Like
+.IR resend ,
+but does not add any header lines.
+This is not a way to hide the sender's identity,
+but useful for sending a message again
+to the same recipients.
+.TP
+.B resend
+Takes a list of messages and a user name
+and sends each message to the named user.
+`Resend-From:' and related header fields are prepended
+to the new copy of the message.
 .TP
 .B Respond
 Same as

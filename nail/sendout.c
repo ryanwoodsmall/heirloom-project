@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.66 (gritter) 11/5/04";
+static char sccsid[] = "@(#)sendout.c	2.67 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -74,7 +74,7 @@ static enum okay start_mta(struct name *to, struct name *mailargs, FILE *input);
 static void message_id(FILE *fo);
 static int fmt(char *str, struct name *np, FILE *fo, int comma,
 		int dropinvalid, int domime);
-static int infix_fw(FILE *fi, FILE *fo, struct message *mp,
+static int infix_resend(FILE *fi, FILE *fo, struct message *mp,
 		struct name *to, int add_resent);
 
 /*
@@ -1162,10 +1162,10 @@ fmt(char *str, struct name *np, FILE *fo, int comma, int dropinvalid,
 }
 
 /*
- * Rewrite a message for forwarding, adding the Resent-Headers.
+ * Rewrite a message for resending, adding the Resent-Headers.
  */
 static int
-infix_fw(FILE *fi, FILE *fo, struct message *mp, struct name *to,
+infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 		int add_resent)
 {
 	size_t count;
@@ -1174,83 +1174,81 @@ infix_fw(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 
 	count = mp->m_size;
 	/*
-	 * Write the original headers first.
+	 * Write the Resent-Fields.
+	 */
+	if (add_resent) {
+		fputs("Resent-", fo);
+		mkdate(fo, "Date");
+		cp = myaddr();
+		if (cp != NULL) {
+			if (mime_name_invalid(cp, 1)) {
+				if (buf)
+					free(buf);
+				return 1;
+			}
+			fwrite("Resent-From: ", sizeof (char), 13, fo);
+			mime_write(cp, sizeof *cp, strlen(cp), fo,
+					CONV_TOHDR_A, TD_ICONV,
+					NULL, (size_t)0);
+			putc('\n', fo);
+			/*
+			if ((cp2 = value("smtp")) == NULL
+				|| strcmp(cp2, "localhost") == 0)
+				fprintf(fo, "Resent-Sender: %s\n",
+						username());
+			*/
+		}
+#ifdef	notdef
+		/*
+		 * RFC 2822 disallows generation of this field.
+		 */
+		cp = value("replyto");
+		if (cp != NULL) {
+			if (mime_name_invalid(cp, 1)) {
+				if (buf)
+					free(buf);
+				return 1;
+			}
+			fwrite("Resent-Reply-To: ", sizeof (char),
+					17, fo);
+			mime_write(cp, sizeof *cp, strlen(cp), fo,
+					CONV_TOHDR_A, TD_ICONV,
+					NULL, (size_t)0);
+			putc('\n', fo);
+		}
+#endif	/* notdef */
+		if (fmt("Resent-To:", to, fo, 1, 1, 0)) {
+			if (buf)
+				free(buf);
+			return 1;
+		}
+		if (value("stealthmua") == NULL) {
+			fputs("Resent-", fo);
+			message_id(fo);
+		}
+	}
+	/*
+	 * Write the original headers.
 	 */
 	while (count > 0) {
 		if ((cp = foldergets(&buf, &bufsize, &count, &c, fi)) == NULL)
-			break;
-		if (count > 0 && *buf == '\n')
 			break;
 		if (ascncasecmp("status: ", buf, 8) != 0
 				&& strncmp("From ", buf, 5) != 0) {
 			fwrite(buf, sizeof *buf, c, fo);
 		}
+		if (count > 0 && *buf == '\n')
+			break;
 	}
 	/*
-	 * Write the Resent-Headers, but only if the message
-	 * has headers at all.
+	 * Write the message body.
 	 */
-	if (count > 0) {
-		if (add_resent) {
-				fputs("Resent-", fo);
-			mkdate(fo, "Date");
-			cp = myaddr();
-			if (cp != NULL) {
-				if (mime_name_invalid(cp, 1)) {
-					if (buf)
-						free(buf);
-					return 1;
-				}
-				fwrite("Resent-From: ", sizeof (char), 13, fo);
-				mime_write(cp, sizeof *cp, strlen(cp), fo,
-						CONV_TOHDR_A, TD_ICONV,
-						NULL, (size_t)0);
-				putc('\n', fo);
-				/*
-				if ((cp2 = value("smtp")) == NULL
-					|| strcmp(cp2, "localhost") == 0)
-					fprintf(fo, "Resent-Sender: %s\n",
-							username());
-				*/
-			}
-#ifdef	notdef
-			/*
-			 * RFC 2822 disallows generation of this field.
-			 */
-			cp = value("replyto");
-			if (cp != NULL) {
-				if (mime_name_invalid(cp, 1)) {
-					if (buf)
-						free(buf);
-					return 1;
-				}
-				fwrite("Resent-Reply-To: ", sizeof (char),
-						17, fo);
-				mime_write(cp, sizeof *cp, strlen(cp), fo,
-						CONV_TOHDR_A, TD_ICONV,
-						NULL, (size_t)0);
-				putc('\n', fo);
-			}
-#endif	/* notdef */
-			if (fmt("Resent-To:", to, fo, 1, 1, 0)) {
-				if (buf)
-					free(buf);
-				return 1;
-			}
-			if (value("stealthmua") == NULL) {
-				fputs("Resent-", fo);
-				message_id(fo);
-			}
-		}
-		putc('\n', fo);
-		/*
-		 * Write the message body.
-		 */
-		while (count > 0) {
-			if (foldergets(&buf, &bufsize, &count, &c, fi) == NULL)
-				break;
-			fwrite(buf, sizeof *buf, c, fo);
-		}
+	while (count > 0) {
+		if (foldergets(&buf, &bufsize, &count, &c, fi) == NULL)
+			break;
+		if (count == 0 && *buf == '\n')
+			break;
+		fwrite(buf, sizeof *buf, c, fo);
 	}
 	if (buf)
 		free(buf);
@@ -1262,7 +1260,7 @@ infix_fw(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 }
 
 int 
-forward_msg(struct message *mp, struct name *to, int add_resent)
+resend_msg(struct message *mp, struct name *to, int add_resent)
 {
 	FILE *ibuf, *nfo, *nfi;
 	char *tempMail;
@@ -1290,7 +1288,7 @@ forward_msg(struct message *mp, struct name *to, int add_resent)
 		return 1;
 	head.h_to = to;
 	to = fixhead(&head, to, 0);
-	if (infix_fw(ibuf, nfo, mp, head.h_to, add_resent) != 0) {
+	if (infix_resend(ibuf, nfo, mp, head.h_to, add_resent) != 0) {
 		senderr++;
 		rewind(nfo);
 		savedeadletter(nfi);
