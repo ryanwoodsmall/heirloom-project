@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.44 (gritter) 11/6/04";
+static char sccsid[]  = "@(#)mime.c	2.45 (gritter) 11/6/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -939,10 +939,13 @@ mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int))
 	upper = in->s + in->l;
 	for (p = in->s, l = 0; p < upper; p++) {
 		if (mustquote(*p&0377) ||
-				*(p + 1) == '\n' && blankchar(*p & 0377) ||
-				*p == ' ' && l == 4 &&
-				p[-4] == 'F' && p[-3] == 'r' &&
-				p[-2] == 'o' && p[-1] == 'm') {
+				p < upper-1 && p[1] == '\n' &&
+					blankchar(p[0]&0377) ||
+				p < upper-4 && l == 0 &&
+					p[0] == 'F' && p[1] == 'r' &&
+					p[2] == 'o' && p[3] == 'm' ||
+				*p == '.' && l == 0 && p < upper-1 &&
+					p[1] == '\n') {
 			if (l >= 69) {
 				sz += 2;
 				fwrite("=\n", sizeof (char), 2, fo);
