@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.66 (gritter) 11/6/04";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.69 (gritter) 12/12/04";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.66 (gritter) 11/6/04";
+static const char sccsid[] USED = "@(#)cp.sl	1.69 (gritter) 12/12/04";
 #endif
 
 #include	<sys/types.h>
@@ -94,7 +94,9 @@ static struct dslot	*d0;
 static unsigned	errcnt;			/* count of errors */
 static long	bflag;			/* buffer size */
 static int	dflag;			/* preserve hard links */
+#ifdef	O_DIRECT
 static int	Dflag;			/* use direct i/o */
+#endif	/* O_DIRECT */
 static int	fflag;			/* force */
 static int	iflag;			/* ask before overwriting */
 static int	nflag;			/* ln: do not remove links */
@@ -164,9 +166,9 @@ usage(void)
 	switch (pers) {
 	case PERS_CP:
 		fprintf(stderr, "\
-Usage: %s [-f] [-i] [-p] f1 f2\n\
-       %s [-f] [-i] [-p] f1 ... fn d1\n\
-       %s [-f] [-i] [-p] [-r|-R] d1 d2\n",
+Usage: %s [-i] [-p] f1 f2\n\
+       %s [-i] [-p] f1 ... fn d1\n\
+       %s [-i] [-p] [-r] d1 d2\n",
        			progname, progname, progname);
 		break;
 	case PERS_MV:
@@ -538,7 +540,6 @@ filecopy(const char *src, const struct stat *ssp,
 	struct stat stbuf;
 	mode_t mode;
 	int sfd, dfd;
-#ifdef	ADDONS
 	float	f, s, t;
 	struct timeval	tv1, tv2;
 	struct rusage	ru1, ru2;
@@ -547,7 +548,6 @@ filecopy(const char *src, const struct stat *ssp,
 		gettimeofday(&tv1, NULL);
 		getrusage(RUSAGE_SELF, &ru1);
 	}
-#endif	/* ADDONS */
 	if ((sfd = open(src, O_RDONLY)) < 0) {
 		fprintf(stderr, "%s: cannot open %s\n%s: %s\n",
 				progname, src,
@@ -581,7 +581,6 @@ end2:
 				progname, tgt, strerror(errno));
 		errcnt |= 04;
 	}
-#ifdef	ADDONS
 	if (sflag) {
 		gettimeofday(&tv2, NULL);
 		getrusage(RUSAGE_SELF, &ru2);
@@ -604,7 +603,6 @@ end2:
 		       s,
 		       t);
 	}
-#endif	/* ADDONS */
 end1:
 	close(sfd);
 }
@@ -1111,7 +1109,6 @@ main(int argc, char **argv)
 	optstring = getfl();
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
-#ifdef	ADDONS
 		case 'b':
 			bflag = atol(optarg);
 			break;
@@ -1120,7 +1117,6 @@ main(int argc, char **argv)
 			Dflag = 1;
 			break;
 #endif	/* O_DIRECT */
-#endif	/* ADDONS */
 		case 'd':
 			dflag = 1;
 			break;

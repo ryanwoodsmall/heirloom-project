@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)cut.1	1.6 (gritter) 4/17/03
-.TH CUT 1 "4/17/03" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)cut.1	1.8 (gritter) 12/6/04
+.TH CUT 1 "12/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cut \- cut out selected fields of each line of a file
 .SH SYNOPSIS
@@ -74,11 +74,6 @@ The
 .B cut
 command accepts the following options:
 .TP
-\fB\-b\fI list\fR
-Each single byte of an input line forms a column.
-All selected bytes are printed without intervening separators;
-all newline characters of the input file are passed through.
-.TP
 \fB\-c\fI list\fR
 Each character of an input line forms a column.
 All selected characters are printed without intervening separators;
@@ -99,17 +94,24 @@ separated by the field delimiter character.
 Lines that do not contain the field delimiter character
 are passed through unchanged.
 .TP
-\fB\-n\fR
-Changes the behavior of the
-.B \-b
-option such that ranges start and end at character boundaries.
-.TP
 \fB\-s\fR
 With the
 .B \-f
 option,
 lines that do not contain the field delimiter character
 are not passed through.
+.PP
+The following options were introduced by POSIX.2:
+.TP
+\fB\-b\fI list\fR
+Each single byte of an input line forms a column.
+All selected bytes are printed without intervening separators;
+all newline characters of the input file are passed through.
+.TP
+\fB\-n\fR
+Changes the behavior of the
+.B \-b
+option such that ranges start and end at character boundaries.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

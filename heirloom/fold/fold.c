@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)fold.sl	1.5 (gritter) 10/13/04";
+static const char sccsid[] USED = "@(#)fold.sl	1.7 (gritter) 12/5/04";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,8 +140,7 @@ setwidth(const char *s)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-bs] [-w number | -number] file1...\n",
-			progname);
+	fprintf(stderr, "usage: %s [-w number] file1...\n", progname);
 	exit(2);
 }
 

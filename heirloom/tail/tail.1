@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)tail.1	1.7 (gritter) 10/12/03
+.\" Sccsid @(#)tail.1	1.9 (gritter) 12/6/04
 .\" Parts taken from tail(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TAIL 1 "10/12/03" "Heirloom Toolchest" "User Commands"
+.TH TAIL 1 "12/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tail \- deliver the last part of a file
 .SH SYNOPSIS
@@ -88,6 +88,7 @@ is always taken as count of lines from the end of input.
 The
 .B tail
 command also accepts the following options
+that were introduced by POSIX.2,
 in the form shown in the third synopsis line:
 .TP
 \fB\-c\fR [\fB+\fR|\fB\-\fR]\fInumber\fR

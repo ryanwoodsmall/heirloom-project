@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cmp.sl	1.15 (gritter) 12/4/04";
+static const char sccsid[] USED = "@(#)cmp.sl	1.17 (gritter) 12/12/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -49,9 +49,9 @@ static const char sccsid[] USED = "@(#)cmp.sl	1.15 (gritter) 12/4/04";
 #include	"atoll.h"
 #include	"memalign.h"
 
-#ifdef	__GLIBC__
+#if defined (__GLIBC__) && defined (_IO_putc_unlocked)
 #undef	putchar
-#define	putchar(c)	putc_unlocked(c, stdout)
+#define	putchar(c)	_IO_putc_unlocked(c, stdout)
 #endif	/* __GLIBC__ */
 
 #define	BLKSIZE		8192
@@ -71,11 +71,7 @@ struct	file {
 static unsigned	errcnt;			/* count of errors */
 static int	lflag;			/* write differing bytes */
 static int	sflag;			/* write nothing */
-#ifdef	ADDONS
 static int	wflag;			/* word mode (Cray) */
-#else	/* !ADDONS */
-#define	wflag	0
-#endif	/* !ADDONS */
 static char	*progname;		/* argv[0] to main() */
 
 static void
@@ -336,11 +332,9 @@ main(int argc, char **argv)
 		case 's':
 			sflag = 1;
 			break;
-#ifdef	ADDONS
 		case 'w':
 			wflag = 1;
 			break;
-#endif
 		default:
 			usage();
 		}

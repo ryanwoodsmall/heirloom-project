@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.58 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.60 (gritter) 12/8/04";
 #else
-static const char sccsid[] USED = "@(#)df.sl	1.58 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)df.sl	1.60 (gritter) 12/8/04";
 #endif
 
 /*
@@ -94,6 +94,7 @@ static ull	totspace;		/* total space */
 static ull	totavail;		/* total available space */
 extern int	sysv3;			/* SYSV3 variable set */
 #endif	/* !UCB */
+static int	hflag;			/* print human-readable units */
 static int	kflag;			/* select 1024-blocks */
 static int	lflag;			/* local file systems only */
 static int	dfspace;		/* this is the dfspace command */
@@ -118,6 +119,26 @@ pnerror(int eno, const char *string)
 	errcnt |= 1;
 }
 
+static char *
+hfmt(ull n)
+{
+	char	*cp;
+	const char	units[] = "KMGTPE", *up = units;
+	int	rest = 0;
+
+	while (n > 1023) {
+		rest = (n % 1024) / 128;
+		n /= 1024;
+		up++;
+	}
+	cp = malloc(10);
+	if (n < 10 && rest)
+		snprintf(cp, 10, "%2llu.%u%c", n, rest, *up);
+	else
+		snprintf(cp, 10, "%4llu%c", n, *up);
+	return cp;
+}
+
 #ifndef	UCB
 static const char *
 files(void)
@@ -133,6 +154,10 @@ static void
 printhead(void)
 {
 	switch (format) {
+	case 'h':
+		printf(
+	"Filesystem             size   used  avail capacity  Mounted on\n");
+		break;
 	case 'P':
 		printf(
 		"Filesystem%s       Used  Available Capacity Mounted on\n",
@@ -203,6 +228,7 @@ procnodes(const char *dir, struct statvfs *sv)
 static void
 printfs(const char *mdir, const char *mdev, const char *mtype)
 {
+	const char	*cp;
 	struct statvfs sv;
 	ull total, avail, used, percent;
 	int bsize = kflag ? 1024 : 512;
@@ -218,6 +244,7 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		case 'b':
 		case 'e':
 		case 'f':
+		case 'h':
 		case 'g':
 		case 'i':
 		case 'k':
@@ -269,6 +296,17 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		procnodes(mdir, &sv);
 #endif	/* __linux__ */
 	switch (format) {
+	case 'h':
+		percent = total ? used * 100 / total : 0;
+		if (strlen(mdev) > 20) {
+			printf("%s\n", mdev);
+			cp = "";
+		} else
+			cp = mdev;
+		printf("%-20s  %s  %s  %s   %3llu%%    %s\n",
+				cp, hfmt(total), hfmt(used), hfmt(avail),
+				percent, mdir);
+		break;
 	case 'P':
 	case 'k':
 		percent = total ? used * 100 / total : 0;
@@ -558,8 +596,7 @@ findfs(const char *fn)
 static void
 usage(void)
 {
-	fprintf(stderr,
-		"usage: %s [ -i ] [ -a ] [ -P [ -k] ] [ -M mtab ] [ -t type | file... ]\n",
+	fprintf(stderr, "usage: %s [ -i ] [ -a ] [ -t type | file... ]\n",
 			progname);
 	exit(2);
 }
@@ -575,10 +612,13 @@ main(int argc, char **argv)
 	progname = basename(argv[0]);
 	aflag = 0;
 	format = 'k';
-	while ((i = getopt(argc, argv, "aikM:Pt:")) != EOF) {
+	while ((i = getopt(argc, argv, "aihkM:Pt:")) != EOF) {
 		switch (i) {
 		case 'a':
 			aflag = 1;
+			break;
+		case 'h':
+			hflag = 1;
 			break;
 		case 'k':
 			kflag = 1;
@@ -600,7 +640,10 @@ main(int argc, char **argv)
 			usage();
 		}
 	}
-	if (format == 'k')
+	if (hflag) {
+		format = 'h';
+		kflag = 1;
+	} else if (format == 'k')
 		kflag = 1;
 	if (fstype && optind != argc)
 		usage();
@@ -617,7 +660,7 @@ static void
 usage(void)
 {
 	fprintf(stderr, dfspace ?  "Usage: %s [file ...]\n" : "Usage:\n\
-%s [-F FSType] [-M mtab] [-befgiklnPtVv] [current_options] \
+%s [-F FSType] [-befgklntVv] [current_options] \
 [-o specific_options] [directory | special ...]\n",
 		progname);
 	exit(2);
@@ -637,13 +680,16 @@ main(int argc, char **argv)
 	putenv("POSIXLY_CORRECT=1");
 #endif
 	while ((i = getopt(argc, argv,
-			dfspace ? "F:" : "befF:giklM:no:PtvV")) != EOF) {
+			dfspace ? "F:" : "befF:ghiklM:no:PtvV")) != EOF) {
 		switch (i) {
 		case 'f':
 			fflag = 1;
 			break;
 		case 'F':
 			fstype = optarg;
+			break;
+		case 'h':
+			hflag = 1;
 			break;
 		case 'g':
 			gflag = 1;
@@ -697,6 +743,10 @@ main(int argc, char **argv)
 	if (dfspace) {
 		format = 04;
 		kflag = 1;
+	} else if (hflag) {
+		format = 'h';
+		kflag = 1;
+		tflag = 0;
 	} else if (gflag) {
 		format = 'g';
 		kflag = tflag = 0;

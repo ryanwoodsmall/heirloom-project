@@ -19,12 +19,12 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)fold.1	1.1 (gritter) 5/5/03
-.TH FOLD 1 "5/5/03" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)fold.1	1.4 (gritter) 12/6/04
+.TH FOLD 1 "12/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 fold \- fold long lines
 .SH SYNOPSIS
-\fBfold\fR [\fB\-b\fR] [\fB\-s\fR] [\fB-w\ \fIwidth\fR | \fB\-\fIwidth\fR]
+\fBfold\fR [\fB\-b\fR] [\fB\-s\fR] [\fB\-w\ \fIwidth\fR | \fB\-\fIwidth\fR]
 [\fIfile\ ...\fR]
 .SH DESCRIPTION
 .I Fold
@@ -45,12 +45,14 @@ The following options are accepted by
 Use bytes instead of columns.
 All characters except for the newline character
 are counted according to the space consumed in bytes.
+This option has been introduced by POSIX.2.
 .TP
 .B \-s
 Try to preserve words, if possible.
 If a blank character appears in an input line
 before it exceeds the width limit,
 the line is prematurely folded after this character.
+This option has been introduced by POSIX.2.
 .TP
 .B \-w\fI width\fR
 Set the maximum output line length (in columns or bytes) to

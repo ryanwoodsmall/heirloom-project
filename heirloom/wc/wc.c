@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)wc_s42.sl	1.37 (gritter) 11/28/04";
+static const char sccsid[] USED = "@(#)wc_s42.sl	1.40 (gritter) 12/12/04";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)wc_sus.sl	1.37 (gritter) 11/28/04";
+static const char sccsid[] USED = "@(#)wc_sus.sl	1.40 (gritter) 12/12/04";
 #else
-static const char sccsid[] USED = "@(#)wc.sl	1.37 (gritter) 11/28/04";
+static const char sccsid[] USED = "@(#)wc.sl	1.40 (gritter) 12/12/04";
 #endif
 
 #include	<sys/types.h>
@@ -63,6 +63,7 @@ static int		cflag;		/* count bytes only */
 static int		lflag;		/* count lines only */
 static int		mflag;		/* count characters only */
 static int		wflag;		/* count words only */
+static int		illflag;	/* illegal flag given */
 static long long	bytec;		/* byte count */
 static long long	charc;		/* character count */
 static long long	wordc;		/* word count */
@@ -76,6 +77,8 @@ static int		putspace;	/* wrote space to output line */
 #endif
 static char		*progname;	/* argv0 to main */
 static int		mb_cur_max;	/* MB_CUR_MAX */
+
+static void		usage(void);
 
 /*
  * Format output.
@@ -156,7 +159,8 @@ mbwc(struct iblok *ip)
 {
 	register long long hadspace = 1;
 	char	mb[MB_LEN_MAX];
-	int c, i, k, n;
+	wint_t	c;
+	int	i, k, n;
 	size_t sz;
 	char	*curp;
 	int	eof = 0;
@@ -261,6 +265,8 @@ fpwc(int fd)
 		return -1;
 	}
 	ib_free(ip);
+	if (illflag)
+		usage();
 #if defined (SUS) || defined (S42)
 	putspace = 0;
 #endif
@@ -303,7 +309,7 @@ filewc(const char *fn)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-cmlw] [name ...]\n", progname);
+	fprintf(stderr, "usage: %s [-clw] [name ...]\n", progname);
 	exit(2);
 }
 
@@ -336,7 +342,7 @@ main(int argc, char **argv)
 			wflag = ac;
 			break;
 		default:
-			usage();
+			illflag = 1;
 		}
 	}
 	if (ac == 0) {

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cat.sl	2.16 (gritter) 10/12/04";
+static const char sccsid[] USED = "@(#)cat.sl	2.17 (gritter) 12/5/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -251,11 +251,9 @@ main(int argc, char **argv)
 		case 't':
 			tflag = 1;
 			break;
-#ifdef	ADDONS
 		case 'B':
 			Bflag = atol(optarg);
 			break;
-#endif	/* ADDONS */
 		default:
 			usage();
 		}

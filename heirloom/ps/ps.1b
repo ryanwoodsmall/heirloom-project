@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1b	1.14 (gritter) 3/28/03
+.\" Sccsid @(#)ps.1b	1.17 (gritter) 12/9/04
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -66,7 +66,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.TH PS 1B "3/28/03" "Heirloom Toolchest" "BSD System Compatibility"
+.TH PS 1B "12/9/04" "Heirloom Toolchest" "BSD System Compatibility"
 .SH NAME
 ps \- (BSD) process status
 .SH SYNOPSIS
@@ -127,9 +127,6 @@ command accepts the following options:
 Selects all processes with a controlling terminal device
 (including session leaders).
 .TP 12
-.B \-A
-Selects all processes.
-.TP 12
 .B \-c
 Prints the command name,
 as stored internally in the system for purposes of accounting,
@@ -148,10 +145,6 @@ if they are session leaders.
 This normally eliminates top-level command interpreters
 and processes waiting for users to login on free terminals.
 .TP 12
-\fB\-G\fI gidlist\fR
-Selects all processes that have one of the specified real \fIgroup ids\fR,
-which may be symbolic or numeric.
-.TP 12
 .B \-l
 Long listing;
 adds process flags,
@@ -165,32 +158,6 @@ See below for the meaning of columns.
 For a user listing as selected with
 .BR \-u ,
 print the numeric user ID instead of the user name.
-.TP 12
-\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]],...
-The output is changed to reflect the named
-.IR property .
-Multiple properties can be given,
-separated by blanks or commas;
-it is also possible to specify multiple
-.B \-o
-options.
-Normally, the default property description is
-written in the first output line.
-If the
-.B = 
-character is present, but the
-.I title
-is missing in all format specifications,
-no descriptions are printed;
-if a
-.I title
-is given, it is used instead of the default.
-See below for valid
-.I property
-strings.
-.TP 12
-\fB\-p\fI pidlist\fR
-Selects all processes with one of the given \fIprocess ids\fR.
 .TP 12
 .B \-r
 Causes only running processes to be printed.
@@ -221,10 +188,6 @@ A user oriented output is produced; adds user name,
 processor usage, memory and resident set size,
 and the time when the process was started.
 .TP 12
-\fB\-U\fI uidlist\fR
-Selects all processes with one of the given real \fIuser ids\fR,
-which may be symbolic or numeric.
-.TP 12
 .B \-v
 A version of the output
 containing virtual memory statistics is output;
@@ -239,6 +202,45 @@ the output width is unlimited.
 .TP 12
 .B \-x
 Include processes that have no controlling terminal.
+.PP
+The following options have been introduced by POSIX.2:
+.TP 12
+.B \-A
+Selects all processes.
+.TP 12
+\fB\-G\fI gidlist\fR
+Selects all processes that have one of the specified real \fIgroup ids\fR,
+which may be symbolic or numeric.
+.TP 12
+\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]],...
+The output is changed to reflect the named
+.IR property .
+Multiple properties can be given,
+separated by blanks or commas;
+it is also possible to specify multiple
+.B \-o
+options.
+Normally, the default property description is
+written in the first output line.
+If the
+.B = 
+character is present, but the
+.I title
+is missing in all format specifications,
+no descriptions are printed;
+if a
+.I title
+is given, it is used instead of the default.
+See below for valid
+.I property
+strings.
+.TP 12
+\fB\-p\fI pidlist\fR
+Selects all processes with one of the given \fIprocess ids\fR.
+.TP 12
+\fB\-U\fI uidlist\fR
+Selects all processes with one of the given real \fIuser ids\fR,
+which may be symbolic or numeric.
 .PP
 The meaning of columns and column headings
 are as follows:

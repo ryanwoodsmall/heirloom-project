@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)cat.1	1.10 (gritter) 3/28/03
+.\" Sccsid @(#)cat.1	1.11 (gritter) 12/5/04
 .\" Parts taken from cat(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CAT 1 "3/28/03" "Heirloom Toolchest" "User Commands"
+.TH CAT 1 "12/5/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cat \- concatenate and print files
 .SH SYNOPSIS
-\fBcat\fR [\fB\-suv\fR [\fB\-et\fR]] [\fIfile\fR ...]
+\fBcat\fR [\fB\-suv\fR [\fB\-et\fR]] [\fB\-B\ \fIsize\fR] [\fIfile\fR ...]
 .SH DESCRIPTION
 .B Cat
 reads each file in sequence and writes it
@@ -91,6 +91,13 @@ If
 .B \-v
 is present,
 this option causes end-of-line to be marked with `$'.
+.PP
+The following option is an extension:
+.TP
+\fB\-B\ \fIsize\fR
+Causes input and output to be performed in
+.I size
+byte units.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

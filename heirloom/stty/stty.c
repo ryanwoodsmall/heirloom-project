@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifndef	UCB
-static const char sccsid[] USED = "@(#)stty.sl	1.16 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)stty.sl	1.17 (gritter) 12/13/04";
 #else	/* UCB */
-static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.16 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.17 (gritter) 12/13/04";
 #endif	/* UCB */
 
 #include <sys/types.h>
@@ -1039,6 +1039,15 @@ sane(int not)
 	ts.c_cflag = CS8|CREAD;
 	ts.c_lflag = ISIG|ICANON|ECHO|ECHOE|ECHOK|ECHOKE|IEXTEN;
 	ts.c_iflag = BRKINT|IGNPAR|ICRNL|IXON|IMAXBEL;
+#ifdef	IUTF8
+	if (MB_CUR_MAX > 1) {
+		wchar_t	wc;
+		if (mbtowc(&wc, "\303\266", 2) == 2 && wc == 0xF6 &&
+				mbtowc(&wc, "\342\202\254", 3) == 3 &&
+				wc == 0x20AC)
+			ts.c_iflag |= IUTF8;
+	}
+#endif	/* IUTF8 */
 	ts.c_oflag = OPOST|ONLCR;
 	cfsetispeed(&ts, ispeed);
 	cfsetospeed(&ts, ospeed);

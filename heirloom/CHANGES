@@ -1,3 +1,33 @@
+Release 041214
+* Traditional and POSIX options as well as extensions are now marked as such
+  in the manual pages.
+* The functionality that was previously provided by specifying the -DADDONS
+  compile flag has been integrated into the base version and documented in
+  the manual pages, and other extensions have been added. This includes:
+  'cat -B size', 'cmp -w', 'cp -b size -d -D -s', 'date -b', 'dd conv=idirect
+  conv=odirect', 'df -h', 'du -h', the 'b', 'help', 'N', 'o', and 'z' commands
+  for 'ed', 'grep -r -R -w', 'ls -h -S -U -X', 'od -C', 'tar zjZ'. Note that
+  these extensions are only intended as a convenience add-on for interactive
+  use; their semantics might change without prior notice in future releases,
+  and their use in scripts is strongly discouraged.
+* split: Fixed a null pointer dereference that occured if the argument to
+  the -a, -b, or -l option was missing.
+* nice: Fixed a null pointer dereference that occured if the argument to
+  the -n option was missing.
+* pr: Fixed a null pointer dereference that occured if the argument to
+  the -o, -l, or -w option was missing.
+* dc: Do not call malloc(0). Doing this made some operations fail with diet
+  libc.
+* ls (BSD version): Print block sizes as units of 1024 kilobytes.
+* pg: Non-printable characters in multibyte locales no longer lead to wrong
+  results when the width of a line on the screen is computed.
+* head: Handle a single '-' on the command line like '-0'.
+* grep, oawk, pg: Work around a bug in HP-UX which can cause MB_CUR_MAX to
+  be influenced by setting the LC_COLLATE locale after LC_CTYPE.
+* ps: Some minor changes were made for NetBSD 2.0.
+* stty: If the LC_CTYPE locale uses the UTF-8 encoding, 'ituf8' is now set
+  with 'sane'.
+
 Release 041204
 * pgrep, pkill: The -o option (select oldest process only) was added.
 * tar: lseek() is now used again to skip faster over irrelevant portions

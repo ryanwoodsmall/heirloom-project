@@ -32,8 +32,8 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\" Sccsid @(#)tar.1	1.43 (gritter) 5/24/04
-.TH TAR 1 "5/24/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)tar.1	1.44 (gritter) 12/5/04
+.TH TAR 1 "12/5/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tar \- tape archiver
 .SH SYNOPSIS
@@ -357,6 +357,31 @@ with the
 and
 .I x
 keys.
+.PP
+The following keys are supported as extensions:
+.TP 10
+.B z
+causes
+.I tar
+to pipe its output through
+.IR gzip (1)
+when creating archives.
+When reading archives,
+this option is ignored.
+.TP 10
+.B j
+Similar to
+.IR z ,
+but using
+.IR bzip2 (1)
+as compression program.
+.TP 10
+.B Z
+Similar to
+.IR z ,
+but using
+.IR compress (1)
+as compression program.
 .SH EXAMPLES
 List the contents of a software distribution archive:
 .in +2

@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)df.1	1.28 (gritter) 3/6/04
-.TH DF 1 "3/6/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)df.1	1.32 (gritter) 12/9/04
+.TH DF 1 "12/9/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 df, dfspace \- disk free
 .SH SYNOPSIS
@@ -28,7 +28,7 @@ df, dfspace \- disk free
 .nh
 .ad l
 \fBdf\fR [\fB\-F\fI\ fstype\fR] [\fB\-M\fI\ mtab\fR]
-[\fB\-o\fI\ fsoptions\fR] [\fB\-befgiklnPtv\fR]
+[\fB\-o\fI\ fsoptions\fR] [\fB\-befghiklnPtv\fR]
 [\fIfile\fR\ ...]
 .PP
 \fBdfspace\fR [\fB\-F\fI\ fstype\fR] [\fIfile\fR ...]
@@ -81,9 +81,6 @@ Print the entire
 structure.
 Overrides the \-b, \-e, \-k, \-n, \-P, and \-t options.
 .TP
-.B \-i
-Print i-node statistics.
-.TP
 .B \-k
 If given alone, the allocation is printed in kbytes,
 and a different output format is used.
@@ -99,22 +96,12 @@ and
 .B smbfs
 are considered to be non-local.
 .TP
-.BI \-M \ mtab
-Use the specified
-.I mtab
-file to get a list of mounted filesystems.
-.TP
 .B \-n
 Print the file system mount point and file system type only.
 .TP
 .BI \-o \ fsoptions
 Specifiy file-system specific options.
 There are none so this option will always cause an error message.
-.TP
-.B \-P
-Select the portable 
-.SM (POSIX)
-output format.
 .TP
 .B \-t
 Use the traditional output format as it is the default,
@@ -130,6 +117,32 @@ and usage in percent.
 .TP
 .B \-V
 Print command lines for each file system only.
+.PP
+The following option has been introduced by POSIX.2:
+.TP
+.B \-P
+Select the portable 
+.SM (POSIX)
+output format.
+.PP
+The following options are extensions:
+.TP
+.B \-h
+Prints the sizes in human-readable powers of 1024,
+i.\|e. `K' for kilobyte,
+`M' for megabyte,
+`G' for gigabyte,
+`T' for terabyte,
+`P' for petabyte,
+and `E' for exabyte.
+.TP
+.B \-i
+Print i-node statistics.
+.TP
+.BI \-M \ mtab
+Use the specified
+.I mtab
+file to get a list of mounted filesystems.
 .SH FILES
 .TP
 .B /etc/mtab

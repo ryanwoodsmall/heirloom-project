@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)join.sl	1.10 (gritter) 11/10/04";
+static const char sccsid[] USED = "@(#)join.sl	1.11 (gritter) 12/5/04";
 
 /*	join F1 F2 on stuff */
 
@@ -101,9 +101,9 @@ static void *srealloc(void *, size_t);
 static void
 usage(void)
 {
-	fprintf(stderr, "\
-usage: %s [-an|-vn] [-e s] [-jn m] [-1 m] [-2 m] [-tc] [-o list] file1 file2\n",
-		progname);
+	fprintf(stderr,
+	"%s: usage: %s [-an] [-e s] [-jn m] [-tc] [-o list] file1 file2\n",
+		progname, progname);
 	exit(2);
 }
 

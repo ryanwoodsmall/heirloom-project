@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "%Z%fgrep.sl	%I% (gritter) %G%";
+static const char sccsid[] USED = "@(#)fgrep.sl	2.8 (gritter) 7/16/04";
 
 #include <sys/types.h>
 #include <string.h>

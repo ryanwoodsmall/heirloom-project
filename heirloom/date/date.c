@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)date_sus.sl	1.22 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)date_sus.sl	1.23 (gritter) 12/5/04";
 #else
-static const char sccsid[] USED = "@(#)date.sl	1.22 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)date.sl	1.23 (gritter) 12/5/04";
 #endif
 
 #include	<unistd.h>
@@ -318,11 +318,9 @@ main(int argc, char **argv)
 		case 'a':
 			adjustment = optarg;
 			break;
-#ifdef	ADDONS
 		case 'b':
 			bflag = 1;
 			break;
-#endif	/* ADDONS */
 		case 'u':
 			uflag = 1;
 			putenv("TZ=GMT");

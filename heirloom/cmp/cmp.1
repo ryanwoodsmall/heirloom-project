@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)cmp.1	1.4 (gritter) 1/11/03
+.\" Sccsid @(#)cmp.1	1.5 (gritter) 12/5/04
 .\" Parts taken from cmp(1), Unix 32V:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,12 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CMP 1 "1/11/03" "Heirloom Toolchest" "User Commands"
+.TH CMP 1 "12/5/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cmp \- compare two files
 .SH SYNOPSIS
-\fBcmp\fR [\fB\-l\fR] [\fB\-s\fR] \fIfile1 file2\fR [\fIskip1\fR [\fIskip2\fR]]
+\fBcmp\fR [\fB\-l\fR] [\fB\-s\fR] [\fB\-w\fR]
+\fIfile1 file2\fR [\fIskip1\fR [\fIskip2\fR]]
 .SH DESCRIPTION
 The two files are
 compared.
@@ -70,6 +71,17 @@ differing bytes (octal) for each difference.
 .B  \-s
 Print nothing for differing files;
 return codes only.
+.PP
+The following option is an extension:
+.TP 6
+.B  \-w
+For each difference,
+the surrounding 8-byte unit,
+measured from the beginning of the file,
+is printed for both files
+as a 64-bit MSB integer in octal,
+and as a byte string,
+with non-ASCII and control characters replaced by an underscore.
 .SH "SEE ALSO"
 diff(1), comm(1)
 .SH DIAGNOSTICS

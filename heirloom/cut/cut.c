@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cut.sl	1.14 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)cut.sl	1.16 (gritter) 12/12/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -108,14 +108,14 @@ error(const char *s)
 static void
 usage(void)
 {
-	error(
-	"Usage: cut [-sn] [-d<char>] {-b<list> | -c<list> | -f<list>} file...");
+	error("Usage: cut [-s] [-d<char>] {-c<list> | -f<list>} file ...");
 }
 
 static void
 badlist(void)
 {
-	error("bad list for b/c/f option");
+	error(method == 'b' ? "bad list for b/c/f option" : 
+			"bad list for c/f option");
 }
 
 static void

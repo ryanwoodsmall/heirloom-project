@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)copy.sl	1.11 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)copy.sl	1.12 (gritter) 12/5/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -493,7 +493,7 @@ usage(int c)
 	if (c)
 		fprintf(stderr, "Bad option - %c\n", c);
 	fprintf(stderr,
-"Usage: %s [-n] [-l|s] [-a[d]] [-m] [-o] [-r] [-v] [-h] src ... [dst]\n",
+"Usage: %s [-n] [-l] [-a[d]] [-m] [-o] [-r] [-v] src ... [dst]\n",
 		progname);
 	exit(1);
 }

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)touch.sl	1.15 (gritter) 9/7/04";
+static const char sccsid[] USED = "@(#)touch.sl	1.16 (gritter) 12/8/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -263,11 +263,8 @@ static void
 usage(void)
 {
 	if (settime == 0)
-		fprintf(stderr, "\
-usage: %s [-amc] [mmddhhmm[yy]] file ...\n\
-       %s [-amc] [-r ref_file] file ...\n\
-       %s [-amc] [-t [[CC]YY]MMDDhhmm[.SS]] file ...\n",
-       		progname, progname, progname);
+		fprintf(stderr, "usage: %s [-amc] [mmddhhmm[yy]] file ...\n",
+       			progname);
 	else
 		fprintf(stderr, "usage: %s [-f file] [mmddhhmm[yy]] file ...\n",
 				progname);

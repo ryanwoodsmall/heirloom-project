@@ -32,30 +32,32 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)grep.sl	2.34 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)grep.sl	2.37 (gritter) 12/12/04";
 /*
-alloc.h:
-	alloc.h	1.3 (gritter) 4/17/03
-grep.h:
-	grep.h	1.20 (gritter) 8/11/03
 ac.c:
 	fgrep.sl	2.8 (gritter) 7/16/04
 alloc.c:
 	alloc.c	1.3 (gritter) 4/17/03
+alloc.h:
+	alloc.h	1.3 (gritter) 4/17/03
+egrep.c:
+	egrep.sl	2.20 (gritter) 12/5/04
+egrep.y:
+	egrep.sl	2.20 (gritter) 12/5/04
 fgrep.c:
-	fgrep.c	1.10 (gritter) 11/21/04
+	fgrep.c	1.11 (gritter) 12/5/04
 ggrep.c:
-	ggrep.c	1.22 (gritter) 11/21/04
+	ggrep.c	1.24 (gritter) 12/8/04
 grep.c:
-	grep.c	1.43 (gritter) 12/1/04
+	grep.c	1.47 (gritter) 12/12/04
+grep.h:
+	grep.h	1.22 (gritter) 12/8/04
 plist.c:
-	plist.c	1.21 (gritter) 12/1/04
+	plist.c	1.22 (gritter) 12/8/04
 rcomp.c:
 	rcomp.c	1.24 (gritter) 1/10/04
 sus.c:
-	sus.c	1.19 (gritter) 11/21/04
+	sus.c	1.21 (gritter) 12/8/04
 svid3.c:
 	svid3.c	1.7 (gritter) 4/17/03
-egrep.y:
-	egrep.sl	2.19 (gritter) 12/1/04
 */

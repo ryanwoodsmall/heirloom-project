@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid %W% (gritter) %G%>	*/
+/*	Sccsid @(#)rcomp.c	1.24 (gritter) 1/10/04>	*/
 
 /*
  * Code involving POSIX.2 regcomp()/regexpr() routines.

@@ -51,7 +51,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)more.sl	1.27 (gritter) 11/21/04";
+static const char sccsid[] USED = "@(#)more.sl	1.28 (gritter) 12/12/04";
 
 /*
 ** more.c - General purpose tty output filter and file perusal program
@@ -86,9 +86,7 @@ static const char sccsid[] USED = "@(#)more.sl	1.27 (gritter) 11/21/04";
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
-#ifndef	TIOCGWINSZ
 #include <sys/ioctl.h>
-#endif
 
 #ifdef	USE_TERMCAP
 #include <termcap.h>

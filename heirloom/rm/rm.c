@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)rm_sus.sl	2.15 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)rm_sus.sl	2.18 (gritter) 12/12/04";
 #else
-static const char sccsid[] USED = "@(#)rm.sl	2.15 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)rm.sl	2.18 (gritter) 12/12/04";
 #endif
 
 #include	<sys/types.h>
@@ -69,8 +69,6 @@ static int	fflag;			/* force */
 static int	iflag;			/* ask for confirmation */
 static int	rflag;			/* recursive */
 static char	*progname;		/* argv[0] to main() */
-static uid_t	myuid;			/* user id */
-static gid_t	mygid;			/* group id */
 static char	*path;			/* full path to current file */
 static size_t	pathsz;			/* allocated size of path */
 extern int	sysv3;			/* emulate SYSV3 behavior */
@@ -99,7 +97,7 @@ smalloc(size_t nbytes)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-fiRr] file ...\n", progname);
+	fprintf(stderr, "usage: %s [-fir] file ...\n", progname);
 	exit(2);
 }
 
@@ -364,7 +362,6 @@ int
 main(int argc, char **argv)
 {
 	int i, startfd = -1;
-	char	*fn;
 
 #ifdef	__GLIBC__
 	putenv("POSIXLY_CORRECT=1");
@@ -401,15 +398,13 @@ main(int argc, char **argv)
 	if (optind >= argc)
 		usage();
 	ontty = isatty(0);
-	myuid = getuid();
-	mygid = getgid();
 	if (rflag && (startfd = open(".", O_RDONLY)) < 0) {
 		fprintf(stderr, "%s: cannot open current directory\n",
 				progname);
 		exit(1);
 	}
 	while (optind < argc) {
-		if ((fn = dotdot(argv[optind])) != NULL) {
+		if (dotdot(argv[optind]) != NULL) {
 			if (fflag == 0)
 				fprintf(stderr, "%s of %s is not allowed\n",
 					progname, argv[optind]);

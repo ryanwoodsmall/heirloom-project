@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.167 (gritter) 12/4/04";
+static const char sccsid[] USED = "@(#)tar.sl	1.169 (gritter) 12/10/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -370,10 +370,8 @@ static struct islot	*ifind(ino_t, struct islot **);
 static void	iput(struct islot *, struct islot **);
 static struct dslot	*dfind(struct dslot **, dev_t);
 static char	*sequence(void);
-#ifdef	ADDONS
 static void	docomp(const char *);
-static int	jflag, zflag;
-#endif	/* ADDONS */
+static int	jflag, zflag, Zflag;
 
 int
 main(int argc, char *argv[])
@@ -514,16 +512,21 @@ main(int argc, char *argv[])
 		case 'B':
 			Bflag = 1;
 			break;
-#ifdef	ADDONS
 		case 'z':
 			zflag = 1;
 			jflag = 0;
+			Zflag = 0;
 			break;
 		case 'j':
 			jflag = 1;
 			zflag = 0;
+			Zflag = 0;
 			break;
-#endif	/* ADDONS */
+		case 'Z':
+			Zflag = 1;
+			jflag = 0;
+			zflag = 0;
+			break;
 		default:
 			fprintf(stderr, "%s: %c: unknown option\n",
 					progname, *cp & 0377);
@@ -557,14 +560,12 @@ main(int argc, char *argv[])
 					progname);
 			done(1);
 		}
-#ifdef	ADDONS
-		if (cflag == 0 && (jflag || zflag)) {
+		if (cflag == 0 && (jflag || zflag || Zflag)) {
 			fprintf(stderr, "%s: can only create "
 					"compressed archives\n",
 					progname);
 			done(1);
 		}
-#endif	/* ADDONS */
 		ckusefile();
 		if (strcmp(usefile, "-") == 0) {
 			if (cflag == 0) {
@@ -583,10 +584,8 @@ main(int argc, char *argv[])
 			}
 		}
 		domtstat();
-#ifdef	ADDONS
-		if (jflag || zflag)
-			docomp(jflag ? "bzip2" : "gzip");
-#endif	/* ADDONS */
+		if (jflag || zflag || Zflag)
+			docomp(jflag ? "bzip2" : Zflag ? "compress" : "gzip");
 		dorep(argv);
 	}
 	else if (xflag)  {
@@ -1401,7 +1400,9 @@ wrhdr(const char *longname, const char *symblink, struct stat *sp)
 					(wrtotal+recno*2+1023)/1024);
 		fprintf(stderr, "a %s%s ", longname,
 				(sp->st_mode&S_IFMT) == S_IFDIR ? "/" : "");
-		if (nflag)
+		if (symblink)
+			fprintf(stderr, "symbolic link to %s\n", symblink);
+		else if (nflag)
 			fprintf(stderr, "%lldK\n",
 					blocks&01?blocks|02:blocks>>1);
 		else
@@ -3090,7 +3091,6 @@ sequence(void)
 	return buf;
 }
 
-#ifdef	ADDONS
 static void
 docomp(const char *name)
 {
@@ -3133,4 +3133,3 @@ docomp(const char *name)
 	mtstat.st_dev = ost.st_dev;
 	mtstat.st_ino = ost.st_ino;
 }
-#endif	/* ADDONS */

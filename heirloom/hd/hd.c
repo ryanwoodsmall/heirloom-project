@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)hd.sl	1.10 (gritter) 7/24/04";
+static const char sccsid[] USED = "@(#)hd.sl	1.11 (gritter) 12/5/04";
 
 #include <sys/types.h>
 #include <stdio.h>
@@ -303,7 +303,7 @@ count(const char *s)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-acbwlAxdov] [-t] [-s offset[*][wlbk]] "
+	fprintf(stderr, "usage: %s [-acbwlAxdo] [-t] [-s offset[*][wlbk]] "
 			"[-n count[*][wlbk]] [file] ...\n",
 			progname);
 	exit(2);

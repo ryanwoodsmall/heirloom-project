@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)csplit.sl	1.5 (gritter) 7/13/04";
+static const char sccsid[] USED = "@(#)csplit.sl	1.6 (gritter) 12/5/04";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,9 +146,8 @@ main(int argc, char **argv)
 static void
 usage(void)
 {
-	fprintf(stderr,
-		"Usage: %s [-s] [-k] [-f prefix] [-n digits] file args ...\n",
-		progname);
+	fprintf(stderr, "%s: Usage: %s [-s] [-k] [-f prefix] file args ...\n",
+		progname, progname);
 	exit(2);
 }
 

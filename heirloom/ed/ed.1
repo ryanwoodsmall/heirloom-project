@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ed.1	1.38 (gritter) 12/1/03
+.\" Sccsid @(#)ed.1	1.40 (gritter) 12/13/04
 .\" Parts taken from ed(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH ED 1 "12/1/03" "Heirloom Toolchest" "User Commands"
+.TH ED 1 "12/13/04" "Heirloom Toolchest" "User Commands"
 .if t .ds q \(aa
 .if n .ds q '
 .SH NAME
@@ -808,6 +808,50 @@ An address alone on a line causes the addressed line to be printed.
 A blank line alone is equivalent to `.+1p'; it is useful
 for stepping through text.
 .PP
+The following commands are extensions:
+.TP 5
+\fR(\|\fI.\|\fR)\fB\|b\fR[\fIcount\fR]
+Prints a screenful of lines,
+starting at the addressed one,
+and browses forward in the buffer by this amount.
+With the optional
+.I count
+argument, the screen size for this and following
+.I b
+commands is set to the given number of lines.
+.TP 5
+.B help
+Causes a summary of
+.I ed
+commands along with short descriptions
+to be printed on the terminal.
+.TP 5
+.B N
+Makes the
+.I p
+command behave like the
+.I n
+command and vice-versa.
+If given a second time,
+the original semantics are restored.
+.TP 5
+\fR(\|\fI.\|\fR)\fB\|o\fR[\fIcount\fR]
+Prints a screenful of lines centered around the addressed one.
+The current line is not changed.
+With the optional
+.I count
+argument, the amount of lines printed above and below
+for this and following
+.I o
+commands is set to the given number.
+.TP 5
+.B z
+Performs the same actions as a
+.I w
+command followed by a
+.I q
+command.
+.PP
 If an interrupt signal is sent,
 .I ed
 prints a `?' and returns to its command level.
@@ -828,7 +872,7 @@ Some size limitations:
 On machines with 32-bit words,
 2\ G bytes in the temporary file;
 on machines with larger words,
-64\ T bytes.
+9\ E lines.
 The limits on the length of lines
 and on the number of lines depend on the amount of core:
 each line takes 2 words.

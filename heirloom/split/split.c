@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)split.sl	1.4 (gritter) 7/13/04";
+static const char sccsid[] USED = "@(#)split.sl	1.6 (gritter) 12/5/04";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,7 +83,7 @@ main(int argc, char **argv)
 			if (argv[i][2]) {
 				suffixlength = atoi(&argv[i][2]);
 				continue;
-			} else if (i < argc) {
+			} else if (i+1 < argc) {
 				suffixlength = atoi(argv[++i]);
 				continue;
 			} else
@@ -94,7 +94,7 @@ main(int argc, char **argv)
 			if (argv[i][2]) {
 				setbcount(&argv[i][2]);
 				continue;
-			} else if (i < argc) {
+			} else if (i+1 < argc) {
 				setbcount(argv[++i]);
 				continue;
 			} else
@@ -105,7 +105,7 @@ main(int argc, char **argv)
 			if (argv[i][2]) {
 				linecount = atoll(&argv[i][2]);
 				continue;
-			} else if (i < argc) {
+			} else if (i+1 < argc) {
 				linecount = atoll(argv[++i]);
 				continue;
 			} else
@@ -118,7 +118,7 @@ main(int argc, char **argv)
 			linecount = atoll(&argv[i][1]);
 			continue;
 		default:
-			usage();
+			break;
 		}
 		argv[i]++;
 		goto nopt;

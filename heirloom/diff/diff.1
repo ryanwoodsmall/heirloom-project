@@ -76,7 +76,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH DIFF 1 "7/11/04" "Heirloom Toolchest" "User Commands"
+.TH DIFF 1 "12/5/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 diff \- differential file comparator
 .SH SYNOPSIS
@@ -170,6 +170,7 @@ flagged by `>'.
 causes a list of differences to be output
 for all files,
 even for those found to have binary content.
+This option is an extension.
 .TP 10
 .B \-b
 causes trailing whitespace characters
@@ -199,6 +200,7 @@ E.g., ``if\ (\ a\ ==\ b\ )'' will compare equal to ``if(a==b)''.
 .B \-B
 causes changes that consist entirely of empty lines added or deleted
 to be ignored.
+This option is an extension.
 .PP
 The following options are mutually exclusive:
 .TP 10
@@ -313,6 +315,7 @@ are marked with `\(mi',
 those added to
 .I file2
 are marked `+'.
+This option is an extension.
 .TP 10
 \fB\-U\ \fInumber\fR
 Same as
@@ -320,6 +323,7 @@ Same as
 but uses
 .I number
 of lines of context.
+This option is an extension.
 .PP
 If both arguments are directories,
 .I diff
@@ -347,6 +351,7 @@ causes the text of files
 that exist in one directory only
 to be output
 as if compared to an empty file modified at 1/1/70.
+This option is an extension.
 .TP 10
 .B \-1
 is similar to
@@ -357,6 +362,7 @@ only to be output.
 Files that exist only in
 .I directory2
 are listed.
+This option is an extension.
 .TP 10
 .B \-2
 is similar to
@@ -367,6 +373,7 @@ only to be output.
 Files that exist only in
 .I directory1
 are listed.
+This option is an extension.
 .TP 10
 .B \-r
 causes application of
@@ -394,6 +401,7 @@ If
 .I pattern
 matches a directory,
 files below that directory are also excluded.
+This option is an extension.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

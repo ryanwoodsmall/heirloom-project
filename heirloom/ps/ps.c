@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.99 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.101 (gritter) 12/12/04";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.99 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.101 (gritter) 12/12/04";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.99 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.101 (gritter) 12/12/04";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.99 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)ps.sl	2.101 (gritter) 12/12/04";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.99 (gritter) 11/7/04";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.101 (gritter) 12/12/04";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
@@ -104,6 +104,24 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.99 (gritter) 11/7/04";
 #include	<sys/mount.h>
 #define	proc	process
 #undef	p_pgid
+#if !defined (SRUN) && defined (LSRUN)
+#define	SRUN	LSRUN
+#endif
+#if !defined (SSLEEP) && defined (LSSLEEP)
+#define	SSLEEP	LSSLEEP
+#endif
+#if !defined (SDEAD) && defined (LSDEAD)
+#define	SDEAD	LSDEAD
+#endif
+#if !defined (SONPROC) && defined (LSONPROC)
+#define	SONPROC	LSONPROC
+#endif
+#if !defined (P_INMEM) && defined (L_INMEM)
+#define	P_INMEM	L_INMEM
+#endif
+#if !defined (P_SINTR) && defined (L_SINTR)
+#define	P_SINTR	L_SINTR
+#endif
 #ifndef	SCHED_OTHER
 #define	SCHED_OTHER	1
 #endif
@@ -3493,11 +3511,8 @@ muststat:
 static void
 usage(void)
 {
-	fprintf(stderr, "\
-usage: %s [ -acglnrSuvwx ] [ -t term ] [ num ]\n\
-       %s [ -aA ] [ -G gidlist ] [ -p proclist ] [ -t termlist ]\n\
-        [ -U uidlist ] [ -o format ]\n",
-		progname, progname);
+	fprintf(stderr, "usage: %s [ -acglnrSuvwx ] [ -t term ] [ num ]\n",
+		progname);
 	exit(2);
 }
 #else	/* !UCB */
@@ -3505,9 +3520,8 @@ static void
 usage(void)
 {
 	fprintf(stderr, "\
-usage: %s [ -edalfcjLPyA ] [ -r sysname ] [ -t termlist ]\n\
-        [ -u uidlist ] [ -p proclist ] [ -g grplist ] [ -s sidlist ]\n\
-        [ -U uidlist ] [ -G gidlist ] [ -o format ]\n",
+usage: %s [ -edalfcj ] [ -r sysname ] [ -t termlist ]\n\
+        [ -u uidlist ] [ -p proclist ] [ -g grplist ] [ -s sidlist ]\n",
 	  progname);
 	exit(2);
 }

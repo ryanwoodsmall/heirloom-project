@@ -113,9 +113,13 @@ dietinstall:
 	$(MAKE) $(DIETFLAGS) install
 	rm -rf /tmp/__man__
 
-bsd:
+freebsd:
 	$(MAKE) LKVM=-lkvm \
 	XO5FL= XO6FL= GNUFL= YACC=yacc
+
+netbsd:
+	$(MAKE) LKVM=-lkvm \
+	XO5FL= XO6FL= GNUFL= YACC=yacc LCURS=-ltermcap CPPFLAGS=-D_USE_TERMCAP
 
 pie:
 	$(MAKE) \

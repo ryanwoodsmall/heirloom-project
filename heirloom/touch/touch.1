@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)touch.1	1.14 (gritter) 10/11/03
-.TH TOUCH 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)touch.1	1.16 (gritter) 12/6/04
+.TH TOUCH 1 "12/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 touch \- update file access and modification times
 .SH SYNOPSIS
@@ -100,6 +100,8 @@ Change the access time,
 but not the modification time unless
 .B \-a
 is also present.
+.PP
+The following options have been introduced by POSIX.2:
 .TP
 .BI \-r \ ref_file
 The corresponding time of the specified file is used

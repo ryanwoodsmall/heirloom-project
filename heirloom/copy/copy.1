@@ -1,12 +1,12 @@
 .\"
-.\" Sccsid @(#)copy.1	1.6 (gritter) 9/5/03
-.TH COPY 1XNX "9/5/03" "Heirloom Toolchest" "XENIX System Compatibility"
+.\" Sccsid @(#)copy.1	1.8 (gritter) 12/8/04
+.TH COPY 1XNX "12/8/04" "Heirloom Toolchest" "XENIX System Compatibility"
 .SH NAME
 copy \- (XENIX) copy groups of files
 .SH SYNOPSIS
 \fBcopy\fR
 [\fB\-a\fR[\fBd\fR]]
-[\fB-nlsmorvh\fR]
+[\fB\-nlsmorvh\fR]
 \fIsource\fR\ .\ .\ .\ [\fIdestination\fR]
 .SH DESCRIPTION
 The
@@ -68,6 +68,7 @@ This option causes symbolic links
 encountered during traversal to be copied
 (symbolic links given as arguments
 will still be followed).
+This option is an extension.
 .TP
 .B \-l
 If possible,
@@ -95,6 +96,7 @@ Recusively copies subdirectories of the source arguments encountered.
 Similar to
 .IR \-l ,
 but uses soft links.
+This option is an extension.
 .TP
 .B \-v
 Prints the name of each file or directory

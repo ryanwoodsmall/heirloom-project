@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)chown.1	1.5 (gritter) 1/11/03
+.\" Sccsid @(#)chown.1	1.7 (gritter) 12/6/04
 .\" Parts taken from chown(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CHOWN 1 "1/11/03" "Heirloom Toolchest" "User Commands"
+.TH CHOWN 1 "12/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 chown, chgrp \- change owner or group
 .SH SYNOPSIS
@@ -113,3 +113,8 @@ behaviour,
 which is to restrict changing the owner
 to a privileged user
 and changing the group to a group to which the file owner belongs.
+.PP
+The [:\fIgroup\fR] argument to
+.I chown
+has been introduced with POSIX.2
+and is not available on older implementations of System\ V.

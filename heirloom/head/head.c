@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)head.sl	1.10 (gritter) 7/24/04";
+static const char sccsid[] USED = "@(#)head.sl	1.12 (gritter) 12/12/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -54,7 +54,7 @@ static char	*progname;		/* argv[0] to main() */
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-# | -n #] [filename...]\n", progname);
+	fprintf(stderr, "usage: %s [-n] [filename...]\n", progname);
 	exit(2);
 }
 
@@ -136,7 +136,8 @@ main(int argc, char **argv)
 			count = get_count(&argv[i][1]);
 			break;
 		case '\0':
-			goto optend;
+			count = 0;
+			break;
 		case '-':
 			if (argv[i][2] == '\0') {
 				i++;
@@ -144,8 +145,6 @@ main(int argc, char **argv)
 			}
 			/*FALLTHRU*/
 		default:
-			fprintf(stderr, "%s: illegal option -- %c\n",
-					progname, argv[i][1]);
 			usage();
 		}
 	}

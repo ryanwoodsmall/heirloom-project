@@ -47,7 +47,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pr.sl	1.24 (gritter) 10/13/04";
+static const char sccsid[] USED = "@(#)pr.sl	1.26 (gritter) 12/12/04";
 
 #include <stdio.h>
 #include <signal.h>
@@ -101,7 +101,6 @@ static long	NCOL;
 static int	*icol;
 static int	*scol;
 static struct iblok	*file;
-static wint_t	*bufp;
 static long	BUFS;
 static wint_t	*buffer;	/* for multi-column output */
 #define	FF	014
@@ -223,7 +222,7 @@ main(int argc, char **argv)
 			case 'o':
 				if (ap[1])
 					oflg = atoi(++ap);
-				else if (ac>=2) {
+				else if (ac>2) {
 					oflg = atoi(*++av);
 					*av = NULL;
 					ac--;
@@ -233,7 +232,7 @@ main(int argc, char **argv)
 			case 'h':
 				if (ap[1])
 					header = &ap[1];
-				else if (ac>=2) {
+				else if (ac>2) {
 					header = *++av;
 					*av = NULL;
 					ac--;
@@ -247,7 +246,7 @@ main(int argc, char **argv)
 			case 'l':
 				if (ap[1])
 					length = atoi(++ap);
-				else if (ac>=2) {
+				else if (ac>2) {
 					length = atoi(*++av);
 					*av = NULL;
 					ac--;
@@ -258,7 +257,7 @@ main(int argc, char **argv)
 				wflg++;
 				if (ap[1])
 					width = atoi(++ap);
-				else if (ac>=2) {
+				else if (ac>2) {
 					width = atoi(*++av);
 					*av = NULL;
 					ac--;
@@ -519,7 +518,7 @@ print(const char *fp, const char **argp)
 	page = 1;
 	for (i = 0; i<NCOL; i++)
 		scol[i] = icol[i] = 0;
-	colp[ncol] = bufp = buffer;
+	colp[ncol] = buffer;
 	while ((mflg||aflg)&&nofile || (!mflg&&!aflg)&&tpgetc(ncol)!=WEOF) {
 		if (pflg >= 0) {
 			putc('\a', stderr);

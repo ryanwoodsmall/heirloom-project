@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid %W% (gritter) %G%>	*/
+/*	Sccsid @(#)plist.c	1.22 (gritter) 12/8/04>	*/
 
 /*
  * Pattern list routines.
@@ -54,6 +54,8 @@ addpat(struct expr **e, char *pat, long len, enum eflags flg)
 		(*e) = (*e)->e_nxt;
 	} else
 		e0 = (*e) = (struct expr *)smalloc(sizeof **e);
+	if (wflag)
+		wcomp(&pat, &len);
 	(*e)->e_nxt = NULL;
 	(*e)->e_pat = pat;
 	(*e)->e_len = len;

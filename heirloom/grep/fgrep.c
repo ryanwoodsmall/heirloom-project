@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)fgrep.c	1.10 (gritter) 11/21/04>	*/
+/*	Sccsid @(#)fgrep.c	1.11 (gritter) 12/5/04>	*/
 
 /*
  * Code for traditional fgrep command only.
@@ -43,7 +43,7 @@ init(void)
 {
 	Fflag = 1;
 	ac_select();
-	options = "bce:f:hilnrvxy";
+	options = "bce:f:hilnrRvxy";
 }
 
 void

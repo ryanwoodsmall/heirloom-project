@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)intro.1.in	1.14 (gritter) 5/15/04
-.TH INTRO 1 "5/15/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)intro.1.in	1.17 (gritter) 12/8/04
+.TH INTRO 1 "12/8/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 intro \- introduction to commands
 .SH DESCRIPTION
@@ -126,6 +126,17 @@ PATH=/usr/5bin/s42:@.DEFBIN.@:$PATH export PATH
 .PP
 You must select exactly one of the personalities above;
 you do not have access to the complete set of tools otherwise.
+.PP
+The manual pages generally note
+which behavior corresponds to which utility version.
+They also mark whether options and arguments
+were part of System V,
+were introduced with POSIX.2,
+or if they are extensions provided by the Heirloom Toolchest,
+(possibly oriented at extensions introduced by other vendors).
+Such extensions are subject to change without a grace period;
+they are only intended for interactive usage
+and should not be included in scripts.
 .PP
 The toolchest also includes some utilities
 modeled after the BSD Compatibility environment

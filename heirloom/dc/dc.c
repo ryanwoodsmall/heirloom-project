@@ -42,7 +42,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*	Sccsid @(#)dc.c	1.18 (gritter) 11/21/04>	*/
+/*	Sccsid @(#)dc.c	1.19 (gritter) 12/6/04>	*/
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -2038,7 +2038,7 @@ char *
 nalloc(register char *p,unsigned nbytes)
 {
 	register char *q, *r;
-	q = r = malloc(nbytes);
+	q = r = malloc(nbytes ? nbytes : 1);
 	if(q==0)
 		return(0);
 	while(nbytes--)

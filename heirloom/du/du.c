@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)du_sus.sl	1.35 (gritter) 7/18/04";
+static const char sccsid[] USED = "@(#)du_sus.sl	1.37 (gritter) 12/8/04";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/du.sl	1.35 (gritter) 7/18/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/du.sl	1.37 (gritter) 12/8/04";
 #else
-static const char sccsid[] USED = "@(#)du.sl	1.35 (gritter) 7/18/04";
+static const char sccsid[] USED = "@(#)du.sl	1.37 (gritter) 12/8/04";
 #endif
 
 #include	<sys/types.h>
@@ -96,6 +96,7 @@ struct dslot {
 
 static unsigned	errcnt;			/* count of errors */
 static int		aflag;		/* report all files */
+static int		hflag;		/* human-readable sizes */
 static int		kflag;		/* sizes in kilobytes */
 static int		sflag;		/* print summary only */
 static int		xflag;		/* do not cross device boundaries */
@@ -159,12 +160,26 @@ pnerror(int eno, const char *string)
 static void
 report(unsigned long long sz, const char *fn)
 {
-	if (kflag) {
+	if (hflag || kflag) {
 		if (sz & 01)
 			sz++;
 		sz >>= 01;
 	}
-	printf("%llu\t%s\n", sz, fn);
+	if (hflag) {
+		const char	units[] = "KMGTPE", *up = units;
+		int	rest = 0;
+
+		while (sz > 1023) {
+			rest = (sz % 1024) / 128;
+			sz /= 1024;
+			up++;
+		}
+		if (sz < 10 && rest)
+			printf("%2llu.%u%c\t%s\n", sz, rest, *up, fn);
+		else
+			printf("%4llu%c\t%s\n", sz, *up, fn);
+	} else
+		printf("%llu\t%s\n", sz, fn);
 }
 
 /*
@@ -503,9 +518,9 @@ static void
 usage(void)
 {
 #ifdef	UCB
-	fprintf(stderr, "usage: %s [-asxo] [name ...]\n", progname);
+	fprintf(stderr, "usage: %s [-as] [name ...]\n", progname);
 #else
-	fprintf(stderr, "usage: %s [-arskxo] [name ...]\n", progname);
+	fprintf(stderr, "usage: %s [-ars] [name ...]\n", progname);
 #endif
 	exit(2);
 }
@@ -526,10 +541,13 @@ main(int argc, char **argv)
 #ifdef	UCB
 	kflag = 1;
 #endif
-	while ((i = getopt(argc, argv, "akosrx")) != EOF) {
+	while ((i = getopt(argc, argv, "ahkosrx")) != EOF) {
 		switch (i) {
 		case 'a':
 			aflag = 1;
+			break;
+		case 'h':
+			hflag = 1;
 			break;
 		case 'k':
 			kflag = 1;

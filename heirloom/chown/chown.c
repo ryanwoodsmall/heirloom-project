@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/chown.sl	1.11 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/chown.sl	1.12 (gritter) 12/5/04";
 #else
-static const char sccsid[] USED = "@(#)chown.sl	1.11 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)chown.sl	1.12 (gritter) 12/5/04";
 #endif
 
 #include	<sys/types.h>
@@ -263,7 +263,7 @@ usage(void)
 		eprintf(1, "usage: %s [-fhR] owner[.group] file ...\n",
 				progname);
 #else	/* !UCB */
-		eprintf(1, "usage: %s [-h] [-R] uid[:gid] file ...\n",
+		eprintf(1, "usage: %s [-h] [-R] uid file ...\n",
 				progname);
 #endif	/* !UCB */
 		break;

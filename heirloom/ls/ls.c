@@ -46,11 +46,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)ls_sus.sl	1.68 (gritter) 11/7/04>";
+static const char sccsid[] USED = "@(#)ls_sus.sl	1.71 (gritter) 12/8/04>";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.68 (gritter) 11/7/04>";
+static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.71 (gritter) 12/8/04>";
 #else
-static const char sccsid[] USED = "@(#)ls.sl	1.68 (gritter) 11/7/04>";
+static const char sccsid[] USED = "@(#)ls.sl	1.71 (gritter) 12/8/04>";
 #endif
 
 /*
@@ -167,11 +167,11 @@ static struct {
 } personalities[] = {
 	/* orig: acdfgilnqrstu1ACFLMRTX */
 #ifdef	UCB
-	{ ":1RaAdClgrtucFqisfL" },	/* PER_LS */
+	{ ":1RaAdClgrtucFqisfLSUXh" },	/* PER_LS */
 #else	/* !UCB */
-	{ "1RadCxmnlogrtucpFbqisfL" },	/* PER_LS */
+	{ "1RadCxmnlogrtucpFbqisfLSUXh" },	/* PER_LS */
 #endif	/* !UCB */
-	{ "1RadCxmnlogrtucpFbqiOfL" }		/* PER_DIR */
+	{ "1RadCxmnlogrtucpFbqiOfLSXh" }	/* PER_DIR */
 };
 
 /* Safer versions of malloc and realloc: */
@@ -225,6 +225,12 @@ report(const char *f)
 #endif	/* !UCB */
 	ex = 1;
 }
+
+#ifdef	UCB
+#define	blockcount(n)	(((n) & 1 ? (n)+1 : (n)) >> 1)
+#else
+#define	blockcount(n)	(n)
+#endif
 
 /*
  * Two functions, uidname and gidname, translate id's to readable names.
@@ -337,7 +343,7 @@ static int field = 0;	/* (used to be) Fields that must be printed. */
 #define FL_ATIME	0x080	/* -u */
 #define FL_CTIME	0x100	/* -c */
 #define FL_MARK		0x200	/* -F */
-#define FL_TYPE		0x400	/* -T */
+/*#define FL_UNUSED	0x400	*/
 #define FL_DIR		0x800	/* -d */
 #define	FL_OWNER	0x1000	/* -o */
 #define	FL_STATUS	0x2000
@@ -489,28 +495,16 @@ numeral(int i, char **pp)
 }
 #endif
 
-#define K	1024L		/* A kilobyte counts in multiples of K */
-#define T	1000L		/* A megabyte in T*K, a gigabyte in T*T*K */
+static char *
+extension(const char *fn)
+{
+	const char	*ep = "";
 
-/* Transform size of file to number of blocks.  This was once a function that
- * guessed the number of indirect blocks, but that nonsense has been removed.
- */
-#if ST_BLOCKS
-#define nblocks(f)	((f)->blocks)
-#else
-#define nblocks(f)	(((f)->size + BLOCK-1) / BLOCK)
-#endif
-
-/* From number of blocks to kilobytes. */
-#if 0
-#if BLOCK < 1024
-#define nblk2k(nb)	(((nb) + (1024 / BLOCK - 1)) / (1024 / BLOCK))
-#else
-#define nblk2k(nb)	((nb) * (BLOCK / 1024))
-#endif
-#else
-#define	nblk2k(nb)	nb
-#endif
+	while (*fn++)
+		if (*fn == '.')
+			ep = &fn[1];
+	return (char *)ep;
+}
 
 static int (*CMP)(struct file *f1, struct file *f2);
 static int (*rCMP)(struct file *f1, struct file *f2);
@@ -561,6 +555,12 @@ namecmp(struct file *f1, struct file *f2)
 }
 
 static int
+extcmp(struct file *f1, struct file *f2)
+{
+	return strcoll(extension(f1->name), extension(f2->name));
+}
+
+static int
 mtimecmp(struct file *f1, struct file *f2)
 {
 	return f1->mtime == f2->mtime ? 0 : f1->mtime > f2->mtime ? -1 : 1;
@@ -579,9 +579,9 @@ ctimecmp(struct file *f1, struct file *f2)
 }
 
 static int
-typecmp(struct file *f1, struct file *f2)
+sizecmp(struct file *f1, struct file *f2)
 {
-	return ifmt(f1->mode) - ifmt(f2->mode);
+	return f1->size == f2->size ? 0 : f1->size > f2->size ? -1 : 1;
 }
 
 static int
@@ -623,9 +623,20 @@ sort(struct file **al)
 			}
 			_mergesort(al);
 		}
-		/* Separate by file type if so desired. */
-		if (field & FL_TYPE) {
-			CMP = typecmp;
+		if (present('X')) {
+			CMP = extcmp;
+			if (present('r')) {
+				rCMP = CMP;
+				CMP = revcmp;
+			}
+			_mergesort(al);
+		}
+		if (present('S')) {
+			CMP = sizecmp;
+			if (present('r')) {
+				rCMP = CMP;
+				CMP = revcmp;
+			}
 			_mergesort(al);
 		}
 	}
@@ -769,11 +780,45 @@ countblocks(struct file *flist)
 #ifdef S_IFLNK
 		case S_IFLNK:
 #endif
-			cb += nblocks(flist);
+			cb += flist->blocks;
 		}
 		flist = flist->next;
 	}
 	return cb;
+}
+
+static char *
+#ifdef	LONGLONG
+hfmt(long long n, int fill)
+#else
+hfmt(long n, int fill)
+#endif
+{
+	static char	b[10];
+	const char	units[] = " KMGTPE", *up = units;
+	int	rest = 0;
+
+	while (n > 1023) {
+		rest = (n % 1024) / 128;
+		n /= 1024;
+		up++;
+	}
+#ifdef	LONGLONG
+	if (up == units)
+		snprintf(b, sizeof b, "%*llu", fill ? 5 : 1, n);
+	else if (n < 10 && rest)
+		snprintf(b, sizeof b, "%*llu.%u%c", fill ? 2 : 1, n, rest, *up);
+	else
+		snprintf(b, sizeof b, "%*llu%c", fill ? 4 : 1, n, *up);
+#else	/* !LONGLONG */
+	if (up == units)
+		snprintf(b, sizeof b, "%*lu", fill ? 5 : 1, n);
+	else if (n < 10 && rest)
+		snprintf(b, sizeof b, "%*lu.%u%c", fill ? 2 : 1, n, rest, *up);
+	else
+		snprintf(b, sizeof b, "%*lu%c", fill ? 4 : 1, n, *up);
+#endif	/* !LONGLONG */
+	return b;
 }
 
 #define	FC_NORMAL	0
@@ -1092,24 +1137,32 @@ print1(struct file *f, int col, int doit)
 	}
 	if (field & FL_BLOCKS) {
 		char	dummy[2];
-		if (doit)
+		if (doit) {
+			if (present('h'))
+				printf("%s ", hfmt(f->blocks * 512,
+							!present('m')));
+			else
 #ifdef	LONGLONG
-			printf("%*llu ", present('m') ? 1 : 4,
-					(long long)nblk2k(nblocks(f)));
+				printf("%*llu ", present('m') ? 1 : 4,
+					(long long)blockcount(f->blocks));
 #else
-			printf("%*lu ", present('m') ? 1 : 4,
-					(long)nblk2k(nblocks(f)));
+				printf("%*lu ", present('m') ? 1 : 4,
+					(long)blockcount(f->blocks));
 #endif
-		else
+		} else {
+			if (present('h'))
+				width += 6;
+			else
 #ifdef	LONGLONG
-			width += snprintf(dummy, sizeof dummy, "%*llu ",
+				width += snprintf(dummy, sizeof dummy, "%*llu ",
 					present('m') ? 1 : 4,
-					(long long)nblk2k(nblocks(f)));
+					(long long)f->blocks);
 #else
-			width += snprintf(dummy, sizeof dummy, "%*lu ",
+				width += snprintf(dummy, sizeof dummy, "%*lu ",
 					present('m') ? 1 : 4,
-					(long)nblk2k(nblocks(f)));
+					(long)f->blocks);
 #endif
+		}
 	}
 	if (field & FL_MODE) {
 		if (doit) {
@@ -1141,10 +1194,13 @@ print1(struct file *f, int col, int doit)
 					(long)minor(f->rdev));
 				break;
 			default:
+				if (present('h'))
+					printf("%5s ", hfmt(f->size, 1));
+				else
 #ifdef	LONGLONG
-				printf("%7llu ", (long long)f->size);
+					printf("%7llu ", (long long)f->size);
 #else
-				printf("%7lu ", (long)f->size);
+					printf("%7lu ", (long)f->size);
 #endif
 			}
 			printf("%s ", timestamp(f));
@@ -1392,11 +1448,14 @@ listfiles(struct file *flist, enum depth depth, enum state state)
 	}
 	sort(&flist);
 	if (depth == SUBMERGED && (field & (FL_BLOCKS | FL_LONG))) {
+		printf("total ");
+		if (present('h'))
+			printf("%s\n", hfmt(countblocks(flist) * 512, 0));
+		else
 #ifdef	LONGLONG
-		printf("%s %lld\n", "total",
-				(long long)nblk2k(countblocks(flist)));
+			printf("%lld\n", (long long)blockcount(countblocks(flist)));
 #else
-		printf("%s %ld\n", "total", (long)nblk2k(countblocks(flist)));
+			printf("%ld\n", (long)blockcount(countblocks(flist)));
 #endif
 	}
 	if (state == SINKING || depth == SURFACE1) {
@@ -1460,11 +1519,9 @@ listfiles(struct file *flist, enum depth depth, enum state state)
 static void
 usage(void)
 {
-	const char	*op = personalities[personality].per_opt;
-
-	if (*op == ':')
-		op++;
-	fprintf(stderr, "usage: %s -%s [files]\n", arg0, op);
+	if (personality == PER_LS)
+		fprintf(stderr, "usage: %s -1RadCxmnlogrtucpFbqisfL [files]\n",
+				arg0);
 	exit(2);
 }
 #else	/* UCB */
@@ -1604,8 +1661,6 @@ main(int argc, char **argv)
 		field = field | FL_MODE | FL_LONG | FL_OWNER;
 	if (present('F'))
 		field |= FL_MARK;
-	if (present('T'))
-		field |= FL_TYPE;
 	if (present('d'))
 		field |= FL_DIR;
 	if (present('f')) {

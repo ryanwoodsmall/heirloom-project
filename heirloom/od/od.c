@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.16 (gritter) 12/4/04";
+static const char sccsid[] USED = "@(#)od.sl	1.19 (gritter) 12/12/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -140,11 +140,7 @@ static long long	limit = -1;	/* print no more bytes than limit */
 static long long	total;		/* total bytes of input */
 static long long	offset;		/* offset to print */
 static int		vflag;		/* print all lines */
-#ifdef	ADDONS
 static int		Cflag;		/* Cray -C option */
-#else	/* !ADDONS */
-#define	Cflag		0
-#endif	/* !ADDONS */
 static char		**files;	/* files to read */
 static const char	*skipstr;	/* skip format string for error msg */
 static FILE		*curfile;	/* current file */
@@ -596,9 +592,11 @@ format(struct type *tp, struct buffer *b1, struct buffer *b2)
 	if (Cflag) {
 		static int	max;
 		int	c;
+		if (max == 0)
+			max = l * (BLOCK/tp->t_cnt) /
+				((b1->bu_cnt+tp->t_cnt-1) / tp->t_cnt);
 		while (l < max)
 			buf[l++] = ' ';
-		max = l;
 		buf[l++] = ' ';
 		for (i = 0; i < b1->bu_cnt || i % 8; i++) {
 			c = i < b1->bu_cnt ? b1->bu_blk.b_c[i] & 0377 : '.';
@@ -660,11 +658,8 @@ od(void)
 static void
 usage(void)
 {
-	fprintf(stderr, "\
-usage: %s [-bcdDfFoOsSvxX] [file] [[+]offset[.][b]]\n\
-       %s [-v] [-A address_base] [-j skip]\n\
-               [-N count] [-t type_string] ... [file ...]\n",
-               progname, progname);
+	fprintf(stderr, "usage: %s [-bcdDfFoOsSvxX] [file] [[+]offset[.][b]]\n",
+               progname);
 	exit(2);
 }
 
@@ -1043,10 +1038,8 @@ main(int argc, char **argv)
 				progname, optopt);
 			usage();
 		case 'C':
-#ifdef	ADDONS
 			Cflag = 1;
 			break;
-#endif	/* ADDONS */
 		case '?':
 			fprintf(stderr, "%s: bad flag -%c\n",
 					progname, optopt);

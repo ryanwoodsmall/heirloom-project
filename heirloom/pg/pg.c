@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.46 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.49 (gritter) 12/12/04";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.46 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)pg.sl	2.49 (gritter) 12/12/04";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -91,7 +91,7 @@ static int	mb_cur_max;		/* MB_CUR_MAX acceleration */
 
 typedef	wint_t	w_type;
 
-#define	width(wc)	(mb_cur_max > 1 ? wcwidth(wc) : 1)
+#define	width(wc)	(mb_cur_max > 1 && iswprint(wc) ? wcwidth(wc) : 1)
 
 /*
  * Get next character from string s and store it in wc; n is set to
@@ -879,7 +879,7 @@ prompt(long long pageno)
 			escape = 0;
 			continue;
 		} else if ((nflag && state == COUNT && key == ' ') ||
-				key == '\n')
+				key == '\n' || key == '\r')
 			break;
 		else if (escape)
 			write(1, "\b", 1);
@@ -2181,8 +2181,8 @@ main(int argc, char **argv)
 			sigset(SIGQUIT, sighandler);
 		if ((oldterm = sigset(SIGTERM, SIG_IGN)) != SIG_IGN)
 			sigset(SIGTERM, sighandler);
-		setlocale(LC_CTYPE, "");
 		setlocale(LC_COLLATE, "");
+		setlocale(LC_CTYPE, "");
 		tty = ttyname(1);
 #ifndef	USE_TERMCAP
 		setupterm(NULL, 1, &tinfostat);

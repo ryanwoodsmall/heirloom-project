@@ -22,7 +22,7 @@ Open UNIX       8.0.0; native (cc), LKP (gcc)
 HP-UX           B.11.11, B.11.22, B.11.23; HP-UX ANSI C, gcc
 AIX             5.1; VisualAge C, gcc
 FreeBSD         4.9, 5.2.1
-NetBSD          1.6
+NetBSD          1.6, 2.0
 OpenBSD         3.4
 
 The following prerequisites are necessary:
@@ -288,4 +288,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/7/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           12/12/04

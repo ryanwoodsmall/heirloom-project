@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)env.sl	1.8 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)env.sl	1.9 (gritter) 12/5/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -46,30 +46,23 @@ static char	*progname;		/* argv[0] to main() */
 
 extern char	**environ;
 
-static void
-usage(void)
-{
-	fprintf(stderr, "usage: %s [- | -i] [name=value] [command]\n",
-			progname);
-	exit(2);
-}
-
 int
 main(int argc, char **argv)
 {
 	int	i;
 
 	progname = basename(argv[0]);
-	while ((i = getopt(argc, argv, "i")) != EOF) {
+	while ((i = getopt(argc, argv, ":i")) != EOF) {
 		switch (i) {
 		case 'i':
 			iflag = 1;
 			break;
 		default:
-			usage();
+			optind--;
+			goto done;
 		}
 	}
-	if (optind < argc && strcmp(argv[optind], "-") == 0 &&
+done:	if (optind < argc && strcmp(argv[optind], "-") == 0 &&
 			strcmp(argv[optind - 1], "--")) {
 		iflag = 1;
 		optind++;

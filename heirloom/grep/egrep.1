@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)egrep.1	1.37 (gritter) 3/6/04
+.\" Sccsid @(#)egrep.1	1.38 (gritter) 12/5/04
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EGREP 1 "3/6/04" "Heirloom Toolchest" "User Commands"
+.TH EGREP 1 "12/5/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 egrep \- search a file for a pattern using full regular expressions
 .SH SYNOPSIS
@@ -40,22 +40,22 @@ egrep \- search a file for a pattern using full regular expressions
 .ad l
 .nh
 \fB/usr/5bin/egrep\fR [\fB\-e\fI\ pattern_list\fR\ ...]
-[\fB\-f\fI\ pattern_file\fR] [\fB\-bchilnv\fR]
+[\fB\-f\fI\ pattern_file\fR] [\fB\-bchilnrRv\fR]
 [\fIpattern_list\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 .PD 0
 \fB/usr/5bin/posix/egrep\fR \fB\-e\fI\ pattern_list\fR\ ...
 [\fB\-f\fI\ pattern_file\fR] [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR]
-[\fB\-bhinsvx\fR] [\fIfile\fR\ ...]
+[\fB\-bhinrRsvx\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 \fB/usr/5bin/posix/egrep\fR \fB\-f\fI\ pattern_file\fR
 [\fB\-e\fI\ pattern_list\fR\ ...] [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR]
-[\fB\-bhinsvx\fR] [\fIfile\fR\ ...]
+[\fB\-bhinrRsvx\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
-\fB/usr/5bin/posix/egrep\fR [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR] [\fB\-bhinsvx\fR]
+\fB/usr/5bin/posix/egrep\fR [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR] [\fB\-bhinsrRvx\fR]
 \fIpattern_list\fR [\fIfile\fR\ ...]
 .br
 .PD
@@ -245,7 +245,7 @@ Line numbers start with 1.
 .TP
 .B \-v
 All lines but those matching are printed.
-.SS /usr/5bin/posix/egrep
+.PP
 The following options are supported by
 .B /usr/5bin/posix/egrep
 only:
@@ -262,6 +262,20 @@ like a regular expression surrounded by
 .I ^
 and
 .I $.
+.PP
+The following options are supported as extensions:
+.TP
+.B \-r
+With this option given,
+.I egrep
+does not directly search in each given file that is a directory,
+but descends it recursively
+and scans each regular file found below it.
+Device files are ignored.
+.TP
+.B \-R
+Same as
+.IR \-r .
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

@@ -46,7 +46,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)file.sl	1.26 (gritter) 5/29/04";
+static const char sccsid[] USED = "@(#)file.sl	1.27 (gritter) 12/5/04";
 
 #ifdef	__GLIBC__
 #include <sys/sysmacros.h>
@@ -883,7 +883,7 @@ static void
 usage(void)
 {
 	fprintf(stderr,
-		"usage: %s [-c] [-h] [-f ffile] [-m mfile] [-z] file...\n",
+		"usage: %s [-c] [-h] [-f ffile] [-m mfile] file...\n",
 		progname);
 	exit(2);
 }

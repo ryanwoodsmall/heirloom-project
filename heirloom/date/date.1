@@ -18,14 +18,15 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)date.1	1.14 (gritter) 10/11/03
-.TH DATE 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)date.1	1.15 (gritter) 12/5/04
+.TH DATE 1 "12/5/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 date \- print or set the date
 .SH SYNOPSIS
 \fBdate\fR [\fB\-u\fR] [\fB+\fIformat\fR]
 .br
-\fBdate\fR [\fB\-u\fR] \fIHHMM\fR | \fImmddHHMM\fR[[\fIcc\fR]\fIyy\fR]
+\fBdate\fR [\fB\-u\fR] [\fB\-b\fR]
+\fIHHMM\fR | \fImmddHHMM\fR[[\fIcc\fR]\fIyy\fR]
 .br
 \fBdate\fR \fB\-a\fR [\fB\-\fR]\fIsss.fff\fR
 .SH DESCRIPTION
@@ -72,6 +73,13 @@ slowing down.
 Use
 .SM UTC
 values for printing and setting the date.
+.PP
+The following option is an extension:
+.TP
+.B \-b
+Causes
+.I date
+not to alter the `wtmp' file for the system time change.
 .PP
 An argument starting with
 .B +

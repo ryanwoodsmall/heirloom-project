@@ -19,11 +19,11 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\" Sccsid @(#)df.1	1.23 (gritter) 2/5/03
-.TH DF 1B "7/31/03" "Heirloom Toolchest" "BSD System Compatibility
+.TH DF 1B "12/9/04" "Heirloom Toolchest" "BSD System Compatibility
 .SH NAME
 df \- (BSD) disk free
 .SH SYNOPSIS
-\fB/usr/ucb/df\fR [\fB\-aikP\fR] [\fB\-M\fI mtab\fR]
+\fB/usr/ucb/df\fR [\fB\-aihkP\fR] [\fB\-M\fI mtab\fR]
 [\fB\-t\fI fstype\fR | \fIfile\fR ...]
 .SH DESCRIPTION
 Df prints file system statistics.
@@ -49,14 +49,11 @@ Normally, file systems with zero block count are omitted.
 .B \-i
 Print i-node statistics.
 .TP
-.B \-k
-If combined with the \-P option,
-the size unit is changed from blocks to kbytes.
-.TP
-.BI \-M \ mtab
-Use the specified
-.I mtab
-file to get a list of mounted filesystems.
+.BI \-t \ fstype
+Restrict output to filesystems of type
+.I fstype.
+.PP
+The following options have been introduced by POSIX.2:
 .TP
 .B \-P
 Select the portable 
@@ -65,9 +62,25 @@ output format.
 Changes the default size unit
 to a block consisting of 512 bytes.
 .TP
-.BI \-t \ fstype
-Restrict output to filesystems of type
-.I fstype.
+.B \-k
+If combined with the \-P option,
+the size unit is changed from blocks to kbytes.
+.PP
+The following options are extensions:
+.TP
+.B \-h
+Prints the sizes in human-readable powers of 1024,
+i.\|e. `K' for kilobyte,
+`M' for megabyte,
+`G' for gigabyte,
+`T' for terabyte,
+`P' for petabyte,
+and `E' for exabyte.
+.TP
+.BI \-M \ mtab
+Use the specified
+.I mtab
+file to get a list of mounted filesystems.
 .SH FILES
 .TP
 .B /etc/mtab

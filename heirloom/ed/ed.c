@@ -48,14 +48,12 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.79 (gritter) 10/5/04";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.81 (gritter) 12/13/04";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.79 (gritter) 10/5/04";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.81 (gritter) 12/13/04";
 #else	/* !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.79 (gritter) 10/5/04";
+static const char sccsid[] USED = "@(#)ed.sl	1.81 (gritter) 12/13/04";
 #endif	/* !SUS, !S42 */
-
-/*#define	ADDONS*/		/* b, help, o, N, and z commands */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -88,10 +86,10 @@ static int	GBSIZE;
 #define	puts(s)		xxputs(s)
 #define	getline(t, n)	xxgetline(t, n)
 
-#if (LONG_MAX > 2147483647)
-#define	MAXCNT	01777777777777777		/* 64 TB */
+#if (LONG_MAX > 017777777777L)
+#define	MAXCNT	0777777777777777777777L		/* 2^63-1 */
 #else
-#define	MAXCNT	017777777777			/* 2 GB */
+#define	MAXCNT	017777777777L			/* 2^31-1 */
 #endif
 #define	BLKMSK	(MAXCNT>>8)			/* was 0377 */
 
@@ -170,13 +168,9 @@ static int	insub;
 static struct tabulator	*tabstops;
 static int	maxlength;
 static int	rspec;
-#ifdef	ADDONS
 static int	Nflag;
 static int	bcount = 22;
 static int	ocount = 11;
-#else	/* !ADDONS */
-#define	Nflag	0
-#endif	/* !ADDONS */
 
 static jmp_buf	savej;
 
@@ -247,9 +241,7 @@ static void	expand(const char *);
 static void	growlb(const char *);
 static void	growrhs(const char *);
 static void	growfn(const char *);
-#ifdef	ADDONS
 static void	help(void);
-#endif	/* ADDONS */
 
 #define	INIT
 #define	GETC()		getchr()
@@ -493,7 +485,6 @@ commands(void)
 		/*FALLTHRU*/
 
 	case 'h':
-#ifdef	ADDONS
 		if ((peekc = getchr()) == 'e') {
 			peekc = 0;
 			if (getchr() != 'l' || getchr() != 'p' ||
@@ -503,7 +494,6 @@ commands(void)
 			help();
 			continue;
 		}
-#endif	/* ADDONS */
 		newline();
 		setnoaddr();
 		if (prvmsg)
@@ -559,7 +549,6 @@ commands(void)
 		newline();
 		goto print;
 
-#ifdef	ADDONS
 	case 'N':
 		newline();
 		setnoaddr();
@@ -588,7 +577,6 @@ commands(void)
 			dot = addr2;
 		}
 		continue;
-#endif	/* ADDONS */
 
 	case 'l':
 		listf++;
@@ -663,9 +651,7 @@ commands(void)
 	case 'W':
 		wrapp++;
 	case 'w':
-#ifdef	ADDONS
 	write:
-#endif	/* ADDONS */
 		setall();
 		nonzero();
 		filename(c);
@@ -709,19 +695,15 @@ commands(void)
 		exfile();
 		if (addr1==zero+1 && addr2==dol)
 			fchange = 0;
-#ifdef	ADDONS
 		if (c == 'z')
 			quit(0);
-#endif	/* ADDONS */
 		continue;
 
-#ifdef	ADDONS
 	case 'z':
 		if ((peekc=getchr()) != '\n')
 			error("illegal suffix");
 		setnoaddr();
 		goto write;
-#endif	/* ADDONS */
 
 	case '=':
 		setall();
@@ -2726,7 +2708,6 @@ step(const char *lp, const char *ep)
 }
 #endif	/* SUS || S42 */
 
-#ifdef	ADDONS
 static void
 help(void)
 {
@@ -2796,4 +2777,3 @@ help(void)
 		puts(line);
 	}
 }
-#endif	/* ADDONS */

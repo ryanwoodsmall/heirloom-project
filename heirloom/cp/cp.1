@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)cp.1	1.14 (gritter) 10/11/03
+.\" Sccsid @(#)cp.1	1.20 (gritter) 12/12/04
 .\" Parts taken from cp(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,13 +32,12 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH CP 1 "10/11/03" "Heirloom Toolchest" "User Commands"
+.TH CP 1 "12/12/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cp \- copy files
 .SH SYNOPSIS
 \fBcp\fR
-[\fB\-f\fR] [\fB\-i\fR] [\fB\-p\fR]
-[\fB\-r\fR\ |\ \fB\-R\fR]
+[\fB\-dDfiprRs\fR] [\fB\-b\ \fIsize\fR]
 \fIfile1\fR [\fIfile2\fR .\ .\ .\ ] \fItarget\fR
 .SH DESCRIPTION
 .I File1
@@ -64,17 +63,6 @@ The
 .B cp
 command accepts the following options:
 .TP
-.B \-f
-If overwriting a target file fails,
-.B cp
-will try to unlink that file and proceed.
-Overrides the
-.B \-i
-option in
-.B /usr/5bin/s42/cp
-and
-.BR /usr/5bin/posix/cp .
-.TP
 .B \-i
 .B Cp
 will ask for confirmation
@@ -93,7 +81,7 @@ and
 .B \-p
 .B Cp
 will try to preserve access and modification times,
-user and group ownerships
+user and group ownerships,
 and file permission bits.
 Failing to preserve these modes
 is always considered an error,
@@ -102,6 +90,26 @@ but only
 and
 .B /usr/5bin/posix/cp
 will print an error message.
+.TP
+.B \-r
+The source file operands may be directories
+that will be copied recursively.
+Symbolic links are followed.
+The content of all non-directory files encountered
+is tried to be reproduced in a regular file.
+.PP
+The following options have been added by POSIX.2:
+.TP
+.B \-f
+If overwriting a target file fails,
+.B cp
+will try to unlink that file and proceed.
+Overrides the
+.B \-i
+option in
+.B /usr/5bin/s42/cp
+and
+.BR /usr/5bin/posix/cp .
 .TP
 .B \-R
 The source file operands may be directories
@@ -113,13 +121,43 @@ and symbolic links encountered during traversal
 are recreated in the target hierarchy.
 If a symbolic link is given as an operand,
 its target is copied.
+.PP
+The following options are extensions:
 .TP
-.B \-r
-The source file operands may be directories
-that will be copied recursively.
-Symbolic links are followed.
-The content of all non-directory files encountered
-is tried to be reproduced in a regular file.
+\fB\-b\ \fIsize\fR
+With this option given,
+.I cp
+performs input and output in units of
+.I size
+bytes.
+The default size depends on the current input file.
+.TP
+.B \-d
+With the
+.I \-r
+or
+.I \-R
+options,
+hard links between copied files are usually splitted,
+i.\|e. each copied file is assigned to a separate i-node.
+When this option is given,
+hard links between copied files
+are reproduced in the destination hierarchy.
+.TP
+.B \-D
+Causes
+.I cp
+to use direct i/o
+when copying file data.
+See the description of `O_DIRECT' in
+.IR open (2)
+for more information.
+.TP
+.B \-s
+With this option,
+.I cp
+prints i/o statistics for each single file
+of which data was copied.
 .SH "SEE ALSO"
 cat(1),
 cpio(1),
@@ -140,18 +178,11 @@ or
 .RS
 .sp
 .B cp
-.I ./-file
+.I ./\-file
 .I target
 .sp
 .RE
 to copy files that begin with a hyphen character.
-.PP
-Files copied with
-.B cp
-will lose all hard link connection.
-Use
-.IR cpio (1)
-to copy while retaining hard links.
 .PP
 A copy of a symbolic link
 contains the same pathname as the original.

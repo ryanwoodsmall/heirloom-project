@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1	1.39 (gritter) 9/25/04
+.\" Sccsid @(#)ps.1	1.42 (gritter) 12/9/04
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH PS 1 "9/25/04" "Heirloom Toolchest" "User Commands"
+.TH PS 1 "12/9/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ps \- process status
 .SH SYNOPSIS
@@ -80,9 +80,6 @@ command accepts the following options:
 Selects all processes with a controlling terminal device,
 except for session leaders.
 .TP 12
-.B \-A
-Selects all processes.
-.TP 12
 .B \-c
 Adds scheduling class and priority to the output.
 This is the default with
@@ -115,10 +112,6 @@ for
 all processes that belong to one of the session ids in
 .IR group .
 .TP 12
-\fB\-G\fI gidlist\fR
-Selects all processes that have one of the specified real \fIgroup ids\fR,
-which may be symbolic or numeric.
-.TP 12
 .B \-j
 Adds process group id and session id to the output.
 See below for the meaning of columns.
@@ -133,42 +126,6 @@ priority, nice value,
 core address,
 memory size in pages and the event waited for.
 See below for the meaning of columns.
-.TP
-.B \-L
-.hw LWPs
-Prints information on lightweight processes (LWPs);
-adds lightweight process id,
-lightweight process time,
-and, if \fI\-f\fR is also present,
-the number of lightweight processes.
-See below for the meaning of columns.
-.TP 12
-\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]],...
-The output is changed to reflect the named
-.IR property .
-Multiple properties can be given,
-separated by blanks or commas;
-it is also possible to specify multiple
-.B \-o
-options.
-Normally, the default property description is
-written in the first output line.
-If the
-.B = 
-character is present, but the
-.I title
-is missing in all format specifications,
-no descriptions are printed;
-if a
-.I title
-is given, it is used instead of the default.
-See below for valid
-.I property
-strings.
-.TP 12
-.B \-P
-Prints the processor on which the process is currently running.
-Disables printing of flags and memory address.
 .TP 12
 \fB\-p\fI pidlist\fR
 Selects all processes with one of the given \fIprocess ids\fR.
@@ -208,10 +165,57 @@ and
 .BR /usr/5bin/s42/ps ,
 the effective user id with
 .BR /usr/5bin/posix/ps .
+.PP
+The following options have been introduced by POSIX.2:
+.TP 12
+.B \-A
+Selects all processes.
+.TP 12
+\fB\-G\fI gidlist\fR
+Selects all processes that have one of the specified real \fIgroup ids\fR,
+which may be symbolic or numeric.
+.TP 12
+\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]],...
+The output is changed to reflect the named
+.IR property .
+Multiple properties can be given,
+separated by blanks or commas;
+it is also possible to specify multiple
+.B \-o
+options.
+Normally, the default property description is
+written in the first output line.
+If the
+.B = 
+character is present, but the
+.I title
+is missing in all format specifications,
+no descriptions are printed;
+if a
+.I title
+is given, it is used instead of the default.
+See below for valid
+.I property
+strings.
 .TP 12
 \fB\-U\fI uidlist\fR
 Selects all processes with one of the given real \fIuser ids\fR,
 which may be symbolic or numeric.
+.PP
+The following options are extensions:
+.TP
+.B \-L
+.hw LWPs
+Prints information on lightweight processes (LWPs);
+adds lightweight process id,
+lightweight process time,
+and, if \fI\-f\fR is also present,
+the number of lightweight processes.
+See below for the meaning of columns.
+.TP 12
+.B \-P
+Prints the processor on which the process is currently running.
+Disables printing of flags and memory address.
 .TP 12
 .B \-y
 Modifies the

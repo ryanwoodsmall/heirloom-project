@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)od.1	1.5 (gritter) 3/6/04
+.\" Sccsid @(#)od.1	1.9 (gritter) 12/10/04
 .\" Parts taken from od(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,14 +32,14 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH OD 1 "3/6/04" "Heirloom Toolchest" "User Commands"
+.TH OD 1 "12/10/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 od \- octal dump
 .SH SYNOPSIS
 .PD 0
 .HP
 .ad l
-\fBod\fR [\fB\-bcdDfFoOsSvxX\fR] [\fIfile\fR]
+\fBod\fR [\fB\-bcCdDfFoOsSvxX\fR] [\fIfile\fR]
 [[\fB+\fR]\fIoffset\fR[\fB.\fR][\fBb\fR]]
 .HP
 .ad l
@@ -60,24 +60,6 @@ If no format specification is present,
 .B \-o
 is default.
 The meanings of the option arguments are:
-.TP
-\fB\-A \fIaddress_base\fR
-Sets the format of the file offset printed in the first column.
-Valid values for \fIaddress_base\fR are:
-.RS
-.TP 3
-.B d
-Print offset as decimal.
-.TP 3
-.B n
-Print no offset column.
-.TP 3
-.B o
-Print offset as octal (default).
-.TP 3
-.B x
-Print offset as hexadecimal.
-.RE
 .TP
 .B  \-b
 Interpret bytes in octal.
@@ -108,6 +90,84 @@ Interpret floating point format as single precision.
 .TP
 .B \-F
 Interpret floating point format as double precision.
+.TP
+.B  \-o
+Interpret two-byte words in octal.
+.TP
+.B \-O
+Interpret four-byte words in octal.
+.TP
+.B  \-s
+Interpret signed two-byte words in decimal.
+.TP
+.B \-S
+Interpret signed four-byte words in decimal.
+.TP
+.B \-v
+Print identical groups of output lines
+that immediately follow each other
+instead of abbreviating
+all but the first one by printing a single
+.B *
+character.
+.TP
+.B  \-x
+Interpret two-byte words in hexadecimal.
+.TP
+.B  \-X
+Interpret four-byte words in hexadecimal.
+.PP
+The following option is supported as an extension:
+.TP
+.B \-C
+Prints the input data interpreted as characters
+as another column right next to the regular output.
+Non-printable characters are replaced by periods.
+.PP
+The
+.I file
+argument specifies which file is to be dumped.
+If no file argument is specified,
+the standard input is used.
+If more than one file argument is specified,
+the concatenation of all files
+without an intervening separator
+is dumped.
+.PP
+The offset argument specifies the offset
+in the file where dumping is to commence.
+This argument is normally interpreted
+as octal bytes.
+If `\fB.\fR' is appended, the offset is interpreted in
+decimal.
+If `\fBb\fR' is appended, the offset is interpreted in
+blocks of 512 bytes.
+If the file argument is omitted,
+the offset argument must be preceded 
+.RB ` + '.
+.PP
+The following options have been introduced by POSIX.2.
+If any of these options is present,
+an offset-like argument
+is always interpreted as the name of a file to be dumped.
+.TP
+\fB\-A \fIaddress_base\fR
+Sets the format of the file offset printed in the first column.
+Valid values for \fIaddress_base\fR are:
+.RS
+.TP 3
+.B d
+Print offset as decimal.
+.TP 3
+.B n
+Print no offset column.
+.TP 3
+.B o
+Print offset as octal (default).
+.TP 3
+.B x
+Print offset as hexadecimal.
+.RE
 .TP
 \fB\-j \fIskip\fR
 Skip
@@ -146,18 +206,6 @@ or a hexadecimal number preceded by
 .B 0x
 or
 .BR 0X .
-.TP
-.B  \-o
-Interpret two-byte words in octal.
-.TP
-.B \-O
-Interpret four-byte words in octal.
-.TP
-.B  \-s
-Interpret signed two-byte words in decimal.
-.TP
-.B \-S
-Interpret signed four-byte words in decimal.
 .TP
 \fB\-t \fItype_string\fR
 Set output format.
@@ -221,51 +269,6 @@ as described for
 .B d
 above.
 .RE
-.TP
-.B \-v
-Print identical groups of output lines
-that immediately follow each other
-instead of abbreviating
-all but the first one by printing a single
-.B *
-character.
-.TP
-.B  \-x
-Interpret two-byte words in hexadecimal.
-.TP
-.B  \-X
-Interpret four-byte words in hexadecimal.
-.PP
-The
-.I file
-argument specifies which file is to be dumped.
-If no file argument is specified,
-the standard input is used.
-If more than one file argument is specified,
-the concatenation of all files
-without an intervening separator
-is dumped.
-.PP
-The offset argument specifies the offset
-in the file where dumping is to commence.
-This argument is normally interpreted
-as octal bytes.
-If `\fB.\fR' is appended, the offset is interpreted in
-decimal.
-If `\fBb\fR' is appended, the offset is interpreted in
-blocks of 512 bytes.
-If the file argument is omitted,
-the offset argument must be preceded 
-.RB ` + '.
-If any of the
-.BR \-A ,
-.BR \-j ,
-.BR \-N ,
-or
-.B \-t
-options is present,
-an argument of this type
-is always interpreted as the name of a file to be dumped.
 .PP
 Unless the
 .B \-N

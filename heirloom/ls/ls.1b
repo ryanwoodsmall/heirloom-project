@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ls.1b	1.9 (gritter) 6/19/04
+.\" Sccsid @(#)ls.1b	1.11 (gritter) 12/9/04
 .\" Parts taken from ls(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH LS 1B "6/19/04" "Heirloom Toolchest" "BSD System Compatibility"
+.TH LS 1B "12/9/04" "Heirloom Toolchest" "BSD System Compatibility"
 .SH NAME
 ls \- (BSD) list contents of directory
 .SH SYNOPSIS
@@ -169,6 +169,27 @@ or printing
 Print one filename per output line.
 This is the default
 if standard output does not refer to a terminal.
+.PP
+The following options are available as extensions:
+.TP
+.B \-h
+Print file sizes in human-readable powers of 1024,
+i.\|e. `K' for kilobyte,
+`M' for megabyte,
+`G' for gigabyte,
+`T' for terabyte,
+`P' for petabyte,
+and `E' for exabyte.
+.TP
+.B \-S
+Sort by file size.
+.TP
+.B \-U
+Do not sort at all.
+.TP
+.B \-X
+Sort by file name extension,
+i.\|e. by the component of the file name following the last dot.
 .PP
 The mode printed under the
 .B \-l

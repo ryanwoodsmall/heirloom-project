@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tail.sl	1.20 (gritter) 7/17/04";
+static const char sccsid[] USED = "@(#)tail.sl	1.21 (gritter) 12/8/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -98,9 +98,8 @@ usage(void)
 {
 	fprintf(stderr, "\
 usage: %s [+/-[n][lbc][f]] [file]\n\
-       %s [+/-[n][l][r|f]] [file]\n\
-       %s [-f] [-c number | -n number] [file]\n",
-		progname, progname, progname);
+       %s [+/-[n][l][r|f]] [file]\n",
+		progname, progname);
 	exit(2);
 }
 

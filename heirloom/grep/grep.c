@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.44 (gritter) 12/2/04>	*/
+/*	Sccsid @(#)grep.c	1.47 (gritter) 12/12/04>	*/
 
 /*
  * Code common to all grep flavors.
@@ -64,6 +64,7 @@ int		qflag;			/* no output at all */
 int		rflag;			/* operate recursively */
 int		sflag;			/* avoid error messages */
 int		vflag;			/* inverse selection */
+int		wflag;			/* search for words */
 int		xflag;			/* match entire line */
 int		mb_cur_max;		/* avoid multiple calls to MB_CUR_MAX */
 unsigned	status = 1;		/* exit status */
@@ -131,6 +132,43 @@ loconv(register char *dst, register char *src, size_t sz)
 			*dst++ = tolower(*src & 0377);
 			src++;
 		}
+}
+
+/*
+ * Determine if pat ends with an unescaped dollar sign.
+ */
+static int
+termdollar(const char *pat, long len)
+{
+	int	dollar = 1;
+
+	if (len == 0 || pat[len - 1] != '$')
+		return 0;
+	pat += --len - 1;
+	while (len-- && *pat-- == '\\')
+		dollar = !dollar;
+	return dollar;
+}
+
+/*
+ * Surround the pattern with \< \>.
+ */
+void
+wcomp(char **pat, long *len)
+{
+	char	*wp = smalloc(*len + 5);
+
+	memcpy(&wp[2], *pat, *len);
+	if ((*pat)[0] == '^')
+		memcpy(wp, "^\\<", 3);
+	else
+		memcpy(wp, "\\<", 2);
+	if (termdollar(*pat, *len))
+		strcpy(&wp[*len-1+2], "\\>$");
+	else
+		strcpy(&wp[*len+2], "\\>");
+	*len += 4;
+	*pat = wp;
 }
 
 /*
@@ -335,7 +373,6 @@ static void
 fngrep(const char *fn, int level)
 {
 	struct iblok	*ip;
-#ifdef	ADDONS
 	struct stat	st;
 
 	if (rflag && fn && stat(fn, &st) == 0) {
@@ -400,7 +437,6 @@ fngrep(const char *fn, int level)
 		    }
 		}
 	}
-#endif	/* ADDONS */
 	if (fn) {
 		if ((ip = ib_open(fn, 0)) == NULL) {
 			if (sflag == 0)
@@ -428,8 +464,8 @@ main(int argc, char **argv)
 	putenv("POSIXLY_CORRECT=1");
 #endif
 	progname = basename(argv[0]);
-	setlocale(LC_CTYPE, "");
 	setlocale(LC_COLLATE, "");
+	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
 	range = gn_range;
 	init();
@@ -476,16 +512,18 @@ main(int argc, char **argv)
 		case 'q':
 			qflag = 1;
 			break;
-#ifdef	ADDONS
 		case 'r':
+		case 'R':
 			rflag = 1;
 			break;
-#endif	/* ADDONS */
 		case 's':
 			sflag = 1;
 			break;
 		case 'v':
 			vflag = 1;
+			break;
+		case 'w':
+			wflag = 1;
 			break;
 		case 'x':
 			xflag = 1;
@@ -514,6 +552,8 @@ main(int argc, char **argv)
 		if (Fflag && status == 2)
 			usage();
 		if (Eflag == 1 && Fflag == 1 || cflag + lflag + qflag > 1)
+			usage();
+		if (wflag && (Eflag || Fflag))
 			usage();
 	}
 	if (cflag)

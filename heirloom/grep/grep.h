@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.h	1.21 (gritter) 12/2/04>	*/
+/*	Sccsid @(#)grep.h	1.22 (gritter) 12/8/04>	*/
 
 #include	<sys/types.h>
 #include	<regex.h>
@@ -79,6 +79,7 @@ extern int		nflag;		/* print line numbers */
 extern int		qflag;		/* no output at all */
 extern int		sflag;		/* avoid error messages */
 extern int		vflag;		/* inverse selection */
+extern int		wflag;		/* search for words */
 extern int		xflag;		/* match entire line */
 extern int		mb_cur_max;	/* MB_CUR_MAX */
 #define	mbcode		(mb_cur_max>1)	/* multibyte characters in use */
@@ -105,6 +106,7 @@ extern char		*options;	/* for getopt() */
  * In grep.c.
  */
 extern void		loconv(char *, char *, size_t);
+extern void		wcomp(char **, long *);
 extern void		report(const char *, size_t, off_t, int);
 
 /*

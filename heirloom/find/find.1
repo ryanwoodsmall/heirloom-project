@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)find.1	1.36 (gritter) 2/21/04
+.\" Sccsid @(#)find.1	1.38 (gritter) 12/6/04
 .\" Parts taken from find(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH FIND 1 "2/21/04" "Heirloom Toolchest" "User Commands"
+.TH FIND 1 "12/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 find \- find files
 .SH SYNOPSIS
@@ -203,7 +203,8 @@ Always true;
 causes the current pathname to be printed.
 If no expression is given,
 .B \-print
-is used per default.
+is used per default
+(as a change introduced by POSIX.2).
 .TP
 .BR \-newer " file"
 True if
@@ -236,6 +237,7 @@ as the currently examined path operand.
 .B \-xdev
 The same as
 .BR \-mount .
+This primary has been introduced by POSIX.
 .TP
 .B \-nouser
 True if the file is owned by a user

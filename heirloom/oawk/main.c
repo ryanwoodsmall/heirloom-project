@@ -78,7 +78,7 @@ char copyright[] =
 #endif
 
 /*	from 4.4BSD /usr/src/old/awk/main.c	4.6 (Berkeley) 4/17/91	*/
-/*	Sccsid @(#)main.c	1.10 (gritter) 3/31/03>	*/
+/*	Sccsid @(#)main.c	1.11 (gritter) 12/12/04>	*/
 
 #include "stdio.h"
 #include "ctype.h"
@@ -108,8 +108,8 @@ char *progname;
 extern int maxsym;
 int
 main(int argc, char **argv) {
-	setlocale(LC_CTYPE, "");
 	setlocale(LC_COLLATE, "");
+	setlocale(LC_CTYPE, "");
 	setlocale(LC_NUMERIC, "C");
 	mb_cur_max = MB_CUR_MAX;
 	progname = tostring(basename(argv[0]));

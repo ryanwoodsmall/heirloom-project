@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diff.c	1.20 (gritter) 7/11/04>	*/
+/*	Sccsid @(#)diff.c	1.21 (gritter) 12/5/04>	*/
 /*	from 4.3BSD diff.c 4.6 4/3/86	*/
 
 #include "diff.h"
@@ -282,7 +282,7 @@ static void
 usage(void)
 {
 	fprintf(stderr, "\
-usage: %s [ -abBcefhilNnrstuw12 -CU num -D string -S name -x pat ] file1 file2\n",
+usage: %s [ -bcefhilnrstw -C num -D string -S name ] file1 file2\n",
 		progname);
 	done();
 }
