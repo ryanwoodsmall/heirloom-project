@@ -1,5 +1,6 @@
 Release ...
-* diff: The -p option (print surrounding C function) has been added.
+* diff: The -p option (print name of surrounding C function) has been added.
+* diff: The -X option (ignore patterns from file) has been added.
 * diff: The combination of the -h and -r options works again.
 * ps: Some values (e.g. LTIME) were determined incorrectly with the -L option
   on Linux systems.
