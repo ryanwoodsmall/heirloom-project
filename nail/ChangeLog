@@ -15,6 +15,10 @@
   but the body did not, the name of the international character set was
   used for declaring the content-type of the body too. Us-ascii is now
   used for the body in such cases.
+* When the 'fullnames' variable was set and the full name of a recipient
+  was the only string in both header and body of an outgoing message that
+  contained non-ASCII characters, no conversion between terminal character
+  set and outgoing character set was performed for it.
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
 

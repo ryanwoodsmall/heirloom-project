@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.53 (gritter) 1/6/05";
+static char sccsid[]  = "@(#)mime.c	2.54 (gritter) 1/7/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -314,22 +314,26 @@ need_hdrconv(struct header *hp, enum gfield w)
 	}
 	if (w & GTO) {
 		for (np = hp->h_to; np; np = np->n_flink)
-			if (has_highbit(np->n_name))
+			if (has_highbit(np->n_name) ||
+					has_highbit(np->n_fullname))
 				goto needs;
 	}
 	if (w & GCC) {
 		for (np = hp->h_cc; np; np = np->n_flink)
-			if (has_highbit(np->n_name))
+			if (has_highbit(np->n_name) ||
+					has_highbit(np->n_fullname))
 				goto needs;
 	}
 	if (w & GBCC) {
 		for (np = hp->h_bcc; np; np = np->n_flink)
-			if (has_highbit(np->n_name))
+			if (has_highbit(np->n_name) ||
+					has_highbit(np->n_fullname))
 				goto needs;
 	}
 	if (w & GREPLYTO) {
 		for (np = hp->h_replyto; np; np = np->n_flink)
-			if (has_highbit(np->n_name))
+			if (has_highbit(np->n_name) ||
+					has_highbit(np->n_fullname))
 				goto needs;
 	}
 	if (w & GSUBJECT) {
