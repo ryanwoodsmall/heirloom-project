@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.55 (gritter) 1/8/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.57 (gritter) 1/21/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.55 (gritter) 1/8/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.57 (gritter) 1/21/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1153,7 +1153,8 @@ static int	eofnext;
  * Read a line from fp, allocating storage as needed.
  */
 static char *
-fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp, int *colchar)
+fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp, int *colchar,
+		int watcheof)
 {
 	int	c = EOF, n = 0;
 	const int	incr = 4096;
@@ -1196,8 +1197,8 @@ fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp, int *colchar)
 	if (llen)
 		*llen = n;
 	eofnext = 0;
-	if (c != EOF) {
-		if ((c = getc(fp)) != EOF)
+	if (watcheof) {
+		if (c != EOF && (c = getc(fp)) != EOF)
 			ungetc(c, fp);
 		else
 			eofnext = 1;
@@ -1557,8 +1558,7 @@ searchbw(void)
 			continue;
 		fseeko(find, (off_t)0, SEEK_END);
 		fseeko(fbuf, pos & MASK, SEEK_SET);
-		if (fgetline(&b, &bsize, &llen, fbuf,
-				&colchar) == NULL)
+		if (fgetline(&b, &bsize, &llen, fbuf, &colchar, 0) == NULL)
 			tmperr(fbuf, "buffer");
 		if (colchar)
 			colb(b, &b[llen]);
@@ -1605,7 +1605,7 @@ nextline(FILE *f, const char *name)
 			tmperr(find, "index");
 		fseeko(find, (off_t)0, SEEK_END);
 		fseeko(fbuf, pos & MASK, SEEK_SET);
-		if (fgetline(&b, &bsize, &llen, fbuf, &colchar) == NULL)
+		if (fgetline(&b, &bsize, &llen, fbuf, &colchar, 0) == NULL)
 			tmperr(fbuf, "buffer");
 	} else if (eofline == 0) {
 		fseeko(find, (off_t)0, SEEK_END);
@@ -1628,7 +1628,7 @@ nextline(FILE *f, const char *name)
 				if (nobuf)
 					fseeko(f, fpos, SEEK_SET);
 				specjump = 1;
-				p = fgetline(&b, &bsize, &llen, f, &colchar);
+				p = fgetline(&b, &bsize, &llen, f, &colchar, 1);
 				if (nobuf)
 					if ((fpos = ftello(f)) == -1)
 						pgerror(errno, name);
@@ -1737,7 +1737,7 @@ savefile(FILE *f)
 		if (!nobuf)
 			fseeko(fbuf,(off_t)0,SEEK_END);
 		pos = ftello(fbuf);
-		if (fgetline(&b, &bsize, &llen, f, &colchar) == NULL) {
+		if (fgetline(&b, &bsize, &llen, f, &colchar, 0) == NULL) {
 			eofline = fline;
 			break;
 		}

@@ -17,6 +17,9 @@ Release ...
   Fischer).
 * ps: -o etime sometimes printed output like '00:00:4294967295' with
   recently started processes (Bugreport by Matthew Fischer).
+* pg: The fix for the '(EOF):' prompt in the last release caused the '.'
+  command to advance a line if input came from a pipe but the current
+  screen was the last one that had already been buffered.
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and
