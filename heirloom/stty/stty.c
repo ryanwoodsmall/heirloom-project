@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifndef	UCB
-static const char sccsid[] USED = "@(#)stty.sl	1.19 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)stty.sl	1.20 (gritter) 2/5/05";
 #else	/* UCB */
-static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.19 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.20 (gritter) 2/5/05";
 #endif	/* UCB */
 
 #include <sys/types.h>
@@ -808,15 +808,18 @@ baudrate(speed_t c)
 static void
 set(void)
 {
-	int	i, gotcha, not;
+	int	i, gotcha, not, sspeed = 0;
+	speed_t	ispeed0, ospeed0, ispeed1, ospeed1;
 	const char	*ap;
 	struct termios	tc;
 
+	ispeed0 = ispeed1 = cfgetispeed(&ts);
+	ospeed0 = ospeed1 = cfgetospeed(&ts);
 	while (*args) {
 		for (i = 0; speeds[i].s_str; i++)
 			if (strcmp(speeds[i].s_str, *args) == 0) {
-				cfsetispeed(&ts, speeds[i].s_val);
-				cfsetospeed(&ts, speeds[i].s_val);
+				ispeed1 = ospeed1 = speeds[i].s_val;
+				sspeed |= 3;
 				goto next;
 			}
 		gotcha = 0;
@@ -861,38 +864,51 @@ set(void)
 			goto next;
 		if (strcmp(*args, "ispeed") == 0) {
 			if (*++args == NULL)
-				return;
+				break;
 			if (atol(*args) == 0) {
-				cfsetispeed(&ts, cfgetospeed(&ts));
+				ispeed1 = ospeed1;
+				sspeed |= 1;
 				goto next;
 			} else for (i = 0; speeds[i].s_str; i++)
 				if (strcmp(speeds[i].s_str, *args) == 0) {
-					tc = ts;
-					cfsetispeed(&tc, speeds[i].s_val);
-					if (cfgetospeed(&tc)==cfgetospeed(&ts))
-						ts = tc;
+					ispeed1 = speeds[i].s_val;
+					sspeed |= 1;
 					goto next;
 				}
 			inval();
 		}
 		if (strcmp(*args, "ospeed") == 0) {
 			if (*++args == NULL)
-				return;
-			if (atol(*args) == 0) {
-				cfsetospeed(&ts, B0);
-				goto next;
-			} else for (i = 0; speeds[i].s_str; i++)
+				break;
+			for (i = 0; speeds[i].s_str; i++)
 				if (strcmp(speeds[i].s_str, *args) == 0) {
-					tc = ts;
-					cfsetospeed(&tc, speeds[i].s_val);
-					if (cfgetispeed(&tc)==cfgetispeed(&ts))
-						ts = tc;
+					ospeed1 = speeds[i].s_val;
+					sspeed |= 2;
 					goto next;
 				}
 			inval();
 		}
 		gset();
 	next:	args++;
+	}
+	if (sspeed) {
+		if (sspeed == 3 && ispeed1 != ospeed1 && ospeed1 != B0) {
+			tc = ts;
+			cfsetispeed(&tc, ispeed1);
+			if (cfgetospeed(&tc) == cfgetospeed(&ts)) {
+				tc = ts;
+				cfsetospeed(&tc, ospeed1);
+				if (cfgetispeed(&tc) == cfgetispeed(&ts)) {
+					cfsetispeed(&ts, ispeed1);
+					cfsetospeed(&ts, ospeed1);
+				}
+			}
+		} else {
+			if (ispeed0 != ispeed1)
+				cfsetispeed(&ts, ispeed1);
+			if (ospeed0 != ospeed1)
+				cfsetospeed(&ts, ospeed1);
+		}
 	}
 }
 
