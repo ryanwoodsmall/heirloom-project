@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.50 (gritter) 1/2/05>	*/
+/*	Sccsid @(#)grep.c	1.51 (gritter) 1/8/05>	*/
 
 /*
  * Code common to all grep flavors.
@@ -62,7 +62,7 @@ int		iflag;			/* ignore case */
 int		lflag;			/* print filenames only */
 int		nflag;			/* print line numbers */
 int		qflag;			/* no output at all */
-int		rflag;			/* operate recursively */
+int	(*rflag)(const char *, struct stat *);	/* operate recursively */
 int		sflag;			/* avoid error messages */
 int		vflag;			/* inverse selection */
 int		wflag;			/* search for words */
@@ -84,6 +84,15 @@ int		(*range)(struct iblok *, char *); /* grep range of lines */
  */
 struct expr	*e0;			/* start of expression list */
 enum matchflags	matchflags;		/* matcher flags */
+
+/*
+ * To avoid link loops with -r.
+ */
+static struct	visit {
+	ino_t	v_ino;
+	dev_t	v_dev;
+} *visited;
+static int	vismax;			/* number of members in visited */
 
 /*
  * Lower-case a character string.
@@ -471,9 +480,23 @@ fngrep(const char *fn, int level)
 {
 	struct iblok	*ip;
 	struct stat	st;
+	int	i;
 
-	if (rflag && fn && stat(fn, &st) == 0) {
-		switch (st.st_mode&S_IFMT) {
+	if (rflag && fn && (level ? rflag : stat)(fn, &st) == 0) {
+		if (rflag != lstat) {
+			for (i = 0; i < level; i++)
+				if (st.st_dev == visited[i].v_dev &&
+						st.st_ino == visited[i].v_ino)
+					return;
+			if (level >= vismax) {
+				vismax += 20;
+				visited = srealloc(visited, sizeof *visited *
+						vismax);
+			}
+			visited[level].v_dev = st.st_dev;
+			visited[level].v_ino = st.st_ino;
+		}
+	mode:	switch (st.st_mode&S_IFMT) {
 #define	ignoring(t, s)	fprintf(stderr, "%s: ignoring %s %s\n", progname, t, s)
 		case S_IFIFO:
 			ignoring("named pipe", fn);
@@ -489,6 +512,10 @@ fngrep(const char *fn, int level)
 			ignoring("socket", fn);
 			return;
 #endif	/* S_IFSOCK */
+		case S_IFLNK:
+			if (stat(fn, &st) < 0 || (st.st_mode&S_IFMT) == S_IFDIR)
+				return;
+			goto mode;
 		default:
 			break;
 		case S_IFDIR: {
@@ -610,8 +637,10 @@ main(int argc, char **argv)
 			qflag = 1;
 			break;
 		case 'r':
+			rflag = stat;
+			break;
 		case 'R':
-			rflag = 1;
+			rflag = lstat;
 			break;
 		case 's':
 			sflag = 1;

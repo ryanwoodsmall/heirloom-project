@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)egrep.1	1.39 (gritter) 12/17/04
+.\" Sccsid @(#)egrep.1	1.40 (gritter) 1/8/05
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EGREP 1 "12/17/04" "Heirloom Toolchest" "User Commands"
+.TH EGREP 1 "1/8/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 egrep \- search a file for a pattern using full regular expressions
 .SH SYNOPSIS
@@ -272,10 +272,14 @@ does not directly search in each given file that is a directory,
 but descends it recursively
 and scans each regular file found below it.
 Device files are ignored.
+Symbolic links are followed.
 .TP
 .B \-R
-Same as
-.IR \-r .
+Operates recursively as with the
+.I \-r
+option,
+but does not follow symbolic links that point to directories
+unless if they are explicitly specified as arguments.
 .TP
 .B \-z
 If an input file is found to be compressed with

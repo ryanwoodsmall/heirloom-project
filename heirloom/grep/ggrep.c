@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid %W% (gritter) %G%>	*/
+/*	Sccsid @(#)ggrep.c	1.26 (gritter) 1/4/05>	*/
 
 /*
  * Code for generic SVID3 grep only.

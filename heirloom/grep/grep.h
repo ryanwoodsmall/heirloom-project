@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid %W% (gritter) %G%>	*/
+/*	Sccsid @(#)grep.h	1.23 (gritter) 1/4/05>	*/
 
 #include	<sys/types.h>
 #include	<regex.h>

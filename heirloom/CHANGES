@@ -2,6 +2,9 @@ Release ...
 * tr: The highest acceptable wide character for complementing strings is now
   dynamically reset from 0x10FFFF to 0xFFFF if memory is sparse. The size of
   the corresponding hash table has been raised to reduce computing time.
+* grep: With the -r option, directory loops caused by symbolic links are now
+  detected and avoided. The -R option does no longer follow symbolic links
+  that point to directories.
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and
