@@ -1,3 +1,9 @@
+[11.15] released ...
+* The compilation process was fixed to work without CPPFLAGS=-D_GNU_SOURCE on
+  Linux/glibc again, although mremap() is not available then. It is therefore
+  recommended to use CPPFLAGS=-D_GNU_SOURCE with Linux/glibc. (Bugreport by
+  Stephen Isard.)
+
 [11.14] released 11/4/04
 * A 'Z' command was introduced. It is similar to the 'z' command, but scrolls
   only to header groups that contain at least one new or flagged message. This
