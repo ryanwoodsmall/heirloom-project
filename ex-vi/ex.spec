@@ -3,7 +3,7 @@
 #
 Summary: A port of the traditional ex/vi editors
 Name: ex
-Version: 041202
+Version: 040420
 Release: 1
 License: BSD
 Source: %{name}-%{version}.tar.bz2
