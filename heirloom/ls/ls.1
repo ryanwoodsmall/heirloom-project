@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ls.1	1.31 (gritter) 1/24/05
+.\" Sccsid @(#)ls.1	1.32 (gritter) 2/24/05
 .\" Parts taken from ls(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH LS 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH LS 1 "2/24/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ls, lc \- list contents of directory
 .SH SYNOPSIS
@@ -114,7 +114,7 @@ lfB l.
 @	symbolic link
 |	named pipe
 \&=	socket
->	door
+>	Solaris door
 .TE
 .RE
 .IP
@@ -258,7 +258,7 @@ l	if the entry is a symbolic link;
 S	if the entry is a socket;
 s	if the entry is a \s-1XENIX\s0 semaphore;
 m	if the entry is a \s-1XENIX\s0 shared data (memory) file;
-D	if the entry is a door;
+D	if the entry is a Solaris door;
 \-	if the entry is a plain file.
 .TE
 .PP
@@ -337,7 +337,7 @@ blue/bold	if the file is a directory;
 yellow/bold	if the file is a special file;
 yellow	if the file is a named pipe;
 cyan	if the file is a symbolic link;
-magenta/bold	if the file is a socket or a door;
+magenta/bold	if the file is a socket or a Solaris door;
 magenta	if the file is a XENIX special file;
 green/bold	if the file is executable.
 .TE

@@ -19,6 +19,7 @@ Release ...
   by Matthew Fischer).
 * The value 255 is now accepted in interval expressions in traditional
   (simple) regular expressions.
+* find: The expression '-type D' matches Solaris door files.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
