@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.31 (gritter) 2/15/05";
+static char sccsid[] = "@(#)ex_put.c	1.32 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -604,10 +604,12 @@ plod(int cnt)
 		 * BUG: this doesn't take the (possibly long) length
 		 * of xCR into account.
 		 */
-		if (xCR)
-			tputs(xCR, 0, plodput);
-		else
-			plodput('\r');
+		if (ospeed != B0) {
+			if (xCR)
+				tputs(xCR, 0, plodput);
+			else
+				plodput('\r');
+		}
 		if (NC) {
 			if (xNL)
 				tputs(xNL, 0, plodput);
@@ -796,7 +798,7 @@ fgoto(void)
 		outcol %= TCOLUMNS;
 		if (AM == 0) {
 			while (l > 0) {
-				if (pfast)
+				if (pfast && ospeed != B0)
 					if (xCR)
 						tputs(xCR, 0, putch);
 					else

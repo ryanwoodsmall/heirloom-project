@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_tty.c	1.28 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_tty.c	1.29 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -96,8 +96,10 @@ gettmode(void)
 {
 	speed_t pospeed;
 
-	if (tcgetattr(1, &tty) < 0)
+	if (tcgetattr(1, &tty) < 0) {
+		ospeed = B0;
 		return;
+	}
 	pospeed = cfgetospeed(&tty);
 	if (ospeed != pospeed)
 		value(SLOWOPEN) = pospeed < B1200;

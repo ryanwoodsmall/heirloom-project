@@ -33,6 +33,8 @@ Release ...
 * The -w option now also sets the scroll size for the 'z' command.
 * When the name of a nonexisting file is given with the 'edit' ex command,
   the command now succeeds and prints a "[New file]" message.
+* If standard output is not a terminal, no '\r' is written at the end of
+  printed lines anymore.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
