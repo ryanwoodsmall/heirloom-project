@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.145 (gritter) 11/6/04
+ *	Sccsid @(#)extern.h	2.146 (gritter) 11/6/04
  */
 
 /* aux.c */
@@ -164,6 +164,7 @@ int followupall(void *v);
 int followupsender(void *v);
 int preserve(void *v);
 int unread(void *v);
+int seen(void *v);
 int messize(void *v);
 int rexit(void *v);
 int set(void *v);

@@ -14,6 +14,8 @@
   terminology of RFC 2822; it is still available under its old name for at
   least a transition period. Also, 'Resent-From:' and related fields are now
   prepended to older fields as specified.
+* A 'seen' command has been introduced; it takes a message list and marks the
+  messages as having been read.
 * Since many versions of Linux do not correctly update the modification time
   of a file with mmap(), utime() is now called to force an update when the
   junk mail database is changed.

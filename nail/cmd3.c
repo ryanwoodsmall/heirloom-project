@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.72 (gritter) 11/6/04";
+static char sccsid[] = "@(#)cmd3.c	2.73 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -434,6 +434,22 @@ unread(void *v)
 			imap_unread(&message[*ip-1], *ip);
 	}
 	return(0);
+}
+
+/*
+ * Mark all given messages as read.
+ */
+int
+seen(void *v)
+{
+	int	*msgvec = v;
+	int	*ip;
+
+	for (ip = msgvec; *ip; ip++) {
+		setdot(&message[*ip-1]);
+		touch(&message[*ip-1]);
+	}
+	return 0;
 }
 
 /*
