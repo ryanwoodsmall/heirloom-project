@@ -19,6 +19,8 @@ Release ...
 * dd: With 'conv=unblock', the last block was not converted.
 * csplit, ed, expr, grep, nl, pax, pg, sed: The POSIX versions no longer
   accept reverted ranges like '[b-a]' in regular expressions.
+* touch: If one of -a or -m but no time specification was given, both
+  access and modification time were set to the current time.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

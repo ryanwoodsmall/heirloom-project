@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)touch_sus.sl	1.17 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)touch_sus.sl	1.18 (gritter) 2/1/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)touch.sl	1.17 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)touch.sl	1.18 (gritter) 2/1/05";
 #endif	/* !SUS */
 
 #include	<sys/types.h>
@@ -326,10 +326,13 @@ main(int argc, char **argv)
 					cp - argv[optind] == 10))
 			otime(argv[optind++]);
 	}
-	if (nacc == (time_t)-1 && nmod == (time_t)-1) {
-		nacc = nmod = now;
+	if (nacc == (time_t)-1 && nmod == (time_t)-1 && aflag == 0 &&
+			mflag == 0)
 		nulltime = 1;
-	}
+	if (nacc == (time_t)-1)
+		nacc = now;
+	if (nmod == (time_t)-1)
+		nmod = now;
 	if (aflag == 0 && mflag == 0)
 		aflag = mflag = 1;
 	if (optind >= argc)
