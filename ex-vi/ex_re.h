@@ -72,12 +72,8 @@
  *
  *	from ex_re.h	7.3 (Berkeley) 5/31/85
  *
- *	@(#)ex_re.h	1.19 (gritter) 2/19/05
+ *	@(#)ex_re.h	1.20 (gritter) 2/19/05
  */
-
-#ifdef	UXRE
-#include <regex.h>
-#endif
 
 /*
  * Regular expression definitions.
@@ -92,11 +88,7 @@ struct	regexp {
 	char	Patbuf[2*LBSIZE + 1];
 	long	Re_ident;
 	bool	Re_used;
-#ifdef	UXRE
-	regex_t	Expbuf;
-#else	/* !UXRE */
-	char	*Expbuf;
-#endif	/* !UXRE */
+	void	*Expbuf;
 	bool	Circfl;
 	short	Nbra;
 };

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.47 (gritter) 2/19/05";
+static char sccsid[] = "@(#)ex_re.c	1.48 (gritter) 2/19/05";
 #endif
 #endif
 
@@ -83,8 +83,12 @@ static char sccsid[] = "@(#)ex_re.c	1.47 (gritter) 2/19/05";
 #include "ex_re.h"
 
 #ifdef	UXRE
+
+#include <regex.h>
+
 char	*braslist[NBRA];
 char	*braelist[NBRA];
+
 #else	/* !UXRE */
 static int	regerrno;
 
@@ -92,7 +96,7 @@ static int	regerrno;
 #define	GETC()			(*sp++)
 #define	PEEKC()			(*sp)
 #define	UNGETC(c)		(--sp)
-#define	RETURN(c)		return (c);
+#define	RETURN(c)		return(ep);
 #define	ERROR(c)		{ regerrno = c; return 0; }
 
 #define	compile(a, b, c, d)	_compile(a, b, c, d)
@@ -881,7 +885,7 @@ refree(struct regexp *rp)
 	if ((r1->Re_used == 0 || rp->Re_ident != r1->Re_ident) &&
 			(r2->Re_used == 0 || rp->Re_ident != r2->Re_ident))
 #ifdef	UXRE
-		regfree(&rp->Expbuf);
+		regfree(rp->Expbuf);
 #else	/* !UXRE */
 		free(rp->Expbuf);
 #endif	/* !UXRE */
@@ -1131,26 +1135,28 @@ complex:		cerror(catgets(catd, 1, 139,
 #endif	/* !NO_BE_BACKSLASH */
 	if (value(IGNORECASE))
 		c |= REG_ICASE;
-	if ((i = regcomp(&re.Expbuf, re.Patbuf, c)) != 0) {
+	if (re.Expbuf == NULL)
+		re.Expbuf = calloc(1, sizeof (regex_t));
+	if ((i = regcomp(re.Expbuf, re.Patbuf, c)) != 0) {
 		switch (i) {
 		case REG_EBRACK:
 		miss:	cerror(catgets(catd, 1, 154, "Missing ]"));
 			/*NOTREACHED*/
 			break;
 		default:
-			regerror(i, &re.Expbuf, &re.Patbuf[1],
+			regerror(i, re.Expbuf, &re.Patbuf[1],
 					sizeof re.Patbuf - 1);
 			cerror(&re.Patbuf[1]);
 		}
 	}
-	if ((re.Nbra = re.Expbuf.re_nsub) > NBRA)
+	if ((re.Nbra = ((regex_t *)re.Expbuf)->re_nsub) > NBRA)
 		re.Nbra = NBRA;
 #else	/* !UXRE */
 	if ((re.Expbuf = malloc(n = rcnt*32 + 2*(p-re.Patbuf) + 5)) == NULL)
 		goto complex;
 	if (value(IGNORECASE))
 		loconv(re.Patbuf, re.Patbuf);
-	if (_compile(re.Patbuf, re.Expbuf, &re.Expbuf[n], '\0') == 0) {
+	if (_compile(re.Patbuf, re.Expbuf, &((char *)re.Expbuf)[n], '\0') == 0) {
 		char	*cp;
 		free(re.Expbuf);
 		switch (regerrno) {
@@ -1232,7 +1238,7 @@ execute(int gf, line *addr)
 	 * so don't fetch them otherwise (enables use of DFA).
 	 */
 	nsub = (re.Re_ident == subre.Re_ident ? NBRA : 0);
-	switch (regexec(&re.Expbuf, p, nsub + 1, bralist, eflags)) {
+	switch (regexec(re.Expbuf, p, nsub + 1, bralist, eflags)) {
 	case 0:
 		break;
 	case REG_NOMATCH:
