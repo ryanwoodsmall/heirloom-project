@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.40 (gritter) 12/2/04";
+static char sccsid[] = "@(#)collect.c	2.41 (gritter) 12/8/04";
 #endif
 #endif /* not lint */
 
@@ -447,6 +447,7 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	(void) &getfields;
 	(void) &tempMail;
 	(void) &tflag;
+	(void) &quote;
 
 	collf = NULL;
 	/*

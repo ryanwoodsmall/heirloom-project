@@ -1,4 +1,4 @@
-[11.18] released ...
+[11.18] released 12/9/04
 * When the 'write' command asks for an attachment filename and a '|' is
   given as the first character, the attachment is piped to the rest of
   the string interpreted as a shell command (contributed by Stephen Isard).
@@ -22,6 +22,9 @@
   it is recommended that it be added manually.
 * Characters with width 0 (e.g. Unicode combining characters) are now handled
   correctly in header summaries.
+* When a message in a multibyte character set like UTF-8 that was encoded
+  as quoted-printable was printed and a multibyte character was separated
+  by a '=' continued line, it was not decoded correctly since release 11.14.
 
 [11.17] released 11/18/04
 * When the 'write' command was used to save attachments in releases after

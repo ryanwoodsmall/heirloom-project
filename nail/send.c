@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.75 (gritter) 12/2/04";
+static char sccsid[] = "@(#)send.c	2.76 (gritter) 12/9/04";
 #endif
 #endif /* not lint */
 
@@ -603,6 +603,19 @@ skip:	switch (ip->m_mimecontent) {
 		pbuf = qbuf = obuf;
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
 		lineno++;
+		while (convert == CONV_FROMQP && line[linelen-2] == '=') {
+			char	*line2 = NULL;
+			size_t	linesize2 = 0, linelen2;
+			if (foldergets(&line2, &linesize2, &count, &linelen2,
+						ibuf) == NULL)
+				break;
+			if (linelen + linelen2 + 1 > linesize)
+				line = srealloc(line, linesize = linelen +
+						linelen2 + 1);
+			memcpy(&line[linelen], line2, linelen2+1);
+			linelen += linelen2;
+			free(line2);
+		}
 		out(line, linelen, pbuf, convert, action,
 				prefix, prefixlen,
 				pbuf == origobuf ? stats : NULL);
