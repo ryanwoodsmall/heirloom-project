@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.184 (gritter) 9/5/04";
+static char sccsid[] = "@(#)imap.c	1.185 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -2447,18 +2447,7 @@ dopr(fp)
 	} else
 		strncpy(o, "sort", sizeof o)[sizeof o - 1] = '\0';
 	run_command(SHELL, 0, fileno(fp), fileno(out), "-c", o, NULL);
-	fflush(out);
-	rewind(out);
-	n = 0;
-	while ((c = getc(out)) != EOF)
-		if (c == '\n')
-			n++;
-	rewind(out);
-	if (n > scrnheight)
-		run_command(get_pager(), 0, fileno(out), -1, NULL, NULL, NULL);
-	else
-		while ((c = getc(out)) != EOF)
-			putchar(c);
+	try_pager(out);
 	Fclose(out);
 }
 

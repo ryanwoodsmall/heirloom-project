@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.61 (gritter) 9/5/04";
+static char sccsid[] = "@(#)cmd3.c	2.63 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -1219,13 +1219,29 @@ account(v)
 {
 	char	**args = (char **)v;
 	struct oldaccount	*a;
-	int	i;
+	char	*cp;
+	int	i, mc;
+	FILE	*fp = stdout;
 
 	if (args[0] == NULL) {
-		listaccounts();
+		if ((fp = Ftemp(&cp, "Ra", "w+", 0600, 1)) == NULL) {
+			perror("tmpfile");
+			return 1;
+		}
+		rm(cp);
+		Ftfree(&cp);
+		mc = listaccounts(fp);
 		for (a = oldaccounts; a; a = a->ac_next)
-			if (a->ac_name)
-				puts(a->ac_name);
+			if (a->ac_name) {
+				if (mc++)
+					fputc('\n', fp);
+				fprintf(fp, "%s:\n", a->ac_name);
+				for (i = 0; a->ac_vars[i]; i++)
+					fprintf(fp, "\t%s\n", a->ac_vars[i]);
+			}
+		if (mc)
+			try_pager(fp);
+		Fclose(fp);
 		return 0;
 	}
 	if (args[1] && args[1][0] == '{' && args[1][1] == '\0') {

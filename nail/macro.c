@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)macro.c	1.5 (gritter) 9/5/04";
+static char sccsid[] = "@(#)macro.c	1.7 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -80,6 +80,8 @@ static int	maexec __P((struct macro *));
 static unsigned	mahash __P((const char *));
 static struct macro	*malook __P((const char *, struct macro *,
 				struct macro **));
+static void	list0 __P((FILE *, struct line *));
+static int	list1 __P((FILE *, struct macro **));
 static void	freelines __P((struct line *));
 
 int
@@ -121,7 +123,7 @@ define1(name, account)
 				break;
 			if (n == 0 || linebuf[n-1] != '\\')
 				break;
-			linebuf[n-1] = ' ';
+			linebuf[n-1] = '\n';
 		}
 		if (n < 0) {
 			fprintf(stderr, "Unterminated %s definition: \"%s\".\n",
@@ -139,6 +141,7 @@ define1(name, account)
 		lp->l_linesize = n+1;
 		lp->l_line = smalloc(lp->l_linesize);
 		memcpy(lp->l_line, linebuf, lp->l_linesize);
+		lp->l_line[n] = '\0';
 		if (lst && lnd) {
 			lnd->l_next = lp;
 			lnd = lp;
@@ -251,13 +254,15 @@ maexec(mp)
 	struct macro	*mp;
 {
 	struct line	*lp;
-	char	*copy;
+	const char	*sp;
+	char	*copy, *cp;
 	int	r = 0;
 
 	unset_allow_undefined = 1;
 	for (lp = mp->ma_contents; lp; lp = lp->l_next) {
-		copy = smalloc(lp->l_linesize);
-		memcpy(copy, lp->l_line, lp->l_linesize);
+		cp = copy = smalloc(lp->l_linesize);
+		for (sp = lp->l_line; sp < &lp->l_line[lp->l_linesize]; sp++)
+			*cp++ = *sp != '\n' ? *sp : ' ';
 		r = execute(copy, 0, lp->l_linesize);
 		free(copy);
 	}
@@ -335,14 +340,74 @@ freelines(lp)
 }
 
 int
-listaccounts()
+listaccounts(fp)
+	FILE	*fp;
+{
+	return list1(fp, accounts);
+}
+
+static void
+list0(fp, lp)
+	FILE	*fp;
+	struct line	*lp;
+{
+	const char	*sp;
+	int	c;
+
+	for (sp = lp->l_line; sp < &lp->l_line[lp->l_linesize]; sp++) {
+		if ((c = *sp&0377) != '\0') {
+			if ((c = *sp&0377) == '\n')
+				putc('\\', fp);
+			putc(c, fp);
+		}
+	}
+	putc('\n', fp);
+}
+
+static int
+list1(fp, table)
+	FILE	*fp;
+	struct macro	**table;
 {
 	struct macro	**mp, *mq;
+	struct line	*lp;
+	int	mc = 0;
 
-	for (mp = accounts; mp < &accounts[MAPRIME]; mp++)
+	for (mp = table; mp < &table[MAPRIME]; mp++)
 		for (mq = *mp; mq; mq = mq->ma_next)
-			if (mq->ma_name)
-				puts(mq->ma_name);
+			if (mq->ma_name) {
+				if (mc++)
+					fputc('\n', fp);
+				fprintf(fp, "%s %s {\n",
+						table == accounts ?
+							"account" : "define",
+						mq->ma_name);
+				for (lp = mq->ma_contents; lp; lp = lp->l_next)
+					list0(fp, lp);
+				fputs("}\n", fp);
+			}
+	return mc;
+}
+
+/*ARGSUSED*/
+int
+cdefines(v)
+	void	*v;
+{
+	FILE	*fp;
+	char	*cp;
+	int	mc;
+
+	if ((fp = Ftemp(&cp, "Ra", "w+", 0600, 1)) == NULL) {
+		perror("tmpfile");
+		return 1;
+	}
+	rm(cp);
+	Ftfree(&cp);
+	mc = list1(fp, macros);
+	if (mc)
+		try_pager(fp);
+	Fclose(fp);
 	return 0;
 }
 

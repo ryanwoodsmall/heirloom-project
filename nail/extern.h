@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.92 (gritter) 9/5/04
+ *	Sccsid @(#)extern.h	2.94 (gritter) 9/5/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -392,12 +392,13 @@ int	cunkill __P((void *));
 int	cundraft __P((void *));
 int	cscore __P((void *));
 int	cdefine __P((void *));
+int	cdefines __P((void *));
 int	define1 __P((const char *, int));
 int	cundef __P((void *));
 void	delaccount __P((const char *));
 int	ccall __P((void *));
 int	callaccount __P((const char *));
-int	listaccounts __P((void));
+int	listaccounts __P((FILE *));
 int	callhook __P((const char *, int));
 int	cmove __P((void *));
 int	cMove __P((void *));
@@ -405,3 +406,4 @@ char	*colalign __P((const char *, int, int));
 int	cnoop __P((void *));
 enum okay	pop3_noop __P((void));
 enum okay	imap_noop __P((void));
+void	try_pager __P((FILE *));

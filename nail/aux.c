@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.61 (gritter) 9/4/04";
+static char sccsid[] = "@(#)aux.c	2.63 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -368,6 +368,28 @@ colalign(cp, col, fill)
 			*np++ = ' ';
 	*np = '\0';
 	return nb;
+}
+
+void
+try_pager(fp)
+	FILE	*fp;
+{
+	long	lines = 0;
+	int	c;
+	char	*cp;
+
+	fflush(fp);
+	rewind(fp);
+	while ((c = getc(fp)) != EOF)
+		if (c == '\n')
+			lines++;
+	rewind(fp);
+	if (is_a_tty[0] && is_a_tty[1] && (cp = value("crt")) != NULL &&
+			lines > (*cp ? atol(cp) : scrnheight))
+		run_command(get_pager(), 0, fileno(fp), -1, NULL, NULL, NULL);
+	else
+		while ((c = getc(fp)) != EOF)
+			putchar(c);
 }
 
 /*

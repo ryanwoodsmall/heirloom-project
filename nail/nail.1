@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.210 (gritter) 9/5/04
+.\"     Sccsid: @(#)nail.1	2.211 (gritter) 9/5/04
 .\"
 .TH NAIL 1 "9/5/04" "nail 11.6" "User Commands"
 .SH NAME
@@ -770,7 +770,7 @@ and a
 command is executed for the system mailbox or inbox
 of that account.
 Without arguments,
-the list of accounts is printed.
+the list of accounts and their contents are printed.
 As an example,
 .sp
 .nf
@@ -856,7 +856,7 @@ but saves the messages in a file named after the local part
 of the sender address of the first message.
 .TP
 .B define
-Defines a macro.
+(def) Defines a macro.
 A macro definition is a sequence of commands in the following form:
 .sp
 .nf
@@ -876,6 +876,9 @@ or can be implicitly invoked by setting the
 or
 .I folder-hook-fullname
 variables.
+.TP
+.B defines
+Prints the currently defined macros including their contents.
 .TP
 .B delete
 (d) Takes a list of messages as argument
