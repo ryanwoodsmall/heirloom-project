@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.295 (gritter) 3/19/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.296 (gritter) 3/19/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1080,7 +1080,7 @@ dooutp(void)
 		if ((mt = Aflag ? open(Oflag, O_RDWR, 0666) :
 					creat(Oflag, 0666)) < 0) {
 			if (sysv3) {
-				emsg(3, "Cannot open <%s> for %s.", Oflag,
+				emsg(013, "Cannot open <%s> for %s.", Oflag,
 					Aflag ? "append" : "output");
 				done(1);
 			} else
@@ -2215,9 +2215,11 @@ msg(int sev, int err, const char *fmt, ...)
 void
 emsg(int sev, const char *fmt, ...)
 {
-	int	i;
+	char	_fmt[60];
+	int	i, fl = sev & 030, n;
 	va_list	ap;
 
+	sev &= ~030;
 	i = errno;
 	if (tflag)
 		fflush(stdout);
@@ -2226,11 +2228,26 @@ emsg(int sev, const char *fmt, ...)
 	fprintf(stderr, "%s: ", progname);
 	sevprnt(sev);
 	va_start(ap, fmt);
+	if (sysv3) {
+		if (fmt[(n=strlen(fmt))-1] == '"' && fmt[n-2] == 's' &&
+				fmt[n-3] == '%' && fmt[n-4] == '"' &&
+				n < sizeof _fmt) {
+			strcpy(_fmt, fmt);
+			_fmt[n-1] = '>';
+			_fmt[n-4] = '<';
+			fmt = _fmt;
+		}
+	}
 	vfprintf(stderr, fmt, ap);
 	va_end(ap);
-	if (sysv3 && sev >= 0)
+	if (sysv3 > 0 && sev >= 0 && fl & 010)
 		fprintf(stderr, "\n\t%s\n", strerror(i));
-	else
+	else if (sysv3 < 0) {
+		if (fl & 020)
+			putc('\n', stderr);
+		else
+			fprintf(stderr, " (errno:%d)\n", i);
+	} else
 		fprintf(stderr, ", errno %d, %s\n", i, strerror(i));
 }
 
@@ -2623,12 +2640,14 @@ dopass(const char *target)
 	struct stat	st;
 
 	if (access(target, W_OK) < 0) {
-		emsg(3, sysv3 ? "cannot write in <%s>" :
+		emsg(033, sysv3 ? "cannot write in <%s>" :
 				"Error during access() of \"%s\"", target);
+		if (sysv3)
+			done(1);
 		usage();
 	}
 	if (stat(target, &st) < 0) {
-		emsg(3, "Error during stat() of \"%s\"", target);
+		emsg(023, "Error during stat() of \"%s\"", target);
 		done(1);
 	}
 	if ((st.st_mode&S_IFMT) != S_IFDIR)
@@ -2986,7 +3005,8 @@ linkunlink(const char *path1, const char *path2)
 			emsg(3, sysv3 ? "cannot unlink <%s>" :
 					"Error cannot unlink \"%s\"", path2);
 	} while (twice++ == 0);
-	emsg(3, "Cannot link \"%s\" and \"%s\"", path1, path2);
+	emsg(023, sysv3 ? "Cannot link <%s> & <%s>" :
+			"Cannot link \"%s\" and \"%s\"", path1, path2);
 	return -1;
 }
 
