@@ -31,6 +31,8 @@
   longer treated as the begin of a new part.
 * The makeconfig script and the installation instructions now include support
   for building nail with Mozilla NSS on Solaris.
+* Building IMAP GSSAPI authentication with Heimdal Kerberos libraries works
+  again.
 
 [11.14] released 11/4/04
 * A 'Z' command was introduced. It is similar to the 'z' command, but scrolls

@@ -38,20 +38,11 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.209 (gritter) 11/7/04";
+static char sccsid[] = "@(#)imap.c	1.210 (gritter) 11/8/04";
 #endif
 #endif /* not lint */
 
 #include "config.h"
-
-#include "rcv.h"
-#include "extern.h"
-#include <errno.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <time.h>
-
-#include "md5.h"
 
 /*
  * Mail -- a mail program
@@ -60,6 +51,24 @@ static char sccsid[] = "@(#)imap.c	1.209 (gritter) 11/7/04";
  */
 
 #ifdef	HAVE_SOCKETS
+
+#include "rcv.h"
+#include <errno.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
+
+#include "md5.h"
+
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#ifdef  HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif  /* HAVE_ARPA_INET_H */
+
+#include "extern.h"
+
 static int	verbose;
 
 #define	IMAP_ANSWER()	{ \
