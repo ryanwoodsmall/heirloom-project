@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)expr_s42.sl	1.24 (gritter) 7/13/04";
+static const char sccsid[] USED = "@(#)expr_s42.sl	1.25 (gritter) 1/31/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)expr_sus.sl	1.24 (gritter) 7/13/04";
+static const char sccsid[] USED = "@(#)expr_sus.sl	1.25 (gritter) 1/31/05";
 #else
-static const char sccsid[] USED = "@(#)expr.sl	1.24 (gritter) 7/13/04";
+static const char sccsid[] USED = "@(#)expr.sl	1.25 (gritter) 1/31/05";
 #endif
 
 /*	expression command */
@@ -319,9 +319,6 @@ ematch(char *s, register char *p)
 
 #ifdef	REG_ANGLES
 	reflags |= REG_ANGLES;
-#endif
-#ifdef	REG_BADRANGE
-	reflags |= REG_BADRANGE;
 #endif
 	if ((num = regcomp(&re, p, reflags)) != 0)
 		errxx(0);

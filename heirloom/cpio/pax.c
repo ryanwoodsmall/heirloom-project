@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pax.sl	1.17 (gritter) 1/23/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.18 (gritter) 1/31/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -606,7 +606,7 @@ parsesub(char *s)
 	s[-len] = '\0';
 	if (ren <= res)
 		rep = srealloc(rep, ++res * sizeof *rep);
-	if (regcomp(&rep[ren].r_re, ps, REG_ANGLES|REG_BADRANGE) != 0)
+	if (regcomp(&rep[ren].r_re, ps, REG_ANGLES) != 0)
 		msg(3, -2, "Regular expression error in \"-s\" option\n");
 	rep[ren].r_rhs = s;
 	rep[ren].r_nbra = nbra;

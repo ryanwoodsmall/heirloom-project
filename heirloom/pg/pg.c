@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.59 (gritter) 1/22/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.60 (gritter) 1/31/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.59 (gritter) 1/22/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.60 (gritter) 1/31/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1394,9 +1394,6 @@ comple(const char *pattern)
 #ifdef	REG_ANGLES
 				| REG_ANGLES	/* enable \< \> */
 #endif	/* REG_ANGLES */
-#ifdef	REG_BADRANGE
-				| REG_BADRANGE	/* enable [m-a] as [ma] */
-#endif	/* REG_BADRANGE */
 #ifdef	REG_ONESUB
 				| REG_ONESUB	/* need one match location */
 #endif	/* REG_ONESUB */

@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)nl_s42.sl	1.15 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)nl_s42.sl	1.16 (gritter) 1/31/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)nl_sus.sl	1.15 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)nl_sus.sl	1.16 (gritter) 1/31/05";
 #else
-static const char sccsid[] USED = "@(#)nl.sl	1.15 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)nl.sl	1.16 (gritter) 1/31/05";
 #endif
 
 #include	<unistd.h>
@@ -170,7 +170,7 @@ settype(struct type *tp, const char *s)
 	switch (s[0]) {
 	case 'p':
 #if defined (SUS) || defined (S42)
-		if ((i=regcomp(&tp->t_re, &s[1], REG_ANGLES|REG_BADRANGE))!=0) {
+		if ((i=regcomp(&tp->t_re, &s[1], REG_ANGLES))!=0) {
 			i = regemap(i);
 #else	/* !SUS, !S42 */
 		if ((tp->t_ep = compile(&s[1], 0, 0)) == 0) {

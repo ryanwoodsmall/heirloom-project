@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)csplit.sl	1.6 (gritter) 12/5/04";
+static const char sccsid[] USED = "@(#)csplit.sl	1.7 (gritter) 1/31/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -197,7 +197,7 @@ scan(char *s)
 #ifdef	SUS
 		args[ncur]->a_re = smalloc(sizeof *args[ncur]->a_re);
 		if (regcomp(args[ncur]->a_re, &s[1],
-				REG_ANGLES|REG_BADRANGE|REG_NOSUB) != 0)
+				REG_ANGLES|REG_NOSUB) != 0)
 #else
 		if ((args[ncur]->a_re = compile(&s[1], 0, 0)) == 0)
 #endif

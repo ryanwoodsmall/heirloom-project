@@ -46,13 +46,9 @@ install:
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
-	for i in basename chmod du lc ln ls more mv nohup page pr rm rmdir sort touch tr who xargs; \
+	for i in basename chmod du lc ln ls more mv nohup page pr rm rmdir sort touch tr who; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
-	done
-	for i xargs; \
-	do \
-		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(SUSBIN)/$$i $(ROOT); \
 	done
 	for i in apropos expand hostname man printenv renice tcopy ul unexpand uptime users w whoami whatis; \
 	do \

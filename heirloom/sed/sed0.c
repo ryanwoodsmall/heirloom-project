@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed0.c	1.59 (gritter) 7/24/04>	*/
+/*	Sccsid @(#)sed0.c	1.60 (gritter) 1/31/05>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -1103,9 +1103,6 @@ sed_compile(char **ep)
 #ifdef	REG_ANGLES
 		reflags |= REG_ANGLES;
 #endif	/* REG_ANGLES */
-#ifdef	REG_BADRANGE
-		reflags |= REG_BADRANGE;
-#endif	/* REG_BADRANGE */
 		if (regcomp(&re->r_preg, pat, reflags) != 0)
 			re = (struct re_emu *)badp;
 	} else

@@ -48,11 +48,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.81 (gritter) 12/13/04";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.82 (gritter) 1/31/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.81 (gritter) 12/13/04";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.82 (gritter) 1/31/05";
 #else	/* !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.81 (gritter) 12/13/04";
+static const char sccsid[] USED = "@(#)ed.sl	1.82 (gritter) 1/31/05";
 #endif	/* !SUS, !S42 */
 
 #include <sys/types.h>
@@ -2637,9 +2637,6 @@ compile(char *unused, char *ep, const char *endbuf, int seof)
 
 #ifdef	REG_ANGLES
 		reflags |= REG_ANGLES;
-#endif
-#ifdef	REG_BADRANGE
-		reflags |= REG_BADRANGE;
 #endif
 		if (op[0])
 			regfree(rp);
