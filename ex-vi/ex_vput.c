@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.47 (gritter) 2/4/05";
+static char sccsid[] = "@(#)ex_vput.c	1.48 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -374,7 +374,9 @@ vgoto(register int y, register int x)
 	}
 #ifdef	MB
 	if (y >= 0 && y <= WLINES && mb_cur_max > 1 && !insmode) {
-		while (x > 0 && (vtube[y][x]&(MULTICOL|TRIM)) == MULTICOL)
+		while (x > 0 && (vtube[y][x]&(MULTICOL|TRIM)) == MULTICOL &&
+				vtube[y][x-1] & MULTICOL &&
+				(vtube[y][x-1]&(MULTICOL|TRIM)) != MULTICOL)
 			x--;
 	}
 #endif	/* MB */
@@ -586,6 +588,7 @@ vinschar(int c)
 	register cell *tp;
 	char	*OIM;
 	bool	OXN;
+	int	noim;
 
 	insmc1 = colsc(c) - 1;
 	if ((!IM || !EI) && ((hold & HOLDQIK) || !value(REDRAW) || value(SLOWOPEN))) {
@@ -739,15 +742,19 @@ vinschar(int c)
 			tabend, tabslack, linend);
 	}
 #endif
-	/*
-	 * This code was used to temporarily disable insert mode for
-	 * multi-column characters because of a bug in a terminal program
-	 * used for development that has been fixed in the meantime. It
-	 * remains here just in case similar problems occur again.
-	 */
 	OIM = IM;
 	OXN = XN;
-	if (0 && insmc1) {
+	noim = 0;
+#ifdef	MB
+	if (mb_cur_max > 1) {
+		for (i = inscol; vtube0[i]; i++)
+			if (i + 1 >= WCOLS && vtube0[i] & MULTICOL) {
+				noim = 1;
+				break;
+			}
+	}
+#endif	/* MB */
+	if (noim) {
 		endim();
 		IM = 0;
 		XN = 0;
@@ -1072,8 +1079,8 @@ viin(int c)
 		 *
 		 * You asked for it, you get it.
 		 */
-		tp = vtube0 + inscol + insmc0 + doomed;
-		for (i = inscol + insmc0 + doomed; i < tabstart; i++)
+		tp = vtube0 + inscol + doomed;
+		for (i = inscol + doomed; i < tabstart; i++)
 			vputchar(*tp++);
 		hold = oldhold;
 		vigotoCL(tabstart + inssiz + insmc0 - doomed);
@@ -1235,6 +1242,26 @@ vputchar(register int c)
 	/* Fix problem of >79 chars on echo line. */
 	if (destcol >= WCOLS-1 && splitw && destline == WECHO)
 		pofix();
+#ifdef	MB
+	if (mb_cur_max > 1) {
+		if (c == MULTICOL)
+			return c;
+		/*
+		 * If a multicolumn character extends beyond the screen
+		 * width, it must be put on the next line. A tilde is
+		 * printed as an indicator but must disappear when the
+		 * text is moved at a later time.
+		 */
+		if (c == ('~'|INVBIT|QUOTE))
+			c = '~'|INVBIT;
+		else if (c == ('~'|INVBIT))
+			return c;
+		else if (destcol < WCOLS && destcol +
+				colsc(c==QUOTE ? ' ' : c&TRIM&~MULTICOL) - 1
+				>= WCOLS)
+			vputchar('~'|INVBIT|QUOTE);
+	}
+#endif	/* MB */
 	if (destcol >= WCOLS) {
 		destline += destcol / WCOLS;
 		destcol %= WCOLS;
@@ -1312,7 +1339,7 @@ def:
 		 * and if we are in hardopen, that the terminal has overstrike.
 		 */
 		if ((d & ~MULTICOL) == (c & TRIM & ~MULTICOL) && !insmode &&
-				(state != HARDOPEN || OS)) {
+				(state != HARDOPEN || OS) && c != MULTICOL) {
 			n = colsc(d);
 			for (m = 1; m < n; m++)
 				if ((tp[m] & (MULTICOL|TRIM)) != MULTICOL)
@@ -1422,16 +1449,14 @@ def:
 		}
 	}
 #ifdef	MB
-	if (mb_cur_max > 1 && (d = colsc(c&TRIM)) > 1) {
-		if ((*tp&MULTICOL) == 0) {
+	if (mb_cur_max > 1 && (d = colsc(c&TRIM&~MULTICOL)) > 1) {
+		if ((hold & HOLDPUPD) == 0)
+			*tp |= MULTICOL;
+		while (--d) {
 			if ((hold & HOLDPUPD) == 0)
-				*tp |= MULTICOL;
-			while (--d) {
-				if ((hold & HOLDPUPD) == 0)
-					*++tp = MULTICOL;
-				destcol++;
-				outcol++;
-			}
+				*++tp = MULTICOL;
+			destcol++;
+			outcol++;
 		}
 	}
 #endif	/* MB */

@@ -10,7 +10,7 @@ changes were made to get closer to the POSIX.2 guidelines for ex and
 vi. Some issues that were clearly bugs and not features have also been
 resolved; see the Changes file for details.
 
-New releases are announced on Fresmeat. If you want to get
+New releases are announced on Freshmeat. If you want to get
 notified by email on each release, use their subscription service at
 <http://freshmeat.net/projects/vi/>.
 
@@ -110,7 +110,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						1/29/05
+Gunnar Ritter						2/15/05
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>

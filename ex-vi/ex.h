@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	@(#)ex.h	1.49 (gritter) 1/13/05
+ *	@(#)ex.h	1.50 (gritter) 2/13/05
  */
 
 /*
@@ -437,6 +437,7 @@ var	bool	verbose;	/* -V option; print command input to stderr */
 var	JMP_BUF	vreslab;	/* For error throws to a visual catch */
 var	bool	writing;	/* 1 if in middle of a file write */
 var	int	xchng;		/* Suppresses multiple "No writes" in !cmd */
+var	int	failed;		/* exit with a non-zero status */
 
 /*
  * Macros

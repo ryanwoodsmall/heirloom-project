@@ -6,6 +6,8 @@ Release ...
   was continued after vi had been stopped by ^Z, with the cursor positioned
   in a line longer than the terminal width as the last line of the current
   screen.
+* Made multicolumn characters work in lines longer than the screen width in
+  visual mode (Bugreport by Matthew Fischer).
 * Made it work for Big5 locales (Patches by Matthew Fischer).
 * Fixed a problem with the 'r' command in EUC-JP and Big5 locales (Bugreport
   by Matthew Fischer).
@@ -13,6 +15,11 @@ Release ...
   locales now works with terminals that have the 'ic' but no 'im' termcap
   capability (Bugreport by Matthew Fischer).
 * The argument to the -w option is correctly recognized now.
+* If the SHELL environment variable is set to the empty string, it is now
+  ignored.
+* A non-null exit status is now returned if a file could not be opened.
+* If the match for a substitution is of length zero, a line overflow is
+  now avoided when compiled with the 'UNIX(R) Regular Expression Library'.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now

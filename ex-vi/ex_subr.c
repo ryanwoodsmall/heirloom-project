@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_subr.c	1.34 (gritter) 1/13/05";
+static char sccsid[] = "@(#)ex_subr.c	1.36 (gritter) 2/15/05";
 #endif
 #endif
 
@@ -659,12 +659,20 @@ qcolumn(register char *lim, register char *gp)
 int 
 qcount(int c)
 {
+	int	sc;
 
 	if (c == '\t') {
 		vcntcol += value(TABSTOP) - vcntcol % value(TABSTOP);
 		return c;
 	}
-	vcntcol += c & MULTICOL ? 1 : colsc(c);
+	/*
+	 * Take account of filler characters inserted at the end of
+	 * the visual line if a multi-column character does not fit.
+	 */
+	sc = colsc(c);
+	while (vcntcol < WCOLS && vcntcol + sc - 1 >= WCOLS)
+		vcntcol++;
+	vcntcol += c & MULTICOL ? 1 : sc;
 	return c;
 }
 
@@ -1025,6 +1033,8 @@ exitex(int i)
 	if (trace)
 		fclose(trace);
 # endif
+	if (failed != 0 && i == 0)
+		i = failed;
 	_exit(i);
 	/*NOTREACHED*/
 	return 0;

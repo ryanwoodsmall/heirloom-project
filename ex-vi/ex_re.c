@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.44 (gritter) 1/9/05";
+static char sccsid[] = "@(#)ex_re.c	1.45 (gritter) 2/13/05";
 #endif
 #endif
 
@@ -682,6 +682,12 @@ ovflo:
 	}
 	lp = loc2;
 	loc2 = sp + (linebuf - genbuf);
+#ifdef	UXRE
+	if (loc1 == lp) {
+		nextc(c, loc2, n);
+		loc2 += n;
+	}
+#endif	/* UXRE */
 	while (*sp++ = *lp++)
 		if (sp >= &genbuf[LBSIZE])
 			goto ovflo;

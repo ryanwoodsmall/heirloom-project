@@ -77,7 +77,7 @@ char *copyright =
 "@(#) Copyright (c) 1980 Regents of the University of California.\n\
  All rights reserved.\n";
 
-static char sccsid[] = "@(#)ex.c	1.35 (gritter) 2/13/05";
+static char sccsid[] = "@(#)ex.c	1.36 (gritter) 2/13/05";
 #endif	/* DOSCCS */
 #endif	/* !lint */
 
@@ -565,7 +565,7 @@ argend:
 		setrupt();
 		intty = isatty(0);
 		value(PROMPT) = intty;
-		if (cp = getenv("SHELL"))
+		if ((cp = getenv("SHELL")) != NULL && *cp != '\0')
 			safecp(shell, cp, sizeof shell, "$SHELL too long");
 		if (fast || !intty)
 			setterm("dumb");

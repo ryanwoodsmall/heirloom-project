@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_io.c	1.37 (gritter) 12/2/04";
+static char sccsid[] = "@(#)ex_io.c	1.38 (gritter) 2/13/05";
 #endif
 #endif
 
@@ -428,6 +428,7 @@ rop(int c)
 				return;
 			}
 		}
+		failed = 1;
 		syserror();
 	}
 	if (fstat(io, &stbuf))
