@@ -6,8 +6,12 @@
   you have to delete your junk mail database and have to create it again.
 * For junk mail detection, fields of MIME part headers are now handled like
   fields of the main header.
-* For junk mail detection, most HTML tags are now ignored, as proposed in
-  Paul Graham's 'Better Bayesian Filtering'.
+* For junk mail detection, most HTML tags are now ignored, similar to the
+  proposal in Paul Graham's 'Better Bayesian Filtering'.
+* When the junk mail database is updated, it is now truncated beyond the
+  last byte just written. Previously, stale data could have remained after
+  this point, which was no problem for nail itself, but could make zcat(1)
+  fail on the file.
 * The 'answered', 'classify, 'draft', 'flag', 'good', 'junk', 'undraft',
   'unflag', and 'unkill' command now make their argument the current
   message. This is now also done by the 'score' command unless the new

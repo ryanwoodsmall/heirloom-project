@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.44 (gritter) 10/24/04";
+static char sccsid[] = "@(#)junk.c	1.45 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -307,6 +307,8 @@ putdb(void)
 	} else
 		fwrite(nodes, 1,
 			getn(&super[OF_super_size]) * SIZEOF_node, nfp);
+	trunc(sfp);
+	trunc(nfp);
 	safe_signal(SIGINT, saveint);
 	Fclose(sfp);
 	Fclose(nfp);
