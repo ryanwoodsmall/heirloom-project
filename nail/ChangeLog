@@ -1,4 +1,6 @@
 [11.21] released ...
+* When mail is sent using SMTP, 'Bcc:' fields are not passed to the
+  server anymore (Bugreport by Matthew Fischer.)
 * The new 'sendcharsets' variable was incorrectly named 'charsets' in
   nail.rc in the last version. If nail 11.20 was the first version of
   nail you ever installed, you should correct this by hand since the

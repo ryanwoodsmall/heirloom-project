@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.79 (gritter) 1/10/05";
+static char sccsid[] = "@(#)sendout.c	2.80 (gritter) 1/19/05";
 #endif
 #endif /* not lint */
 
@@ -771,8 +771,7 @@ start_mta(struct name *to, struct name *mailargs, FILE *input)
 			printf("\n");
 			return OKAY;
 		}
-	} else if (debug || value("debug"))
-		return OKAY;
+	}
 	/*
 	 * Fork, set up the temporary mail file as standard
 	 * input for "mail", and exec with the user list we generated
@@ -811,7 +810,8 @@ start_mta(struct name *to, struct name *mailargs, FILE *input)
 				". . . message not sent.\n"), stderr);
 		_exit(1);
 	}
-	if (value("verbose") != NULL || value("sendwait")) {
+	if (value("verbose") != NULL || value("sendwait") || debug
+			|| value("debug")) {
 		if (wait_child(pid) == 0)
 			ok = OKAY;
 		else

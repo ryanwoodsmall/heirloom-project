@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.30 (gritter) 10/30/04";
+static char sccsid[] = "@(#)smtp.c	2.31 (gritter) 1/19/05";
 #endif
 #endif /* not lint */
 
@@ -66,6 +66,7 @@ static char sccsid[] = "@(#)smtp.c	2.30 (gritter) 10/30/04";
 
 #ifdef	HAVE_SOCKETS
 static int verbose;
+static int _debug;
 #endif
 
 /*
@@ -189,7 +190,7 @@ read_smtp(struct sock *sp, int value)
 					"Unexpected EOF on SMTP connection\n"));
 			return 5;
 		}
-		if (verbose)
+		if (verbose || debug || _debug)
 			fputs(smtpbuf, stderr);
 		switch (*smtpbuf) {
 		case '1': ret = 1; break;
@@ -208,16 +209,16 @@ read_smtp(struct sock *sp, int value)
 /*
  * Macros for talk_smtp.
  */
-#define	SMTP_ANSWER(x)	if (read_smtp(sp, x) != (x)) { \
-				swrite(sp, "QUIT\r\n"); \
+#define	SMTP_ANSWER(x)	if (!debug && !_debug && read_smtp(sp, x) != (x)) { \
 				if (b != NULL) \
 					free(b); \
 				return 1; \
 			}
 
-#define	SMTP_OUT(x)	if (verbose) \
+#define	SMTP_OUT(x)	if (verbose || debug || _debug) \
 				fprintf(stderr, ">>> %s", x); \
-			swrite(sp, x);
+			if (!debug && !_debug) \
+				swrite(sp, x);
 
 /*
  * Talk to a SMTP server.
@@ -231,6 +232,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	size_t blen, bsize = 0, count;
 	char	*user, *password, *b64, *skinned, *authstr, *cp;
 	enum	{ AUTH_NONE, AUTH_LOGIN, AUTH_CRAM_MD5 } auth;
+	int	inhdr = 1, inbcc = 0;
 
 	skinned = skin(myaddr());
 	user = auth_var("-user", skinned);
@@ -260,7 +262,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 		SMTP_ANSWER(2);
 		SMTP_OUT("STARTTLS\r\n");
 		SMTP_ANSWER(2);
-		if (ssl_open(server, sp, uhp) != OKAY)
+		if (!debug && !_debug && ssl_open(server, sp, uhp) != OKAY)
 			return 1;
 	}
 #else	/* !USE_SSL */
@@ -321,8 +323,32 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	rewind(fi);
 	count = fsize(fi);
 	while (fgetline(&b, &bsize, &count, &blen, fi, 1) != NULL) {
-		if (*b == '.')
-			swrite1(sp, ".", 1, 1);
+		if (inhdr) {
+			if (*b == '\n') {
+				inhdr = 0;
+				inbcc = 0;
+			} else if (inbcc && blankchar(*b & 0377))
+				continue;
+			/*
+			 * We know what we have generated first, so
+			 * do not look for whitespace before the ':'.
+			 */
+			else if (ascncasecmp(b, "bcc: ", 5) == 0) {
+				inbcc = 1;
+				continue;
+			} else
+				inbcc = 0;
+		}
+		if (*b == '.') {
+			if (debug || _debug)
+				putc('.', stderr);
+			else
+				swrite1(sp, ".", 1, 1);
+		}
+		if (debug || _debug) {
+			fprintf(stderr, ">>> %s", b);
+			continue;
+		}
 		b[blen-1] = '\r';
 		b[blen] = '\n';
 		swrite1(sp, b, blen+1, 1);
@@ -347,6 +373,7 @@ smtp_mta(char *server, struct name *to, FILE *fi)
 
 	memset(&so, 0, sizeof so);
 	verbose = value("verbose") != NULL;
+	_debug = value("debug") != NULL;
 	if (strncmp(server, "smtp://", 7) == 0) {
 		use_ssl = 0;
 		server += 7;
@@ -357,12 +384,13 @@ smtp_mta(char *server, struct name *to, FILE *fi)
 #endif
 	} else
 		use_ssl = 0;
-	if (sopen(server, &so, use_ssl, server, use_ssl ? "smtps" : "smtp",
-				verbose) != OKAY)
+	if (!debug && !_debug && sopen(server, &so, use_ssl, server,
+				use_ssl ? "smtps" : "smtp", verbose) != OKAY)
 		return 1;
 	so.s_desc = "SMTP";
 	ret = talk_smtp(to, fi, &so, server, server);
-	sclose(&so);
+	if (!debug && !_debug)
+		sclose(&so);
 	if (smtpbuf) {
 		free(smtpbuf);
 		smtpbuf = NULL;
