@@ -1,7 +1,7 @@
 Release ...
-* tr: The highest acceptable character for complementing strings has
-  been reset from 0x10FFFF to 0xFFFF again since tr otherwise simply
-  needs to much computing time.
+* tr: The highest acceptable wide character for complementing strings is now
+  dynamically reset from 0x10FFFF to 0xFFFF if memory is sparse. The size of
+  the corresponding hash table has been raised to reduce computing time.
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and

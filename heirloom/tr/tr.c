@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	1.27 (gritter) 1/7/05";
+static const char sccsid[] USED = "@(#)tr_sus.sl	1.28 (gritter) 1/7/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.27 (gritter) 1/7/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.28 (gritter) 1/7/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	1.27 (gritter) 1/7/05";
+static const char sccsid[] USED = "@(#)tr.sl	1.28 (gritter) 1/7/05";
 #endif
 
 #include	<unistd.h>
@@ -67,6 +67,15 @@ static const char sccsid[] USED = "@(#)tr.sl	1.27 (gritter) 1/7/05";
 #define	putchar(c)	_IO_putc_unlocked(c, stdout)
 #endif
 
+#define	BORDER0	0xFFL		/* single-byte limit */
+#define	BORDER1	0xFFFFL		/* Unicode BMP limit */
+#define	BORDER2	0x10FFFFL	/* Unicode limit */
+
+#define	HBITS0	8		/* singlebyte hash table bits */
+#define	HBITS1	14		/* multibyte hash table bits */
+
+#define	OOM	((struct item *)-1)	/* out of memory indicator */
+
 struct	elem {			/* parsed elements and :class: lists */
 	struct elem	*e_nxt;
 	enum {
@@ -87,15 +96,17 @@ struct	item {			/* hash table item */
 	wint_t		i_out;	/* translated character (if any) */
 };
 
+#define	HBITS		14
+
 struct	store {			/* check for presence of characters */
-	struct item	*s_htab[256];	/* hash table with wide characters */
+	struct item	**s_htab;	/* hash table with wide characters */
 	char		s_ctab[256];	/* singlebyte characters */
 	struct elem	*s_chain;	/* list of :class: elements */
 	int		s_compl;	/* complement values */
 };
 
 struct	trans {			/* translate characters */
-	struct item	*t_htab[256];	/* hash table with wide characters */
+	struct item	**t_htab;	/* hash table with wide characters */
 	char		t_ctab[256];	/* singlebyte characters */
 	struct elem	*t_chain;	/* list of :class: elements */
 };
@@ -122,7 +133,9 @@ static struct store	*deltab;	/* deletion table */
 static struct store	*squeeztab;	/* squeez table */
 static int		multibyte;	/* multibyte LC_CTYPE */
 static unsigned long	borderc;	/* highest fully supported character */
+static int		hbits;		/* size of hash tables is 1<<hbits */
 static struct iblok	*input;		/* input buffer structure */
+static void		*reserve;	/* reserver for OOM condition */
 
 #define	peek(wc, s)	(multibyte ? mbtowc(&(wc), s, MB_LEN_MAX) :\
 				((wc) = *(s) & 0377, (wc) != 0))
@@ -174,7 +187,7 @@ smalloc(size_t nbytes)
 	return srealloc(NULL, nbytes);
 }
 
-#define	hash(c)	((uint32_t)(2654435769U * (uint32_t)(c) >> 24))
+#define	hash(c)	((uint32_t)(2654435769U * (uint32_t)(c) >> (32-hbits)))
 
 static struct item *
 lookup(wint_t wc, struct item **it, int make)
@@ -189,7 +202,22 @@ lookup(wint_t wc, struct item **it, int make)
 		ip = ip->i_nxt;
 	}
 	if (make && ip == NULL) {
-		ip = scalloc(1, sizeof *ip);
+		if ((ip = calloc(1, sizeof *ip)) == NULL) {
+			if (borderc == BORDER2 && reserve) {
+				/*
+				 * Not enough memory to cover all of Unicode.
+				 * Fall back to BMP limit. Reserve memory has
+				 * been allocated previously and must now be
+				 * free'd; this is necessary because ib_getw()
+				 * will need some memory left.
+				 */
+				free(reserve);
+				borderc = BORDER1;
+				return OOM;
+			}
+			write(2, "no memory\n", 10);
+			exit(077);
+		}
 		ip->i_in = wc;
 		ip->i_nxt = it[h];
 		it[h] = ip;
@@ -230,6 +258,8 @@ dotrans(wint_t wc, struct trans *tp)
 
 	if ((ip = lookup(wc, tp->t_htab, 0)) != NULL)
 		return ip->i_out;
+	if (ip == OOM)
+		return wc;
 	for (ep = tp->t_chain; ep; ep = ep->e_nxt) {
 		switch (ep->e_type) {
 		case E_UPPER:
@@ -273,6 +303,7 @@ mktrans(const char *s1, const char *s2, int compl)
 	a1 = mkarg(s1, compl, 1);
 	a2 = mkarg(s2, 0, 2);
 	tp = scalloc(1, sizeof *tp);
+	tp->t_htab = scalloc(1<<hbits, sizeof *tp->t_htab);
 	if (!multibyte) {
 		int	c;
 
@@ -286,7 +317,8 @@ mktrans(const char *s1, const char *s2, int compl)
 				tp->t_ctab[e1->e_data.e_chr] =
 					(char)e2->e_data.e_chr;
 			ip = lookup(e1->e_data.e_chr, tp->t_htab, 1);
-			ip->i_out = e2->e_data.e_chr;
+			if (ip != OOM)
+				ip->i_out = e2->e_data.e_chr;
 			free(e1);
 			free(e2);
 		} else if ((e1->e_type == E_UPPER && e2->e_type == E_LOWER) ||
@@ -337,8 +369,10 @@ have(wint_t wc, struct store *sp)
 {
 	int	yes;
 	struct elem	*ep;
+	struct item	*ip;
 
-	if ((yes = (lookup(wc, sp->s_htab, 0) != NULL)) == 0) {
+	if ((yes = ((ip = lookup(wc, sp->s_htab, 0)) != NULL &&
+			ip != OOM)) == 0) {
 		for (ep = sp->s_chain; ep && yes == 0; ep = ep->e_nxt) {
 			switch (ep->e_type) {
 			default:
@@ -363,6 +397,7 @@ mkstore(const char *s, int compl)
 	if (s == NULL)
 		return NULL;
 	sp = scalloc(1, sizeof *sp);
+	sp->s_htab = scalloc(1<<hbits, sizeof *sp->s_htab);
 	sp->s_compl = compl;
 	if (compl && !multibyte) {
 		int	c;
@@ -849,7 +884,10 @@ main(int argc, char **argv)
 	/*setlocale(LC_COLLATE, "");*/
 	setlocale(LC_CTYPE, "");
 	multibyte = MB_CUR_MAX > 1;
-	borderc = multibyte ? /*0x10FFFF*/ 0xFFFF : 255;
+	borderc = multibyte ? BORDER2 : BORDER0;
+	hbits = multibyte ? HBITS1 : HBITS0;
+	if (multibyte)
+		reserve = smalloc(0xFFFF);
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
 		case 'c':
