@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.34 (gritter) 10/3/04";
+static char sccsid[] = "@(#)junk.c	1.35 (gritter) 10/3/04";
 #endif
 #endif /* not lint */
 
@@ -71,21 +71,40 @@ static char sccsid[] = "@(#)junk.c	1.34 (gritter) 10/3/04";
 #define	MAX3	0x00ffffffUL
 #define	MAX4	0xffffffffUL
 
+/*
+ * The dictionary consists of two files forming a hash table. The hash
+ * consists of the first 32 bits of the result of applying MD5 to the
+ * input word. This scheme ensures that collisions are unlikely enough
+ * to make junk detection work, since the number of actually important
+ * words is relatively small. (Experiments indicated that it still
+ * worked acceptably even if only 19 bits were used.)
+ *
+ * On the other hand, using 32 bits makes it nearly impossible to derive
+ * reasonably well chosen secret tokens like passwords from the database,
+ * since e.g. all six-character ASCII alphanumeric words already map to
+ * each possible hash thirteen times. Testing for occurences of randomly
+ * chosen tokens will therefore likely not give useful results.
+ *
+ * To make the chain structure independent from input, the MD5 output is
+ * xor'ed with a random number. This makes it impossible that someone uses
+ * a carefully crafted message for a denial-of-service attack against the
+ * database.
+ */
 static struct node {
-	char	hash[4];
-	char	next[4];
-	char	good[3];
-	char	bad[3];
-	char	prob[3];
+	char	hash[4];	/* mangled first 32 bits of MD5 of word */
+	char	next[4];	/* bit-negated table index of next node */
+	char	good[3];	/* number of times this appeared in good msgs */
+	char	bad[3];		/* number of times this appeared in bad msgs */
+	char	prob[3];	/* transformed floating-point probability */
 } *nodes;
 
 static struct super {
-	char	size[4];
-	char	used[4];
-	char	ngood[4];
-	char	nbad[4];
-	char	shuffle[4];
-	char	bucket[65536][4];
+	char	size[4];	/* allocated nodes in the chain file */
+	char	used[4];	/* used nodes in the chain file */
+	char	ngood[4];	/* number of good messages scanned so far */
+	char	nbad[4];	/* number of bad messages scanned so far */
+	char	mangle[4];	/* used to mangle the MD5 hash */
+	char	bucket[65536][4];	/* bit-negated node indices */
 } *super;
 
 #define	get(e)	\
@@ -156,7 +175,7 @@ enum entry {
 
 static const char	README1[] = "\
 This is a junk mail database maintained by nail(1). It does not contain any\n\
-of the actual words found in your messages. Instead, parts of shuffled MD5\n\
+of the actual words found in your messages. Instead, parts of mangled MD5\n\
 hashes are used for lookup. It is thus possible to tell if some given word\n\
 was likely contained in your mail from examining this data, at best.\n";
 static const char	README2[] = "\n\
@@ -181,7 +200,7 @@ static int insert(int *msgvec, enum entry entry);
 static void clsf(struct message *m);
 static void rate(const char *word, enum entry entry, struct lexstat *sp);
 static unsigned long dbhash(const char *word);
-static void mkshuffle(void);
+static void mkmangle(void);
 
 static enum okay 
 getdb(void)
@@ -203,7 +222,7 @@ getdb(void)
 				ferror(sfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(super, 0, sizeof *super);
-			mkshuffle();
+			mkmangle();
 			if (compressed)
 				zfree(zp);
 			Fclose(sfp);
@@ -212,7 +231,7 @@ getdb(void)
 			zfree(zp);
 	} else {
 		memset(super, 0, sizeof *super);
-		mkshuffle();
+		mkmangle();
 	}
 	if ((n = getn(super->size)) == 0) {
 		n = 1;
@@ -235,7 +254,7 @@ getdb(void)
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(nodes, 0, n * sizeof *nodes);
 			memset(super, 0, sizeof *super);
-			mkshuffle();
+			mkmangle();
 			putn(super->size, n);
 		}
 		if (compressed)
@@ -528,6 +547,15 @@ loop:	i = 0;
 			}
 		if (c == i)
 			goto loop;
+		/*
+		 * Including the results of other filtering software (the
+		 * 'X-Spam' fields) might seem tempting, but will also rate
+		 * their false negatives good with this filter. Therefore
+		 * these fields are ignored.
+		 *
+		 * Handling 'Received' fields is difficult since they include
+		 * lots of both useless and interesting words for our purposes.
+		 */
 		if (sp->loc == HEADER &&
 				(asccasecmp(sp->field, "message-id*") == 0 ||
 				 asccasecmp(sp->field, "references*") == 0 ||
@@ -786,6 +814,12 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 		for (i = 0; i < BEST; i++) {
 			if (h == best[i].hash)
 				break;
+			/*
+			 * This selection prefers words from the end of the
+			 * header and from the start of the body. It does
+			 * probably not matter much at all, but gives at
+			 * least the most interesting verbose output.
+			 */
 			if (d > best[i].dist || best[i].loc == HEADER &&
 					d >= best[i].dist) {
 				for (j = BEST-2; j >= i; j--)
@@ -810,12 +844,19 @@ dbhash(const char *word)
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char *)word, strlen(word));
 	MD5Final(digest, &ctx);
-	h = getn(digest) ^ getn(super->shuffle);
+	h = getn(digest) ^ getn(super->mangle);
 	return h;
 }
 
+/*
+ * The selection of the value for mangling is not critical. It is practically
+ * impossible for any person to determine the exact time when the database
+ * was created first (without looking at the database, which would reveal the
+ * value anyway), so we just use this. The MD5 hash here ensures that each
+ * single second gives a completely different mangling value.
+ */
 static void 
-mkshuffle(void)
+mkmangle(void)
 {
 	union {
 		time_t	t;
@@ -831,5 +872,5 @@ mkshuffle(void)
 	MD5Update(&ctx, (unsigned char *)u.c, sizeof u.c);
 	MD5Final(digest, &ctx);
 	s = getn(digest);
-	putn(super->shuffle, s);
+	putn(super->mangle, s);
 }
