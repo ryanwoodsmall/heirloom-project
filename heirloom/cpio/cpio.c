@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.290 (gritter) 3/1/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.291 (gritter) 3/8/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -508,7 +508,9 @@ union zextra {
 		char	ze_gn_tag[2];
 		char	ze_gn_tsize[2];
 	} Ze_gn;
-#define	SIZEOF_zextra_64	32
+#define	SIZEOF_zextra_64	32		/* regular size */
+#define	SIZEOF_zextra_64_a	28		/* size without startn field */
+#define	SIZEOF_zextra_64_b	20		/* size without reloff field */
 	struct	zextra_64 {
 		char	ze_64_tag[2];
 		char	ze_64_tsize[2];
@@ -5611,7 +5613,9 @@ ziprxtra(struct file *f, struct zip_header *z)
 			size = (ple16(xp->Ze_gn.ze_gn_tsize)&0177777) + 4;
 			switch (tag) {
 			case mag_zip64f:	/* ZIP64 extended information */
-				if (size != SIZEOF_zextra_64)
+				if (size != SIZEOF_zextra_64 &&
+						size != SIZEOF_zextra_64_a &&
+						size != SIZEOF_zextra_64_b)
 					break;
 				if (f->f_st.st_size == 0xffffffff)
 					f->f_st.st_size =

@@ -31,6 +31,8 @@ Release ...
 * cpio: Specifying -i, -o, or -p twice is no longer considered an error.
 * shl: When the LNEXT terminal special character is given twice, it is now
   passed to the terminal buffer properly.
+* cpio: Accept smaller zip64 extra headers which are created by some other
+  zip archivers.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
