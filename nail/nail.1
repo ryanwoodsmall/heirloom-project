@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.270 (gritter) 11/3/04
+.\"     Sccsid: @(#)nail.1	2.271 (gritter) 11/3/04
 .\"
 .TH NAIL 1 "11/3/04" "nail 11.14" "User Commands"
 .SH NAME
@@ -2527,7 +2527,10 @@ classified as junk.
 The default is `NUROSPMFATK+\-J',
 or `NU\ \ *HMFATK+\-J' if
 .I bsdflags
-is set.
+or the
+.I SYSV3
+environment variable
+are set.
 .TP
 .B autobcc
 Specifies a list of recipients to which
@@ -3328,6 +3331,9 @@ If this variable is set and
 .I MAILRC
 is not set,
 it is read as startup file.
+.TP
+.B SYSV3
+Changes the letters printed in the first column of a header summary.
 .TP
 .B TMPDIR
 Used as directory for temporary files instead of /tmp, if set.

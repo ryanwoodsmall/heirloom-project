@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.53 (gritter) 10/24/04";
+static char sccsid[] = "@(#)list.c	2.54 (gritter) 11/4/04";
 #endif
 #endif /* not lint */
 
@@ -194,7 +194,7 @@ static int
 markall(char *buf, int f)
 {
 	char **np, **nq;
-	int i, retval;
+	int i, retval, gotheaders;
 	struct message *mp, *mx;
 	char **namelist, *bufp, *id = NULL, *cp;
 	int tok, beg, mc, star, other, valdot, colmod, colresult, topen, tback;
@@ -220,6 +220,7 @@ markall(char *buf, int f)
 	beg = 0;
 	topen = 0;
 	tback = 0;
+	gotheaders = 0;
 	while (tok != TEOL) {
 		switch (tok) {
 		case TNUMBER:
@@ -372,6 +373,8 @@ number:
 			break;
 
 		case TCOMMA:
+			if (mb.mb_type == MB_IMAP && gotheaders++ == 0)
+				imap_getheaders(1, msgCount);
 			if ((cp = hfield("references", dot)) != NULL) {
 				struct name *n;
 
@@ -452,6 +455,8 @@ number:
 	if (np > namelist || id) {
 		int	allnet = value("allnet") != NULL;
 
+		if (mb.mb_type == MB_IMAP && gotheaders++ == 0)
+			imap_getheaders(1, msgCount);
 		for (i = 1; i <= msgCount; i++) {
 			mc = 0;
 			if (np > namelist) {

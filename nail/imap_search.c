@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap_search.c	1.26 (gritter) 11/3/04";
+static char sccsid[] = "@(#)imap_search.c	1.27 (gritter) 11/4/04";
 #endif
 #endif /* not lint */
 
@@ -102,6 +102,7 @@ static enum itoken {
 
 static unsigned long	inumber;
 static void	*iargs[2];
+static int	needheaders;
 
 static struct itlex {
 	const char	*s_string;
@@ -187,10 +188,13 @@ imap_search(const char *spec, int f)
 	begin = spec;
 	if (imap_search1(spec, f) == OKAY)
 		return OKAY;
+	needheaders = 0;
 	if (itparse(spec, &xp, 0) == STOP)
 		return STOP;
 	if (ittree == NULL)
 		return OKAY;
+	if (mb.mb_type == MB_IMAP && needheaders)
+		imap_getheaders(1, msgCount);
 	for (i = 0; i < msgCount; i++) {
 		if (message[i].m_flag&MHIDDEN)
 			continue;
@@ -360,12 +364,15 @@ itsplit(const char *spec, char **xp)
 	case ITTEXT:
 	case ITTO:
 		/* <string> */
+		needheaders++;
 		return itstring(&iargs[0], spec, xp);
-	case ITBEFORE:
-	case ITON:
 	case ITSENTBEFORE:
 	case ITSENTON:
 	case ITSENTSINCE:
+		needheaders++;
+		/*FALLTHRU*/
+	case ITBEFORE:
+	case ITON:
 	case ITSINCE:
 		/* <date> */
 		if (itstring(&iargs[0], spec, xp) != OKAY)
@@ -379,6 +386,7 @@ itsplit(const char *spec, char **xp)
 		return OKAY;
 	case ITHEADER:
 		/* <field-name> <string> */
+		needheaders++;
 		if (itstring(&iargs[0], spec, xp) != OKAY)
 			return STOP;
 		spec = *xp;
