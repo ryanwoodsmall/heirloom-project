@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.190 (gritter) 9/9/04";
+static char sccsid[] = "@(#)imap.c	1.192 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -649,6 +649,15 @@ rec_dequeue()
 				(msgCount - rp->rec_count + 1) *
 					sizeof *message);
 			msgCount--;
+			/*
+			 * If the message was part of a collapsed thread,
+			 * the m_collapsed field of one of its ancestors
+			 * should be incremented. It seems hardly possible
+			 * to do this with the current message structure,
+			 * though. The result is that a '+' may be shown
+			 * in the header summary even if no collapsed
+			 * children exists.
+			 */
 			break;
 		}
 		free(rq);
@@ -1217,7 +1226,7 @@ imap_setfile1(xserver, newmail, isedit, transparent)
 		safe_signal(SIGINT, saveint);
 		safe_signal(SIGPIPE, savepipe);
 		imaplock = 0;
-		return 1;
+		return -1;
 	}
 	if (saveint != SIG_IGN)
 		safe_signal(SIGINT, imapcatch);
@@ -1247,7 +1256,7 @@ imap_setfile1(xserver, newmail, isedit, transparent)
 			safe_signal(SIGINT, saveint);
 			safe_signal(SIGPIPE, savepipe);
 			imaplock = 0;
-			return 1;
+			return -1;
 		}
 	} else	/* same account */
 		mb.mb_flags |= same_flags;
