@@ -42,6 +42,7 @@ NetBSD          1.6
 AIX             5.1
 UNICOS          9.0.2.2
 EP/IX           2.2.1AA; /svr4/bin/cc
+OpenBSD         3.3
 
 If your system does not appear in this list, just try it out. Whether
 it works or not, you should contact the development list and report the
@@ -140,4 +141,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/1/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/2/04
