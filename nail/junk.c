@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.8 (gritter) 9/27/04";
+static char sccsid[] = "@(#)junk.c	1.9 (gritter) 9/27/04";
 #endif
 #endif /* not lint */
 
@@ -46,6 +46,7 @@ static char sccsid[] = "@(#)junk.c	1.8 (gritter) 9/27/04";
 
 #include "rcv.h"
 #include "extern.h"
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <time.h>
@@ -87,6 +88,7 @@ struct element {
 #define	s2f(s)	((float)(s) / 0xffffU)
 
 struct statistics {
+	char	head[128];
 	char	ngood[4];
 	char	nbad[4];
 };
@@ -139,7 +141,8 @@ static enum okay	scan __P((struct message *, struct element *,
 static void	add __P((const char *, struct element *));
 static char	*nextword __P((char **, size_t *, size_t *,
 			FILE *, struct lexstat *));
-static void	recompute __P((unsigned long, unsigned long));
+static void	recompute __P((struct element *, struct element *,
+			unsigned long, unsigned long));
 static void	clsf __P((struct message *, struct element *));
 static void	rate __P((const char *, struct element *));
 static unsigned	dbhash __P((const char *));
@@ -150,14 +153,19 @@ getdb(db)
 {
 	FILE	*fp;
 	struct element	*table;
+	void	*zp = NULL;
 
 	if ((fp = dbfp(db, 0)) == (FILE *)-1)
 		return NULL;
+	if (fp)
+		zp = zalloc(fp);
 	table = smalloc(SIZE * sizeof *table);
-	if (fp == NULL || fseek(fp, DBHEAD + db * SIZE * sizeof *table,
-				SEEK_SET) != 0 ||
-			fread(table, sizeof *table, SIZE, fp) != SIZE)
+	if (fp == NULL || zread(zp, (char *)table, SIZE * sizeof *table) !=
+			SIZE * sizeof *table ||
+			ferror(fp))
 		memset(table, 0, sizeof *table * SIZE);
+	if (zp)
+		zfree(zp);
 	if (fp)
 		Fclose(fp);
 	return table;
@@ -170,14 +178,15 @@ putdb(db, table)
 {
 	FILE	*fp;
 	sighandler_type	saveint;
+	void	*zp;
 
 	if ((fp = dbfp(db, 1)) == NULL || fp == (FILE *)-1)
 		return;
-	if (fseek(fp, DBHEAD + db * SIZE * sizeof *table, SEEK_SET) == 0) {
-		saveint = safe_signal(SIGINT, SIG_IGN);
-		fwrite(table, sizeof *table, SIZE, fp);
-		safe_signal(SIGINT, saveint);
-	}
+	zp = zalloc(fp);
+	saveint = safe_signal(SIGINT, SIG_IGN);
+	zwrite(zp, (char *)table, SIZE * sizeof *table);
+	safe_signal(SIGINT, saveint);
+	zfree(zp);
 	Fclose(fp);
 }
 
@@ -190,10 +199,7 @@ getst()
 	if ((fp = dbfp(STAT, 0)) == (FILE *)-1)
 		return NULL;
 	sp = smalloc(sizeof *sp);
-	if (fp == NULL ||
-			fseek(fp, DBHEAD + 3 * SIZE * sizeof (struct element),
-				SEEK_SET) != 0 ||
-			fread(sp, sizeof *sp, 1, fp) != 1)
+	if (fp == NULL || fread(sp, sizeof *sp, 1, fp) != 1)
 		memset(sp, 0, sizeof *sp);
 	if (fp)
 		Fclose(fp);
@@ -211,14 +217,12 @@ putst(sp)
 	if ((fp = dbfp(STAT, 1)) == NULL || fp == (FILE *)-1)
 		return;
 	time(&now);
-	fprintf(fp, "Junk mail database last updated by %s on %s",
+	snprintf(sp->head, sizeof sp->head,
+			"Junk mail database last updated by %s on %s",
 			version, ctime(&now));
-	if (fseek(fp, DBHEAD + 3 * SIZE * sizeof (struct element),
-				SEEK_SET) == 0) {
-		saveint = safe_signal(SIGINT, SIG_IGN);
-		fwrite(sp, sizeof *sp, 1, fp);
-		safe_signal(SIGINT, saveint);
-	}
+	saveint = safe_signal(SIGINT, SIG_IGN);
+	fwrite(sp, sizeof *sp, 1, fp);
+	safe_signal(SIGINT, saveint);
 	Fclose(fp);
 }
 
@@ -228,25 +232,38 @@ dbfp(db, rw)
 	int	rw;
 {
 	FILE	*fp;
-	char	*fn;
+	char	*dir, *fn;
 	struct flock	flp;
+	const char *const	sf[] = {
+		"good.Z", "bad.Z", "prob.Z", "stat.bin"
+	};
+	int	n;
 
-	if ((fn = value("junkdb")) == NULL) {
+	if ((dir = value("junkdb")) == NULL) {
 		fprintf(stderr, "No junk mail database specified. "
 				"Set the junkdb variable.\n");
 		return (FILE *)-1;
 	}
-	fn = expand(fn);
+	dir = expand(dir);
+	if (makedir(dir) == STOP) {
+		fprintf(stderr, "Cannot create directory \"%s\"\n.", dir);
+		return (FILE *)-1;
+	}
+	fn = ac_alloc((n = strlen(dir)) + strlen(sf[db]) + 2);
+	strcpy(fn, dir);
+	fn[n] = '/';
+	strcpy(&fn[n+1], sf[db]);
 	if ((fp = Fopen(fn, rw ? "r+" : "r")) == NULL &&
 			rw ? (fp = Fopen(fn, "w+")) == NULL : 0) {
 		fprintf(stderr, "Cannot open junk mail database \"%s\".\n", fn);
+		ac_free(fn);
 		return NULL;
 	}
+	ac_free(fn);
 	if (fp) {
 		flp.l_type = rw ? F_WRLCK : F_RDLCK;
-		flp.l_start = db * SIZE * sizeof (struct element);
-		flp.l_len = db == STAT ? sizeof (struct statistics) : 
-			SIZE * sizeof (struct element);
+		flp.l_start = 0;
+		flp.l_len = 0;
 		flp.l_whence = SEEK_SET;
 		fcntl(fileno(fp), F_SETLKW, &flp);
 	}
@@ -384,15 +401,17 @@ scan(m, table, func)
 }
 
 static void
-recompute(ngood, nbad)
+recompute(good, bad, ngood, nbad)
+	struct element	*good, *bad;
 	unsigned long	ngood, nbad;
 {
-	struct element	*good, *bad, *prob;
+	struct element	*prob;
 	struct statistics	*sp;
 	unsigned	g, b, n, p;
 	float	d;
 
-	if ((good = getdb(GOOD)) == NULL || (bad = getdb(BAD)) == NULL)
+	if (good == NULL && (good = getdb(GOOD)) == NULL ||
+			bad == NULL && (bad = getdb(BAD)) == NULL)
 		return;
 	prob = scalloc(sizeof *prob, SIZE);
 	for (n = 0; n < SIZE; n++) {
@@ -455,8 +474,8 @@ insert(msgvec, db)
 		}
 	}
 	putdb(db, table);
-	free(table);
-	recompute(ngood, nbad);
+	recompute(db == GOOD ? table : NULL, db == BAD ? table : NULL,
+			ngood, nbad);
 	return 0;
 }
 
