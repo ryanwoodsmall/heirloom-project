@@ -2,6 +2,10 @@
 * A 'forward-as-attachment' variable has been introduced. If it is set,
   the 'forward' command uses a MIME 'message/rfc822' attachment for the
   original message instead of including it in the newly created text.
+* The character set to be used for outgoing messages can now be specified
+  with the 'sendcharsets' variable. It can contain multiple values, with
+  the first appropriate one being used to send the message. The 'charset'
+  variable is still accepted but has been removed from the documentation.
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
 

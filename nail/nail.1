@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.289 (gritter) 1/3/05
+.\"     Sccsid: @(#)nail.1	2.290 (gritter) 1/6/05
 .\"
-.TH NAIL 1 "1/3/05" "nail 11.20" "User Commands"
+.TH NAIL 1 "1/6/05" "nail 11.20" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -669,35 +669,35 @@ the content types text/plain or application/octet-stream are used,
 the first for text or international text files,
 the second for any file that contains formatting characters
 other than newlines and horizontal tabulators.
-.SS "Locale"
-\fINail\fR uses the LC_CTYPE locale setting
-to determine whether a character is printable.
-Thus, its value has to match
-the character set of the terminal
-\fInail\fR runs on.
 .SS "Character sets"
-If a message contains non-ASCII characters,
+.I Nail
+normally detects the character set of the terminal
+using the LC_CTYPE locale setting.
+If the locale cannot be used appropriately,
+the \fIttycharset\fR variable should be set
+to provide an explicit value.
+When reading messages,
+their text is converted to the terminal character set if possible.
+.PP
+The character set for outgoing messages
+is not necessarily the same
+as the one used on the terminal.
+If an outgoing text message
+contains characters not representable in US-ASCII,
 the character set being used
-must be declared within the header.
-Its value can be declared
-using the \fIcharset\fR variable.
-It is normally assumed
-that this is the terminal character set, too.
-If the latter differs from the one
-that should be used in outgoing mail,
-the \fIttycharset\fR variable can be used
-for its declaration.
-An outgoing message is then converted,
-resulting in errors when this process
-cannot be done for the entire text;
-if the message contains NUL
-characters,
-it is not converted.
-Attachments are never converted.
-Any message that is displayed on a terminal
-is tried to convert, too,
-with characters not in the terminal character set
-replaced by question marks.
+must be declared within its header.
+Permissible values can be declared
+using the \fIsendcharsets\fR variable,
+separated by commas;
+.I nail
+tries each of the values in order
+and uses the first appropriate one.
+If the message contains characters that cannot be represented
+in any of the given character sets,
+the message will not be sent,
+and its text will be saved to the `dead.letter' file.
+Messages that contains NUL bytes are not converted.
+Attachments are also not converted even if they are plain text.
 .SS "Commands"
 Each command is typed on a line by itself,
 and may take arguments following the command word.
@@ -2650,14 +2650,6 @@ command) to be entered automatically
 with the value of this option as sorting method
 when a folder is opened.
 .TP
-.B charset
-The name of the character set used by \fInail\fR.
-If unset, \fIiso-8859-1\fR is the default.
-The character set
-of all outgoing messages
-that contain non-ASCII characters
-is declared using its value.
-.TP
 .B cmd
 The default value for the \fIpipe\fR command.
 .TP
@@ -3077,6 +3069,16 @@ are printed.
 This number is also used
 for scrolling with the z command.
 .TP
+.B sendcharsets
+A comma-separated list of character set names
+that can be used in Internet mail.
+When a message is prepared for sending,
+.I nail
+tries to convert its text
+to each of the given character sets in order
+and uses the first appropriate one.
+The default is `iso-8859-1'.
+.TP
 .B sendmail
 To use an alternate mail delivery system,
 set this option to the full pathname
@@ -3415,7 +3417,6 @@ if this succeeds, the value is assigned at startup
 and will be displayed by the \fIset\fP command.
 Note that this is not necessarily a character set name
 that can be used in Internet messages.
-If unset, its default is the value of the charset variable.
 .TP
 .B VISUAL
 Pathname of the text editor to use
@@ -4580,7 +4581,7 @@ or the
 .I ttycharset
 variable.
 In the second case, the
-.I charset
+.I sendcharsets
 and
 .I ttycharset
 variables must be set to the same value

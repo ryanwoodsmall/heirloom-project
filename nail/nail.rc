@@ -3,7 +3,7 @@
 # This file is not overwritten when 'make install' is run in
 # the nail build process again.
 
-# Sccsid @(#)nail.rc	2.7 (gritter) 12/2/04
+# Sccsid @(#)nail.rc	2.8 (gritter) 1/6/05
 
 # Do not forward to mbox by default since this is likely to be
 # irritating for most users today.
@@ -36,12 +36,9 @@ set indentprefix="> "
 # Automatically quote the text of the message that is responded to.
 set quote
 
-# Set the charset for outgoing messages to iso-8859-1. It would be
-# preferable to use utf-8 here, but this is not possible on many of
-# the older supported systems because iconv() is not able to handle
-# it there. If your system supports utf-8, you are encouraged to
-# change this setting.
-set charset=iso-8859-1
+# Outgoing messages are sent in ISO-8859-1 if all their characters are
+# representable in it, otherwise in UTF-8.
+set charsets=iso-8859-1,utf-8
 
 # Display sender's real names in header summaries.
 set showname

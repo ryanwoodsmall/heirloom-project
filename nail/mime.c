@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.51 (gritter) 12/25/04";
+static char sccsid[]  = "@(#)mime.c	2.52 (gritter) 1/6/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -256,7 +256,7 @@ getcharset(int isclean)
 	char *charset;
 
 	if (isclean & MIME_HIGHBIT) {
-		charset = value("charset");
+		charset = wantcharset ? wantcharset : value("charset");
 		if (charset == NULL) {
 			charset = defcharset;
 		}
