@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)popen.c	2.17 (gritter) 10/2/04";
+static char sccsid[] = "@(#)popen.c	2.18 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -70,7 +70,9 @@ struct fp {
 		FP_GZIPPED	= 01,
 		FP_BZIP2ED	= 02,
 		FP_IMAP		= 03,
-		FP_MAILDIR	= 04
+		FP_MAILDIR	= 04,
+		FP_MASK		= 0177,
+		FP_READONLY	= 0200
 	} compressed;
 };
 static struct fp *fp_head;
@@ -236,6 +238,8 @@ Zopen(const char *file, const char *mode, int *compression)
 		*compression = FP_UNCOMPRESSED;
 		return Fopen(file, mode);
 	}
+	if (access(rp, W_OK) < 0)
+		*compression |= FP_READONLY;
 	if ((input = open(rp, bits & W_OK ? O_RDWR : O_RDONLY)) < 0
 			&& ((omode&O_CREAT) == 0 || errno != ENOENT))
 		return NULL;
@@ -245,8 +249,8 @@ open:	if ((output = Ftemp(&tempfn, "Rz", "w+", 0600, 0)) == NULL) {
 		return NULL;
 	}
 	unlink(tempfn);
-	if (input >= 0 || *compression == FP_IMAP ||
-			*compression == FP_MAILDIR) {
+	if (input >= 0 || (*compression&FP_MASK) == FP_IMAP ||
+			(*compression&FP_MASK) == FP_MAILDIR) {
 		if (decompress(*compression, input, fileno(output)) < 0) {
 			close(input);
 			Fclose(output);
@@ -382,10 +386,10 @@ compress(struct fp *fpp)
 	fflush(fpp->fp);
 	clearerr(fpp->fp);
 	fseek(fpp->fp, fpp->offset, SEEK_SET);
-	if (fpp->compressed == FP_IMAP) {
+	if ((fpp->compressed&FP_MASK) == FP_IMAP) {
 		return imap_append(fpp->realfile, fpp->fp);
 	}
-	if (fpp->compressed == FP_MAILDIR) {
+	if ((fpp->compressed&FP_MASK) == FP_MAILDIR) {
 		return maildir_append(fpp->realfile, fpp->fp);
 	}
 	if ((output = open(fpp->realfile,
@@ -397,7 +401,7 @@ compress(struct fp *fpp)
 	}
 	if ((fpp->omode & O_APPEND) == 0)
 		ftruncate(output, 0);
-	switch (fpp->compressed) {
+	switch (fpp->compressed & FP_MASK) {
 	case FP_GZIPPED:
 		command[0] = "gzip"; command[1] = "-c"; break;
 	case FP_BZIP2ED:
@@ -423,7 +427,7 @@ decompress(int compression, int input, int output)
 	 * Note that it is not possible to handle 'pack' or 'compress'
 	 * formats because appending data does not work with them.
 	 */
-	switch (compression) {
+	switch (compression & FP_MASK) {
 	case FP_GZIPPED:	command[0] = "gzip"; command[1] = "-cd"; break;
 	case FP_BZIP2ED:	command[0] = "bzip2"; command[1] = "-cd"; break;
 	case FP_IMAP:		return 0;
@@ -442,7 +446,7 @@ unregister_file(FILE *fp)
 
 	for (pp = &fp_head; (p = *pp) != (struct fp *)NULL; pp = &p->link)
 		if (p->fp == fp) {
-			if (p->compressed != FP_UNCOMPRESSED)
+			if ((p->compressed&FP_MASK) != FP_UNCOMPRESSED)
 				ok = compress(p);
 			*pp = p->link;
 			free(p);
