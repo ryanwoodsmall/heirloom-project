@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.23 (gritter) 10/1/04";
+static char sccsid[] = "@(#)junk.c	1.24 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -116,7 +116,7 @@ struct lexstat {
 	int	price;
 	int	url;
 	int	lastc;
-	enum {
+	enum loc {
 		FROM_LINE	= 0,
 		HEADER		= 1,
 		BODY		= 2
@@ -155,13 +155,13 @@ static enum okay	getdb __P((void));
 static void	putdb __P((void));
 static FILE	*dbfp __P((enum db, int));
 static enum okay	scan __P((struct message *, enum entry,
-	void (*) __P((const char *, enum entry))));
-static void	add __P((const char *, enum entry));
+	void (*) __P((const char *, enum entry, struct lexstat *))));
+static void	add __P((const char *, enum entry, struct lexstat *));
 static char	*nextword __P((char **, size_t *, size_t *,
 			FILE *, struct lexstat *));
 static void	recompute __P((void));
 static void	clsf __P((struct message *));
-static void	rate __P((const char *, enum entry));
+static void	rate __P((const char *, enum entry, struct lexstat *));
 static unsigned	long	dbhash __P((const char *));
 static struct node	*lookup __P((unsigned long, int));
 static void	mkshuffle __P((void));
@@ -486,10 +486,12 @@ loop:	i = 0;
 	return NULL;
 }
 
+/*ARGSUSED3*/
 static void
-add(word, entry)
+add(word, entry, sp)
 	const char	*word;
 	enum entry	entry;
+	struct lexstat	*sp;
 {
 	unsigned	c;
 	unsigned long	h;
@@ -520,7 +522,7 @@ static enum okay
 scan(m, entry, func)
 	struct message	*m;
 	enum entry	entry;
-	void	(*func) __P((const char *, enum entry));
+	void	(*func) __P((const char *, enum entry, struct lexstat *));
 {
 	FILE	*fp;
 	char	*buf = NULL, *cp;
@@ -542,7 +544,7 @@ scan(m, entry, func)
 	sp = scalloc(1, sizeof *sp);
 	count = fsize(fp);
 	while (nextword(&buf, &bufsize, &count, fp, sp) != NULL)
-		(*func)(buf, entry);
+		(*func)(buf, entry, sp);
 	free(buf);
 	free(sp);
 	Fclose(fp);
@@ -666,6 +668,7 @@ static struct {
 	float	prob;
 	char	*word;
 	unsigned long	hash;
+	enum loc	loc;
 } best[BEST];
 
 static void
@@ -711,11 +714,11 @@ clsf(m)
 		m->m_flag &= ~MJUNK;
 }
 
-/*ARGSUSED2*/
 static void
-rate(word, entry)
+rate(word, entry, sp)
 	const char	*word;
 	enum entry	entry;
+	struct lexstat	*sp;
 {
 	struct node	*n;
 	unsigned long	h;
@@ -732,17 +735,19 @@ rate(word, entry)
 	if (p == 0)
 		return;
 	d = p >= MID ? p - MID : MID - p;
-	if (d > best[BEST-1].dist)
+	if (d >= best[BEST-1].dist)
 		for (i = 0; i < BEST; i++) {
 			if (h == best[i].hash)
 				break;
-			if (d > best[i].dist) {
+			if (d > best[i].dist || best[i].loc == HEADER &&
+					d >= best[i].dist) {
 				for (j = BEST-2; j >= i; j--)
 					best[j+1] = best[j];
 				best[i].dist = d;
 				best[i].prob = p;
 				best[i].word = savestr(word);
 				best[i].hash = h;
+				best[i].loc = sp->loc;
 				break;
 			}
 		}
