@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.31 (gritter) 1/19/05";
+static char sccsid[] = "@(#)smtp.c	2.32 (gritter) 3/1/05";
 #endif
 #endif /* not lint */
 
@@ -225,7 +225,7 @@ read_smtp(struct sock *sp, int value)
  */
 static int
 talk_smtp(struct name *to, FILE *fi, struct sock *sp,
-		char *server, char *uhp)
+		char *xserver, char *uhp)
 {
 	struct name *n;
 	char *b = NULL, o[LINESIZE];
@@ -257,6 +257,13 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 #ifdef	USE_SSL
 	if (value("smtp-use-starttls") ||
 			value("smtp-use-tls") /* v11.0 compatibility */) {
+		char	*server;
+		if ((cp = strchr(xserver, ':')) != NULL) {
+			server = salloc(cp - xserver + 1);
+			memcpy(server, xserver, cp - xserver);
+			server[cp - xserver] = '\0';
+		} else
+			server = xserver;
 		snprintf(o, sizeof o, "EHLO %s\r\n", nodename(1));
 		SMTP_OUT(o);
 		SMTP_ANSWER(2);

@@ -1,4 +1,9 @@
-[11.21] released ...
+[11.22] released ...
+* When using a hostname with a port number attached with SMTP STARTTLS,
+  strip the port number for correct host name verification (Bugreport by
+  Gary E. Rafe).
+
+[11.21] released 2/19/05
 * When mail is sent using SMTP, 'Bcc:' fields are not passed to the
   server anymore (Bugreport by Matthew Fischer.)
 * When replying to a message part for which a 'pipe-type/subtype'
