@@ -72,7 +72,7 @@
  *
  *	from ex_vis.h	7.4 (Berkeley) 5/31/85
  *
- *	@(#)ex_vis.h	1.15 (gritter) 11/27/04
+ *	@(#)ex_vis.h	1.17 (gritter) 1/10/05
  */
 
 /*

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.35 (gritter) 1/10/05";
+static char sccsid[] = "@(#)ex_vput.c	1.38 (gritter) 1/10/05";
 #endif
 #endif
 
@@ -588,6 +588,7 @@ vinschar(int c)
 	bool	OXN;
 
 	if ((!IM || !EI) && ((hold & HOLDQIK) || !value(REDRAW) || value(SLOWOPEN))) {
+		int	(*OO)() = Outchar;
 		/*
 		 * Don't want to try to use terminal
 		 * insert mode, or to try to fake it.
@@ -598,7 +599,13 @@ vinschar(int c)
 			vgotab();
 			return c;
 		}
+		/*
+		 * This indicates to vputchar() that it has to set MULTICOL
+		 * bits but must not call us recursively.
+		 */
+		Outchar = NULL;
 		vputchar(c);
+		Outchar = OO;
 		if (DEPTH(vcline) * WCOLS + !value(REDRAW) >
 		    (destline - LINE(vcline)) * WCOLS + destcol)
 			return c;
@@ -684,11 +691,11 @@ vinschar(int c)
 		int	(*OO)() = Outchar;
 		endim();
 		if (inscol + insmc0 != linend)
-			doomed -= inssiz + insmc1;
+			doomed -= inssiz + insmc0;
 		if (insmc1 == 0 && c != '\t' &&
 				vtube0[inscol+insmc0] & MULTICOL)
-			cellcpy(&vtube0[inscol+insmc0+1],
-					&vtube0[inscol+insmc0+2]);
+			cellcpy(&vtube0[inscol+insmc0],
+					&vtube0[inscol+insmc0+1]);
 		/*
 		 * This indicates to vputchar() that it has to set MULTICOL
 		 * bits but must not call us recursively.
@@ -1428,7 +1435,8 @@ def:
 					(*Outchar)(MULTICOL);
 			} else {
 				/*
-				 * This occurs when replacing characters.
+				 * This occurs when replacing characters,
+				 * or in open mode.
 				 */
 				while (--d) {
 					*++tp = MULTICOL;

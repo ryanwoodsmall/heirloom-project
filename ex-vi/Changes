@@ -4,6 +4,8 @@ Release ...
   other than xterm.
 * When a multicolumn character was inserted and then replaced, the visual
   screen representation was sometimes not updated accordingly.
+* Undoing the replacement of a multicolumn character by a singlecolumn
+  character twice made the singlecolumn character invisible.
 * The '\u', '\l', '\U', and '\L' substitution sequences work with multibyte
   characters now.
 * Handle character case conversions with the '~' vi command correctly if the
