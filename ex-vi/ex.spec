@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)ex.spec	1.6 (gritter) 11/27/04
+# Sccsid @(#)ex.spec	1.7 (gritter) 1/22/05
 #
 Summary: A port of the traditional ex/vi editors
 Name: ex
@@ -30,9 +30,10 @@ Requires: /etc/termcap
 %define	makeflags	PREFIX=%{prefix} BINDIR=%{bindir} LIBEXECDIR=%{libexecdir} MANDIR=%{mandir} PRESERVEDIR=%{preservedir} INSTALL=%{ucbinstall} RPMCFLAGS="%{cflags}"
 
 %description
-This is a port of the traditional ex and vi editor implementation. It
-was enhanced to support most of the additions in System V and POSIX.2,
-and international character sets (including UTF-8).
+This is a port of the traditional ex and vi editor implementation as
+found on 2BSD and 4BSD. It was enhanced to support most of the additions
+in System V and POSIX.2, and international character sets like UTF-8 and
+many East Asian encodings.
 
 %prep
 rm -rf %{buildroot}

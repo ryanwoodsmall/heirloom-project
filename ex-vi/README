@@ -5,10 +5,10 @@ This implementation is derived from ex/vi 3.7 of 6/7/85 and the BSD
 termcap library, originally from the 2.11BSD distribution. All of them
 were changed to compile and run on newer POSIX compatible Unix systems.
 Support for international character sets was added, including support
-for multibyte locales (in particular UTF-8), and some changes were made
-to get closer to the POSIX.2 guidelines for ex and vi. Some issues that
-were clearly bugs and not features have also been resolved; the the
-Changes file for details.
+for multibyte locales (based on UTF-8 or East Asian encodings), and some
+changes were made to get closer to the POSIX.2 guidelines for ex and
+vi. Some issues that were clearly bugs and not features have also been
+resolved; see the Changes file for details.
 
 New releases are announced on Fresmeat. If you want to get
 notified by email on each release, use their subscription service at
@@ -86,8 +86,7 @@ provide basic multibyte support. In particular, vi needs wcwidth() to
 determine the visual width of a character, and mbrtowc() to detect when a
 byte sequence that is entered at the terminal has been completed.
 
-The multibyte code is known to work with UTF-8 locales on the following
-systems:
+The multibyte code is known to work on the following systems:
 
 Linux		glibc 2.2.2 and later
 Sun Solaris	9 and later
@@ -95,16 +94,23 @@ HP HP-UX	B.11.23
 FreeBSD		5.3
 NetBSD		2.0
 
-It has been tested with xterm patch #192, rxvt-unicode 4.2, and
-mlterm 2.9.1.
+It has been tested on xterm patch #192, rxvt-unicode 4.2, mlterm 2.9.1, and
+xiterm 0.5.
 
-To use UTF-8 locales in ex mode, the terminal must be put in 'stty iutf8'
+Successful operation is known for the following encodings: UTF-8, EUC-JP,
+EUC-KR, Big5, Big5-HKSCS, GBK. vi does not support locking-shift encodings
+like those that use ISO 2022 escape sequences. It also requires that the
+first byte of any multibyte character has the highest bit set. This excludes
+7-bit encodings like UTF-7, and encodings whose sequences start with ASCII
+characters like TCVN 5712.
+
+To use UTF-8 locales in ex mode, the terminal should be put in 'stty iutf8'
 mode on Linux if it does not perform this automatically. Otherwise, typing
 the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						1/1/05
+Gunnar Ritter						1/22/05
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>
