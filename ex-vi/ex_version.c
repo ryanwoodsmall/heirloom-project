@@ -70,12 +70,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Sccsid @(#)ex_version.c	1.130 (gritter) 3/4/05
+ * Sccsid @(#)ex_version.c	1.131 (gritter) 3/24/05
  */
 
 #include "ex.h"
 
-static char *versionstring = "@(#)Version 4.0 (gritter) 3/4/05";
+static char *versionstring = "@(#)Version 4.0 (gritter) 3/24/05";
 
 void 
 printver(void)

@@ -72,7 +72,7 @@
  *
  *	from ex_vis.h	7.4 (Berkeley) 5/31/85
  *
- *	@(#)ex_vis.h	1.17 (gritter) 1/10/05
+ *	@(#)ex_vis.h	1.18 (gritter) 3/24/05
  */
 
 /*
@@ -288,7 +288,7 @@ var	cell	lastcmd[5];	/* Chars in last command */
 var	int	lastcnt;	/* Count for last command */
 var	cell	*lastcp;	/* Save current command here to repeat */
 var	bool	lasthad;	/* Last command had a count? */
-var	short	lastvgk;	/* Previous input key, if not from keyboard */
+var	int	lastvgk;	/* Previous input key, if not from keyboard */
 var	short	lastreg;	/* Register with last command */
 var	char	*ncols['z'-'a'+2];	/* Cursor positions of marks */
 var	char	*notenam;	/* Name to be noted with change count */

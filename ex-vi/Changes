@@ -1,6 +1,8 @@
 Release ...
 * vi no longer dies with a segmentation fault if a line does not fit on the
   screen after an insertion.
+* The 'p' command now works correctly if the buffer contains a partial line
+  with multibyte characters.
 
 Release 2/25/05
 * Traditional regular expressions can now be used with multibyte characters.
