@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.57 (gritter) 1/21/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.58 (gritter) 1/22/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.57 (gritter) 1/21/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.58 (gritter) 1/22/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -622,7 +622,7 @@ checkf(void)
 static size_t
 endline(unsigned col, const char *s, const char *end)
 {
-	unsigned pos = 0, ipos = 0, opos = 0;
+	unsigned pos = 0, ipos = 0;
 	const char *olds = s;
 	int	m, n;
 	w_type	wc;
@@ -630,7 +630,6 @@ endline(unsigned col, const char *s, const char *end)
 	if (fflag)
 		return end - s;
 	while (s < end) {
-		opos = ipos;
 		ipos = pos;
 		next(wc, s, n);
 		switch (wc) {
@@ -639,7 +638,7 @@ endline(unsigned col, const char *s, const char *end)
 		 */
 		case '\b':
 			if (pos > 0)
-				pos = opos;
+				pos--;
 			break;
 		/*
 		 * No cursor movement.
@@ -675,7 +674,8 @@ endline(unsigned col, const char *s, const char *end)
 			}
 		}
 		if (pos > col) {
-			s += n;
+			if (pos == col + 1)
+				s += n;
 			while (seqstart(*s&0377) && (m = known_sequence(s)) > 0)
 				s += m;
 			if (*s == '\n')

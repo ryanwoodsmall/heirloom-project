@@ -23,6 +23,7 @@ Release ...
 * more: Do not rely on the state of continued calls to mbrtowc() but reset
   its state each time and call it with the complete sequence again to work
   around problems with glibc in EUC-JP locales (Patch by Matthew Fischer).
+* pg: Fixed the handling of backspaces following multicolumn characters.
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and
