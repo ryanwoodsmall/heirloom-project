@@ -1,4 +1,5 @@
 Welcome to nail, a mail user agent for Unix systems!
+====================================================
 
 Nail is derived from Berkeley Mail and is intended provide the
 functionality of the POSIX mailx command with additional support
@@ -8,15 +9,24 @@ operation for IMAP, message threading, scoring, and filtering.
 It is also usable as a mail batch language, both for sending
 and receiving mail.
 
+New releases of nail are announced on Freshmeat. If you want to get
+notified by email on each release, use their subscription service at
+<http://freshmeat.net/projects/nail/>.
+
+The project homepage is currently at <http://nail.sourceforge.net>.
+
+
+How to build
+============
+
 To compile and install nail, look at the file 'INSTALL'. You can also
 build nail RPMs using 'rpmbuild -tb nail-<version>.tar.bz2'.
 
-After compilation, edit the personal and system-wide run time
-configuration files to match your needs. You _really_ should do this or
-at least install the template because most of the built-in defaults still
-have the compatibility values of twenty-five years ago. For batch usage,
-it is recommended to pass the configuration as environment variables only,
-as e.g. 'env MAILRC=/dev/null from=user@host nail -n' does.
+You should always install the template for the system-wide configuration
+file. If this is not possible because you lack the necessary permissions,
+integrate its contents into your ~/.mailrc. This is because some of the
+built-in defaults are not appropriate anymore for the Unix platforms of
+today, but are still being kept for compatibility.
 
 Nail has been built successfully in the following environments using
 the current configuration system:
@@ -33,17 +43,11 @@ AIX             5.1
 UNICOS          9.0.2.2
 EP/IX           2.2.1AA; /svr4/bin/cc
 
-If you can build it on other systems, please contact the nail
-development list (see below) and send a diff with your changes so
-they can be included in the main version (preferably a unified
-diff, diff -u). If there are no changes, even better, but it would
-be nice to hear from you even then to extend the list above.
+If your system does not appear in this list, just try it out. Whether
+it works or not, you should contact the development list and report the
+results.
 
-It should generally be possible to build nail on most Unix-style
-systems without much effort; however, especially the character set
-support varies between them. See the file 'I18N' for details.
-
-On the other hand, I strongly discourage from porting nail to Windows
+But note that I strongly discourage from porting nail to Windows
 and environments that make Windows look Unix-like; I won't accept any
 patches or suggestions that go in this direction. There are two major
 reasons for this: First, any port makes maintaining harder; there are
@@ -65,6 +69,12 @@ free software to mainframes of a certain company is considered a good
 thing today. I just wish to express my opinion as a free software
 developer, and to inform you that I don't maintain such a port.
 
+
+Mailbox formats
+===============
+
+Nail supports the mbox and maildir mailbox formats.
+
 The mbox format variant based on the 'Content-Length:' header field that
 is used on most SVr4 systems by default is not supported by nail. As this
 format generally is a design flaw, you should fix your system by either
@@ -77,23 +87,57 @@ to the MMDF format used on OpenServer systems; unless you switch to
 procmail (or contribute support for this format), nail will not be
 able to read your mailbox there.
 
-New nail versions will be announced on <http://freshmeat.net>; you
-can use their subscription service if you wish to be notified by mail
-when a new version is released. Nail's home page is located at
-<http://nail.sourceforge.net>. Please always look for the newest
-version before reporting bugs.
 
-Nail development is discussed on the 'nail-devel' mailing list.
-All people interested in discussing or coding features for future
-releases are invited to participate. Bug reports should also be
-sent to the list. To subscribe to the list or look at the archives,
-visit <https://lists.sourceforge.net/lists/listinfo/nail-devel>. If
-you do not want to subscribe, you can directly mail to the list
-using the address <nail-devel@lists.sourceforge.net>.
+Questions, suggestions, bug reports
+===================================
+
+Please use the 'nail-devel' mailing list for questions, suggestions,
+or bug reports. This has at least three advantages over contacting me
+directly:
+
+1. Other people can comment on the issue. They might have solved a similar
+   problem, or might be willing to implement improvements.
+
+2. Since all posts are archived, a problem needs to be commented once only,
+   and the answers are readily available on the web then.
+
+3. Unless you had an acceptable reason to contact me directly, I will refuse
+   to give you technical answers by personal mail. Thus if you ignore this
+   advice, you will just have to resend your message to the list.
+
+Also before you send something to the list, make sure that you did the
+following:
+
+1. Check out that you are using a binary made from pristine sources of the
+   latest release. This is particularly important if you received your nail
+   binaries from a third-party vendor. If you are unwilling to do this for
+   whatever reason, use the support channels of your vendor instead of
+   abusing the Open Source development model for your personal profit.
+
+2. Check that your issue is not already solved or commented in the existing
+   documentation. This does not only involve reading this file; you also
+   have to look at the manual page, the ChangeLog, and the I18N file which
+   documents some internationalization aspects. After doing that, you have
+   to search the mailing list archive for related topics. Remember that you
+   are spending other people's spare time when you ask questions, and that
+   you just waste it if your question was a superfluous one.
+
+3. If you are reporting a bug, try to reproduce it and include detailed
+   instructions for doing that in your report. If you cannot reproduce the
+   bug, document carefully what you have done before the problem occurred.
+   The more information you provide, the greater are the chances that the
+   bug can be fixed quickly.
+
+Both the contact instructions and the list archive are available at
+<https://lists.sourceforge.net/lists/listinfo/nail-devel>. You currently
+do not need to be a subscriber to post to the list. It is recommended
+that you subscribe, though, because your collaboration will advance the
+project too.
+
 
 Enjoy!
 
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           10/25/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/1/04

@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.268 (gritter) 11/1/04
+.\"     Sccsid: @(#)nail.1	2.269 (gritter) 11/1/04
 .\"
 .TH NAIL 1 "11/1/04" "nail 11.14" "User Commands"
 .SH NAME
@@ -4370,6 +4370,38 @@ CRLs can be imported in Mozilla applications
 (provided that
 .I nss-config-dir
 is set appropriately).
+.SS "Sending mail from scripts"
+If you want to send mail from scripts,
+you must be aware that
+.I nail
+reads the user's configuration files by default.
+So unless your script is only intended for your own personal use
+(as e.g. a cron job),
+you need to circumvent this by invoking
+.I nail
+like
+.nf
+.sp
+    \fBMAILRC=/dev/null nail \-n\fR
+.sp
+.fi
+You then need to create a configuration for
+.I nail
+for your script.
+This can be done by either pointing the
+.I MAILRC
+variable to a custom configuration file,
+or by passing the configuration in environment variables.
+Since many of the configuration options are not valid shell variables, the
+.I env
+command is useful in this situation.
+An invocation could thus look like
+.nf
+.sp
+    \fBenv MAILRC=/dev/null\fR from=\fIscriptreply@domain\fR \e
+          smtp-auth-user=\fIlogin\fR smtp-auth-password=\fIsecret\fR \e
+          smtp=\fIotherhost\fR \fBnail \-n\fR \-s "\fIsubject\fR" \e
+          \-a \fIattachment_file\fR \fIrecipient@domain\fR <\fIcontent_file\fR
 .SH "SEE ALSO"
 fmt(1),
 newaliases(1),
