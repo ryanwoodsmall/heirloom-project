@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.47 (gritter) 10/24/04";
+static char sccsid[] = "@(#)junk.c	1.48 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -432,7 +432,7 @@ nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 	int	c, i, j, k;
 	char	*cp, *cq;
 
-	sp->hadamp = 0;
+loop:	sp->hadamp = 0;
 	if (sp->save) {
 		i = j = 0;
 		for (cp = sp->save; *cp; cp++) {
@@ -441,7 +441,7 @@ nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 		SAVE('\0')
 		free(sp->save);
 		sp->save = NULL;
-		return *buf;
+		goto out;
 	}
 	if (sp->loc == FROM_LINE)
 		while (*count > 0 && (c = getc(fp)) != EOF) {
@@ -451,7 +451,7 @@ nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 				break;
 			}
 		}
-loop:	i = 0;
+	i = 0;
 	j = 0;
 	if (sp->loc == HEADER && sp->field[0]) {
 	field:	cp = sp->field;
@@ -602,7 +602,7 @@ loop:	i = 0;
 		}
 		sp->lastc = c;
 	}
-	if (i > 0) {
+out:	if (i > 0) {
 		SAVE('\0')
 		c = 0;
 		for (k = 0; k < i; k++)

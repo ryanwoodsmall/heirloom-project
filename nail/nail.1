@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.257 (gritter) 10/24/04
+.\"     Sccsid: @(#)nail.1	2.258 (gritter) 10/24/04
 .\"
 .TH NAIL 1 "10/24/04" "nail 11.13" "User Commands"
 .SH NAME
@@ -1335,10 +1335,6 @@ If the current folder is located on an IMAP or POP3 server,
 a NOOP command is sent.
 Otherwise, no operation is performed.
 .TP
-.B preserve
-(pre) A synonym for
-.IR hold .
-.TP
 .B Pipe
 (Pi) Like
 .I pipe
@@ -1353,6 +1349,10 @@ the current message is piped
 through the command given by the \fIcmd\fR variable.
 If the \fI page\fR variable is set,
 every message is followed by a formfeed character.
+.TP
+.B preserve
+(pre) A synonym for
+.IR hold .
 .TP
 .B Print
 (P) Like
