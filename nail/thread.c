@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.48 (gritter) 9/9/04";
+static char sccsid[] = "@(#)thread.c	1.49 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -242,7 +242,8 @@ interlink(m, count, newmail)
 	long	n;
 	struct msort	*ms;
 	struct message	*root;
-	int	autocollapse = !newmail && value("autocollapse") != NULL;
+	int	autocollapse = !newmail && !(inhook&2) &&
+			value("autocollapse") != NULL;
 
 	ms = smalloc(sizeof *ms * count);
 	for (n = 0, i = 0; i < count; i++) {
