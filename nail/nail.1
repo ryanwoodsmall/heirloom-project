@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.215 (gritter) 9/7/04
+.\"     Sccsid: @(#)nail.1	2.217 (gritter) 9/9/04
 .\"
-.TH NAIL 1 "9/7/04" "nail 11.6" "User Commands"
+.TH NAIL 1 "9/9/04" "nail 11.7pre" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -833,6 +833,14 @@ if given.
 If no directory is given,
 then changes to the user's login directory.
 .TP
+.B collapse
+(coll)
+Only applicable to threaded mode.
+Takes a message list
+and makes all replies to these messages invisible
+in header summaries,
+unless they are in state `new'.
+.TP
 .B connect
 (conn) If operating in disconnected mode on an IMAP mailbox,
 switch to online mode and connect to the mail server
@@ -1579,6 +1587,15 @@ The group names no longer have any significance.
 Takes a message list and marks each message
 as not having been answered.
 .TP
+.B uncollapse
+(unc)
+Only applicable to threaded mode.
+Takes a message list
+and makes the message and all replies to it visible
+in header summaries again.
+When a message becomes the current message,
+it is automatically uncollapsed.
+.TP
 .B undef
 Undefines each of the named macros.
 It is not an error to use a name that does not belong to
@@ -1925,6 +1942,13 @@ or
 is set).
 Responding with a newline
 indicates your satisfaction with the current list.
+.TP
+.B autocollapse
+Causes threads to be collapsed automatically when
+threaded mode is entered
+(see the
+.I collapse
+command).
 .TP
 .B autoinc
 Same as
@@ -2313,9 +2337,11 @@ mboxed,
 flagged,
 answered,
 draft,
-killed.
-The default is `NUROSPMFATK',
-or `NU\ \ *HMFATK' if
+killed,
+start of a collapsed thread,
+collapsed.
+The default is `NUROSPMFATK+\-',
+or `NU\ \ *HMFATK+\-' if
 .I bsdflags
 is set.
 .TP

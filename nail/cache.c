@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.54 (gritter) 9/6/04";
+static char sccsid[] = "@(#)cache.c	1.55 (gritter) 9/8/04";
 #endif
 #endif /* not lint */
 
@@ -296,7 +296,7 @@ putcache(mp, m)
 	} else {
 		fcntl_lock(fileno(obuf), F_WRLCK);
 		if (fscanf(obuf, infofmt, &ob, &osize, &oflag, &otime,
-					&olines) >= 4 &&
+					&olines) >= 4 && ob != '\0' &&
 				(ob == 'B' || (ob == 'H' && c != 'B'))) {
 			if (m->m_xlines <= 0 && olines > 0)
 				m->m_xlines = olines;
@@ -325,14 +325,9 @@ putcache(mp, m)
 		Fclose(obuf);
 		return;
 	}
-	fprintf(obuf, infofmt, c, (long)m->m_xsize,
-			USEBITS(m->m_flag),
-			(long)m->m_time,
-			m->m_xlines);
-	putc('\n', obuf);
-	fseek(obuf, INITSKIP, SEEK_SET);
 	if (c == 'N')
 		goto done;
+	fseek(obuf, INITSKIP, SEEK_SET);
 	zp = zalloc(obuf);
 	count = m->m_size;
 	while (count > 0) {
@@ -348,7 +343,13 @@ putcache(mp, m)
 		unlink(name);
 		goto out;
 	}
-done:	if (ferror(obuf)) {
+done:	rewind(obuf);
+	fprintf(obuf, infofmt, c, (long)m->m_xsize,
+			USEBITS(m->m_flag),
+			(long)m->m_time,
+			m->m_xlines);
+	putc('\n', obuf);
+	if (ferror(obuf)) {
 		unlink(name);
 		goto out;
 	}

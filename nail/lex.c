@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.69 (gritter) 9/6/04";
+static char sccsid[] = "@(#)lex.c	2.71 (gritter) 9/8/04";
 #endif
 #endif /* not lint */
 
@@ -317,8 +317,10 @@ commands()
 					int odid = did_print_dot;
 
 					setfile(mailname, 1);
-					dot = &message[odot];
-					did_print_dot = odid;
+					if (mb.mb_type != MB_IMAP) {
+						dot = &message[odot];
+						did_print_dot = odid;
+					}
 				}
 			}
 			reset_on_stop = 1;
@@ -945,4 +947,5 @@ initbox(name)
 	mb.mb_flags = MB_NOFLAGS;
 	prevdot = NULL;
 	dot = NULL;
+	did_print_dot = 0;
 }

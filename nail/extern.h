@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.98 (gritter) 9/6/04
+ *	Sccsid @(#)extern.h	2.99 (gritter) 9/8/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -417,3 +417,6 @@ enum okay	maildir_append __P((const char *, FILE *));
 unsigned	pjw __P((const char *));
 long	nextprime __P((long));
 extern void	substdate __P((struct message *));
+int	ccollapse __P((void *));
+int	cuncollapse __P((void *));
+void	uncollapse1 __P((struct message *));

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.74 (gritter) 9/6/04
+ *	Sccsid @(#)def.h	2.75 (gritter) 9/8/04
  */
 
 /*
@@ -274,6 +274,7 @@ struct message {
 	float		m_score;	/* score of message */
 	char	*m_maildir_file;	/* original maildir file of msg */
 	unsigned	m_maildir_hash;	/* hash of file name in maildir sub */
+	int	m_collapsed;		/* collapsed thread information */
 };
 
 /*

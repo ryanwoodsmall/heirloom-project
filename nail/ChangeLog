@@ -1,3 +1,9 @@
+[11.7] released ...
+* A collapsed view of message threads was introduced. See the 'collapse'
+  and 'uncollapse' commands, and the 'autocollapse' variable.
+* Nail did not properly keep the mark for the current message if messages
+  were expunged on an IMAP server.
+
 [11.6] released 9/7/04
 * An IMAP performance improvement introduced in release 11.5 lead to an
   inconsistency in the internal states if a command like 'copy' was

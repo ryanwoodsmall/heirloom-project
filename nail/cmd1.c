@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.67 (gritter) 9/4/04";
+static char sccsid[] = "@(#)cmd1.c	2.69 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -126,13 +126,15 @@ headers(v)
 			mp = threadroot;
 		if (dot != &message[n-1]) {
 			for (mq = mp; mq; mq = next_in_thread(mq))
-				if ((mq->m_flag&(MDELETED|MHIDDEN|MKILL))==0) {
+				if ((mq->m_flag&(MDELETED|MHIDDEN|MKILL))==0 &&
+						mp->m_collapsed <= 0) {
 					setdot(mq);
 					break;
 				}
 		}
 		while (mp) {
-			if ((mp->m_flag & (MDELETED|MHIDDEN|MKILL)) == 0) {
+			if ((mp->m_flag & (MDELETED|MHIDDEN|MKILL)) == 0 &&
+					mp->m_collapsed <= 0) {
 				if (flag++ >= size)
 					break;
 				printhead(mp - &message[0] + 1, stdout,
@@ -303,6 +305,10 @@ dispc(mp, a)
 		dispc = a[7];
 	if (mp->m_flag & MKILL)
 		dispc = a[10];
+	if (mb.mb_threaded == 1 && mp->m_collapsed > 0)
+		dispc = a[12];
+	if (mb.mb_threaded == 1 && mp->m_collapsed < 0)
+		dispc = a[11];
 	return dispc;
 }
 
@@ -569,7 +575,7 @@ printhead(mesg, f, threaded)
 
 	bsdflags = value("bsdcompat") != NULL || value("bsdflags") != NULL ||
 		getenv("SYSV3") != NULL;
-	strcpy(attrlist, bsdflags ? "NU  *HMFATK" : "NUROSPMFATK");
+	strcpy(attrlist, bsdflags ? "NU  *HMFATK+-" : "NUROSPMFATK+-");
 	if ((cp = value("attrlist")) != NULL) {
 		sz = strlen(cp);
 		if (sz > sizeof attrlist - 1)
