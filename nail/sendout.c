@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.41 (gritter) 9/9/04";
+static char sccsid[] = "@(#)sendout.c	2.42 (gritter) 9/10/04";
 #endif
 #endif /* not lint */
 
@@ -899,7 +899,7 @@ mail1(hp, printheaders, quote, quotefile, recipient_record, tflag)
 			goto out;
 		}
 	}
-	ok = start_mta(to, hp->h_smopts, mtf) == 0;
+	ok = start_mta(to, hp->h_smopts, mtf);
 out:
 	Fclose(mtf);
 	return ok;
