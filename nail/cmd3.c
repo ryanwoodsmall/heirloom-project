@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.75 (gritter) 12/2/04";
+static char sccsid[] = "@(#)cmd3.c	2.76 (gritter) 12/3/04";
 #endif
 #endif /* not lint */
 
@@ -450,12 +450,17 @@ static char *
 fwdedit(char *subj)
 {
 	char *newsubj;
+	struct str	in, out;
 
 	if (subj == NULL || *subj == '\0')
 		return NULL;
-	newsubj = salloc(strlen(subj) + 6);
+	in.s = subj;
+	in.l = strlen(subj);
+	mime_fromhdr(&in, &out, TD_ISPR|TD_ICONV);
+	newsubj = salloc(strlen(out.s) + 6);
 	strcpy(newsubj, "Fwd: ");
-	strcpy(&newsubj[5], subj);
+	strcpy(&newsubj[5], out.s);
+	free(out.s);
 	return newsubj;
 }
 
