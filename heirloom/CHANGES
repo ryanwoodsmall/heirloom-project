@@ -24,6 +24,8 @@ Release ...
   its state each time and call it with the complete sequence again to work
   around problems with glibc in EUC-JP locales (Patch by Matthew Fischer).
 * pg: Fixed the handling of backspaces following multicolumn characters.
+* pg: Allow the rmacs/ae escape sequence (end alternate character set) to
+  be sent to the terminal.
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and
