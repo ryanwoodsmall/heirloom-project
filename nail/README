@@ -38,7 +38,7 @@ Open UNIX           8.0.0
 FreeBSD             4.9 and above
 HP HP-UX            B.11.11, B.11.23; HP C/ANSI C, gcc
 HP Tru64 UNIX       4.0G, 5.1B; Developers' Toolkit C, gcc
-NetBSD              1.6
+NetBSD              1.6, 2.0
 IBM AIX             5.1; VisualAge C, gcc
 Cray UNICOS         9.0.2.2
 Control Data EP/IX  2.2.1AA; /svr4/bin/cc
@@ -145,4 +145,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/20/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           12/12/04
