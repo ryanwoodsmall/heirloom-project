@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.51 (gritter) 10/25/04";
+static char sccsid[] = "@(#)junk.c	1.52 (gritter) 10/25/04";
 #endif
 #endif /* not lint */
 
@@ -877,7 +877,7 @@ clsf(struct message *m)
 			break;
 		if (verbose)
 			fprintf(stderr, "Probe %2d: \"%s\", hash=%lu "
-				"prob=%g dist=%g\n",
+				"prob=%.4f dist=%.4f\n",
 				i+1,
 				best[i].word, best[i].hash,
 				best[i].prob, best[i].dist);
@@ -910,7 +910,7 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 	} else
 		p = DFL;
 	if (_debug)
-		fprintf(stderr, "h=%lu g=%u b=%u p=%g %s\n", h,
+		fprintf(stderr, "h=%lu g=%u b=%u p=%.4f %s\n", h,
 				n ? get(&n[OF_node_good]) : 0,
 				n ? get(&n[OF_node_bad]) : 0,
 				p, word);
@@ -1019,7 +1019,7 @@ cprobability(void *v)
 			p = s2f(s);
 			if (p != 0) {
 				d = p >= MID ? p - MID : MID - p;
-				printf("prob=%g dist=%g", p, d);
+				printf("prob=%.4f dist=%.4f", p, d);
 			} else
 				printf("too infrequent");
 		} else
