@@ -36,9 +36,9 @@ install:
 	if test $(DEFBIN) = $(S42BIN) -o $(DEFBIN) = $(SUSBIN) \
 		-o $(DEFBIN) = $(SU3BIN) ; \
 	then \
-		$(LNS) nawk.1 $(ROOT)$(MANDIR)/man1/awk.1 ; \
+		sh build/crossln $(ROOT)$(MANDIR)/man1/nawk.1 $(ROOT)$(MANDIR)/man1/awk.1 $(ROOT); \
 	else \
-		$(LNS) oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 ; \
+		sh build/crossln $(ROOT)$(MANDIR)/man1/oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 $(ROOT); \
 	fi
 	for i in basename chmod cp date du file id ln mkdir mv nohup pr ps rm rmdir sort touch tr wc who; \
 	do \

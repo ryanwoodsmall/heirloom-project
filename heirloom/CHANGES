@@ -1,4 +1,4 @@
-Release ...
+Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
   /usr/5bin/posix2001 by default. mk.config files have to be augmented with
   the SU3BIN macro if they are to be reused.
