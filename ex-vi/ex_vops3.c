@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops3.c	1.18 (gritter) 11/27/04";
+static char sccsid[] = "@(#)ex_vops3.c	1.19 (gritter) 1/2/05";
 #endif
 #endif
 
@@ -625,25 +625,25 @@ isa(register char *cp)
 	return (0);
 }
 
-static int
-cswitch(char *dst, const char *src)
+static void
+cswitch(char *dst, int *dn, const char *src, int *sn)
 {
-	int	c, n;
+	int	c;
 
 #ifdef	MB
 	if (mb_cur_max > 1) {
-		nextc(c, src, n);
+		nextc(c, src, *sn);
 		if (c & INVBIT) {
 			*dst = *src;
-			n = 1;
+			*dn = *sn = 1;
 		} else {
 			if (iswupper(c))
 				c = towlower(c);
 			else if (iswlower(c))
 				c = towupper(c);
-			if (wctomb(dst, c) != n) {
+			if ((*dn = wctomb(dst, c)) > *sn) {
 				*dst = *src;
-				n = 1;
+				*dn = *sn = 1;
 			}
 		}
 	} else
@@ -656,9 +656,8 @@ cswitch(char *dst, const char *src)
 			*dst = toupper(c);
 		else
 			*dst = c;
-		n = 1;
+		*dn = *sn = 1;
 	}
-	return n;
 }
 
 void
@@ -666,26 +665,26 @@ vswitch(int cnt)
 {
 	if (cnt <= 1) {
 		char mbuf[MB_LEN_MAX+4];
-		int	n;
+		int	n0, n1;
 		setLAST();
 		mbuf[0] = 'r';
-		n = cswitch(&mbuf[1], cursor);
-		if (cursor[n] != '\0')
-			mbuf[1+n++] = ' ';
-		mbuf[1+n] = '\0';
+		cswitch(&mbuf[1], &n1, cursor, &n0);
+		if (cursor[n1] != '\0')
+			mbuf[1+n1++] = ' ';
+		mbuf[1+n1] = '\0';
 		macpush(mbuf, 1);
 	} else {	/* cnt > 1 */
 		char *mbuf = malloc(MAXDIGS + cnt*(mb_cur_max+1) + 5);
 		register char *p = &mbuf[MAXDIGS + 1];
-		register int num, n, m;
+		int num, n0, n1, m;
 
 		setLAST();
 		*p++ = 's';
 		for (num = 0, m = 0; num < cnt && cursor[m] != '\0'; num++) {
 			*p++ = CTRL('v');
-			n = cswitch(p, &cursor[m]);
-			p += n;
-			m += n;
+			cswitch(p, &n1, &cursor[m], &n0);
+			p += n1;
+			m += n0;
 		}
 		*p++ = ESCAPE;
 		if (cursor[m])

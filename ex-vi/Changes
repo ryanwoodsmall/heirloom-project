@@ -1,3 +1,7 @@
+Release ...
+* Handle character case conversions with the '~' vi command correctly if the
+  length of the converted multibyte sequence is smaller than the original one.
+
 Release 12/2/04
 * Support for multibyte character locales was added.
 * The code has been converted to ANSI C, and support for pre-POSIX systems has
