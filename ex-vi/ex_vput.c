@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.43 (gritter) 1/20/05";
+static char sccsid[] = "@(#)ex_vput.c	1.44 (gritter) 1/22/05";
 #endif
 #endif
 
@@ -373,7 +373,7 @@ vgoto(register int y, register int x)
 		x %= WCOLS;
 	}
 #ifdef	MB
-	if (y >= 0 && mb_cur_max > 1 && !insmode) {
+	if (y >= 0 && y <= WLINES && mb_cur_max > 1 && !insmode) {
 		while (x > 0 && (vtube[y][x]&(MULTICOL|TRIM)) == MULTICOL)
 			x--;
 	}
