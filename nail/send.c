@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.61 (gritter) 11/1/04";
+static char sccsid[] = "@(#)send.c	2.62 (gritter) 11/2/04";
 #endif
 #endif /* not lint */
 
@@ -148,7 +148,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 					prefix ? prefix : "",
 					fakefrom(mp), fakedate(mp->m_time));
 	} else {
-		if (prefix) {
+		if (prefix && doign != allignore) {
 			fputs(prefix, obuf);
 			sz += strlen(prefix);
 		}
