@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.50 (gritter) 10/31/04";
+static char sccsid[] = "@(#)send.c	2.51 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -436,8 +436,9 @@ skip:	switch (ip->m_mimecontent) {
 							np->m_partstring) {
 						len = fprintf(obuf,
 							"%sPart %s:\n", level ||
-							np != ip->m_multipart ?
-								"\n" : "",
+							strcmp(np->m_partstring,
+								"1") ?
+							"\n" : "",
 							np->m_partstring);
 						addstats(stats, 1, len);
 					}
