@@ -32,7 +32,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.23 (gritter) 2/6/05";
+#if defined (SUS)
+static const char sccsid[] USED = "@(#)od_sus.sl	1.24 (gritter) 2/6/05";
+#else
+static const char sccsid[] USED = "@(#)od.sl	1.24 (gritter) 2/6/05";
+#endif
 
 #include	<unistd.h>
 #include	<stdio.h>
