@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.11 (gritter) 10/2/04";
+static char sccsid[] = "@(#)head.c	2.12 (gritter) 10/12/04";
 #endif
 #endif /* not lint */
 
@@ -553,7 +553,6 @@ routeaddr(const char *name)
 			break;
 		case '>':
 			return (char *)rp;
-			break;
 		}
 	}
 	return NULL;

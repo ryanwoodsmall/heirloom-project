@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.55 (gritter) 10/2/04";
+static char sccsid[] = "@(#)sendout.c	2.58 (gritter) 10/9/04";
 #endif
 #endif /* not lint */
 
@@ -49,6 +49,7 @@ static char sccsid[] = "@(#)sendout.c	2.55 (gritter) 10/2/04";
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
+#include "md5.h"
 
 /*
  * Mail -- a mail program
@@ -56,7 +57,6 @@ static char sccsid[] = "@(#)sendout.c	2.55 (gritter) 10/2/04";
  * Mail to others.
  */
 
-static const char	randfile[] = "/dev/urandom";
 static char	*send_boundary;
 
 static char *getencoding(int convert);
@@ -77,58 +77,17 @@ static int fmt(char *str, struct name *np, FILE *fo, int comma,
 static int infix_fw(FILE *fi, FILE *fo, struct message *mp,
 		struct name *to, int add_resent);
 
-#define	BOUNDARRAY	8
-
 /*
  * Generate a boundary for MIME multipart messages.
  */
 char *
 makeboundary(void)
 {
-	int i, j, bd;
-	static unsigned msgc;
-	static pid_t pid;
-	static char bound[73];
-	time_t t;
-	unsigned long r[BOUNDARRAY];
-	char b[BOUNDARRAY][sizeof r[0] * 2 + 1];
+	static char bound[70];
+	time_t	now;
 
-	if (pid == 0) {
-		pid = getpid();
-		msgc = (unsigned)pid;
-	}
-	msgc *= 2053 * (unsigned)time(&t);
-	if ((bd = open(randfile, O_RDONLY)) != -1) {
-		for (i = 0; i < BOUNDARRAY; i++) {
-			if (read(bd, &r[i], sizeof r[0]) != sizeof r[0]) {
-				r[0] = 0L;
-				break;
-			}
-		}
-		close(bd);
-	} else
-		r[0] = 0L;
-	if (r[0] == 0L) {
-		srand((unsigned)msgc);
-		for (i = 0; i < BOUNDARRAY; i++) {
-			r[i] = 1L;
-			while (r[i] < 60466176L) {
-				j = rand();
-				if (j != 0)
-					r[i] *= (unsigned long)j;
-			}
-		}
-	}
-	snprintf(bound, 73,
-			"%.5s%.5s-=-%.5s%.5s-CUT-HERE-%.5s%.5s-=-%.5s%.5s",
-			itostr(36, (unsigned)r[0], b[0]),
-			itostr(36, (unsigned)r[1], b[1]),
-			itostr(36, (unsigned)r[2], b[2]),
-			itostr(36, (unsigned)r[3], b[3]),
-			itostr(36, (unsigned)r[4], b[4]),
-			itostr(36, (unsigned)r[5], b[5]),
-			itostr(36, (unsigned)r[6], b[6]),
-			itostr(36, (unsigned)r[7], b[7]));
+	time(&now);
+	snprintf(bound, sizeof bound, "=_%lx.%s", now, getrandstring(32));
 	send_boundary = bound;
 	return send_boundary;
 }
@@ -945,48 +904,21 @@ out:
 
 /*
  * Create a Message-Id: header field.
- * Use either the host name or the host part of the from address.
+ * Use either the host name or the from address.
  */
 static void
 message_id(FILE *fo)
 {
-	static unsigned long msgc;
-	time_t t;
-	char *domainpart;
-	int rd;
-	long randbuf;
-	char datestr[sizeof (time_t) * 2 + 1];
-	char pidstr[sizeof (pid_t) * 2+ 1];
-	char countstr[sizeof msgc * 2 + 1];
-	char randstr[sizeof randbuf * 2+ 1];
+	char	*cp;
+	time_t	now;
 
-
-	msgc++;
-	time(&t);
-	rd = open(randfile, O_RDONLY);
-	if (rd != -1) {
-		if (read(rd, &randbuf, sizeof randbuf) != sizeof randbuf) {
-			srand((unsigned)(msgc * t));
-			randbuf = (long)rand();
-		}
-		close(rd);
-	} else {
-		srand((unsigned)(msgc * t));
-		randbuf = (long)rand();
-	}
-	itostr(16, (unsigned)t, datestr);
-	itostr(36, (unsigned)getpid(), pidstr);
-	itostr(36, (unsigned)msgc, countstr);
-	itostr(36, (unsigned)randbuf, randstr);
-	if ((domainpart = skin(value("from"))) != NULL
-			&& (domainpart = last_at_before_slash(domainpart))
-			!= NULL)
-		domainpart++;
+	time(&now);
+	if ((cp = value("hostname")) != NULL)
+		fprintf(fo, "Message-ID: <%lx.%s@%s>\n",
+				now, getrandstring(24), cp);
 	else
-		domainpart = nodename(1);
-	fprintf(fo, "Message-ID: <%s.%s%.5s%s%.5s@%s>\n",
-			datestr, progname, pidstr, countstr, randstr,
-			domainpart);
+		fprintf(fo, "Message-ID: <%lx.%s%%%s>\n",
+				now, getrandstring(16), skin(myaddr()));
 }
 
 static const char *weekday_names[] = {

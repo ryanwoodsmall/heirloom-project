@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.129 (gritter) 10/2/04
+ *	Sccsid @(#)extern.h	2.131 (gritter) 10/9/04
  */
 
 /* aux.c */
@@ -72,6 +72,7 @@ char *cram_md5_string(const char *user, const char *pass, const char *b64);
 char *getuser(void);
 char *getpassword(struct termios *otio, int *reset_tio, const char *query);
 void transflags(struct message *omessage, long omsgCount, int transparent);
+char *getrandstring(size_t length);
 void out_of_memory(void);
 void *smalloc(size_t s);
 void *srealloc(void *v, size_t s);
@@ -87,7 +88,7 @@ int ascncasecmp(const char *s1, const char *s2, size_t sz);
 char *asccasestr(const char *haystack, const char *xneedle);
 /* base64.c */
 char *strtob64(const char *p);
-void *memtob64(const void *vp, size_t isz);
+char *memtob64(const void *vp, size_t isz);
 size_t mime_write_tob64(struct str *in, FILE *fo, int is_header);
 void mime_fromb64(struct str *in, struct str *out, int is_text);
 void mime_fromb64_b(struct str *in, struct str *out, int is_text, FILE *f);
@@ -358,7 +359,6 @@ char *mime_getboundary(char *h);
 char *mime_filecontent(char *name);
 int get_mime_convert(FILE *fp, char **contenttype, char **charset,
 		enum mimeclean *isclean, int dosign);
-char *itostr(unsigned base, unsigned i, char *b);
 void mime_fromhdr(struct str *in, struct str *out, enum tdflags flags);
 char *mime_fromaddr(char *name);
 size_t prefixwrite(void *ptr, size_t size, size_t nmemb, FILE *f,

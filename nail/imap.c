@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.204 (gritter) 10/2/04";
+static char sccsid[] = "@(#)imap.c	1.205 (gritter) 10/12/04";
 #endif
 #endif /* not lint */
 
@@ -391,12 +391,12 @@ imap_response_parse(void)
 static enum okay 
 imap_answer(struct mailbox *mp, int errprnt)
 {
-	int sz, i, complete;
+	int	i, complete;
 	enum okay ok = STOP;
 
 	if (mp->mb_type == MB_CACHE)
 		return OKAY;
-again:	if ((sz = sgetline(&imapbuf, &imapbufsize, NULL, &mp->mb_sock)) > 0) {
+again:	if (sgetline(&imapbuf, &imapbufsize, NULL, &mp->mb_sock) > 0) {
 		if (verbose)
 			fputs(imapbuf, stderr);
 		imap_response_parse();
@@ -1589,7 +1589,7 @@ imap_fetchheaders (
 	struct message	mt;
 	size_t	expected;
 	enum okay	ok;
-	int	n = 0, u, sz;
+	int	n = 0, u;
 	FILE	*queuefp = NULL;
 
 	if (m[bot].m_uid)
@@ -1640,8 +1640,8 @@ imap_fetchheaders (
 		imap_fetchdata(mp, &mt, expected, NEED_HEADER, NULL, 0, 0);
 		if (n >= 0 && !(m[n-1].m_have & HAVE_HEADER))
 			commitmsg(mp, &m[n-1], mt, HAVE_HEADER);
-		if (n == -1 && (sz = sgetline(&imapbuf, &imapbufsize, NULL,
-					&mp->mb_sock)) > 0) {
+		if (n == -1 && sgetline(&imapbuf, &imapbufsize, NULL,
+					&mp->mb_sock) > 0) {
 			if (verbose)
 				fputs(imapbuf, stderr);
 			if ((cp = asccasestr(imapbuf, "UID ")) != NULL) {
@@ -2641,7 +2641,7 @@ imap_copyuid(struct mailbox *mp, struct message *m, const char *name)
 	struct message	xm;
 
 	if ((cp = asccasestr(responded_text, "[COPYUID ")) == NULL ||
-			imap_copyuid_parse(&responded_text[9], &uidvalidity,
+			imap_copyuid_parse(&cp[9], &uidvalidity,
 				&olduid, &newuid) == STOP)
 		return STOP;
 	xmb = *mp;
@@ -2674,7 +2674,7 @@ imap_appenduid(struct mailbox *mp, FILE *fp, time_t t, long off1,
 	struct message	xm;
 
 	if ((cp = asccasestr(responded_text, "[APPENDUID ")) == NULL ||
-			imap_appenduid_parse(&responded_text[11], &uidvalidity,
+			imap_appenduid_parse(&cp[11], &uidvalidity,
 				&uid) == STOP)
 		return STOP;
 	xmb = *mp;
@@ -2782,8 +2782,8 @@ imap_search2(struct mailbox *mp, struct message *m, int count,
 				sz = strlen(spec) + 1;
 				nsp = nspec = salloc(nsz = 6*strlen(spec) + 1);
 				sp = (char *)spec;
-				if (iconv(it, &sp, &sz, &nsp, &nsz) >= 0 &&
-						sz == 0) {
+				if (iconv(it, &sp, &sz, &nsp, &nsz)
+						!= (size_t)-1 && sz == 0) {
 					spec = nspec;
 					cp = "utf-8";
 				}

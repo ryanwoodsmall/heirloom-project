@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.52 (gritter) 10/2/04";
+static char sccsid[] = "@(#)thread.c	1.53 (gritter) 10/12/04";
 #endif
 #endif /* not lint */
 
@@ -135,8 +135,6 @@ mlook(char *id, struct mitem *mt, struct message *mdata, int mprime)
 		n++;
 		while (c >= mprime)
 			c -= mprime;
-		while (c < 0)
-			c += mprime;
 		mp = &mt[c];
 	}
 	if (mdata != NULL && mp->mi_id == NULL) {

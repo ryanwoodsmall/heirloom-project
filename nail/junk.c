@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.35 (gritter) 10/3/04";
+static char sccsid[] = "@(#)junk.c	1.37 (gritter) 10/12/04";
 #endif
 #endif /* not lint */
 
@@ -90,13 +90,15 @@ static char sccsid[] = "@(#)junk.c	1.35 (gritter) 10/3/04";
  * a carefully crafted message for a denial-of-service attack against the
  * database.
  */
-static struct node {
+#define	SIZEOF_node	17
+struct node {
 	char	hash[4];	/* mangled first 32 bits of MD5 of word */
 	char	next[4];	/* bit-negated table index of next node */
 	char	good[3];	/* number of times this appeared in good msgs */
 	char	bad[3];		/* number of times this appeared in bad msgs */
 	char	prob[3];	/* transformed floating-point probability */
-} *nodes;
+};
+static char	*nodes;
 
 static struct super {
 	char	size[4];	/* allocated nodes in the chain file */
@@ -237,7 +239,7 @@ getdb(void)
 		n = 1;
 		putn(super->size, 1);
 	}
-	nodes = smalloc(n * sizeof *nodes);
+	nodes = smalloc(n * SIZEOF_node);
 	if (sfp && (nfp = dbfp(NODES, 0, &compressed)) != NULL) {
 		if (nfp == (FILE *)-1) {
 			Fclose(sfp);
@@ -247,12 +249,13 @@ getdb(void)
 		}
 		if (compressed)
 			zp = zalloc(nfp);
-		if ((compressed ? zread(zp, (char *)nodes, n * sizeof *nodes)
-				!= n * sizeof *nodes :
-				fread(nodes, sizeof *nodes, n, nfp) != n) ||
+		if ((compressed ? zread(zp, nodes, n * SIZEOF_node)
+				!= n * SIZEOF_node :
+				fread(nodes, 1, n * SIZEOF_node, nfp)
+				!= n * SIZEOF_node) ||
 				ferror(nfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
-			memset(nodes, 0, n * sizeof *nodes);
+			memset(nodes, 0, n * SIZEOF_node);
 			memset(super, 0, sizeof *super);
 			mkmangle();
 			putn(super->size, n);
@@ -261,7 +264,7 @@ getdb(void)
 			zfree(zp);
 		Fclose(nfp);
 	} else
-		memset(nodes, 0, n * sizeof *nodes);
+		memset(nodes, 0, n * SIZEOF_node);
 	if (sfp)
 		Fclose(sfp);
 	return OKAY;
@@ -288,10 +291,10 @@ putdb(void)
 		fwrite(super, 1, sizeof *super, sfp);
 	if (ncomp) {
 		zp = zalloc(nfp);
-		zwrite(zp, (char *)nodes, getn(super->size) * sizeof *nodes);
+		zwrite(zp, nodes, getn(super->size) * SIZEOF_node);
 		zfree(zp);
 	} else
-		fwrite(nodes, sizeof *nodes, getn(super->size), nfp);
+		fwrite(nodes, 1, getn(super->size) * SIZEOF_node, nfp);
 	safe_signal(SIGINT, saveint);
 	Fclose(sfp);
 	Fclose(nfp);
@@ -364,14 +367,14 @@ lookup(unsigned long hash, int create)
 	used = getn(super->used);
 	size = getn(super->size);
 	c = ~getn(super->bucket[hash & MAX2]);
-	n = &nodes[c];
+	n = (struct node *)&nodes[c*SIZEOF_node];
 	while (c < used) {
 		if (getn(n->hash) == hash)
 			return n;
 		lastc = c;
 		lastn = n;
 		c = ~getn(n->next);
-		n = &nodes[c];
+		n = (struct node *)&nodes[c*SIZEOF_node];
 	}
 	if (create) {
 		if (used >= size) {
@@ -381,12 +384,12 @@ lookup(unsigned long hash, int create)
 					"Junk mail database overflow.\n");
 				return NULL;
 			}
-			nodes = srealloc(nodes, (size+incr) * sizeof *nodes);
-			memset(&nodes[size], 0, incr * sizeof *nodes);
+			nodes = srealloc(nodes, (size+incr) * SIZEOF_node);
+			memset(&nodes[size], 0, incr * SIZEOF_node);
 			size += incr;
 			putn(super->size, size);
 		}
-		n = &nodes[used];
+		n = (struct node *)&nodes[used*SIZEOF_node];
 		putn(n->hash, hash);
 		if (lastc < used)
 			putn(lastn->next, ~used);
@@ -648,7 +651,7 @@ recompute(void)
 	ngood = getn(super->ngood);
 	nbad = getn(super->nbad);
 	for (i = 0; i < used; i++) {
-		n = &nodes[i];
+		n = (struct node *)&nodes[i*SIZEOF_node];
 		g = get(n->good) * 2;
 		b = get(n->bad);
 		if (g + b >= 5) {
@@ -838,7 +841,7 @@ static unsigned long
 dbhash(const char *word)
 {
 	unsigned char	digest[16];
-	unsigned	h;
+	unsigned long	h;
 	MD5_CTX	ctx;
 
 	MD5Init(&ctx);

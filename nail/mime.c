@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.27 (gritter) 10/3/04";
+static char sccsid[]  = "@(#)mime.c	2.29 (gritter) 10/11/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -878,7 +878,7 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 				ascncasecmp(*contenttype, "text/", 5) == 0)
 			*contenttype = "application/octet-stream";
 		*charset = NULL;
-	} else if (*isclean & MIME_LONGLINES || dosign)
+	} else if (*isclean & (MIME_LONGLINES|MIME_CTRLCHAR) || dosign)
 		convert = CONV_TOQP;
 	else if (*isclean & MIME_HIGHBIT)
 		convert = gettextconversion();
@@ -899,30 +899,6 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 		*charset = getcharset(*isclean);
 	}
 	return convert;
-}
-
-/*
- * Convert i to a baseX character string and store it in b.
- * The caller has to ensure that the size of b is sufficient.
- */
-char *
-itostr(unsigned base, unsigned i, char *b)
-{
-	char *p, *q, c;
-	
-	p = b;
-	while (i != 0) {
-		*p++ = basetable[i % base];
-		i /= base;
-	}
-	*p-- = '\0';
-	q = b;
-	while (p >= q) {
-		c = *q;
-		*q++ = *p;
-		*p-- = c;
-	}
-	return b;
 }
 
 /*

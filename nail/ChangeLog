@@ -1,3 +1,8 @@
+[11.11] released ...
+* When sending messages that contain ASCII control characters but neither
+  NULs nor non-ASCII characters, the quoted-printable MIME encoding is now
+  used instead of 7bit.
+
 [11.10] released 10/3/04
 * The creation of quoted-printable encoded MIME data was broken in 11.9.
 * Junk mail filter improvement: Do not ignore single-letter words; extract

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.15 (gritter) 10/2/04";
+static char sccsid[] = "@(#)openssl.c	1.17 (gritter) 10/9/04";
 #endif
 #endif /* not lint */
 
@@ -109,7 +109,9 @@ static int smime_verify(struct message *m, int n, STACK *chain,
 static EVP_CIPHER *smime_cipher(const char *name);
 static int ssl_password_cb(char *buf, int size, int rwflag, void *userdata);
 static FILE *smime_sign_cert(const char *xname, const char *xname2, int warn);
+#if defined (X509_V_FLAG_CRL_CHECK) && defined (X509_V_FLAG_CRL_CHECK_ALL)
 static enum okay load_crl1(X509_STORE *store, const char *name);
+#endif
 static enum okay load_crls(X509_STORE *store, const char *vfile,
 		const char *vdir);
 
@@ -323,7 +325,7 @@ ssl_check_host(const char *server, struct sock *sp)
 					fprintf(stderr,
 						"Comparing DNS name: \"%s\"\n",
 						gen->d.ia5->data);
-				if (!asccasecmp(gen->d.ia5->data,
+				if (!asccasecmp((char *)gen->d.ia5->data,
 							(char *)server))
 					goto found;
 			}
@@ -575,7 +577,8 @@ loop:	if ((from = hfield("from", m)) != NULL)
 							"Comparing alt. "
 							"address: %s\"\n",
 							data);
-					if (!asccasecmp(gen->d.ia5->data, from))
+					if (!asccasecmp((char *)
+							gen->d.ia5->data, from))
 						goto found;
 				}
 			}
@@ -764,8 +767,8 @@ smime_decrypt(struct message *m, const char *to, const char *cc, int signcall)
 						NULL)) == NULL) {
 			ssl_gen_err("Error reading decryption certificate");
 			Fclose(fp);
-			return NULL;
 			EVP_PKEY_free(pkey);
+			return NULL;
 		}
 		Fclose(fp);
 	}

@@ -23,7 +23,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)base64.c	2.10 (gritter) 10/2/04";
+static char sccsid[] = "@(#)base64.c	2.11 (gritter) 10/9/04";
 #endif
 #endif /* not lint */
 
@@ -81,7 +81,7 @@ strtob64(const char *p)
 	return memtob64(p, strlen(p));
 }
 
-void *
+char *
 memtob64(const void *vp, size_t isz)
 {
 	char	q[3];

@@ -77,7 +77,7 @@ nail: $(OBJ) LIBS
 
 $(OBJ): config.h def.h extern.h glob.h rcv.h
 imap.o: imap_gssapi.c
-md5.o imap.o hmac.o smtp.o aux.o pop3.o: md5.h
+md5.o imap.o hmac.o smtp.o aux.o pop3.o junk.o: md5.h
 
 config.h LIBS:
 	$(SHELL) ./makeconfig

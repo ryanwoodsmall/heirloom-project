@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.14 (gritter) 10/2/04";
+static char sccsid[] = "@(#)maildir.c	1.15 (gritter) 10/12/04";
 #endif
 #endif /* not lint */
 
@@ -759,8 +759,6 @@ mdlook(const char *name, struct message *data)
 		n++;
 		while (c >= mdprime)
 			c -= mdprime;
-		while (c < 0)
-			c += mdprime;
 		md = &mdtable[c];
 	}
 	if (data != NULL && md->md_data == NULL)

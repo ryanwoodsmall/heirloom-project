@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.69 (gritter) 10/2/04";
+static char sccsid[] = "@(#)aux.c	2.74 (gritter) 10/9/04";
 #endif
 #endif /* not lint */
 
@@ -855,6 +855,40 @@ transflags(struct message *omessage, long omsgCount, int transparent)
 	setdot(newdot);
 	prevdot = newprevdot;
 	free(omessage);
+}
+
+char *
+getrandstring(size_t length)
+{
+	static unsigned char	nodedigest[16];
+	static pid_t	pid;
+	int	i, fd = -1;
+	char	*data;
+	char	*cp, *rp;
+	MD5_CTX	ctx;
+
+	data = salloc(length);
+	if ((fd = open("/dev/urandom", O_RDONLY)) < 0 ||
+			read(fd, data, length) != length) {
+		if (pid == 0) {
+			pid = getpid();
+			srand(pid);
+			cp = nodename(0);
+			MD5Init(&ctx);
+			MD5Update(&ctx, (unsigned char *)cp, strlen(cp));
+			MD5Final(nodedigest, &ctx);
+		}
+		for (i = 0; i < length; i++)
+			data[i] = (int)(255 * (rand() / (RAND_MAX + 1.0))) ^
+				nodedigest[i % sizeof nodedigest];
+	}
+	if (fd > 0)
+		close(fd);
+	cp = memtob64(data, length);
+	rp = salloc(length+1);
+	strncpy(rp, cp, length)[length] = '\0';
+	free(cp);
+	return rp;
 }
 
 void 
