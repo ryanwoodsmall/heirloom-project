@@ -1,7 +1,14 @@
-[11.11] released ...
+[11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
   NULs nor non-ASCII characters, the quoted-printable MIME encoding is now
   used instead of 7bit.
+* A dangling pointer after a memory reallocation could result in a coredump
+  when the junk mail database was updated by a 'good' or a 'junk' command.
+* The code for accessing the junk mail database has been made more machine-
+  independent. It will not make a difference on most of the platforms on
+  which nail runs. If your compiler does insert padding into C structs that
+  contain only members of type char, you will have to create the junk mail
+  database from scratch again, though.
 
 [11.10] released 10/3/04
 * The creation of quoted-printable encoded MIME data was broken in 11.9.

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.37 (gritter) 10/12/04";
+static char sccsid[] = "@(#)junk.c	1.38 (gritter) 10/13/04";
 #endif
 #endif /* not lint */
 
@@ -91,23 +91,22 @@ static char sccsid[] = "@(#)junk.c	1.37 (gritter) 10/12/04";
  * database.
  */
 #define	SIZEOF_node	17
-struct node {
-	char	hash[4];	/* mangled first 32 bits of MD5 of word */
-	char	next[4];	/* bit-negated table index of next node */
-	char	good[3];	/* number of times this appeared in good msgs */
-	char	bad[3];		/* number of times this appeared in bad msgs */
-	char	prob[3];	/* transformed floating-point probability */
-};
+#define	OF_node_hash	0	/* mangled first 32 bits of MD5 of word */
+#define	OF_node_next	4	/* bit-negated table index of next node */
+#define	OF_node_good	8	/* number of times this appeared in good msgs */
+#define	OF_node_bad	11	/* number of times this appeared in bad msgs */
+#define	OF_node_prob	14	/* transformed floating-point probability */
 static char	*nodes;
 
-static struct super {
-	char	size[4];	/* allocated nodes in the chain file */
-	char	used[4];	/* used nodes in the chain file */
-	char	ngood[4];	/* number of good messages scanned so far */
-	char	nbad[4];	/* number of bad messages scanned so far */
-	char	mangle[4];	/* used to mangle the MD5 hash */
-	char	bucket[65536][4];	/* bit-negated node indices */
-} *super;
+#define	SIZEOF_super	262164
+#define	OF_super_size	0	/* allocated nodes in the chain file */
+#define	OF_super_used	4	/* used nodes in the chain file */
+#define	OF_super_ngood	8	/* number of good messages scanned so far */
+#define	OF_super_nbad	12	/* number of bad messages scanned so far */
+#define	OF_super_mangle	16	/* used to mangle the MD5 hash */
+#define	OF_super_bucket	20	/* 65536 bit-negated node indices */
+#define	SIZEOF_entry	4
+static char	*super;
 
 #define	get(e)	\
 	((unsigned)(((char *)(e))[0]&0377) + \
@@ -191,7 +190,7 @@ static int	verbose;
 static enum okay getdb(void);
 static void putdb(void);
 static FILE *dbfp(enum db db, int rw, int *compressed);
-static struct node *lookup(unsigned long hash, int create);
+static char *lookup(unsigned long hash, int create);
 static char *nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 		struct lexstat *sp);
 static void add(const char *word, enum entry entry, struct lexstat *sp);
@@ -214,16 +213,17 @@ getdb(void)
 
 	if ((sfp = dbfp(SUPER, 0, &compressed)) == (FILE *)-1)
 		return STOP;
-	super = smalloc(sizeof *super);
+	super = smalloc(SIZEOF_super);
 	if (sfp) {
 		if (compressed)
 			zp = zalloc(sfp);
-		if ((compressed ? zread(zp, (char *)super, sizeof *super)
-					!= sizeof *super :
-				fread(super, sizeof *super, 1, sfp) != 1) ||
+		if ((compressed ? zread(zp, super, SIZEOF_super)
+					!= SIZEOF_super :
+				fread(super, 1, SIZEOF_super, sfp)
+					!= SIZEOF_super) ||
 				ferror(sfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
-			memset(super, 0, sizeof *super);
+			memset(super, 0, SIZEOF_super);
 			mkmangle();
 			if (compressed)
 				zfree(zp);
@@ -232,12 +232,12 @@ getdb(void)
 		} else if (compressed)
 			zfree(zp);
 	} else {
-		memset(super, 0, sizeof *super);
+		memset(super, 0, SIZEOF_super);
 		mkmangle();
 	}
-	if ((n = getn(super->size)) == 0) {
+	if ((n = getn(&super[OF_super_size])) == 0) {
 		n = 1;
-		putn(super->size, 1);
+		putn(&super[OF_super_size], 1);
 	}
 	nodes = smalloc(n * SIZEOF_node);
 	if (sfp && (nfp = dbfp(NODES, 0, &compressed)) != NULL) {
@@ -256,9 +256,9 @@ getdb(void)
 				ferror(nfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(nodes, 0, n * SIZEOF_node);
-			memset(super, 0, sizeof *super);
+			memset(super, 0, SIZEOF_super);
 			mkmangle();
-			putn(super->size, n);
+			putn(&super[OF_super_size], n);
 		}
 		if (compressed)
 			zfree(zp);
@@ -285,16 +285,17 @@ putdb(void)
 	saveint = safe_signal(SIGINT, SIG_IGN);
 	if (scomp) {
 		zp = zalloc(sfp);
-		zwrite(zp, (char *)super, sizeof *super);
+		zwrite(zp, super, SIZEOF_super);
 		zfree(zp);
 	} else
-		fwrite(super, 1, sizeof *super, sfp);
+		fwrite(super, 1, SIZEOF_super, sfp);
 	if (ncomp) {
 		zp = zalloc(nfp);
-		zwrite(zp, nodes, getn(super->size) * SIZEOF_node);
+		zwrite(zp, nodes, getn(&super[OF_super_size]) * SIZEOF_node);
 		zfree(zp);
 	} else
-		fwrite(nodes, 1, getn(super->size) * SIZEOF_node, nfp);
+		fwrite(nodes, 1,
+			getn(&super[OF_super_size]) * SIZEOF_node, nfp);
 	safe_signal(SIGINT, saveint);
 	Fclose(sfp);
 	Fclose(nfp);
@@ -358,23 +359,23 @@ okay:	ac_free(fn);
 	return fp;
 }
 
-static struct node *
+static char *
 lookup(unsigned long hash, int create)
 {
-	struct node	*n, *lastn = NULL;
+	char	*n, *lastn = NULL;
 	unsigned long	c, lastc = MAX4, used, size, incr;
 
-	used = getn(super->used);
-	size = getn(super->size);
-	c = ~getn(super->bucket[hash & MAX2]);
-	n = (struct node *)&nodes[c*SIZEOF_node];
+	used = getn(&super[OF_super_used]);
+	size = getn(&super[OF_super_size]);
+	c = ~getn(&super[OF_super_bucket + (hash&MAX2)*SIZEOF_entry]);
+	n = &nodes[c*SIZEOF_node];
 	while (c < used) {
-		if (getn(n->hash) == hash)
+		if (getn(&n[OF_node_hash]) == hash)
 			return n;
 		lastc = c;
 		lastn = n;
-		c = ~getn(n->next);
-		n = (struct node *)&nodes[c*SIZEOF_node];
+		c = ~getn(&n[OF_node_next]);
+		n = &nodes[c*SIZEOF_node];
 	}
 	if (create) {
 		if (used >= size) {
@@ -384,19 +385,21 @@ lookup(unsigned long hash, int create)
 					"Junk mail database overflow.\n");
 				return NULL;
 			}
-			nodes = srealloc(nodes, (size+incr) * SIZEOF_node);
-			memset(&nodes[size], 0, incr * SIZEOF_node);
+			nodes = srealloc(nodes, (size+incr)*SIZEOF_node);
+			memset(&nodes[size*SIZEOF_node], 0, incr*SIZEOF_node);
 			size += incr;
-			putn(super->size, size);
+			putn(&super[OF_super_size], size);
+			lastn = &nodes[lastc*SIZEOF_node];
 		}
-		n = (struct node *)&nodes[used*SIZEOF_node];
-		putn(n->hash, hash);
+		n = &nodes[used*SIZEOF_node];
+		putn(&n[OF_node_hash], hash);
 		if (lastc < used)
-			putn(lastn->next, ~used);
+			putn(&lastn[OF_node_next], ~used);
 		else
-			putn(super->bucket[hash & MAX2], ~used);
+			putn(&super[OF_super_bucket + (hash&MAX2)*SIZEOF_entry],
+					~used);
 		used++;
-		putn(super->used, used);
+		putn(&super[OF_super_used], used);
 		return n;
 	} else
 		return NULL;
@@ -584,23 +587,23 @@ add(const char *word, enum entry entry, struct lexstat *sp)
 {
 	unsigned	c;
 	unsigned long	h;
-	struct node	*n;
+	char	*n;
 
 	h = dbhash(word);
 	if ((n = lookup(h, 1)) != NULL) {
 		switch (entry) {
 		case GOOD:
-			c = get(n->good);
+			c = get(&n[OF_node_good]);
 			if (c < MAX3) {
 				c++;
-				put(n->good, c);
+				put(&n[OF_node_good], c);
 			}
 			break;
 		case BAD:
-			c = get(n->bad);
+			c = get(&n[OF_node_bad]);
 			if (c < MAX3) {
 				c++;
-				put(n->bad, c);
+				put(&n[OF_node_bad], c);
 			}
 			break;
 		}
@@ -644,16 +647,16 @@ recompute(void)
 	unsigned long	used, i;
 	unsigned long	ngood, nbad;
 	unsigned	g, b, p;
-	struct node	*n;
+	char	*n;
 	float	d;
 
-	used = getn(super->used);
-	ngood = getn(super->ngood);
-	nbad = getn(super->nbad);
+	used = getn(&super[OF_super_used]);
+	ngood = getn(&super[OF_super_ngood]);
+	nbad = getn(&super[OF_super_nbad]);
 	for (i = 0; i < used; i++) {
-		n = (struct node *)&nodes[i*SIZEOF_node];
-		g = get(n->good) * 2;
-		b = get(n->bad);
+		n = &nodes[i*SIZEOF_node];
+		g = get(&n[OF_node_good]) * 2;
+		b = get(&n[OF_node_bad]);
 		if (g + b >= 5) {
 			d = smin(1.0, nbad ? (float)b/nbad : 0.0) /
 				(smin(1.0, ngood ? (float)g/ngood : 0.0) +
@@ -669,7 +672,7 @@ recompute(void)
 			p = f2s(DFL);
 		else
 			p = 0;
-		put(n->prob, p);
+		put(&n[OF_node_prob], p);
 	}
 }
 
@@ -684,10 +687,10 @@ insert(int *msgvec, enum entry entry)
 		return 1;
 	switch (entry) {
 	case GOOD:
-		u = getn(super->ngood);
+		u = getn(&super[OF_super_ngood]);
 		break;
 	case BAD:
-		u = getn(super->nbad);
+		u = getn(&super[OF_super_nbad]);
 		break;
 	}
 	for (ip = msgvec; *ip; ip++) {
@@ -704,10 +707,10 @@ insert(int *msgvec, enum entry entry)
 	}
 	switch (entry) {
 	case GOOD:
-		putn(super->ngood, u);
+		putn(&super[OF_super_ngood], u);
 		break;
 	case BAD:
-		putn(super->nbad, u);
+		putn(&super[OF_super_nbad], u);
 		break;
 	}
 	recompute();
@@ -798,7 +801,7 @@ clsf(struct message *m)
 static void
 rate(const char *word, enum entry entry, struct lexstat *sp)
 {
-	struct node	*n;
+	char	*n;
 	unsigned long	h;
 	unsigned	s;
 	float	p, d;
@@ -806,7 +809,7 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 
 	h = dbhash(word);
 	if ((n = lookup(h, 0)) != NULL) {
-		s = get(n->prob);
+		s = get(&n[OF_node_prob]);
 		p = s2f(s);
 	} else
 		p = DFL;
@@ -847,7 +850,7 @@ dbhash(const char *word)
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char *)word, strlen(word));
 	MD5Final(digest, &ctx);
-	h = getn(digest) ^ getn(super->mangle);
+	h = getn(digest) ^ getn(&super[OF_super_mangle]);
 	return h;
 }
 
@@ -875,5 +878,5 @@ mkmangle(void)
 	MD5Update(&ctx, (unsigned char *)u.c, sizeof u.c);
 	MD5Final(digest, &ctx);
 	s = getn(digest);
-	putn(super->mangle, s);
+	putn(&super[OF_super_mangle], s);
 }
