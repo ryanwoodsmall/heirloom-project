@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.205 (gritter) 10/12/04";
+static char sccsid[] = "@(#)imap.c	1.206 (gritter) 10/19/04";
 #endif
 #endif /* not lint */
 
@@ -1103,6 +1103,7 @@ imap_split(char **server, const char **sp, int *use_ssl, const char **cp,
 		memcpy(*user, *uhp, *cp - *uhp);
 		(*user)[*cp - *uhp] = '\0';
 		*sp = &(*cp)[1];
+		*user = strdec(*user);
 	} else {
 		*user = NULL;
 		*sp = *uhp;

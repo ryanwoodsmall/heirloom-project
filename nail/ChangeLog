@@ -4,6 +4,11 @@
   Tennent).
 * An internal problem in the token scanning for junk mail detection has been
   fixed; the end of the mail header was not always correctly determined.
+* Special characters in IMAP or POP3 account strings like 'imap://user@host'
+  can now be escaped using URL notation, e.g. 'foo%2Fbar' for 'foo/bar'. It
+  was previously not possible to use these characters. This is a slightly
+  incompatible change as the '%' character must now also be escaped, as
+  '%25'. (Bugreport by Thomas Wolff.)
 
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
