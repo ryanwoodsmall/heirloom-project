@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.39 (gritter) 9/1/04";
+static char sccsid[] = "@(#)sendout.c	2.40 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -937,7 +937,7 @@ FILE *fo;
 			!= NULL)
 		domainpart++;
 	else
-		domainpart = nodename();
+		domainpart = nodename(1);
 	fprintf(fo, "Message-ID: <%s.%s%.5s%s%.5s@%s>\n",
 			datestr, progname, pidstr, countstr, randstr,
 			domainpart);

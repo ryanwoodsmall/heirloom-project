@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.55 (gritter) 9/4/04";
+static char sccsid[] = "@(#)fio.c	2.56 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -608,10 +608,12 @@ getfold(name, size)
 	int size;
 {
 	char *folder;
+	enum protocol	p;
 
 	if ((folder = value("folder")) == NULL)
 		return (-1);
-	if (*folder == '/' || which_protocol(folder) != PROTO_FILE) {
+	if (*folder == '/' || (p = which_protocol(folder)) != PROTO_FILE &&
+			p != PROTO_MAILDIR) {
 		strncpy(name, folder, size);
 		name[size-1]='\0';
 	} else {
@@ -777,6 +779,7 @@ get_header(mp)
 {
 	switch (mb.mb_type) {
 	case MB_FILE:
+	case MB_MAILDIR:
 		return OKAY;
 	case MB_POP3:
 		return pop3_header(mp);
@@ -796,6 +799,7 @@ get_body(mp)
 {
 	switch (mb.mb_type) {
 	case MB_FILE:
+	case MB_MAILDIR:
 		return OKAY;
 	case MB_POP3:
 		return pop3_body(mp);

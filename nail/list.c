@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.46 (gritter) 9/4/04";
+static char sccsid[] = "@(#)list.c	2.47 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -763,9 +763,9 @@ scan(sp)
 	}
 
 	/*
-	 * Only in threaded mode: select descendants of a message.
+	 * Select members of a message thread.
 	 */
-	if (mb.mb_threaded == 1 && c == '&') {
+	if (c == '&') {
 		threadflag = 1;
 		if (*cp == '\0' || spacechar(*cp&0377)) {
 			lexstring[0] = '.';
@@ -1043,7 +1043,7 @@ mark(mesg, f)
 	i = mesg;
 	if (i < 1 || i > msgCount)
 		panic(catgets(catd, CATSET, 129, "Bad message number to mark"));
-	if (threadflag) {
+	if (mb.mb_threaded == 1 && threadflag) {
 		if ((message[i-1].m_flag & MHIDDEN) == 0) {
 			if (f == MDELETED ||
 					(message[i-1].m_flag&MDELETED) == 0)

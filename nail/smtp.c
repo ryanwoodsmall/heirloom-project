@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.25 (gritter) 8/28/04";
+static char sccsid[] = "@(#)smtp.c	2.26 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -72,7 +72,8 @@ static int verbose;
  * Return our hostname.
  */
 char *
-nodename()
+nodename(mayoverride)
+	int	mayoverride;
 {
 	static char *hostname;
 	char *hn;
@@ -85,7 +86,7 @@ nodename()
 #endif	/* !HAVE_IPv6_FUNCS */
 #endif	/* HAVE_SOCKETS */
 
-	if ((hn = value("hostname")) != NULL && *hn) {
+	if (mayoverride && (hn = value("hostname")) != NULL && *hn) {
 		free(hostname);
 		hostname = sstrdup(hn);
 	}
@@ -136,7 +137,7 @@ myaddr()
 	if (value("smtp") == NULL)
 		return NULL;
 	if (addr == NULL) {
-		hn = nodename();
+		hn = nodename(1);
 		sz = strlen(myname) + strlen(hn) + 2;
 		addr = smalloc(sz);
 		snprintf(addr, sz, "%s@%s", myname, hn);
@@ -261,7 +262,7 @@ char *server, *uhp;
 #ifdef	USE_SSL
 	if (value("smtp-use-starttls") ||
 			value("smtp-use-tls") /* v11.0 compatibility */) {
-		snprintf(o, sizeof o, "EHLO %s\r\n", nodename());
+		snprintf(o, sizeof o, "EHLO %s\r\n", nodename(1));
 		SMTP_OUT(o);
 		SMTP_ANSWER(2);
 		SMTP_OUT("STARTTLS\r\n");
@@ -276,7 +277,7 @@ char *server, *uhp;
 	}
 #endif	/* !USE_SSL */
 	if (auth != AUTH_NONE) {
-		snprintf(o, sizeof o, "EHLO %s\r\n", nodename());
+		snprintf(o, sizeof o, "EHLO %s\r\n", nodename(1));
 		SMTP_OUT(o);
 		SMTP_ANSWER(2);
 		switch (auth) {
@@ -306,7 +307,7 @@ char *server, *uhp;
 			break;
 		}
 	} else {
-		snprintf(o, sizeof o, "HELO %s\r\n", nodename());
+		snprintf(o, sizeof o, "HELO %s\r\n", nodename(1));
 		SMTP_OUT(o);
 		SMTP_ANSWER(2);
 	}

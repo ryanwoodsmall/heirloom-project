@@ -1,4 +1,10 @@
-[11.6] released ...
+[11.6] released 9/7/04
+* An IMAP performance improvement introduced in release 11.5 lead to an
+  inconsistency in the internal states if a command like 'copy' was
+  followed by another command that fetched a message text from the server.
+  Due to an error in the IMAP response parser, this sometimes resulted in
+  core dumps.
+* Support for the 'maildir' folder format was added.
 * The 'account' command was changed; its syntax and semantics are similar
   to the 'define' command now. This change is downwards compatible, and
   old 'account' definitions are still accepted.
@@ -7,9 +13,17 @@
 * It is not an error to 'unset' an undefined variable from within a 'call'
   command or folder hook now.
 * A 'defines' command was added to print the currently defined macros.
+* The header summary that is printed when new mail arrives erroneously
+  included killed messages.
 * When a message in a multibyte character set like UTF-8 that was encoded
   as quoted-printable was printed and a multibyte character was separated
   by a '=' continued line, it was not decoded correctly.
+* The '&' addressing mode is now recognized in non-threaded mode too,
+  although it has no special effect then.
+* When the 'thread', 'sort', 'unthread', or 'unsort' commands are called
+  from within a folder hook, they do not print a header summary anymore.
+  Also, the first new message is made the current message correctly now
+  in this situation.
 
 [11.5] released 9/5/04
 ***************************************************************************

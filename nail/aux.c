@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.63 (gritter) 9/5/04";
+static char sccsid[] = "@(#)aux.c	2.65 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -55,6 +55,12 @@ static char sccsid[] = "@(#)aux.c	2.63 (gritter) 9/5/04";
 #ifdef	HAVE_WCWIDTH
 #include <wchar.h>
 #endif	/* HAVE_WCWIDTH */
+#include <errno.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
+#include <dirent.h>
+#include <fcntl.h>
 
 #include "md5.h"
 
@@ -551,12 +557,16 @@ which_protocol(name)
 	const char *name;
 {
 	register const char *cp;
+	char	*np;
+	size_t	sz;
+	struct stat	st;
+	enum protocol	p;
 
 	if (name[0] == '%' && name[1] == ':')
 		name += 2;
 	for (cp = name; *cp && *cp != ':'; cp++)
 		if (!alnumchar(*cp&0377))
-			return PROTO_FILE;
+			goto file;
 	if (cp[0] == ':' && cp[1] == '/' && cp[2] == '/') {
 		if (strncmp(name, "pop3://", 7) == 0)
 			return PROTO_POP3;
@@ -577,8 +587,38 @@ which_protocol(name)
 					"No SSL support compiled in.\n"));
 #endif	/* !USE_SSL */
 		return PROTO_UNKNOWN;
-	} else
-		return PROTO_FILE;
+	} else {
+	file:	p = PROTO_FILE;
+		np = ac_alloc((sz = strlen(name)) + 5);
+		strcpy(np, name);
+		if (stat(name, &st) == 0) {
+			if (S_ISDIR(st.st_mode)) {
+				strcpy(&np[sz], "/tmp");
+				if (stat(np, &st) == 0 && S_ISDIR(st.st_mode)) {
+					strcpy(&np[sz], "/new");
+					if (stat(np, &st) == 0 &&
+							S_ISDIR(st.st_mode)) {
+						strcpy(&np[sz], "/cur");
+						if (stat(np, &st) == 0 &&
+							S_ISDIR(st.st_mode))
+						    p = PROTO_MAILDIR;
+					}
+				}
+			}
+		} else {
+			strcpy(&np[sz], ".gz");
+			if (stat(np, &st) < 0) {
+				strcpy(&np[sz], ".bz2");
+				if (stat(np, &st) < 0) {
+					if ((cp = value("newfolders")) != 0 &&
+						strcmp(cp, "maildir") == 0)
+					p = PROTO_MAILDIR;
+				}
+			}
+		}
+		ac_free(np);
+		return p;
+	}
 }
 
 const char *
@@ -646,6 +686,45 @@ disconnected(file)
 	r = value(vp) != NULL;
 	ac_free(vp);
 	return r;
+}
+
+unsigned
+pjw(cp)
+	const char	*cp;
+{
+	unsigned	h = 0, g;
+
+	cp--;
+	while (*++cp) {
+		h = (h << 4 & 0xffffffff) + (*cp&0377);
+		if ((g = h & 0xf0000000) != 0) {
+			h = h ^ g >> 24;
+			h = h ^ g;
+		}
+	}
+	return h;
+}
+
+long
+nextprime(n)
+	long	n;
+{
+	const long	primes[] = {
+			509, 1021, 2039, 4093, 8191, 16381, 32749, 65521,
+			131071, 262139, 524287, 1048573, 2097143, 4194301,
+			8388593, 16777213, 33554393, 67108859, 134217689,
+			268435399, 536870909, 1073741789, 2147483647
+		};
+	long	mprime = 7;
+	int	i;
+
+	for (i = 0; i < sizeof primes / sizeof *primes; i++)
+		if ((mprime = primes[i]) >= (n < 65536 ? n*4 :
+					n < 262144 ? n*2 : n))
+			break;
+	if (i == sizeof primes / sizeof *primes)
+		mprime = n;	/* not so prime, but better than failure */
+	return mprime;
 }
 
 #define	Hexchar(n)	((n)>9 ? (n)-10+'A' : (n)+'0')
@@ -898,6 +977,80 @@ const char *cp;
 	} else
 		return NULL;
 }
+
+enum okay
+makedir(name)
+	const char	*name;
+{
+	int	e;
+	struct stat	st;
+
+	if (mkdir(name, 0700) < 0) {
+		e = errno;
+		if ((e == EEXIST || e == ENOSYS) &&
+				stat(name, &st) == 0 &&
+				(st.st_mode&S_IFMT) == S_IFDIR)
+			return OKAY;
+		return STOP;
+	}
+	return OKAY;
+}
+
+#ifdef	HAVE_FCHDIR
+enum okay
+cwget(cw)
+	struct cw	*cw;
+{
+	if ((cw->cw_fd = open(".", O_RDONLY)) < 0)
+		return STOP;
+	if (fchdir(cw->cw_fd) < 0) {
+		close(cw->cw_fd);
+		return STOP;
+	}
+	return OKAY;
+}
+
+enum okay
+cwret(cw)
+	struct cw	*cw;
+{
+	if (fchdir(cw->cw_fd) < 0)
+		return STOP;
+	return OKAY;
+}
+
+void
+cwrelse(cw)
+	struct cw	*cw;
+{
+	close(cw->cw_fd);
+}
+#else	/* !HAVE_FCHDIR */
+enum okay
+cwget(cw)
+	struct cw	*cw;
+{
+	if (getcwd(cw->cw_wd, sizeof cw->cw_wd) == NULL || chdir(cw->cw_wd) < 0)
+		return STOP;
+	return OKAY;
+}
+
+enum okay
+cwret(cw)
+	struct cw	*cw;
+{
+	if (chdir(cw->cw_wd) < 0)
+		return STOP;
+	return OKAY;
+}
+
+/*ARGSUSED*/
+void
+cwrelse(cw)
+	struct cw	*cw;
+{
+}
+#endif	/* !HAVE_FCHDIR */
 
 /*
  * Locale-independent character class functions.

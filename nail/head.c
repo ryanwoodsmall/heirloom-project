@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.7 (gritter) 8/19/04";
+static char sccsid[] = "@(#)head.c	2.8 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -1249,4 +1249,34 @@ combinetime(year, month, day, hour, minute, second)
 	t += (year - 70) * 31536000 + ((year - 69) / 4) * 86400 -
 		((year - 1) / 100) * 86400 + ((year + 299) / 400) * 86400;
 	return t;
+}
+
+void
+substdate(m)
+	struct message *m;
+{
+	char *cp;
+	time_t now;
+
+	/*
+	 * Determine the date to print in faked 'From ' lines. This is
+	 * traditionally the date the message was written to the mail
+	 * file. Try to determine this using RFC message header fields,
+	 * or fall back to current time.
+	 */
+	time(&now);
+	if ((cp = hfield_mult("received", m, 0)) != NULL) {
+		while ((cp = nexttoken(cp)) != NULL && *cp != ';') {
+			do
+				cp++;
+			while (alnumchar(*cp & 0377));
+		}
+		if (cp && *++cp)
+			m->m_time = rfctime(cp);
+	}
+	if (m->m_time == 0 || m->m_time > now)
+		if ((cp = hfield("date", m)) != NULL)
+			m->m_time = rfctime(cp);
+	if (m->m_time == 0 || m->m_time > now)
+		m->m_time = now;
 }

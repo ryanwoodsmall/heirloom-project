@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)macro.c	1.7 (gritter) 9/5/04";
+static char sccsid[] = "@(#)macro.c	1.8 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -77,7 +77,7 @@ static struct macro	*accounts[MAPRIME];
 static void	undef1 __P((const char *, struct macro **));
 static int	closingangle __P((const char *));
 static int	maexec __P((struct macro *));
-static unsigned	mahash __P((const char *));
+#define	mahash(cp)	(pjw(cp) % MAPRIME)
 static struct macro	*malook __P((const char *, struct macro *,
 				struct macro **));
 static void	list0 __P((FILE *, struct line *));
@@ -281,23 +281,6 @@ closingangle(cp)
 	while (spacechar(*cp&0377))
 		cp++;
 	return *cp == '\0';
-}
-
-static unsigned
-mahash(cp)
-	const char	*cp;
-{
-	unsigned	h = 0, g;
-
-	cp--;
-	while (*++cp) {
-		h = h << 4 & 0xffffffff;
-		if ((g = h & 0xf0000000) != 0) {
-			h = h ^ g >> 24;
-			h = h ^ g;
-		}
-	}
-	return h % MAPRIME;
 }
 
 static struct macro *

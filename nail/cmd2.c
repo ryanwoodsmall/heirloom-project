@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.33 (gritter) 9/4/04";
+static char sccsid[] = "@(#)cmd2.c	2.34 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -390,10 +390,10 @@ save1(str, mark, cmd, ignore, convert, sender_record, domove)
 	if (Fclose(obuf) != 0)
 		success = 0;
 	if (success) {
-		if (prot == PROTO_IMAP)
-			disp = disconnected(file) ? "[Queued]" :
-				imap_created_mailbox ?
-				"[New file]" : "[Appended]";
+		if (prot == PROTO_IMAP || prot == PROTO_MAILDIR)
+			disp = prot == PROTO_IMAP && disconnected(file) ?
+				"[Queued]" : imap_created_mailbox ?
+					"[New file]" : "[Appended]";
 		printf("\"%s\" %s ", file, disp);
 		if (tstats[0] >= 0)
 			printf("%lu", (long)tstats[0]);

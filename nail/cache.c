@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.53 (gritter) 9/4/04";
+static char sccsid[] = "@(#)cache.c	1.54 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -63,26 +63,12 @@ static char sccsid[] = "@(#)cache.c	1.53 (gritter) 9/4/04";
  * A cache for IMAP.
  */
 
-#ifdef	HAVE_FCHDIR
-struct	cw {
-	int	cw_fd;
-};
-#else	/* !HAVE_FCHDIR */
-struct	cw {
-	char	cw_wd[PATHSIZE];
-};
-#endif	/* !HAVE_FCHDIR */
-static enum okay	cwget __P((struct cw *));
-static enum okay	cwret __P((struct cw *));
-static void	cwrelse __P((struct cw *));
-
 static char	*encname __P((struct mailbox *, const char *, int));
 static char	*encuid __P((struct mailbox *, unsigned long));
 static FILE	*clean __P((struct mailbox *, struct cw *));
 static unsigned long	*builds __P((long *));
 static void	purge __P((struct mailbox *, struct message *, long,
 				struct cw *, const char *));
-static enum okay	makedir __P((const char *));
 static int	longlt __P((const void *, const void *));
 static void	remve __P((unsigned long));
 static FILE	*cache_queue1 __P((struct mailbox *, char *, char **));
@@ -489,24 +475,6 @@ out:	if (cwret(cw) == STOP) {
 	return fp;
 }
 
-static enum okay
-makedir(name)
-	const char	*name;
-{
-	int	e;
-	struct stat	st;
-
-	if (mkdir(name, 0700) < 0) {
-		e = errno;
-		if ((e == EEXIST || e == ENOSYS) &&
-				stat(name, &st) == 0 &&
-				(st.st_mode&S_IFMT) == S_IFDIR)
-			return OKAY;
-		return STOP;
-	}
-	return OKAY;
-}
-
 static unsigned long *
 builds(long *contentelem)
 {
@@ -815,60 +783,4 @@ dequeue1(mp)
 	}
 	return OKAY;
 }
-
-#ifdef	HAVE_FCHDIR
-static enum okay
-cwget(cw)
-	struct cw	*cw;
-{
-	if ((cw->cw_fd = open(".", O_RDONLY)) < 0)
-		return STOP;
-	if (fchdir(cw->cw_fd) < 0) {
-		close(cw->cw_fd);
-		return STOP;
-	}
-	return OKAY;
-}
-
-static enum okay
-cwret(cw)
-	struct cw	*cw;
-{
-	if (fchdir(cw->cw_fd) < 0)
-		return STOP;
-	return OKAY;
-}
-
-static void
-cwrelse(cw)
-	struct cw	*cw;
-{
-	close(cw->cw_fd);
-}
-#else	/* !HAVE_FCHDIR */
-static enum okay
-cwget(cw)
-	struct cw	*cw;
-{
-	if (getcwd(cw->cw_wd, sizeof cw->cw_wd) == NULL || chdir(cw->cw_wd) < 0)
-		return STOP;
-	return OKAY;
-}
-
-static enum okay
-cwret(cw)
-	struct cw	*cw;
-{
-	if (chdir(cw->cw_wd) < 0)
-		return STOP;
-	return OKAY;
-}
-
-/*ARGSUSED*/
-static void
-cwrelse(cw)
-	struct cw	*cw;
-{
-}
-#endif	/* !HAVE_FCHDIR */
 #endif	/* HAVE_SOCKETS */

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)popen.c	2.13 (gritter) 8/14/04";
+static char sccsid[] = "@(#)popen.c	2.14 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -69,7 +69,8 @@ struct fp {
 		FP_UNCOMPRESSED	= 00,
 		FP_GZIPPED	= 01,
 		FP_BZIP2ED	= 02,
-		FP_IMAP		= 04
+		FP_IMAP		= 03,
+		FP_MAILDIR	= 04
 	} compressed;
 };
 static struct fp *fp_head;
@@ -210,14 +211,16 @@ Zopen(file, mode, compression)
 	int	_compression;
 	long	offset;
 	char	*extension;
+	enum protocol	p;
 
 	if (scan_mode(mode, &omode) < 0)
 		return NULL;
 	if (compression == NULL)
 		compression = &_compression;
 	bits = R_OK | (omode == O_RDONLY ? 0 : W_OK);
-	if (omode & O_APPEND && which_protocol(file) == PROTO_IMAP) {
-		*compression = FP_IMAP;
+	if (omode & O_APPEND && ((p = which_protocol(file)) == PROTO_IMAP ||
+			p == PROTO_MAILDIR)) {
+		*compression = p == PROTO_IMAP ? FP_IMAP : FP_MAILDIR;
 		omode = O_RDWR | O_APPEND | O_CREAT;
 		rp = file;
 		input = -1;
@@ -250,7 +253,8 @@ open:	if ((output = Ftemp(&tempfn, "Rz", "w+", 0600, 0)) == NULL) {
 		return NULL;
 	}
 	unlink(tempfn);
-	if (input >= 0 || *compression == FP_IMAP) {
+	if (input >= 0 || *compression == FP_IMAP ||
+			*compression == FP_MAILDIR) {
 		if (decompress(*compression, input, fileno(output)) < 0) {
 			close(input);
 			Fclose(output);
@@ -395,6 +399,9 @@ compress(struct fp *fpp)
 	if (fpp->compressed == FP_IMAP) {
 		return imap_append(fpp->realfile, fpp->fp);
 	}
+	if (fpp->compressed == FP_MAILDIR) {
+		return maildir_append(fpp->realfile, fpp->fp);
+	}
 	if ((output = open(fpp->realfile,
 			(fpp->omode|O_CREAT)&~O_EXCL,
 			0666)) < 0) {
@@ -434,6 +441,7 @@ decompress(int compression, int input, int output)
 	case FP_GZIPPED:	command[0] = "gzip"; command[1] = "-cd"; break;
 	case FP_BZIP2ED:	command[0] = "bzip2"; command[1] = "-cd"; break;
 	case FP_IMAP:		return 0;
+	case FP_MAILDIR:	return 0;
 	default:		command[0] = "cat"; command[1] = NULL;
 	}
 	return run_command(command[0], 0, input, output,

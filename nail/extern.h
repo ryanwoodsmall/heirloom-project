@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.94 (gritter) 9/5/04
+ *	Sccsid @(#)extern.h	2.98 (gritter) 9/6/04
  */
 
 struct name *cat __P((struct name *, struct name *));
@@ -246,7 +246,7 @@ sighandler_type safe_signal __P((int, sighandler_type));
 char	*laststring __P((char *, int *, int));
 int	forward_msg __P((struct message *, struct name *, int));
 int	smtp_mta __P((char *, struct name *, FILE *));
-char	*nodename __P((void));
+char	*nodename __P((int));
 int	mime_name_invalid __P((char *, int));
 struct name	*checkaddrs __P((struct name *));
 char	*myaddr __P((void));
@@ -407,3 +407,13 @@ int	cnoop __P((void *));
 enum okay	pop3_noop __P((void));
 enum okay	imap_noop __P((void));
 void	try_pager __P((FILE *));
+enum okay	cwget __P((struct cw *));
+enum okay	cwret __P((struct cw *));
+void	cwrelse __P((struct cw *));
+enum okay	makedir __P((const char *));
+int	maildir_setfile __P((const char *, int, int));
+void	maildir_quit __P((void));
+enum okay	maildir_append __P((const char *, FILE *));
+unsigned	pjw __P((const char *));
+long	nextprime __P((long));
+extern void	substdate __P((struct message *));

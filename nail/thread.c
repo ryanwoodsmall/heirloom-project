@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.40 (gritter) 9/4/04";
+static char sccsid[] = "@(#)thread.c	1.42 (gritter) 9/7/04";
 #endif
 #endif /* not lint */
 
@@ -356,23 +356,11 @@ makethreads(m, count)
 {
 	struct mitem	*mt;
 	char	*cp;
-	long	i;
-	int	primes[] = {
-			509, 1021, 2039, 4093, 8191, 16381, 32749, 65521,
-			131071, 262139, 524287, 1048573, 2097143, 4194301,
-			8388593, 16777213, 33554393, 67108859, 134217689,
-			268435399, 536870909, 1073741789, 2147483647
-		};
-	int	mprime = 7;
+	long	i, mprime;
 
 	if (count == 0)
 		return;
-	for (i = 0; i < sizeof primes / sizeof *primes; i++)
-		if ((mprime = primes[i]) >= (count < 65536 ? count*4 :
-					count < 262144 ? count*2 : count))
-			break;
-	if (i == sizeof primes / sizeof *primes)
-		mprime = count;	/* not so prime, but better than failure */
+	mprime = nextprime(count);
 	mt = scalloc(mprime, sizeof *mt);
 	for (i = 0; i < count; i++) {
 		if ((m[i].m_flag&MHIDDEN) == 0) {
@@ -414,7 +402,7 @@ thread(vp)
 		free(mb.mb_sorted);
 		mb.mb_sorted = sstrdup("thread");
 	}
-	if (vp && value("header"))
+	if (vp && !inhook && value("header"))
 		return headers(vp);
 	return 0;
 }
@@ -426,7 +414,7 @@ unthread(vp)
 	mb.mb_threaded = 0;
 	free(mb.mb_sorted);
 	mb.mb_sorted = NULL;
-	if (vp && value("header"))
+	if (vp && !inhook && value("header"))
 		return headers(vp);
 	return 0;
 }
@@ -643,7 +631,7 @@ sort(vp)
 	finalize(threadroot);
 	mb.mb_threaded = 2;
 	ac_free(ms);
-	return vp && value("header") ? headers(msgvec) : 0;
+	return vp && !inhook && value("header") ? headers(msgvec) : 0;
 }
 
 static char *

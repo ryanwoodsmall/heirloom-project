@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.185 (gritter) 9/5/04";
+static char sccsid[] = "@(#)imap.c	1.187 (gritter) 9/7/04";
 #endif
 #endif /* not lint */
 
@@ -109,7 +109,8 @@ static enum {
 	RESPONSE_BAD,
 	RESPONSE_PREAUTH,
 	RESPONSE_BYE,
-	RESPONSE_OTHER
+	RESPONSE_OTHER,
+	RESPONSE_UNKNOWN
 } response_status;
 
 static char	*responded_tag;
@@ -329,12 +330,20 @@ imap_response_parse()
 	switch (*ip) {
 	case '+':
 		response_type = RESPONSE_CONT;
-		ip += 2;
-		pp += 2;
+		ip++;
+		pp++;
+		while (*ip == ' ') {
+			ip++;
+			pp++;
+		}
 		break;
 	case '*':
-		ip += 2;
-		pp += 2;
+		ip++;
+		pp++;
+		while (*ip == ' ') {
+			ip++;
+			pp++;
+		}
 		imap_response_get(&ip);
 		pp = &parsebuf[ip - imapbuf];
 		switch (response_status) {
@@ -347,11 +356,19 @@ imap_response_parse()
 		break;
 	default:
 		responded_tag = parsebuf;
-		while (*pp != ' ')
+		while (*pp && *pp != ' ')
 			pp++;
+		if (*pp == '\0') {
+			response_type = RESPONSE_UNKNOWN;
+			break;
+		}
 		*pp++ = '\0';
-		while (*pp == ' ')
+		while (*pp && *pp == ' ')
 			pp++;
+		if (*pp == '\0') {
+			response_type = RESPONSE_UNKNOWN;
+			break;
+		}
 		ip = &imapbuf[pp - parsebuf];
 		response_type = RESPONSE_TAGGED;
 		imap_response_get(&ip);
@@ -359,6 +376,7 @@ imap_response_parse()
 	}
 	responded_text = pp;
 	if (response_type != RESPONSE_CONT &&
+			response_type != RESPONSE_UNKNOWN &&
 			response_status == RESPONSE_OTHER)
 		imap_other_get(pp);
 }
@@ -377,6 +395,8 @@ again:	if ((sz = sgetline(&imapbuf, &imapbufsize, NULL, &mp->mb_sock)) > 0) {
 		if (verbose)
 			fputs(imapbuf, stderr);
 		imap_response_parse();
+		if (response_type == RESPONSE_UNKNOWN)
+			goto again;
 		if (response_type == RESPONSE_CONT)
 			return OKAY;
 		if (response_status == RESPONSE_OTHER) {
@@ -416,6 +436,7 @@ again:	if ((sz = sgetline(&imapbuf, &imapbufsize, NULL, &mp->mb_sock)) > 0) {
 				fprintf(stderr, catgets(catd, CATSET, 218,
 					"IMAP error: %s"), responded_text);
 			break;
+		case RESPONSE_UNKNOWN:	/* does not happen */
 		case RESPONSE_BYE:
 			i = mp->mb_active;
 			mp->mb_active = MB_NONE;
@@ -1320,7 +1341,7 @@ imap_fetchdata(mp, m, expected, need, head, headsize, headlines)
 			size += linelen;
 		}
 		lines++;
-		if ((expected -= linelen) == 0)
+		if ((expected -= linelen) <= 0)
 			break;
 	}
 	if (!emptyline) {
@@ -1440,10 +1461,21 @@ imap_get(mp, m, need)
 				tag(1), number, cp);
 	}
 	IMAP_OUT(o, MB_COMD, goto out)
-	do
+	for (;;) {
 		ok = imap_answer(mp, 1);
-	while (response_status != RESPONSE_OTHER ||
-			response_other != MESSAGE_DATA_FETCH);
+		if (response_status != RESPONSE_OTHER ||
+				response_other != MESSAGE_DATA_FETCH)
+			continue;
+		if (m->m_uid) {
+			if ((cp=asccasestr(responded_other_text, "UID ")) == 0)
+				continue;
+			if (strtol(&cp[4], NULL, 10) == m->m_uid)
+				break;
+		} else {
+			if (responded_other_number == number)
+				break;
+		}
+	}
 	if (ok == STOP || (cp = strrchr(responded_other_text, '{')) == NULL)
 		goto out;
 	expected = atol(&cp[1]);
@@ -2521,19 +2553,19 @@ again:	if (m->m_uid)
 	 * the 'exit' command still leaves the message unread.
 	 */
 out:	if ((m->m_flag&(MREAD|MSTATUS)) == (MREAD|MSTATUS))
-		imap_store(mp, m, n, '-', "\\Seen", 0);
+		imap_store(mp, m, n, '-', "\\Seen", 1);
 	if (m->m_flag&MFLAG)
-		imap_store(mp, m, n, '-', "\\Flagged", 0);
+		imap_store(mp, m, n, '-', "\\Flagged", 1);
 	if (m->m_flag&MUNFLAG)
-		imap_store(mp, m, n, '+', "\\Flagged", 0);
+		imap_store(mp, m, n, '+', "\\Flagged", 1);
 	if (m->m_flag&MANSWER)
-		imap_store(mp, m, n, '-', "\\Answered", 0);
+		imap_store(mp, m, n, '-', "\\Answered", 1);
 	if (m->m_flag&MUNANSWER)
-		imap_store(mp, m, n, '+', "\\Answered", 0);
+		imap_store(mp, m, n, '+', "\\Answered", 1);
 	if (m->m_flag&MDRAFT)
-		imap_store(mp, m, n, '-', "\\Draft", 0);
+		imap_store(mp, m, n, '-', "\\Draft", 1);
 	if (m->m_flag&MUNDRAFT)
-		imap_store(mp, m, n, '+', "\\Draft", 0);
+		imap_store(mp, m, n, '+', "\\Draft", 1);
 	return ok;
 }
 

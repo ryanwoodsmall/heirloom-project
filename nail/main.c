@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.38 (gritter) 9/5/04";
+static char sccsid[] = "@(#)main.c	2.39 (gritter) 9/6/04";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -460,7 +460,7 @@ usage:
 		safe_signal(SIGINT, prevint);
 	}
 	commands();
-	if (mb.mb_type == MB_FILE) {
+	if (mb.mb_type == MB_FILE || mb.mb_type == MB_MAILDIR) {
 		safe_signal(SIGHUP, SIG_IGN);
 		safe_signal(SIGINT, SIG_IGN);
 		safe_signal(SIGQUIT, SIG_IGN);

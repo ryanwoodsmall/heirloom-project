@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.72 (gritter) 9/5/04
+ *	Sccsid @(#)def.h	2.74 (gritter) 9/6/04
  */
 
 /*
@@ -150,6 +150,7 @@ enum protocol {
 	PROTO_FILE,			/* refers to a local file */
 	PROTO_POP3,			/* is a pop3 server string */
 	PROTO_IMAP,			/* is an imap server string */
+	PROTO_MAILDIR,			/* refers to a maildir folder */
 	PROTO_UNKNOWN			/* unknown protocol */
 };
 
@@ -186,6 +187,7 @@ struct mailbox {
 		MB_FILE,		/* local file */
 		MB_POP3,		/* POP3 mailbox */
 		MB_IMAP,		/* IMAP mailbox */
+		MB_MAILDIR,		/* maildir folder */
 		MB_CACHE		/* cached mailbox */
 	} mb_type;			/* type of mailbox */
 	enum {
@@ -270,6 +272,8 @@ struct message {
 	unsigned	m_level;	/* thread level of message */
 	long		m_threadpos;	/* position in threaded display */
 	float		m_score;	/* score of message */
+	char	*m_maildir_file;	/* original maildir file of msg */
+	unsigned	m_maildir_hash;	/* hash of file name in maildir sub */
 };
 
 /*
@@ -561,3 +565,16 @@ extern const unsigned char	class_char[];
 #endif	/* __GLIBC__ */
 
 #define	CBAD		(-15555)
+
+/*
+ * For saving the current directory and later returning.
+ */
+#ifdef	HAVE_FCHDIR
+struct	cw {
+	int	cw_fd;
+};
+#else	/* !HAVE_FCHDIR */
+struct	cw {
+	char	cw_wd[PATHSIZE];
+};
+#endif	/* !HAVE_FCHDIR */

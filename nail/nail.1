@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.211 (gritter) 9/5/04
+.\"     Sccsid: @(#)nail.1	2.215 (gritter) 9/7/04
 .\"
-.TH NAIL 1 "9/5/04" "nail 11.6" "User Commands"
+.TH NAIL 1 "9/7/04" "nail 11.6" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -340,15 +340,17 @@ In sorted/threaded mode,
 the last message in the sorted/threaded order.
 .TP
 .BI & x
-Only recognized in threaded mode;
+In threaded mode,
 selects the message addressed with
 .IR x ,
 where
 .I x
 is any other message specification,
 and all messages from the thread that begins at it.
+Otherwise, it is identical to
+.IR x .
 If
-.I n
+.I x
 is omitted,
 the thread beginning with the current message is selected.
 .TP
@@ -1007,6 +1009,11 @@ respectively.
 Likewise, if \fIname\fR does not exist,
 but either \fIname\fB.gz\fR or \fIname\fB.bz2\fR exists,
 the compressed file is used.
+If \fIname\fR refers to a directory
+with the subdirectories `tmp', `new', and `cur',
+it is treated as a folder in
+.I maildir
+format.
 A name of the form
 .nf
 
@@ -2122,12 +2129,19 @@ For IMAP mailboxes,
 the server is then polled for new mail,
 which may result in delayed operation
 if the connection to the server is slow.
+A
+.I maildir
+folder must be re-scanned to determine
+if new mail has arrived.
 .IP
 If this variable is set to the special value
 .BR nopoll ,
-the server is not actively asked for new mail,
+an IMAP server is not actively asked for new mail,
 but new mail may still be detected and announced
 with any other IMAP command that is sent to the server.
+A
+.I maildir
+folder is not scanned then.
 .IP
 In any case,
 the IMAP server may send notifications about messages
@@ -2582,6 +2596,13 @@ Use this file for
 .I nail
 commands
 that are not understood by other mailx implementations.
+.TP
+.B newfolders
+If this variable has the value
+.BR maildir ,
+newly created local folders will be in
+.I maildir
+format.
 .TP
 .B ORGANIZATION
 The value to put into the \fI`Organization:'\fR field of the message header.
@@ -3315,7 +3336,7 @@ You should use IMAP if you can, though;
 first because it requires fewer network operations than POP3
 to get the contents of the mailbox
 and is thus faster;
-and second because message flags
+and second because message attributes
 are maintained by the IMAP server,
 so you can easily distinguish new and old messages
 each time you connect.
@@ -3715,8 +3736,19 @@ use of the
 .I exit
 command instead of
 .I quit
-will not cause it to be reset.
-The `flagged', `answered', and `draft' flags are usually permanent,
+will not cause it to be reset,
+and if the
+.IR autoinc / newmail
+variables are unset,
+messages that arrived during a session
+will not be in state `new' anymore
+when the folder is opened again.
+Also if commands queued in disconnected mode are committed,
+the IMAP server will delete the `new' flag
+for all messages in the changed folder,
+and new messages will appear as unread
+when it is selected for viewing later.
+The `flagged', `answered', and `draft' attributes are usually permanent,
 but some IMAP servers are known to drop them without notification.
 .\" This is why nail does not even check if storing them succeeds.
 Message numbers may change with IMAP

@@ -48,8 +48,8 @@ FEATURES	= -DMAILRC='"$(MAILRC)"' -DMAILSPOOL='"$(MAILSPOOL)"' \
 OBJ = aux.o base64.o cache.o cmd1.o cmd2.o cmd3.o cmdtab.o collect.o \
 	dotlock.o edit.o fio.o getname.o getopt.o head.o hmac.o \
 	imap.o imap_search.o lex.o list.o lzw.o \
-	macro.o main.o md5.o mime.o names.o pop3.o popen.o quit.o send.o \
-	sendout.o smtp.o ssl.o strings.o temp.o thread.o tty.o \
+	macro.o maildir.o main.o md5.o mime.o names.o pop3.o popen.o quit.o \
+	send.o sendout.o smtp.o ssl.o strings.o temp.o thread.o tty.o \
 	v7.local.o vars.o \
 	version.o
 

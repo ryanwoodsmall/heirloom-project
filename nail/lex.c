@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.66 (gritter) 9/5/04";
+static char sccsid[] = "@(#)lex.c	2.69 (gritter) 9/6/04";
 #endif
 #endif /* not lint */
 
@@ -94,6 +94,8 @@ setfile(name, newmail)
 	switch (which_protocol(name)) {
 	case PROTO_FILE:
 		break;
+	case PROTO_MAILDIR:
+		return maildir_setfile(name, newmail, isedit);
 	case PROTO_POP3:
 		shudclob = 1;
 		return pop3_setfile(name, newmail, isedit);
@@ -254,7 +256,8 @@ newmailinfo(omsgCount)
 		if (mb.mb_type == MB_IMAP)
 			imap_getheaders(omsgCount+1, msgCount);
 		while (++omsgCount <= msgCount)
-			if (!(message[omsgCount-1].m_flag & MDELETED))
+			if (!(message[omsgCount-1].m_flag &
+						(MDELETED|MKILL|MHIDDEN)))
 				printhead(omsgCount, stdout, 0);
 	}
 	return mdot;
@@ -307,7 +310,9 @@ commands()
 						stat(mailname, &st) == 0 &&
 						st.st_size > mailsize) ||
 						(mb.mb_type == MB_IMAP &&
-						imap_newmail(n) > x)) {
+						imap_newmail(n) > x) ||
+						(mb.mb_type == MB_MAILDIR &&
+						n != 0)) {
 					int odot = dot - &message[0];
 					int odid = did_print_dot;
 
