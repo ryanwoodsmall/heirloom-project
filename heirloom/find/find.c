@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.34 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.35 (gritter) 2/5/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.34 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.35 (gritter) 2/5/05";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.34 (gritter) 1/24/05";
+static const char sccsid[] USED = "@(#)find.sl	1.35 (gritter) 2/5/05";
 #endif
 
 #include <stdio.h>
@@ -1395,10 +1395,12 @@ newmode(const char *ms, const mode_t pm)
 	} while (*ms++ == ',');
 	if (*--ms)
 		er("bad permissions: %s", mo);
-out:	if ((pm & S_ISGID) && setsgid == 0)
-		nm |= S_ISGID;
-	else if ((nm & S_ISGID) && setsgid == 0)
-		nm &= ~(mode_t)S_ISGID;
+out:	if (pm & S_IFDIR) {
+		if ((pm & S_ISGID) && setsgid == 0)
+			nm |= S_ISGID;
+		else if ((nm & S_ISGID) && setsgid == 0)
+			nm &= ~(mode_t)S_ISGID;
+	}
 	return(nm);
 }
 

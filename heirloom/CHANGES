@@ -86,6 +86,7 @@ Release ...
 * pax: The '-n' option in read mode does not mark a pattern as used if it
   matched an archive entry but that entry was not selected due to '-u'.
 * pax: If link() fails, no separate copy of an archive entry is created.
+* find: Symbolic modes for -perm that include the sgid bit now work properly.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
