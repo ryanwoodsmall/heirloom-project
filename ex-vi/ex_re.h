@@ -72,7 +72,7 @@
  *
  *	from ex_re.h	7.3 (Berkeley) 5/31/85
  *
- *	@(#)ex_re.h	1.21 (gritter) 2/19/05
+ *	@(#)ex_re.h	1.22 (gritter) 2/19/05
  */
 
 /*
@@ -90,6 +90,8 @@ struct	regexp {
 	void	*Expbuf;
 	bool	Circfl;
 	short	Nbra;
+	int	Flags;
+	int	Length;
 };
 
 /*

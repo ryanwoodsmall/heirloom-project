@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.50 (gritter) 2/19/05";
+static char sccsid[] = "@(#)ex_re.c	1.51 (gritter) 2/19/05";
 #endif
 #endif
 
@@ -115,6 +115,10 @@ static int	regerrno;
 #define	REGEXP_H_USED_FROM_VI
 
 #include "regexp.h"
+
+#ifndef	REG_ICASE
+#define	REG_ICASE	1
+#endif
 
 static size_t
 loconv(register char *dst, register const char *src)
@@ -910,10 +914,109 @@ resre(struct regexp *store)
 	return store;
 }
 
+static void
+compile1(void)
+{
+#ifdef	UXRE
+	int	n;
+#else	/* !UXRE */
+	char	*r;
+	char	*p;
+#endif	/* !UXRE */
+
+	refree(&re);
+	re.Flags = value(IGNORECASE) ? REG_ICASE : 0;
+#ifdef	UXRE
+	re.Flags |= REG_ANGLES | REG_BADRANGE;
+#ifndef	NO_BE_BACKSLASH
+	re.Flags |= REG_BKTESCAPE;
+#endif	/* !NO_BE_BACKSLASH */
+	if (re.Expbuf == NULL)
+		re.Expbuf = calloc(1, sizeof (regex_t));
+	if ((n = regcomp(re.Expbuf, re.Patbuf, re.Flags)) != 0) {
+		switch (n) {
+		case REG_EBRACK:
+			cerror(catgets(catd, 1, 154, "Missing ]"));
+			/*NOTREACHED*/
+			break;
+		default:
+			regerror(n, re.Expbuf, &re.Patbuf[1],
+					sizeof re.Patbuf - 1);
+			cerror(&re.Patbuf[1]);
+		}
+	}
+	if ((re.Nbra = ((regex_t *)re.Expbuf)->re_nsub) > NBRA)
+		re.Nbra = NBRA;
+#else	/* !UXRE */
+	if ((re.Expbuf = malloc(re.Length)) == NULL)
+		cerror("Re too complex|Regular expression too complicated");
+	if (re.Flags & REG_ICASE) {
+		p = malloc(strlen(re.Patbuf) + 1);
+		loconv(p, re.Patbuf);
+	} else
+		p = re.Patbuf;
+	r = _compile(p, re.Expbuf, &((char *)re.Expbuf)[re.Length], '\0');
+	if (p != re.Patbuf)
+		free(p);
+	if (r == 0) {
+		char	*cp;
+		free(re.Expbuf);
+		switch (regerrno) {
+		case 11:
+			cp = "Range endpoint too large|Range endpoint "
+					"too large in regular expression";
+			break;
+		case 16:
+			cp = "Bad number|Bad number in regular expression";
+			break;
+		case 25:
+			cp = "\"\\digit\" out of range";
+			break;
+		case 36:
+			cp = "Badly formed re|Missing closing delimiter "
+				"for regular expression";
+			break;
+		case 41:
+			cp = "No remembered search string.";
+			break;
+		case 42:
+			cp = "Unmatched \\( or \\)|More \\('s than \\)'s in "
+				"regular expression or vice-versa";
+			break;
+		case 43:
+			cp = "Awash in \\('s!|Too many \\('d subexressions "
+				"in a regular expression";
+			break;
+		case 44:
+			cp = "More than 2 numbers given in \\{~\\}";
+			break;
+		case 45:
+			cp = "} expected after \\";
+			break;
+		case 46:
+			cp = "First number exceeds second in \\{~\\}";
+			break;
+		case 49:
+			cp = "Missing ]";
+			break;
+		case 67:
+			cp = "Illegal byte sequence.";
+			break;
+		default:
+			cp = "Unknown regexp error code!!";
+		}
+		cerror(cp);
+	}
+	re.Circfl = circf;
+	re.Nbra = nbra;
+#endif	/* !UXRE */
+	re.Re_ident++;
+}
+
 int
 compile(int eof, int oknl)
 {
-	int c, d, i, n;
+	int c, d, i, n = 0;
 	char	mb[MB_LEN_MAX+1];
 	char *p = re.Patbuf, *end = re.Patbuf + sizeof re.Patbuf;
 	int nomagic = value(MAGIC) ? 0 : 1, esc, rcnt = 0;
@@ -1058,7 +1161,7 @@ compile(int eof, int oknl)
 			do {
 				c = GETWC(mb);
 				if (c == '\n' || c == EOF)
-					goto miss;
+					cerror("Missing ]");
 				for (i = 0; mb[i]; i++) {
 					*p++ = mb[i];
 					if (p >= end)
@@ -1071,7 +1174,7 @@ compile(int eof, int oknl)
 					do {
 						c = GETWC(mb);
 						if (c == '\n' || c == EOF)
-							goto miss;
+							cerror("Missing ]");
 						for (i = 0; mb[i]; i++) {
 							*p++ = mb[i];
 							if (p >= end)
@@ -1129,88 +1232,8 @@ complex:		cerror(catgets(catd, 1, 139,
 	if (p == re.Patbuf)
 		*p++ = '.';	/* approximate historical behavior */
 	*p = '\0';
-	refree(&re);
-#ifdef	UXRE
-	c = REG_ANGLES | REG_BADRANGE;
-#ifndef	NO_BE_BACKSLASH
-	c |= REG_BKTESCAPE;
-#endif	/* !NO_BE_BACKSLASH */
-	if (value(IGNORECASE))
-		c |= REG_ICASE;
-	if (re.Expbuf == NULL)
-		re.Expbuf = calloc(1, sizeof (regex_t));
-	if ((i = regcomp(re.Expbuf, re.Patbuf, c)) != 0) {
-		switch (i) {
-		case REG_EBRACK:
-		miss:	cerror(catgets(catd, 1, 154, "Missing ]"));
-			/*NOTREACHED*/
-			break;
-		default:
-			regerror(i, re.Expbuf, &re.Patbuf[1],
-					sizeof re.Patbuf - 1);
-			cerror(&re.Patbuf[1]);
-		}
-	}
-	if ((re.Nbra = ((regex_t *)re.Expbuf)->re_nsub) > NBRA)
-		re.Nbra = NBRA;
-#else	/* !UXRE */
-	if ((re.Expbuf = malloc(n = rcnt*32 + 2*(p-re.Patbuf) + 5)) == NULL)
-		goto complex;
-	if (value(IGNORECASE))
-		loconv(re.Patbuf, re.Patbuf);
-	if (_compile(re.Patbuf, re.Expbuf, &((char *)re.Expbuf)[n], '\0')==0) {
-		char	*cp;
-		free(re.Expbuf);
-		switch (regerrno) {
-		case 11:
-			cp = "Range endpoint too large|Range endpoint "
-					"too large in regular expression";
-			break;
-		case 16:
-			cp = "Bad number|Bad number in regular expression";
-			break;
-		case 25:
-			cp = "\"\\digit\" out of range";
-			break;
-		case 36:
-			cp = "Badly formed re|Missing closing delimiter "
-				"for regular expression";
-			break;
-		case 41:
-			cp = "No remembered search string.";
-			break;
-		case 42:
-			cp = "Unmatched \\( or \\)|More \\('s than \\)'s in "
-				"regular expression or vice-versa";
-			break;
-		case 43:
-			cp = "Awash in \\('s!|Too many \\('d subexressions "
-				"in a regular expression";
-			break;
-		case 44:
-			cp = "More than 2 numbers given in \\{~\\}";
-			break;
-		case 45:
-			cp = "} expected after \\";
-			break;
-		case 46:
-			cp = "First number exceeds second in \\{~\\}";
-			break;
-		case 49:
-		miss:	cp = "Missing ]";
-			break;
-		case 67:
-			cp = "Illegal byte sequence.";
-			break;
-		default:
-			cp = "Unknown regexp error code!!";
-		}
-		cerror(cp);
-	}
-	re.Circfl = circf;
-	re.Nbra = nbra;
-#endif	/* !UXRE */
-	re.Re_ident++;
+	re.Length = rcnt*32 + 2*(p-re.Patbuf) + 5;
+	compile1();
 	return eof;
 }
 
@@ -1231,6 +1254,8 @@ execute(int gf, line *addr)
 	} else {
 		if (addr == zero)
 			return 0;
+		if ((value(IGNORECASE) ? 1:0) ^ (re.Flags & REG_ICASE ? 1:0))
+			compile1();
 		p = linebuf;
 		getline(*addr);
 	}
@@ -1274,6 +1299,8 @@ execute(int gf, line *addr)
 			return 0;
 		p = linebuf;
 		getline(*addr);
+		if ((value(IGNORECASE) ? 1:0) ^ (re.Flags & REG_ICASE ? 1:0))
+			compile1();
 		if (value(IGNORECASE))
 			loconv(linebuf, linebuf);
 	}
