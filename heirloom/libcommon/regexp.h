@@ -45,9 +45,9 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.53 (gritter) 2/19/05";
+	"@(#)regexp.sl	1.54 (gritter) 2/19/05";
 
-#ifndef	__dietlibc__
+#if !defined (REGEXP_H_USED_FROM_VI) && !defined (__dietlibc__)
 #define	REGEXP_H_WCHARS
 #endif
 
