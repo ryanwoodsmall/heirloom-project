@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pax_su3.sl	1.22 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pax_su3.sl	1.23 (gritter) 2/6/05";
 #else
-static const char sccsid[] USED = "@(#)pax.sl	1.22 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.23 (gritter) 2/6/05";
 #endif
 
 #include <sys/types.h>
@@ -604,6 +604,7 @@ parsesub(char *s)
 	wchar_t	seof = nextc(&s, &len);
 	wint_t	c, d;
 	int	nbra = 0;
+	int	reflags;
 
 	if (seof == 0)
 		goto unt;
@@ -640,7 +641,10 @@ parsesub(char *s)
 	s[-len] = '\0';
 	if (ren <= res)
 		rep = srealloc(rep, ++res * sizeof *rep);
-	if (regcomp(&rep[ren].r_re, ps, REG_ANGLES) != 0)
+	reflags = REG_ANGLES;
+	if (pax >= PAX_TYPE_PAX2001)
+		reflags |= REG_AVOIDNULL;
+	if (regcomp(&rep[ren].r_re, ps, reflags) != 0)
 		msg(3, -2, "Regular expression error in \"-s\" option\n");
 	rep[ren].r_rhs = s;
 	rep[ren].r_nbra = nbra;
