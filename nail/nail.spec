@@ -1,4 +1,4 @@
-# Sccsid @(#)nail.spec	1.29 (gritter) 9/20/04
+# Sccsid @(#)nail.spec	1.30 (gritter) 11/1/04
 
 %define	use_nss	0
 %define	mozilla_version	1.6
@@ -41,8 +41,9 @@ and receiving mail.
 %define	sendmail	/usr/lib/sendmail
 %define	ucbinstall	install
 %define	cflags		-O2 -fomit-frame-pointer
+%define	cppflags	-D_GNU_SOURCE
 
-%define	makeflags	PREFIX=%{prefix} BINDIR=%{bindir} MANDIR=%{mandir} SYSCONFDIR=%{sysconfdir} MAILRC=%{mailrc} MAILSPOOL=%{mailspool} SENDMAIL=%{sendmail} UCBINSTALL=%{ucbinstall} CFLAGS="%{cflags}"
+%define	makeflags	PREFIX=%{prefix} BINDIR=%{bindir} MANDIR=%{mandir} SYSCONFDIR=%{sysconfdir} MAILRC=%{mailrc} MAILSPOOL=%{mailspool} SENDMAIL=%{sendmail} UCBINSTALL=%{ucbinstall} CFLAGS="%{cflags}" CPPFLAGS="%{cppflags}"
 
 %prep
 %setup
