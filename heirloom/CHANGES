@@ -13,6 +13,8 @@ Release ...
 * more: If a 'n' command was given without a previous '/', a segmentation
   fault occured. The error condition is now properly recognized (Bugreport
   by Matthew Fischer).
+* more: Fixed underlining of multibyte characters (Bugreport by Matthew
+  Fischer).
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and

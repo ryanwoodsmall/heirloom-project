@@ -51,7 +51,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)more.sl	1.29 (gritter) 1/15/05";
+static const char sccsid[] USED = "@(#)more.sl	1.30 (gritter) 1/15/05";
 
 /*
 ** more.c - General purpose tty output filter and file perusal program
@@ -1019,6 +1019,13 @@ prbuf (register const char *s, register int n)
 	    }
 	    if (c != ' ' || pstate == 0 || state != 0 || ulglitch == 0)
 	        putchar(c);
+	    if (mb_cur_max > 1 && c & 0200) {
+		    int	n = mblen(&s[-1], mb_cur_max);
+		    while (--n > 0) {
+			    putchar(*s & 0377);
+			    s++;
+		    }
+	    }
 	    if (state && *chUL) {
 		pr(chBS);
 		tputs(chUL, 1, putch);
