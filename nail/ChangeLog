@@ -12,6 +12,7 @@
   last byte just written. Previously, stale data could have remained after
   this point, which was no problem for nail itself, but could make zcat(1)
   fail on the file.
+* The new 'probability' command prints the junk statistics for given words.
 * The 'answered', 'classify, 'draft', 'flag', 'good', 'junk', 'undraft',
   'unflag', and 'unkill' command now make their argument the current
   message. This is now also done by the 'score' command unless the new

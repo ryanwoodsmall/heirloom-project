@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.256 (gritter) 10/23/04
+.\"     Sccsid: @(#)nail.1	2.257 (gritter) 10/24/04
 .\"
-.TH NAIL 1 "10/23/04" "nail 11.13" "User Commands"
+.TH NAIL 1 "10/24/04" "nail 11.13" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -1373,6 +1373,10 @@ all parts with a content type of `text' or `message' are shown,
 the other are hidden except for their headers.
 Messages are decrypted and converted to the terminal character set
 if necessary.
+.TP
+.B probability
+(prob) For each word given as argument,
+the contents of its junk mail database entry are printed.
 .TP
 .B quit
 (q) Terminates the session, saving all undeleted,
@@ -3995,11 +3999,6 @@ command,
 and the junk messages to the
 .I junk
 command.
-The number of good messages passed
-should not exceed the number of bad messages too much
-and vice-versa.
-Otherwise, words common to all kinds of messages
-might shift the detection mechanism too much in one direction.
 .PP
 Once a reasonable amount of statistics has been collected,
 new messages can be classified automatically.
@@ -4046,6 +4045,10 @@ along with their statistical probabilities.
 This can help you to find out
 why some messages are not classified
 as you would like them to be.
+To see the statistical probability of a given word,
+use the
+.I probability
+command.
 .SS "Reading HTML mail"
 You need either the
 .I w3m

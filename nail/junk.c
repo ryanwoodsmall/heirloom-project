@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.45 (gritter) 10/24/04";
+static char sccsid[] = "@(#)junk.c	1.47 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -944,4 +944,48 @@ mkmangle(void)
 	MD5Final(digest, &ctx);
 	s = getn(digest);
 	putn(&super[OF_super_mangle], s);
+}
+
+int
+cprobability(void *v)
+{
+	char	**args = v;
+	unsigned long	used, ngood, nbad;
+	unsigned long	h;
+	unsigned	s, g, b;
+	float	p, d;
+	char	*n;
+
+	if (*args == NULL) {
+		fprintf(stderr, "No words given.\n");
+		return 1;
+	}
+	if (getdb() != OKAY)
+		return 1;
+	used = getn(&super[OF_super_used]);
+	ngood = getn(&super[OF_super_ngood]);
+	nbad = getn(&super[OF_super_nbad]);
+	printf("Database statistics: words=%lu ngood=%lu nbad=%lu\n",
+			used, ngood, nbad);
+	do {
+		h = dbhash(*args);
+		printf("\"%s\", hash=%lu ", *args, h);
+		if ((n = lookup(h, 0)) != NULL) {
+			g = get(&n[OF_node_good]);
+			b = get(&n[OF_node_bad]);
+			printf("good=%u bad=%u ", g, b);
+			s = get(&n[OF_node_prob]);
+			p = s2f(s);
+			if (p != 0) {
+				d = p >= MID ? p - MID : MID - p;
+				printf("prob=%g dist=%g", p, d);
+			} else
+				printf("too infrequent");
+		} else
+			printf("not in database");
+		putchar('\n');
+	} while (*++args);
+	free(super);
+	free(nodes);
+	return 0;
 }
