@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)ggrep.c	1.25 (gritter) 12/17/04>	*/
+/*	Sccsid %W% (gritter) %G%>	*/
 
 /*
  * Code for generic SVID3 grep only.
@@ -104,7 +104,7 @@ static void
 st_build(void)
 {
 	if (iflag)
-		loconv(e0->e_pat, e0->e_pat, e0->e_len + 1);
+		e0->e_len = loconv(e0->e_pat, e0->e_pat, e0->e_len + 1) - 1;
 	if ((c_exp = compile(e0->e_pat, NULL, NULL)) == NULL)
 		comperr(regerrno);
 }

@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.48 (gritter) 12/17/04>	*/
+/*	Sccsid @(#)grep.c	1.50 (gritter) 1/2/05>	*/
 
 /*
  * Code common to all grep flavors.
@@ -88,13 +88,15 @@ enum matchflags	matchflags;		/* matcher flags */
 /*
  * Lower-case a character string.
  */
-void
+size_t
 loconv(register char *dst, register char *src, size_t sz)
 {
+	char	*odst = dst;
+
 	if (mbcode) {
 		char	mb[MB_LEN_MAX];
 		wchar_t wc;
-		int len, i;
+		int len, i, nlen;
 
 		while (sz > 0) {
 			if ((*src & 0200) == 0) {
@@ -108,8 +110,8 @@ loconv(register char *dst, register char *src, size_t sz)
 			} else {
 				wc = towlower(wc);
 				if (len >= mb_cur_max) {
-					if (wctomb(dst, wc) == len) {
-						dst += len;
+					if ((nlen = wctomb(dst, wc)) <= len) {
+						dst += nlen;
 						src += len;
 						sz -= len;
 					} else {
@@ -117,10 +119,10 @@ loconv(register char *dst, register char *src, size_t sz)
 						sz--;
 					}
 				} else {
-					if (wctomb(mb, wc) == len) {
+					if ((nlen = wctomb(mb, wc)) <= len) {
 						sz -= len;
 						src += len;
-						for (i = 0; i < len; i++)
+						for (i = 0; i < nlen; i++)
 							*dst++ = mb[i];
 					} else {
 						*dst++ = *src++;
@@ -129,11 +131,13 @@ loconv(register char *dst, register char *src, size_t sz)
 				}
 			}
 		}
-	} else
+	} else {
 		while (sz--) {
 			*dst++ = tolower(*src & 0377);
 			src++;
 		}
+	}
+	return dst - odst;
 }
 
 /*
@@ -271,6 +275,7 @@ report(const char *line, size_t llen, off_t bcnt, int addnl)
 static int
 matchline(char *line, size_t sz, int putnl, struct iblok *ip)
 {
+	size_t	csz = sz;
 	int terminate = 0;
 	char lbuf[512], *abuf = NULL, *cline = line;
 
@@ -280,12 +285,12 @@ matchline(char *line, size_t sz, int putnl, struct iblok *ip)
 			cline = abuf;
 		} else
 			cline = lbuf;
-		loconv(cline, line, sz);
-		cline[sz] = '\0';
+		csz = loconv(cline, line, sz);
+		cline[csz] = '\0';
 	} else if (matchflags & MF_NULTERM)
 		cline[sz] = '\0';
 	lineno++;
-	if (match(cline, sz) ^ vflag) {
+	if (match(cline, csz) ^ vflag) {
 		lmatch++;
 		if (qflag == 0) {
 			if (status == 1)

@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)run.c	1.28 (gritter) 12/25/04>
+   Sccsid @(#)run.c	1.30 (gritter) 1/1/05>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -1927,7 +1927,7 @@ static void caseconv(unsigned char *s, wint_t (*conv)(wint_t))
 {
 	unsigned char *t = s;
 	wchar_t wc;
-	int len;
+	int len, nlen;
 
 	while (*s) {
 		len = mbtowc(&wc, (char *)s, mb_cur_max);
@@ -1935,12 +1935,13 @@ static void caseconv(unsigned char *s, wint_t (*conv)(wint_t))
 			*t++ = *s++;
 		else {
 			wc = conv(wc);
-			if (wctomb((char *)t, wc) == len)
-				t += len, s += len;
-			else
+			if ((nlen = wctomb((char *)t, wc)) <= len) {
+				t += nlen, s += len;
+			} else
 				*t++ = *s++;
 		}
 	}
+	*t = '\0';
 }
 
 static void growbuf(unsigned char **buf, int *bufsize, int incr,

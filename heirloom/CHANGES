@@ -20,6 +20,9 @@ Release ...
   instead.
 * rm: For the traditional command versions, 'rm -- -' now tries to remove a
   file named '-'.
+* grep (traditional), nawk: Handle character case conversions correctly if
+  the length of the converted multibyte sequence is smaller than the original
+  one.
 
 Release 041214
 * Traditional and POSIX options as well as extensions are now marked as such

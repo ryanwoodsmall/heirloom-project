@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.h	1.22 (gritter) 12/8/04>	*/
+/*	Sccsid %W% (gritter) %G%>	*/
 
 #include	<sys/types.h>
 #include	<regex.h>
@@ -105,7 +105,7 @@ extern char		*options;	/* for getopt() */
 /*
  * In grep.c.
  */
-extern void		loconv(char *, char *, size_t);
+extern size_t		loconv(char *, char *, size_t);
 extern void		wcomp(char **, long *);
 extern void		report(const char *, size_t, off_t, int);
 
