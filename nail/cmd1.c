@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.87 (gritter) 11/23/04";
+static char sccsid[] = "@(#)cmd1.c	2.88 (gritter) 12/3/04";
 #endif
 #endif /* not lint */
 
@@ -454,7 +454,7 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 				if ((s = mbtowc(&wc, fp, mb_cur_max)) < 0)
 					n = s = 1;
 				else {
-					if ((n = wcwidth(wc)) < 1)
+					if ((n = wcwidth(wc)) < 0)
 						n = 1;
 				}
 			} else

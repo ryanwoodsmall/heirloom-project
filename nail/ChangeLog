@@ -20,6 +20,8 @@
   only useful with a 'fwdretain' command executed before. Such a command is
   executed by default in /etc/nail.rc for new installations; for other sites,
   it is recommended that it be added manually.
+* Characters with width 0 (e.g. Unicode combining characters) are now handled
+  correctly in header summaries.
 
 [11.17] released 11/18/04
 * When the 'write' command was used to save attachments in releases after

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.76 (gritter) 11/7/04";
+static char sccsid[] = "@(#)aux.c	2.77 (gritter) 12/3/04";
 #endif
 #endif /* not lint */
 
@@ -344,7 +344,7 @@ colalign(const char *cp, int col, int fill)
 			if ((sz = mbtowc(&wc, cp, mb_cur_max)) < 0) {
 				n = sz = 1;
 			} else {
-				if ((n = wcwidth(wc)) < 1)
+				if ((n = wcwidth(wc)) < 0)
 					n = 1;
 			}
 		} else
