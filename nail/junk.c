@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.42 (gritter) 10/24/04";
+static char sccsid[] = "@(#)junk.c	1.43 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -148,6 +148,14 @@ struct lexstat {
 		HEADER		= 1,
 		BODY		= 2
 	} loc;
+	enum html {
+		HTML_NONE	= 0,
+		HTML_TEXT	= 1,
+		HTML_TAG	= 2,
+		HTML_SKIP	= 3
+	} html;
+	char	tag[8];
+	char	*tagp;
 	char	field[LINESIZE];
 };
 
@@ -464,6 +472,38 @@ loop:	i = 0;
 			sp->lastc = '\n';
 			continue;
 		}
+		if (c == '\b') {
+			sp->html = HTML_TEXT;
+			continue;
+		}
+		if (c == '<' && sp->html == HTML_TEXT) {
+			sp->html = HTML_TAG;
+			sp->tagp = sp->tag;
+			continue;
+		}
+		if (sp->html == HTML_TAG) {
+			if (spacechar(c)) {
+				*sp->tagp = '\0';
+				if (!asccasecmp(sp->tag, "a") ||
+						!asccasecmp(sp->tag, "img") ||
+						!asccasecmp(sp->tag, "font"))
+					sp->html = HTML_TEXT;
+				else
+					sp->html = HTML_SKIP;
+			} else if (c == '>') {
+				sp->html = HTML_TEXT;
+				continue;
+			} else {
+				if (sp->tagp - sp->tag < sizeof sp->tag - 1)
+					*sp->tagp++ = c;
+				continue;
+			}
+		}
+		if (sp->html == HTML_SKIP) {
+			if (c == '>')
+				sp->html = HTML_TEXT;
+			continue;
+		}
 		if (c == '$' && i == 0)
 			sp->price = 1;
 		if (sp->loc == HEADER && sp->lastc == '\n') {
@@ -488,6 +528,7 @@ loop:	i = 0;
 			} else if (c == '\n') {
 				j = 0;
 				sp->loc = BODY;
+				sp->html = HTML_NONE;
 			}
 		}
 		if (sp->url) {

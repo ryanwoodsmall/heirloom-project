@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.40 (gritter) 10/24/04";
+static char sccsid[] = "@(#)send.c	2.41 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -618,7 +618,7 @@ const struct message *mp;	/* can be NULL if rewritestatus == 0 */
 					action == CONV_TOSRCH ?
 						TD_ICONV : 
 					action == CONV_TOFLTR ? 
-						TD_DELNUL : TD_NONE,
+						TD_DELCTRL : TD_NONE,
 				prefix, prefixlen);
 		addstats(stats, 1, sz);
 	}
@@ -701,7 +701,7 @@ const struct message *mp;	/* can be NULL if rewritestatus == 0 */
 					action == CONV_TOSRCH ?
 						TD_ICONV :
 					action == CONV_TOFLTR ? 
-						TD_DELNUL : TD_NONE,
+						TD_DELCTRL : TD_NONE,
 				prefix, prefixlen);
 		if (ferror(obuf))
 			return 1;
@@ -1034,6 +1034,8 @@ send_multi_parseheader:
 					putc('\0', obuf);
 				goto send_multi_parseheader;
 			}
+			if (new_content == MIME_HTML && action == CONV_TOFLTR)
+				putc('\b', obuf);
 			lineno = -1;
 			if ((mime_content = new_content) == MIME_MULTI) {
 				if (b->b_str == NULL) {
@@ -1041,7 +1043,8 @@ send_multi_parseheader:
 					goto send_multi_end;
 				}
 				b->b_len = strlen(b->b_str);
-			} else if (mime_content == MIME_TEXT) {
+			} else if (mime_content == MIME_TEXT ||
+					mime_content == MIME_HTML) {
 				if (cs == NULL)
 					cs = us_ascii;
 #ifdef	HAVE_ICONV
@@ -1109,6 +1112,7 @@ send_multi_parseheader:
 			}
 			break;
 		case MIME_TEXT:
+		case MIME_HTML:
 		case MIME_MESSAGE:
 			if (lineno > 0) {
 				sz = mime_write(oline, sizeof *oline,
@@ -1120,7 +1124,7 @@ send_multi_parseheader:
 					 	action == CONV_TOSRCH ?
 							TD_ICONV :
 						action == CONV_TOFLTR ?
-							TD_DELNUL : TD_NONE,
+							TD_DELCTRL : TD_NONE,
 					pbuf == qbuf ? prefix : NULL,
 					pbuf == qbuf ? prefixlen : 0);
 				if (pbuf == origobuf)
@@ -1270,7 +1274,7 @@ send_message(struct message *mp, FILE *obuf, struct ignoretab *doign,
 					action == CONV_TOSRCH ?
 						TD_ICONV :
 					action == CONV_TOFLTR ?
-						TD_DELNUL : TD_NONE,
+						TD_DELCTRL : TD_NONE,
 				prefix, prefixlen);
 			if (obuf == origobuf)
 				addstats(stats, lines, sz);
@@ -1368,6 +1372,8 @@ send_parseheader:
 			mime_content = MIME_MESSAGE;
 		}
 	}
+	if (mime_content == MIME_HTML && action == CONV_TOFLTR)
+		putc('\b', obuf);
 	if (ferror(obuf)) {
 		error_return = -1;
 		goto send_end;
@@ -1380,6 +1386,7 @@ send_parseheader:
 			action == CONV_TOFLTR) {
 		switch (mime_content) {
 		case MIME_TEXT:
+		case MIME_HTML:
 			if (convert == CONV_FROMB64)
 				convert = CONV_FROMB64_T;
 			/*FALLTHROUGH*/
@@ -1439,7 +1446,7 @@ send_parseheader:
 						action == CONV_TOSRCH ?
 							TD_ICONV :
 						action == CONV_TOFLTR ?
-							TD_DELNUL : TD_NONE,
+							TD_DELCTRL : TD_NONE,
 					pbuf == qbuf ? prefix : NULL,
 					pbuf == qbuf ? prefixlen : 0);
 		if (ferror(pbuf)) {
