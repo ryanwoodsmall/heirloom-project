@@ -19,10 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)mbstowcs.c	1.1 (gritter) 5/1/04	*/
+/*	Sccsid @(#)mbstowcs.c	1.2 (gritter) 1/15/05	*/
 
-#include "wchar.h"
 #include <errno.h>
+#include "wchar.h"
 
 size_t
 mbstowcs(wchar_t *pwcs, const char *s, size_t n)

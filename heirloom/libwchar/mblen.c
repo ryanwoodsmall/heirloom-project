@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004 Gunnar Ritter
+ * Copyright (c) 2005 Gunnar Ritter
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -19,22 +19,20 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)mbrtowc.c	1.2 (gritter) 1/15/05	*/
+/*	Sccsid @(#)mblen.c	1.2 (gritter) 1/15/05	*/
 
-#include <errno.h>
 #include "wchar.h"
 
-size_t
-mbrtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
+int
+mblen(const char *s, size_t n)
 {
 	if (s != NULL) {
-		if (n < 1) {
-			errno = EILSEQ;
-			return -1;
-		}
-		if (pwc != NULL)
-			*pwc = *s & 0377;
-		return *s != '\0';
+		if (n < 1)
+			return 0;
+		else if (*s == '\0')
+			return 0;
+		else
+			return 1;
 	} else
 		return 0;
 }

@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)wchar.h	1.2 (gritter) 11/7/04	*/
+/*	Sccsid @(#)wchar.h	1.3 (gritter) 1/15/05	*/
 
 #ifndef	LIBWCHAR_WCHAR_H
 #define	LIBWCHAR_WCHAR_H	1
@@ -36,6 +36,7 @@ typedef	int		mbstate_t;
 extern int	mbtowc(wchar_t *, const char *, size_t);
 extern int	wctomb(char *, wchar_t);
 extern size_t	mbstowcs(wchar_t *, const char *, size_t);
+extern int	mblen(const char *, size_t);
 
 /*wint_t		btowc(int);*/
 #define	btowc(c)	(c)

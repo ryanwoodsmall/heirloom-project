@@ -1,7 +1,7 @@
 all: libwchar.a
 
 OBJ = mbtowc.o wctomb.o wctype.o mbstowcs.o wcwidth.o wcslen.o wcsncmp.o \
-	mbrtowc.o wctfunc.o
+	mbrtowc.o wctfunc.o mblen.o
 libwchar.a: fake $(OBJ)
 	$(AR) -rv libwchar.a $(OBJ)
 
@@ -19,6 +19,9 @@ clean:
 
 mbtowc.o: mbtowc.c wchar.h
 	$(CC) $(CFLAGSS) $(CPPFLAGS) $(LARGEF) -I. -c mbtowc.c
+
+mblen.o: mblen.c wchar.h
+	$(CC) $(CFLAGSS) $(CPPFLAGS) $(LARGEF) -I. -c mblen.c
 
 mbrtowc.o: mbrtowc.c wchar.h
 	$(CC) $(CFLAGSS) $(CPPFLAGS) $(LARGEF) $(ICOMMON) -I. -c mbrtowc.c
