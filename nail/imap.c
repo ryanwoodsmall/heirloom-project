@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.195 (gritter) 9/15/04";
+static char sccsid[] = "@(#)imap.c	1.196 (gritter) 9/15/04";
 #endif
 #endif /* not lint */
 
@@ -1418,6 +1418,9 @@ imap_get(mp, m, need)
 	(void)&headsize;
 	(void)&head;
 	(void)&headlines;
+	(void)&item;
+	(void)&resp;
+	(void)&u;
 	verbose = value("verbose") != NULL;
 	if (getcache(mp, m, need) == OKAY)
 		return OKAY;

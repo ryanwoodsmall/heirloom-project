@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ssl.c	1.5 (gritter) 9/2/04";
+static char sccsid[] = "@(#)ssl.c	1.6 (gritter) 9/16/04";
 #endif
 #endif /* not lint */
 
@@ -79,12 +79,14 @@ static char sccsid[] = "@(#)ssl.c	1.5 (gritter) 9/2/04";
  * Pravir Chandra: Network Security with OpenSSL. Sebastopol, CA 2002.
  */
 
-enum {
+static enum {
 	VRFY_IGNORE,
 	VRFY_WARN,
 	VRFY_ASK,
 	VRFY_STRICT
 } ssl_vrfy_level;
+
+static int	verbose;
 
 static void ssl_set_vrfy_level __P((const char *));
 static enum okay ssl_vrfy_decide __P((void));
@@ -345,16 +347,24 @@ ssl_check_host(server, sp)
 	if (gens != NULL) {
 		for (i = 0; i < sk_GENERAL_NAME_num(gens); i++) {
 			gen = sk_GENERAL_NAME_value(gens, i);
-			if (gen->type == GEN_DNS &&
-					!asccasecmp(gen->d.ia5->data,
-						(char *)server))
-				goto found;
+			if (gen->type == GEN_DNS) {
+				if (verbose)
+					fprintf(stderr,
+						"Comparing DNS name: \"%s\"\n",
+						gen->d.ia5->data);
+				if (!asccasecmp(gen->d.ia5->data,
+							(char *)server))
+					goto found;
+			}
 		}
 	}
 	if ((subj = X509_get_subject_name(cert)) != NULL &&
 			X509_NAME_get_text_by_NID(subj, NID_commonName,
 				data, sizeof data) > 0) {
 		data[sizeof data - 1] = 0;
+		if (verbose)
+			fprintf(stderr, "Comparing common name: \"%s\"\n",
+					data);
 		if (asccasecmp(data, server) == 0)
 			goto found;
 	}
@@ -374,6 +384,7 @@ ssl_open(server, sp, uhp)
 	char *cp;
 	long options;
 
+	verbose = value("verbose") != NULL;
 	if (initialized == 0) {
 		SSL_library_init();
 		initialized = 1;

@@ -1,4 +1,4 @@
-[11.7] released ...
+[11.7] released 9/16/04
 * A collapsed view of message threads was introduced. See the 'collapse'
   and 'uncollapse' commands, and the 'autocollapse' variable.
 * The 'z' command now always shifts the header summary by a full screen

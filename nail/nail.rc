@@ -3,7 +3,7 @@
 # This file is not overwritten when 'make install' is run in
 # the nail build process again.
 
-# Sccsid @(#)nail.rc	2.5 (gritter) 9/5/04
+# Sccsid @(#)nail.rc	2.6 (gritter) 9/16/04
 
 # Do not forward to mbox by default since this is likely to be
 # irritating for most users today.
@@ -51,8 +51,11 @@ set showname
 set showto
 
 # Automatically check for new messages at each prompt, but avoid polling
-# of IMAP servers.
+# of IMAP servers or maildir folders.
 set newmail=nopoll
+
+# If threaded mode is activated, automatically collapse thread.
+set autocollapse
 
 # Hide some header fields which are uninteresting for most human readers.
 ignore received in-reply-to message-id references
