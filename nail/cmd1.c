@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.91 (gritter) 2/12/05";
+static char sccsid[] = "@(#)cmd1.c	2.92 (gritter) 3/4/05";
 #endif
 #endif /* not lint */
 
@@ -65,6 +65,7 @@ static int dispc(struct message *mp, const char *a);
 static int scroll1(char *arg, int onlynew);
 static void hprf(const char *fmt, int mesg, FILE *f, int threaded,
 		const char *attrlist);
+static int putindent(FILE *fp, struct message *mp, int maxwidth);
 static int type1(int *msgvec, int doign, int page, int pipe, int decode,
 		char *cmd, off_t *tstats);
 static int pipe1(char *str, int doign);
@@ -375,7 +376,7 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 	size_t	headsize = 0;
 	const char	*fp;
 	int	B, c, i, n, s;
-	int	headlen = 0, indent;
+	int	headlen = 0;
 	struct str	in, out;
 	int	subjlen = scrnwidth, fromlen, isto = 0, isaddr = 0;
 	FILE	*ibuf;
@@ -544,19 +545,9 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 						(long)mp->m_xsize);
 				break;
 			case 'i':
-				indent = 0;
-				if (threaded) {
-					while (indent++ < mp->m_level) {
-						if (indent >= scrnwidth - 60) {
-							putc('^', f);
-							indent++;
-							break;
-						}
-						putc(' ', f);
-					}
-					indent--;
-				}
-				subjlen -= indent;
+				if (threaded)
+					subjlen -= putindent(f, mp,
+							scrnwidth - 60);
 				break;
 			case 'S':
 				B = 1;
@@ -609,6 +600,76 @@ hprf(const char *fmt, int mesg, FILE *f, int threaded, const char *attrlist)
 		free(headline);
 	if (pbuf)
 		ac_free(pbuf);
+}
+
+/*
+ * Print out the indenting in threaded display.
+ */
+static int
+putindent(FILE *fp, struct message *mp, int maxwidth)
+{
+	struct message	*mq;
+	int	indent, i;
+	int	*us;
+	char	*cs;
+	int	important = MNEW|MFLAGGED;
+
+	if (mp->m_level == 0)
+		return 0;
+	cs = ac_alloc(mp->m_level);
+	us = ac_alloc(mp->m_level * sizeof *us);
+	i = mp->m_level - 1;
+	if (mp->m_younger && mp->m_younger->m_level == i + 1) {
+		if (mp->m_parent && mp->m_parent->m_flag & important)
+			us[i] = mp->m_flag & important ? 0x2523 : 0x2520;
+		else
+			us[i] = mp->m_flag & important ? 0x251D : 0x251C;
+		cs[i] = '+';
+	} else {
+		if (mp->m_parent && mp->m_parent->m_flag & important)
+			us[i] = mp->m_flag & important ? 0x2517 : 0x2516;
+		else
+			us[i] = mp->m_flag & important ? 0x2515 : 0x2514;
+		cs[i] = '\\';
+	}
+	mq = mp->m_parent;
+	for (i = mp->m_level - 2; i >= 0; i--) {
+		if (mq) {
+			if (i > mq->m_level - 1) {
+				us[i] = cs[i] = ' ';
+				continue;
+			}
+			if (mq->m_younger) {
+				if (mq->m_parent &&
+						mq->m_parent->m_flag&important)
+					us[i] = 0x2503;
+				else
+					us[i] = 0x2502;
+				cs[i] = '|';
+			} else
+				us[i] = cs[i] = ' ';
+			mq = mq->m_parent;
+		} else
+			us[i] = cs[i] = ' ';
+	}
+	for (indent = 0; indent < mp->m_level && indent < maxwidth; indent++) {
+		if (indent < maxwidth - 1)
+			putuc(us[indent], cs[indent] & 0377);
+		else
+			putuc(0x21B8, '^');
+	}
+	ac_free(us);
+	return indent;
+
+	while (indent++ < mp->m_level) {
+		if (indent >= maxwidth) {
+			putc('^', fp);
+			indent++;
+			break;
+		}
+		putc(' ', fp);
+	}
+	return --indent;
 }
 
 /*

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.80 (gritter) 12/26/04";
+static char sccsid[] = "@(#)aux.c	2.81 (gritter) 3/4/05";
 #endif
 #endif /* not lint */
 
@@ -1065,18 +1065,9 @@ makeprint(struct str *in, struct str *out)
 	outp = out->s;
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
 	if (mb_cur_max > 1) {
-		static int	utf8 = -1;
 		wchar_t	wc;
 		char	mb[MB_LEN_MAX+1];
 		int	i, n;
-		if (utf8 == -1) {
-			if (mbtowc(&wc, "\303\266", 2) == 2 && wc == 0xF6 &&
-					mbtowc(&wc, "\342\202\254", 3) == 3 &&
-					wc == 0x20AC)
-				utf8 = 1;
-			else
-				utf8 = 0;
-		}
 		out->l = 0;
 		while (inp < &in->s[in->l]) {
 			if (*inp & 0200)
@@ -1156,6 +1147,29 @@ prout(const char *s, size_t sz, FILE *fp)
 	n = fwrite(out.s, 1, out.l, fp);
 	free(out.s);
 	return n;
+}
+
+/*
+ * Print out a Unicode character or a substitute for it.
+ */
+int
+putuc(int u, int c)
+{
+#if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
+	if (utf8 && u & ~(wchar_t)0177) {
+		char	mb[MB_LEN_MAX];
+		int	i, n, r = 0;
+		if ((n = wctomb(mb, u)) > 0) {
+			for (i = 0; i < n; i++)
+				r += putchar(mb[i] & 0377) != EOF;
+			return r;
+		} else if (n == 0)
+			return putchar('\0') != EOF;
+		else
+			return 0;
+	} else
+#endif	/* HAVE_MBTOWC && HAVE_WCTYPE_H */
+		return putchar(c) != EOF;
 }
 
 /*

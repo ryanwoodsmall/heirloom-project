@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)glob.h	2.23 (gritter) 1/6/05
+ *	Sccsid @(#)glob.h	2.24 (gritter) 3/4/05
  */
 
 /*
@@ -105,6 +105,7 @@ _E int	unset_allow_undefined;		/* allow to unset undefined variables */
 _E int	inhook;				/* currently executing a hook */
 _E int	starting;			/* still in startup code */
 _E char *wantcharset;			/* overrides the "charset" variable */
+_E int	utf8;				/* UTF-8 encoding in use for locale */
 
 #ifdef	USE_SSL
 _E enum ssl_vrfy_level	ssl_vrfy_level;	/* SSL verification level */

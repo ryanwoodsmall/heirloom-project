@@ -1,4 +1,6 @@
 [11.22] released ...
+* In threaded mode, the thread structure is now shown using line-drawing
+  characters in the header summary.
 * When using a hostname with a port number attached with SMTP STARTTLS,
   strip the port number for correct host name verification (Bugreport by
   Gary E. Rafe).

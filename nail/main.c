@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.43 (gritter) 12/2/04";
+static char sccsid[] = "@(#)main.c	2.44 (gritter) 3/4/05";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -136,7 +136,16 @@ main(int argc, char *argv[])
 #if defined (HAVE_NL_LANGINFO) && defined (CODESET)
 	if (value("ttycharset") == NULL && (cp = nl_langinfo(CODESET)) != NULL)
 		assign("ttycharset", cp);
-#endif
+#endif	/* HAVE_NL_LANGINFO && CODESET */
+#if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
+	if (mb_cur_max > 1) {
+		wchar_t	wc;
+		if (mbtowc(&wc, "\303\266", 2) == 2 && wc == 0xF6 &&
+				mbtowc(&wc, "\342\202\254", 3) == 3 &&
+				wc == 0x20AC)
+			utf8 = 1;
+	}
+#endif	/* HAVE_MBTOWC && HAVE_WCTYPE_H */
 #else	/* !HAVE_SETLOCALE */
 	mb_cur_max = 1;
 #endif	/* !HAVE_SETLOCALE */

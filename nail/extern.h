@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.151 (gritter) 12/25/04
+ *	Sccsid @(#)extern.h	2.152 (gritter) 3/4/05
  */
 
 /* aux.c */
@@ -88,6 +88,7 @@ void cwrelse(struct cw *cw);
 void makeprint(struct str *in, struct str *out);
 char *prstr(const char *s);
 int prout(const char *s, size_t sz, FILE *fp);
+int putuc(int u, int c);
 int asccasecmp(const char *s1, const char *s2);
 int ascncasecmp(const char *s1, const char *s2, size_t sz);
 char *asccasestr(const char *haystack, const char *xneedle);
