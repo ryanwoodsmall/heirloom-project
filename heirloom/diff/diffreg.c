@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffreg.c	1.25 (gritter) 12/1/04>	*/
+/*	Sccsid @(#)diffreg.c	1.26 (gritter) 3/26/05>	*/
 /*	from 4.3BSD diffreg.c 4.16 3/29/86	*/
 
 #include "diff.h"
@@ -183,6 +183,8 @@ static long	*J;		/* will be overlaid on class */
 static off_t	*ixold;		/* will be overlaid on klist */
 static off_t	*ixnew;		/* will be overlaid on file[1] */
 static int	(*chrtran)(int);/* translation for case-folding */
+static long	plast;		/* match of last search for -p */
+static long	*saveJ;		/* saved J for -p */
 
 /* chrtran points to one of 3 translation functions:
  *	cup2low if folding upper to lower case
@@ -232,6 +234,7 @@ static void	dump_context_vec(void);
 static void	sdone(int);
 static char	*wcget(int, wint_t *, int *);
 static void	missnl(int);
+static void	pdump(long);
 
 #define	notseekable(m)	(((m)&S_IFMT) != S_IFREG && ((m)&S_IFMT) != S_IFBLK)
 
@@ -378,6 +381,7 @@ notsame:
 		check_mb();
 	else
 		check_sb();
+	plast = 0;
 	output();
 	status = anychange;
 same:
@@ -916,6 +920,10 @@ output(void)
 	m = len[0];
 	J[0] = 0;
 	J[m+1] = len[1]+1;
+	if (pflag) {
+		saveJ = talloc((len[0]+2)*sizeof(*saveJ));
+		memcpy(saveJ, J, (len[0]+2)*sizeof(*saveJ));
+	}
 	if(opt!=D_EDIT) for(i0=1;i0<=m;i0=i1+1) {
 		while(i0<=m&&J[i0]==J[i0-1]+1) i0++;
 		j0 = J[i0-1]+1;
@@ -1369,7 +1377,10 @@ dump_context_vec(void)
 		range(lowa, upb, ",");
 		printf(" +");
 		range(lowc, upd, ",");
-		printf(" @@\n");
+		printf(" @@");
+		if (pflag)
+			pdump(lowa-1);
+		printf("\n");
 
 		while (cvp <= context_vec_ptr) {
 			a = cvp->a; b = cvp->b; c = cvp->c; d = cvp->d;
@@ -1401,7 +1412,10 @@ dump_context_vec(void)
 	}
 
 	if (opt == D_CONTEXT) {
-		printf("***************\n*** ");
+		printf("***************");
+		if (pflag)
+			pdump(lowa-1);
+		printf("\n*** ");
 		range(lowa,upb,",");
 		printf(" ****\n");
 
@@ -1548,4 +1562,63 @@ missnl(int f)
 	if (aflag == 0)
 		fprintf(stderr, "Warning: missing newline at end of file %s\n",
 			f == 0 ? file1 : file2);
+}
+
+/*
+ * Find and dump the name of the C function with the -p option. The
+ * search begins at line a.
+ */
+static void
+pdump(long a)
+{
+#define	psize	40
+	static char	lbuf[psize*MB_LEN_MAX+1];
+	char	mbuf[MB_LEN_MAX+1];
+	int	c, i, j;
+	wchar_t	wc;
+
+	while (a-->plast) {
+		if (saveJ[a+1] == 0)
+			continue;
+		fseeko(input[0], ixold[a], SEEK_SET);
+		i = 0;
+		do {
+			if ((c=getc(input[0])) == EOF || c == '\n')
+				break;
+			mbuf[i] = c;
+		} while (++i<mb_cur_max);
+		if (mb_cur_max>1) {
+			mbuf[i] = 0;
+			if (((c=mbuf[0])&0200)==0)
+				wc = mbuf[0];
+			else if (mbtowc(&wc, mbuf, i) < 0)
+				continue;
+		}
+		if ((mb_cur_max>1 && mbuf[0]&0200 ? iswalpha(wc):isalpha(c)) ||
+				c == '$' || c == '_') {
+			plast = a+1;
+			for (j = 0; j < i; j++)
+				lbuf[j] = mbuf[j];
+			while (i < sizeof lbuf - 1) {
+				if ((c=getc(input[0])) == EOF || c == '\n')
+					break;
+				lbuf[i++] = c;
+			}
+			for (j=0;j<i&&j<psize;) {
+				if (mb_cur_max==1 || (lbuf[j]&0200) == 0)
+					j++;
+				else {
+					c = mbtowc(NULL, &lbuf[j], i-j);
+					j += c>0 ? c:1;
+				}
+			}
+			lbuf[j] = 0;
+			break;
+		}
+	}
+	if (plast) {
+		putchar(' ');
+		for (i = 0; lbuf[i]; i++)
+			putchar(lbuf[i] & 0377);
+	}
 }

@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diff.c	1.21 (gritter) 12/5/04>	*/
+/*	Sccsid @(#)diff.c	1.22 (gritter) 3/26/05>	*/
 /*	from 4.3BSD diff.c 4.6 4/3/86	*/
 
 #include "diff.h"
@@ -104,7 +104,7 @@ main(int argc, char **argv)
 	status = 2;
 	argv0 = argv[0];
 	diffargv = argv;
-	while ((i = getopt(argc, argv, ":D:efnbBwitcC:uU:hS:rslNx:a12"))
+	while ((i = getopt(argc, argv, ":D:efnbBwitcC:uU:hS:rslNx:a12p"))
 			!= EOF) {
 		switch (i) {
 #ifdef notdef
@@ -216,6 +216,9 @@ main(int argc, char **argv)
 		case 'a':
 			aflag++;
 			break;
+		case 'p':
+			pflag++;
+			break;
 		default:
 			if (invalid == 0 && !sysv3)
 				invalid = optopt;
@@ -239,6 +242,19 @@ main(int argc, char **argv)
 		    "%s: -h doesn't support -e, -f, -n, -c, -u, or -I\n",
 		    	progname);
 		done();
+	}
+	if (pflag) {
+		if (opt == D_UNIFIED || opt == D_CONTEXT)
+			/*EMPTY*/;
+		else if (opt == 0) {
+			opt = D_CONTEXT;
+			context = 3;
+		} else {
+			fprintf(stderr,
+				"%s: -p doesn't support -e, -f, -n, or -I\n",
+		    		progname);
+			done();
+		}
 	}
 	diffany(argv);
 	/*NOTREACHED*/

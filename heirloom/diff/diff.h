@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diff.h	1.14 (gritter) 7/11/04>	*/
+/*	Sccsid @(#)diff.h	1.15 (gritter) 3/26/05>	*/
 /*	from 4.3BSD diff.h	4.7	85/08/16	*/
 
 /*
@@ -119,6 +119,7 @@ int	opt;
 
 int	aflag;			/* diff binary files */
 int	tflag;			/* expand tabs on output */
+int	pflag;			/* show surrounding C function */
 
 /*
  * Algorithm related options

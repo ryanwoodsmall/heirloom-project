@@ -1,4 +1,5 @@
 Release ...
+* diff: The -p option (print surrounding C function) has been added.
 * ps: Some values (e.g. LTIME) were determined incorrectly with the -L option
   on Linux systems.
 * /usr/ucb/ps: Specifying -agx now has the same effect as specifying -ax.
