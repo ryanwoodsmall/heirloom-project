@@ -43,9 +43,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)chmod_sus.sl	1.8 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)chmod_sus.sl	1.9 (gritter) 2/15/05";
 #else
-static const char sccsid[] USED = "@(#)chmod.sl	1.8 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)chmod.sl	1.9 (gritter) 2/15/05";
 #endif
 /*
  * chmod [-R] [ugoa][+-=][rwxXlstugo] files
@@ -87,7 +87,7 @@ static int	Rflag;
 static void	chng(const char *, const char *);
 static mode_t	newmode(const char *, const mode_t, const char *);
 static mode_t	absol(const char **);
-static mode_t	who(const char **);
+static mode_t	who(const char **, mode_t *);
 static int	what(const char **);
 static mode_t	where(const char **, mode_t, int *, int *, const mode_t);
 static void	*srealloc(void *, size_t);
@@ -174,7 +174,7 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 {
 	register mode_t	o, m, b;
 	int	lock, setsgid = 0, didprc = 0, cleared = 0, copy = 0;
-	mode_t	nm, om;
+	mode_t	nm, om, mm;
 
 	nm = om = pm;
 	m = absol(&ms);
@@ -186,19 +186,19 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 			== 01)
 		nm &= ~(mode_t)S_ENFMT;
 	do {
-		m = who(&ms);
+		m = who(&ms, &mm);
 		while (o = what(&ms)) {
 			b = where(&ms, nm, &lock, &copy, pm);
 			switch (o) {
 			case '+':
-				nm |= b & m;
+				nm |= b & m & ~mm;
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
 					lock |= 02;
 				break;
 			case '-':
-				nm &= ~(b & m);
+				nm &= ~(b & m & ~mm);
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
@@ -206,7 +206,7 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 				break;
 			case '=':
 				nm &= ~m;
-				nm |= b & m;
+				nm |= b & m & ~mm;
 				lock &= ~01;
 				if (lock & 04)
 					lock |= 02;
@@ -291,11 +291,12 @@ absol(const char **ms)
 }
 
 static mode_t
-who(const char **ms)
+who(const char **ms, mode_t *mp)
 {
 	register int m;
 
 	m = 0;
+	*mp = 0;
 	for (;;) switch (*(*ms)++) {
 	case 'u':
 		m |= USER;
@@ -311,8 +312,10 @@ who(const char **ms)
 		continue;
 	default:
 		(*ms)--;
-		if (m == 0)
-			m = ALL & ~um;
+		if (m == 0) {
+			m = ALL;
+			*mp = um;
+		}
 		return m;
 	}
 }

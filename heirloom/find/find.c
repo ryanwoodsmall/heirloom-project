@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.38 (gritter) 2/7/05";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.39 (gritter) 2/15/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.38 (gritter) 2/7/05";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.39 (gritter) 2/15/05";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.38 (gritter) 2/7/05";
+static const char sccsid[] USED = "@(#)find.sl	1.39 (gritter) 2/15/05";
 #endif
 
 #include <stdio.h>
@@ -1363,7 +1363,7 @@ mknewer(struct anode *p, const char *b, int (*f)(struct anode *))
 #endif
 
 static mode_t	absol(const char **);
-static mode_t	who(const char **);
+static mode_t	who(const char **, mode_t *);
 static int	what(const char **);
 static mode_t	where(const char **, mode_t, int *, int *, const mode_t);
 
@@ -1372,7 +1372,7 @@ newmode(const char *ms, const mode_t pm)
 {
 	register mode_t	o, m, b;
 	int	lock, setsgid = 0, cleared = 0, copy = 0;
-	mode_t	nm, om;
+	mode_t	nm, om, mm;
 	const char *mo = ms;
 
 	nm = om = pm;
@@ -1385,19 +1385,19 @@ newmode(const char *ms, const mode_t pm)
 			== 01)
 		nm &= ~(mode_t)S_ENFMT;
 	do {
-		m = who(&ms);
+		m = who(&ms, &mm);
 		while (o = what(&ms)) {
 			b = where(&ms, nm, &lock, &copy, pm);
 			switch (o) {
 			case '+':
-				nm |= b & m;
+				nm |= b & m & ~mm;
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
 					lock |= 02;
 				break;
 			case '-':
-				nm &= ~(b & m);
+				nm &= ~(b & m & ~mm);
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
@@ -1405,7 +1405,7 @@ newmode(const char *ms, const mode_t pm)
 				break;
 			case '=':
 				nm &= ~m;
-				nm |= b & m;
+				nm |= b & m & ~mm;
 				lock &= ~01;
 				if (lock & 04)
 					lock |= 02;
@@ -1441,11 +1441,12 @@ absol(const char **ms)
 }
 
 static mode_t
-who(const char **ms)
+who(const char **ms, mode_t *mp)
 {
 	register int m;
 
 	m = 0;
+	*mp = 0;
 	for (;;) switch (*(*ms)++) {
 	case 'u':
 		m |= USER;
@@ -1461,8 +1462,10 @@ who(const char **ms)
 		continue;
 	default:
 		(*ms)--;
-		if (m == 0)
-			m = ALL & ~(mode_t)um;
+		if (m == 0) {
+			m = ALL;
+			*mp = um;
+		}
 		return m;
 	}
 }

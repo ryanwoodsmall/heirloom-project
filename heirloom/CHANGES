@@ -10,6 +10,11 @@ Release ...
 * join: If a join field does not exist, substitute the empty string for it.
 * ed: With the SVID4 and POSIX versions, matches of zero length in substitute
   commands do no longer lead to endless loops.
+* mkdir, mkfifo: When the -m option is given with a symbolic mode that has
+  no 'who' part, the umask is now respected with the POSIX versions.
+* chmod: When the -m option is given with a symbolic mode that has no 'who'
+  part, the umask is now respected with the POSIX versions even if the
+  previous file mode contained bits set within the umask.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
