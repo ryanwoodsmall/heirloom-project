@@ -41,7 +41,8 @@ Release ...
   properly.
 * ed: The 'G' command accepts the 'l' and 'n suffices now.
 * ed: When a hangup signal is received, ed exits with failure status now.
-* ed: The address '0' is now accepted as '1' for the 'c' and 'i' commands.
+* ed: The address '0' is now accepted as '1' for the 'c' and 'i' commands
+  for the POSIX.1-2001 version.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
