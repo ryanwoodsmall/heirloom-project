@@ -43,7 +43,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)join.sl	1.11 (gritter) 12/5/04";
+#if defined (SUS)
+static const char sccsid[] USED = "@(#)join_sus.sl	1.12 (gritter) 2/2/05";
+#else
+static const char sccsid[] USED = "@(#)join.sl	1.12 (gritter) 2/2/05";
+#endif
 
 /*	join F1 F2 on stuff */
 
@@ -195,6 +199,10 @@ main(int argc, char **argv)
 					arg = argv[2];
 				}
 			}
+#ifdef	SUS
+			if (no == 0)
+				usage();
+#endif	/* SUS */
 			break;
 		case 'j':
 			if (argv[2] == NULL)

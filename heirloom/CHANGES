@@ -46,6 +46,7 @@ Release ...
 * sed: If the input is seekable and the 'q' command is used, the file
   pointer is now left after the last line processed.
 * ln: The -f option is not ignored with the -s option for the POSIX version.
+* join: For the POSIX version, the list for the -o option must not be empty.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

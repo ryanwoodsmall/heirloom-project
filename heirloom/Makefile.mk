@@ -4,7 +4,9 @@ intro.1: intro.1.in
 	$(SHELL) build/genintro intro.1.in >intro.1
 
 clean:
-	rm -f heirloom.pkg intro.1 core log *~
+	rm -f heirloom.pkg core log *~
+
+MRPROPER = intro.1
 
 install:
 	test -d $(ROOT)$(DEFBIN) || mkdir -p $(ROOT)$(DEFBIN)
@@ -38,7 +40,7 @@ install:
 	else \
 		$(LNS) oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 ; \
 	fi
-	for i in basename chmod cp csplit date du ed egrep expr fgrep grep id ln mkdir mv nawk nl nohup pg pr ps rm rmdir sed sort touch tr wc who; \
+	for i in basename chmod cp csplit date du egrep expr fgrep grep id join ln mkdir mv nawk nl nohup pg pr ps rm rmdir sed sort touch tr wc who; \
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SU3BIN)/$$i $(ROOT); \
 	done
@@ -46,7 +48,7 @@ install:
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
-	for i in basename chmod du lc ln ls more mv nohup page pr rm rmdir sort touch tr who; \
+	for i in basename chmod du join lc ln ls more mv nohup page pr rm rmdir sort touch tr who; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
