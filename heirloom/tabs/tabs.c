@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tabs.sl	1.9 (gritter) 7/17/04";
+static const char sccsid[] USED = "@(#)tabs.sl	1.10 (gritter) 2/5/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -159,14 +159,14 @@ stspec(const char *s)
 }
 
 static void
-scan(int ac, char **av)
+scan(int ac, char **av, int really)
 {
 	int	c;
 
 	for (c = 1; c < ac; c++) {
 		switch (av[c][0]) {
 		case '+':
-			if (av[c][1] == 'm') {
+			if (really && av[c][1] == 'm') {
 				if (av[c][2])
 					margin = atoi(&av[c][2]);
 				else {
@@ -179,7 +179,8 @@ scan(int ac, char **av)
 			}
 			/*FALLTHRU*/
 		default:
-			stspec(av[c]);
+			if (really)
+				stspec(av[c]);
 			break;
 		case '-':
 			if (av[c][1] == 'T') {
@@ -187,46 +188,68 @@ scan(int ac, char **av)
 					TERM = &av[c][2];
 				else if (++c < ac)
 						TERM = av[c];
+				else {
+					fprintf(stderr, "Missing argument "
+							"to -T option\n");
+					quit(2);
+				}
 			} /*else if (av[c][1] == '-' && av[c][2] == '\0') {
 				while (++c < ac)
 					stspec(av[c]);
 				return;
-			} */else
+			} */else if (really)
 				stspec(av[c]);
 		}
 	}
 }
 
 #ifdef	USE_TERMCAP
-static void
-setupterm(char *d1, int d2, char *d3)
+#ifndef	ERR
+#define	ERR	0
+#endif
+#ifndef	OK
+#define	OK	1
+#endif
+static int
+setupterm(char *d1, int d2, int *d3)
 {
 	static char	buf[2048];
 	static char	tspace[2048];
 	static char	*tptr = tspace;
 
 	TERM = strdup(getenv("TERM"));
-	if (TERM == NULL || tgetent(buf, TERM) == NULL)
-		return;
+	if (TERM == NULL || tgetent(buf, TERM) == NULL) {
+		if (d3)
+			*d3 = 0;
+		return ERR;
+	}
 	set_tab = tgetstr("st", &tptr);
 	clear_all_tabs = tgetstr("ct", &tptr);
 	set_left_margin = tgetstr("ML", &tptr);
 	columns = tgetnum("co");
+	return OK;
 }
 #endif	/* USE_TERMCAP */
 
 int
 main(int argc, char **argv)
 {
-	setupterm(TERM, 1, NULL);
+	int	err;
+
+	scan(argc, argv, 0);
+	if (setupterm(TERM, 1, &err) != OK) {
+		fprintf(stderr, "no terminal description for terminal type "
+				"%s\n", TERM ? TERM : getenv("TERM"));
+		quit(1);
+	}
+	scan(argc, argv, 1);
+	if (tabspec == 0)
+		stspec("-8");
 	if (set_tab == NULL || clear_all_tabs == NULL) {
 		fprintf(stderr, "tabs not supported on terminal type %s\n",
 				TERM ? TERM : getenv("TERM"));
 		quit(1);
 	}
-	scan(argc, argv);
-	if (tabspec == 0)
-		stspec("-8");
 	prepare();
 	set();
 	quit(0);

@@ -96,6 +96,7 @@ Release ...
 * man: With the -k option, the exit status is now 0 if any matches have been
   found.
 * stty: If ispeed and ospeed are different, both are printed separately.
+* tabs: The -T option had no effect. Its argument is now required.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
