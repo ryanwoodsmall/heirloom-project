@@ -1,7 +1,7 @@
-Release ...
+Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
   deletes the character before the cursor again as documented (Bugreport by
-  Matthew Fischer).
+  Matthew Fischer). (P)
 * When a multicolumn character was replaced by another multicolumn character
   in insert mode, the display was not updated appropriately with terminals
   other than xterm.
