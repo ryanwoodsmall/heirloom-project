@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.70 (gritter) 1/23/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.71 (gritter) 2/2/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.70 (gritter) 1/23/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.71 (gritter) 2/2/05";
 #endif
 
 #include	<sys/types.h>
@@ -1035,7 +1035,11 @@ ln(const char *src, const char *tgt, struct stat *dsp, int level,
 		errcnt |= 01;
 		return;
 	}
-	if (dsp && !sflag) {
+	if (dsp
+#if !defined (SUS)
+			&& !sflag
+#endif	/* !SUS */
+			) {
 		if (nflag && !fflag) {
 			fprintf(stderr, "%s: %s: File exists\n",
 					progname, tgt);
