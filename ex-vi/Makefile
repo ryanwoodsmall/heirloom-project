@@ -72,7 +72,7 @@
 #
 #	from Makefile	7.13.1.3 (2.11BSD GTE) 1996/10/23
 #
-#	@(#)Makefile	1.49 (gritter) 2/19/05
+#	@(#)Makefile	1.50 (gritter) 2/20/05
 #
 
 #
@@ -207,8 +207,9 @@ OSTYPE	= -DVMUNIX
 #
 #TERMLIB	= ncurses
 #
-# The preferred choice for ex on Linux distributions and other systems that
-# provide a good termcap file is the 2.11BSD termcap library included here.
+# The preferred choice for ex on Linux distributions, other systems that
+# provide a good termcap file, or when setting the TERMCAP environment
+# variable is deemed sufficient, is the included 2.11BSD termcap library.
 #
 TERMLIB	= termlib
 
