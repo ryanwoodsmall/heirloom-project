@@ -43,11 +43,7 @@
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)join_sus.sl	1.12 (gritter) 2/2/05";
-#else
-static const char sccsid[] USED = "@(#)join.sl	1.12 (gritter) 2/2/05";
-#endif
+static const char sccsid[] USED = "@(#)join.sl	1.13 (gritter) 2/5/05";
 
 /*	join F1 F2 on stuff */
 
@@ -199,10 +195,11 @@ main(int argc, char **argv)
 					arg = argv[2];
 				}
 			}
-#ifdef	SUS
-			if (no == 0)
-				usage();
-#endif	/* SUS */
+			if (no == 0) {
+				fprintf(stderr, "%s: invalid file number (%s) "
+						"for -o\n", progname, arg);
+				exit(2);
+			}
 			break;
 		case 'j':
 			if (argv[2] == NULL)
