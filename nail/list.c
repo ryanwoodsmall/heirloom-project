@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.56 (gritter) 12/29/04";
+static char sccsid[] = "@(#)list.c	2.57 (gritter) 12/30/04";
 #endif
 #endif /* not lint */
 
@@ -383,7 +383,7 @@ number:
 				imap_getheaders(1, msgCount);
 			if ((cp = hfield("references", dot)) != NULL) {
 				struct name	*np;
-				if ((np = extract(id, GREF)) != NULL) {
+				if ((np = extract(cp, GREF)) != NULL) {
 					while (np->n_flink != NULL)
 						np = np->n_flink;
 					id = savestr(np->n_name);
