@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.66 (gritter) 10/2/04";
+static char sccsid[] = "@(#)fio.c	2.67 (gritter) 10/19/04";
 #endif
 #endif /* not lint */
 
@@ -306,10 +306,11 @@ setinput(struct mailbox *mp, struct message *m, enum needspec need)
 struct message *
 setdot(struct message *mp)
 {
-	if (dot != mp)
+	if (dot != mp) {
 		prevdot = dot;
+		did_print_dot = 0;
+	}
 	dot = mp;
-	did_print_dot = 0;
 	uncollapse1(dot, 0);
 	return dot;
 }

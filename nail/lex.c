@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.74 (gritter) 10/2/04";
+static char sccsid[] = "@(#)lex.c	2.75 (gritter) 10/19/04";
 #endif
 #endif /* not lint */
 
@@ -83,6 +83,7 @@ setfile(char *name, int newmail)
 	size_t offset;
 	int omsgCount = 0;
 	struct shortcut *sh;
+	struct flock	flp;
 
 	isedit = *name != '%' && ((sh = get_shortcut(name)) == NULL ||
 			*sh->sh_long != '%');
@@ -167,6 +168,9 @@ setfile(char *name, int newmail)
 	 * and set pointers.
 	 */
 
+	flp.l_type = F_RDLCK;
+	flp.l_start = 0;
+	flp.l_whence = SEEK_SET;
 	if (!newmail) {
 		mb.mb_type = MB_FILE;
 		mb.mb_perm = MB_DELE|MB_EDIT;
@@ -189,11 +193,20 @@ setfile(char *name, int newmail)
 		edit = isedit;
 		initbox(name);
 		offset = 0;
+		flp.l_len = 0;
+		if (fcntl(fileno(ibuf), F_SETLKW, &flp) < 0) {
+			perror("Unable to lock mailbox");
+			Fclose(ibuf);
+			return -1;
+		}
 	} else /* newmail */{
 		fseek(mb.mb_otf, 0L, SEEK_END);
 		fseek(ibuf, mailsize, SEEK_SET);
 		offset = mailsize;
 		omsgCount = msgCount;
+		flp.l_len = offset;
+		if (fcntl(fileno(ibuf), F_SETLKW, &flp) < 0)
+			goto nonewmail;
 	}
 	mailsize = fsize(ibuf);
 	if (newmail && mailsize <= offset) {

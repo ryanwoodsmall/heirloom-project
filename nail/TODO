@@ -28,6 +28,9 @@ The POP3 client supports USER/PASS and APOP authentications only. If you
 need other authentication methods and have the ability to test them,
 please write and contribute code.
 
+A variable should be added to specify the default character set for
+messages without MIME declarations.
+
 If you want to edit arbitrary header fields with the 'editheaders'
 option, you are invited to supply code for it. Be warned that this
 is a nontrivial task due to MIME. Contact the development mailing
@@ -53,4 +56,4 @@ window. For the receiving part, it is simply annoying. If you want
 a confirmation, ask the recipient to send one in the body of the
 message.
 
-	Gunnar Ritter					9/22/04
+	Gunnar Ritter					10/19/04

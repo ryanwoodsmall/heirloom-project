@@ -9,6 +9,8 @@
   was previously not possible to use these characters. This is a slightly
   incompatible change as the '%' character must now also be escaped, as
   '%25'. (Bugreport by Thomas Wolff.)
+* The system mailbox is now locked using fcntl(2) for reading too (Problem
+  reported by Thomas Wolff).
 
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
