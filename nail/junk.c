@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.41 (gritter) 10/23/04";
+static char sccsid[] = "@(#)junk.c	1.42 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -459,6 +459,11 @@ loop:	i = 0;
 	}
 	while (*count > 0 && (c = getc(fp)) != EOF) {
 		(*count)--;
+		if (c == '\0') {
+			sp->loc = HEADER;
+			sp->lastc = '\n';
+			continue;
+		}
 		if (c == '$' && i == 0)
 			sp->price = 1;
 		if (sp->loc == HEADER && sp->lastc == '\n') {

@@ -4,6 +4,8 @@
   occurs between digits, and the ';' character if a '&' was previously
   encountered within the same word. To take advantage of these changes,
   you have to delete your junk mail database and have to create it again.
+* For junk mail detection, fields of MIME part headers are now handled like
+  fields of the main header.
 * The 'answered', 'classify, 'draft', 'flag', 'good', 'junk', 'undraft',
   'unflag', and 'unkill' command now make their argument the current
   message. This is now also done by the 'score' command unless the new

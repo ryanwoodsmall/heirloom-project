@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.81 (gritter) 10/13/04
+ *	Sccsid @(#)def.h	2.82 (gritter) 10/24/04
  */
 
 /*
@@ -130,9 +130,10 @@ enum mimeclean {
 };
 
 enum tdflags {
-	TD_NONE	= 0,		/* no display conversion */
-	TD_ISPR	= 01,		/* use isprint() checks */
-	TD_ICONV= 02		/* use iconv() */
+	TD_NONE		= 0,	/* no display conversion */
+	TD_ISPR		= 01,	/* use isprint() checks */
+	TD_ICONV	= 02,	/* use iconv() */
+	TD_DELNUL	= 04	/* delete NUL characters */
 };
 
 struct str {

@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.36 (gritter) 10/21/04";
+static char sccsid[]  = "@(#)mime.c	2.37 (gritter) 10/24/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -72,6 +72,7 @@ static int mustquote_inhdrq(int c);
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
 static size_t xmbstowcs(wchar_t *pwcs, const char *s, size_t nwcs);
 #endif
+static size_t	delnul(char *cp, size_t sz);
 static char *getcharset(int isclean);
 static int has_highbit(register const char *s);
 #ifdef	HAVE_ICONV
@@ -161,6 +162,19 @@ xmbstowcs(wchar_t *pwcs, const char *s, size_t nwcs)
 	return nwcs - n;
 }
 #endif	/* HAVE_MBTOWC && HAVE_WCTYPE_H */
+
+static size_t
+delnul(char *cp, size_t sz)
+{
+	size_t	x = 0, y = 0;
+
+	while (x < sz) {
+		if (cp[x] != '\0')
+			cp[y++] = cp[x];
+		x++;
+	}
+	return y;
+}
 
 /*
  * Replace non-printable characters in s with question marks.
@@ -1158,6 +1172,8 @@ fromhdr_end:
 	*q = '\0';
 	if (flags & TD_ISPR)
 		out->l = makeprint(out->s, out->l);
+	if (flags & TD_DELNUL)
+		out->l = delnul(out->s, out->l);
 #ifdef	HAVE_ICONV
 	if (fhicd != (iconv_t)-1)
 		iconv_close(fhicd);
@@ -1563,6 +1579,8 @@ fwrite_td(void *ptr, size_t size, size_t nmemb, FILE *f, enum tdflags flags,
 				upper - mptr)
 			csize = upper - mptr;
 	}
+	if (flags & TD_DELNUL)
+		csize = delnul(mptr, csize);
 	sz = prefixwrite(mptr, sizeof *mptr, csize, f, prefix, prefixlen);
 	ac_free(mptr);
 	return sz;
@@ -1637,7 +1655,7 @@ mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
 		break;
 	case CONV_FROMHDR:
 		mime_fromhdr(&in, &out, TD_ISPR|TD_ICONV);
-		sz = fwrite_td(out.s, sizeof *out.s, out.l, f, TD_NONE,
+		sz = fwrite_td(out.s, sizeof *out.s, out.l, f, dflags&TD_DELNUL,
 				prefix, prefixlen);
 		free(out.s);
 		break;
