@@ -45,7 +45,7 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.51 (gritter) 2/19/05";
+	"@(#)regexp.sl	1.52 (gritter) 2/19/05";
 
 #ifndef	__dietlibc__
 #define	REGEXP_H_WCHARS
@@ -1009,7 +1009,8 @@ regexp_h_advance(const char *lp, const char *ep)
 		while (low--) {
 			c = regexp_h_fetch(lp, 1);
 			if (!regexp_h_cclass(ep, c,
-					(ep[-1] & 0377) == (CCL|RNGE|CMB)))
+					(ep[-1] & 0377 & ~REGEXP_H_LEAST)
+					== (CCL|RNGE|CMB)))
 				return 0;
 		}
 		curlp = lp;
@@ -1017,7 +1018,8 @@ regexp_h_advance(const char *lp, const char *ep)
 			regexp_h_push(&sb, &sp, &sc, lp);
 			c = regexp_h_fetch(lp, 1);
 			if (!regexp_h_cclass(ep, c,
-					(ep[-1] & 0377) == (CCL|RNGE|CMB)))
+					(ep[-1] & 0377 & ~REGEXP_H_LEAST)
+					== (CCL|RNGE|CMB)))
 				break;
 		}
 		if (size < 0) {
