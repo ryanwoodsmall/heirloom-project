@@ -19,7 +19,7 @@ config.h:
 	-echo '#include <math.h>' >___build$$$$.c ; \
 	echo 'int main(void) { sqrtl(2); fmodl(2, 2); powl(2, 2); return 0; }'\
 		>>___build$$$$.c ; \
-	$(CC) ___build$$$$.c -lm -o ___build$$$$ ; \
+	$(CC) ___build$$$$.c -lm -o ___build$$$$ >/dev/null 2>&1 ; \
 	if test $$? = 0 && test -f ___build$$$$ ; \
 	then	\
 		echo '#if !defined (__dietlibc__) && !defined (_AIX)' >>config.h ; \

@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)sus.c	1.21 (gritter) 12/8/04>	*/
+/*	Sccsid @(#)sus.c	1.22 (gritter) 12/17/04>	*/
 
 /*
  * Code for POSIX.2 command version only.
@@ -97,16 +97,16 @@ init(void)
 	case 'e':
 		Eflag = 2;
 		rc_select();
-		options = "EFbce:f:hilnqrRsvxy";
+		options = "EFbce:f:hilnqrRsvxyz";
 		break;
 	case 'f':
 		Fflag = 2;
 		ac_select();
-		options = "Fbce:f:hilnqrRsvxy";
+		options = "Fbce:f:hilnqrRsvxyz";
 		break;
 	default:
 		rc_select();
-		options = "EFbce:f:hilnqrRsvwxy";
+		options = "EFbce:f:hilnqrRsvwxyz";
 	}
 }
 

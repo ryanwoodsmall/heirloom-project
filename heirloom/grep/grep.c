@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.47 (gritter) 12/12/04>	*/
+/*	Sccsid @(#)grep.c	1.48 (gritter) 12/17/04>	*/
 
 /*
  * Code common to all grep flavors.
@@ -44,6 +44,7 @@
 #include	<limits.h>
 #include	<ctype.h>
 #include	<dirent.h>
+#include	<errno.h>
 
 #include	"grep.h"
 #include	"alloc.h"
@@ -66,6 +67,7 @@ int		sflag;			/* avoid error messages */
 int		vflag;			/* inverse selection */
 int		wflag;			/* search for words */
 int		xflag;			/* match entire line */
+int		zflag;			/* decompress compressed files */
 int		mb_cur_max;		/* avoid multiple calls to MB_CUR_MAX */
 unsigned	status = 1;		/* exit status */
 off_t		lmatch;			/* count of line matches */
@@ -171,6 +173,70 @@ wcomp(char **pat, long *len)
 	*pat = wp;
 }
 
+static struct iblok *
+redirect(struct iblok *ip, const char *arg0, const char *arg1)
+{
+	struct iblok	*nip = NULL;
+	int	pd[2];
+
+	if (pipe(pd) < 0)
+		return NULL;
+	switch (fork()) {
+	case 0:
+		if (lseek(ip->ib_fd, -(ip->ib_end - ip->ib_cur),
+					SEEK_CUR) == (off_t)-1) {
+			int	xpd[2];
+			if (pipe(xpd) == 0 && fork() == 0) {
+				ssize_t	rd, wo, wt;
+				close(xpd[0]);
+				for (;;) {
+					rd = ip->ib_end - ip->ib_cur;
+					wo = wt = 0;
+					do {
+						if ((wo = write(xpd[1],
+								&ip->ib_cur[wt],
+								rd - wt))
+								<= 0) {
+							if (errno == EINTR)
+								continue;
+							_exit(0);
+						}
+						wt += wo;
+					} while (wt < rd);
+					if (ib_read(ip) == EOF)
+						break;
+					ip->ib_cur--;
+				}
+				_exit(0);
+			} else {
+				close(xpd[1]);
+				dup2(xpd[0], 0);
+				close(xpd[0]);
+			}
+		} else {
+			if (ip->ib_fd)
+				dup2(ip->ib_fd, 0);
+		}
+		if (ip->ib_fd)
+			ib_close(ip);
+		else
+			ib_free(ip);
+		dup2(pd[1], 1);
+		close(pd[0]);
+		close(pd[1]);
+		execlp(arg0, arg0, arg1, NULL);
+		fprintf(stderr, "%s: could not exec %s\n", progname, arg0);
+		_exit(0177);
+		/*NOTREACHED*/
+	case -1:
+		return NULL;
+	default:
+		close(pd[1]);
+		nip = ib_alloc(pd[0], 0);
+		return nip;
+	}
+}
+
 /*
  * Report a matching line.
  */
@@ -261,7 +327,7 @@ gn_range(struct iblok *ip, char *last)
  * Main grep routine. The line buffer herein is only used for overlaps
  * between file buffer fills.
  */
-static int
+static struct iblok *
 grep(struct iblok *ip)
 {
 	char *line = NULL;		/* line buffer */
@@ -275,6 +341,32 @@ grep(struct iblok *ip)
 	if (ib_read(ip) == EOF)
 		goto endgrep;
 	ip->ib_cur--;
+	if (zflag) {
+		struct iblok	*np;
+		for (;;) {
+			sz = ip->ib_end - ip->ib_cur;
+			if (sz > 3 && memcmp(ip->ib_cur, "BZh", 3) == 0)
+				np = redirect(ip, "bzip2", "-cd");
+			else if (sz > 2 &&
+					memcmp(ip->ib_cur, "\37\235", 2) == 0)
+				np = redirect(ip, "zcat", NULL);
+			else if (sz > 2 &&
+					memcmp(ip->ib_cur, "\37\213", 2) == 0)
+				np = redirect(ip, "gzip", "-cd");
+			else
+				break;
+			if (np == NULL)
+				break;
+			if (ip->ib_fd)
+				ib_close(ip);
+			else
+				ib_free(ip);
+			ip = np;
+			if (ib_read(ip) == EOF)
+				goto endgrep;
+			ip->ib_cur--;
+		}
+	}
 	for (;;) {
 		for (lastnl = ip->ib_end - 1;
 				*lastnl != '\n' && lastnl > ip->ib_cur;
@@ -363,7 +455,7 @@ endgrep:
 		printf("%lu\n", (long)lmatch);
 #endif
 	}
-	return 0;
+	return ip;
 }
 
 /*
@@ -448,7 +540,7 @@ fngrep(const char *fn, int level)
 		}
 	} else
 		ip = ib_alloc(0, 0);
-	grep(ip);
+	ip = grep(ip);
 	if (ip->ib_fd)
 		ib_close(ip);
 	else
@@ -527,6 +619,9 @@ main(int argc, char **argv)
 			break;
 		case 'x':
 			xflag = 1;
+			break;
+		case 'z':
+			zflag = 1;
 			break;
 		default:
 			if (!(Fflag&2))

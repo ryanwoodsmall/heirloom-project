@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)egrep.1	1.38 (gritter) 12/5/04
+.\" Sccsid @(#)egrep.1	1.39 (gritter) 12/17/04
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EGREP 1 "12/5/04" "Heirloom Toolchest" "User Commands"
+.TH EGREP 1 "12/17/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 egrep \- search a file for a pattern using full regular expressions
 .SH SYNOPSIS
@@ -40,22 +40,22 @@ egrep \- search a file for a pattern using full regular expressions
 .ad l
 .nh
 \fB/usr/5bin/egrep\fR [\fB\-e\fI\ pattern_list\fR\ ...]
-[\fB\-f\fI\ pattern_file\fR] [\fB\-bchilnrRv\fR]
+[\fB\-f\fI\ pattern_file\fR] [\fB\-bchilnrRvz\fR]
 [\fIpattern_list\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 .PD 0
 \fB/usr/5bin/posix/egrep\fR \fB\-e\fI\ pattern_list\fR\ ...
 [\fB\-f\fI\ pattern_file\fR] [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR]
-[\fB\-bhinrRsvx\fR] [\fIfile\fR\ ...]
+[\fB\-bhinrRsvxz\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 \fB/usr/5bin/posix/egrep\fR \fB\-f\fI\ pattern_file\fR
 [\fB\-e\fI\ pattern_list\fR\ ...] [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR]
-[\fB\-bhinrRsvx\fR] [\fIfile\fR\ ...]
+[\fB\-bhinrRsvxz\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
-\fB/usr/5bin/posix/egrep\fR [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR] [\fB\-bhinsrRvx\fR]
+\fB/usr/5bin/posix/egrep\fR [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR] [\fB\-bhinsrRvxz\fR]
 \fIpattern_list\fR [\fIfile\fR\ ...]
 .br
 .PD
@@ -276,6 +276,17 @@ Device files are ignored.
 .B \-R
 Same as
 .IR \-r .
+.TP
+.B \-z
+If an input file is found to be compressed with
+.IR compress (1),
+.IR gzip (1),
+or
+.IR bzip2 (1),
+the appropriate compression program is started,
+and
+.I egrep
+searches for the pattern in its output.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

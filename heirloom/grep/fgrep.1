@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)fgrep.1	1.21 (gritter) 12/5/04
+.\" Sccsid @(#)fgrep.1	1.22 (gritter) 12/17/04
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH FGREP 1 "12/5/04" "Heirloom Toolchest" "User Commands"
+.TH FGREP 1 "12/17/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 fgrep \- search a file for a character string
 .SH SYNOPSIS
@@ -40,22 +40,22 @@ fgrep \- search a file for a character string
 .ad l
 .nh
 \fB/usr/5bin/fgrep\fR [\fB\-e\fI\ string_list\fR\ ...]
-[\fB\-f\fI\ string_file\fR] [\fB\-bchilnrRvx\fR]
+[\fB\-f\fI\ string_file\fR] [\fB\-bchilnrRvxz\fR]
 [\fIstring_list\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 .PD 0
 \fB/usr/5bin/posix/fgrep\fR \fB\-e\fI\ string_list\fR\ ...
 [\fB\-f\fI\ string_file\fR] [\fB\-c\fR|\fB\-l\fR]
-[\fB\-bhinrRvx\fR] [\fIfile\fR\ ...]
+[\fB\-bhinrRvxz\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 \fB/usr/5bin/posix/fgrep\fR \fB\-f\fI\ string_file\fR
 [\fB\-e\fI\ string_list\fR\ ...] [\fB\-c\fR|\fB\-l\fR]
-[\fB\-bhinrRvx\fR] [\fIfile\fR\ ...]
+[\fB\-bhinrRvxz\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
-\fB/usr/5bin/posix/fgrep\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-bhinrRvx\fR]
+\fB/usr/5bin/posix/fgrep\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-bhinrRvxz\fR]
 \fIstring_list\fR [\fIfile\fR\ ...]
 .br
 .PD
@@ -136,6 +136,17 @@ Device files are ignored.
 .B \-R
 Same as
 .IR \-r .
+.TP
+.B \-z
+If an input file is found to be compressed with
+.IR compress (1),
+.IR gzip (1),
+or
+.IR bzip2 (1),
+the appropriate compression program is started,
+and
+.I fgrep
+searches for the pattern in its output.
 .PP
 .B /usr/5bin/s42/fgrep
 is identical to

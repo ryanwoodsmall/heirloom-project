@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)ggrep.c	1.24 (gritter) 12/8/04>	*/
+/*	Sccsid @(#)ggrep.c	1.25 (gritter) 12/17/04>	*/
 
 /*
  * Code for generic SVID3 grep only.
@@ -149,7 +149,7 @@ void
 init(void)
 {
 	st_select();
-	options = "bchilnrRsvwy";
+	options = "bchilnrRsvwyz";
 }
 
 void

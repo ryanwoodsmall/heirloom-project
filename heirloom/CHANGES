@@ -1,4 +1,6 @@
 Release ...
+* grep: A '-z' option is now available; it decompresses compressed files and
+  looks for the pattern in the plain text.
 * pg: Compute the width of non-printable characters that correspond to a
   multibyte sequence correctly.
 
