@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops2.c	1.33 (gritter) 11/29/04";
+static char sccsid[] = "@(#)ex_vops2.c	1.34 (gritter) 1/12/05";
 #endif
 #endif
 
@@ -577,7 +577,7 @@ xgappend(int c, char **gp)
 		return;
 	}
 #ifdef	MB
-	if (mb_cur_max > 1) {
+	if (mb_cur_max > 1 && !(c & INVBIT)) {
 		char	mb[MB_LEN_MAX];
 		int	i, n;
 		n = wctomb(mb, c);
@@ -585,7 +585,7 @@ xgappend(int c, char **gp)
 			*(*gp)++ = mb[i];
 	} else
 #endif	/* MB */
-		*(*gp)++ = c;
+		*(*gp)++ = c & 0377;
 }
 
 /*
