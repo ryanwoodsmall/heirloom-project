@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vadj.c	1.10 (gritter) 11/23/04";
+static char sccsid[] = "@(#)ex_vadj.c	1.11 (gritter) 3/4/05";
 #endif
 #endif
 
@@ -167,6 +167,8 @@ vreopen(int p, int lineno, int l)
 	register int d;
 	register struct vlinfo *vp = &vlinfo[l];
 
+	if (p < 0)
+		error("Line too long to fit on screen");
 	d = vp->vdepth;
 	if (d == 0 || (vp->vflags & VDIRT))
 		vp->vdepth = d = vdepth();
