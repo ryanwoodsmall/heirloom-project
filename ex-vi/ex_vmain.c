@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vmain.c	1.28 (gritter) 11/28/04";
+static char sccsid[] = "@(#)ex_vmain.c	1.29 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -1033,6 +1033,10 @@ doinit:
 			Pline = OPline;
 			Putchar = OPutchar;
 			ungetchar(d);
+			if (globp && tflag < 0) {
+				tflag = 0;
+				goto doinit;
+			}
 			globp = oglobp;
 
 			/*

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmdsub.c	1.28 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_cmdsub.c	1.29 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -733,7 +733,7 @@ badtags:
 				peekc = d;
 				globp = oglobp;
 				value(MAGIC) = omagic;
-				if (tflag)
+				if (tflag > 0)
 					value(WRAPSCAN) = owrapscan;
 				samef = 0;
 				firstpat = savefirstpat;
@@ -752,18 +752,20 @@ badtags:
 			 * line) we get left in nomagic mode.
 			 */
 			value(MAGIC) = 0;
-			if (tflag)
+			if (tflag > 0)
 				value(WRAPSCAN) = 1;
 			commands(1, 1);
 			failed = ofailed;
 			peekc = d;
 			globp = oglobp;
 			value(MAGIC) = omagic;
-			if (tflag) {
+			if (tflag > 0) {
 				value(WRAPSCAN) = owrapscan;
-				if (savefirstpat)
+				if (savefirstpat) {
 					globp = savefirstpat;
-				tflag = 0;
+					tflag = -1;
+				} else
+					tflag = 0;
 			}
 			return;
 		}	/* end of "for each tag in file" */
