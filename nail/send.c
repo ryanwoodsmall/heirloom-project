@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.81 (gritter) 3/4/05";
+static char sccsid[] = "@(#)send.c	2.82 (gritter) 3/22/05";
 #endif
 #endif /* not lint */
 
@@ -432,6 +432,8 @@ skip:	switch (ip->m_mimecontent) {
 		switch (action) {
 		case SEND_TODISP:
 		case SEND_TODISP_ALL:
+		case SEND_QUOTE:
+		case SEND_QUOTE_ALL:
 			if ((pipecmd = getpipecmd(ip->m_ct_type_plain)) != NULL)
 				break;
 			if (level == 0 && count) {
@@ -442,11 +444,6 @@ skip:	switch (ip->m_mimecontent) {
 			/*FALLTHRU*/
 		case SEND_TOFLTR:
 			return rt;
-		case SEND_QUOTE:
-		case SEND_QUOTE_ALL:
-			if ((pipecmd = getpipecmd(ip->m_ct_type_plain)) != NULL)
-				break;
-			return -1;
 		case SEND_TOFILE:
 		case SEND_TOPIPE:
 		case SEND_TOSRCH:
