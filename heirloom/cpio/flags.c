@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)flags.c	1.3 (gritter) 5/29/04	*/
+/*	Sccsid @(#)flags.c	1.4 (gritter) 3/5/05	*/
 
 #include <unistd.h>
 #include <stdio.h>
@@ -47,7 +47,7 @@ flags(int ac, char **av)
 		case 'i':
 		case 'o':
 		case 'p':
-			if (action)
+			if (action && action != i)
 				illegal = 1;
 			action = i;
 			break;
