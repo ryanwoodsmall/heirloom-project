@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.49 (gritter) 12/23/04";
+static char sccsid[]  = "@(#)mime.c	2.50 (gritter) 12/25/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -67,7 +67,7 @@ static char *mimetypes_user = "~/.mime.types";
 char *us_ascii = "us-ascii";
 
 static int mustquote_body(int c);
-static int mustquote_hdr(const char *cp, int wordstart);
+static int mustquote_hdr(const char *cp, int wordstart, int wordend);
 static int mustquote_inhdrq(int c);
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
 static size_t xmbstowcs(wchar_t *pwcs, const char *s, size_t nwcs);
@@ -115,7 +115,7 @@ mustquote_body(int c)
  * Check if c must be quoted inside a message's header.
  */
 static int 
-mustquote_hdr(const char *cp, int wordstart)
+mustquote_hdr(const char *cp, int wordstart, int wordend)
 {
 	int	c = *cp & 0377;
 
@@ -124,7 +124,7 @@ mustquote_hdr(const char *cp, int wordstart)
 	if (wordstart && cp[0] == '=' && cp[1] == '?')
 		return 1;
 	if (cp[0] == '?' && cp[1] == '=' &&
-			(cp[2] == '\0' || whitechar(cp[2]&0377)))
+			(wordend || cp[2] == '\0' || whitechar(cp[2]&0377)))
 		return 1;
 	return 0;
 }
@@ -1204,7 +1204,7 @@ mime_write_tohdr(struct str *in, FILE *fo)
 	b = 0;
 	for (wbeg = in->s, quoteany = 0; wbeg < upper; wbeg++) {
 		b |= *wbeg;
-		if (mustquote_hdr(wbeg, wbeg == in->s))
+		if (mustquote_hdr(wbeg, wbeg == in->s, wbeg == &upper[-1]))
 			quoteany++;
 	}
 	if (2 * quoteany > in->l) {
@@ -1271,7 +1271,8 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				wend < upper && !whitechar(*wend & 0377);
 					wend++) {
 				b |= *wend;
-				if (mustquote_hdr(wend, wend == wbeg))
+				if (mustquote_hdr(wend, wend == wbeg,
+							wbeg == &upper[-1]))
 					mustquote++;
 			}
 			if (mustquote || broken || (wend - wbeg) >= 74 &&
