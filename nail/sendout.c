@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.70 (gritter) 11/26/04";
+static char sccsid[] = "@(#)sendout.c	2.71 (gritter) 12/2/04";
 #endif
 #endif /* not lint */
 
@@ -772,6 +772,45 @@ start_mta(struct name *to, struct name *mailargs, FILE *input)
 }
 
 /*
+ * Record outgoing mail if instructed to do so.
+ */
+static enum okay
+mightrecord(FILE *fp, struct name *to, int recipient_record)
+{
+	char	*cp, *cq, *ep;
+
+	if (recipient_record) {
+		cq = skin(to->n_name);
+		cp = salloc(strlen(cq) + 1);
+		strcpy(cp, cq);
+		for (cq = cp; *cq && *cq != '@'; cq++);
+		*cq = '\0';
+	} else
+		cp = value("record");
+	if (cp != NULL) {
+		ep = expand(cp);
+		if (value("outfolder") && *ep != '/' && *ep != '+' &&
+				which_protocol(ep) == PROTO_FILE) {
+			cq = salloc(strlen(cp) + 2);
+			cq[0] = '+';
+			strcpy(&cq[1], cp);
+			cp = cq;
+			ep = expand(cp);
+		}
+		if (savemail(ep, fp) != 0) {
+			fprintf(stderr,
+				"Error while saving message to %s - "
+				"message not sent\n", ep);
+			rewind(fp);
+			exit_status |= 1;
+			savedeadletter(fp);
+			return STOP;
+		}
+	}
+	return OKAY;
+}
+
+/*
  * Mail a message on standard input to the people indicated
  * in the passed header.  (Internal interface).
  */
@@ -779,7 +818,6 @@ enum okay
 mail1(struct header *hp, int printheaders, struct message *quote,
 		char *quotefile, int recipient_record, int tflag)
 {
-	char *cp, *cq, *ep;
 	struct name *to;
 	FILE *mtf, *nmtf;
 	enum okay	ok = STOP;
@@ -870,34 +908,8 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 		ok = OKAY;
 		goto out;
 	}
-	if (recipient_record) {
-		cq = skin(to->n_name);
-		cp = salloc(strlen(cq) + 1);
-		strcpy(cp, cq);
-		for (cq = cp; *cq && *cq != '@'; cq++);
-		*cq = '\0';
-	} else
-		cp = value("record");
-	if (cp != NULL) {
-		ep = expand(cp);
-		if (value("outfolder") && *ep != '/' && *ep != '+' &&
-				which_protocol(ep) == PROTO_FILE) {
-			cq = salloc(strlen(cp) + 2);
-			cq[0] = '+';
-			strcpy(&cq[1], cp);
-			cp = cq;
-			ep = expand(cp);
-		}
-		if (savemail(ep, mtf) != 0) {
-			fprintf(stderr,
-				"Error while saving message to %s - "
-				"message not sent\n", ep);
-			rewind(mtf);
-			exit_status |= 1;
-			savedeadletter(mtf);
-			goto out;
-		}
-	}
+	if (mightrecord(mtf, to, recipient_record) != OKAY)
+		goto out;
 	ok = transfer(to, hp->h_smopts, mtf);
 out:
 	Fclose(mtf);
@@ -1267,7 +1279,7 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 	FILE *ibuf, *nfo, *nfi;
 	char *tempMail;
 	struct header head;
-	enum okay	ok;
+	enum okay	ok = STOP;
 
 	memset(&head, 0, sizeof head);
 	if ((to = checkaddrs(to)) == NULL) {
@@ -1307,9 +1319,11 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 	if (senderr)
 		savedeadletter(nfi);
 	to = elide(to);
-	if (count(to) != 0)
-		ok = transfer(to, head.h_smopts, nfi);
-	else
+	if (count(to) != 0) {
+		if (value("record-resent") == NULL ||
+				mightrecord(nfi, to, 0) == OKAY)
+			ok = transfer(to, head.h_smopts, nfi);
+	} else
 		ok = OKAY;
 	Fclose(nfi);
 	return ok;

@@ -8,6 +8,9 @@
   they were applied too (regardless of the database update they performed).
   'Ungood' now marks a message as being junk, and 'unjunk' clears the junk
   mark.
+* A 'record-resent' variable has been introduced. If it is set, the 'resend'
+  and 'Resend' commands save messages to the 'record' folder. (Proposed by
+  Bob Tennent.)
 
 [11.17] released 11/18/04
 * When the 'write' command was used to save attachments in releases after
