@@ -1,0 +1,99 @@
+Welcome to nail, a mail user agent for Unix systems!
+
+Nail is derived from Berkeley Mail and is intended provide the
+functionality of the POSIX mailx command with additional support
+for MIME messages, IMAP, POP3, and SMTP. It provides enhanced
+features for interactive use, such as caching and disconnected
+operation for IMAP, message threading, scoring, and filtering.
+It is also usable as a mail batch language, both for sending
+and receiving mail.
+
+To compile and install nail, look at the file 'INSTALL'. You can also
+build nail RPMs using 'rpmbuild -tb nail-<version>.tar.bz2'.
+
+After compilation, edit the personal and system-wide run time
+configuration files to match your needs. You _really_ should do this or
+at least install the template because most of the built-in defaults still
+have the compatibility values of twenty-five years ago. For batch usage,
+it is recommended to pass the configuration as environment variables only,
+as e.g. 'MAILRC=/dev/null from=user@host nail -n' does.
+
+Nail has been built successfully in the following environments using
+the current configuration system:
+
+Linux           Kernel 2.2 and above; libc4, glibc 2.2 and above, diet libc;
+                gcc, Intel C
+Solaris         8 and above; Sun C, gcc
+Open UNIX       8.0.0
+FreeBSD         4.9-RELEASE, 5.2.1-RELEASE
+HP-UX           B.11.11, B.11.23
+Tru64 UNIX      4.0G, 5.1B
+NetBSD          1.6
+AIX             5.1
+UNICOS          9.0.2.2
+EP/IX           2.2.1AA; /svr4/bin/cc
+
+If you can build it on other systems, please contact the nail
+development list (see below) and send a diff with your changes so
+they can be included in the main version (preferably a unified
+diff, diff -u). If there are no changes, even better, but it would
+be nice to hear from you even then to extend the list above.
+
+It should generally be possible to build nail on most Unix-style
+systems without much effort; however, especially the character set
+support varies between them. See the file 'I18N' for details.
+
+On the other hand, I strongly discourage from porting nail to Windows
+and environments that make Windows look Unix-like; I won't accept any
+patches or suggestions that go in this direction. There are two major
+reasons for this: First, any port makes maintaining harder; there are
+always more work-arounds in the source, and introducing new features
+involves the question whether they will work an all supported platforms.
+The more different a platform behaves from, let's say, the common Unix
+way, the more hacks have to be made, costing human time that could
+otherwise have been used to enhance the software for Unix platforms.
+Windows is just not worth this, and here we are at the second point:
+Porting software to Windows encourages people to use -- that is: to buy
+-- Windows. It supports a company that is known to threaten Open Source
+software like nail. In short, porting nail (or similar free software)
+to Windows has an ill effect on that software. Don't do it.
+
+Note that my statement doesn't legally restrict you if you want to port
+nail to any platform. This would not be the way of free software either,
+especially since I might be wrong in the future; as an example, porting
+free software to mainframes of a certain company is considered a good
+thing today. I just wish to express my opinion as a free software
+developer, and to inform you that I don't maintain such a port.
+
+The mbox format variant based on the 'Content-Length:' header field that
+is used on most SVr4 systems by default is not supported by nail. As this
+format generally is a design flaw, you should fix your system by either
+using procmail for local mail delivery, which is a good idea anyway, or
+at least add the -E flag to the Mlocal line in /etc/sendmail.cf if using
+/usr/lib/mail.local.
+
+Although it is not bad, just obsolete, similar considerations apply
+to the MMDF format used on OpenServer systems; unless you switch to
+procmail (or contribute support for this format), nail will not be
+able to read your mailbox there.
+
+New nail versions will be announced on <http://freshmeat.net>; you
+can use their subscription service if you wish to be notified by mail
+when a new version is released. Nail's home page is located at
+<http://nail.sourceforge.net>. Please always look for the newest
+version before reporting bugs.
+
+Nail development is discussed on the 'nail-devel' mailing list.
+All people interested in discussing or coding features for future
+releases are invited to participate. Bug reports should also be
+sent to the list. To subscribe to the list or look at the archives,
+visit <https://lists.sourceforge.net/lists/listinfo/nail-devel>. If
+you do not want to subscribe, you can directly mail to the list
+using the address <nail-devel@lists.sourceforge.net>.
+
+Enjoy!
+
+Gunnar Ritter
+Freiburg i. Br.
+Germany
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           9/5/04

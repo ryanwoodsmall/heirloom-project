@@ -1,0 +1,288 @@
+/*
+ * Nail - a mail user agent derived from Berkeley Mail.
+ *
+ * Copyright (c) 2000-2002 Gunnar Ritter, Freiburg i. Br., Germany.
+ */
+/*
+ * Copyright (c) 2004
+ *	Gunnar Ritter.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by Gunnar Ritter
+ *	and his contributors.
+ * 4. Neither the name of Gunnar Ritter nor the names of his contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY GUNNAR RITTER AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL GUNNAR RITTER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#ifndef lint
+#ifdef	DOSCCS
+static char sccsid[] = "@(#)macro.c	1.4 (gritter) 9/4/04";
+#endif
+#endif /* not lint */
+
+#include "config.h"
+
+#include "rcv.h"
+#include "extern.h"
+
+/*
+ * Mail -- a mail program
+ *
+ * Macros.
+ */
+
+struct line {
+	struct line	*l_next;
+	char	*l_line;
+	size_t	l_linesize;
+};
+
+struct macro {
+	struct macro	*ma_next;
+	char	*ma_name;
+	struct line	*ma_contents;
+};
+
+static int	closingangle __P((const char *));
+static int	maexec __P((struct macro *));
+static unsigned	mahash __P((const char *));
+static struct macro	*malook __P((const char *, struct macro *));
+static void	freelines __P((struct line *));
+
+int
+cdefine(v)
+	void	*v;
+{
+	char	**args = v;
+	struct macro	*mp;
+	struct line	*lp, *lst = NULL, *lnd = NULL;
+	char	*linebuf = NULL;
+	size_t	linesize = 0;
+	int	n;
+
+	if (args[0] == NULL) {
+		fprintf(stderr, "Missing macro name to define.\n");
+		return 1;
+	}
+	if (args[1] == NULL || strcmp(args[1], "{") || args[2] != NULL) {
+		fprintf(stderr, "Syntax is: define <name> {\n");
+		return 1;
+	}
+	mp = scalloc(1, sizeof *mp);
+	mp->ma_name = sstrdup(*args);
+	for (;;) {
+		n = 0;
+		for (;;) {
+			n = readline_restart(input, &linebuf, &linesize, n);
+			if (n < 0)
+				break;
+			if (n == 0 || linebuf[n-1] != '\\')
+				break;
+			linebuf[n-1] = ' ';
+		}
+		if (n < 0) {
+			fprintf(stderr, "Unterminated macro: \"%s\".\n",
+					mp->ma_name);
+			if (sourcing)
+				unstack();
+			free(mp->ma_name);
+			free(mp);
+			return 1;
+		}
+		if (closingangle(linebuf))
+			break;
+		lp = scalloc(1, sizeof *lp);
+		lp->l_linesize = n+1;
+		lp->l_line = smalloc(lp->l_linesize);
+		memcpy(lp->l_line, linebuf, lp->l_linesize);
+		if (lst && lnd) {
+			lnd->l_next = lp;
+			lnd = lp;
+		} else
+			lst = lnd = lp;
+	}
+	mp->ma_contents = lst;
+	if (malook(mp->ma_name, mp) != NULL) {
+		fprintf(stderr, "A macro named \"%s\" already exists.\n",
+				mp->ma_name);
+		freelines(mp->ma_contents);
+		free(mp->ma_name);
+		free(mp);
+		return 1;
+	}
+	return 0;
+}
+
+int
+cundef(v)
+	void	*v;
+{
+	char	**args = v;
+	struct macro	*mp;
+
+	if (*args == NULL) {
+		fprintf(stderr, "Missing macro name to undef.\n");
+		return 1;
+	}
+	do {
+		if ((mp = malook(*args, NULL)) != NULL) {
+			freelines(mp->ma_contents);
+			free(mp->ma_name);
+			mp->ma_name = NULL;
+		}
+	} while (*++args);
+	return 0;
+}
+
+int
+ccall(v)
+	void	*v;
+{
+	char	**args = v;
+	struct macro	*mp;
+
+	if (args[0] == NULL || args[1] != NULL && args[2] != NULL) {
+		fprintf(stderr, "Syntax is: call <name>\n");
+		return 1;
+	}
+	if ((mp = malook(*args, NULL)) == NULL) {
+		fprintf(stderr, "Undefined macro called: \"%s\"\n", *args);
+		return 1;
+	}
+	return maexec(mp);
+}
+
+int
+callhook(name, newmail)
+	const char	*name;
+	int	newmail;
+{
+	struct macro	*mp;
+	char	*var, *cp;
+	int	len, r;
+
+	var = ac_alloc(len = strlen(name) + 13);
+	snprintf(var, len, "folder-hook-%s", name);
+	if ((cp = value(var)) == NULL && (cp = value("folder-hook")) == NULL)
+		return 0;
+	if ((mp = malook(cp, NULL)) == NULL) {
+		fprintf(stderr, "Cannot call hook for folder \"%s\": "
+				"Macro \"%s\" does not exist.\n",
+				name, cp);
+		return 1;
+	}
+	inhook = newmail ? 3 : 1;
+	r = maexec(mp);
+	inhook = 0;
+	return r;
+}
+
+static int
+maexec(mp)
+	struct macro	*mp;
+{
+	struct line	*lp;
+	char	*copy;
+	int	r = 0;
+
+	for (lp = mp->ma_contents; lp; lp = lp->l_next) {
+		copy = smalloc(lp->l_linesize);
+		memcpy(copy, lp->l_line, lp->l_linesize);
+		r = execute(copy, 0, lp->l_linesize);
+		free(copy);
+	}
+	return r;
+}
+
+static int
+closingangle(cp)
+	const char	*cp;
+{
+	while (spacechar(*cp&0377))
+		cp++;
+	if (*cp++ != '}')
+		return 0;
+	while (spacechar(*cp&0377))
+		cp++;
+	return *cp == '\0';
+}
+
+#define	MAPRIME		29
+
+static unsigned
+mahash(cp)
+	const char	*cp;
+{
+	unsigned	h = 0, g;
+
+	cp--;
+	while (*++cp) {
+		h = h << 4 & 0xffffffff;
+		if ((g = h & 0xf0000000) != 0) {
+			h = h ^ g >> 24;
+			h = h ^ g;
+		}
+	}
+	return h % MAPRIME;
+}
+
+static struct macro *
+malook(name, data)
+	const char	*name;
+	struct macro	*data;
+{
+	static struct macro	*table[MAPRIME];
+	struct macro	*mp;
+	unsigned	h;
+
+	mp = table[h = mahash(name)];
+	while (mp != NULL) {
+		if (mp->ma_name && strcmp(mp->ma_name, name) == 0)
+			break;
+		mp = mp->ma_next;
+	}
+	if (data) {
+		if (mp != NULL)
+			return NULL;
+		data->ma_next = table[h];
+		table[h] = data;
+	}
+	return mp;
+}
+
+static void
+freelines(lp)
+	struct line	*lp;
+{
+	struct line	*lq = NULL;
+
+	while (lp) {
+		free(lp->l_line);
+		free(lq);
+		lq = lp;
+		lp = lp->l_next;
+	}
+	free(lq);
+}
