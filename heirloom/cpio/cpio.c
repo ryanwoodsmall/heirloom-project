@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.292 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.293 (gritter) 3/19/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -2814,9 +2814,7 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 		if (imdir(tgt) < 0)
 			goto skip;
 	}
-	if (vflag)
-		fprintf(stderr, "%s\n", f->f_name);
-	else if (Vflag)
+	if (Vflag && !vflag)
 		prdot(0);
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && lflag) {
 		if (Lflag) {
@@ -2867,6 +2865,8 @@ cantlink:	errcnt += 1;
 			(fmttype & TYP_CPIO || fmttype == FMT_ZIP
 			 || action == 'p') &&
 			(i = canlink(tgt, &f->f_st, 1)) != 0) {
+		if (vflag)
+			fprintf(stderr, "%s\n", f->f_name);
 		tunlink(&temp);
 		if (pax != PAX_TYPE_CPIO && i < 0)
 			goto skip;
@@ -2884,6 +2884,12 @@ cantlink:	errcnt += 1;
 		 */
 		chmod(tgt, 0600);
 	} else if (fmttype & TYP_TAR && f->f_st.st_nlink > 1) {
+		if (vflag) {
+			if (pax == PAX_TYPE_CPIO)
+				printf("%s linked to %s\n",
+						f->f_lnam, f->f_name);
+			fprintf(stderr, "%s\n", f->f_name);
+		}
 		if (link(f->f_lnam, f->f_name) == 0) {
 			tunlink(&temp);
 			if (fmttype & TYP_USTAR && f->f_st.st_size > 0)
@@ -2900,7 +2906,8 @@ cantlink:	errcnt += 1;
 			else
 				goto restore;
 		}
-	}
+	} else if (vflag)
+		fprintf(stderr, "%s\n", f->f_name);
 	switch (f->f_st.st_mode & S_IFMT) {
 	case S_IFDIR:
 		if (!dflag) {
@@ -3331,8 +3338,12 @@ canlink(const char *path, struct stat *st, int really)
 			 */
 			if (fmttype & TYP_NCPIO && ip->i_nlk == 0)
 				return 0;
-			if (link(ip->i_name, path) == 0)
+			if (link(ip->i_name, path) == 0) {
+				if (vflag && pax == PAX_TYPE_CPIO)
+					printf("%s linked to %s\n",
+							ip->i_name, path);
 				return 1;
+			}
 			else if (pax != PAX_TYPE_CPIO) {
 				emsg(3, "Cannot link \"%s\" and \"%s\"",
 						ip->i_name, path);
