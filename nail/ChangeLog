@@ -4,6 +4,9 @@
   old 'account' definitions are still accepted.
 * It is not an error to 'unset' an undefined variable from within a 'call'
   command or folder hook now.
+* When a message in a multibyte character set like UTF-8 that was encoded
+  as quoted-printable was printed and a multibyte character was separated
+  by a '=' continued line, it was not decoded correctly.
 
 [11.5] released 9/5/04
 ***************************************************************************

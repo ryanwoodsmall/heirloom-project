@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.22 (gritter) 9/4/04";
+static char sccsid[] = "@(#)send.c	2.23 (gritter) 9/5/04";
 #endif
 #endif /* not lint */
 
@@ -106,7 +106,7 @@ static void	put_from_ __P((FILE *));
 static struct sendmsg	*open_sendmsg __P((FILE *, size_t, int));
 static void	close_sendmsg __P((struct sendmsg *));
 static char	*read_sendmsg __P((struct sendmsg *, char **, size_t *,
-			size_t *, long *, int));
+			size_t *, long *, int, int, long *));
 static void	unread_sendmsg __P((struct sendmsg *, long *));
 static void	del_hdr __P((struct hdrline *));
 static int	read_hdr __P((struct hdrline **ph, struct sendmsg *pm,
@@ -436,15 +436,17 @@ struct sendmsg *pm;
 }
 
 static char *
-read_sendmsg(pm, s, size, ex_llen, ex_count, appendnl)
+read_sendmsg(pm, s, size, ex_llen, ex_count, appendnl, fromqp, ex_lines)
 	struct sendmsg *pm;
 	char **s;
 	size_t *size;
 	size_t *ex_llen;
 	long *ex_count;
-	int appendnl;
+	int appendnl, fromqp;
+	long *ex_lines;
 {
-	size_t in_llen;
+	size_t in_llen, in_pos = 0;
+	long	lines = 0;
 	char *stripped;
 
 	/*
@@ -452,7 +454,7 @@ read_sendmsg(pm, s, size, ex_llen, ex_count, appendnl)
 	 * *ex_count is kept together with sendmsg stream (when a
 	 * line is unread, *ex_count is put back, i. e. augmented).
 	 */
-	if (pm->sm_unread) {
+next:	if (pm->sm_unread) {
 		pm->sm_unread = 0;
 		if (appendnl && pm->sm_line[pm->sm_llen - 1] != '\n') {
 			newline_appended();
@@ -470,6 +472,7 @@ read_sendmsg(pm, s, size, ex_llen, ex_count, appendnl)
 			 */
 			return NULL;
 	}
+	lines++;
 	/*
 	 * Copy the line to the passed buffer, possibly stripping
 	 * the >From_.
@@ -485,14 +488,21 @@ read_sendmsg(pm, s, size, ex_llen, ex_count, appendnl)
 	} else
 		stripped = pm->sm_line;
 	in_llen = pm->sm_llen - (stripped - pm->sm_line);
-	if (s == NULL || *size < in_llen + 1)
-		*s = srealloc(*s, *size = in_llen + 1);
-	memcpy(*s, stripped, in_llen);
-	(*s)[in_llen] = '\0';
+	if (s == NULL || *size < in_pos + in_llen + 1)
+		*s = srealloc(*s, *size = in_pos + in_llen + 1);
+	memcpy(&(*s)[in_pos], stripped, in_llen);
+	(*s)[in_pos + in_llen] = '\0';
+	if (fromqp && in_llen >= 2 && (*s)[in_pos+in_llen-1] == '\n' &&
+			(*s)[in_pos+in_llen-2] == '=') {
+		in_pos += in_llen;
+		goto next;
+	}
 	if (ex_llen)
-		*ex_llen = in_llen;
+		*ex_llen = in_llen + in_pos;
 	if (ex_count)
 		*ex_count -= pm->sm_llen;
+	if (ex_lines)
+		*ex_lines = lines;
 	return *s;
 }
 
@@ -551,9 +561,11 @@ int allowempty;
 {
 	char *line = NULL, *cp;
 	size_t lineno = 0, linesize = 0, linelen;
+	long	lines;
 
-	while (read_sendmsg(pm, &line, &linesize, &linelen, NULL, 1) != NULL) {
-		if (++lineno == 1) {
+	while (read_sendmsg(pm, &line, &linesize, &linelen, NULL, 1, 0,
+				&lines) != NULL) {
+		if ((lineno += lines) == 1) {
 			for (cp = line; fieldnamechar(*cp & 0377); cp++);
 			if (cp > line)
 				while (blankchar(*cp & 0377))
@@ -826,6 +838,7 @@ int action, prefixlen;
 	char *cs = us_ascii, *tcs;
 	struct boundary *b = b0;
 	int lineno = -1, jump_to_bound = 0;
+	long	lines;
 	size_t sz, linesize = 0, linelen, olinesize = 0, olinelen = 0;
 
 	(void)&mime_content;
@@ -850,7 +863,8 @@ int action, prefixlen;
 	b0->b_len = strlen(b0->b_str);
 	mime_content = MIME_DISCARD;
 	origobuf = obuf;
-	while (read_sendmsg(pm, &line, &linesize, &linelen, NULL, 0) != NULL) {
+	while (read_sendmsg(pm, &line, &linesize, &linelen, NULL, 0,
+				convert == CONV_FROMQP, &lines) != NULL) {
 		if (line[0] == '-' && line[1] == '-') {
 			/*
 			 * This line could be a multipart boundary.
@@ -932,7 +946,8 @@ send_multi_midbound:
 						fputs(catgets(catd, CATSET, 175,
 							":\n"), obuf);
 						if (obuf == origobuf)
-							addstats(stats, 2, 8);
+							addstats(stats,
+								lines+1, 8);
 					}
 					new_content = MIME_TEXT;
 					cs = us_ascii;
@@ -1103,7 +1118,7 @@ send_multi_parseheader:
 					pbuf == qbuf ? prefix : NULL,
 					pbuf == qbuf ? prefixlen : 0);
 				if (pbuf == origobuf)
-					addstats(stats, 1, sz);
+					addstats(stats, lines, sz);
 			}
 			break;
 		case MIME_DISCARD:
@@ -1120,7 +1135,7 @@ send_multi_parseheader:
 					pbuf == qbuf ? prefix : NULL,
 					pbuf == qbuf ? prefixlen : 0);
 				if (pbuf == origobuf)
-					addstats(stats, 1, sz);
+					addstats(stats, lines, sz);
 			}
 		}
 		if (ferror(pbuf)) {
@@ -1205,6 +1220,7 @@ send_message(mp, obuf, doign, prefix, action, stats)
 	int mainhdr = 1;
 	struct hdrline *ph;
 	size_t sz, linesize = 0;
+	long	lines;
 
 	(void)&pbuf;
 	(void)&pm;
@@ -1237,8 +1253,9 @@ send_message(mp, obuf, doign, prefix, action, stats)
 		if ((ibuf = setinput(&mb, mp, NEED_BODY)) == NULL)
 			return -1;
 		pm = open_sendmsg(ibuf, mp->m_size, action != CONV_NONE);
-		if ((cp = read_sendmsg(pm, &line, &linesize, &length, NULL, 0))
-				!= NULL && doign != allignore) {
+		if ((cp = read_sendmsg(pm, &line, &linesize, &length, NULL, 0,
+					0, &lines)) != NULL &&
+				doign != allignore) {
 			sz = mime_write(line, sizeof *line, length, obuf,
 				action == CONV_TODISP || action == CONV_QUOTE ||
 						action == CONV_TOSRCH ?
@@ -1249,7 +1266,7 @@ send_message(mp, obuf, doign, prefix, action, stats)
 						TD_NONE,
 				prefix, prefixlen);
 			if (obuf == origobuf)
-				addstats(stats, 1, sz);
+				addstats(stats, lines, sz);
 		}
 	} else {
 		if ((mp->m_have & HAVE_BODY) == 0) {
@@ -1376,7 +1393,8 @@ send_parseheader:
 	if (stats && convert != CONV_NONE)
 		stats[0] = -1;
 	for (;;) {
-		cp = read_sendmsg(pm, &line, &linesize, &count, NULL, 0);
+		cp = read_sendmsg(pm, &line, &linesize, &count, NULL, 0,
+				convert == CONV_FROMQP, &lines);
 		if (cp == NULL)
 			break;
 		sz = mime_write(line, sizeof *line, count,
@@ -1392,7 +1410,7 @@ send_parseheader:
 			goto send_end;
 		}
 		if (pbuf == origobuf)
-			addstats(stats, 1, sz);
+			addstats(stats, lines, sz);
 	}
 send_end:
 	close_sendmsg(pm);
