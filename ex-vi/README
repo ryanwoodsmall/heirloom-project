@@ -51,7 +51,7 @@ IBM AIX		5.1, 4.3
 NEC SUPER-UX	10.2
 NEC UX/4800	Release11.5 Rev.A
 FreeBSD		3.1, 4.5, 5.x
-NetBSD		1.6
+NetBSD		1.6, 2.0
 
 Reports about other Unix systems are welcome, whether successful or not
 (in the latter case add a detailed description). This port of vi is only
@@ -91,7 +91,9 @@ systems:
 
 Linux		glibc 2.3.3
 Sun Solaris	10
+HP HP-UX	B.11.23
 FreeBSD		5.3
+NetBSD		2.0
 
 It has been tested with xterm patch #192 and rxvt-unicode 4.2.
 
@@ -101,7 +103,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter						12/2/04
+Gunnar Ritter						12/12/04
 Freiburg i. Br.
 Germany
 <Gunnar.Ritter@pluto.uni-freiburg.de>
