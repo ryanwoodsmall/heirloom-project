@@ -45,7 +45,7 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.52 (gritter) 2/19/05";
+	"@(#)regexp.sl	1.53 (gritter) 2/19/05";
 
 #ifndef	__dietlibc__
 #define	REGEXP_H_WCHARS
@@ -300,8 +300,22 @@ regexp_h_cclass_wc(const char *set, register wint_t c, int af)
 	set += 17;
 	while (set < end) {
 		wc = regexp_h_fetch(set, 0);
-		if (wc == L'-' && wl != WEOF && set < end) {
+#ifdef	REGEXP_H_VI_BACKSLASH
+		if (wc == '\\' && set < end &&
+				(*set == ']' || *set == '-' ||
+				 *set == '^' || *set == '\\')) {
 			wc = regexp_h_fetch(set, 0);
+		} else
+#endif	/* REGEXP_H_VI_BACKSLASH */
+		if (wc == '-' && wl != WEOF && set < end) {
+			wc = regexp_h_fetch(set, 0);
+#ifdef	REGEXP_H_VI_BACKSLASH
+			if (wc == '\\' && set < end &&
+					(*set == ']' || *set == '-' ||
+					 *set == '^' || *set == '\\')) {
+				wc = regexp_h_fetch(set, 0);
+			}
+#endif	/* REGEXP_H_VI_BACKSLASH */
 			if (c > wl && c < wc)
 				return af;
 		}
@@ -415,11 +429,27 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 					c &= 0377;
 					if(c == '\0' || c == '\n')
 						ERROR(49);
+#ifdef	REGEXP_H_VI_BACKSLASH
+					if(c == '\\' && ((c = PEEKC()) == ']' ||
+							c == '-' || c == '^' ||
+							c == '\\')) {
+						c = GETC();
+						c &= 0377;
+					} else
+#endif	/* REGEXP_H_VI_BACKSLASH */
 					if(c == '-' && lc != 0) {
 						if ((c = GETC()) == ']') {
 							PLACE('-');
 							break;
 						}
+#ifdef	REGEXP_H_VI_BACKSLASH
+						if(c == '\\' &&
+							((c = PEEKC()) == ']' ||
+								c == '-' ||
+								c == '^' ||
+								c == '\\'))
+							c = GETC();
+#endif	/* REGEXP_H_VI_BACKSLASH */
 						c &= 0377;
 						while(lc < c) {
 							PLACE(lc);
@@ -454,6 +484,14 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 				do {
 					if (c == '\0' || c == '\n')
 						ERROR(49);
+#ifdef	REGEXP_H_VI_BACKSLASH
+					if(c == '\\' && ((c = PEEKC()) == ']' ||
+							c == '-' || c == '^' ||
+							c == '\\')) {
+						regexp_h_store(c, eq, endbuf);
+						regexp_h_getwc(c);
+					} else
+#endif	/* REGEXP_H_VI_BACKSLASH */
 					if (c == '-' && lc != 0 && lc <= 0177) {
 						regexp_h_store(c, eq, endbuf);
 						regexp_h_getwc(c);
@@ -461,6 +499,17 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 							PLACE('-');
 							break;
 						}
+#ifdef	REGEXP_H_VI_BACKSLASH
+						if(c == '\\' &&
+							((c = PEEKC()) == ']' ||
+								c == '-' ||
+								c == '^' ||
+								c == '\\')) {
+							regexp_h_store(c, eq,
+								endbuf);
+							regexp_h_getwc(c);
+						}
+#endif	/* REGEXP_H_VI_BACKSLASH */
 						while (lc < (c & 0177)) {
 							PLACE(lc);
 							lc++;
