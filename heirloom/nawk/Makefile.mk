@@ -18,10 +18,8 @@ awk.g.c: awk.g.y
 		ed -s y.tab.h
 
 awk.g.2001.c: awk.g.2001.y awk.g.c
-	mv y.tab.h _y.tab.h
-	$(YACC) -d awk.g.2001.y
+	$(YACC) awk.g.2001.y
 	mv -f y.tab.c awk.g.2001.c
-	mv _y.tab.h y.tab.h
 
 awk.g.2001.y: awk.g.y
 	sed -f rerule.sed <awk.g.y >awk.g.2001.y
