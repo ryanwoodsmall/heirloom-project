@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.63 (gritter) 11/7/04";
+static char sccsid[] = "@(#)junk.c	1.64 (gritter) 11/7/04";
 #endif
 #endif /* not lint */
 
@@ -338,7 +338,6 @@ skip:	if ((n = getn(&super[OF_super_size])) == 0) {
 static void 
 putdb(void)
 {
-	sighandler_type	saveint;
 	void	*zp;
 	int	scomp, ncomp;
 
@@ -348,7 +347,8 @@ putdb(void)
 	if (!nodes_mmapped && (nfp = dbfp(NODES, O_WRONLY, &ncomp, &nname))
 			== NULL || nfp == (FILE *)-1)
 		return;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if (super_mmapped == 0 || nodes_mmapped == 0)
+		holdint();
 	/*
 	 * Use utime() with mmap() since Linux does not update st_mtime
 	 * reliably otherwise.
@@ -372,7 +372,8 @@ putdb(void)
 	} else
 		fwrite(nodes, 1,
 			getn(&super[OF_super_size]) * SIZEOF_node, nfp);
-	safe_signal(SIGINT, saveint);
+	if (super_mmapped == 0 || nodes_mmapped == 0)
+		relseint();
 }
 
 static void
@@ -494,6 +495,7 @@ lookup(unsigned long h1, unsigned long h2, int create)
 				return NULL;
 			lastn = &nodes[lastc*SIZEOF_node];
 		}
+		putn(&super[OF_super_used], used+1);
 		n = &nodes[used*SIZEOF_node];
 		putn(&n[OF_node_hash], h1);
 		put(&n[OF_node_hash2], h2);
@@ -502,8 +504,6 @@ lookup(unsigned long h1, unsigned long h2, int create)
 		else
 			putn(&super[OF_super_bucket + (h1&MAX2)*SIZEOF_entry],
 					~used);
-		used++;
-		putn(&super[OF_super_used], used);
 		return n;
 	} else
 		return NULL;

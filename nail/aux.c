@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)aux.c	2.75 (gritter) 10/19/04";
+static char sccsid[] = "@(#)aux.c	2.76 (gritter) 11/7/04";
 #endif
 #endif /* not lint */
 
@@ -153,6 +153,26 @@ panic(const char *format, ...)
 	fprintf(stderr, catgets(catd, CATSET, 2, "\n"));
 	fflush(stderr);
 	abort();
+}
+
+void
+holdint(void)
+{
+	sigset_t	set;
+
+	sigemptyset(&set);
+	sigaddset(&set, SIGINT);
+	sigprocmask(SIG_BLOCK, &set, NULL);
+}
+
+void
+relseint(void)
+{
+	sigset_t	set;
+
+	sigemptyset(&set);
+	sigaddset(&set, SIGINT);
+	sigprocmask(SIG_UNBLOCK, &set, NULL);
 }
 
 /*

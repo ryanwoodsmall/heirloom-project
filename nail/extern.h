@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.147 (gritter) 11/7/04
+ *	Sccsid @(#)extern.h	2.148 (gritter) 11/7/04
  */
 
 /* aux.c */
@@ -43,6 +43,8 @@ char *savestr(const char *str);
 char *save2str(const char *str, const char *old);
 char *savecat(const char *s1, const char *s2);
 void panic(const char *format, ...);
+void holdint(void);
+void relseint(void);
 void touch(struct message *mp);
 int is_dir(char *name);
 int argcount(char **argv);
