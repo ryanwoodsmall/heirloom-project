@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.57 (gritter) 11/1/04";
+static char sccsid[] = "@(#)junk.c	1.58 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -53,19 +53,14 @@ static char sccsid[] = "@(#)junk.c	1.57 (gritter) 11/1/04";
 
 #ifdef	HAVE_MMAP
 #include <sys/mman.h>
+#else	/* !HAVE_MMAP */
+#define	mmap(a, b, c, d, e, f)	MAP_FAILED
+#define	munmap(a, b)
+#endif	/* !HAVE_MMAP */
 
 #ifndef	MAP_FAILED
-#define	MAP_FAILED	(void *)-1
+#define	MAP_FAILED	((void *)-1)
 #endif	/* !MAP_FAILED */
-
-static size_t	super_mmapped;
-static size_t	nodes_mmapped;
-static int	rw_map;
-#else	/* !HAVE_MMAP */
-#define	super_mmapped	((size_t)0)
-#define	nodes_mmapped	((size_t)0)
-#define	rw_map		0
-#endif	/* !HAVE_MMAP */
 
 #include "extern.h"
 #include "md5.h"
@@ -116,6 +111,10 @@ static char	*nodes;
 #define	OF_super_bucket	20	/* 65536 bit-negated node indices */
 #define	SIZEOF_entry	4
 static char	*super;
+
+static size_t	super_mmapped;
+static size_t	nodes_mmapped;
+static int	rw_map;
 
 /*
  * Version history
@@ -246,7 +245,6 @@ getdb(int rw)
 
 	if ((sfp = dbfp(SUPER, rw, &compressed)) == (FILE *)-1)
 		return STOP;
-#ifdef	HAVE_MMAP
 	if (sfp && !compressed) {
 		super = mmap(NULL, SIZEOF_super,
 				rw!=O_RDONLY ? PROT_READ|PROT_WRITE : PROT_READ,
@@ -257,7 +255,6 @@ getdb(int rw)
 		}
 	}
 	super_mmapped = 0;
-#endif	/* HAVE_MMAP */
 	super = smalloc(SIZEOF_super);
 	if (sfp) {
 		if (compressed)
@@ -290,7 +287,6 @@ skip:	if ((n = getn(&super[OF_super_size])) == 0) {
 			return STOP;
 		}
 	}
-#ifdef	HAVE_MMAP
 	rw_map = rw;
 	if (sfp && nfp && !compressed) {
 		nodes = mmap(NULL, n * SIZEOF_node,
@@ -302,7 +298,6 @@ skip:	if ((n = getn(&super[OF_super_size])) == 0) {
 		}
 	}
 	nodes_mmapped = 0;
-#endif	/* HAVE_MMAP */
 	nodes = smalloc(n * SIZEOF_node);
 	if (sfp && nfp) {
 		if (compressed)
@@ -370,19 +365,15 @@ putdb(void)
 static void
 relsedb(void)
 {
-#ifdef	HAVE_MMAP
 	if (super_mmapped) {
 		munmap(super, super_mmapped);
 		super_mmapped = 0;
 	} else
-#endif	/* HAVE_MMAP */
 		free(super);
-#ifdef	HAVE_MMAP
 	if (nodes_mmapped) {
 		munmap(nodes, nodes_mmapped);
 		nodes_mmapped = 0;
 	} else
-#endif	/* HAVE_MMAP */
 		free(nodes);
 	if (sfp && sfp != (FILE *)-1) {
 		Fclose(sfp);
@@ -494,7 +485,6 @@ lookup(unsigned long h1, unsigned long h2, int create)
 					"Junk mail database overflow.\n");
 				return NULL;
 			}
-#ifdef	HAVE_MMAP
 			if (nodes_mmapped) {
 				void	*onodes;
 
@@ -505,16 +495,15 @@ lookup(unsigned long h1, unsigned long h2, int create)
 					goto oflo;
 				onodes = nodes;
 				if ((nodes = mmap(NULL, (size+incr)*SIZEOF_node,
-						rw_map ? PROT_READ|PROT_WRITE :
+						rw_map!=O_RDONLY ?
+							PROT_READ|PROT_WRITE :
 							PROT_READ,
 						MAP_SHARED, fileno(nfp), 0))
 						== MAP_FAILED)
 					goto oflo;
 				munmap(onodes, nodes_mmapped);
 				nodes_mmapped = (size+incr)*SIZEOF_node;
-			} else
-#endif	/* HAVE_MMAP */
-			{
+			} else {
 				nodes = srealloc(nodes,
 						(size+incr)*SIZEOF_node);
 				memset(&nodes[size*SIZEOF_node], 0,
