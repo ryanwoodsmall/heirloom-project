@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.71 (gritter) 11/11/04";
+static char sccsid[] = "@(#)send.c	2.72 (gritter) 11/18/04";
 #endif
 #endif /* not lint */
 
@@ -519,6 +519,8 @@ skip:	switch (ip->m_mimecontent) {
 					rt = -1;
 				else if (action == SEND_QUOTE)
 					break;
+				if (action == SEND_TOFILE && obuf != origobuf)
+					Fclose(obuf);
 			}
 			return rt;
 		case SEND_MBOX:

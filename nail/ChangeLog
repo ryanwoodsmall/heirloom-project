@@ -1,3 +1,8 @@
+[11.17] released 11/18/04
+* When the 'write' command was used to save attachments in releases after
+  11.14, the output file was not properly closed. Since writes to that file
+  are buffered, data was only completely written when nail was quit.
+
 [11.16] released 11/18/04
 * When a header field line that started and ended with a MIME encoded word
   followed a line that ended with a MIME encoded word, the newline character
