@@ -1,4 +1,5 @@
-[11.10] released ...
+[11.10] released 10/3/04
+* The creation of quoted-printable encoded MIME data was broken in 11.9.
 * Junk mail filter improvement: Do not ignore single-letter words; extract
   hostnames from URLs and store them separately.
 
