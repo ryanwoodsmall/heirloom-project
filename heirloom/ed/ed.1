@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ed.1	1.45 (gritter) 2/6/05
+.\" Sccsid @(#)ed.1	1.46 (gritter) 2/17/05
 .\" Parts taken from ed(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH ED 1 "2/6/05" "Heirloom Toolchest" "User Commands"
+.TH ED 1 "2/17/05" "Heirloom Toolchest" "User Commands"
 .if t .ds q \(aa
 .if n .ds q '
 .SH NAME
@@ -881,12 +881,13 @@ and
 .BR /usr/5bin/s42/ed .
 .PP
 Some size limitations:
-On machines with 32-bit words,
-2\ G bytes in the temporary file;
-on machines with larger words,
-9\ E bytes.
-The limits on the length of lines
-and on the number of lines depend on the amount of core:
+The maximum number of bytes in the buffer
+corresponds to the address size;
+on machines with 32-bit addressing,
+it is 2\ G bytes,
+with 64-bit addressing,
+it is 9\ E bytes.
+The limit on the number of lines depends on the amount of core:
 each line takes 2 words.
 .PP
 If a line contains a NUL character,
