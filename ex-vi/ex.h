@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	@(#)ex.h	1.51 (gritter) 2/15/05
+ *	@(#)ex.h	1.52 (gritter) 2/17/05
  */
 
 /*
@@ -398,7 +398,7 @@ var	bool	inopen;		/* Inside open or visual */
 var	char	*input;		/* Current position in cmd line input buffer */
 var	bool	intty;		/* Input is a tty */
 var	short	io;		/* General i/o unit (auto-closed on error!) */
-extern	short	lastc;		/* Last character ret'd from cmd input */
+extern	int	lastc;		/* Last character ret'd from cmd input */
 var	bool	laste;		/* Last command was an "e" (or "rec") */
 var	char	lastmac;	/* Last macro called for ** */
 var	char	lasttag[TAGSIZE];	/* Last argument to a tag command */
@@ -417,7 +417,7 @@ var	shand	oldxfsz;	/* Previous SIGXFSZ handler */
 var	short	oprompt;	/* Saved during source */
 extern	unsigned short	ospeed;		/* Output speed (from gtty) */
 var	int	otchng;		/* Backup tchng to find changes in macros */
-var	short	peekc;		/* Peek ahead character (cmd mode input) */
+var	int	peekc;		/* Peek ahead character (cmd mode input) */
 var	char	*pkill[2];	/* Trim for put with ragged (LISP) delete */
 var	bool	pfast;		/* Have stty -nl'ed to go faster */
 var	pid_t	pid;		/* Process id of child */

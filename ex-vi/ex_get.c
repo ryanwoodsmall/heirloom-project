@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_get.c	1.16 (gritter) 11/24/04";
+static char sccsid[] = "@(#)ex_get.c	1.17 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -88,7 +88,7 @@ static char sccsid[] = "@(#)ex_get.c	1.16 (gritter) 11/24/04";
  * we have different flavors of routines which do/don't return such.
  */
 static	bool junkbs;
-short	lastc = '\n';
+int	lastc = '\n';
 
 void 
 ignchar(void)

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_io.c	1.39 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_io.c	1.40 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -964,14 +964,19 @@ source(char *fil, bool okfail)
 {
 	JMP_BUF osetexit;
 	register int saveinp, ointty, oerrno;
-	char *saveglobp;
-	short savepeekc;
+	char *saveglobp, *saveinput;
+	char	saveinline[BUFSIZ];
+	int savepeekc, savelastc;
 
 	signal(SIGINT, SIG_IGN);
 	saveinp = dup(0);
 	savepeekc = peekc;
+	savelastc = lastc;
 	saveglobp = globp;
-	peekc = 0; globp = 0;
+	saveinput = input;
+	if (input)
+		strcpy(saveinline, input);
+	peekc = 0; lastc = 0; globp = 0; input = 0;
 	if (saveinp < 0)
 		error(catgets(catd, 1, 119, "Too many nested sources"));
 	if (slevel <= 0)
@@ -982,6 +987,10 @@ source(char *fil, bool okfail)
 		setrupt();
 		dup(saveinp);
 		close(saveinp);
+		input = saveinput;
+		if (input)
+			strcpy(input, saveinline);
+		lastc = savelastc;
 		errno = oerrno;
 		if (!okfail)
 			filioerr(fil);
@@ -1000,6 +1009,10 @@ source(char *fil, bool okfail)
 		close(0);
 		dup(saveinp);
 		close(saveinp);
+		input = saveinput;
+		if (input)
+			strcpy(input, saveinline);
+		lastc = savelastc;
 		slevel--;
 		resexit(osetexit);
 		reset();
@@ -1010,7 +1023,11 @@ source(char *fil, bool okfail)
 	dup(saveinp);
 	close(saveinp);
 	globp = saveglobp;
+	input = saveinput;
+	if (input)
+		strcpy(input, saveinline);
 	peekc = savepeekc;
+	lastc = savelastc;
 	slevel--;
 	resexit(osetexit);
 }

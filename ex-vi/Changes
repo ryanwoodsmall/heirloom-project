@@ -35,6 +35,8 @@ Release ...
   the command now succeeds and prints a "[New file]" message.
 * If standard output is not a terminal, no '\r' is written at the end of
   printed lines anymore.
+* The 'source' ex command now works if command input comes from a pipe or
+  regular file.
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
