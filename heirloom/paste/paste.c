@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)paste.sl	1.8 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)paste.sl	1.10 (gritter) 2/1/05";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -113,7 +113,8 @@ static void
 cantopen(const char *fn)
 {
 	fprintf(stderr, "%s: cannot open %s\n", progname, fn);
-	exit(1);
+	if (sflag == 0)
+		exit(1);
 }
 
 static void
@@ -202,8 +203,10 @@ serial(const char *fn)
 	resdelim();
 	if (fn[0] == '-' && fn[1] == '\0')
 		fp = stdin;
-	else if ((fp = fopen(fn, "r")) == NULL)
+	else if ((fp = fopen(fn, "r")) == NULL) {
 		cantopen(fn);
+		return 1;
+	}
 	c = getc(fp);
 	while (c != EOF) {
 		if (c == '\n') {
@@ -224,7 +227,7 @@ static int
 paste(char **args)
 {
 	struct file	*fstart = NULL, *fp, *fq = NULL;
-	int	c, i, oneof, hadnl;
+	int	c, i, oneof, hadnl, delcnt;
 
 	for (i = 0; args[i]; i++) {
 		fp = smalloc(sizeof *fp);
@@ -243,20 +246,34 @@ paste(char **args)
 	do {
 		oneof = 1;
 		hadnl = 0;
+		delcnt = 0;
 		resdelim();
 		for (fp = fstart; fp; fp = fp->f_nxt) {
-			while ((c = getc(fp->f_fp)) != EOF && c != '\n')
+			while ((c = getc(fp->f_fp)) != EOF && c != '\n') {
+				while (delcnt > 0) {
+					putdelim();
+					delcnt--;
+				}
 				putchar(c);
+			}
 			if (c == '\n')
 				hadnl = 1;
 			if (c != EOF && (c = getc(fp->f_fp)) != EOF)
 				ungetc(c, fp->f_fp);
 			if (c != EOF)
 				oneof = 0;
-			if (fp->f_nxt)
-				putdelim();
-			else if (hadnl)
+			if (fp->f_nxt) {
+				if (oneof)
+					delcnt++;
+				else
+					putdelim();
+			} else if (hadnl) {
+				while (delcnt > 0) {
+					putdelim();
+					delcnt--;
+				}
 				putchar('\n');
+			}
 		}
 	} while (oneof == 0);
 	for (fp = fstart; fp; fp = fp->f_nxt)

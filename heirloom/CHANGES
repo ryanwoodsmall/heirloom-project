@@ -26,6 +26,10 @@ Release ...
   list to the -f option, lines without the delimiter character were printed.
 * cut: The -b, -c, and -f options did not accept the tabulator character as
   a field specification separator.
+* paste: If standard input was used as input multiple times, a delimiter
+  was printed after the last line of regular output.
+* paste: If an inaccessible file is given with the -s option, the utility no
+  longer exits but continues with the next file.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
