@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.48 (gritter) 11/11/04";
+static char sccsid[]  = "@(#)mime.c	2.49 (gritter) 12/23/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -67,7 +67,7 @@ static char *mimetypes_user = "~/.mime.types";
 char *us_ascii = "us-ascii";
 
 static int mustquote_body(int c);
-static int mustquote_hdr(int c);
+static int mustquote_hdr(const char *cp, int wordstart);
 static int mustquote_inhdrq(int c);
 #if defined (HAVE_MBTOWC) && defined (HAVE_WCTYPE_H)
 static size_t xmbstowcs(wchar_t *pwcs, const char *s, size_t nwcs);
@@ -115,11 +115,16 @@ mustquote_body(int c)
  * Check if c must be quoted inside a message's header.
  */
 static int 
-mustquote_hdr(int c)
+mustquote_hdr(const char *cp, int wordstart)
 {
+	int	c = *cp & 0377;
+
 	if (c != '\n' && (c < 040 || c >= 0177))
 		return 1;
-	if (c == '=' || c == '?' || c == '_')
+	if (wordstart && cp[0] == '=' && cp[1] == '?')
+		return 1;
+	if (cp[0] == '?' && cp[1] == '=' &&
+			(cp[2] == '\0' || whitechar(cp[2]&0377)))
 		return 1;
 	return 0;
 }
@@ -1182,18 +1187,26 @@ fromhdr_end:
 static size_t
 mime_write_tohdr(struct str *in, FILE *fo)
 {
-	char *upper, *wbeg, *wend, *charset, *lastwordend = NULL, *lastspc;
+	char *upper, *wbeg, *wend, *charset, *lastwordend = NULL, *lastspc, b,
+		*charset7;
 	struct str cin, cout;
-	size_t sz = 0, col = 0, wr, charsetlen;
+	size_t sz = 0, col = 0, wr, charsetlen, charset7len;
 	int quoteany, mustquote, broken,
 		maxcol = 65 /* there is the header field's name, too */;
 
 	upper = in->s + in->l;
 	charset = getcharset(MIME_HIGHBIT);
+	if ((charset7 = value("charset7")) == NULL)
+		charset7 = us_ascii;
 	charsetlen = strlen(charset);
-	for (wbeg = in->s, quoteany = 0; wbeg < upper; wbeg++)
-		if (mustquote_hdr(*wbeg))
+	charset7len = strlen(charset7);
+	charsetlen = smax(charsetlen, charset7len);
+	b = 0;
+	for (wbeg = in->s, quoteany = 0; wbeg < upper; wbeg++) {
+		b |= *wbeg;
+		if (mustquote_hdr(wbeg, wbeg == in->s))
 			quoteany++;
+	}
 	if (2 * quoteany > in->l) {
 		/*
 		 * Print the entire field in base64.
@@ -1205,7 +1218,8 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				cin.l = wend - wbeg;
 				if (cin.l * 4/3 + 7 + charsetlen
 						< maxcol - col) {
-					fprintf(fo, "=?%s?B?", charset);
+					fprintf(fo, "=?%s?B?",
+						b&0200 ? charset : charset7);
 					wr = mime_write_tob64(&cin, fo, 1);
 					fwrite("?=", sizeof (char), 2, fo);
 					wr += 7 + charsetlen;
@@ -1252,10 +1266,12 @@ mime_write_tohdr(struct str *in, FILE *fo)
 				break;
 			}
 			mustquote = 0;
+			b = 0;
 			for (wend = wbeg;
 				wend < upper && !whitechar(*wend & 0377);
 					wend++) {
-				if (mustquote_hdr(*wend&0377))
+				b |= *wend;
+				if (mustquote_hdr(wend, wend == wbeg))
 					mustquote++;
 			}
 			if (mustquote || broken || (wend - wbeg) >= 74 &&
@@ -1276,8 +1292,8 @@ mime_write_tohdr(struct str *in, FILE *fo)
 								lastspc++,
 								sz++;
 							}
-						fprintf(fo, "=?%s?Q?",
-								charset);
+						fprintf(fo, "=?%s?Q?", b&0200 ?
+							charset : charset7);
 						fwrite(cout.s, sizeof *cout.s,
 								cout.l, fo);
 						fwrite("?=", 1, 2, fo);

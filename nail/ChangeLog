@@ -1,3 +1,9 @@
+[11.19] released ...
+* Only MIME-encode words in header fields if they start with '=?' or end
+  with '?=' (instead of encoding any words containing '?', '=', or '_'),
+  and declare them as 'us-ascii' if they do not contain any bytes with the
+  highest bit set (Bugreport by Suresh Ramasubramanian).
+
 [11.18] released 12/9/04
 * When the 'write' command asks for an attachment filename and a '|' is
   given as the first character, the attachment is piped to the rest of

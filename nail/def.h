@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.91 (gritter) 11/26/04
+ *	Sccsid @(#)def.h	2.92 (gritter) 12/23/04
  */
 
 /*
@@ -603,6 +603,9 @@ extern const unsigned char	class_char[];
 #endif	/* __GLIBC__ */
 
 #define	CBAD		(-15555)
+
+#define	smin(a, b)	((a) < (b) ? (a) : (b))
+#define	smax(a, b)	((a) < (b) ? (b) : (a))
 
 /*
  * For saving the current directory and later returning.

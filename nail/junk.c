@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.65 (gritter) 11/29/04";
+static char sccsid[] = "@(#)junk.c	1.66 (gritter) 12/23/04";
 #endif
 #endif /* not lint */
 
@@ -139,9 +139,6 @@ static int	table_version;
 	(((char *)(e))[0] = (n) & 0x0000ff, \
 	 ((char *)(e))[1] = ((n) & 0x00ff00) >> 8, \
 	 ((char *)(e))[2] = ((n) & 0xff0000) >> 16)
-
-#define	smin(a, b)	((a) < (b) ? (a) : (b))
-#define	smax(a, b)	((a) < (b) ? (b) : (a))
 
 #define	f2s(d)	(smin(((unsigned)((d) * MAX3)), MAX3))
 
