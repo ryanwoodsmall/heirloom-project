@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)touch_sus.sl	1.19 (gritter) 2/10/05";
+static const char sccsid[] USED = "@(#)touch_sus.sl	1.20 (gritter) 2/27/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)touch.sl	1.19 (gritter) 2/10/05";
+static const char sccsid[] USED = "@(#)touch.sl	1.20 (gritter) 2/27/05";
 #endif	/* !SUS */
 
 #include	<sys/types.h>
@@ -343,7 +343,10 @@ main(int argc, char **argv)
 #ifdef	SUS
 	if (optind >= argc)
 		usage();
-#endif	/* SUS */
+#else	/* !SUS */
+	if (optind >= argc && date_time == 0)
+		usage();
+#endif	/* !SUS */
 	for (i = optind; i < argc; i++)
 		touch(argv[i]);
 	return errcnt < 0100 ? errcnt : 077;
