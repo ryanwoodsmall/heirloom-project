@@ -21,6 +21,8 @@
   Michael Sipser).
 * Files in maildir folders are now read in the order obtained from
   readdir().
+* When the variables 'sign' or 'Sign' are set to the empty string, they
+  are treated as if they had been unset for the '~a' or '~A' commands.
 
 [11.20] released 1/13/05
 * A 'forward-as-attachment' variable has been introduced. If it is set,

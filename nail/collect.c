@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.44 (gritter) 1/10/05";
+static char sccsid[] = "@(#)collect.c	2.45 (gritter) 2/19/05";
 #endif
 #endif /* not lint */
 
@@ -819,7 +819,8 @@ cont:
 			/*
 			 * Insert the contents of a signature variable.
 			 */
-			if ((cp = value(c == 'a' ? "sign" : "Sign")) != NULL) {
+			if ((cp = value(c == 'a' ? "sign" : "Sign")) != NULL &&
+					*cp != '\0') {
 				if (is_a_tty[0])
 					putesc(cp, stdout);
 				putesc(cp, collf);
