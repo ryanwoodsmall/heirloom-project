@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.70 (gritter) 11/11/04";
+static char sccsid[] = "@(#)send.c	2.71 (gritter) 11/11/04";
 #endif
 #endif /* not lint */
 
@@ -80,7 +80,8 @@ static size_t out(char *buf, size_t len, FILE *fp,
 		char *prefix, size_t prefixlen, off_t *stats);
 static void addstats(off_t *stats, off_t lines, off_t bytes);
 static FILE *newfile(struct mimepart *ip);
-static FILE *getpipetype(char *content, FILE **qbuf, int quote);
+static char *getpipecmd(char *content);
+static FILE *getpipefile(char *cmd, FILE **qbuf, int quote);
 static void pipecpy(FILE *pipebuf, FILE *outbuf, FILE *origobuf,
 		char *prefix, size_t prefixlen, off_t *stats);
 static void statusput(const struct message *mp, FILE *obuf,
@@ -184,7 +185,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	int	c;
 	struct mimepart	*np;
 	FILE	*ibuf = NULL, *pbuf = obuf, *qbuf = obuf, *origobuf = obuf;
-	char	*tcs;
+	char	*tcs, *pipecmd = NULL;
 	enum conversion	convert;
 	sighandler_type	oldpipe = SIG_DFL;
 	int	rt = 0;
@@ -394,6 +395,16 @@ skip:	switch (ip->m_mimecontent) {
 		/*FALLTHRU*/
 	case MIME_TEXT:
 	case MIME_TEXT_PLAIN:
+		switch (action) {
+		case SEND_TODISP:
+		case SEND_TODISP_ALL:
+		case SEND_QUOTE:
+		case SEND_QUOTE_ALL:
+			pipecmd = getpipecmd(ip->m_ct_type_plain);
+			/*FALLTHRU*/
+		default:
+			break;
+		}
 		break;
 	case MIME_DISCARD:
 		if (action != SEND_DECRYPT)
@@ -407,6 +418,8 @@ skip:	switch (ip->m_mimecontent) {
 		switch (action) {
 		case SEND_TODISP:
 		case SEND_TODISP_ALL:
+			if ((pipecmd = getpipecmd(ip->m_ct_type_plain)) != NULL)
+				break;
 			if (level == 0 && count) {
 				cp = "[Binary content]\n\n";
 				out(cp, strlen(cp), obuf, CONV_NONE, SEND_MBOX,
@@ -417,6 +430,8 @@ skip:	switch (ip->m_mimecontent) {
 			return rt;
 		case SEND_QUOTE:
 		case SEND_QUOTE_ALL:
+			if ((pipecmd = getpipecmd(ip->m_ct_type_plain)) != NULL)
+				break;
 			return -1;
 		case SEND_TOFILE:
 		case SEND_TOSRCH:
@@ -545,9 +560,9 @@ skip:	switch (ip->m_mimecontent) {
 		convert = CONV_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
-	if (action == SEND_TODISP || action == SEND_TODISP_ALL ||
+	if ((action == SEND_TODISP || action == SEND_TODISP_ALL ||
 			action == SEND_QUOTE || action == SEND_QUOTE_ALL ||
-			action == SEND_TOSRCH) {
+			action == SEND_TOSRCH) && pipecmd == NULL) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if (asccasecmp(tcs, ip->m_charset) &&
@@ -557,10 +572,12 @@ skip:	switch (ip->m_mimecontent) {
 			iconvd = (iconv_t)-1;
 	}
 #endif	/* HAVE_ICONV */
-	if (action == SEND_TODISP || action == SEND_TODISP_ALL ||
-			action == SEND_QUOTE || action == SEND_QUOTE_ALL) {
+	if ((action == SEND_TODISP || action == SEND_TODISP_ALL ||
+			action == SEND_QUOTE || action == SEND_QUOTE_ALL) &&
+			pipecmd != NULL) {
+		action = SEND_TOFILE;
 		qbuf = obuf;
-		pbuf = getpipetype(ip->m_ct_type_plain, &qbuf,
+		pbuf = getpipefile(pipecmd, &qbuf,
 			action == SEND_QUOTE || action == SEND_QUOTE_ALL);
 		if (pbuf != qbuf) {
 			oldpipe = safe_signal(SIGPIPE, onpipe);
@@ -926,14 +943,13 @@ newfile(struct mimepart *ip)
 	return fp;
 }
 
-static FILE *
-getpipetype(char *content, FILE **qbuf, int quote)
+static char *
+getpipecmd(char *content)
 {
-	char *penv, *pipecmd, *shell, *cp, *cq;
-	FILE *rbuf = *qbuf;
+	char	*penv, *cp, *cq, *pipecmd;
 
 	if (content == NULL)
-		return *qbuf;
+		return NULL;
 	penv = ac_alloc(strlen(content) + 6);
 	strcpy(penv, "pipe-");
 	cp = &penv[5];
@@ -941,7 +957,18 @@ getpipetype(char *content, FILE **qbuf, int quote)
 	do
 		*cp++ = lowerconv(*cq & 0377);
 	while (*cq++);
-	if ((pipecmd = value(penv)) != NULL) {
+	pipecmd = value(penv);
+	ac_free(penv);
+	return pipecmd;
+}
+
+static FILE *
+getpipefile(char *pipecmd, FILE **qbuf, int quote)
+{
+	char	*shell;
+	FILE	*rbuf = *qbuf;
+
+	if (pipecmd != NULL) {
 		if (quote) {
 			char *tempPipe;
 
@@ -964,7 +991,6 @@ getpipetype(char *content, FILE **qbuf, int quote)
 				fflush(stdout);
 		}
 	}
-	ac_free(penv);
 	return rbuf;
 }
 
