@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tail.sl	1.21 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)tail.sl	1.22 (gritter) 2/2/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -60,6 +60,7 @@ static const char sccsid[] USED = "@(#)tail.sl	1.21 (gritter) 12/8/04";
 #include	<errno.h>
 #include	<libgen.h>
 #include	<limits.h>
+#include	<ctype.h>
 #include	"atoll.h"
 
 enum	from {
@@ -393,8 +394,11 @@ getcount(const char *arg, int type)
 	if (arg[0] == '+') {
 		cnt.c_frm = FR_BEGIN;
 		arg++;
-	} else if (arg[0] == '-')
+	} else if (arg[0] == '-') {
+		if (arg[1] == '-' && arg[2] == '\0')
+			return NULL;
 		arg++;
+	}
 	else if (type == '\0')
 		return NULL;
 	if (arg[0] == '+' || arg[0] == '-')
@@ -405,9 +409,11 @@ getcount(const char *arg, int type)
 	if (type == '\0') {
 		cnt.c_typ = 'l';
 		if (x == arg) {
-			if (*x == 'f' || *x == 'c')
+			if (cnt.c_frm != FR_BEGIN && (*x == 'f' ||
+						*x == 'c' && (x[1] == '\0' ||
+							isdigit(x[1] & 0377))))
 				return NULL;
-			cnt.c_off = 10;
+			cnt.c_off = cnt.c_frm == FR_BEGIN ? 9 : 10;
 		}
 		while (*x != '\0') {
 			switch (*x) {
@@ -458,6 +464,9 @@ main(int argc, char **argv)
 	progname = basename(argv[0]);
 	if (argc > 1 && (cnt = getcount(argv[1], '\0')) != NULL) {
 		optind = 2;
+		if (argc > 2 && argv[2][0] == '-' && argv[2][1] == '-' &&
+				argv[2][2] == '\0')
+			optind++;
 		goto optend;
 	}
 	while ((i = getopt(argc, argv, optstring)) != EOF) {

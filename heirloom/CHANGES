@@ -52,6 +52,7 @@ Release ...
   corresponding sort field.
 * uniq: The argument to the -f and -s options is required, and a '--' is
   accepted to end the option list.
+* tail: Accept '+c' without a count; accept '--' to end the option list.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
