@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmds.c	1.20 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_cmds.c	1.21 (gritter) 2/17/05";
 #endif
 #endif
 
@@ -675,7 +675,12 @@ recovnext:
 				tail("stop");
 				goto suspend;
 			case 'u':
-				tail("suspend");
+				getchar();
+				if (peekchar() == 'b') {
+					tail2of("substitute");
+					goto substitute;
+				}
+				tail2of("suspend");
 suspend:
 				if (!ldisc)
 					error(catgets(catd, 1, 24,
@@ -697,10 +702,11 @@ suspend:
 /* ~ */
 /* substitute */
 		case '&':
-		case '~':
+	 	case '~':
 			Command = "substitute";
 			if (c == 's')
 				tail(Command);
+substitute:
 			vmacchng(0);
 			if (!substitute(c))
 				pflag = 0;
