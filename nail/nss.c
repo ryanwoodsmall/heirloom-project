@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.33 (gritter) 11/11/04";
+static char sccsid[] = "@(#)nss.c	1.34 (gritter) 11/17/04";
 #endif
 #endif /* not lint */
 
@@ -57,6 +57,7 @@ static sigjmp_buf	nssjmp;
 #include <nss.h>
 #include <ssl.h>
 #include <prinit.h>
+#include <prmem.h>
 #include <pk11func.h>
 #include <prtypes.h>
 #include <prerror.h>
@@ -282,6 +283,25 @@ ssl_open(const char *server, struct sock *sp, const char *uhp)
 	}
 	sp->s_prfd = fdc;
 	sp->s_use_ssl = 1;
+	if (verbose) {
+		char	*cipher, *issuer, *subject;
+		int	keysize, secretkeysize;
+
+		if (SSL_SecurityStatus(fdc, NULL, &cipher,
+					&keysize, &secretkeysize,
+					&issuer, &subject) == SECSuccess) {
+			fprintf(stderr, "SSL parameters: cipher=%s, "
+					"keysize=%d, secretkeysize=%d,\n"
+					"issuer=%s\n"
+					"subject=%s\n",
+					cipher, keysize, secretkeysize,
+					issuer, subject);
+			PR_Free(cipher);
+			PR_Free(issuer);
+			PR_Free(subject);
+		} else
+			nss_gen_err("Could not read status information");
+	}
 	return OKAY;
 }
 

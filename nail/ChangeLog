@@ -13,6 +13,8 @@
   server failed at the first attempt.
 * Previous versions refused to write messages or attachments to /dev/null
   on some Solaris versions.
+* If the 'from' variable is set to an address that does not contain an '@'
+  character, no (syntactically incorrect) Message-ID is generated anymore.
 
 [11.15] released 11/10/04
 * The compilation process was fixed to work without CPPFLAGS=-D_GNU_SOURCE on

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.68 (gritter) 11/7/04";
+static char sccsid[] = "@(#)sendout.c	2.69 (gritter) 11/17/04";
 #endif
 #endif /* not lint */
 
@@ -918,7 +918,7 @@ message_id(FILE *fo)
 	if ((cp = value("hostname")) != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s@%s>\n",
 				(long)now, getrandstring(24), cp);
-	else if ((cp = skin(myaddr())) != NULL)
+	else if ((cp = skin(myaddr())) != NULL && strchr(cp, '@') != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s%%%s>\n",
 				(long)now, getrandstring(16), cp);
 }
