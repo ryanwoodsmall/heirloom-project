@@ -17,6 +17,12 @@
   by POSIX.1-2004. MIME decoding and decryption are now performed before each
   message is passed to the editor. If you prefer the old behavior, set the new
   'writebackedited' variable.
+* When large amounts of messages were deleted on an IMAP server (or many
+  other STORE commands were generated e.g. because many messages were marked
+  as read), nail sent all of these commands asynchronously. This did slow
+  down operation with some servers and eventually lead to a deadlock after
+  some thousand commands were sent. Nail now waits for server responses in
+  defined intervals. (Bugreport by Stephen Isard.)
 * The handling of read-only compressed mbox format folders was fixed.
 * In version 11.12, fcntl() read locking was erroneously introduced for files
   other than system mailboxes too. It is now disabled for such files again.

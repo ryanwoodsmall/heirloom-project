@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.206 (gritter) 10/19/04";
+static char sccsid[] = "@(#)imap.c	1.207 (gritter) 11/3/04";
 #endif
 #endif /* not lint */
 
@@ -216,7 +216,8 @@ static void commitmsg(struct mailbox *mp, struct message *to,
 static enum okay imap_fetchheaders(struct mailbox *mp, struct message *m,
 		int bot, int top);
 static enum okay imap_exit(struct mailbox *mp);
-static enum okay imap_delete(struct mailbox *mp, int n, struct message *m);
+static enum okay imap_delete(struct mailbox *mp, int n, struct message *m, int
+		needstat);
 static enum okay imap_close(struct mailbox *mp);
 static enum okay imap_update(struct mailbox *mp);
 static enum okay imap_store(struct mailbox *mp, struct message *m,
@@ -1730,9 +1731,9 @@ imap_exit(struct mailbox *mp)
 }
 
 static enum okay 
-imap_delete(struct mailbox *mp, int n, struct message *m)
+imap_delete(struct mailbox *mp, int n, struct message *m, int needstat)
 {
-	imap_store(mp, m, n, '+', "\\Deleted", 0);
+	imap_store(mp, m, n, '+', "\\Deleted", needstat);
 	if (mp->mb_type == MB_IMAP)
 		delcache(mp, m);
 	return OKAY;
@@ -1755,7 +1756,7 @@ imap_update(struct mailbox *mp)
 {
 	FILE *readstat = NULL;
 	struct message *m;
-	int dodel, c, gotcha = 0, held = 0, modflags = 0;
+	int dodel, c, gotcha = 0, held = 0, modflags = 0, needstat, stored = 0;
 
 	verbose = value("verbose") != NULL;
 	if (Tflag != NULL) {
@@ -1788,38 +1789,61 @@ imap_update(struct mailbox *mp)
 			dodel = !((m->m_flag&MPRESERVE) ||
 					(m->m_flag&MTOUCH) == 0);
 		}
+		/*
+		 * Fetch the result after around each 800 STORE commands
+		 * sent (approx. 32k data sent). Otherwise, servers will
+		 * try to flush the return queue at some point, leading
+		 * to a deadlock if we are still writing commands but not
+		 * reading their results.
+		 */
+		needstat = stored > 0 && stored % 800 == 0;
 		if (dodel) {
-			imap_delete(mp, m-message+1, m);
+			imap_delete(mp, m-message+1, m, needstat);
+			stored++;
 			gotcha++;
 		} else {
-			if ((m->m_flag&(MREAD|MSTATUS)) == (MREAD|MSTATUS))
+			if ((m->m_flag&(MREAD|MSTATUS)) == (MREAD|MSTATUS)) {
 				imap_store(mp, m, m-message+1,
-						'+', "\\Seen", 0);
-			if (m->m_flag & MFLAG)
+						'+', "\\Seen", needstat);
+				stored++;
+			}
+			if (m->m_flag & MFLAG) {
 				imap_store(mp, m, m-message+1,
-						'+', "\\Flagged", 0);
-			if (m->m_flag & MUNFLAG)
+						'+', "\\Flagged", needstat);
+				stored++;
+			}
+			if (m->m_flag & MUNFLAG) {
 				imap_store(mp, m, m-message+1,
-						'-', "\\Flagged", 0);
-			if (m->m_flag & MANSWER)
+						'-', "\\Flagged", needstat);
+				stored++;
+			}
+			if (m->m_flag & MANSWER) {
 				imap_store(mp, m, m-message+1,
-						'+', "\\Answered", 0);
-			if (m->m_flag & MUNANSWER)
+						'+', "\\Answered", needstat);
+				stored++;
+			}
+			if (m->m_flag & MUNANSWER) {
 				imap_store(mp, m, m-message+1,
-						'-', "\\Answered", 0);
-			if (m->m_flag & MDRAFT)
+						'-', "\\Answered", needstat);
+				stored++;
+			}
+			if (m->m_flag & MDRAFT) {
 				imap_store(mp, m, m-message+1,
-						'+', "\\Draft", 0);
-			if (m->m_flag & MUNDRAFT)
+						'+', "\\Draft", needstat);
+				stored++;
+			}
+			if (m->m_flag & MUNDRAFT) {
 				imap_store(mp, m, m-message+1,
-						'-', "\\Draft", 0);
+						'-', "\\Draft", needstat);
+				stored++;
+			}
 			if (mp->mb_type != MB_CACHE ||
 				!edit && (!(m->m_flag&(MBOXED|MSAVED|MDELETED))
 					|| (m->m_flag &
 						(MBOXED|MPRESERVE|MTOUCH)) ==
 				  		(MPRESERVE|MTOUCH)) ||
-				edit && !(m->m_flag & MDELETED))
-			held++;
+					edit && !(m->m_flag & MDELETED))
+				held++;
 			if (m->m_flag & MNEW) {
 				m->m_flag &= ~MNEW;
 				m->m_flag |= MSTATUS;
