@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.39 (gritter) 10/30/04";
+static char sccsid[] = "@(#)cmd2.c	2.40 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -174,7 +174,7 @@ save(void *v)
 {
 	char *str = v;
 
-	return save1(str, 1, "save", saveignore, CONV_NONE, 0, 0);
+	return save1(str, 1, "save", saveignore, ACT_NONE, 0, 0);
 }
 
 int 
@@ -182,7 +182,7 @@ Save(void *v)
 {
 	char *str = v;
 
-	return save1(str, 1, "save", saveignore, CONV_NONE, 1, 0);
+	return save1(str, 1, "save", saveignore, ACT_NONE, 1, 0);
 }
 
 /*
@@ -193,7 +193,7 @@ copycmd(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "copy", saveignore, CONV_NONE, 0, 0);
+	return save1(str, 0, "copy", saveignore, ACT_NONE, 0, 0);
 }
 
 int 
@@ -201,7 +201,7 @@ Copycmd(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "copy", saveignore, CONV_NONE, 1, 0);
+	return save1(str, 0, "copy", saveignore, ACT_NONE, 1, 0);
 }
 
 /*
@@ -212,7 +212,7 @@ cmove(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "move", saveignore, CONV_NONE, 0, 1);
+	return save1(str, 0, "move", saveignore, ACT_NONE, 0, 1);
 }
 
 int 
@@ -220,7 +220,7 @@ cMove(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "move", saveignore, CONV_NONE, 1, 1);
+	return save1(str, 0, "move", saveignore, ACT_NONE, 1, 1);
 }
 
 /*
@@ -231,7 +231,7 @@ cdecrypt(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "decrypt", saveignore, CONV_DECRYPT, 0, 0);
+	return save1(str, 0, "decrypt", saveignore, ACT_DECRYPT, 0, 0);
 }
 
 int 
@@ -239,7 +239,7 @@ cDecrypt(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "decrypt", saveignore, CONV_DECRYPT, 1, 0);
+	return save1(str, 0, "decrypt", saveignore, ACT_DECRYPT, 1, 0);
 }
 
 /*
@@ -268,7 +268,7 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 		for (cp = str; *cp && blankchar(*cp & 0377); cp++);
 		f = (*cp != '\0');
 	} else {
-		if ((file = snarf(str, &f, convert != CONV_TOFILE)) == NULL)
+		if ((file = snarf(str, &f, convert != ACT_TOFILE)) == NULL)
 			return(1);
 	}
 	if (!f) {
@@ -318,9 +318,9 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 			disp = catgets(catd, CATSET, 26, "[New file]");
 		}
 	}
-	if ((obuf = convert == CONV_TOFILE ? Fopen(file, "a+") :
+	if ((obuf = convert == ACT_TOFILE ? Fopen(file, "a+") :
 			Zopen(file, "a+", &compressed)) == NULL) {
-		if ((obuf = convert == CONV_TOFILE ? Fopen(file, "wx") :
+		if ((obuf = convert == ACT_TOFILE ? Fopen(file, "wx") :
 				Zopen(file, "wx", &compressed)) == NULL) {
 			perror(file);
 			return(1);
@@ -430,7 +430,7 @@ cwrite(void *v)
 {
 	char *str = v;
 
-	return save1(str, 0, "write", allignore, CONV_TOFILE, 0, 0);
+	return save1(str, 0, "write", allignore, ACT_TOFILE, 0, 0);
 }
 
 /*

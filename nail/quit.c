@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)quit.c	2.25 (gritter) 10/30/04";
+static char sccsid[] = "@(#)quit.c	2.26 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -99,7 +99,7 @@ writeback(FILE *res, FILE *obuf)
 		if ((mp->m_flag&MPRESERVE)||(mp->m_flag&MTOUCH)==0) {
 			p++;
 			if (send(mp, obuf, (struct ignoretab *)0,
-						NULL, CONV_NONE, NULL) < 0) {
+						NULL, ACT_NONE, NULL) < 0) {
 				perror(mailname);
 				fseek(obuf, 0L, SEEK_SET);
 				return(-1);
@@ -422,7 +422,7 @@ makembox(void)
 				if (imap_copy(mp, mp-message+1, mbox) == STOP)
 					goto err;
 			} else if (send(mp, obuf, saveignore,
-						NULL, CONV_NONE, NULL) < 0) {
+						NULL, ACT_NONE, NULL) < 0) {
 				perror(mbox);
 			err:	if (ibuf)
 					Fclose(ibuf);
@@ -554,7 +554,7 @@ edstop(void)
 			continue;
 		c++;
 		if (send(mp, obuf, (struct ignoretab *) NULL,
-					NULL, CONV_NONE, NULL) < 0) {
+					NULL, ACT_NONE, NULL) < 0) {
 			perror(mailname);
 			relsesigs();
 			reset(0);

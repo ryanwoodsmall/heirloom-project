@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.84 (gritter) 11/1/04";
+static char sccsid[] = "@(#)cmd1.c	2.85 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -750,8 +750,8 @@ type1(int *msgvec, int doign, int page, int pipe, int decode,
 				"Message %2d:\n"), *ip);
 		send(mp, obuf, doign ? ignore : 0, NULL,
 			decode || pipe && value("piperaw") ?
-				CONV_NONE :
-				doign ? CONV_TODISP : CONV_TODISP_ALL,
+				ACT_NONE :
+				doign ? ACT_TODISP : ACT_TODISP_ALL,
 			mstats);
 		if (pipe && value("page")) {
 			putc('\f', obuf);

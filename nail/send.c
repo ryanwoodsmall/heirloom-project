@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.58 (gritter) 11/1/04";
+static char sccsid[] = "@(#)send.c	2.59 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -62,7 +62,7 @@ enum parseflags {
 static void onpipe(int signo);
 static int sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		struct ignoretab *doign, char *prefix, size_t prefixlen,
-		enum conversion action, off_t *stats, int level);
+		enum action action, off_t *stats, int level);
 static struct mimepart *parsemsg(struct message *mp, enum parseflags pf);
 static enum okay parsepart(struct message *zmp, struct mimepart *ip,
 		enum parseflags pf, int level);
@@ -76,7 +76,7 @@ static void parse822(struct message *zmp, struct mimepart *ip,
 static void parsepkcs7(struct message *zmp, struct mimepart *ip,
 		enum parseflags pf, int level);
 static size_t out(char *buf, size_t len, FILE *fp,
-		enum conversion convert, enum conversion action,
+		enum conversion convert, enum action action,
 		char *prefix, size_t prefixlen, off_t *stats);
 static void addstats(off_t *stats, off_t lines, off_t bytes);
 static FILE *newfile(struct mimepart *ip);
@@ -104,13 +104,13 @@ onpipe(int signo)
  * Adjust the status: field if need be.
  * If doign is given, suppress ignored header fields.
  * prefix is a string to prepend to each output line.
- * action = data destination (CONV_NONE,_TOFILE,_TODISP,_QUOTE,_DECRYPT).
+ * action = data destination (ACT_NONE,_TOFILE,_TODISP,_QUOTE,_DECRYPT).
  * stats[0] is line count, stats[1] is character count. stats may be NULL.
- * Note that stats[0] is valid for CONV_NONE only.
+ * Note that stats[0] is valid for ACT_NONE only.
  */
 int
 send(struct message *mp, FILE *obuf, struct ignoretab *doign,
-		char *prefix, enum conversion action, off_t *stats)
+		char *prefix, enum action action, off_t *stats)
 {
 	size_t	count;
 	FILE	*ibuf;
@@ -120,7 +120,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 	struct mimepart	*ip;
 	char	*cp, *cp2;
 
-	if (mp == dot && action != CONV_TOSRCH && action != CONV_TOFLTR)
+	if (mp == dot && action != ACT_TOSRCH && action != ACT_TOFLTR)
 		did_print_dot = 1;
 	if (stats)
 		stats[0] = stats[1] = 0;
@@ -164,7 +164,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 	if (sz)
 		addstats(stats, 1, sz);
 	pf = 0;
-	if (action != CONV_NONE)
+	if (action != ACT_NONE)
 		pf |= PARSE_DECRYPT|PARSE_PARTS;
 	if ((ip = parsemsg(mp, pf)) == NULL)
 		return -1;
@@ -175,7 +175,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 static int
 sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		struct ignoretab *doign, char *prefix, size_t prefixlen,
-		enum conversion action, off_t *stats, int level)
+		enum action action, off_t *stats, int level)
 {
 	char	*line = NULL;
 	size_t	linesize = 0, linelen, count, len;
@@ -197,7 +197,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	(void)&rt;
 	(void)&obuf;
 	if (ip->m_mimecontent == MIME_PKCS7 && ip->m_multipart &&
-			action != CONV_NONE)
+			action != ACT_NONE)
 		goto skip;
 	dostat = 0;
 	if (level == 0) {
@@ -221,9 +221,9 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				break;
 		}
 	isenc = 0;
-	convert = action == CONV_TODISP || action == CONV_TODISP_ALL ||
-			action == CONV_QUOTE || action == CONV_QUOTE_ALL ||
-			action == CONV_TOSRCH || action == CONV_TOFLTR ?
+	convert = action == ACT_TODISP || action == ACT_TODISP_ALL ||
+			action == ACT_QUOTE || action == ACT_QUOTE_ALL ||
+			action == ACT_TOSRCH || action == ACT_TOFLTR ?
 		CONV_FROMHDR : CONV_NONE;
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
 		lineno++;
@@ -239,7 +239,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 			if (dostat & 2)
 				xstatusput(zmp, obuf, prefix, stats);
 			if (doign != allignore)
-				out("\n", 1, obuf, CONV_NONE, action,
+				out("\n", 1, obuf, ACT_NONE, action,
 						prefix, prefixlen, stats);
 			break;
 		}
@@ -274,7 +274,7 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				if (dostat & 2)
 					xstatusput(zmp, obuf, prefix, stats);
 				if (doign != allignore)
-					out("\n", 1, obuf, CONV_NONE, action,
+					out("\n", 1, obuf, ACT_NONE, action,
 						prefix, prefixlen, stats);
 				break;
 			}
@@ -331,12 +331,12 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 		if (!ignoring) {
 			start = line;
 			len = linelen;
-			if (action == CONV_TODISP ||
-					action == CONV_TODISP_ALL ||
-					action == CONV_QUOTE ||
-					action == CONV_QUOTE_ALL ||
-					action == CONV_TOSRCH ||
-					action == CONV_TOFLTR) {
+			if (action == ACT_TODISP ||
+					action == ACT_TODISP_ALL ||
+					action == ACT_QUOTE ||
+					action == ACT_QUOTE_ALL ||
+					action == ACT_TOSRCH ||
+					action == ACT_TOFLTR) {
 				/*
 				 * Strip blank characters if two MIME-encoded
 				 * words follow on continuing lines.
@@ -365,59 +365,62 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 skip:	switch (ip->m_mimecontent) {
 	case MIME_822:
 		switch (action) {
-		case CONV_TOFLTR:
+		case ACT_TOFLTR:
 			putc('\0', obuf);
 			/*FALLTHRU*/
-		case CONV_TODISP:
-		case CONV_TODISP_ALL:
-		case CONV_QUOTE:
-		case CONV_QUOTE_ALL:
-		case CONV_TOSRCH:
-		case CONV_DECRYPT:
+		case ACT_TODISP:
+		case ACT_TODISP_ALL:
+		case ACT_QUOTE:
+		case ACT_QUOTE_ALL:
+		case ACT_TOSRCH:
+		case ACT_DECRYPT:
 			goto multi;
-		case CONV_TOFILE:
+		case ACT_TOFILE:
 			put_from_(obuf);
 			/*FALLTHRU*/
-		default:
+		case ACT_NONE:
 			break;
 		}
 		break;
 	case MIME_TEXT_HTML:
-		if (action == CONV_TOFLTR)
+		if (action == ACT_TOFLTR)
 			putc('\b', obuf);
 		/*FALLTHRU*/
 	case MIME_TEXT:
 	case MIME_TEXT_PLAIN:
 		break;
 	case MIME_DISCARD:
-		if (action != CONV_DECRYPT)
+		if (action != ACT_DECRYPT)
 			return rt;
 		break;
 	case MIME_PKCS7:
-		if (action != CONV_NONE && ip->m_multipart)
+		if (action != ACT_NONE && ip->m_multipart)
 			goto multi;
 		/*FALLTHRU*/
 	default:
 		switch (action) {
-		case CONV_TODISP:
-		case CONV_TODISP_ALL:
+		case ACT_TODISP:
+		case ACT_TODISP_ALL:
 			if (level == 0 && count) {
 				cp = "[Binary content]\n\n";
-				out(cp, strlen(cp), obuf, CONV_NONE, action,
+				out(cp, strlen(cp), obuf, ACT_NONE, action,
 						prefix, prefixlen, stats);
 			}
 			/*FALLTHRU*/
-		default:
+		case ACT_TOFLTR:
 			return rt;
-		case CONV_TOFILE:
-		case CONV_TOSRCH:
-		case CONV_DECRYPT:
-		case CONV_NONE:
+		case ACT_QUOTE:
+		case ACT_QUOTE_ALL:
+			return -1;
+		case ACT_TOFILE:
+		case ACT_TOSRCH:
+		case ACT_DECRYPT:
+		case ACT_NONE:
 			break;
 		}
 		break;
 	case MIME_ALTERNATIVE:
-		if ((action == CONV_TODISP || action == CONV_QUOTE) &&
+		if ((action == ACT_TODISP || action == ACT_QUOTE) &&
 				value("print-alternatives") == NULL)
 			for (np = ip->m_multipart; np; np = np->m_nextpart)
 				if (np->m_mimecontent == MIME_TEXT_PLAIN) {
@@ -432,20 +435,20 @@ skip:	switch (ip->m_mimecontent) {
 		/*FALLTHRU*/
 	case MIME_MULTI:
 		switch (action) {
-		case CONV_TODISP:
-		case CONV_TODISP_ALL:
-		case CONV_QUOTE:
-		case CONV_QUOTE_ALL:
-		case CONV_TOFILE:
-		case CONV_TOSRCH:
-		case CONV_TOFLTR:
-		case CONV_DECRYPT:
+		case ACT_TODISP:
+		case ACT_TODISP_ALL:
+		case ACT_QUOTE:
+		case ACT_QUOTE_ALL:
+		case ACT_TOFILE:
+		case ACT_TOSRCH:
+		case ACT_TOFLTR:
+		case ACT_DECRYPT:
 		multi:	for (np = ip->m_multipart; np; np = np->m_nextpart) {
 				if (np->m_mimecontent == MIME_DISCARD &&
-						action != CONV_DECRYPT)
+						action != ACT_DECRYPT)
 					continue;
 				switch (action) {
-				case CONV_TOFILE:
+				case ACT_TOFILE:
 					if (np->m_partstring &&
 							strcmp(np->m_partstring,
 								"1") == 0)
@@ -454,9 +457,9 @@ skip:	switch (ip->m_mimecontent) {
 					if ((obuf = newfile(np)) == NULL)
 						continue;
 					break;
-				case CONV_TODISP:
-				case CONV_TODISP_ALL:
-				case CONV_QUOTE_ALL:
+				case ACT_TODISP:
+				case ACT_TODISP_ALL:
+				case ACT_QUOTE_ALL:
 					if ((ip->m_mimecontent == MIME_MULTI ||
 							ip->m_mimecontent ==
 							MIME_ALTERNATIVE) &&
@@ -471,27 +474,30 @@ skip:	switch (ip->m_mimecontent) {
 							"\n" : "",
 							np->m_partstring);
 						out(cp, strlen(cp), obuf,
-							CONV_NONE, action,
+							ACT_NONE, action,
 							prefix, prefixlen,
 							stats);
 						ac_free(cp);
 					}
 					break;
-				case CONV_TOFLTR:
+				case ACT_TOFLTR:
 					putc('\0', obuf);
 					/*FALLTHRU*/
-				default:
+				case ACT_NONE:
+				case ACT_TOSRCH:
+				case ACT_QUOTE:
+				case ACT_DECRYPT:
 					break;
 				}
 				if (sendpart(zmp, np, obuf,
 						doign, prefix, prefixlen,
 						action, stats, level+1) < 0)
-					return -1;
-				if (action == CONV_QUOTE)
+					rt = -1;
+				else if (action == ACT_QUOTE)
 					break;
 			}
 			return rt;
-		default:
+		case ACT_NONE:
 			break;
 		}
 	}
@@ -526,13 +532,13 @@ skip:	switch (ip->m_mimecontent) {
 	default:
 		convert = CONV_NONE;
 	}
-	if (action == CONV_DECRYPT || action == CONV_NONE)
-		convert = CONV_NONE;
+	if (action == ACT_DECRYPT || action == ACT_NONE)
+		convert = ACT_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
-	if (action == CONV_TODISP || action == CONV_TODISP_ALL ||
-			action == CONV_QUOTE || action == CONV_QUOTE_ALL ||
-			action == CONV_TOSRCH) {
+	if (action == ACT_TODISP || action == ACT_TODISP_ALL ||
+			action == ACT_QUOTE || action == ACT_QUOTE_ALL ||
+			action == ACT_TOSRCH) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if (asccasecmp(tcs, ip->m_charset) &&
@@ -542,11 +548,11 @@ skip:	switch (ip->m_mimecontent) {
 			iconvd = (iconv_t)-1;
 	}
 #endif	/* HAVE_ICONV */
-	if (action == CONV_TODISP || action == CONV_TODISP_ALL ||
-			action == CONV_QUOTE || action == CONV_QUOTE_ALL) {
+	if (action == ACT_TODISP || action == ACT_TODISP_ALL ||
+			action == ACT_QUOTE || action == ACT_QUOTE_ALL) {
 		qbuf = obuf;
 		pbuf = getpipetype(ip->m_ct_type_plain, &qbuf,
-			action == CONV_QUOTE || action == CONV_QUOTE_ALL);
+			action == ACT_QUOTE || action == ACT_QUOTE_ALL);
 		if (pbuf != qbuf) {
 			oldpipe = safe_signal(SIGPIPE, onpipe);
 			if (sigsetjmp(pipejmp, 1))
@@ -816,7 +822,7 @@ parsepkcs7(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 
 static size_t
 out(char *buf, size_t len, FILE *fp,
-		enum conversion convert, enum conversion action,
+		enum conversion convert, enum action action,
 		char *prefix, size_t prefixlen, off_t *stats)
 {
 	size_t	sz, n;
@@ -824,7 +830,7 @@ out(char *buf, size_t len, FILE *fp,
 	long	lines;
 
 	sz = 0;
-	if (action == CONV_NONE || action == CONV_DECRYPT) {
+	if (action == ACT_NONE || action == ACT_DECRYPT) {
 		cp = buf;
 		n = len;
 		while (n && cp[0] == '>')
@@ -836,14 +842,14 @@ out(char *buf, size_t len, FILE *fp,
 		}
 	}
 	sz += mime_write(buf, 1, len, fp,
-			action == CONV_NONE ? CONV_NONE: convert,
-			action == CONV_TODISP || action == CONV_TODISP_ALL ||
-					action == CONV_QUOTE ||
-					action == CONV_QUOTE_ALL ?
+			action == ACT_NONE ? ACT_NONE: convert,
+			action == ACT_TODISP || action == ACT_TODISP_ALL ||
+					action == ACT_QUOTE ||
+					action == ACT_QUOTE_ALL ?
 				TD_ISPR|TD_ICONV :
-				action == CONV_TOSRCH ?
+				action == ACT_TOSRCH ?
 					TD_ICONV :
-				action == CONV_TOFLTR ?
+				action == ACT_TOFLTR ?
 					TD_DELCTRL : TD_NONE,
 			prefix, prefixlen);
 	lines = 0;

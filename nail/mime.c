@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.42 (gritter) 11/1/04";
+static char sccsid[]  = "@(#)mime.c	2.43 (gritter) 11/1/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -86,7 +86,7 @@ static int is_this_enc(const char *line, const char *encoding);
 static char *mime_tline(char *x, char *l);
 static char *mime_type(char *ext, char *filename);
 static enum mimeclean mime_isclean(FILE *f);
-static int gettextconversion(void);
+static enum conversion gettextconversion(void);
 static char *ctohex(int c, char *hex);
 static size_t mime_write_toqp(struct str *in, FILE *fo, int (*mustquote)(int));
 static void mime_str_toqp(struct str *in, struct str *out,
@@ -848,7 +848,7 @@ mime_isclean(FILE *f)
 /*
  * Get the conversion that matches the encoding specified in the environment.
  */
-static int 
+static enum conversion
 gettextconversion(void)
 {
 	char *p;

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.87 (gritter) 11/1/04
+ *	Sccsid @(#)def.h	2.88 (gritter) 11/1/04
  */
 
 /*
@@ -95,14 +95,6 @@ enum mimeenc {
 enum conversion {
 	CONV_NONE,			/* no conversion */
 	CONV_7BIT,			/* no conversion, is 7bit */
-	CONV_TODISP,			/* convert in displayable form */
-	CONV_TODISP_ALL,		/* same, include all parts */
-	CONV_TOSRCH,			/* convert for IMAP search */
-	CONV_TOFLTR,			/* convert for filtering */
-	CONV_TOFILE,			/* convert for saving to a file */
-	CONV_QUOTE,			/* quote, first part body only */
-	CONV_QUOTE_ALL,			/* quote, all parts */
-	CONV_DECRYPT,			/* decrypt message */
 	CONV_FROMQP,			/* convert from quoted-printable */
 	CONV_TOQP,			/* convert to quoted-printable */
 	CONV_FROMB64,			/* convert from base64 */
@@ -111,6 +103,18 @@ enum conversion {
 	CONV_FROMHDR,			/* convert from RFC1522 format */
 	CONV_TOHDR,			/* convert to RFC1522 format */
 	CONV_TOHDR_A			/* convert addresses for header */
+};
+
+enum action {
+	ACT_NONE,			/* no conversion to perform */
+	ACT_TODISP,			/* convert to displayable form */
+	ACT_TODISP_ALL,			/* same, include all MIME parts */
+	ACT_TOSRCH,			/* convert for IMAP SEARCH */
+	ACT_TOFLTR,			/* convert for junk mail filtering */
+	ACT_TOFILE,			/* convert for saving body to a file */
+	ACT_QUOTE,			/* convert for quoting */
+	ACT_QUOTE_ALL,			/* same, include all MIME parts */
+	ACT_DECRYPT			/* decrypt */
 };
 
 enum mimecontent {

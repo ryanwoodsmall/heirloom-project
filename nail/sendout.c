@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.62 (gritter) 10/31/04";
+static char sccsid[] = "@(#)sendout.c	2.63 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -59,7 +59,7 @@ static char sccsid[] = "@(#)sendout.c	2.62 (gritter) 10/31/04";
 
 static char	*send_boundary;
 
-static char *getencoding(int convert);
+static char *getencoding(enum conversion convert);
 static struct name *fixhead(struct header *hp, struct name *tolist,
 		enum gfield addauto);
 static int put_signature(FILE *fo, int convert);
@@ -96,7 +96,7 @@ makeboundary(void)
  * Get an encoding flag based on the given string.
  */
 static char *
-getencoding(int convert)
+getencoding(enum conversion convert)
 {
 	switch (convert) {
 	case CONV_7BIT:
@@ -107,6 +107,8 @@ getencoding(int convert)
 		return "quoted-printable";
 	case CONV_TOB64:
 		return "base64";
+	default:
+		break;
 	}
 	/*NOTREACHED*/
 	return NULL;
@@ -214,7 +216,7 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 {
 	FILE *fi;
 	char *charset = NULL, *contenttype = NULL, *basename;
-	int convert = CONV_TOB64;
+	enum conversion convert = CONV_TOB64;
 	int err = 0;
 	enum mimeclean isclean;
 	size_t sz;
@@ -356,7 +358,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	char *tcs, *convhdr = NULL;
 #endif
 	enum mimeclean isclean;
-	int convert;
+	enum action convert;
 	char *charset = NULL, *contenttype = NULL;
 
 	if ((nfo = Ftemp(&tempMail, "Rs", "w", 0600, 1)) == NULL) {
@@ -397,7 +399,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	if (puthead(hp, nfo,
 		   GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA|GUA|GMIME
 		   |GMSGID|GIDENT|GREPLYTO|GREF|GDATE,
-		   convert, contenttype, charset)) {
+		   ACT_NONE, convert, contenttype, charset)) {
 		Fclose(nfo);
 		Fclose(nfi);
 #ifdef	HAVE_ICONV
@@ -964,14 +966,14 @@ mkdate(FILE *fo, const char *field)
 				if (hp->h_cc != NULL && w & GCC) { \
 					if (fmt("Cc:", hp->h_cc, fo, \
 							w&GCOMMA, 0, \
-							convert!=CONV_TODISP)) \
+							action!=ACT_TODISP)) \
 						return 1; \
 					gotcha++; \
 				} \
 				if (hp->h_bcc != NULL && w & GBCC) { \
 					if (fmt("Bcc:", hp->h_bcc, fo, \
 							w&GCOMMA, 0, \
-							convert!=CONV_TODISP)) \
+							action!=ACT_TODISP)) \
 						return 1; \
 					gotcha++; \
 				} \
@@ -982,7 +984,8 @@ mkdate(FILE *fo, const char *field)
  */
 int
 puthead(struct header *hp, FILE *fo, enum gfield w,
-		int convert, char *contenttype, char *charset)
+		enum action action, enum conversion convert,
+		char *contenttype, char *charset)
 {
 	int gotcha;
 	char *addr/*, *cp*/;
@@ -1010,9 +1013,9 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			*/
 			fwrite("From: ", sizeof (char), 6, fo);
 			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
-					convert == CONV_TODISP ?
+					action == ACT_TODISP ?
 					CONV_NONE:CONV_TOHDR_A,
-					convert == CONV_TODISP ?
+					action == ACT_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
@@ -1023,9 +1026,9 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		if (addr != NULL) {
 			fwrite("Organization: ", sizeof (char), 14, fo);
 			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
-					convert == CONV_TODISP ?
+					action == ACT_TODISP ?
 					CONV_NONE:CONV_TOHDR,
-					convert == CONV_TODISP ?
+					action == ACT_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
@@ -1035,12 +1038,12 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 	}
 	if (hp->h_replyto != NULL && w & GREPLYTO) {
 		if (fmt("Reply-To:", hp->h_replyto, fo, w&GCOMMA, 0,
-					convert != CONV_TODISP))
+					action != ACT_TODISP))
 			return 1;
 		gotcha++;
 	}
 	if (hp->h_to != NULL && w & GTO) {
-		if (fmt("To:", hp->h_to, fo, w&GCOMMA, 0,convert!=CONV_TODISP))
+		if (fmt("To:", hp->h_to, fo, w&GCOMMA, 0,action!=ACT_TODISP))
 			return 1;
 		gotcha++;
 	}
@@ -1052,18 +1055,18 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			fwrite("Re: ", sizeof (char), 4, fo);
 			if (mime_write(hp->h_subject + 4, sizeof *hp->h_subject,
 					strlen(hp->h_subject + 4),
-					fo, convert == CONV_TODISP ?
+					fo, action == ACT_TODISP ?
 					CONV_NONE:CONV_TOHDR,
-					convert == CONV_TODISP ?
+					action == ACT_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
 		} else if (*hp->h_subject) {
 			if (mime_write(hp->h_subject, sizeof *hp->h_subject,
 					strlen(hp->h_subject),
-					fo, convert == CONV_TODISP ?
+					fo, action == ACT_TODISP ?
 					CONV_NONE:CONV_TOHDR,
-					convert == CONV_TODISP ?
+					action == ACT_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
