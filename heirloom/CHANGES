@@ -45,6 +45,8 @@ Release ...
 * ed: When a hangup signal is received, ed exits with failure status now.
 * ed: The address '0' is now accepted as '1' for the 'c' and 'i' commands
   for the POSIX.1-2001 version.
+* ed: A 'POSIX_SHELL' makefile macro has been introduced. Existing mk.config
+  files have to be augmented if they are to be re-used.
 * sed: If the input is seekable and the 'q' command is used, the file
   pointer is now left after the last line processed.
 * ln: The -f option is not ignored with the -s option for the POSIX version.

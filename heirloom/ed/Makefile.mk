@@ -16,13 +16,13 @@ ed_sus: ed_sus.o
 	$(LD) $(LDFLAGS) ed_sus.o $(LCOMMON) $(LUXRE) $(LWCHAR) $(LIBS) -o ed_sus
 
 ed_sus.o: ed.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) $(IUXRE) -DSUS -DSHELL='"$(SHELL)"' -c ed.c -o ed_sus.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) $(IUXRE) -DSUS -DSHELL='"$(POSIX_SHELL)"' -c ed.c -o ed_sus.o
 
 ed_su3: ed_su3.o
 	$(LD) $(LDFLAGS) ed_su3.o $(LCOMMON) $(LUXRE) $(LWCHAR) $(LIBS) -o ed_su3
 
 ed_su3.o: ed.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) $(IUXRE) -DSU3 -DSHELL='"$(SHELL)"' -c ed.c -o ed_su3.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) $(IUXRE) -DSU3 -DSHELL='"$(POSIX_SHELL)"' -c ed.c -o ed_su3.o
 
 install: all
 	$(UCBINST) -c ed $(ROOT)$(SV3BIN)/ed
