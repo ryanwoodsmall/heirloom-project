@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.265 (gritter) 10/31/04
+.\"     Sccsid: @(#)nail.1	2.266 (gritter) 11/1/04
 .\"
-.TH NAIL 1 "10/31/04" "nail 11.14" "User Commands"
+.TH NAIL 1 "11/1/04" "nail 11.14" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -2365,6 +2365,16 @@ when printed;
 it should only be used as a last resort
 if no working system locale can be found.
 .TP
+.B print-alternatives
+When a MIME message part of type
+.I multipart/alternative
+is displayed and it contains a subpart of type
+.IR text/plain ,
+other parts are normally discarded.
+Setting this variable causes all subparts to be displayed,
+just as if the surrounding part was of type
+.IR multipart/mixed .
+.TP
 .B quiet
 Suppresses the printing of the version when first invoked.
 .TP
@@ -4498,13 +4508,6 @@ mode is to configure a local SMTP server
 such that it sends outgoing mail
 as soon as an external network connection is available again,
 i.\|e. to advise it to do that from a network startup script.
-.PP
-\fINail\fR is intended to be
-a MIME-conformant mail user agent,
-with the following exception:
-No special handling of `multipart/alternative' messages is performed;
-all parts with content types of `text' or `message' are shown.
-This is done because the user should see as much information as possible.
 .PP
 A \fImail\fR command appeared in Version 1 AT&T Unix.
 Berkeley Mail was written in 1978 by Kurt Shoens.

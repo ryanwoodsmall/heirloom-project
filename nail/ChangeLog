@@ -4,6 +4,9 @@
   is useful for reading large mailing lists.
 * The attachment decoding functions have been rewritten. As a result, nail is
   now able to decrypt and display encrypted parts of multipart messages.
+* For MIME messages of type 'multipart/alternative', only the text/plain part
+  is displayed now if one is present. The 'print-alternatives' variable can
+  be set to print all parts, as it was done previously.
 * A 'show' command was introduced to make the raw MIME-encoded message text
   visible.
 * Modifications to messages made using the 'edit' and 'visual' commands do
@@ -12,7 +15,7 @@
   message is passed to the editor. If you prefer the old behavior, set the new
   'writebackedited' variable.
 * The handling of read-only compressed mbox format folders was fixed.
-* In version 11.12, fcntl() read locking was erroneusly introduced for files
+* In version 11.12, fcntl() read locking was erroneously introduced for files
   other than system mailboxes too. It is now disabled for such files again.
 
 [11.13] released 10/27/04

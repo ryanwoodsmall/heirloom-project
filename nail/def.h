@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.84 (gritter) 10/30/04
+ *	Sccsid @(#)def.h	2.85 (gritter) 11/1/04
  */
 
 /*
@@ -115,10 +115,12 @@ enum mimecontent {
 	MIME_UNKNOWN,			/* unknown content */
 	MIME_SUBHDR,			/* inside a multipart subheader */
 	MIME_822,			/* message/rfc822 content */
-	MIME_MESSAGE,			/* message/ content */
-	MIME_TEXT,			/* text/ content */
-	MIME_HTML,			/* text/html content */
-	MIME_MULTI,			/* multipart/ content */
+	MIME_MESSAGE,			/* other message/ content */
+	MIME_TEXT_PLAIN,		/* text/plain content */
+	MIME_TEXT_HTML,			/* text/html content */
+	MIME_TEXT,			/* other text/ content */
+	MIME_ALTERNATIVE,		/* multipart/alternative content */
+	MIME_MULTI,			/* other multipart/ content */
 	MIME_PKCS7,			/* PKCS7 content */
 	MIME_DISCARD			/* content is discarded */
 };

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.54 (gritter) 10/31/04";
+static char sccsid[] = "@(#)send.c	2.55 (gritter) 11/1/04";
 #endif
 #endif /* not lint */
 
@@ -373,11 +373,12 @@ skip:	switch (ip->m_mimecontent) {
 			break;
 		}
 		break;
-	case MIME_HTML:
+	case MIME_TEXT_HTML:
 		if (action == CONV_TOFLTR)
 			putc('\b', obuf);
 		/*FALLTHRU*/
 	case MIME_TEXT:
+	case MIME_TEXT_PLAIN:
 		break;
 	case MIME_DISCARD:
 		if (action != CONV_DECRYPT)
@@ -405,6 +406,20 @@ skip:	switch (ip->m_mimecontent) {
 			break;
 		}
 		break;
+	case MIME_ALTERNATIVE:
+		if ((action == CONV_TODISP || action == CONV_QUOTE) &&
+				value("print-alternatives") == NULL)
+			for (np = ip->m_multipart; np; np = np->m_nextpart)
+				if (np->m_mimecontent == MIME_TEXT_PLAIN) {
+					if (sendpart(zmp, np, obuf,
+							doign, prefix,
+							prefixlen,
+							action, stats,
+							level+1) < 0)
+						return -1;
+					return rt;
+				}
+		/*FALLTHRU*/
 	case MIME_MULTI:
 		switch (action) {
 		case CONV_TODISP:
@@ -428,7 +443,9 @@ skip:	switch (ip->m_mimecontent) {
 						continue;
 					break;
 				case CONV_TODISP:
-					if (ip->m_mimecontent == MIME_MULTI &&
+					if ((ip->m_mimecontent == MIME_MULTI ||
+							ip->m_mimecontent ==
+							MIME_ALTERNATIVE) &&
 							np->m_partstring) {
 						len = fprintf(obuf,
 							"%sPart %s:\n", level ||
@@ -477,7 +494,8 @@ skip:	switch (ip->m_mimecontent) {
 	case MIME_B64:
 		switch (ip->m_mimecontent) {
 		case MIME_TEXT:
-		case MIME_HTML:
+		case MIME_TEXT_PLAIN:
+		case MIME_TEXT_HTML:
 			convert = CONV_FROMB64_T;
 			break;
 		default:
@@ -596,6 +614,7 @@ parsepart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 		default:
 			break;
 		case MIME_MULTI:
+		case MIME_ALTERNATIVE:
 			parsemultipart(zmp, ip, pf, level);
 			break;
 		case MIME_822:

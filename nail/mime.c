@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.40 (gritter) 10/31/04";
+static char sccsid[]  = "@(#)mime.c	2.41 (gritter) 11/1/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -617,14 +617,18 @@ mime_getcontent(char *s)
 {
 	if (strchr(s, '/') == NULL)	/* for compatibility with non-MIME */
 		return MIME_TEXT;
+	if (asccasecmp(s, "text/plain") == 0)
+		return MIME_TEXT_PLAIN;
 	if (asccasecmp(s, "text/html") == 0)
-		return MIME_HTML;
+		return MIME_TEXT_HTML;
 	if (ascncasecmp(s, "text/", 5) == 0)
 		return MIME_TEXT;
 	if (asccasecmp(s, "message/rfc822") == 0)
 		return MIME_822;
 	if (ascncasecmp(s, "message/", 8) == 0)
 		return MIME_MESSAGE;
+	if (asccasecmp(s, "multipart/alternative") == 0)
+		return MIME_ALTERNATIVE;
 	if (ascncasecmp(s, "multipart/", 10) == 0)
 		return MIME_MULTI;
 	if (asccasecmp(s, "application/x-pkcs7-mime") == 0 ||
