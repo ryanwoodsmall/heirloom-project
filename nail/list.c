@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.54 (gritter) 11/4/04";
+static char sccsid[] = "@(#)list.c	2.56 (gritter) 12/29/04";
 #endif
 #endif /* not lint */
 
@@ -55,6 +55,11 @@ static char sccsid[] = "@(#)list.c	2.54 (gritter) 11/4/04";
  * Message list handling.
  */
 
+enum idtype {
+	ID_REFERENCES,
+	ID_IN_REPLY_TO
+};
+
 static char **add_to_namelist(char ***namelist, size_t *nmlsize,
 		char **np, char *string);
 static int markall(char *buf, int f);
@@ -64,7 +69,7 @@ static int scan(char **sp);
 static void regret(int token);
 static void scaninit(void);
 static int matchsender(char *str, int mesg, int allnet);
-static int matchmid(char *id, int mesg);
+static int matchmid(char *id, enum idtype idtype, int mesg);
 static int matchsubj(char *str, int mesg);
 static void unmark(int mesg);
 static int metamess(int meta, int f);
@@ -199,6 +204,7 @@ markall(char *buf, int f)
 	char **namelist, *bufp, *id = NULL, *cp;
 	int tok, beg, mc, star, other, valdot, colmod, colresult, topen, tback;
 	size_t nmlsize;
+	enum idtype	idtype = ID_REFERENCES;
 
 	lexstring = ac_alloc(STRINGLEN = 2 * strlen(buf) + 1);
 	valdot = dot - &message[0] + 1;
@@ -376,17 +382,19 @@ number:
 			if (mb.mb_type == MB_IMAP && gotheaders++ == 0)
 				imap_getheaders(1, msgCount);
 			if ((cp = hfield("references", dot)) != NULL) {
-				struct name *n;
-
-				if ((n = extract(cp, GREF)) != NULL) {
-					while (n->n_flink != NULL)
-						n = n->n_flink;
-					id = savestr(n->n_name);
+				struct name	*np;
+				if ((np = extract(id, GREF)) != NULL) {
+					while (np->n_flink != NULL)
+						np = np->n_flink;
+					id = savestr(np->n_name);
+					idtype = ID_REFERENCES;
 				}
 			}
-			if (id == NULL &&
-					(cp=hfield("in-reply-to", dot)) != NULL)
+			if (id == NULL && (cp = hfield("in-reply-to", dot))
+					!= NULL) {
 				id = savestr(cp);
+				idtype = ID_IN_REPLY_TO;
+			}
 			if (id == NULL) {
 				printf(catgets(catd, CATSET, 227,
 		"Cannot determine parent Message-ID of the current message\n"));
@@ -476,7 +484,7 @@ number:
 					}
 				}
 			}
-			if (mc == 0 && id && matchmid(id, i))
+			if (mc == 0 && id && matchmid(id, idtype, i))
 				mc++;
 			if (mc == 0)
 				unmark(i);
@@ -963,13 +971,24 @@ matchsender(char *str, int mesg, int allnet)
 }
 
 static int 
-matchmid(char *id, int mesg)
+matchmid(char *id, enum idtype idtype, int mesg)
 {
+	struct name	*np;
 	char *cp;
 
-	if ((cp = hfield("message-id", &message[mesg - 1])) != NULL &&
-			msgidcmp(cp, id) == 0)
-		return 1;
+	if ((cp = hfield("message-id", &message[mesg - 1])) != NULL) {
+		switch (idtype) {
+		case ID_REFERENCES:
+			return msgidcmp(id, cp) == 0;
+		case ID_IN_REPLY_TO:
+			if ((np = extract(id, GREF)) != NULL)
+				do {
+					if (msgidcmp(np->n_name, cp) == 0)
+						return 1;
+				} while ((np = np->n_flink) != NULL);
+			break;
+		}
+	}
 	return 0;
 }
 

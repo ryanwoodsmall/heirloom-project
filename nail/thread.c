@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.53 (gritter) 10/12/04";
+static char sccsid[] = "@(#)thread.c	1.54 (gritter) 12/29/04";
 #endif
 #endif /* not lint */
 
@@ -330,10 +330,14 @@ lookup(struct message *m, struct mitem *mi, int mprime)
 		}
 	}
 	if ((cp = hfield("in-reply-to", m)) != NULL) {
-		if ((ip = mlook(cp, mi, NULL, mprime)) != NULL) {
-			adopt(ip->mi_data, m, 1);
-			return;
-		}
+		if ((np = extract(cp, GREF)) != NULL)
+			do {
+				if ((ip = mlook(np->n_name, mi, NULL, mprime))
+						!= NULL) {
+					adopt(ip->mi_data, m, 1);
+					return;
+				}
+			} while ((np = np->n_flink) != NULL);
 	}
 }
 
