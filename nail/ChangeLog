@@ -30,6 +30,9 @@
   was the only string in both header and body of an outgoing message that
   contained non-ASCII characters, no conversion between terminal character
   set and outgoing character set was performed for it.
+* For files that contain ASCII control characters but no NULs, a 'charset'
+  parameter was erroneusly generated even though these are not 'text/plain'
+  according to MIME.
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
 * When announcing messages after a folder open or a 'newmail' command, a
