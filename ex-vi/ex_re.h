@@ -72,7 +72,7 @@
  *
  *	from ex_re.h	7.3 (Berkeley) 5/31/85
  *
- *	@(#)ex_re.h	1.18 (gritter) 11/23/04
+ *	@(#)ex_re.h	1.19 (gritter) 2/19/05
  */
 
 #ifdef	UXRE
@@ -89,15 +89,13 @@
  * more and alternation.)
  */
 struct	regexp {
-#ifdef	UXRE
-	char	Expbuf[2*LBSIZE + 1];
-	regex_t	Re;
+	char	Patbuf[2*LBSIZE + 1];
 	long	Re_ident;
 	bool	Re_used;
+#ifdef	UXRE
+	regex_t	Expbuf;
 #else	/* !UXRE */
-	char	Expbuf[ESIZE + 2];
-	int	Low;
-	int	Siz;
+	char	*Expbuf;
 #endif	/* !UXRE */
 	bool	Circfl;
 	short	Nbra;
@@ -113,18 +111,8 @@ var struct	regexp re;		/* Last re */
 var struct	regexp scanre;		/* Last scanning re */
 var struct	regexp subre;		/* Last substitute re */
 
-/*
- * Defining circfl and expbuf like this saves us from having to change
- * old code in the ex_re.c stuff.
- */
-#define	expbuf	re.Expbuf
-#define	circfl	re.Circfl
-#define	nbra	re.Nbra
-#define	low	re.Low
-#define	siz	re.Siz
-
-var	char	*loc1;		/* Where re began to match (in linebuf) */
-var	char	*loc2;		/* First char after re match (") */
+extern	char	*loc1;		/* Where re began to match (in linebuf) */
+extern	char	*loc2;		/* First char after re match (") */
 
 /*
  * Since the phototypesetter v7-epsilon
@@ -136,30 +124,9 @@ extern struct regexp *resre(struct regexp *);
 /*
  * Definitions for substitute
  */
-var char	*braslist[NBRA];	/* Starts of \(\)'ed text in lhs */
-var char	*braelist[NBRA];	/* Ends... */
+extern char	*braslist[NBRA];	/* Starts of \(\)'ed text in lhs */
+extern char	*braelist[NBRA];	/* Ends... */
 var char	rhsbuf[RHSSIZE];	/* Rhs of last substitute */
 #ifdef	BIT8
 var char	rhsquo[RHSSIZE];	/* Quote indicator for rhsbuf */
 #endif
-
-/*
- * Definitions of codes for the compiled re's.
- * The re algorithm is described in a paper
- * by K. Thompson in the CACM about 10 years ago
- * and is the same as in ed.
- */
-#define	STAR	1
-#define	RNGE	0100
-
-#define	CBRA	1
-#define	CDOT	4
-#define	CCL	8
-#define	NCCL	12
-#define	CDOL	16
-#define	CEOFC	17
-#define	CKET	18
-#define	CCHR	20
-#define	CBRC	24
-#define	CLET	25
-#define	CBACK	36

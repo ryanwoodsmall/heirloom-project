@@ -70,7 +70,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *	@(#)ex_proto.h	1.27 (gritter) 2/15/05
+ *	@(#)ex_proto.h	1.28 (gritter) 2/19/05
  */
 
 /*
@@ -245,9 +245,6 @@ extern int compile(int, int);
 extern int same(register int, register int);
 extern int ecmp(register char *, register char *, register int);
 extern int execute(int, line *);
-extern void getrnge(register char *);
-extern int advance(register char *, register char *);
-extern int cclass(register char *, register int, int);
 /* ex_set.c */
 extern void set(void);
 extern int setend(void);

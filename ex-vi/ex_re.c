@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.46 (gritter) 2/18/05";
+static char sccsid[] = "@(#)ex_re.c	1.47 (gritter) 2/19/05";
 #endif
 #endif
 
@@ -81,6 +81,86 @@ static char sccsid[] = "@(#)ex_re.c	1.46 (gritter) 2/18/05";
 
 #include "ex.h"
 #include "ex_re.h"
+
+#ifdef	UXRE
+char	*braslist[NBRA];
+char	*braelist[NBRA];
+#else	/* !UXRE */
+static int	regerrno;
+
+#define	INIT			register char *sp = instring;
+#define	GETC()			(*sp++)
+#define	PEEKC()			(*sp)
+#define	UNGETC(c)		(--sp)
+#define	RETURN(c)		return (c);
+#define	ERROR(c)		{ regerrno = c; return 0; }
+
+#define	compile(a, b, c, d)	_compile(a, b, c, d)
+#define	regexp_h_static		static
+
+#ifndef	NO_BE_BACKSLASH
+#define	REGEXP_H_VI_BACKSLASH
+#endif	/* !NO_BE_BACKSLASH */
+
+#ifdef	MB
+#define	REGEXP_H_WCHARS
+#endif	/* MB */
+
+#define	REGEXP_H_USED_FROM_VI
+
+#include "regexp.h"
+
+static size_t
+loconv(register char *dst, register const char *src)
+{
+	char	*odst = dst;
+
+#ifdef	MB
+	if (mb_cur_max > 1) {
+		char	mb[MB_LEN_MAX];
+		wchar_t wc;
+		int len, i, nlen;
+
+		while (*src) {
+			if ((*src & 0200) == 0) {
+				*dst++ = tolower(*src);
+				src++;
+			} else if ((len = mbtowc(&wc, src, mb_cur_max)) <= 0) {
+				*dst++ = *src++;
+			} else {
+				wc = towlower(wc);
+				if (len >= mb_cur_max) {
+					if ((nlen = wctomb(dst, wc)) <= len) {
+						dst += nlen;
+						src += len;
+					} else {
+						*dst++ = *src++;
+					}
+				} else {
+					if ((nlen = wctomb(mb, wc)) <= len) {
+						src += len;
+						for (i = 0; i < nlen; i++)
+							*dst++ = mb[i];
+					} else {
+						*dst++ = *src++;
+					}
+				}
+			}
+		}
+	} else
+#endif	/* MB */
+	{
+		while (*src) {
+			*dst++ = tolower(*src & 0377);
+			src++;
+		}
+	}
+	return dst - odst;
+}
+
+#undef	compile
+
+#endif	/* !UXRE */
 
 /*
  * Global, substitute and regular expressions.
@@ -326,10 +406,10 @@ compsub(int ch)
 		/* fall into ... */
 	case '&':
 	redo:
-		if (re.Expbuf[0] == 0)
+		if (re.Patbuf[0] == 0)
 			error(catgets(catd, 1, 127,
 			"No previous re|No previous regular expression"));
-		if (subre.Expbuf[0] == 0)
+		if (subre.Patbuf[0] == 0)
 			error(catgets(catd, 1, 128,
 	"No previous substitute re|No previous substitute to repeat"));
 		break;
@@ -643,9 +723,9 @@ dosub(void)
 				continue;
 			}
 #ifndef	BIT8
-		if (c < 0 && (c &= TRIM) >= '1' && c < nbra + '1') {
+		if (c < 0 && (c &= TRIM) >= '1' && c < re.Nbra + '1') {
 #else
-		if (q && c >= '1' && c < nbra + '1') {
+		if (q && c >= '1' && c < re.Nbra + '1') {
 #endif
 			sp = place(sp, braslist[c - '1'], braelist[c - '1']);
 			if (sp == 0)
@@ -777,11 +857,10 @@ snote(register int total, register int lines)
 void
 cerror(char *s)
 {
-	expbuf[0] = '\0';
+	re.Patbuf[0] = '\0';
 	error(s);
 }
 
-#ifdef	UXRE
 void
 refree(struct regexp *rp)
 {
@@ -801,17 +880,18 @@ refree(struct regexp *rp)
 	}
 	if ((r1->Re_used == 0 || rp->Re_ident != r1->Re_ident) &&
 			(r2->Re_used == 0 || rp->Re_ident != r2->Re_ident))
-		regfree(&rp->Re);
+#ifdef	UXRE
+		regfree(&rp->Expbuf);
+#else	/* !UXRE */
+		free(rp->Expbuf);
+#endif	/* !UXRE */
 	rp->Re_used = 0;
 }
-#endif
 
 struct regexp *
 savere(struct regexp *store)
 {
-#ifdef	UXRE
 	refree(store);
-#endif
 	copy(store, &re, sizeof re);
 	return store;
 }
@@ -819,21 +899,18 @@ savere(struct regexp *store)
 struct regexp *
 resre(struct regexp *store)
 {
-#ifdef	UXRE
 	refree(&re);
-#endif
 	copy(&re, store, sizeof re);
 	return store;
 }
 
-#ifdef	UXRE
 int
 compile(int eof, int oknl)
 {
 	int c, d, i, n;
 	char	mb[MB_LEN_MAX+1];
-	char *p = re.Expbuf, *end = re.Expbuf + sizeof re.Expbuf;
-	int err = 0, nomagic = value(MAGIC) ? 0 : 1, esc;
+	char *p = re.Patbuf, *end = re.Patbuf + sizeof re.Patbuf;
+	int nomagic = value(MAGIC) ? 0 : 1, esc, rcnt = 0;
 	char *rhsp;
 #ifdef	BIT8
 	char *rhsq;
@@ -847,13 +924,13 @@ compile(int eof, int oknl)
 		switch (c) {
 		case '/':
 		case '?':
-			if (scanre.Expbuf[0] == 0)
+			if (scanre.Patbuf[0] == 0)
 				error(catgets(catd, 1, 134,
 	"No previous scan re|No previous scanning regular expression"));
 			resre(&scanre);
 			return c;
 		case '&':
-			if (subre.Expbuf[0] == 0)
+			if (subre.Patbuf[0] == 0)
 				error(catgets(catd, 1, 135,
 	"No previous substitute re|No previous substitute regular expression"));
 			resre(&subre);
@@ -874,9 +951,9 @@ compile(int eof, int oknl)
 			"No previous re|No previous regular expression"));
 		return eof;
 	}
-	nbra = circfl = 0;
+	re.Nbra = re.Circfl = 0;
 	if (c == '^')
-		circfl++;
+		re.Circfl++;
 	esc = 0;
 	goto havec;
 	/*
@@ -963,6 +1040,7 @@ compile(int eof, int oknl)
 #endif
 			}
 		} else if (!esc && c == '[') {
+			rcnt++;
 			/*
 			 * Search for the end of the bracket expression
 			 * since '~' may not be recognized inside.
@@ -980,6 +1058,7 @@ compile(int eof, int oknl)
 					if (p >= end)
 						goto complex;
 				}
+#ifdef	UXRE
 				if (d == '[' && (c == ':' || c == '.' ||
 							c == '=')) {
 					d = c;
@@ -1001,6 +1080,7 @@ compile(int eof, int oknl)
 					}
 					c = EOF; /* -> reset d and continue */
 				}
+#endif	/* UXRE */
 				d = c;
 			} while (c != ']');
 		} else if (esc && c == '{') {
@@ -1040,33 +1120,94 @@ compile(int eof, int oknl)
 complex:		cerror(catgets(catd, 1, 139,
 			"Re too complex|Regular expression too complicated"));
 	}
-	if (p == expbuf)
+	if (p == re.Patbuf)
 		*p++ = '.';	/* approximate historical behavior */
 	*p = '\0';
 	refree(&re);
+#ifdef	UXRE
 	c = REG_ANGLES | REG_BADRANGE;
 #ifndef	NO_BE_BACKSLASH
 	c |= REG_BKTESCAPE;
 #endif	/* !NO_BE_BACKSLASH */
 	if (value(IGNORECASE))
 		c |= REG_ICASE;
-	if ((err = regcomp(&re.Re, re.Expbuf, c)) != 0) {
-		switch (err) {
+	if ((i = regcomp(&re.Expbuf, re.Patbuf, c)) != 0) {
+		switch (i) {
 		case REG_EBRACK:
 		miss:	cerror(catgets(catd, 1, 154, "Missing ]"));
+			/*NOTREACHED*/
+			break;
 		default:
-			regerror(err, &re.Re, &re.Expbuf[1],
-					sizeof re.Expbuf - 1);
-			cerror(&re.Expbuf[1]);
+			regerror(i, &re.Expbuf, &re.Patbuf[1],
+					sizeof re.Patbuf - 1);
+			cerror(&re.Patbuf[1]);
 		}
 	}
+	if ((re.Nbra = re.Expbuf.re_nsub) > NBRA)
+		re.Nbra = NBRA;
+#else	/* !UXRE */
+	if ((re.Expbuf = malloc(n = rcnt*32 + 2*(p-re.Patbuf) + 5)) == NULL)
+		goto complex;
+	if (value(IGNORECASE))
+		loconv(re.Patbuf, re.Patbuf);
+	if (_compile(re.Patbuf, re.Expbuf, &re.Expbuf[n], '\0') == 0) {
+		char	*cp;
+		free(re.Expbuf);
+		switch (regerrno) {
+		case 11:
+			cp = "Range endpoint too large|Range endpoint "
+					"too large in regular expression";
+			break;
+		case 16:
+			cp = "Bad number|Bad number in regular expression";
+			break;
+		case 25:
+			cp = "\"\\digit\" out of range";
+			break;
+		case 36:
+			cp = "Badly formed re|Missing closing delimiter "
+				"for regular expression";
+			break;
+		case 41:
+			cp = "No remembered search string.";
+			break;
+		case 42:
+			cp = "Unmatched \\( or \\)|More \\('s than \\)'s in "
+				"regular expression or vice-versa";
+			break;
+		case 43:
+			cp = "Awash in \\('s!|Too many \\('d subexressions "
+				"in a regular expression";
+			break;
+		case 44:
+			cp = "More than 2 numbers given in \\{~\\}";
+			break;
+		case 45:
+			cp = "} expected after \\";
+			break;
+		case 46:
+			cp = "First number exceeds second in \\{~\\}";
+			break;
+		case 49:
+		miss:	cp = "Missing ]";
+			break;
+		case 67:
+			cp = "Illegal byte sequence.";
+			break;
+		default:
+			cp = "Unknown regexp error code!!";
+		}
+		cerror(cp);
+	}
+	re.Circfl = circf;
+	re.Nbra = nbra;
+#endif	/* !UXRE */
 	re.Re_used = 1;
 	re.Re_ident++;
-	if ((nbra = re.Re.re_nsub) > NBRA)
-		nbra = NBRA;
 	return eof;
 }
 
+#ifdef	UXRE
 int
 execute(int gf, line *addr)
 {
@@ -1076,7 +1217,7 @@ execute(int gf, line *addr)
 	regmatch_t bralist[NBRA + 1];
 
 	if (gf) {
-		if (circfl)
+		if (re.Circfl)
 			return 0;
 		eflags |= REG_NOTBOL;
 		p = loc2;
@@ -1091,7 +1232,7 @@ execute(int gf, line *addr)
 	 * so don't fetch them otherwise (enables use of DFA).
 	 */
 	nsub = (re.Re_ident == subre.Re_ident ? NBRA : 0);
-	switch (regexec(&re.Re, p, nsub + 1, bralist, eflags)) {
+	switch (regexec(&re.Expbuf, p, nsub + 1, bralist, eflags)) {
 	case 0:
 		break;
 	case REG_NOMATCH:
@@ -1112,620 +1253,24 @@ execute(int gf, line *addr)
 	return 1;
 }
 #else	/* !UXRE */
-#define	INSCHAR(c)	{ \
-				if ((c) == '\n' || (c) == EOF) \
-					cerror(catgets(catd, 1, 154, \
-						"Missing ]")); \
-				*ep++ = (c); \
-				cclcnt++; \
-				if (ep >= &expbuf[ESIZE]) \
-					goto complex; \
-			}
-
-int
-compile(int eof, int oknl)
-{
-	register int c;
-	register char *ep;
-#ifdef	BIT8
-#ifndef	NO_BE_BACKSLASH
-	bool haddash;
-#endif	/* !NO_BE_BACKSLASH */
-#endif	/* BIT8 */
-	char *lastep = NULL;
-	char bracket[NBRA], *bracketp, *rhsp;
-#ifdef	BIT8
-	char *rhsq;
-#endif
-	int cclcnt;
-	int i, cflg, closed;
-
-	if (isalpha(eof) || isdigit(eof))
-		error(catgets(catd, 1, 133,
-	"Regular expressions cannot be delimited by letters or digits"));
-	ep = expbuf;
-	c = getchar();
-	if (eof == '\\')
-		switch (c) {
-
-		case '/':
-		case '?':
-			if (scanre.Expbuf[0] == 0)
-				error(catgets(catd, 1, 134,
-	"No previous scan re|No previous scanning regular expression"));
-			resre(&scanre);
-			return (c);
-
-		case '&':
-			if (subre.Expbuf[0] == 0)
-				error(catgets(catd, 1, 135,
-	"No previous substitute re|No previous substitute regular expression"));
-			resre(&subre);
-			return (c);
-
-		default:
-			error(catgets(catd, 1, 136,
-	"Badly formed re|Regular expression \\ must be followed by / or ?"));
-		}
-	if (c == eof || c == '\n' || c == EOF) {
-		if (*ep == 0)
-			error(catgets(catd, 1, 137,
-			"No previous re|No previous regular expression"));
-		if (c == '\n' && oknl == 0)
-			error(catgets(catd, 1, 138,
-			"Missing closing delimiter@for regular expression"));
-		if (c != eof)
-			ungetchar(c);
-		return (eof);
-	}
-	bracketp = bracket;
-	nbra = 0;
-	circfl = 0;
-	closed = 0;
-	if (c == '^') {
-		c = getchar();
-		circfl++;
-	}
-	ungetchar(c);
-	for (;;) {
-		if (ep >= &expbuf[ESIZE - 2])
-complex:
-			cerror(catgets(catd, 1, 139,
-			"Re too complex|Regular expression too complicated"));
-		c = getchar();
-		if (c == eof || c == EOF) {
-			if (bracketp != bracket)
-				cerror(catgets(catd, 1, 140,
-		"Unmatched \\(|More \\('s than \\)'s in regular expression"));
-			*ep++ = CEOFC;
-			if (c == EOF)
-				ungetchar(c);
-			return (eof);
-		}
-		if (value(MAGIC)) {
-			if (c != '*' && (c != '\\' || peekchar() != '{') ||
-					ep == expbuf) {
-				lastep = ep;
-			}
-		} else
-			if (c != '\\' || peekchar() != '*' || ep == expbuf) {
-				lastep = ep;
-			}
-		switch (c) {
-
-		case '\\':
-			c = getchar();
-			switch (c) {
-
-			case '(':
-				if (nbra >= NBRA)
-					cerror(catgets(catd, 1, 141,
-"Awash in \\('s!|Too many \\('d subexressions in a regular expression"));
-				*bracketp++ = nbra;
-				*ep++ = CBRA;
-				*ep++ = nbra++;
-				continue;
-
-			case ')':
-				if (bracketp <= bracket)
-					cerror(catgets(catd, 1, 142,
-		"Extra \\)|More \\)'s than \\('s in regular expression"));
-				*ep++ = CKET;
-				*ep++ = *--bracketp;
-				closed++;
-				continue;
-
-			case '<':
-				*ep++ = CBRC;
-				continue;
-
-			case '>':
-				*ep++ = CLET;
-				continue;
-			case '{':
-				if (lastep == (char *)0)
-					goto defchar;
-				*lastep |= RNGE;
-				cflg = 0;
-nlim:
-				c = getchar();
-				i = 0;
-				do {
-					if ('0' <= c && c <= '9')
-						i = 10 * i + c - '0';
-					else
-						cerror(catgets(catd, 1, 143,
-			"Bad number|Bad number in regular expression"));
-				} while ((c = getchar()) != '\\' && c != ',');
-				if (i > 255)
-					cerror(catgets(catd, 1, 144,
-"Range endpoint too large|Range endpoint too large in regular expression"));
-				*ep++ = i;
-				if (c == ',') {
-					if (cflg++)
-						cerror(catgets(catd, 1, 145,
-				"More than 2 numbers given in \\{~\\}"));
-					if ((c = getchar()) == '\\') {
-						*ep++ = 255;
-					} else {
-						ungetchar(c);
-						goto nlim;
-					}
-				}
-				if (getchar() != '}')
-					cerror(catgets(catd, 1, 146,
-						"} expected after \\"));
-				if (!cflg) {
-					*ep++ = i;
-				}
-				else if ((ep[-1] & 0377) < (ep[-2] & 0377))
-					cerror(catgets(catd, 1, 147,
-				"First number exceeds second in \\{~\\}"));
-				continue;
-			default:
-				if (c >= '1' && c <= '9') {
-					if ((c -= '1') >= closed)
-						cerror(catgets(catd, 1, 148,
-						"\"\\digit\" out of range"));
-					*ep++ = CBACK;
-					*ep++ = c;
-					continue;
-				}
-			}
-			if (value(MAGIC) == 0)
-magic:
-			switch (c) {
-
-			case '.':
-				*ep++ = CDOT;
-				continue;
-
-			case '~':
-				rhsp = rhsbuf;
-#ifdef	BIT8
-				rhsq = rhsquo;
-#endif
-				while (*rhsp) {
-#ifndef	BIT8
-					if (*rhsp & QUOTE) {
-						c = *rhsp & TRIM;
-#else
-					if (*rhsq) {
-						c = *rhsp;
-#endif
-						if (c == '&')
-							error(catgets(catd, 1,
-		149, "Replacement pattern contains &@- cannot use in re"));
-						if (c >= '1' && c <= '9')
-							error(catgets(catd, 1,
-		150, "Replacement pattern contains \\d@- cannot use in re"));
-					}
-					if (ep >= &expbuf[ESIZE-2])
-						goto complex;
-					*ep++ = CCHR;
-#ifndef	BIT8
-					*ep++ = *rhsp++ & TRIM;
-#else
-					*ep++ = *rhsp++;
-					rhsq++;
-#endif
-				}
-				continue;
-
-			case '*':
-				if (ep == expbuf)
-					break;
-				if (*lastep == CBRA || *lastep == CKET)
-					cerror(catgets(catd, 1, 151,
-		"Illegal *|Can't * a \\( ... \\) in regular expression"));
-#ifndef	BIT8
-				if (*lastep == CCHR && (lastep[1] & QUOTE))
-					cerror(catgets(catd, 1, 152,
-			"Illegal *|Can't * a \\n in regular expression"));
-#endif
-				*lastep |= STAR;
-				continue;
-
-			case '[':
-				*ep++ = CCL;
-				*ep++ = 0;
-#ifdef	BIT8
-#ifndef	NO_BE_BACKSLASH
-				haddash = 0;
-#endif	/* !NO_BE_BACKSLASH */
-#endif	/* BIT8 */
-				cclcnt = 1;
-				c = getchar();
-				if (c == '^') {
-					c = getchar();
-					ep[-2] = NCCL;
-				}
-#ifndef	NO_BE_BACKSLASH
-				if (c == ']')
-					cerror(catgets(catd, 1, 153,
-"Bad character class|Empty character class '[]' or '[^]' cannot match"));
-				while (c != ']') {
-					if (c == '\\' && any(peekchar(), "]-^\\")) {
-#ifndef	BIT8
-						c = getchar() | QUOTE;
-#else	/* BIT8 */
-						if ((c = getchar()) == '-') {
-							haddash = 1;
-							c = getchar();
-						}
-#endif	/* BIT8 */
-					}
-					INSCHAR(c)
-					c = getchar();
-				}
-#ifdef	BIT8
-				if (haddash)
-					INSCHAR('-')
-#endif	/* BIT8 */
-#else	/* NO_BE_BACKSLASH */
-				/*
-				 * There is no escape character inside a
-				 * bracket expression. Characters lose their
-				 * special meaning by position only.
-				 */
-				do
-					INSCHAR(c)
-				while ((c = getchar()) != ']');
-#endif	/* NO_BE_BACKSLASH */
-				lastep[1] = cclcnt;
-				continue;
-			}
-			if (c == EOF) {
-				ungetchar(EOF);
-				c = '\\';
-				goto defchar;
-			}
-			*ep++ = CCHR;
-			if (c == '\n')
-				cerror(catgets(catd, 1, 155,
-	"No newlines in re's|Can't escape newlines into regular expressions"));
-/*
-			if (c < '1' || c > NBRA + '1') {
-*/
-				*ep++ = c;
-				continue;
-/*
-			}
-			c -= '1';
-			if (c >= nbra)
-				cerror(catgets(catd, 1, 156,
-"Bad \\n|\\n in regular expression with n greater than the number of \\('s"));
-			*ep++ = c | QUOTE;
-			continue;
-*/
-
-		case '\n':
-			if (oknl) {
-				ungetchar(c);
-				*ep++ = CEOFC;
-				return (eof);
-			}
-			cerror(catgets(catd, 1, 157,
-	"Badly formed re|Missing closing delimiter for regular expression"));
-
-		case '$':
-			if (peekchar() == eof || peekchar() == EOF || oknl && peekchar() == '\n') {
-				*ep++ = CDOL;
-				continue;
-			}
-			goto defchar;
-
-		case '.':
-		case '~':
-		case '*':
-		case '[':
-			if (value(MAGIC))
-				goto magic;
-defchar:
-		default:
-			*ep++ = CCHR;
-			*ep++ = c;
-			continue;
-		}
-	}
-}
-
-int
-same(register int a, register int b)
-{
-
-	return (a == b || value(IGNORECASE) &&
-	   ((islower(a) && toupper(a) == b) || (islower(b) && toupper(b) == a)));
-}
-
-int
-ecmp(register char *a, register char *b, register int count)
-{
-	while (count--)
-		if (!same(*a++, *b++))
-			return (0);
-	return (1);
-}
-
-char	*locs;
-
 int
 execute(int gf, line *addr)
 {
-	register char *p1, *p2;
-	register int c;
+	char *p;
 
 	if (gf) {
-		if (circfl)
-			return (0);
-		locs = p1 = loc2;
+		if (re.Circfl)
+			return 0;
+		p = locs = loc2;
 	} else {
 		if (addr == zero)
-			return (0);
-		p1 = linebuf;
+			return 0;
+		p = linebuf;
 		getline(*addr);
-		locs = 0;
+		if (value(IGNORECASE))
+			loconv(linebuf, linebuf);
 	}
-	p2 = expbuf;
-	if (circfl) {
-		loc1 = p1;
-		return (advance(p1, p2));
-	}
-	/* fast check for first character */
-	if (*p2 == CCHR) {
-		c = p2[1];
-		do {
-			if (c != *p1 && (!value(IGNORECASE) ||
-			   !((islower(c) && toupper(c) == *p1) ||
-			   (islower(*p1&0377) && toupper(*p1&0377) == c))))
-				continue;
-			if (advance(p1, p2)) {
-				loc1 = p1;
-				return (1);
-			}
-		} while (*p1++);
-		return (0);
-	}
-	/* regular algorithm */
-	do {
-		if (advance(p1, p2)) {
-			loc1 = p1;
-			return (1);
-		}
-	} while (*p1++);
-	return (0);
-}
-
-void
-getrnge(register char *str)
-{
-	low = *str++ & 0377;
-	siz = (*str & 0377) == 255 ? 20000 : (*str & 0377) - low;
-}
-
-#define	uletter(c)	(isalpha(c) || c == '_')
-
-int
-advance(register char *lp, register char *ep)
-{
-	register char *curlp;
-	/* char *sp, *sp1; */
-	int c, ct;
-	char *bbeg;
-
-	for (;;) switch (*ep++) {
-
-	case CCHR:
-/* useless
-		if (*ep & QUOTE) {
-			c = *ep++ & TRIM;
-			sp = braslist[c];
-			sp1 = braelist[c];
-			while (sp < sp1) {
-				if (!same(*sp, *lp))
-					return (0);
-				sp++, lp++;
-			}
-			continue;
-		}
-*/
-		if (!same(*ep, *lp))
-			return (0);
-		ep++, lp++;
-		continue;
-
-	case CDOT:
-		if (*lp++)
-			continue;
-		return (0);
-
-	case CDOL:
-		if (*lp == 0)
-			continue;
-		return (0);
-
-	case CEOFC:
-		loc2 = lp;
-		return (1);
-
-	case CCL:
-		if (cclass(ep, *lp++, 1)) {
-			ep += *ep;
-			continue;
-		}
-		return (0);
-
-	case NCCL:
-		if (cclass(ep, *lp++, 0)) {
-			ep += *ep;
-			continue;
-		}
-		return (0);
-
-	case CBRA:
-		braslist[(int)*ep++] = lp;
-		continue;
-
-	case CKET:
-		braelist[(int)*ep++] = lp;
-		continue;
-
-	case CCHR|RNGE:
-		c = *ep++;
-		getrnge(ep);
-		while (low--)
-			if (!same(*lp++, c))
-				return (0);
-		curlp = lp;
-		while (siz--)
-			if (!same(*lp++, c))
-				break;
-		if (siz < 0)
-			lp++;
-		ep += 2;
-		goto star;
-
-	case CDOT|RNGE:
-		getrnge(ep);
-		while (low--)
-			if (*lp++ == '\0')
-				return (0);
-		curlp = lp;
-		while (siz--)
-			if (*lp++ == '\0')
-				break;
-		if (siz < 0)
-			lp++;
-		ep += 2;
-		goto star;
-
-	case CCL|RNGE:
-	case NCCL|RNGE:
-		getrnge(ep + *ep);
-		while (low--) {
-			if (!cclass(ep, *lp++, ep[-1] == (CCL|RNGE)))
-				return (0);
-		}
-		curlp = lp;
-		while (siz--) {
-			if (!cclass(ep, *lp++, ep[-1] == (CCL|RNGE)))
-				break;
-		}
-		if (siz < 0)
-			lp++;
-		ep += *ep + 2;
-		goto star;
-
-	case CBACK:
-		bbeg = braslist[*ep & 0377];
-		ct = braelist[*ep++ & 0377] - bbeg;
-		if (ecmp(bbeg, lp, ct)) {
-			lp += ct;
-			continue;
-		}
-		return (0);
-
-	case CBACK|STAR:
-		bbeg = braslist[*ep & 0377];
-		ct = braelist[*ep++ & 0377] - bbeg;
-		curlp = lp;
-		while (ecmp(bbeg, lp, ct))
-			lp += ct;
-		while (lp >= curlp) {
-			if (advance(lp, ep))
-				return (1);
-			lp -= ct;
-		}
-		return (0);
-
-	case CDOT|STAR:
-		curlp = lp;
-		while (*lp++)
-			continue;
-		goto star;
-
-	case CCHR|STAR:
-		curlp = lp;
-		while (same(*lp, *ep))
-			lp++;
-		lp++;
-		ep++;
-		goto star;
-
-	case CCL|STAR:
-	case NCCL|STAR:
-		curlp = lp;
-		while (cclass(ep, *lp++, ep[-1] == (CCL|STAR)))
-			continue;
-		ep += *ep;
-		goto star;
-star:
-		do {
-			lp--;
-			if (lp == locs)
-				break;
-			if (advance(lp, ep))
-				return (1);
-		} while (lp > curlp);
-		return (0);
-
-	case CBRC:
-		if (lp == linebuf)
-			continue;
-		if ((isdigit(*lp&0377) || uletter(*lp&0377))
-			&& !uletter(lp[-1]&0377) && !isdigit(lp[-1]&0377))
-			continue;
-		return (0);
-
-	case CLET:
-		if (!uletter(*lp&0377) && !isdigit(*lp&0377))
-			continue;
-		return (0);
-
-	default:
-		error(catgets(catd, 1, 158, "Re internal error"));
-	}
-}
-
-int
-cclass(register char *set, register int c, int af)
-{
-	register int n;
-
-	if (c == 0)
-		return (0);
-	if (value(IGNORECASE) && isupper(c))
-		c = tolower(c);
-	n = *set++;
-	while (--n)
-		if (n > 2 && set[1] == '-') {
-			if (c >= (set[0] & TRIM) && c <= (set[2] & TRIM))
-				return (af);
-			set += 3;
-			n -= 2;
-		} else
-			if ((*set++ & TRIM) == c)
-				return (af);
-	return (!af);
+	circf = re.Circfl;
+	return step(p, re.Expbuf);
 }
 #endif	/* !UXRE */

@@ -1,4 +1,5 @@
 Release ...
+* Traditional regular expressions can now be used with multibyte characters.
 * If a line began with a tabulator and another tabulator was inserted with
   the cursor located on the first tabulator, the display was not updated
   appropriately since the last release (Bugreport by Matthew Fischer). (P)

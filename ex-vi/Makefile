@@ -72,7 +72,7 @@
 #
 #	from Makefile	7.13.1.3 (2.11BSD GTE) 1996/10/23
 #
-#	@(#)Makefile	1.47 (gritter) 2/19/05
+#	@(#)Makefile	1.49 (gritter) 2/19/05
 #
 
 #
@@ -151,13 +151,15 @@ FEATURES	= -DLISPCODE -DCHDIR -DFASTTAG -DUCVISUAL -DMB -DBIT8
 #LANGMSG		= -DLANGMSG -DCATNAME='"UNKNOWN"'
 
 #
-# For multibyte character support in regular expressions, and for the
-# features of localized regular expressions ([:class:], [.c.], [=c=],
-# \(re\)*, \(re\)\{m,n\}), you need Caldera's 'UNIX(R) Regular Expression
-# Library' or a derivative of it. Comment out the three following lines if
-# you don't have it or if it does not compile; it needs some advanced
-# multibyte character support (wchar.h, wctype.h, btowc() etc.) which is
-# not provided by older compilation environments.
+# For POSIX regular expressions, e.g. the star applied to subexpressions
+# as in \(ab\)* and localized regular expressions like [:class:], [.c.],
+# and [=c=], you need Caldera's 'UNIX(R) Regular Expression Library' or
+# the included derivative of it.
+#
+# Comment out the three following lines if you do not have it or if it
+# does not compile; it needs some advanced multibyte character support
+# (wchar.h, wctype.h, btowc() etc.) which is not provided by older
+# compilation environments.
 #
 REINC	= -I./libuxre -DUXRE
 RELIB	= -L./libuxre -luxre

@@ -9,8 +9,4 @@ TODO list for ex
 
 - SVr4 ex probably has some silent features that this one should have too.
 
-- The traditional regular expression code in ex_re.c could be updated to
-    work with multibyte characters. This would mostly involve to take the
-    code from libcommon/regexp.h of the Heirloom Toolchest.
-
 Gunnar Ritter						2/19/05
