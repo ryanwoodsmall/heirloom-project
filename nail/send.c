@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.43 (gritter) 10/31/04";
+static char sccsid[] = "@(#)send.c	2.49 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -56,6 +56,7 @@ static char sccsid[] = "@(#)send.c	2.43 (gritter) 10/31/04";
 enum parseflags {
 	PARSE_DEFAULT	= 0,
 	PARSE_DECRYPT	= 01,
+	PARSE_PARTS	= 02
 };
 
 static void onpipe(int signo);
@@ -159,7 +160,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 		addstats(stats, 1, sz);
 	pf = 0;
 	if (action != CONV_NONE)
-		pf |= PARSE_DECRYPT;
+		pf |= PARSE_DECRYPT|PARSE_PARTS;
 	if ((ip = parsemsg(mp, pf)) == NULL)
 		return -1;
 	return sendpart(mp, ip, obuf, doign, prefix, prefixlen, action, stats,
@@ -205,6 +206,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	if ((ibuf = setinput(&mb, (struct message *)ip, NEED_BODY)) == NULL)
 		return -1;
 	count = ip->m_size;
+	if (ip->m_mimecontent == MIME_DISCARD)
+		goto skip;
 	if ((ip->m_flag&MNOFROM) == 0)
 		while (count && (c = getc(ibuf)) != EOF) {
 			count--;
@@ -360,7 +363,7 @@ skip:	switch (ip->m_mimecontent) {
 		case CONV_TODISP:
 		case CONV_QUOTE:
 		case CONV_TOSRCH:
-		/*case CONV_DECRYPT:*/
+		case CONV_DECRYPT:
 			goto multi;
 		case CONV_TOFILE:
 			put_from_(obuf);
@@ -374,6 +377,10 @@ skip:	switch (ip->m_mimecontent) {
 			putc('\b', obuf);
 		/*FALLTHRU*/
 	case MIME_TEXT:
+		break;
+	case MIME_DISCARD:
+		if (action != CONV_DECRYPT)
+			return rt;
 		break;
 	case MIME_PKCS7:
 		if (action != CONV_NONE)
@@ -392,6 +399,7 @@ skip:	switch (ip->m_mimecontent) {
 			return rt;
 		case CONV_TOFILE:
 		case CONV_TOSRCH:
+		case CONV_DECRYPT:
 			break;
 		}
 		break;
@@ -402,7 +410,7 @@ skip:	switch (ip->m_mimecontent) {
 		case CONV_TOFILE:
 		case CONV_TOSRCH:
 		case CONV_TOFLTR:
-		/*case CONV_DECRYPT:*/
+		case CONV_DECRYPT:
 		multi:	for (np = ip->m_multipart; np; np = np->m_nextpart) {
 				switch (action) {
 				case CONV_TOFILE:
@@ -469,6 +477,8 @@ skip:	switch (ip->m_mimecontent) {
 	default:
 		convert = CONV_NONE;
 	}
+	if (action == CONV_DECRYPT || action == CONV_NONE)
+		convert = CONV_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV
 	if (action == CONV_TODISP || action == CONV_QUOTE ||
@@ -546,14 +556,13 @@ parsepart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 	char	*cp;
 
 	ip->m_ct_type = hfield("content-type", (struct message *)ip);
-	ip->m_mimecontent = ip->m_ct_type ? mime_getcontent(ip->m_ct_type) :
-		MIME_TEXT;
 	if (ip->m_ct_type != NULL) {
 		ip->m_ct_type_plain = savestr(ip->m_ct_type);
 		if ((cp = strchr(ip->m_ct_type_plain, ';')) != NULL)
 			*cp = '\0';
 	} else
 		ip->m_ct_type_plain = "text/plain";
+	ip->m_mimecontent = mime_getcontent(ip->m_ct_type_plain);
 	if (ip->m_ct_type)
 		ip->m_charset = mime_getparam("charset", ip->m_ct_type);
 	if (ip->m_charset == NULL)
@@ -566,21 +575,23 @@ parsepart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 			(ip->m_filename = mime_getparam("filename", cp)) == 0)
 		if (ip->m_ct_type != NULL)
 			ip->m_filename = mime_getparam("name", ip->m_ct_type);
-	switch (ip->m_mimecontent) {
-	case MIME_PKCS7:
-		if (pf & PARSE_DECRYPT) {
-			parsepkcs7(zmp, ip, pf, level);
+	if (pf & PARSE_PARTS) {
+		switch (ip->m_mimecontent) {
+		case MIME_PKCS7:
+			if (pf & PARSE_DECRYPT) {
+				parsepkcs7(zmp, ip, pf, level);
+				break;
+			}
+			/*FALLTHRU*/
+		default:
+			break;
+		case MIME_MULTI:
+			parsemultipart(zmp, ip, pf, level);
+			break;
+		case MIME_822:
+			parse822(zmp, ip, pf, level);
 			break;
 		}
-		/*FALLTHRU*/
-	default:
-		break;
-	case MIME_MULTI:
-		parsemultipart(zmp, ip, pf, level);
-		break;
-	case MIME_822:
-		parse822(zmp, ip, pf, level);
-		break;
 	}
 	return OKAY;
 }
@@ -604,13 +615,21 @@ parsemultipart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 	if ((ibuf = setinput(&mb, (struct message *)ip, NEED_BODY)) == NULL)
 		return;
 	count = ip->m_size;
+	while (foldergets(&line, &linesize, &count, &linelen, ibuf))
+		if (line[0] == '\n')
+			break;
+	offs = ftell(ibuf);
+	newpart(ip, &np, offs, NULL);
 	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
 		if (linelen >= boundlen + 1 &&
 				strncmp(line, boundary, boundlen) == 0) {
 			if (line[boundlen] == '\n') {
 				offs = ftell(ibuf);
-				if (np)
+				if (part != 0) {
 					endpart(&np, offs-boundlen-2, lines);
+					newpart(ip, &np, offs-boundlen-2, NULL);
+				}
+				endpart(&np, offs, 2);
 				newpart(ip, &np, offs, &part);
 				lines = 0;
 			} else if (line[boundlen] == '-' &&
@@ -618,6 +637,8 @@ parsemultipart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 					line[boundlen+2] == '\n') {
 				offs = ftell(ibuf);
 				endpart(&np, offs-boundlen-4, lines);
+				newpart(ip, &np, offs-boundlen-4, NULL);
+				endpart(&np, offs+count, 2);
 			} else
 				lines++;
 		} else
@@ -628,7 +649,8 @@ parsemultipart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 		endpart(&np, offs, lines);
 	}
 	for (np = ip->m_multipart; np; np = np->m_nextpart)
-		parsepart(zmp, np, pf, level+1);
+		if (np->m_mimecontent != MIME_DISCARD)
+			parsepart(zmp, np, pf, level+1);
 	free(line);
 }
 
@@ -643,15 +665,18 @@ newpart(struct mimepart *ip, struct mimepart **np, off_t offs, int *part)
 	(*np)->m_have = HAVE_HEADER|HAVE_BODY;
 	(*np)->m_block = nail_blockof(offs);
 	(*np)->m_offset = nail_offsetof(offs);
-	(*part)++;
-	sz = ip->m_partstring ? strlen(ip->m_partstring) : 0;
-	sz += 20;
-	(*np)->m_partstring = salloc(sz);
-	if (ip->m_partstring)
-		snprintf((*np)->m_partstring, sz, "%s.%u", ip->m_partstring,
-				*part);
-	else
-		snprintf((*np)->m_partstring, sz, "%u", *part);
+	if (part) {
+		(*part)++;
+		sz = ip->m_partstring ? strlen(ip->m_partstring) : 0;
+		sz += 20;
+		(*np)->m_partstring = salloc(sz);
+		if (ip->m_partstring)
+			snprintf((*np)->m_partstring, sz, "%s.%u",
+					ip->m_partstring, *part);
+		else
+			snprintf((*np)->m_partstring, sz, "%u", *part);
+	} else
+		(*np)->m_mimecontent = MIME_DISCARD;
 	if (ip->m_multipart) {
 		for (pp = ip->m_multipart; pp->m_nextpart; pp = pp->m_nextpart);
 		pp->m_nextpart = *np;

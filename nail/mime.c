@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.39 (gritter) 10/30/04";
+static char sccsid[]  = "@(#)mime.c	2.40 (gritter) 10/31/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -609,36 +609,26 @@ mime_getenc(char *p)
 }
 
 /*
- * Get the mime content from a Content-Type header line.
+ * Get the mime content from a Content-Type header field, other parameters
+ * already stripped.
  */
 int 
 mime_getcontent(char *s)
 {
-	char *p, *q, *r;
-
-	if (*s == '"')
-		s++;
-	r = salloc(strlen(s) + 1);
-	p = s, q = r;
-	while (*p && !whitechar(*p & 0377) && *p != ';') {
-		*q++ = lowerconv(*p & 0377);
-		p++;
-	}
-	*q = '\0';
-	if (strchr(r, '/') == NULL)	/* for compatibility with non-MIME */
+	if (strchr(s, '/') == NULL)	/* for compatibility with non-MIME */
 		return MIME_TEXT;
-	if (strncmp(r, "text/html", 9) == 0)
+	if (asccasecmp(s, "text/html") == 0)
 		return MIME_HTML;
-	if (strncmp(r, "text/", 5) == 0)
+	if (ascncasecmp(s, "text/", 5) == 0)
 		return MIME_TEXT;
-	if (strncmp(r, "message/rfc822", 14) == 0)
+	if (asccasecmp(s, "message/rfc822") == 0)
 		return MIME_822;
-	if (strncmp(r, "message/", 8) == 0)
+	if (ascncasecmp(s, "message/", 8) == 0)
 		return MIME_MESSAGE;
-	if (strncmp(r, "multipart/", 10) == 0)
+	if (ascncasecmp(s, "multipart/", 10) == 0)
 		return MIME_MULTI;
-	if (strncmp(r, "application/x-pkcs7-mime", 24) == 0 ||
-				strncmp(r, "application/pkcs7-mime", 22) == 0)
+	if (asccasecmp(s, "application/x-pkcs7-mime") == 0 ||
+				asccasecmp(s, "application/pkcs7-mime") == 0)
 		return MIME_PKCS7;
 	return MIME_UNKNOWN;
 }
