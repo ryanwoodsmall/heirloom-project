@@ -46,7 +46,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)file.sl	1.29 (gritter) 12/29/04";
+#if defined (SUS)
+static const char sccsid[] USED = "@(#)file_sus.sl	1.30 (gritter) 2/4/05";
+#else	/* !SUS */
+static const char sccsid[] USED = "@(#)file.sl	1.30 (gritter) 2/4/05";
+#endif	/* !SUS */
 
 #ifdef	__GLIBC__
 #include <sys/sysmacros.h>
@@ -235,7 +239,9 @@ type(const char *file)
 	if(statfn(file, &mbuf) < 0) {
 		if (sysv3) {
 			printf("cannot open, %s\n", strerror(errno));
+#ifndef	SUS
 			status |= 1;
+#endif	/* !SUS */
 			return;
 		}
 		goto cant;
@@ -295,7 +301,9 @@ spcl:
 			printf("cannot open for reading\n");
 		else
 			printf("cannot open: %s\n", strerror(errno));
+#ifndef	SUS
 		status |= 1;
+#endif	/* !SUS */
 		return;
 	}
 rd:	in = read(ifile, buf, sizeof buf);

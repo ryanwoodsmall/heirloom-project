@@ -40,7 +40,7 @@ install:
 	else \
 		$(LNS) oawk.1 $(ROOT)$(MANDIR)/man1/awk.1 ; \
 	fi
-	for i in basename chmod cp csplit date du egrep expr fgrep grep id join ln mkdir mv nawk nl nohup pg pr ps rm rmdir sed sort touch tr wc who; \
+	for i in basename chmod cp csplit date du egrep expr file fgrep grep id join ln mkdir mv nawk nl nohup pg pr ps rm rmdir sed sort touch tr wc who; \
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SU3BIN)/$$i $(ROOT); \
 	done
@@ -48,7 +48,7 @@ install:
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
-	for i in basename chmod du join lc ln ls more mv nohup page pr rm rmdir sort touch tr who; \
+	for i in basename chmod du file join lc ln ls more mv nohup page pr rm rmdir sort touch tr who; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done

@@ -72,6 +72,8 @@ Release ...
   personality, contrary to the documentation.
 * nawk: printf("%u") did not work if the argument was larger that INT_MAX.
 * nawk: RLENGTH was not set correctly for matches of zero length.
+* file: The POSIX version does not exit with an error status if a file could
+  not be opened.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
