@@ -1,5 +1,6 @@
 [11.10] released ...
-* Junk mail filter improvement: Do not ignore single-letter words.
+* Junk mail filter improvement: Do not ignore single-letter words; extract
+  hostnames from URLs and store them separately.
 
 [11.9] released 10/2/04
 * A Bayesian junk mail filter has been added. See the 'EXAMPLES' section of

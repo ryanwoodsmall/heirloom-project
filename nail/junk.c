@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.32 (gritter) 10/3/04";
+static char sccsid[] = "@(#)junk.c	1.33 (gritter) 10/3/04";
 #endif
 #endif /* not lint */
 
@@ -118,6 +118,7 @@ static struct super {
 	 ((char *)(p))[3] = ((n) & 0xff000000UL) >> 24)
 
 struct lexstat {
+	char	*save;
 	int	price;
 	int	url;
 	int	lastc;
@@ -392,6 +393,16 @@ nextword(char **buf, size_t *bufsize, size_t *count, FILE *fp,
 	int	c, i, j, k;
 	char	*cp, *cq;
 
+	if (sp->save) {
+		i = j = 0;
+		for (cp = sp->save; *cp; cp++) {
+			SAVE(*cp&0377)
+		}
+		SAVE('\0')
+		free(sp->save);
+		sp->save = NULL;
+		return *buf;
+	}
 	if (sp->loc == FROM_LINE)
 		while (*count > 0 && (c = getc(fp)) != EOF) {
 			sp->lastc = c;
@@ -448,6 +459,16 @@ loop:	i = 0;
 		if (sp->url) {
 			if (!url_xchar(c)) {
 				sp->url = 0;
+				cp = sp->save = smalloc(i+6);
+				for (cq = "HOST*"; *cq; cq++)
+					*cp++ = *cq;
+				for (cq = &(*buf)[j]; *cq != ':'; cq++);
+				cq += 3;	/* skip "://" */
+				while (cq < &(*buf)[i+j] &&
+						(alnumchar(*cq&0377) ||
+						 *cq == '.' || *cq == '-'))
+					*cp++ = *cq++;
+				*cp = '\0';
 				break;
 			}
 			SAVE(c)
@@ -467,7 +488,7 @@ loop:	i = 0;
 			}
 			(*count)--;
 			sp->url = 1;
-			(*buf)[i+j] = '\0';
+			SAVE('\0')
 			cp = savestr(*buf);
 			j = i = 0;
 			for (cq = "URL*"; *cq; cq++) {
@@ -494,7 +515,7 @@ loop:	i = 0;
 			break;
 	}
 	if (i > 0) {
-		(*buf)[i+j] = '\0';
+		SAVE('\0')
 		c = 0;
 		for (k = 0; k < i; k++)
 			if (digitchar((*buf)[k+j]&0377))

@@ -60,7 +60,7 @@
  *
  * Adopted for nail by Gunnar Ritter.
  *
- * Sccsid @(#)lzw.c	1.9 (gritter) 10/2/04
+ * Sccsid @(#)lzw.c	1.10 (gritter) 10/3/04
  */
 
 #include "config.h"
@@ -117,7 +117,7 @@ struct s_zstate {
 	long zs_in_count;		/* Length of input. */
 	long zs_bytes_out;		/* Length of compressed output. */
 	long zs_out_count;		/* # of codes output (for debugging). */
-	char_type zs_buf[BITS];
+	char_type zs_buf[BITS+1];
 	union {
 		struct {
 			long zs_fcode;
@@ -130,7 +130,7 @@ struct s_zstate {
 			int zs_finchar;
 			code_int zs_code, zs_oldcode, zs_incode;
 			int zs_roffset, zs_size;
-			char_type zs_gbuf[BITS];
+			char_type zs_gbuf[BITS+1];
 		} r;			/* Read parameters */
 	} u;
 };
