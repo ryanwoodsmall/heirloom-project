@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.258 (gritter) 10/24/04
+.\"     Sccsid: @(#)nail.1	2.259 (gritter) 10/24/04
 .\"
 .TH NAIL 1 "10/24/04" "nail 11.13" "User Commands"
 .SH NAME
@@ -43,7 +43,7 @@ nail \- send and receive Internet mail
 .PD 0
 .HP
 .ad l
-\fBnail\fR [\fB\-BDFintv~\fR]
+\fBnail\fR [\fB\-BDdFintv~\fR]
 [\fB\-s\fI\ subject\fR] [\fB\-a\fI\ attachment\fR ]
 [\fB\-c\fI\ cc-addr\fR] [\fB\-b\fI\ bcc-addr\fR] [\fB\-r\fI\ from-addr\fR]
 [\fB\-h\fI\ hops\fR]
@@ -51,12 +51,12 @@ nail \- send and receive Internet mail
 \fIto-addr\fR .\ .\ .
 .HP
 .ad l
-\fBnail\fR [\fB\-BDeHiInNv~\fR] [\fB\-T\fI\ name\fR]
+\fBnail\fR [\fB\-BDdeHiInNv~\fR] [\fB\-T\fI\ name\fR]
 [\fB\-A\fI\ account\fR]
 \fB\-f\fR [\fIname\fR]
 .HP
 .ad l
-\fBnail\fR [\fB\-BDeinNv~\fR]
+\fBnail\fR [\fB\-BDdeinNv~\fR]
 [\fB\-A\fI\ account\fR]
 [\fB\-u\fI\ user\fR]
 .br
@@ -108,6 +108,14 @@ Start in
 mode; see the description for the
 .I disconnected
 variable option.
+.TP
+.B \-d
+Enables debugging messages and disables the actual delivery of messages.
+Unlike
+.IR \-v ,
+this option is intended for
+.I nail
+development only.
 .TP
 .B \-e
 Just check if mail is present in the system mailbox.
@@ -2108,6 +2116,11 @@ converted to local time.
 .TP
 .B debug
 Prints debugging messages and disables the actual delivery of messages.
+Unlike
+.IR verbose ,
+this option is intended for
+.I nail
+development only.
 .TP
 .B disconnected
 When an IMAP mailbox is selected and this variable is set,

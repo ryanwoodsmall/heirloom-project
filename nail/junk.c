@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.48 (gritter) 10/24/04";
+static char sccsid[] = "@(#)junk.c	1.50 (gritter) 10/25/04";
 #endif
 #endif /* not lint */
 
@@ -85,13 +85,13 @@ static char sccsid[] = "@(#)junk.c	1.48 (gritter) 10/24/04";
  * each possible hash thirteen times. Testing for occurences of randomly
  * chosen tokens will therefore likely not give useful results.
  *
- * To make the chain structure independent from input, the MD5 output is
+ * To make the chain structure independent from input, the MD5 input is
  * xor'ed with a random number. This makes it impossible that someone uses
  * a carefully crafted message for a denial-of-service attack against the
  * database.
  */
 #define	SIZEOF_node	17
-#define	OF_node_hash	0	/* mangled first 32 bits of MD5 of word */
+#define	OF_node_hash	0	/* first 32 bits of MD5 of word|mangle */
 #define	OF_node_next	4	/* bit-negated table index of next node */
 #define	OF_node_good	8	/* number of times this appeared in good msgs */
 #define	OF_node_bad	11	/* number of times this appeared in bad msgs */
@@ -103,10 +103,19 @@ static char	*nodes;
 #define	OF_super_used	4	/* used nodes in the chain file */
 #define	OF_super_ngood	8	/* number of good messages scanned so far */
 #define	OF_super_nbad	12	/* number of bad messages scanned so far */
-#define	OF_super_mangle	16	/* used to mangle the MD5 hash */
+#define	OF_super_mangle	16	/* used to mangle the MD5 input */
 #define	OF_super_bucket	20	/* 65536 bit-negated node indices */
 #define	SIZEOF_entry	4
 static char	*super;
+
+/*
+ * Version history
+ * ---------------
+ * 0	Initial version
+ * 1	Fixed the mangling; it was ineffective in version 0.
+ */
+static int	table_version;
+#define	current_table_version	1
 
 #define	get(e)	\
 	((unsigned)(((char *)(e))[0]&0377) + \
@@ -187,9 +196,9 @@ enum entry {
 
 static const char	README1[] = "\
 This is a junk mail database maintained by nail(1). It does not contain any\n\
-of the actual words found in your messages. Instead, parts of mangled MD5\n\
-hashes are used for lookup. It is thus possible to tell if some given word\n\
-was likely contained in your mail from examining this data, at best.\n";
+of the actual words found in your messages. Instead, parts of MD5 hashes are\n\
+used for lookup. It is thus possible to tell if some given word was likely\n\
+contained in your mail from examining this data, at best.\n";
 static const char	README2[] = "\n\
 The database files are stored in compress(1) format by default. This saves\n\
 some space, but leads to higher processor usage when the database is read\n\
@@ -197,6 +206,7 @@ or updated. You can use uncompress(1) on these files if you prefer to store\n\
 them in flat form.\n";
 
 static int	verbose;
+static int	_debug;
 
 static enum okay getdb(void);
 static void putdb(void);
@@ -320,12 +330,16 @@ dbfp(enum db db, int rw, int *compressed)
 	FILE	*fp, *rp;
 	char	*dir, *fn;
 	struct flock	flp;
-	const char *const	sf[] = {
-		"super", "nodes"
+	char *sfx[][2] = {
+		{ "super",	"nodes" },
+		{ "super1",	"nodes1" }
 	};
-	const char *const	zf[] = {
-		"super.Z", "nodes.Z"
+	char **sf;
+	char *zfx[][2] = {
+		{ "super.Z",	"nodes.Z" },
+		{ "super1.Z",	"nodes1.Z" }
 	};
+	char **zf;
 	int	n;
 
 	if ((dir = value("junkdb")) == NULL) {
@@ -338,6 +352,10 @@ dbfp(enum db db, int rw, int *compressed)
 		fprintf(stderr, "Cannot create directory \"%s\"\n.", dir);
 		return (FILE *)-1;
 	}
+	if (!rw)
+		table_version = current_table_version;
+loop:	sf = sfx[table_version];
+	zf = zfx[table_version];
 	fn = ac_alloc((n = strlen(dir)) + 40);
 	strcpy(fn, dir);
 	fn[n] = '/';
@@ -360,6 +378,12 @@ dbfp(enum db db, int rw, int *compressed)
 			fputs(README2, rp);
 			Fclose(rp);
 		}
+	} else if (fp == NULL) {
+		if (table_version > 0) {
+			table_version--;
+			goto loop;
+		} else
+			table_version = current_table_version;
 	}
 okay:	ac_free(fn);
 	if (fp) {
@@ -801,6 +825,7 @@ cclassify(void *v)
 	int	*msgvec = v, *ip;
 
 	verbose = value("verbose") != NULL;
+	_debug = debug || value("debug") != NULL;
 	if (getdb() != OKAY)
 		return 1;
 	for (ip = msgvec; *ip; ip++) {
@@ -878,6 +903,11 @@ rate(const char *word, enum entry entry, struct lexstat *sp)
 		p = s2f(s);
 	} else
 		p = DFL;
+	if (_debug)
+		fprintf(stderr, "h=%lu g=%u b=%u p=%g %s\n", h,
+				n ? get(&n[OF_node_good]) : 0,
+				n ? get(&n[OF_node_bad]) : 0,
+				p, word);
 	if (p == 0)
 		return;
 	d = p >= MID ? p - MID : MID - p;
@@ -914,8 +944,12 @@ dbhash(const char *word)
 
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char *)word, strlen(word));
+	if (table_version >= 1)
+		MD5Update(&ctx, (unsigned char *)&super[OF_super_mangle], 4);
 	MD5Final(digest, &ctx);
-	h = getn(digest) ^ getn(&super[OF_super_mangle]);
+	h = getn(digest);
+	if (table_version < 1)	/* this did nothing useful, fixed above */
+		h ^= getn(&super[OF_super_mangle]);
 	return h;
 }
 
@@ -924,7 +958,8 @@ dbhash(const char *word)
  * impossible for any person to determine the exact time when the database
  * was created first (without looking at the database, which would reveal the
  * value anyway), so we just use this. The MD5 hash here ensures that each
- * single second gives a completely different mangling value.
+ * single second gives a completely different mangling value (which is not
+ * necessary anymore if table_version>=1, but does not hurt).
  */
 static void 
 mkmangle(void)
