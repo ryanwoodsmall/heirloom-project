@@ -1,4 +1,4 @@
-[11.16] released ...
+[11.16] released 11/18/04
 * When a header field line that started and ended with a MIME encoded word
   followed a line that ended with a MIME encoded word, the newline character
   preceding the next header field was erroneously omitted when a message was
