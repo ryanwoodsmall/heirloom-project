@@ -35,6 +35,7 @@ Release ...
   following 'p' vi command pasted the text affected by the former vi command.
   It now pastes the text of the last yank or delete even if that was an ex
   command.
+* Some build fixes for diet libc have been made.
 
 Release 12/2/04
 * Support for multibyte character locales was added.

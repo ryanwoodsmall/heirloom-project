@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.27 (gritter) 1/13/05";
+static char sccsid[] = "@(#)ex_put.c	1.28 (gritter) 1/16/05";
 #endif
 #endif
 
@@ -1120,12 +1120,14 @@ ttcharoff(void)
 	long vdis;
 
 	errno = 0;
+#ifndef	__dietlibc__
 	vdis = fpathconf(1, _PC_VDISABLE);
 	if (errno)
 		/*
 		 * Use the old value of 0377, hope it is not
 		 * the user's favourite character.
 		 */
+#endif	/* !__dietlibc__ */
 		vdis = '\377';
 #else	/* !_PC_VDISABLE */
 #define	vdis	'\377';

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.41 (gritter) 1/13/05";
+static char sccsid[] = "@(#)ex_vput.c	1.42 (gritter) 1/16/05";
 #endif
 #endif
 
@@ -600,8 +600,10 @@ vinschar(int c)
 			return c;
 		}
 		vputchar(c);
+#ifdef	MB
 		if (insmc1 == 0 && (vtube0[destcol]&(TRIM|MULTICOL))==MULTICOL)
 			vtube0[destcol] = INVBIT;
+#endif	/* MB */
 		if (DEPTH(vcline) * WCOLS + !value(REDRAW) >
 		    (destline - LINE(vcline)) * WCOLS + destcol)
 			return c;
@@ -686,9 +688,11 @@ vinschar(int c)
 		endim();
 		if (inscol + insmc0 != linend)
 			doomed -= inssiz + insmc1;
+#ifdef	MB
 		if (insmc1 == 0 && c != '\t' &&
 				vtube0[inscol+insmc0] & MULTICOL)
 			vtube0[inscol+insmc0] = INVBIT;
+#endif	/* MB */
 		do
 			vputchar(c);
 		while (--inssiz);
