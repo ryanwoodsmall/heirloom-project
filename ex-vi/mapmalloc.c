@@ -2,7 +2,7 @@
  * AT&T Unix 7th Edition memory allocation routines.
  *
  * Modified for ex by Gunnar Ritter, Freiburg i. Br., Germany,
- * July 2000.
+ * February 2005.
  *
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	@(#)malloc.c	1.18 (gritter) 2/18/05
+ *	Sccsid @(#)mapmalloc.c	1.1 (gritter) 2/18/05
  */
 
 #ifdef	VMUNIX
@@ -44,6 +44,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/mman.h>
+
+#ifndef	MAP_FAILED
+#define	MAP_FAILED	((void *)-1)
+#endif	/* !MAP_FAILED */
 
 #include "config.h"
 
@@ -57,23 +62,20 @@ extern	nl_catd	catd;
 /*
  * Since ex makes use of sbrk(), the C library's version of malloc()
  * must be avoided.
- *
- * In ex, malloc() calls sbrk() only one time with an argument of
- * POOL. Ex itselves never uses malloc() internally, so POOL
- * must be sufficient for library calls like setlocale() only.
- *
- * Known problem: If linking against ncurses, changing the terminal
- * type repeatedly outruns the pool. Even that is not really a
- * problem since the work continues with the old terminal type, so
- * there is no need for a large pool here.
  */
-#define	POOL	32768
+
+/*
+#define debug
+#define longdebug
+*/
 
 #ifdef debug
 #define ASSERT(p) if(!(p))botch("p");else
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <inttypes.h>
 int 
 botch(char *s)
 {
@@ -82,9 +84,22 @@ botch(char *s)
 	/*printf("assertion botched: %s\n",s);*/
 	abort();
 }
-static int allock(void);
+static int allock(void *);
+void dump(const char *msg, uintptr_t t)
+{
+	const char hex[] = "0123456789ABCDEF";
+	int	i;
+	write(2, msg, strlen(msg));
+	write(2, ": ", 2);
+	for (i = sizeof t - 1; i >= 0; i--) {
+		write(2, &hex[(t & (0x0f << 8*i+4)) >> 8*i+4], 1);
+		write(2, &hex[(t & (0x0f << 8*i)) >> 8*i], 1);
+	}
+	write(2, "\n", 1);
+}
 #else
 #define ASSERT(p)
+#define	dump(a, b)
 #endif
 
 /*	avoid break bug */
@@ -125,55 +140,80 @@ static int allock(void);
 #define	setbusy(p)	(union store *)((INT)(p)|BUSY)
 #define	clearbusy(p)	(union store *)((INT)(p)&~BUSY)
 
+static	long POOLBLOCK = 32768;
+
+static	struct pool *pool0;
+
 union store { union store *ptr;
+	      struct pool *pool;
 	      ALIGN dummy[NALIGN];
 	      /*int calloc;*/	/*calloc clears an array of integers*/
 };
 
-static	union store allocs[2];	/*initial arena*/
-static	union store *allocp;	/*search ptr*/
-static	union store *alloct;	/*arena top*/
-static	union store *allocx;	/*for benefit of realloc*/
-extern int	error(char *, ...);
+struct pool {
+	struct pool *Next;
+	union store Allocs[2];	/*initial arena*/
+	union store *Allocp;	/*search ptr*/
+	union store *Alloct;	/*arena top*/
+	union store *Allocx;	/*for benefit of realloc*/
+	char *Brk;
+	char *End;
+	ALIGN Dummy[NALIGN];
+};
 
-char *
-poolsbrk(intptr_t inc)
+#define	allocs	(o->Allocs)
+#define	allocp	(o->Allocp)
+#define	alloct	(o->Alloct)
+#define	allocx	(o->Allocx)
+
+static void *
+map(void *addr, long len)
 {
-	static char *pool;
-	static intptr_t ps;
-	intptr_t os, ns;
+#ifndef	MAP_ANON
+	int	flags = 0;
+	static int fd = -1;
 
-	if (pool == NULL)
-		if ((pool = sbrk(POOL)) == (char *)-1)
-			error(catgets(catd, 1, 241,
-				"No memory pool"));
-	if (inc == 0)
-		return pool + ps;
-	os = ps;
-	ns = ps + inc;
-	if (ns >= POOL)
-		error(catgets(catd, 1, 242,
-				"Memory pool exhausted"));
-	ps = ns;
-	return pool + os;
+	if (fd == -1 && ((fd = open("/dev/zero", O_RDWR)) < 0 ||
+				fcntl(fd, F_SETFD, FD_CLOEXEC) < 0))
+		return 0;
+#else	/* MAP_ANON */
+	int	flags = MAP_ANON;
+	int	fd = -1;
+#endif	/* MAP_ANON */
+	flags |= MAP_PRIVATE;
+	if (addr)
+		flags |= MAP_FIXED;
+	return mmap(addr, len, PROT_READ|PROT_WRITE, flags, fd, 0);
 }
 
 void *
 malloc(size_t nbytes)
 {
 	register union store *p, *q;
+	struct pool *o;
 	register int nw;
 	static int temp;	/*coroutines assume no auto*/
 
-	if(allocs[0].ptr==0) {	/*first time*/
+	if (nbytes == 0)
+		nbytes = 1;
+	if(pool0==0||pool0==MAP_FAILED) {	/*first time*/
+		if((pool0 = map(NULL, POOLBLOCK)) == MAP_FAILED) {
+			errno = ENOMEM;
+			return 0;
+		}
+		pool0->Brk = (char *)pool0->Dummy;
+		pool0->End = (char *)pool0 + POOLBLOCK;
+	}
+	o = pool0;
+first:	if(allocs[0].ptr==0) {	/*first time*/
 		allocs[0].ptr = setbusy(&allocs[1]);
 		allocs[1].ptr = setbusy(&allocs[0]);
 		alloct = &allocs[1];
 		allocp = &allocs[0];
 	}
-	nw = (nbytes+WORD+WORD-1)/WORD;
+	nw = (nbytes+2*WORD+WORD-1)/WORD;
 	ASSERT(allocp>=allocs && allocp<=alloct);
-	ASSERT(allock());
+	ASSERT(allock(o));
 	for(p=allocp; ; ) {
 		for(temp=0; ; ) {
 			if(!testbusy(p->ptr)) {
@@ -196,16 +236,33 @@ malloc(size_t nbytes)
 				break;
 		}
 		temp = ((nw+BLOCK/WORD)/(BLOCK/WORD))*(BLOCK/WORD);
-		q = (union store *)poolsbrk(0);
+		q = (void *)o->Brk;
 		if(q+temp+GRANULE < q) {
 			errno = ENOMEM;
-			return(NULL);
+			return(0);
 		}
-		q = (union store *)poolsbrk(temp*WORD);
-		if((INT)q == -1) {
-			errno = ENOMEM;
-			return(NULL);
+		if(o->Brk+temp*WORD>=o->End) {
+			long	new;
+			if (o->Next != 0 && o->Next != MAP_FAILED) {
+				o = o->Next;
+				goto first;
+			}
+			POOLBLOCK *= 2;
+			new = (((nw*WORD)+POOLBLOCK)/POOLBLOCK)*POOLBLOCK;
+			if ((o->Next = map(0,new)) == MAP_FAILED) {
+				POOLBLOCK /= 2;
+				new=(((nw*WORD)+POOLBLOCK)/POOLBLOCK)*POOLBLOCK;
+				if ((o->Next = map(0,new)) == MAP_FAILED) {
+					errno = ENOMEM;
+					return(0);
+				}
+			}
+			o = o->Next;
+			o->Brk = (char *)o->Dummy;
+			o->End = (char *)o + new;
+			goto first;
 		}
+		o->Brk += temp*WORD;
 		ASSERT(q>alloct);
 		alloct->ptr = q;
 		if(q!=alloct+1)
@@ -221,21 +278,26 @@ found:
 		allocp->ptr = p->ptr;
 	}
 	p->ptr = setbusy(allocp);
-	return((char *)(p+1));
+	p[1].pool = o;
+	dump("malloc", (uintptr_t)(p + 2));
+	return(p+2);
 }
 
 /*	freeing strategy tuned for LIFO allocation
 */
-void
+void 
 free(register void *ap)
 {
-	register union store *p = (union store *)ap;
+	register union store *p = ap;
+	struct pool *o;
 
+	dump("  free", (uintptr_t)ap);
 	if (ap == NULL)
 		return;
+	o = p[-1].pool;
 	ASSERT(p>clearbusy(allocs[1].ptr)&&p<=alloct);
-	ASSERT(allock());
-	allocp = --p;
+	ASSERT(allock(o));
+	allocp = p -= 2;
 	ASSERT(testbusy(p->ptr));
 	p->ptr = clearbusy(p->ptr);
 	ASSERT(p->ptr > allocp && p->ptr <= alloct);
@@ -252,6 +314,7 @@ realloc(void *ap, size_t nbytes)
 {
 	register union store *p = ap;
 	register union store *q;
+	struct pool *o;
 	union store *s, *t;
 	register size_t nw;
 	size_t onw;
@@ -262,12 +325,13 @@ realloc(void *ap, size_t nbytes)
 		free(p);
 		return NULL;
 	}
-	if(testbusy(p[-1].ptr))
-		free((char *)p);
-	onw = p[-1].ptr - p;
+	if(testbusy(p[-2].ptr))
+		free(p);
+	onw = p[-2].ptr - p;
+	o = p[-1].pool;
 	q = (union store *)malloc(nbytes);
 	if(q==NULL || q==p)
-		return((char *)q);
+		return(q);
 	s = p;
 	t = q;
 	nw = (nbytes+WORD-1)/WORD;
@@ -277,14 +341,15 @@ realloc(void *ap, size_t nbytes)
 		*t++ = *s++;
 	if(q<p && q+nw>=p)
 		(q+(q+nw-p))->ptr = allocx;
-	return((char *)q);
+	return(q);
 }
 
 #ifdef debug
 int 
-allock(void)
+allock(void *ao)
 {
 #ifdef longdebug
+	struct pool *o = ao;
 	register union store *p;
 	int x;
 	x = 0;
@@ -357,5 +422,7 @@ mallopt(void)
 	return -1;
 }
 #endif	/* notdef */
+
+char *poolsbrk(intptr_t val) { return NULL; }
 
 #endif	/* VMUNIX */
