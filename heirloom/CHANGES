@@ -2,10 +2,13 @@ Release ...
 * Operate correctly if stat(2) returns a zero st_blksize field. This is the
   case for pipes on NetBSD 2.0 and resulted in no output when using tar to
   write to them.
+* sed: Handle a byte with the same value as the ASCII backslash at the second
+  or a following position of a multibyte sequence correctly with the 'a', 'c',
+  and 'i' commands.
 * ls: If the target file name contained in a symbolic link is empty, print
   nothing (instead of "?") with the -l option etc.
-* It is now possible to use hard links at installation. The symbolic links
-  which are used by default are shorter now.
+* It is now possible to use hard links between installed files. The symbolic
+  links which are used by default are shorter now.
 
 Release 050309
 * find: The -anewer and -cnewer primaries were introduced.

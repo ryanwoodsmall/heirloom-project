@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed0.c	1.63 (gritter) 2/6/05>	*/
+/*	Sccsid @(#)sed0.c	1.64 (gritter) 3/12/05>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -756,7 +756,8 @@ cmp(const char *a, const char *b)
 static void
 text(char **textbuf)
 {
-	register char	*p, *q;
+	register char	*p, *oq;
+	char *q;
 	size_t sz = 128;
 
 	*textbuf = smalloc(sz);
@@ -764,14 +765,18 @@ text(char **textbuf)
 	q = cp;
 	for(;;) {
 
-		if((*p = *q++) == '\\')
-			*p = *q++;
-		if(*p == '\0') {
+		oq = q;
+		if(fetch(&q) == '\\') {
+			oq = q;
+			fetch(&q);
+		}
+		while(oq < q)
+			*p++ = *oq++;
+		if(p[-1] == '\0') {
 			cp = --q;
 			return;
 		}
 		check(p, *textbuf, sz, 128, null)
-		p++;
 	}
 }
 

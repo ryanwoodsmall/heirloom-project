@@ -6,20 +6,20 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)sed_su3.sl	2.30 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)sed_su3.sl	2.31 (gritter) 3/12/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)sed_sus.sl	2.30 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)sed_sus.sl	2.31 (gritter) 3/12/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)sed_s42.sl	2.30 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)sed_s42.sl	2.31 (gritter) 3/12/05";
 #else	/* !SUS, !SU3, !S42 */
-static const char sccsid[] USED = "@(#)sed.sl	2.30 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)sed.sl	2.31 (gritter) 3/12/05";
 #endif	/* !SUS, !SU3, !S42 */
 
 /*
 sed.h:
 	sed.h	1.32 (gritter) 2/6/05
 sed0.c:
-	sed0.c	1.63 (gritter) 2/6/05
+	sed0.c	1.64 (gritter) 3/12/05
 sed1.c:
 	sed1.c	1.42 (gritter) 2/6/05
 */
