@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.15 (gritter) 9/30/04";
+static char sccsid[] = "@(#)junk.c	1.16 (gritter) 9/30/04";
 #endif
 #endif /* not lint */
 
@@ -79,6 +79,7 @@ static struct super {
 	char	used[4];
 	char	ngood[4];
 	char	nbad[4];
+	char	shuffle[4];
 	char	bucket[65536][4];
 } *super;
 
@@ -151,6 +152,7 @@ static void	clsf __P((struct message *));
 static void	rate __P((const char *, enum entry));
 static unsigned	long	dbhash __P((const char *));
 static struct node	*lookup __P((unsigned long, int));
+static void	mkshuffle __P((void));
 
 static enum okay
 getdb()
@@ -169,13 +171,16 @@ getdb()
 				ferror(sfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(super, 0, sizeof *super);
+			mkshuffle();
 			zfree(zp);
 			Fclose(sfp);
 			sfp = NULL;
 		} else
 			zfree(zp);
-	} else
+	} else {
 		memset(super, 0, sizeof *super);
+		mkshuffle();
+	}
 	if ((n = getn(super->size)) == 0) {
 		n = 1;
 		putn(super->size, 1);
@@ -195,6 +200,7 @@ getdb()
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(nodes, 0, n * sizeof *nodes);
 			memset(super, 0, sizeof *super);
+			mkshuffle();
 			putn(super->size, n);
 		}
 		zfree(zp);
@@ -682,6 +688,26 @@ dbhash(word)
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char *)word, strlen(word));
 	MD5Final(digest, &ctx);
-	h = getn(digest);
+	h = getn(digest) ^ getn(super->shuffle);
 	return h;
+}
+
+static void
+mkshuffle()
+{
+	union {
+		time_t	t;
+		char	c[16];
+	} u;
+	unsigned long	s;
+	unsigned char	digest[16];
+	MD5_CTX	ctx;
+
+	memset(&u, 0, sizeof u);
+	time(&u.t);
+	MD5Init(&ctx);
+	MD5Update(&ctx, (unsigned char *)u.c, sizeof u.c);
+	MD5Final(digest, &ctx);
+	s = getn(digest);
+	putn(super->shuffle, s);
 }
