@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diff.c	1.22 (gritter) 3/26/05>	*/
+/*	Sccsid @(#)diff.c	1.23 (gritter) 3/27/05>	*/
 /*	from 4.3BSD diff.c 4.6 4/3/86	*/
 
 #include "diff.h"
@@ -237,12 +237,6 @@ main(int argc, char **argv)
 		fprintf(stderr, "%s: invalid option -%c\n", progname, invalid);
 		usage();
 	}
-	if (hflag && opt) {
-		fprintf(stderr,
-		    "%s: -h doesn't support -e, -f, -n, -c, -u, or -I\n",
-		    	progname);
-		done();
-	}
 	if (pflag) {
 		if (opt == D_UNIFIED || opt == D_CONTEXT)
 			/*EMPTY*/;
@@ -255,6 +249,12 @@ main(int argc, char **argv)
 		    		progname);
 			done();
 		}
+	}
+	if (hflag && opt) {
+		fprintf(stderr,
+		    "%s: -h doesn't support -e, -f, -n, -c, -u, or -I\n",
+		    	progname);
+		done();
 	}
 	diffany(argv);
 	/*NOTREACHED*/
