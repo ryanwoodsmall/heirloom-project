@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.52 (gritter) 10/31/04";
+static char sccsid[] = "@(#)send.c	2.53 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -191,7 +191,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	(void)&oldpipe;
 	(void)&rt;
 	(void)&obuf;
-	if (ip->m_mimecontent == MIME_PKCS7 && action != CONV_NONE)
+	if (ip->m_mimecontent == MIME_PKCS7 && ip->m_multipart &&
+			action != CONV_NONE)
 		goto skip;
 	dostat = 0;
 	if (level == 0) {
@@ -383,7 +384,7 @@ skip:	switch (ip->m_mimecontent) {
 			return rt;
 		break;
 	case MIME_PKCS7:
-		if (action != CONV_NONE)
+		if (action != CONV_NONE && ip->m_multipart)
 			goto multi;
 		/*FALLTHRU*/
 	default:
@@ -400,6 +401,7 @@ skip:	switch (ip->m_mimecontent) {
 		case CONV_TOFILE:
 		case CONV_TOSRCH:
 		case CONV_DECRYPT:
+		case CONV_NONE:
 			break;
 		}
 		break;
@@ -648,9 +650,12 @@ parsemultipart(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 					line[boundlen+1] == '-' &&
 					line[boundlen+2] == '\n') {
 				offs = ftell(ibuf);
-				endpart(&np, offs-boundlen-4, lines);
-				newpart(ip, &np, offs-boundlen-4, NULL);
+				if (part != 0) {
+					endpart(&np, offs-boundlen-4, lines);
+					newpart(ip, &np, offs-boundlen-4, NULL);
+				}
 				endpart(&np, offs+count, 2);
+				break;
 			} else
 				lines++;
 		} else
@@ -776,11 +781,23 @@ out(char *buf, size_t len, FILE *fp,
 		enum conversion convert, enum conversion action,
 		char *prefix, size_t prefixlen, off_t *stats)
 {
-	size_t	sz;
+	size_t	sz, n;
 	char	*cp;
 	long	lines;
 
-	sz = mime_write(buf, 1, len, fp,
+	sz = 0;
+	if (action == CONV_NONE || action == CONV_DECRYPT) {
+		cp = buf;
+		n = len;
+		while (n && cp[0] == '>')
+			cp++, n--;
+		if (n >= 5 && cp[0] == 'F' && cp[1] == 'r' && cp[2] == 'o' &&
+				cp[3] == 'm' && cp[4] == ' ') {
+			putc('>', fp);
+			sz++;
+		}
+	}
+	sz += mime_write(buf, 1, len, fp,
 			action == CONV_NONE ? CONV_NONE: convert,
 			action == CONV_TODISP ?
 				TD_ISPR|TD_ICONV :
