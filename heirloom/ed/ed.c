@@ -48,11 +48,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.88 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.89 (gritter) 2/1/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.88 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.89 (gritter) 2/1/05";
 #else	/* !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.88 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.89 (gritter) 2/1/05";
 #endif	/* !SUS, !S42 */
 
 #include <sys/types.h>
@@ -511,13 +511,15 @@ commands(void)
 		continue;
 
 	case 'i':
-		if (addr1 == zero && addr1+1 <= dol) {
+		setdot();
+		if (addr1 == zero) {
 			if (addr1 == addr2)
 				addr2++;
 			addr1++;
-		}
-		setdot();
-		nonzero();
+			if (dol != zero)
+				nonzero();
+		} else
+			nonzero();
 		newline();
 		checkpoint();
 		append(gettty, addr2-1);
