@@ -2,6 +2,8 @@
 * Unless the 'fullnames' variable was set, nail did not generate 'To' header
   fields when replying to messages since version 11.5 (Bugreport by Bob
   Tennent).
+* An internal problem in the token scanning for junk mail detection has been
+  fixed; the end of the mail header was not always correctly determined.
 
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither

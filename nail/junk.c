@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.38 (gritter) 10/13/04";
+static char sccsid[] = "@(#)junk.c	1.39 (gritter) 10/15/04";
 #endif
 #endif /* not lint */
 
@@ -462,7 +462,6 @@ loop:	i = 0;
 				k = 0;
 				while (k < sizeof sp->field - 3) {
 					sp->field[k++] = c;
-					sp->lastc = c;
 					if (*count <= 0 ||
 							(c = getc(fp)) == EOF)
 						break;
@@ -470,6 +469,7 @@ loop:	i = 0;
 						ungetc(c, fp);
 						break;
 					}
+					sp->lastc = c;
 					(*count)--;
 				}
 				sp->field[k++] = '*';
@@ -481,7 +481,6 @@ loop:	i = 0;
 				sp->loc = BODY;
 			}
 		}
-		sp->lastc = c;
 		if (sp->url) {
 			if (!url_xchar(c)) {
 				sp->url = 0;
@@ -537,8 +536,11 @@ loop:	i = 0;
 			ungetc(c, fp);
 			(*count)++;
 			break;
-		} else if (i > 0)
+		} else if (i > 0) {
+			sp->lastc = c;
 			break;
+		}
+		sp->lastc = c;
 	}
 	if (i > 0) {
 		SAVE('\0')
