@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)join.sl	1.13 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)join.sl	1.14 (gritter) 2/10/05";
 
 /*	join F1 F2 on stuff */
 
@@ -64,10 +64,8 @@ enum {
 	F2 = 1,
 	JF = -1
 };
-#define	ppi(f, j)	((j) >= 0 && (j) < ppisize[f] ? ppibuf[f][j] : NULL)
-#define	cpi(f, j)	((j) >= 0 && (j) < ppisize[f] ? ppibuf[f][j] : \
-		(abort(), ""))
-#define comp() strcoll(cpi(F1, j1),cpi(F2, j2))
+#define	ppi(f, j)	((j) >= 0 && (j) < ppisize[f] ? ppibuf[f][j] : null)
+#define comp() strcoll(ppi(F1, j1),ppi(F2, j2))
 
 #define	next(wc, s, n)	(*(s) & 0200 ? ((n) = mbtowi(&(wc), (s), mb_cur_max), \
 		(n) = ((n) > 0 ? (n) : (n) < 0 ? (wc=WEOF, 1) : 1)) : \
@@ -383,7 +381,7 @@ output(int on1, int on2)	/* print items from olist */
 			}
 			if (temp == 0 || *temp == 0)
 				temp = null;
-			printf("%s", temp);
+			printf("%s", temp ? temp : null);
 			if (i == no - 1)
 				printf("\n");
 			else if (mb_cur_max > 1)

@@ -7,6 +7,7 @@ Release ...
 * touch: For the SVID versions, the first non-option argument is treated
   as a time specification if it starts with a digit, regardless of the
   following characters.
+* join: If a join field does not exist, substitute the empty string for it.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
