@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.21 (gritter) 10/2/04";
+static char sccsid[] = "@(#)tty.c	2.22 (gritter) 10/13/04";
 #endif
 #endif /* not lint */
 
@@ -285,13 +285,15 @@ grabh(struct header *hp, enum gfield gflags, int subjfirst)
 	if ((savequit = safe_signal(SIGQUIT, SIG_IGN)) == SIG_DFL)
 		safe_signal(SIGQUIT, SIG_DFL);
 #else	/* TIOCSTI */
+	saveint = safe_signal(SIGINT, SIG_IGN);
 	if (sigsetjmp(intjmp, 1)) {
 		/* avoid garbled output with C-c */
 		printf("\n");
 		fflush(stdout);
 		goto out;
 	}
-	saveint = safe_signal(SIGINT, ttyint);
+	if (saveint != SIG_IGN)
+		safe_signal(SIGINT, ttyint);
 #endif	/* TIOCSTI */
 	if (gflags & GTO) {
 		TTYSET_CHECK(hp->h_to)

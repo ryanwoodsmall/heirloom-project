@@ -1,3 +1,7 @@
+[11.12] released ...
+* Unless the 'fullnames' variable was set, nail did not generate 'To' header
+  fields when replying to messages since version 11.5.
+
 [11.11] released 10/13/04
 * When sending messages that contain ASCII control characters but neither
   NULs nor non-ASCII characters, the quoted-printable MIME encoding is now

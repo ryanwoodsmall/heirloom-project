@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)names.c	2.18 (gritter) 10/2/04";
+static char sccsid[] = "@(#)names.c	2.19 (gritter) 10/13/04";
 #endif
 #endif /* not lint */
 
@@ -56,7 +56,7 @@ static char sccsid[] = "@(#)names.c	2.18 (gritter) 10/2/04";
 #include <unistd.h>
 
 static struct name *tailof(struct name *name);
-static struct name *extract1(char *line, int ntype, char *separators,
+static struct name *extract1(char *line, enum gfield ntype, char *separators,
 		int copypfx);
 static char *yankword(char *ap, char *wbuf, char *separators, int copypfx);
 static int same_name(char *n1, char *n2);
@@ -71,7 +71,7 @@ static struct name *delname(struct name *np, char *name);
  * name and return it.
  */
 struct name *
-nalloc(char *str, int ntype)
+nalloc(char *str, enum gfield ntype)
 {
 	struct name *np;
 	struct str	in, out;
@@ -120,13 +120,13 @@ tailof(struct name *name)
  * Return the list or NULL if none found.
  */
 struct name *
-extract(char *line, int ntype)
+extract(char *line, enum gfield ntype)
 {
 	return extract1(line, ntype, " \t,(", 0);
 }
 
 struct name *
-sextract(char *line, int ntype)
+sextract(char *line, enum gfield ntype)
 {
 	if (line && strpbrk(line, ",\"\\(<"))
 		return extract1(line, ntype, ",", 1);
@@ -135,7 +135,7 @@ sextract(char *line, int ntype)
 }
 
 static struct name *
-extract1(char *line, int ntype, char *separators, int copypfx)
+extract1(char *line, enum gfield ntype, char *separators, int copypfx)
 {
 	char *cp, *nbuf;
 	struct name *top, *np, *t;

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.131 (gritter) 10/9/04
+ *	Sccsid @(#)extern.h	2.132 (gritter) 10/13/04
  */
 
 /* aux.c */
@@ -367,9 +367,9 @@ size_t mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
 		enum conversion convert, enum tdflags dflags,
 		char *prefix, size_t prefixlen);
 /* names.c */
-struct name *nalloc(char *str, int ntype);
-struct name *extract(char *line, int ntype);
-struct name *sextract(char *line, int ntype);
+struct name *nalloc(char *str, enum gfield ntype);
+struct name *extract(char *line, enum gfield ntype);
+struct name *sextract(char *line, enum gfield ntype);
 char *detract(struct name *np, enum gfield ntype);
 struct name *outof(struct name *names, FILE *fo, struct header *hp);
 int is_fileaddr(char *name);

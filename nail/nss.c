@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.30 (gritter) 10/2/04";
+static char sccsid[] = "@(#)nss.c	1.31 (gritter) 10/13/04";
 #endif
 #endif /* not lint */
 
@@ -1033,14 +1033,16 @@ getdig(struct message *m, int n, SECItem ***digests,
 		}
 		if (part == 1) {
 			if (nl) {
-				NSS_CMSDigestContext_Update(digctx, "\r\n", 2);
+				NSS_CMSDigestContext_Update(digctx,
+						(unsigned char *)"\r\n", 2);
 				nl = 0;
 			}
 			if (buf[buflen-1] == '\n') {
 				nl = 1;
 				buflen--;
 			}
-			NSS_CMSDigestContext_Update(digctx, buf, buflen);
+			NSS_CMSDigestContext_Update(digctx,
+					(unsigned char *)buf, buflen);
 			continue;
 		}
 	}

@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.80 (gritter) 10/2/04
+ *	Sccsid @(#)def.h	2.81 (gritter) 10/13/04
  */
 
 /*
@@ -388,7 +388,7 @@ struct header {
 struct name {
 	struct	name *n_flink;		/* Forward link in list. */
 	struct	name *n_blink;		/* Backward list link */
-	short	n_type;			/* From which list it came */
+	enum gfield	n_type;		/* From which list it came */
 	char	*n_name;		/* This fella's name */
 	char	*n_fullname;		/* Sometimes, name including comment */
 };
