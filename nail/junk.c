@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.25 (gritter) 10/2/04";
+static char sccsid[] = "@(#)junk.c	1.26 (gritter) 10/2/04";
 #endif
 #endif /* not lint */
 
@@ -50,6 +50,7 @@ static char sccsid[] = "@(#)junk.c	1.25 (gritter) 10/2/04";
 #include <fcntl.h>
 #include <limits.h>
 #include <time.h>
+#include <unistd.h>
 #include "md5.h"
 
 /*
@@ -148,12 +149,23 @@ enum entry {
 	BAD  = 1
 };
 
+static const char	README1[] = "\
+This is a junk mail database maintained by nail(1). It does not contain any\n\
+of the actual words found in your messages. Instead, parts of shuffled MD5\n\
+hashes are used for lookup. It is thus possible to tell if some given word\n\
+was likely contained in your mail from examining this data, at best.\n";
+static const char	README2[] = "\n\
+The database files are stored in compress(1) format by default. This saves\n\
+some space, but leads to higher processor usage when the database is read\n\
+or updated. You can use uncompress(1) on these files if you prefer to store\n\
+them in flat form.\n";
+
 static int	verbose;
 
 static int	insert __P((int *, enum entry));
 static enum okay	getdb __P((void));
 static void	putdb __P((void));
-static FILE	*dbfp __P((enum db, int));
+static FILE	*dbfp __P((enum db, int, int *));
 static enum okay	scan __P((struct message *, enum entry,
 	void (*) __P((const char *, enum entry, struct lexstat *))));
 static void	add __P((const char *, enum entry, struct lexstat *));
@@ -172,22 +184,26 @@ getdb()
 	FILE	*sfp, *nfp;
 	void	*zp = NULL;
 	long	n;
+	int	compressed;
 
-	if ((sfp = dbfp(SUPER, 0)) == (FILE *)-1)
+	if ((sfp = dbfp(SUPER, 0, &compressed)) == (FILE *)-1)
 		return STOP;
 	super = smalloc(sizeof *super);
 	if (sfp) {
-		zp = zalloc(sfp);
-		if (zread(zp, (char *)super, sizeof *super)
-				!= sizeof *super ||
+		if (compressed)
+			zp = zalloc(sfp);
+		if ((compressed ? zread(zp, (char *)super, sizeof *super)
+					!= sizeof *super :
+				fread(super, sizeof *super, 1, sfp) != 1) ||
 				ferror(sfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(super, 0, sizeof *super);
 			mkshuffle();
-			zfree(zp);
+			if (compressed)
+				zfree(zp);
 			Fclose(sfp);
 			sfp = NULL;
-		} else
+		} else if (compressed)
 			zfree(zp);
 	} else {
 		memset(super, 0, sizeof *super);
@@ -198,16 +214,18 @@ getdb()
 		putn(super->size, 1);
 	}
 	nodes = smalloc(n * sizeof *nodes);
-	if (sfp && (nfp = dbfp(NODES, 0)) != NULL) {
+	if (sfp && (nfp = dbfp(NODES, 0, &compressed)) != NULL) {
 		if (nfp == (FILE *)-1) {
 			Fclose(sfp);
 			free(super);
 			free(nodes);
 			return STOP;
 		}
-		zp = zalloc(nfp);
-		if (zread(zp, (char *)nodes, n * sizeof *nodes)
-				!= n * sizeof *nodes ||
+		if (compressed)
+			zp = zalloc(nfp);
+		if ((compressed ? zread(zp, (char *)nodes, n * sizeof *nodes)
+				!= n * sizeof *nodes :
+				fread(nodes, sizeof *nodes, n, nfp) != n) ||
 				ferror(nfp)) {
 			fprintf(stderr, "Error reading junk mail database.\n");
 			memset(nodes, 0, n * sizeof *nodes);
@@ -215,7 +233,8 @@ getdb()
 			mkshuffle();
 			putn(super->size, n);
 		}
-		zfree(zp);
+		if (compressed)
+			zfree(zp);
 		Fclose(nfp);
 	} else
 		memset(nodes, 0, n * sizeof *nodes);
@@ -230,32 +249,43 @@ putdb()
 	FILE	*sfp, *nfp;
 	sighandler_type	saveint;
 	void	*zp;
+	int	scomp, ncomp;
 
-	if ((sfp = dbfp(SUPER, 1)) == NULL || sfp == (FILE *)-1)
+	if ((sfp = dbfp(SUPER, 1, &scomp)) == NULL || sfp == (FILE *)-1)
 		return;
-	if ((nfp = dbfp(NODES, 1)) == NULL || nfp == (FILE *)-1)
+	if ((nfp = dbfp(NODES, 1, &ncomp)) == NULL || nfp == (FILE *)-1)
 		return;
 	saveint = safe_signal(SIGINT, SIG_IGN);
-	zp = zalloc(sfp);
-	zwrite(zp, (char *)super, sizeof *super);
-	zfree(zp);
-	zp = zalloc(nfp);
-	zwrite(zp, (char *)nodes, getn(super->size) * sizeof *nodes);
-	zfree(zp);
+	if (scomp) {
+		zp = zalloc(sfp);
+		zwrite(zp, (char *)super, sizeof *super);
+		zfree(zp);
+	} else
+		fwrite(super, 1, sizeof *super, sfp);
+	if (ncomp) {
+		zp = zalloc(nfp);
+		zwrite(zp, (char *)nodes, getn(super->size) * sizeof *nodes);
+		zfree(zp);
+	} else
+		fwrite(nodes, sizeof *nodes, getn(super->size), nfp);
 	safe_signal(SIGINT, saveint);
 	Fclose(sfp);
 	Fclose(nfp);
 }
 
 static FILE *
-dbfp(db, rw)
+dbfp(db, rw, compressed)
 	enum db	db;
 	int	rw;
+	int	*compressed;
 {
-	FILE	*fp;
+	FILE	*fp, *rp;
 	char	*dir, *fn;
 	struct flock	flp;
 	const char *const	sf[] = {
+		"super", "nodes"
+	};
+	const char *const	zf[] = {
 		"super.Z", "nodes.Z"
 	};
 	int	n;
@@ -270,17 +300,30 @@ dbfp(db, rw)
 		fprintf(stderr, "Cannot create directory \"%s\"\n.", dir);
 		return (FILE *)-1;
 	}
-	fn = ac_alloc((n = strlen(dir)) + strlen(sf[db]) + 2);
+	fn = ac_alloc((n = strlen(dir)) + 40);
 	strcpy(fn, dir);
 	fn[n] = '/';
+	*compressed = 0;
 	strcpy(&fn[n+1], sf[db]);
+	if ((fp = Fopen(fn, rw ? "r+" : "r")) != NULL)
+		goto okay;
+	*compressed = 1;
+	strcpy(&fn[n+1], zf[db]);
 	if ((fp = Fopen(fn, rw ? "r+" : "r")) == NULL &&
 			rw ? (fp = Fopen(fn, "w+")) == NULL : 0) {
 		fprintf(stderr, "Cannot open junk mail database \"%s\".\n", fn);
 		ac_free(fn);
 		return NULL;
 	}
-	ac_free(fn);
+	if (rw) {
+		strcpy(&fn[n+1], "README");
+		if (access(fn, F_OK) < 0 && (rp = Fopen(fn, "w")) != NULL) {
+			fputs(README1, rp);
+			fputs(README2, rp);
+			Fclose(rp);
+		}
+	}
+okay:	ac_free(fn);
 	if (fp) {
 		flp.l_type = rw ? F_WRLCK : F_RDLCK;
 		flp.l_start = 0;
