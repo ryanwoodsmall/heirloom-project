@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)edit.c	2.16 (gritter) 10/21/04";
+static char sccsid[] = "@(#)edit.c	2.17 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -87,15 +87,17 @@ edit1(int *msgvec, int type)
 {
 	int c;
 	int i;
-	FILE *fp;
+	FILE *fp = NULL;
 	struct message *mp;
 	off_t size;
-	char *line = NULL, *fromline = NULL;
+	char *line = NULL;
 	size_t linesize;
+	int	wb;
 
 	/*
 	 * Deal with each message to be edited . . .
 	 */
+	wb = value("writebackedited") != NULL;
 	for (i = 0; msgvec[i] && i < msgCount; i++) {
 		sighandler_type sigint;
 
@@ -117,20 +119,9 @@ edit1(int *msgvec, int type)
 		did_print_dot = 1;
 		touch(mp);
 		sigint = safe_signal(SIGINT, SIG_IGN);
-		if (mp->m_flag & MNOFROM) {
-			char *from, *date;
-			size_t sz;
-
-			from = fakefrom(mp);
-			date = fakedate(mp->m_time);
-			sz = strlen(from) + strlen(date) + 8;
-			fromline = salloc(sz);
-			snprintf(fromline, sz, "From %s %s\n", from, date);
-		}
-		if ((fp = setinput(&mb, mp, NEED_BODY)) == NULL)
-			return 1;
 		fp = run_editor(fp, mp->m_size, type,
-				(mb.mb_perm & MB_EDIT) == 0, fromline, NULL);
+				(mb.mb_perm & MB_EDIT) == 0 || !wb,
+				NULL, mp, wb ? CONV_NONE : CONV_TODISP);
 		if (fp != NULL) {
 			fseek(mb.mb_otf, 0L, SEEK_END);
 			size = ftell(mb.mb_otf);
@@ -164,8 +155,8 @@ edit1(int *msgvec, int type)
  * "Type" is 'e' for ed, 'v' for vi.
  */
 FILE *
-run_editor(FILE *fp, off_t size, int type, int readonly, char *fromline,
-		struct header *hp)
+run_editor(FILE *fp, off_t size, int type, int readonly,
+		struct header *hp, struct message *mp, enum conversion convert)
 {
 	FILE *nf = NULL;
 	int t;
@@ -179,17 +170,19 @@ run_editor(FILE *fp, off_t size, int type, int readonly, char *fromline,
 		perror(catgets(catd, CATSET, 73, "temporary mail edit file"));
 		goto out;
 	}
-	if (fromline)
-		fputs(fromline, nf);
 	if (hp)
 		puthead(hp, nf, GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA, CONV_TODISP,
 				NULL, NULL);
-	if (size >= 0)
-		while (--size >= 0 && (t = getc(fp)) != EOF)
-			putc(t, nf);
-	else
-		while ((t = getc(fp)) != EOF)
-			putc(t, nf);
+	if (mp) {
+		send(mp, nf, 0, NULL, convert, NULL);
+	} else {
+		if (size >= 0)
+			while (--size >= 0 && (t = getc(fp)) != EOF)
+				putc(t, nf);
+		else
+			while ((t = getc(fp)) != EOF)
+				putc(t, nf);
+	}
 	fflush(nf);
 	if (fstat(fileno(nf), &statb) < 0)
 		modtime = 0;

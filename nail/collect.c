@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.32 (gritter) 10/30/04";
+static char sccsid[] = "@(#)collect.c	2.33 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -974,7 +974,7 @@ static void
 mesedit(int c, struct header *hp)
 {
 	sighandler_type sigint = safe_signal(SIGINT, SIG_IGN);
-	FILE *nf = run_editor(collf, (off_t)-1, c, 0, NULL, hp);
+	FILE *nf = run_editor(collf, (off_t)-1, c, 0, hp, NULL, CONV_NONE);
 
 	if (nf != NULL) {
 		if (hp) {

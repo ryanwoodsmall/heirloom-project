@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.137 (gritter) 10/31/04
+ *	Sccsid @(#)extern.h	2.138 (gritter) 10/31/04
  */
 
 /* aux.c */
@@ -214,7 +214,7 @@ void dot_unlock(const char *fname);
 int editor(void *v);
 int visual(void *v);
 FILE *run_editor(FILE *fp, off_t size, int type, int readonly,
-		char *fromline, struct header *hp);
+		struct header *hp, struct message *mp, enum conversion convert);
 /* fio.c */
 void setptr(FILE *ibuf, off_t offset);
 int putline(FILE *obuf, char *linebuf, size_t count);

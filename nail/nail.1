@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.263 (gritter) 10/31/04
+.\"     Sccsid: @(#)nail.1	2.264 (gritter) 10/31/04
 .\"
 .TH NAIL 1 "10/31/04" "nail 11.14" "User Commands"
 .SH NAME
@@ -993,8 +993,10 @@ command.
 (e) Takes a list of messages
 and points the text editor
 at each one in turn.
-On return from the editor,
-the message is read back in.
+Modified contents are discarded
+unless the
+.I writebackedited
+variable is set.
 .TP
 .B else
 Marks the end of the then-part
@@ -1765,6 +1767,10 @@ and if the message content has been altered.
 .B visual
 (v) Takes a message list and invokes the display editor
 on each message.
+Modified contents are discarded
+unless the
+.I writebackedited
+variable is set.
 .TP
 .B write
 (w) For conventional messages,
@@ -2461,6 +2467,19 @@ prints all data that is sent to remote servers in clear texts,
 including passwords,
 so care should be taken that no unauthorized option
 can view the screen if this option is enabled.
+.TP
+.B writebackedited
+If this variable is set,
+messages modified using the
+.I edit
+or
+.I visual
+commands are written back to the current folder when it is quit.
+This is only possible for writable folders in
+.I mbox
+format.
+Setting this variable also disables
+MIME decoding and decryption for the editing commands.
 .SS "String Options"
 .PP
 The string options include the following:
