@@ -9,6 +9,8 @@ Release ...
 * Made it work for Big5 locales (Patches by Matthew Fischer).
 * Fixed a problem with the 'r' command in EUC-JP and Big5 locales (Bugreport
   by Matthew Fischer).
+* The insertion of multicolumn characters now works with terminals that have
+  the 'ic' but no 'im' termcap capability (Bugreport by Matthew Fischer).
 
 Release 1/19/05
 * The last release erroneously made 'X' work like 'x' in visual mode. It now
