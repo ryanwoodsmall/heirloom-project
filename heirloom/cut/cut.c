@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cut.sl	1.18 (gritter) 2/1/05";
+static const char sccsid[] USED = "@(#)cut.sl	1.19 (gritter) 2/4/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -282,7 +282,7 @@ cutf(struct iblok *ip)
 			n = 1;
 		}
 		if (cp == NULL || wc == '\n' || wc == wcdelim) {
-			if (have(i) && (gotcha || wc == wcdelim) ||
+			if (have(i) && (!sflag || gotcha || wc == wcdelim) ||
 					(!sflag && i == 1 &&
 						(cp == NULL || wc == '\n'))) {
 				if (gotcha)
