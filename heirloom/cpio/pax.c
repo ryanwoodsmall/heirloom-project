@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pax_su3.sl	1.21 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pax_su3.sl	1.22 (gritter) 2/6/05";
 #else
-static const char sccsid[] USED = "@(#)pax.sl	1.21 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.22 (gritter) 2/6/05";
 #endif
 
 #include <sys/types.h>
@@ -403,11 +403,14 @@ ofiles_pax(char **name, size_t *namsiz)
 								curdev[i] &&
 								st.st_ino ==
 								curino[i]) {
-							    msg(4, 1,
+							    if (pax ==
+							      PAX_TYPE_PAX2001)
+							     msg(4, 1,
 								"Symbolic link "
 								"loop at "
 								"\"%s\"\n",
 								path);
+							    break;
 							}
 						if (i <= dti)
 							break;

@@ -18,7 +18,7 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.28 (gritter) 2/6/05
+.\" Sccsid @(#)pax.1	1.29 (gritter) 2/6/05
 .TH PAX 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
@@ -256,6 +256,9 @@ Follow symbolic links when reading files with
 .I \-w
 or
 .IR \-rw .
+.B /usr/posix2001/bin/pax
+terminates immediately when it
+detects a symbolic link loop with this option,
 .TP
 .B \-n
 If any

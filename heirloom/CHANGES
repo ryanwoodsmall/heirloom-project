@@ -15,8 +15,6 @@ Release ...
   POSIX.1-2001 version. The SVID personalities also do no longer require it.
 * pax: The -H option from POSIX.1-2001 has been added; pax does not follow
   symbolic links on the command line anymore unless this option is present.
-  If pax detects a symbolic link loop, it now terminates for alignment with
-  POSIX.1-2001.
 * tr: The -C option from POSIX.1-2001 has been added.
 * dd: With 'conv=unblock', the last block was not converted.
 * grep: The content of a file that consisted only of a single byte other than
