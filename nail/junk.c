@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.21 (gritter) 10/1/04";
+static char sccsid[] = "@(#)junk.c	1.22 (gritter) 10/1/04";
 #endif
 #endif /* not lint */
 
@@ -397,7 +397,9 @@ loop:	i = 0;
 				goto brk;
 			}
 			SAVE(c)
-		} else if (constituent(c, *buf, i+j, sp->price)) {
+		} else if (constituent(c, *buf, i+j, sp->price) ||
+				sp->inbody == 0 && c == '.' &&
+				asccasecmp(sp->field, "subject*")) {
 			SAVE(c)
 		} else if (i > 0 && c == ':' && *count > 2) {
 			if ((c = getc(fp)) != '/') {
@@ -458,9 +460,14 @@ loop:	i = 0;
 		if (sp->inbody == 0 &&
 				(asccasecmp(sp->field, "message-id*") == 0 ||
 				 asccasecmp(sp->field, "references*") == 0 ||
+				 asccasecmp(sp->field, "in-reply-to*") == 0 ||
 				 asccasecmp(sp->field, "date*") == 0 ||
+				 asccasecmp(sp->field, "delivery-date*") == 0 ||
+				 ascncasecmp(sp->field, "x-spam", 6) == 0 ||
+				 ascncasecmp(sp->field, "x-scanned", 9) == 0 ||
 				 asccasecmp(sp->field, "received*") == 0 &&
-				 	2*c > i))
+				 	((2*c > i) || i < 4 ||
+					asccasestr(*buf, "localhost") != NULL)))
 			goto loop;
 		return *buf;
 	}
