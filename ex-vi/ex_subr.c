@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_subr.c	1.33 (gritter) 1/12/05";
+static char sccsid[] = "@(#)ex_subr.c	1.34 (gritter) 1/13/05";
 #endif
 #endif
 
@@ -636,7 +636,11 @@ qcolumn(register char *lim, register char *gp)
 	Outchar = qcount;
 	vcntcol = 0;
 	if (lim != NULL) {
-		n = skipright(linebuf, lim);
+		if (lim < linebuf) {
+			lim = linebuf;
+			n = 0;
+		} else
+			n = skipright(linebuf, lim);
 		x = lim[n], lim[n] = 0;
 	}
 	pline(0);

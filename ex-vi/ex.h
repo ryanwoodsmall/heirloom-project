@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	@(#)ex.h	1.48 (gritter) 12/2/04
+ *	@(#)ex.h	1.49 (gritter) 1/13/05
  */
 
 /*
@@ -552,7 +552,8 @@ var	int	mb_cur_max;
 #define	colsc(c)	(mb_cur_max > 1 && ((c)&0177) != (c) ? wcwidth(c) : 1)
 #define	skipleft(l, p)	(mb_cur_max > 1 && ((p)[0]&0200 || \
 				(p)>(l) && (p)[-1]&0200) ? wskipleft(l, p) : -1)
-#define	skipright(l, p)	(mb_cur_max > 1 && (p)[0]&0200 ? wskipright(l, p) : 1)
+#define	skipright(l, p)	(mb_cur_max > 1 && (p)>=(l) && (p)[0]&0200 ? \
+				wskipright(l, p) : 1)
 #define	samechar(cp, c)	(mb_cur_max > 1 && *(cp)&0200 ? wsamechar(cp, c) : \
 				(*(cp)&0377) == c)
 #define	xisdigit(c)	(mb_cur_max > 1 ? iswdigit(c) : isdigit(c))

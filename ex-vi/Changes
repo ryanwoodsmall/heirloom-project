@@ -27,6 +27,8 @@ Release ...
   length of the converted multibyte sequence is smaller than the original one.
 * Multibyte sequences that correspond to an unprintable character are now
   printed as multiple octal escape sequences.
+* Pressing the ^U (kill) character in insert mode sometimes positioned the
+  cursor at weird locations since the last revision (P).
 * Fixed an old vi bug: If a vi command that yanked or deleted part of a line
   was followed by an ex command that also yanked or deleted some text, a
   following 'p' vi command pasted the text affected by the former vi command.
