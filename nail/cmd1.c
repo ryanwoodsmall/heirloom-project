@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.79 (gritter) 10/2/04";
+static char sccsid[] = "@(#)cmd1.c	2.80 (gritter) 10/30/04";
 #endif
 #endif /* not lint */
 
@@ -62,6 +62,7 @@ static char sccsid[] = "@(#)cmd1.c	2.79 (gritter) 10/2/04";
 static int screen;
 static void onpipe(int signo);
 static int dispc(struct message *mp, const char *a);
+static int scroll1(char *arg, int onlynew);
 static void hprf(const char *fmt, int mesg, FILE *f, int threaded,
 		const char *attrlist);
 static int type1(int *msgvec, int doign, int page, int pipe, char *cmd,
@@ -84,12 +85,12 @@ int
 headers(void *v)
 {
 	int *msgvec = v;
-	int g, k, n, mesg, flag = 0;
-	struct message *mp, *mq;
+	int g, k, n, mesg, flag = 0, lastg = 1;
+	struct message *mp, *mq, *lastmq = NULL;
 	int size;
 
 	size = screensize();
-	n = msgvec[0];	/* n == 0: called from scroll() */
+	n = msgvec[0];	/* n == {-2, -1, 0}: called from scroll() */
 	if (screen < 0)
 		screen = 0;
 	k = screen * size;
@@ -104,10 +105,21 @@ headers(void *v)
 			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0) {
 				if (g % size == 0)
 					mq = mp;
-				if (n ? mp == &message[n-1] : g == k)
+				if (n==-2 && mp->m_flag&MNEW && g<k+size) {
+					lastg = g;
+					lastmq = mq;
+				}
+				if (n>0 && mp==&message[n-1] ||
+						n==0 && g==k ||
+						n==-2 && g==k+size && lastmq ||
+						n<0 && g>=k && mp->m_flag&MNEW)
 					break;
 				g++;
 			}
+		if (n==-2 && lastmq) {
+			g = lastg;
+			mq = lastmq;
+		}
 		screen = g / size;
 		mp = mq;
 		mesg = mp - &message[0];
@@ -137,10 +149,21 @@ headers(void *v)
 					 mp == &message[n-1])) {
 				if (g % size == 0)
 					mq = mp;
-				if (n ? mp == &message[n-1] : g == k)
+				if (n==-2 && mp->m_flag&MNEW && g<k+size) {
+					lastg = g;
+					lastmq = mq;
+				}
+				if (n>0 && mp==&message[n-1] ||
+						n==0 && g==k ||
+						n==-2 && g==k+size && lastmq ||
+						n<0 && g>=k && mp->m_flag&MNEW)
 					break;
 				g++;
 			}
+		if (n==-2 && lastmq) {
+			g = lastg;
+			mq = lastmq;
+		}
 		screen = g / size;
 		mp = mq;
 		if (dot != &message[n-1]) {
@@ -173,14 +196,25 @@ headers(void *v)
 /*
  * Scroll to the next/previous screen
  */
-int 
+int
 scroll(void *v)
 {
-	char *arg = v;
+	return scroll1(v, 0);
+}
+
+int
+Scroll(void *v)
+{
+	return scroll1(v, 1);
+}
+
+static int
+scroll1(char *arg, int onlynew)
+{
 	int size;
 	int cur[1];
 
-	cur[0] = 0;
+	cur[0] = onlynew ? -1 : 0;
 	size = screensize();
 	switch (*arg) {
 	case '1': case '2': case '3': case '4': case '5':
@@ -216,6 +250,8 @@ scroll_forward:
 			printf(catgets(catd, CATSET, 8,
 					"On first screenful of messages\n"));
 		}
+		if (cur[0] == -1)
+			cur[0] = -2;
 		break;
 
 	default:

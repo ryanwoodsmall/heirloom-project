@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.134 (gritter) 10/24/04
+ *	Sccsid @(#)extern.h	2.135 (gritter) 10/30/04
  */
 
 /* aux.c */
@@ -111,6 +111,7 @@ enum okay cache_dequeue(struct mailbox *mp);
 char *get_pager(void);
 int headers(void *v);
 int scroll(void *v);
+int Scroll(void *v);
 int screensize(void);
 int from(void *v);
 void printhead(int mesg, FILE *f, int threaded);
