@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.52 (gritter) 2/20/05";
+static char sccsid[] = "@(#)ex_re.c	1.53 (gritter) 2/20/05";
 #endif
 #endif
 
@@ -744,7 +744,7 @@ dosub(void)
 		}
 #ifdef	MB
 		if (mb_cur_max > 1) {
-			char	mb[MB_CUR_MAX+1];
+			char	mb[MB_LEN_MAX+1];
 			int	i, m;
 			if (casecnt)
 				c = fixcase(c & TRIM);
