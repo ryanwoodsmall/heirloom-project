@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.82 (gritter) 10/30/04";
+static char sccsid[] = "@(#)cmd1.c	2.83 (gritter) 10/31/04";
 #endif
 #endif /* not lint */
 
@@ -65,8 +65,8 @@ static int dispc(struct message *mp, const char *a);
 static int scroll1(char *arg, int onlynew);
 static void hprf(const char *fmt, int mesg, FILE *f, int threaded,
 		const char *attrlist);
-static int type1(int *msgvec, int doign, int page, int pipe, char *cmd,
-		off_t *tstats);
+static int type1(int *msgvec, int doign, int page, int pipe, int decode,
+		char *cmd, off_t *tstats);
 static int pipe1(char *str, int doign);
 static void brokpipe(int signo);
 
@@ -684,7 +684,8 @@ pcmdlist(void *v)
 static sigjmp_buf	pipestop;
 
 static int
-type1(int *msgvec, int doign, int page, int pipe, char *cmd, off_t *tstats)
+type1(int *msgvec, int doign, int page, int pipe, int decode,
+		char *cmd, off_t *tstats)
 {
 	int *ip;
 	struct message *mp;
@@ -748,7 +749,7 @@ type1(int *msgvec, int doign, int page, int pipe, char *cmd, off_t *tstats)
 			fprintf(obuf, catgets(catd, CATSET, 17,
 				"Message %2d:\n"), *ip);
 		send(mp, obuf, doign ? ignore : 0, NULL,
-				    pipe && value("piperaw") ?
+				    decode || pipe && value("piperaw") ?
 				    	CONV_NONE : CONV_TODISP,
 				    mstats);
 		if (pipe && value("page")) {
@@ -876,7 +877,7 @@ pipe1(char *str, int doign)
 	}
 	printf(catgets(catd, CATSET, 268, "Pipe to: \"%s\"\n"), cmd);
 	stats[0] = stats[1] = 0;
-	if ((ret = type1(msgvec, doign, 0, 1, cmd, stats)) == 0) {
+	if ((ret = type1(msgvec, doign, 0, 1, 0, cmd, stats)) == 0) {
 		printf("\"%s\" ", cmd);
 		if (stats[0] >= 0)
 			printf("%lu", (long)stats[0]);
@@ -894,7 +895,7 @@ int
 more(void *v)
 {
 	int *msgvec = v;
-	return (type1(msgvec, 1, 1, 0, NULL, NULL));
+	return (type1(msgvec, 1, 1, 0, 0, NULL, NULL));
 }
 
 /*
@@ -905,7 +906,7 @@ More(void *v)
 {
 	int *msgvec = v;
 
-	return (type1(msgvec, 0, 1, 0, NULL, NULL));
+	return (type1(msgvec, 0, 1, 0, 0, NULL, NULL));
 }
 
 /*
@@ -916,7 +917,7 @@ type(void *v)
 {
 	int *msgvec = v;
 
-	return(type1(msgvec, 1, 0, 0, NULL, NULL));
+	return(type1(msgvec, 1, 0, 0, 0, NULL, NULL));
 }
 
 /*
@@ -927,7 +928,18 @@ Type(void *v)
 {
 	int *msgvec = v;
 
-	return(type1(msgvec, 0, 0, 0, NULL, NULL));
+	return(type1(msgvec, 0, 0, 0, 0, NULL, NULL));
+}
+
+/*
+ * Show MIME-encoded message text, including all fields.
+ */
+int
+show(void *v)
+{
+	int *msgvec = v;
+
+	return(type1(msgvec, 0, 0, 0, 1, NULL, NULL));
 }
 
 /*

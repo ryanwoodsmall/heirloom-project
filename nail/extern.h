@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.136 (gritter) 10/30/04
+ *	Sccsid @(#)extern.h	2.137 (gritter) 10/31/04
  */
 
 /* aux.c */
@@ -122,6 +122,7 @@ int more(void *v);
 int More(void *v);
 int type(void *v);
 int Type(void *v);
+int show(void *v);
 int pipecmd(void *v);
 int Pipecmd(void *v);
 int top(void *v);

@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.262 (gritter) 10/30/04
+.\"     Sccsid: @(#)nail.1	2.263 (gritter) 10/31/04
 .\"
-.TH NAIL 1 "10/30/04" "nail 11.14" "User Commands"
+.TH NAIL 1 "10/31/04" "nail 11.14" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -1557,6 +1557,12 @@ as described for the
 command.
 With no arguments,
 a list of defined shortcuts is printed.
+.TP
+.B show
+(Sh) Like
+.IR print ,
+but performs neither MIME decoding nor decryption
+so that the raw message text is shown.
 .TP
 .B size
 Takes a message list and prints out
