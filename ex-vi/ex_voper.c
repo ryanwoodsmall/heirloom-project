@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_voper.c	1.23 (gritter) 12/1/04";
+static char sccsid[] = "@(#)ex_voper.c	1.24 (gritter) 1/11/05";
 #endif
 #endif
 
@@ -830,7 +830,7 @@ find(int c)
 int 
 word(register void (*op)(int), int cnt)
 {
-	register int which = 0;
+	register int which = 0, i;
 	register char *iwc;
 	register line *iwdot = wdot;
 
@@ -839,9 +839,9 @@ word(register void (*op)(int), int cnt)
 		which = wordch(wcursor);
 		while (wordof(which, wcursor)) {
 			if (cnt == 1 && op != vmove &&
-					wcursor[skipright(linebuf, wcursor)]
+					wcursor[i = skipright(linebuf, wcursor)]
 					== 0) {
-				wcursor++;
+				wcursor += i;
 				break;
 			}
 			if (!lnext())

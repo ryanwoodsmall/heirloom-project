@@ -6,6 +6,9 @@ Release ...
   screen representation was sometimes not updated accordingly.
 * Undoing the replacement of a multicolumn character by a singlecolumn
   character twice made the singlecolumn character invisible.
+* The 'cw' visual command with a multibyte character as last character of
+  the affected word located at the end of the line left garbage bytes past
+  the end of the new text.
 * Visual 'U' followed by 'u' lead to garbage on the screen when multibyte
   characters were present on the changed line.
 * The '\u', '\l', '\U', and '\L' substitution sequences work with multibyte
