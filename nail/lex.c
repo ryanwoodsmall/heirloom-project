@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.78 (gritter) 11/6/04";
+static char sccsid[] = "@(#)lex.c	2.79 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -670,8 +670,10 @@ static int	inithdr;		/* am printing startup headers */
 void 
 onintr(int s)
 {
-	if (handlerstacktop != NULL)
-		return handlerstacktop(s);
+	if (handlerstacktop != NULL) {
+		handlerstacktop(s);
+		return;
+	}
 	safe_signal(SIGINT, onintr);
 	noreset = 0;
 	if (!inithdr)
