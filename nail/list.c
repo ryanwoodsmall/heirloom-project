@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.51 (gritter) 10/2/04";
+static char sccsid[] = "@(#)list.c	2.53 (gritter) 10/24/04";
 #endif
 #endif /* not lint */
 
@@ -678,8 +678,12 @@ getrawlist(const char *line, size_t linesize, char **argv, int argc,
 				if (echolist)
 					*cp2++ = c;
 				quotec = c;
-			}
-			else if (blankchar(c & 0377))
+			} else if (c == '\\' && !echolist) {
+				if (*cp)
+					*cp2++ = *cp++;
+				else
+					*cp2++ = c;
+			} else if (blankchar(c & 0377))
 				break;
 			else
 				*cp2++ = c;
@@ -858,6 +862,8 @@ scan(char **sp)
 		c = *cp++;
 	}
 	while (c != '\0') {
+		if (quotec == 0 && c == '\\' && *cp)
+			c = *cp++;
 		if (c == quotec) {
 			cp++;
 			break;
