@@ -30,6 +30,8 @@ Release ...
   was printed after the last line of regular output.
 * paste: If an inaccessible file is given with the -s option, the utility no
   longer exits but continues with the next file.
+* od: When reading from standard input with the -N option, the file pointer
+  is now left after the last byte read.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.21 (gritter) 1/9/05";
+static const char sccsid[] USED = "@(#)od.sl	1.22 (gritter) 2/1/05";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -229,9 +229,11 @@ nextfile(void)
 	do {
 		if (files == NULL || files[0] == NULL)
 			return NULL;
-		if (files[0][0] == '-' && files[0][1] == '\0')
+		if (files[0][0] == '-' && files[0][1] == '\0') {
 			fp = stdin;
-		else {
+			if (limit >= 0)
+				setvbuf(stdin, NULL, _IONBF, 0);
+		} else {
 			if ((fp = fopen(files[0], "r")) == NULL) {
 				fprintf(stderr, "%s: cannot open %s\n",
 						progname, files[0]);
@@ -671,6 +673,8 @@ setfiles(char **av)
 	else {
 		curfile = stdin;
 		hadinput = 1;
+		if (limit >= 0)
+			setvbuf(stdin, NULL, _IONBF, 0);
 	}
 }
 
