@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.72 (gritter) 12/2/04";
+static char sccsid[] = "@(#)sendout.c	2.73 (gritter) 1/3/05";
 #endif
 #endif /* not lint */
 
@@ -64,6 +64,7 @@ static struct name *fixhead(struct header *hp, struct name *tolist,
 		enum gfield addauto);
 static int put_signature(FILE *fo, int convert);
 static int attach_file(struct attachment *ap, FILE *fo, int dosign);
+static int attach_message(struct attachment *ap, FILE *fo, int dosign);
 static int make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
 		const char *contenttype, const char *charset, int dosign);
 static FILE *infix(struct header *hp, FILE *fi, int dosign);
@@ -287,6 +288,24 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 }
 
 /*
+ * Attach a message to the file buffer.
+ */
+static int
+attach_message(struct attachment *ap, FILE *fo, int dosign)
+{
+	struct message	*mp;
+
+	fprintf(fo, "\n--%s\n"
+		    "Content-Type: message/rfc822\n"
+		    "Content-Disposition: inline\n\n", send_boundary);
+	mp = &message[ap->a_msgno - 1];
+	touch(mp);
+	if (send(mp, fo, 0, NULL, SEND_RFC822, NULL) < 0)
+		return -1;
+	return 0;
+}
+
+/*
  * Generate the body of a MIME multipart message.
  */
 static int
@@ -337,9 +356,15 @@ make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
 		if (charset != NULL)
 			put_signature(fo, convert);
 	}
-	for (att = hp->h_attach; att != NULL; att = att->a_flink)
-		if (attach_file(att, fo, dosign) != 0)
-			return -1;
+	for (att = hp->h_attach; att != NULL; att = att->a_flink) {
+		if (att->a_msgno) {
+			if (attach_message(att, fo, dosign) != 0)
+				return -1;
+		} else {
+			if (attach_file(att, fo, dosign) != 0)
+				return -1;
+		}
+	}
 	/* the final boundary with two attached dashes */
 	fprintf(fo, "\n--%s--\n", send_boundary);
 	return 0;

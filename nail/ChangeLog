@@ -1,4 +1,7 @@
 [11.20] released ...
+* A 'forward-as-attachment' variable has been introduced. If it is set,
+  the 'forward' command uses a MIME 'message/rfc822' attachment for the
+  original message instead of including it in the newly created text.
 * Resolved a symbol conflict with SVR4 systems like Solaris that lead to
   failed builds because of a redeclaration of 'enum idtype'.
 

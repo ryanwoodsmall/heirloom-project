@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.76 (gritter) 12/3/04";
+static char sccsid[] = "@(#)cmd3.c	2.77 (gritter) 1/3/05";
 #endif
 #endif /* not lint */
 
@@ -401,7 +401,9 @@ forward1(char *str, int recipient_record)
 	char	*recipient;
 	struct message	*mp;
 	struct header	head;
+	int	forward_as_attachment;
 
+	forward_as_attachment = value("forward-as-attachment") != NULL;
 	msgvec = salloc((msgCount + 2) * sizeof *msgvec);
 	if ((recipient = laststring(str, &f, 0)) == NULL) {
 		puts(catgets(catd, CATSET, 47, "No recipient specified."));
@@ -429,17 +431,23 @@ forward1(char *str, int recipient_record)
 		printf("Cannot forward multiple messages at once\n");
 		return 1;
 	}
-	mp = &message[*msgvec - 1];
-	touch(mp);
-	setdot(mp);
 	memset(&head, 0, sizeof head);
 	if ((head.h_to = sextract(recipient,
 			GTO | (value("fullnames") ? GFULL : GSKIN))) == NULL)
 		return 1;
+	mp = &message[*msgvec - 1];
+	if (forward_as_attachment) {
+		head.h_attach = csalloc(1, sizeof *head.h_attach);
+		head.h_attach->a_msgno = *msgvec;
+	} else {
+		touch(mp);
+		setdot(mp);
+	}
 	if ((head.h_subject = hfield("subject", mp)) == NULL)
 		head.h_subject = hfield("subj", mp);
 	head.h_subject = fwdedit(head.h_subject);
-	mail1(&head, 1, mp, NULL, recipient_record, 1, 0);
+	mail1(&head, 1, forward_as_attachment ? NULL : mp,
+			NULL, recipient_record, 1, 0);
 	return 0;
 }
 

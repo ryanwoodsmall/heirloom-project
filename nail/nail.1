@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.288 (gritter) 1/2/05
+.\"     Sccsid: @(#)nail.1	2.289 (gritter) 1/3/05
 .\"
-.TH NAIL 1 "1/2/05" "nail 11.20" "User Commands"
+.TH NAIL 1 "1/3/05" "nail 11.20" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -2287,6 +2287,17 @@ with the
 .I respond
 commands and vice-versa.
 .TP
+.B forward-as-attachment
+Original messages are normally sent as inline text with the
+.I forward
+command,
+and only the first part of a multipart message is included.
+With this option,
+messages are sent as MIME
+.I message/rfc822
+attachments,
+and all of their parts are included.
+.TP
 .B fullnames
 When replying to a message,
 \fInail\fR normally removes the comment parts of email addresses,
@@ -2773,7 +2784,10 @@ to get correct Message-ID header fields.
 The string to print before the text of a message
 with the
 .I forward
-command.
+command
+(unless the
+.I forward-as-attachment
+variable is set).
 Defaults to ``-------- Original Message --------'' if unset.
 If it is set to the empty string,
 no heading is printed.

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.78 (gritter) 12/26/04";
+static char sccsid[] = "@(#)send.c	2.79 (gritter) 1/3/05";
 #endif
 #endif /* not lint */
 
@@ -147,19 +147,23 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 	count = mp->m_size;
 	sz = 0;
 	if (mp->m_flag & MNOFROM) {
-		if (doign != allignore && doign != fwdignore)
+		if (doign != allignore && doign != fwdignore &&
+				action != SEND_RFC822)
 			sz = fprintf(obuf, "%sFrom %s %s\n",
 					prefix ? prefix : "",
 					fakefrom(mp), fakedate(mp->m_time));
 	} else {
-		if (prefix && doign != allignore && doign != fwdignore) {
+		if (prefix && doign != allignore && doign != fwdignore &&
+				action != SEND_RFC822) {
 			fputs(prefix, obuf);
 			sz += strlen(prefix);
 		}
 		while (count && (c = getc(ibuf)) != EOF) {
-			if (doign != allignore && doign != fwdignore)
+			if (doign != allignore && doign != fwdignore &&
+					action != SEND_RFC822) {
 				putc(c, obuf);
-			sz++;
+				sz++;
+			}
 			count--;
 			if (c == '\n')
 				break;
@@ -168,7 +172,7 @@ send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 	if (sz)
 		addstats(stats, 1, sz);
 	pf = 0;
-	if (action != SEND_MBOX && action != SEND_SHOW)
+	if (action != SEND_MBOX && action != SEND_RFC822 && action != SEND_SHOW)
 		pf |= PARSE_DECRYPT|PARSE_PARTS;
 	if ((ip = parsemsg(mp, pf)) == NULL)
 		return -1;
@@ -204,7 +208,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	(void)&stats;
 	(void)&action;
 	if (ip->m_mimecontent == MIME_PKCS7 && ip->m_multipart &&
-			action != SEND_MBOX && action != SEND_SHOW)
+			action != SEND_MBOX && action != SEND_RFC822 &&
+			action != SEND_SHOW)
 		goto skip;
 	dostat = 0;
 	if (level == 0) {
@@ -391,6 +396,7 @@ skip:	switch (ip->m_mimecontent) {
 			put_from_(obuf, ip->m_multipart);
 			/*FALLTHRU*/
 		case SEND_MBOX:
+		case SEND_RFC822:
 		case SEND_SHOW:
 			break;
 		}
@@ -417,8 +423,8 @@ skip:	switch (ip->m_mimecontent) {
 			return rt;
 		break;
 	case MIME_PKCS7:
-		if (action != SEND_MBOX && action != SEND_SHOW &&
-				ip->m_multipart)
+		if (action != SEND_MBOX && action != SEND_RFC822 &&
+				action != SEND_SHOW && ip->m_multipart)
 			goto multi;
 		/*FALLTHRU*/
 	default:
@@ -444,6 +450,7 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_TOSRCH:
 		case SEND_DECRYPT:
 		case SEND_MBOX:
+		case SEND_RFC822:
 		case SEND_SHOW:
 			break;
 		}
@@ -517,6 +524,7 @@ skip:	switch (ip->m_mimecontent) {
 					putc('\0', obuf);
 					/*FALLTHRU*/
 				case SEND_MBOX:
+				case SEND_RFC822:
 				case SEND_SHOW:
 				case SEND_TOSRCH:
 				case SEND_QUOTE:
@@ -541,6 +549,7 @@ skip:	switch (ip->m_mimecontent) {
 			}
 			return rt;
 		case SEND_MBOX:
+		case SEND_RFC822:
 		case SEND_SHOW:
 			break;
 		}
@@ -577,7 +586,7 @@ skip:	switch (ip->m_mimecontent) {
 		convert = CONV_NONE;
 	}
 	if (action == SEND_DECRYPT || action == SEND_MBOX ||
-			action == SEND_SHOW)
+			action == SEND_RFC822 || action == SEND_SHOW)
 		convert = CONV_NONE;
 	tcs = gettcharset();
 #ifdef	HAVE_ICONV

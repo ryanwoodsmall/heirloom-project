@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.93 (gritter) 12/25/04
+ *	Sccsid @(#)def.h	2.94 (gritter) 1/3/05
  */
 
 /*
@@ -107,6 +107,7 @@ enum conversion {
 
 enum sendaction {
 	SEND_MBOX,			/* no conversion to perform */
+	SEND_RFC822,			/* no conversion, no From_ line */
 	SEND_TODISP,			/* convert to displayable form */
 	SEND_TODISP_ALL,		/* same, include all MIME parts */
 	SEND_SHOW,			/* convert to 'show' command form */
@@ -443,6 +444,7 @@ struct attachment {
 	char	*a_content_disposition;	/* content disposition */
 	char	*a_content_id;		/* content id */
 	char	*a_content_description;	/* content description */
+	int	a_msgno;		/* message number */
 };
 
 /*

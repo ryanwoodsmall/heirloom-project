@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.42 (gritter) 12/25/04";
+static char sccsid[] = "@(#)collect.c	2.43 (gritter) 1/3/05";
 #endif
 #endif /* not lint */
 
@@ -194,9 +194,15 @@ print_collf(FILE *collf, struct header *hp)
 		prout(lbuf, linelen, obuf);
 	if (hp->h_attach != NULL) {
 		fputs(catgets(catd, CATSET, 63, "Attachments:"), obuf);
-		for (ap = hp->h_attach; ap != NULL; ap = ap->a_flink)
-			fprintf(obuf, " %s", ap->a_name);
-		fputs("\n", obuf);
+		for (ap = hp->h_attach; ap != NULL; ap = ap->a_flink) {
+			if (ap->a_msgno)
+				fprintf(obuf, " message %u", ap->a_msgno);
+			else
+				fprintf(obuf, " %s", ap->a_name);
+			if (ap->a_flink)
+				putc(',', obuf);
+		}
+		putc('\n', obuf);
 	}
 endpipe:
 	if (obuf != stdout) {
@@ -253,14 +259,11 @@ read_attachment_data(struct attachment *ap, unsigned number)
 {
 	char prefix[80];
 
-	if (ap == NULL) {
-		/*LINTED*/
-		ap = (struct attachment *)salloc(sizeof *ap);
-		ap->a_name = NULL;
-		ap->a_content_type = NULL;
-		ap->a_content_disposition = NULL;
-		ap->a_content_id = NULL;
-		ap->a_content_description = NULL;
+	if (ap == NULL)
+		ap = csalloc(1, sizeof *ap);
+	if (ap->a_msgno) {
+		printf("#%u\tmessage %u\n", number, ap->a_msgno);
+		return ap;
 	}
 	snprintf(prefix, sizeof prefix, catgets(catd, CATSET, 50,
 			"#%u\tfilename: "), number);
@@ -346,13 +349,8 @@ add_attachment(struct attachment *attach, const char *file)
 	if (access(file, R_OK) != 0)
 		return NULL;
 	/*LINTED*/
-	nap = (struct attachment *)salloc(sizeof *nap);
-	nap->a_flink = NULL;
+	nap = csalloc(1, sizeof *nap);
 	nap->a_name = salloc(strlen(file) + 1);
-	nap->a_content_type = NULL;
-	nap->a_content_disposition = NULL;
-	nap->a_content_id = NULL;
-	nap->a_content_description = NULL;
 	strcpy(nap->a_name, file);
 	if (attach != NULL) {
 		for (ap = attach; ap->a_flink != NULL; ap = ap->a_flink);
