@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)cpio.1	1.86 (gritter) 3/1/05
-.TH CPIO 1 "3/1/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)cpio.1	1.87 (gritter) 3/14/05
+.TH CPIO 1 "3/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cpio \- copy file archives in and out
 .SH SYNOPSIS
@@ -751,11 +751,13 @@ archive containing all files below the directory
 to the file
 .IR \%project.tar.gz ,
 excluding all directories named
+.I CVS
+or
 .I SCCS
 and their contents:
 .RS 2
 .sp
-find project \-depth \-print | egrep \-v '/SCCS(/|$)' |
+find project \-depth \-print | egrep \-v '/(CVS|SCCS)(/|$)' |
 .br
       cpio \-o \-H ustar | gzip \-c > project.tar.gz
 .RE
