@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.139 (gritter) 11/1/04
+ *	Sccsid @(#)extern.h	2.140 (gritter) 11/3/04
  */
 
 /* aux.c */
@@ -214,7 +214,7 @@ void dot_unlock(const char *fname);
 int editor(void *v);
 int visual(void *v);
 FILE *run_editor(FILE *fp, off_t size, int type, int readonly,
-		struct header *hp, struct message *mp, enum action action);
+		struct header *hp, struct message *mp, enum sendaction action);
 /* fio.c */
 void setptr(FILE *ibuf, off_t offset);
 int putline(FILE *obuf, char *linebuf, size_t count);
@@ -433,7 +433,7 @@ char *foldergets(char **s, size_t *size, size_t *count, size_t *llen,
 		FILE *stream);
 #define	send(a, b, c, d, e, f)	xsend(a, b, c, d, e, f)
 int send(struct message *mp, FILE *obuf, struct ignoretab *doign,
-		char *prefix, enum action action, off_t *stats);
+		char *prefix, enum sendaction action, off_t *stats);
 /* sendout.c */
 char *makeboundary(void);
 int mail(struct name *to, struct name *cc, struct name *bcc,
@@ -445,7 +445,7 @@ enum okay mail1(struct header *hp, int printheaders, struct message *quote,
 		char *quotefile, int recipient_record, int tflag);
 int mkdate(FILE *fo, const char *field);
 int puthead(struct header *hp, FILE *fo, enum gfield w,
-		enum action action, enum conversion convert,
+		enum sendaction action, enum conversion convert,
 		char *contenttype, char *charset);
 int forward_msg(struct message *mp, struct name *to, int add_resent);
 /* smtp.c */

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.35 (gritter) 11/1/04";
+static char sccsid[] = "@(#)collect.c	2.36 (gritter) 11/3/04";
 #endif
 #endif /* not lint */
 
@@ -189,7 +189,7 @@ print_collf(FILE *collf, struct header *hp)
 	gf = GTO|GSUBJECT|GCC|GBCC|GNL|GREPLYTO;
 	if (value("fullnames"))
 		gf |= GCOMMA;
-	puthead(hp, obuf, gf, ACT_TODISP, CONV_NONE, NULL, NULL);
+	puthead(hp, obuf, gf, SEND_TODISP, CONV_NONE, NULL, NULL);
 	while (fgetline(&lbuf, &linesize, &count, &linelen, collf, 1)) {
 		makeprint(lbuf, linelen);
 		fwrite(lbuf, sizeof *lbuf, linelen, obuf);
@@ -415,7 +415,7 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	int getfields;
 	sigset_t oset, nset;
 	long count;
-	enum action	action;
+	enum sendaction	action;
 	const char tildehelp[] =
 "-------------------- ~ ESCAPES ----------------------------\n\
 ~~              Quote a single tilde\n\
@@ -516,7 +516,7 @@ collect(struct header *hp, int printheaders, struct message *mp,
 				t &= ~GNL, getfields |= GCC;
 		}
 		if (printheaders) {
-			puthead(hp, stdout, t, ACT_TODISP, CONV_NONE,
+			puthead(hp, stdout, t, SEND_TODISP, CONV_NONE,
 					NULL, NULL);
 			fflush(stdout);
 		}
@@ -527,14 +527,14 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	 */
 	if (mp != NULL && (quote = value("quote")) != NULL) {
 		quoteig = allignore;
-		action = ACT_QUOTE;
+		action = SEND_QUOTE;
 		if (strcmp(quote, "noheading") == 0) {
 			/*EMPTY*/
 		} else if (strcmp(quote, "headers") == 0) {
 			quoteig = ignore;
 		} else if (strcmp(quote, "allheaders") == 0) {
 			quoteig = NULL;
-			action = ACT_QUOTE_ALL;
+			action = SEND_QUOTE_ALL;
 		} else {
 			cp = hfield("from", mp);
 			if (cp != NULL) {
@@ -978,7 +978,7 @@ static void
 mesedit(int c, struct header *hp)
 {
 	sighandler_type sigint = safe_signal(SIGINT, SIG_IGN);
-	FILE *nf = run_editor(collf, (off_t)-1, c, 0, hp, NULL, ACT_NONE);
+	FILE *nf = run_editor(collf, (off_t)-1, c, 0, hp, NULL, SEND_MBOX);
 
 	if (nf != NULL) {
 		if (hp) {
@@ -1055,7 +1055,7 @@ forward(char *ms, FILE *fp, int f)
 	int *msgvec;
 	struct ignoretab *ig;
 	char *tabst;
-	enum action	action;
+	enum sendaction	action;
 
 	/*LINTED*/
 	msgvec = (int *)salloc((msgCount+1) * sizeof *msgvec);
@@ -1077,7 +1077,7 @@ forward(char *ms, FILE *fp, int f)
 	else if ((tabst = value("indentprefix")) == NULL)
 		tabst = "\t";
 	ig = upperchar(f) ? (struct ignoretab *)NULL : ignore;
-	action = upperchar(f) ? ACT_QUOTE_ALL : ACT_QUOTE;
+	action = upperchar(f) ? SEND_QUOTE_ALL : SEND_QUOTE;
 	printf(catgets(catd, CATSET, 69, "Interpolating:"));
 	for (; *msgvec != 0; msgvec++) {
 		struct message *mp = message + *msgvec - 1;

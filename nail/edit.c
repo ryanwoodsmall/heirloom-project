@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)edit.c	2.19 (gritter) 11/1/04";
+static char sccsid[] = "@(#)edit.c	2.20 (gritter) 11/3/04";
 #endif
 #endif /* not lint */
 
@@ -121,7 +121,7 @@ edit1(int *msgvec, int type)
 		sigint = safe_signal(SIGINT, SIG_IGN);
 		fp = run_editor(fp, mp->m_size, type,
 				(mb.mb_perm & MB_EDIT) == 0 || !wb,
-				NULL, mp, wb ? ACT_NONE : ACT_TODISP_ALL);
+				NULL, mp, wb ? SEND_MBOX : SEND_TODISP_ALL);
 		if (fp != NULL) {
 			fseek(mb.mb_otf, 0L, SEEK_END);
 			size = ftell(mb.mb_otf);
@@ -156,7 +156,7 @@ edit1(int *msgvec, int type)
  */
 FILE *
 run_editor(FILE *fp, off_t size, int type, int readonly,
-		struct header *hp, struct message *mp, enum action action)
+		struct header *hp, struct message *mp, enum sendaction action)
 {
 	FILE *nf = NULL;
 	int t;
@@ -171,7 +171,7 @@ run_editor(FILE *fp, off_t size, int type, int readonly,
 		goto out;
 	}
 	if (hp)
-		puthead(hp, nf, GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA, ACT_TODISP,
+		puthead(hp, nf, GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA, SEND_TODISP,
 				CONV_NONE, NULL, NULL);
 	if (mp) {
 		send(mp, nf, 0, NULL, action, NULL);

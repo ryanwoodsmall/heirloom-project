@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.88 (gritter) 11/1/04
+ *	Sccsid @(#)def.h	2.89 (gritter) 11/3/04
  */
 
 /*
@@ -105,16 +105,16 @@ enum conversion {
 	CONV_TOHDR_A			/* convert addresses for header */
 };
 
-enum action {
-	ACT_NONE,			/* no conversion to perform */
-	ACT_TODISP,			/* convert to displayable form */
-	ACT_TODISP_ALL,			/* same, include all MIME parts */
-	ACT_TOSRCH,			/* convert for IMAP SEARCH */
-	ACT_TOFLTR,			/* convert for junk mail filtering */
-	ACT_TOFILE,			/* convert for saving body to a file */
-	ACT_QUOTE,			/* convert for quoting */
-	ACT_QUOTE_ALL,			/* same, include all MIME parts */
-	ACT_DECRYPT			/* decrypt */
+enum sendaction {
+	SEND_MBOX,			/* no conversion to perform */
+	SEND_TODISP,			/* convert to displayable form */
+	SEND_TODISP_ALL,		/* same, include all MIME parts */
+	SEND_TOSRCH,			/* convert for IMAP SEARCH */
+	SEND_TOFLTR,			/* convert for junk mail filtering */
+	SEND_TOFILE,			/* convert for saving body to a file */
+	SEND_QUOTE,			/* convert for quoting */
+	SEND_QUOTE_ALL,			/* same, include all MIME parts */
+	SEND_DECRYPT			/* decrypt */
 };
 
 enum mimecontent {

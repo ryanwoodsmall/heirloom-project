@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.64 (gritter) 11/1/04";
+static char sccsid[] = "@(#)sendout.c	2.65 (gritter) 11/3/04";
 #endif
 #endif /* not lint */
 
@@ -358,7 +358,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	char *tcs, *convhdr = NULL;
 #endif
 	enum mimeclean isclean;
-	enum action convert;
+	enum sendaction convert;
 	char *charset = NULL, *contenttype = NULL;
 
 	if ((nfo = Ftemp(&tempMail, "Rs", "w", 0600, 1)) == NULL) {
@@ -399,7 +399,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	if (puthead(hp, nfo,
 		   GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA|GUA|GMIME
 		   |GMSGID|GIDENT|GREPLYTO|GREF|GDATE,
-		   ACT_NONE, convert, contenttype, charset)) {
+		   SEND_MBOX, convert, contenttype, charset)) {
 		Fclose(nfo);
 		Fclose(nfi);
 #ifdef	HAVE_ICONV
@@ -966,14 +966,14 @@ mkdate(FILE *fo, const char *field)
 				if (hp->h_cc != NULL && w & GCC) { \
 					if (fmt("Cc:", hp->h_cc, fo, \
 							w&GCOMMA, 0, \
-							action!=ACT_TODISP)) \
+							action!=SEND_TODISP)) \
 						return 1; \
 					gotcha++; \
 				} \
 				if (hp->h_bcc != NULL && w & GBCC) { \
 					if (fmt("Bcc:", hp->h_bcc, fo, \
 							w&GCOMMA, 0, \
-							action!=ACT_TODISP)) \
+							action!=SEND_TODISP)) \
 						return 1; \
 					gotcha++; \
 				} \
@@ -984,7 +984,7 @@ mkdate(FILE *fo, const char *field)
  */
 int
 puthead(struct header *hp, FILE *fo, enum gfield w,
-		enum action action, enum conversion convert,
+		enum sendaction action, enum conversion convert,
 		char *contenttype, char *charset)
 {
 	int gotcha;
@@ -1013,9 +1013,9 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			*/
 			fwrite("From: ", sizeof (char), 6, fo);
 			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
-					action == ACT_TODISP ?
+					action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR_A,
-					action == ACT_TODISP ?
+					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
@@ -1026,9 +1026,9 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		if (addr != NULL) {
 			fwrite("Organization: ", sizeof (char), 14, fo);
 			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
-					action == ACT_TODISP ?
+					action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
-					action == ACT_TODISP ?
+					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
@@ -1038,12 +1038,12 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 	}
 	if (hp->h_replyto != NULL && w & GREPLYTO) {
 		if (fmt("Reply-To:", hp->h_replyto, fo, w&GCOMMA, 0,
-					action != ACT_TODISP))
+					action != SEND_TODISP))
 			return 1;
 		gotcha++;
 	}
 	if (hp->h_to != NULL && w & GTO) {
-		if (fmt("To:", hp->h_to, fo, w&GCOMMA, 0,action!=ACT_TODISP))
+		if (fmt("To:", hp->h_to, fo, w&GCOMMA, 0,action!=SEND_TODISP))
 			return 1;
 		gotcha++;
 	}
@@ -1055,18 +1055,18 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			fwrite("Re: ", sizeof (char), 4, fo);
 			if (mime_write(hp->h_subject + 4, sizeof *hp->h_subject,
 					strlen(hp->h_subject + 4),
-					fo, action == ACT_TODISP ?
+					fo, action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
-					action == ACT_TODISP ?
+					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
 		} else if (*hp->h_subject) {
 			if (mime_write(hp->h_subject, sizeof *hp->h_subject,
 					strlen(hp->h_subject),
-					fo, action == ACT_TODISP ?
+					fo, action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
-					action == ACT_TODISP ?
+					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
 					NULL, (size_t)0) == 0)
 				return 1;
