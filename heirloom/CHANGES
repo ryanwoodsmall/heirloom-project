@@ -93,7 +93,10 @@ Release ...
   matched an archive entry but that entry was not selected due to '-u'.
 * pax: If link() fails, no separate copy of an archive entry is created.
 * pax: When a socket is encountered, print an error message and exit with
-  failure.
+  failure for the POSIX.1-2001 version.
+* pax: If invoked by a user other than the super-user and -po or -pe are
+  given, the POSIX.1-2001 version produces an error for any extracted file
+  not owned by the invoking user.
 * find: Symbolic modes for -perm that include the sgid bit now work properly.
 * cp: The -f option does not disable the -i option in the POSIX personality
   and vice-versa.

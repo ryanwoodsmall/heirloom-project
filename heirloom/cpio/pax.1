@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.27 (gritter) 2/5/05
-.TH PAX 1 "2/5/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pax.1	1.28 (gritter) 2/6/05
+.TH PAX 1 "2/6/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
 .SH SYNOPSIS
@@ -289,8 +289,7 @@ Causes preservation of every possible mode, ownership and time.
 Inhibits preservation of file modification times.
 .TP
 .B o
-Causes preservation of owner and group IDs
-(for the super-user only).
+Causes preservation of owner and group IDs.
 .TP
 .B p
 Causes preservation of file mode bits
@@ -298,6 +297,20 @@ regardless of the umask
 (see
 .IR umask (2)).
 .RE
+.IP
+If file ownership is preserved,
+.I pax
+tries to set the group ownerships to those specified in the archive
+or the original hierarchy, respectively,
+regardless of the privilegues of the invoking user.
+.BR /usr/5bin/pax ,
+.BR /usr/5bin/s42/pax ,
+and
+.B /usr/5bin/posix/pax
+try to set the user ownerships only if invoked by the super-user;
+if invoked by regular users,
+.B /usr/5bin/posix2001/pax
+will produce an error for any file that is not owned by the invoking user.
 .TP
 \fB\-s\ /\fIregular expression\fB/\fIreplacement\fB/\fR[\fBgp\fR]
 Modifies file names in a manner similar to that described in

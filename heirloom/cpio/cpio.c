@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.287 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.288 (gritter) 2/6/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -795,7 +795,6 @@ int			printsev;	/* print message severity strings */
 static int		compressed_bar;	/* this is a compressed bar archive */
 static int		formatforced;	/* -k -i -Hfmt forces a format */
 
-int			pax;		/* this is the pax command */
 int			pax_dflag;	/* directory matches only itself */
 int			pax_kflag;	/* do not overwrite files */
 int			pax_nflag;	/* select first archive member only */
@@ -964,7 +963,7 @@ main(int argc, char **argv)
 		fflush(stdout);
 	else if (Vflag)
 		prdot(1);
-	if (pax)
+	if (pax != PAX_TYPE_CPIO)
 		pax_onexit();
 	fprintf(stderr, "%llu blocks\n", blocks + ((bytes + 0777) >> 9));
 	mclose();
@@ -1032,12 +1031,12 @@ copyout(int (*copyfn)(const char *, struct stat *))
 		 * We thus ignore them and do not even issue a warning,
 		 * because that would only displace more important messages
 		 * on a terminal and confuse people who just want to copy
-		 * directory hierarchies.--But for pax, POSIX requires us
-		 * to fail!
+		 * directory hierarchies.--But for pax, POSIX.1-2001 requires
+		 * us to fail!
 		 */
 		if ((st.st_mode&S_IFMT) == S_IFSOCK ||
 				(st.st_mode&S_IFMT) == S_IFDOOR) {
-			if (pax) {
+			if (pax >= PAX_TYPE_PAX2001) {
 				msg(2, 0, "Cannot handle %s \"%s\".\n",
 					(st.st_mode&S_IFMT) == S_IFSOCK ?
 						"socket" : "door", np);
@@ -1452,7 +1451,7 @@ addfile(const char *realfile, struct stat *st,
 	int	failure = 1;
 
 	file = sstrdup(realfile);
-	if (pax && strcmp(file, trailer)) {
+	if (pax != PAX_TYPE_CPIO && strcmp(file, trailer)) {
 		size_t	junk = 0;
 		if (pax_sflag && pax_sname(&file, &junk) == 0)
 			goto cleanup;
@@ -2462,7 +2461,8 @@ rstime(const char *fn, struct stat *st, const char *which)
 
 	utb.actime = st->st_atime;
 	utb.modtime = st->st_mtime;
-	if (pax && (pax_preserve&(PAX_P_ATIME|PAX_P_MTIME)) != 0 &&
+	if (pax != PAX_TYPE_CPIO &&
+			(pax_preserve&(PAX_P_ATIME|PAX_P_MTIME)) != 0 &&
 			(pax_preserve&PAX_P_EVERY) == 0) {
 		struct stat	xst;
 		if (stat(fn, &xst) < 0)
@@ -2694,7 +2694,7 @@ passfile(const char *fn, struct stat *st)
 	size_t	newsz = 0;
 
 	newfn = sstrdup(fn);
-	if (pax) {
+	if (pax != PAX_TYPE_CPIO) {
 		if (pax_sflag && pax_sname(&newfn, &newsz) == 0)
 			return 0;
 		if (rflag && rname(&newfn, &newsz) == 0)
@@ -2774,7 +2774,7 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 				goto skip;
 			}
 			if (uflag == 0 && f->f_st.st_mtime <= nst.st_mtime) {
-				if (pax == 0)
+				if (pax == PAX_TYPE_CPIO)
 					msg(-1, 0, sysv3 ?
 					"current <%s> newer or same age\n" :
 					"Existing \"%s\" same age or newer\n",
@@ -2861,7 +2861,7 @@ cantlink:	errcnt += 1;
 			 || action == 'p') &&
 			(i = canlink(tgt, &f->f_st, 1)) != 0) {
 		tunlink(&temp);
-		if (pax && i < 0)
+		if (pax != PAX_TYPE_CPIO && i < 0)
 			goto skip;
 		/*
 		 * At this point, hard links in SVR4 cpio format have
@@ -3009,7 +3009,7 @@ filev(struct file *f)
 	const char	*cp;
 	long	c;
 
-	if (pax == 0 && fmttype & TYP_TAR && f->f_st.st_nlink > 1)
+	if (pax == PAX_TYPE_CPIO && fmttype & TYP_TAR && f->f_st.st_nlink > 1)
 		printf("%s linked to %s\n", f->f_lnam, f->f_name);
 	if (sysv3)
 		printf("%-6o", (int)f->f_st.st_mode&(07777|S_IFMT));
@@ -3040,14 +3040,16 @@ filev(struct file *f)
 	if (sysv3 || (f->f_st.st_mode&S_IFMT)!=S_IFCHR &&
 			(f->f_st.st_mode&S_IFMT)!=S_IFBLK &&
 			(f->f_st.st_mode&S_IFMT)!=S_IFNAM)
-		printf(pax ? "%8llu" : sysv3 ? "%7llu" : " %-7llu", f->f_dsize);
+		printf(pax != PAX_TYPE_CPIO ? "%8llu" :
+				sysv3 ? "%7llu" : " %-7llu", f->f_dsize);
 	else
 		printf(" %3lu,%3lu", (long)f->f_rmajor, (long)f->f_rminor);
 	prtime(f->f_st.st_mtime);
 	printf("%s", f->f_name);
 	if ((f->f_st.st_mode&S_IFMT) == S_IFLNK)
 		printf(" -> %s", f->f_lnam);
-	if (pax && (f->f_st.st_mode&S_IFMT) != S_IFDIR && f->f_st.st_nlink>1) {
+	if (pax != PAX_TYPE_CPIO && (f->f_st.st_mode&S_IFMT) != S_IFDIR &&
+			f->f_st.st_nlink>1) {
 		if (fmttype & TYP_TAR)
 			printf(" == %s", f->f_lnam);
 		else
@@ -3213,12 +3215,14 @@ setattr(const char *fn, struct stat *st)
 	uid_t	uid = Rflag ? Ruid : myuid;
 	gid_t	gid = Rflag ? Rgid : mygid;
 
-	if ((pax == 1 || myuid == 0) &&
-			(pax == 0 || pax_preserve&(PAX_P_OWNER|PAX_P_EVERY))) {
+	if ((pax != PAX_TYPE_CPIO || myuid == 0) &&
+			(pax == PAX_TYPE_CPIO ||
+			 pax_preserve&(PAX_P_OWNER|PAX_P_EVERY))) {
 		if (setowner(fn, st) != 0)
 			return 1;
 	}
-	if (pax == 1 && (pax_preserve&(PAX_P_OWNER|PAX_P_EVERY)) == 0)
+	if (pax != PAX_TYPE_CPIO &&
+			(pax_preserve&(PAX_P_OWNER|PAX_P_EVERY)) == 0)
 		mode &= ~(mode_t)(S_ISUID|S_ISGID);
 	if (myuid != 0 || Rflag) {
 		if (st->st_uid != uid || st->st_gid != gid) {
@@ -3233,13 +3237,16 @@ setattr(const char *fn, struct stat *st)
 		return 0;
 	if (hp_Uflag)
 		mode &= ~umsk|S_IFMT;
-	if (pax && (pax_preserve & (PAX_P_MODE|PAX_P_OWNER)) == 0)
+	if (pax != PAX_TYPE_CPIO &&
+			(pax_preserve&(PAX_P_MODE|PAX_P_OWNER|PAX_P_EVERY))==0)
 		mode &= 01777|S_IFMT;
-	if ((pax == 0 || pax_preserve&PAX_P_MODE) && chmod(fn, mode) < 0) {
+	if ((pax == PAX_TYPE_CPIO || pax_preserve&(PAX_P_MODE|PAX_P_EVERY)) &&
+			chmod(fn, mode) < 0) {
 		emsg(2, "Cannot chmod() \"%s\"", fn);
 		return 1;
 	}
-	if (pax ? (pax_preserve&(PAX_P_ATIME|PAX_P_MTIME|PAX_P_EVERY)) !=
+	if (pax != PAX_TYPE_CPIO ?
+			(pax_preserve&(PAX_P_ATIME|PAX_P_MTIME|PAX_P_EVERY)) !=
 			(PAX_P_ATIME|PAX_P_MTIME) : mflag)
 		return rstime(fn, st, "modification");
 	else
@@ -3253,6 +3260,18 @@ setowner(const char *fn, struct stat *st)
 	gid_t	gid = Rflag ? Rgid : st->st_gid;
 
 	if (((st->st_mode&S_IFMT)==S_IFLNK?lchown:chown)(fn, uid, gid) < 0) {
+		emsg(2, "Cannot chown() \"%s\"", fn);
+		return 1;
+	}
+	if (pax >= PAX_TYPE_PAX2001 && myuid && myuid != st->st_uid &&
+			pax_preserve & (PAX_P_OWNER|PAX_P_EVERY)) {
+		/*
+		 * Do not even try to preserve user ownership in this case.
+		 * It would either fail, or, without _POSIX_CHOWN_RESTRICTED,
+		 * leave us with a file we do not own and which we thus could
+		 * not chmod() later.
+		 */
+		errno = EPERM;
 		emsg(2, "Cannot chown() \"%s\"", fn);
 		return 1;
 	}
@@ -3303,7 +3322,7 @@ canlink(const char *path, struct stat *st, int really)
 				return 0;
 			if (link(ip->i_name, path) == 0)
 				return 1;
-			else if (pax) {
+			else if (pax != PAX_TYPE_CPIO) {
 				emsg(3, "Cannot link \"%s\" and \"%s\"",
 						ip->i_name, path);
 				return -1;
@@ -4663,7 +4682,7 @@ mstat(void)
 			break;
 		case S_IFCHR:
 			if (action == 'o' && !Aflag) {
-				if (pax) {
+				if (pax != PAX_TYPE_CPIO) {
 					if (fmttype & TYP_PAX)
 						blksiz = 5120;
 					else if (fmttype & TYP_TAR)
@@ -4817,13 +4836,13 @@ addg(const char *pattern, int art)
 	struct glist	*gp;
 
 	gp = scalloc(1, sizeof *gp);
-	if (!pax && pattern[0] == '!') {
+	if (pax == PAX_TYPE_CPIO && pattern[0] == '!') {
 		gp->g_not = 1;
 		pattern++;
 	}
 	gp->g_pat = sstrdup(pattern);
 	gp->g_art = art;
-	if (pax) {
+	if (pax != PAX_TYPE_CPIO) {
 		struct glist	*gb = NULL, *gc;
 		for (gc = patterns; gc; gc = gc->g_nxt)
 			gb = gc;

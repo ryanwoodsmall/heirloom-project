@@ -32,7 +32,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pax.sl	1.20 (gritter) 2/5/05";
+#if defined (SU3)
+static const char sccsid[] USED = "@(#)pax_su3.sl	1.21 (gritter) 2/6/05";
+#else
+static const char sccsid[] USED = "@(#)pax.sl	1.21 (gritter) 2/6/05";
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -72,7 +76,11 @@ flags(int ac, char **av)
 	int	illegal = 0;
 	char	*x;
 
-	pax = 1;
+#if defined (SU3)
+	pax = PAX_TYPE_PAX2001;
+#else
+	pax = PAX_TYPE_PAX1992;
+#endif
 	dflag = 1;
 	uflag = 1;
 	ofiles = ofiles_pax;

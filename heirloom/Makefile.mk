@@ -48,9 +48,13 @@ install:
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
-	for i in basename chmod du file lc ln ls more mv nohup od page pr rm rmdir sort touch tr who; \
+	for i in basename chmod du file lc ln ls more mv nohup od page pax pr rm rmdir sort touch tr who; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
+	done
+	for i in pax; \
+	do \
+		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(SUSBIN)/$$i $(ROOT); \
 	done
 	for i in od; \
 	do \
