@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)dd.1	1.6 (gritter) 12/5/04
+.\" Sccsid @(#)dd.1	1.7 (gritter) 1/14/05
 .\"
 .\" Parts taken from dd(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
@@ -33,7 +33,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH DD 1 "12/5/04" "Heirloom Toolchest" "User Commands"
+.TH DD 1 "1/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 dd \- convert and copy a file
 .SH SYNOPSIS
@@ -279,3 +279,15 @@ from a proposed BTL standard April 16, 1979.
 The `ibm' conversion, while less blessed as a standard,
 corresponds better to certain IBM print train conventions.
 There is no universal solution.
+.PP
+When reading from pipes, FIFOs, character devices (e.\|g. terminals),
+or network sockets,
+partial input records can occur at any time
+even before the end of the data stream is reached.
+For the `count' option,
+these are handled exactly like full records.
+Using
+.I dd
+to retrieve exactly
+.IR count * ibs
+bytes from such files does thus not generally work unless `ibs=1'.
