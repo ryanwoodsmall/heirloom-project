@@ -45,9 +45,9 @@
 #define	USED
 #endif
 #ifndef	SUS
-static const char sccsid[] USED = "@(#)find.sl	1.31 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)find.sl	1.32 (gritter) 1/9/05";
 #else
-static const char sccsid[] USED = "@(#)find_sus.sl	1.31 (gritter) 11/7/04";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.32 (gritter) 1/9/05";
 #endif
 
 #include <stdio.h>
@@ -176,6 +176,7 @@ static int	Prune;		/* -prune at this point */
 static int	Mount;		/* -mount, -xdev */
 static int	Execplus;	/* have a -exec command {} + node */
 static char	*Statfs;	/* result of statfs() on FreeBSD */
+static int	incomplete;	/* encountered an incomplete statement */
 extern int	sysv3;
 
 static int	(*statfn)(const char *, struct stat *) = lstat;
@@ -379,7 +380,7 @@ static struct anode *e3(void) { /* parse parens and predicates */
 	}
 	if (n.F)
 		return mk(&n);
-	b = nxtarg(1);
+	b = nxtarg(2);
 	s = *b;
 	/*if(s=='+') b++;*/
 	if(EQ(a, "-name"))
@@ -456,7 +457,7 @@ static struct anode *e3(void) { /* parse parens and predicates */
 	else if(EQ(a, "-ncpio"))
 		mkcpio(&n, b, 1);
 	else if(EQ(a, "-newer")) {
-		if(stat(b, &Statb) < 0)
+		if(*b && stat(b, &Statb) < 0)
 			er("cannot access %s", b);
 		n.l.t = Statb.st_mtime;
 		n.F = newer;
@@ -467,8 +468,11 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		n.F = fstype, n.l.fstype = b;
 		Statfs = a;
 	}
-	if (n.F)
+	if (n.F) {
+		if (incomplete)
+			nxtarg(1);
 		return mk(&n);
+	}
 err:	pr("bad option %s", a);
 	usage();
 	/*NOTREACHED*/
@@ -496,11 +500,12 @@ static void oper(const char **ops)
 static char *nxtarg(int must) { /* get next arg from command line */
 	static int strikes = 0;
 
-	if(must && Ai>=Argc || strikes==3)
+	if(must==1 && Ai>=Argc || strikes==3)
 		er("incomplete statement");
 	if(Ai>=Argc) {
 		if (must >= 0)
 			strikes++;
+		incomplete = 1;
 		Ai = Argc + 1;
 		return("");
 	}
@@ -1184,6 +1189,8 @@ static void mkcpio(struct anode *p, const char *b, int ascii)
 	char	flags[20], *cp;
 
 	p->F = cpio;
+	if (*b == '\0')
+		return;
 	depth = 1;
 	Print = 0;
 	Cpio = 1;
