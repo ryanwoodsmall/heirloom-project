@@ -50,6 +50,8 @@ Release ...
 * sort: With the -d option, digits were ignored erroneously.
 * sort: With '-k x,y', the second number refers to the last character of the
   corresponding sort field.
+* uniq: The argument to the -f and -s options is required, and a '--' is
+  accepted to end the option list.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
