@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.37 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.38 (gritter) 2/7/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.37 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.38 (gritter) 2/7/05";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.37 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)find.sl	1.38 (gritter) 2/7/05";
 #endif
 
 #include <stdio.h>
@@ -215,6 +215,8 @@ static int	exeq(struct anode *);
 static int	ok(struct anode *);
 static int	cpio(struct anode *);
 static int	newer(struct anode *);
+static int	cnewer(struct anode *);
+static int	anewer(struct anode *);
 static int	fstype(struct anode *);
 static int	local(struct anode *);
 static int	scomp(long long, long long, char);
@@ -238,6 +240,7 @@ static void	usage(void);
 static void	*srealloc(void *, size_t);
 static void	mkcpio(struct anode *, const char *, int);
 static void	trailer(struct anode *, int);
+static void	mknewer(struct anode *, const char *, int (*)(struct anode *));
 static mode_t	newmode(const char *ms, const mode_t pm);
 
 int
@@ -477,12 +480,13 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		mkcpio(&n, b, 0);
 	else if(EQ(a, "-ncpio"))
 		mkcpio(&n, b, 1);
-	else if(EQ(a, "-newer")) {
-		if(*b && stat(b, &Statb) < 0)
-			er("cannot access %s", b);
-		n.l.t = Statb.st_mtime;
-		n.F = newer;
-	} else if(EQ(a, "-fstype")) {
+	else if(EQ(a, "-newer"))
+		mknewer(&n, b, newer);
+	else if(EQ(a, "-anewer"))
+		mknewer(&n, b, anewer);
+	else if(EQ(a, "-cnewer"))
+		mknewer(&n, b, cnewer);
+	else if(EQ(a, "-fstype")) {
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 		getfstypes();
 #endif	/* __linux__ || _AIX || __hpux */
@@ -704,6 +708,14 @@ static int cpio(struct anode *p)
 static int newer(register struct anode *p)
 {
 	return Statb.st_mtime > p->l.t;
+}
+static int anewer(register struct anode *p)
+{
+	return Statb.st_atime > p->l.t;
+}
+static int cnewer(register struct anode *p)
+{
+	return Statb.st_ctime > p->l.t;
 }
 static int fstype(register struct anode *p)
 {
@@ -1286,6 +1298,15 @@ trailer(register struct anode *p, int termcpio)
 	} else if (p->F == exeq && p->r.a)
 		exeq(p);
 	Pathname = Opath;
+}
+
+static void
+mknewer(struct anode *p, const char *b, int (*f)(struct anode *))
+{
+	if (*b && stat(b, &Statb) < 0)
+		er("cannot access %s", b);
+	p->l.t = Statb.st_mtime;
+	p->F = f;
 }
 
 /*

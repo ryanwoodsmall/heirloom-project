@@ -1,3 +1,6 @@
+Release ...
+* find: The -anewer and -cnewer primaries were introduced.
+
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in
   /usr/5bin/posix2001 by default. mk.config files have to be augmented with

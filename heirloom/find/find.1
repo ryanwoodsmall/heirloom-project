@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)find.1	1.40 (gritter) 1/24/05
+.\" Sccsid @(#)find.1	1.41 (gritter) 2/7/05
 .\" Parts taken from find(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH FIND 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH FIND 1 "2/7/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 find \- find files
 .SH SYNOPSIS
@@ -211,6 +211,21 @@ is used per default
 True if
 the current file has been modified more recently than the argument
 .I file.
+.TP
+.BR \-anewer " file"
+True if
+the current file has been accessed more recently than the argument
+.I file
+was modified.
+This primary is an extension.
+.TP
+.BR \-cnewer " file"
+True if a status change
+has occurred on the current file
+more recently than the argument
+.I file
+was modified.
+This primary is an extension.
 .TP
 .B \-depth
 Always true;
