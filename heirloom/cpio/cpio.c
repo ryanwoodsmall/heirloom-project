@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.289 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)cpio.sl	1.290 (gritter) 3/1/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -931,6 +931,7 @@ static void	addrec(char **, long *, long *,
 static void	paxnam(struct tar_header *, const char *);
 static char	*sequence(void);
 static char	*joinpath(const char *, char *);
+static int	utf8(const char *);
 
 size_t		(*ofiles)(char **, size_t *) = ofiles_cpio;
 void		(*prtime)(time_t) = prtime_cpio;
@@ -5075,10 +5076,8 @@ static int
 tmkname(struct tar_header *hp, const char *fn)
 {
 	const char	*cp, *cs = NULL;
-	char	or = 0;
 
 	for (cp = fn; *cp; cp++) {
-		or |= *cp;
 		if (fmttype & TYP_USTAR && *cp == '/' && cp[1] != '\0' &&
 				cp > fn && cp-fn <= TPFXSIZ)
 			cs = cp;
@@ -5087,7 +5086,7 @@ tmkname(struct tar_header *hp, const char *fn)
 		writegnuname(fn, cp - fn + 1, 'L');
 		cp = &fn[99];
 	} else if (cp - (cs ? &cs[1] : fn) > TNAMSIZ) {
-		if (fmttype & TYP_PAX && (or & 0200) == 0) {
+		if (fmttype & TYP_PAX && utf8(fn)) {
 			paxrec |= PR_PATH;
 			strcpy(hp->t_name, sequence());
 			return 0;
@@ -5136,15 +5135,13 @@ static int
 tmklink(struct tar_header *hp, const char *fn)
 {
 	const char	*cp;
-	char	or = 0;
 
-	for (cp = fn; *cp; cp++)
-		or |= *cp;
+	for (cp = fn; *cp; cp++);
 	if (fmttype == FMT_GNUTAR && cp - fn > 99) {
 		writegnuname(fn, cp - fn + 1, 'K');
 		cp = &fn[99];
 	} else if (cp - fn > TNAMSIZ) {
-		if (fmttype & TYP_PAX && (or & 0200) == 0) {
+		if (fmttype & TYP_PAX && utf8(fn)) {
 			paxrec |= PR_LINKPATH;
 			strcpy(hp->t_linkname, sequence());
 			return 0;
@@ -6872,4 +6869,31 @@ joinpath(const char *base, char *name)
 	*np = '\0';
 	free(name);
 	return new;
+}
+
+static int
+utf8(const char *cp)
+{
+	int	c, n;
+
+	while (*cp) if ((c = *cp++ & 0377) & 0200) {
+		if (c == (c & 037 | 0300))
+			n = 1;
+		else if (c == (c & 017 | 0340))
+			n = 2;
+		else if (c == (c & 07 | 0360))
+			n = 3;
+		else if (c == (c & 03 | 0370))
+			n = 4;
+		else if (c == (c & 01 | 0374))
+			n = 5;
+		else
+			return 0;
+		while (n--) {
+			c = *cp++ & 0377;
+			if (c != (c & 077 | 0200))
+				return 0;
+		}
+	}
+	return 1;
 }

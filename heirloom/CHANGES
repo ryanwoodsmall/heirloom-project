@@ -26,6 +26,8 @@ Release ...
 * cp: A SVID4 version was introduced which behaves like the SVID3 version
   in the above respect but does not disable -i if standard input is not a
   terminal.
+* cpio, pax, tar: Any filename that forms a valid UTF-8 string is now
+  accepted as input when creating a pax format archive.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

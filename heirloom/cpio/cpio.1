@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)cpio.1	1.85 (gritter) 2/10/05
-.TH CPIO 1 "2/10/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)cpio.1	1.86 (gritter) 3/1/05
+.TH CPIO 1 "3/1/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cpio \- copy file archives in and out
 .SH SYNOPSIS
@@ -622,7 +622,7 @@ capable of reading
 archives,
 although files may be extracted under wrong names
 and extended headers may be extracted as separate files.
-If a file name contains non-ASCII characters,
+If a file name contains non-UTF-8 characters,
 it may not be archived or extracted correctly
 because of a problem of the
 .I pax
@@ -643,7 +643,7 @@ by implementations that support only the
 format and vice-versa.
 The
 .I sun
-format has also problems with non-ASCII characters in file names.
+format has also problems with non-UTF-8 characters in file names.
 .PP
 The
 .B GNU

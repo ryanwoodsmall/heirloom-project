@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.169 (gritter) 12/10/04";
+static const char sccsid[] USED = "@(#)tar.sl	1.170 (gritter) 3/1/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -372,6 +372,7 @@ static struct dslot	*dfind(struct dslot **, dev_t);
 static char	*sequence(void);
 static void	docomp(const char *);
 static int	jflag, zflag, Zflag;
+static int	utf8(const char *);
 
 int
 main(int argc, char *argv[])
@@ -1366,15 +1367,10 @@ putsym(const char *longname, const char *shortname,
 	}
 	(*symblink)[len] = '\0';
 	if (len >= 100) {
-		if (oldflag <= 0 && gnuflag <= 0) {
-			char	c = 0, *cp;
-			for (cp = *symblink; *cp; cp++)
-				c |= *cp;
-			if ((c & 0200) == 0) {
-				paxrec |= PR_LINKPATH;
-				strcpy(dblock.dbuf.linkname, sequence());
-				return 0;
-			}
+		if (oldflag <= 0 && gnuflag <= 0 && utf8(*symblink)) {
+			paxrec |= PR_LINKPATH;
+			strcpy(dblock.dbuf.linkname, sequence());
+			return 0;
 		}
 		fprintf(stderr, "%s: %s: symbolic link too long\n",
 				progname, longname);
@@ -2270,20 +2266,18 @@ static int
 mkname(struct header *hp, const char *fn)
 {
 	const char	*cp, *cs = NULL;
-	char	or = 0;
 
 	if (Aflag)
 		while (*fn == '/')
 			fn++;
 	for (cp = fn; *cp; cp++) {
-		or |= *cp;
 		if (*cp == '/' && cp[1] != '\0' && cp > fn &&
 				cp - fn <= PFXSIZ &&
 				gnuflag <= 0 && oldflag <= 0)
 			cs = cp;
 	}
 	if (cp - (cs ? &cs[1] : fn) > NAMSIZ) {
-		if ((or & 0200) == 0 && oldflag <= 0 && gnuflag <= 0) {
+		if (oldflag <= 0 && gnuflag <= 0 && utf8(fn)) {
 			paxrec |= PR_PATH;
 			strcpy(hp->name, sequence());
 			return 0;
@@ -2325,15 +2319,13 @@ static int
 mklink(struct header *hp, const char *fn, const char *refname)
 {
 	const char	*cp;
-	char	or = 0;
 
 	if (Aflag)
 		while (*fn == '/')
 			fn++;
-	for (cp = fn; *cp; cp++)
-		or |= *cp;
+	for (cp = fn; *cp; cp++);
 	if (cp - fn > NAMSIZ) {
-		if ((or & 0200) == 0 && oldflag <= 0 && gnuflag <= 0) {
+		if (oldflag <= 0 && gnuflag <= 0 && utf8(fn)) {
 			paxrec |= PR_LINKPATH;
 			strcpy(hp->linkname, sequence());
 			return 0;
@@ -3132,4 +3124,31 @@ docomp(const char *name)
 	domtstat();
 	mtstat.st_dev = ost.st_dev;
 	mtstat.st_ino = ost.st_ino;
+}
+
+static int
+utf8(const char *cp)
+{
+	int	c, n;
+
+	while (*cp) if ((c = *cp++ & 0377) & 0200) {
+		if (c == (c & 037 | 0300))
+			n = 1;
+		else if (c == (c & 017 | 0340))
+			n = 2;
+		else if (c == (c & 07 | 0360))
+			n = 3;
+		else if (c == (c & 03 | 0370))
+			n = 4;
+		else if (c == (c & 01 | 0374))
+			n = 5;
+		else
+			return 0;
+		while (n--) {
+			c = *cp++ & 0377;
+			if (c != (c & 077 | 0200))
+				return 0;
+		}
+	}
+	return 1;
 }
