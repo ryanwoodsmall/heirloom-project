@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.80 (gritter) 1/26/05";
+static char sccsid[] = "@(#)send.c	2.81 (gritter) 3/4/05";
 #endif
 #endif /* not lint */
 
@@ -393,6 +393,7 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_DECRYPT:
 			goto multi;
 		case SEND_TOFILE:
+		case SEND_TOPIPE:
 			put_from_(obuf, ip->m_multipart);
 			/*FALLTHRU*/
 		case SEND_MBOX:
@@ -447,6 +448,7 @@ skip:	switch (ip->m_mimecontent) {
 				break;
 			return -1;
 		case SEND_TOFILE:
+		case SEND_TOPIPE:
 		case SEND_TOSRCH:
 		case SEND_DECRYPT:
 		case SEND_MBOX:
@@ -477,6 +479,7 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_QUOTE:
 		case SEND_QUOTE_ALL:
 		case SEND_TOFILE:
+		case SEND_TOPIPE:
 		case SEND_TOSRCH:
 		case SEND_TOFLTR:
 		case SEND_DECRYPT:
@@ -529,6 +532,7 @@ skip:	switch (ip->m_mimecontent) {
 				case SEND_TOSRCH:
 				case SEND_QUOTE:
 				case SEND_DECRYPT:
+				case SEND_TOPIPE:
 					break;
 				}
 				if (sendpart(zmp, np, obuf,
@@ -592,7 +596,10 @@ skip:	switch (ip->m_mimecontent) {
 #ifdef	HAVE_ICONV
 	if ((action == SEND_TODISP || action == SEND_TODISP_ALL ||
 			action == SEND_QUOTE || action == SEND_QUOTE_ALL ||
-			action == SEND_TOSRCH) && pipecmd == NULL) {
+			action == SEND_TOSRCH) &&
+			(ip->m_mimecontent == MIME_TEXT_PLAIN ||
+			 ip->m_mimecontent == MIME_TEXT_HTML ||
+			 ip->m_mimecontent == MIME_TEXT)) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if (asccasecmp(tcs, ip->m_charset) &&
@@ -608,7 +615,7 @@ skip:	switch (ip->m_mimecontent) {
 		qbuf = obuf;
 		pbuf = getpipefile(pipecmd, &qbuf,
 			action == SEND_QUOTE || action == SEND_QUOTE_ALL);
-		action = SEND_TOFILE;
+		action = SEND_TOPIPE;
 		if (pbuf != qbuf) {
 			oldpipe = safe_signal(SIGPIPE, onpipe);
 			if (sigsetjmp(pipejmp, 1))
@@ -931,7 +938,7 @@ out(char *buf, size_t len, FILE *fp,
 					action == SEND_QUOTE ||
 					action == SEND_QUOTE_ALL ?
 				TD_ISPR|TD_ICONV :
-				action == SEND_TOSRCH ?
+				action == SEND_TOSRCH || action == SEND_TOPIPE ?
 					TD_ICONV :
 				action == SEND_TOFLTR ?
 					TD_DELCTRL :
