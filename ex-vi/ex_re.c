@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.45 (gritter) 2/13/05";
+static char sccsid[] = "@(#)ex_re.c	1.46 (gritter) 2/18/05";
 #endif
 #endif
 
@@ -659,7 +659,7 @@ dosub(void)
 			if (casecnt)
 				c = fixcase(c & TRIM);
 			if (c & INVBIT || (m = wctomb(mb, c)) <= 0) {
-				*mb = rp[-n];
+				mb[0] = rp[-n];
 				m = 1;
 			}
 			for (i = 0; i < m; i++) {
