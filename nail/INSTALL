@@ -64,7 +64,10 @@ Makefile variables to control the build process:
 
 CFLAGS          Flags for the C compiler, such as '-O'.
 
-CPPFLAGS        Flags for the C preprocessor.
+CPPFLAGS        Flags for the C preprocessor. Some versions of glibc on
+                Linux need '-D_GNU_SOURCE' here, or wcwidth() will not be
+                available and multibyte characters cannot be displayed
+                correctly.
 
 INCLUDES        A list of additional include file directories, as
                 '-I/usr/local/include'. Use this to locate the include
@@ -80,8 +83,8 @@ LDFLAGS         Flags for the linker. To compile with GSSAPI authentication
 
 LIBS            A list of additional libraries such as '-lfoo'. -lsocket,
                 -lnsl, -lssl, -lcrypto, -liconv, and NSS libraries are
-		automatically included by makeconfig and should not be
-		put into this.
+                automatically included by makeconfig and should not be
+                put into this.
 
 As usual with Makefile variables, you can pass these values to make in
 the environment or on the command line. Thus if you want to avoid to edit
@@ -228,4 +231,4 @@ simply assumes that you want to build NSS if it manages to build the test
 executable.
 
 
-        Gunnar Ritter                                   9/20/04
+        Gunnar Ritter                                   11/2/04

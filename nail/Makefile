@@ -19,6 +19,10 @@ DESTDIR		=
 
 UCBINSTALL	= /usr/ucb/install
 
+# Define compiler, preprocessor, and linker flags here.
+# Note that some Linux/glibc versions need -D_GNU_SOURCE in CPPFLAGS, or
+# wcwidth() will not be available and multibyte characters will not be
+# displayed correctly.
 #CFLAGS		=
 #CPPFLAGS	=
 #LDFLAGS		=
