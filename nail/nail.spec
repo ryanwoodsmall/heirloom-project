@@ -1,4 +1,4 @@
-# Sccsid @(#)nail.spec	1.30 (gritter) 11/1/04
+# Sccsid @(#)nail.spec	1.31 (gritter) 1/8/05
 
 %define	use_nss	0
 %define	mozilla_version	1.6
@@ -77,7 +77,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc COPYING AUTHORS INSTALL README TODO I18N ChangeLog
+%doc COPYING AUTHORS INSTALL README TODO ChangeLog
 %config(noreplace) /etc/nail.rc
 /usr/bin/nail
 /usr/share/man/man1/nail*

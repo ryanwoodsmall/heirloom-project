@@ -6,6 +6,9 @@
   with the 'sendcharsets' variable. It can contain multiple values, with
   the first appropriate one being used to send the message. The 'charset'
   variable is still accepted but has been removed from the documentation.
+* If neither the 'sendcharsets' nor the 'charset' variable is set, the
+  character set for outgoing messages that contain non-ASCII characters is
+  now 'utf-8' instead of 'iso-8859-1'.
 * When the 'encoding' variable was set to '8bit' and a message contained
   characters that were not representable in the outgoing character set
   in its body but not in its header, the characters were replaced by

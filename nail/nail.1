@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.291 (gritter) 1/7/05
+.\"     Sccsid: @(#)nail.1	2.292 (gritter) 1/8/05
 .\"
-.TH NAIL 1 "1/7/05" "nail 11.20" "User Commands"
+.TH NAIL 1 "1/8/05" "nail 11.20" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -678,6 +678,11 @@ the \fIttycharset\fR variable should be set
 to provide an explicit value.
 When reading messages,
 their text is converted to the terminal character set if possible.
+Unprintable characters and illegal byte sequences are detected
+and replaced by Unicode substitute characters or question marks
+unless the
+.I print-all-chars
+is set at initialization time.
 .PP
 The character set for outgoing messages
 is not necessarily the same
@@ -698,6 +703,17 @@ the message will not be sent,
 and its text will be saved to the `dead.letter' file.
 Messages that contains NUL bytes are not converted.
 Attachments are also not converted even if they are plain text.
+.PP
+Best results are usually achieved
+when
+.I nail
+is run in a UTF-8 locale
+on a UTF-8 capable terminal.
+In this setup,
+characters from various countries can be displayed,
+while it is still possible to use more simple
+character sets for sending
+to retain maximum compatibility with older mail clients.
 .SS "Commands"
 Each command is typed on a line by itself,
 and may take arguments following the command word.
@@ -3082,12 +3098,21 @@ for scrolling with the z command.
 .B sendcharsets
 A comma-separated list of character set names
 that can be used in Internet mail.
-When a message is prepared for sending,
+When a message that contains characters not representable in US-ASCII
+is prepared for sending,
 .I nail
 tries to convert its text
 to each of the given character sets in order
 and uses the first appropriate one.
-The default is `iso-8859-1'.
+The default is `utf-8'.
+.IP
+Character sets assigned to this variable should be ordered
+in ascending complexity.
+That is, the list should start with e.\|g.
+`iso-8859-1' for compatibility with older mail clients,
+might contain some other language-specific character sets,
+and should end with `utf-8'
+to handle messages that combine texts in multiple languages.
 .TP
 .B sendmail
 To use an alternate mail delivery system,
@@ -4596,6 +4621,12 @@ and
 .I ttycharset
 variables must be set to the same value
 to inhibit character set conversion.
+If
+.I iconv()
+is not available at all,
+the value assigned to
+.I sendcharsets
+must match the character set that is used on the terminal.
 .PP
 Nail expects input text to be in Unix format,
 with lines separated by 

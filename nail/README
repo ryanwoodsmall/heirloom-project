@@ -116,16 +116,15 @@ following:
 1. Check out that you are using a binary made from pristine sources of the
    latest release. This is particularly important if you received your nail
    binaries from a third-party vendor. If you are unwilling to do this for
-   whatever reason, use the support channels of your vendor instead of
-   abusing the Open Source development model for your personal profit.
+   whatever reason, use the support channels of your vendor and avoid abusing
+   the Open Source development model.
 
 2. Check that your issue is not already solved or commented in the existing
    documentation. This does not only involve reading this file; you also
-   have to look at the manual page, the ChangeLog, and the I18N file which
-   documents some internationalization aspects. After doing that, you have
-   to search the mailing list archive for related topics. Remember that you
-   are spending other people's spare time when you ask questions, and that
-   you just waste it if your question was a superfluous one.
+   need to look at the manual page and the ChangeLog. After doing that, you
+   need to search the mailing list archive for related topics. Remember that
+   you are spending other people's spare time when you ask questions, and
+   that you just waste it if your question was a superfluous one.
 
 3. If you are reporting a bug, try to reproduce it and include detailed
    instructions for doing that in your report. If you cannot reproduce the
@@ -145,4 +144,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           12/12/04
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           1/8/05

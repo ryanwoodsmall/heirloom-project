@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.54 (gritter) 1/7/05";
+static char sccsid[]  = "@(#)mime.c	2.55 (gritter) 1/8/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -245,7 +245,7 @@ checkaddrs(struct name *np)
 	return np;
 }
 
-static char defcharset[] = "iso-8859-1";
+static char defcharset[] = "utf-8";
 
 /*
  * Get the character set dependant on the conversion.
