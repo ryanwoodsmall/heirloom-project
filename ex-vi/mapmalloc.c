@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)mapmalloc.c	1.4 (gritter) 2/20/05
+ *	Sccsid @(#)mapmalloc.c	1.5 (gritter) 4/5/05
  */
 
 #ifdef	VMUNIX
@@ -107,6 +107,13 @@ void dump(const char *msg, uintptr_t t)
 #define ASSERT(p)
 #define	dump(a, b)
 #endif
+
+#ifdef valgrind
+#include <valgrind.h>
+#else	/* !valgrind */
+#define	VALGRIND_MALLOCLIKE_BLOCK(a, b, c, d)
+#define	VALGRIND_FREELIKE_BLOCK(a, b)
+#endif	/* !valgrind */
 
 /*	avoid break bug */
 #ifdef pdp11
@@ -292,6 +299,7 @@ found:
 	p->ptr = setbusy(allocp);
 	p[1].pool = o;
 	dump("malloc", (uintptr_t)(p + 2));
+	VALGRIND_MALLOCLIKE_BLOCK(p+2,nbytes,0,0);
 	return(p+2);
 }
 
@@ -313,6 +321,7 @@ free(register void *ap)
 	ASSERT(testbusy(p->ptr));
 	p->ptr = clearbusy(p->ptr);
 	ASSERT(p->ptr > allocp && p->ptr <= alloct);
+	VALGRIND_FREELIKE_BLOCK(ap,0);
 }
 
 /*	realloc(p, nbytes) reallocates a block obtained from malloc()
