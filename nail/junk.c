@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.31 (gritter) 10/2/04";
+static char sccsid[] = "@(#)junk.c	1.32 (gritter) 10/3/04";
 #endif
 #endif /* not lint */
 
@@ -448,7 +448,7 @@ loop:	i = 0;
 		if (sp->url) {
 			if (!url_xchar(c)) {
 				sp->url = 0;
-				goto brk;
+				break;
 			}
 			SAVE(c)
 		} else if (constituent(c, *buf, i+j, sp->price) ||
@@ -458,12 +458,12 @@ loop:	i = 0;
 		} else if (i > 0 && c == ':' && *count > 2) {
 			if ((c = getc(fp)) != '/') {
 				ungetc(c, fp);
-				goto brk;
+				break;
 			}
 			(*count)--;
 			if ((c = getc(fp)) != '/') {
 				ungetc(c, fp);
-				goto brk;
+				break;
 			}
 			(*count)--;
 			sp->url = 1;
@@ -490,13 +490,8 @@ loop:	i = 0;
 			ungetc(c, fp);
 			(*count)++;
 			break;
-		} else if (i > 0) {
-		brk:	if (i < 2)
-				i = 0;
-			else {
-				break;
-			}
-		}
+		} else if (i > 0)
+			break;
 	}
 	if (i > 0) {
 		(*buf)[i+j] = '\0';

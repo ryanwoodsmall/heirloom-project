@@ -1,3 +1,6 @@
+[11.10] released ...
+* Junk mail filter improvement: Do not ignore single-letter words.
+
 [11.9] released 10/2/04
 * A Bayesian junk mail filter has been added. See the 'EXAMPLES' section of
   the manual page for an introduction.
