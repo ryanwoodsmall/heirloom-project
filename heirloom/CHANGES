@@ -15,6 +15,8 @@ Release ...
 * chmod: When the -m option is given with a symbolic mode that has no 'who'
   part, the umask is now respected with the POSIX versions even if the
   previous file mode contained bits set within the umask.
+* fmt: Trailing blanks were left on lines with multibyte characters (Patch
+  by Matthew Fischer).
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

@@ -51,7 +51,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)fmt.sl	1.7 (gritter) 11/21/04";
+static const char sccsid[] USED = "@(#)fmt.sl	1.8 (gritter) 2/15/05";
 
 #include <stdio.h>
 #include <string.h>
@@ -516,7 +516,7 @@ tabulate(wchar_t *line)
 	 * Toss trailing blanks in the output line.
 	 */
 
-	cp = line + colwidth(line) - 1;
+	cp = line + wcslen(line) - 1;
 	while (cp >= line && *cp == ' ')
 		cp--;
 	*++cp = '\0';
