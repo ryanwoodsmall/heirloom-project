@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.29 (gritter) 10/11/04";
+static char sccsid[]  = "@(#)mime.c	2.30 (gritter) 10/21/04";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -1041,7 +1041,7 @@ mime_fromqp(struct str *in, struct str *out, int ishdr)
 void 
 mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 {
-	char *p, *q, *op, *upper, *cs, *cbeg, *tcs;
+	char *p, *q, *op, *upper, *cs, *cbeg, *tcs, *lastwordend = NULL;
 	struct str cin, cout;
 	int convert;
 	size_t maxstor;
@@ -1104,6 +1104,8 @@ mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 					mime_fromqp(&cin, &cout, 1);
 					break;
 			}
+			if (lastwordend)
+				q = lastwordend;
 #ifdef	HAVE_ICONV
 			if ((flags & TD_ICONV) && fhicd != (iconv_t)-1) {
 				char *iptr, *mptr, *nptr, *uptr;
@@ -1134,6 +1136,7 @@ mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 			}
 #endif
 			free(cout.s);
+			lastwordend = q;
 		} else {
 notmime:
 			p = op;
@@ -1141,6 +1144,8 @@ notmime:
 				mime_fromhdr_inc(16);
 			*q++ = *p;
 			out->l++;
+			if (!blankchar(*p&0377))
+				lastwordend = NULL;
 		}
 	}
 fromhdr_end:

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.38 (gritter) 10/2/04";
+static char sccsid[] = "@(#)send.c	2.39 (gritter) 10/21/04";
 #endif
 #endif /* not lint */
 
@@ -80,6 +80,7 @@ struct hdrline {
 	struct hdrline *hd_next;	/* next header line in list */
 	char *hd_line;			/* buffer containing the line */
 	size_t hd_llen;			/* line length */
+	int	hd_isenc;		/* start or end is MIME-encoded word */
 };
 
 enum {
@@ -501,16 +502,34 @@ static void
 addline_hdr(struct hdrline **p0, char *line, size_t linelen)
 {
 	struct hdrline *ph, *pp;
+	const char	*cp;
 
 	ph = smalloc(sizeof *ph);
 	ph->hd_line = smalloc(linelen + 1);
 	memcpy(ph->hd_line, line, linelen);
 	ph->hd_line[linelen] = '\0';
 	ph->hd_llen = linelen;
+	ph->hd_isenc = 0;
 	ph->hd_next = NULL;
+	if (linelen > 0 && line[linelen-1] == '\n')
+		cp = &line[linelen-2];
+	else
+		cp = &line[linelen-1];
+	while (cp >= line && whitechar(*cp&0377))
+		cp++;
+	if (cp - line > 8 && cp[0] == '=' && cp[-1] == '?')
+		ph->hd_isenc |= 2;
 	if (*p0) {
 		for (pp = *p0; pp->hd_next; pp = pp->hd_next);
 		pp->hd_next = ph;
+		if (pp->hd_isenc & 2) {
+			for (cp = line; blankchar(*cp&0377); cp++);
+			if (cp > line && linelen - (cp - line) > 8 &&
+					cp[0] == '=' && cp[1] == '?')
+				ph->hd_isenc |= 1;
+			else
+				pp->hd_isenc &= ~2;
+		}
 	} else
 		*p0 = ph;
 }
@@ -567,7 +586,8 @@ const struct message *mp;	/* can be NULL if rewritestatus == 0 */
 #endif
 {
 	int ignoring = 0;
-	size_t sz;
+	char	*start;
+	size_t sz, len;
 
 	if (rewritestatus)
 		rewritestatus = 3;
@@ -652,8 +672,24 @@ const struct message *mp;	/* can be NULL if rewritestatus == 0 */
 			if (ignoring)
 				continue;
 		}
-		sz = mime_write(ph->hd_line, sizeof *ph->hd_line,
-				ph->hd_llen, obuf,
+		start = ph->hd_line;
+		len = ph->hd_llen;
+		if (action == CONV_TODISP || action == CONV_QUOTE ||
+				action == CONV_TOSRCH ||
+				action == CONV_TOFLTR) {
+			if (ph->hd_isenc & 1)
+				while (blankchar(*start&0377)) {
+					start++;
+					len--;
+				}
+			if (ph->hd_isenc & 2) {
+				if (len > 0 && start[len-1] == '\n')
+					len--;
+				while (len > 0 && blankchar(start[len-1]&0377))
+					len--;
+			}
+		}
+		sz = mime_write(start, 1, len, obuf,
 				action == CONV_TODISP || action == CONV_QUOTE ||
 						action == CONV_TOSRCH ||
 						action == CONV_TOFLTR ?

@@ -1,4 +1,6 @@
 [11.12] released ...
+* Blank characters between MIME encoded words in header fields are now
+  discarded for display purposes as demanded by RFC 2047.
 * Unless the 'fullnames' variable was set, nail did not generate 'To' header
   fields when replying to messages since version 11.5 (Bugreport by Bob
   Tennent).

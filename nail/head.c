@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.12 (gritter) 10/12/04";
+static char sccsid[] = "@(#)head.c	2.13 (gritter) 10/21/04";
 #endif
 #endif /* not lint */
 
@@ -401,7 +401,7 @@ gethfield(FILE *f, char **linebuf, size_t *linesize, int rem, char **colon)
 	char *line2 = NULL;
 	size_t line2size = 0;
 	char *cp, *cp2;
-	int c;
+	int c, isenc;
 
 	if (*linebuf == NULL)
 		*linebuf = srealloc(*linebuf, *linesize = 1);
@@ -424,10 +424,13 @@ gethfield(FILE *f, char **linebuf, size_t *linesize, int rem, char **colon)
 		*colon = cp;
 		cp = *linebuf + c;
 		for (;;) {
+			isenc = 0;
 			while (--cp >= *linebuf && blankchar(*cp & 0377));
 			cp++;
 			if (rem <= 0)
 				break;
+			if (cp-8 >= *linebuf && cp[-1] == '=' && cp[-2] == '?')
+				isenc |= 1;
 			ungetc(c = getc(f), f);
 			if (!blankchar(c))
 				break;
@@ -436,6 +439,8 @@ gethfield(FILE *f, char **linebuf, size_t *linesize, int rem, char **colon)
 			rem--;
 			for (cp2 = line2; blankchar(*cp2 & 0377); cp2++);
 			c -= cp2 - line2;
+			if (cp2[0] == '=' && cp2[1] == '?' && c > 8)
+				isenc |= 2;
 			if (cp + c >= *linebuf + *linesize - 2) {
 				size_t diff = cp - *linebuf;
 				size_t colondiff = *colon - *linebuf;
@@ -444,7 +449,8 @@ gethfield(FILE *f, char **linebuf, size_t *linesize, int rem, char **colon)
 				cp = &(*linebuf)[diff];
 				*colon = &(*linebuf)[colondiff];
 			}
-			*cp++ = ' ';
+			if (isenc != 3)
+				*cp++ = ' ';
 			memcpy(cp, cp2, c);
 			cp += c;
 		}
