@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.103 (gritter) 1/19/05";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.104 (gritter) 2/9/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.103 (gritter) 1/19/05";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.104 (gritter) 2/9/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.103 (gritter) 1/19/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.104 (gritter) 2/9/05";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.103 (gritter) 1/19/05";
+static const char sccsid[] USED = "@(#)ps.sl	2.104 (gritter) 2/9/05";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.103 (gritter) 1/19/05";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.104 (gritter) 2/9/05";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
@@ -4341,12 +4341,14 @@ options(int ac, char **av)
 			if (nflag)
 				add_format(OU_RUID, "   UID");
 			else
-				add_format(OU_RUSER, "USER   ");
+				add_format(OU_RUSER, "USER    ");
 		}
 		if (format == 'l') {
 			add_format(OU_PID, NULL);
 			add_format(OU_PPID, NULL);
-		} else
+		} else if (format == 'u')
+			add_format(OU_PID, "  PID");
+		else
 			add_format(OU_PID, "   PID");
 		if (format == 'l' || format == 'u')
 			add_format(OU_C, "CP");
