@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.61 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.62 (gritter) 3/15/05";
 #else
-static const char sccsid[] USED = "@(#)df.sl	1.61 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)df.sl	1.62 (gritter) 3/15/05";
 #endif
 
 /*
@@ -549,7 +549,7 @@ findfs(const char *fn)
 		m_fstype = mt.mnt_fstype;
 #endif	/* SVR4 */
 		if (S_ISBLK(s1.st_mode)) {
-			if (lstat(m_fstype, &s2) < 0) {
+			if (lstat(m_special, &s2) < 0) {
 				/*
 				 * Ignore this silently as it is most likely
 				 * something like "proc", "devpts".
