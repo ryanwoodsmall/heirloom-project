@@ -20,6 +20,9 @@ Release ...
 * pg: The fix for the '(EOF):' prompt in the last release caused the '.'
   command to advance a line if input came from a pipe but the current
   screen was the last one that had already been buffered.
+* more: Do not rely on the state of continued calls to mbrtowc() but reset
+  its state each time and call it with the complete sequence again to work
+  around problems with glibc in EUC-JP locales (Patch by Matthew Fischer).
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and

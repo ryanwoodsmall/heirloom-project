@@ -51,7 +51,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)more.sl	1.31 (gritter) 1/15/05";
+static const char sccsid[] USED = "@(#)more.sl	1.32 (gritter) 1/21/05";
 
 /*
 ** more.c - General purpose tty output filter and file perusal program
@@ -893,12 +893,15 @@ getline(register FILE *f, int *length)
 	else if (mb_cur_max > 1 && c&0200) {
 	    int w, n;
 	    wchar_t wc;
-	    while ((n = mbrtowc(&wc, &Line[i-1], 1, &state)) == -2) {
+	    int i1;
+	    i1 = i - 1;
+	    while ((n = mbrtowc(&wc, &Line[i1], i - i1, &state)) == -2) {
 		if ((c = Getc(f)) == EOF || c == '\n')
 		    break;
 		if (i >= LINSIZ-1)
 		    Line = srealloc(Line, LINSIZ+=256);
 		Line[i++] = c;
+		memset(&state, 0, sizeof state);
 	    }
 	    if (n > 0 && (w = wcwidth(wc)) > 0)
 		column += w;
