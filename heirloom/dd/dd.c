@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)dd.sl	1.26 (gritter) 12/1/04";
+static const char sccsid[] USED = "@(#)dd.sl	1.27 (gritter) 1/31/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -770,7 +770,7 @@ ewrite(char *data, size_t size)
 static void
 cflush(void)
 {
-	if (cflow) {
+	if (convs & CONV_BLOCK && cflow) {
 		while (cflow < cbs)
 			cblok[cflow++] = ' ';
 		ewrite(cblok, cbs);

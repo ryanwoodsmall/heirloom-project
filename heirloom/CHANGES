@@ -2,6 +2,8 @@ Release ...
 * POSIX.1-2001 was added as another personality. Binaries are installed in
   /usr/5bin/posix2001 by default. mk.config files have to be augmented with
   the SU3BIN macro if they are to be reused.
+  The POSIX.1-2001 personality still lacks some features for the 'file' and
+  'pax' commands.
 * find, ls: POSIX.1-2001 versions have been introduced.
 * chown, chgrp: The -H, -L, and -P options from POSIX.1-2001 have been added.
   If changing the owner or group of a directory fails, chown and chgrp now
@@ -14,6 +16,7 @@ Release ...
   If pax detects a symbolic link loop, it now terminates for alignment with
   POSIX.1-2001.
 * tr: The -C option from POSIX.1-2001 has been added.
+* dd: With 'conv=unblock', the last block was not converted.
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now
