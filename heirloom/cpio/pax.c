@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pax.sl	1.19 (gritter) 2/5/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.20 (gritter) 2/5/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -102,6 +102,9 @@ flags(int ac, char **av)
 				break;
 			case 'k':
 				blksiz *= 1024;
+				break;
+			case 'm':
+				blksiz *= 1048576;
 				break;
 			case 'w':
 				blksiz *= 2;

@@ -83,7 +83,7 @@ Release ...
   group ownerships then).
 * pax: Without -ro or -re, set[ug]id bits are not preserved.
 * pax: A '&' in the replacement string for the '-s' option did not work.
-* pax: The '-b' option now accepts a 'b' (multiply by 512) suffix.
+* pax: The '-b' option now accepts multiplication suffixes.
 * pax: The '-u' option is now respected in read mode too.
 * pax: The '-n' option in read mode does not mark a pattern as used if it
   matched an archive entry but that entry was not selected due to '-u'.

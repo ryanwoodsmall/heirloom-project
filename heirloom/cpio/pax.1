@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.26 (gritter) 1/23/05
-.TH PAX 1 "1/23/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pax.1	1.27 (gritter) 2/5/05
+.TH PAX 1 "2/5/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
 .SH SYNOPSIS
@@ -175,10 +175,20 @@ The archive must be seekable,
 such as a regular file or a block device,
 or a tape device capable of writing between filemarks.
 .TP
-\fB\-b\fI size\fR
+\fB\-b\fI size\fR[\fBw\fR|\fBb\fR|\fBk\fR|\fBm\fR]
 Blocks input and output archives at
 .I size
 byte records.
+The optional suffix multiplies
+.I size
+by 2 for
+.BR w ,
+512 for
+.BR b ,
+1024 for
+.BR k ,
+and 1048576 for
+.BR m .
 .TP
 .B \-c
 Reverses the sense of patterns
