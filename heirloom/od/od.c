@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)od.sl	1.20 (gritter) 1/2/05";
+static const char sccsid[] USED = "@(#)od.sl	1.21 (gritter) 1/9/05";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -429,7 +429,7 @@ put(const char *s)
 				printf("*\n");
 		} else {
 			prnt(offset, ob);
-			if (ol > Os)
+			if (ol + 1 > Os)
 				Ob = srealloc(Ob, Os = ol + 1);
 			strcpy(Ob, ob);
 			eq = 0;
