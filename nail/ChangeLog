@@ -3,6 +3,9 @@
   Linux/glibc again, although mremap() is not available then. It is therefore
   recommended to use CPPFLAGS=-D_GNU_SOURCE with Linux/glibc. (Bugreports by
   Stephen Isard, Laurens Blankers, Bob Tennent.)
+* The handling of interrupts during IMAP and POP3 operations has been revised
+  as discussed on the mailing list. See the NOTES section in the manual page
+  for a description.
 * When an editor is invoked using ~e, ~v, 'edit', or 'visual', interrupts are
   no longer ignored in its process. With most editor implementations, this
   does not make any difference since they enable interrupts themselves again;

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.37 (gritter) 11/5/04";
+static char sccsid[] = "@(#)collect.c	2.38 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -416,6 +416,7 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	sigset_t oset, nset;
 	long count;
 	enum sendaction	action;
+	sighandler_type	savedtop;
 	const char tildehelp[] =
 "-------------------- ~ ESCAPES ----------------------------\n\
 ~~              Quote a single tilde\n\
@@ -456,6 +457,7 @@ collect(struct header *hp, int printheaders, struct message *mp,
 	sigaddset(&nset, SIGINT);
 	sigaddset(&nset, SIGHUP);
 	sigprocmask(SIG_BLOCK, &nset, &oset);
+	handlerpush(collint);
 	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
 		safe_signal(SIGINT, collint);
 	if ((savehup = safe_signal(SIGHUP, SIG_IGN)) != SIG_IGN)
@@ -888,6 +890,7 @@ out:
 		}
 		rewind(collf);
 	}
+	handlerpop();
 	noreset--;
 	sigemptyset(&nset);
 	sigaddset(&nset, SIGINT);

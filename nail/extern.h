@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.142 (gritter) 11/5/04
+ *	Sccsid @(#)extern.h	2.143 (gritter) 11/6/04
  */
 
 /* aux.c */
@@ -312,6 +312,7 @@ int newmailinfo(int omsgCount);
 void commands(void);
 int execute(char *linebuf, int contxt, size_t linesize);
 void setmsize(int sz);
+void onintr(int s);
 void announce(int printheaders);
 int newfileinfo(void);
 int getmdot(int newmail);

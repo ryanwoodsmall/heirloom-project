@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.77 (gritter) 10/31/04";
+static char sccsid[] = "@(#)lex.c	2.78 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -56,9 +56,9 @@ static char sccsid[] = "@(#)lex.c	2.77 (gritter) 10/31/04";
  */
 
 static char	*prompt;
+static sighandler_type	oldpipe;
 
 static const struct cmd *lex(char *Word);
-static void intr(int s);
 static void stop(int s);
 static void hangup(int s);
 
@@ -296,15 +296,19 @@ commands(void)
 	(void)&eofloop;
 	if (!sourcing) {
 		if (safe_signal(SIGINT, SIG_IGN) != SIG_IGN)
-			safe_signal(SIGINT, intr);
+			safe_signal(SIGINT, onintr);
 		if (safe_signal(SIGHUP, SIG_IGN) != SIG_IGN)
 			safe_signal(SIGHUP, hangup);
 		safe_signal(SIGTSTP, stop);
 		safe_signal(SIGTTOU, stop);
 		safe_signal(SIGTTIN, stop);
 	}
+	oldpipe = safe_signal(SIGPIPE, SIG_IGN);
+	safe_signal(SIGPIPE, oldpipe);
 	setexit();
 	for (;;) {
+		interrupts = 0;
+		handlerstacktop = NULL;
 		/*
 		 * Print the prompt, if needed.  Clear out
 		 * string space, and flush the output.
@@ -663,10 +667,12 @@ lex(char *Word)
 static int	inithdr;		/* am printing startup headers */
 
 /*ARGSUSED*/
-static void 
-intr(int s)
+void 
+onintr(int s)
 {
-
+	if (handlerstacktop != NULL)
+		return handlerstacktop(s);
+	safe_signal(SIGINT, onintr);
 	noreset = 0;
 	if (!inithdr)
 		sawcom++;
@@ -680,7 +686,9 @@ intr(int s)
 		close(image);
 		image = -1;
 	}
-	fprintf(stderr, catgets(catd, CATSET, 102, "Interrupt\n"));
+	if (interrupts != 1)
+		fprintf(stderr, catgets(catd, CATSET, 102, "Interrupt\n"));
+	safe_signal(SIGPIPE, oldpipe);
 	reset(0);
 }
 

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.207 (gritter) 11/3/04";
+static char sccsid[] = "@(#)imap.c	1.208 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -176,6 +176,7 @@ static enum okay imap_parse_list(void);
 static enum okay imap_finish(struct mailbox *mp);
 static void imap_timer_off(void);
 static void imapcatch(int s);
+static void maincatch(int s);
 static enum okay imap_noop1(struct mailbox *mp);
 static void rec_queue(enum rec_type type, unsigned long count);
 static enum okay rec_dequeue(void);
@@ -556,6 +557,16 @@ imapcatch(int s)
 	siglongjmp(imapjmp, 1);
 }
 
+static void
+maincatch(int s)
+{
+	if (interrupts++ == 0) {
+		fprintf(stderr, catgets(catd, CATSET, 102, "Interrupt\n"));
+		return;
+	}
+	onintr(0);
+}
+
 static enum okay 
 imap_noop1(struct mailbox *mp)
 {
@@ -581,11 +592,10 @@ imap_noop(void)
 		return STOP;
 	verbose = value("verbose") != NULL;
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		ok = imap_noop1(&mb);
@@ -593,6 +603,8 @@ imap_noop(void)
 	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
 	imaplock = 0;
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -705,15 +717,14 @@ imapalarm(int s)
 	sighandler_type savepipe;
 
 	if (imaplock++ == 0) {
-		saveint = safe_signal(SIGINT, SIG_IGN);
+		if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+			safe_signal(SIGINT, maincatch);
 		savepipe = safe_signal(SIGPIPE, SIG_IGN);
 		if (sigsetjmp(imapjmp, 1)) {
 			safe_signal(SIGINT, saveint);
 			safe_signal(SIGPIPE, savepipe);
 			goto brk;
 		}
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		if (imap_noop1(&mb) != OKAY) {
@@ -1453,20 +1464,18 @@ imap_get(struct mailbox *mp, struct message *m, enum needspec need)
 	case NEED_UNSPEC:
 		return STOP;
 	}
-	if (imaplock++ == 0) {
-		saveint = safe_signal(SIGINT, SIG_IGN);
-		savepipe = safe_signal(SIGPIPE, SIG_IGN);
-		if (sigsetjmp(imapjmp, 1)) {
-			safe_signal(SIGINT, saveint);
-			safe_signal(SIGPIPE, savepipe);
-			imaplock--;
-			return STOP;
-		}
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
-		if (savepipe != SIG_IGN)
-			safe_signal(SIGPIPE, imapcatch);
+	imaplock = 1;
+	savepipe = safe_signal(SIGPIPE, SIG_IGN);
+	if (sigsetjmp(imapjmp, 1)) {
+		safe_signal(SIGINT, saveint);
+		safe_signal(SIGPIPE, savepipe);
+		imaplock = 0;
+		return STOP;
 	}
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
+	if (savepipe != SIG_IGN)
+		safe_signal(SIGPIPE, imapcatch);
 	if (m->m_uid)
 		snprintf(o, sizeof o,
 				"%s UID FETCH %lu (%s)\r\n",
@@ -1547,6 +1556,8 @@ out:	while (mp->mb_active & MB_COMD)
 	if (ok == OKAY)
 		putcache(mp, m);
 	free(head);
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -1700,16 +1711,18 @@ imap_getheaders(int bot, int top)
 	if (bot >= top)
 		return;
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
-		for (i = bot; i <= top; i += chunk)
+		for (i = bot; i <= top; i += chunk) {
 			ok = imap_fetchheaders(&mb, message, i,
 					i+chunk-1 < top ? i+chunk-1 : top);
+			if (interrupts)
+				onintr(0);
+		}
 	}
 	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
@@ -1970,11 +1983,10 @@ imap_unstore(struct message *m, int n, const char *flag)
 	(void)&ok;
 	verbose = value("verbose") != NULL;
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		ok = imap_store(&mb, m, n, '-', flag, 1);
@@ -1982,6 +1994,8 @@ imap_unstore(struct message *m, int n, const char *flag)
 	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
 	imaplock = 0;
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -2015,11 +2029,10 @@ imap_imap(void *vp)
 		return 1;
 	}
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		snprintf(o, sizeof o, "%s %s\r\n", tag(1), (char *)vp);
@@ -2032,6 +2045,8 @@ imap_imap(void *vp)
 out:	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
 	imaplock = 0;
+	if (interrupts)
+		onintr(0);
 	return ok != OKAY;
 }
 
@@ -2300,12 +2315,11 @@ imap_append(const char *xserver, FILE *fp)
 	server = savestr((char *)xserver);
 	imap_split(&server, &sp, &use_ssl, &cp, &uhp, &mbx, &pass, &user);
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1))
 		goto out;
-	if (saveint != SIG_IGN)
-		safe_signal(SIGINT, imapcatch);
 	if (savepipe != SIG_IGN)
 		safe_signal(SIGPIPE, imapcatch);
 	if ((mb.mb_type == MB_CACHE || mb.mb_sock.s_fd > 0) &&
@@ -2345,6 +2359,8 @@ imap_append(const char *xserver, FILE *fp)
 out:	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
 	imaplock = 0;
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -2463,12 +2479,11 @@ imap_folders(const char *name, int strip)
 	rm(tempfn);
 	Ftfree(&tempfn);
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1))
 		goto out;
-	if (saveint != SIG_IGN)
-		safe_signal(SIGINT, imapcatch);
 	if (savepipe != SIG_IGN)
 		safe_signal(SIGPIPE, imapcatch);
 	if (mb.mb_type == MB_CACHE)
@@ -2476,6 +2491,10 @@ imap_folders(const char *name, int strip)
 	else
 		imap_list(&mb, fold, strip, fp);
 	imaplock = 0;
+	if (interrupts) {
+		Fclose(fp);
+		onintr(0);
+	}
 	fflush(fp);
 	rewind(fp);
 	if (fsize(fp) > 0)
@@ -2617,11 +2636,10 @@ imap_copy(struct message *m, int n, const char *name)
 	(void)&ok;
 	verbose = value("verbose") != NULL;
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		ok = imap_copy1(&mb, m, n, name);
@@ -2629,6 +2647,8 @@ imap_copy(struct message *m, int n, const char *name)
 	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
 	imaplock = 0;
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -2859,11 +2879,10 @@ imap_search1(const char *spec, int f)
 		return STOP;
 	verbose = value("verbose") != NULL;
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		ok = imap_search2(&mb, message, msgCount, spec, f);
@@ -2871,6 +2890,8 @@ imap_search1(const char *spec, int f)
 	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
 	imaplock = 0;
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -2906,11 +2927,10 @@ imap_remove(const char *name)
 		return STOP;
 	}
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		ok = imap_remove1(&mb, protfile(name));
@@ -2920,6 +2940,8 @@ imap_remove(const char *name)
 	imaplock = 0;
 	if (ok == OKAY)
 		ok = cache_remove(name);
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 
@@ -2962,11 +2984,10 @@ imap_rename(const char *old, const char *new)
 		return STOP;
 	}
 	imaplock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(imapjmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, imapcatch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, imapcatch);
 		ok = imap_rename1(&mb, protfile(old), protfile(new));
@@ -2976,6 +2997,8 @@ imap_rename(const char *old, const char *new)
 	imaplock = 0;
 	if (ok == OKAY)
 		ok = cache_rename(old, new);
+	if (interrupts)
+		onintr(0);
 	return ok;
 }
 

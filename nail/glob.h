@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)glob.h	2.20 (gritter) 10/2/04
+ *	Sccsid @(#)glob.h	2.21 (gritter) 11/6/04
  */
 
 /*
@@ -125,7 +125,10 @@ extern const char *month_names[];
 #include <setjmp.h>
 
 _E sigjmp_buf	srbuf;
-
+_E int		interrupts;
+_E sighandler_type	handlerstacktop;
+#define	handlerpush(f)	(savedtop = handlerstacktop, handlerstacktop = (f))
+#define	handlerpop()	(handlerstacktop = savedtop)
 
 /*
  * The pointers for the string allocation routines,

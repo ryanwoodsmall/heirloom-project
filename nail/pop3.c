@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)pop3.c	2.39 (gritter) 10/19/04";
+static char sccsid[] = "@(#)pop3.c	2.40 (gritter) 11/6/04";
 #endif
 #endif /* not lint */
 
@@ -85,6 +85,7 @@ static void pop3_timer_off(void);
 static enum okay pop3_answer(struct mailbox *mp);
 static enum okay pop3_finish(struct mailbox *mp);
 static void pop3catch(int s);
+static void maincatch(int s);
 static enum okay pop3_noop1(struct mailbox *mp);
 static void pop3alarm(int s);
 static enum okay pop3_pass(struct mailbox *mp, const char *pass);
@@ -191,6 +192,16 @@ pop3catch(int s)
 	siglongjmp(pop3jmp, 1);
 }
 
+static void
+maincatch(int s)
+{
+	if (interrupts++ == 0) {
+		fprintf(stderr, catgets(catd, CATSET, 102, "Interrupt\n"));
+		return;
+	}
+	onintr(0);
+}
+
 static enum okay 
 pop3_noop1(struct mailbox *mp)
 {
@@ -210,11 +221,10 @@ pop3_noop(void)
 	(void)&ok;
 	verbose = value("verbose") != NULL;
 	pop3lock = 1;
-	saveint = safe_signal(SIGINT, SIG_IGN);
+	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+		safe_signal(SIGINT, maincatch);
 	savepipe = safe_signal(SIGPIPE, SIG_IGN);
 	if (sigsetjmp(pop3jmp, 1) == 0) {
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, pop3catch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, pop3catch);
 		ok = pop3_noop1(&mb);
@@ -233,15 +243,14 @@ pop3alarm(int s)
 	sighandler_type savepipe;
 
 	if (pop3lock++ == 0) {
-		saveint = safe_signal(SIGINT, SIG_IGN);
+		if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+			safe_signal(SIGINT, maincatch);
 		savepipe = safe_signal(SIGPIPE, SIG_IGN);
 		if (sigsetjmp(pop3jmp, 1)) {
 			safe_signal(SIGINT, saveint);
 			safe_signal(SIGPIPE, savepipe);
 			goto brk;
 		}
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, pop3catch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, pop3catch);
 		if (pop3_noop1(&mb) != OKAY) {
@@ -645,7 +654,8 @@ pop3_get(struct mailbox *mp, struct message *m, enum needspec need)
 		return STOP;
 	}
 	if (pop3lock++ == 0) {
-		saveint = safe_signal(SIGINT, SIG_IGN);
+		if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
+			safe_signal(SIGINT, maincatch);
 		savepipe = safe_signal(SIGPIPE, SIG_IGN);
 		if (sigsetjmp(pop3jmp, 1)) {
 			safe_signal(SIGINT, saveint);
@@ -653,8 +663,6 @@ pop3_get(struct mailbox *mp, struct message *m, enum needspec need)
 			pop3lock--;
 			return STOP;
 		}
-		if (saveint != SIG_IGN)
-			safe_signal(SIGINT, pop3catch);
 		if (savepipe != SIG_IGN)
 			safe_signal(SIGPIPE, pop3catch);
 	}
@@ -680,6 +688,8 @@ retry:	switch (need) {
 			need = NEED_BODY;
 			goto retry;
 		}
+		if (interrupts)
+			onintr(0);
 		return STOP;
 	}
 	size = 0;
@@ -763,6 +773,8 @@ retry:	switch (need) {
 	if (savepipe != SIG_IGN)
 		safe_signal(SIGPIPE, savepipe);
 	pop3lock--;
+	if (interrupts)
+		onintr(0);
 	return OKAY;
 }
 

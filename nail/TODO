@@ -25,10 +25,8 @@ need them and cannot wait, contribute code.
 - The deletion code (more general, all STORE code) should be able to
   generate requests for ranges of messages to speed up operation.
 
-- The interrupt handling should be improved; the first SIGINT should
-  cause a direct return to the command loop, possibly after an outstanding
-  network operation has been completed, and a second SIGINT should cancel
-  the network operation itself.
+- Large messages should be transferred in separate parts with IMAP so
+  that the operation can be interrupted in between.
 
 ------------------------------------------------------------------------
 
@@ -64,4 +62,4 @@ window. For the receiving part, it is simply annoying. If you want
 a confirmation, ask the recipient to send one in the body of the
 message.
 
-	Gunnar Ritter					11/4/04
+	Gunnar Ritter					11/6/04
