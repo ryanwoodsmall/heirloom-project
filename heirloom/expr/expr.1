@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)expr.1	1.15 (gritter) 1/24/05
+.\" Sccsid @(#)expr.1	1.16 (gritter) 2/3/05
 .\" Parts taken from expr(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EXPR 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH EXPR 1 "2/3/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 expr \- evaluate arguments as an expression
 .SH SYNOPSIS
@@ -111,6 +111,18 @@ Same as
 .TP
 .RI ( " expr " )
 parentheses for grouping.
+.TP
+.I string
+Yields itself
+unless it is part of a larger expression.
+With
+.BR /usr/5bin/posix/expr
+and
+.BR /usr/5bin/posix2001/expr ,
+all
+.I strings
+that form valid decimal numbers
+are converted to the canonical form.
 .PP
 The following operators are supported only by
 .B /usr/5bin/s42/expr

@@ -53,6 +53,10 @@ Release ...
 * uniq: The argument to the -f and -s options is required, and a '--' is
   accepted to end the option list.
 * tail: Accept '+c' without a count; accept '--' to end the option list.
+* expr: If a parenthesis is followed by another character, the argument is
+  treated as a string now.
+* expr: With the POSIX versions, single string arguments that are valid
+  decimal numbers are converted to their canonical form (e.g. -0001 to -1).
 
 Release 050123
 * tr: The highest acceptable wide character for complementing strings is now

@@ -45,11 +45,14 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)expr_s42.sl	1.25 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)expr_s42.sl	1.26 (gritter) 2/3/05";
+static int	sus = 0;
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)expr_sus.sl	1.25 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)expr_sus.sl	1.26 (gritter) 2/3/05";
+static int	sus = 1;
 #else
-static const char sccsid[] USED = "@(#)expr.sl	1.25 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)expr.sl	1.26 (gritter) 2/3/05";
+static int	sus = 0;
 #endif
 
 /*	expression command */
@@ -131,7 +134,13 @@ static int	nbra;
 /* a single `expression' is evaluated and printed: */
 
 expression:	expr NOARG {
-			puts($1);
+			if (sus && numeric($1)) {
+				int64_t	n;
+				n = atoll($1);
+				printf("%lld\n", n);
+				exit(n == 0);
+			} else
+				puts($1);
 			exit((!strcmp($1,"0")||!strcmp($1,"\0"))? 1: 0);
 			}
 	;
@@ -204,7 +213,7 @@ yylex(void)
 
 	p = Av[Argi++];
 
-	if(*p == '(' || *p == ')')
+	if((*p == '(' || *p == ')') && p[1] == '\0')
 		return (int)*p;
 	for(i = 0; *operators[i]; ++i)
 		if(EQL(operators[i], p))
@@ -350,7 +359,7 @@ ematch(char *s, register char *p)
 	if(advance(s, expbuf)) {
 		if(nbra == 1) {
 			p = braslist[0];
-			num = braelist[0] - p;
+			num = braelist[0] ? braelist[0] - p : 0;
 			Mstring[0] = srealloc(Mstring[0], num + 1);
 			strncpy(Mstring[0], p, num);
 			Mstring[0][num] = '\0';
