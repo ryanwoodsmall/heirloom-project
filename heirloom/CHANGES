@@ -29,6 +29,8 @@ Release ...
 * cpio, pax, tar: Any filename that forms a valid UTF-8 string is now
   accepted as input when creating a pax format archive.
 * cpio: Specifying -i, -o, or -p twice is no longer considered an error.
+* shl: When the LNEXT terminal special character is given twice, it is now
+  passed to the terminal buffer properly.
 
 Release 050206
 * POSIX.1-2001 was added as another personality. Binaries are installed in

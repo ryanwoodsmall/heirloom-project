@@ -22,7 +22,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)shl.c	1.22 (gritter) 11/21/04	*/
+/*	Sccsid @(#)shl.c	1.23 (gritter) 3/7/05	*/
 
 #if !defined (__FreeBSD__) && !defined (__hpux) && !defined (_AIX) && \
 	!defined (__NetBSD__) && !defined (__OpenBSD__)
@@ -634,7 +634,8 @@ doinput(void)
 			static char hadlnext;
 
 #ifdef	VLNEXT
-			if (c && (c&0377) == (lcur->l_tio.c_cc[VLNEXT]&0377)) {
+			if (c && (c&0377) == (lcur->l_tio.c_cc[VLNEXT]&0377) &&
+					hadlnext == 0) {
 				hadlnext = c;
 			} else
 #endif	/* VLNEXT */
