@@ -27,8 +27,9 @@ Release ...
   length of the converted multibyte sequence is smaller than the original one.
 * Multibyte sequences that correspond to an unprintable character are now
   printed as multiple octal escape sequences.
-* Pressing the ^U (kill) character in insert mode sometimes positioned the
-  cursor at weird locations since the last revision (P).
+* Pressing the ^U (kill) character in insert mode with a multibyte character
+  at the beginning of an insertion at the start of a line sometimes positioned
+  the cursor at weird locations since the last revision.
 * Fixed an old vi bug: If a vi command that yanked or deleted part of a line
   was followed by an ex command that also yanked or deleted some text, a
   following 'p' vi command pasted the text affected by the former vi command.
@@ -174,4 +175,5 @@ Release 31/05/00
   enabled with -DISO8859_1. It does not include the regular expression code,
   but otherwise works well in practice with the ISO-8859-1 character set.
 
-Fixes for problems that were introduced in this port are marked (P).
+Fixes for problems that were introduced in this port are marked (P), unless
+they only affect newly introduced parts (such as multibyte support).
