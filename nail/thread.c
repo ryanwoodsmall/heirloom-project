@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.47 (gritter) 9/9/04";
+static char sccsid[] = "@(#)thread.c	1.48 (gritter) 9/9/04";
 #endif
 #endif /* not lint */
 
@@ -702,7 +702,7 @@ colps(b, cl)
 	struct message	*m;
 	int	cc = 0, uc = 0;
 
-	if (cl && b->m_collapsed > 0)
+	if (cl && (b->m_collapsed > 0 || (b->m_flag & (MNEW|MREAD)) == MNEW))
 		return;
 	if (b->m_child) {
 		m = b->m_child;
