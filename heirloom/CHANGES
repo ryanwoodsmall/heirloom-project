@@ -10,6 +10,9 @@ Release ...
   regular prompt and then with '(EOF):'. The end-of-file condition is now
   detected earlier, and the prompt is changed earlier accordingly.
 * od: Fixed a one-byte heap overflow in the output buffering mechanism.
+* more: If a 'n' command was given without a previous '/', a segmentation
+  fault occured. The error condition is now properly recognized (Bugreport
+  by Matthew Fischer).
 
 Release 050106
 * grep: A '-z' option is now available; it decompresses compressed files and

@@ -51,7 +51,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)more.sl	1.28 (gritter) 12/12/04";
+static const char sccsid[] USED = "@(#)more.sl	1.29 (gritter) 1/15/05";
 
 /*
 ** more.c - General purpose tty output filter and file perusal program
@@ -1418,6 +1418,8 @@ search (char *buf, FILE *file, register int n)
     context.line = saveln = Currline;
     context.chrctr = startline;
     lncount = 0;
+    if (buf == NULL && used == 0)
+	    error ("No previous regular expression");
     if (buf && used) {
 	regfree(&s);
 	used = 0;
