@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.34 (gritter) 1/2/05";
+static char sccsid[] = "@(#)ex_vput.c	1.35 (gritter) 1/10/05";
 #endif
 #endif
 
@@ -623,12 +623,6 @@ vinschar(int c)
 		}
 		return c;
 	}
-	insmc0 = 0;
-#ifdef	MB
-	while (inscol+insmc0 < LBSIZE &&
-			(vtube0[inscol+insmc0]&(MULTICOL|TRIM)) == MULTICOL)
-		insmc0++;
-#endif	/* MB */
 	insmc1 = colsc(c) - 1;
 	/*
 	 * Compute the number of positions in the line image of the
@@ -659,6 +653,16 @@ vinschar(int c)
 	 * of the output cursor.
 	 */
 	inscol = destcol + (destline - LINE(vcline)) * WCOLS;
+	insmc0 = 0;
+#ifdef	MB
+	i = 0;
+	while (inscol+i < LBSIZE && vtube0[inscol+i]&MULTICOL &&
+			(vtube0[inscol+insmc0+i]&(MULTICOL|TRIM)) != MULTICOL)
+		i++;
+	while (inscol+insmc0+i < LBSIZE &&
+			(vtube0[inscol+insmc0+i]&(MULTICOL|TRIM)) == MULTICOL)
+		insmc0++;
+#endif	/* MB */
 	if (c == '\t') {
 		/*
 		 * Characters inserted from a tab must be
