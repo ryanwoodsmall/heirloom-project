@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pax.sl	1.18 (gritter) 1/31/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.19 (gritter) 2/5/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -70,6 +70,7 @@ flags(int ac, char **av)
 	const char	optstring[] = "rwab:cdf:HikKlLno:p:s:tuvx:X";
 	int	i;
 	int	illegal = 0;
+	char	*x;
 
 	pax = 1;
 	dflag = 1;
@@ -94,7 +95,19 @@ flags(int ac, char **av)
 			Aflag = 1;
 			break;
 		case 'b':
-			if ((blksiz = atol(optarg)) <= 0)
+			blksiz = strtol(optarg, &x, 10);
+			switch (*x) {
+			case 'b':
+				blksiz *= 512;
+				break;
+			case 'k':
+				blksiz *= 1024;
+				break;
+			case 'w':
+				blksiz *= 2;
+				break;
+			}
+			if (blksiz <= 0)
 				msg(4, -2,
 					"Illegal size given for -b option.\n");
 			Cflag = 1;
@@ -495,19 +508,26 @@ int
 pax_track(const char *name, time_t mtime)
 {
 	struct pax_had	*pp;
+	struct stat	st;
 
-	if ((pax_uflag == 0 || action != 'o') && (pax_nflag == 0 || patterns))
+	if (pax_uflag == 0 && (pax_nflag == 0 || patterns))
 		return 1;
-	if (plook(name, &pp) != 0) {
-		if (pax_uflag == 0)
+	if (action == 'i' && pax_uflag) {
+		if (lstat(name, &st) == 0 && mtime < st.st_mtime)
 			return 0;
-		if (mtime > pp->p_mtime) {
+	}
+	if (action != 'i' || pax_nflag) {
+		if (plook(name, &pp) != 0) {
+			if (action != 'i' && pax_uflag == 0)
+				return 0;
+			if (mtime > pp->p_mtime) {
+				pp->p_mtime = mtime;
+				return 1;
+			}
+			return 0;
+		} else
 			pp->p_mtime = mtime;
-			return 1;
-		}
-		return 0;
-	} else
-		pp->p_mtime = mtime;
+	}
 	return 1;
 }
 
@@ -670,7 +690,7 @@ pax_sname(char **oldp, size_t *olds)
 			if (y >= 0)
 				for (l = bralist[y].rm_so; l < bralist[y].rm_eo;
 						l++)
-					put(inp[i]);
+					put(inp[l]);
 			else
 				put(c);
 		}

@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	1.284 (gritter) 12/4/04";
+static const char sccsid[] USED = "@(#)cpio.sl	1.285 (gritter) 2/5/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -872,7 +872,7 @@ static int	skippad(unsigned long long, int);
 static int	allzero(const char *, int);
 static const char	*getuser(uid_t);
 static const char	*getgroup(gid_t);
-static int	want(struct file *);
+static struct glist	*want(struct file *, struct glist **);
 static void	patfile(void);
 static int	ckodd(long long, int, const char *, const char *);
 static int	rname(char **, size_t *);
@@ -2451,8 +2451,18 @@ rstime(const char *fn, struct stat *st, const char *which)
 
 	utb.actime = st->st_atime;
 	utb.modtime = st->st_mtime;
+	if (pax && (pax_preserve&(PAX_P_ATIME|PAX_P_MTIME)) != 0 &&
+			(pax_preserve&PAX_P_EVERY) == 0) {
+		struct stat	xst;
+		if (stat(fn, &xst) < 0)
+			goto fail;
+		if (pax_preserve&PAX_P_ATIME)
+			utb.actime = xst.st_atime;
+		if (pax_preserve&PAX_P_MTIME)
+			utb.modtime = xst.st_mtime;
+	}
 	if (utime(fn, &utb) < 0) {
-		emsg(2, "Unable to reset %s time for \"%s\"", which, fn);
+	fail:	emsg(2, "Unable to reset %s time for \"%s\"", which, fn);
 		return 1;
 	}
 	return 0;
@@ -2728,7 +2738,7 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 	struct stat	nst;
 	char	*temp = NULL;
 	size_t	len;
-	int	fd;
+	int	fd, i;
 	int	failure = 2;
 
 	if (fmttype == FMT_ZIP && (f->f_st.st_mode&S_IFMT) != S_IFREG &&
@@ -2801,8 +2811,10 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && f->f_st.st_nlink > 1 &&
 			(fmttype & TYP_CPIO || fmttype == FMT_ZIP
 			 || action == 'p') &&
-			canlink(tgt, &f->f_st, 1)) {
+			(i = canlink(tgt, &f->f_st, 1)) != 0) {
 		tunlink(&temp);
+		if (pax && i < 0)
+			goto skip;
 		/*
 		 * At this point, hard links in SVR4 cpio format have
 		 * been reordered and data is associated with the first
@@ -3153,10 +3165,13 @@ setattr(const char *fn, struct stat *st)
 	uid_t	uid = Rflag ? Ruid : myuid;
 	gid_t	gid = Rflag ? Rgid : mygid;
 
-	if (myuid == 0 && (pax == 0 || pax_preserve&PAX_P_OWNER)) {
+	if ((pax == 1 || myuid == 0) &&
+			(pax == 0 || pax_preserve&(PAX_P_OWNER|PAX_P_EVERY))) {
 		if (setowner(fn, st) != 0)
 			return 1;
 	}
+	if (pax == 1 && (pax_preserve&(PAX_P_OWNER|PAX_P_EVERY)) == 0)
+		mode &= ~(mode_t)(S_ISUID|S_ISGID);
 	if (myuid != 0 || Rflag) {
 		if (st->st_uid != uid || st->st_gid != gid) {
 			mode &= ~(mode_t)S_ISUID;
@@ -3176,7 +3191,8 @@ setattr(const char *fn, struct stat *st)
 		emsg(2, "Cannot chmod() \"%s\"", fn);
 		return 1;
 	}
-	if (pax ? (pax_preserve&PAX_P_MTIME) == 0 : mflag)
+	if (pax ? (pax_preserve&(PAX_P_ATIME|PAX_P_MTIME|PAX_P_EVERY)) !=
+			(PAX_P_ATIME|PAX_P_MTIME) : mflag)
 		return rstime(fn, st, "modification");
 	else
 		return 0;
@@ -3185,7 +3201,7 @@ setattr(const char *fn, struct stat *st)
 static int
 setowner(const char *fn, struct stat *st)
 {
-	uid_t	uid = Rflag ? Ruid : st->st_uid;
+	uid_t	uid = Rflag ? Ruid : myuid ? myuid : st->st_uid;
 	gid_t	gid = Rflag ? Rgid : st->st_gid;
 
 	if (((st->st_mode&S_IFMT)==S_IFLNK?lchown:chown)(fn, uid, gid) < 0) {
@@ -3242,7 +3258,7 @@ canlink(const char *path, struct stat *st, int really)
 			else if (pax) {
 				emsg(3, "Cannot link \"%s\" and \"%s\"",
 						ip->i_name, path);
-				errcnt++;
+				return -1;
 			}
 		} else {
 			printf(" == %s", ip->i_name);
@@ -3471,15 +3487,27 @@ flushtree(struct islot *ip, int pad)
 static int
 inpone(struct file *f, int shallskip)
 {
-	if ((patterns == NULL || want(f) ^ fflag) &&
-			pax_track(f->f_name, f->f_st.st_mtime) &&
-			(pax_sflag == 0 || pax_sname(&f->f_name, &f->f_nsiz)) &&
-			(rflag == 0 || rname(&f->f_name, &f->f_nsiz))) {
-		errcnt += infile(f);
-		return 0;
+	struct glist	*gp = NULL, *gb = NULL;
+	int	val = -1, selected = 0;
+
+	if ((patterns == NULL || (gp = want(f, &gb)) != NULL ^ fflag) &&
+			pax_track(f->f_name, f->f_st.st_mtime)) {
+		selected = 1;
+		if ((pax_sflag == 0 || pax_sname(&f->f_name, &f->f_nsiz)) &&
+				(rflag == 0 || rname(&f->f_name, &f->f_nsiz))) {
+			errcnt += infile(f);
+			val = 0;
+		}
 	} else if (shallskip)
 		errcnt += skipfile(f);
-	return -1;
+	if (gp != NULL && selected) {
+		gp->g_gotcha = 1;
+		if (gp->g_nxt && gp->g_nxt->g_art)
+			gp->g_nxt->g_gotcha = 1;
+		else if (gp->g_art && gb)
+			gb->g_gotcha = 1;
+	}
+	return val;
 }
 
 /*
@@ -3921,7 +3949,8 @@ retry2:	if (fmttype & TYP_BINARY) {
 			skipped);
 	}
 	attempts = 0;
-	if (f->f_st.st_atime == 0 || pax_preserve & PAX_P_ATIME)
+	if (f->f_st.st_atime == 0 || (pax_preserve&(PAX_P_ATIME|PAX_P_EVERY)) ==
+			PAX_P_ATIME)
 		f->f_st.st_atime = f->f_st.st_mtime;
 	if ((f->f_dsize = f->f_st.st_size) < 0)
 		goto badhdr;
@@ -4763,25 +4792,20 @@ addg(const char *pattern, int art)
 /*
  * Check if the file name s matches any of the given patterns.
  */
-static int
-want(struct file *f)
+static struct glist *
+want(struct file *f, struct glist **gb)
 {
 	extern int	gmatch(const char *, const char *);
-	struct glist	*gp, *gb = NULL;
+	struct glist	*gp;
 
 	for (gp = patterns; gp; gp = gp->g_nxt) {
 		if ((gmatch(f->f_name, gp->g_pat) != 0) ^ gp->g_not &&
 				(pax_nflag == 0 || gp->g_gotcha == 0)) {
-			gp->g_gotcha = 1;
-			if (gp->g_nxt && gp->g_nxt->g_art)
-				gp->g_nxt->g_gotcha = 1;
-			else if (gp->g_art && gb)
-				gb->g_gotcha = 1;
-			return 1;
+			return gp;
 		}
-		gb = gp;
+		*gb = gp;
 	}
-	return 0;
+	return NULL;
 }
 
 static void
