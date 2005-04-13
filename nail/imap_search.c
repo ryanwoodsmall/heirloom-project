@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap_search.c	1.27 (gritter) 11/4/04";
+static char sccsid[] = "@(#)imap_search.c	1.28 (gritter) 4/14/05";
 #endif
 #endif /* not lint */
 
@@ -509,7 +509,7 @@ itexecute(struct mailbox *mp, struct message *m, int c, struct itnode *n)
 	case ITALL:
 		return 1;
 	case ITANSWERED:
-		return m->m_flag & MANSWERED;
+		return (m->m_flag&MANSWERED) != 0;
 	case ITBCC:
 		return matchenvelope(m, "bcc", n->n_v);
 	case ITBEFORE:
@@ -519,17 +519,17 @@ itexecute(struct mailbox *mp, struct message *m, int c, struct itnode *n)
 	case ITCC:
 		return matchenvelope(m, "cc", n->n_v);
 	case ITDELETED:
-		return m->m_flag & MDELETED;
+		return (m->m_flag&MDELETED) != 0;
 	case ITDRAFT:
-		return m->m_flag & MDRAFTED;
+		return (m->m_flag&MDRAFTED) != 0;
 	case ITFLAGGED:
-		return m->m_flag & MFLAGGED;
+		return (m->m_flag&MFLAGGED) != 0;
 	case ITFROM:
 		return matchenvelope(m, "from", n->n_v);
 	case ITHEADER:
 		return matchfield(m, n->n_v, n->n_w);
 	case ITKEYWORD:
-		return m->m_flag & n->n_n;
+		return (m->m_flag & n->n_n) != 0;
 	case ITLARGER:
 		return m->m_xsize > n->n_n;
 	case ITNEW:
@@ -544,9 +544,9 @@ itexecute(struct mailbox *mp, struct message *m, int c, struct itnode *n)
 		return itexecute(mp, m, c, n->n_x) |
 			itexecute(mp, m, c, n->n_y);
 	case ITRECENT:
-		return m->m_flag & MNEW;
+		return (m->m_flag&MNEW) != 0;
 	case ITSEEN:
-		return m->m_flag & MREAD;
+		return (m->m_flag&MREAD) != 0;
 	case ITSENTBEFORE:
 		return m->m_date < n->n_n;
 	case ITSENTON:
