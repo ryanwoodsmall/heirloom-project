@@ -38,10 +38,11 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.80 (gritter) 2/12/05";
+static char sccsid[] = "@(#)cmd3.c	2.81 (gritter) 4/13/05";
 #endif
 #endif /* not lint */
 
+#include <math.h>
 #include <float.h>
 #include "rcv.h"
 #include "extern.h"
@@ -1472,10 +1473,11 @@ cundraft(void *v)
 static float 
 huge(void)
 {
+#if defined (_CRAY)
 	/*
 	 * This is not perfect, but correct for machines with a 32-bit
-	 * IEEE float, and does at least not produce SIGFPE on the Cray
-	 * Y-MP.
+	 * IEEE float and a 32-bit unsigned long, and does at least not
+	 * produce SIGFPE on the Cray Y-MP.
 	 */
 	union {
 		float	f;
@@ -1484,6 +1486,15 @@ huge(void)
 
 	u.l = 0xff800000; /* -inf */
 	return u.f;
+#elif defined (INFINITY)
+	return -INFINITY;
+#elif defined (HUGE_VALF)
+	return -HUGE_VALF;
+#elif defined (FLT_MAX)
+	return -FLT_MAX;
+#else
+	return -1e10;
+#endif
 }
 
 int 
