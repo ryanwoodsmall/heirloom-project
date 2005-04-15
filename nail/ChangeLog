@@ -1,6 +1,8 @@
 [11.23] released ...
 * The ~F and ~M tilde escapes did not work for interpolating messages with
   binary attachments anymore since version 11.13 (Bugreport by Tivon Luker).
+* The current message is now shown in the header summary even if it has been
+  killed.
 * The 'kill' command did not operate correctly on 64-bit big-endian machines.
 
 [11.22] released 3/20/05

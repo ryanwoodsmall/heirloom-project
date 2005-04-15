@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.98 (gritter) 3/4/05
+ *	Sccsid @(#)def.h	2.99 (gritter) 4/15/05
  */
 
 /*
@@ -403,6 +403,9 @@ enum gfield {
 };
 
 #define	GMASK	(GTO|GSUBJECT|GCC|GBCC|GREPLYTO)/* Mask of places from whence */
+
+#define	visible(mp)	(((mp)->m_flag&(MDELETED|MHIDDEN|MKILL))==0|| \
+				dot==(mp) && (mp)->m_flag&MKILL)
 
 /*
  * Structure used to pass about the current

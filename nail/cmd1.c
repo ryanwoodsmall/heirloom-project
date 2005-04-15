@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.94 (gritter) 3/4/05";
+static char sccsid[] = "@(#)cmd1.c	2.95 (gritter) 4/15/05";
 #endif
 #endif /* not lint */
 
@@ -104,7 +104,7 @@ headers(void *v)
 		g = 0;
 		mq = &message[0];
 		for (mp = &message[0]; mp < &message[msgCount]; mp++)
-			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0) {
+			if (visible(mp)) {
 				if (g % size == 0)
 					mq = mp;
 				if (mp->m_flag&fl) {
@@ -127,7 +127,7 @@ headers(void *v)
 		mesg = mp - &message[0];
 		if (dot != &message[n-1]) {
 			for (mq = mp; mq < &message[msgCount]; mq++)
-				if ((mq->m_flag&(MDELETED|MHIDDEN|MKILL))==0) {
+				if (visible(mq)) {
 					setdot(mq);
 					break;
 				}
@@ -136,7 +136,7 @@ headers(void *v)
 			imap_getheaders(mesg+1, mesg + size);
 		for (; mp < &message[msgCount]; mp++) {
 			mesg++;
-			if (mp->m_flag & (MDELETED|MHIDDEN|MKILL))
+			if (!visible(mp))
 				continue;
 			if (flag++ >= size)
 				break;
@@ -146,8 +146,7 @@ headers(void *v)
 		g = 0;
 		mq = threadroot;
 		for (mp = threadroot; mp; mp = next_in_thread(mp))
-			if ((mp->m_flag&(MDELETED|MHIDDEN|MKILL))==0 &&
-					(mp->m_collapsed <= 0 ||
+			if (visible(mp) && (mp->m_collapsed <= 0 ||
 					 mp == &message[n-1])) {
 				if (g % size == 0)
 					mq = mp;
@@ -170,15 +169,13 @@ headers(void *v)
 		mp = mq;
 		if (dot != &message[n-1]) {
 			for (mq = mp; mq; mq = next_in_thread(mq))
-				if ((mq->m_flag&(MDELETED|MHIDDEN|MKILL))==0 &&
-						mq->m_collapsed <= 0) {
+				if (visible(mq) && mq->m_collapsed <= 0) {
 					setdot(mq);
 					break;
 				}
 		}
 		while (mp) {
-			if ((mp->m_flag & (MDELETED|MHIDDEN|MKILL)) == 0 &&
-					(mp->m_collapsed <= 0 ||
+			if (visible(mp) && (mp->m_collapsed <= 0 ||
 					 mp == &message[n-1])) {
 				if (flag++ >= size)
 					break;

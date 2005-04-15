@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.80 (gritter) 1/8/05";
+static char sccsid[] = "@(#)lex.c	2.81 (gritter) 4/15/05";
 #endif
 #endif /* not lint */
 
@@ -271,8 +271,7 @@ newmailinfo(int omsgCount)
 		if (mb.mb_type == MB_IMAP)
 			imap_getheaders(omsgCount+1, msgCount);
 		while (++omsgCount <= msgCount)
-			if (!(message[omsgCount-1].m_flag &
-						(MDELETED|MKILL|MHIDDEN)))
+			if (visible(&message[omsgCount-1]))
 				printhead(omsgCount, stdout, 0);
 	}
 	return mdot;
@@ -616,7 +615,7 @@ out:
 	if (com == (struct cmd *)NULL)
 		return(0);
 	if (value("autoprint") != NULL && com->c_argtype & P)
-		if ((dot->m_flag & (MDELETED|MHIDDEN|MKILL)) == 0) {
+		if (visible(dot)) {
 			muvec[0] = dot - &message[0] + 1;
 			muvec[1] = 0;
 			type(muvec);
