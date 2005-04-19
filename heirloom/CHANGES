@@ -1,4 +1,8 @@
 Release ...
+* tar: Fixed a NULL pointer dereference that occured if the 'b' option was
+  given without a corresponding argument.
+
+Release 050411
 * diff: The -p option (print name of surrounding C function) has been added.
 * diff: The -X option (ignore patterns from file) has been added.
 * diff: The combination of the -h and -r options works again.

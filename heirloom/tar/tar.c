@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.171 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)tar.sl	1.172 (gritter) 4/19/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -454,9 +454,11 @@ main(int argc, char *argv[])
 			break;
 		case 'b':
 			bflag = B_USER;
+			if (*argv == NULL)
+				goto invblk;
 			nblock = atoi(*argv++);
 			if (nblock <= 0 || (long)nblock > MAXBLF) {
-				fprintf(stderr,
+			invblk:	fprintf(stderr,
 					"%s: invalid blocksize. (Max %ld)\n",
 					progname, (long)MAXBLF);
 				done(1);
