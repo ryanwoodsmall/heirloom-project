@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.172 (gritter) 4/19/05";
+static const char sccsid[] USED = "@(#)tar.sl	1.173 (gritter) 4/19/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -2079,7 +2079,8 @@ cmp(const char *b, const char *s, size_t n)
 static int
 readtape(char *buffer)
 {
-	int i, j;
+	static int rd;
+	int i = -1, j;
 
 again:	if (recno >= nblock || first == 0) {
 		if (first == 0 && nblock == 1 && bflag == 0)
@@ -2091,7 +2092,7 @@ again:	if (recno >= nblock || first == 0) {
 					"of block size.\n", progname);
 			done(1);
 		}
-		if ((i = mtread(tbuf, TBLOCK*j)) < 0) {
+		if ((rd = i = mtread(tbuf, TBLOCK*j)) < 0) {
 			fprintf(stderr, "%s: tape read error\n", progname);
 			done(3);
 		}
@@ -2099,7 +2100,7 @@ again:	if (recno >= nblock || first == 0) {
 			goto again;
 		if (first == 0 || i == 0) {
 			if ((i % TBLOCK) != 0 || i == 0) {
-				fprintf(stderr, "%s: tape blocksize error\n",
+			tbe:	fprintf(stderr, "%s: tape blocksize error\n",
 						progname);
 				done(3);
 			}
@@ -2117,6 +2118,8 @@ again:	if (recno >= nblock || first == 0) {
 		recno = 0;
 	}
 	first = 1;
+	if ((rd -= TBLOCK) < 0)
+		goto tbe;
 	memcpy(buffer, &tbuf[recno++], TBLOCK);
 	return(TBLOCK);
 }

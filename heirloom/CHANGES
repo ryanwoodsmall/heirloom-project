@@ -1,6 +1,11 @@
 Release ...
 * tar: Fixed a NULL pointer dereference that occured if the 'b' option was
   given without a corresponding argument.
+* tar: Immediately issue an error if calls to read() for an input archive
+  return fewer bytes than the first one and the archive has not yet been
+  processed completely. This condition was previously not detected in the
+  rare case where the previous contents of the input buffer accidentally
+  formed a valid continuation of the archive.
 
 Release 050411
 * diff: The -p option (print name of surrounding C function) has been added.
