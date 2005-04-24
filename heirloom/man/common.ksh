@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.33 (gritter) 2/15/05
+#	Sccsid common.ksh	1.34 (gritter) 4/25/05
 #
 
 #
@@ -161,6 +161,10 @@ format() {
 				;;
 			.so\ *)
 				f_so="${f_firstline#.so+( )}"
+				case $f_so in
+				*/*)	;;
+				*)	f_so=${1%%/*}/$f_so ;;
+				esac
 				for f_i in "$f_so"*
 				do
 					format "$f_i" "$2" "$3" "$4"

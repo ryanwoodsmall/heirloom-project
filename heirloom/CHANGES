@@ -1,4 +1,5 @@
 Release ...
+* man: Handle .so requests that do not contain a path to the target file.
 * tar: Fixed a NULL pointer dereference that occured if the 'b' option was
   given without a corresponding argument.
 * tar: Immediately issue an error if calls to read() for an input archive
