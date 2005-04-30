@@ -22,10 +22,37 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)shl.c	1.23 (gritter) 3/7/05	*/
+
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#define	USED	__attribute__ ((used))
+#elif defined __GNUC__
+#define	USED	__attribute__ ((unused))
+#else
+#define	USED
+#endif
+static const char sccsid[] USED = "@(#)shl.sl	1.24 (gritter) 4/30/05";
 
 #if !defined (__FreeBSD__) && !defined (__hpux) && !defined (_AIX) && \
 	!defined (__NetBSD__) && !defined (__OpenBSD__)
+
+#include	<sys/types.h>
+#include	<termios.h>
+
+/*
+ * Structure for a single shell layer.
+ */
+struct layer {
+	struct layer	*l_prev;	/* previous node in layer list */
+	struct layer	*l_next;	/* next node in layer list */
+	struct termios	l_tio;		/* termios struct of layer */
+	char		l_name[9];	/* name of layer */
+	char		l_line[64];	/* device name for tty */
+	pid_t		l_pid;		/* pid/pgid of layer */
+	int		l_pty;		/* pty master */
+	int		l_blk;		/* output is blocked */
+};
+
+extern int	sysv3;
 
 /*
  * UnixWare 2.1 needs _KMEMUSER to access some flags for STREAMS. Maybe other
@@ -46,7 +73,6 @@
  * is collected by the same mechanism in reverse direction.
  */
 
-#include	"shl.h"
 #include	<sys/wait.h>
 #include	<sys/stat.h>
 #include	<sys/ioctl.h>
@@ -913,12 +939,27 @@ llist(struct layer *l)
 int
 lpslist(struct layer *l)
 {
-	int ret;
+	pid_t	pid;
+	int	status;
 
 	llist(l);
-	ret = pslist(l, msg);
-	msg("");
-	return ret;
+	switch (pid = fork()) {
+	case -1:
+		return 1;
+	default:
+		while (waitpid(pid, &status, 0) != pid);
+		msg("");
+		break;
+	case 0:
+		putenv("PATH=" SV3BIN ":" DEFBIN ":/bin:/usr/bin");
+		if (sysv3 && getenv("SYSV3") == NULL)
+			putenv("SYSV3=set");
+		dup2(2, 1);
+		execlp("ps", "ps", "-f", "-t", &l->l_line[5], NULL);
+		msg("no ps command found");
+		_exit(0177);
+	}
+	return status;
 }
 
 /*

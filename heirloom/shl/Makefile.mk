@@ -1,16 +1,10 @@
 all: shl
 
-shl: shl.o pslist.o shlid.o
-	$(LD) $(LDFLAGS) shl.o pslist.o shlid.o $(LCOMMON) $(LWCHAR) $(LIBS) -o shl
+shl: shl.o
+	$(LD) $(LDFLAGS) shl.o $(LCOMMON) $(LWCHAR) $(LIBS) -o shl
 
 shl.o: shl.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(GNUFL) $(IWCHAR) $(ICOMMON) -c shl.c
-
-pslist.o: pslist.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -c pslist.c
-
-shlid.o: shlid.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -c shlid.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -DSV3BIN='"$(SV3BIN)"' -DDEFBIN='"$(DEFBIN)"' -c shl.c
 
 install: all
 	u=`uname`; \
@@ -26,8 +20,4 @@ install: all
 	fi
 
 clean:
-	rm -f shl shl.o pslist.o shlid.o core log *~
-
-shl.o: shl.h
-pslist.o: shl.h
-shlid.o: shl.h
+	rm -f shl shl.o core log *~

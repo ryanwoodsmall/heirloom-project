@@ -7,6 +7,7 @@ Release ...
   processed completely. This condition was previously not detected in the
   rare case where the previous contents of the input buffer accidentally
   formed a valid continuation of the archive.
+* shl: The external 'ps' command is now used for the 'layers -l' command.
 
 Release 050411
 * diff: The -p option (print name of surrounding C function) has been added.
