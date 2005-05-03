@@ -8,6 +8,8 @@ Release ...
   rare case where the previous contents of the input buffer accidentally
   formed a valid continuation of the archive.
 * shl: The external 'ps' command is now used for the 'layers -l' command.
+* cp: An '-a' option was added that preserves hard links and all attributes
+  during a recursive copy.
 
 Release 050411
 * diff: The -p option (print name of surrounding C function) has been added.

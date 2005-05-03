@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.79 (gritter) 3/17/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.80 (gritter) 5/3/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.79 (gritter) 3/17/05";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.80 (gritter) 5/3/05";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.79 (gritter) 3/17/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.80 (gritter) 5/3/05";
 #endif
 
 #include	<sys/types.h>
@@ -1124,7 +1124,7 @@ getfl(void)
 		go = ln;
 	} else {
 		pers = PERS_CP;
-		optstring = "b:dDfiHLpPrRs";
+		optstring = "ab:dDfiHLpPrRs";
 		go = cpmv;
 	}
 	return optstring;
@@ -1176,6 +1176,9 @@ main(int argc, char **argv)
 		case 'p':
 			pflag = 1;
 			break;
+		case 'a':
+			dflag = pflag = 1;
+			/*FALLTHRU*/
 		case 'R':
 			Rflag = 1;
 			/*FALLTHRU*/
