@@ -1,4 +1,7 @@
 [11.23] released ...
+* Fixed a crash due to a null pointer dereference that occurred when both
+  control and non-ASCII bytes but no NUL bytes were present in a message
+  body and no content type was defined in a mime.types file.
 * The ~F and ~M tilde escapes did not work for interpolating messages with
   binary attachments anymore since version 11.13 (Bugreport by Tivon Luker).
 * The current message is now shown in the header summary even if it has been
