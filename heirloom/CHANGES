@@ -1,4 +1,6 @@
 Release ...
+* Fixed a double free() call that could occur in multibyte locales with
+  all programs using traditional (simple) regular expressions.
 * man: Handle .so requests that do not contain a path to the target file.
 * tar: Fixed a NULL pointer dereference that occured if the 'b' option was
   given without a corresponding argument.

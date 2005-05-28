@@ -45,7 +45,7 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.54 (gritter) 2/19/05";
+	"@(#)regexp.sl	1.55 (gritter) 5/28/05";
 
 #if !defined (REGEXP_H_USED_FROM_VI) && !defined (__dietlibc__)
 #define	REGEXP_H_WCHARS
@@ -787,8 +787,8 @@ regexp_h_pushwc(struct regexp_h_stack **sb,
 }
 
 static regexp_h_inline const char *
-regexp_h_pop(struct regexp_h_stack **sp, const char ***sc,
-		const char *lp)
+regexp_h_pop(struct regexp_h_stack **sb, struct regexp_h_stack **sp,
+		const char ***sc, const char *lp)
 {
 	if (regexp_h_firstwc == NULL || lp <= regexp_h_firstwc)
 		return &lp[-1];
@@ -798,6 +798,7 @@ regexp_h_pop(struct regexp_h_stack **sp, const char ***sc,
 		if ((*sp)->s_prv == NULL) {
 			regexp_h_free(*sp);
 			*sp = NULL;
+			*sb = NULL;
 			return regexp_h_firstwc;
 		}
 		*sp = (*sp)->s_prv;
@@ -1175,7 +1176,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #ifdef	REGEXP_H_WCHARS
 		} else {
 			do {
-				lp = regexp_h_pop(&sp, &sc, lp);
+				lp = regexp_h_pop(&sb, &sp, &sc, lp);
 				if (lp <= locs)
 					break;
 				if (regexp_h_advance(lp, ep)) {
