@@ -1,4 +1,8 @@
 [11.23] released ...
+* The 'move' command does not anymore mark messages as moved if writing to
+  an IMAP folder fails.
+* The 'undelete' command now also clears the 'saved' flags of messages that
+  have been moved.
 * Fixed a crash due to a null pointer dereference that occurred when both
   control and non-ASCII bytes but no NUL bytes were present in a message
   body and no content type was defined in a mime.types file.

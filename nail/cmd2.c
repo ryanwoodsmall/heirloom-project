@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.43 (gritter) 12/2/04";
+static char sccsid[] = "@(#)cmd2.c	2.45 (gritter) 5/28/05";
 #endif
 #endif /* not lint */
 
@@ -371,17 +371,14 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 				ignore[0].i_count == 0 &&
 				ignore[1].i_count == 0 &&
 				imap_thisaccount(file)) {
-			if (imap_copy(mp, *ip, file) == STOP) {
-				Fclose(obuf);
-				return 1;
-			}
+			if (imap_copy(mp, *ip, file) == STOP)
+				goto ferr;
 			mstats[0] = -1;
 			mstats[1] = mp->m_xsize;
 		} else if (send(mp, obuf, ignore, NULL,
 					convert, mstats) < 0) {
 			perror(file);
-			Fclose(obuf);
-			return(1);
+			goto ferr;
 		}
 		touch(mp);
 		if (mark)
@@ -396,7 +393,7 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 	fflush(obuf);
 	if (ferror(obuf)) {
 		perror(file);
-		success = 0;
+	ferr:	success = 0;
 	}
 	if (Fclose(obuf) != 0)
 		success = 0;
@@ -411,12 +408,18 @@ save1(char *str, int mark, char *cmd, struct ignoretab *ignore,
 		else
 			printf(catgets(catd, CATSET, 27, "binary"));
 		printf("/%lu\n", (long)tstats[1]);
-	} else if (mark)
+	} else if (mark) {
 		for (ip = msgvec; *ip && ip-msgvec < msgCount; ip++) {
 			mp = &message[*ip - 1];
 			mp->m_flag &= ~MSAVED;
 		}
-	if (domove && last) {
+	} else if (domove) {
+		for (ip = msgvec; *ip && ip-msgvec < msgCount; ip++) {
+			mp = &message[*ip - 1];
+			mp->m_flag &= ~(MSAVED|MDELETED);
+		}
+	}
+	if (domove && last && success) {
 		setdot(&message[last-1]);
 		last = first(0, MDELETED);
 		setdot(&message[last ? last-1 : 0]);
@@ -554,7 +557,10 @@ undeletecmd(void *v)
 		mp = &message[*ip - 1];
 		touch(mp);
 		setdot(mp);
-		mp->m_flag &= ~MDELETED;
+		if (mp->m_flag & (MDELETED|MSAVED))
+			mp->m_flag &= ~(MDELETED|MSAVED);
+		else
+			mp->m_flag &= ~MDELETED;
 		if (mb.mb_type == MB_IMAP || mb.mb_type == MB_CACHE)
 			imap_undelete(mp, *ip);
 	}
