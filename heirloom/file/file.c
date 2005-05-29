@@ -39,7 +39,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -47,9 +47,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)file_sus.sl	1.31 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)file_sus.sl	1.32 (gritter) 5/29/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)file.sl	1.31 (gritter) 2/24/05";
+static const char sccsid[] USED = "@(#)file.sl	1.32 (gritter) 5/29/05";
 #endif	/* !SUS */
 
 #ifdef	__GLIBC__

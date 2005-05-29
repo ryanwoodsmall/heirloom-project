@@ -40,7 +40,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.92 (gritter) 2/13/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.93 (gritter) 5/29/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.92 (gritter) 2/13/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.93 (gritter) 5/29/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.92 (gritter) 2/13/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.93 (gritter) 5/29/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.92 (gritter) 2/13/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.93 (gritter) 5/29/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>

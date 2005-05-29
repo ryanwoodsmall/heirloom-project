@@ -40,7 +40,7 @@
  *  2+head+2+page[56]+5
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -48,9 +48,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)pr_sus.sl	1.28 (gritter) 2/3/05";
+static const char sccsid[] USED = "@(#)pr_sus.sl	1.29 (gritter) 5/29/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)pr.sl	1.28 (gritter) 2/3/05";
+static const char sccsid[] USED = "@(#)pr.sl	1.29 (gritter) 5/29/05";
 #endif	/* !SUS */
 
 #include <stdio.h>

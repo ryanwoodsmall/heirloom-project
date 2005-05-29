@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)basename_sus.sl	1.8 (gritter) 5/1/04";
+static const char sccsid[] USED = "@(#)basename_sus.sl	1.9 (gritter) 5/29/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/basename.sl	1.8 (gritter) 5/1/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/basename.sl	1.9 (gritter) 5/29/05";
 #else
-static const char sccsid[] USED = "@(#)basename.sl	1.8 (gritter) 5/1/04";
+static const char sccsid[] USED = "@(#)basename.sl	1.9 (gritter) 5/29/05";
 #endif
 
 #include <stdio.h>

@@ -32,14 +32,14 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)units.sl	1.9 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)units.sl	1.10 (gritter) 5/29/05";
 
 #include <stdio.h>
 #include <stdlib.h>

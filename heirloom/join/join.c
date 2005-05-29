@@ -36,14 +36,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)join.sl	1.14 (gritter) 2/10/05";
+static const char sccsid[] USED = "@(#)join.sl	1.15 (gritter) 5/29/05";
 
 /*	join F1 F2 on stuff */
 

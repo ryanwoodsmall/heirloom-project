@@ -26,7 +26,7 @@
  */
 #if defined (__linux__) || defined (__FreeBSD__)
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -34,9 +34,9 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)priocntl_s42.sl	1.17 (gritter) 9/25/04";
+static const char sccsid[] USED = "@(#)priocntl_s42.sl	1.18 (gritter) 5/29/05";
 #else
-static const char sccsid[] USED = "@(#)priocntl.sl	1.17 (gritter) 9/25/04";
+static const char sccsid[] USED = "@(#)priocntl.sl	1.18 (gritter) 5/29/05";
 #endif
 
 #include	<sys/time.h>

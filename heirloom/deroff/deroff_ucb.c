@@ -43,14 +43,14 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/deroff.sl	1.11 (gritter) 7/16/04";
+static const char sccsid[] USED = "@(#)/usr/ucb/deroff.sl	1.12 (gritter) 5/29/05";
 
 /*	from deroff.c	8.1 (Berkeley) 6/6/93	*/
 

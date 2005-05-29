@@ -22,7 +22,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -30,9 +30,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)mkdir_sus.sl	1.6 (gritter) 2/15/05";
+static const char sccsid[] USED = "@(#)mkdir_sus.sl	1.7 (gritter) 5/29/05";
 #else
-static const char sccsid[] USED = "@(#)mkdir.sl	1.6 (gritter) 2/15/05";
+static const char sccsid[] USED = "@(#)mkdir.sl	1.7 (gritter) 5/29/05";
 #endif
 
 #include	<sys/types.h>

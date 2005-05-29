@@ -1,4 +1,4 @@
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -6,13 +6,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)sed_su3.sl	2.31 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)sed_su3.sl	2.32 (gritter) 5/29/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)sed_sus.sl	2.31 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)sed_sus.sl	2.32 (gritter) 5/29/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)sed_s42.sl	2.31 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)sed_s42.sl	2.32 (gritter) 5/29/05";
 #else	/* !SUS, !SU3, !S42 */
-static const char sccsid[] USED = "@(#)sed.sl	2.31 (gritter) 3/12/05";
+static const char sccsid[] USED = "@(#)sed.sl	2.32 (gritter) 5/29/05";
 #endif	/* !SUS, !SU3, !S42 */
 
 /*

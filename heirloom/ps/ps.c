@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.106 (gritter) 3/16/05";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.107 (gritter) 5/29/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.106 (gritter) 3/16/05";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.107 (gritter) 5/29/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.106 (gritter) 3/16/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.107 (gritter) 5/29/05";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.106 (gritter) 3/16/05";
+static const char sccsid[] USED = "@(#)ps.sl	2.107 (gritter) 5/29/05";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.106 (gritter) 3/16/05";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.107 (gritter) 5/29/05";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER

@@ -37,7 +37,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	REGEXP_H_USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	REGEXP_H_USED	__attribute__ ((unused))
@@ -45,7 +45,7 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.55 (gritter) 5/28/05";
+	"@(#)regexp.sl	1.56 (gritter) 5/29/05";
 
 #if !defined (REGEXP_H_USED_FROM_VI) && !defined (__dietlibc__)
 #define	REGEXP_H_WCHARS

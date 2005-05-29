@@ -36,14 +36,14 @@
 
 /* from what.c	8.1 (Berkeley) 6/6/93 */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)what.sl	1.7 (gritter) 4/20/04";
+static const char sccsid[] USED = "@(#)what.sl	1.8 (gritter) 5/29/05";
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)su.sl	1.23 (gritter) 10/8/04";
+static const char sccsid[] USED = "@(#)su.sl	1.24 (gritter) 5/29/05";
 
 #include	"config.h"
 #include	<sys/types.h>

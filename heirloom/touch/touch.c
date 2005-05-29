@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)touch_sus.sl	1.20 (gritter) 2/27/05";
+static const char sccsid[] USED = "@(#)touch_sus.sl	1.21 (gritter) 5/29/05";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)touch.sl	1.20 (gritter) 2/27/05";
+static const char sccsid[] USED = "@(#)touch.sl	1.21 (gritter) 5/29/05";
 #endif	/* !SUS */
 
 #include	<sys/types.h>

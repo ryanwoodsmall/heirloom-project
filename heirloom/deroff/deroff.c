@@ -9,14 +9,14 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)deroff.sl	1.6 (gritter) 5/15/04";
+static const char sccsid[] USED = "@(#)deroff.sl	1.7 (gritter) 5/29/05";
 
 #include <stdio.h>
 #include <stdlib.h>

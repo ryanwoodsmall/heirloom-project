@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tapecntl.sl	1.34 (gritter) 12/8/04";
+static const char sccsid[] USED = "@(#)tapecntl.sl	1.35 (gritter) 5/29/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -218,7 +218,7 @@ tape v%s usage:   %s [-<tape>] [-a arg] <command> [device]\n\
         setblk     - set block size (in bytes) for device\n\
         setcomp    - set compression (0 disabled, 1 enabled)\n\
         setdensity - set density code (in hexadecimal)\n",
-        "1.34",
+        "1.35",
         progname);
         exit(1);
 }

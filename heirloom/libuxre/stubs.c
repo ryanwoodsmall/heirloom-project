@@ -1,7 +1,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, November 2002.
  *
- * Sccsid @(#)stubs.c	1.24 (gritter) 10/12/04
+ * Sccsid @(#)stubs.c	1.25 (gritter) 5/29/05
  */
 /*  UNIX(R) Regular Expresssion Library
  *
@@ -53,14 +53,14 @@ libuxre_mb2wc(w_type *wt, const unsigned char *s)
 	return len > 0 ? len - 1 : len;
 }
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)libuxre.sl	1.24 (gritter) 10/12/04";
+static const char sccsid[] USED = "@(#)libuxre.sl	1.25 (gritter) 5/29/05";
 /*
 _collelem.c:
 	_collelem.c	1.4 (gritter) 10/18/03

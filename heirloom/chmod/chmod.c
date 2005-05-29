@@ -35,7 +35,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -43,9 +43,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)chmod_sus.sl	1.9 (gritter) 2/15/05";
+static const char sccsid[] USED = "@(#)chmod_sus.sl	1.10 (gritter) 5/29/05";
 #else
-static const char sccsid[] USED = "@(#)chmod.sl	1.9 (gritter) 2/15/05";
+static const char sccsid[] USED = "@(#)chmod.sl	1.10 (gritter) 5/29/05";
 #endif
 /*
  * chmod [-R] [ugoa][+-=][rwxXlstugo] files

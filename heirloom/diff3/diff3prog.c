@@ -73,14 +73,14 @@
 
 /*	from 4.3BSD diff3.c	4.4 (Berkeley) 8/27/85	*/
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/lib/diff3prog.sl	1.8 (gritter) 10/5/04";
+static const char sccsid[] USED = "@(#)/usr/lib/diff3prog.sl	1.9 (gritter) 5/29/05";
 
 #include <unistd.h>
 #include <stdio.h>

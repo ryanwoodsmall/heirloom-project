@@ -36,14 +36,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.173 (gritter) 4/19/05";
+static const char sccsid[] USED = "@(#)tar.sl	1.174 (gritter) 5/29/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>

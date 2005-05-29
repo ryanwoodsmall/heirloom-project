@@ -44,14 +44,14 @@
  */
 
 /*	from 4.3BSD more.c	5.4 (Berkeley) 4/3/86	*/
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)more.sl	1.32 (gritter) 1/21/05";
+static const char sccsid[] USED = "@(#)more.sl	1.33 (gritter) 5/29/05";
 
 /*
 ** more.c - General purpose tty output filter and file perusal program

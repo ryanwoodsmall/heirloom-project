@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)sus.c	1.23 (gritter) 2/6/05>	*/
+/*	Sccsid @(#)sus.c	1.24 (gritter) 5/29/05>	*/
 
 /*
  * Code for POSIX.2 command version only.
@@ -40,14 +40,14 @@
 
 #if defined (SU3)
 int		sus = 3;
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char su3id[] USED = "@(#)grep_su3.sl	1.23 (gritter) 2/6/05";
+static const char su3id[] USED = "@(#)grep_su3.sl	1.24 (gritter) 5/29/05";
 #else
 int		sus = 1;
 #endif

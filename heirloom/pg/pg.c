@@ -22,7 +22,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -30,11 +30,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pg_su3.sl	2.61 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pg_su3.sl	2.62 (gritter) 5/29/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.61 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.62 (gritter) 5/29/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.61 (gritter) 2/6/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.62 (gritter) 5/29/05";
 #endif
 
 #ifndef	USE_TERMCAP
