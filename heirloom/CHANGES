@@ -12,6 +12,10 @@ Release ...
 * shl: The external 'ps' command is now used for the 'layers -l' command.
 * cp: An '-a' option was added that preserves hard links and all attributes
   during a recursive copy.
+* tail: 'tail -f -n 0 file' now skips to the end of existing data before
+  waiting for changes, as demanded by POSIX interpretation XCU ERN 62.
+  'tail -0f file' continues the historical behavior of printing existing
+  data first. (Issue reported by Pierre Gentile.)
 
 Release 050411
 * diff: The -p option (print name of surrounding C function) has been added.

@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tail.sl	1.24 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)tail.sl	1.25 (gritter) 6/3/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -82,6 +82,7 @@ static unsigned	errcnt;			/* count of errors */
 static int	fflag;			/* follow file changes */
 static int	rflag;			/* reverse count */
 static char	*progname;		/* argv[0] to main() */
+static int	newopt;			/* new option invocation */
 static size_t	outblk;
 
 static void *
@@ -177,7 +178,7 @@ endtail(struct count *cnt, int fd, struct stat *sp)
 	char	*spc;
 	size_t	spcsize;
 
-	if (cnt->c_off <= 0)
+	if (cnt->c_off <= 0 && (!fflag || !newopt))
 		return 0;
 	n = (cnt->c_typ == 'b' ? (cnt->c_off << 9) : cnt->c_off);
 	if (cnt->c_typ != 'l' &&
@@ -471,6 +472,7 @@ main(int argc, char **argv)
 			optind++;
 		goto optend;
 	}
+	newopt = 1;
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
 		case 'c':
