@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.46 (gritter) 6/8/05";
+static char sccsid[] = "@(#)collect.c	2.47 (gritter) 6/8/05";
 #endif
 #endif /* not lint */
 
@@ -1179,7 +1179,7 @@ void
 savedeadletter(FILE *fp)
 {
 	FILE *dbuf;
-	int c;
+	int c, lines = 0, bytes = 0;
 	char *cp;
 
 	if (fsize(fp) == 0)
@@ -1190,9 +1190,15 @@ savedeadletter(FILE *fp)
 	umask(c);
 	if (dbuf == NULL)
 		return;
-	while ((c = getc(fp)) != EOF)
+	printf("\"%s\" ", cp);
+	while ((c = getc(fp)) != EOF) {
 		putc(c, dbuf);
+		bytes++;
+		if (c == '\n')
+			lines++;
+	}
 	Fclose(dbuf);
+	printf("%d/%d\n", lines, bytes);
 	rewind(fp);
 }
 

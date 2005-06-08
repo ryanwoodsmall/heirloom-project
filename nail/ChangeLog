@@ -13,6 +13,7 @@
 * The current message is now shown in the header summary even if it has been
   killed.
 * The 'kill' command did not operate correctly on 64-bit big-endian machines.
+* A notification is now printed when text is saved to dead.letter.
 
 [11.22] released 3/20/05
 * In threaded mode, the thread structure is now shown using line-drawing
