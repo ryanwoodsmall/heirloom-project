@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.45 (gritter) 2/19/05";
+static char sccsid[] = "@(#)collect.c	2.46 (gritter) 6/8/05";
 #endif
 #endif /* not lint */
 
@@ -643,7 +643,8 @@ cont:
 		    (value("dot") != NULL || value("ignoreeof") != NULL))
 			break;
 		if (linebuf[0] != escape || (value("interactive") == NULL &&
-					tildeflag <= 0)) {
+					tildeflag == 0 ||
+					tildeflag < 0)) {
 			if (putline(collf, linebuf, count) < 0)
 				goto err;
 			continue;

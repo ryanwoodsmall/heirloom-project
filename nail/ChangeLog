@@ -1,4 +1,6 @@
 [11.23] released ...
+* The '-r' option now actually disables tilde escapes as documented (Bugreport
+  by Bob Tennent).
 * The 'move' command does not anymore mark messages as moved if writing to
   an IMAP folder fails.
 * The 'undelete' command now also clears the 'saved' flags of messages that
