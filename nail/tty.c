@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.23 (gritter) 12/25/04";
+static char sccsid[] = "@(#)tty.c	2.24 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -62,12 +62,13 @@ static	sigjmp_buf	intjmp;		/* Place to go when interrupted */
 #ifndef TIOCSTI
 static	int		ttyset;		/* We must now do erase/kill */
 #endif
+static	struct termios	ttybuf;
 static	long		vdis;		/* _POSIX_VDISABLE char */
 
 static void ttystop(int s);
 static void ttyint(int s);
 static int safe_getc(FILE *ibuf);
-static char *rtty_internal(char *pr, char *src);
+static char *rtty_internal(const char *pr, char *src);
 
 /*
  * Receipt continuation.
@@ -123,7 +124,7 @@ again:
  * be read.
  */
 static char *
-rtty_internal(char *pr, char *src)
+rtty_internal(const char *pr, char *src)
 {
 	char ch, canonb[LINESIZE];
 	int c;
@@ -239,10 +240,23 @@ redo:
 						hp->h_subject); \
 			}
 
+static struct name *
+grabaddrs(const char *field, struct name *np, int comma, enum gfield gflags)
+{
+	struct name	*nq;
+
+	TTYSET_CHECK(np);
+	loop:
+		np = sextract(rtty_internal(field, detract(np, comma)), gflags);
+		for (nq = np; nq != NULL; nq = nq->n_flink)
+			if (mime_name_invalid(nq->n_name, 1))
+				goto loop;
+	return np;
+}
+
 int 
 grabh(struct header *hp, enum gfield gflags, int subjfirst)
 {
-	struct termios ttybuf;
 	sighandler_type saveint;
 #ifndef TIOCSTI
 	sighandler_type savequit;
@@ -295,25 +309,29 @@ grabh(struct header *hp, enum gfield gflags, int subjfirst)
 	if (saveint != SIG_IGN)
 		safe_signal(SIGINT, ttyint);
 #endif	/* TIOCSTI */
-	if (gflags & GTO) {
-		TTYSET_CHECK(hp->h_to)
-		hp->h_to = checkaddrs(sextract(rtty_internal("To: ",
-						detract(hp->h_to, comma)),
-					GTO|GFULL));
-	}
+	if (gflags & GTO)
+		hp->h_to = grabaddrs("To: ", hp->h_to, comma, GTO|GFULL);
 	if (subjfirst)
 		GRAB_SUBJECT
-	if (gflags & GCC) {
-		TTYSET_CHECK(hp->h_cc)
-		hp->h_cc = checkaddrs(sextract(rtty_internal("Cc: ",
-						detract(hp->h_cc, comma)),
-					GCC|GFULL));
-	}
-	if (gflags & GBCC) {
-		TTYSET_CHECK(hp->h_bcc)
-		hp->h_bcc = checkaddrs(sextract(rtty_internal("Bcc: ",
-						detract(hp->h_bcc, comma)),
-					GBCC|GFULL));
+	if (gflags & GCC)
+		hp->h_cc = grabaddrs("Cc: ", hp->h_cc, comma, GCC|GFULL);
+	if (gflags & GBCC)
+		hp->h_bcc = grabaddrs("Bcc: ", hp->h_bcc, comma, GBCC|GFULL);
+	if (gflags & GEXTRA) {
+		if (hp->h_from == NULL)
+			hp->h_from = sextract(myaddr(), GEXTRA|GFULL);
+		hp->h_from = grabaddrs("From: ", hp->h_from, comma,
+				GEXTRA|GFULL);
+		if (hp->h_replyto == NULL)
+			hp->h_replyto = sextract(value("replyto"),
+					GEXTRA|GFULL);
+		hp->h_replyto = grabaddrs("Reply-To: ", hp->h_replyto, comma,
+				GEXTRA|GFULL);
+		if (hp->h_organization == NULL)
+			hp->h_organization = value("ORGANIZATION");
+		TTYSET_CHECK(hp->h_organization);
+		hp->h_organization = rtty_internal("Organization: ",
+				hp->h_organization);
 	}
 	if (!subjfirst)
 		GRAB_SUBJECT

@@ -7,6 +7,10 @@
   using the '~b', '~c', '~h', and '~p' tilde escapes, but changing the values
   of the 'autocc' and 'autobcc' variables using '~:set' has no effect on the
   currently composed message anymore.
+* The values of the 'from' and 'replyto' variables can now contain multiple
+  addresses.
+* A '~H' tilde escape was introduced. It allows to set message-specific values
+  for the 'From', 'Reply-To', and 'Organization' header fields.
 * The '-r' option now actually disables tilde escapes as documented (Bugreport
   by Bob Tennent).
 * The 'move' command does not anymore mark messages as moved if writing to

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.82 (gritter) 6/9/05";
+static char sccsid[] = "@(#)sendout.c	2.83 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -1031,6 +1031,20 @@ mkdate(FILE *fo, const char *field)
 			tzdiff_hour, tzdiff_min);
 }
 
+static enum okay
+putname(char *line, enum gfield w, enum sendaction action, int *gotcha,
+		char *prefix, FILE *fo)
+{
+	struct name	*np;
+
+	if ((np = sextract(line, GEXTRA|GFULL)) == NULL)
+		return 0;
+	if (fmt(prefix, np, fo, w&(GCOMMA|GFILES), 0, action != SEND_TODISP))
+		return 1;
+	(*gotcha)++;
+	return 0;
+}
+
 #define	FMT_CC_AND_BCC	{ \
 				if (hp->h_cc != NULL && w & GCC) { \
 					if (fmt("Cc:", hp->h_cc, fo, \
@@ -1071,26 +1085,16 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		mkdate(fo, "Date"), gotcha++;
 	}
 	if (w & GIDENT) {
-		if ((addr = myaddr()) != NULL) {
-			if (mime_name_invalid(addr, 1))
-				return 1;
-			/*
-			if ((cp = value("smtp")) == NULL
-					|| strcmp(cp, "localhost") == 0)
-				fprintf(fo, "Sender: %s\n", username());
-			*/
-			fwrite("From: ", sizeof (char), 6, fo);
-			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
-					action == SEND_TODISP ?
-					CONV_NONE:CONV_TOHDR_A,
-					action == SEND_TODISP ?
-					TD_ISPR|TD_ICONV:TD_ICONV,
-					NULL, (size_t)0) == 0)
+		if (hp->h_from != NULL) {
+			if (fmt("From:", hp->h_from, fo, w&(GCOMMA|GFILES), 0,
+						action!=SEND_TODISP))
 				return 1;
 			gotcha++;
-			putc('\n', fo);
-		}
-		if ((addr = value("ORGANIZATION")) != NULL) {
+		} else if ((addr = myaddr()) != NULL)
+			if (putname(addr, w, action, &gotcha, "From:", fo))
+				return 1;
+		if ((addr = hp->h_organization) != NULL ||
+				(addr = value("ORGANIZATION")) != NULL) {
 			fwrite("Organization: ", sizeof (char), 14, fo);
 			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
 					action == SEND_TODISP ?
@@ -1102,20 +1106,15 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			gotcha++;
 			putc('\n', fo);
 		}
-		if ((addr = value("replyto")) != NULL) {
-			if (mime_name_invalid(addr, 1))
-				return 1;
-			fwrite("Reply-To: ", sizeof (char), 10, fo);
-			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
-					action == SEND_TODISP ?
-					CONV_NONE:CONV_TOHDR_A,
-					action == SEND_TODISP ?
-					TD_ISPR|TD_ICONV:TD_ICONV,
-					NULL, (size_t)0) == 0)
+		if (hp->h_replyto != NULL) {
+			if (fmt("Reply-To:", hp->h_replyto, fo,
+					w&(GCOMMA|GFILES), 0,
+					action!=SEND_TODISP))
 				return 1;
 			gotcha++;
-			putc('\n', fo);
-		}
+		} else if ((addr = value("replyto")) != NULL)
+			if (putname(addr, w, action, &gotcha, "Reply-To:", fo))
+				return 1;
 	}
 	if (hp->h_to != NULL && w & GTO) {
 		if (fmt("To:", hp->h_to, fo, w&(GCOMMA|GFILES), 0,

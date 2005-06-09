@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.100 (gritter) 6/9/05
+ *	Sccsid @(#)def.h	2.101 (gritter) 6/9/05
  */
 
 /*
@@ -398,7 +398,7 @@ enum gfield {
 	GDATE	= 8192,		/* Date: field */
 	GFULL	= 16384,	/* include full names */
 	GSKIN	= 32768,	/* skin names */
-	/*	  65536 */	/* unused */
+	GEXTRA	= 65536, 	/* extra fields */
 	GFILES	= 131072	/* include filename addresses */
 };
 
@@ -421,6 +421,9 @@ struct header {
 	struct name *h_smopts;		/* Sendmail options */
 	struct attachment *h_attach;	/* MIME attachments */
 	char	*h_charset;		/* preferred charset */
+	struct name *h_from;		/* overridden "From:" field */
+	struct name *h_replyto;		/* overridden "Reply-To:" field */
+	char *h_organization;		/* overridden "Organization:" field */
 };
 
 /*

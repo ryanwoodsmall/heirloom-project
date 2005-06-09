@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)names.c	2.19 (gritter) 10/13/04";
+static char sccsid[] = "@(#)names.c	2.20 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -763,24 +763,31 @@ prettyprint(struct name *name)
 struct name *
 delete_alternates(struct name *np)
 {
-	char **ap;
-	char *cp;
+	struct name	*xp;
+	char	**ap;
 
 	np = delname(np, myname);
 	if (altnames)
 		for (ap = altnames; *ap; ap++)
 			np = delname(np, *ap);
-	if ((cp = skin(value("from"))) != NULL)
-		np = delname(np, cp);
-	if ((cp = skin(value("replyto"))) != NULL)
-		np = delname(np, cp);
+	if ((xp = sextract(value("from"), GEXTRA|GSKIN)) != NULL)
+		while (xp) {
+			np = delname(np, xp->n_name);
+			xp = xp->n_flink;
+		}
+	if ((xp = sextract(value("replyto"), GEXTRA|GSKIN)) != NULL)
+		while (xp) {
+			np = delname(np, xp->n_name);
+			xp = xp->n_flink;
+		}
 	return np;
 }
 
 int
 is_myname(char *name)
 {
-	char **ap, *cp;
+	struct name	*xp;
+	char	**ap;
 
 	if (same_name(myname, name))
 		return 1;
@@ -788,9 +795,17 @@ is_myname(char *name)
 		for (ap = altnames; *ap; ap++)
 			if (same_name(*ap, name))
 				return 1;
-	if ((cp = value("from")) != NULL && same_name(skin(cp), name))
-		return 1;
-	if ((cp = value("replyto")) != NULL && same_name(skin(cp), name))
-		return 1;
+	if ((xp = sextract(value("from"), GEXTRA|GSKIN)) != NULL)
+		while (xp) {
+			if (same_name(xp->n_name, name))
+				return 1;
+			xp = xp->n_flink;
+		}
+	if ((xp = sextract(value("replyto"), GEXTRA|GSKIN)) != NULL)
+		while (xp) {
+			if (same_name(xp->n_name, name))
+				return 1;
+			xp = xp->n_flink;
+		}
 	return 0;
 }

@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.57 (gritter) 6/9/05";
+static char sccsid[]  = "@(#)mime.c	2.58 (gritter) 6/9/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -301,41 +301,42 @@ has_highbit(const char *s)
 	return 0;
 }
 
+static int
+name_highbit(struct name *np)
+{
+	while (np) {
+		if (has_highbit(np->n_name) || has_highbit(np->n_fullname))
+			return 1;
+		np = np->n_flink;
+	}
+	return 0;
+}
+
 char *
 need_hdrconv(struct header *hp, enum gfield w)
 {
-	struct name *np;
-
 	if (w & GIDENT) {
-		if (has_highbit(myaddr()))
+		if (hp->h_from && name_highbit(hp->h_from))
 			goto needs;
-		if (has_highbit(value("ORGANIZATION")))
+		else if (has_highbit(myaddr()))
 			goto needs;
-		if (has_highbit(value("replyto")))
+		if (hp->h_organization && has_highbit(hp->h_organization))
 			goto needs;
-	}
-	if (w & GTO) {
-		for (np = hp->h_to; np; np = np->n_flink)
-			if (has_highbit(np->n_name) ||
-					has_highbit(np->n_fullname))
-				goto needs;
-	}
-	if (w & GCC) {
-		for (np = hp->h_cc; np; np = np->n_flink)
-			if (has_highbit(np->n_name) ||
-					has_highbit(np->n_fullname))
-				goto needs;
-	}
-	if (w & GBCC) {
-		for (np = hp->h_bcc; np; np = np->n_flink)
-			if (has_highbit(np->n_name) ||
-					has_highbit(np->n_fullname))
-				goto needs;
-	}
-	if (w & GSUBJECT) {
-		if (has_highbit(hp->h_subject))
+		else if (has_highbit(value("ORGANIZATION")))
+			goto needs;
+		if (hp->h_replyto && name_highbit(hp->h_replyto))
+			goto needs;
+		else if (has_highbit(value("replyto")))
 			goto needs;
 	}
+	if (w & GTO && name_highbit(hp->h_to))
+		goto needs;
+	if (w & GCC && name_highbit(hp->h_cc))
+		goto needs;
+	if (w & GBCC && name_highbit(hp->h_bcc))
+		goto needs;
+	if (w & GSUBJECT && has_highbit(hp->h_subject))
+		goto needs;
 	return NULL;
 needs:	return getcharset(MIME_HIGHBIT);
 }
