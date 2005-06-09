@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.83 (gritter) 6/9/05";
+static char sccsid[] = "@(#)sendout.c	2.84 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -987,7 +987,7 @@ message_id(FILE *fo)
 	if ((cp = value("hostname")) != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s@%s>\n",
 				(long)now, getrandstring(24), cp);
-	else if ((cp = skin(myaddr())) != NULL && strchr(cp, '@') != NULL)
+	else if ((cp = skin(myorigin())) != NULL && strchr(cp, '@') != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s%%%s>\n",
 				(long)now, getrandstring(16), cp);
 }
@@ -1033,15 +1033,19 @@ mkdate(FILE *fo, const char *field)
 
 static enum okay
 putname(char *line, enum gfield w, enum sendaction action, int *gotcha,
-		char *prefix, FILE *fo)
+		char *prefix, FILE *fo, struct name **xp)
 {
 	struct name	*np;
 
-	if ((np = sextract(line, GEXTRA|GFULL)) == NULL)
+	np = sextract(line, GEXTRA|GFULL);
+	if (*xp)
+		*xp = np;
+	if (np == NULL)
 		return 0;
 	if (fmt(prefix, np, fo, w&(GCOMMA|GFILES), 0, action != SEND_TODISP))
 		return 1;
-	(*gotcha)++;
+	if (gotcha)
+		(*gotcha)++;
 	return 0;
 }
 
@@ -1073,7 +1077,7 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 	int gotcha;
 	char *addr/*, *cp*/;
 	int stealthmua;
-	struct name *np;
+	struct name *np, *fromfield = NULL, *senderfield = NULL;
 
 
 	if (value("stealthmua"))
@@ -1090,8 +1094,10 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 						action!=SEND_TODISP))
 				return 1;
 			gotcha++;
-		} else if ((addr = myaddr()) != NULL)
-			if (putname(addr, w, action, &gotcha, "From:", fo))
+			fromfield = hp->h_from;
+		} else if ((addr = myaddrs()) != NULL)
+			if (putname(addr, w, action, &gotcha, "From:", fo,
+						&fromfield))
 				return 1;
 		if ((addr = hp->h_organization) != NULL ||
 				(addr = value("ORGANIZATION")) != NULL) {
@@ -1113,8 +1119,22 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 				return 1;
 			gotcha++;
 		} else if ((addr = value("replyto")) != NULL)
-			if (putname(addr, w, action, &gotcha, "Reply-To:", fo))
+			if (putname(addr, w, action, &gotcha, "Reply-To:", fo,
+						NULL))
 				return 1;
+		if (hp->h_sender != NULL) {
+			if (fmt("Sender:", hp->h_sender, fo,
+					w&(GCOMMA|GFILES), 0,
+					action!=SEND_TODISP))
+				return 1;
+			gotcha++;
+			senderfield = hp->h_sender;
+		} else if ((addr = value("sender")) != NULL)
+			if (putname(addr, w, action, &gotcha, "Sender:", fo,
+						&senderfield))
+				return 1;
+		if (check_from_and_sender(fromfield, senderfield))
+			return 1;
 	}
 	if (hp->h_to != NULL && w & GTO) {
 		if (fmt("To:", hp->h_to, fo, w&(GCOMMA|GFILES), 0,
@@ -1247,6 +1267,7 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 	size_t count;
 	char *buf = NULL, *cp/*, *cp2*/;
 	size_t c, bufsize = 0;
+	struct name	*fromfield = NULL, *senderfield = NULL;
 
 	count = mp->m_size;
 	/*
@@ -1255,24 +1276,15 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 	if (add_resent) {
 		fputs("Resent-", fo);
 		mkdate(fo, "Date");
-		cp = myaddr();
-		if (cp != NULL) {
-			if (mime_name_invalid(cp, 1)) {
-				if (buf)
-					free(buf);
+		if ((cp = myaddrs()) != NULL) {
+			if (putname(cp, GCOMMA, SEND_MBOX, NULL,
+					"Resent-From:", fo, &fromfield))
 				return 1;
-			}
-			fwrite("Resent-From: ", sizeof (char), 13, fo);
-			mime_write(cp, sizeof *cp, strlen(cp), fo,
-					CONV_TOHDR_A, TD_ICONV,
-					NULL, (size_t)0);
-			putc('\n', fo);
-			/*
-			if ((cp2 = value("smtp")) == NULL
-				|| strcmp(cp2, "localhost") == 0)
-				fprintf(fo, "Resent-Sender: %s\n",
-						username());
-			*/
+		}
+		if ((cp = value("sender")) != NULL) {
+			if (putname(cp, GCOMMA, SEND_MBOX, NULL,
+					"Resent-Sender:", fo, &senderfield))
+				return 1;
 		}
 #ifdef	notdef
 		/*
@@ -1303,6 +1315,8 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 			message_id(fo);
 		}
 	}
+	if (check_from_and_sender(fromfield, senderfield))
+		return 1;
 	/*
 	 * Write the original headers.
 	 */

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.15 (gritter) 6/9/05";
+static char sccsid[] = "@(#)head.c	2.16 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -315,6 +315,10 @@ extract_header(FILE *fp, struct header *hp)
 			seenfields++;
 			hq->h_replyto = checkaddrs(cat(hq->h_replyto,
 					sextract(value, GEXTRA|GFULL)));
+		} else if ((value = thisfield(linebuf, "sender")) != NULL) {
+			seenfields++;
+			hq->h_sender = checkaddrs(cat(hq->h_sender,
+					sextract(value, GEXTRA|GFULL)));
 		} else if ((value = thisfield(linebuf,
 						"organization")) != NULL) {
 			seenfields++;
@@ -353,6 +357,7 @@ extract_header(FILE *fp, struct header *hp)
 		hp->h_bcc = hq->h_bcc;
 		hp->h_from = hq->h_from;
 		hp->h_replyto = hq->h_replyto;
+		hp->h_sender = hq->h_sender;
 		hp->h_organization = hq->h_organization;
 		hp->h_subject = hq->h_subject;
 	} else
@@ -1261,4 +1266,32 @@ substdate(struct message *m)
 			m->m_time = rfctime(cp);
 	if (m->m_time == 0 || m->m_time > now)
 		m->m_time = now;
+}
+
+int
+check_from_and_sender(struct name *fromfield, struct name *senderfield)
+{
+	if (fromfield && fromfield->n_flink && senderfield == NULL) {
+		fprintf(stderr, "A Sender: field is required with multiple "
+				"addresses in From: field.\n");
+		return 1;
+	}
+	if (senderfield && senderfield->n_flink) {
+		fprintf(stderr, "The Sender: field may contain "
+				"only one address.\n");
+		return 2;
+	}
+	return 0;
+}
+
+char *
+getsender(struct message *mp)
+{
+	char	*cp;
+	struct name	*np;
+
+	if ((cp = hfield("from", mp)) == NULL ||
+			(np = sextract(cp, GEXTRA|GSKIN)) == NULL)
+		return NULL;
+	return np->n_flink != NULL ? skin(hfield("sender", mp)) : np->n_name;
 }

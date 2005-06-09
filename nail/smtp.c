@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.32 (gritter) 3/1/05";
+static char sccsid[] = "@(#)smtp.c	2.33 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -119,10 +119,10 @@ nodename(int mayoverride)
 }
 
 /*
- * Return the user's From: address.
+ * Return the user's From: address(es).
  */
 char *
-myaddr(void)
+myaddrs(void)
 {
 	char *cp, *hn;
 	static char *addr;
@@ -143,6 +143,18 @@ myaddr(void)
 		snprintf(addr, sz, "%s@%s", myname, hn);
 	}
 	return addr;
+}
+
+char *
+myorigin(void)
+{
+	char	*cp;
+	struct name	*np;
+
+	if ((cp = myaddrs()) == NULL ||
+			(np = sextract(cp, GEXTRA|GFULL)) == NULL)
+		return NULL;
+	return np->n_flink != NULL ? value("sender") : cp;
 }
 
 #ifdef	HAVE_SOCKETS
@@ -234,7 +246,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	enum	{ AUTH_NONE, AUTH_LOGIN, AUTH_CRAM_MD5 } auth;
 	int	inhdr = 1, inbcc = 0;
 
-	skinned = skin(myaddr());
+	skinned = skin(myorigin());
 	user = auth_var("-user", skinned);
 	password = auth_var("-password", skinned);
 	if ((authstr = auth_var("", skinned)) == NULL)

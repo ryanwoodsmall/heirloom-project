@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.153 (gritter) 3/4/05
+ *	Sccsid @(#)extern.h	2.154 (gritter) 6/9/05
  */
 
 /* aux.c */
@@ -282,6 +282,8 @@ time_t rfctime(char *date);
 time_t combinetime(int year, int month, int day,
 		int hour, int minute, int second);
 void substdate(struct message *m);
+int check_from_and_sender(struct name *fromfield, struct name *senderfield);
+char *getsender(struct message *m);
 /* imap.c */
 enum okay imap_noop(void);
 enum okay imap_select(struct mailbox *mp, off_t *size, int *count,
@@ -466,7 +468,8 @@ int puthead(struct header *hp, FILE *fo, enum gfield w,
 int resend_msg(struct message *mp, struct name *to, int add_resent);
 /* smtp.c */
 char *nodename(int mayoverride);
-char *myaddr(void);
+char *myaddrs(void);
+char *myorigin(void);
 int smtp_mta(char *server, struct name *to, FILE *fi);
 /* ssl.c */
 void ssl_set_vrfy_level(const char *uhp);

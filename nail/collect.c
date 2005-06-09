@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.49 (gritter) 6/9/05";
+static char sccsid[] = "@(#)collect.c	2.50 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -170,10 +170,11 @@ print_collf(FILE *collf, struct header *hp)
 			maxlines--;
 		if (hp->h_attach)
 			maxlines--;
-		maxlines -= myaddr() != NULL || hp->h_from != NULL;
+		maxlines -= myaddrs() != NULL || hp->h_from != NULL;
 		maxlines -= value("ORGANIZATION") != NULL ||
 			hp->h_organization != NULL;
 		maxlines -= value("replyto") != NULL || hp->h_replyto != NULL;
+		maxlines -= value("sender") != NULL || hp->h_sender != NULL;
 		if (linecnt > maxlines) {
 			cp = get_pager();
 			if (sigsetjmp(pipejmp, 1))
@@ -726,7 +727,9 @@ cont:
 			/*
 			 * Grab extra headers.
 			 */
-			grabh(hp, GEXTRA, 0);
+			do
+				grabh(hp, GEXTRA, 0);
+			while (check_from_and_sender(hp->h_from, hp->h_sender));
 			goto cont;
 		case 't':
 			/*
@@ -991,6 +994,8 @@ makeheader(FILE *fp, struct header *hp)
 		Fclose(collf);
 	Fclose(fp);
 	collf = nf;
+	if (check_from_and_sender(hp->h_from, hp->h_sender))
+		return STOP;
 	return OKAY;
 }
 

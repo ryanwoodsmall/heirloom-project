@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.301 (gritter) 6/9/05
+.\"     Sccsid: @(#)nail.1	2.302 (gritter) 6/9/05
 .\"
 .TH NAIL 1 "6/9/05" "nail 11.23" "User Commands"
 .SH NAME
@@ -2037,7 +2037,7 @@ by using the current terminal erase and kill characters.
 .TP
 .B ~H
 Edit the message header fields
-`From:', `Reply-To:', and `Organization:'
+`From:', `Reply-To:', `Sender:', and `Organization:'
 in the same manner as described for
 .IR ~h .
 The default values for these fields originate from the
@@ -2328,7 +2328,8 @@ as the terminator of a message the user is sending.
 .B editheaders
 When a message is edited while being composed,
 its header is included in the editable text.
-`To:', `Cc:', `Bcc:', `Subject:', `From:', `Reply-To:', and 'Organization:'
+`To:', `Cc:', `Bcc:', `Subject:', `From:', `Reply-To:', `Sender:',
+and 'Organization:'
 fields are accepted within the header,
 other fields are ignored.
 .TP
@@ -2838,9 +2839,10 @@ is not executed if this variable is effective for a folder
 (unless it is explicitly invoked within the called macro).
 .TP
 .B from
-The address to put into the \fI`From:'\fR field of the message header.
+The address (or a list of addresses)
+to put into the \fI`From:'\fR field of the message header.
 If replying to a message,
-this address is handled as if it were in the alternates list.
+these addresses are handled as if they were in the alternates list.
 .\" If this variable is set,
 .\" a \fI`Sender:'\fR field containing the user's name
 .\" is also generated,
@@ -2852,6 +2854,12 @@ either this variable or
 .I hostname
 have to be set
 to get correct Message-ID header fields.
+If
+.I from
+contains more than one address,
+the
+.I sender
+variable must also be set.
 .TP
 .B fwdheading
 The string to print before the text of a message
@@ -3168,6 +3176,24 @@ That is, the list should start with e.\|g.
 might contain some other language-specific character sets,
 and should end with `utf-8'
 to handle messages that combine texts in multiple languages.
+.TP
+.B sender
+An address that is put into the `Sender:' field
+of outgoing messages.
+This field needs not normally be present.
+It is, however, required
+if the `From:' field contains more than one address.
+It can also be used to indicate that a message
+was sent on behalf of somebody other;
+in this case, `From:' should contain the address
+of the person that took responsibility for the message,
+and `Sender:' should contain the address
+of the person that actually sent the message.
+The
+.I sender
+address is handled as if it were in the
+.I alternates
+list.
 .TP
 .B sendmail
 To use an alternate mail delivery system,

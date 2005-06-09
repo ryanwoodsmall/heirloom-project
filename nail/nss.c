@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.37 (gritter) 2/12/05";
+static char sccsid[] = "@(#)nss.c	1.38 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -265,10 +265,13 @@ smime_sign(FILE *ip)
 	CERTCertificate	*cert;
 	CERTCertDBHandle	*handle;
 	FILE	*hp, *bp, *sp;
+	char	*addr;
 
 	if (nss_init() != OKAY)
 		return NULL;
-	if ((cert = get_signer_cert(myaddr())) == NULL)
+	if ((addr = myorigin()) == NULL)
+		return NULL;
+	if ((cert = get_signer_cert(addr)) == NULL)
 		return NULL;
 	handle = CERT_GetDefaultCertDB();
 	if ((msg = NSS_CMSMessage_Create(NULL)) == NULL) {
@@ -690,12 +693,11 @@ verify1(struct message *m, int n)
 	int	nlevels, i;
 	int	status = 0;
 	int	foundsender = 0;
-	char	*from;
+	char	*sender;
 
 	if ((m = getsig(m, n, &msg)) == NULL)
 		return 1;
-	if ((from = hfield("from", m)) != NULL)
-		from = skin(from);
+	sender = getsender(m);
 	handle = CERT_GetDefaultCertDB();
 	nlevels = NSS_CMSMessage_ContentLevelCount(msg);
 	for (i = 0; i < nlevels; i++) {
@@ -774,13 +776,13 @@ verify1(struct message *m, int n)
 				svs = NSS_CMSUtil_VerificationStatusToString
 					(vs);
 				addr = CERT_GetCertEmailAddress(&cert->subject);
-				if (from != NULL && addr != NULL &&
-							!asccasecmp(from, addr))
-						foundsender++;
+				if (sender != NULL && addr != NULL &&
+						asccasecmp(sender, addr) == 0)
+					foundsender++;
 				else {
 					addr = CERT_GetFirstEmailAddress(cert);
-					while (from && addr) {
-						if (!asccasecmp(from, addr)) {
+					while (sender && addr) {
+						if (!asccasecmp(sender, addr)) {
 							foundsender++;
 							break;
 						}
@@ -815,10 +817,10 @@ verify1(struct message *m, int n)
 		}
 	}
 	if (foundsender == 0) {
-		if (from) {
+		if (sender) {
 			fprintf(stderr, "Signers of message "
 					"%d do not include the sender <%s>\n",
-				n, from);
+				n, sender);
 			status = -1;
 		} else
 			fprintf(stderr, "Warning: Message %d has no From: "

@@ -9,6 +9,8 @@
   currently composed message anymore.
 * The values of the 'from' and 'replyto' variables can now contain multiple
   addresses.
+* A 'sender' variable was introduced to set the content of the 'Sender:'
+  field for outgoing messages.
 * A '~H' tilde escape was introduced. It allows to set message-specific values
   for the 'From', 'Reply-To', and 'Organization' header fields. These fields
   are now also accepted in the editor output with the 'editheaders' variable.

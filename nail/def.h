@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.101 (gritter) 6/9/05
+ *	Sccsid @(#)def.h	2.102 (gritter) 6/9/05
  */
 
 /*
@@ -423,6 +423,7 @@ struct header {
 	char	*h_charset;		/* preferred charset */
 	struct name *h_from;		/* overridden "From:" field */
 	struct name *h_replyto;		/* overridden "Reply-To:" field */
+	struct name *h_sender;		/* overridden "Sender:" field */
 	char *h_organization;		/* overridden "Organization:" field */
 };
 

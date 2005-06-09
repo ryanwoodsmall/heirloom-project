@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)names.c	2.20 (gritter) 6/9/05";
+static char sccsid[] = "@(#)names.c	2.21 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -780,6 +780,11 @@ delete_alternates(struct name *np)
 			np = delname(np, xp->n_name);
 			xp = xp->n_flink;
 		}
+	if ((xp = sextract(value("sender"), GEXTRA|GSKIN)) != NULL)
+		while (xp) {
+			np = delname(np, xp->n_name);
+			xp = xp->n_flink;
+		}
 	return np;
 }
 
@@ -802,6 +807,12 @@ is_myname(char *name)
 			xp = xp->n_flink;
 		}
 	if ((xp = sextract(value("replyto"), GEXTRA|GSKIN)) != NULL)
+		while (xp) {
+			if (same_name(xp->n_name, name))
+				return 1;
+			xp = xp->n_flink;
+		}
+	if ((xp = sextract(value("sender"), GEXTRA|GSKIN)) != NULL)
 		while (xp) {
 			if (same_name(xp->n_name, name))
 				return 1;

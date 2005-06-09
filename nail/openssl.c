@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.19 (gritter) 11/1/04";
+static char sccsid[] = "@(#)openssl.c	1.20 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -415,14 +415,16 @@ FILE *
 smime_sign(FILE *ip)
 {
 	FILE	*sp, *fp, *bp, *hp;
-	char	*cp;
+	char	*cp, *addr;
 	X509	*cert;
 	PKCS7	*pkcs7;
 	EVP_PKEY	*pkey;
 	BIO	*bb, *sb;
 
 	ssl_init();
-	if ((fp = smime_sign_cert(myaddr(), NULL, 1)) == NULL)
+	if ((addr = myorigin()) == NULL)
+		return NULL;
+	if ((fp = smime_sign_cert(addr, NULL, 1)) == NULL)
 		return NULL;
 	if ((pkey = PEM_read_PrivateKey(fp, NULL, ssl_password_cb, NULL))
 			== NULL) {
@@ -494,7 +496,7 @@ static int
 smime_verify(struct message *m, int n, STACK *chain, X509_STORE *store)
 {
 	struct message	*x;
-	char	*cp, *from, *to, *cc, *cnttype;
+	char	*cp, *sender, *to, *cc, *cnttype;
 	int	c, i, j;
 	FILE	*fp, *ip;
 	off_t	size;
@@ -508,8 +510,7 @@ smime_verify(struct message *m, int n, STACK *chain, X509_STORE *store)
 
 	verify_error_found = 0;
 	message_number = n;
-loop:	if ((from = hfield("from", m)) != NULL)
-		from = skin(from);
+loop:	sender = getsender(m);
 	to = hfield("to", m);
 	cc = hfield("cc", m);
 	cnttype = hfield("content-type", m);
@@ -556,9 +557,9 @@ loop:	if ((from = hfield("from", m)) != NULL)
 	}
 	BIO_free(fb);
 	Fclose(fp);
-	if (from == NULL) {
+	if (sender == NULL) {
 		fprintf(stderr,
-			"Warning: Message %d has no From: header field.\n", n);
+			"Warning: Message %d has no sender.\n", n);
 		return 0;
 	}
 	certs = PKCS7_get0_signers(pkcs7, chain, 0);
@@ -579,7 +580,8 @@ loop:	if ((from = hfield("from", m)) != NULL)
 							"address: %s\"\n",
 							data);
 					if (!asccasecmp((char *)
-							gen->d.ia5->data, from))
+							gen->d.ia5->data,
+							sender))
 						goto found;
 				}
 			}
@@ -592,12 +594,12 @@ loop:	if ((from = hfield("from", m)) != NULL)
 			if (verbose)
 				fprintf(stderr, "Comparing address: \"%s\"\n",
 						data);
-			if (asccasecmp(data, from) == 0)
+			if (asccasecmp(data, sender) == 0)
 				goto found;
 		}
 	}
 	fprintf(stderr, "Message %d: certificate does not match <%s>\n",
-			n, from);
+			n, sender);
 	return 1;
 found:	if (verify_error_found == 0)
 		printf("Message %d was verified successfully.\n", n);
