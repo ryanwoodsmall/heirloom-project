@@ -1,4 +1,12 @@
 [11.23] released ...
+* The output for the '~p' tilde escape was extended to include the fields
+  implied by the 'from', 'replyto', and 'ORGANIZATION' variables (Proposed
+  by Bob Tennent).
+* The 'autocc' and 'autobcc' variables are now evaluated before composition
+  of a message begins. The resulting addresses can thus be edited and viewed
+  using the '~b', '~c', '~h', and '~p' tilde escapes, but changing the values
+  of the 'autocc' and 'autobcc' variables using '~:set' has no effect on the
+  currently composed message anymore.
 * The '-r' option now actually disables tilde escapes as documented (Bugreport
   by Bob Tennent).
 * The 'move' command does not anymore mark messages as moved if writing to

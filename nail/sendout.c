@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.81 (gritter) 5/9/05";
+static char sccsid[] = "@(#)sendout.c	2.82 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -60,8 +60,7 @@ static char sccsid[] = "@(#)sendout.c	2.81 (gritter) 5/9/05";
 static char	*send_boundary;
 
 static char *getencoding(enum conversion convert);
-static struct name *fixhead(struct header *hp, struct name *tolist,
-		enum gfield addauto);
+static struct name *fixhead(struct header *hp, struct name *tolist);
 static int put_signature(FILE *fo, int convert);
 static int attach_file(struct attachment *ap, FILE *fo, int dosign);
 static int attach_message(struct attachment *ap, FILE *fo, int dosign);
@@ -120,15 +119,13 @@ getencoding(enum conversion convert)
  * the distribution list into the appropriate fields.
  */
 static struct name *
-fixhead(struct header *hp, struct name *tolist, enum gfield addauto)
+fixhead(struct header *hp, struct name *tolist)
 {
 	struct name *np;
-	char	*cp;
 
 	hp->h_to = NULL;
 	hp->h_cc = NULL;
 	hp->h_bcc = NULL;
-	hp->h_replyto = NULL;
 	for (np = tolist; np != NULL; np = np->n_flink)
 		if ((np->n_type & GMASK) == GTO)
 			hp->h_to =
@@ -142,24 +139,6 @@ fixhead(struct header *hp, struct name *tolist, enum gfield addauto)
 			hp->h_bcc =
 				cat(hp->h_bcc, nalloc(np->n_fullname,
 							np->n_type|GFULL));
-		else if ((np->n_type & GMASK) == GREPLYTO)
-			hp->h_replyto =
-				cat(hp->h_replyto, nalloc(np->n_fullname,
-							np->n_type|GFULL));
-	if (addauto&GCC && (cp = value("autocc")) != NULL && *cp) {
-		np = checkaddrs(sextract(cp, GCC|GFULL));
-		hp->h_cc = cat(hp->h_cc, np);
-		tolist = cat(tolist, np);
-	}
-	if (addauto&GBCC && (cp = value("autobcc")) != NULL && *cp) {
-		np = checkaddrs(sextract(cp, GBCC|GFULL));
-		hp->h_bcc = cat(hp->h_bcc, np);
-		tolist = cat(tolist, np);
-	}
-	if (addauto&GREPLYTO && (cp = value("replyto")) != NULL && *cp) {
-		np = checkaddrs(sextract(cp, GREPLYTO|GFULL));
-		hp->h_replyto = cat(hp->h_replyto, np);
-	}
 	return tolist;
 }
 
@@ -410,8 +389,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 			&isclean, dosign);
 #ifdef	HAVE_ICONV
 	tcs = gettcharset();
-	if ((convhdr = need_hdrconv(hp,
-				GTO|GSUBJECT|GCC|GBCC|GREPLYTO|GIDENT)) != 0 &&
+	if ((convhdr = need_hdrconv(hp, GTO|GSUBJECT|GCC|GBCC|GIDENT)) != 0 &&
 			asccasecmp(convhdr, tcs)) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
@@ -429,7 +407,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 #endif	/* HAVE_ICONV */
 	if (puthead(hp, nfo,
 		   GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA|GUA|GMIME
-		   |GMSGID|GIDENT|GREPLYTO|GREF|GDATE,
+		   |GMSGID|GIDENT|GREF|GDATE,
 		   SEND_MBOX, convert, contenttype, charset)) {
 		Fclose(nfo);
 		Fclose(nfi);
@@ -874,7 +852,7 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 	FILE *mtf, *nmtf;
 	enum okay	ok = STOP;
 	int	dosign = -1;
-	char	*charsets, *ncs = NULL;
+	char	*charsets, *ncs = NULL, *cp;
 
 #ifdef	notdef
 	if ((hp->h_to = checkaddrs(hp->h_to)) == NULL) {
@@ -882,6 +860,11 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 		return STOP;
 	}
 #endif
+	if ((cp = value("autocc")) != NULL && *cp)
+		hp->h_cc = cat(hp->h_cc, checkaddrs(sextract(cp, GCC|GFULL)));
+	if ((cp = value("autobcc")) != NULL && *cp)
+		hp->h_bcc = cat(hp->h_bcc,
+				checkaddrs(sextract(cp, GBCC|GFULL)));
 	/*
 	 * Collect user's mail from standard input.
 	 * Get the result as mtf.
@@ -932,7 +915,7 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 		printf(catgets(catd, CATSET, 186, "No recipients specified\n"));
 		senderr++;
 	}
-	to = fixhead(hp, to, GCC|GBCC|GREPLYTO);
+	to = fixhead(hp, to);
 	if (hp->h_charset) {
 		wantcharset = hp->h_charset;
 		goto try;
@@ -1088,8 +1071,7 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		mkdate(fo, "Date"), gotcha++;
 	}
 	if (w & GIDENT) {
-		addr = myaddr();
-		if (addr != NULL) {
+		if ((addr = myaddr()) != NULL) {
 			if (mime_name_invalid(addr, 1))
 				return 1;
 			/*
@@ -1108,8 +1090,7 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			gotcha++;
 			putc('\n', fo);
 		}
-		addr = value("ORGANIZATION");
-		if (addr != NULL) {
+		if ((addr = value("ORGANIZATION")) != NULL) {
 			fwrite("Organization: ", sizeof (char), 14, fo);
 			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
 					action == SEND_TODISP ?
@@ -1121,12 +1102,20 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			gotcha++;
 			putc('\n', fo);
 		}
-	}
-	if (hp->h_replyto != NULL && w & GREPLYTO) {
-		if (fmt("Reply-To:", hp->h_replyto, fo, w&(GCOMMA|GFILES), 0,
-					action != SEND_TODISP))
-			return 1;
-		gotcha++;
+		if ((addr = value("replyto")) != NULL) {
+			if (mime_name_invalid(addr, 1))
+				return 1;
+			fwrite("Reply-To: ", sizeof (char), 10, fo);
+			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
+					action == SEND_TODISP ?
+					CONV_NONE:CONV_TOHDR_A,
+					action == SEND_TODISP ?
+					TD_ISPR|TD_ICONV:TD_ICONV,
+					NULL, (size_t)0) == 0)
+				return 1;
+			gotcha++;
+			putc('\n', fo);
+		}
 	}
 	if (hp->h_to != NULL && w & GTO) {
 		if (fmt("To:", hp->h_to, fo, w&(GCOMMA|GFILES), 0,
@@ -1375,7 +1364,7 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 	if ((ibuf = setinput(&mb, mp, NEED_BODY)) == NULL)
 		return 1;
 	head.h_to = to;
-	to = fixhead(&head, to, 0);
+	to = fixhead(&head, to);
 	if (infix_resend(ibuf, nfo, mp, head.h_to, add_resent) != 0) {
 		senderr++;
 		rewind(nfo);

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.47 (gritter) 6/8/05";
+static char sccsid[] = "@(#)collect.c	2.48 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -168,10 +168,11 @@ print_collf(FILE *collf, struct header *hp)
 			maxlines--;
 		if (hp->h_bcc)
 			maxlines--;
-		if (hp->h_replyto)
-			maxlines--;
 		if (hp->h_attach)
 			maxlines--;
+		maxlines -= myaddr() != NULL;
+		maxlines -= value("ORGANIZATION") != NULL;
+		maxlines -= value("replyto") != NULL;
 		if (linecnt > maxlines) {
 			cp = get_pager();
 			if (sigsetjmp(pipejmp, 1))
@@ -186,7 +187,7 @@ print_collf(FILE *collf, struct header *hp)
 	}
 	fprintf(obuf, catgets(catd, CATSET, 62,
 				"-------\nMessage contains:\n"));
-	gf = GTO|GSUBJECT|GCC|GBCC|GNL|GREPLYTO|GFILES;
+	gf = GIDENT|GTO|GSUBJECT|GCC|GBCC|GNL|GFILES;
 	if (value("fullnames"))
 		gf |= GCOMMA;
 	puthead(hp, obuf, gf, SEND_TODISP, CONV_NONE, NULL, NULL);
