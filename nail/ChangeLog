@@ -10,7 +10,8 @@
 * The values of the 'from' and 'replyto' variables can now contain multiple
   addresses.
 * A '~H' tilde escape was introduced. It allows to set message-specific values
-  for the 'From', 'Reply-To', and 'Organization' header fields.
+  for the 'From', 'Reply-To', and 'Organization' header fields. These fields
+  are now also accepted in the editor output with the 'editheaders' variable.
 * The '-r' option now actually disables tilde escapes as documented (Bugreport
   by Bob Tennent).
 * The 'move' command does not anymore mark messages as moved if writing to

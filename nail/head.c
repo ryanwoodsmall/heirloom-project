@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)head.c	2.14 (gritter) 12/25/04";
+static char sccsid[] = "@(#)head.c	2.15 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -307,6 +307,21 @@ extract_header(FILE *fp, struct header *hp)
 			seenfields++;
 			hq->h_bcc = checkaddrs(cat(hq->h_bcc,
 					sextract(value, GBCC|GFULL)));
+		} else if ((value = thisfield(linebuf, "from")) != NULL) {
+			seenfields++;
+			hq->h_from = checkaddrs(cat(hq->h_from,
+					sextract(value, GEXTRA|GFULL)));
+		} else if ((value = thisfield(linebuf, "reply-to")) != NULL) {
+			seenfields++;
+			hq->h_replyto = checkaddrs(cat(hq->h_replyto,
+					sextract(value, GEXTRA|GFULL)));
+		} else if ((value = thisfield(linebuf,
+						"organization")) != NULL) {
+			seenfields++;
+			for (cp = value; blankchar(*cp & 0377); cp++);
+			hq->h_organization = hq->h_organization ?
+				save2str(hq->h_organization, cp) :
+				savestr(cp);
 		} else if ((value = thisfield(linebuf, "subject")) != NULL ||
 				(value = thisfield(linebuf, "subj")) != NULL) {
 			seenfields++;
@@ -336,6 +351,9 @@ extract_header(FILE *fp, struct header *hp)
 		hp->h_to = hq->h_to;
 		hp->h_cc = hq->h_cc;
 		hp->h_bcc = hq->h_bcc;
+		hp->h_from = hq->h_from;
+		hp->h_replyto = hq->h_replyto;
+		hp->h_organization = hq->h_organization;
 		hp->h_subject = hq->h_subject;
 	} else
 		fprintf(stderr, catgets(catd, CATSET, 267,

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)edit.c	2.21 (gritter) 11/5/04";
+static char sccsid[] = "@(#)edit.c	2.22 (gritter) 6/9/05";
 #endif
 #endif /* not lint */
 
@@ -173,9 +173,12 @@ run_editor(FILE *fp, off_t size, int type, int readonly,
 		perror(catgets(catd, CATSET, 73, "temporary mail edit file"));
 		goto out;
 	}
-	if (hp)
-		puthead(hp, nf, GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA, SEND_TODISP,
-				CONV_NONE, NULL, NULL);
+	if (hp) {
+		t = GTO|GSUBJECT|GCC|GBCC|GNL|GCOMMA;
+		if (hp->h_from || hp->h_replyto || hp->h_organization)
+			t |= GIDENT;
+		puthead(hp, nf, t, SEND_TODISP, CONV_NONE, NULL, NULL);
+	}
 	if (mp) {
 		send(mp, nf, 0, NULL, action, NULL);
 	} else {
