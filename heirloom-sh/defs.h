@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.11 (gritter) 6/16/05
+ * Sccsid @(#)defs.h	1.12 (gritter) 6/16/05
  */
 
 #ifndef	_DEFS_H
@@ -395,6 +395,8 @@ void bfailed(const unsigned char *, const unsigned char *,
 		const unsigned char *);
 /* ulimit.c */
 void sysulimit(int, char **);
+/* umask.c */
+void sysumask(int, char **);
 /* word.c */
 int word(void);
 unsigned int skipwc(void);

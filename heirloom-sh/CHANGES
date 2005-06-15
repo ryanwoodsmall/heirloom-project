@@ -4,6 +4,8 @@ Release ...
   readable and writable by all users depending on the umask.)
 * The "read" command now accepts the "-r" option (disable backslash as
   an escape character).
+* The "umask" command now accepts the "-S" option (process symbolic
+  mode strings).
 * The code has been converted to ANSI C.
 * A redefinition of the EOF macro caused the shell to hang on NetBSD.
 * Various conversions from pointers to smaller integers caused the shell

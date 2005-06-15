@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)msg.c	1.6 (gritter) 6/16/05
+ * Sccsid @(#)msg.c	1.7 (gritter) 6/16/05
  */
 /* from OpenSolaris "msg.c	1.13	05/06/08 SMI" */
 /*
@@ -48,6 +48,7 @@
 
 const char	badopt[]	= "bad option(s)";
 const char	badargs[]	= "missing argument";
+const char	badumask[]	= "bad umask";
 const char	mailmsg[]	= "you have mail\n";
 const char	nospace[]	= "no space";
 const char	nostack[]	= "no stack space";

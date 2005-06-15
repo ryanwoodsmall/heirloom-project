@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.6 (gritter) 6/15/05
+ * Sccsid @(#)bltin.c	1.7 (gritter) 6/16/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -347,29 +347,8 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 		break;
 			
 	case SYSUMASK:
-		if (a1)
-		{ 
-			int c;
-			mode_t i;
-
-			i = 0;
-			while ((c = *a1++) >= '0' && c <= '7')
-				i = (i << 3) + c - '0';
-			umask(i);
-		}
-		else
-		{
-			mode_t i;
-			int j;
-
-			umask(i = umask(0));
-			prc_buff('0');
-			for (j = 6; j >= 0; j -= 3)
-				prc_buff(((i >> j) & 07) +'0');
-			prc_buff(NL);
-		}
+		sysumask(argc, (char **)argv);
 		break;
-
 #endif
 
 	case SYSTST:

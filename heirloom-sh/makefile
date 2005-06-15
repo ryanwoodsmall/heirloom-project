@@ -53,7 +53,7 @@ OBJ = args.o blok.o bltin.o cmd.o ctype.o defs.o echo.o error.o \
 	expand.o fault.o func.o hash.o hashserv.o io.o jobs.o \
 	macro.o main.o msg.o name.o print.o pwd.o service.o \
 	setbrk.o stak.o string.o test.o ulimit.o word.o xec.o \
-	gmatch.o getopt.o strsig.o version.o mapmalloc.o
+	gmatch.o getopt.o strsig.o version.o mapmalloc.o umask.o
 
 .c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $<
 
@@ -90,6 +90,8 @@ error.o: error.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 expand.o: expand.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 fault.o: fault.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 func.o: func.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
+getopt.o: getopt.c
+gmatch.o: gmatch.c mbtowi.h
 hash.o: hash.c hash.h defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 hashserv.o: hashserv.c hash.h defs.h mac.h mode.h name.h stak.h brkincr.h \
   ctype.h
@@ -98,18 +100,21 @@ jobs.o: jobs.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 macro.o: macro.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h \
   sym.h
 main.o: main.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h sym.h \
-  timeout.h dup.h hash.h
+  hash.h timeout.h dup.h
+mapmalloc.o: mapmalloc.c
 msg.o: msg.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h sym.h
 name.o: name.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 print.o: print.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
-pwd.o: pwd.c mac.h
+pwd.o: pwd.c mac.h defs.h mode.h name.h stak.h brkincr.h ctype.h
 service.o: service.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 setbrk.o: setbrk.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 stak.o: stak.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 string.o: string.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
+strsig.o: strsig.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 test.o: test.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 ulimit.o: ulimit.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
+umask.o: umask.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
+version.o: version.c
 word.o: word.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h sym.h
 xec.o: xec.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h sym.h \
   hash.h
-strsig.o: defs.h
