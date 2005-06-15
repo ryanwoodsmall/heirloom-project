@@ -1,15 +1,53 @@
-CFLAGS=-g -O
-STRIP=:
-LNS=ln -s
-UCBINST=/usr/ucb/install
+#
+# Root directory. Mainly useful for package building; leave empty for
+# normal installation.
+#
+ROOT =
+
+#
+# The destination directory for the "sh" and "jsh" binaries.
+#
 SV3BIN=/usr/5bin
+
+#
+# A BSD-compatible install command.
+#
+UCBINST=/usr/ucb/install
+
+#
+# The strip command that is used at installation time.
+#
+STRIP=: strip -s -R .comment -R .note
+
+#
+# A command to create the link from "jsh" to "sh".
+#
+LNS=ln -s
+
+#
+# Uncomment the following line to compile with diet libc. -Ifakewchar might
+# be usable for other environments without wide character support too.
+#
+#CC=diet gcc -Ifakewchar
+
+#
+# Compiler flags.
+#
+CFLAGS=-g -O
+
+#
+# Flags for the C preprocessor.
+#
 CPPFLAGS=-D_GNU_SOURCE
+
+#
+# The compiler warning options.
 WERROR=-Werror
 WARN = -Wchar-subscripts -Wformat -Wno-format-y2k -Wimplicit \
 	-Wmissing-braces -Wsequence-point -Wreturn-type -Wtrigraphs \
 	-Wunused-function -Wunused-label -Wunused-variable -Wunused-value \
 	-Wuninitialized -Wmultichar -Wpointer-arith $(WERROR)
-WARN=
+#WARN=
 
 OBJ = args.o blok.o bltin.o cmd.o ctype.o defs.o echo.o error.o \
 	expand.o fault.o func.o hash.o hashserv.o io.o jobs.o \
@@ -29,10 +67,11 @@ jsh: sh
 	$(LNS) sh jsh
 
 install: all
+	test -d $(ROOT)$(SV3BIN) || mkdir -p $(ROOT)$(SV3BIN)
 	$(UCBINST) -c -m 755 sh $(ROOT)$(SV3BIN)/sh
 	$(STRIP) $(ROOT)$(SV3BIN)/sh
 	rm -f $(ROOT)$(SV3BIN)/jsh
-	$(LNS) sh $(ROOT)$(SV3BIN)/jsh
+	cd $(ROOT)$(SV3BIN) && $(LNS) sh jsh
 
 clean:
 	rm -f $(OBJ) sh jsh core log *~
