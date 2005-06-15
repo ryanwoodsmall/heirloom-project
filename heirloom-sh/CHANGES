@@ -2,6 +2,8 @@ Release ...
 * Temporary files for here documents are now created with mode 0600.
   (They were previously created with mode 0666, which could leave them
   readable and writable by all users depending on the umask.)
+* The "read" command now accepts the "-r" option (disable backslash as
+  an escape character).
 * The code has been converted to ANSI C.
 * A redefinition of the EOF macro caused the shell to hang on NetBSD.
 * Various conversions from pointers to smaller integers caused the shell

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)name.c	1.9 (gritter) 6/16/05
+ * Sccsid @(#)name.c	1.10 (gritter) 6/16/05
  */
 /* from OpenSolaris "name.c	1.23	05/06/08 SMI" */
 /*
@@ -315,12 +315,22 @@ readvar(unsigned char **names)
 	register struct fileblk *f = &fb;
 	unsigned char	c[MULTI_BYTE_MAX+1];
 	register int	rc = 0;
-	struct namnod *n = lookup(*names++);	/* done now to avoid storage mess */
-	unsigned char	*rel = (unsigned char *)relstak();
+	struct namnod *n;
+	unsigned char	*rel;
 	unsigned char *oldstak;
 	register unsigned char *pc, *rest;
 	int		d;
+	unsigned int	(*newwc)(void);
+	extern const char	badargs[];
 
+	if (eq(*names, "-r")) {
+		if (*++names == NULL)
+			error(badargs);
+		newwc = readwc;
+	} else
+		newwc = nextwc;
+	n = lookup(*names++);	/* done now to avoid storage mess */
+	rel = (unsigned char *)relstak();
 	push(f);
 	initf(dup(0));
 
@@ -351,7 +361,7 @@ readvar(unsigned char **names)
 	 */
 	for (;;) 
 	{
-		d = nextwc();
+		d = newwc();
 		if(eolchar(d))
 			break;
 		rest = readw(d);
@@ -381,7 +391,7 @@ readvar(unsigned char **names)
 			}
 			else		/* strip imbedded IFS characters */
 				while(1) {
-					d = nextwc();
+					d = newwc();
 					if(eolchar(d))
 						break;
 					rest = readw(d);
@@ -393,8 +403,8 @@ readvar(unsigned char **names)
 		}
 		else
 		{
-			if(d == '\\') {
-				d = readwc();
+			if(d == '\\' && newwc == nextwc) {
+				d = newwc();
 				rest = readw(d);
 				while(d = *rest++) {
 					if (staktop >= brkend)
@@ -414,7 +424,7 @@ readvar(unsigned char **names)
 				if(!anys(c, ifsnod.namval))
 					oldstak = staktop;
 			}
-			d = nextwc();
+			d = newwc();
 
 			if (eolchar(d))
 				staktop = oldstak;
