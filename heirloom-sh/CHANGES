@@ -6,6 +6,10 @@ Release ...
   an escape character).
 * The "umask" command now accepts the "-S" option (process symbolic
   mode strings).
+* A SVR4.2-like "TIMEOUT" variable has been introduced. If it is set in
+  the initial environment, the shell will terminate after the value of
+  the variable in seconds. A value of 0 (the default) means no timeout.
+  It is now forbidden to set a trap on SIGALRM because of this.
 * The code has been converted to ANSI C.
 * A redefinition of the EOF macro caused the shell to hang on NetBSD.
 * Various conversions from pointers to smaller integers caused the shell

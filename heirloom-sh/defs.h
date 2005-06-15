@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.12 (gritter) 6/16/05
+ * Sccsid @(#)defs.h	1.13 (gritter) 6/16/05
  */
 
 #ifndef	_DEFS_H
@@ -480,6 +480,7 @@ extern struct namnod	ps2nod;
 extern struct namnod	mchknod;
 extern struct namnod	acctnod;
 extern struct namnod	mailpnod;
+extern struct namnod	timeoutnod;
 
 /* special names */
 extern unsigned char				flagadr[];
@@ -499,6 +500,7 @@ extern const char				ps2name[];
 extern const char				mchkname[];
 extern const char				acctname[];
 extern const char				mailpname[];
+extern const char				timeoutname[];
 
 /* transput */
 extern unsigned char				tmpout[];
@@ -542,6 +544,7 @@ extern const char				devnull[];
 #define			privflg		04000000
 #define			forcexit	010000000
 #define			jcoff		020000000
+#define			waiting		040000000
 
 extern long				flags;
 extern int				rwait;	/* flags read waiting */

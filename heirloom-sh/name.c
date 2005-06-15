@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)name.c	1.10 (gritter) 6/16/05
+ * Sccsid @(#)name.c	1.11 (gritter) 6/16/05
  */
 /* from OpenSolaris "name.c	1.23	05/06/08 SMI" */
 /*
@@ -104,7 +104,7 @@ struct namnod mchknod =
 struct namnod acctnod =
 {
 	(struct namnod *)NIL,
-	(struct namnod *)NIL,
+	&timeoutnod,
 	(unsigned char *)acctname
 };
 struct namnod mailpnod =
@@ -112,6 +112,12 @@ struct namnod mailpnod =
 	(struct namnod *)NIL,
 	(struct namnod *)NIL,
 	(unsigned char *)mailpname
+};
+struct namnod timeoutnod =
+{
+	(struct namnod *)NIL,
+	(struct namnod *)NIL,
+	(unsigned char *)timeoutname
 };
 
 

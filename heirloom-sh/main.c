@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)main.c	1.6 (gritter) 6/16/05
  */
 
 
@@ -254,6 +254,9 @@ main(int c, char *v[], char *e[])
 	 */
 	assign(&ifsnod, sptbnl);
 
+	dfault(&timeoutnod, "0");
+	timeoutnod.namflg |= N_RDONLY;
+
 	dfault(&mchknod, MAILCHECK);
 	mailchk = stoi(mchknod.namval);
 
@@ -362,6 +365,7 @@ BOOL	prof;
 {
 	time_t	mailtime = 0;	/* Must not be a register variable */
 	time_t 	curtime = 0;
+	long	timeout = 0;
 
 	/*
 	 * move input
@@ -421,9 +425,13 @@ BOOL	prof;
 
 			prs(ps1nod.namval);
 
+			if ((timeout = atol(timeoutnod.namval)) > 0)
+				alarm(timeout);
+
 #ifdef TIME_OUT
 			alarm(TIMEOUT);
 #endif
+			flags |= waiting;
 
 		}
 
@@ -435,9 +443,14 @@ BOOL	prof;
 			eof = 0;
 		}
 
+		if (timeout > 0) {
+			alarm(0);
+			timeout = 0;
+		}
 #ifdef TIME_OUT
 		alarm(0);
 #endif
+		flags &= ~waiting;
 
 		{
 			register struct trenod *t;

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.6 (gritter) 6/15/05
+ * Sccsid @(#)fault.c	1.8 (gritter) 6/16/05
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -218,6 +218,8 @@ fault(register int sig)
 		case SIGALRM:
 			if (sleeping)
 				return;
+			if (flags & waiting)
+				done(0);
 			break;
 	}
 
@@ -393,7 +395,7 @@ systrap(int argc, char **argv)
 		while (*++argv) {
 			if (str_2_sig(*argv, &sig) < 0 ||
 			    sig >= MAXTRAP || sig < MINTRAP ||
-			    sig == SIGSEGV) {
+			    sig == SIGSEGV || sig == SIGALRM) {
 				failure(cmd, badtrap);
 			} else if (noa1) {
 				/*

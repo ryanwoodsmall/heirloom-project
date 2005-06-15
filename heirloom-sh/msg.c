@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)msg.c	1.7 (gritter) 6/16/05
+ * Sccsid @(#)msg.c	1.8 (gritter) 6/16/05
  */
 /* from OpenSolaris "msg.c	1.13	05/06/08 SMI" */
 /*
@@ -133,6 +133,7 @@ const char	ps2name[]	= "PS2";
 const char	mchkname[]	= "MAILCHECK";
 const char	acctname[]  	= "SHACCT";
 const char	mailpname[]	= "MAILPATH";
+const char	timeoutname[]	= "TIMEOUT";
 
 /*
  * string constants
