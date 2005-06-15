@@ -3,6 +3,7 @@ Release ...
   (They were previously created with mode 0666, which could leave them
   readable and writable by all users depending on the umask.)
 * The code has been converted to ANSI C.
+* A redefinition of the EOF macro caused the shell to hang on NetBSD.
 
 Release 050614
 * Initial release.
