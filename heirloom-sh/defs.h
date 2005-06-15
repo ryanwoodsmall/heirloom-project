@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.8 (gritter) 6/15/05
+ * Sccsid @(#)defs.h	1.9 (gritter) 6/15/05
  */
 
 #ifndef	_DEFS_H
@@ -219,7 +219,7 @@ void chktrap(void);
 int systrap(int, char **);
 #define	sleep(a)	sh_sleep(a)
 void sleep(unsigned int);
-void sigsegv(int, siginfo_t *, ucontext_t *);
+void sigsegv(int, siginfo_t *);
 /* func.c */
 void freefunc(struct namnod *);
 void freetree(struct trenod *);

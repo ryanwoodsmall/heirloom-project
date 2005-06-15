@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)fault.c	1.6 (gritter) 6/15/05
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -472,7 +472,7 @@ sleep(unsigned int ticks)
 }
 
 void
-sigsegv(int sig, siginfo_t *sip, ucontext_t *uap)
+sigsegv(int sig, siginfo_t *sip)
 {
 	if (sip == (siginfo_t *)NULL) {
 		/*
