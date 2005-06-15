@@ -5,7 +5,7 @@ This is a portable version of the OpenSolaris Bourne Shell. It is known
 to compile on:
 
 Linux           glibc 2.2 and above, diet libc
-Solaris         9
+Solaris         9 and above
 FreeBSD         5.4
 NetBSD          2.0
 

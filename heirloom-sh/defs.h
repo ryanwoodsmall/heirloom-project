@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.9 (gritter) 6/15/05
+ * Sccsid @(#)defs.h	1.10 (gritter) 6/15/05
  */
 
 #ifndef	_DEFS_H
@@ -361,16 +361,8 @@ int getarg(struct comnod *);
 /* setbrk.c */
 unsigned char *setbrk(int);
 /* stak.c */
-unsigned char *getstak(int);
-unsigned char *locstak(void);
-void growstak(unsigned char *);
-unsigned char *savstak(void);
-unsigned char *endstak(unsigned char *);
 void tdystak(unsigned char *);
 void stakchk(void);
-unsigned char *cpystak(unsigned char *);
-unsigned char *movstrstak(const unsigned char *, unsigned char *);
-unsigned char *memcpystak(unsigned char *, const unsigned char *, int);
 /* string.c */
 unsigned char *movstr(const unsigned char *, unsigned char *);
 int any(wchar_t, const unsigned char *);
@@ -408,7 +400,7 @@ void execexp(unsigned char *, intptr_t);
 void execprint(unsigned char **);
 
 #define		attrib(n, f)		(n->namflg |= f)
-#define		round(a, b)		(((int)(((char *)(a)+b)-1))&~((b)-1))
+#define		round(a, b)	(((intptr_t)(((char *)(a)+b)-1))&~((b)-1))
 #define		closepipe(x)	(close(x[INPIPE]), close(x[OTPIPE]))
 #define		eq(a, b)		(cf(a, b) == 0)
 #define		max(a, b)		((a) > (b)?(a):(b))

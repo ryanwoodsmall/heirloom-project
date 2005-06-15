@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.c	1.6 (gritter) 6/15/05
+ * Sccsid @(#)macro.c	1.7 (gritter) 6/15/05
  */
 /* from OpenSolaris "macro.c	1.14	05/06/08 SMI" */
 /*
@@ -238,7 +238,7 @@ retry:
 					c = '1';
 				}
 				c -= '0';
-				v = ((c == 0) ? cmdadr : ((int)c <= dolc) ? dolv[c] : (unsigned char *)(dolg = 0));
+				v = ((c == 0) ? cmdadr : (c <= dolc) ? dolv[c] : (unsigned char *)(intptr_t)(dolg = 0));
 			}
 			else if (c == '$')
 				v = pidadr;

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mode.h	1.4 (gritter) 6/15/05
+ * Sccsid @(#)mode.h	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "mode.h	1.12	05/06/08 SMI"	 SVr4.0 1.8.1.2 */
 /*
@@ -56,7 +56,7 @@ typedef short BOOL;
  * into an Rvalue so two cheats
  * are necessary, one for each context.
  */
-#define	Rcheat(a)	((int)(a))
+#define	Rcheat(a)	((intptr_t)(a))
 
 
 /* address puns for storage allocation */

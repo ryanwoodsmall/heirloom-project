@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)stak.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)stak.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "stak.c	1.10	05/06/08 SMI" */
 /*
@@ -44,13 +44,13 @@
 
 unsigned char *
 getstak (			/* allocate requested stack */
-    int asize
+    intptr_t asize
 )
 {
 	register unsigned char	*oldstak;
 	register int	size;
 
-	size = round(asize, BYTESPERWORD);
+	size = round((intptr_t)asize, BYTESPERWORD);
 	oldstak = stakbot;
 	staktop = stakbot += size;
 	if (staktop >= brkend)
@@ -78,9 +78,9 @@ locstak(void)
 void 
 growstak(unsigned char *newtop)
 {
-	register unsigned	incr;
+	register uintptr_t	incr;
 
-	incr = (unsigned)round(newtop - brkend + 1, BYTESPERWORD);
+	incr = (uintptr_t)round(newtop - brkend + 1, BYTESPERWORD);
 	if (brkincr > incr)
 		incr = brkincr;
 	if (setbrk(incr) == (unsigned char *)-1)

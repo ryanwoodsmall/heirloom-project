@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)service.c	1.6 (gritter) 6/15/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -616,7 +616,7 @@ split (		/* blank interpretation routine */
 			makearg((struct argnod *)argp);
 			count++;
 		}
-		gchain = (struct argnod *)((int)gchain | ARGMK);
+		gchain = (struct argnod *)((intptr_t)gchain | ARGMK);
 	}
 }
 
