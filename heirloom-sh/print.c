@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)print.c	1.8 (gritter) 6/16/05
+ * Sccsid @(#)print.c	1.9 (gritter) 6/16/05
  */
 /* from OpenSolaris "print.c	1.17	05/06/08 SMI"	 SVr4.0 1.12.6.1 */
 /*
@@ -42,6 +42,7 @@
 #include	"defs.h"
 #include	<sys/param.h>
 #include	<locale.h>
+#include 	<ctype.h>
 #include	<wctype.h>	/* iswprint() */
 
 #define		BUFLEN		256
@@ -283,7 +284,7 @@ prs_cntl(const unsigned char *s)
 		} else {
 			c = wc;
 			s += n;
-			if (!iswprint(c)) {
+			if (!(mb_cur_max > 1 ? iswprint(c) : isprint(c))) {
 				if (c < '\040' && c > 0) {
 					/*
 					 * assumes ASCII char
