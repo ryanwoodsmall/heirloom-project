@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)fault.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -46,7 +46,6 @@
 static	void (*psig0_func)() = SIG_ERR;	/* previous signal handler for signal 0 */
 static	char sigsegv_stack[SIGSTKSZ];
 
-static void sigsegv(int sig, siginfo_t *sip, ucontext_t *uap);
 static BOOL sleeping = 0;
 static unsigned char *trapcom[MAXTRAP]; /* array of actions, one per signal */
 static BOOL trapflg[MAXTRAP] =
@@ -130,9 +129,8 @@ sigval[MAXTRAP]))() =
 	0,	/* check point thaw */
 };
 
-static int
-ignoring(i)
-register int i;
+static int 
+ignoring(register int i)
 {
 	struct sigaction act;
 	if (trapflg[i] & SIGIGN)
@@ -145,9 +143,8 @@ register int i;
 	return (0);
 }
 
-static void
-clrsig(i)
-int	i;
+static void 
+clrsig(int i)
 {
 	if (trapcom[i] != 0) {
 		free(trapcom[i]);
@@ -171,8 +168,8 @@ int	i;
 	}
 }
 
-void
-done(sig)
+void 
+done(int sig)
 {
 	register unsigned char	*t;
 	int	savxit;
@@ -212,11 +209,10 @@ done(sig)
 	exit(exitval);
 }
 
-void
-fault(sig)
-register int	sig;
+void 
+fault(register int sig)
 {
-	register int flag;
+	register int flag = 0;
 
 	switch (sig) {
 		case SIGALRM:
@@ -236,10 +232,8 @@ register int	sig;
 	trapflg[sig] |= flag;
 }
 
-int
-handle(sig, func)
-	int sig;
-	void (*func)();
+int 
+handle(int sig, void (*func)(int))
 {
 	int	ret;
 	struct sigaction act, oact;
@@ -279,8 +273,8 @@ handle(sig, func)
 	return (ret);
 }
 
-void
-stdsigs()
+void 
+stdsigs(void)
 {
 	register int	i;
 	stack_t	ss;
@@ -323,8 +317,8 @@ stdsigs()
 	}
 }
 
-void
-oldsigs()
+void 
+oldsigs(void)
 {
 	register int	i;
 	register unsigned char	*t;
@@ -344,8 +338,8 @@ oldsigs()
  * check for traps
  */
 
-void
-chktrap()
+void 
+chktrap(void)
 {
 	register int	i = MAXTRAP;
 	register unsigned char	*t;
@@ -367,9 +361,8 @@ chktrap()
 	}
 }
 
-systrap(argc, argv)
-int argc;
-char **argv;
+int 
+systrap(int argc, char **argv)
 {
 	int sig;
 
@@ -432,11 +425,11 @@ char **argv;
 			}
 		}
 	}
+	return 0;
 }
 
-unsigned int
-sleep(ticks)
-unsigned int ticks;
+void
+sleep(unsigned int ticks)
 {
 	sigset_t set, oset;
 	struct sigaction act, oact;

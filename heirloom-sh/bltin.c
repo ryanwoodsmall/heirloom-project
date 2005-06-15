@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)bltin.c	1.6 (gritter) 6/15/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -46,14 +46,13 @@
 #include	"sym.h"
 #include	"hash.h"
 #include	<sys/types.h>
+#include	<sys/stat.h>
 #include	<sys/times.h>
 
 #define	setmode	sh_setmode
 
-builtin(type, argc, argv, t)
-int type, argc;
-unsigned char **argv;
-struct trenod	*t;
+void
+builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 {
 	short index = initio(t->treio, (type != SYSEXEC));
 	unsigned char *a1 = argv[1];
@@ -62,23 +61,23 @@ struct trenod	*t;
 	{
 
 	case SYSSUSP:
-		syssusp(argc,argv);
+		syssusp(argc,(char **)argv);
 		break;
 
 	case SYSSTOP:
-		sysstop(argc,argv);
+		sysstop(argc,(char **)argv);
 		break;
 
 	case SYSKILL:
-		syskill(argc,argv);
+		syskill(argc,(char **)argv);
 		break;
 
 	case SYSFGBG:
-		sysfgbg(argc,argv);
+		sysfgbg(argc,(char **)argv);
 		break;
 
 	case SYSJOBS:
-		sysjobs(argc,argv);
+		sysjobs(argc,(char **)argv);
 		break;
 
 	case SYSDOT:
@@ -141,7 +140,7 @@ struct trenod	*t;
 		break;
 
 	case SYSTRAP:
-		systrap(argc,argv);
+		systrap(argc,(char **)argv);
 		break;
 
 	case SYSEXEC:
@@ -275,7 +274,7 @@ struct trenod	*t;
 		break;
 
 	case SYSWAIT:
-		syswait(argc,argv);
+		syswait(argc,(char **)argv);
 		break;
 
 	case SYSREAD:
@@ -339,12 +338,12 @@ struct trenod	*t;
 
 	case SYSEVAL:
 		if (a1)
-			execexp(a1, &argv[2]);
+			execexp(a1, (intptr_t)&argv[2]);
 		break;
 
 #ifndef RES	
 	case SYSULIMIT:
-		sysulimit(argc, argv);
+		sysulimit(argc, (char **)argv);
 		break;
 			
 	case SYSUMASK:
@@ -444,7 +443,6 @@ struct trenod	*t;
 	case SYSGETOPT: {
 		int getoptval;
 		struct namnod *n;
-		extern unsigned char numbuf[];
 		unsigned char *varnam = argv[2];
 		unsigned char c[2];
 		if(argc < 3) {

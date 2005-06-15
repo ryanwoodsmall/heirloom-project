@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hash.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)hash.c	1.4 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "hash.c	1.8	05/06/08 SMI"	 SVr4.0 1.3.2.1 */
@@ -59,9 +59,10 @@ static struct node 	**table;
 static unsigned int 	bitsper;		/* Bits per byte */
 static unsigned int	shift;
 
-static unsigned int crunch();
+static unsigned int crunch(unsigned char *);
 
-hcreate()
+void
+hcreate(void)
 {
 	unsigned char c = (unsigned char)~0;			/* A byte full of 1's */
 	int j;
@@ -85,8 +86,7 @@ hcreate()
 }
 
 
-void hscan(uscan)	
-	void	(*uscan)();
+void hscan(void (*uscan)(ENTRY *))
 {
 	struct node		*p, *nxt;
 	int				j;

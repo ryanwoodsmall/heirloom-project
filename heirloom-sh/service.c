@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)service.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -45,9 +45,9 @@
 
 #define	ARGMK	01
 
-static unsigned char	*execs();
-static int	gsort();
-static int	split();
+static unsigned char *execs(unsigned char *, register unsigned char *[]);
+static void gsort(unsigned char *[], unsigned char *[]);
+static int split(unsigned char *);
 extern const char	*sysmsg[];
 extern short topfd;
 
@@ -56,12 +56,11 @@ extern short topfd;
 /*
  * service routines for `execute'
  */
-initio(iop, save)
-	struct ionod	*iop;
-	int		save;
+int 
+initio(struct ionod *iop, int save)
 {
 	register unsigned char	*ion;
-	register int	iof, fd;
+	register int	iof, fd = -1;
 	int		ioufd;
 	short	lastfd;
 	int	newmode;
@@ -124,8 +123,7 @@ initio(iop, save)
 }
 
 unsigned char *
-simple(s)
-unsigned char	*s;
+simple(unsigned char *s)
 {
 	unsigned char	*sname;
 
@@ -140,8 +138,7 @@ unsigned char	*s;
 }
 
 unsigned char *
-getpath(s)
-	unsigned char	*s;
+getpath(unsigned char *s)
 {
 	register unsigned char	*path, *newpath;
 	register int pathlen;
@@ -167,10 +164,12 @@ getpath(s)
 		} else
 			return (cpystak(path));
 	}
+	/*NOTREACHED*/
+	return 0;
 }
 
-pathopen(path, name)
-register unsigned char *path, *name;
+int 
+pathopen(register const unsigned char *path, register const unsigned char *name)
 {
 	register int	f;
 
@@ -182,14 +181,12 @@ register unsigned char *path, *name;
 }
 
 unsigned char *
-catpath(path, name)
-register unsigned char	*path;
-unsigned char	*name;
+catpath(register const unsigned char *path, unsigned const char *name)
 {
 	/*
 	 * leaves result on top of stack
 	 */
-	register unsigned char	*scanp = path;
+	register unsigned const char	*scanp = path;
 	register unsigned char	*argp = locstak();
 
 	while (*scanp && *scanp != COLON)
@@ -214,14 +211,13 @@ unsigned char	*name;
 			growstak(argp);
 	}
 	while (*argp++ = *scanp++);
-	return (path);
+	return (unsigned char *)(path);
 }
 
 unsigned char *
-nextpath(path)
-	register unsigned char	*path;
+nextpath(register const unsigned char *path)
 {
-	register unsigned char	*scanp = path;
+	register const unsigned char	*scanp = path;
 
 	while (*scanp && *scanp != COLON)
 		scanp++;
@@ -229,16 +225,14 @@ nextpath(path)
 	if (*scanp == COLON)
 		scanp++;
 
-	return (*scanp ? scanp : 0);
+	return (unsigned char *)(*scanp ? scanp : 0);
 }
 
 static unsigned char	*xecmsg;
 static unsigned char	**xecenv;
 
-int
-execa(at, pos)
-    unsigned char *at[];
-    short pos;
+void
+execa(unsigned char *at[], int pos)
 {
 	register unsigned char	*path;
 	register unsigned char	**t = at;
@@ -268,12 +262,9 @@ execa(at, pos)
 }
 
 static unsigned char *
-execs(ap, t)
-unsigned char	*ap;
-register unsigned char	*t[];
+execs(unsigned char *ap, register unsigned char *t[])
 {
 	register unsigned char	*p, *prefix;
-	unsigned char		*savptr;
 
 	prefix = catpath(ap, t[0]);
 	trim(p = curstak());
@@ -343,8 +334,8 @@ register unsigned char	*t[];
 
 BOOL		nosubst;
 
-trim(at)
-unsigned char	*at;
+void
+trim(unsigned char *at)
 {
 	register unsigned char	*last;
 	register unsigned char 	*current;
@@ -393,8 +384,8 @@ unsigned char	*at;
 }
 
 /* Same as trim, but only removes backlashes before slashes */
-trims(at)
-unsigned char	*at;
+void
+trims(unsigned char *at)
 {
 	register unsigned char	*last;
 	register unsigned char 	*current;
@@ -447,8 +438,7 @@ unsigned char	*at;
 }
 
 unsigned char *
-mactrim(s)
-unsigned char	*s;
+mactrim(unsigned char *s)
 {
 	register unsigned char	*t = macro(s);
 
@@ -457,8 +447,7 @@ unsigned char	*s;
 }
 
 unsigned char **
-scan(argn)
-int	argn;
+scan(int argn)
 {
 	register struct argnod *argp =
 			(struct argnod *)(Rcheat(gchain) & ~ARGMK);
@@ -484,9 +473,8 @@ int	argn;
 	return (comargn);
 }
 
-static int
-gsort(from, to)
-unsigned char	*from[], *to[];
+static void
+gsort(unsigned char *from[], unsigned char *to[])
 {
 	int	k, m, n;
 	register int	i, j;
@@ -525,8 +513,8 @@ unsigned char	*from[], *to[];
 /*
  * Argument list generation
  */
-getarg(ac)
-struct comnod	*ac;
+int 
+getarg(struct comnod *ac)
 {
 	register struct argnod	*argp;
 	register int		count = 0;
@@ -537,16 +525,17 @@ struct comnod	*ac;
 		argp = c->comarg;
 		while (argp)
 		{
-			count += split(macro(argp->argval), 1);
+			count += split(macro(argp->argval));
 			argp = argp->argnxt;
 		}
 	}
 	return (count);
 }
 
-static int
-split(s)		/* blank interpretation routine */
-unsigned char	*s;
+static int 
+split (		/* blank interpretation routine */
+    unsigned char *s
+)
 {
 	register unsigned char	*argp;
 	register int	c;
@@ -624,7 +613,7 @@ unsigned char	*s;
 			count += c;
 		else
 		{
-			makearg(argp);
+			makearg((struct argnod *)argp);
 			count++;
 		}
 		gchain = (struct argnod *)((int)gchain | ARGMK);
@@ -647,13 +636,14 @@ static int shaccton;	/* 0 implies do not write record on exit */
  *	suspend accounting until turned on by preacct()
  */
 
-suspacct()
+int 
+suspacct(void)
 {
 	shaccton = 0;
 }
 
-preacct(cmdadr)
-	unsigned char *cmdadr;
+int 
+preacct(unsigned char *cmdadr)
 {
 	unsigned char *simple();
 
@@ -669,7 +659,8 @@ preacct(cmdadr)
 }
 
 
-doacct()
+int 
+doacct(void)
 {
 	int fd;
 	clock_t after;

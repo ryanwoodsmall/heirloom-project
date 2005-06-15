@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)io.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "io.c	1.19	05/06/08 SMI"	 SVr4.0 1.10.2.1 */
 /*
@@ -49,8 +49,8 @@ short topfd;
 
 /* ========	input output and file copying ======== */
 
-initf(fd)
-int	fd;
+void
+initf(int fd)
 {
 	register struct fileblk *f = standin;
 
@@ -63,8 +63,8 @@ int	fd;
 	f->feof = FALSE;
 }
 
-estabf(s)
-register unsigned char *s;
+int 
+estabf(register unsigned char *s)
 {
 	register struct fileblk *f;
 
@@ -76,8 +76,8 @@ register unsigned char *s;
 	return (f->feof = (s == 0));
 }
 
-push(af)
-struct fileblk *af;
+void
+push(struct fileblk *af)
 {
 	register struct fileblk *f;
 
@@ -87,7 +87,8 @@ struct fileblk *af;
 	standin = f;
 }
 
-pop()
+int 
+pop(void)
 {
 	register struct fileblk *f;
 
@@ -103,16 +104,16 @@ pop()
 
 struct tempblk *tmpfptr;
 
-pushtemp(fd, tb)
-	int fd;
-	struct tempblk *tb;
+void
+pushtemp(int fd, struct tempblk *tb)
 {
 	tb->fdes = fd;
 	tb->fstak = tmpfptr;
 	tmpfptr = tb;
 }
 
-poptemp()
+int 
+poptemp(void)
 {
 	if (tmpfptr){
 		close(tmpfptr->fdes);
@@ -122,23 +123,21 @@ poptemp()
 		return (FALSE);
 }
 
-chkpipe(pv)
-int	*pv;
+void
+chkpipe(int *pv)
 {
 	if (pipe(pv) < 0 || pv[INPIPE] < 0 || pv[OTPIPE] < 0)
 		error(piperr);
 }
 
-chkopen(idf, mode)
-unsigned char *idf;
-int mode;
+int 
+chkopen(const unsigned char *idf, int mode)
 {
 	register int	rc;
 
-	if ((rc = open((char *)idf, mode, 0666)) < 0)
+	if ((rc = open((const char *)idf, mode, 0666)) < 0)
 		failed(idf, badopen);
-	else
-		return (rc);
+	return (rc);
 }
 
 /*
@@ -146,8 +145,8 @@ int mode;
  * then closed.  If f2 is descriptor 0, modify the global ioset variable
  * accordingly.
  */
-renamef(f1, f2)
-register int	f1, f2;
+void
+renamef(register int f1, register int f2)
 {
 #ifdef RES
 	if (f1 != f2)
@@ -174,20 +173,19 @@ register int	f1, f2;
 #endif
 }
 
-create(s)
-unsigned char *s;
+int 
+create(unsigned char *s)
 {
 	register int	rc;
 
 	if ((rc = creat((char *)s, 0666)) < 0)
 		failed(s, badcreate);
-	else
-		return (rc);
+	return (rc);
 }
 
 
-tmpfil(tb)
-	struct tempblk *tb;
+int 
+tmpfil(struct tempblk *tb)
 {
 	int fd;
 
@@ -195,15 +193,12 @@ tmpfil(tb)
 	do {
 		itos(serial++);
 		movstr(numbuf, tmpname);
-		fd = open((char *)tmpout, O_RDWR|O_CREAT|O_EXCL, 0666);
+		fd = open((char *)tmpout, O_RDWR|O_CREAT|O_EXCL, 0600);
 	} while ((fd == -1) && (errno == EEXIST));
-	if (fd != -1) {
-		pushtemp(fd, tb);
-		return (fd);
-	}
-	else
+	if (fd == -1)
 		failed(tmpout, badcreate);
-
+	pushtemp(fd, tb);
+	return (fd);
 }
 
 /*
@@ -212,8 +207,8 @@ tmpfil(tb)
 extern BOOL		nosubst;
 #define			CPYSIZ		512
 
-copy(ioparg)
-struct ionod	*ioparg;
+void
+copy(struct ionod *ioparg)
 {
 	register unsigned char	*cline;
 	register unsigned char	*clinep;
@@ -337,8 +332,8 @@ struct ionod	*ioparg;
 }
 
 
-link_iodocs(i)
-	struct ionod	*i;
+void
+link_iodocs(struct ionod *i)
 {
 	int r;
 
@@ -363,8 +358,8 @@ link_iodocs(i)
 }
 
 
-swap_iodoc_nm(i)
-	struct ionod	*i;
+void
+swap_iodoc_nm(struct ionod *i)
 {
 	while (i)
 	{
@@ -377,8 +372,8 @@ swap_iodoc_nm(i)
 }
 
 
-savefd(fd)
-	int fd;
+int 
+savefd(int fd)
 {
 	register int	f;
 
@@ -387,8 +382,8 @@ savefd(fd)
 }
 
 
-restore(last)
-	register int	last;
+void
+restore(register int last)
 {
 	register int 	i;
 	register int	dupfd;

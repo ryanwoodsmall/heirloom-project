@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)echo.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)echo.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "echo.c	1.16	05/06/08 SMI" */
 
@@ -40,10 +40,8 @@
 
 #define	exit(a)	flushb(); return (a)
 
-extern int exitval;
-
-echo(argc, argv)
-unsigned char **argv;
+int
+echo(int argc, unsigned char **argv)
 {
 	register unsigned char	*cp;
 	register int	i, wd;

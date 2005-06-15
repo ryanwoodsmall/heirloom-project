@@ -25,7 +25,7 @@
  * Sccsid @(#)main.c	1.2 (gritter) 6/14/05
  */
 /*
- * Sccsid @(#)strsig.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)strsig.c	1.4 (gritter) 6/15/05
  */
 
 #include <signal.h>
@@ -166,10 +166,8 @@ static const struct sig_strlist {
 	{ -1,		NULL	}
 };
 
-int
-str_2_sig(str, signum)
-	const char *str;
-	int *signum;
+int 
+str_2_sig(const char *str, int *signum)
 {
 	register int	i;
 
@@ -182,9 +180,8 @@ str_2_sig(str, signum)
 	return 0;
 }
 
-int
-sig_2_str(signum, str)
-	char *str;
+int 
+sig_2_str(int signum, char *str)
 {
 	register int	i;
 
@@ -197,8 +194,8 @@ sig_2_str(signum, str)
 	return 0;
 }
 
-void
-init_sigval()
+void 
+init_sigval(void)
 {
 	extern void	(*(sigval[]))();
 

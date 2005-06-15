@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)defs.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "defs.c	1.12	05/06/08 SMI" */
 /*

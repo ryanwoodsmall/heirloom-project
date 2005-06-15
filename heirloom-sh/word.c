@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)word.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)word.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "word.c	1.21	05/06/08 SMI"	 SVr4.0 1.11.2.2 */
 /*
@@ -48,7 +48,8 @@ static int	readb(struct fileblk *, int, int);
 /* ========	character handling for command lines	======== */
 
 
-word()
+int 
+word(void)
 {
 	register unsigned int	c, d, cc;
 	struct argnod	*arg = (struct argnod *)locstak();
@@ -242,7 +243,8 @@ word()
 	return (wdval);
 }
 
-unsigned int skipwc()
+unsigned int 
+skipwc(void)
 {
 	register unsigned int c;
 
@@ -251,7 +253,8 @@ unsigned int skipwc()
 	return (c);
 }
 
-unsigned int nextwc()
+unsigned int 
+nextwc(void)
 {
 	register unsigned int	c, d;
 
@@ -271,7 +274,6 @@ wchar_t	d;
 {
 	static unsigned char c[MULTI_BYTE_MAX + 1];
 	int length;
-	wchar_t l;
 	if (isascii(d)) {
 		c[0] = d;
 		c[1] = '\0';
@@ -287,14 +289,14 @@ wchar_t	d;
 	return (c);
 }
 
-unsigned int
-readwc()
+unsigned int 
+readwc(void)
 {
 	wchar_t	c;
 	int	len;
 	struct fileblk	*f;
 	int	mbmax = MB_CUR_MAX;
-	int	i, mlen;
+	int	i, mlen = 0;
 
 	if (peekn) {
 		c = peekn & 0x7fffffff;

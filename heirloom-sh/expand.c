@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)expand.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)expand.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "expand.c	1.13	05/06/08 SMI" */
 /*
@@ -54,10 +54,11 @@
  * "[...a-z...]" in params matches a through z.
  *
  */
-static int	addg();
+static void addg(unsigned char *, unsigned char *,
+		unsigned char *, unsigned char *);
 
-expand(as, rcnt)
-	unsigned char	*as;
+int 
+expand(unsigned char *as, int rcnt)
 {
 	int	count;
 	DIR	*dirf;
@@ -216,9 +217,9 @@ expand(as, rcnt)
 	return (count);
 }
 
-static int
-addg(as1, as2, as3, as4)
-unsigned char	*as1, *as2, *as3, *as4;
+static void
+addg(unsigned char *as1, unsigned char *as2,
+		unsigned char *as3, unsigned char *as4)
 {
 	register unsigned char	*s1, *s2;
 	register int	c;
@@ -286,11 +287,11 @@ unsigned char	*as1, *as2, *as3, *as4;
 		}
 		while (*s2++ = *++s1);
 	}
-	makearg(endstak(s2));
+	makearg((struct argnod *)endstak(s2));
 }
 
-makearg(args)
-	register struct argnod *args;
+void
+makearg(register struct argnod *args)
 {
 	args->argnxt = gchain;
 	gchain = args;

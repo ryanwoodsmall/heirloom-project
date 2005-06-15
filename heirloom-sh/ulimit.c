@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ulimit.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)ulimit.c	1.6 (gritter) 6/15/05
  */
 /* from OpenSolaris "ulimit.c	1.12	05/06/08 SMI" */
 
@@ -52,19 +52,18 @@ static struct rlimtab {
 	char	*scale;
 	rlim_t	divisor;
 } rlimtab[] = {
-/* RLIMIT_CPU	*/	"time",		"seconds",	1,
-/* RLIMIT_FSIZE */	"file",		"blocks",	512,
-/* RLIMIT_DATA	*/	"data",		"kbytes",	1024,
-/* RLIMIT_STACK */	"stack",	"kbytes",	1024,
-/* RLIMIT_CORE	*/	"coredump",	"blocks",	512,
-/* RLIMIT_NOFILE */	"nofiles",	"descriptors",	1,
-/* RLIMIT_AS */		"memory",	"kbytes",	1024,
+	{ /* RLIMIT_CPU	*/	"time",		"seconds",	1, },
+	{ /* RLIMIT_FSIZE */	"file",		"blocks",	512, },
+	{ /* RLIMIT_DATA */	"data",		"kbytes",	1024, },
+	{ /* RLIMIT_STACK */	"stack",	"kbytes",	1024, },
+	{ /* RLIMIT_CORE */	"coredump",	"blocks",	512, },
+	{ /* RLIMIT_NOFILE */	"nofiles",	"descriptors",	1, },
+	{ /* RLIMIT_AS */	"memory",	"kbytes",	1024 }
 };
 
 void
 sysulimit(int argc, char **argv)
 {
-	extern int opterr, optind;
 	int savopterr, savoptind, savsp;
 	char *savoptarg;
 	char *args;

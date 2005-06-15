@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)print.c	1.6 (gritter) 6/14/05
+ * Sccsid @(#)print.c	1.7 (gritter) 6/15/05
  */
 /* from OpenSolaris "print.c	1.17	05/06/08 SMI"	 SVr4.0 1.12.6.1 */
 /*
@@ -54,18 +54,11 @@ static unsigned char *bufp = buffer;
 static int index = 0;
 static int buffd = 1;
 
-void	prc_buff(unsigned char c);
-void	prs_buff(unsigned char *s);
-void	prn_buff(int n);
-void	prs_cntl(unsigned char *s);
-void	prs(unsigned char *as);
-void	itos(int n);
-
 /*
  * printing and io conversion
  */
-void
-prp()
+void 
+prp(void)
 {
 	if ((flags & prompt) == 0 && cmdadr) {
 		prs_cntl(cmdadr);
@@ -74,9 +67,9 @@ prp()
 }
 
 void
-prs(unsigned char *as)
+prs(const unsigned char *as)
 {
-	char	*s;
+	const char	*s;
 
 	if ((s = (char *)as) != 0) {
 		write(output, s, length(s) - 1);
@@ -157,9 +150,9 @@ itos(int n)
 }
 
 int
-stoi(unsigned char *icp)
+stoi(const unsigned char *icp)
 {
-	unsigned char	*cp = icp;
+	const unsigned char	*cp = icp;
 	int	r = 0;
 	unsigned char	c;
 
@@ -167,11 +160,9 @@ stoi(unsigned char *icp)
 		r = r * 10 + c - '0';
 		cp++;
 	}
-	if (r < 0 || cp == icp) {
+	if (r < 0 || cp == icp)
 		failed(icp, badnum);
-	} else {
-		return (r);
-	}
+	return (r);
 }
 
 int
@@ -222,8 +213,8 @@ prull(unsigned long long n)
 	prs_buff(&numbuf[i]);
 }
 
-void
-flushb()
+void 
+flushb(void)
 {
 	if (index) {
 		bufp[index] = '\0';
@@ -248,18 +239,18 @@ prc_buff(unsigned char c)
 }
 
 void
-prs_buff(unsigned char *s)
+prs_buff(const unsigned char *s)
 {
-	int len = length((char *)s) - 1;
+	int len = length((const char *)s) - 1;
 
 	if (buffd != -1 && index + len >= BUFLEN) {
 		flushb();
 	}
 
 	if (buffd != -1 && len >= BUFLEN) {
-		write(buffd, (char *)s, len);
+		write(buffd, (const char *)s, len);
 	} else {
-		movstr((char *)s, &bufp[index]);
+		movstr((const char *)s, &bufp[index]);
 		index += len;
 	}
 }
@@ -275,11 +266,11 @@ octal(unsigned char c, unsigned char *ptr)
 }
 
 void
-prs_cntl(unsigned char *s)
+prs_cntl(const unsigned char *s)
 {
 	int n;
 	wchar_t wc;
-	unsigned char *olds = s;
+	const unsigned char *olds = s;
 	unsigned char *ptr = bufp;
 	wchar_t c;
 

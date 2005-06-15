@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ctype.h	1.3 (gritter) 6/14/05
+ * Sccsid @(#)ctype.h	1.5 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "ctype.h	1.8	05/06/08 SMI"	 SVr4.0 1.10.1.1 */
@@ -90,32 +90,24 @@
 #define _IDCH	(T_IDC|T_DIG)
 #define _META	(T_SPC|T_DIP|T_MET|T_EOR)
 
-extern 
-#ifdef __STDC__
-const 
-#endif
-unsigned char	_ctype1[];
+extern const unsigned char	sh_ctype1[];
 
 /* nb these args are not call by value !!!! */
-#define	space(c)	((c<QUOTE) && _ctype1[c]&(T_SPC))
-#define eofmeta(c)	((c<QUOTE) && _ctype1[c]&(_META|T_EOF))
-#define qotchar(c)	((c<QUOTE) && _ctype1[c]&(T_QOT))
-#define eolchar(c)	((c<QUOTE) && _ctype1[c]&(T_EOR|T_EOF))
-#define dipchar(c)	((c<QUOTE) && _ctype1[c]&(T_DIP))
-#define subchar(c)	((c<QUOTE) && _ctype1[c]&(T_SUB|T_QOT))
-#define escchar(c)	((c<QUOTE) && _ctype1[c]&(T_ESC))
+#define	space(c)	((c<QUOTE) && sh_ctype1[c]&(T_SPC))
+#define eofmeta(c)	((c<QUOTE) && sh_ctype1[c]&(_META|T_EOF))
+#define qotchar(c)	((c<QUOTE) && sh_ctype1[c]&(T_QOT))
+#define eolchar(c)	((c<QUOTE) && sh_ctype1[c]&(T_EOR|T_EOF))
+#define dipchar(c)	((c<QUOTE) && sh_ctype1[c]&(T_DIP))
+#define subchar(c)	((c<QUOTE) && sh_ctype1[c]&(T_SUB|T_QOT))
+#define escchar(c)	((c<QUOTE) && sh_ctype1[c]&(T_ESC))
 
-extern 
-#ifdef __STDC__ 
-const 
-#endif 
-unsigned char   _ctype2[];
+extern const unsigned char   sh_ctype2[];
 
-#define	digit(c)	((c<QUOTE) && _ctype2[c]&(T_DIG))
-#define dolchar(c)	((c<QUOTE) && _ctype2[c]&(T_AST|T_BRC|T_DIG|T_IDC|T_SHN))
-#define defchar(c)	((c<QUOTE) && _ctype2[c]&(T_DEF))
-#define setchar(c)	((c<QUOTE) && _ctype2[c]&(T_SET))
-#define digchar(c)	((c<QUOTE) && _ctype2[c]&(T_AST|T_DIG))
-#define	letter(c)	((c<QUOTE) && _ctype2[c]&(T_IDC))
-#define alphanum(c)	((c<QUOTE) && _ctype2[c]&(_IDCH))
-#define astchar(c)	((c<QUOTE) && _ctype2[c]&(T_AST))
+#define	digit(c)	((c<QUOTE) && sh_ctype2[c]&(T_DIG))
+#define dolchar(c)	((c<QUOTE) && sh_ctype2[c]&(T_AST|T_BRC|T_DIG|T_IDC|T_SHN))
+#define defchar(c)	((c<QUOTE) && sh_ctype2[c]&(T_DEF))
+#define setchar(c)	((c<QUOTE) && sh_ctype2[c]&(T_SET))
+#define digchar(c)	((c<QUOTE) && sh_ctype2[c]&(T_AST|T_DIG))
+#define	letter(c)	((c<QUOTE) && sh_ctype2[c]&(T_IDC))
+#define alphanum(c)	((c<QUOTE) && sh_ctype2[c]&(_IDCH))
+#define astchar(c)	((c<QUOTE) && sh_ctype2[c]&(T_AST))

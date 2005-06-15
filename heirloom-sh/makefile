@@ -59,7 +59,7 @@ jobs.o: jobs.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 macro.o: macro.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h \
   sym.h
 main.o: main.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h sym.h \
-  timeout.h dup.h
+  timeout.h dup.h hash.h
 msg.o: msg.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h sym.h
 name.o: name.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 print.o: print.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h

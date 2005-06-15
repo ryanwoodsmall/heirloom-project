@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hashserv.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)hashserv.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "hashserv.c	1.12	05/06/08 SMI"	 SVr4.0 1.10.5.1 */
 /*
@@ -49,13 +49,10 @@ static int	dotpath;
 static int	multrel;
 static struct entry	relcmd;
 
-static int	argpath();
+static int	argpath(struct argnod *);
 
-short
-pathlook(com, flg, arg)
-	unsigned char	*com;
-	int		flg;
-	register struct argnod	*arg;
+short 
+pathlook(unsigned char *com, int flg, register struct argnod *arg)
 {
 	register unsigned char	*name = com;
 	register ENTRY	*h;
@@ -65,7 +62,6 @@ pathlook(com, flg, arg)
 	int		i;
 	int		pathset = 0;
 	int		oldpath = 0;
-	struct namnod	*n;
 
 
 
@@ -157,22 +153,21 @@ pathsrch:
 }
 
 
-static void
-zapentry(h)
-	ENTRY *h;
+static void 
+zapentry(ENTRY *h)
 {
 	h->data &= HASHZAP;
 }
 
-void
-zaphash()
+void 
+zaphash(void)
 {
 	hscan(zapentry);
 	relcmd.next = 0;
 }
 
 void 
-zapcd()
+zapcd(void)
 {
 	ENTRY *ptr = relcmd.next;
 
@@ -185,9 +180,8 @@ zapcd()
 }
 
 
-static void
-hashout(h)
-	ENTRY *h;
+static void 
+hashout(ENTRY *h)
 {
 	sigchk();
 
@@ -211,15 +205,16 @@ hashout(h)
 	prc_buff(NL);
 }
 
-void
-hashpr()
+void 
+hashpr(void)
 {
 	prs_buff("hits	cost	command\n");
 	hscan(hashout);
 }
 
 
-set_dotpath()
+void
+set_dotpath(void)
 {
 	register unsigned char	*path;
 	register int	cnt = 1;
@@ -249,8 +244,8 @@ set_dotpath()
 }
 
 
-hash_func(name)
-	unsigned char *name;
+void
+hash_func(unsigned char *name)
 {
 	ENTRY	*h;
 	ENTRY	hentry;
@@ -269,8 +264,8 @@ hash_func(name)
 	}
 }
 
-func_unhash(name)
-	unsigned char *name;
+void
+func_unhash(unsigned char *name)
 {
 	ENTRY 	*h;
 	int i;
@@ -286,9 +281,8 @@ func_unhash(name)
 }
 
 
-short
-hash_cmd(name)
-	unsigned char *name;
+short 
+hash_cmd(unsigned char *name)
 {
 	ENTRY	*h;
 
@@ -318,8 +312,8 @@ hash_cmd(name)
 /*
  * Return 0 if found, 1 if not.
  */
-what_is_path(name)
-	register unsigned char *name;
+int 
+what_is_path(register unsigned char *name)
 {
 	register ENTRY	*h;
 	int		cnt;
@@ -345,7 +339,7 @@ what_is_path(name)
 				prs_buff(" is a function\n");
 				prs_buff(name);
 				prs_buff("(){\n");
-				prf(n->namenv);
+				prf((struct trenod *)n->namenv);
 				prs_buff("\n}\n");
 				return (0);
 			}
@@ -396,9 +390,8 @@ what_is_path(name)
 }
 
 
-findpath(name, oldpath)
-	register unsigned char *name;
-	int oldpath;
+int 
+findpath(register unsigned char *name, int oldpath)
 {
 	register unsigned char 	*path;
 	register int	count = 1;
@@ -455,10 +448,8 @@ findpath(name, oldpath)
  * a non-regular file as executable. 
  */
 
-chk_access(name, mode, regflag)
-register unsigned char	*name;
-mode_t mode; 
-int regflag;
+int
+chk_access(register unsigned char *name, mode_t mode, int regflag)
 {	
 	static int flag;
 	static uid_t euid; 
@@ -491,25 +482,23 @@ int regflag;
 }
 
 
-pr_path(name, count)
-	register unsigned char	*name;
-	int count;
+void
+pr_path(register unsigned char *name, int count)
 {
 	register unsigned char	*path;
 
 	path = getpath(name);
 
 	while (--count && path)
-		path = nextpath(path, name);
+		path = nextpath(path);
 
 	catpath(path, name);
 	prs_buff(curstak());
 }
 
 
-static
-argpath(arg)
-	register struct argnod	*arg;
+static int
+argpath(register struct argnod *arg)
 {
 	register unsigned char 	*s;
 	register unsigned char	*start;

@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)main.c	1.5 (gritter) 6/15/05
  */
 
 
@@ -42,10 +42,13 @@
 
 #include	"defs.h"
 #include	"sym.h"
+#include	"hash.h"
 #include	"timeout.h"
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
+#include	<fcntl.h>
+#include	<time.h>
 #include	"dup.h"
 
 #ifdef RES
@@ -75,20 +78,16 @@ char **execargs = (char **)(-2);
 #endif
 
 
-static int	exfile();
-extern unsigned char 	*simple();
+static void exfile(int);
 
 
-main(c, v, e)
-int	c;
-char	*v[];
-char	*e[];
+int 
+main(int c, char *v[], char *e[])
 {
 	register int	rflag = ttyflg;
 	int		rsflag = 1;	/* local restricted flag */
 	register unsigned char *flagc = flagadr;
 	struct namnod	*n;
-	extern int	init_sigval();
 
 	init_sigval();
 	mypid = getpid();
@@ -180,7 +179,7 @@ char	*e[];
 	 * look for options
 	 * dolc is $#
 	 */
-	dolc = options(c, v);
+	dolc = options(c, (unsigned char **)v);
 
 	if (dolc < 2)
 	{
@@ -353,9 +352,11 @@ char	*e[];
 
 	exfile(0);
 	done(0);
+	/*NOTREACHED*/
+	return 0;
 }
 
-static int
+static void
 exfile(prof)
 BOOL	prof;
 {
@@ -444,7 +445,7 @@ BOOL	prof;
 			if (t == NULL && flags & ttyflg)
 				freejobs();
 			else
-				execute(t, 0, eflag);
+				execute(t, 0, eflag, NULL, NULL);
 		}
 
 		eof |= (flags & oneflg);
@@ -452,13 +453,15 @@ BOOL	prof;
 	}
 }
 
-chkpr()
+void
+chkpr(void)
 {
 	if ((flags & prompt) && standin->fstak == 0)
 		prs(ps2nod.namval);
 }
 
-settmp()
+void
+settmp(void)
 {
 	int i;
 	i = ltos(mypid);
@@ -466,8 +469,8 @@ settmp()
 	tmpname = movstr(numbuf + i, &tmpout[TMPNAM]);
 }
 
-Ldup(fa, fb)
-register int	fa, fb;
+void
+Ldup(register int fa, register int fb)
 {
 #ifdef RES
 
@@ -491,7 +494,8 @@ register int	fa, fb;
 }
 
 
-chkmail()
+void
+chkmail(void)
 {
 	register unsigned char 	*s = mailp;
 	register unsigned char	*save;
@@ -546,8 +550,8 @@ chkmail()
 }
 
 
-setmail(mailpath)
-	unsigned char *mailpath;
+void
+setmail(unsigned char *mailpath)
 {
 	register unsigned char	*s = mailpath;
 	register int 	cnt = 1;
@@ -576,8 +580,8 @@ setmail(mailpath)
 	}
 }
 
-void
-setwidth()
+void 
+setwidth(void)
 {
 	unsigned char *name = lookup("LC_CTYPE")->namval;
 	if (!name || !*name)
@@ -593,7 +597,8 @@ setwidth()
 	}
 }
 
-setmode(prof)
+void
+setmode(int prof)
 {
 	/*
 	 * decide whether interactive

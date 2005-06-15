@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)stak.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)stak.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "stak.c	1.10	05/06/08 SMI" */
 /*
@@ -43,8 +43,9 @@
 /* ========	storage allocation	======== */
 
 unsigned char *
-getstak(asize)			/* allocate requested stack */
-int	asize;
+getstak (			/* allocate requested stack */
+    int asize
+)
 {
 	register unsigned char	*oldstak;
 	register int	size;
@@ -62,11 +63,11 @@ int	asize;
  * should be followed by `endstak'
  */
 unsigned char *
-locstak()
+locstak(void)
 {
 	if (brkend - stakbot < BRKINCR)
 	{
-		if (setbrk(brkincr) == -1)
+		if (setbrk(brkincr) == (unsigned char *)-1)
 			error(nostack);
 		if (brkincr < BRKMAX)
 			brkincr += 256;
@@ -74,29 +75,29 @@ locstak()
 	return(stakbot);
 }
 
-void
-growstak(newtop)
-unsigned char	*newtop;
+void 
+growstak(unsigned char *newtop)
 {
 	register unsigned	incr;
 
 	incr = (unsigned)round(newtop - brkend + 1, BYTESPERWORD);
 	if (brkincr > incr)
 		incr = brkincr;
-	if (setbrk(incr) == -1)
+	if (setbrk(incr) == (unsigned char *)-1)
 		error(nospace);
 }
 
 unsigned char *
-savstak()
+savstak(void)
 {
 	assert(staktop == stakbot);
 	return(stakbot);
 }
 
 unsigned char *
-endstak(argp)		/* tidy up after `locstak' */
-register unsigned char	*argp;
+endstak (		/* tidy up after `locstak' */
+    register unsigned char *argp
+)
 {
 	register unsigned char	*oldstak;
 
@@ -110,8 +111,10 @@ register unsigned char	*argp;
 	return(oldstak);
 }
 
-tdystak(x)		/* try to bring stack back to x */
-register unsigned char	*x;
+void
+tdystak (		/* try to bring stack back to x */
+    register unsigned char *x
+)
 {
 	while ((unsigned char *)stakbsy > x)
 	{
@@ -119,25 +122,24 @@ register unsigned char	*x;
 		stakbsy = stakbsy->word;
 	}
 	staktop = stakbot = max(x, stakbas);
-	rmtemp(x);
+	rmtemp((struct ionod *)x);
 }
 
-stakchk()
+void
+stakchk(void)
 {
 	if ((brkend - stakbas) > BRKINCR + BRKINCR)
 		setbrk(-BRKINCR);
 }
 
 unsigned char *
-cpystak(x)
-unsigned char	*x;
+cpystak(unsigned char *x)
 {
 	return(endstak(movstrstak(x, locstak())));
 }
 
 unsigned char *
-movstrstak(a, b)
-register unsigned char	*a, *b;
+movstrstak(register const unsigned char *a, register unsigned char *b)
 {
 	do
 	{
@@ -153,9 +155,8 @@ register unsigned char	*a, *b;
  * Return s1
  */
 unsigned char *
-memcpystak(s1, s2, n)
-register unsigned char *s1, *s2;
-register int n;
+memcpystak(register unsigned char *s1, register const unsigned char *s2,
+		register int n)
 {
 	register unsigned char *os1 = s1;
 

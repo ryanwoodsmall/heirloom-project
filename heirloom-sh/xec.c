@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xec.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)xec.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "xec.c	1.23	05/06/08 SMI" */
 /*
@@ -53,9 +53,8 @@ pid_t parent;
 /* ========	command execution	======== */
 
 
-execute(argt, xflags, errorflg, pf1, pf2)
-struct trenod	*argt;
-int	*pf1, *pf2;
+int 
+execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 {
 	/*
 	 * `stakbot' is preserved by this routine
@@ -69,9 +68,9 @@ int	*pf1, *pf2;
 
 	if ((t = argt) && execbrk == 0) {
 		register int treeflgs;
-		register unsigned char **com;
+		register unsigned char **com = NULL;
 		int type;
-		short pos;
+		short pos = 0;
 
 		treeflgs = t->tretyp;
 		type = treeflgs & COMMSK;
@@ -113,17 +112,17 @@ int	*pf1, *pf2;
 
 		case TCOM:
 			{
-				unsigned char	*a1, *name;
-				int	argn, internal;
+				unsigned char	*a1;
+				int	argn;
 				struct argnod	*schain = gchain;
 				struct ionod	*io = t->treio;
-				short 	cmdhash;
-				short	comtype;
+				short 	cmdhash = 0;
+				short	comtype = 0;
 
 				exitval = 0;
 
 				gchain = 0;
-				argn = getarg(t);
+				argn = getarg((struct comnod *)t);
 				com = scan(argn);
 				a1 = com[1];
 				gchain = schain;
@@ -172,7 +171,7 @@ int	*pf1, *pf2;
 					else if (comtype == FUNCTION)
 					{
 						struct dolnod *olddolh;
-						struct namnod *n, *opt;
+						struct namnod *n;
 						short index;
 						unsigned char **olddolv = dolv;
 						int olddolc = dolc;
@@ -328,7 +327,7 @@ int	*pf1, *pf2;
 			initio(t->treio, 0);
 
 			if (type == TFORK)
-				execute(forkptr(t)->forktre, xflags | XEC_EXECED, errorflg);
+				execute(forkptr(t)->forktre, xflags | XEC_EXECED, errorflg, NULL, NULL);
 			else if (com[0] != ENDARGS)
 			{
 				eflag = 0;
@@ -344,7 +343,7 @@ int	*pf1, *pf2;
 			/* Forked process is subshell:  may want job control */
 			flags &= ~jcoff;
 			clearjobs();
-			execute(parptr(t)->partre, xflags, errorflg);
+			execute(parptr(t)->partre, xflags, errorflg, NULL, NULL);
 			done(0);
 
 		case TFIL:
@@ -360,18 +359,18 @@ int	*pf1, *pf2;
 			break;
 
 		case TLST:
-			execute(lstptr(t)->lstlef, xflags&XEC_NOSTOP, errorflg);
+			execute(lstptr(t)->lstlef, xflags&XEC_NOSTOP, errorflg, NULL, NULL);
 			/* Update errorflg if set -e is invoked in the sub-sh*/
-			execute(lstptr(t)->lstrit, xflags, (errorflg | (eflag & errflg)));
+			execute(lstptr(t)->lstrit, xflags, (errorflg | (eflag & errflg)), NULL, NULL);
 			break;
 
 		case TAND:
 		case TORF:
 		{
-			register xval;
-			xval = execute(lstptr(t)->lstlef, XEC_NOSTOP, 0);
+			register int xval;
+			xval = execute(lstptr(t)->lstlef, XEC_NOSTOP, 0, NULL, NULL);
 			if ((xval == 0) == (type == TAND))
-				execute(lstptr(t)->lstrit, xflags|XEC_NOSTOP, errorflg);
+				execute(lstptr(t)->lstrit, xflags|XEC_NOSTOP, errorflg, NULL, NULL);
 			break;
 		}
 
@@ -398,7 +397,7 @@ int	*pf1, *pf2;
 				while (*args != ENDARGS && execbrk == 0)
 				{
 					assign(n, *args++);
-					execute(forptr(t)->fortre, XEC_NOSTOP, errorflg);
+					execute(forptr(t)->fortre, XEC_NOSTOP, errorflg, NULL, NULL);
 					if (breakcnt < 0)
 						execbrk = (++breakcnt != 0);
 				}
@@ -418,10 +417,10 @@ int	*pf1, *pf2;
 
 				loopcnt++;
 				while (execbrk == 0 && (execute(whptr(t)->whtre,
-				    XEC_NOSTOP, 0) == 0) == (type == TWH) &&
+				    XEC_NOSTOP, 0, NULL, NULL) == 0) == (type == TWH) &&
 				    (flags&noexec) == 0)
 {
-					i = execute(whptr(t)->dotre, XEC_NOSTOP, errorflg);
+					i = execute(whptr(t)->dotre, XEC_NOSTOP, errorflg, NULL, NULL);
 					if (breakcnt < 0)
 						execbrk = (++breakcnt != 0);
 				}
@@ -434,10 +433,10 @@ int	*pf1, *pf2;
 			break;
 
 		case TIF:
-			if (execute(ifptr(t)->iftre, XEC_NOSTOP, 0) == 0)
-				execute(ifptr(t)->thtre, xflags|XEC_NOSTOP, errorflg);
+			if (execute(ifptr(t)->iftre, XEC_NOSTOP, 0, NULL, NULL) == 0)
+				execute(ifptr(t)->thtre, xflags|XEC_NOSTOP, errorflg, NULL, NULL);
 			else if (ifptr(t)->eltre)
-				execute(ifptr(t)->eltre, xflags|XEC_NOSTOP, errorflg);
+				execute(ifptr(t)->eltre, xflags|XEC_NOSTOP, errorflg, NULL, NULL);
 			else
 				exitval = 0;	/* force zero exit for if-then-fi */
 			break;
@@ -458,7 +457,7 @@ int	*pf1, *pf2;
 
 						if (gmatch(r, s = macro(rex->argval)) || (trim(s), eq(r, s)))
 						{
-							execute(regp->regcom, XEC_NOSTOP, errorflg);
+							execute(regp->regcom, XEC_NOSTOP, errorflg, NULL, NULL);
 							regp = 0;
 							break;
 						}
@@ -479,9 +478,8 @@ int	*pf1, *pf2;
 	return(exitval);
 }
 
-execexp(s, f)
-unsigned char	*s;
-int	f;
+void
+execexp(unsigned char *s, intptr_t f)
 {
 	struct fileblk	fb;
 
@@ -493,12 +491,12 @@ int	f;
 	}
 	else if (f >= 0)
 		initf(f);
-	execute(cmd(NL, NLFLG | MTFLG), 0, (int)(flags & errflg));
+	execute(cmd(NL, NLFLG | MTFLG), 0, (int)(flags & errflg), NULL, NULL);
 	pop();
 }
 
-execprint(com)
-	unsigned char **com;
+void
+execprint(unsigned char **com)
 {
 	register int 	argn = 0;
 	unsigned char	*s;

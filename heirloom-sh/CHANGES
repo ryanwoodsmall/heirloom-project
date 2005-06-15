@@ -1,2 +1,8 @@
+Release ...
+* Temporary files for here documents are now created with mode 0600.
+  (They were previously created with mode 0666, which could leave them
+  readable and writable by all users depending on the umask.)
+* The code has been converted to ANSI C.
+
 Release 050614
 * Initial release.

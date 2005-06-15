@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)func.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)func.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "func.c	1.10	05/06/08 SMI"	 SVr4.0 1.4.1.3 */
 /*
@@ -40,15 +40,15 @@
 
 #include	"defs.h"
 
-freefunc(n)
-	struct namnod 	*n;
+void
+freefunc(struct namnod *n)
 {
 	freetree((struct trenod *)(n->namenv));
 }
 
 
-freetree(t)
-	register struct trenod *t;
+void
+freetree(register struct trenod *t)
 {
 	if (t)
 	{
@@ -129,8 +129,8 @@ freetree(t)
 	}
 }
 
-free_arg(argp)
-	register struct argnod 	*argp;
+void
+free_arg(register struct argnod *argp)
 {
 	register struct argnod 	*sav;
 
@@ -143,8 +143,8 @@ free_arg(argp)
 }
 
 
-freeio(iop)
-	register struct ionod *iop;
+void
+freeio(register struct ionod *iop)
 {
 	register struct ionod *sav;
 
@@ -182,8 +182,8 @@ freeio(iop)
 }
 
 
-freereg(regp)
-	register struct regnod 	*regp;
+void
+freereg(register struct regnod *regp)
 {
 	register struct regnod 	*sav;
 
@@ -198,9 +198,10 @@ freereg(regp)
 }
 
 
-static nonl = 0;
+static int nonl = 0;
 
-prbgnlst()
+void
+prbgnlst(void)
 {
 	if (nonl)
 		prc_buff(SPACE);
@@ -208,7 +209,8 @@ prbgnlst()
 		prc_buff(NL);
 }
 
-prendlst()
+void
+prendlst(void)
 {
 	if (nonl) {
 		prc_buff(';');
@@ -218,15 +220,16 @@ prendlst()
 		prc_buff(NL);
 }
 
-prcmd(t)
+void
+prcmd(struct trenod *t)
 {
 	nonl++;
 	prf(t);
 	nonl = 0;
 }
 
-prf(t)
-	register struct trenod	*t;
+void
+prf(register struct trenod *t)
 {
 	sigchk();
 
@@ -404,8 +407,8 @@ prf(t)
 	sigchk();
 }
 
-prarg(argp)
-	register struct argnod	*argp;
+void
+prarg(register struct argnod *argp)
 {
 	while (argp)
 	{
@@ -417,8 +420,8 @@ prarg(argp)
 }
 
 
-prio(iop)
-	register struct ionod	*iop;
+void
+prio(register struct ionod *iop)
 {
 	register int	iof;
 	register unsigned char	*ion;

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)jobs.c	1.6 (gritter) 6/15/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -102,7 +102,7 @@ static struct job 	*jobcur, /* active jobs listed in currency order */
 			*thisjob,
 			*joblst; /* active jobs listed in job ID order	 */
 
-static int	printjob(struct job *jp, int propts);
+static void	printjob(struct job *jp, int propts);
 
 static struct job *
 pgid2job(pgid)
@@ -117,13 +117,10 @@ register pid_t pgid;
 }
 
 static struct job *
-str2job(cmd, job, mustbejob)
-register char *cmd;
-register char *job;
-int mustbejob;
+str2job(register char *cmd, register char *job, int mustbejob)
 {
 	register struct job *jp, *njp;
-	register i;
+	register int i;
 
 	if (*job != '%')
 		jp = pgid2job(stoi(job));
@@ -136,7 +133,7 @@ int mustbejob;
 		for (jp = joblst; jp && jp->j_jid != i; jp = jp->j_nxtp)
 			continue;
 	} else if (*job == '?') {
-		register j;
+		register int j;
 		register char *p;
 		i = strlen(++job);
 		jp = 0;
@@ -172,9 +169,8 @@ int mustbejob;
 	return (jp);
 }
 
-static void
-freejob(jp)
-register struct job *jp;
+static void 
+freejob(register struct job *jp)
 {
 	register struct job **njp;
 	register struct job **cjp;
@@ -198,7 +194,8 @@ register struct job *jp;
  * to exit, but needs to wait until the fg job
  * is done.
  */
-collect_fg_job()
+void
+collect_fg_job(void)
 {
 	register struct job *jp;
 	register pid_t pid;
@@ -321,8 +318,8 @@ int rc;
  * from builtin() where chktrap() is already called.
  */
 
-static void
-collectjobs(wnohang)
+static void 
+collectjobs(int wnohang)
 {
 	pid_t pid;
 	register struct job *jp;
@@ -343,8 +340,8 @@ collectjobs(wnohang)
 
 }
 
-void
-freejobs()
+void 
+freejobs(void)
 {
 	register struct job *jp;
 
@@ -373,9 +370,8 @@ freejobs()
 	}
 }
 
-static void
-waitjob(jp)
-register struct job *jp;
+static void 
+waitjob(register struct job *jp)
 {
 	int stat;
 	int done;
@@ -424,9 +420,8 @@ pid_t new, expected;
 	return (0);
 }
 
-static void
-restartjob(jp, fg)
-register struct job *jp;
+static void 
+restartjob(register struct job *jp, int fg)
 {
 	if (jp != jobcur) {
 		register struct job *t;
@@ -462,9 +457,8 @@ register struct job *jp;
 	}
 }
 
-static
-printjob(jp, propts)
-register struct job *jp;
+static void
+printjob(register struct job *jp, int propts)
 {
 	int sp = 0;
 
@@ -567,8 +561,8 @@ register struct job *jp;
  * and after the "exec" builtin
  */
 
-void
-startjobs()
+void 
+startjobs(void)
 {
 	svpgid = mypgid;
 
@@ -590,9 +584,8 @@ startjobs()
 
 }
 
-int
-endjobs(check_if)
-int check_if;
+int 
+endjobs(int check_if)
 {
 	if ((flags & (jcoff|jcflg)) != jcflg)
 		return (1);
@@ -632,18 +625,15 @@ int check_if;
  * called by the shell to reserve a job slot for a job about to be spawned
  */
 
-void
-deallocjob()
+void 
+deallocjob(void)
 {
 	free(thisjob);
 	jobcnt--;
 }
 
-int
-allocjob(cmd, cwd, monitor)
-register char *cmd;
-register unsigned char *cwd;
-int monitor;
+void
+allocjob(register char *cmd, register unsigned char *cwd, int monitor)
 {
 	register struct job *jp, **jpp;
 	register int jid, cmdlen, cwdlen;
@@ -680,7 +670,8 @@ int monitor;
 	thisjob = jp;
 }
 
-clearjobs()
+void
+clearjobs(void)
 {
 	register struct job *jp, *sjp;
 
@@ -695,8 +686,8 @@ clearjobs()
 
 }
 
-makejob(monitor, fg)
-int monitor, fg;
+void
+makejob(int monitor, int fg)
 {
 	if (monitor) {
 		mypgid = mypid;
@@ -728,7 +719,7 @@ pid_t pid;
 int fg;
 {
 
-	register propts;
+	register int propts;
 
 	thisjob->j_nxtp = *nextjob;
 	*nextjob = thisjob;
@@ -762,15 +753,12 @@ int fg;
  * the builtin "jobs" command
  */
 
-void
-sysjobs(argc, argv)
-int argc;
-char *argv[];
+void 
+sysjobs(int argc, char *argv[])
 {
 	register char *cmd = *argv;
 	register struct job *jp;
-	register propts, c;
-	extern int opterr, i;
+	register int propts, c;
 	int savoptind = optind;
 	int loptind = -1;
 	int savopterr = opterr;
@@ -859,12 +847,11 @@ err:
  * the builtin "fg" and "bg" commands
  */
 
-sysfgbg(argc, argv)
-int argc;
-char *argv[];
+void
+sysfgbg(int argc, char *argv[])
 {
 	register char *cmd = *argv;
-	register fg;
+	register int fg;
 
 	if ((flags & jcflg) == 0)
 		failed(cmd, nojc);
@@ -892,10 +879,8 @@ char *argv[];
  * the builtin "wait" commands
  */
 
-void
-syswait(argc, argv)
-int argc;
-char *argv[];
+void 
+syswait(int argc, char *argv[])
 {
 	register char *cmd = *argv;
 	register struct job *jp;
@@ -920,11 +905,8 @@ char *argv[];
 	}
 }
 
-static
-sigv(cmd, sig, args)
-	char *cmd;
-	int sig;
-	char *args;
+static void
+sigv(char *cmd, int sig, char *args)
 {
 	int pgrp = 0;
 	int stopme = 0;
@@ -998,9 +980,8 @@ sigv(cmd, sig, args)
 
 }
 
-sysstop(argc, argv)
-int argc;
-char *argv[];
+void
+sysstop(int argc, char *argv[])
 {
 	char *cmd = *argv;
 	if (argc <= 1)
@@ -1009,9 +990,8 @@ char *argv[];
 		sigv(cmd, SIGSTOP, *argv);
 }
 
-syskill(argc, argv)
-int argc;
-char *argv[];
+void
+syskill(int argc, char *argv[])
 {
 	char *cmd = *argv;
 	int sig = SIGTERM;
@@ -1025,8 +1005,8 @@ char *argv[];
 
 		if (argc == 2) {
 
-			register i;
-			register cnt = 0;
+			register int i;
+			register int cnt = 0;
 			register char sep = 0;
 			char buf[12];
 
@@ -1062,9 +1042,8 @@ char *argv[];
 
 }
 
-syssusp(argc, argv)
-int argc;
-char *argv[];
+void
+syssusp(int argc, char *argv[])
 {
 	if (argc != 1)
 		failed(argv[0], badopt);

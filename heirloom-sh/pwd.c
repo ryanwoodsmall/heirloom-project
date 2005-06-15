@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pwd.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)pwd.c	1.6 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "pwd.c	1.10	05/06/08 SMI"	 SVr4.0 1.14.6.1 */
@@ -34,6 +34,7 @@
  */
 
 #include	"mac.h"
+#include	"defs.h"
 #include	<errno.h>
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -43,20 +44,15 @@
 #define	SLASH	'/'
 #define PARTLY	2
 
-static void rmslash();
-#ifdef __STDC__
+static void rmslash(unsigned char *);
 extern const char	longpwd[];
-#else
-extern char	longpwd[];
-#endif
-extern char *getcwd();
 
 unsigned char cwdname[PATH_MAX+1];
 
 static int 	didpwd = FALSE;
 
-cwd(dir)
-	register unsigned char *dir;
+void
+cwd(register unsigned char *dir)
 {
 	register unsigned char *pcwd;
 	register unsigned char *pdir;
@@ -186,8 +182,8 @@ cwd(dir)
 	return;
 }
 
-void
-cwd2()
+void 
+cwd2(void)
 {
 	struct stat stat1, stat2;
 	unsigned char *pcwd;
@@ -231,7 +227,7 @@ cwd2()
 }
 
 unsigned char *
-cwdget()
+cwdget(void)
 {
 	cwd2();
 	if (didpwd == FALSE) {
@@ -246,7 +242,8 @@ cwdget()
  *	Print the current working directory.
  */
 
-cwdprint()
+void
+cwdprint(void)
 {
 	register unsigned char *cp;
 
@@ -273,9 +270,8 @@ cwdprint()
  *	This routine will remove repeated slashes from string.
  */
 
-static void
-rmslash(string)
-	unsigned char *string;
+static void 
+rmslash(unsigned char *string)
 {
 	register unsigned char *pstring;
 

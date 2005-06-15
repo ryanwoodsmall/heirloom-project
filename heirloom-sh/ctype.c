@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ctype.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)ctype.c	1.5 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "ctype.c	1.7	05/06/08 SMI"	 SVr4.0 1.9.1.1 */
@@ -35,10 +35,7 @@
 
 #include	"defs.h"
 
-#ifdef __STDC__
-const 
-#endif
-unsigned char	_ctype1[] =
+const unsigned char	sh_ctype1[] =
 {
 /*	000	001	002	003	004	005	006	007	*/
 	_EOF,	0,	0,	0,	0,	0,	0,	0,
@@ -87,10 +84,7 @@ unsigned char	_ctype1[] =
 	0,	0,	0,	0,	_BAR,	0,	0,	0
 };
 
-#ifdef __STDC__
-const 
-#endif
-unsigned char	_ctype2[] =
+const unsigned char	sh_ctype2[] =
 {
 /*	000	001	002	003	004	005	006	007	*/
 	0,	0,	0,	0,	0,	0,	0,	0,

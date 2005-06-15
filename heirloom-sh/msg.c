@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)msg.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)msg.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "msg.c	1.13	05/06/08 SMI" */
 /*
@@ -45,9 +45,6 @@
 /*
  * error messages
  */
-#ifndef __STDC__
-#define const 
-#endif
 
 const char	badopt[]	= "bad option(s)";
 const char	mailmsg[]	= "you have mail\n";

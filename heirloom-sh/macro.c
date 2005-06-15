@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.c	1.4 (gritter) 6/14/05
+ * Sccsid @(#)macro.c	1.6 (gritter) 6/15/05
  */
 /* from OpenSolaris "macro.c	1.14	05/06/08 SMI" */
 /*
@@ -43,12 +43,16 @@
 
 static unsigned char	quote;	/* used locally */
 static unsigned char	quoted;	/* used locally */
-static int getch();
 
-static void
-copyto(endch, trimflag)
-int trimflag;  /* flag to check if argument will be trimmed */
-register unsigned char	endch;
+static void copyto(int, int);
+static void skipto(int);
+static int getch(int, int);
+
+static void 
+copyto (
+    int endch,
+    int trimflag  /* flag to check if argument will be trimmed */
+)
 {
 	register unsigned int	c;
 	register unsigned int 	d;
@@ -138,9 +142,8 @@ register unsigned char	endch;
 		error(badsub);
 }
 
-static
-skipto(endch)
-register unsigned char	endch;
+static void
+skipto(int endch)
 {
 	/*
 	 * skip chars up to }
@@ -168,15 +171,16 @@ register unsigned char	endch;
 		error(badsub);
 }
 
-static
-int getch(endch, trimflag)
-unsigned char	endch;
-int trimflag; /* flag to check if an argument is going to be trimmed, here document
+static int 
+getch (
+    int endch,
+    int trimflag /* flag to check if an argument is going to be trimmed, here document
 		 output is never trimmed
 	 */
+)
 {
 	register unsigned int	d;
-	int atflag;  /* flag to check if $@ has already been seen within double 
+	int atflag = 0;  /* flag to check if $@ has already been seen within double 
 		        quotes */
 retry:
 	d = readwc();
@@ -193,7 +197,7 @@ retry:
 			int		dolg = 0;
 			BOOL		bra;
 			BOOL		nulflg;
-			register unsigned char	*argp, *v;
+			register unsigned char	*argp, *v = NULL;
 			unsigned char		idb[2];
 			unsigned char		*id = idb;
 
@@ -414,8 +418,7 @@ retry:
 }
 
 unsigned char *
-macro(as)
-unsigned char	*as;
+macro(unsigned char *as)
 {
 	/*
 	 * Strip "" and do $ substitution
@@ -425,7 +428,7 @@ unsigned char	*as;
 	register unsigned char	savq = quote;
 	struct filehdr	fb;
 
-	push(&fb);
+	push((struct fileblk *)&fb);
 	estabf(as);
 	usestak();
 	quote = 0;
@@ -450,8 +453,10 @@ unsigned char	*as;
 /* Save file descriptor for command substitution */
 int savpipe = -1;
 
-comsubst(trimflag)
-int trimflag; /* used to determine if argument will later be trimmed */
+void
+comsubst (
+    int trimflag /* used to determine if argument will later be trimmed */
+)
 {
 	/*
 	 * command substn
@@ -543,7 +548,7 @@ int trimflag; /* used to determine if argument will later be trimmed */
 	{
 		extern pid_t parent;
 		int stat;
-		register rc;
+		register int rc;
 		int	ret = 0;
 
 		while ((ret = waitpid(parent,&stat,0)) != parent) {
@@ -575,8 +580,8 @@ int trimflag; /* used to determine if argument will later be trimmed */
 
 #define CPYSIZ	512
 
-subst(in, ot)
-int	in, ot;
+void
+subst(int in, int ot)
 {
 	register unsigned int	c;
 	struct fileblk	fb;
@@ -623,7 +628,8 @@ int	in, ot;
 	pop();
 }
 
-flush(ot)
+void
+flush(int ot)
 {
 	write(ot, stakbot, staktop - stakbot);
 	if (flags & execpr)

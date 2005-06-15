@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)test.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)test.c	1.5 (gritter) 6/15/05
  */
 /* from OpenSolaris "test.c	1.15	05/06/08 SMI" */
 
@@ -43,13 +43,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-extern	int lstat();
 int	ap, ac;
 unsigned char **av;
 
-test(argn, com)
-unsigned char *com[];
-int	argn;
+int 
+test(int argn, unsigned char *com[])
 {
 	ac = argn;
 	av = com;
@@ -66,7 +64,7 @@ int	argn;
 }
 
 unsigned char *
-nxtarg(mt)
+nxtarg(int mt)
 {
 	if (ap >= ac)
 	{
@@ -80,7 +78,8 @@ nxtarg(mt)
 	return(av[ap++]);
 }
 
-sexp()
+int 
+sexp(void)
 {
 	int	p1;
 	unsigned char	*p2;
@@ -99,7 +98,8 @@ sexp()
 	return(p1);
 }
 
-e1()
+int 
+e1(void)
 {
 	int	p1;
 	unsigned char	*p2;
@@ -113,7 +113,8 @@ e1()
 	return(p1);
 }
 
-e2()
+int 
+e2(void)
 {
 	if (eq(nxtarg(0), "!"))
 		return(!e3());
@@ -121,7 +122,8 @@ e2()
 	return(e3());
 }
 
-e3()
+int 
+e3(void)
 {
 	int	p1;
 	register unsigned char	*a;
@@ -220,12 +222,12 @@ e3()
 
 	bfailed(btest, badop, p2);
 /* NOTREACHED */
+	return 0;
 }
 
 
-ftype(f, field)
-unsigned char	*f;
-int	field;
+int 
+ftype(unsigned char *f, int field)
 {
 	struct stat statb;
 
@@ -236,9 +238,8 @@ int	field;
 	return(0);
 }
 
-filtyp(f,field)
-unsigned char	*f;
-int field;
+int 
+filtyp(unsigned char *f, int field)
 {
 	struct stat statb;
 	int (*statf)() = (field == S_IFLNK) ? lstat : stat;
@@ -253,8 +254,8 @@ int field;
 
 
 
-fsizep(f)
-unsigned char *f;
+int 
+fsizep(unsigned char *f)
 {
 	struct stat statb;
 
@@ -267,10 +268,9 @@ unsigned char *f;
  * fake diagnostics to continue to look like original
  * test(1) diagnostics
  */
-bfailed(s1, s2, s3) 
-unsigned char *s1;
-unsigned char *s2;
-unsigned char *s3;
+void
+bfailed(const unsigned char *s1, const unsigned char *s2,
+		const unsigned char *s3)
 {
 	prp();
 	prs(s1);

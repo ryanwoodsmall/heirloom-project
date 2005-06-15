@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)setbrk.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)setbrk.c	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "setbrk.c	1.10	05/06/08 SMI"	 SVr4.0 1.8.1.1 */
 /*
@@ -41,9 +41,8 @@
 #include	"defs.h"
 
 
-unsigned char*
-setbrk(incr)
-int incr;
+unsigned char *
+setbrk(int incr)
 {
 
 	register unsigned char *a = (unsigned char *)sbrk(incr);

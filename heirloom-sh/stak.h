@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)stak.h	1.3 (gritter) 6/14/05
+ * Sccsid @(#)stak.h	1.4 (gritter) 6/15/05
  */
 /* from OpenSolaris "stak.h	1.8	05/06/08 SMI" */
 /*

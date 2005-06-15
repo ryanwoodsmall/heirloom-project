@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)error.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)error.c	1.5 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "error.c	1.9	05/06/08 SMI"	 SVr4.0 1.9.5.1 */
@@ -38,10 +38,8 @@
 
 /* ========	error handling	======== */
 
-extern void done();
-
-failed(s1, s2)
-unsigned char	*s1, *s2;
+void
+failed(const unsigned char *s1, const unsigned char *s2)
 {
 	prp();
 	prs_cntl(s1);
@@ -54,14 +52,14 @@ unsigned char	*s1, *s2;
 	exitsh(ERROR);
 }
 
-error(s)
-unsigned char	*s;
+void
+error(const unsigned char *s)
 {
 	failed(s, NIL);
 }
 
-exitsh(xno)
-int	xno;
+void
+exitsh(int xno)
 {
 	/*
 	 * Arrive here from `FATAL' errors
@@ -85,8 +83,8 @@ int	xno;
 	}
 }
 
-rmtemp(base)
-struct ionod	*base;
+void
+rmtemp(struct ionod *base)
 {
 	while (iotemp > base)
 	{
@@ -96,7 +94,8 @@ struct ionod	*base;
 	}
 }
 
-rmfunctmp()
+void
+rmfunctmp(void)
 {
 	while (fiotemp)
 	{
@@ -105,8 +104,8 @@ rmfunctmp()
 	}
 }
 
-failure(s1, s2)
-unsigned char	*s1, *s2;
+void
+failure(const unsigned char *s1, const unsigned char *s2)
 {
 	prp();
 	prs_cntl(s1);

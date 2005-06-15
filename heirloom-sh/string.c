@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)string.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)string.c	1.4 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "string.c	1.11	05/06/08 SMI"	 SVr4.0 1.8.2.1 */
@@ -40,16 +40,14 @@
 
 
 unsigned char *
-movstr(a, b)
-register unsigned char	*a, *b;
+movstr(register const unsigned char *a, register unsigned char *b)
 {
 	while (*b++ = *a++);
 	return(--b);
 }
 
-any(c, s)
-wchar_t		c;
-unsigned char	*s;
+int
+any(wchar_t c, const unsigned char *s)
 {
 	register unsigned int d;
 
@@ -61,17 +59,17 @@ unsigned char	*s;
 	return(FALSE);
 }
 
-int anys(c, s)
-unsigned char *c, *s;
+int 
+anys(const unsigned char *c, const unsigned char *s)
 {
 	wchar_t f, e;
 	register wchar_t d;
 	register int n;
-	if((n = mbtowc(&f, (char *)c, MULTI_BYTE_MAX)) <= 0)
+	if((n = mbtowc(&f, (const char *)c, MULTI_BYTE_MAX)) <= 0)
 		return(FALSE);
 	d = f;
 	while(1) {
-		if((n = mbtowc(&e, (char *)s, MULTI_BYTE_MAX)) <= 0)
+		if((n = mbtowc(&e, (const char *)s, MULTI_BYTE_MAX)) <= 0)
 			return(FALSE);
 		if(d == e)
 			return(TRUE);
@@ -79,8 +77,8 @@ unsigned char *c, *s;
 	}
 }
 
-int cf(s1, s2)
-register unsigned char *s1, *s2;
+int 
+cf(register const unsigned char *s1, register const unsigned char *s2)
 {
 	while (*s1++ == *s2)
 		if (*s2++ == 0)
@@ -88,10 +86,10 @@ register unsigned char *s1, *s2;
 	return(*--s1 - *s2);
 }
 
-int length(as)
-unsigned char	*as;
+int 
+length(const unsigned char *as)
 {
-	register unsigned char	*s;
+	register const unsigned char	*s;
 
 	if (s = as)
 		while (*s++);
@@ -99,9 +97,8 @@ unsigned char	*as;
 }
 
 unsigned char *
-movstrn(a, b, n)
-	register unsigned char *a, *b;
-	register int n;
+movstrn(register const unsigned char *a,
+		register unsigned char *b, register int n)
 {
 	while ((n-- > 0) && *a)
 		*b++ = *a++;

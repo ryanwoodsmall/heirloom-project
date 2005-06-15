@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)args.c	1.3 (gritter) 6/14/05
+ * Sccsid @(#)args.c	1.4 (gritter) 6/15/05
  */
 
 /* from OpenSolaris "args.c	1.10	05/06/08 SMI"	 SVr4.0 1.10.4.1 */
@@ -36,9 +36,8 @@
 
 #include	"defs.h"
 
-static struct dolnod *copyargs();
-static struct dolnod *freedolh();
-extern struct dolnod *freeargs();
+static void freedolh(void);
+static struct dolnod *copyargs(unsigned char *[], int);
 static struct dolnod *dolh;
 
 /* Used to save outermost positional parameters */
@@ -91,9 +90,8 @@ long	flagval[]  =
 /* ========	option handling	======== */
 
 
-options(argc,argv)
-	unsigned char	**argv;
-	int	argc;
+int 
+options(int argc, unsigned char **argv)
 {
 	register unsigned char *cp;
 	register unsigned char **argp = argv;
@@ -208,8 +206,8 @@ options(argc,argv)
 /*
  * sets up positional parameters
  */
-setargs(argi)
-	unsigned char	*argi[];
+void 
+setargs(unsigned char *argi[])
 {
 	register unsigned char **argp = argi;	/* count args */
 	register int argn = 0;
@@ -225,8 +223,8 @@ setargs(argi)
 }
 
 
-static struct dolnod *
-freedolh()
+static void
+freedolh(void)
 {
 	register unsigned char **argp;
 	register struct dolnod *argblk;
@@ -244,8 +242,7 @@ freedolh()
 }
 
 struct dolnod *
-freeargs(blk)
-	struct dolnod *blk;
+freeargs(struct dolnod *blk)
 {
 	register unsigned char **argp;
 	register struct dolnod *argr = 0;
@@ -279,8 +276,7 @@ freeargs(blk)
 }
 
 static struct dolnod *
-copyargs(from, n)
-	unsigned char	*from[];
+copyargs(unsigned char *from[], int n)
 {
 	register struct dolnod *np = (struct dolnod *)alloc(sizeof(struct dolnod));
 	register unsigned char **fp = from;
@@ -299,8 +295,7 @@ copyargs(from, n)
 
 
 struct dolnod *
-clean_args(blk)
-	struct dolnod *blk;
+clean_args(struct dolnod *blk)
 {
 	register unsigned char **argp;
 	register struct dolnod *argr = 0;
@@ -323,7 +318,8 @@ clean_args(blk)
 	return(argr);
 }
 
-clearup()
+void
+clearup(void)
 {
 	/*
 	 * force `for' $* lists to go away
@@ -369,8 +365,8 @@ clearup()
  * away. 
  */
 
-struct dolnod *savargs(funcnt)
-int funcnt;
+struct dolnod *
+savargs(int funcnt)
 {
 	if (!funcnt) {
 		globdolh = dolh;
@@ -386,8 +382,8 @@ int funcnt;
  * use count.
  */
 
-void restorargs(olddolh, funcnt)
-struct dolnod *olddolh;
+void 
+restorargs(struct dolnod *olddolh, int funcnt)
 {
 	if(argfor != olddolh)
 		while ((argfor = clean_args(argfor)) != olddolh && argfor);
@@ -406,7 +402,7 @@ struct dolnod *olddolh;
 }
 
 struct dolnod *
-useargs()
+useargs(void)
 {
 	if (dolh)
 	{
