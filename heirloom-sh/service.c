@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.6 (gritter) 6/15/05
+ * Sccsid @(#)service.c	1.7 (gritter) 6/16/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -348,8 +348,7 @@ trim(unsigned char *at)
 	{
 		last = at;
 		while (c = *current) {
-			if ((len = mbtowc(&wc, (char *)current,
-					MB_LEN_MAX)) <= 0) {
+			if ((len = nextc(&wc, (char *)current)) <= 0) {
 				*last++ = c;
 				current++;
 				continue;
@@ -366,8 +365,7 @@ trim(unsigned char *at)
 			nosubst = 1;
 			current++;
 			if (c = *current) {
-				if ((len = mbtowc(&wc, (char *)current,
-						MB_LEN_MAX)) <= 0) {
+				if ((len = nextc(&wc, (char *)current)) <= 0) {
 					*last++ = c;
 					current++;
 					continue;
@@ -397,8 +395,7 @@ trims(unsigned char *at)
 	{
 		last = at;
 		while (c = *current) {
-			if ((len = mbtowc(&wc, (char *)current,
-					MB_LEN_MAX)) <= 0) {
+			if ((len = nextc(&wc, (char *)current)) <= 0) {
 				*last++ = c;
 				current++;
 				continue;
@@ -424,8 +421,7 @@ trims(unsigned char *at)
 			}
 
 			*last++ = '\\';
-			if ((len = mbtowc(&wc, (char *)current,
-					MB_LEN_MAX)) <= 0) {
+			if ((len = nextc(&wc, (char *)current)) <= 0) {
 				*last++ = c;
 				current++;
 				continue;
@@ -547,8 +543,7 @@ split (		/* blank interpretation routine */
 		argp = locstak() + BYTESPERWORD;
 		while (c = *s) {
 			wchar_t wc;
-			if ((length = mbtowc(&wc, (char *)s,
-					MB_LEN_MAX)) <= 0) {
+			if ((length = nextc(&wc, (char *)s)) <= 0) {
 				wc = (unsigned char)*s;
 				length = 1;
 			}
@@ -559,8 +554,7 @@ split (		/* blank interpretation routine */
 				*argp++ = c;
 				s++;
 				/* get rest of multibyte character */
-				if ((length = mbtowc(&wc, (char *)s,
-						MB_LEN_MAX)) <= 0) {
+				if ((length = nextc(&wc, (char *)s)) <= 0) {
 					wc = (unsigned char)*s;
 					length = 1;
 				}

@@ -6,6 +6,9 @@ Release ...
 * A redefinition of the EOF macro caused the shell to hang on NetBSD.
 * Various conversions from pointers to smaller integers caused the shell
   to fail on some 64-bit architectures.
+* With GNU libc, multibyte characters no longer leave the word splitting
+  in an inconsistent state.
+* All characters are now treated as valid in single-byte locales.
 
 Release 050614
 * Initial release.

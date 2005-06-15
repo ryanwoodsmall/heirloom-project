@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)expand.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)expand.c	1.5 (gritter) 6/16/05
  */
 /* from OpenSolaris "expand.c	1.13	05/06/08 SMI" */
 /*
@@ -85,7 +85,7 @@ expand(unsigned char *as, int rcnt)
 		open = 0;
 		do
 		{
-			if ((len = mbtowc(&wc, (char *)cs, MB_LEN_MAX)) <= 0) {
+			if ((len = nextc(&wc, (char *)cs)) <= 0) {
 				len = 1;
 				wc = (unsigned char)*cs;
 			}
@@ -249,7 +249,7 @@ addg(unsigned char *as1, unsigned char *as2,
 	s1 = as2;
 	for (;;)
 	{
-		if ((len = mbtowc(&wc, (char *)s1, MB_LEN_MAX)) <= 0) {
+		if ((len = nextc(&wc, (char *)s1)) <= 0) {
 			len = 1;
 			wc = (unsigned char)*s1;
 		}

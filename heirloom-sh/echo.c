@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)echo.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)echo.c	1.6 (gritter) 6/16/05
  */
 /* from OpenSolaris "echo.c	1.16	05/06/08 SMI" */
 
@@ -106,8 +106,7 @@ echo(int argc, unsigned char **argv)
 		{
 			sigchk();
 			for (cp = argv[i]; *cp; cp++) {
-				if ((len = mbtowc(&wc, (char *)cp,
-						MB_LEN_MAX)) <= 0) {
+				if ((len = nextc(&wc, (char *)cp)) <= 0) {
 					prc_buff(*cp);
 					continue;
 				}

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)print.c	1.7 (gritter) 6/15/05
+ * Sccsid @(#)print.c	1.8 (gritter) 6/16/05
  */
 /* from OpenSolaris "print.c	1.17	05/06/08 SMI"	 SVr4.0 1.12.6.1 */
 /*
@@ -93,7 +93,7 @@ prwc(wchar_t c)
 	if (c == 0) {
 		return;
 	}
-	if ((len = wctomb(mb, c)) < 0) {
+	if ((len = putb(mb, c)) < 0) {
 		mb[0] = (unsigned char)c;
 		len = 1;
 	}
@@ -274,7 +274,7 @@ prs_cntl(const unsigned char *s)
 	unsigned char *ptr = bufp;
 	wchar_t c;
 
-	if ((n = mbtowc(&wc, (const char *)s, MB_LEN_MAX)) <= 0) {
+	if ((n = nextc(&wc, (const char *)s)) <= 0) {
 		n = 0;
 	}
 	while (n != 0) {
@@ -317,7 +317,7 @@ prs_cntl(const unsigned char *s)
 			ptr = bufp;
 		}
 		olds = s;
-		if ((n = mbtowc(&wc, (const char *)s, MB_LEN_MAX)) <= 0) {
+		if ((n = nextc(&wc, (const char *)s)) <= 0) {
 			n = 0;
 		}
 	}

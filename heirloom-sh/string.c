@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)string.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)string.c	1.5 (gritter) 6/16/05
  */
 
 /* from OpenSolaris "string.c	1.11	05/06/08 SMI"	 SVr4.0 1.8.2.1 */
@@ -65,11 +65,11 @@ anys(const unsigned char *c, const unsigned char *s)
 	wchar_t f, e;
 	register wchar_t d;
 	register int n;
-	if((n = mbtowc(&f, (const char *)c, MULTI_BYTE_MAX)) <= 0)
+	if((n = nextc(&f, (const char *)c)) <= 0)
 		return(FALSE);
 	d = f;
 	while(1) {
-		if((n = mbtowc(&e, (const char *)s, MULTI_BYTE_MAX)) <= 0)
+		if((n = nextc(&e, (const char *)s)) <= 0)
 			return(FALSE);
 		if(d == e)
 			return(TRUE);

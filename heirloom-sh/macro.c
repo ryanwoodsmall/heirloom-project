@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.c	1.7 (gritter) 6/15/05
+ * Sccsid @(#)macro.c	1.8 (gritter) 6/16/05
  */
 /* from OpenSolaris "macro.c	1.14	05/06/08 SMI" */
 /*
@@ -306,7 +306,7 @@ retry:
 							while (c = *v) {
 								wchar_t 	wc;
 								register int 	length;
-								if ((length = mbtowc(&wc, (char *)v, MB_LEN_MAX)) <= 0)
+								if ((length = nextc(&wc, (char *)v)) <= 0)
 									length = 1;
 
 								if(quote || (c == '\\' && trimflag)) {
@@ -363,7 +363,7 @@ retry:
 							wchar_t 	wc;
 							register int 	len;
 
-							if ((len = mbtowc(&wc, (char *)argp, MB_LEN_MAX)) <= 0)
+							if ((len = nextc(&wc, (char *)argp)) <= 0)
 								len = 1;
 								
 							if(c == '\\' && trimflag) {
@@ -372,7 +372,7 @@ retry:
 									argp++;
 									continue;
 								}
-								if ((len = mbtowc(&wc, (char *)argp, MB_LEN_MAX)) <= 0)
+								if ((len = nextc(&wc, (char *)argp)) <= 0)
 									len = 1;
 							}
 							while(len-- > 0) {

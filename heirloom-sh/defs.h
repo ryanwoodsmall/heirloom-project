@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.10 (gritter) 6/15/05
+ * Sccsid @(#)defs.h	1.11 (gritter) 6/16/05
  */
 
 #ifndef	_DEFS_H
@@ -159,6 +159,13 @@ extern "C" {
 #include <stdlib.h>
 #include <limits.h>
 #define	MULTI_BYTE_MAX MB_LEN_MAX
+extern int	mb_cur_max;
+#define	nextc(wc, sp)	(mb_cur_max > 1 && *(sp) & 0200 ? \
+				mbtowc(wc, sp, mb_cur_max) : \
+				(*(wc) = *(sp) & 0377, *(wc) != 0))
+#define	putb(mb, wc)	(mb_cur_max > 1 && wc & ~(wchar_t)0177 ? \
+				wctomb(mb, wc) : \
+				(*(mb) = wc, 1))
 
 /* id's */
 extern pid_t	mypid;

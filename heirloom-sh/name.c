@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)name.c	1.8 (gritter) 6/15/05
+ * Sccsid @(#)name.c	1.9 (gritter) 6/16/05
  */
 /* from OpenSolaris "name.c	1.23	05/06/08 SMI" */
 /*
@@ -876,4 +876,7 @@ dolocale(char *nm)
 		free(fake_env[i]);
 		fake_env[i] = (char *)0;
 	}
+	mb_cur_max = MB_CUR_MAX;
 }
+
+int	mb_cur_max = 1;

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)word.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)word.c	1.5 (gritter) 6/16/05
  */
 /* from OpenSolaris "word.c	1.21	05/06/08 SMI"	 SVr4.0 1.11.2.2 */
 /*
@@ -280,7 +280,7 @@ wchar_t	d;
 		return (c);
 	}
 
-	length = wctomb((char *)c, d);
+	length = putb((char *)c, d);
 	if (length <= 0) {
 		c[0] = (unsigned char)d;
 		length = 1;
@@ -295,7 +295,6 @@ readwc(void)
 	wchar_t	c;
 	int	len;
 	struct fileblk	*f;
-	int	mbmax = MB_CUR_MAX;
 	int	i, mlen = 0;
 
 	if (peekn) {
@@ -341,14 +340,15 @@ retry:
 			return (c);
 		}
 
-		for (i = 1; i <= mbmax; i++) {
+		for (i = 1; i <= mb_cur_max; i++) {
 			int	rest;
 			if ((rest = f->fend - f->fnxt) < i) {
 				/*
 				 * not enough bytes available
 				 * f->fsiz could be BUFFERSIZE or 1
-				 * since mbmax is enough smaller than BUFFERSIZE,
-				 * this loop won't overrun the f->fbuf buffer.
+				 * since mb_cur_max is enough smaller than
+				 * BUFFERSIZE, this loop won't overrun
+				 * the f->fbuf buffer.
 				 */
 				len = readb(f,
 					(f->fsiz == 1) ? 1 : (f->fsiz - rest),
@@ -356,12 +356,16 @@ retry:
 				if (len == 0)
 					break;
 			}
-			mlen = mbtowc(&c, (char *)f->fnxt, i);
+			mlen = mb_cur_max > 1 ?
+				mbtowc(&c, (char *)f->fnxt, i) :
+				(c = *f->fnxt & 0377, c != 0);
 			if (mlen > 0)
 				break;
+			if (mb_cur_max > 1)
+				mbtowc(NULL, NULL, 0);
 		}
 
-		if (i > mbmax) {
+		if (i > mb_cur_max) {
 			/*
 			 * enough bytes available but cannot be converted to
 			 * a valid wchar.

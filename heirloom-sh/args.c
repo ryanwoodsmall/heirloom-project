@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)args.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)args.c	1.5 (gritter) 6/16/05
  */
 
 /* from OpenSolaris "args.c	1.10	05/06/08 SMI"	 SVr4.0 1.10.4.1 */
@@ -124,7 +124,7 @@ options(int argc, unsigned char **argv)
 		 */
 		cp++;
 		while (*cp) {
-			if ((len = mbtowc(&wc, (char *)cp, MB_LEN_MAX)) <= 0) {
+			if ((len = nextc(&wc, (char *)cp)) <= 0) {
 				len = 1;
 				wc = (unsigned char)*cp;
 				failed(argv[1],badopt);
@@ -164,7 +164,7 @@ options(int argc, unsigned char **argv)
 		cp++;
 		while (*cp)
 		{
-			if ((len = mbtowc(&wc, (char *)cp, MB_LEN_MAX)) <= 0) {
+			if ((len = nextc(&wc, (char *)cp)) <= 0) {
 				cp++;
 				continue;
 			}
