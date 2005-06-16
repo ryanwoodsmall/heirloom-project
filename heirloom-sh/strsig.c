@@ -25,7 +25,7 @@
  * Sccsid @(#)main.c	1.2 (gritter) 6/14/05
  */
 /*
- * Sccsid @(#)strsig.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)strsig.c	1.5 (gritter) 6/16/05
  */
 
 #include <signal.h>
@@ -170,13 +170,19 @@ int
 str_2_sig(const char *str, int *signum)
 {
 	register int	i;
+	long	n;
+	char	*x;
 
 	for (i = 0; sig_strs[i].sig_str; i++)
 		if (eq(str, sig_strs[i].sig_str))
 			break;
-	if (sig_strs[i].sig_str == NULL)
-		return -1;
-	*signum = sig_strs[i].sig_num;
+	if (sig_strs[i].sig_str == NULL) {
+		n = strtol(str, &x, 10);
+		if (*x != '\0' || n < 0 || n >= i)
+			return -1;
+		*signum = n;
+	} else
+		*signum = sig_strs[i].sig_num;
 	return 0;
 }
 
