@@ -31,7 +31,7 @@
 #else
 #define	USED
 #endif
-static const char id[] USED = "@(#)sh.sl	1.19 (gritter) 6/16/05";
+static const char id[] USED = "@(#)sh.sl	1.20 (gritter) 6/16/05";
 /* SLIST */
 /*
 args.c: * Sccsid @(#)args.c	1.5 (gritter) 6/16/05
@@ -50,7 +50,7 @@ expand.c: * Sccsid @(#)expand.c	1.5 (gritter) 6/16/05
 fault.c: * Sccsid @(#)fault.c	1.8 (gritter) 6/16/05
 func.c: * Sccsid @(#)func.c	1.4 (gritter) 6/15/05
 getopt.c: * Sccsid @(#)getopt.c	1.4 (gritter) 6/15/05
-hash.c: * Sccsid @(#)hash.c	1.4 (gritter) 6/15/05
+hash.c: * Sccsid @(#)hash.c	1.5 (gritter) 6/16/05
 hash.h: * Sccsid @(#)hash.h	1.4 (gritter) 6/15/05
 hashserv.c: * Sccsid @(#)hashserv.c	1.4 (gritter) 6/15/05
 io.c: * Sccsid @(#)io.c	1.5 (gritter) 6/15/05

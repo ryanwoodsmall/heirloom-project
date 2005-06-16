@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hash.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)hash.c	1.5 (gritter) 6/16/05
  */
 
 /* from OpenSolaris "hash.c	1.8	05/06/08 SMI"	 SVr4.0 1.3.2.1 */
@@ -86,7 +86,8 @@ hcreate(void)
 }
 
 
-void hscan(void (*uscan)(ENTRY *))
+void
+hscan(void (*uscan)(ENTRY *))
 {
 	struct node		*p, *nxt;
 	int				j;
@@ -106,8 +107,7 @@ void hscan(void (*uscan)(ENTRY *))
 
 
 ENTRY *
-hfind(str)
-	unsigned char	*str;
+hfind(unsigned char *str)
 {
 	struct node 	*p;
 	struct node 	**q;
@@ -144,8 +144,7 @@ hfind(str)
 }
 
 ENTRY *
-henter(item)
-	ENTRY item;
+henter(ENTRY item)
 {
 	struct node	*p = (struct node *)alloc(sizeof(struct node));
 
@@ -157,8 +156,7 @@ henter(item)
 
 
 static unsigned int 
-crunch(key)	
-	unsigned char	*key;
+crunch(unsigned char *key)	
 {
 	unsigned int 	sum = 0;	
 	int s;
