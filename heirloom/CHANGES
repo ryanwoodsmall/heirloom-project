@@ -1,4 +1,4 @@
-Release ...
+Release 050612
 * Fixed a double free() call that could occur in multibyte locales with
   all programs using traditional (simple) regular expressions.
 * man: Handle .so requests that do not contain a path to the target file.
