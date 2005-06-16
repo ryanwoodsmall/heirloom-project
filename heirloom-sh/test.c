@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)test.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)test.c	1.6 (gritter) 6/16/05
  */
 /* from OpenSolaris "test.c	1.15	05/06/08 SMI" */
 
@@ -43,8 +43,20 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-int	ap, ac;
-unsigned char **av;
+static int	ap, ac;
+static unsigned char **av;
+
+/* test.c */
+static unsigned char *nxtarg(int);
+static int sexp(void);
+static int e1(void);
+static int e2(void);
+static int e3(void);
+static int ftype(const unsigned char *, int);
+static int filtyp(const unsigned char *, int);
+static int fsizep(const unsigned char *);
+static void bfailed(const unsigned char *, const unsigned char *,
+		const unsigned char *);
 
 int 
 test(int argn, unsigned char *com[])
@@ -63,7 +75,7 @@ test(int argn, unsigned char *com[])
 	return(sexp() ? 0 : 1);
 }
 
-unsigned char *
+static unsigned char *
 nxtarg(int mt)
 {
 	if (ap >= ac)
@@ -78,7 +90,7 @@ nxtarg(int mt)
 	return(av[ap++]);
 }
 
-int 
+static int 
 sexp(void)
 {
 	int	p1;
@@ -98,7 +110,7 @@ sexp(void)
 	return(p1);
 }
 
-int 
+static int 
 e1(void)
 {
 	int	p1;
@@ -113,7 +125,7 @@ e1(void)
 	return(p1);
 }
 
-int 
+static int 
 e2(void)
 {
 	if (eq(nxtarg(0), "!"))
@@ -122,7 +134,7 @@ e2(void)
 	return(e3());
 }
 
-int 
+static int 
 e3(void)
 {
 	int	p1;
@@ -226,8 +238,8 @@ e3(void)
 }
 
 
-int 
-ftype(unsigned char *f, int field)
+static int 
+ftype(const unsigned char *f, int field)
 {
 	struct stat statb;
 
@@ -238,8 +250,8 @@ ftype(unsigned char *f, int field)
 	return(0);
 }
 
-int 
-filtyp(unsigned char *f, int field)
+static int 
+filtyp(const unsigned char *f, int field)
 {
 	struct stat statb;
 	int (*statf)() = (field == S_IFLNK) ? lstat : stat;
@@ -254,8 +266,8 @@ filtyp(unsigned char *f, int field)
 
 
 
-int 
-fsizep(unsigned char *f)
+static int 
+fsizep(const unsigned char *f)
 {
 	struct stat statb;
 
@@ -268,7 +280,7 @@ fsizep(unsigned char *f)
  * fake diagnostics to continue to look like original
  * test(1) diagnostics
  */
-void
+static void
 bfailed(const unsigned char *s1, const unsigned char *s2,
 		const unsigned char *s3)
 {

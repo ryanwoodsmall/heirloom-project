@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)name.c	1.11 (gritter) 6/16/05
+ * Sccsid @(#)name.c	1.12 (gritter) 6/16/05
  */
 /* from OpenSolaris "name.c	1.23	05/06/08 SMI" */
 /*
@@ -528,8 +528,7 @@ lookup(register unsigned char *nam)
 }
 
 BOOL
-chkid(nam)
-unsigned char	*nam;
+chkid(unsigned char *nam)
 {
 	register unsigned char *cp = nam;
 

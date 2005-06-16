@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.7 (gritter) 6/15/05
+ * Sccsid @(#)jobs.c	1.8 (gritter) 6/16/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -105,8 +105,7 @@ static struct job 	*jobcur, /* active jobs listed in currency order */
 static void	printjob(struct job *jp, int propts);
 
 static struct job *
-pgid2job(pgid)
-register pid_t pgid;
+pgid2job(register pid_t pgid)
 {
 	register struct job *jp;
 
@@ -227,11 +226,7 @@ collect_fg_job(void)
  */
 
 static int
-statjob(jp, stat, fg, rc)
-register struct job *jp;
-int stat;
-int fg;
-int rc;
+statjob(register struct job *jp, int stat, int fg, int rc)
 {
 	pid_t tgid;
 	int done = 0;
@@ -406,8 +401,7 @@ waitjob(register struct job *jp)
  */
 
 int
-settgid(new, expected)
-pid_t new, expected;
+settgid(pid_t new, pid_t expected)
 {
 	register pid_t current = tcgetpgrp(0);
 
@@ -714,9 +708,7 @@ makejob(int monitor, int fg)
  */
 
 void
-postjob(pid, fg)
-pid_t pid;
-int fg;
+postjob(pid_t pid, int fg)
 {
 
 	register int propts;

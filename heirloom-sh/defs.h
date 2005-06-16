@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.13 (gritter) 6/16/05
+ * Sccsid @(#)defs.h	1.14 (gritter) 6/16/05
  */
 
 #ifndef	_DEFS_H
@@ -383,16 +383,6 @@ int sig_2_str(int, char *);
 void init_sigval(void);
 /* test.c */
 int test(int, unsigned char *[]);
-unsigned char *nxtarg(int);
-int sexp(void);
-int e1(void);
-int e2(void);
-int e3(void);
-int ftype(unsigned char *, int);
-int filtyp(unsigned char *, int);
-int fsizep(unsigned char *);
-void bfailed(const unsigned char *, const unsigned char *,
-		const unsigned char *);
 /* ulimit.c */
 void sysulimit(int, char **);
 /* umask.c */

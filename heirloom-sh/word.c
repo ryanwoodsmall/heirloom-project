@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)word.c	1.5 (gritter) 6/16/05
+ * Sccsid @(#)word.c	1.6 (gritter) 6/16/05
  */
 /* from OpenSolaris "word.c	1.21	05/06/08 SMI"	 SVr4.0 1.11.2.2 */
 /*
@@ -269,8 +269,8 @@ retry:
 	return (d);
 }
 
-unsigned char *readw(d)
-wchar_t	d;
+unsigned char *
+readw(wchar_t d)
 {
 	static unsigned char c[MULTI_BYTE_MAX + 1];
 	int length;

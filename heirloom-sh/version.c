@@ -31,18 +31,18 @@
 #else
 #define	USED
 #endif
-static const char id[] USED = "@(#)sh.sl	1.21 (gritter) 6/16/05";
+static const char id[] USED = "@(#)sh.sl	1.22 (gritter) 6/16/05";
 /* SLIST */
 /*
 args.c: * Sccsid @(#)args.c	1.5 (gritter) 6/16/05
-blok.c: * Sccsid @(#)blok.c	1.6 (gritter) 6/15/05
+blok.c: * Sccsid @(#)blok.c	1.7 (gritter) 6/16/05
 bltin.c: * Sccsid @(#)bltin.c	1.7 (gritter) 6/16/05
 brkincr.h: * Sccsid @(#)brkincr.h	1.4 (gritter) 6/15/05
 cmd.c: * Sccsid @(#)cmd.c	1.4 (gritter) 6/15/05
 ctype.c: * Sccsid @(#)ctype.c	1.5 (gritter) 6/15/05
 ctype.h: * Sccsid @(#)ctype.h	1.5 (gritter) 6/15/05
 defs.c: * Sccsid @(#)defs.c	1.4 (gritter) 6/15/05
-defs.h: * Sccsid @(#)defs.h	1.13 (gritter) 6/16/05
+defs.h: * Sccsid @(#)defs.h	1.14 (gritter) 6/16/05
 dup.h: * Sccsid @(#)dup.h	1.4 (gritter) 6/15/05
 echo.c: * Sccsid @(#)echo.c	1.7 (gritter) 6/16/05
 error.c: * Sccsid @(#)error.c	1.5 (gritter) 6/15/05
@@ -54,13 +54,13 @@ hash.c: * Sccsid @(#)hash.c	1.5 (gritter) 6/16/05
 hash.h: * Sccsid @(#)hash.h	1.4 (gritter) 6/15/05
 hashserv.c: * Sccsid @(#)hashserv.c	1.4 (gritter) 6/15/05
 io.c: * Sccsid @(#)io.c	1.5 (gritter) 6/15/05
-jobs.c: * Sccsid @(#)jobs.c	1.7 (gritter) 6/15/05
+jobs.c: * Sccsid @(#)jobs.c	1.8 (gritter) 6/16/05
 mac.h: * Sccsid @(#)mac.h	1.5 (gritter) 6/15/05
 macro.c: * Sccsid @(#)macro.c	1.8 (gritter) 6/16/05
 main.c: * Sccsid @(#)main.c	1.6 (gritter) 6/16/05
 mode.h: * Sccsid @(#)mode.h	1.5 (gritter) 6/15/05
 msg.c: * Sccsid @(#)msg.c	1.9 (gritter) 6/16/05
-name.c: * Sccsid @(#)name.c	1.11 (gritter) 6/16/05
+name.c: * Sccsid @(#)name.c	1.12 (gritter) 6/16/05
 name.h: * Sccsid @(#)name.h	1.4 (gritter) 6/15/05
 print.c: * Sccsid @(#)print.c	1.9 (gritter) 6/16/05
 pwd.c: * Sccsid @(#)pwd.c	1.6 (gritter) 6/15/05
@@ -72,10 +72,10 @@ string.c: * Sccsid @(#)string.c	1.5 (gritter) 6/16/05
 strsig.c: * Sccsid @(#)main.c	1.2 (gritter) 6/14/05
 strsig.c: * Sccsid @(#)strsig.c	1.5 (gritter) 6/16/05
 sym.h: * Sccsid @(#)sym.h	1.4 (gritter) 6/15/05
-test.c: * Sccsid @(#)test.c	1.5 (gritter) 6/15/05
+test.c: * Sccsid @(#)test.c	1.6 (gritter) 6/16/05
 timeout.h: * Sccsid @(#)timeout.h	1.4 (gritter) 6/15/05
 ulimit.c: * Sccsid @(#)ulimit.c	1.6 (gritter) 6/15/05
 umask.c: * Sccsid @(#)umask.c	1.1 (gritter) 6/16/05
-word.c: * Sccsid @(#)word.c	1.5 (gritter) 6/16/05
+word.c: * Sccsid @(#)word.c	1.6 (gritter) 6/16/05
 xec.c: * Sccsid @(#)xec.c	1.4 (gritter) 6/15/05
 */

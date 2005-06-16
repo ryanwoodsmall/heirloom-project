@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)blok.c	1.6 (gritter) 6/15/05
+ * Sccsid @(#)blok.c	1.7 (gritter) 6/16/05
  */
 
 /* from OpenSolaris "blok.c	1.19	05/06/08 SMI" */
@@ -54,7 +54,6 @@ struct blk *blokp;			/* current search pointer */
 struct blk *bloktop;		/* top of arena (last blok) */
 
 unsigned char		*brkbegin;
-unsigned char		*setbrk();
 
 void *
 alloc(nbytes)
@@ -259,8 +258,7 @@ chkmem(void)
 #endif
 
 size_t
-blklen(q)
-char *q;
+blklen(char *q)
 {
 	register struct blk *pp = (struct blk *)q;
 	register struct blk *p;
