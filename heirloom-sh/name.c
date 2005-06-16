@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)name.c	1.12 (gritter) 6/16/05
+ * Sccsid @(#)name.c	1.13 (gritter) 6/16/05
  */
 /* from OpenSolaris "name.c	1.23	05/06/08 SMI" */
 /*
@@ -456,6 +456,7 @@ readvar(unsigned char **names)
 
 #ifdef	__sun
 	if (isastream(0) != 1)
+#endif
 		/*
 		 * If we are reading on a stream do not attempt to
 		 * lseek(2) back towards the start because this is
@@ -465,7 +466,6 @@ readvar(unsigned char **names)
 		 *
 		 */
 		lseek(0, (off_t)(f->nxtoff - f->endoff), SEEK_CUR);
-#endif
 
 	pop();
 	return(rc);

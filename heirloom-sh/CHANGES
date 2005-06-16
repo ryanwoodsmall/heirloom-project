@@ -4,6 +4,7 @@ Release ...
   readable and writable by all users depending on the umask.)
 * The "kill" command with a "-number" argument was broken in the first
   release and has been fixed.
+* The "read" command was broken in the first release and has been fixed.
 * The "read" command now accepts the "-r" option (disable backslash as
   an escape character).
 * The "umask" command now accepts the "-S" option (process symbolic

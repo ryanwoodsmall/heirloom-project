@@ -73,6 +73,14 @@ install: all
 	rm -f $(ROOT)$(SV3BIN)/jsh
 	cd $(ROOT)$(SV3BIN) && $(LNS) sh jsh
 
+diet:
+	$(MAKE) CC='diet gcc -Ifakewchar' CFLAGS='-Os -fomit-frame-pointer' \
+		STRIP='strip -s -R .comment -R .note' WERROR=
+
+dietinstall:
+	ldd sh >/dev/null 2>&1 && { echo dynamic; exit 1; } || :
+	$(MAKE) install SV3BIN=/sbin
+
 clean:
 	rm -f $(OBJ) sh jsh core log *~
 
