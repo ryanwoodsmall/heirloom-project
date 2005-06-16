@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)echo.c	1.6 (gritter) 6/16/05
+ * Sccsid @(#)echo.c	1.7 (gritter) 6/16/05
  */
 /* from OpenSolaris "echo.c	1.16	05/06/08 SMI" */
 
@@ -37,6 +37,8 @@
  *	UNIX shell
  */
 #include	"defs.h"
+
+#define	_iBCS2
 
 #define	exit(a)	flushb(); return (a)
 

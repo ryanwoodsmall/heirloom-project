@@ -19,6 +19,8 @@ Release ...
 * With GNU libc, multibyte characters no longer leave the word splitting
   in an inconsistent state.
 * All characters are now treated as valid in single-byte locales.
+* The "SYSV3" variable in the initial environment now causes the "echo"
+  command to accept the "-n" option.
 
 Release 050614
 * Initial release.
