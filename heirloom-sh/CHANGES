@@ -21,6 +21,7 @@ Release ...
 * All characters are now treated as valid in single-byte locales.
 * The "SYSV3" variable in the initial environment now causes the "echo"
   command to accept the "-n" option.
+* The default path has been changed to "/bin:/usr/bin:".
 
 Release 050614
 * Initial release.

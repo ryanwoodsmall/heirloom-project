@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)msg.c	1.8 (gritter) 6/16/05
+ * Sccsid @(#)msg.c	1.9 (gritter) 6/16/05
  */
 /* from OpenSolaris "msg.c	1.13	05/06/08 SMI" */
 /*
@@ -140,7 +140,7 @@ const char	timeoutname[]	= "TIMEOUT";
  */
 const char	nullstr[]	= "";
 const char	sptbnl[]	= " \t\n";
-const char	defpath[]	= "/usr/bin:";
+const char	defpath[]	= "/bin:/usr/bin:";
 const char	colon[]		= ": ";
 const char	minus[]		= "-";
 const char	endoffile[]	= "end of file";
