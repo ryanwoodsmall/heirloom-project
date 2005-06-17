@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.9 (gritter) 6/17/05
+ * Sccsid @(#)fault.c	1.10 (gritter) 6/17/05
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -286,7 +286,7 @@ stdsigs(void)
 	int rtmax = (int)SIGRTMAX;
 #else
 	int rtmin = 0;
-	int rtmax = 0;
+	int rtmax = -1;
 #endif
 
 	ss.ss_size = SIGSTKSZ;
