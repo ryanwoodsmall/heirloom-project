@@ -2,7 +2,7 @@
 # Root directory. Mainly useful for package building; leave empty for
 # normal installation.
 #
-ROOT =
+ROOT=
 
 #
 # The destination directory for the "sh" and "jsh" binaries.
@@ -17,7 +17,7 @@ UCBINST=/usr/ucb/install
 #
 # The strip command that is used at installation time.
 #
-STRIP=: strip -s -R .comment -R .note
+STRIP=strip -s -R .comment -R .note
 
 #
 # A command to create the link from "jsh" to "sh".
@@ -33,7 +33,7 @@ LNS=ln -s
 #
 # Compiler flags.
 #
-CFLAGS=-g -O
+CFLAGS=-O -fomit-frame-pointer
 
 #
 # Flags for the C preprocessor.
@@ -42,12 +42,17 @@ CPPFLAGS=-D_GNU_SOURCE
 
 #
 # The compiler warning options.
+#
 WERROR=-Werror
 WARN = -Wchar-subscripts -Wformat -Wno-format-y2k -Wimplicit \
 	-Wmissing-braces -Wsequence-point -Wreturn-type -Wtrigraphs \
 	-Wunused-function -Wunused-label -Wunused-variable -Wunused-value \
 	-Wuninitialized -Wmultichar -Wpointer-arith $(WERROR)
 #WARN=
+
+#
+# End of adjustable settings.
+#
 
 OBJ = args.o blok.o bltin.o cmd.o ctype.o defs.o echo.o error.o \
 	expand.o fault.o func.o hash.o hashserv.o io.o jobs.o \
@@ -80,6 +85,15 @@ diet:
 dietinstall:
 	ldd sh >/dev/null 2>&1 && { echo dynamic; exit 1; } || :
 	$(MAKE) install SV3BIN=/sbin
+
+world:
+	$(MAKE) clean
+	$(MAKE)
+	sudo $(MAKE) install
+	$(MAKE) clean
+	$(MAKE) diet
+	sudo $(MAKE) dietinstall
+	$(MAKE) clean
 
 clean:
 	rm -f $(OBJ) sh jsh core log *~

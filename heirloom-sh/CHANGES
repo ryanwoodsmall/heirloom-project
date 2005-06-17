@@ -1,4 +1,4 @@
-Release ...
+Release 050617
 * Temporary files for here documents are now created with mode 0600.
   (They were previously created with mode 0666, which could leave them
   readable and writable by all users depending on the umask.)
@@ -19,7 +19,7 @@ Release ...
   to fail on some 64-bit architectures.
 * With GNU libc, multibyte characters no longer leave the word splitting
   in an inconsistent state.
-* All characters are now treated as valid in single-byte locales.
+* All code points are now treated as valid in single-byte locales.
 * The "SYSV3" variable in the initial environment now causes the "echo"
   command to accept the "-n" option.
 * The default path has been changed to "/bin:/usr/bin:".
