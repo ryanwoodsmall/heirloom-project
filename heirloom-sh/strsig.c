@@ -22,17 +22,12 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.2 (gritter) 6/14/05
- */
-/*
- * Sccsid @(#)strsig.c	1.5 (gritter) 6/16/05
+ * Sccsid @(#)strsig.c	1.6 (gritter) 6/17/05
  */
 
 #include <signal.h>
 #include <stdlib.h>
 #include "defs.h"
-
-#define	MAXSIGVAL	32
 
 static const struct sig_strlist {
 	const int	sig_num;
@@ -198,139 +193,4 @@ sig_2_str(int signum, char *str)
 		return -1;
 	movstr(sig_strs[i].sig_str, str);
 	return 0;
-}
-
-void 
-init_sigval(void)
-{
-	extern void	(*(sigval[]))();
-
-#ifdef	SIGHUP
-	if (SIGHUP < MAXSIGVAL)
-		sigval[SIGHUP] = done;
-#endif
-#ifdef	SIGINT
-	if (SIGINT < MAXSIGVAL)
-		sigval[SIGINT] = fault;
-#endif
-#ifdef	SIGQUIT
-	if (SIGQUIT < MAXSIGVAL)
-		sigval[SIGQUIT] = fault;
-#endif
-#ifdef	SIGILL
-	if (SIGILL < MAXSIGVAL)
-		sigval[SIGILL] = done;
-#endif
-#ifdef	SIGTRAP
-	if (SIGTRAP < MAXSIGVAL)
-		sigval[SIGTRAP] = done;
-#endif
-#ifdef	SIGIOT
-	if (SIGIOT < MAXSIGVAL)
-		sigval[SIGIOT] = done;
-#endif
-#ifdef	SIGBUS
-	if (SIGBUS < MAXSIGVAL)
-		sigval[SIGBUS] = done;
-#endif
-#ifdef	SIGFPE
-	if (SIGFPE < MAXSIGVAL)
-		sigval[SIGFPE] = done;
-#endif
-#ifdef	SIGKILL
-	if (SIGKILL < MAXSIGVAL)
-		sigval[SIGKILL] = 0;
-#endif
-#ifdef	SIGUSR1
-	if (SIGUSR1 < MAXSIGVAL)
-		sigval[SIGUSR1] = done;
-#endif
-#ifdef	SIGSEGV
-	if (SIGSEGV < MAXSIGVAL)
-		sigval[SIGSEGV] = done;
-#endif
-#ifdef	SIGEMT
-	if (SIGEMT < MAXSIGVAL)
-		sigval[SIGEMT] = done;
-#endif
-#ifdef	SIGUSR2
-	if (SIGUSR2 < MAXSIGVAL)
-		sigval[SIGUSR2] = done;
-#endif
-#ifdef	SIGPIPE
-	if (SIGPIPE < MAXSIGVAL)
-		sigval[SIGPIPE] = done;
-#endif
-#ifdef	SIGALRM
-	if (SIGALRM < MAXSIGVAL)
-		sigval[SIGALRM] = fault;
-#endif
-#ifdef	SIGTERM
-	if (SIGTERM < MAXSIGVAL)
-		sigval[SIGTERM] = fault;
-#endif
-#ifdef	SIGSTKFLT
-	if (SIGSTKFLT < MAXSIGVAL)
-		sigval[SIGSTKFLT] = done;
-#endif
-#ifdef	SIGCHLD
-	if (SIGCHLD < MAXSIGVAL)
-		sigval[SIGCHLD] = 0;
-#endif
-#ifdef	SIGCONT
-	if (SIGCONT < MAXSIGVAL)
-		sigval[SIGCONT] = 0;
-#endif
-#ifdef	SIGSTOP
-	if (SIGSTOP < MAXSIGVAL)
-		sigval[SIGSTOP] = 0;
-#endif
-#ifdef	SIGTSTP
-	if (SIGTSTP < MAXSIGVAL)
-		sigval[SIGTSTP] = 0;
-#endif
-#ifdef	SIGTTIN
-	if (SIGTTIN < MAXSIGVAL)
-		sigval[SIGTTIN] = 0;
-#endif
-#ifdef	SIGTTOU
-	if (SIGTTOU < MAXSIGVAL)
-		sigval[SIGTTOU] = 0;
-#endif
-#ifdef	SIGURG
-	if (SIGURG < MAXSIGVAL)
-		sigval[SIGURG] = 0;
-#endif
-#ifdef	SIGXCPU
-	if (SIGXCPU < MAXSIGVAL)
-		sigval[SIGXCPU] = done;
-#endif
-#ifdef	SIGXFSZ
-	if (SIGXFSZ < MAXSIGVAL)
-		sigval[SIGXFSZ] = done;
-#endif
-#ifdef	SIGVTALRM
-	if (SIGVTALRM < MAXSIGVAL)
-		sigval[SIGVTALRM] = done;
-#endif
-#ifdef	SIGPROF
-	if (SIGPROF < MAXSIGVAL)
-		sigval[SIGPROF] = done;
-#endif
-#ifdef	SIGWINCH
-	if (SIGWINCH < MAXSIGVAL)
-		sigval[SIGWINCH] = 0;
-#endif
-#ifdef	SIGPOLL
-	if (SIGPOLL < MAXSIGVAL)
-		sigval[SIGPOLL] = done;
-#endif
-#ifdef	SIGPWR
-	if (SIGPWR < MAXSIGVAL)
-		sigval[SIGPWR] = done;
-#endif
-#ifdef	SIGSYS
-	if (SIGSYS < MAXSIGVAL)
-		sigval[SIGSYS] = done;
-#endif
 }

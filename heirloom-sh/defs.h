@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.14 (gritter) 6/16/05
+ * Sccsid @(#)defs.h	1.15 (gritter) 6/17/05
  */
 
 #ifndef	_DEFS_H
@@ -227,6 +227,7 @@ int systrap(int, char **);
 #define	sleep(a)	sh_sleep(a)
 void sleep(unsigned int);
 void sigsegv(int, siginfo_t *);
+void init_sigval(void);
 /* func.c */
 void freefunc(struct namnod *);
 void freetree(struct trenod *);
@@ -380,7 +381,6 @@ unsigned char *movstrn(const unsigned char *, unsigned char *, int);
 /* strsig.c */
 int str_2_sig(const char *, int *);
 int sig_2_str(int, char *);
-void init_sigval(void);
 /* test.c */
 int test(int, unsigned char *[]);
 /* ulimit.c */
@@ -549,7 +549,11 @@ extern jmp_buf			errshell;
 
 extern unsigned			brkincr;
 #define		MINTRAP		0
+#if defined (NSIG) && (NSIG) >= 36
 #define		MAXTRAP		NSIG
+#else
+#define		MAXTRAP		36
+#endif
 
 #define		TRAPSET		2
 #define		SIGSET		4
