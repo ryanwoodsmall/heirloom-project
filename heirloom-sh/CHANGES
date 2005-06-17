@@ -1,3 +1,8 @@
+Release ...
+* The default path has been changed to "/usr/5bin:/bin:/usr/bin:" to
+  provide maximum System V compatibility if the Heirloom Toolchest is
+  also installed.
+
 Release 050617
 * Temporary files for here documents are now created with mode 0600.
   (They were previously created with mode 0666, which could leave them
