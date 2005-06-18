@@ -27,10 +27,8 @@ OpenBSD         3.4
 
 The following prerequisites are necessary:
 
-flex            <http://www.gnu.org/software/flex>. Unix lex cannot
-                be used here.
-a yacc command  The commercial vendors' yacc, Berkeley yacc, and bison
-                are all okay.
+a lex command   Both Unix lex and flex can be used.
+a yacc command  Unix yacc, Berkeley yacc, and bison can be used.
 make            Implementations known to work are GNU make, AIX make,
                 and NetBSD make. The build system is designed to be
                 portable, but in practice, other make commands have
@@ -291,4 +289,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           2/2/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/18/05

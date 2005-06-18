@@ -72,7 +72,7 @@
  */
 
 /*	from 4.4BSD /usr/src/old/awk/awk.lx.l	4.5 (Berkeley) 4/17/91	*/
-/*	Sccsid @(#)awk.lx.l	1.11 (gritter) 7/24/03>	*/
+/*	Sccsid @(#)awk.lx.l	1.12 (gritter) 6/18/05>	*/
 
 %X str chc reg esc comment
 
@@ -88,6 +88,7 @@ extern char	*lexprog;
 
 #define	cast	(void *)(intptr_t)
 
+#ifdef	FLEX_SCANNER
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size)				\
 {								\
@@ -106,6 +107,26 @@ extern char	*lexprog;
 	else							\
 		result = read( fileno(yyin), buf, max_size );	\
 }
+#else	/* !FLEX_SCANNER */
+#undef	input
+int	input(void)
+{
+	register int c;
+	extern char	*lexprog;
+
+	if (yysptr > yysbuf)
+		c = U(*--yysptr) & 0377;
+	else if (yyin == NULL)
+		c = *lexprog++ & 0377;
+	else
+		c = getc(yyin);
+	if (c == '\n')
+		yylineno++;
+	else if (c == EOF)
+		c = 0;
+	return(c);
+}
+#endif	/* !FLEX_SCANNER */
 
 long long	lineno	= 1;
 #define	RETURN(x)	{if (ldbg) ptoken(x); return(x); }
