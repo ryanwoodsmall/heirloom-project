@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maid.c	1.11 (gritter) 6/18/05
+ * Sccsid @(#)maid.c	1.12 (gritter) 6/18/05
  */
 /*
 ma_id() {
@@ -42,7 +42,7 @@ static char mawhat[]="@(#) ma.sl	2.116"; }
 #else
 #define	USED
 #endif
-static const char id[] = "@(#)ma.sl 1.11 (gritter) 6/18/05";
+static const char id[] = "@(#)ma.sl 1.12 (gritter) 6/18/05";
 /* SLIST */
 /*
 Dout.c: * Sccsid @(#)Dout.c	1.4 (gritter) 6/18/05
@@ -66,7 +66,7 @@ doopen.c: * Sccsid @(#)doopen.c	1.4 (gritter) 6/18/05
 dumpaff.c: * Sccsid @(#)dumpaff.c	1.3 (gritter) 6/18/05
 dumprcv.c: * Sccsid @(#)dumprcv.c	1.3 (gritter) 6/18/05
 errmsg.c: * Sccsid @(#)errmsg.c	1.3 (gritter) 6/18/05
-fgetline.c: * Sccsid @(#)maid.c	1.11 (gritter) 6/18/05
+fgetline.c: * Sccsid @(#)maid.c	1.12 (gritter) 6/18/05
 gendeliv.c: * Sccsid @(#)gendeliv.c	1.4 (gritter) 6/18/05
 getarg.c: * Sccsid @(#)getarg.c	1.3 (gritter) 6/18/05
 getcomment.c: * Sccsid @(#)getcomment.c	1.3 (gritter) 6/18/05
@@ -84,7 +84,7 @@ lock.c: * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
 mail.h: * Sccsid @(#)mail.h	1.8 (gritter) 6/18/05
 maillock.c: * Sccsid @(#)maillock.c	1.3 (gritter) 6/18/05
 maillock.h: * Sccsid @(#)maillock.h	1.3 (gritter) 6/18/05
-main.c: * Sccsid @(#)main.c	1.7 (gritter) 6/18/05
+main.c: * Sccsid @(#)main.c	1.8 (gritter) 6/18/05
 mkdead.c: * Sccsid @(#)mkdead.c	1.5 (gritter) 6/18/05
 mta_ercode.c: * Sccsid @(#)mta_ercode.c	1.3 (gritter) 6/18/05
 new_recipl.c: * Sccsid @(#)new_recipl.c	1.3 (gritter) 6/18/05
