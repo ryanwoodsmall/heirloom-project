@@ -27,7 +27,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)cksaved.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)cksaved.c	1.6 (gritter) 6/18/05
  */
 
 /*
@@ -66,8 +66,9 @@ cksaved(char *user)
 	/*
 	 *	If no save file, or size is 0, return.
 	 */
-	if ((stat(save, &stbuf) != 0) || (stbuf.st_size == 0))
+	if ((stat(save, &stbuf) != 0) || (stbuf.st_size == 0)) {
 		Return;
+	}
 
 	/*
 	 *	Ok, we have a savefile. If no mailfile exists,

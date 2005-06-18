@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sendlist.c	1.7 (gritter) 6/18/05
+ * Sccsid @(#)sendlist.c	1.8 (gritter) 6/18/05
  */
 
 #include "mail.h"
@@ -158,8 +158,9 @@ send_mbox(char *mbox, int letnum)
 	uid_t useruid, saved_uid;
 	void (*istat)(int), (*qstat)(int), (*hstat)(int);
 
-	if (!islocal(mbox, &useruid))
+	if (!islocal(mbox, &useruid)) {
 		Return (1);
+	}
 	cat(&file, &filesize, maildir, mbox);
 
 	/*

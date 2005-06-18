@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gethead.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)gethead.c	1.5 (gritter) 6/18/05
  */
 
 #include "mail.h"
@@ -94,8 +94,9 @@ gethead(int current, int all)
 	printf("%d letters found in %s, %d scheduled for deletion, "
 	    "%d newly arrived\n", nlet, mailfile, changed, nlet - onlet);
 
-	if (all == 2 && !changed)
+	if (all == 2 && !changed) {
 		Return (0);
+	}
 
 	file = doopen(lettmp, "r", E_TMP);
 	if (!flgr) {
