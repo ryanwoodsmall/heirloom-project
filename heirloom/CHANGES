@@ -1,3 +1,7 @@
+Release ...
+* A new version of the 'mail' utility has been introduced; it has been
+  derived from OpenSolaris code.
+
 Release 050612
 * Fixed a double free() call that could occur in multibyte locales with
   all programs using traditional (simple) regular expressions.

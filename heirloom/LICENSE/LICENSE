@@ -83,9 +83,9 @@ These utilities have been derived from Ancient Unix code:
 	banner	bc	cal	calendar	chmod	cksum
 	col	comm	dc	deroff(1b)	diff	diff3
 	ed	egrep	expr	factor	fgrep	file	find
-	grep	join	mail	mkdir	oawk	pr	random
-	sed	sort	spell	sum	tail	tar	tsort
-	uniq	unit
+	grep	join	mkdir	oawk	pr	random	sed
+	sort	spell	sum	tail	tar	tsort	uniq
+	unit
 
 as well as the 'gmatch' and 'regexp' parts of libcommon.
 
@@ -127,8 +127,7 @@ Some utilities and manual pages are based on various releases of
 The following utilities include 4BSD code:
 
 	bc	ching	dc	deroff(1b)	diff	diff3	fmt
-	ln(1b)	mail	more	nawk	oawk	renice	tcopy	ul
-	what
+	ln(1b)	more	nawk	oawk	renice	tcopy	ul	what
 
 ********************************************************************************
 One utilities is based on the MINIX 2.0 sources, to which the
@@ -175,6 +174,10 @@ released made available by Caldera at <http://unixtools.sourceforge.net/>.
 GNU GPL 2.0 applies to 'nawk' (see the file COPYING); GNU LGPL 2.1 applies
 to 'libuxre' (see COPYING.LGPL). Changes to these tools are subject to these
 licenses also.
+
+********************************************************************************
+The 'mail' utility is based on Sun's OpenSolaris code. The file
+OPENSOLARIS.LICENSE contains the licensing conditions for it.
 
 ********************************************************************************
 The 'deroff' utility is derived from Plan 9 <http://cm.bell-labs.com/plan9dist/>
@@ -341,4 +344,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								5/15/04
+Gunnar Ritter								6/18/05

@@ -24,57 +24,44 @@
 
 
 /*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
+ * Copyright (c) 1999, by Sun Microsystems, Inc.
+ * All rights reserved.
  */
 
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "casncmp.c	1.9	05/06/08 SMI"	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)casncmp.c	1.3 (gritter) 6/18/05
+ */
+/*LINTLIBRARY*/
+
+/*
+ *  NAME
+ *	casncmp - compare strings ignoring case
+ *
+ *  SYNOPSIS
+ *	int casncmp(char *s1, char *s2, ssize_t n)
+ *
+ *  DESCRIPTION
+ *	Compare two strings ignoring case differences.
+ *	Stop after n bytes or the trailing NUL.
  */
 
-#include "mail.h"
+#include "libmail.h"
+#include <ctype.h>
+#include <sys/types.h>
 
-void
-lock(char *user)
+int
+casncmp(char *s1, char *s2, ssize_t n)
 {
-	char	tbuf[80];
-
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	if (s1 == s2)
+		return (0);
+	while ((--n >= 0) && (tolower(*s1) == tolower(*s2))) {
+		s2++;
+		if (*s1++ == '\0')
+			return (0);
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	return ((n < 0)? 0: (*s1 - *s2));
 }

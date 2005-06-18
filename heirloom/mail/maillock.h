@@ -24,57 +24,43 @@
 
 
 /*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
+ * Copyright (c) 1999, by Sun Microsystems, Inc.
+ * All rights reserved.
  */
 
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+#ifndef	_MAILLOCK_H
+#define	_MAILLOCK_H
+
+/*	from OpenSolaris "maillock.h	1.9	05/06/08 SMI"	 SVr4.0 1.6		*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)maillock.h	1.3 (gritter) 6/18/05
  */
 
-#include "mail.h"
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-void
-lock(char *user)
-{
-	char	tbuf[80];
+#define	MAILDIR		"/var/mail/"
+#define	SAVEDIR		"/var/mail/:saved/"
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
-	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
+#define	PATHSIZE	1024	/* maximum path length of a lock file */
+#define	L_SUCCESS	0
+#define	L_NAMELEN	1	/* recipient name > 13 chars */
+#define	L_TMPLOCK	2	/* problem creating temp lockfile */
+#define	L_TMPWRITE	3	/* problem writing pid into temp lockfile */
+#define	L_MAXTRYS	4	/* cannot link to lockfile after N tries */
+#define	L_ERROR		5	/* Something other than EEXIST happened */
+#define	L_MANLOCK	6	/* cannot set mandatory lock on temp lockfile */
+
+extern int maillock(char *user, int retrycnt);
+extern void mailunlock(void);
+extern void touchlock(void);
+
+#ifdef	__cplusplus
 }
+#endif
 
-void 
-unlock(void) {
-	mailunlock();
-}
+#endif	/* _MAILLOCK_H */

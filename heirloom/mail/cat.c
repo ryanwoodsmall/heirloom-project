@@ -23,58 +23,57 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "cat.c	1.6	05/06/08 SMI" 	 SVr4.0 1.3		*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)cat.c	1.4 (gritter) 6/18/05
  */
+/*
+    NAME
+	cat - concatenate two strings
 
+    SYNOPSIS
+	void cat(char *to, char *from1, char *from2)
+
+    DESCRIPTION
+	cat() concatenates "from1" and "from2" to "to"
+		to	-> destination string
+		from1	-> source string
+		from2	-> source string
+*/
 #include "mail.h"
-
-void
-lock(char *user)
+#define	next(to, tosize, i) \
+		if ((i) >= *(tosize)) \
+			*(to) = srealloc(*(to), *(tosize) += 32); \
+		(*(to))[(i)++]
+	
+void 
+cat(char **to, size_t *tosize,
+		register const char *from1, register const char *from2)
 {
-	char	tbuf[80];
+	size_t	i = 0;
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	while (from1 && *from1) {
+		next(to, tosize, i) = *from1++;
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
+	while (from2 && *from2) {
+		next(to, tosize, i) = *from2++;
 	}
-	done(0);
+	next(to, tosize, i) = '\0';
 }
 
-void 
-unlock(void) {
-	mailunlock();
+void
+concat(char **to, size_t *tosize, const char *from)
+{
+	size_t	i = 0;
+
+	if (*to)
+		while ((*to)[i] != '\0')
+			i++;
+	while (from && *from) {
+		next(to, tosize, i) = *from++;
+	}
+	next(to, tosize, i) = '\0';
 }

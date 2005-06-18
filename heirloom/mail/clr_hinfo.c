@@ -23,58 +23,55 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "clr_hinfo.c	1.7	05/06/08 SMI"	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)clr_hinfo.c	1.3 (gritter) 6/18/05
  */
+	 	/* SVr4.0 2.	*/
+/*
+    NAME
+	clr_hinfo, clrhdr - clean out mail header information
+
+    SYNOPSIS
+	void clr_hinfo()
+	void clrhdr(int hdrtype)
+
+    DESCRIPTION
+	Clr_hinfo() cleans out hdrlines[] and other associated data
+	in preparation for the next message.
+
+	Clrhdr() does a single hdrlines[].
+*/
 
 #include "mail.h"
 
-void
-lock(char *user)
+void 
+clr_hinfo(void)
 {
-	char	tbuf[80];
+	register	int	i;
+	static		int	firsttime = 1;
+	static char		pn[] = "clr_hinfo";
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	Dout(pn, 0, "\n");
+	if (firsttime) {
+		firsttime = 0;
+		return;
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
+	fnuhdrtype = 0;
+	orig_aff = orig_rcv = 0;
+	for (i = 0; i < H_CONT; i++) {
+		clrhdr(i);
 	}
-	done(0);
+	return;
 }
 
 void 
-unlock(void) {
-	mailunlock();
+clrhdr(int hdrtype)
+{
+	while (hdrlines[hdrtype].head != (struct hdrs *)NULL) {
+		poplist (hdrtype, HEAD);
+	}
 }

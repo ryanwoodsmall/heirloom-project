@@ -63,17 +63,17 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\"	Sccsid @(#)mail.1	1.8 (gritter) 1/11/03
+.\"	Sccsid @(#)mail.1	1.9 (gritter) 6/18/05
 .\"	from binmail.1	6.1 (Berkeley) 4/29/85
 .\"
-.TH MAIL 1 "1/11/03" "Heirloom Toolchest" "User Commands"
+.TH MAIL 1 "6/18/05" "Heirloom Toolchest" "User Commands"
 .AT 3
 .SH NAME
 mail \- send or receive mail among users
 .SH SYNOPSIS
-\fBmail\fR [\fB\-epqr\fR] [\fB\-f\fI\ file\fR]
+\fBmail\fR [\fB\-ehpPqr\fR] [\fB\-f\fI\ file\fR]
 .br
-\fBmail\fR [\fB\-t\fR] \fIperson\fR ...
+\fBmail\fR [\fB\-tw\fR] \fIperson\fR ...
 .LP
 .SH DESCRIPTION
 .PP
@@ -86,39 +86,94 @@ to direct disposition of the message.
 newline
 Go on to next message.
 .TP
-d
-Delete message and go on to the next.
+.I number
+Display the message with the given
+.IR number .
 .TP
-p
-Print message again.
+.B \-
+Print the previous message.
 .TP
-\-
-Go back to previous message.
+.B +
+Print the next message without deleting the current one.
 .TP
-s [\fIfile\fR] ...
-Save the message in the named
+.BI ! command
+Execute the given
+.I command
+in the shell.
+.TP
+.B a
+Check for newly read mail,
+position the current message accordingly
+and print it.
+.TP
+\fBd\fI number\fP
+Delete the message with the given
+.IR number .
+The default is the current message.
+.TP
+.B dp
+Delete the current message and display the next one.
+.TP
+.B dq
+Delete the current message and exit.
+.TP
+.B h a
+Display a header summary of all messages.
+.TP
+.B h d
+Display a header summary of the messages scheduled for deletion.
+.TP
+\fBh\fI number\fP
+Display a header summary around the given
+.IR number .
+The default is the current message.
+.TP
+\fBm\fI user\fP
+Mail the current message to
+.I user
+and delete it.
+.TP
+.B n
+Display the next message without deleting the current one.
+.TP
+.B p
+Print the current message
+and override all warnings about binary content.
+.TP
+.B P
+Print the current message
+including all header fields.
+.TP
+.B q
+Quit.
+.TP
+\fBr\fR [\fIargs\fR]
+Reply to the current letter using
+\fImail\fR [\fIargs\fR]
+and delete it afterwards.
+.TP
+\fBs\fR [\fIfiles\fR]
+Save the current message to the given
 .I files
-(`mbox' default).
+(default
+.IR mbox )
+and delete it.
 .TP
-w [\fIfile\fR] ...
-Save the message, without a header, in the named
+\fBu\fR [\fInumber\fR]
+Undelete the message with the given
+.I number
+(or the current message).
+.TP
+\fBw\fR [\fIfiles\fR]
+Save the current message to the given
 .I files
-(`mbox' default).
+(default
+.IR mbox )
+without the message header
+and delete it.
 .TP
-m [\fIperson\fR] ...
-Mail the message to the named
-.I persons
-(yourself is default).
-.TP
-EOT (control-D)
-Put unexamined mail back in the mailbox and stop.
-.TP
-q
-Same as EOT.
-.TP
-.RI ! command
-Escape to the Shell to do
-.IR command .
+.B x
+Exit without actually deleting any messages.
 .TP
 *
 Print a command summary.
@@ -153,10 +208,30 @@ The
 option causes the named file, for example, `mbox',
 to be printed as if it were the mail file.
 .PP
+When invoked with the
+.B \-h
+option,
+.I mail
+will display a header summary when starting
+and will then prompt for commands.
+.PP
+With
+\fB\-m\ \fImessage_type\fR,
+a `Message-Type:' header field with the given value
+.I message_type
+is created.
+This field is solely for informational purposes
+and has no technical meaning in the Internet mail system.
+.PP
 The
 .B \-p
 option causes all messages to be printed
 without prompting for disposition.
+.PP
+With the
+.B \-P
+option given,
+all header fields are printed by default.
 .PP
 An interrupt normally terminates the 
 .I mail
@@ -175,6 +250,13 @@ The
 .B \-t
 option causes a `To:' header field to be created
 with the names of all recipients.
+.PP
+With the
+.B \-w
+option,
+.I mail
+does not wait until the mail transfer agent finishes execution
+when a message is sent.
 .PP
 When a user logs in he is informed of the presence of mail.
 .SH FILES
@@ -206,9 +288,10 @@ User's mail file.
 .SH "SEE ALSO"
 mailx(1),
 write(1),
-uucp(1C),
-uux(1C),
-mailaddr(7),
-sendmail(8)
+mailaddr(7)
 .SH NOTES
 Race conditions sometimes result in a failure to remove a lock file.
+.PP
+The
+.I mail
+command is restricted to ASCII text messages.

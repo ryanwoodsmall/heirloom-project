@@ -23,58 +23,47 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "pckrcvspot.c	1.7	05/06/08 SMI"	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)pckrcvspot.c	1.4 (gritter) 6/18/05
  */
-
+	 	/* SVr4.0 2.	*/
 #include "mail.h"
-
-void
-lock(char *user)
+/*
+ * If any H_RECEIVED lines in msg, decide where to put them.
+ * Returns :
+ *	-1 ==> No H_RECEIVED lines to be printed.
+ *	> 0 ==> Header line type after (before) which to place H_RECEIVED lines
+ */
+int 
+pckrcvspot(void)
 {
-	char	tbuf[80];
+	static char pn[] = "pckrcvspot";
+	register int	rc = 0;
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	if (hdrlines[H_RECEIVED].head == (struct hdrs *)NULL) {
+		rc = -1;
+	} else if (orig_rcv) {
+		rc = H_RECEIVED;
+	} else if (orig_aff) {
+		rc = H_AFWDFROM;
+	} else if (fnuhdrtype == H_RVERS) {
+		if (hdrlines[H_EOH].head != (struct hdrs *)NULL) {
+			if (hdrlines[H_DATE].head != (struct hdrs *)NULL) {
+				rc = H_DATE;
+			} else {
+				rc = H_EOH;
+			}
+		}
+	} else if ((fnuhdrtype == H_MVERS) &&
+	    (hdrlines[H_EOH].head != (struct hdrs *)NULL)) {
+		rc = H_EOH;
+	} else {
+		rc = H_CTYPE;
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	Dout(pn, 3, "'%s'\n", (rc == -1 ? "No Received: lines": header[rc].tag));
+	return (rc);
 }

@@ -23,58 +23,33 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "istext.c	1.6	05/06/08 SMI" 	 SVr4.0 1.		*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)istext.c	1.4 (gritter) 6/18/05
  */
-
 #include "mail.h"
 
-void
-lock(char *user)
+/*
+ * istext(line, size) - check for text characters
+ */
+int 
+istext(register unsigned char *s, int size)
 {
-	char	tbuf[80];
-
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	register unsigned char *ep;
+	register int c;
+	
+	for (ep = s+size; --ep >= s; ) {
+		c = *ep;
+		if ((!isprint(c)) && (!isspace(c)) &&
+		    /* Since backspace is not included in either of the */
+		    /* above, must do separately                        */
+		    /* Bell character is allowable control char in the text */
+		    (c != 010) && (c != 007)) {
+			return(FALSE);
+		}
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	return(TRUE);
 }

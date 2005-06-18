@@ -23,58 +23,38 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "doopen.c	1.8	05/06/08 SMI" 	 SVr4.0 2.		*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)doopen.c	1.4 (gritter) 6/18/05
  */
-
 #include "mail.h"
+/*
+	Generic open routine.
+	Exits on error with passed error value.
+	Returns file pointer on success.
 
-void
-lock(char *user)
+	Note: This should be used only for critical files
+	as it will terminate mail(1) on failure.
+*/
+FILE *
+doopen(char *file, char *type, int errnum)
 {
-	char	tbuf[80];
+	static char pn[] = "doopen";
+	FILE *fptr = NULL;
+	struct stat st;
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	if ((stat(file, &st) < 0 && errno == EOVERFLOW) ||
+		(fptr = fopen(file, type)) == NULL) {
+		fprintf(stderr,
+			"%s: Can't open '%s' type: %s\n",program,file,type);
+		error = errnum;
+		sav_errno = errno;
+		Dout(pn, 0, "can't open '%s' type: %s\n",program,file,type);
+		Dout(pn, 0, "error set to %d\n", error);
+		done(0);
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	return(fptr);
 }

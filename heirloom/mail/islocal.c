@@ -22,59 +22,39 @@
 /*	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T	*/
 /*	  All Rights Reserved  	*/
 
-
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "islocal.c	1.6	05/06/08 SMI"	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)islocal.c	1.3 (gritter) 6/18/05
  */
 
+#include <sys/param.h>
 #include "mail.h"
 
-void
-lock(char *user)
+/*
+ * islocal (char *user, uid_t *puid) - see if user exists on this system
+ */
+int 
+islocal(char *user, uid_t *puid)
 {
-	char	tbuf[80];
+	char	fname[MAXPATHLEN];
+	struct stat statb;
+	struct passwd *pwd_ptr;
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	/* Check for existing mailfile first */
+	(void) snprintf(fname, sizeof (fname), "%s%s", maildir, user);
+	if (stat(fname, &statb) == 0) {
+		*puid = statb.st_uid;
+		return (TRUE);
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
 
-void 
-unlock(void) {
-	mailunlock();
+	/* If no existing mailfile, check passwd file */
+	setpwent();
+	if ((pwd_ptr = getpwnam(user)) == NULL) {
+		return (FALSE);
+	}
+	*puid = pwd_ptr->pw_uid;
+	return (TRUE);
 }

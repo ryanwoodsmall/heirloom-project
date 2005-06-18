@@ -23,58 +23,48 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "pickFrom.c	1.6	05/06/08 SMI" 	 SVr4.0 2.		*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)pickFrom.c	1.4 (gritter) 6/18/05
+ */
+#include "mail.h"
+/*
+ * pickFrom (line) - scans line, ASSUMED TO BE of the form
+ *	[>]From <fromU> <date> [remote from <fromS>]
+ * and fills fromU and fromS global strings appropriately.
  */
 
-#include "mail.h"
-
-void
-lock(char *user)
-{
-	char	tbuf[80];
-
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
-	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
 void 
-unlock(void) {
-	mailunlock();
+pickFrom(register char *lineptr)
+{
+	register char *p;
+	static char rf[] = "remote from ";
+	int rfl;
+
+	if (*lineptr == '>')
+		lineptr++;
+	lineptr += 5;
+	cpy(&fromU, &fromUsize, lineptr);
+	for (p = fromU; *p; p++)
+		if (isspace(*p & 0377)) {
+			*p = '\0';
+			break;
+		}
+	rfl = strlen (rf);
+	while (*lineptr && strncmp (lineptr, rf, rfl))
+		lineptr++;
+	if (*lineptr == '\0') {
+		cpy(&fromS, &fromSsize, "");
+	} else {
+		lineptr += rfl;
+		cpy(&fromS, &fromSsize, lineptr);
+		for (p = fromS; *p; p++)
+			if (isspace(*p & 0377)) {
+				*p = '\0';
+				break;
+			}
+	}
 }

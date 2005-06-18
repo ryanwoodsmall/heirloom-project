@@ -24,57 +24,38 @@
 
 
 /*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
+ * Copyright (c) 1999, by Sun Microsystems, Inc.
+ * All rights reserved.
  */
 
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "strmove.c	1.8	05/06/08 SMI"	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)strmove.c	1.3 (gritter) 6/18/05
+ */
+/*LINTLIBRARY*/
+
+#include <sys/types.h>
+#include "libmail.h"
+
+/*
+ *  NAME
+ *	strmove - copy a string, permitting overlaps
+ *
+ *  SYNOPSIS
+ *	void strmove(char *to, char *from)
+ *
+ *  DESCRIPTION
+ *	strmove() acts exactly like strcpy() with the additional
+ *	guarantee that it will work with overlapping strings.
+ *	It does it left-to-right, a byte at a time.
  */
 
-#include "mail.h"
-
 void
-lock(char *user)
+strmove(char *to, char *from)
 {
-	char	tbuf[80];
-
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
-	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	while ((*to++ = *from++) != 0)
+		;
 }

@@ -23,58 +23,29 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "getarg.c	1.6	05/06/08 SMI" 	 SVr4.0 2.		*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)getarg.c	1.3 (gritter) 6/18/05
  */
-
 #include "mail.h"
-
-void
-lock(char *user)
+/*
+	get next token
+		p	-> string to be searched
+		s	-> area to return token
+	returns:
+		p	-> updated string pointer
+		s	-> token
+		NULL	-> no token
+*/
+char *
+getarg(register char *s, register char *p)
 {
-	char	tbuf[80];
-
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
-	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	while (*p == ' ' || *p == '\t') p++;
+	if (*p == '\n' || *p == '\0') return(NULL);
+	while (*p != ' ' && *p != '\t' && *p != '\n' && *p != '\0') *s++ = *p++;
+	*s = '\0';
+	return(p);
 }

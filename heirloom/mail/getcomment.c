@@ -23,58 +23,55 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "getcomment.c	1.7	05/06/08 SMI" 	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)getcomment.c	1.3 (gritter) 6/18/05
+ */
+		/* SVr4.0 2.	*/
+#include "mail.h"
+/*
+ * Get comment field, if any, from line.
+ *	1 ==> found comment.
+ *	0 ==> no comment found.
+ *     -1 ==> no closing (terminating) paren found for comment.
  */
 
-#include "mail.h"
-
-void
-lock(char *user)
+int 
+getcomment (
+    register char *s,
+    register char *q	/* Copy comment, if found, to here */
+)
 {
-	char	tbuf[80];
-
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	register char	*p, *sav_q;
+	register int	depth = 0;
+	
+	if ((p = strchr(s, '(')) == (char *)NULL) {
+		/* no comment found */
+		return (0);
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
+	sav_q = q;
+	while (*p) {
+		*q++ = *p;
+		if (*p == ')') {
+			/* account for nested parens within comment */
+			depth--;
+			if (depth == 0) {
+				break;
+			}
+		} else if (*p == '(') {
+			depth++;
+		}
+		p++;
 	}
-	done(0);
-}
-
-void 
-unlock(void) {
-	mailunlock();
+	*q = '\0';
+	if (*p != ')') {
+		/* closing paren not found */
+		*sav_q = '\0';
+		return (-1);
+	}
+	/* found comment */
+	return (1);
 }

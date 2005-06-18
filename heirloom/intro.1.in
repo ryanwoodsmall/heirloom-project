@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)intro.1.in	1.20 (gritter) 1/24/05
-.TH INTRO 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)intro.1.in	1.21 (gritter) 6/18/05
+.TH INTRO 1 "6/18/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 intro \- introduction to commands
 .SH DESCRIPTION
@@ -39,7 +39,8 @@ by Caldera in January 2002.
 In addition, 4BSD source
 (governed by the University's copyright and partially
 derived from 32V) has been used.
-(Other sources were Caldera's `Open Source Unix[tm] Tools',
+(Other sources were Sun's `OpenSolaris',
+Caldera's `Open Source Unix[tm] Tools',
 the MINIX utility collection,
 Plan 9,
 and Info-ZIP's compression codes.)

@@ -23,58 +23,39 @@
 /*	  All Rights Reserved  	*/
 
 
-/*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
- */
-
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+/*	from OpenSolaris "del_recipl.c	1.6	05/06/08 SMI"	*/
 
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)del_recipl.c	1.3 (gritter) 6/18/05
  */
-
+	 	/* SVr4.0 1.	*/
 #include "mail.h"
 
-void
-lock(char *user)
-{
-	char	tbuf[80];
+/*
+    NAME
+	del_reciplist - delete a recipient list
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
-	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
-}
+    SYNOPSIS
+	del_reciplist (reciplist *list)
+
+    DESCRIPTION
+	Free the space used by a recipient list.
+*/
 
 void 
-unlock(void) {
-	mailunlock();
+del_reciplist(reciplist *plist)
+{
+	static char	pn[] = "del_reciplist";
+	recip		*r = &plist->recip_list;
+	Dout(pn, 0, "entered\n");
+	if (r->next != (struct recip *)NULL) {
+		for (r = r->next; r != (struct recip *)NULL; ) {
+			recip *old = r;
+			r = old->next;
+			free(old->name);
+			free((char*)old);
+		}
+	}
 }
