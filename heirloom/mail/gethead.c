@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gethead.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)gethead.c	1.6 (gritter) 6/18/05
  */
 
 #include "mail.h"
@@ -80,7 +80,7 @@ gethead(int current, int all)
 	FILE	*file;
 	char	*hold = NULL;
 	size_t	holdsize = 0;
-	char	*wline = NULL;;
+	char	*wline = NULL;
 	size_t	wlinesize = 0;
 	int	ln;
 	char	mark;
