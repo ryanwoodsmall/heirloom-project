@@ -26,7 +26,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getopt.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)getopt.c	1.5 (gritter) 6/18/05
  */
 /* from OpenSolaris "getopt.c	1.23	05/06/08 SMI" */
 
@@ -57,13 +57,9 @@
  * that would require moving the 'optstring[0]' test outside of the
  * function.
  */
-#define	ERR(s, c, i)	if (opterr && optstring[0] != ':') { \
+#define	ERR(s, c)	if (opterr && optstring[0] != ':') { \
 	char errbuf[256]; \
-	char cbuf[2]; \
-	cbuf[0] = c; \
-	cbuf[1] = '\0'; \
-	(void) snprintf(errbuf, sizeof (errbuf), s, argv[0], \
-	    (i ? argv[i]+2 : cbuf)); \
+	(void) snprintf(errbuf, sizeof (errbuf), s, argv[0], c); \
 	(void) write(2, errbuf, strlen(errbuf)); }
 
 /*
@@ -80,97 +76,21 @@ int _sp = 1;
  * Determine if the specified character (c) is present in the string
  * (optstring) as a regular, single character option. If the option is found,
  * return a pointer into optstring pointing at the short-option character,
- * otherwise return null. The characters ':' and '(' are not allowed.
+ * otherwise return null. The character ':' is not allowed.
  */
 static char *
 parseshort(const char *optstring, const char c)
 {
 	char *cp = (char *)optstring;
 
-	if (c == ':' || c == '(')
+	if (c == ':')
 		return (NULL);
 	do {
 		if (*cp == c)
 			return (cp);
-		while (*cp == '(')
-			while (*cp != '\0' && *cp != ')')
-				cp++;
 	} while (*cp++ != '\0');
 	return (NULL);
 }
-
-/*
- * Determine if the specified string (opt) is present in the string
- * (optstring) as a long-option contained within parenthesis. If the
- * long-option specifies option-argument, return a pointer to it in
- * longoptarg.  Otherwise set longoptarg to null. If the option is found,
- * return a pointer into optstring pointing at the short-option character
- * associated with this long-option; otherwise return null.
- *
- * optstring 	The entire optstring passed to getopt() by the caller
- *
- * opt		The long option read from the command line
- *
- * longoptarg	The argument to the option is returned in this parameter,
- *              if an option exists. Possible return values in longoptarg
- *              are:
- *                  NULL		No argument was found
- *		    empty string ("")	Argument was explicitly left empty
- *					by the user (e.g., --option= )
- *		    valid string	Argument found on the command line
- *
- * returns	Pointer to equivalent short-option in optstring, null
- *              if option not found in optstring.
- *
- * ASSUMES: No parameters are NULL
- *
- */
-static char *
-parselong(const char *optstring, const char *opt, char **longoptarg)
-{
-	char	*cp;	/* ptr into optstring, beginning of one option spec. */
-	char	*ip;	/* ptr into optstring, traverses every char */
-	char	*op;	/* pointer into opt */
-	int	match;	/* nonzero if opt is matching part of optstring */
-
-	cp = ip = (char *)optstring;
-	do {
-		if (*ip != '(' && *++ip == '\0')
-			break;
-		if (*ip == ':' && *++ip == '\0')
-			break;
-		while (*ip == '(') {
-			if (*++ip == '\0')
-				break;
-			op = (char *)opt;
-			match = 1;
-			while (*ip != ')' && *ip != '\0' && *op != '\0')
-				match = (*ip++ == *op++ && match);
-			if (match && *ip == ')' &&
-			    (*op == '\0' || *op == '=')) {
-				if ((*op) == '=') {
-				    /* may be an empty string - OK */
-				    (*longoptarg) = op + 1;
-				} else {
-				    (*longoptarg) = NULL;
-				}
-				return (cp);
-			}
-			if (*ip == ')' && *++ip == '\0')
-				break;
-		}
-		cp = ip;
-		/*
-		 * Handle double-colon in optstring ("a::(longa)")
-		 * The old getopt() accepts it and treats it as a
-		 * required argument.
-		 */
-		while ((cp > optstring) && ((*cp) == ':')) {
-		    --cp;
-		}
-	} while (*cp != '\0');
-	return (NULL);
-} /* parselong() */
 
 /*
  * External function entry point.
@@ -180,8 +100,6 @@ getopt(int argc, char *const *argv, const char *optstring)
 {
 	char	c;
 	char	*cp;
-	int	longopt;
-	char	*longoptarg;
 
 	/*
 	 * Has the end of the options been encountered?  The following
@@ -213,31 +131,17 @@ getopt(int argc, char *const *argv, const char *optstring)
 	 * character, but its meaning can be determined from context.
 	 * Note that the specification only requires that the alnum
 	 * characters be accepted.
-	 *
-	 * If the second character of the argument is a '-' this must be
-	 * a long-option, otherwise it must be a short option.  Scan for
-	 * the option in optstring by the appropriate algorithm. Either
-	 * scan will return a pointer to the short-option character in
-	 * optstring if the option is found and NULL otherwise.
-	 *
-	 * For an unrecognized long-option, optopt will equal 0, but
-	 * since long-options can't aggregate the failing option can
-	 * be identified by argv[optind-1].
 	 */
 	optopt = c = (unsigned char)argv[optind][_sp];
 	optarg = NULL;
-	longopt = (_sp == 1 && c == '-');
-	if (!(longopt ?
-	    ((cp = parselong(optstring, argv[optind]+2, &longoptarg)) != NULL) :
-	    ((cp = parseshort(optstring, c)) != NULL))) {
+	if ((cp = parseshort(optstring, c)) == NULL) {
 		/* LINTED: variable format specifier */
-		ERR("%s: illegal option -- %s\n",
-		    c, (longopt ? optind : 0));
+		ERR("%s: illegal option -- %c\n", c);
 		/*
 		 * Note: When the long option is unrecognized, optopt
 		 * will be '-' here, which matches the specification.
 		 */
-		if (argv[optind][++_sp] == '\0' || longopt) {
+		if (argv[optind][++_sp] == '\0') {
 			optind++;
 			_sp = 1;
 		}
@@ -263,27 +167,14 @@ getopt(int argc, char *const *argv, const char *optstring)
 	 *
 	 * The second clause allows -abcd (where b requires an option-argument)
 	 * to be interpreted as "-a -b cd".
-	 *
-	 * Note that the option-argument can legally be an empty string,
-	 * such as:
-	 * 	command --option= operand
-	 * which explicitly sets the value of --option to nil
 	 */
 	if (*(cp + 1) == ':') {
 		/* The option takes an argument */
-		if (!longopt && argv[optind][_sp+1] != '\0') {
+		if (argv[optind][_sp+1] != '\0') {
 			optarg = &argv[optind++][_sp+1];
-		} else if (longopt && longoptarg) {
-			/*
-			 * The option argument was explicitly set to
-			 * the empty string on the command line (--option=)
-			 */
-			optind++;
-			optarg = longoptarg;
 		} else if (++optind >= argc) {
 			/* LINTED: variable format specifier */
-			ERR("%s: option requires an argument" \
-			    " -- %s\n", c, (longopt ? optind - 1 : 0));
+			ERR("%s: option requires an argument -- %c\n", c);
 			_sp = 1;
 			optarg = NULL;
 			return (optstring[0] == ':' ? ':' : '?');
@@ -292,16 +183,7 @@ getopt(int argc, char *const *argv, const char *optstring)
 		_sp = 1;
 	} else {
 		/* The option does NOT take an argument */
-		if (longopt && (longoptarg != NULL)) {
-		    /* User supplied an arg to an option that takes none */
-		    /* LINTED: variable format specifier */
-		    ERR("%s: option doesn't take an argument -- %s\n",
-			0, (longopt ? optind : 0));
-		    optarg = longoptarg = NULL;
-		    c = '?';
-		}
-
-		if (longopt || argv[optind][++_sp] == '\0') {
+		if (argv[optind][++_sp] == '\0') {
 			_sp = 1;
 			optind++;
 		}
