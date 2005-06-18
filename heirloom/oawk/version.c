@@ -5,14 +5,14 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)oawk.sl  2.27 (gritter) 6/18/05";
+static const char sccsid[] USED = "@(#)oawk.sl  2.28 (gritter) 6/18/05";
 /*
 awk.def:
 	awk.def	1.18 (gritter) 10/5/04
 awk.g.y:
 	awk.g.y	1.5 (gritter) 7/24/03
 awk.lx.l:
-	awk.lx.l	1.12 (gritter) 6/18/05
+	awk.lx.l	1.13 (gritter) 6/18/05
 b.c:
 	b.c	1.10 (gritter) 3/31/03
 freeze.c:

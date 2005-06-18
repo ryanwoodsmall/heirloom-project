@@ -1,7 +1,8 @@
+%{
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)awk.lx.l	1.11 (gritter) 6/18/05>
+   Sccsid @(#)awk.lx.l	1.12 (gritter) 6/18/05>
  */
 /* UNIX(R) Regular Expression Tools
  
@@ -63,6 +64,7 @@
 
 /*%Start A str sc reg comment*/
 /*%X A str sc reg comment*/
+%}
 %X A str reg
 
 %{

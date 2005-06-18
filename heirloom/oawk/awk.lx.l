@@ -1,3 +1,4 @@
+%{
 /*-
  * This code contains changes by
  *      Gunnar Ritter, Freiburg i. Br., Germany, 2002. All rights reserved.
@@ -72,7 +73,8 @@
  */
 
 /*	from 4.4BSD /usr/src/old/awk/awk.lx.l	4.5 (Berkeley) 4/17/91	*/
-/*	Sccsid @(#)awk.lx.l	1.12 (gritter) 6/18/05>	*/
+/*	Sccsid @(#)awk.lx.l	1.13 (gritter) 6/18/05>	*/
+%}
 
 %X str chc reg esc comment
 
