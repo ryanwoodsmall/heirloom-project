@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ulimit.c	1.8 (gritter) 6/19/05
+ * Sccsid @(#)ulimit.c	1.9 (gritter) 6/20/05
  */
 /* from OpenSolaris "ulimit.c	1.12	05/06/08 SMI" */
 
@@ -43,11 +43,7 @@
 #include <stdlib.h>
 #include "defs.h"
 
-/*
- * order is important in this table! it is indexed by resource ID.
- */
-
-static struct rlimtab {
+static const struct rlimtab {
 	int	resource;
 	char	*name;
 	char	*scale;
@@ -84,7 +80,7 @@ sysulimit(int argc, char **argv)
 	rlim_t limit, new_limit;
 	struct rlimit rlimit;
 	int resources[sizeof rlimtab / sizeof *rlimtab];
-	struct rlimtab	*rp = NULL;
+	const struct rlimtab	*rp = NULL;
 
 	savoptind = optind;
 	savopterr = opterr;
