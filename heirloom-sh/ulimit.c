@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ulimit.c	1.7 (gritter) 6/19/05
+ * Sccsid @(#)ulimit.c	1.8 (gritter) 6/19/05
  */
 /* from OpenSolaris "ulimit.c	1.12	05/06/08 SMI" */
 
@@ -48,17 +48,30 @@
  */
 
 static struct rlimtab {
+	int	resource;
 	char	*name;
 	char	*scale;
 	rlim_t	divisor;
 } rlimtab[] = {
-	{ /* RLIMIT_CPU	*/	"time",		"seconds",	1, },
-	{ /* RLIMIT_FSIZE */	"file",		"blocks",	512, },
-	{ /* RLIMIT_DATA */	"data",		"kbytes",	1024, },
-	{ /* RLIMIT_STACK */	"stack",	"kbytes",	1024, },
-	{ /* RLIMIT_CORE */	"coredump",	"blocks",	512, },
-	{ /* RLIMIT_NOFILE */	"nofiles",	"descriptors",	1, },
-	{ /* RLIMIT_AS */	"memory",	"kbytes",	1024 }
+	{ RLIMIT_CORE,	 	"coredump",	"blocks",	512 },
+	{ RLIMIT_DATA,	 	"data",		"kbytes",	1024 },
+	{ RLIMIT_FSIZE, 	"file",		"blocks",	512 },
+#ifdef	RLIMIT_MEMLOCK
+	{ RLIMIT_MEMLOCK,	"memlock",	"kbytes",	1024 },
+#endif
+#ifdef	RLIMIT_RSS
+	{ RLIMIT_RSS,		"rss",		"kbytes",	1024 },
+#endif
+	{ RLIMIT_STACK, 	"stack",	"kbytes",	1024 },
+	{ RLIMIT_CPU,		"time",		"seconds",	1 },
+	{ RLIMIT_NOFILE, 	"nofiles",	"descriptors",	1 },
+#ifdef	RLIMIT_NPROC
+	{ RLIMIT_NPROC,		"processes",	"count",	1 },
+#endif
+#ifdef	RLIMIT_AS
+	{ RLIMIT_AS,	 	"memory",	"kbytes",	1024 },
+#endif
+	{ -1,			NULL,		NULL,		0 }
 };
 
 void
@@ -67,14 +80,11 @@ sysulimit(int argc, char **argv)
 	int savopterr, savoptind, savsp;
 	char *savoptarg;
 	char *args;
-	int hard, soft, cnt, c, res;
+	int hard, soft, c, i, res;
 	rlim_t limit, new_limit;
 	struct rlimit rlimit;
-	char resources[RLIM_NLIMITS];
-
-	for (res = 0;  res < RLIM_NLIMITS; res++) {
-		resources[res] = 0;
-	}
+	int resources[sizeof rlimtab / sizeof *rlimtab];
+	struct rlimtab	*rp = NULL;
 
 	savoptind = optind;
 	savopterr = opterr;
@@ -85,9 +95,13 @@ sysulimit(int argc, char **argv)
 	opterr = 0;
 	hard = 0;
 	soft = 0;
-	cnt = 0;
+	res = 0;
 
-	while ((c = getopt(argc, argv, "HSacdfnstv")) != -1) {
+	while ((c = getopt(argc, argv, "HSacdflmnstuv")) != -1) {
+		if (res == sizeof resources / sizeof *resources) {
+			failure(usage, ulimuse);
+			goto err;
+		}
 		switch (c) {
 		case 'S':
 			soft++;
@@ -96,32 +110,64 @@ sysulimit(int argc, char **argv)
 			hard++;
 			continue;
 		case 'a':
-			for (res = 0;  res < RLIM_NLIMITS; res++) {
-				resources[res]++;
+			if (res) {
+				failure(usage, ulimuse);
+				goto err;
 			}
-			cnt = RLIM_NLIMITS;
+			resources[res++] = RLIMIT_CORE;
+			resources[res++] = RLIMIT_DATA;
+			resources[res++] = RLIMIT_FSIZE;
+#ifdef	RLIMIT_MEMLOCK
+			resources[res++] = RLIMIT_MEMLOCK;
+#endif
+#ifdef	RLIMIT_RSS
+			resources[res++] = RLIMIT_RSS;
+#endif
+			resources[res++] = RLIMIT_STACK;
+			resources[res++] = RLIMIT_CPU;
+			resources[res++] = RLIMIT_NOFILE;
+#ifdef	RLIMIT_NPROC
+			resources[res++] = RLIMIT_NPROC;
+#endif
+#ifdef	RLIMIT_AS
+			resources[res++] = RLIMIT_AS;
+#endif
 			continue;
 		case 'c':
-			res = RLIMIT_CORE;
+			resources[res++] = RLIMIT_CORE;
 			break;
 		case 'd':
-			res = RLIMIT_DATA;
+			resources[res++] = RLIMIT_DATA;
 			break;
 		case 'f':
-			res = RLIMIT_FSIZE;
+			resources[res++] = RLIMIT_FSIZE;
 			break;
+#ifdef	RLIMIT_MEMLOCK
+		case 'l':
+			resources[res++] = RLIMIT_MEMLOCK;
+			break;
+#endif
+#ifdef	RLIMIT_RSS
+		case 'm':
+			resources[res++] = RLIMIT_RSS;
+			break;
+#endif
 		case 'n':
-			res = RLIMIT_NOFILE;
+			resources[res++] = RLIMIT_NOFILE;
 			break;
 		case 's':
-			res = RLIMIT_STACK;
+			resources[res++] = RLIMIT_STACK;
 			break;
 		case 't':
-			res = RLIMIT_CPU;
+			resources[res++] = RLIMIT_CPU;
 			break;
+#ifdef	RLIMIT_CPU
+		case 'u':
+			resources[res++] = RLIMIT_CPU;
+#endif
 #ifdef	RLIMIT_AS
 		case 'v':
-			res = RLIMIT_AS;
+			resources[res++] = RLIMIT_AS;
 			break;
 #endif
 		default:
@@ -129,34 +175,35 @@ sysulimit(int argc, char **argv)
 			failure(usage, ulimuse);
 			goto err;
 		}
-		resources[res]++;
-		cnt++;
 	}
 
-	if (cnt == 0) {
-		resources[res = RLIMIT_FSIZE]++;
-		cnt++;
-	}
+	if (res == 0)
+		resources[res++] = RLIMIT_FSIZE;
 
 	/*
 	 * if out of arguments, then print the specified resources
 	 */
 
 	if (optind == argc) {
-		if (!hard && !soft) {
+		if (!hard && !soft)
 			soft++;
-		}
-		for (res = 0; res < RLIM_NLIMITS; res++) {
-			if (resources[res] == 0) {
+		for (c = 0; c < res; c++) {
+			rp = NULL;
+			for (i = 0; i < sizeof resources / sizeof *resources;
+					i++)
+				if (rlimtab[i].resource == resources[c]) {
+					rp = &rlimtab[i];
+					break;
+				}
+			if (rp == NULL)
+				continue;
+			if (getrlimit(rp->resource, &rlimit) < 0) {
 				continue;
 			}
-			if (getrlimit(res, &rlimit) < 0) {
-				continue;
-			}
-			if (cnt > 1) {
-				prs_buff(rlimtab[res].name);
+			if (res > 1) {
+				prs_buff(rp->name);
 				prc_buff('(');
-				prs_buff(rlimtab[res].scale);
+				prs_buff(rp->scale);
 				prc_buff(')');
 				prc_buff(' ');
 			}
@@ -165,7 +212,7 @@ sysulimit(int argc, char **argv)
 					prs_buff("unlimited");
 				} else  {
 					prull_buff(rlimit.rlim_cur /
-					    rlimtab[res].divisor);
+					    rp->divisor);
 				}
 			}
 			if (hard && soft) {
@@ -176,7 +223,7 @@ sysulimit(int argc, char **argv)
 					prs_buff("unlimited");
 				} else  {
 					prull_buff(rlimit.rlim_max /
-					    rlimtab[res].divisor);
+					    rp->divisor);
 				}
 			}
 			prc_buff('\n');
@@ -184,7 +231,7 @@ sysulimit(int argc, char **argv)
 		goto err;
 	}
 
-	if (cnt > 1 || optind + 1 != argc) {
+	if (res > 1 || optind + 1 != argc) {
 		failure(usage, ulimuse);
 		goto err;
 	}
@@ -211,7 +258,7 @@ sysulimit(int argc, char **argv)
 		} while (*++args);
 
 		/* Check for overflow! */
-		new_limit = limit * rlimtab[res].divisor;
+		new_limit = limit * rp->divisor;
 		if (new_limit >= limit) {
 			limit = new_limit;
 		} else {
@@ -220,7 +267,7 @@ sysulimit(int argc, char **argv)
 		}
 	}
 
-	if (getrlimit(res, &rlimit) < 0) {
+	if (getrlimit(resources[0], &rlimit) < 0) {
 		failure(argv[0], badulimit);
 		goto err;
 	}
@@ -236,7 +283,7 @@ sysulimit(int argc, char **argv)
 		rlimit.rlim_cur = limit;
 	}
 
-	if (setrlimit(res, &rlimit) < 0) {
+	if (setrlimit(resources[0], &rlimit) < 0) {
 		failure(argv[0], badulimit);
 	}
 

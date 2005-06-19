@@ -1,4 +1,6 @@
 Release ...
+* The "ulimit" command was fixed to work portably; the "-lmu" flags have
+  been added to it.
 * The default path has been changed to "/usr/5bin:/bin:/usr/bin:" to
   provide maximum System V compatibility if the Heirloom Toolchest is
   also installed.
