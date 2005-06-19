@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.8 (gritter) 6/16/05
+ * Sccsid @(#)jobs.c	1.9 (gritter) 6/19/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -754,11 +754,11 @@ sysjobs(int argc, char *argv[])
 	int savoptind = optind;
 	int loptind = -1;
 	int savopterr = opterr;
-	int savsp = _sp;
+	int savsp = getopt_sp;
 	char *savoptarg = optarg;
 	optind = 1;
 	opterr = 0;
-	_sp = 1;
+	getopt_sp = 1;
 	propts = 0;
 
 	if ((flags & jcflg) == 0)
@@ -790,7 +790,7 @@ err:
 	optind = savoptind;
 	optarg = savoptarg;
 	opterr = savopterr;
-	_sp = savsp;
+	getopt_sp = savsp;
 	if (loptind == -1)
 		return;
 

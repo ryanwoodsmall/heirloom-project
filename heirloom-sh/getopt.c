@@ -26,7 +26,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getopt.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)getopt.c	1.6 (gritter) 6/19/05
  */
 /* from OpenSolaris "getopt.c	1.23	05/06/08 SMI" */
 
@@ -39,9 +39,9 @@
  * requirements.
  *
  * This actual implementation is a bit looser than the specification
- * as it allows any character other than ':' and '(' to be used as
- * a short option character - The specification only guarantees the
- * alnum characters ([a-z][A-Z][0-9]).
+ * as it allows any character other than ':' to be used as an option
+ * character - The specification only guarantees the alnum characters
+ * ([a-z][A-Z][0-9]).
  */
 
 #include <unistd.h>
@@ -63,23 +63,23 @@
 	(void) write(2, errbuf, strlen(errbuf)); }
 
 /*
- * _sp is required to keep state between successive calls to getopt() while
- * extracting aggregated short-options (ie: -abcd). Hence, getopt() is not
+ * getopt_sp is required to keep state between successive calls to getopt()
+ * while extracting aggregated options (ie: -abcd). Hence, getopt() is not
  * thread safe or reentrant, but it really doesn't matter.
  *
  * So, why isn't this "static" you ask?  Because the historical Bourne
  * shell has actually latched on to this little piece of private data.
  */
-int _sp = 1;
+int getopt_sp = 1;
 
 /*
  * Determine if the specified character (c) is present in the string
  * (optstring) as a regular, single character option. If the option is found,
- * return a pointer into optstring pointing at the short-option character,
+ * return a pointer into optstring pointing at the option character,
  * otherwise return null. The character ':' is not allowed.
  */
 static char *
-parseshort(const char *optstring, const char c)
+parse(const char *optstring, const char c)
 {
 	char *cp = (char *)optstring;
 
@@ -113,7 +113,7 @@ getopt(int argc, char *const *argv, const char *optstring)
 	 *	argv[optind]	points to the string "--"
 	 * getopt() returns -1 after incrementing optind.
 	 */
-	if (_sp == 1) {
+	if (getopt_sp == 1) {
 		if (optind >= argc || argv[optind][0] != '-' ||
 		    argv[optind] == NULL || argv[optind][1] == '\0')
 			return (EOF);
@@ -132,18 +132,14 @@ getopt(int argc, char *const *argv, const char *optstring)
 	 * Note that the specification only requires that the alnum
 	 * characters be accepted.
 	 */
-	optopt = c = (unsigned char)argv[optind][_sp];
+	optopt = c = (unsigned char)argv[optind][getopt_sp];
 	optarg = NULL;
-	if ((cp = parseshort(optstring, c)) == NULL) {
+	if ((cp = parse(optstring, c)) == NULL) {
 		/* LINTED: variable format specifier */
 		ERR("%s: illegal option -- %c\n", c);
-		/*
-		 * Note: When the long option is unrecognized, optopt
-		 * will be '-' here, which matches the specification.
-		 */
-		if (argv[optind][++_sp] == '\0') {
+		if (argv[optind][++getopt_sp] == '\0') {
 			optind++;
-			_sp = 1;
+			getopt_sp = 1;
 		}
 		return ('?');
 	}
@@ -170,21 +166,21 @@ getopt(int argc, char *const *argv, const char *optstring)
 	 */
 	if (*(cp + 1) == ':') {
 		/* The option takes an argument */
-		if (argv[optind][_sp+1] != '\0') {
-			optarg = &argv[optind++][_sp+1];
+		if (argv[optind][getopt_sp+1] != '\0') {
+			optarg = &argv[optind++][getopt_sp+1];
 		} else if (++optind >= argc) {
 			/* LINTED: variable format specifier */
 			ERR("%s: option requires an argument -- %c\n", c);
-			_sp = 1;
+			getopt_sp = 1;
 			optarg = NULL;
 			return (optstring[0] == ':' ? ':' : '?');
 		} else
 			optarg = argv[optind++];
-		_sp = 1;
+		getopt_sp = 1;
 	} else {
 		/* The option does NOT take an argument */
-		if (argv[optind][++_sp] == '\0') {
-			_sp = 1;
+		if (argv[optind][++getopt_sp] == '\0') {
+			getopt_sp = 1;
 			optind++;
 		}
 		optarg = NULL;

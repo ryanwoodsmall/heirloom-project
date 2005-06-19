@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.15 (gritter) 6/17/05
+ * Sccsid @(#)defs.h	1.16 (gritter) 6/19/05
  */
 
 #ifndef	_DEFS_H
@@ -176,7 +176,7 @@ extern pid_t	mysid;
 
 extern int		optind;
 extern int		opterr;
-extern int 		_sp;
+extern int 		getopt_sp;
 extern char 		*optarg;
 
 #define	free	sh_free

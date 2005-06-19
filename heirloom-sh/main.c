@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.6 (gritter) 6/16/05
+ * Sccsid @(#)main.c	1.7 (gritter) 6/19/05
  */
 
 
@@ -268,7 +268,7 @@ main(int c, char *v[], char *e[])
 	 * make sure that option parsing starts
 	 * at first character
 	 */
-	_sp = 1;
+	getopt_sp = 1;
 
 	/* initialize multibyte information */
 	setwidth();

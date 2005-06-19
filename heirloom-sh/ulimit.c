@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ulimit.c	1.6 (gritter) 6/15/05
+ * Sccsid @(#)ulimit.c	1.7 (gritter) 6/19/05
  */
 /* from OpenSolaris "ulimit.c	1.12	05/06/08 SMI" */
 
@@ -78,10 +78,10 @@ sysulimit(int argc, char **argv)
 
 	savoptind = optind;
 	savopterr = opterr;
-	savsp = _sp;
+	savsp = getopt_sp;
 	savoptarg = optarg;
 	optind = 1;
-	_sp = 1;
+	getopt_sp = 1;
 	opterr = 0;
 	hard = 0;
 	soft = 0;
@@ -243,6 +243,6 @@ sysulimit(int argc, char **argv)
 err:
 	optind = savoptind;
 	opterr = savopterr;
-	_sp = savsp;
+	getopt_sp = savsp;
 	optarg = savoptarg;
 }
