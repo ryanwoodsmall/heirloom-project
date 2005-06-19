@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)print.c	1.9 (gritter) 6/16/05
+ * Sccsid @(#)print.c	1.10 (gritter) 6/19/05
  */
 /* from OpenSolaris "print.c	1.17	05/06/08 SMI"	 SVr4.0 1.12.6.1 */
 /*
@@ -164,6 +164,27 @@ stoi(const unsigned char *icp)
 	if (r < 0 || cp == icp)
 		failed(icp, badnum);
 	return (r);
+}
+
+long long
+stoifll(const unsigned char *icp)
+{
+	const unsigned char	*cp;
+	long long	r = 0;
+	int		sign = 1;
+	unsigned char	c;
+
+	for (cp = icp; space(*cp); cp++);
+	if (*cp == '-') {
+		sign = -1;
+		cp++;
+	} else if (*cp == '+')
+		cp++;
+	while ((c = *cp, digit(c)) && c) {
+		r = r * 10 + c - '0';
+		cp++;
+	}
+	return (r * sign);
 }
 
 int

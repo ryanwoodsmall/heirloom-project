@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)test.c	1.6 (gritter) 6/16/05
+ * Sccsid @(#)test.c	1.7 (gritter) 6/19/05
  */
 /* from OpenSolaris "test.c	1.15	05/06/08 SMI" */
 
@@ -217,8 +217,8 @@ e3(void)
 		return(eq(nxtarg(0), a));
 	if (eq(p2, "!="))
 		return(!eq(nxtarg(0), a));
-	ll_1 = strtoll((char *)a, NULL, 10);
-	ll_2 = strtoll((char *)nxtarg(0), NULL, 10);
+	ll_1 = stoifll(a);
+	ll_2 = stoifll(nxtarg(0));
 	if (eq(p2, "-eq"))
 		return (ll_1 == ll_2);
 	if (eq(p2, "-ne"))

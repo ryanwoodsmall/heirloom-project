@@ -6,7 +6,8 @@ to compile on:
 
 Linux           glibc 2.2 and above, diet libc
 Solaris         9 and above
-HP-UX		B.11.23
+HP-UX		B.11.11 and above
+Tru64 Unix	5.1
 FreeBSD         5.4
 NetBSD          2.0
 
@@ -26,4 +27,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/19/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           %G%

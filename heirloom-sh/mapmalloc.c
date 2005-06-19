@@ -43,6 +43,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/mman.h>
+#include <inttypes.h>
 
 #ifndef	MAP_FAILED
 #define	MAP_FAILED	((void *)-1)
@@ -73,7 +74,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <inttypes.h>
 int 
 botch(char *s)
 {

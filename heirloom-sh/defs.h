@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.17 (gritter) 6/19/05
+ * Sccsid @(#)defs.h	1.18 (gritter) 6/19/05
  */
 
 #ifndef	_DEFS_H
@@ -334,6 +334,7 @@ void prt(long);
 void prn(int);
 void itos(int);
 int stoi(const unsigned char *);
+long long stoifll(const unsigned char *);
 int ltos(long);
 void prl(long);
 int ulltos(unsigned long long);

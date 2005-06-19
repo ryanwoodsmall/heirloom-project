@@ -2,7 +2,8 @@ Release ...
 * The default path has been changed to "/usr/5bin:/bin:/usr/bin:" to
   provide maximum System V compatibility if the Heirloom Toolchest is
   also installed.
-* The shell now also compiles on HP-UX (B.11.23).
+* The shell now also compiles on HP-UX (B.11.11, B.11.23) and Tru64
+  Unix (5.1).
 
 Release 050617
 * Temporary files for here documents are now created with mode 0600.
