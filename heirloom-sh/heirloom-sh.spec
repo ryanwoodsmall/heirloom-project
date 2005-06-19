@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-sh.spec	1.3 (gritter) 6/19/05
+# Sccsid @(#)heirloom-sh.spec	1.4 (gritter) 6/20/05
 #
 Summary: The Heirloom Bourne Shell.
 Name: heirloom-sh
@@ -30,8 +30,14 @@ BuildRoot: %{_tmppath}/%{name}-root
 %define	makeflags	ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} MANDIR=%{mandir} CC=%{xcc} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LNS=%{lns} UCBINST=install
 
 %description
-The Heirloom Bourne Shell is a derivative of the traditional Unix shell
-as found on SVR4 implementations.
+The Heirloom Bourne Shell is a portable variant of the traditional Unix
+shell. It is especially suitable for testing the portability of shell
+scripts and for processing legacy scripts. The Bourne shell does not
+provide as many features as newer Unix shells, but it does provide a
+stable shell language. With this in mind, it is also suitable for
+general script processing and interactive use. This variant of the
+Bourne shell has been derived from OpenSolaris code and thus provides
+the SVR4/SVID3 level of the shell.
 
 %prep
 rm -rf %{buildroot}
