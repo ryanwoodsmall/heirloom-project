@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)print.c	1.10 (gritter) 6/19/05
+ * Sccsid @(#)print.c	1.11 (gritter) 6/19/05
  */
 /* from OpenSolaris "print.c	1.17	05/06/08 SMI"	 SVr4.0 1.12.6.1 */
 /*
@@ -51,6 +51,7 @@ unsigned char numbuf[21];
 
 static unsigned char buffer[BUFLEN];
 static unsigned char *bufp = buffer;
+#undef	index
 #define	index	sh_index
 static int index = 0;
 static int buffd = 1;
@@ -105,12 +106,12 @@ void
 prt(long t)
 {
 	int hr, min, sec;
-	static long hz;
+	static long clk_tck;
 	
-	if (hz == 0)
-		hz = sysconf(_SC_CLK_TCK);
-	t += hz / 2;
-	t /= hz;
+	if (clk_tck == 0)
+		clk_tck = sysconf(_SC_CLK_TCK);
+	t += clk_tck / 2;
+	t /= clk_tck;
 	sec = t % 60;
 	t /= 60;
 	min = t % 60;

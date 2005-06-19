@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.10 (gritter) 6/19/05
+ * Sccsid @(#)jobs.c	1.11 (gritter) 6/19/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -270,8 +270,10 @@ statjob(register struct job *jp, int stat, int fg, int rc)
 		if (WIFSIGNALED(stat)) {
 			jp->j_xval = WTERMSIG(stat);
 			jp->j_flag |= J_SIGNALED;
+#ifdef	WCOREDUMP
 			if (WCOREDUMP(stat))
 				jp->j_flag |= J_DUMPED;
+#endif	/* WCOREDUMP */
 			if (!fg || jp->j_xval != SIGINT) {
 				jp->j_flag |= J_NOTIFY;
 				jobnote++;
