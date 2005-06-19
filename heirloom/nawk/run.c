@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)run.c	1.31 (gritter) 2/4/05>
+   Sccsid @(#)run.c	1.32 (gritter) 6/19/05>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -950,7 +950,7 @@ Cell *aprintf(Node **a, int n)
 Cell *arith(Node **a, int n)
 {
 	Awkfloat i, j = 0;
-	double v, ipow();
+	double v;
 	register Cell *x, *y, *z;
 
 	x = execute(a[0]);
@@ -1036,7 +1036,7 @@ Cell *assign(Node **a, int n)
 {
 	register Cell *x, *y;
 	Awkfloat xf, yf;
-	double v, ipow();
+	double v;
 
 	y = execute(a[1]);
 	x = execute(a[0]);	/* order reversed from before... */
@@ -1586,7 +1586,6 @@ FILE *openfile(int a, unsigned char *s)
 {
 	register int i, m;
 	register FILE *fp = 0;
-	extern FILE *popen();
 
 	if (*s == '\0')
 		error(MM_ERROR, ":75:Null file name in print or getline");

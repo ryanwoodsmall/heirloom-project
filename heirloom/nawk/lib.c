@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)lib.c	1.24 (gritter) 12/25/04>
+   Sccsid @(#)lib.c	1.25 (gritter) 6/19/05>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -405,7 +405,6 @@ void newfld(int n)	/* add field n (after end) */
 static int refldbld(unsigned char *rec,
 		unsigned char *fs)	/* build fields from reg expr in FS */
 {
-	fa *makedfa();
 	unsigned char *fr;
 	int i;
 	fa *pfa;
