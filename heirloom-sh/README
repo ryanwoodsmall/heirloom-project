@@ -16,8 +16,8 @@ To build and install, see the settings in the "makefile" and adjust
 them if necessary. You can also build a RPM package with the command
 "rpmbuild -tb heirloom-sh-<version>.tar.bz2".
 
-New releases of nail are announced on Freshmeat. If you want to get
-notified by email on each release, use their subscription service at
+New releases of this project are announced on Freshmeat. If you want to
+get notified by email on each release, use their subscription service at
 <http://freshmeat.net/projects/bournesh/>.
 
 The project homepage is currently at <http://heirloom.sourceforge.net>.
@@ -28,4 +28,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/19/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/20/05
