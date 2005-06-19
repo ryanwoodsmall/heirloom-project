@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.7 (gritter) 6/16/05
+ * Sccsid @(#)service.c	1.8 (gritter) 6/19/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -42,6 +42,7 @@
 #include	"defs.h"
 #include	<errno.h>
 #include	<fcntl.h>
+#include	<time.h>
 
 #define	ARGMK	01
 
@@ -630,17 +631,15 @@ static int shaccton;	/* 0 implies do not write record on exit */
  *	suspend accounting until turned on by preacct()
  */
 
-int 
+void 
 suspacct(void)
 {
 	shaccton = 0;
 }
 
-int 
+void
 preacct(unsigned char *cmdadr)
 {
-	unsigned char *simple();
-
 	if (acctnod.namval && *acctnod.namval)
 	{
 		sabuf.ac_btime = time((time_t *)0);
@@ -653,7 +652,7 @@ preacct(unsigned char *cmdadr)
 }
 
 
-int 
+void
 doacct(void)
 {
 	int fd;
@@ -678,11 +677,11 @@ doacct(void)
  *	with 3 bits base-8 exponent, 13 bits fraction
  */
 
-compress(t)
-	register clock_t t;
+int
+compress(register clock_t t)
 {
-	register exp = 0;
-	register rund = 0;
+	register int exp = 0;
+	register int rund = 0;
 
 	while (t >= 8192)
 	{

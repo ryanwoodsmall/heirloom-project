@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.18 (gritter) 6/19/05
+ * Sccsid @(#)defs.h	1.19 (gritter) 6/19/05
  */
 
 #ifndef	_DEFS_H
@@ -145,6 +145,9 @@ extern "C" {
 
 /* arg list terminator */
 #define		ENDARGS		0
+
+/* enable shell accounting */
+#define		ACCT
 
 #include	<unistd.h>
 #include	"mac.h"
@@ -367,6 +370,10 @@ void trims(unsigned char *);
 unsigned char *mactrim(unsigned char *);
 unsigned char **scan(int);
 int getarg(struct comnod *);
+void suspacct(void);
+void preacct(unsigned char *);
+void doacct(void);
+int compress(clock_t);
 /* setbrk.c */
 unsigned char *setbrk(int);
 /* stak.c */
