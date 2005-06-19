@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.9 (gritter) 6/19/05
+ * Sccsid @(#)jobs.c	1.10 (gritter) 6/19/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -493,7 +493,7 @@ printjob(register struct job *jp, int propts)
 		sp = 28;
 		if (jp->j_flag & J_SIGNALED) {
 			const char *sigstr;
-			if ((sigstr = strsignal(jp->j_xval)) != NULL) {
+			if ((sigstr = str_signal(jp->j_xval)) != NULL) {
 				sp -= strlen(sigstr);
 				prs_buff(sigstr);
 			} else {

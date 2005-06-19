@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.16 (gritter) 6/19/05
+ * Sccsid @(#)defs.h	1.17 (gritter) 6/19/05
  */
 
 #ifndef	_DEFS_H
@@ -381,6 +381,7 @@ unsigned char *movstrn(const unsigned char *, unsigned char *, int);
 /* strsig.c */
 int str_2_sig(const char *, int *);
 int sig_2_str(int, char *);
+char *str_signal(int);
 /* test.c */
 int test(int, unsigned char *[]);
 /* ulimit.c */

@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)strsig.c	1.6 (gritter) 6/17/05
+ * Sccsid @(#)strsig.c	1.7 (gritter) 6/19/05
  */
 
 #include <signal.h>
@@ -32,131 +32,132 @@
 static const struct sig_strlist {
 	const int	sig_num;
 	const char	*sig_str;
+	const char	*sig_name;
 } sig_strs[] = {
-	{ 0,		"EXIT"	},
-	{ SIGHUP,	"HUP"	},
-	{ SIGINT,	"INT"	},
-	{ SIGQUIT,	"QUIT"	},
-	{ SIGILL,	"ILL"	},
-	{ SIGTRAP,	"TRAP"	},
-	{ SIGABRT,	"ABRT"	},
+	{ 0,		"EXIT",		"UNKNOWN SIGNAL"		},
+	{ SIGHUP,	"HUP",		"Hangup"			},
+	{ SIGINT,	"INT",		"Interrupt"			},
+	{ SIGQUIT,	"QUIT",		"Quit"				},
+	{ SIGILL,	"ILL",		"Illegal Instruction"		},
+	{ SIGTRAP,	"TRAP",		"Trace/Breakpoint Trap"		},
+	{ SIGABRT,	"ABRT",		"Abort"				},
 #ifdef	SIGIOT
-	{ SIGIOT,	"IOT"	},
+	{ SIGIOT,	"IOT",		"Input/Output Trap"		},
 #endif
 #ifdef	SIGEMT
-	{ SIGEMT,	"EMT"	},
+	{ SIGEMT,	"EMT",		"Emulation Trap"		},
 #endif
 #ifdef	SIGFPE
-	{ SIGFPE,	"FPE"	},
+	{ SIGFPE,	"FPE",		"Arithmetic Exception"		},
 #endif
 #ifdef	SIGKILL
-	{ SIGKILL,	"KILL"	},
+	{ SIGKILL,	"KILL",		"Killed"			},
 #endif
 #ifdef	SIGBUS
-	{ SIGBUS,	"BUS"	},
+	{ SIGBUS,	"BUS",		"Bus Error"			},
 #endif
 #ifdef	SIGSEGV
-	{ SIGSEGV,	"SEGV"	},
+	{ SIGSEGV,	"SEGV",		"Segmentation Fault"		},
 #endif
 #ifdef	SIGSYS
-	{ SIGSYS,	"SYS"	},
+	{ SIGSYS,	"SYS",		"Bad System Call"		},
 #endif
 #ifdef	SIGPIPE
-	{ SIGPIPE,	"PIPE"	},
+	{ SIGPIPE,	"PIPE",		"Broken Pipe"			},
 #endif
 #ifdef	SIGALRM
-	{ SIGALRM,	"ALRM"	},
+	{ SIGALRM,	"ALRM",		"Alarm Clock"			},
 #endif
 #ifdef	SIGTERM
-	{ SIGTERM,	"TERM"	},
+	{ SIGTERM,	"TERM",		"Terminated"			},
 #endif
 #ifdef	SIGUSR1
-	{ SIGUSR1,	"USR1"	},
+	{ SIGUSR1,	"USR1",		"User Signal 1"			},
 #endif
 #ifdef	SIGUSR2
-	{ SIGUSR2,	"USR2"	},
+	{ SIGUSR2,	"USR2",		"User Signal 2"			},
 #endif
 #ifdef	SIGCLD
-	{ SIGCLD,	"CLD"	},
+	{ SIGCLD,	"CLD",		"Child Status Changed"		},
 #endif
 #ifdef	SIGCHLD
-	{ SIGCHLD,	"CHLD"	},
+	{ SIGCHLD,	"CHLD",		"Child Status Changed"		},
 #endif
 #ifdef	SIGPWR
-	{ SIGPWR,	"PWR"	},
+	{ SIGPWR,	"PWR",		"Power-Fail/Restart"		},
 #endif
 #ifdef	SIGWINCH
-	{ SIGWINCH,	"WINCH"	},
+	{ SIGWINCH,	"WINCH",	"Window Size Change"		},
 #endif
 #ifdef	SIGURG
-	{ SIGURG,	"URG"	},
+	{ SIGURG,	"URG",		"Urgent Socket Condition"	},
 #endif
 #ifdef	SIGPOLL
-	{ SIGPOLL,	"POLL"	},
+	{ SIGPOLL,	"POLL",		"Pollable Event"		},
 #endif
 #ifdef	SIGIO
-	{ SIGIO,	"IO"	},
+	{ SIGIO,	"IO",		"Input/Output Now Possible"	},
 #endif
 #ifdef	SIGSTOP
-	{ SIGSTOP,	"STOP"	},
+	{ SIGSTOP,	"STOP",		"Stopped (signal)"		},
 #endif
 #ifdef	SIGTSTP
-	{ SIGTSTP,	"TSTP"	},
+	{ SIGTSTP,	"TSTP",		"Stopped (user)"		},
 #endif
 #ifdef	SIGCONT
-	{ SIGCONT,	"CONT"	},
+	{ SIGCONT,	"CONT",		"Continued"			},
 #endif
 #ifdef	SIGTTIN
-	{ SIGTTIN,	"TTIN"	},
+	{ SIGTTIN,	"TTIN",		"Stopped (tty input)"		},
 #endif
 #ifdef	SIGTTOU
-	{ SIGTTOU,	"TTOU"	},
+	{ SIGTTOU,	"TTOU",		"Stopped (tty output)"		},
 #endif
 #ifdef	SIGVTALRM
-	{ SIGVTALRM,	"VTALRM"	},
+	{ SIGVTALRM,	"VTALRM",	"Virtual Timer Expired"		},
 #endif
 #ifdef	SIGPROF
-	{ SIGPROF,	"PROF"	},
+	{ SIGPROF,	"PROF",		"Profiling Timer Expired"	},
 #endif
 #ifdef	SIGXCPU
-	{ SIGXCPU,	"XCPU"	},
+	{ SIGXCPU,	"XCPU",		"Cpu Limit Exceeded"		},
 #endif
 #ifdef	SIGXFSZ
-	{ SIGXFSZ,	"XFSZ"	},
+	{ SIGXFSZ,	"XFSZ",		"File Size Limit Exceeded"	},
 #endif
 #ifdef	SIGWAITING
-	{ SIGWAITING,	"WAITING"	},
+	{ SIGWAITING,	"WAITING",	"No runnable lwp"		},
 #endif
 #ifdef	SIGLWP
-	{ SIGLWP,	"LWP"	},
+	{ SIGLWP,	"LWP",		"Inter-lwp signal"		},
 #endif
 #ifdef	SIGFREEZE
-	{ SIGFREEZE,	"FREEZE"	},
+	{ SIGFREEZE,	"FREEZE",	"Checkpoint Freeze"		},
 #endif
 #ifdef	SIGTHAW
-	{ SIGTHAW,	"THAW"	},
+	{ SIGTHAW,	"THAW",		"Checkpoint Thaw"		},
 #endif
 #ifdef	SIGCANCEL
-	{ SIGCANCEL,	"CANCEL"	},
+	{ SIGCANCEL,	"CANCEL",	"Thread Cancellation"		},
 #endif
 #ifdef	SIGLOST
-	{ SIGLOST,	"LOST"	},
+	{ SIGLOST,	"LOST",		"Resource Lost"			},
 #endif
 #ifdef	SIGSTKFLT
-	{ SIGSTKFLT,	"STKFLT"	},
+	{ SIGSTKFLT,	"STKFLT",	"Stack Fault On Coprocessor"	},
 #endif
 #ifdef	SIGINFO
-	{ SIGINFO,	"INFO"	},
+	{ SIGINFO,	"INFO",		"Status Request From Keyboard"	},
 #endif
 #ifdef	SIG_2_STR_WITH_RT_SIGNALS
-	{ SIGRTMIN,	"RTMIN"	},
-	{ SIGRTMIN+1,	"RTMIN+1"	},
-	{ SIGRTMIN+2,	"RTMIN+2"	},
-	{ SIGRTMIN+3,	"RTMIN+3"	},
-	{ SIGRTMAX-3,	"RTMAX-3"	},
-	{ SIGRTMAX-2,	"RTMAX-2"	},
-	{ SIGRTMAX-1,	"RTMAX-1"	},
-	{ SIGRTMAX,	"RTMAX"	},
+	{ SIGRTMIN,	"RTMIN",	"First Realtime Signal"		},
+	{ SIGRTMIN+1,	"RTMIN+1",	"Second Realtime Signal"	},
+	{ SIGRTMIN+2,	"RTMIN+2"	"Third Realtime Signal"		},
+	{ SIGRTMIN+3,	"RTMIN+3",	"Fourth Realtime Signal"	},
+	{ SIGRTMAX-3,	"RTMAX-3",	"Fourth Last Realtime Signal"	},
+	{ SIGRTMAX-2,	"RTMAX-2",	"Third Last Realtime Signal"	},
+	{ SIGRTMAX-1,	"RTMAX-1",	"Second Last Realtime Signal"	},
+	{ SIGRTMAX,	"RTMAX"	},	"Last Realtime Signal"		},
 #endif	/* SIG_2_STR_WITH_RT_SIGNALS */
 	{ -1,		NULL	}
 };
@@ -193,4 +194,15 @@ sig_2_str(int signum, char *str)
 		return -1;
 	movstr(sig_strs[i].sig_str, str);
 	return 0;
+}
+
+char *
+str_signal(int signum)
+{
+	register int	i;
+
+	for (i = 0; sig_strs[i].sig_name; i++)
+		if (sig_strs[i].sig_num == signum)
+			break;
+	return (char *)sig_strs[i].sig_name;
 }
