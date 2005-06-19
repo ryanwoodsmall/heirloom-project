@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)popenvp.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)popenvp.c	1.5 (gritter) 6/19/05
  */
 /*LINTLIBRARY*/
 
@@ -57,6 +57,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <errno.h>
+#include <sigset.h>
 
 #define	tst(a, b) (*mode == 'r'? (b) : (a))
 #define	RDR	0
