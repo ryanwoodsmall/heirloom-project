@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fgetline.c	1.2 (gritter) 6/19/05
+ * Sccsid @(#)fgetline.c	1.3 (gritter) 6/19/05
  */
 
 #include <sys/types.h>
@@ -75,13 +75,12 @@ fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 int
 seteuid(uid_t euid)
 {
-	if (euid != 0)
-		setuid(euid);
+	return euid ? setuid(euid) : -1;
 }
 
 int
 setegid(gid_t egid)
 {
-	setgid(egid);
+	return setgid(egid);
 }
 #endif	/* __hpux */
