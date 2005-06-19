@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maid.c	1.14 (gritter) 6/18/05
+ * Sccsid @(#)maid.c	1.15 (gritter) 6/19/05
  */
 /*
 ma_id() {
@@ -42,7 +42,7 @@ static char mawhat[]="@(#) ma.sl	2.116"; }
 #else
 #define	USED
 #endif
-static const char id[] = "@(#)ma.sl 1.14 (gritter) 6/18/05";
+static const char id[] = "@(#)ma.sl 1.15 (gritter) 6/19/05";
 /* SLIST */
 /*
 Dout.c: * Sccsid @(#)Dout.c	1.4 (gritter) 6/18/05
@@ -61,12 +61,12 @@ createmf.c: * Sccsid @(#)createmf.c	1.4 (gritter) 6/18/05
 del_recipl.c: * Sccsid @(#)del_recipl.c	1.3 (gritter) 6/18/05
 delempty.c: * Sccsid @(#)delempty.c	1.3 (gritter) 6/18/05
 delete.c: * Sccsid @(#)delete.c	1.4 (gritter) 6/18/05
-done.c: * Sccsid @(#)done.c	1.3 (gritter) 6/18/05
+done.c: * Sccsid @(#)done.c	1.4 (gritter) 6/19/05
 doopen.c: * Sccsid @(#)doopen.c	1.4 (gritter) 6/18/05
 dumpaff.c: * Sccsid @(#)dumpaff.c	1.3 (gritter) 6/18/05
 dumprcv.c: * Sccsid @(#)dumprcv.c	1.3 (gritter) 6/18/05
 errmsg.c: * Sccsid @(#)errmsg.c	1.3 (gritter) 6/18/05
-fgetline.c: * Sccsid @(#)maid.c	1.14 (gritter) 6/18/05
+fgetline.c: * Sccsid @(#)fgetline.c	1.1 (gritter) 6/19/05
 gendeliv.c: * Sccsid @(#)gendeliv.c	1.4 (gritter) 6/18/05
 getarg.c: * Sccsid @(#)getarg.c	1.3 (gritter) 6/18/05
 getcomment.c: * Sccsid @(#)getcomment.c	1.3 (gritter) 6/18/05

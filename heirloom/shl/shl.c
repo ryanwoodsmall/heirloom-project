@@ -30,10 +30,18 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)shl.sl	1.25 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)shl.sl	1.26 (gritter) 6/19/05";
 
 #if !defined (__FreeBSD__) && !defined (__hpux) && !defined (_AIX) && \
 	!defined (__NetBSD__) && !defined (__OpenBSD__)
+
+/*
+ * UnixWare 2.1 needs _KMEMUSER to access some flags for STREAMS. Maybe other
+ * SVR4 do too, so define it on non-Sun systems for now.
+ */
+#ifndef	sun
+#define	_KMEMUSER
+#endif
 
 #include	<sys/types.h>
 #include	<termios.h>
@@ -53,14 +61,6 @@ struct layer {
 };
 
 extern int	sysv3;
-
-/*
- * UnixWare 2.1 needs _KMEMUSER to access some flags for STREAMS. Maybe other
- * SVR4 do too, so define it on non-Sun systems for now.
- */
-#ifndef	sun
-#define	_KMEMUSER
-#endif
 
 #ifdef	__dietlibc__
 #define	_XOPEN_SOURCE	600L

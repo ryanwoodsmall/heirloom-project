@@ -22,9 +22,10 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid %W% (gritter) %G%
+ * Sccsid @(#)fgetline.c	1.1 (gritter) 6/19/05
  */
 
+#include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -69,3 +70,18 @@ fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 		*llen = n;
 	return *line;
 }
+
+#ifdef	__hpux
+int
+seteuid(uid_t euid)
+{
+	if (euid != 0)
+		setuid(euid);
+}
+
+int
+setegid(gid_t gid)
+{
+	setgid(egid);
+}
+#endif	/* __hpux */

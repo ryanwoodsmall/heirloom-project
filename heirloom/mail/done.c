@@ -32,11 +32,10 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)done.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)done.c	1.4 (gritter) 6/19/05
  */
 
 #include "mail.h"
-#include <sysexits.h>
 
 /*
  * remap the bin/mail exit code to sendmail recognizable
@@ -49,24 +48,24 @@ maperrno(int err)
 
 	switch (sav_errno) {
 	case 0:
-		rc = EX_OK;
+		rc = 0;		/* EX_OK */
 		break;
 	case EPERM:
 	case EACCES:
 	case ENOSPC:
         case EDQUOT:
-		rc = EX_CANTCREAT;
+		rc = 73;	/* EX_CANTCREAT */
 		break;
 	case EAGAIN:
-		rc = EX_TEMPFAIL;
+		rc = 75;	/* EX_TEMPFAIL */
 		break;
 	case ENOENT:
 	case EISDIR:
 	case ENOTDIR:
-		rc = EX_OSFILE;
+		rc = 72;	/* EX_OSFILE */
 		break;
 	default:
-		rc = EX_IOERR;
+		rc = 74;	/* EX_IOERR */
 		break;
 	}
 	return(rc);
