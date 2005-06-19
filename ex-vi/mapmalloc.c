@@ -36,7 +36,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)mapmalloc.c	1.5 (gritter) 4/5/05
+ *	Sccsid @(#)mapmalloc.c	1.6 (gritter) 6/19/05
  */
 
 #ifdef	VMUNIX
@@ -45,6 +45,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/mman.h>
+#include <inttypes.h>
 
 #ifndef	MAP_FAILED
 #define	MAP_FAILED	((void *)-1)
@@ -77,7 +78,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <inttypes.h>
 int 
 botch(char *s)
 {
