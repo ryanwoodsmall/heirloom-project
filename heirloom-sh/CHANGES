@@ -7,6 +7,7 @@ Release ...
 * The shell now also compiles on HP-UX (B.11.11, B.11.23), AIX 5.1, and
   Tru64 Unix (5.1).
 * Shell accounting with the SHACCT mechanism has been enabled.
+* A manual page has been added.
 
 Release 050617
 * Temporary files for here documents are now created with mode 0600.

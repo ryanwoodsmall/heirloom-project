@@ -10,6 +10,11 @@ ROOT=
 SV3BIN=/usr/5bin
 
 #
+# Location for manual pages (with man1 below).
+#
+MANDIR = /usr/share/man/5man
+
+#
 # A BSD-compatible install command.
 #
 UCBINST=/usr/ucb/install
@@ -77,6 +82,10 @@ install: all
 	$(STRIP) $(ROOT)$(SV3BIN)/sh
 	rm -f $(ROOT)$(SV3BIN)/jsh
 	cd $(ROOT)$(SV3BIN) && $(LNS) sh jsh
+	test -d $(ROOT)$(MANDIR)/man1 || mkdir -p $(ROOT)$(MANDIR)/man1
+	$(UCBINST) -c -m 644 sh.1 $(ROOT)$(MANDIR)/man1/sh.1
+	rm -f $(ROOT)$(MANDIR)/man1/jsh.1
+	cd $(ROOT)$(MANDIR)/man1 && $(LNS) sh.1 jsh.1
 
 diet:
 	$(MAKE) CC='diet gcc -Ifakewchar' CFLAGS='-Os -fomit-frame-pointer' \

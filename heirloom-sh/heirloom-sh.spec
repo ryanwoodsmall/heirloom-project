@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-sh.spec	1.2 (gritter) 6/16/05
+# Sccsid @(#)heirloom-sh.spec	1.3 (gritter) 6/19/05
 #
 Summary: The Heirloom Bourne Shell.
 Name: heirloom-sh
@@ -51,3 +51,4 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc CALDERA.LICENSE CHANGES OPENSOLARIS.LICENSE README
 %{sv3bin}/*
+%{mandir}/man1/*
