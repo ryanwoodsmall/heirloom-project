@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)sh.1	1.6 (gritter) 6/20/05
+.\" Sccsid @(#)sh.1	1.8 (gritter) 6/20/05
 .\" Derived from sh(1) and test(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -37,9 +37,9 @@
 .SH NAME
 sh, jsh \- the standard command interpreter
 .SH SYNOPSIS
-\fBsh\fR [\fB\-acefhiknprstuvx\fR] [\fIarg\fR] ...
+\fBsh\fR [\fB\-acefhikmnprstuvx\fR] [\fIarg\fR] ...
 .br
-\fBjsh\fR [\fB\-acefhiknprstuvx\fR] [\fIarg\fR] ...
+\fBjsh\fR [\fB\-acefhikmnprstuvx\fR] [\fIarg\fR] ...
 .SH DESCRIPTION
 .I Sh
 is a command programming language
@@ -668,7 +668,8 @@ If a command is followed by
 then the default standard input
 for the command
 is the empty file
-(/dev/null).
+(/dev/null),
+unless job control is enabled.
 Otherwise, the environment for the execution of a command contains the
 file descriptors of the invoking shell as modified by input
 output specifications.
@@ -728,7 +729,8 @@ echo a=b c
 .SS "Signals"
 The INTERRUPT and QUIT signals for an invoked
 command are ignored if the command is followed by
-.BR & ;
+.B &
+(unless job control is enabled);
 otherwise signals have the values
 inherited by the shell from its parent.
 (But see also
@@ -1023,8 +1025,21 @@ Normally, these commands are looked up when they are executed.
 All keyword arguments are placed in the environment for a command,
 not just those that precede the command name.
 .TP
+.B \-m
+Enables job control (see below).
+.TP
 .B \-n
 Read commands but do not execute them.
+.TP
+.B \-p
+Makes the shell privileged.
+A privileged shell does not execute the system and user profiles;
+if an non-privileged shell (the default)
+has an effective user or group id
+different to its real user or group id
+or if it has an effective user or group id below 100,
+it resets its effective user or group id, respectively,
+to the corresponding real id at startup.
 .TP
 .B \-t
 Exit after reading and executing one command.
@@ -1109,8 +1124,22 @@ true if the file exists and is readable.
 .BR \-w " file"
 true if the file exists and is writable.
 .TP
+.BR \-u " file"
+true if the file exists and has the setuid bit set.
+.TP
+.BR \-g " file"
+true if the file exists and has the setgid bit set.
+.TP
+.BR \-k " file"
+true if the file exists and has the sticky bit set.
+.TP
 .BR \-f " file"
-true if the file exists and is not a directory.
+true if the file exists and is a regular file
+(or any file other than a directory if
+.I /usr/ucb
+occurs early in the current
+.SM $PATH
+parameter).
 .TP
 .BR \-d " file"
 true if the file exists and is a directory.
@@ -1123,6 +1152,12 @@ true if the file exists and is a symbolic link.
 .TP
 .BR \-p " file"
 true if the file exists and is a named pipe.
+.TP
+.BR \-b " file"
+true if the file exists and is a block device.
+.TP
+.BR \-c " file"
+true if the file exists and is a character device.
 .TP
 .BR \-s " file"
 true if the file exists and has a size greater than zero.
@@ -1263,7 +1298,7 @@ for
 .SM EXIT
 is the same as a `0' argument.
 .TP
-\fBtype\fI name\fR [...]
+\fBtype\fI name\fR ...
 For each
 .IR name ,
 prints if it would be executed as a shell function,
@@ -1275,63 +1310,69 @@ In the last case, the full path name to the command is also printed.
 .PD 0
 .TP
 \fBulimit\fP [\fB\-\fP[\fBHS\fP][\fBc\fP|\fBd\fP|\fBf\fP|\fBm\fP|\fBn\fP|\fBs\fP|\fBt\fP|\fBu\fP|\fBv\fP]] [\fIlimit\fP]
-prints or sets hard or soft limits,
+Handles resource limits for the shell
+and processes created by it,
 as described in
 .IR getrlimit (2).
-If a
+Without a
 .I limit
-argument is present,
-the limit setting is changed;
-otherwise,
-.I ulimit
-prints the current setting.
-The
-.B \-H
-option specifies a hard limit that may be raised by the super-user only.
-The
-.B \-S
-option specifies a soft limit that may be raised by the user as long as it
-does not exceed the hard limit.
-If neither option is specified,
-.I ulimit
-will set both limits, or print the soft limit, respectively.
-If no limit is specified, \-f is assumed.
-Any number of limits may be printed at a time.
-The following options are accepted to specify limits:
+argument,
+the current settings are printed;
+otherwise, a new limit is set.
+The following options are accepted:
 .RS
+.PD 0
+.TP
+.B \-H
+Sets a hard limit.
+Only the super-user may raise a hard limit.
+.TP
+.B \-S
+Sets a soft limit.
+A soft limit must not exceed the hard limit.
+.IP
+If neither
+.I \-H
+or
+.I \-S
+is given,
+the soft limit is printed,
+or both limits are set, respectively.
 .TP
 .B \-a
-print all limits
+Chooses all limits described.
 .TP
 .B \-c
-maximum core file size in 512-byte blocks
+The maximum size of a core dump in 512-byte blocks.
 .TP
 .B \-d
-maximum data segment in kbytes
+The maximum size of the data segment in kbytes.
 .TP
 .B \-f
-maximum file size in 512-byte blocks
+The maximum size of a file in 512-byte blocks.
+This is the default if no limit is explicitly selected.
 .TP
 .B \-l
-maximum size of locked memory in kbytes
+The maximum size of locked memory in kbytes.
 .TP
 .B \-m
-maximum resident set size in kbytes
-.TP 
+The maximum resident set size in kbytes.
+.TP
 .B \-n
-maximum file descriptor
+The maximum number of open file descriptors.
 .TP
 .B \-s
-maximum stack segment in kbytes
+The maximum size of the stack segment in kbytes.
 .TP
 .B \-t
-maximum CPU time in seconds
+The maximum processor time in seconds.
 .TP
 .B \-u
-maximum number of processes per user
+The maximum number of child processes.
 .TP
 .B \-v
-maximum virtual size in kbytes.
+The maximum address space size in kbytes.
+.PD
 .RE
 .TP
 \fBumask \fR[\fB\-S\fR] [\fInnn\fR]
@@ -1350,7 +1391,7 @@ With the
 .B \-S
 option, the current mask is printed as a symbolic string.
 .TP
-\fBunset\fI variable \fR[...]
+\fBunset\fI variable \fR...
 Unsets each
 .I variable
 named.
@@ -1421,12 +1462,19 @@ command.
 When an interactive shell is invoked as
 .BR jsh ,
 job control is enabled.
-Any complete command statement forms a job
-that can be stopped, restarted, and terminated.
-Stopping is done by pressing the
-.SM SUSP
-key, typically
-.IR ^Z .
+Job control allows to stop and resume processes,
+and to switch between foreground and background jobs.
+A job consists of the commands of a single pipeline.
+Each job is placed in a separate process group;
+a login shell and all jobs created by it form a session.
+Interrupt, quit, and other terminal control characters
+only affect the current foreground process group.
+The foreground job can be stopped pressing the
+suspend key, typically
+.IR ^Z ;
+any job can be stopped by sending the
+.SM STOP
+signal to it.
 Jobs are identified by
 .I "jod ids"
 of the following form:
@@ -1435,85 +1483,85 @@ of the following form:
 The current job.
 .TP
 .B %\-
-The previous job.
+The job that was previously the current job.
 .TP
 .BI ? string
-The job for which the command line uniquely contains
+The only job whose name contains
 .IR string .
 .TP
 .BI % number
-The job number.
+The job with the given number.
 .TP
 .I number
-The process group id of an existing job.
+The job with process group id
+.IR number .
 .TP
 .I string
-The job for which the command line is uniquely prefixed by
-.IR string .
+The only job for which
+.I string
+is a prefix of its name.
 .PP
 The following built-in commands are additionally available
 with job control:
 .TP
 \fBbg\fR [\fIjobid\fP ...]
-The specified jobs are resumed in the background.
-If no
+Places each
 .I jobid
-is given,
-the current job is assumed.
+in the background.
+The default job id is the current job.
 .TP 
 \fBfg\fR [\fIjobid\fP ...]
-The specified jobs are resumed in the foreground.
-If no
+Sequentially selects each
 .I jobid
-is given,
-the current job is assumed.
+as the foreground job.
+The default job id is the current job.
 .TP
 \fBjobs\fR [\fB\-p\fR|\fB\-l\fR] [\fIjobid\fP ...] | [\fB\-x\fI command \fR[\fIarguments\fR ...]] 
-Reports all stopped or background jobs,
-or those specified by
-.IR jobid .
-The following options are accepted:
+Prints information about each
+.IR jobid ,
+or executes
+.IR command .
 .RS
 .TP
 .B \-l
-Additionally reports the process group
-.SM ID
-and the initial working directory for each job.
+Includes the process group id and the starting directory.
 .TP
 .B \-p
-Restricts the output to the process group
-.SM ID
-of each job.
+Includes the process group id.
 .TP
 \fB\-x \fIcommand \fR[\fIarguments\fR ...]
-Replaces any
-.I jobid
-in
+Executes
 .I command
-or
-.I arguments
-with the corresponding process group
-.SM ID
-and executes the result.
+with
+.IR arguments ;
+each
+.I argument
+that forms a job id
+is replaced by the process group id
+of the respective job.
+It is an error if a given job does not exist.
 .RE
 .TP
 \fBkill\fR [[\fB\-s\fR \fIsignal\fR | \fB\-\fIsignal\fR] \fIjobid\fR ... | \fB-l \fI[status]\fR
-Built-in version of
+A special version of the
 .IR kill (1)
-that accepts
-.I jobid
-arguments.
+command that recognizes job ids in its arguments.
+.I signal
 .TP
 \fBstop \fIjobid\fR ...
-Stops the execution of the given jobs.
+Stops the given jobs
+(i.\|e. sends a
+.SM STOP
+signal to them).
 .TP
 .B suspend
-Stops the execution of the shell.
+Stops the shell itself.
+This is not allowed if the shell is a session leader.
 .TP
 \fBwait \fR[\fIjobid\fR]
-The wait builtin additionally accepts
-.I jobid
-arguments.
+The
+.I wait
+command (see above) recognizes job ids in its arguments.
 .SH FILES
 /etc/profile
 .br
