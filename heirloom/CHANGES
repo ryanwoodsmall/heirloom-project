@@ -2,6 +2,8 @@ Release ...
 * A new version of the 'mail' utility has been introduced; it has been
   derived from OpenSolaris code.
 * Both Unix lex and flex can now be used for building the tools.
+* xargs: The '-l' and '-L' options override previous occurrences of the
+  '-i' or '-I' option.
 
 Release 050612
 * Fixed a double free() call that could occur in multibyte locales with

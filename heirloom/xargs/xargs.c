@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)xargs.sl	1.14 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)xargs.sl	1.15 (gritter) 6/20/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -260,6 +260,7 @@ flags(int ac, char **av)
 			else
 				lflag = 1;
 			xflag = 1;
+			iflag = NULL;
 			continue;
 		case 'L':
 			if (av[i][2])
@@ -269,6 +270,7 @@ flags(int ac, char **av)
 			else
 				mustbepos('L', "");
 			xflag = 1;
+			iflag = NULL;
 			nflag = 0;
 			continue;
 		case 'n':
