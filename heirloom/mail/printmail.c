@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)printmail.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)printmail.c	1.6 (gritter) 6/21/05
  */
 
 #include "mail.h"
@@ -56,6 +56,12 @@ printmail(void)
 	size_t	readbufsize;
 	char	*resp;
 	gid_t	savedegid;
+
+	(void)&curlet;
+	(void)&showlet;
+	(void)&print;
+	(void)&sav_j;
+	(void)&ttyf;
 
 	stbufp = &stbuf;
 

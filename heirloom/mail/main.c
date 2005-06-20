@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.8 (gritter) 6/18/05
+ * Sccsid @(#)main.c	1.9 (gritter) 6/21/05
  */
 
 #include "mail.h"
@@ -52,6 +52,8 @@ main(int argc, char **argv)
 	int env_var_idx, next_slot_idx;
 	int tmpfd = -1;
 
+	(void)&argc;
+	(void)&argv;
 	/* fix here for bug #1086130 - security hole	*/
 	/* skip over the LD_* env variable		*/
 	env_var_idx = 0; next_slot_idx = 0;
