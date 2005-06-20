@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ulimit.c	1.9 (gritter) 6/20/05
+ * Sccsid @(#)ulimit.c	1.10 (gritter) 6/20/05
  */
 /* from OpenSolaris "ulimit.c	1.12	05/06/08 SMI" */
 
@@ -94,10 +94,8 @@ sysulimit(int argc, char **argv)
 	res = 0;
 
 	while ((c = getopt(argc, argv, "HSacdflmnstuv")) != -1) {
-		if (res == sizeof resources / sizeof *resources) {
-			failure(usage, ulimuse);
-			goto err;
-		}
+		if (res == sizeof resources / sizeof *resources)
+			goto fail;
 		switch (c) {
 		case 'S':
 			soft++;
@@ -106,10 +104,8 @@ sysulimit(int argc, char **argv)
 			hard++;
 			continue;
 		case 'a':
-			if (res) {
-				failure(usage, ulimuse);
-				goto err;
-			}
+			if (res)
+				goto fail;
 			resources[res++] = RLIMIT_CORE;
 			resources[res++] = RLIMIT_DATA;
 			resources[res++] = RLIMIT_FSIZE;
@@ -168,8 +164,7 @@ sysulimit(int argc, char **argv)
 #endif
 		default:
 		case '?':
-			failure(usage, ulimuse);
-			goto err;
+			goto fail;
 		}
 	}
 
@@ -227,10 +222,8 @@ sysulimit(int argc, char **argv)
 		goto err;
 	}
 
-	if (res > 1 || optind + 1 != argc) {
-		failure(usage, ulimuse);
-		goto err;
-	}
+	if (res > 1 || optind + 1 != argc)
+		goto fail;
 
 	if (eq(argv[optind], "unlimited")) {
 		limit = RLIM_INFINITY;
@@ -239,34 +232,34 @@ sysulimit(int argc, char **argv)
 
 		new_limit = limit = 0;
 		do {
-			if (*args < '0' || *args > '9') {
-				failure(argv[0], badulimit);
-				goto err;
-			}
+			if (*args < '0' || *args > '9')
+				goto fail;
 			/* Check for overflow! */
 			new_limit = (limit * 10) + (*args - '0');
 			if (new_limit >= limit) {
 				limit = new_limit;
-			} else {
-				failure(argv[0], badulimit);
-				goto err;
-			}
+			} else
+				goto fail;
 		} while (*++args);
 
+		rp = NULL;
+		for (i = 0; i < sizeof resources / sizeof *resources; i++)
+			if (rlimtab[i].resource == resources[0]) {
+				rp = &rlimtab[i];
+				break;
+			}
+		if (rp == NULL)
+			goto fail;
 		/* Check for overflow! */
 		new_limit = limit * rp->divisor;
 		if (new_limit >= limit) {
 			limit = new_limit;
-		} else {
-			failure(argv[0], badulimit);
-			goto err;
-		}
+		} else
+			goto fail;
 	}
 
-	if (getrlimit(resources[0], &rlimit) < 0) {
-		failure(argv[0], badulimit);
-		goto err;
-	}
+	if (getrlimit(resources[0], &rlimit) < 0)
+		goto fail;
 
 	if (!hard && !soft) {
 		hard++;
@@ -280,7 +273,7 @@ sysulimit(int argc, char **argv)
 	}
 
 	if (setrlimit(resources[0], &rlimit) < 0) {
-		failure(argv[0], badulimit);
+	fail:	failure(argv[0], badulimit);
 	}
 
 err:
