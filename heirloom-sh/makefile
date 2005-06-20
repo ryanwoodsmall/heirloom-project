@@ -46,6 +46,11 @@ CFLAGS=-O -fomit-frame-pointer
 CPPFLAGS=-D_GNU_SOURCE
 
 #
+# A define for large file support, if necessary.
+#
+LARGEF=-D_FILE_OFFSET_BITS=64L
+
+#
 # The compiler warning options.
 #
 WERROR=-Werror
@@ -65,7 +70,7 @@ OBJ = args.o blok.o bltin.o cmd.o ctype.o defs.o echo.o error.o \
 	setbrk.o stak.o string.o test.o ulimit.o word.o xec.o \
 	gmatch.o getopt.o strsig.o version.o mapmalloc.o umask.o
 
-.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $<
+.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(LARGEF) $(WARN) $<
 
 all: sh jsh
 
