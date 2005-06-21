@@ -1,4 +1,4 @@
-# Sccsid @(#)nail.spec	1.31 (gritter) 1/8/05
+# Sccsid @(#)nail.spec	1.32 (gritter) 6/22/05
 
 %define	use_nss	0
 %define	mozilla_version	1.6
@@ -69,7 +69,7 @@ make %{makeflags}
 
 %install
 make DESTDIR=%{buildroot} %{makeflags} install
-gzip -9 %{buildroot}/usr/share/man/man1/nail.1
+gzip -9 %{buildroot}/%{mandir}/man1/nail.1
 
 %clean
 cd ..; rm -rf %{_builddir}/%{name}-%{version}
@@ -79,5 +79,5 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc COPYING AUTHORS INSTALL README TODO ChangeLog
 %config(noreplace) /etc/nail.rc
-/usr/bin/nail
-/usr/share/man/man1/nail*
+%{bindir}/nail
+%{mandir}/man1/nail*
