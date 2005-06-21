@@ -1,64 +1,80 @@
 #
-#	from Unix 7th Edition /bin/spell */
+# CDDL HEADER START
 #
-# Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#   Redistributions of source code and documentation must retain the
-#    above copyright notice, this list of conditions and the following
-#    disclaimer.
-#   Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#   All advertising materials mentioning features or use of this software
-#    must display the following acknowledgement:
-#      This product includes software developed or owned by Caldera
-#      International, Inc.
-#   Neither the name of Caldera International, Inc. nor the names of
-#    other contributors may be used to endorse or promote products
-#    derived from this software without specific prior written permission.
+# You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+# or http://www.opensolaris.org/os/licensing.
+# See the License for the specific language governing permissions
+# and limitations under the License.
 #
-# USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
-# INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
-# LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# B flags, D dictionary, F files, H history, S stop, V data for -v
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+# If applicable, add the following below this CDDL HEADER, with the
+# fields enclosed by brackets "[]" replaced with your own identifying
+# information: Portions Copyright [yyyy] [name of copyright owner]
 #
-# Sccsid @(#)spell.sh	1.12 (gritter) 12/1/03
+# CDDL HEADER END
+#
+#	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T
+#	  All Rights Reserved
 
-PATH=@DEFBIN@:@SV3BIN@:$PATH export PATH
 
-libdir=@DEFLIB@/spell
+#	Copyright (c) 1998, 2000 by Sun Microsystems, Inc.
+#	All rights reserved.
 
-H_SPELL=${H_SPELL-@SPELLHIST@}
-test -w "$H_SPELL" || H_SPELL=/dev/null
-T_SPELL=/tmp/spell.$$
+#	Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
+
+# from OpenSolaris "spell.sh	1.21	05/06/08 SMI"	/* SVr4.0 1.11	*/
+#	spell program
+# Sccsid @(#)spell.sh	2.1 (gritter) 6/21/05
+# B_SPELL flags, D_SPELL dictionary, F_SPELL input files, H_SPELL history,
+# S_SPELL stop, V_SPELL data for -v
+# L_SPELL sed script, I_SPELL -i option to deroff
+PATH=@DEFLIB@/spell:@SV3BIN@:@DEFBIN@:$PATH export PATH
+
+H_SPELL=${H_SPELL:-@SPELLHIST@}
 V_SPELL=/dev/null
+F_SPELL=
+FT_SPELL=
 B_SPELL=
-lfile=/dev/null
-trap "rm -f $T_SPELL; exit" 0 1 2 13 15
+L_SPELL="sed -e \"/^[.'].*[.'][ 	]*nx[ 	]*\/usr\/lib/d\" -e \"/^[.'].*[.'][ 	]*so[ 	]*\/usr\/lib/d\" -e \"/^[.'][ 	]*so[ 	]*\/usr\/lib/d\" -e \"/^[.'][ 	]*nx[ 	]*\/usr\/lib/d\" "
+
+LOCAL=
+
+# mktmpdir - Create a private (mode 0700) temporary directory inside of /tmp
+# for this process's temporary files.  We set up a trap to remove the
+# directory on exit (trap 0), and also on SIGHUP, SIGINT, SIGQUIT, and
+# SIGTERM.
+#
+mktmpdir() {
+	tmpdir=/tmp/spell.$$
+	trap "rm -rf $tmpdir; exit" 0 1 2 13 15
+	mkdir -m 700 $tmpdir || exit 1
+}
+
+mktmpdir
+
+DEROFF="deroff \$I_SPELL"
+
 while :
 do
-	while getopts abvx A
+	while getopts abvxli A
 	do
 		case $A in
 		v)	B_SPELL="$B_SPELL -v"
-			V_SPELL=${T_SPELL}a ;;
-		a)	;;
-		b)	D_SPELL=${D_SPELL-$libdir/hlistb}
+			V_SPELL=$tmpdir/spell.$$
+			;;
+		b)	D_SPELL=${LB_SPELL:-@DEFLIB@/spell/hlistb}
 			B_SPELL="$B_SPELL -b" ;;
+		a)	;;
 		x)	B_SPELL="$B_SPELL -x" ;;
-		*)	echo "usage: `basename $0` [-v] [-b] [-x] [+local_file] [ files ]" >&2
+		l)	L_SPELL="cat" ;;
+		i)	I_SPELL="-i" ;;
+		*)	echo "usage: `basename $0` [-v] [-b] [-x] [-l] [-i] [+local_file] [ files ]" >&2
 			exit 2 ;;
 		esac
 	done
@@ -66,14 +82,14 @@ do
 	OPTIND=1
 	case $1 in
 	+*)
-		lfile=`expr x"$1" : 'x+\(.*\)'`
-		if test -z "$lfile"
+		LOCAL=`expr x"$1" : 'x+\(.*\)'`
+		if test -z "$LOCAL"
 		then
 			echo "`basename $0` cannot identify local spell file" >&2
 			exit 1
-		elif test ! -r "$lfile"
+		elif test ! -r "$LOCAL"
 		then
-			echo "`basename $0` cannot read $lfile" >&2
+			echo "`basename $0` cannot read $LOCAL" >&2
 			exit 1
 		fi
 		shift
@@ -83,16 +99,18 @@ do
 	esac
 done
 
-mkfifo $T_SPELL || exit
-deroff -w ${@+"$@"} |\
-  sort -u |\
-  $libdir/spellprog ${S_SPELL-$libdir/hstop} $T_SPELL |\
-  $libdir/spellprog ${D_SPELL-$libdir/hlista} $V_SPELL $B_SPELL |\
-  sort -u +0f +0 $T_SPELL - |\
-  fgrep -v -x -f "$lfile" |\
-  tee -a $H_SPELL
+(cat ${@+"$@"}; echo) | eval $L_SPELL |\
+ deroff $I_SPELL |\
+ LC_ALL=C tr -cs "[A-Z][a-z][0-9]\'\&\.\,\;\?\:" "[\012*]" |\
+ sed '1,$s/^[^A-Za-z0-9]*//' | sed '1,$s/[^A-Za-z0-9]*$//' |\
+ sed -n "/[A-Za-z]/p" | sort -u +0 |\
+ spellprog ${S_SPELL:-@DEFLIB@/spell/hstop} 1 |\
+ spellprog $B_SPELL ${D_SPELL:-@DEFLIB@/spell/hlista} $V_SPELL |\
+ comm -23 - ${LOCAL:-/dev/null} |\
+ tee -a $H_SPELL
 who am i >>$H_SPELL 2>/dev/null
 case $V_SPELL in
-/dev/null)	exit
+/dev/null)
+	exit
 esac
 sed '/^\./d' $V_SPELL | sort -u +1f +0

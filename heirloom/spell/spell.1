@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)spell.1	1.7 (gritter) 10/25/03
+.\" Sccsid @(#)spell.1	2.1 (gritter) 6/21/05
 .\" Derived from spell(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,16 +32,20 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH SPELL 1 "10/25/03" "Heirloom Toolchest" "User Commands"
+.TH SPELL 1 "6/21/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
-spell, spellin, spellout \- find spelling errors
+spell \- find spelling errors
 .SH SYNOPSIS
-\fBspell\fR [\fB\-v\fR] [\fB\-b\fR] [\fB\-x\fR]
+\fBspell\fR [\fB\-v\fR] [\fB\-b\fR] [\fB\-x\fR] [\fB\-i\fR] [\fB\-l\fR]
 [\fB+\fIlocal_file\fR] [\fIfile\fR\ ...]
 .br
 \fB/usr/5lib/spell/spellin\fR [\fIlist\fR]
 .br
-\fB/usr/5lib/spell/spellout\fR [\fB\-d\fR] \fIlist\fR
+\fB/usr/5lib/spell/hashcheck\fR
+.br
+\fB/usr/5lib/spell/hashmake\fR
+.br
+\fB/usr/5lib/spell/compress\fR
 .SH DESCRIPTION
 .I Spell
 collects words from the named documents,
@@ -84,6 +88,15 @@ notwithstanding.
 Under the 
 .B \-x
 option, every plausible stem is printed with `=' for each word.
+.PP
+The
+.B \-i
+option is passed to
+.IR deroff (1).
+.PP
+With the
+.B \-l
+option, all chains of included files are followed.
 .PP
 If the \fB+\fIlocal_file\fR argument is present,
 words present in \fIlocal_file\fR (one word per line)
@@ -137,7 +150,7 @@ history file
 .TP
 .B /usr/5lib/spell/spellprog
 .SH "SEE ALSO"
-deroff(1b),
+deroff(1),
 sort(1),
 tee(1),
 sed(1)

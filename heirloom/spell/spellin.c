@@ -1,83 +1,157 @@
-/*	from Unix 7th Edition /usr/src/cmd/spell/spellin.c	*/
 /*
- * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+ * CDDL HEADER START
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *   Redistributions of source code and documentation must retain the
- *    above copyright notice, this list of conditions and the following
- *    disclaimer.
- *   Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *   All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *      This product includes software developed or owned by Caldera
- *      International, Inc.
- *   Neither the name of Caldera International, Inc. nor the names of
- *    other contributors may be used to endorse or promote products
- *    derived from this software without specific prior written permission.
+ * The contents of this file are subject to the terms of the
+ * Common Development and Distribution License, Version 1.0 only
+ * (the "License").  You may not use this file except in compliance
+ * with the License.
  *
- * USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
- * INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
- * LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+ * or http://www.opensolaris.org/os/licensing.
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL HEADER in each
+ * file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+ * If applicable, add the following below this CDDL HEADER, with the
+ * fields enclosed by brackets "[]" replaced with your own identifying
+ * information: Portions Copyright [yyyy] [name of copyright owner]
+ *
+ * CDDL HEADER END
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
-#define	USED	__attribute__ ((used))
-#elif defined __GNUC__
-#define	USED	__attribute__ ((unused))
-#else
-#define	USED
-#endif
-static const char sccsid[] USED = "@(#)/usr/5lib/spell/spellin.sl	1.6 (gritter) 5/29/05";
+/*	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T	*/
+/*	  All Rights Reserved  	*/
 
-#include "spell.h"
-/* add entries to hash table for use by spell
-   preexisting hash table is first argument
-   words to be added are standard input
-   if no hash table is given, create one from scratch
-*/
+
+/*	from OpenSolaris "spellin.c	1.12	05/06/08 SMI"	 SVr4.0 1.4		*/
+
+/*
+ * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
+ *
+ * Sccsid @(#)spellin.c	2.2 (gritter) 6/21/05
+ */
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <locale.h>
+#include "hash.h"
+#include "huff.h"
+
+int32_t	encode(int32_t, int32_t *);
+
+#define	S (BYTE * sizeof (int32_t))
+#define	B (BYTE * sizeof (uint32_t))
+uint32_t *table;
+int32_t hindex[NI];
+uint32_t wp;		/* word pointer */
+int32_t bp = B;		/* bit pointer */
+static int ignore;
+static int extra;
+
+static int32_t
+append(register uint32_t w1, register int32_t i)
+{
+	while (wp < ND - 1) {
+		table[wp] |= w1>>(B-bp);
+		i -= bp;
+		if (i < 0) {
+			bp = -i;
+			return (1);
+		}
+		w1 <<= bp;
+		bp = B;
+		wp++;
+	}
+	return (0);
+}
+
+
+/*
+ *	usage: hashin N
+ *	where N is number of words in dictionary
+ *	and standard input contains sorted, unique
+ *	hashed words in octal
+ */
 
 int
-main(int argc,char **argv)
+main(int argc, char **argv)
 {
-	register int i, j;
-	long h;
-	register long *lp;
-	char word[NW];
-	register char *wp;
+	int32_t h, k, d;
+	int32_t  i;
+	int32_t count;
+	int32_t w1;
+	int32_t x;
+	int32_t t, u;
+	double z;
 
-	if(!prime(argc,argv)) {
-		fprintf(stderr,
-		    "spellin: cannot initialize hash table\n");
+	k = 0;
+	u = 0;
+	if (argc != 2) {
+		(void) fprintf(stderr, "%s: arg count\n", argv[0]);
 		exit(1);
 	}
-	while (fgets(word, sizeof(word), stdin)) {
-		for (i=0; i<NP; i++) {
-			for (wp = word, h = 0, lp = pow2[i];
-				 (j = *wp) != '\0'; ++wp, ++lp)
-				h += j * *lp;
-			h %= p[i];
-			set(h);
+	table = malloc(ND * sizeof (*table));
+	if (table == 0) {
+		(void) fprintf(stderr, "%s: no space for table\n", argv[0]);
+		exit(1);
+	}
+	if ((atof(argv[1])) == 0.0) {
+		(void) fprintf(stderr, "%s: illegal count", argv[0]);
+		exit(1);
+	}
+
+	z = huff((1L<<HASHWIDTH)/atof(argv[1]));
+	(void) fprintf(stderr, "%s: expected code widths = %f\n",
+	    argv[0], z);
+	for (count = 0; scanf("%lo", (long *)&h) == 1; ++count) {
+		if ((t = h >> (HASHWIDTH - INDEXWIDTH)) != u) {
+			if (bp != B)
+				wp++;
+			bp = B;
+			while (u < t)
+				hindex[++u] = wp;
+			k =  (int32_t)t<<(HASHWIDTH-INDEXWIDTH);
+		}
+		d = h-k;
+		k = h;
+		for (;;) {
+			for (x = d; ; x /= 2) {
+				i = encode(x, &w1);
+				if (i > 0)
+					break;
+			}
+			if (i > B) {
+				if (!(append((uint32_t)(w1>>(int32_t) (i-B)), B) &&
+				    append((uint32_t)(w1<<(int32_t) (B+B-i)),
+				    i-B)))
+					ignore++;
+			} else
+				if (!append((uint32_t)(w1<<(int32_t)(B-i)), i))
+					ignore++;
+			d -= x;
+			if (d > 0)
+				extra++;
+			else
+				break;
 		}
 	}
-#ifdef gcos
-	freopen((char *)NULL, "wi", stdout);
-#endif
-	if (fwrite(tab, 1, sizeof tab, stdout) != sizeof tab) {
-		fprintf(stderr,
-		    "spellin: trouble writing hash table\n");
-		exit(1);
-	}
-	return(0);
+	if (bp != B)
+		wp++;
+	while (++u < NI)
+		hindex[u] = wp;
+	whuff();
+	for (i = 0; i < NI; i++)
+		le32p(hindex[i], (char *)&hindex[i]);
+	(void) fwrite((char *)hindex, sizeof (*hindex), NI, stdout);
+	for (i = 0; i < wp; i++)
+		le32p(table[i], (char *)&table[i]);
+	(void) fwrite((char *)table, sizeof (*table), wp, stdout);
+	(void) fprintf(stderr,
+	    "%s: %ld items, %d ignored, %d extra, %u words occupied\n",
+	    argv[0], (long)count, ignore, extra, (unsigned)wp);
+	count -= ignore;
+	(void) fprintf(stderr, "%s: %f table bits/item, %f table+index bits\n",
+	    argv[0], (((float)BYTE * wp) * sizeof (*table) / count),
+	    (BYTE * ((float)wp * sizeof (*table) + sizeof (hindex)) / count));
+	return 0;
 }
