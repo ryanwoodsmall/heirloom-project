@@ -33,10 +33,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)printmail.c	1.6 (gritter) 6/21/05
+ * Sccsid @(#)printmail.c	1.8 (gritter) 6/22/05
  */
 
 #include "mail.h"
+
+char	*lockfile;
+
 /*
  *	Print mail entries
  */
@@ -159,6 +162,7 @@ printmail(void)
 	/*
 	 *	Secure the mailfile to guarantee integrity
 	 */
+	lockfile = mailfile;
 	lock(my_name);
 
 	/*
@@ -170,6 +174,7 @@ printmail(void)
 	onlet = nlet;
 	fclose(malf);
 	fclose(tmpf);
+	tmpf = NULL;
 	unlock();	/* All done, OK to unlock now */
 	tmpf = doopen(lettmp, "r+", E_TMP);
 	changed = 0;
@@ -236,6 +241,7 @@ printmail(void)
 			file_size = stbufp->st_size;
 			fclose(malf);
 			fclose(tmpf);
+			tmpf = NULL;
 			unlock();
 			tmpf = doopen(lettmp, "r+", E_TMP);
 			if (++k < nlet)

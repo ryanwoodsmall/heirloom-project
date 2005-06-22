@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sendmail.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)sendmail.c	1.5 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -412,6 +412,7 @@ wrapsend:
 	}
 
 	if (fclose(tmpf) == EOF) {
+		tmpf = NULL;
 		tmperr();
 		done(0);
 	}

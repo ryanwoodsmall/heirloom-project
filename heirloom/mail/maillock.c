@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maillock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)maillock.c	1.4 (gritter) 6/22/05
  */
 /*LINTLIBRARY*/
 
@@ -72,16 +72,20 @@ maillock(char *user, int retrycnt)
 	struct stat sbuf;
 	int statfailed;
 	char locktmp[PATHSIZE];	/* Usable lock temporary */
-	char file[PATHSIZE];
+	char _file[PATHSIZE];
+	char *file;
+	extern char	*lockfile;
 
 	if (locked)
 		return (0);
-	(void) strcpy(file, MAILDIR);
-	(void) strcat(file, user);
-	(void) strcpy(curlock, file);
-	(void) strcat(curlock, lockext);
-	(void) strcpy(locktmp, file);
-	(void) strcat(locktmp, "XXXXXX");
+	if (lockfile)
+		file = lockfile;
+	else {
+		snprintf(_file, sizeof _file, "%s%s", MAILDIR, user);
+		file = _file;
+	}
+	snprintf(curlock, sizeof curlock, "%s%s", file, lockext);
+	snprintf(locktmp, sizeof locktmp, "%sXXXXXX", file);
 	(void) close(mkstemp(locktmp));
 	(void) remove(locktmp);
 	statfailed = 0;

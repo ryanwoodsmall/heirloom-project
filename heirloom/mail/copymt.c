@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)copymt.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)copymt.c	1.5 (gritter) 6/22/05
  */
 /*
     NAME
@@ -174,6 +174,8 @@ putout:
 		if (nlet == 0) {
 			fclose(f1);
 			fclose(f2);
+			if (f2 == tmpf)
+				tmpf = NULL;
 			errmsg(E_FILE,"mailfile does not begin with a 'From' line");
 			done(0);
 		}

@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mkdead.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)mkdead.c	1.6 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -74,6 +74,7 @@ mkdead(void)
 				program,dotdead);
 			Dout(pn, 0, "Cannot create %s\n", dotdead);
 			fclose(tmpf);
+			tmpf = NULL;
 			error = E_FILE;
 			Dout(pn, 0, "error set to %d\n", error);
 			umask(7);

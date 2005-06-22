@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maid.c	1.19 (gritter) 6/21/05
+ * Sccsid @(#)maid.c	1.21 (gritter) 6/22/05
  */
 /*
 ma_id() {
@@ -42,7 +42,7 @@ static char mawhat[]="@(#) ma.sl	2.116"; }
 #else
 #define	USED
 #endif
-static const char id[] = "@(#)ma.sl 1.19 (gritter) 6/21/05";
+static const char id[] = "@(#)ma.sl 1.21 (gritter) 6/22/05";
 /* SLIST */
 /*
 Dout.c: * Sccsid @(#)Dout.c	1.4 (gritter) 6/18/05
@@ -55,13 +55,13 @@ cksaved.c: * Sccsid @(#)cksaved.c	1.6 (gritter) 6/18/05
 clr_hinfo.c: * Sccsid @(#)clr_hinfo.c	1.3 (gritter) 6/18/05
 copyback.c: * Sccsid @(#)copyback.c	1.7 (gritter) 6/18/05
 copylet.c: * Sccsid @(#)copylet.c	1.5 (gritter) 6/18/05
-copymt.c: * Sccsid @(#)copymt.c	1.4 (gritter) 6/18/05
+copymt.c: * Sccsid @(#)copymt.c	1.5 (gritter) 6/22/05
 copystream.c: * Sccsid @(#)copystream.c	1.3 (gritter) 6/18/05
 createmf.c: * Sccsid @(#)createmf.c	1.4 (gritter) 6/18/05
 del_recipl.c: * Sccsid @(#)del_recipl.c	1.3 (gritter) 6/18/05
 delempty.c: * Sccsid @(#)delempty.c	1.3 (gritter) 6/18/05
 delete.c: * Sccsid @(#)delete.c	1.4 (gritter) 6/18/05
-done.c: * Sccsid @(#)done.c	1.4 (gritter) 6/19/05
+done.c: * Sccsid @(#)done.c	1.5 (gritter) 6/22/05
 doopen.c: * Sccsid @(#)doopen.c	1.4 (gritter) 6/18/05
 dumpaff.c: * Sccsid @(#)dumpaff.c	1.3 (gritter) 6/18/05
 dumprcv.c: * Sccsid @(#)dumprcv.c	1.3 (gritter) 6/18/05
@@ -71,8 +71,8 @@ gendeliv.c: * Sccsid @(#)gendeliv.c	1.4 (gritter) 6/18/05
 getarg.c: * Sccsid @(#)getarg.c	1.3 (gritter) 6/18/05
 getcomment.c: * Sccsid @(#)getcomment.c	1.3 (gritter) 6/18/05
 getdomain.c: * Sccsid @(#)getdomain.c	1.3 (gritter) 6/18/05
-gethead.c: * Sccsid @(#)gethead.c	1.6 (gritter) 6/18/05
-goback.c: * Sccsid @(#)goback.c	1.4 (gritter) 6/18/05
+gethead.c: * Sccsid @(#)gethead.c	1.7 (gritter) 6/22/05
+goback.c: * Sccsid @(#)goback.c	1.5 (gritter) 6/22/05
 init.c: * Sccsid @(#)init.c	1.5 (gritter) 6/18/05
 isheader.c: * Sccsid @(#)isheader.c	1.4 (gritter) 6/18/05
 isit.c: * Sccsid @(#)isit.c	1.4 (gritter) 6/18/05
@@ -82,10 +82,10 @@ legal.c: * Sccsid @(#)legal.c	1.3 (gritter) 6/18/05
 libmail.h: * Sccsid @(#)libmail.h	1.4 (gritter) 6/18/05
 lock.c: * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
 mail.h: * Sccsid @(#)mail.h	1.8 (gritter) 6/18/05
-maillock.c: * Sccsid @(#)maillock.c	1.3 (gritter) 6/18/05
+maillock.c: * Sccsid @(#)maillock.c	1.4 (gritter) 6/22/05
 maillock.h: * Sccsid @(#)maillock.h	1.3 (gritter) 6/18/05
 main.c: * Sccsid @(#)main.c	1.9 (gritter) 6/21/05
-mkdead.c: * Sccsid @(#)mkdead.c	1.5 (gritter) 6/18/05
+mkdead.c: * Sccsid @(#)mkdead.c	1.6 (gritter) 6/22/05
 mta_ercode.c: * Sccsid @(#)mta_ercode.c	1.3 (gritter) 6/18/05
 new_recipl.c: * Sccsid @(#)new_recipl.c	1.3 (gritter) 6/18/05
 parse.c: * Sccsid @(#)parse.c	1.4 (gritter) 6/18/05
@@ -96,13 +96,13 @@ pipletr.c: * Sccsid @(#)pipletr.c	1.6 (gritter) 6/18/05
 popenvp.c: * Sccsid @(#)popenvp.c	1.5 (gritter) 6/19/05
 poplist.c: * Sccsid @(#)poplist.c	1.3 (gritter) 6/18/05
 printhdr.c: * Sccsid @(#)printhdr.c	1.3 (gritter) 6/18/05
-printmail.c: * Sccsid @(#)printmail.c	1.6 (gritter) 6/21/05
+printmail.c: * Sccsid @(#)printmail.c	1.8 (gritter) 6/22/05
 pushlist.c: * Sccsid @(#)pushlist.c	1.4 (gritter) 6/18/05
 s_string.h: * Sccsid @(#)s_string.h	1.3 (gritter) 6/18/05
 savehdrs.c: * Sccsid @(#)savehdrs.c	1.3 (gritter) 6/18/05
 sel_disp.c: * Sccsid @(#)sel_disp.c	1.3 (gritter) 6/18/05
 sendlist.c: * Sccsid @(#)sendlist.c	1.8 (gritter) 6/18/05
-sendmail.c: * Sccsid @(#)sendmail.c	1.4 (gritter) 6/18/05
+sendmail.c: * Sccsid @(#)sendmail.c	1.5 (gritter) 6/22/05
 setsig.c: * Sccsid @(#)setsig.c	1.5 (gritter) 6/18/05
 skipspace.c: * Sccsid @(#)skipspace.c	1.3 (gritter) 6/18/05
 stamp.c: * Sccsid @(#)stamp.c	1.3 (gritter) 6/18/05

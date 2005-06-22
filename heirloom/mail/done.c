@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)done.c	1.4 (gritter) 6/19/05
+ * Sccsid @(#)done.c	1.5 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -95,8 +95,10 @@ done(int needtmp)
 	}
 	if (maxerr && sending)
 		mkdead();
-	if (tmpf)
+	if (tmpf) {
 		fclose(tmpf);
+		tmpf = NULL;
+	}
 	if (!needtmp && lettmp) {
 		Dout(pn, 0, "temp file removed\n");
 		unlink(lettmp);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gethead.c	1.6 (gritter) 6/18/05
+ * Sccsid @(#)gethead.c	1.7 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -210,6 +210,7 @@ void
 tmperr(void)
 {
 	fclose(tmpf);
+	tmpf = NULL;
 	errmsg(E_TMP, "");
 }
 

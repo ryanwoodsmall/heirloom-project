@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)goback.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)goback.c	1.5 (gritter) 6/22/05
  */
 
 /*
@@ -71,6 +71,7 @@ goback(int letnum)
 		cpy(&work, &worksize, "");
 		cpy(&wuser, &wusersize, "");
 		fclose(tmpf);
+		tmpf = NULL;
 		if (!replying) {
 			dflag = 1;
 			Dout(pn, 0, "dflag = 1\n");
