@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)sh.1	1.9 (gritter) 6/20/05
+.\" Sccsid @(#)sh.1	1.10 (gritter) 6/23/05
 .\" Derived from sh(1) and test(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH SH 1 "6/20/05" "Heirloom Bourne Shell" "User Commands"
+.TH SH 1 "6/23/05" "Heirloom Bourne Shell" "User Commands"
 .SH NAME
 sh, jsh \- the standard command interpreter
 .SH SYNOPSIS
@@ -459,6 +459,19 @@ normally
 .BR tab ,
 and
 .BR newline .
+.TP
+.SM
+.BR LANG ", " LC_ALL
+See
+.IR locale (7).
+.TP
+.SM
+.B LC_CTYPE
+Affects the mapping of bytes to characters
+for file name generation,
+for the interpretation of `\e',
+and for handling
+.SM $IFS.
 .TP
 .SM
 .B SHACCT

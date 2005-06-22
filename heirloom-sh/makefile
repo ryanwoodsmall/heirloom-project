@@ -92,6 +92,9 @@ install: all
 	rm -f $(ROOT)$(MANDIR)/man1/jsh.1
 	cd $(ROOT)$(MANDIR)/man1 && $(LNS) sh.1 jsh.1
 
+maninstall:
+	$(UCBINST) -c -m 644 sh.1 $(ROOT)$(MANDIR)/man1/sh.1
+
 diet:
 	$(MAKE) CC='diet gcc -Ifakewchar' CFLAGS='-Os -fomit-frame-pointer' \
 		STRIP='strip -s -R .comment -R .note' WERROR=
