@@ -175,8 +175,8 @@ to 'libuxre' (see COPYING.LGPL). Changes to these tools are subject to these
 licenses also.
 
 ********************************************************************************
-The 'mail' and 'spell' utilities are based on Sun's OpenSolaris code. The
-file OPENSOLARIS.LICENSE contains the licensing conditions for it.
+The 'bfs', 'mail' and 'spell' utilities are based on Sun's OpenSolaris code.
+The file OPENSOLARIS.LICENSE contains the licensing conditions for it.
 
 ********************************************************************************
 The 'deroff' utility is derived from Plan 9 <http://cm.bell-labs.com/plan9dist/>
@@ -343,4 +343,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								6/21/05
+Gunnar Ritter								6/22/05

@@ -1,0 +1,212 @@
+'\" t
+.\" CDDL HEADER START
+.\"
+.\" The contents of this file are subject to the terms of the
+.\" Common Development and Distribution License, Version 1.0 only
+.\" (the "License").  You may not use this file except in compliance
+.\" with the License.
+.\"
+.\" You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+.\" or http://www.opensolaris.org/os/licensing.
+.\" See the License for the specific language governing permissions
+.\" and limitations under the License.
+.\"
+.\" When distributing Covered Code, include this CDDL HEADER in each
+.\" file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+.\" If applicable, add the following below this CDDL HEADER, with the
+.\" fields enclosed by brackets "[]" replaced with your own identifying
+.\" information: Portions Copyright [yyyy] [name of copyright owner]
+.\"
+.\" CDDL HEADER END
+.\"
+.\" Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany.
+.\"
+.\" Sccsid @(#)bfs.1	1.2 (gritter) 6/22/05
+.TH BFS 1 "6/22/05" "Heirloom Toolchest" "User Commands"
+.SH NAME
+bfs \- big file scanner
+.SH SYNOPSIS
+\fBbfs\fR [\fB\-\fR] \fIname\fR
+.SH DESCRIPTION
+.I bfs
+is a read-only variant of
+.IR ed (1).
+Since it has no editing buffer,
+it consumes no space for a temporary file
+and needs less time while reading the file initially.
+Also
+.I bfs
+can process slightly larger files on machines with 32-bit addressing.
+.PP
+With the
+.B \-
+argument, no character counts are printed.
+.I name
+specifies the file to be scanned.
+.PP
+.I bfs
+supports simple regular expressions
+and addressing as
+.IR ed .
+The terminating `/' and `?' characters
+around regular expressions must not be omitted.
+Additional addressing modes are
+.TP 10n
+\fB>\fIregex\fB>\fR
+which stops at the next line matching
+.I regex
+without wrap-around, and
+.TP
+\fB<\fIregex\fB<\fR
+which stops at the first previous line matching
+.I regex
+without wrap-around.
+.PP
+The following commands are available
+(default addresses are shown as in
+.IR ed (1)):
+.TP
+\fBe\fI name\fR
+Changes the currently scanned file to
+.IR name .
+.TP
+.B f
+Prints the name of the currently scanned file.
+.TP
+\fR(\fI1\fB,\fI$\fR)\fBg/\fIregular expression\fB/\fIcommand list\fR
+Executes
+.I command list
+for each line in the range that matches the
+.I regular expression
+given.
+.TP
+\fR(\fI.\fR)\fBk\fIx\fR
+Marks the given line with the lower-case letter
+.I x
+for further addressing with `\(fm\fIx\fR'.
+.TP
+\fR(\fI.\fB,\fI.\fR)\fBp\fR
+Prints the given range of lines to standard output.
+.TP
+.B P
+Toggles the prompt `*' and more verbose error messages on and off.
+.TP
+.B q
+Quits the
+.I bfs
+command.
+.TP
+\fR(\fI1\fB,\fI$\fR)\fBv/\fIregular expression\fB/\fIcommand list\fR
+Executes
+.I command list
+for each line in the range that does not match the
+.I regular expression
+given.
+.TP
+\fR(\fI1\fB,\fI$\fR)\fBw\fI name\fR
+Writes the current file
+to another file
+.IR name .
+.TP
+\fR(\fI.\fB,\fI.\fR)\fBxb/\fIregular expression\fB/\fIlabel\fR
+A match for
+.I regular expression
+is searched within the range of lines;
+if it is found, execution continues at
+.IR label .
+This command is not available when input is read from a terminal;
+if input comes from a pipe,
+only
+.I labels
+that are set after the location of this command can be used.
+.TP
+\fBxb\fR[\fBz\fR|\fBn\fR] \fIlabel\fR
+If the command suffix is
+.B z
+and the last executed shell command returned zero,
+or if the suffix is
+.B n
+and the shell command returned non-zero,
+execution continues at
+.IR label .
+.TP
+\fBxc\fR [\fB0\fR|\fB1\fR]
+Toggles or sets line crunching.
+If enabled,
+the output of the
+.I p
+and <newline> commands is modified such that
+tabs or successive spaces are replaced by single spaces,
+and empty lines are discarded.
+.TP
+\fBxf\fI name\fR
+Reads command input from the file
+.IR name .
+.I xf
+commands may be nested.
+On end-of-file or error,
+execution continues at the next upper nesting level.
+.TP
+.B xn
+Lists the marks previously set by the
+.I k
+command.
+.TP
+\fBxo\fR [\fIname\fR]
+Redirects the output of the
+.I p
+and <newline> commands to the file
+.IR name .
+If no
+.I name
+is given, output is written to the standard output as usual.
+.TP
+\fBxt\fR \fInumber\fR
+Causes each line printed with the
+.I p
+and <newline> commands to be truncated after
+.I number
+characters have been written.
+By default, lines are not truncated.
+.TP
+\fBxv\fR[\fIdigit\fR][\fB!\fR]\fIstring\fR
+Sets the value of the 0th to 9th variable to
+.IR string ;
+if the initial
+.B !
+is present,
+.I string
+is interpreted as a shell command once,
+and the first line of its output is assigned.
+Variables can be referenced anywhere in command input as
+\fB%0\fR to \fB%9\fR.
+.TP
+\fR(\fI$\fR)\fB=\fR
+Prints the line number of the given line.
+.TP
+\fB!\fR\fIshell command\fR
+Executes the given
+.IR "shell command" .
+.TP
+.BI : label
+Sets a
+.I label
+for command input.
+.PP
+The size limit for the files which
+.I bfs
+can display depends on the number of lines that fit in core;
+each line takes 2 words.
+.SH "ENVIRONMENT VARIABLES"
+.TP
+.BR LANG ", " LC_ALL
+See
+.IR locale (7).
+.TP
+.B LC_CTYPE
+Determines the mapping of bytes to characters
+in regular expressions and with the
+.I xt
+command.
+.SH "SEE ALSO"
+ed(1)
