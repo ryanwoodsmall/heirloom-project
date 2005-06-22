@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hashcheck.c	2.2 (gritter) 6/21/05
+ * Sccsid @(#)hashcheck.c	2.3 (gritter) 6/22/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -38,7 +38,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)hashcheck.c	2.2 (gritter) 6/21/05";
+static const char sccsid[] USED = "@(#)hashcheck.c	2.3 (gritter) 6/22/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -53,10 +53,10 @@ int32_t hindex[NI];
 uint32_t *table;
 uint32_t wp;
 int bp;
-#define	U (BYTE*sizeof (unsigned))
-#define	L (BYTE*sizeof (long))
+#define	U (BYTE*sizeof (uint32_t))
+#define	L (BYTE*sizeof (int32_t))
 
-static long
+static int32_t
 fetch(void)
 {
 	int32_t w1;
@@ -96,7 +96,7 @@ main(void)
 	table = malloc(hindex[NI-1]*sizeof (*table));
 	(void) fread((char *)table, sizeof (*table), hindex[NI-1], stdin);
 	for (i = 0; i < hindex[NI-1]; i++)
-		table[i] = ple32((char *)&hindex[i]);
+		table[i] = ple32((char *)&table[i]);
 	for (i = 0; i < NI-1; i++) {
 		bp = U;
 		v = (int32_t)i<<(HASHWIDTH-INDEXWIDTH);

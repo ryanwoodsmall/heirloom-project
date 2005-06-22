@@ -121,7 +121,7 @@ clean:
 	rm -f hash.o hashcheck.o hashlook.o hashmake.o huff.o \
 		spellin.o spellprog.o hashcheck hashmake host_hashmake \
 		host_spellin spell spellin spellprog compress \
-		hlista hlistb htemp1 hstop
+		hlista hlistb htemp1 hstop core log *~
 
 hash.o: hash.c hash.h
 hashcheck.o: hashcheck.c hash.h huff.h

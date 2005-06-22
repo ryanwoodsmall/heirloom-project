@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)spellprog.c	2.1 (gritter) 6/21/05
+ * Sccsid @(#)spellprog.c	2.2 (gritter) 6/22/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)spellprog.c	2.1 (gritter) 6/21/05";
+static const char sccsid[] USED = "@(#)spellprog.c	2.2 (gritter) 6/22/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -83,7 +83,7 @@ static int	dict(char *, char *);
 static int	monosyl(char *, char *);
 static int	VCe(char *, char *, char *, int);
 static char	*skipv(char *);
-static void	ztos(char *);
+static char	*ztos(const char *);
 
 static struct suftab {
 	char *suf;
@@ -720,18 +720,20 @@ ise(void)
 	register struct suftab *p;
 
 	for (p = suftab; p->suf; p++) {
-		ztos(p->suf);
-		ztos(p->d1);
-		ztos(p->a1);
+		p->suf = ztos(p->suf);
+		p->d1 = ztos(p->d1);
+		p->a1 = ztos(p->a1);
 	}
 }
 
-static void
-ztos(char *s)
+static char *
+ztos(const char *_s)
 {
-	for (; *s; s++)
+	char	*t = strdup(_s), *s;
+	for (s = t; *s; s++)
 		if (*s == 'z')
 			*s = 's';
+	return t;
 }
 
 static int
