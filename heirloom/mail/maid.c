@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maid.c	1.21 (gritter) 6/22/05
+ * Sccsid @(#)maid.c	1.22 (gritter) 6/22/05
  */
 /*
 ma_id() {
@@ -42,7 +42,7 @@ static char mawhat[]="@(#) ma.sl	2.116"; }
 #else
 #define	USED
 #endif
-static const char id[] = "@(#)ma.sl 1.21 (gritter) 6/22/05";
+static const char id[] = "@(#)ma.sl 1.22 (gritter) 6/22/05";
 /* SLIST */
 /*
 Dout.c: * Sccsid @(#)Dout.c	1.4 (gritter) 6/18/05
@@ -96,7 +96,7 @@ pipletr.c: * Sccsid @(#)pipletr.c	1.6 (gritter) 6/18/05
 popenvp.c: * Sccsid @(#)popenvp.c	1.5 (gritter) 6/19/05
 poplist.c: * Sccsid @(#)poplist.c	1.3 (gritter) 6/18/05
 printhdr.c: * Sccsid @(#)printhdr.c	1.3 (gritter) 6/18/05
-printmail.c: * Sccsid @(#)printmail.c	1.8 (gritter) 6/22/05
+printmail.c: * Sccsid @(#)printmail.c	1.9 (gritter) 6/22/05
 pushlist.c: * Sccsid @(#)pushlist.c	1.4 (gritter) 6/18/05
 s_string.h: * Sccsid @(#)s_string.h	1.3 (gritter) 6/18/05
 savehdrs.c: * Sccsid @(#)savehdrs.c	1.3 (gritter) 6/18/05

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)printmail.c	1.8 (gritter) 6/22/05
+ * Sccsid @(#)printmail.c	1.9 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -55,8 +55,8 @@ printmail(void)
 	struct	stat stbuf;
 	struct	stat *stbufp;
 	int ttyf = isatty(1) ? TTY : ORDINARY;
-	char	*readbuf;	/* holds user's response in interactive mode */
-	size_t	readbufsize;
+	char	*readbuf = NULL;/* holds user's response in interactive mode */
+	size_t	readbufsize = 0;
 	char	*resp;
 	gid_t	savedegid;
 
