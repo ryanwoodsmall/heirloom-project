@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)spell.1	2.1 (gritter) 6/21/05
+.\" Sccsid @(#)spell.1	2.2 (gritter) 6/22/05
 .\" Derived from spell(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH SPELL 1 "6/21/05" "Heirloom Toolchest" "User Commands"
+.TH SPELL 1 "6/22/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 spell \- find spelling errors
 .SH SYNOPSIS
@@ -118,25 +118,26 @@ are accumulated in the history file.
 The stop list filters out misspellings (e.g. thier=thy\-y+ier)
 that would otherwise pass.
 .PP
-Two routines help maintain the hash lists used by
+Four routines help maintain the hash lists used by
 .I spell.
-Both expect a list of words, one per line,
-from the standard input.
+.I Hashmake
+expects a list of words, one per line,
+from the standard input,
+and writes the hash value for each word
+to standard output.
 .I Spellin
-adds the words on the standard input to the
+adds the hash values on the standard input to the
 preexisting
 .I list
-and places a new list on the standard output.
+and places a new binary list on the standard output.
 If no 
 .I list
 is specified, the new list is created from scratch.
-.I Spellout
-looks up each word in the standard input and prints
-on the standard output
-those that are missing from (or present on, with
-option
-.BR \-d )
-the hash list.
+.I Hashcheck
+reads a binary list from standard input
+and prints the hash values contained in it.
+.I Compress
+removes duplicate entries from the history file.
 .SH FILES
 .TP
 \fBD_SPELL\fR=\fB/usr/5lib/spell/hlist\fR[\fBab\fR]
