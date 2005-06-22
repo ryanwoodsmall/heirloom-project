@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getdomain.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)getdomain.c	1.4 (gritter) 6/22/05
  */
 /*LINTLIBRARY*/
 
@@ -93,7 +93,7 @@ look4domain(char *file, char *buf, int size)
 		}
 	}
 
-	(void) fclose(fp);
+	fclose(fp);
 	return (ret);
 }
 
@@ -104,7 +104,7 @@ readdomain(char *buf, int size)
 	char *ret;
 
 	if ((ret = xgetenv("DOMAIN")) != 0) {
-		(void) strncpy(buf, ret, size);
+		strncpy(buf, ret, size);
 		return (buf);
 	}
 

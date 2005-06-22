@@ -27,7 +27,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)islocal.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)islocal.c	1.4 (gritter) 6/22/05
  */
 
 #include <sys/param.h>
@@ -44,7 +44,7 @@ islocal(char *user, uid_t *puid)
 	struct passwd *pwd_ptr;
 
 	/* Check for existing mailfile first */
-	(void) snprintf(fname, sizeof (fname), "%s%s", maildir, user);
+	snprintf(fname, sizeof (fname), "%s%s", maildir, user);
 	if (stat(fname, &statb) == 0) {
 		*puid = statb.st_uid;
 		return (TRUE);

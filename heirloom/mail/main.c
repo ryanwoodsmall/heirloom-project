@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.9 (gritter) 6/21/05
+ * Sccsid @(#)main.c	1.10 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -75,7 +75,7 @@ main(int argc, char **argv)
 	nsig.sa_handler = SIG_DFL;
 	sigemptyset(&nsig.sa_mask);
 	nsig.sa_flags = SA_RESTART;
-	(void) sigaction(SIGCONT, &nsig, (struct sigaction *)0);
+	sigaction(SIGCONT, &nsig, (struct sigaction *)0);
 	}
 #endif
 
@@ -153,7 +153,7 @@ main(int argc, char **argv)
 		if ((dbgfp = fdopen(tmpfd, "w")) == (FILE *)NULL) {
 			fprintf(stderr, "%s: can't open debugging file '%s'\n",
 				program, dbgfname);
-			(void) close(tmpfd);
+			close(tmpfd);
 			exit(13);
 		}
 		setbuf(dbgfp, NULL);

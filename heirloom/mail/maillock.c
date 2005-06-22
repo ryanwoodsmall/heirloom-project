@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maillock.c	1.4 (gritter) 6/22/05
+ * Sccsid @(#)maillock.c	1.5 (gritter) 6/22/05
  */
 /*LINTLIBRARY*/
 
@@ -86,8 +86,8 @@ maillock(char *user, int retrycnt)
 	}
 	snprintf(curlock, sizeof curlock, "%s%s", file, lockext);
 	snprintf(locktmp, sizeof locktmp, "%sXXXXXX", file);
-	(void) close(mkstemp(locktmp));
-	(void) remove(locktmp);
+	close(mkstemp(locktmp));
+	remove(locktmp);
 	statfailed = 0;
 	for (;;) {
 		t = lock1(locktmp, curlock);
@@ -99,7 +99,7 @@ maillock(char *user, int retrycnt)
 		if (stat(curlock, &sbuf) < 0) {
 			if (statfailed++ > 5)
 				return (-1);
-			(void) sleep(5);
+			sleep(5);
 			continue;
 		}
 		statfailed = 0;
@@ -113,10 +113,10 @@ maillock(char *user, int retrycnt)
 		 * old, keep trying.
 		 */
 		if (t < sbuf.st_ctime + 300) {
-			(void) sleep(5);
+			sleep(5);
 			continue;
 		}
-		(void) remove(curlock);
+		remove(curlock);
 	}
 }
 
@@ -127,7 +127,7 @@ maillock(char *user, int retrycnt)
 void
 mailunlock(void)
 {
-	(void) remove(curlock);
+	remove(curlock);
 	locked = 0;
 }
 
@@ -146,7 +146,7 @@ lock1(char tempfile[], char name[])
 	fd = open(tempfile, O_RDWR|O_CREAT|O_EXCL, 0600);
 	if (fd < 0)
 		return (time(0));
-	(void) fstat(fd, &sbuf);
+	fstat(fd, &sbuf);
 	/*
 	 * Write the string "0" into the lock file to give us some
 	 * interoperability with SVR4 mailers.  SVR4 mailers expect
@@ -155,13 +155,13 @@ lock1(char tempfile[], char name[])
 	 * 0 into it so that SVR4 mailers will always think our lock file
 	 * is valid.
 	 */
-	(void) write(fd, "0", 2);
-	(void) close(fd);
+	write(fd, "0", 2);
+	close(fd);
 	if (link(tempfile, name) < 0) {
-		(void) remove(tempfile);
+		remove(tempfile);
 		return (sbuf.st_ctime);
 	}
-	(void) remove(tempfile);
+	remove(tempfile);
 	return ((time_t)0);
 }
 
@@ -193,5 +193,5 @@ touchlock(void)
 	 */
 	tp.actime = sbuf.st_atime;
 	tp.modtime = sbuf.st_mtime;
-	(void) utime(curlock, &tp);
+	utime(curlock, &tp);
 }

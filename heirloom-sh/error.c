@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)error.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)error.c	1.6 (gritter) 6/22/05
  */
 
 /* from OpenSolaris "error.c	1.9	05/06/08 SMI"	 SVr4.0 1.9.5.1 */
@@ -77,7 +77,7 @@ exitsh(int xno)
 	{
 		clearup();
 		restore(0);
-		(void)setb(1);
+		setb(1);
 		execbrk = breakcnt = funcnt = 0;
 		longjmp(errshell, 1);
 	}

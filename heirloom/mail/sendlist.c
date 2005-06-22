@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sendlist.c	1.8 (gritter) 6/18/05
+ * Sccsid @(#)sendlist.c	1.9 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -188,7 +188,7 @@ send_mbox(char *mbox, int letnum)
 	} else {
 				/* mail box is ok, now do append */
 		if ((malf = fdopen(mbfd, "a")) != NULL) {
-			(void) snprintf(biffmsg, sizeof (biffmsg),
+			snprintf(biffmsg, sizeof (biffmsg),
 			    "%s@%ld\n", mbox, ftell(malf));
 			rc = copylet(letnum, malf, ORDINARY);
 			fclose(malf);
@@ -202,9 +202,9 @@ send_mbox(char *mbox, int letnum)
 
 done:
 	/* restore signal */
-	(void) sigset(SIGINT, istat);
-	(void) sigset(SIGQUIT, qstat);
-	(void) sigset(SIGHUP, hstat);
+	sigset(SIGINT, istat);
+	sigset(SIGQUIT, qstat);
+	sigset(SIGHUP, hstat);
 	unlock();
 	seteuid(saved_uid);
 	Return (rc);

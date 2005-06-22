@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)printmail.c	1.9 (gritter) 6/22/05
+ * Sccsid @(#)printmail.c	1.10 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -118,15 +118,15 @@ printmail(void)
 
 	/* Open the file as the real gid */
 	savedegid = getegid();
-	(void) setegid(getgid());
+	setegid(getgid());
 	malf = fopen(mailfile, "r");
-	(void) setegid(savedegid);
+	setegid(savedegid);
 	/*
 	 *	stat succeeded, but we cannot access the mailfile
 	 */
 	if (stret == CSUCCESS && malf == NULL) {
 		char buf[MAXFILENAME+50];
-		(void) snprintf(buf, sizeof (buf),
+		snprintf(buf, sizeof (buf),
 		    "Invalid permissions on %s", mailfile);
 		errmsg(E_PERM, buf);
 		return;

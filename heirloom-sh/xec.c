@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xec.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)xec.c	1.5 (gritter) 6/22/05
  */
 /* from OpenSolaris "xec.c	1.23	05/06/08 SMI" */
 /*
@@ -184,7 +184,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 						execute((struct trenod *)(n->namenv), xflags, errorflg, pf1, pf2);
 						execbrk = 0;
 						restore(index);
-						(void) restorargs(olddolh, funcnt);
+						restorargs(olddolh, funcnt);
 						dolv = olddolv;
 						dolc = olddolc;
 						funcnt--;
@@ -223,7 +223,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 						savefd = setb(-1);
 						savebot = stakbot;
 						prcmd(t);
-						(void)setb(savefd);
+						setb(savefd);
 						allocjob(savebot, cwdget(), monitor);
 					} else
 						allocjob("", "", 0);

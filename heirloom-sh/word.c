@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)word.c	1.6 (gritter) 6/16/05
+ * Sccsid @(#)word.c	1.7 (gritter) 6/22/05
  */
 /* from OpenSolaris "word.c	1.21	05/06/08 SMI"	 SVr4.0 1.11.2.2 */
 /*
@@ -412,7 +412,7 @@ readb(struct fileblk *f, int toread, int rest)
 		 * copies the remaining 'rest' bytes from f->fnxt
 		 * to f->fbuf
 		 */
-		(void) memcpy(f->fbuf, f->fnxt, rest);
+		memcpy(f->fbuf, f->fnxt, rest);
 		f->fnxt = f->fbuf;
 		f->fend = f->fnxt + rest;
 		f->nxtoff = 0;

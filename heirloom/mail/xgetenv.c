@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xgetenv.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)xgetenv.c	1.4 (gritter) 6/22/05
  */
 /*LINTLIBRARY*/
 
@@ -110,7 +110,7 @@ xsetenv(char *xfile)
 	/* Read in the entire file. */
 	nread = read(infd, xbuf, sizeof (xbuf));
 	if (nread < 0) {
-		(void) close(infd);
+		close(infd);
 		return (0);
 	}
 
@@ -134,7 +134,7 @@ xsetenv(char *xfile)
 	}
 
 	xenv[envctr] = 0;
-	(void) close(infd);
+	close(infd);
 	return (1);
 }
 

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.8 (gritter) 6/19/05
+ * Sccsid @(#)service.c	1.9 (gritter) 6/22/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -158,7 +158,7 @@ getpath(unsigned char *s)
 		if (pathlen > 2 && path[pathlen - 1] == ':' &&
 				path[pathlen - 2] != ':') {
 			newpath = locstak();
-			(void) memcpystak(newpath, path, pathlen);
+			memcpystak(newpath, path, pathlen);
 			newpath[pathlen] = ':';
 			endstak(newpath + pathlen + 1);
 			return (newpath);

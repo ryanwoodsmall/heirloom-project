@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)lock.c	1.4 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -47,7 +47,7 @@ lock(char *user)
 	case L_SUCCESS:
 	    return;
 	case L_NAMELEN:
-	    (void) snprintf(tbuf, sizeof (tbuf),
+	    snprintf(tbuf, sizeof (tbuf),
 		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
 		program, user);
 	    break;

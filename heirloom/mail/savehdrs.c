@@ -27,7 +27,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)savehdrs.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)savehdrs.c	1.4 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -69,7 +69,7 @@ savehdrs(char *s, int hdrtype)
 		if (hdrlines[H_FROM1].head == (struct hdrs *)NULL) {
 			if ((rf = substr(s, " remote from ")) >= 0) {
 				trimnl(s + rf);
-				(void) snprintf(tbuf, sizeof (tbuf),
+				snprintf(tbuf, sizeof (tbuf),
 				    "from %s by %s%s; %s",
 				    s+rf+13, thissys, maildomain(),
 				    RFC822datestring);

@@ -26,7 +26,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getopt.c	1.6 (gritter) 6/19/05
+ * Sccsid @(#)getopt.c	1.7 (gritter) 6/22/05
  */
 /* from OpenSolaris "getopt.c	1.23	05/06/08 SMI" */
 
@@ -59,8 +59,8 @@
  */
 #define	ERR(s, c)	if (opterr && optstring[0] != ':') { \
 	char errbuf[256]; \
-	(void) snprintf(errbuf, sizeof (errbuf), s, argv[0], c); \
-	(void) write(2, errbuf, strlen(errbuf)); }
+	snprintf(errbuf, sizeof (errbuf), s, argv[0], c); \
+	write(2, errbuf, strlen(errbuf)); }
 
 /*
  * getopt_sp is required to keep state between successive calls to getopt()

@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)createmf.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)createmf.c	1.5 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -57,9 +57,9 @@ createmf(uid_t uid, char *file)
 		else
 			close(fd);
 		umask(7);
-		(void) sigset(SIGINT, istat);
-		(void) sigset(SIGQUIT, qstat);
-		(void) sigset(SIGHUP, hstat);
+		sigset(SIGINT, istat);
+		sigset(SIGQUIT, qstat);
+		sigset(SIGHUP, hstat);
 	}
 }
 #else
@@ -112,7 +112,7 @@ tryagain:
 		    sb.st_ino != fsb.st_ino)) {
 			/*  file changed after open */
 			fprintf(stderr, "%s: security violation, '%s' inode changed after open\n", program, path);
-			(void)close(mbfd);
+			close(mbfd);
 			return -1;
 		}
 	}

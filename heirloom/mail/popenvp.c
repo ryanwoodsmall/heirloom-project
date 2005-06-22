@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)popenvp.c	1.5 (gritter) 6/19/05
+ * Sccsid @(#)popenvp.c	1.6 (gritter) 6/22/05
  */
 /*LINTLIBRARY*/
 
@@ -85,24 +85,24 @@ popenvp(char *file, char **argv, char *mode, int resetid)
 		int	stdio;
 
 		if (resetid) {
-			(void) setgid(getgid());
-			(void) setuid(getuid());
+			setgid(getgid());
+			setuid(getuid());
 		}
 		stdio = tst(0, 1);
-		(void) close(myside);
-		(void) close(stdio);
-		(void) fcntl(yourside, F_DUPFD, stdio);
-		(void) close(yourside);
-		(void) execvp(file, argv);
-		(void) fprintf(stderr, "exec of \"%s\" failed: %s\n",
+		close(myside);
+		close(stdio);
+		fcntl(yourside, F_DUPFD, stdio);
+		close(yourside);
+		execvp(file, argv);
+		fprintf(stderr, "exec of \"%s\" failed: %s\n",
 		    file, strerror(errno));
-		(void) fflush(stderr);
+		fflush(stderr);
 		_exit(1);
 	}
 	if (pid == (pid_t)-1)
 		return (NULL);
 	popen_pid[myside] = pid;
-	(void) close(yourside);
+	close(yourside);
 	return (fdopen(myside, mode));
 }
 
@@ -115,7 +115,7 @@ pclosevp(FILE *ptr)
 	void (*hstat)(int), (*istat)(int), (*qstat)(int);
 
 	f = fileno(ptr);
-	(void) fclose(ptr);
+	fclose(ptr);
 	istat = sigset(SIGINT, SIG_IGN);
 	qstat = sigset(SIGQUIT, SIG_IGN);
 	hstat = sigset(SIGHUP, SIG_IGN);
@@ -125,8 +125,8 @@ pclosevp(FILE *ptr)
 
 	if (r == (pid_t)-1)
 		status = -1;
-	(void) sigset(SIGINT, istat);
-	(void) sigset(SIGQUIT, qstat);
-	(void) sigset(SIGHUP, hstat);
+	sigset(SIGINT, istat);
+	sigset(SIGQUIT, qstat);
+	sigset(SIGHUP, hstat);
 	return (status);
 }

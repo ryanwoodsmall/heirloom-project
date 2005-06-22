@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sendmail.c	1.5 (gritter) 6/22/05
+ * Sccsid @(#)sendmail.c	1.6 (gritter) 6/22/05
  */
 
 #include "mail.h"
@@ -107,10 +107,10 @@ sendmail(int argc, char **argv)
 		Write out the from line header for the letter
 	*/
 	if (fromflag && deliverflag && from_user[0] != '\0') {
-		(void) snprintf(buf, bufsize, "%s%s %s\n", 
+		snprintf(buf, bufsize, "%s%s %s\n", 
 			header[H_FROM].tag, from_user, datestring);
 	} else {
-		(void) snprintf(buf, bufsize, "%s%s %s\n", 
+		snprintf(buf, bufsize, "%s%s %s\n", 
 			header[H_FROM].tag, my_name, datestring);
 	}
 	if (!wtmpf(buf, strlen(buf))) {
@@ -125,7 +125,7 @@ sendmail(int argc, char **argv)
 		aret = argc;
 		args = argv;
 		while (--aret > 0) {
-			(void) snprintf(buf, bufsize, "%s %s\n", header[H_TO].tag, *++args);
+			snprintf(buf, bufsize, "%s %s\n", header[H_TO].tag, *++args);
 			if (!wtmpf(buf, strlen(buf))) {
 				done(0);
 			}
@@ -202,7 +202,7 @@ sendmail(int argc, char **argv)
 			break;
 		case H_TCOPY:
 			/* Write out placeholder for later */
-			(void) snprintf(buf, bufsize, "%s \n", header[H_TCOPY].tag);
+			snprintf(buf, bufsize, "%s \n", header[H_TCOPY].tag);
 			if (!wtmpf(buf, strlen(buf))) {
 				done(0);
 			}
@@ -256,21 +256,21 @@ sendmail(int argc, char **argv)
 			 */
 			if ((hptr = hdrlines[H_MIMEVERS].head) !=
 						    (struct hdrs *)NULL) {
-				(void) snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
+				snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
 			}
 			if ((hptr = hdrlines[H_CTYPE].head) !=
 						    (struct hdrs *)NULL) {
-				(void) snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
+				snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
 			}
 			if ((hptr = hdrlines[H_CLEN].head) !=
 						    (struct hdrs *)NULL) {
-				(void) snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
+				snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
@@ -289,21 +289,21 @@ sendmail(int argc, char **argv)
 			 */
 			if ((hptr = hdrlines[H_MIMEVERS].head) !=
 						    (struct hdrs *)NULL) {
-				(void) snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
+				snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
 			}
 			if ((hptr = hdrlines[H_CTYPE].head) !=
 						    (struct hdrs *)NULL) {
-				(void) snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
+				snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
 			}
 			if ((hptr = hdrlines[H_CLEN].head) !=
 						    (struct hdrs *)NULL) {
-				(void) snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
+				snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
@@ -322,21 +322,21 @@ sendmail(int argc, char **argv)
 	 * placeholders in the tmp file. When the 'real' message is sent,
 	 * the proper values will be put out by copylet().
 	 */
-	(void) snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
+	snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
 	if (!wtmpf(line, strlen(line))) {
 		done(0);
 	}
 	if (hdrlines[H_MIMEVERS].head == (struct hdrs *)NULL) {
 		savehdrs(line, H_MIMEVERS);
 	}
-	(void) snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
+	snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
 	if (!wtmpf(line, strlen(line))) {
 		done(0);
 	}
 	if (hdrlines[H_CTYPE].head == (struct hdrs *)NULL) {
 		savehdrs(line,H_CTYPE);
 	}
-	(void) snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
+	snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
 	if (!wtmpf(line, strlen(line))) {
 		done(0);
 	}
@@ -407,8 +407,7 @@ wrapsend:
 	 * Set 'place-holder' value of content length to true value
 	 */
 	if ((hptr = hdrlines[H_CLEN].head) != (struct hdrs *)NULL) {
-		(void) snprintf(hptr->value, sizeof (hptr->value),
-		    "%ld", count);
+		snprintf(hptr->value, sizeof (hptr->value), "%ld", count);
 	}
 
 	if (fclose(tmpf) == EOF) {

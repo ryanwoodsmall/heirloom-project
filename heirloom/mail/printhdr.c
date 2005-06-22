@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)printhdr.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)printhdr.c	1.4 (gritter) 6/22/05
  */
 
 
@@ -53,7 +53,7 @@ printhdr(int type, int hdrtype, struct hdrs *hptr, FILE *fp)
 		return (0);
 	}
 
-	(void) snprintf(buf, sizeof (buf), "%s %s\n",
+	snprintf(buf, sizeof (buf), "%s %s\n",
 	    header[hdrtype].tag, hptr->value);
 	n = strlen(buf);
 	if (fwrite(buf, 1, n, fp) != n)  {
@@ -65,7 +65,7 @@ printhdr(int type, int hdrtype, struct hdrs *hptr, FILE *fp)
 	contptr = hptr;
 	while (contptr->cont != (struct hdrs *)NULL) {
 		contptr = contptr->cont;
-		(void) snprintf(buf, sizeof (buf), "%s\n", contptr->value);
+		snprintf(buf, sizeof (buf), "%s\n", contptr->value);
 		n = strlen(buf);
 		if (fwrite(buf, 1, n, fp) != n)  {
 			sav_errno = errno;

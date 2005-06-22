@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hashcheck.c	2.3 (gritter) 6/22/05
+ * Sccsid @(#)hashcheck.c	2.4 (gritter) 6/22/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -38,7 +38,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)hashcheck.c	2.3 (gritter) 6/22/05";
+static const char sccsid[] USED = "@(#)hashcheck.c	2.4 (gritter) 6/22/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -89,12 +89,12 @@ main(void)
 	int32_t v;
 	int32_t a;
 
-	(void) rhuff(stdin);
-	(void) fread((char *)hindex, sizeof (*hindex), NI, stdin);
+	rhuff(stdin);
+	fread((char *)hindex, sizeof (*hindex), NI, stdin);
 	for (i = 0; i < NI; i++)
 		hindex[i] = ple32((char *)&hindex[i]);
 	table = malloc(hindex[NI-1]*sizeof (*table));
-	(void) fread((char *)table, sizeof (*table), hindex[NI-1], stdin);
+	fread((char *)table, sizeof (*table), hindex[NI-1], stdin);
 	for (i = 0; i < hindex[NI-1]; i++)
 		table[i] = ple32((char *)&table[i]);
 	for (i = 0; i < NI-1; i++) {
@@ -112,7 +112,7 @@ main(void)
 				wp == hindex[i+1] && bp < U)
 				break;
 			v += a;
-			(void) printf("%.9lo\n", (long)v);
+			printf("%.9lo\n", (long)v);
 		}
 	}
 	return 0;

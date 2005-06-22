@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)parse.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)parse.c	1.5 (gritter) 6/22/05
  */
 #include "mail.h"
 /*
@@ -243,8 +243,8 @@ parse(int argc, char **argv)
 
 	if (ismail && (goerr > 0)) {
 		errmsg(E_SYNTAX,"Usage: [-ehpPqr] [-f file] [-x debuglevel]");
-		(void) fprintf (stderr, "or\t[-tw] [-m message_type] [-T file] [-x debuglevel] persons\n");
-		(void) fprintf (stderr, "or\t[-x debuglevel]\n");
+		fprintf (stderr, "or\t[-tw] [-m message_type] [-T file] [-x debuglevel] persons\n");
+		fprintf (stderr, "or\t[-x debuglevel]\n");
 		done(0);
 	}
 

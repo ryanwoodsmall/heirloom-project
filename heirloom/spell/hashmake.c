@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hashmake.c	2.2 (gritter) 6/21/05
+ * Sccsid @(#)hashmake.c	2.3 (gritter) 6/22/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -38,7 +38,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)hashmake.c	2.2 (gritter) 6/21/05";
+static const char sccsid[] USED = "@(#)hashmake.c	2.3 (gritter) 6/22/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -61,7 +61,7 @@ main(int argc, char **argv)
 		n = strlen(word);
 		if (word[n-1] == '\n')
 			word[n-1] = '\0';
-		(void) printf("%.*lo\n", (HASHWIDTH+2)/3, (long)hash(word));
+		printf("%.*lo\n", (HASHWIDTH+2)/3, (long)hash(word));
 	}
 	return 0;
 }

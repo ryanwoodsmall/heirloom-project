@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)spellin.c	2.2 (gritter) 6/21/05
+ * Sccsid @(#)spellin.c	2.3 (gritter) 6/22/05
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -87,21 +87,21 @@ main(int argc, char **argv)
 	k = 0;
 	u = 0;
 	if (argc != 2) {
-		(void) fprintf(stderr, "%s: arg count\n", argv[0]);
+		fprintf(stderr, "%s: arg count\n", argv[0]);
 		exit(1);
 	}
 	table = malloc(ND * sizeof (*table));
 	if (table == 0) {
-		(void) fprintf(stderr, "%s: no space for table\n", argv[0]);
+		fprintf(stderr, "%s: no space for table\n", argv[0]);
 		exit(1);
 	}
 	if ((atof(argv[1])) == 0.0) {
-		(void) fprintf(stderr, "%s: illegal count", argv[0]);
+		fprintf(stderr, "%s: illegal count", argv[0]);
 		exit(1);
 	}
 
 	z = huff((1L<<HASHWIDTH)/atof(argv[1]));
-	(void) fprintf(stderr, "%s: expected code widths = %f\n",
+	fprintf(stderr, "%s: expected code widths = %f\n",
 	    argv[0], z);
 	for (count = 0; scanf("%lo", (long *)&h) == 1; ++count) {
 		if ((t = h >> (HASHWIDTH - INDEXWIDTH)) != u) {
@@ -142,15 +142,15 @@ main(int argc, char **argv)
 	whuff();
 	for (i = 0; i < NI; i++)
 		le32p(hindex[i], (char *)&hindex[i]);
-	(void) fwrite((char *)hindex, sizeof (*hindex), NI, stdout);
+	fwrite((char *)hindex, sizeof (*hindex), NI, stdout);
 	for (i = 0; i < wp; i++)
 		le32p(table[i], (char *)&table[i]);
-	(void) fwrite((char *)table, sizeof (*table), wp, stdout);
-	(void) fprintf(stderr,
+	fwrite((char *)table, sizeof (*table), wp, stdout);
+	fprintf(stderr,
 	    "%s: %ld items, %d ignored, %d extra, %u words occupied\n",
 	    argv[0], (long)count, ignore, extra, (unsigned)wp);
 	count -= ignore;
-	(void) fprintf(stderr, "%s: %f table bits/item, %f table+index bits\n",
+	fprintf(stderr, "%s: %f table bits/item, %f table+index bits\n",
 	    argv[0], (((float)BYTE * wp) * sizeof (*table) / count),
 	    (BYTE * ((float)wp * sizeof (*table) + sizeof (hindex)) / count));
 	return 0;

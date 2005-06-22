@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)huff.c	2.3 (gritter) 6/22/05
+ * Sccsid @(#)huff.c	2.4 (gritter) 6/22/05
  */
 
 
@@ -195,7 +195,7 @@ huff(float a)
 	for (i = 0, q = 1, rq = r; i < QW; i++, q *= 2, rq *= rq)
 		continue;
 	rq /= r;	/* rq = r^(q-1) */
-	(void) qlog(rq, 1./q, 1L, rq);
+	qlog(rq, 1./q, 1L, rq);
 	d = z.p;
 	n = d*(q-1);
 	if (n != d * (q - 1))
@@ -220,7 +220,7 @@ whuff(void)
 
 	for (i = 0; i < sizeof huffcode / sizeof *hp; i++)
 		le32p(hp[i], (char *)&hp[i]);
-	(void) fwrite((char *) & huffcode, sizeof (huffcode), 1, stdout);
+	fwrite((char *) & huffcode, sizeof (huffcode), 1, stdout);
 }
 
 int

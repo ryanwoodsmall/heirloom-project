@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.7 (gritter) 6/19/05
+ * Sccsid @(#)main.c	1.8 (gritter) 6/22/05
  */
 
 
@@ -142,7 +142,7 @@ main(int c, char *v[], char *e[])
 	 * Do locale processing only if /usr is mounted.
 	 */
 	if (localedir_exists)
-		(void) setlocale(LC_ALL, "");
+		setlocale(LC_ALL, "");
 
 	/*
 	 * 'rsflag' is zero if SHELL variable is
@@ -382,7 +382,7 @@ BOOL	prof;
 	if (setjmp(errshell) && prof)
 	{
 		close(input);
-		(void) endjobs(0);
+		endjobs(0);
 		return;
 	}
 	/*
@@ -604,9 +604,9 @@ setwidth(void)
 	 */
 	if (localedir_exists) {
 		if (!name || !*name)
-			(void) setlocale(LC_CTYPE, "C");
+			setlocale(LC_CTYPE, "C");
 		else
-			(void) setlocale(LC_CTYPE, (const char *)name);
+			setlocale(LC_CTYPE, (const char *)name);
 	}
 }
 

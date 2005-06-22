@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.11 (gritter) 6/19/05
+ * Sccsid @(#)jobs.c	1.12 (gritter) 6/22/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -255,7 +255,7 @@ statjob(register struct job *jp, int stat, int fg, int rc)
 			else {
 				jp->j_flag |= J_SAVETTY;
 				tcgetattr(0, &jp->j_stty);
-				(void) tcsetattr(0, TCSANOW, &mystty);
+				tcsetattr(0, TCSANOW, &mystty);
 			}
 		}
 		if (jp->j_jid) {
@@ -332,7 +332,7 @@ collectjobs(int wnohang)
 		if ((pid = waitpid(-1, &stat, wnohang|wflags)) <= 0)
 			break;
 		if (jp = pgid2job(pid))
-			(void) statjob(jp, stat, 0, 0);
+			statjob(jp, stat, 0, 0);
 	}
 
 }
@@ -356,7 +356,7 @@ freejobs(void)
 					printjob(jp, PR_STAT|PR_PGID);
 			}
 		}
-		(void) setb(savefd);
+		setb(savefd);
 	}
 
 	if (jobdone) {
@@ -434,13 +434,13 @@ restartjob(register struct job *jp, int fg)
 #ifdef	VDSUSP
 			jp->j_stty.c_cc[VDSUSP] = mystty.c_cc[VDSUSP];
 #endif	/* VDSUSP */
-			(void) tcsetattr(0, TCSADRAIN, &jp->j_stty);
+			tcsetattr(0, TCSADRAIN, &jp->j_stty);
 		}
-		(void) settgid(jp->j_tgid, mypgid);
+		settgid(jp->j_tgid, mypgid);
 	}
-	(void) kill(-(jp->j_pgid), SIGCONT);
+	kill(-(jp->j_pgid), SIGCONT);
 	if (jp->j_tgid != jp->j_pgid)
-		(void) kill(-(jp->j_tgid), SIGCONT);
+		kill(-(jp->j_tgid), SIGCONT);
 	jp->j_flag &= ~(J_STOPPED|J_SIGNALED|J_SAVETTY);
 	jp->j_flag |= J_RUNNING;
 	if (fg)  {
@@ -575,7 +575,7 @@ startjobs(void)
 	if (mysid != mypgid) {
 		setpgid(0, 0);
 		mypgid = mypid;
-		(void) settgid(mypgid, svpgid);
+		settgid(mypgid, svpgid);
 	}
 
 }
@@ -609,7 +609,7 @@ endjobs(int check_if)
 	}
 
 	if (svpgid != mypgid) {
-		(void) settgid(svtgid, mypgid);
+		settgid(svtgid, mypgid);
 		setpgid(0, svpgid);
 	}
 
@@ -895,7 +895,7 @@ syswait(int argc, char *argv[])
 			continue;
 		if (waitpid(jp->j_pid, &stat, wflags) <= 0)
 			break;
-		(void) statjob(jp, stat, 0, 1);
+		statjob(jp, stat, 0, 1);
 	}
 }
 
@@ -936,7 +936,7 @@ sigv(char *cmd, int sig, char *args)
 			return;
 		}
 		if (id == mypgid && mypgid != svpgid) {
-			(void) settgid(svtgid, mypgid);
+			settgid(svtgid, mypgid);
 			setpgid(0, svpgid);
 			stopme++;
 		}
@@ -965,11 +965,11 @@ sigv(char *cmd, int sig, char *args)
 		}
 
 	} else if (sig == SIGTERM && pgrp)
-		(void) kill(id, SIGCONT);
+		kill(id, SIGCONT);
 
 	if (stopme) {
 		setpgid(0, mypgid);
-		(void) settgid(mypgid, svpgid);
+		settgid(mypgid, svpgid);
 	}
 
 }

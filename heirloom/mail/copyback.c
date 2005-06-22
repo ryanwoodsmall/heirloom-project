@@ -27,7 +27,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)copyback.c	1.7 (gritter) 6/18/05
+ * Sccsid @(#)copyback.c	1.8 (gritter) 6/22/05
  */
 
 /*
@@ -144,7 +144,7 @@ success:
 		if (let[i].change == ' ') {
 			if (copylet(i, malf, ORDINARY) == FALSE) {
 				errmsg(E_FILE, "Cannot copy mail to savefile");
-				(void) fprintf(stderr, "%s: A copy of your "
+				fprintf(stderr, "%s: A copy of your "
 				    "mailfile is in '%s'\n", program, lettmp);
 				done(1);	/* keep temp file */
 			}
@@ -177,7 +177,7 @@ success:
 	}
 
 	unlock();
-	(void) sigset(SIGINT, istat);
-	(void) sigset(SIGQUIT, qstat);
-	(void) sigset(SIGHUP, hstat);
+	sigset(SIGINT, istat);
+	sigset(SIGQUIT, qstat);
+	sigset(SIGHUP, hstat);
 }

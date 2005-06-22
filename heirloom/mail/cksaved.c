@@ -27,7 +27,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)cksaved.c	1.6 (gritter) 6/18/05
+ * Sccsid @(#)cksaved.c	1.7 (gritter) 6/22/05
  */
 
 /*
@@ -88,7 +88,7 @@ cksaved(char *user)
 			Return;
 		}
 
-		(void) snprintf(command, sizeof (command),
+		snprintf(command, sizeof (command),
 		    "echo \"Your mailfile was just restored by the mail "
 		    "program.\nPermissions of your mailfile are set "
 		    "to 0660.\"| mail %s", user);
@@ -97,14 +97,14 @@ cksaved(char *user)
 	else {
 		FILE *Istream, *Ostream;
 		if ((Ostream = fopen(mail, "a")) == NULL) {
-			(void) fprintf(stderr,
+			fprintf(stderr,
 			    "%s: Cannot open file '%s' for output\n",
 			program, mail);
 			unlock();
 			Return;
 		}
 		if ((Istream = fopen(save, "r")) == NULL) {
-			(void) fprintf(stderr, "%s: Cannot open saved "
+			fprintf(stderr, "%s: Cannot open saved "
 			    "file '%s' for reading\n", program, save);
 			fclose(Ostream);
 			unlock();
@@ -119,7 +119,7 @@ cksaved(char *user)
 			Return;
 		}
 
-		(void) snprintf(command, sizeof (command),
+		snprintf(command, sizeof (command),
 		    "echo \"Your mail save file has just been appended "
 		    "to your mail box by the mail program.\" | mail %s", user);
 	}

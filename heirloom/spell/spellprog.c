@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)spellprog.c	2.2 (gritter) 6/22/05
+ * Sccsid @(#)spellprog.c	2.3 (gritter) 6/22/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)spellprog.c	2.2 (gritter) 6/22/05";
+static const char sccsid[] USED = "@(#)spellprog.c	2.3 (gritter) 6/22/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -276,8 +276,7 @@ main(int argc, char **argv)
 	argv = &argv[optind];
 
 	if ((argc < 2) || !prime(*argv)) {
-		(void) fprintf(stderr,
-			       "%s: cannot initialize hash table\n", prog);
+		fprintf(stderr, "%s: cannot initialize hash table\n", prog);
 		exit(1);
 	}
 	argc--;
@@ -306,7 +305,7 @@ main(int argc, char **argv)
 		if (ep[-1] == '-') {
 			*--ep = 0;
 			if (!tryword(word, ep, 0))
-				(void) fprintf(file, "%s\n", word);
+				fprintf(file, "%s\n", word);
 			continue;
 		}
 		for (cp = word, dp = original; cp < ep; )
@@ -335,16 +334,15 @@ lcase:
 			word[0] = Tolower(word[0]);
 			goto lcase;
 		}
-		(void) fprintf(file, "%s\n", original);
+		fprintf(file, "%s\n", original);
 		continue;
 
 foundit:
 		if (pass == '1')
-			(void) fprintf(file, "%s-\n", original);
+			fprintf(file, "%s-\n", original);
 		else if (affix[0] != 0 && affix[0] != '.') {
 			file = found;
-			(void) fprintf(file, "%s\t%s\n", affix,
-			    original);
+			fprintf(file, "%s\t%s\n", affix, original);
 		}
 	}
 	return 0;
@@ -669,7 +667,7 @@ tryword(char *bp, char *ep, int lev)
 	j = lev;
 	do {
 		if (deriv[j])
-			(void) strcat(affix, deriv[j]);
+			strcat(affix, deriv[j]);
 	} while (--j > 0);
 	return (i);
 }
@@ -741,7 +739,7 @@ dict(char *bp, char *ep)
 {
 	register int temp, result;
 	if (xflag)
-		(void) fprintf(stdout, "=%.*s\n", ep-bp, bp);
+		fprintf(stdout, "=%.*s\n", ep-bp, bp);
 	temp = *ep;
 	*ep = 0;
 	result = hashlook(bp);

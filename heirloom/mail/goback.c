@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)goback.c	1.5 (gritter) 6/22/05
+ * Sccsid @(#)goback.c	1.6 (gritter) 6/22/05
  */
 
 /*
@@ -134,7 +134,7 @@ goback(int letnum)
 					cpy(&m_sendto, &m_sendtosize, "");
 				buf = srealloc(buf, bufsize = strlen(m_sendto) +
 						strlen(work) + 20);
-				(void) snprintf(buf, bufsize,
+				snprintf(buf, bufsize,
 				    "mail %s %s", m_sendto, work);
 				printf("%s\n", buf);
 				systm(buf);

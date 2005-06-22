@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.10 (gritter) 6/17/05
+ * Sccsid @(#)fault.c	1.11 (gritter) 6/22/05
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -197,7 +197,7 @@ done(int sig)
 		collect_fg_job();
 	}
 
-	(void) endjobs(0);
+	endjobs(0);
 	if (sig) {
 		sigset_t set;
 		sigemptyset(&set);
