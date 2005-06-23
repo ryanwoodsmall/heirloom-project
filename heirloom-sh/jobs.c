@@ -400,6 +400,10 @@ waitjob(register struct job *jp)
 /*
  * modify the foreground process group to *new* only if the
  * current foreground process group is equal to *expected*
+ * Some systems return the value of a non-existing process
+ * group id with tcgetpgrp() after the last process of the
+ * foreground process group has exited. In this case, behave
+ * as if it had been the expected one.
  */
 
 int
