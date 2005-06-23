@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bfs.c	1.9 (gritter) 6/22/05";
+static const char sccsid[] USED = "@(#)bfs.c	1.10 (gritter) 6/23/05";
 
 #include <setjmp.h>
 #include <signal.h>
@@ -110,15 +110,15 @@ static char prompt = 1;
 static char verbose = 1;	/* 1=print # of bytes read in; 0=silent. */
 static char *varray[10];	/* Holds xv cmd parameters. */
 static size_t varraysize[10];
-static double outcnt;
+static long long outcnt;
 static char strtmp[PATH_MAX+32];
 static int mb_cur_max;
 
 static void reset(int);
 static void begin(struct Comd *p);
-static int  bigopen(char file[]);
-static void sizeprt(int blk, int off);
-static void bigread(int l, char **rec, size_t *recsize);
+static int  bigopen(const char *file);
+static void sizeprt(long long blk, int off);
+static void bigread(long l, char **rec, size_t *recsize);
 static int gcomd(struct Comd *p, int k);
 static int fcomd(struct Comd *p);
 static void ecomd(void);
@@ -167,9 +167,9 @@ static void eat(void);
 static int more(void);
 static void quit(void);
 static void out(char *ln);
-static char *untab(char l[]);
-static int patoi(char *b);
-static int equal(char *a, char *b);
+static char *untab(const char *l);
+static int patoi(const char *b);
+static int equal(const char *a, const char *b);
 static void intcat(const char *);
 static void *grow(void *ptr, size_t size, const char *msg);
 
@@ -316,15 +316,16 @@ begin(struct Comd *p)
 }
 
 static int
-bigopen(char file[])
+bigopen(const char *file)
 {
 	long l, off, cnt;
-	long blk, s;
+	off_t blk;
+	long s;
 	int newline, n;
 	char block[512];
 	size_t totsiz;
 	const char	toomany[] = "too many lines";
-	if ((txtfd = open(file, 0)) < 0)
+	if ((txtfd = open(file, O_RDONLY)) < 0)
 		return (err(1, "can't open"));
 	blk = -1;
 	newline = 1;
@@ -368,6 +369,8 @@ bigopen(char file[])
 				}
 			}
 			if (block[off] == '\n') newline = 1;
+			if (cnt == LONG_MAX)
+				return err(1, "line too long");
 			cnt++;
 		}
 	}
@@ -381,18 +384,18 @@ bigopen(char file[])
 }
 
 static void
-sizeprt(int blk, int off)
+sizeprt(long long blk, int off)
 {
 	if (verbose)
-		printf("%.0f", 512.*blk+off);
+		printf("%lld", 512*blk+off);
 }
 
-static int saveblk = -1;
+static off_t saveblk = -1;
 
 static void
-bigread(int l, char **rec, size_t *recsize)
+bigread(long l, char **rec, size_t *recsize)
 {
-	int i;
+	long i;
 	char *b;
 	long r;
 	int off;
@@ -413,7 +416,7 @@ bigread(int l, char **rec, size_t *recsize)
 	prevoff &= 0777;
 	lprev = l;
 	if (prevblk != saveblk) {
-		lseek(txtfd, ((long)(saveblk = prevblk))<<9, 0);
+		lseek(txtfd, (saveblk = prevblk)<<9, 0);
 		read(txtfd, savetxt, 512);
 	}
 	r = 0;
@@ -480,7 +483,7 @@ static int
 gcomd(struct Comd *p, int k)
 {
 	char d;
-	int i, end;
+	long i, end;
 	char *line = NULL;
 	size_t linesize = 0;
 	if (defaults(p, 1, 2, 1, Dollar, 0, 0))
@@ -563,7 +566,7 @@ xncomd(struct Comd *p)
 static int
 pcomd(struct Comd *p)
 {
-	int i;
+	long i;
 	char *line = NULL;
 	size_t linesize = 0;
 	if (more() || defaults(p, 1, 2, Dot, Dot, 1, 0))
@@ -722,8 +725,7 @@ xocomd(struct Comd *p)
 		if (outfildes != 1) {
 			Return (err(1, "already diverted"));
 		}
-		if ((fd = open(arg, O_WRONLY|O_CREAT|O_TRUNC,
-		    (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH))) < 0) {
+		if ((fd = open(arg, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) {
 			Return (err(1, "can't create"));
 		}
 		outfildes = fd;
@@ -806,7 +808,8 @@ xvcomd(void)
 static int
 wcomd(struct Comd *p)
 {
-	int i, fd, savefd;
+	long i;
+	int fd, savefd;
 	int savecrunch, savetrunc;
 	char *arg = NULL, *line = NULL;
 	size_t argsize = 0, linesize = 0;
@@ -821,8 +824,7 @@ wcomd(struct Comd *p)
 	if (equal(arg, bigfile)) {
 		Return (err(1, "no change indicated"));
 	}
-	if ((fd = open(arg, O_WRONLY|O_CREAT|O_TRUNC,
-	    (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)))  < 0) {
+	if ((fd = open(arg, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) {
 		Return (err(1, "can't create"));
 	}
 
@@ -839,7 +841,7 @@ wcomd(struct Comd *p)
 		out(line);
 	}
 	if (verbose)
-		printf("%.0f\n", outcnt);
+		printf("%lld\n", outcnt);
 	close(fd);
 
 	outfildes = savefd;
@@ -1162,8 +1164,8 @@ getrex(struct Comd *p, int prt, char c)
 static int
 hunt(int prt, char rex[], long start, int down, int wrap, int errsok)
 {
-	int i, end1, incr;
-	int start1, start2;
+	long i, end1, incr;
+	long start1, start2;
 	char *line = NULL;
 	size_t linesize = 0;
 	char *rebuf;
@@ -1461,7 +1463,7 @@ newfile(int prt, char f[])
 			intptr = comdlist;
 		} else intptr = internal;
 		fd = 100;
-	} else if ((fd = open(f, 0)) < 0) {
+	} else if ((fd = open(f, O_RDONLY)) < 0) {
 		snprintf(strtmp, sizeof strtmp, "cannot open %s", f);
 		return (err(prt, strtmp));
 	}
@@ -1577,11 +1579,11 @@ out(char *ln)
 }
 
 static char *
-untab(char l[])
+untab(const char *l)
 {
 	static char *line;
 	static size_t linesize;
-	char *s;
+	const char *s;
 	long q;
 
 	free(line);
@@ -1608,10 +1610,10 @@ untab(char l[])
  */
 
 static int
-patoi(char *b)
+patoi(const char *b)
 {
 	int i;
-	char *a;
+	const char *a;
 
 	a = b;
 	i = 0;
@@ -1627,9 +1629,9 @@ patoi(char *b)
  */
 
 static int
-equal(char *a, char *b)
+equal(const char *a, const char *b)
 {
-	char *x, *y;
+	const char *x, *y;
 
 	x = a;
 	y = b;
