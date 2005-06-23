@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bfs.c	1.12 (gritter) 6/23/05";
+static const char sccsid[] USED = "@(#)bfs.c	1.13 (gritter) 6/23/05";
 
 #include <setjmp.h>
 #include <signal.h>
@@ -1600,6 +1600,7 @@ out(char *ln, long length)
 				continue;
 			puts("i/o error");
 			errcnt = 1;
+			break;
 		}
 		w += p;
 	}
