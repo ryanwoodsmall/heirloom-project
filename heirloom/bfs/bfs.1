@@ -21,8 +21,8 @@
 .\"
 .\" Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany.
 .\"
-.\" Sccsid @(#)bfs.1	1.2 (gritter) 6/22/05
-.TH BFS 1 "6/22/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)bfs.1	1.3 (gritter) 6/23/05
+.TH BFS 1 "6/23/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 bfs \- big file scanner
 .SH SYNOPSIS
@@ -165,8 +165,9 @@ is given, output is written to the standard output as usual.
 Causes each line printed with the
 .I p
 and <newline> commands to be truncated after
+a width of
 .I number
-characters have been written.
+character positions has been reached.
 By default, lines are not truncated.
 .TP
 \fBxv\fR[\fIdigit\fR][\fB!\fR]\fIstring\fR
@@ -197,6 +198,14 @@ The size limit for the files which
 .I bfs
 can display depends on the number of lines that fit in core;
 each line takes 2 words.
+.PP
+If a line contains a NUL character,
+regular expressions cannot match beyond it,
+but the entire line is written with the
+.I p
+and
+.I w
+commands.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

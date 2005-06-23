@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bfs.c	1.11 (gritter) 6/23/05";
+static const char sccsid[] USED = "@(#)bfs.c	1.12 (gritter) 6/23/05";
 
 #include <setjmp.h>
 #include <signal.h>
@@ -58,13 +58,14 @@ static const char sccsid[] USED = "@(#)bfs.c	1.11 (gritter) 6/23/05";
 #include <inttypes.h>
 #include <wchar.h>
 #include <limits.h>
+#include <errno.h>
 #include "sigset.h"
 static jmp_buf env;
 
 #define	BRKTYP	long
 #define	BRKSIZ	8192
 #define	BRKTWO	4
-#define	BFSTRU	LONG_MAX
+#define	BFSTRU	-1L
 #define	BFSBUF	512
 
 struct Comd {
@@ -113,12 +114,13 @@ static size_t varraysize[10];
 static long long outcnt;
 static char strtmp[PATH_MAX+32];
 static int mb_cur_max;
+static int errcnt;
 
 static void reset(int);
 static void begin(struct Comd *p);
 static int  bigopen(const char *file);
 static void sizeprt(long long blk, int off);
-static void bigread(long l, char **rec, size_t *recsize);
+static long bigread(long l, char **rec, size_t *recsize);
 static int gcomd(struct Comd *p, int k);
 static int fcomd(struct Comd *p);
 static void ecomd(void);
@@ -166,7 +168,7 @@ static int peekc(void);
 static void eat(void);
 static int more(void);
 static void quit(void);
-static void out(char *ln);
+static void out(char *ln, long length);
 static char *untab(const char *l);
 static int patoi(const char *b);
 static int equal(const char *a, const char *b);
@@ -374,6 +376,10 @@ bigopen(const char *file)
 			cnt++;
 		}
 	}
+	if (n < 0) {
+		errcnt = 1;
+		puts("i/o error");
+	}
 	if (!(l&07777)) {
 		totsiz += BRKTWO;
 		lincnt = grow(lincnt, totsiz * sizeof *lincnt, toomany);
@@ -392,7 +398,7 @@ sizeprt(long long blk, int off)
 
 static off_t saveblk = -1;
 
-static void
+static long
 bigread(long l, char **rec, size_t *recsize)
 {
 	long i;
@@ -430,25 +436,31 @@ bigread(long l, char **rec, size_t *recsize)
 				if (nrec == NULL) {
 					write(2, "Line too long--"
 						 "output truncated\n", 32);
-					return;
+					goto out;
 				}
 				*rec = nrec;
 			}
-			(*rec)[r++] = *b;
 			if (*b == '\n') {
-			out:	(*rec)[r-1] = '\0';
-				return;
+			out:	(*rec)[r] = '\0';
+				return r;
 			}
+			(*rec)[r++] = *b;
 		}
 		if ((i = read(txtfd, savetxt, 512)) == 0) {
 			puts("'\\n' appended");
-			r++;
 			goto out;
 		}
 		rd = i;
 		off = 0;
 		saveblk++;
 	}
+	if (rd < 0) {
+		puts("i/o error");
+		saveblk = -1;
+	}
+	if (*rec == 0)
+		*rec = grow(*rec, *recsize = 1, "no space");
+	goto out;
 }
 
 static void
@@ -572,14 +584,14 @@ xncomd(struct Comd *p)
 static int
 pcomd(struct Comd *p)
 {
-	long i;
+	long i, n;
 	char *line = NULL;
 	size_t linesize = 0;
 	if (more() || defaults(p, 1, 2, Dot, Dot, 1, 0))
 		return (-1);
 	for (i = p->Cadr[0]; i <= p->Cadr[1] && i > 0; i++) {
-		bigread(i, &line, &linesize);
-		out(line);
+		n = bigread(i, &line, &linesize);
+		out(line, n);
 	}
 	free(line);
 	return (0);
@@ -814,7 +826,7 @@ xvcomd(void)
 static int
 wcomd(struct Comd *p)
 {
-	long i;
+	long i, n;
 	int fd, savefd;
 	int savecrunch, savetrunc;
 	char *arg = NULL, *line = NULL;
@@ -843,8 +855,8 @@ wcomd(struct Comd *p)
 
 	outcnt = 0;
 	for (i = p->Cadr[0]; i <= p->Cadr[1] && i > 0; i++) {
-		bigread(i, &line, &linesize);
-		out(line);
+		n = bigread(i, &line, &linesize);
+		out(line, n);
 	}
 	if (verbose)
 		printf("%lld\n", outcnt);
@@ -910,7 +922,7 @@ excomd(void)
 		sigset(SIGINT, SIG_DFL);
 		if (infildes == 100 || flag4) {
 			execl(SHELL, "sh", "-c", intptr, 0);
-			exit(0);
+			_exit(0);
 		}
 		if (infildes != 0) {
 			close(0);
@@ -918,7 +930,7 @@ excomd(void)
 		}
 		for (j = 3; j < 15; j++) close(j);
 		execl(SHELL, "sh", "-t", 0);
-		exit(0);
+		_exit(0);
 	}
 	sigset(SIGINT, SIG_IGN);
 	while (wait(status) != i);
@@ -1522,18 +1534,18 @@ more(void)
 static void
 quit(void)
 {
-	exit(0);
+	exit(errcnt);
 }
 
 static void
-out(char *ln)
+out(char *ln, long length)
 {
 	char *rp, *wp, prev;
 	int w, width;
 	char *oldrp;
 	wchar_t cl;
 	int p;
-	intptr_t lim;
+	long lim;
 	if (crunch > 0) {
 
 		ln = untab(ln);
@@ -1552,24 +1564,24 @@ out(char *ln)
 		if (*ln == '\n')
 			return;
 	} else
-		ln[lim = strlen(ln)] = '\n';
+		ln[lim = length] = '\n';
 
-	if (mb_cur_max <= 1) {
+	if (trunc < 0)
+		/*EMPTY*/;
+	else if (mb_cur_max <= 1) {
 		if (lim > trunc)
 			ln[lim = trunc] = '\n';
 	} else {
-		if ((trunc < (BFSBUF -1)) || (lim > trunc)) {
+		if (lim > trunc) {
 			w = 0;
 			oldrp = rp = ln;
-			/*CONSTCOND*/while (1) {
-				if ((p = mbtowc(&cl, rp, mb_cur_max)) == 0) {
-					break;
-				}
+			while (rp < &ln[lim]) {
+				p = mbtowc(&cl, rp, mb_cur_max);
 				if (p == -1) {
 					width = p = 1;
 				} else {
 					width = wcwidth(cl);
-					if (width == 0)
+					if (width < 0)
 						width = 1;
 				}
 				if ((w += width) > trunc)
@@ -1581,7 +1593,17 @@ out(char *ln)
 		}
 	}
 
-	outcnt += write(outfildes, ln, lim+1);
+	w = 0;
+	while (w < lim+1) {
+		if ((p = write(outfildes, &ln[w], lim+1)) < 0) {
+			if (errno == EAGAIN)
+				continue;
+			puts("i/o error");
+			errcnt = 1;
+		}
+		w += p;
+	}
+	outcnt += w;
 }
 
 static char *
