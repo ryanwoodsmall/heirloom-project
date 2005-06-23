@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bfs.c	1.10 (gritter) 6/23/05";
+static const char sccsid[] USED = "@(#)bfs.c	1.11 (gritter) 6/23/05";
 
 #include <setjmp.h>
 #include <signal.h>
@@ -400,6 +400,7 @@ bigread(long l, char **rec, size_t *recsize)
 	long r;
 	int off;
 	static char savetxt[512];
+	static int rd;
 
 	if ((i = l-lprev) == 1) prevoff += lincnt[lprev];
 	else if (i >= 0 && i <= 32)
@@ -417,13 +418,13 @@ bigread(long l, char **rec, size_t *recsize)
 	lprev = l;
 	if (prevblk != saveblk) {
 		lseek(txtfd, (saveblk = prevblk)<<9, 0);
-		read(txtfd, savetxt, 512);
+		rd = read(txtfd, savetxt, 512);
 	}
 	r = 0;
 	off = prevoff;
-	/*CONSTCOND*/while (1) {
-		for (b = savetxt+off; b < savetxt+512; b++) {
-			if (r >= *recsize) {
+	while (rd > 0) {
+		for (b = savetxt+off; b < savetxt+rd; b++) {
+			if (r+1 >= *recsize) {
 				char	*nrec;
 				nrec = realloc(*rec, *recsize += BFSBUF);
 				if (nrec == NULL) {
@@ -435,11 +436,16 @@ bigread(long l, char **rec, size_t *recsize)
 			}
 			(*rec)[r++] = *b;
 			if (*b == '\n') {
-				(*rec)[r-1] = '\0';
+			out:	(*rec)[r-1] = '\0';
 				return;
 			}
 		}
-		read(txtfd, savetxt, 512);
+		if ((i = read(txtfd, savetxt, 512)) == 0) {
+			puts("'\\n' appended");
+			r++;
+			goto out;
+		}
+		rd = i;
 		off = 0;
 		saveblk++;
 	}
