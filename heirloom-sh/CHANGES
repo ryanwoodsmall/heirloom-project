@@ -1,3 +1,6 @@
+Release ...
+* Job control now works on FreeBSD.
+
 Release 050621
 * The "ulimit" command was fixed to work portably; the "-lmu" flags have
   been added to it.

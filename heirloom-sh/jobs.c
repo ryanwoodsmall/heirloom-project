@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.12 (gritter) 6/22/05
+ * Sccsid @(#)jobs.c	1.13 (gritter) 6/23/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -407,7 +407,7 @@ settgid(pid_t new, pid_t expected)
 {
 	register pid_t current = tcgetpgrp(0);
 
-	if (current != expected)
+	if (current != expected && (kill(-current, 0) == 0 || errno == EPERM))
 		return (current);
 
 	if (new != current)
