@@ -1,4 +1,4 @@
-.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(GNUFL) $(LARGEF) $(ICOMMON) -DSHELL='"$(SHELL)"' $<
+.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(GNUFL) $(LARGEF) $(ICOMMON) $(IWCHAR) -DSHELL='"$(SHELL)"' $<
 
 all: bfs
 
