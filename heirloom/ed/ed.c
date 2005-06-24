@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.93 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.94 (gritter) 6/24/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.93 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.94 (gritter) 6/24/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.93 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.94 (gritter) 6/24/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.93 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.94 (gritter) 6/24/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -1138,6 +1138,10 @@ getfile(void)
 	do {
 		if (--ninbuf < 0) {
 			if (ioeof || (ninbuf=read(io, genbuf, LBSIZE)-1) < 0) {
+				if (ninbuf < -1) {
+					puts("input error");
+					status = 1;
+				}
 				if (i > 0) {
 					puts("'\\n' appended");
 					c = '\n';
@@ -1479,6 +1483,7 @@ blkio(long b, char *buf, int wr)
 	lseek(tfile, b<<9, SEEK_SET);
 	if ((wr ? write(tfile, buf, 512) : read (tfile, buf, 512)) != 512) {
 		error("I/O error on temp file");
+		status = 1;
 	}
 }
 
