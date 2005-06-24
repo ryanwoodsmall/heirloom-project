@@ -1482,8 +1482,8 @@ blkio(long b, char *buf, int wr)
 {
 	lseek(tfile, b<<9, SEEK_SET);
 	if ((wr ? write(tfile, buf, 512) : read (tfile, buf, 512)) != 512) {
-		error("I/O error on temp file");
 		status = 1;
+		error("I/O error on temp file");
 	}
 }
 
