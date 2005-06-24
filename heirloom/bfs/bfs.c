@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bfs.c	1.13 (gritter) 6/23/05";
+static const char sccsid[] USED = "@(#)bfs.c	1.14 (gritter) 6/24/05";
 
 #include <setjmp.h>
 #include <signal.h>
@@ -1425,7 +1425,7 @@ percent(char **line, size_t *linesize)
 	var = c;
 	j = 0;
 	while (!j) {
-		fr = grow(fr, strlen(*line + 1), "command too long");
+		fr = grow(fr, strlen(*line) + 1, "command too long");
 		front = fr;
 		j = 1;
 		olp = *line;
