@@ -5,7 +5,7 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	cal calendar cat chmod chown \
 	cksum cmp col comm copy cp cpio csplit cut \
 	date dc dd deroff diff diff3 dirname df du ed env expand expr \
-	factor file find fmt fold grep groups hd head hostname id join \
+	factor file find fmt fold getopt grep groups hd head hostname id join \
 	line listusers ln logins logname ls mail man mkdir mkfifo mknod more \
 	nawk news nice nl nohup oawk od \
 	paste pg pgrep pr printenv priocntl ps psrinfo \

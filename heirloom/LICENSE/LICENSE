@@ -129,6 +129,13 @@ The following utilities include 4BSD code:
 	ln(1b)	more	nawk	oawk	renice	tcopy	ul	what
 
 ********************************************************************************
+The following utilities are based on Sun's OpenSolaris code; the file
+OPENSOLARIS.LICENSE contains the licensing conditions for them:
+
+	bfs	getopt	mail	spell
+
+Changes to these programs are also subject to the original license.
+********************************************************************************
 One utilities is based on the MINIX 2.0 sources, to which the
 following license applies:
 
@@ -173,10 +180,6 @@ released made available by Caldera at <http://unixtools.sourceforge.net/>.
 GNU GPL 2.0 applies to 'nawk' (see the file COPYING); GNU LGPL 2.1 applies
 to 'libuxre' (see COPYING.LGPL). Changes to these tools are subject to these
 licenses also.
-
-********************************************************************************
-The 'bfs', 'mail' and 'spell' utilities are based on Sun's OpenSolaris code.
-The file OPENSOLARIS.LICENSE contains the licensing conditions for it.
 
 ********************************************************************************
 The 'deroff' utility is derived from Plan 9 <http://cm.bell-labs.com/plan9dist/>
@@ -343,4 +346,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								6/22/05
+Gunnar Ritter								6/24/05
