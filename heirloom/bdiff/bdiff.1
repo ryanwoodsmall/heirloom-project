@@ -1,0 +1,58 @@
+.\"
+.\" CDDL HEADER START
+.\"
+.\" The contents of this file are subject to the terms of the
+.\" Common Development and Distribution License, Version 1.0 only
+.\" (the "License").  You may not use this file except in compliance
+.\" with the License.
+.\"
+.\" You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+.\" or http://www.opensolaris.org/os/licensing.
+.\" See the License for the specific language governing permissions
+.\" and limitations under the License.
+.\"
+.\" When distributing Covered Code, include this CDDL HEADER in each
+.\" file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+.\" If applicable, add the following below this CDDL HEADER, with the
+.\" fields enclosed by brackets "[]" replaced with your own identifying
+.\" information: Portions Copyright [yyyy] [name of copyright owner]
+.\"
+.\" CDDL HEADER END
+.\"
+.\" Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany.
+.\"
+.\" Sccsid @(#)bdiff.1	1.1 (gritter) 6/24/05
+.TH BDIFF 1 "6/24/05" "Heirloom Toolchest" "User Commands"
+.SH NAME
+bdiff \- big diff
+.SH SYNOPSIS
+\fBbdiff\fI file1 file2 \fR[\fIsegmentsize\fR] [\fB\-s\fR]
+.SH DESCRIPTION
+.I bdiff
+produces a list of differences for files which
+.IR diff (1)
+cannot handle directly because of their size.
+It does this by splitting the content of both
+.I files
+given into pieces of at most
+.I segmentsize
+bytes (3500 by default).
+This may result in more identical lines listed as differences,
+but produces meaningful listings for tools
+which post-process
+.I diff
+output.
+.PP
+If either
+.I file1
+or
+.I file2
+is `\-', the standard input is used instead.
+.PP
+The
+.B \-s
+option suppresses error messages.
+.SH FILES
+/tmp/bd*
+.SH "SEE ALSO"
+diff(1)

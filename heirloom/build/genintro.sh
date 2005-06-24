@@ -1,6 +1,6 @@
 #!/sbin/sh
 
-# Sccsid @(#)genintro.sh	1.5 (gritter) 10/25/03
+# Sccsid @(#)genintro.sh	1.6 (gritter) 6/24/05
 
 LC_ALL=C export LC_ALL
 
@@ -16,7 +16,14 @@ l1 l1 l.
 Name	Appears on Page	Description
 !
 
-nawk/awk '
+if test -x nawk/awk
+then
+	awk=nawk/awk
+else
+	awk=nawk
+fi
+
+$awk '
 /^.TH / {
 	page = tolower($2)
 	sect = $3

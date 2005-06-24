@@ -132,7 +132,7 @@ The following utilities include 4BSD code:
 The following utilities are based on Sun's OpenSolaris code; the file
 OPENSOLARIS.LICENSE contains the licensing conditions for them:
 
-	bfs	getopt	mail	spell
+	bdiff	bfs	getopt	mail	spell
 
 Changes to these programs are also subject to the original license.
 ********************************************************************************
