@@ -1,5 +1,8 @@
 Release ...
 * Job control now works on FreeBSD.
+* The "NOTES" section of the manual page now lists some behavior special
+  to the Bourne shell (thanks to Sven Mascheck for maintaining the larger
+  list on the web from which the points for this one were derived).
 
 Release 050621
 * The "ulimit" command was fixed to work portably; the "-lmu" flags have

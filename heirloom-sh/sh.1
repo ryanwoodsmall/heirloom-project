@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)sh.1	1.10 (gritter) 6/23/05
+.\" Sccsid @(#)sh.1	1.11 (gritter) 6/26/05
 .\" Derived from sh(1) and test(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH SH 1 "6/23/05" "Heirloom Bourne Shell" "User Commands"
+.TH SH 1 "6/26/05" "Heirloom Bourne Shell" "User Commands"
 .SH NAME
 sh, jsh \- the standard command interpreter
 .SH SYNOPSIS
@@ -543,7 +543,7 @@ Matches any character except the enclosed ones.
 The following characters have a special meaning to the shell
 and cause termination of a word unless quoted.
 .PP
-	\fB;   &   (   )   \(or   <   >   newline   space   tab\fP
+    \fB;   &   (   )   \(or   ^   <   >   newline   space   tab\fP
 .PP
 A character may be
 .I quoted
@@ -1417,6 +1417,11 @@ If
 is not given then all currently active child processes are waited for.
 The return code from this command is that of
 the process waited for.
+If
+.I n
+does not refer to a child process of the shell,
+.I wait
+returns immediately with code 0.
 .PD
 .PP
 .SS "Invocation"
@@ -1588,6 +1593,7 @@ exec(2),
 signal(2)
 .SH DIAGNOSTICS
 Errors detected by the shell, such as syntax errors
+or fatal errors in special commands,
 cause the shell
 to return a non zero exit status.
 If the shell is being used non interactively
@@ -1595,3 +1601,65 @@ then execution of the shell file is abandoned.
 Otherwise, the shell returns the exit status of
 the last command executed (see also
 .IR exit ).
+.SH NOTES
+For historical reasons,
+.I ^
+is a synonym for
+.I \(or
+as pipeline separator.
+Its use in new applications is discouraged.
+.PP
+If a command other than a simple-command
+(i.\|e. `for ...', `case ...' etc.) is redirected,
+it is executed in a subshell.
+If variable assignments must be visible in the parent shell
+after the input has been redirected, the
+.I exec
+special command can be used:
+.RS
+.sp
+.nf
+exec 5<&0 <input
+while read line
+do
+        ...
+        variable=value
+        ...
+done
+exec <&5 5<&\-
+.fi
+.sp
+.RE
+.PP
+If parameters that have been inherited from the initial environment
+are modified,
+they must be explicitly exported
+to make the change visible to external commands,
+as described under `Environment' above.
+.PP
+The
+.SM $IFS
+parameter is applied to any unquoted word.
+Thus
+.RS
+.sp
+.nf
+IFS=X
+echoXfoo
+.fi
+.sp
+.RE
+executes the `echo' command with the argument `foo'.
+.PP
+The command `set \-\-' without further arguments is a no-op.
+The
+.I shift
+special command can be used to delete all positional parameters.
+.PP
+There is only one namespace for both functions and parameters.
+A function definition will delete a parameter with the same name
+and vice-versa.
+.PP
+Parameter assignments that precede a special command
+affect the shell itself;
+parameter assignments that precede the call of a function are ignored.
