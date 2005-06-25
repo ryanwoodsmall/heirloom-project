@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fgetline.c	1.3 (gritter) 6/19/05
+ * Sccsid @(#)fgetline.c	1.4 (gritter) 6/25/05
  */
 
 #include <sys/types.h>
@@ -41,6 +41,11 @@ srealloc(void *p, size_t size)
 }
 
 #define	LSIZE	128	/* initial line size */
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)	_IO_getc_unlocked(f)
+#endif
 
 char *
 fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)

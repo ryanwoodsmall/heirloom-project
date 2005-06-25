@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bdiff.c	1.4 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)bdiff.c	1.5 (gritter) 6/25/05";
 
 #include "fatal.h"
 #include <signal.h>
@@ -550,6 +550,11 @@ satoi(const char *p, off_t *ip)
  * Loop until either the entire line is read or until there is no more space
  * to be malloc'd.
  */
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)	_IO_getc_unlocked(f)
+#endif
 
 #define	LSIZE	128
 static char *

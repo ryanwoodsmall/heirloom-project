@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)spellprog.c	2.3 (gritter) 6/22/05
+ * Sccsid @(#)spellprog.c	2.4 (gritter) 6/25/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)spellprog.c	2.3 (gritter) 6/22/05";
+static const char sccsid[] USED = "@(#)spellprog.c	2.4 (gritter) 6/25/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -53,6 +53,11 @@ static const char sccsid[] USED = "@(#)spellprog.c	2.3 (gritter) 6/22/05";
 #include <ctype.h>
 #include <locale.h>
 #include "hash.h"
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getchar
+#define	getchar()	_IO_getc_unlocked(stdin)
+#endif
 
 #define	Tolower(c) (isupper(c)?tolower(c):c)
 #define	DLEV 2
