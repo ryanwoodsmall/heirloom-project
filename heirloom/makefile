@@ -4,9 +4,11 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	banner basename bc bdiff bfs \
 	cal calendar cat chmod chown \
 	cksum cmp col comm copy cp cpio csplit cut \
-	date dc dd deroff diff diff3 dirname df du ed env expand expr \
+	date dc dd deroff diff diff3 dircmp dirname df du \
+	ed env expand expr \
 	factor file find fmt fold getopt grep groups hd head hostname id join \
-	line listusers ln logins logname ls mail man mkdir mkfifo mknod more \
+	line listusers ln logins logname ls \
+	mail man mkdir mkfifo mknod more mvdir \
 	nawk news nice nl nohup oawk od \
 	paste pg pgrep pr printenv priocntl ps psrinfo \
 	random renice rm rmdir \

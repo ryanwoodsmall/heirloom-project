@@ -1,8 +1,8 @@
 Release ...
 * New versions of the 'mail' and 'spell' utilities have been introduced;
   they have been derived from OpenSolaris code.
-* The 'bdiff, 'bfs', and 'getopt' utilities are now available (derived from
-  OpenSolaris code).
+* The 'bdiff, 'bfs', 'dircmp', 'getopt', and 'mvdir' utilities are now
+  available (derived from OpenSolaris code).
 * Both Unix lex and flex can now be used for building the tools.
 * xargs: The '-l' and '-L' options override previous occurrences of the
   '-i' or '-I' option.

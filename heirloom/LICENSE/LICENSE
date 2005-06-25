@@ -132,7 +132,7 @@ The following utilities include 4BSD code:
 The following utilities are based on Sun's OpenSolaris code; the file
 OPENSOLARIS.LICENSE contains the licensing conditions for them:
 
-	bdiff	bfs	getopt	mail	spell
+	bdiff	bfs	dircmp	getopt	mail	mvdir	spell
 
 Changes to these programs are also subject to the original license.
 ********************************************************************************
@@ -346,4 +346,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								6/24/05
+Gunnar Ritter								6/25/05
