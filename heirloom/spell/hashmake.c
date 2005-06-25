@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hashmake.c	2.3 (gritter) 6/22/05
+ * Sccsid @(#)hashmake.c	2.4 (gritter) 6/25/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -38,7 +38,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)hashmake.c	2.3 (gritter) 6/22/05";
+static const char sccsid[] USED = "@(#)hashmake.c	2.4 (gritter) 6/25/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -49,19 +49,46 @@ static const char sccsid[] USED = "@(#)hashmake.c	2.3 (gritter) 6/22/05";
 
 #include "hash.h"
 
-/* ARGSUSED */
-int
-main(int argc, char **argv)
+static void *
+srealloc(void *p, size_t size)
 {
-	char word[LINE_MAX];
-	int n;
+	if ((p = realloc(p, size)) == NULL) {
+		write(2, "out of memory\n", 14);
+		_exit(0177);
+	}
+	return p;
+}
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getchar
+#define	getchar()	_IO_getc_unlocked(stdin)
+#endif
+
+int
+main(void)
+{
+	char *word = NULL;
+	size_t size = 0;
+	int c, n;
 
 	hashinit();
-	while (fgets(word, sizeof word, stdin)) {
-		n = strlen(word);
-		if (word[n-1] == '\n')
-			word[n-1] = '\0';
+	do {
+		n = 0;
+		while ((c = getchar()) != EOF && c != '\n') {
+			if (n >= size)
+				word = srealloc(word, size += 128);
+			word[n++] = c;
+		}
+		if (n == 0) {
+			if (c == EOF)
+				break;
+			else
+				continue;
+		}
+		if (n >= size)
+			word = srealloc(word, size += 128);
+		word[n] = '\0';
 		printf("%.*lo\n", (HASHWIDTH+2)/3, (long)hash(word));
-	}
+	} while (c != EOF);
 	return 0;
 }

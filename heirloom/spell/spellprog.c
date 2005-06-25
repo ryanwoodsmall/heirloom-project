@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)spellprog.c	2.4 (gritter) 6/25/05
+ * Sccsid @(#)spellprog.c	2.5 (gritter) 6/25/05
  */
 
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)spellprog.c	2.4 (gritter) 6/25/05";
+static const char sccsid[] USED = "@(#)spellprog.c	2.5 (gritter) 6/25/05";
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -89,6 +89,7 @@ static int	monosyl(char *, char *);
 static int	VCe(char *, char *, char *, int);
 static char	*skipv(char *);
 static char	*ztos(const char *);
+static void	*srealloc(void *, size_t);
 
 static struct suftab {
 	char *suf;
@@ -197,10 +198,14 @@ static char *preftab[] = {
 static int vflag;
 static int xflag;
 static char *prog;
-static char word[LINE_MAX];
-static char original[LINE_MAX];
-static char *deriv[LINE_MAX];
-static char affix[LINE_MAX];
+static char *word;
+static size_t wordsize;
+static char *original;
+static size_t originalsize;
+static char **deriv;
+static size_t derivsize;
+static char *affix;
+static size_t affixsize;
 static FILE *file, *found;
 /*
  *	deriv is stack of pointers to notes like +micro +ed
@@ -296,23 +301,37 @@ main(int argc, char **argv)
 		found = fopen(*argv, "w");
 
 	for (;;) {
+		size_t	en;
+		if (affixsize == 0)
+			affix = srealloc(affix, affixsize = 1);
 		affix[0] = 0;
 		file = stdout;
-		for (ep = word; (*ep = j = getchar()) != '\n'; ep++)
-			if (j == EOF)
-				exit(0);
+		en = 0;
+		while ((j = getchar()) != EOF && j != '\n') {
+			if (en >= wordsize)
+				word = srealloc(word, wordsize += 128);
+			word[en++] = j;
+		}
+		if (j == EOF)
+			exit(0);
+		if (en >= wordsize)
+			word = srealloc(word, wordsize += 128);
+		word[en] = '\0';
+		ep = &word[en];
 /*
  *	here is the hyphen processing. these words were found in the stop
  *	list. however, if they exist as is, (no derivations tried) in the
  *	dictionary, let them through as correct.
  *
  */
-		if (ep[-1] == '-') {
+		if (ep > word && ep[-1] == '-') {
 			*--ep = 0;
 			if (!tryword(word, ep, 0))
 				fprintf(file, "%s\n", word);
 			continue;
 		}
+		if (originalsize < wordsize)
+			original = srealloc(original, originalsize = wordsize);
 		for (cp = word, dp = original; cp < ep; )
 			*dp++ = *cp++;
 		*dp = 0;
@@ -366,11 +385,15 @@ trysuff(char *ep, int lev)
 	register char *cp, *sp;
 
 	lev += DLEV;
+	if (lev+2 >= derivsize) {
+		derivsize = lev+2;
+		deriv = srealloc(deriv, sizeof *deriv * derivsize);
+	}
 	deriv[lev] = deriv[lev-1] = 0;
 	for (t = &suftab[0]; (sp = t->suf) != 0; t++) {
 		cp = ep;
 		while (*sp)
-			if (*--cp != *sp++)
+			if (--cp < word && &cp[1] == word || *cp != *sp++)
 				goto next;
 		for (sp = cp; --sp >= word && !vowel(*sp); );
 		if (sp < word)
@@ -621,25 +644,41 @@ trypref(char *ep, char *a, int lev)
 {
 	register char *cp;
 	char *bp;
-	register char *pp;
+	size_t pn;
 	int val = 0;
-	char space[LINE_MAX * 2];
+	char *space = NULL;
+	size_t spacesize = 0;
+	if (lev+3 >= derivsize) {
+		derivsize = lev+3;
+		deriv = srealloc(deriv, sizeof *deriv * derivsize);
+	}
 	deriv[lev] = a;
 	if (tryword(word, ep, lev))
 		return (1);
 	bp = word;
-	pp = space;
-	deriv[lev+1] = pp;
+	pn = 0;
+	deriv[lev+1] = space;
 	while (cp = lookuppref(&bp, ep)) {
-		*pp++ = '+';
-		while (*pp = *cp++)
-			pp++;
+		if (pn >= spacesize) {
+			space = srealloc(space, spacesize += 128);
+			deriv[lev+1] = space;
+		}
+		space[pn++] = '+';
+		do {
+			if (pn >= spacesize) {
+				space = srealloc(space, spacesize += 128);
+				deriv[lev+1] = space;
+			}
+			space[pn++] = *cp;
+		} while (*cp++);
+		pn--;
 		if (tryword(bp, ep, lev+1)) {
 			val = 1;
 			break;
 		}
 	}
 	deriv[lev+1] = deriv[lev+2] = 0;
+	free(space);
 	return (val);
 }
 
@@ -647,7 +686,8 @@ static int
 tryword(char *bp, char *ep, int lev)
 {
 	register int i, j;
-	char duple[3];
+	char duple[3], *dp;
+	size_t an;
 	if (ep-bp <= 1)
 		return (0);
 	if (vowel(*ep)) {
@@ -657,7 +697,11 @@ tryword(char *bp, char *ep, int lev)
 	i = dict(bp, ep);
 	if (i == 0 && vowel(*ep) && ep[-1] == ep[-2] && monosyl(bp, ep-1)) {
 		ep--;
-		deriv[++lev] = duple;
+		if (++lev+1>= derivsize) {
+			derivsize = lev+1;
+			deriv = srealloc(deriv, sizeof *deriv * derivsize);
+		}
+		deriv[lev] = duple;
 		duple[0] = '+';
 		duple[1] = *ep;
 		duple[2] = 0;
@@ -670,9 +714,17 @@ tryword(char *bp, char *ep, int lev)
 	 *	for printing
 	 */
 	j = lev;
+	for (an = 0; affix[an]; an++);
 	do {
-		if (deriv[j])
-			strcat(affix, deriv[j]);
+		if (deriv[j]) {
+			dp = deriv[j];
+			do {
+				if (an >= affixsize)
+					affix = srealloc(affix, affixsize+=128);
+				affix[an++] = *dp;
+			} while (*dp++);
+			an--;
+		}
 	} while (--j > 0);
 	return (i);
 }
@@ -750,4 +802,14 @@ dict(char *bp, char *ep)
 	result = hashlook(bp);
 	*ep = temp;
 	return (result);
+}
+
+static void *
+srealloc(void *p, size_t size)
+{
+	if ((p = realloc(p, size)) == NULL) {
+		write(2, "out of memory\n", 14);
+		_exit(0177);
+	}
+	return p;
 }

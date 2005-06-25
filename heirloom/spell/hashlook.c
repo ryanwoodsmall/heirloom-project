@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hashlook.c	2.3 (gritter) 6/22/05
+ * Sccsid @(#)hashlook.c	2.4 (gritter) 6/25/05
  */
 
 #include <stdlib.h>
@@ -122,12 +122,13 @@ prime(char *file)
 		return (0);
 	for (i = 0; i < NI; i++)
 		hindex[i] = ple32((char *)&hindex[i]);
-	if ((table = malloc(hindex[NI-1] * sizeof (*table))) == 0 ||
+	if ((table = malloc((hindex[NI-1]+1) * sizeof (*table))) == 0 ||
 	    fread((char *)table, sizeof (*table), hindex[NI-1], f) !=
 	    hindex[NI-1])
 		return (0);
 	for (i = 0; i < hindex[NI-1]; i++)
 		table[i] = ple32((char *)&table[i]);
+	table[i] = 0;
 	fclose(f);
 	hashinit();
 	return (1);
