@@ -1,7 +1,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, November 2002.
  *
- * Sccsid @(#)stubs.c	1.25 (gritter) 5/29/05
+ * Sccsid @(#)stubs.c	1.27 (gritter) 6/26/05
  */
 /*  UNIX(R) Regular Expresssion Library
  *
@@ -60,38 +60,23 @@ libuxre_mb2wc(w_type *wt, const unsigned char *s)
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)libuxre.sl	1.25 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)libuxre.sl	1.27 (gritter) 6/26/05";
+/* SLIST */
 /*
-_collelem.c:
-	_collelem.c	1.4 (gritter) 10/18/03
-_collmult.c:
-	_collmult.c	1.4 (gritter) 9/22/03
-bracket.c:
-	bracket.c	1.14 (gritter) 10/18/03
-colldata.h:
-	colldata.h	1.4 (gritter) 10/18/03
-onefile.c:
-	onefile.c	1.1 (gritter) 9/22/03
-re.h:
-	re.h	1.14 (gritter) 10/18/03
-regcomp.c:
-	regcomp.c	1.6 (gritter) 9/22/03
-regdfa.c:
-	regdfa.c	1.9 (gritter) 9/22/03
-regdfa.h:
-	regdfa.h	1.3 (gritter) 9/22/03
-regerror.c:
-	regerror.c	1.4 (gritter) 3/29/03
-regex.h:
-	regex.h	1.12 (gritter) 9/22/03
-regexec.c:
-	regexec.c	1.6 (gritter) 9/22/03
-regfree.c:
-	regfree.c	1.3 (gritter) 9/22/03
-regnfa.c:
-	regnfa.c	1.7 (gritter) 9/22/03
-regparse.c:
-	regparse.c	1.12 (gritter) 9/22/03
-wcharm.h:
-	wcharm.h	1.12 (gritter) 10/18/03
+_collelem.c: * Sccsid @(#)_collelem.c	1.4 (gritter) 10/18/03
+_collmult.c: * Sccsid @(#)_collmult.c	1.4 (gritter) 9/22/03
+bracket.c: * Sccsid @(#)bracket.c	1.14 (gritter) 10/18/03
+colldata.h: * Sccsid @(#)colldata.h	1.5 (gritter) 5/1/04
+onefile.c: * Sccsid @(#)onefile.c	1.1 (gritter) 9/22/03
+re.h: * Sccsid @(#)re.h	1.15 (gritter) 2/6/05
+regcomp.c: * Sccsid @(#)regcomp.c	1.6 (gritter) 9/22/03
+regdfa.c: * Sccsid @(#)regdfa.c	1.9 (gritter) 9/22/03
+regdfa.h: * Sccsid @(#)regdfa.h	1.3 (gritter) 9/22/03
+regerror.c: * Sccsid @(#)regerror.c	1.4 (gritter) 3/29/03
+regex.h: * Sccsid @(#)regex.h	1.13 (gritter) 2/6/05
+regexec.c: * Sccsid @(#)regexec.c	1.7 (gritter) 2/6/05
+regfree.c: * Sccsid @(#)regfree.c	1.3 (gritter) 9/22/03
+regnfa.c: * Sccsid @(#)regnfa.c	1.8 (gritter) 2/6/05
+regparse.c: * Sccsid @(#)regparse.c	1.12 (gritter) 9/22/03
+wcharm.h: * Sccsid @(#)wcharm.h	1.12 (gritter) 10/18/03
 */
