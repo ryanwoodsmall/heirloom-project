@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hash.c	1.5 (gritter) 6/16/05
+ * Sccsid @(#)hash.c	1.6 (gritter) 6/26/05
  */
 
 /* from OpenSolaris "hash.c	1.8	05/06/08 SMI"	 SVr4.0 1.3.2.1 */
@@ -112,7 +112,7 @@ hfind(unsigned char *str)
 	struct node 	*p;
 	struct node 	**q;
 	unsigned int 	i;
-	int 			res;		
+	int 			res = 0;
 
 	i = hash(str);
 
