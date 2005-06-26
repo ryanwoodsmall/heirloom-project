@@ -1,5 +1,8 @@
 Release ...
 * Job control now works on FreeBSD.
+* Calls to memcpy() with overlapping source and destination have been
+  replaced by memmove(). (Resulting erroneous behavior had not yet been
+  observed with the original code, though.)
 * The "NOTES" section of the manual page now lists some behavior special
   to the Bourne shell (thanks to Sven Mascheck for maintaining the larger
   list on the web from which the points for this one were derived).

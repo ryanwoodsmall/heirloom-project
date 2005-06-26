@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.9 (gritter) 6/22/05
+ * Sccsid @(#)service.c	1.10 (gritter) 6/26/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -356,7 +356,7 @@ trim(unsigned char *at)
 			}
 
 			if (wc != '\\') {
-				memcpy(last, current, len);
+				memmove(last, current, len);
 				last += len;
 				current += len;
 				continue;
@@ -371,7 +371,7 @@ trim(unsigned char *at)
 					current++;
 					continue;
 				}
-				memcpy(last, current, len);
+				memmove(last, current, len);
 				last += len;
 				current += len;
 			} else
@@ -403,7 +403,7 @@ trims(unsigned char *at)
 			}
 
 			if (wc != '\\') {
-				memcpy(last, current, len);
+				memmove(last, current, len);
 				last += len; current += len;
 				continue;
 			}
@@ -427,7 +427,7 @@ trims(unsigned char *at)
 				current++;
 				continue;
 			}
-			memcpy(last, current, len);
+			memmove(last, current, len);
 			last += len; current += len;
 		}
 		*last = 0;
