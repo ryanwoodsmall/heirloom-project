@@ -6,6 +6,8 @@ Release ...
 * Both Unix lex and flex can now be used for building the tools.
 * xargs: The '-l' and '-L' options override previous occurrences of the
   '-i' or '-I' option.
+* awk (POSIX version): A command line argument that contains a '=' character
+  but starts with a digit is no longer treated as a variable assignment.
 
 Release 050612
 * Fixed a double free() call that could occur in multibyte locales with

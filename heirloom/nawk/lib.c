@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)lib.c	1.25 (gritter) 6/19/05>
+   Sccsid @(#)lib.c	1.26 (gritter) 6/26/05>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -38,6 +38,7 @@
 #include <pfmt.h>
 #include <stdarg.h>
 #include <wctype.h>
+#include "asciitype.h"
 
 #undef	RS
 
@@ -685,9 +686,9 @@ int isclvar(unsigned char *s)	/* is s of form var=something? */
 	unsigned char *os = s;
 
 	for ( ; *s; s++)
-		if (!(isalnum(*s) || *s == '_'))
+		if (!(alnumchar(*s) || *s == '_'))
 			break;
-	return *s == '=' && s > os && *(s+1) != '=';
+	return *s == '=' && s > os && *(s+1) != '=' && !digitchar(*os);
 }
 
 int is2number(register unsigned char *s, Cell *p)
