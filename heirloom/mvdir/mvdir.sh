@@ -32,7 +32,7 @@
 # from OpenSolaris "mvdir.sh	1.11	05/06/08 SMI"
 
 #     Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-#     Sccsid @(#)mvdir.sh	1.6 (gritter) 6/25/05
+#     Sccsid @(#)mvdir.sh	1.7 (gritter) 6/26/05
 
 PATH=@SV3BIN@:@DEFBIN@:$PATH export PATH
 if [ $# != 2 ]
@@ -70,12 +70,14 @@ fi
 	mkdir -- "$t" || exit	# see if we can create the directory
 	(cd "$t"; pwd)
 	rmdir -- "$t"
+	echo		# for synchronization
 	echo		# signal error to awk
-	echo
+	echo		# in case of two errors
 ) | LC_ALL=C awk '{
 	from = $0
 	getline
 	to = $0
+	getline
 	if (to == "" || from == "")
 		exit 2
 	if (index(to, from) == 1 || index(from, to) == 1)
