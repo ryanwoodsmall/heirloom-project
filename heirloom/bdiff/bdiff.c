@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bdiff.c	1.5 (gritter) 6/25/05";
+static const char sccsid[] USED = "@(#)bdiff.c	1.6 (gritter) 6/26/05";
 
 #include "fatal.h"
 #include <signal.h>
@@ -354,7 +354,7 @@ saverest(char **linep, size_t *bufsizp, size_t *buflenp, FILE *iptr)
 	lp = *linep;
 
 	while (lp) {
-		fwrite(*linep, sizeof **linep, *buflenp, stdout);
+		fwrite(*linep, sizeof **linep, *buflenp, temptr);
 		linenum++;
 		lp = readline(linep, bufsizp, buflenp, iptr);
 	}
