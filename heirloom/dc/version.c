@@ -5,11 +5,9 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)dc.sl	2.9 (gritter) 5/29/05";
-
+static const char sccsid[] USED = "@(#)dc.sl	2.11 (gritter) 6/26/05";
+/* SLIST */
 /*
-dc.c:
-	dc.c	1.20 (gritter) 2/4/05
-dc.h:
-	dc.h	1.9 (gritter) 2/4/05
+dc.c:	Sccsid @(#)dc.c	1.20 (gritter) 2/4/05>	
+dc.h:	Sccsid @(#)dc.h	1.9 (gritter) 2/4/05>	
 */

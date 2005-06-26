@@ -32,30 +32,19 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)grep.sl	2.48 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)grep.sl	2.50 (gritter) 6/26/05";
+/* SLIST */
 /*
-ac.c:
-	fgrep.sl	2.9 (gritter) 12/19/04
-alloc.c:
-	alloc.c	1.3 (gritter) 4/17/03
-alloc.h:
-	alloc.h	1.3 (gritter) 4/17/03
-egrep.y:
-	egrep.sl	2.21 (gritter) 12/17/04
-fgrep.c:
-	fgrep.c	1.12 (gritter) 12/17/04
-ggrep.c:
-	ggrep.c	1.25 (gritter) 12/17/04
-grep.c:
-	grep.c	1.52 (gritter) 2/5/05
-grep.h:
-	grep.h	1.22 (gritter) 12/8/04
-plist.c:
-	plist.c	1.22 (gritter) 12/8/04
-rcomp.c:
-	rcomp.c	1.27 (gritter) 2/6/05
-sus.c:
-	sus.c	1.23 (gritter) 2/6/05
-svid3.c:
-	svid3.c	1.7 (gritter) 4/17/03
+ac.c:static const char sccsid[] USED = "@(#)fgrep.sl	2.10 (gritter) 5/29/05";
+alloc.c:	Sccsid @(#)alloc.c	1.3 (gritter) 4/17/03>	
+alloc.h:	Sccsid @(#)alloc.h	1.3 (gritter) 4/17/03>	
+egrep.y:static const char sccsid[] USED = "@(#)egrep.sl	2.22 (gritter) 5/29/05";
+fgrep.c:	Sccsid @(#)fgrep.c	1.12 (gritter) 12/17/04>	
+ggrep.c:	Sccsid @(#)ggrep.c	1.26 (gritter) 1/4/05>	
+grep.c:	Sccsid @(#)grep.c	1.52 (gritter) 2/5/05>	
+grep.h:	Sccsid @(#)grep.h	1.23 (gritter) 1/4/05>	
+plist.c:	Sccsid @(#)plist.c	1.22 (gritter) 12/8/04>	
+rcomp.c:	Sccsid @(#)rcomp.c	1.27 (gritter) 2/6/05>	
+sus.c:	Sccsid @(#)sus.c	1.24 (gritter) 5/29/05>	
+svid3.c:	Sccsid @(#)svid3.c	1.7 (gritter) 4/17/03>	
 */

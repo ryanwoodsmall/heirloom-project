@@ -5,30 +5,18 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)oawk.sl  2.28 (gritter) 6/18/05";
+static const char sccsid[] USED = "@(#)oawk.sl  2.30 (gritter) 6/26/05";
+/* SLIST */
 /*
-awk.def:
-	awk.def	1.18 (gritter) 10/5/04
-awk.g.y:
-	awk.g.y	1.5 (gritter) 7/24/03
-awk.lx.l:
-	awk.lx.l	1.13 (gritter) 6/18/05
-b.c:
-	b.c	1.10 (gritter) 3/31/03
-freeze.c:
-	freeze.c	1.3 (gritter) 3/31/03
-lib.c:
-	lib.c	1.15 (gritter) 4/8/03
-main.c:
-	main.c	1.11 (gritter) 12/12/04
-oawk.1:
-	oawk.1	1.12 (gritter) 4/30/03
-parse.c:
-	parse.c	1.5 (gritter) 4/21/04
-proc.c:
-	proc.c	1.5 (gritter) 4/4/04
-run.c:
-	run.c	1.19 (gritter) 10/13/04
-tran.c:
-	tran.c	1.7 (gritter) 3/31/03
+awk.def: *	Sccsid @(#)awk.def	1.18 (gritter) 10/5/04
+awk.g.y:	Sccsid @(#)awk.g.y	1.5 (gritter) 7/24/03>	
+awk.lx.l:	Sccsid @(#)awk.lx.l	1.13 (gritter) 6/18/05>	
+b.c:	Sccsid @(#)b.c	1.10 (gritter) 3/31/03>	
+freeze.c:	Sccsid @(#)freeze.c	1.3 (gritter) 3/31/03>	
+lib.c:	Sccsid @(#)lib.c	1.16 (gritter) 7/16/04>	
+main.c:	Sccsid @(#)main.c	1.11 (gritter) 12/12/04>	
+parse.c:	Sccsid @(#)parse.c	1.5 (gritter) 4/21/04>	
+proc.c:	Sccsid @(#)proc.c	1.7 (gritter) 10/2/04>	
+run.c:	Sccsid @(#)run.c	1.19 (gritter) 10/13/04>	
+tran.c:	Sccsid @(#)tran.c	1.7 (gritter) 3/31/03>	
 */
