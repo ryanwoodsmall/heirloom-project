@@ -33,10 +33,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pax_su3.sl	1.25 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)pax_su3.sl	1.26 (gritter) 6/26/05";
 #else
-static const char sccsid[] USED = "@(#)pax.sl	1.25 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)pax.sl	1.26 (gritter) 6/26/05";
 #endif
+/*	Sccsid @(#)pax.c	1.26 (gritter) 6/26/05	*/
 
 #include <sys/types.h>
 #include <sys/stat.h>

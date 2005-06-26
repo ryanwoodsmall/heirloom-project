@@ -1,13 +1,13 @@
 all: cpio pax pax_su3
 
-cpio: cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o flags.o nonpax.o
-	$(LD) $(LDFLAGS) cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o flags.o nonpax.o $(LIBZ) $(LIBBZ2) $(LCOMMON) $(LWCHAR) $(LIBS) -o cpio
+cpio: cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o flags.o nonpax.o version.o
+	$(LD) $(LDFLAGS) cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o flags.o nonpax.o version.o $(LIBZ) $(LIBBZ2) $(LCOMMON) $(LWCHAR) $(LIBS) -o cpio
 
 pax: cpio pax.o
-	$(LD) $(LDFLAGS) cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o pax.o $(LIBZ) $(LIBBZ2) $(LCOMMON) $(LUXRE) $(LWCHAR) $(LIBS) -o pax
+	$(LD) $(LDFLAGS) cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o pax.o version.o $(LIBZ) $(LIBBZ2) $(LCOMMON) $(LUXRE) $(LWCHAR) $(LIBS) -o pax
 
 pax_su3: cpio pax_su3.o
-	$(LD) $(LDFLAGS) cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o pax_su3.o $(LIBZ) $(LIBBZ2) $(LCOMMON) $(LUXRE) $(LWCHAR) $(LIBS) -o pax_su3
+	$(LD) $(LDFLAGS) cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o pax_su3.o version.o $(LIBZ) $(LIBBZ2) $(LCOMMON) $(LUXRE) $(LWCHAR) $(LIBS) -o pax_su3
 
 cpio.o: cpio.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(GNUFL) $(LARGEF) $(IWCHAR) $(ICOMMON) -DUSE_ZLIB=$(USE_ZLIB) -DUSE_BZLIB=$(USE_BZLIB) -c cpio.c
@@ -42,6 +42,9 @@ crc32.o: crc32.c
 blast.o: blast.c
 	$(CC) $(CFLAGS2) $(CPPFLAGS) $(GNUFL) $(LARGEF) $(IWCHAR) $(ICOMMON) -c blast.c
 
+version.o: version.c
+	$(CC) $(CFLAGS2) $(CPPFLAGS) $(GNUFL) $(LARGEF) $(IWCHAR) $(ICOMMON) -c version.c
+
 install: all
 	$(UCBINST) -c cpio $(ROOT)$(DEFBIN)/cpio
 	$(STRIP) $(ROOT)$(DEFBIN)/cpio
@@ -53,7 +56,7 @@ install: all
 	$(MANINST) -c -m 644 pax.1 $(ROOT)$(MANDIR)/man1/pax.1
 
 clean:
-	rm -f cpio cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o flags.o nonpax.o pax pax.o pax_su3 pax_su3.o core log *~
+	rm -f cpio cpio.o unshrink.o explode.o expand.o inflate.o crc32.o blast.o flags.o nonpax.o pax pax.o pax_su3 pax_su3.o version.o core log *~
 
 cpio.o: cpio.h blast.h
 unshrink.o: cpio.h unzip.h
