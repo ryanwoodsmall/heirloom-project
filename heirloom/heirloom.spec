@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom.spec	1.29 (gritter) 1/24/05
+# Sccsid @(#)heirloom.spec	1.30 (gritter) 6/28/05
 #
 Summary: Heirloom Toolchest: A collection of standard Unix utilities
 Name: heirloom
@@ -60,10 +60,16 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 %define	libbz2		-lbz2
 %define	use_bzlib	1
 
+%if %(test -x %{sv3bin}/sh && echo 1 || echo 0)
+%define	shell		%{sv3bin}/sh
+%else
+%define	shell		/bin/sh
+%endif
+
 #
 # Combine the settings defined above.
 #
-%define	p_flags	SHELL=/bin/sh ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} SU3BIN=%{su3bin} UCBBIN=%{ucbbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
+%define	p_flags	SHELL=%{shell} ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} SU3BIN=%{su3bin} UCBBIN=%{ucbbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
 %define	c_flags	CC=%{xcc} CFLAGS2=%{cflags2} CFLAGSS=%{cflagss} CFLAGSU=%{cflagsu} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LCURS=%{lcurs} LIBZ=%{libz} USE_ZLIB=%{use_zlib} LIBBZ2=%{libbz2} USE_BZLIB=%{use_bzlib} TTYGRP= YACC=%{yacc}
 %define	makeflags %{p_flags} %{c_flags}
 

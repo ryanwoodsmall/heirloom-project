@@ -1,4 +1,8 @@
-Release ...
+Release 050628
+* The Bourne shell (derived from OpenSolaris code) has been added to the
+  Heirloom project as a separate package. It is recommended to install it
+  before the new version of the tools, and to adapt 'build/mk.config' such
+  that it is used.
 * New versions of the 'mail' and 'spell' utilities have been introduced;
   they have been derived from OpenSolaris code.
 * The 'bdiff, 'bfs', 'dircmp', 'fmtmsg', 'getopt', and 'mvdir' utilities

@@ -39,6 +39,11 @@ make            Implementations known to work are GNU make, AIX make,
 
 The following prerequisites are optional:
 
+Bourne shell    It is recommended that the Heirloom Bourne shell from
+                <http://heirloom.sourceforge.net/sh.html> is installed
+                first. The tools will work with any shell, but use of the
+                Bourne shell ensures maximum compatibility with traditional
+                Unix behavior.
 gzip            <http://www.gzip.org/>. Invoked by cpio/pax, file, and
                 tar when a gzip compressed file is encountered.
 bzip2           <http://sources.redhat.com/bzip2>. Invoked by cpio/pax,
@@ -60,7 +65,10 @@ wait a few minutes and install the resulting rpm that is found in
 /usr/src/redhat/RPMS/i386/heirloom-<version>-1.i386.rpm (or wherever
 your vendor's setup puts such files). Then access the tools by prefixing
 your PATH with /usr/5bin and skip the rest of this section. (With older
-versions of rpm you need to use 'rpm' instead of 'rpmbuild'.)
+versions of rpm you need to use 'rpm' instead of 'rpmbuild'.) The tools
+in the package will automatically use the Heirloom Bourne shell if it is
+installed at compilation time; the Heirloom Toolchest package then
+requires the Heirloom Bourne shell package to be also installed.
 
 On Solaris and Open UNIX, you can build a package for pkgadd from
 the sources. Extract them, change to the heirloom-<version> directory,
@@ -289,4 +297,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/19/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/28/05

@@ -121,6 +121,15 @@ dietinstall:
 	$(MAKE) $(DIETFLAGS) install
 	rm -rf /tmp/__man__
 
+world:
+	make mrproper
+	make diet
+	sudo make dietinstall
+	make mrproper
+	make
+	sudo make install
+	make clean
+
 freebsd:
 	$(MAKE) LKVM=-lkvm \
 	XO5FL= XO6FL= GNUFL= YACC=yacc
