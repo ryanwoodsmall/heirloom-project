@@ -32,7 +32,9 @@ MAILSPOOL       The directory where the mail files of users are stored
 
 SENDMAIL        Path to the de-facto standard /usr/lib/sendmail interface
                 normally offered by Unix MTAs. If only SMTP is used to send
-                mail, the value does not matter.
+                mail, the value does not matter. Note that if you want to
+                use the '-r' option in nail, the sendmail interface must
+                support the '-r' option too.
 
 DESTDIR         Prepended to BINDIR, MANDIR etc. at 'make install'. Mostly
                 useful for package building.
@@ -237,4 +239,4 @@ simply assumes that you want to build NSS if it manages to build the test
 executable.
 
 
-        Gunnar Ritter                                   11/11/04
+        Gunnar Ritter                                   6/28/05

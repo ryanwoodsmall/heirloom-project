@@ -1,4 +1,4 @@
-[11.23] released ...
+[11.23] released 6/28/05
 * The output for the '~p' tilde escape was extended to include the fields
   implied by the 'from', 'replyto', 'sender', and 'ORGANIZATION' variables
   (Proposed by Bob Tennent).
@@ -17,6 +17,9 @@
   'editheaders' variable.
 * The '-r' option now actually disables tilde escapes as documented (Bugreport
   by Bob Tennent).
+* The INSTALL file now notes that sendmail must support the '-r' option if
+  the '-r' option of nail is used (Issue reported by Attila Zimler and
+  Allan Peda).
 * The 'move' command does not anymore mark messages as moved if writing to
   an IMAP folder fails.
 * The 'undelete' command now also clears the 'saved' flags of messages that
