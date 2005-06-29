@@ -30,14 +30,14 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char id[] = "@(#)test_sus.sl	1.4 (gritter) 6/29/05";
+static const char id[] = "@(#)test_sus.sl	1.5 (gritter) 6/29/05";
 #else
-static const char id[] = "@(#)test.sl	1.4 (gritter) 6/29/05";
+static const char id[] = "@(#)test.sl	1.5 (gritter) 6/29/05";
 #endif
 /* SLIST */
 /*
-defs.h: * Sccsid @(#)defs.h	1.1 (gritter) 6/29/05
-helper.c: * Sccsid @(#)helper.c	1.1 (gritter) 6/29/05
+defs.h: * Sccsid @(#)defs.h	1.2 (gritter) 6/29/05
+helper.c: * Sccsid @(#)helper.c	1.2 (gritter) 6/29/05
 main.c: * Sccsid @(#)main.c	1.2 (gritter) 6/29/05
-test.c: * Sccsid @(#)test.c	1.8 (gritter) 6/29/05
+test.c: * Sccsid @(#)test.c	1.9 (gritter) 6/29/05
 */

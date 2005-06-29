@@ -3,8 +3,8 @@ all: test test_sus
 test: test.o main.o helper.o version.o
 	$(LD) $(LDFLAGS) test.o main.o helper.o version.o $(LCOMMON) $(LIBS) -o test
 
-test_sus: test_sus.o main.o helper.o version_sus.o
-	$(LD) $(LDFLAGS) test_sus.o main.o helper.o version_sus.o $(LCOMMON) $(LIBS) -o test_sus
+test_sus: test_sus.o main.o helper_sus.o version_sus.o
+	$(LD) $(LDFLAGS) test_sus.o main.o helper_sus.o version_sus.o $(LCOMMON) $(LIBS) -o test_sus
 
 test.o: test.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -c test.c
@@ -17,6 +17,9 @@ main.o: main.c
 
 helper.o: helper.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -c helper.c
+
+helper_sus.o: helper.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -DSUS -c helper.c -o helper_sus.o
 
 version.o: version.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -c version.c
@@ -32,9 +35,10 @@ install: all
 	$(MANINST) -c -m 644 test.1 $(ROOT)$(MANDIR)/man1/test.1
 
 clean:
-	rm -f test test.o test_sus test_sus.o main.o helper.o version.o version_sus.o core log *~
+	rm -f test test.o test_sus test_sus.o main.o helper.o helper_sus.o version.o version_sus.o core log *~
 
 main.o: main.c defs.h
 helper.o: helper.c defs.h
+helper_sus.o: helper.c defs.h
 test.o: test.c defs.h
 test_sus.o: test.c defs.h

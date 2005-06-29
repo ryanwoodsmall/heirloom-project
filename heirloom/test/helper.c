@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)helper.c	1.1 (gritter) 6/29/05
+ * Sccsid @(#)helper.c	1.2 (gritter) 6/29/05
  */
 /* from OpenSolaris "hashserv.c	1.12	05/06/08 SMI"	 SVr4.0 1.10.5.1 */
 /*
@@ -107,5 +107,5 @@ void
 failed(const char *p, const char *q)
 {
 	fprintf(stderr, "%s: %s\n", p, q);
-	exit(1);
+	exit(ERROR);
 }
