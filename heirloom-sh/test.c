@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)test.c	1.7 (gritter) 6/19/05
+ * Sccsid @(#)test.c	1.8 (gritter) 6/29/05
  */
 /* from OpenSolaris "test.c	1.15	05/06/08 SMI" */
 
@@ -160,6 +160,12 @@ e3(void)
 			return(chk_access(nxtarg(0), S_IWRITE, 0) == 0);
 		if (eq(a, "-x"))
 			return(chk_access(nxtarg(0), S_IEXEC, 0) == 0);
+#ifdef	SUS
+		if (eq(a, "-e"))
+			return(access(nxtarg(0), F_OK) == 0);
+		if (eq(a, "-S"))
+			return(filtyp(nxtarg(0), S_IFSOCK));
+#endif	/* SUS */
 		if (eq(a, "-d"))
 			return(filtyp(nxtarg(0), S_IFDIR));
 		if (eq(a, "-c"))
