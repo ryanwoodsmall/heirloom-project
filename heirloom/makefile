@@ -5,16 +5,16 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	cal calendar cat chmod chown \
 	cksum cmp col comm copy cp cpio csplit cut \
 	date dc dd deroff diff diff3 dircmp dirname df du \
-	ed env expand expr \
+	echo ed env expand expr \
 	factor file find fmt fmtmsg fold \
 	getopt grep groups hd head hostname id join \
 	line listusers ln logins logname ls \
 	mail man mkdir mkfifo mknod more mvdir \
 	nawk news nice nl nohup oawk od \
-	paste pg pgrep pr printenv priocntl ps psrinfo \
+	paste pg pgrep pr printenv priocntl ps psrinfo pwd \
 	random renice rm rmdir \
 	sdiff sed setpgrp shl sleep sort spell split stty su sum sync \
-	tabs tail tapecntl tar tcopy tee time touch tr tsort tty \
+	tabs tail tapecntl tar tcopy tee test time touch tr tsort tty \
 	ul uname uniq units users wc what who whoami whodo xargs yes
 
 dummy: makefiles all

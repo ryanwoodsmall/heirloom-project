@@ -1,0 +1,113 @@
+.\"
+.\" Sccsid @(#)echo.1	1.1 (gritter) 6/29/05
+.\" Derived from echo(1), Unix 7th Edition:
+.\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\"   Redistributions of source code and documentation must retain the
+.\"    above copyright notice, this list of conditions and the following
+.\"    disclaimer.
+.\"   Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"   All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"      This product includes software developed or owned by Caldera
+.\"      International, Inc.
+.\"   Neither the name of Caldera International, Inc. nor the names of
+.\"    other contributors may be used to endorse or promote products
+.\"    derived from this software without specific prior written permission.
+.\"
+.\" USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
+.\" INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+.\" BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+.\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+.\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+.\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.TH ECHO 1 "6/29/05" "Heirloom Toolchest" "User Commands"
+.SH NAME
+echo \- echo arguments
+.SH SYNOPSIS
+\fBecho\fR [\fIargument \fR...]
+.SH DESCRIPTION
+.I Echo
+writes its
+.I arguments
+separated by blanks and terminated by
+a newline on the standard output.
+.PP
+.I Echo
+is useful for producing diagnostics in
+shell programs and for writing constant data on pipes.
+To send diagnostics to the standard error file, do
+`echo ... 1>&2'.
+.PP
+The following escapes sequences are recognized in the
+.IR arguments :
+.TP 7n
+.B \eb
+Prints a backspace character.
+.TP
+.B \ec
+Causes the command to return immediately.
+Any following characters are ignored,
+and the terminating newline is not printed.
+.TP
+.B \ef
+Prints a formfeed character.
+.TP
+.B \en
+Prints a newline character.
+.TP
+.B \er
+Prints a carriage-return character.
+.TP
+.B \et
+Prints a tabulator character.
+.TP
+.B \ev
+Prints a vertical tabulator character.
+.TP
+.B \e\e
+Prints a backslash character.
+.TP
+.BI \e0 nnn
+Prints the character (byte) with octal value
+.IR nnn .
+.SH "ENVIRONMENT VARIABLES"
+.TP
+.BR LANG ", " LC_ALL
+See
+.IR locale (7).
+.TP
+.B LC_CTYPE
+Determines the scope of backslash as an escape character.
+.TP
+.B PATH
+If
+.I /usr/ucb
+precedes
+.I /usr/5bin
+or
+.I /usr/bin
+in the setting of this
+variable and the first argument is
+.BR \-n ,
+the terminating newline is not printed,
+and no escape sequences are recognized.
+.TP
+.B SYSV3
+If this variable is set,
+the
+.I \-n
+argument is also interpreted,
+but escape sequences are processed as usual.
