@@ -22,12 +22,12 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)strsig.c	1.7 (gritter) 6/19/05
+ * Sccsid @(#)strsig.c	1.8 (gritter) 6/30/05
  */
 
 #include <signal.h>
 #include <stdlib.h>
-#include "defs.h"
+#include <string.h>
 
 static const struct sig_strlist {
 	const int	sig_num;
@@ -170,7 +170,7 @@ str_2_sig(const char *str, int *signum)
 	char	*x;
 
 	for (i = 0; sig_strs[i].sig_str; i++)
-		if (eq(str, sig_strs[i].sig_str))
+		if (strcmp(str, sig_strs[i].sig_str) == 0)
 			break;
 	if (sig_strs[i].sig_str == NULL) {
 		n = strtol(str, &x, 10);
@@ -192,7 +192,7 @@ sig_2_str(int signum, char *str)
 			break;
 	if (sig_strs[i].sig_str == NULL)
 		return -1;
-	movstr(sig_strs[i].sig_str, str);
+	strcpy(str, sig_strs[i].sig_str);
 	return 0;
 }
 

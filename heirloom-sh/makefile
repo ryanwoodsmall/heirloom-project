@@ -149,7 +149,7 @@ service.o: service.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 setbrk.o: setbrk.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 stak.o: stak.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 string.o: string.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
-strsig.o: strsig.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
+strsig.o: strsig.c
 test.o: test.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 ulimit.o: ulimit.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 umask.o: umask.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
