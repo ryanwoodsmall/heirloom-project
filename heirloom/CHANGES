@@ -1,7 +1,7 @@
 Release ...
 * The 'echo' and 'test' commands have been added as standalone versions of
   those of the Heirloom Bourne shell.
-* The 'false', 'pwd', and 'true' commands have been added.
+* The 'false', 'kill', 'pwd', and 'true' commands have been added.
 
 Release 050628
 * The Bourne shell (derived from OpenSolaris code) has been added to the

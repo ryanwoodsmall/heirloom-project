@@ -8,7 +8,7 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	echo ed env expand expr \
 	factor file find fmt fmtmsg fold \
 	getopt grep groups hd head hostname id join \
-	line listusers ln logins logname ls \
+	kill line listusers ln logins logname ls \
 	mail man mkdir mkfifo mknod more mvdir \
 	nawk news nice nl nohup oawk od \
 	paste pg pgrep pr printenv priocntl ps psrinfo pwd \
