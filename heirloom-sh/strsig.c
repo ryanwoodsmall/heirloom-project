@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)strsig.c	1.8 (gritter) 6/30/05
+ * Sccsid @(#)strsig.c	1.9 (gritter) 6/30/05
  */
 
 #include <signal.h>
@@ -174,7 +174,7 @@ str_2_sig(const char *str, int *signum)
 			break;
 	if (sig_strs[i].sig_str == NULL) {
 		n = strtol(str, &x, 10);
-		if (*x != '\0' || n < 0 || n >= i)
+		if (*x != '\0' || n < 0 || n >= i || *str == '+' || *str == '-')
 			return -1;
 		*signum = n;
 	} else
