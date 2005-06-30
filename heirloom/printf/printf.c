@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)printf.c	1.3 (gritter) 6/30/05";
+static const char sccsid[] USED = "@(#)printf.c	1.4 (gritter) 7/1/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,37 +60,44 @@ usage(void)
 	exit(2);
 }
 
-static int
-constant(const char *cp)
-{
-	char	*xp;
-	wchar_t	wc;
-	int	i, n;
-
-	if (*cp == '"' || *cp == '\'') {
-		if (mb_cur_max > 1 && cp[1] & 0200) {
-			if ((i = mbtowc(&wc, &cp[1], mb_cur_max)) < 0)
-				return WEOF;
-			return wc;
-		} else
-			return cp[1] & 0377;
-	}
-	errno = 0;
-	n = strtol(cp, &xp, 0);
-	if (errno) {
-		fprintf(stderr, "%s: \"%s\" arithmetic overflow\n",
-			progname, cp);
-		status |= 1;
-		xp = "";
-	}
-	if (*xp) {
-		fprintf(stderr, "%s: \"%s\" %s\n", progname, cp,
-			xp > cp ? "not completely converted" :
-				"expected numeric value");
-		status |= 1;
-	}
-	return n;
+#define	getnum(T, type, func)	static type \
+T(const char *cp) \
+{ \
+	char	*xp; \
+	wchar_t	wc; \
+	int	i; \
+	type	n; \
+\
+	if (*cp == '"' || *cp == '\'') { \
+		if (mb_cur_max > 1 && cp[1] & 0200) { \
+			if ((i = mbtowc(&wc, &cp[1], mb_cur_max)) < 0) \
+				return WEOF; \
+			return wc; \
+		} else \
+			return cp[1] & 0377; \
+	} \
+	errno = 0; \
+	n = func(cp, &xp); \
+	if (errno) { \
+		fprintf(stderr, "%s: \"%s\" arithmetic overflow\n", \
+			progname, cp); \
+		status |= 1; \
+		xp = ""; \
+	} \
+	if (*xp) { \
+		fprintf(stderr, "%s: \"%s\" %s\n", progname, cp, \
+			xp > cp ? "not completely converted" : \
+				"expected numeric value"); \
+		status |= 1; \
+	} \
+	return n; \
 }
+
+#define	getint(a, b)	strtol(a, b, 0)
+#define	getdouble(a, b)	strtod(a, b)
+
+getnum(integer, int, getint)
+getnum(floating, double, getdouble)
 
 static int
 backslash(int bflag, int really)
@@ -220,21 +227,23 @@ percent(void)
 		fp--;
 		return;
 	}
-	switch (*fp) {
+loop:	switch (*fp) {
 	case '-':
 		sign = -1;
 		/*FALLTHRU*/
 	case '+':
 	case '#':
 	case '0':
+	case ' ':
 		fp++;
+		goto loop;
 	}
 	if (digitchar(*fp&0377)) {
 		do
 			width = width * 10 + *fp++ - '0';
 		while (digitchar(*fp&0377));
 	} else if (*fp == '*') {
-		width = a < ac ? constant(av[a++]) : 0;
+		width = a < ac ? integer(av[a++]) : 0;
 		fp++;
 		star |= 1;
 	}
@@ -247,7 +256,7 @@ percent(void)
 				prec = prec * 10 + *fp++ - '0';
 			while (digitchar(*fp&0377));
 		} else if (*fp == '*') {
-			prec = a < ac ? constant(av[a++]) : 0;
+			prec = a < ac ? integer(av[a++]) : 0;
 			fp++;
 			star |= 2;
 		}
@@ -267,7 +276,7 @@ percent(void)
 	case 'X':
 	case 'c':
 		if (a < ac)
-			n = *fp == 'c' ? *av[a++] & 0377 : constant(av[a++]);
+			n = *fp == 'c' ? *av[a++] & 0377 : integer(av[a++]);
 		else
 			n = 0;
 		c = fp[1];
@@ -293,7 +302,7 @@ percent(void)
 	case 'g':
 	case 'G':
 		if (a < ac)
-			f = strtod(av[a++], NULL);
+			f = floating(av[a++]);
 		else
 			f = 0;
 		c = fp[1];
@@ -344,6 +353,11 @@ main(int argc, char **argv)
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
 	progname = basename(argv[0]);
+	if (argc > 1 && argv[1][0] == '-' && argv[1][1] == '-' &&
+			argv[1][2] == '\0') {
+		argv++;
+		argc--;
+	}
 	if (argc <= 1)
 		usage();
 	ac = argc;
