@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)echo.c	1.7 (gritter) 6/16/05
+ * Sccsid @(#)echo.c	1.8 (gritter) 6/30/05
  */
 /* from OpenSolaris "echo.c	1.16	05/06/08 SMI" */
 
@@ -115,6 +115,11 @@ echo(int argc, unsigned char **argv)
 
 				if (wc == '\\') {
 					switch (*++cp) {
+#ifdef	SUS
+					case 'a':
+						prc_buff('\a');
+						continue;
+#endif	/* SUS */
 					case 'b':
 						prc_buff('\b');
 						continue;

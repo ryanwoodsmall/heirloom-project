@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xec.c	1.5 (gritter) 6/22/05
+ * Sccsid @(#)xec.c	1.6 (gritter) 6/30/05
  */
 /* from OpenSolaris "xec.c	1.23	05/06/08 SMI" */
 /*
@@ -341,7 +341,8 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 
 		case TPAR:
 			/* Forked process is subshell:  may want job control */
-			flags &= ~jcoff;
+			if ((xflags & XEC_PIPED) == 0)
+				flags &= ~jcoff;
 			clearjobs();
 			execute(parptr(t)->partre, xflags, errorflg, NULL, NULL);
 			done(0);
@@ -351,7 +352,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 				int pv[2];
 
 				chkpipe(pv);
-				if (execute(lstptr(t)->lstlef, xflags & XEC_NOSTOP, errorflg, pf1, pv) == 0)
+				if (execute(lstptr(t)->lstlef, xflags & XEC_NOSTOP | XEC_PIPED, errorflg, pf1, pv) == 0)
 					execute(lstptr(t)->lstrit, xflags, errorflg, pv, pf2);
 				else
 					closepipe(pv);
@@ -359,7 +360,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 			break;
 
 		case TLST:
-			execute(lstptr(t)->lstlef, xflags&XEC_NOSTOP, errorflg, NULL, NULL);
+			execute(lstptr(t)->lstlef, xflags&(XEC_NOSTOP|XEC_PIPED), errorflg, NULL, NULL);
 			/* Update errorflg if set -e is invoked in the sub-sh*/
 			execute(lstptr(t)->lstrit, xflags, (errorflg | (eflag & errflg)), NULL, NULL);
 			break;

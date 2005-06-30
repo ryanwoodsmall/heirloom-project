@@ -1,4 +1,7 @@
 Release ...
+* Job control is not re-enabled in interactive subshells within the left
+  sides of pipelines anymore. This previously caused commands like
+  "(cat a; cat b) | cat" to fail with "+ Stopped (tty output)".
 * Job control now works on FreeBSD.
 * Calls to memcpy() with overlapping source and destination have been
   replaced by memmove(). (Resulting erroneous behavior had not yet been

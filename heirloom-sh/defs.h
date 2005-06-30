@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.19 (gritter) 6/19/05
+ * Sccsid @(#)defs.h	1.20 (gritter) 6/30/05
  */
 
 #ifndef	_DEFS_H
@@ -51,6 +51,7 @@ extern "C" {
 #define		XEC_EXECED	01
 #define			XEC_LINKED	02
 #define		XEC_NOSTOP	04
+#define		XEC_PIPED	010
 
 /* endjobs flags */
 #define			JOB_STOPPED	01
