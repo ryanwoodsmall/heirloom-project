@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)echo.1	1.2 (gritter) 6/30/05
+.\" Sccsid @(#)echo.1	1.3 (gritter) 6/30/05
 .\" Derived from echo(1), Unix 7th Edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -54,6 +54,13 @@ To send diagnostics to the standard error file, do
 The following escapes sequences are recognized in the
 .IR arguments :
 .TP 7n
+.B \ea
+Prints an alert character
+.RB ( /usr/5bin/posix/echo
+and
+.B /usr/5bin/posix2001/echo
+only).
+.TP
 .B \eb
 Prints a backspace character.
 .TP
