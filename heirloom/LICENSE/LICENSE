@@ -25,16 +25,16 @@ The following tools have been rewritten from scratch:
 
 	basename	cat	chown	cmp	copy	cp
 	cpio*	csplit	cut	date	dd	df	dirname
-	du	env	expand	fold	groups	hd	head
-	hostname	id	install	line	listusers
+	du	env	expand	false 	fold	groups	hd
+	head	hostname	id	install	line	listusers
 	logins	logname	man	mkdir	mkfifo	mknod	mt
 	newform	news	nice	nl	nohup	od	paste
 	pg	pgrep	printenv	priocntl	ps
 	psrinfo	pwd	rm	rmdir	sdiff	setpgrp	shl
 	sleep	split	stty	su	sync	tabs	tape
-	tapecntl	tee	time	touch	tr	tty
-	uname	unexpand	users	wc	who	whoami
-	whodo	xargs	yes
+	tapecntl	tee	time	touch	tr	true
+	tty	uname	unexpand	users	wc	who
+	whoami	whodo	xargs	yes
 
 	* See below for the licenses on compression codes.
 
@@ -348,4 +348,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								6/29/05
+Gunnar Ritter								6/30/05

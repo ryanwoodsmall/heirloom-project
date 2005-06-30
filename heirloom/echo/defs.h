@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.1 (gritter) 6/29/05
+ * Sccsid @(#)defs.h	1.2 (gritter) 6/29/05
  */
 
 #include <stdlib.h>
@@ -45,7 +45,11 @@ struct namnod {
 #define	N_EXPORT	1
 #define	N_ENVNAM	2
 
+#ifdef	SUS
+#define	ERROR		2
+#else	/* !SUS */
 #define	ERROR		1
+#endif	/* !SUS */
 
 #define	badop		"unknown operator "
 #define	badopt		"bad option(s)"

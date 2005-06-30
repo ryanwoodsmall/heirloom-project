@@ -29,10 +29,10 @@
 #else
 #define	USED
 #endif
-static const char id[] = "@(#)echo.sl	1.3 (gritter) 6/29/05";
+static const char id[] = "@(#)echo.sl	1.4 (gritter) 6/29/05";
 /* SLIST */
 /*
-defs.h: * Sccsid @(#)defs.h	1.1 (gritter) 6/29/05
+defs.h: * Sccsid @(#)defs.h	1.2 (gritter) 6/29/05
 echo.c: * Sccsid @(#)echo.c	1.7 (gritter) 6/16/05
 main.c: * Sccsid @(#)main.c	1.2 (gritter) 6/29/05
 */
