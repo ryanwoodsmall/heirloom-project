@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)printf.c	1.4 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)printf.c	1.5 (gritter) 7/1/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +42,11 @@ static const char sccsid[] USED = "@(#)printf.c	1.4 (gritter) 7/1/05";
 #include <limits.h>
 #include <errno.h>
 #include "asciitype.h"
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	putchar
+#define	putchar(c)	_IO_putc_unlocked(c, stdout)
+#endif
 
 static char		*fp;		/* format pointer */
 static int		a;		/* current argument index */
