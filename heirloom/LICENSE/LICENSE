@@ -29,12 +29,12 @@ The following tools have been rewritten from scratch:
 	head	hostname	id	install	kill	line
 	listusers	logins	logname	man	mkdir	mkfifo
 	mknod	mt	newform	news	nice	nl	nohup
-	od	paste	pg	pgrep	printenv	priocntl
-	ps	psrinfo	pwd	rm	rmdir	sdiff	setpgrp
-	shl	sleep	split	stty	su	sync	tabs
-	tape	tapecntl	tee	time	touch	tr
-	true	tty	uname	unexpand	users	wc
-	who	whoami	whodo	xargs	yes
+	od	paste	pg	pgrep	printenv	printf
+	priocntl	ps	psrinfo	pwd	rm	rmdir
+	sdiff	setpgrp	shl	sleep	split	stty	su
+	sync	tabs	tape	tapecntl	tee	time
+	touch	tr	true	tty	uname	unexpand
+	users	wc	who	whoami	whodo	xargs	yes
 
 	* See below for the licenses on compression codes.
 
