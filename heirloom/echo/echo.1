@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)echo.1	1.1 (gritter) 6/29/05
+.\" Sccsid @(#)echo.1	1.2 (gritter) 6/30/05
 .\" Derived from echo(1), Unix 7th Edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH ECHO 1 "6/29/05" "Heirloom Toolchest" "User Commands"
+.TH ECHO 1 "6/30/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 echo \- echo arguments
 .SH SYNOPSIS
@@ -111,3 +111,12 @@ the
 .I \-n
 argument is also interpreted,
 but escape sequences are processed as usual.
+.SH "SEE ALSO"
+printf(1)
+.SH NOTES
+It is recommended for portability that
+.IR printf (1)
+is used instead of
+.I echo
+if backslashes are to be printed
+or if the trailing newline is to be omitted.
