@@ -1,25 +1,25 @@
 all: test test_sus
 
 test: test.o main.o helper.o version.o
-	$(LD) $(LDFLAGS) test.o main.o helper.o version.o $(LCOMMON) $(LIBS) -o test
+	$(LD) $(LDFLAGS) test.o main.o helper.o version.o $(LCOMMON) $(LWCHAR) $(LIBS) -o test
 
 test_sus: test_sus.o main.o helper_sus.o version_sus.o
-	$(LD) $(LDFLAGS) test_sus.o main.o helper_sus.o version_sus.o $(LCOMMON) $(LIBS) -o test_sus
+	$(LD) $(LDFLAGS) test_sus.o main.o helper_sus.o version_sus.o $(LCOMMON) $(LWCHAR) $(LIBS) -o test_sus
 
 test.o: test.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -c test.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) $(IWCHAR) -c test.c
 
 test_sus.o: test.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -DSUS -c test.c -o test_sus.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) $(IWCHAR) -DSUS -c test.c -o test_sus.o
 
 main.o: main.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -Dfunc='test' -c main.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) $(IWCHAR) -Dfunc='test' -c main.c
 
 helper.o: helper.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -c helper.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) $(IWCHAR) -c helper.c
 
 helper_sus.o: helper.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -DSUS -c helper.c -o helper_sus.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) $(IWCHAR) -DSUS -c helper.c -o helper_sus.o
 
 version.o: version.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(LARGEF) $(ICOMMON) -c version.c
