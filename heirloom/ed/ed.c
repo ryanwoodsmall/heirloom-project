@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.94 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.95 (gritter) 7/1/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.94 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.95 (gritter) 7/1/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.94 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.95 (gritter) 7/1/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.94 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.95 (gritter) 7/1/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -1138,7 +1138,7 @@ getfile(void)
 	do {
 		if (--ninbuf < 0) {
 			if (ioeof || (ninbuf=read(io, genbuf, LBSIZE)-1) < 0) {
-				if (ninbuf < -1) {
+				if (ioeof == 0 && ninbuf < -1) {
 					puts("input error");
 					status = 1;
 				}
