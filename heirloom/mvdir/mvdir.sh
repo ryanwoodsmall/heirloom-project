@@ -32,17 +32,17 @@
 # from OpenSolaris "mvdir.sh	1.11	05/06/08 SMI"
 
 #     Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-#     Sccsid @(#)mvdir.sh	1.7 (gritter) 6/26/05
+#     Sccsid @(#)mvdir.sh	1.8 (gritter) 7/1/05
 
 PATH=@SV3BIN@:@DEFBIN@:$PATH export PATH
 if [ $# != 2 ]
 then
-  echo "Usage: mvdir fromdir newname" >&2
+  echo "Usage: `basename $0` fromdir newname" >&2
   exit 2
 fi
 if [ "$1" = . ]
 then
-	echo "mvdir: cannot move '.'" >&2
+	echo "`basename $0`: cannot move '.'" >&2
 	exit 2
 fi
 f=`basename "$1"`

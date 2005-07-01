@@ -27,7 +27,7 @@
 #	All rights reserved.
 # from OpenSolaris "dircmp.sh	1.21	05/06/08 SMI"
 #     Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-#     Sccsid @(#)dircmp.sh	1.5 (gritter) 6/25/05
+#     Sccsid @(#)dircmp.sh	1.6 (gritter) 7/1/05
 tmpdir=/var/tmp
 PATH=@SV3BIN@:@DEFBIN@:$PATH export PATH
 progname=`basename $0`
@@ -105,7 +105,7 @@ do
 	s)	Sflag=1;; 
 	w)	width=`expr $OPTARG + 0 2>/dev/null`
 		if [ $? = 2 ]
-		then echo "dircmp: numeric argument required"
+		then echo "$progname: numeric argument required"
 			exit 2
 		fi
 		;;

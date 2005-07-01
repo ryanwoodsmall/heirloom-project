@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.3 (gritter) 6/26/05
+ * Sccsid @(#)main.c	1.4 (gritter) 7/1/05
  */
 
 
@@ -60,6 +60,7 @@
 #include	<errno.h>
 #include	<unistd.h>
 #include	<stdlib.h>
+#include	<libgen.h>
 #include	"fmtmsg.h"
 
 
@@ -87,7 +88,7 @@
 
 
 #define	CLASS		(MM_PRINT|MM_SOFT|MM_NRECOV|MM_UTIL)
-#define BIGUSAGE	"fmtmsg [-a action] [-c class] [-l label] [-s severity] [-t tag]\n       [-u subclass[,subclass[,...]]] [text]\n"
+#define BIGUSAGE	"%s [-a action] [-c class] [-l label] [-s severity] [-t tag]\n       [-u subclass[,subclass[,...]]] [text]\n"
 
 
 /*
@@ -563,7 +564,7 @@ main(
 	 */
 
 	if (argc == 1) {
-	    fputs(BIGUSAGE, stderr);
+	    fprintf(stderr, BIGUSAGE, cmdname);
 	    exit(0);
 	}
 
@@ -639,7 +640,7 @@ main(
 
 	/* Report syntax errors */
 	if (errflg) {
-	    fputs(BIGUSAGE, stderr);
+	    fprintf(stderr, BIGUSAGE, cmdname);
 	    exit(1);
 	}
 

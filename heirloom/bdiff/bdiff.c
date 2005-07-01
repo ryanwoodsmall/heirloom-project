@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bdiff.c	1.6 (gritter) 6/26/05";
+static const char sccsid[] USED = "@(#)bdiff.c	1.7 (gritter) 7/1/05";
 
 #include "fatal.h"
 #include <signal.h>
@@ -51,6 +51,7 @@ static const char sccsid[] USED = "@(#)bdiff.c	1.6 (gritter) 6/26/05";
 #include <string.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <libgen.h>
 #include "sigset.h"
 
 #define	ONSIG	16
@@ -112,7 +113,7 @@ main(int argc, char *argv[])
 	FILE *poldtemp, *pnewtemp, *pipeinp;
 	int status;
 
-	prognam = argv[0];
+	prognam = basename(argv[0]);
 	/*
 	 * Set flags for 'fatal' so that it will clean up,
 	 * produce a message, and terminate.

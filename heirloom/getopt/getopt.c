@@ -40,13 +40,14 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)getopt.c	1.3 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)getopt.c	1.4 (gritter) 7/1/05";
 
 #include <stdio.h>
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #define	BLOCKLEN	5120
 
@@ -57,11 +58,14 @@ static const char sccsid[] USED = "@(#)getopt.c	1.3 (gritter) 6/24/05";
 		if ((len + incr) >= size) { \
 			size = len + incr + 1; \
 			if ((buf = realloc(buf, size)) == NULL) { \
-				fputs("getopt: Out of memory\n", stderr); \
+				fprintf(stderr, "%s: Out of memory\n", \
+						progname); \
 				exit(2); \
 			} \
 		} \
 	}
+
+static const char	*progname;
 
 int
 main(int argc, char **argv)
@@ -73,8 +77,9 @@ main(int argc, char **argv)
 	char	*goarg;
 	size_t	bufsize;
 
+	progname = basename(argv[0]);
 	if (argc < 2) {
-		fputs("usage: getopt legal-args $*\n", stderr);
+		fprintf(stderr, "usage: %s legal-args $*\n", progname);
 		exit(2);
 	}
 
@@ -85,7 +90,7 @@ main(int argc, char **argv)
 
 	bufsize = BLOCKLEN;
 	if ((outstr = malloc(bufsize)) == NULL) {
-		fputs("getopt: Out of memory\n", stderr);
+		fprintf(stderr, "%s: Out of memory\n", progname);
 		exit(2);
 	}
 	outstr[0] = '\0';
