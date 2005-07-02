@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bfs.c	1.14 (gritter) 6/24/05";
+static const char sccsid[] USED = "@(#)bfs.c	1.15 (gritter) 7/2/05";
 
 #include <setjmp.h>
 #include <signal.h>
@@ -921,7 +921,7 @@ excomd(void)
 		/* Guarantees child can be intr. */
 		sigset(SIGINT, SIG_DFL);
 		if (infildes == 100 || flag4) {
-			execl(SHELL, "sh", "-c", intptr, 0);
+			execl(SHELL, "sh", "-c", intptr, NULL);
 			_exit(0);
 		}
 		if (infildes != 0) {
@@ -929,7 +929,7 @@ excomd(void)
 			dup(infildes);
 		}
 		for (j = 3; j < 15; j++) close(j);
-		execl(SHELL, "sh", "-t", 0);
+		execl(SHELL, "sh", "-t", NULL);
 		_exit(0);
 	}
 	sigset(SIGINT, SIG_IGN);

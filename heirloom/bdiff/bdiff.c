@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bdiff.c	1.7 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)bdiff.c	1.8 (gritter) 7/2/05";
 
 #include "fatal.h"
 #include <signal.h>
@@ -295,7 +295,7 @@ main(int argc, char *argv[])
 			putenv("LC_ALL=C");
 
 			/* Execute 'diff' on the segment files. */
-			execlp(diff, diff, "-a", otmp, ntmp, 0);
+			execlp(diff, diff, "-a", otmp, ntmp, NULL);
 
 			/*
 			 * Exit code here must be > 1.
