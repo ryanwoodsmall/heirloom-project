@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)istext.c	1.5 (gritter) 7/3/05
+ * Sccsid @(#)istext.c	1.6 (gritter) 7/3/05
  */
 #include "mail.h"
 #include <ctype.h>
@@ -48,8 +48,10 @@ istext(register unsigned char *s, int size)
 
 	for (ep = s; ep < &s[size]; ep += n) {
 		if (mb_cur_max > 1) {
-			if ((n = mbtowc(&wc, ep, &s[size] - ep)) <= 0)
+			if ((n = mbtowc(&wc, ep, &s[size] - ep)) <= 0) {
+				mbtowc(NULL, NULL, 0);
 				return(FALSE);
+			}
 			if (!iswprint(wc) && !iswspace(wc) &&
 					wc != 010 && wc != 007)
 				return(FALSE);
