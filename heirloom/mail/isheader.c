@@ -28,9 +28,10 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)isheader.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)isheader.c	1.5 (gritter) 7/3/05
  */
 #include "mail.h"
+#include "asciitype.h"
 /*
  * isheader(lp, ctf) - check if lp is header line and return type
  *	lp	-> 	pointer to line
@@ -48,7 +49,7 @@ isheader(char *lp, int *ctfp)
 	register int	i;
 
 	p = lp;
-	while((*p) && (*p != '\n') && (isspace(*p))) {
+	while((*p) && (*p != '\n') && (spacechar(*p&0377))) {
 		p++;
 	}
 	if((*p == '\0') || (*p == '\n')) {
@@ -85,7 +86,7 @@ isheader(char *lp, int *ctfp)
  	 */
 	if ((p = strpbrk(lp, ":")) != NULL ) {
 		for(q = lp; q < p; q++)  {
-			if ((*q == ' ') || (!isprint(*q)))  {
+			if (!graphchar(*q&0377))  {
 				return(FALSE);
 			}
 		}

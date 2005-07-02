@@ -33,13 +33,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)skipspace.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)skipspace.c	1.4 (gritter) 7/3/05
  */
 /*LINTLIBRARY*/
 
 #include <sys/types.h>
 #include "libmail.h"
-#include <ctype.h>
+#include "asciitype.h"
 
 /*
  * Return pointer to first non-blank character in p
@@ -47,7 +47,7 @@
 char *
 skipspace(char *p)
 {
-	while (*p && isspace(*p)) {
+	while (*p && spacechar(*p&0377)) {
 		p++;
 	}
 	return (p);

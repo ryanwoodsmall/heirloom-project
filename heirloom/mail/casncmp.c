@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)casncmp.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)casncmp.c	1.4 (gritter) 7/3/05
  */
 /*LINTLIBRARY*/
 
@@ -50,15 +50,15 @@
  */
 
 #include "libmail.h"
-#include <ctype.h>
 #include <sys/types.h>
+#include "asciitype.h"
 
 int
 casncmp(char *s1, char *s2, ssize_t n)
 {
 	if (s1 == s2)
 		return (0);
-	while ((--n >= 0) && (tolower(*s1) == tolower(*s2))) {
+	while ((--n >= 0) && (lowerconv(*s1&0377) == lowerconv(*s2&0377))) {
 		s2++;
 		if (*s1++ == '\0')
 			return (0);

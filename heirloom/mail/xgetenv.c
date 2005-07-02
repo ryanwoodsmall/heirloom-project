@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xgetenv.c	1.4 (gritter) 6/22/05
+ * Sccsid @(#)xgetenv.c	1.5 (gritter) 7/3/05
  */
 /*LINTLIBRARY*/
 
@@ -77,7 +77,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#include <ctype.h>
+#include "asciitype.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -184,15 +184,15 @@ reduce(char *from)
 	char *svfrom = from;
 
 	/* <sp1> */
-	while (*from &&isspace((int)*from))
+	while (*from &&spacechar(*from&0377))
 		from++;
 
 	/* variable */
-	while (*from && (*from != '=') && !isspace((int)*from))
+	while (*from && (*from != '=') && !spacechar(*from&0377))
 		*to++ = *from++;
 
 	/* <sp2> */
-	while (*from && isspace((int)*from))
+	while (*from && spacechar(*from&0377))
 		from++;
 
 	/* = */
@@ -200,7 +200,7 @@ reduce(char *from)
 		*to++ = *from++;
 
 	/* <sp3> */
-	while (*from && isspace((int)*from))
+	while (*from && spacechar(*from&0377))
 		from++;
 
 	/* value */
@@ -208,7 +208,7 @@ reduce(char *from)
 		*to++ = *from++;
 
 	/* <sp4> */
-	while ((to > svfrom) && isspace((int)to[-1]))
+	while ((to > svfrom) && spacechar(to[-1]&0377))
 		to--;
 	*to = '\0';
 }

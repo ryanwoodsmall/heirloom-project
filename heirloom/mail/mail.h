@@ -36,7 +36,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mail.h	1.8 (gritter) 6/18/05
+ * Sccsid @(#)mail.h	1.11 (gritter) 7/3/05
  */
 
  /*
@@ -132,7 +132,7 @@
 
 #define	H_AFWDCNT		1	/* "Auto-Forward-Count:"  */
 #define	H_AFWDFROM		2	/* "Auto-Forwarded-From:" */
-#define	H_CLEN			3	/* "Content-Length:"      */
+/*	H_CLEN			3	   "Content-Length:"      */
 #define	H_CTYPE			4	/* "Content-Type:"        */
 #define	H_DATE			5	/* "Date:" 		  */
 #define	H_DEFOPTS		6	/* "Default-Options:" 	  */
@@ -140,7 +140,7 @@
 #define	H_FROM			8	/* "From " 		  */
 #define	H_FROM1			9	/* ">From " 		  */
 #define	H_FROM2			10	/* "From: " 		  */
-#define	H_MIMEVERS		11	/* "MIME-Version:"        */
+/*	H_MIMEVERS		11	   "MIME-Version:"        */
 #define	H_MTSID			12	/* "MTS-Message-ID:" 	  */
 #define	H_MTYPE			13	/* "Message-Type:" 	  */
 #define	H_MVERS			14	/* "Message-Version:" 	  */
@@ -422,6 +422,7 @@ extern	char	mailsave[];	/* dir for save files */
 extern	char	*mailsurr;	/* surrogate file name */
 extern	FILE	*malf;		/* File pointer for mailfile */
 extern	int	maxerr;		/* largest value of error */
+extern	int	mb_cur_max;	/* MB_CUR_MAX */
 extern	char	mbox[];		/* name for mbox */
 extern	uid_t	mf_uid;		/* uid of user's mailfile */
 extern	gid_t	mf_gid;		/* gid of user's mailfile */

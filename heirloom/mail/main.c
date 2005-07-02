@@ -32,10 +32,11 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.10 (gritter) 6/22/05
+ * Sccsid @(#)main.c	1.11 (gritter) 7/3/05
  */
 
 #include "mail.h"
+#include <locale.h>
 /*
  *	mail [ -ehpPqrtw ] [-x debuglevel] [ -f file ] [ -F user(s) ]
  *	mail -T file persons
@@ -54,6 +55,8 @@ main(int argc, char **argv)
 
 	(void)&argc;
 	(void)&argv;
+	setlocale(LC_CTYPE, "");
+	mb_cur_max = MB_CUR_MAX;
 	/* fix here for bug #1086130 - security hole	*/
 	/* skip over the LD_* env variable		*/
 	env_var_idx = 0; next_slot_idx = 0;

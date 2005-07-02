@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)init.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)init.c	1.8 (gritter) 7/3/05
  */
 
  /*
@@ -118,7 +118,7 @@ struct hdr	header[] = {
 	{	"",				FALSE,	},
 	{	"Auto-Forward-Count:",		FALSE,	},
 	{	"Auto-Forwarded-From:",		FALSE,	},
-	{	"Content-Length:",		TRUE,	},
+	{	"Content-Length:" /* unused */,	TRUE,	},
 	{	"Content-Type:",		FALSE,	},
 	{	"Date:",			TRUE,	},
 	{	"Default-Options:",		FALSE,	},
@@ -126,7 +126,7 @@ struct hdr	header[] = {
 	{	"From ",			TRUE,	},
 	{	">From ",			TRUE,	},
 	{	"From:",			TRUE,	},
-	{	"MIME-Version:",		FALSE,	},
+	{	"MIME-Version:" /* unused */,	FALSE,	},
 	{	"MTS-Message-ID:",		FALSE,	},
 	{	"Message-Type:",		FALSE,	},
 	{	"Message-Version:",		FALSE,	},
@@ -203,6 +203,7 @@ char		mailsave[] = SAVEDIR;	/* dir for save files */
 char		*mailsurr = MAILSURR;	/* surrogate file name */
 FILE		*malf;		/* File pointer for mailfile */
 int		maxerr = 0;	/* largest value of error */
+int		mb_cur_max;	/* MB_CUR_MAX */
 char		mbox[] = "/mbox";	/* name for mbox */
 uid_t		mf_uid;		/* uid of users mailfile */
 gid_t		mf_gid;		/* gid of users mailfile */

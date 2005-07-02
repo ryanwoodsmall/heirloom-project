@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)copylet.c	1.5 (gritter) 6/18/05
+ * Sccsid @(#)copylet.c	1.7 (gritter) 7/3/05
  */
 
 #include "mail.h"
@@ -100,7 +100,6 @@ xxxcopylet(int letnum, register FILE *f, int type)
 					/* H_AFWDFROM lines? */
 	int	didrcvlines = FALSE;	/* Did we already put out any */
 					/* H_RECEIVED lines? */
-	long	clen = -1L;
 	int	htype = 0;			/* header type */
 	int	sav_htype;	/* Header type of last non-H_CONT header line */
 	struct hdrs *hptr = NULL;
@@ -130,15 +129,6 @@ xxxcopylet(int letnum, register FILE *f, int type)
 		}
 		htype = isheader (buf, &ctf);
 		Dout(pn, 5, "loop 1: buf = %s, htype= %d/%s\n", buf, htype, header[htype].tag);
-		if (htype == H_CLEN) {
-			if (!sending) {
-				savehdrs(buf,htype);
-			}
-			if ((hptr = hdrlines[H_CLEN].head) !=
-			    (struct hdrs *)NULL) {
-				clen = atol (hptr->value);
-			}
-		}
 		if (type == ZAP) {
 			if (htype != FALSE) {
 				pushrest = (lastc != '\n');
@@ -197,7 +187,7 @@ xxxcopylet(int letnum, register FILE *f, int type)
 				/* Account for content-type info */
 				/* of returned msg */
 				if (fprintf(f, "%s %s\n", header[H_CTYPE].tag,
-				    (let[letnum].text == TRUE ? "text/plain" : "application/octet-stream")) < 0)
+				    (let[letnum].text == TRUE ? "text" : "binary")) < 0)
 				{
 					sav_errno = errno;
 					Return(FALSE);
@@ -227,25 +217,11 @@ xxxcopylet(int letnum, register FILE *f, int type)
 							(struct hdrs *)NULL) {
 				    i += rcvbytecnt;
 				}
-				/* Add in strlen of MIME-Version:, */
-				/* Content-Length: and Content-Type: */
+				/* Add in strlen of Content-Type: */
 				/* values for msg being returned... */
-				if ((hptr = hdrlines[H_MIMEVERS].head) !=
-							(struct hdrs *)NULL) {
-				    i += strlen(hdrlines[H_MIMEVERS].head->value);
-				}
 				if ((hptr = hdrlines[H_CTYPE].head) !=
 							(struct hdrs *)NULL) {
 				    i += strlen(hdrlines[H_CTYPE].head->value);
-				}
-				if ((hptr = hdrlines[H_CLEN].head) !=
-							(struct hdrs *)NULL) {
-				    i += strlen(hdrlines[H_CLEN].head->value);
-				}
-				if (fprintf(f, "%s %ld\n", header[H_CLEN].tag, i) < 0)
-				{
-					sav_errno = errno;
-					Return(FALSE);
 				}
 			}
 			if (fprintf(f, "\n") < 0)
@@ -318,16 +294,11 @@ xxxcopylet(int letnum, register FILE *f, int type)
 			    }
 			    continue;
 			case H_TCOPY:
-			case H_MIMEVERS:
 			case H_CTYPE:
-			case H_CLEN:
 				if (!sending) {
 					savehdrs(buf,htype);
 				}
 				hptr = hdrlines[htype].head;
-				if (htype == H_CLEN) {
-					clen = atol (hptr->value);
-				}
 				/*
 				 * Use values saved in hdrlines[] structure
 				 * rather than what was read from tmp file.
@@ -374,16 +345,7 @@ xxxcopylet(int letnum, register FILE *f, int type)
 			break;
 		}
 
-	Dout(pn, 1, "header processed, clen/k/n = %ld/%ld/%d\n", clen, k, n);
-
-	if (clen >= 0) {
-		if (((clen - n) == k) || ((clen - n) == (k - 1))) {
-			k = clen - n;
-		} else {
-			/* probable content-length mismatch. show it ALL! */
-			Dout(pn, 1, "clen conflict. using k = %ld\n", k);
-		}
-	}
+	Dout(pn, 1, "header processed, k/n = %ld/%ld/%d\n", k, n);
 
 	/* copy balance of message */
 	if (rtrncont)

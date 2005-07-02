@@ -7,6 +7,11 @@ Release ...
   realloc().
 * ed: Do not warn about an 'input error' anymore when reading a file that
   lacks the terminating newline.
+* mail: The Content-Length header field is not used anymore; it is ignored
+  when a folder is read, and is omitted when a message is written.
+* mail: The LC_CTYPE locale now determines the set of printable characters.
+* mail: MIME header fields are no longer generated; the mail command is far
+  away from conforming to MIME and should not fake such information.
 
 Release 050628
 * The Bourne shell (derived from OpenSolaris code) has been added to the

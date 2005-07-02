@@ -28,9 +28,10 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pickFrom.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)pickFrom.c	1.5 (gritter) 7/3/05
  */
 #include "mail.h"
+#include "asciitype.h"
 /*
  * pickFrom (line) - scans line, ASSUMED TO BE of the form
  *	[>]From <fromU> <date> [remote from <fromS>]
@@ -49,7 +50,7 @@ pickFrom(register char *lineptr)
 	lineptr += 5;
 	cpy(&fromU, &fromUsize, lineptr);
 	for (p = fromU; *p; p++)
-		if (isspace(*p & 0377)) {
+		if (spacechar(*p & 0377)) {
 			*p = '\0';
 			break;
 		}
@@ -62,7 +63,7 @@ pickFrom(register char *lineptr)
 		lineptr += rfl;
 		cpy(&fromS, &fromSsize, lineptr);
 		for (p = fromS; *p; p++)
-			if (isspace(*p & 0377)) {
+			if (spacechar(*p & 0377)) {
 				*p = '\0';
 				break;
 			}

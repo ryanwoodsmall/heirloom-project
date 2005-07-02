@@ -28,9 +28,12 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)istext.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)istext.c	1.5 (gritter) 7/3/05
  */
 #include "mail.h"
+#include <ctype.h>
+#include <wctype.h>
+#include <wchar.h>
 
 /*
  * istext(line, size) - check for text characters
@@ -39,16 +42,28 @@ int
 istext(register unsigned char *s, int size)
 {
 	register unsigned char *ep;
+	wchar_t	wc;
 	register int c;
-	
-	for (ep = s+size; --ep >= s; ) {
-		c = *ep;
-		if ((!isprint(c)) && (!isspace(c)) &&
-		    /* Since backspace is not included in either of the */
-		    /* above, must do separately                        */
-		    /* Bell character is allowable control char in the text */
-		    (c != 010) && (c != 007)) {
-			return(FALSE);
+	int	n;
+
+	for (ep = s; ep < &s[size]; ep += n) {
+		if (mb_cur_max > 1) {
+			if ((n = mbtowc(&wc, ep, &s[size] - ep)) <= 0)
+				return(FALSE);
+			if (!iswprint(wc) && !iswspace(wc) &&
+					wc != 010 && wc != 007)
+				return(FALSE);
+		} else {
+			n = 1;
+			c = *ep&0377;
+			if ((!isprint(c)) && (!isspace(c)) &&
+		    	/* Since backspace is not included in either of the */
+		    	/* above, must do separately                        */
+		    	/* Bell character is allowable control char in the  */
+			/* text */
+					(c != 010) && (c != 007)) {
+				return(FALSE);
+			}
 		}
 	}
 	return(TRUE);

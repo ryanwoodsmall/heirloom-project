@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getdomain.c	1.4 (gritter) 6/22/05
+ * Sccsid @(#)getdomain.c	1.5 (gritter) 7/3/05
  */
 /*LINTLIBRARY*/
 
@@ -44,6 +44,7 @@
 #include <sys/utsname.h>
 #include <sys/systeminfo.h>
 #endif
+#include "asciitype.h"
 
 #define	NMLN 512
 #ifdef __sun
@@ -83,9 +84,9 @@ look4domain(char *file, char *buf, int size)
 
 	while (fgets(buf, size, fp))
 		if (strncmp(buf, "domain", 6) == 0)
-	if (isspace(buf[6])) {
+	if (spacechar(buf[6]&0377)) {
 		char *x = skipspace(buf + 6);
-		if (isgraph(*x)) {
+		if (graphchar(*x&0377)) {
 			trimnl(x);
 			strmove(buf, x);
 			ret = buf;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sendmail.c	1.6 (gritter) 6/22/05
+ * Sccsid @(#)sendmail.c	1.9 (gritter) 7/3/05
  */
 
 #include "mail.h"
@@ -95,7 +95,7 @@ sendmail(int argc, char **argv)
 	bp = localtime(&iop);
 	tp = asctime(bp);
 	zp = tzname[bp->tm_isdst];
-	sprintf(datestring, "%.16s %.3s %.5s", tp, zp, tp+20);
+	sprintf(datestring, "%.16s %.4s %.5s", tp, zp, tp+20);
 	trimnl (datestring);
 	/* asctime: Fri Sep 30 00:00:00 1986\n */
 	/*          0123456789012345678901234  */
@@ -194,8 +194,6 @@ sendmail(int argc, char **argv)
 			concat(&Rpath, &Rpathsize, fromS);
 			n = 0; /* don't copy remote from's into mesg. */
 			break;
-		case H_MIMEVERS:
-		case H_CLEN:
 		case H_CTYPE:
 			/* suppress it: only generated if needed */
 			n = 0; /* suppress */
@@ -250,27 +248,13 @@ sendmail(int argc, char **argv)
 			return;
 		} else {
 			/*
-			 * no content: put mime-version, content-type
-			 * and -length only if explicitly present.
+			 * no content: put content-type
+			 * only if explicitly present.
 			 * Write out 'place-holders' only. (see below....)
 			 */
-			if ((hptr = hdrlines[H_MIMEVERS].head) !=
-						    (struct hdrs *)NULL) {
-				snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
-				if (!wtmpf(line, strlen(line))) {
-					done(0);
-				}
-			}
 			if ((hptr = hdrlines[H_CTYPE].head) !=
 						    (struct hdrs *)NULL) {
 				snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
-				if (!wtmpf(line, strlen(line))) {
-					done(0);
-				}
-			}
-			if ((hptr = hdrlines[H_CLEN].head) !=
-						    (struct hdrs *)NULL) {
-				snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
@@ -283,27 +267,13 @@ sendmail(int argc, char **argv)
 		n = getline (&buf, &bufsize, stdin);
 		if (n == 0 || (ttyf && !strncmp (buf, ".\n", 2)) ) {
 			/*
-			 * no content: put mime-version, content-type
-			 * and -length only if explicitly present.
-			 * Write out 'place-holders' only. (see below....)
+			 * no content: put content-type
+			 * only if explicitly present.
+			 * Write out 'place-holder' only. (see below....)
 			 */
-			if ((hptr = hdrlines[H_MIMEVERS].head) !=
-						    (struct hdrs *)NULL) {
-				snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
-				if (!wtmpf(line, strlen(line))) {
-					done(0);
-				}
-			}
 			if ((hptr = hdrlines[H_CTYPE].head) !=
 						    (struct hdrs *)NULL) {
 				snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
-				if (!wtmpf(line, strlen(line))) {
-					done(0);
-				}
-			}
-			if ((hptr = hdrlines[H_CLEN].head) !=
-						    (struct hdrs *)NULL) {
-				snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
 				if (!wtmpf(line, strlen(line))) {
 					done(0);
 				}
@@ -318,30 +288,16 @@ sendmail(int argc, char **argv)
 	}
 
 	/* 
-	 * Write out H_MIMEVERS, H_CTYPE & H_CLEN lines. These are used only as 
+	 * Write out H_CTYPE line. This is used only as 
 	 * placeholders in the tmp file. When the 'real' message is sent,
-	 * the proper values will be put out by copylet().
+	 * the proper value will be put out by copylet().
 	 */
-	snprintf(line, linesize, "%s \n", header[H_MIMEVERS].tag);
-	if (!wtmpf(line, strlen(line))) {
-		done(0);
-	}
-	if (hdrlines[H_MIMEVERS].head == (struct hdrs *)NULL) {
-		savehdrs(line, H_MIMEVERS);
-	}
 	snprintf(line, linesize, "%s \n", header[H_CTYPE].tag);
 	if (!wtmpf(line, strlen(line))) {
 		done(0);
 	}
 	if (hdrlines[H_CTYPE].head == (struct hdrs *)NULL) {
 		savehdrs(line,H_CTYPE);
-	}
-	snprintf(line, linesize, "%s \n", header[H_CLEN].tag);
-	if (!wtmpf(line, strlen(line))) {
-		done(0);
-	}
-	if (hdrlines[H_CLEN].head == (struct hdrs *)NULL) {
-		savehdrs(line,H_CLEN);
 	}
 	/* and a blank line */
 	if (!wtmpf("\n", 1)) {
@@ -390,24 +346,11 @@ wrapsend:
 	let[0].text = (binflg == 1 ? FALSE : TRUE);
 	Dout(pn, 0, "body copy complete, count %ld\n", count);
 	/*
-	 * Modify value of H_MIMEVERS if necessary.
-	 */
-	if ((hptr = hdrlines[H_MIMEVERS].head) != (struct hdrs *)NULL) {
-		if (strlen(hptr->value) == 0)
-			strcpy(hptr->value, "1.0");
-	}
-	/*
 	 * Modify value of H_CTYPE if necessary.
 	 */
 	if ((hptr = hdrlines[H_CTYPE].head) != (struct hdrs *)NULL) {
 		if (strlen(hptr->value) == 0)
-			strcpy(hptr->value, "text/plain");
-	}
-	/*
-	 * Set 'place-holder' value of content length to true value
-	 */
-	if ((hptr = hdrlines[H_CLEN].head) != (struct hdrs *)NULL) {
-		snprintf(hptr->value, sizeof (hptr->value), "%ld", count);
+			strcpy(hptr->value, binflg ? "binary" : "text");
 	}
 
 	if (fclose(tmpf) == EOF) {

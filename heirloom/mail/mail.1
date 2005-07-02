@@ -63,10 +63,10 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\"	Sccsid @(#)mail.1	1.10 (gritter) 6/30/05
+.\"	Sccsid @(#)mail.1	1.11 (gritter) 7/3/05
 .\"	from binmail.1	6.1 (Berkeley) 4/29/85
 .\"
-.TH MAIL 1 "6/30/05" "Heirloom Toolchest" "User Commands"
+.TH MAIL 1 "7/3/05" "Heirloom Toolchest" "User Commands"
 .AT 3
 .SH NAME
 mail \- send or receive mail among users
@@ -282,6 +282,14 @@ lock for mail directory
 unmailable text
 .SH "ENVIRONMENT VARIABLES"
 .TP
+.BR LANG ", " LC_ALL
+See
+.IR locale (7).
+.TP
+.B LC_CTYPE
+Determines the set of printable characters
+when deciding whether a message is text or not.
+.TP
 .B MAIL
 User's mail file.
 .SH "SEE ALSO"
@@ -293,4 +301,4 @@ Race conditions sometimes result in a failure to remove a lock file.
 .PP
 The
 .I mail
-command is restricted to ASCII text messages.
+command is restricted to text messages in the current locale.

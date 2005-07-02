@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)copymt.c	1.5 (gritter) 6/22/05
+ * Sccsid @(#)copymt.c	1.6 (gritter) 7/3/05
  */
 /*
     NAME
@@ -54,9 +54,7 @@ copymt(register FILE *f1, register FILE *f2)
 	int ToldUser = FALSE;
 	int mesg = 0;
 	int ctf = FALSE; 		/* header continuation flag */
-	long clen = (long)0;
 	int hdr = 0;
-	int cflg = 0;			/* found Content-length in header */
 
 	Dout(pn, 0,"entered\n");
 	if (!let[1].adr) {
@@ -74,75 +72,6 @@ copymt(register FILE *f1, register FILE *f2)
 		} else if ((hdr = isheader (line, &ctf)) == FALSE) {
 			ctf = FALSE;	/* next line can't be cont. */
 		}
-		if (!hdr && cflg) {	/* nonheader, Content-length seen */
-			if (clen < n) {	/* read too much */
-				/* NB: this only can happen if the content-length
-				 * says a smaller number than what's seen on the
-				 * first non-header line.
-				 */
-				if (let[nlet-1].text == TRUE) {
-					let[nlet-1].text = istext((unsigned char*)line,clen);
-				    Dout(pn, 0, "1, let[%d].text = %s\n",
-					   nlet-1,
-					   (let[nlet-1].text ? "TRUE":"FALSE"));
-				}
-				if (fwrite(line,1,(int)clen,f2) != clen) {
-					fclose(f1); fclose(f2);
-					errmsg(E_FILE,
-						"Write error in copymt()");
-					done(0);
-				}
-				nextadr += clen;
-				n -= clen;
-				strmove (line, line+clen);
-				cflg = 0;
-				ctf = FALSE;
-				hdr = isheader(line, &ctf);
-				goto dohdr;
-			}
-			/* here, clen >= n */
-			if (n == 1 && line[0] == '\n'){	/* leading empty line */
-				clen++;		/* cheat */
-			}
-			nextadr += clen;
-			for (;;) {
-				if (let[nlet-1].text == TRUE) {
-					let[nlet-1].text = istext((unsigned char*)line,n);
-				  Dout(pn, 0, "2, let[%d].text = %s\n",
-					nlet-1,
-					(let[nlet-1].text ? "TRUE" : "FALSE"));
-				}
-				if (fwrite(line,1,n,f2) != n) {
-					fclose(f1); fclose(f2);
-					errmsg(E_FILE,
-						"Write error in copymt()");
-					done(0);
-				}
-				clen -= n;
-				if (clen <= 0) {
-					break;
-				}
-				n = clen < linesize ? clen : linesize;
-				if ((n = fread (line, 1, n, f1)) <= 0) {
-				    fprintf(stderr,
-		"%c%s:\tYour mailfile was found to be corrupted.\n",
-						BELL, program);
-				    fprintf(stderr,
-					"\t(Unexpected end-of-file).\n");
-				    fprintf(stderr,
-					"\tMessage #%d may be truncated.%c\n\n",
-						nlet, BELL);
-					nextadr -= clen;
-					clen = 0; /* stop the loop */
-				}
-			}
-			/* All done, go to top for next message */
-			cflg = 0;
-			StartNewMsg = TRUE;
-			continue;
-		}
-
-dohdr:
 		switch (hdr) {
 		case H_FROM:
 			if(nlet >= (MAXLET-2)) {
@@ -158,13 +87,6 @@ dohdr:
 			Dout(pn, 5, "setting StartNewMsg to FALSE\n");
 			StartNewMsg = FALSE;
 			ToldUser = FALSE;
-			break;
-		case H_CLEN:
-			if (cflg) {
-				break;
-			}
-			cflg = TRUE;	/* mark for clen processing */
-			clen = atol (strpbrk (line, ":")+1);
 			break;
 		default:
 			break;

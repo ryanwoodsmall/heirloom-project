@@ -32,10 +32,11 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)isit.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)isit.c	1.5 (gritter) 7/3/05
  */
 
 #include "mail.h"
+#include "asciitype.h"
 
 /*
  * isit(lp, type) --  match "name" portion of 
@@ -63,7 +64,7 @@ isit(register char *lp, register int type)
 		break;
 	default:
 		for (p = header[type].tag; *lp && *p; lp++, p++) {
-			if (toupper(*p) != toupper(*lp))  {
+			if (upperconv(*p&0377) != upperconv(*lp&0377))  {
 				return(FALSE);
 			}
 		}

@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)add_recip.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)add_recip.c	1.5 (gritter) 7/3/05
  */
 	 	/* SVr4.0 1.5	*/
 /*
@@ -49,6 +49,7 @@
 */
 
 #include "mail.h"
+#include "asciitype.h"
 
 int
 add_recip(reciplist *plist, char *name, int checkdups)
@@ -63,7 +64,7 @@ add_recip(reciplist *plist, char *name, int checkdups)
 	}
 
 	p = name;
-	while (*p && !isspace(*p)) {
+	while (*p && !spacechar(*p&0377)) {
 		p++;
 	}
 	if (*p != '\0') {
