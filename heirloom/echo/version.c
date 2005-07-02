@@ -29,14 +29,16 @@
 #else
 #define	USED
 #endif
-#ifdef	SUS
-static const char id[] = "@(#)echo_sus.sl	1.6 (gritter) 6/30/05";
+#if defined (UCB)
+static const char id[] = "@(#)/usr/ucb/echo.sl	1.7 (gritter) 7/2/05";
+#elif defined (SUS)
+static const char id[] = "@(#)echo_sus.sl	1.7 (gritter) 7/2/05";
 #else	/* !SUS */
-static const char id[] = "@(#)echo.sl	1.6 (gritter) 6/30/05";
+static const char id[] = "@(#)echo.sl	1.7 (gritter) 7/2/05";
 #endif	/* !SUS */
 /* SLIST */
 /*
-defs.h: * Sccsid @(#)defs.h	1.2 (gritter) 6/29/05
-echo.c: * Sccsid @(#)echo.c	1.8 (gritter) 6/30/05
-main.c: * Sccsid @(#)main.c	1.2 (gritter) 6/29/05
+defs.h: * Sccsid @(#)defs.h	1.3 (gritter) 7/2/05
+echo.c: * Sccsid @(#)echo.c	1.9 (gritter) 7/2/05
+main.c: * Sccsid @(#)main.c	1.3 (gritter) 7/2/05
 */

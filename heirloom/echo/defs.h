@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.2 (gritter) 6/29/05
+ * Sccsid @(#)defs.h	1.3 (gritter) 7/2/05
  */
 
 #include <stdlib.h>
@@ -56,7 +56,11 @@ struct namnod {
 #define	btest		"test"
 #define	colon		": "
 
-extern int	ucb_builtins;
+#ifndef	UCB
+#define	ucb_builtins	0
+#else	/* UCB */
+#define	ucb_builtins	1
+#endif	/* UCB */
 
 extern int		chk_access(const char *, mode_t, int);
 #define	eq(a, b)	(strcmp(a, b) == 0)

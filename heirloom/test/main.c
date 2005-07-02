@@ -23,51 +23,24 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.2 (gritter) 6/29/05
+ * Sccsid @(#)main.c	1.3 (gritter) 7/2/05
  */
 
 #include "defs.h"
 #include <locale.h>
 
 int	mb_cur_max;
-int	ucb_builtins;
 
 int
 main(int argc, char **argv)
 {
 	extern int	func(int, char **);
 	extern int	sysv3;
-	char	*pp;
 
 	if (sysv3)
 		putenv("SYSV3=set");
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
-	if ((pp = getenv("PATH")) != NULL) {
-		while (*pp) {
-			while (*pp == ':')
-				pp++;
-			if (strncmp(pp, "/usr/ucb", 8) == 0 &&
-					(pp[8] == ':' || pp[8] == '\0')) {
-				ucb_builtins = 1;
-				break;
-			} else if (strncmp(pp, "/bin", 4) == 0 &&
-					(pp[4] == ':' || pp[4] == '\0')) {
-				ucb_builtins = 0;
-				break;
-			} else if (strncmp(pp, "/usr/bin", 8) == 0 &&
-					(pp[8] == ':' || pp[8] == '\0')) {
-				ucb_builtins = 0;
-				break;
-			} else if (strncmp(pp, "/usr/5bin", 9) == 0 &&
-					(pp[9] == ':' || pp[9] == '\0')) {
-				ucb_builtins = 0;
-				break;
-			}
-			while (*pp && *pp != ':')
-				pp++;
-		}
-	}
 	return func(argc, argv);
 }
 
