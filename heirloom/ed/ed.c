@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.95 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.96 (gritter) 7/2/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.95 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.96 (gritter) 7/2/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.95 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.96 (gritter) 7/2/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.95 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.96 (gritter) 7/2/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -1233,6 +1233,8 @@ append(int (*f)(void), long *a)
 			}
 			dot += zero - ozero;
 			dol += zero - ozero;
+			addr1 += zero - ozero;
+			addr2 += zero - ozero;
 			if (unddot) {
 				unddot += zero - ozero;
 				unddol += zero - ozero;

@@ -2,6 +2,9 @@ Release ...
 * The 'echo' and 'test' commands have been added as standalone versions of
   those of the Heirloom Bourne shell.
 * The 'false', 'kill', 'printf', 'pwd', and 'true' commands have been added.
+* ed: Copying a larger number of lines with the 't' command could cause a
+  segmentation fault because some pointers were not updated after calling
+  realloc().
 * ed: Do not warn about an 'input error' anymore when reading a file that
   lacks the terminating newline.
 
