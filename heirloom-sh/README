@@ -6,6 +6,7 @@ to compile on:
 
 Linux           glibc 2.2 and above, diet libc
 Solaris         9 and above
+Open UNIX       8.0.0
 HP-UX           B.11.11 and above
 AIX             5.1
 Tru64 Unix      5.1
@@ -28,4 +29,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<Gunnar.Ritter@pluto.uni-freiburg.de>                           6/20/05
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           7/2/05
