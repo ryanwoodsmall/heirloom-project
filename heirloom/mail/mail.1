@@ -63,7 +63,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\"	Sccsid @(#)mail.1	1.11 (gritter) 7/3/05
+.\"	Sccsid @(#)mail.1	1.12 (gritter) 7/3/05
 .\"	from binmail.1	6.1 (Berkeley) 4/29/85
 .\"
 .TH MAIL 1 "7/3/05" "Heirloom Toolchest" "User Commands"
@@ -302,3 +302,7 @@ Race conditions sometimes result in a failure to remove a lock file.
 The
 .I mail
 command is restricted to text messages in the current locale.
+It does not support the MIME specification.
+For message exchange on the Internet,
+.I mail
+is thus effectively restricted to ASCII text messages.
