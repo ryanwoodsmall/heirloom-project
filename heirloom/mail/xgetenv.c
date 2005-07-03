@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xgetenv.c	1.5 (gritter) 7/3/05
+ * Sccsid @(#)xgetenv.c	1.6 (gritter) 7/3/05
  */
 /*LINTLIBRARY*/
 
@@ -148,12 +148,16 @@ char *
 xgetenv(char *env)
 {
 	extern char **environ;
-	char *ret, **svenviron = environ;
-
-	environ = xenv;
-	ret = getenv(env);
-	environ = svenviron;
-	return (ret);
+	char *ret, **svenviron;
+	
+	if (xenv != NULL) {
+		svenviron = environ;
+		environ = xenv;
+		ret = getenv(env);
+		environ = svenviron;
+		return (ret);
+	} else
+		return NULL;
 }
 
 /*
