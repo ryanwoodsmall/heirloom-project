@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.9 (gritter) 7/3/05
+ * Sccsid @(#)bltin.c	1.10 (gritter) 7/3/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -606,6 +606,8 @@ spellcheck(unsigned char *old)
 			}
 		}
 		closedir(dir);
+		if (best == 0)
+			return 0;
 		if (np+1 > brkend)
 			growstak(np);
 		*np++ = '/';
