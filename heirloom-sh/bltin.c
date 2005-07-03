@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.8 (gritter) 7/3/05
+ * Sccsid @(#)bltin.c	1.9 (gritter) 7/3/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -212,23 +212,27 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 			    cdpath);
 
 #ifdef	SPELL
-			if (flags & ttyflg && f && spellcheck(a1)) {
-				int	c, d;
-				prs_buff("cd ");
-				prs_buff(curstak());
-				prs_buff("? ");
-				flushb();
-				c = readwc();
-				if (c != NL && c != EOF)
-					while ((d = readwc()) != NL &&
-							d != EOF);
-				if (c == 'y' || c == 'Y' || c == NL ||
-						c == EOF) {
-					a1 = curstak();
-					f = chdir((const char *)a1) < 0;
-					if (f == 0)
-						prs("ok\n");
-				}
+			if (flags & ttyflg && f) {
+				int	saverrno = errno;
+				if (spellcheck(a1)) {
+					int	c, d;
+					prs_buff("cd ");
+					prs_buff(curstak());
+					prs_buff("? ");
+					flushb();
+					c = readwc();
+					if (c != NL && c != EOF)
+						while ((d = readwc()) != NL &&
+								d != EOF);
+					if (c != 'n' && c != 'N') {
+						a1 = curstak();
+						f = chdir((const char *)a1) < 0;
+						if (f == 0)
+							prs("ok\n");
+					} else
+						errno = saverrno;
+				} else
+					errno = saverrno;
 			}
 #endif	/* SPELL */
 
@@ -511,7 +515,7 @@ better(unsigned char *newpath, unsigned char *newcur,
 	unsigned char	*np, *cp;
 	unsigned char	*op = old;
 	struct stat	st;
-	int		val = 0, typo = 0, miss = 0, mult;
+	int		val = 0, typo = 0, miss = 0;
 
 	for (np = newcur; *np; np++) {
 		if (sp >= &save[sizeof save - 2])
@@ -529,46 +533,25 @@ better(unsigned char *newpath, unsigned char *newcur,
 	if (stat(newpath, &st) < 0 || (st.st_mode&S_IFMT) != S_IFDIR ||
 			access(newpath, X_OK) != 0)
 		goto restore;
-	/*
-	 * This is an accessible directory. Look for typing errors first.
-	 */
 	np = newcand;
-	while (*np && s0(*op)) {
+	do {
 		if (*np != s0(*op)) {
-			if (np[1] == s0(op[1]))
+			if (np[0] && s0(op[0]) && np[1] == s0(op[1]))
 				typo++;
-			else if (np[0] == s0(op[1]) && s0(op[1]) &&
-					(np[1] != s0(op[2]) || np[1] == '\0')) {
-				np--;
+			else if (s0(op[0]) && np[0] == s0(op[1])) {
+				op++;
 				miss++;
-			} else if (np[1] == s0(op[0]) && np[1] &&
-					(np[2] != s0(op[1]) || np[2] == '\0')) {
-				op--;
+			} else if (np[0] && np[1] == s0(op[0])) {
+				np++;
 				miss++;
 			} else
-				goto worse;
+				goto restore;
 		}
-		np++;
-		op++;
-	}
-	mult = *np == s0(*op) ? 8 : 2;
-	val = miss ? mult*PATH_MAX - miss :
-		typo ? 2*mult*PATH_MAX - typo :
-			3*mult*PATH_MAX;	/* i.e. old was correct */
-	goto restore;
-	/*
-	 * If there was no match yet, look if the old directory name is
-	 * a prefix or a substring of the new one.
-	 */
-worse:	for (np = newcand; *np; np++) {
-		for (op = old; s0(*op) && *np == s0(*op); op++);
-		if (op - old > val) {
-			val = op - old;
-			if (np == newcand) {
-				val += PATH_MAX;
-				break;
-			}
-		}
+	} while (*np++ && s0(*op) && op++);
+	if (np[-1] == s0(*op)) {
+		val = miss == 1 ? 1 :
+			typo == 1 && miss == 0 ? 2 :
+			miss == 0 && typo == 0 ? 3 : 0;
 	}
 restore:
 	np = newcur;
