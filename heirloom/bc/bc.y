@@ -50,12 +50,13 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bc.sl	1.23 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)bc.sl	1.24 (gritter) 7/3/05";
 #include <unistd.h>
 #include <signal.h>
 #include <limits.h>
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 typedef	intptr_t	YYSTYPE;
 #define	YYSTYPE	YYSTYPE
@@ -94,7 +95,6 @@ typedef	intptr_t	YYSTYPE;
 %term QSTR
 
 %{
-#include <stdio.h>
 #define	THIS_BC_STRING_MAX	1000
 static FILE *in;
 static char cary[LINE_MAX + 1], *cp = { cary };
