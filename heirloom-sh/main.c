@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.8 (gritter) 6/22/05
+ * Sccsid @(#)main.c	1.9 (gritter) 7/3/05
  */
 
 
@@ -142,7 +142,7 @@ main(int c, char *v[], char *e[])
 	 * Do locale processing only if /usr is mounted.
 	 */
 	if (localedir_exists)
-		setlocale(LC_ALL, "");
+		setlocale(LC_CTYPE, "");
 
 	/*
 	 * 'rsflag' is zero if SHELL variable is
@@ -596,7 +596,9 @@ setmail(unsigned char *mailpath)
 void 
 setwidth(void)
 {
-	unsigned char *name = lookup("LC_CTYPE")->namval;
+	unsigned char *name = lookup("LC_ALL")->namval;
+	if (!name || !*name)
+		name = lookup("LC_CTYPE")->namval;
 	if (!name || !*name)
 		name = lookup("LANG")->namval;
 	/*
@@ -608,6 +610,7 @@ setwidth(void)
 		else
 			setlocale(LC_CTYPE, (const char *)name);
 	}
+	mb_cur_max = MB_CUR_MAX;
 }
 
 void

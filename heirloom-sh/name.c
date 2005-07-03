@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)name.c	1.13 (gritter) 6/16/05
+ * Sccsid @(#)name.c	1.14 (gritter) 7/3/05
  */
 /* from OpenSolaris "name.c	1.23	05/06/08 SMI" */
 /*
@@ -798,7 +798,6 @@ unset_name(register unsigned char *name)
 static char *localevar[] = {
 	"LC_ALL",
 	"LC_CTYPE",
-	"LC_MESSAGES",
 	"LANG",
 	0
 };
@@ -829,8 +828,7 @@ dolocale(char *nm)
 	 * Do locale processing only if /usr is mounted.
 	 */
 	if ((*nm != 'L') || !localedir_exists ||
-	    (!(eq(nm, "LC_ALL") || eq(nm, "LC_CTYPE") ||
-	    eq(nm, "LANG") || eq(nm, "LC_MESSAGES"))))
+	    (!(eq(nm, "LC_ALL") || eq(nm, "LC_CTYPE") || eq(nm, "LANG"))))
 		return;
 
 	/*
@@ -880,7 +878,7 @@ dolocale(char *nm)
 	real_env = (char **)environ;
 	environ = fake_env;
 
-	if (setlocale(LC_ALL, "") == NULL)
+	if (setlocale(LC_CTYPE, "") == NULL)
 		prs("couldn't set locale correctly\n");
 
 	/*
