@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.10 (gritter) 7/3/05
+ * Sccsid @(#)bltin.c	1.11 (gritter) 7/3/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -212,7 +212,7 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 			    cdpath);
 
 #ifdef	SPELL
-			if (flags & ttyflg && f) {
+			if (flags & ttyflg && f && errno == ENOENT) {
 				int	saverrno = errno;
 				if (spellcheck(a1)) {
 					int	c, d;
@@ -569,7 +569,8 @@ spellcheck(unsigned char *old)
 	const char	*cp;
 	DIR		*dir;
 	struct dirent	*dp;
-	int		best, i;
+	int		best, i, c;
+	struct stat	st;
 
 	if (*op == '/') {
 		if (np+1 > brkend)
@@ -581,14 +582,26 @@ spellcheck(unsigned char *old)
 	}
 	do {
 		oc = op;
-		while (*op && *op != '/')
-			op++;
+		nc = np;
+		while (*op && *op != '/') {
+			if (np >= brkend)
+				growstak(np);
+			*np++ = *op++;
+		}
 		while (*op == '/')
 			op++;
-		if ((dir = opendir(np>new?new:(unsigned char *)".")) == NULL)
+		if (np >= brkend)
+			growstak(np);
+		*np = '\0';
+		if (stat(new, &st) == 0 && (st.st_mode&S_IFMT) == S_IFDIR &&
+				access(new, X_OK) == 0)
+			goto next;
+		c = *nc;
+		*nc = '\0';
+		if ((dir = opendir(nc>new?new:(unsigned char *)".")) == NULL)
 			return 0;
+		*nc = c;
 		best = 0;
-		nc = np;
 		while ((dp = readdir(dir)) != NULL) {
 			if (dp->d_name[0] == '.' && (dp->d_name[1] == '\0' ||
 						dp->d_name[1] == '.' &&
@@ -608,7 +621,7 @@ spellcheck(unsigned char *old)
 		closedir(dir);
 		if (best == 0)
 			return 0;
-		if (np+1 > brkend)
+	next:	if (np+1 > brkend)
 			growstak(np);
 		*np++ = '/';
 		*np = '\0';
