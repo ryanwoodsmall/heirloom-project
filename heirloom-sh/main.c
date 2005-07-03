@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.9 (gritter) 7/3/05
+ * Sccsid @(#)main.c	1.10 (gritter) 7/3/05
  */
 
 
@@ -95,11 +95,6 @@ main(int c, char *v[], char *e[])
 	mysid = getsid(mypid);
 
 	/*
-	 * Do locale processing only if /usr is mounted.
-	 */
-	localedir_exists = (access(localedir, F_OK) == 0);
-
-	/*
 	 * initialize storage allocation
 	 */
 
@@ -132,17 +127,9 @@ main(int c, char *v[], char *e[])
 	setup_env();
 
 	/*
-	 * LC_MESSAGES is set here so that early error messages will
-	 * come out in the right style.
-	 * Note that LC_CTYPE is done later on and is *not*
-	 * taken from the previous environ
+	 * Do locale processing.
 	 */
-
-	/*
-	 * Do locale processing only if /usr is mounted.
-	 */
-	if (localedir_exists)
-		setlocale(LC_CTYPE, "");
+	setlocale(LC_CTYPE, "");
 
 	/*
 	 * 'rsflag' is zero if SHELL variable is
@@ -601,15 +588,10 @@ setwidth(void)
 		name = lookup("LC_CTYPE")->namval;
 	if (!name || !*name)
 		name = lookup("LANG")->namval;
-	/*
-	 * Do locale processing only if /usr is mounted.
-	 */
-	if (localedir_exists) {
-		if (!name || !*name)
-			setlocale(LC_CTYPE, "C");
-		else
-			setlocale(LC_CTYPE, (const char *)name);
-	}
+	if (!name || !*name)
+		setlocale(LC_CTYPE, "C");
+	else
+		setlocale(LC_CTYPE, (const char *)name);
 	mb_cur_max = MB_CUR_MAX;
 }
 

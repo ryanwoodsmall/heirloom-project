@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.20 (gritter) 6/30/05
+ * Sccsid @(#)defs.h	1.21 (gritter) 7/3/05
  */
 
 #ifndef	_DEFS_H
@@ -463,10 +463,6 @@ extern const char				stdprompt[];
 extern const char				supprompt[];
 extern const char				profile[];
 extern const char				sysprofile[];
-
-/* locale testing */
-extern const char			localedir[];
-extern int				localedir_exists;
 
 /* built in names */
 extern struct namnod	fngnod;

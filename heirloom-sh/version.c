@@ -31,7 +31,7 @@
 #else
 #define	USED
 #endif
-static const char id[] USED = "@(#)sh.sl	1.53 (gritter) 7/3/05";
+static const char id[] USED = "@(#)sh.sl	1.54 (gritter) 7/3/05";
 /* SLIST */
 /*
 args.c: * Sccsid @(#)args.c	1.5 (gritter) 6/16/05
@@ -42,7 +42,7 @@ cmd.c: * Sccsid @(#)cmd.c	1.4 (gritter) 6/15/05
 ctype.c: * Sccsid @(#)ctype.c	1.5 (gritter) 6/15/05
 ctype.h: * Sccsid @(#)ctype.h	1.5 (gritter) 6/15/05
 defs.c: * Sccsid @(#)defs.c	1.4 (gritter) 6/15/05
-defs.h: * Sccsid @(#)defs.h	1.20 (gritter) 6/30/05
+defs.h: * Sccsid @(#)defs.h	1.21 (gritter) 7/3/05
 dup.h: * Sccsid @(#)dup.h	1.4 (gritter) 6/15/05
 echo.c: * Sccsid @(#)echo.c	1.9 (gritter) 7/2/05
 error.c: * Sccsid @(#)error.c	1.6 (gritter) 6/22/05
@@ -57,10 +57,10 @@ io.c: * Sccsid @(#)io.c	1.5 (gritter) 6/15/05
 jobs.c: * Sccsid @(#)jobs.c	1.13 (gritter) 6/23/05
 mac.h: * Sccsid @(#)mac.h	1.6 (gritter) 6/19/05
 macro.c: * Sccsid @(#)macro.c	1.8 (gritter) 6/16/05
-main.c: * Sccsid @(#)main.c	1.9 (gritter) 7/3/05
+main.c: * Sccsid @(#)main.c	1.10 (gritter) 7/3/05
 mode.h: * Sccsid @(#)mode.h	1.5 (gritter) 6/15/05
-msg.c: * Sccsid @(#)msg.c	1.10 (gritter) 6/17/05
-name.c: * Sccsid @(#)name.c	1.14 (gritter) 7/3/05
+msg.c: * Sccsid @(#)msg.c	1.11 (gritter) 7/3/05
+name.c: * Sccsid @(#)name.c	1.15 (gritter) 7/3/05
 name.h: * Sccsid @(#)name.h	1.4 (gritter) 6/15/05
 print.c: * Sccsid @(#)print.c	1.11 (gritter) 6/19/05
 pwd.c: * Sccsid @(#)pwd.c	1.6 (gritter) 6/15/05

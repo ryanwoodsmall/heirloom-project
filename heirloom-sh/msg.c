@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)msg.c	1.10 (gritter) 6/17/05
+ * Sccsid @(#)msg.c	1.11 (gritter) 7/3/05
  */
 /* from OpenSolaris "msg.c	1.13	05/06/08 SMI" */
 /*
@@ -153,12 +153,6 @@ const char	stdprompt[]	= "$ ";
 const char	supprompt[]	= "# ";
 const char	profile[]	= ".profile";
 const char	sysprofile[]	= "/etc/profile";
-
-/*
- * locale testing
- */
-const char	localedir[]	= "/usr/lib/locale";
-int		localedir_exists;
 
 /*
  * tables
