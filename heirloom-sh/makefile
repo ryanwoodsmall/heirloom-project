@@ -12,7 +12,12 @@ SV3BIN=/usr/5bin
 #
 # Location for manual pages (with man1 below).
 #
-MANDIR = /usr/share/man/5man
+MANDIR=/usr/share/man/5man
+
+#
+# If spell checking should be done for the "cd" special command.
+#
+SPELL=-DSPELL
 
 #
 # A BSD-compatible install command.
@@ -43,7 +48,7 @@ CFLAGS=-O -fomit-frame-pointer
 #
 # Flags for the C preprocessor.
 #
-CPPFLAGS=-D_GNU_SOURCE
+CPPFLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=1
 
 #
 # A define for large file support, if necessary.
@@ -70,9 +75,9 @@ OBJ = args.o blok.o bltin.o cmd.o ctype.o defs.o echo.o error.o \
 	setbrk.o stak.o string.o test.o ulimit.o word.o xec.o \
 	gmatch.o getopt.o strsig.o version.o mapmalloc.o umask.o
 
-.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(LARGEF) $(WARN) $<
+.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(LARGEF) $(SPELL) $(WARN) $<
 
-all: sh jsh
+all: sh jsh sh.1.out
 
 sh: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o sh
@@ -81,6 +86,10 @@ jsh: sh
 	rm -f jsh
 	$(LNS) sh jsh
 
+sh.1.out: sh.1
+	test "x$(SPELL)" != x && cat sh.1 >$@ || \
+		sed '/BEGIN SPELL/,/END SPELL/d' <sh.1 >$@
+
 install: all
 	test -d $(ROOT)$(SV3BIN) || mkdir -p $(ROOT)$(SV3BIN)
 	$(UCBINST) -c -m 755 sh $(ROOT)$(SV3BIN)/sh
@@ -88,12 +97,12 @@ install: all
 	rm -f $(ROOT)$(SV3BIN)/jsh
 	cd $(ROOT)$(SV3BIN) && $(LNS) sh jsh
 	test -d $(ROOT)$(MANDIR)/man1 || mkdir -p $(ROOT)$(MANDIR)/man1
-	$(UCBINST) -c -m 644 sh.1 $(ROOT)$(MANDIR)/man1/sh.1
+	$(UCBINST) -c -m 644 sh.1.out $(ROOT)$(MANDIR)/man1/sh.1
 	rm -f $(ROOT)$(MANDIR)/man1/jsh.1
 	cd $(ROOT)$(MANDIR)/man1 && $(LNS) sh.1 jsh.1
 
-maninstall:
-	$(UCBINST) -c -m 644 sh.1 $(ROOT)$(MANDIR)/man1/sh.1
+maninstall: sh.1.out
+	$(UCBINST) -c -m 644 sh.1.out $(ROOT)$(MANDIR)/man1/sh.1
 
 diet:
 	$(MAKE) CC='diet gcc -Ifakewchar' CFLAGS='-Os -fomit-frame-pointer' \
@@ -113,7 +122,7 @@ world:
 	$(MAKE) clean
 
 clean:
-	rm -f $(OBJ) sh jsh core log *~
+	rm -f $(OBJ) sh jsh sh.1.out core log *~
 
 mrproper: clean
 

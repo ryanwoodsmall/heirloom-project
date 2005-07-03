@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.7 (gritter) 6/16/05
+ * Sccsid @(#)bltin.c	1.8 (gritter) 7/3/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -48,8 +48,13 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/times.h>
+#include	<dirent.h>
 
 #define	setmode	sh_setmode
+
+#ifdef	SPELL
+static int	spellcheck(unsigned char *);
+#endif
 
 void
 builtin(int type, int argc, unsigned char **argv, struct trenod *t)
@@ -205,6 +210,27 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 			}
 			while ((f = (chdir((const char *) curstak()) < 0)) &&
 			    cdpath);
+
+#ifdef	SPELL
+			if (flags & ttyflg && f && spellcheck(a1)) {
+				int	c, d;
+				prs_buff("cd ");
+				prs_buff(curstak());
+				prs_buff("? ");
+				flushb();
+				c = readwc();
+				if (c != NL && c != EOF)
+					while ((d = readwc()) != NL &&
+							d != EOF);
+				if (c == 'y' || c == 'Y' || c == NL ||
+						c == EOF) {
+					a1 = curstak();
+					f = chdir((const char *)a1) < 0;
+					if (f == 0)
+						prs("ok\n");
+				}
+			}
+#endif	/* SPELL */
 
 			if (f) {
 				switch(errno) {
@@ -466,3 +492,144 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 	restore(index);
 	chktrap();
 }
+
+#ifdef	SPELL
+
+#define	s0(c)	((c) == '/' ? '\0' : (c))
+
+/*
+ * Compare two directory names for spell checking. newpath is the best current
+ * path collected so far. newcur is the best previous directory, newcand
+ * is the candidate. old is the current part of the wrong path.
+ */
+static int
+better(unsigned char *newpath, unsigned char *newcur,
+		unsigned char *newcand, unsigned char *old)
+{
+	unsigned char	save[PATH_MAX+1];	/* can allocate only one path */
+	unsigned char	*sp = save;		/* on the stack at a time */
+	unsigned char	*np, *cp;
+	unsigned char	*op = old;
+	struct stat	st;
+	int		val = 0, typo = 0, miss = 0, mult;
+
+	for (np = newcur; *np; np++) {
+		if (sp >= &save[sizeof save - 2])
+			return -1;
+		*sp++ = *np;
+	}
+	*sp = '\0';
+	cp = newcur;
+	for (np = newcand; *np; np++) {
+		if (cp+1 >= brkend)
+			growstak(cp);
+		*cp++ = *np;
+	}
+	*cp = '\0';
+	if (stat(newpath, &st) < 0 || (st.st_mode&S_IFMT) != S_IFDIR ||
+			access(newpath, X_OK) != 0)
+		goto restore;
+	/*
+	 * This is an accessible directory. Look for typing errors first.
+	 */
+	np = newcand;
+	while (*np && s0(*op)) {
+		if (*np != s0(*op)) {
+			if (np[1] == s0(op[1]))
+				typo++;
+			else if (np[0] == s0(op[1]) && s0(op[1]) &&
+					(np[1] != s0(op[2]) || np[1] == '\0')) {
+				np--;
+				miss++;
+			} else if (np[1] == s0(op[0]) && np[1] &&
+					(np[2] != s0(op[1]) || np[2] == '\0')) {
+				op--;
+				miss++;
+			} else
+				goto worse;
+		}
+		np++;
+		op++;
+	}
+	mult = *np == s0(*op) ? 8 : 2;
+	val = miss ? mult*PATH_MAX - miss :
+		typo ? 2*mult*PATH_MAX - typo :
+			3*mult*PATH_MAX;	/* i.e. old was correct */
+	goto restore;
+	/*
+	 * If there was no match yet, look if the old directory name is
+	 * a prefix or a substring of the new one.
+	 */
+worse:	for (np = newcand; *np; np++) {
+		for (op = old; s0(*op) && *np == s0(*op); op++);
+		if (op - old > val) {
+			val = op - old;
+			if (np == newcand) {
+				val += PATH_MAX;
+				break;
+			}
+		}
+	}
+restore:
+	np = newcur;
+	for (sp = save; *sp; sp++)
+		*np++ = *sp;
+	*np = '\0';
+	return val;
+}
+
+static int
+spellcheck(unsigned char *old)
+{
+	unsigned char	*new = locstak();
+	unsigned char	*op = old, *oc, *np = new, *nc;
+	const char	*cp;
+	DIR		*dir;
+	struct dirent	*dp;
+	int		best, i;
+
+	if (*op == '/') {
+		if (np+1 > brkend)
+			growstak(np);
+		*np++ = '/';
+		*np = '\0';
+		while (*op == '/')
+			op++;
+	}
+	do {
+		oc = op;
+		while (*op && *op != '/')
+			op++;
+		while (*op == '/')
+			op++;
+		if ((dir = opendir(np>new?new:(unsigned char *)".")) == NULL)
+			return 0;
+		best = 0;
+		nc = np;
+		while ((dp = readdir(dir)) != NULL) {
+			if (dp->d_name[0] == '.' && (dp->d_name[1] == '\0' ||
+						dp->d_name[1] == '.' &&
+						dp->d_name[2] == '\0'))
+				continue;
+			if ((i = better(new, nc, dp->d_name, oc)) > best) {
+				best = i;
+				np = nc;
+				for (cp = dp->d_name; *cp; cp++) {
+					if (np+1 > brkend)
+						growstak(np);
+					*np++ = *cp & 0377;
+				}
+				*np = '\0';
+			}
+		}
+		closedir(dir);
+		if (np+1 > brkend)
+			growstak(np);
+		*np++ = '/';
+		*np = '\0';
+	} while (*op);
+	if (np > new)
+		np[-1] = '\0';
+	return np > new && *new;
+}
+#endif	/* SPELL */

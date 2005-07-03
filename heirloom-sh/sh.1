@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)sh.1	1.11 (gritter) 6/26/05
+.\" Sccsid @(#)sh.1	1.12 (gritter) 7/3/05
 .\" Derived from sh(1) and test(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH SH 1 "6/26/05" "Heirloom Bourne Shell" "User Commands"
+.TH SH 1 "7/3/05" "Heirloom Bourne Shell" "User Commands"
 .SH NAME
 sh, jsh \- the standard command interpreter
 .SH SYNOPSIS
@@ -835,6 +835,21 @@ each of these directories is used as a prefix to
 .I arg
 in the given order,
 and the current directory is set to the first one that is found.
+.\" BEGIN SPELL
+.IP
+If there has still no suitable directory been found,
+an interactive shell will try to fix spelling errors
+and propose an alternative directory name:
+.sp
+.nf
+        $ cd /usf/lb
+        cd /usr/lib? \fIy\fP
+        ok
+.fi
+.sp
+If the answer is `y' or just a newline is typed,
+the shell will set the current directory to the one proposed.
+.\" END SPELL
 .TP
 \fBecho\fR [\fIarg \fR...]
 Each
@@ -1458,7 +1473,7 @@ If the
 .B \-i
 flag is present or
 if the shell input and output are attached to a terminal (as told by
-.IR gtty )
+.IR isatty (3))
 then this shell is
 .I interactive.
 In this case the terminate signal
