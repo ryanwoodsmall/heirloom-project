@@ -1,5 +1,5 @@
 /*
- * Sccsid @(#)wchar.h	1.1 (gritter) 6/15/05
+ * Sccsid @(#)wchar.h	1.2 (gritter) 7/4/05
  */
 
 typedef	int	wint_t;
@@ -30,11 +30,3 @@ wctomb(char *s, wchar_t wchar)
 	} else
 		return 0;
 }
-
-#ifdef	__dietlibc__
-char *
-setlocale(int category, const char *locale)
-{
-	return locale ? (char *)locale : "C";
-}
-#endif	/* __dietlibc__ */
