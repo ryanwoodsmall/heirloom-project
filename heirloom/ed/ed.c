@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.96 (gritter) 7/2/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.97 (gritter) 7/4/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.96 (gritter) 7/2/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.97 (gritter) 7/4/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.96 (gritter) 7/2/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.97 (gritter) 7/4/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.96 (gritter) 7/2/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.97 (gritter) 7/4/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -120,7 +120,6 @@ static long	*dot;
 static long	*unddot;
 static long	*dol;
 static long	*unddol;
-static long	*undrdol;
 static long	*addr1;
 static long	*addr2;
 static char	*genbuf;
@@ -148,8 +147,8 @@ static char	obuff[512];
 static int	oblock	= -1;
 static int	ichanged;
 static int	nleft;
-static long	names[26];
-static long	undnames[26];
+static long	*names;
+static long	*undnames;
 static int	anymarks;
 static int	subnewa;
 static int	fchange;
@@ -347,8 +346,10 @@ main(int argc, char **argv)
 				growfn("maximum of characters in "
 						"file names reached");
 		while (savedfile[i] = (*argv)[i]);
-		globp = "r";
+		globp = "e";
 	}
+	names = malloc(26*sizeof *names);
+	undnames = malloc(26*sizeof *undnames);
 	zero = malloc(nlall*sizeof *zero);
 	if ((undzero = malloc(nlall*sizeof *undzero)) == NULL)
 		puts("no memory for undo");
@@ -1245,8 +1246,7 @@ append(int (*f)(void), long *a)
 						nlall*sizeof *undzero)) == 0) {
 					puts("no memory for undo");
 					free(ozero);
-				} else
-					undrdol += undzero - ozero;
+				}
 			}
 		}
 		tl = putline();
@@ -2165,32 +2165,26 @@ checkpoint(void)
 	if (undzero && globp == NULL) {
 		for (a1 = zero+1, a2 = undzero+1; a1 <= dol; a1++, a2++)
 			*a2 = *a1;
-		undrdol = a2-1;
-		unddot = dot;
-		unddol = dol;
+		unddot = &undzero[dot-zero];
+		unddol = &undzero[dol-zero];
 		for (a1 = names, a2 = undnames; a1 < &names[26]; a1++, a2++)
 			*a2 = *a1;
 	}
 }
 
-#define	swapa(a, b)	(t = a, a = b, b = t)
-#define	swapp(a, b)	(a1 = a, a = b, b = a1)
+#define	swap(a, b)	(t = a, a = b, b = t)
 
 static void
 undo(void)
 {
-	long	*a1, *a2;
-	long	t;
+	long	*t;
 
 	if (undzero == NULL)
 		error("no undo information saved");
-	for (a1 = zero+1, a2 = undzero+1; a1<=dol || a2<=undrdol; a1++, a2++)
-		swapa(*a1, *a2);
-	undrdol = &undzero[dol-zero];
-	swapp(dot, unddot);
-	swapp(dol, unddol);
-	for (a1 = names, a2 = undnames; a1 < &names[26]; a1++, a2++)
-		swapa(*a1, *a2);
+	swap(zero, undzero);
+	swap(dot, unddot);
+	swap(dol, unddol);
+	swap(names, undnames);
 }
 
 static int

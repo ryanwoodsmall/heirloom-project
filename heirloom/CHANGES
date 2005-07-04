@@ -7,6 +7,8 @@ Release ...
   realloc().
 * ed: Do not warn about an 'input error' anymore when reading a file that
   lacks the terminating newline.
+* ed: Disallow the 'u' command if no change has been made yet after a file
+  specified on the command line has been read.
 * mail: The Content-Length header field is not used anymore; it is ignored
   when a folder is read, and is omitted when a message is written.
 * mail: The LC_CTYPE locale now determines the set of printable characters.
