@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.303 (gritter) 7/5/05
+.\"     Sccsid: @(#)nail.1	2.304 (gritter) 7/5/05
 .\"
 .TH NAIL 1 "7/5/05" "nail 11.24" "User Commands"
 .SH NAME
@@ -1061,6 +1061,9 @@ With an existing folder as an argument,
 lists then names of folders below the named folder;
 e.\|g. the command `folders @'
 lists the folders on the base level of the current IMAP server.
+See also the
+.I imap-list-depth
+variable.
 .TP
 .B folder
 (fold) The folder command switches
@@ -2951,6 +2954,14 @@ greater than 0
 causes a NOOP command to be sent each
 .I value
 seconds if no other operation is performed.
+.TP
+.B imap-list-depth
+When retrieving the list of folders on an IMAP server, the
+.I folders
+command stops after it has reached a certain depth
+to avoid possible infinite loops.
+The value of this variable sets the maximum depth allowed.
+The default is 2.
 .TP
 .B indentprefix
 String used by the `\fI~m\fR' and `\fI~M\fR' tilde escapes

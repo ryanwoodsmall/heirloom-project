@@ -1,4 +1,6 @@
 [11.24] released ...
+* An 'imap-list-depth' variable was introduced to control the maximum depth
+  of the folder traversal for the 'folders' command.
 * Only applicable if Mozilla NSS is used for SSL support: If the certificate
   of the server contains a dNSName, NSS ignores the CN. Thus if the CN
   contains a name that does not also appear as one of the dNSNames, the

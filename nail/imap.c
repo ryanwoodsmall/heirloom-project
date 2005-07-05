@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.210 (gritter) 11/8/04";
+static char sccsid[] = "@(#)imap.c	1.211 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -2420,15 +2420,17 @@ imap_list(struct mailbox *mp, const char *base, int strip, FILE *fp)
 	int	n;
 	const char	*bp;
 	char	*cp;
+	int	depth;
 
 	verbose = value("verbose") != NULL;
+	depth = (cp = value("imap-list-depth")) != NULL ? atoi(cp) : 2;
 	if (imap_list1(mp, base, &list, &lend, 0) == STOP)
 		return STOP;
 	if (list == NULL || lend == NULL)
 		return OKAY;
 	for (lp = list; lp; lp = lp->l_next)
 		if (lp->l_delim != '/' && lp->l_delim != EOF &&
-				lp->l_level < 2 &&
+				lp->l_level < depth &&
 				(lp->l_attr&LIST_NOINFERIORS) == 0) {
 			cp = salloc((n = strlen(lp->l_name)) + 2);
 			strcpy(cp, lp->l_name);
