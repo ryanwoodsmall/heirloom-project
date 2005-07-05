@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.211 (gritter) 7/5/05";
+static char sccsid[] = "@(#)imap.c	1.212 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -2470,6 +2470,7 @@ imap_folders(const char *name, int strip)
 	const char	*fold, *cp, *sp;
 	char	*tempfn;
 	FILE	*fp;
+	int	columnize = is_a_tty[1];
 
 	(void)&saveint;
 	(void)&savepipe;
@@ -2484,12 +2485,15 @@ imap_folders(const char *name, int strip)
 		return;
 	}
 	fold = protfile(name);
-	if ((fp = Ftemp(&tempfn, "Ri", "w+", 0600, 1)) == NULL) {
-		perror("tmpfile");
-		return;
-	}
-	rm(tempfn);
-	Ftfree(&tempfn);
+	if (columnize) {
+		if ((fp = Ftemp(&tempfn, "Ri", "w+", 0600, 1)) == NULL) {
+			perror("tmpfile");
+			return;
+		}
+		rm(tempfn);
+		Ftfree(&tempfn);
+	} else
+		fp = stdout;
 	imaplock = 1;
 	if ((saveint = safe_signal(SIGINT, SIG_IGN)) != SIG_IGN)
 		safe_signal(SIGINT, maincatch);
@@ -2504,19 +2508,23 @@ imap_folders(const char *name, int strip)
 		imap_list(&mb, fold, strip, fp);
 	imaplock = 0;
 	if (interrupts) {
-		Fclose(fp);
+		if (columnize)
+			Fclose(fp);
 		onintr(0);
 	}
 	fflush(fp);
-	rewind(fp);
-	if (fsize(fp) > 0)
-		dopr(fp);
-	else
-		fprintf(stderr, "Folder not found.\n");
+	if (columnize) {
+		rewind(fp);
+		if (fsize(fp) > 0)
+			dopr(fp);
+		else
+			fprintf(stderr, "Folder not found.\n");
+	}
 out:
 	safe_signal(SIGINT, saveint);
 	safe_signal(SIGPIPE, savepipe);
-	Fclose(fp);
+	if (columnize)
+		Fclose(fp);
 }
 
 static void
