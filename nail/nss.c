@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.38 (gritter) 6/9/05";
+static char sccsid[] = "@(#)nss.c	1.39 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -111,6 +111,27 @@ password_cb(PK11SlotInfo *slot, PRBool retry, void *arg)
 static SECStatus
 bad_cert_cb(void *arg, PRFileDesc *fd)
 {
+	if (PORT_GetError() == SSL_ERROR_BAD_CERT_DOMAIN) {
+		/*
+		 * If a certificate contains both a dNSName and a CN,
+		 * the NSS library uses only the dNSName to verify
+		 * the identity of the peer. Check the CN also.
+		 *
+		 * RFC 2595, 2.4 is not clear on this issue.
+		 */
+		CERTCertificate	*cert;
+		char	*cn;
+		int	eq;
+
+		if ((cert = SSL_PeerCertificate(fd)) != NULL) {
+			cn = CERT_GetCommonName(&cert->subject);
+			eq = asccasecmp(cn, (char *)arg) == 0;
+			PORT_Free(cn);
+			CERT_DestroyCertificate(cert);
+			if (eq)
+				return SECSuccess;
+		}
+	}
 	fprintf(stderr, "Error in certificate: %s.\n", bad_cert_str());
 	return ssl_vrfy_decide() == OKAY ? SECSuccess : SECFailure;
 }
@@ -201,7 +222,7 @@ ssl_open(const char *server, struct sock *sp, const char *uhp)
 	}
 	SSL_SetURL(fdc, server);
 	SSL_SetPKCS11PinArg(fdc, NULL);
-	SSL_BadCertHook(fdc, bad_cert_cb, NULL);
+	SSL_BadCertHook(fdc, bad_cert_cb, (void *)server);
 	if (SSL_ResetHandshake(fdc, PR_FALSE) != SECSuccess) {
 		nss_gen_err("Cannot reset NSS handshake");
 		PR_Close(fdc);

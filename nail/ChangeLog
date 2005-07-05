@@ -1,3 +1,11 @@
+[11.24] released ...
+* Only applicable if Mozilla NSS is used for SSL support: If the certificate
+  of the server contains a dNSName, NSS ignores the CN. Thus if the CN
+  contains a name that does not also appear as one of the dNSNames, the
+  certificate is rejected. This case is now verified separately in nail,
+  and the certificate is accepted if the CN matches the host name of the
+  server.
+
 [11.23] released 6/28/05
 * The output for the '~p' tilde escape was extended to include the fields
   implied by the 'from', 'replyto', 'sender', and 'ORGANIZATION' variables
