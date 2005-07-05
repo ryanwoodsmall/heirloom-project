@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.304 (gritter) 7/5/05
+.\"     Sccsid: @(#)nail.1	2.305 (gritter) 7/5/05
 .\"
 .TH NAIL 1 "7/5/05" "nail 11.24" "User Commands"
 .SH NAME
@@ -51,12 +51,12 @@ nail \- send and receive Internet mail
 \fIto-addr\fR .\ .\ .
 .HP
 .ad l
-\fBnail\fR [\fB\-BDdeHiInNv~\fR] [\fB\-T\fI\ name\fR]
+\fBnail\fR [\fB\-BDdeHiInNRv~\fR] [\fB\-T\fI\ name\fR]
 [\fB\-A\fI\ account\fR]
 \fB\-f\fR [\fIname\fR]
 .HP
 .ad l
-\fBnail\fR [\fB\-BDdeinNv~\fR]
+\fBnail\fR [\fB\-BDdeinNRv~\fR]
 [\fB\-A\fI\ account\fR]
 [\fB\-u\fI\ user\fR]
 .br
@@ -188,6 +188,9 @@ This option exists for compatibility only;
 it is recommended to set the 
 .I from
 variable directly instead.
+.TP
+.B \-R
+Opens any folders read-only.
 .TP
 .BI \-s \ subject
 Specify subject on command line (only the first argument after the

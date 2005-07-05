@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.81 (gritter) 4/15/05";
+static char sccsid[] = "@(#)lex.c	2.82 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -173,7 +173,7 @@ setfile(char *name, int newmail)
 	flp.l_whence = SEEK_SET;
 	if (!newmail) {
 		mb.mb_type = MB_FILE;
-		mb.mb_perm = MB_DELE|MB_EDIT;
+		mb.mb_perm = Rflag ? 0 : MB_DELE|MB_EDIT;
 		mb.mb_compressed = compressed;
 		if (compressed) {
 			if (compressed & 0200)

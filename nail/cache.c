@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.58 (gritter) 10/2/04";
+static char sccsid[] = "@(#)cache.c	1.59 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -590,7 +590,7 @@ cache_setptr(int transparent)
 	ok = OKAY;
 	if (ok == OKAY) {
 		mb.mb_type = MB_CACHE;
-		mb.mb_perm = MB_DELE;
+		mb.mb_perm = Rflag ? 0 : MB_DELE;
 		if (transparent)
 			transflags(omessage, omsgCount, 1);
 		else

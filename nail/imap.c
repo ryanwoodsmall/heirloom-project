@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.212 (gritter) 7/5/05";
+static char sccsid[] = "@(#)imap.c	1.213 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -1253,7 +1253,7 @@ imap_setfile1(const char *xserver, int newmail, int isedit, int transparent)
 		}
 	} else	/* same account */
 		mb.mb_flags |= same_flags;
-	mb.mb_perm = MB_DELE;
+	mb.mb_perm = Rflag ? 0 : MB_DELE;
 	mb.mb_type = MB_IMAP;
 	cache_dequeue(&mb);
 	if (imap_select(&mb, &mailsize, &msgCount, mbx) != OKAY) {

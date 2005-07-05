@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.17 (gritter) 2/16/05";
+static char sccsid[] = "@(#)maildir.c	1.18 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -165,7 +165,7 @@ maildir_setfile1(const char *name, int newmail, int omsgCount)
 
 	if (!newmail)
 		cleantmp(name);
-	mb.mb_perm = MB_DELE;
+	mb.mb_perm = Rflag ? 0 : MB_DELE;
 	if ((i = subdir(name, "cur", newmail)) != 0)
 		return i;
 	if ((i = subdir(name, "new", newmail)) != 0)

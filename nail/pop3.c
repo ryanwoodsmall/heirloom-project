@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)pop3.c	2.40 (gritter) 11/6/04";
+static char sccsid[] = "@(#)pop3.c	2.41 (gritter) 7/5/05";
 #endif
 #endif /* not lint */
 
@@ -615,7 +615,7 @@ pop3_setfile(const char *server, int newmail, int isedit)
 		return 1;
 	}
 	mb.mb_type = MB_POP3;
-	mb.mb_perm = MB_DELE;
+	mb.mb_perm = Rflag ? 0 : MB_DELE;
 	pop3_setptr(&mb);
 	setmsize(msgCount);
 	sawcom = 0;
