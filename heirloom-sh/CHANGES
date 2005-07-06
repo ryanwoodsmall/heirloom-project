@@ -1,6 +1,6 @@
-Release ...
-* Spell checking for the "cd" command is now available. It can be disabled
-  in the makefile at wish.
+Release 050706
+* Spell checking for the "cd" command is now optionally available. It can
+  be enabled in the makefile at wish.
 * Job control is not re-enabled in interactive subshells within the left
   sides of pipelines anymore. This previously caused commands like
   "(cat a; cat b) | cat" to fail with "+ Stopped (tty output)".

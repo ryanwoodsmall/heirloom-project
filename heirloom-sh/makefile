@@ -15,7 +15,8 @@ SV3BIN=/usr/5bin
 MANDIR=/usr/share/man/5man
 
 #
-# If spell checking should be done for the "cd" special command.
+# Enable this definition if spell checking should be done for the
+# "cd" special command.
 #
 SPELL=-DSPELL
 
@@ -48,7 +49,7 @@ CFLAGS=-O -fomit-frame-pointer
 #
 # Flags for the C preprocessor.
 #
-CPPFLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=1
+CPPFLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=1 -D__NO_STRING_INLINES
 
 #
 # A define for large file support, if necessary.
