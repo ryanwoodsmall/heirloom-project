@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.84 (gritter) 6/9/05";
+static char sccsid[] = "@(#)sendout.c	2.85 (gritter) 7/7/05";
 #endif
 #endif /* not lint */
 
@@ -1038,7 +1038,7 @@ putname(char *line, enum gfield w, enum sendaction action, int *gotcha,
 	struct name	*np;
 
 	np = sextract(line, GEXTRA|GFULL);
-	if (*xp)
+	if (xp)
 		*xp = np;
 	if (np == NULL)
 		return 0;
