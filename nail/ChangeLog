@@ -7,6 +7,8 @@
 * If standard output is not a terminal device, the output of the 'folders'
   command applied to an IMAP account is no longer arranged into columns.
 * The new '-R' option causes all folders to be opened read-only.
+* When reading header fields from a terminal, the input buffer could
+  overflow by one byte (Patch by Ulf Harnhammar).
 * Only applicable if Mozilla NSS is used for SSL support: If the certificate
   of the server contains a dNSName, NSS ignores the CN. Thus if the CN
   contains a name that does not also appear as one of the dNSNames, the
