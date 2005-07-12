@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)sh.1	1.13 (gritter) 7/3/05
+.\" Sccsid @(#)sh.1	1.14 (gritter) 7/13/05
 .\" Derived from sh(1) and test(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH SH 1 "7/3/05" "Heirloom Bourne Shell" "User Commands"
+.TH SH 1 "7/13/05" "Heirloom Bourne Shell" "User Commands"
 .SH NAME
 sh, jsh \- the standard command interpreter
 .SH SYNOPSIS
@@ -978,13 +978,16 @@ A missing argument or an illegal option
 also causes a non-zero return value,
 and an error message is printed to standard error.
 .TP
-\fBhash\fR [\fIname\fR ...]
+\fBhash\fR [\fB\-r\fR] [\fIname\fR ...]
 The shell maintains a hash table
 of the locations of external commands.
 If
 .I name
 arguments are given,
 each one is looked up and is inserted into the table if it is found.
+With the
+.I \-r
+option, the table is cleared.
 Otherwise,
 a list of the commands currently in the table is printed.
 .TP
