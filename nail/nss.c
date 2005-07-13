@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.39 (gritter) 7/5/05";
+static char sccsid[] = "@(#)nss.c	1.40 (gritter) 7/13/05";
 #endif
 #endif /* not lint */
 
@@ -277,7 +277,7 @@ nss_gen_err(const char *fmt, ...)
 }
 
 FILE *
-smime_sign(FILE *ip)
+smime_sign(FILE *ip, struct header *headp)
 {
 	NSSCMSMessage	*msg;
 	NSSCMSContentInfo	*content;
@@ -290,7 +290,7 @@ smime_sign(FILE *ip)
 
 	if (nss_init() != OKAY)
 		return NULL;
-	if ((addr = myorigin()) == NULL)
+	if ((addr = myorigin(headp)) == NULL)
 		return NULL;
 	if ((cert = get_signer_cert(addr)) == NULL)
 		return NULL;

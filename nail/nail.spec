@@ -1,4 +1,4 @@
-# Sccsid @(#)nail.spec	1.32 (gritter) 6/22/05
+# Sccsid @(#)nail.spec	1.33 (gritter) 7/12/05
 
 %define	use_nss	0
 %define	mozilla_version	1.6
@@ -11,7 +11,7 @@ License: BSD
 Group: Applications/Internet
 Source: %{name}-%{version}.tar.bz2
 URL: <http://nail.sourceforge.net>
-Vendor: Gunnar Ritter <Gunnar.Ritter@pluto.uni-freiburg.de>
+Vendor: Gunnar Ritter <gunnarr@acm.org>
 Packager: Didar Hussain <dhs@rediffmail.com>
 BuildRoot: %{_tmppath}/%{name}-root
 

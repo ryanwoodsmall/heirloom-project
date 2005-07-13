@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.26 (gritter) 7/8/05";
+static char sccsid[] = "@(#)tty.c	2.27 (gritter) 7/13/05";
 #endif
 #endif /* not lint */
 
@@ -319,7 +319,7 @@ grabh(struct header *hp, enum gfield gflags, int subjfirst)
 		hp->h_bcc = grabaddrs("Bcc: ", hp->h_bcc, comma, GBCC|GFULL);
 	if (gflags & GEXTRA) {
 		if (hp->h_from == NULL)
-			hp->h_from = sextract(myaddrs(), GEXTRA|GFULL);
+			hp->h_from = sextract(myaddrs(hp), GEXTRA|GFULL);
 		hp->h_from = grabaddrs("From: ", hp->h_from, comma,
 				GEXTRA|GFULL);
 		if (hp->h_replyto == NULL)

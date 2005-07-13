@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.59 (gritter) 6/9/05";
+static char sccsid[]  = "@(#)mime.c	2.60 (gritter) 7/13/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -318,7 +318,7 @@ need_hdrconv(struct header *hp, enum gfield w)
 	if (w & GIDENT) {
 		if (hp->h_from && name_highbit(hp->h_from))
 			goto needs;
-		else if (has_highbit(myaddrs()))
+		else if (has_highbit(myaddrs(hp)))
 			goto needs;
 		if (hp->h_organization && has_highbit(hp->h_organization))
 			goto needs;

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.33 (gritter) 6/9/05";
+static char sccsid[] = "@(#)smtp.c	2.34 (gritter) 7/13/05";
 #endif
 #endif /* not lint */
 
@@ -122,12 +122,18 @@ nodename(int mayoverride)
  * Return the user's From: address(es).
  */
 char *
-myaddrs(void)
+myaddrs(struct header *hp)
 {
 	char *cp, *hn;
 	static char *addr;
 	size_t sz;
 
+	if (hp != NULL && hp->h_from != NULL) {
+		if (hp->h_from->n_fullname)
+			return savestr(hp->h_from->n_fullname);
+		if (hp->h_from->n_name)
+			return savestr(hp->h_from->n_name);
+	}
 	if ((cp = value("from")) != NULL)
 		return cp;
 	/*
@@ -146,12 +152,12 @@ myaddrs(void)
 }
 
 char *
-myorigin(void)
+myorigin(struct header *hp)
 {
 	char	*cp;
 	struct name	*np;
 
-	if ((cp = myaddrs()) == NULL ||
+	if ((cp = myaddrs(hp)) == NULL ||
 			(np = sextract(cp, GEXTRA|GFULL)) == NULL)
 		return NULL;
 	return np->n_flink != NULL ? value("sender") : cp;
@@ -162,7 +168,7 @@ myorigin(void)
 static char *auth_var(const char *type, const char *addr);
 static int read_smtp(struct sock *sp, int value);
 static int talk_smtp(struct name *to, FILE *fi, struct sock *sp,
-		char *server, char *uhp);
+		char *server, char *uhp, struct header *hp);
 
 static char *
 auth_var(const char *type, const char *addr)
@@ -237,7 +243,7 @@ read_smtp(struct sock *sp, int value)
  */
 static int
 talk_smtp(struct name *to, FILE *fi, struct sock *sp,
-		char *xserver, char *uhp)
+		char *xserver, char *uhp, struct header *hp)
 {
 	struct name *n;
 	char *b = NULL, o[LINESIZE];
@@ -246,7 +252,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	enum	{ AUTH_NONE, AUTH_LOGIN, AUTH_CRAM_MD5 } auth;
 	int	inhdr = 1, inbcc = 0;
 
-	skinned = skin(myorigin());
+	skinned = skin(myorigin(hp));
 	user = auth_var("-user", skinned);
 	password = auth_var("-password", skinned);
 	if ((authstr = auth_var("", skinned)) == NULL)
@@ -385,7 +391,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
  * Connect to a SMTP server.
  */
 int
-smtp_mta(char *server, struct name *to, FILE *fi)
+smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp)
 {
 	struct sock	so;
 	int	use_ssl, ret;
@@ -407,7 +413,7 @@ smtp_mta(char *server, struct name *to, FILE *fi)
 				use_ssl ? "smtps" : "smtp", verbose) != OKAY)
 		return 1;
 	so.s_desc = "SMTP";
-	ret = talk_smtp(to, fi, &so, server, server);
+	ret = talk_smtp(to, fi, &so, server, server, hp);
 	if (!debug && !_debug)
 		sclose(&so);
 	if (smtpbuf) {
@@ -419,7 +425,7 @@ smtp_mta(char *server, struct name *to, FILE *fi)
 }
 #else	/* !HAVE_SOCKETS */
 int
-smtp_mta(char *server, struct name *to, FILE *fi)
+smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp)
 {
 	fputs(catgets(catd, CATSET, 194,
 			"No SMTP support compiled in.\n"), stderr);

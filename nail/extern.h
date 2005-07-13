@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.154 (gritter) 6/9/05
+ *	Sccsid @(#)extern.h	2.155 (gritter) 7/13/05
  */
 
 /* aux.c */
@@ -411,7 +411,7 @@ enum okay ssl_open(const char *server, struct sock *sp, const char *uhp);
 void ssl_gen_err(const char *fmt, ...);
 #endif	/* USE_OPENSSL */
 int cverify(void *vp);
-FILE *smime_sign(FILE *ip);
+FILE *smime_sign(FILE *ip, struct header *);
 FILE *smime_encrypt(FILE *ip, const char *certfile, const char *to);
 struct message *smime_decrypt(struct message *m, const char *to,
 		const char *cc, int signcall);
@@ -468,9 +468,9 @@ int puthead(struct header *hp, FILE *fo, enum gfield w,
 int resend_msg(struct message *mp, struct name *to, int add_resent);
 /* smtp.c */
 char *nodename(int mayoverride);
-char *myaddrs(void);
-char *myorigin(void);
-int smtp_mta(char *server, struct name *to, FILE *fi);
+char *myaddrs(struct header *hp);
+char *myorigin(struct header *hp);
+int smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp);
 /* ssl.c */
 void ssl_set_vrfy_level(const char *uhp);
 enum okay ssl_vrfy_decide(void);

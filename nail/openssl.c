@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.20 (gritter) 6/9/05";
+static char sccsid[] = "@(#)openssl.c	1.21 (gritter) 7/13/05";
 #endif
 #endif /* not lint */
 
@@ -412,7 +412,7 @@ ssl_gen_err(const char *fmt, ...)
 }
 
 FILE *
-smime_sign(FILE *ip)
+smime_sign(FILE *ip, struct header *hp)
 {
 	FILE	*sp, *fp, *bp, *hp;
 	char	*cp, *addr;
@@ -422,7 +422,7 @@ smime_sign(FILE *ip)
 	BIO	*bb, *sb;
 
 	ssl_init();
-	if ((addr = myorigin()) == NULL)
+	if ((addr = myorigin(hp)) == NULL)
 		return NULL;
 	if ((fp = smime_sign_cert(addr, NULL, 1)) == NULL)
 		return NULL;

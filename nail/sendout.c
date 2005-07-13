@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.85 (gritter) 7/7/05";
+static char sccsid[] = "@(#)sendout.c	2.86 (gritter) 7/13/05";
 #endif
 #endif /* not lint */
 
@@ -69,9 +69,11 @@ static int make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
 static FILE *infix(struct header *hp, FILE *fi, int dosign);
 static int savemail(char *name, FILE *fi);
 static int sendmail_internal(void *v, int recipient_record);
-static enum okay transfer(struct name *to, struct name *mailargs, FILE *input);
-static enum okay start_mta(struct name *to, struct name *mailargs, FILE *input);
-static void message_id(FILE *fo);
+static enum okay transfer(struct name *to, struct name *mailargs, FILE *input,
+		struct header *hp);
+static enum okay start_mta(struct name *to, struct name *mailargs, FILE *input,
+		struct header *hp);
+static void message_id(FILE *fo, struct header *hp);
 static int fmt(char *str, struct name *np, FILE *fo, int comma,
 		int dropinvalid, int domime);
 static int infix_resend(FILE *fi, FILE *fo, struct message *mp,
@@ -682,7 +684,7 @@ Sendmail(void *v)
 }
 
 static enum okay
-transfer(struct name *to, struct name *mailargs, FILE *input)
+transfer(struct name *to, struct name *mailargs, FILE *input, struct header *hp)
 {
 	char	o[LINESIZE], *cp;
 	struct name	*np, *nt;
@@ -697,7 +699,7 @@ transfer(struct name *to, struct name *mailargs, FILE *input)
 			if ((ef = smime_encrypt(input, cp, np->n_name)) != 0) {
 				nt = nalloc(np->n_name,
 					np->n_type & ~(GFULL|GSKIN));
-				if (start_mta(nt, mailargs, ef) != OKAY)
+				if (start_mta(nt, mailargs, ef, hp) != OKAY)
 					ok = STOP;
 				Fclose(ef);
 			} else {
@@ -720,7 +722,7 @@ transfer(struct name *to, struct name *mailargs, FILE *input)
 	}
 	if (cnt) {
 		if (value("smime-force-encryption") ||
-				start_mta(to, mailargs, input) != OKAY)
+				start_mta(to, mailargs, input, hp) != OKAY)
 			ok = STOP;
 	}
 	return ok;
@@ -731,7 +733,8 @@ transfer(struct name *to, struct name *mailargs, FILE *input)
  * mailing to namelist and stdin redirected to input.
  */
 static enum okay
-start_mta(struct name *to, struct name *mailargs, FILE *input)
+start_mta(struct name *to, struct name *mailargs, FILE *input,
+		struct header *hp)
 {
 	char **args = NULL, **t;
 	pid_t pid;
@@ -772,7 +775,7 @@ start_mta(struct name *to, struct name *mailargs, FILE *input)
 		freopen("/dev/null", "r", stdin);
 		if (smtp != NULL) {
 			prepare_child(&nset, 0, 1);
-			if (smtp_mta(smtp, to, input) == 0)
+			if (smtp_mta(smtp, to, input, hp) == 0)
 				_exit(0);
 		} else {
 			prepare_child(&nset, fileno(input), -1);
@@ -948,7 +951,7 @@ try:	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
 	}
 	mtf = nmtf;
 	if (dosign) {
-		if ((nmtf = smime_sign(mtf)) == NULL)
+		if ((nmtf = smime_sign(mtf, hp)) == NULL)
 			goto fail;
 		Fclose(mtf);
 		mtf = nmtf;
@@ -967,7 +970,7 @@ try:	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
 	}
 	if (mightrecord(mtf, to, recipient_record) != OKAY)
 		goto out;
-	ok = transfer(to, hp->h_smopts, mtf);
+	ok = transfer(to, hp->h_smopts, mtf, hp);
 out:
 	Fclose(mtf);
 	return ok;
@@ -978,7 +981,7 @@ out:
  * Use either the host name or the from address.
  */
 static void
-message_id(FILE *fo)
+message_id(FILE *fo, struct header *hp)
 {
 	char	*cp;
 	time_t	now;
@@ -987,7 +990,7 @@ message_id(FILE *fo)
 	if ((cp = value("hostname")) != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s@%s>\n",
 				(long)now, getrandstring(24), cp);
-	else if ((cp = skin(myorigin())) != NULL && strchr(cp, '@') != NULL)
+	else if ((cp = skin(myorigin(hp))) != NULL && strchr(cp, '@') != NULL)
 		fprintf(fo, "Message-ID: <%lx.%s%%%s>\n",
 				(long)now, getrandstring(16), cp);
 }
@@ -1095,7 +1098,7 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 				return 1;
 			gotcha++;
 			fromfield = hp->h_from;
-		} else if ((addr = myaddrs()) != NULL)
+		} else if ((addr = myaddrs(hp)) != NULL)
 			if (putname(addr, w, action, &gotcha, "From:", fo,
 						&fromfield))
 				return 1;
@@ -1172,7 +1175,7 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 	if (value("bsdcompat") || value("bsdorder"))
 		FMT_CC_AND_BCC
 	if (w & GMSGID && stealthmua == 0)
-		message_id(fo), gotcha++;
+		message_id(fo, hp), gotcha++;
 	if (hp->h_ref != NULL && w & GREF) {
 		fmt("References:", hp->h_ref, fo, 0, 1, 0);
 		if ((np = hp->h_ref) != NULL && np->n_name) {
@@ -1276,7 +1279,7 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 	if (add_resent) {
 		fputs("Resent-", fo);
 		mkdate(fo, "Date");
-		if ((cp = myaddrs()) != NULL) {
+		if ((cp = myaddrs(NULL)) != NULL) {
 			if (putname(cp, GCOMMA, SEND_MBOX, NULL,
 					"Resent-From:", fo, &fromfield))
 				return 1;
@@ -1312,7 +1315,7 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 		}
 		if (value("stealthmua") == NULL) {
 			fputs("Resent-", fo);
-			message_id(fo);
+			message_id(fo, NULL);
 		}
 	}
 	if (check_from_and_sender(fromfield, senderfield))
@@ -1398,7 +1401,7 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 	if (count(to) != 0) {
 		if (value("record-resent") == NULL ||
 				mightrecord(nfi, to, 0) == OKAY)
-			ok = transfer(to, head.h_smopts, nfi);
+			ok = transfer(to, head.h_smopts, nfi, NULL);
 	} else
 		ok = OKAY;
 	Fclose(nfi);

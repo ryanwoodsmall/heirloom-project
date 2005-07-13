@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)collect.c	2.50 (gritter) 6/9/05";
+static char sccsid[] = "@(#)collect.c	2.51 (gritter) 7/13/05";
 #endif
 #endif /* not lint */
 
@@ -170,7 +170,7 @@ print_collf(FILE *collf, struct header *hp)
 			maxlines--;
 		if (hp->h_attach)
 			maxlines--;
-		maxlines -= myaddrs() != NULL || hp->h_from != NULL;
+		maxlines -= myaddrs(hp) != NULL || hp->h_from != NULL;
 		maxlines -= value("ORGANIZATION") != NULL ||
 			hp->h_organization != NULL;
 		maxlines -= value("replyto") != NULL || hp->h_replyto != NULL;
