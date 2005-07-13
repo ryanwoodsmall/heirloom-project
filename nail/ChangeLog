@@ -3,7 +3,8 @@
   segmentation fault due to a NULL pointer dereference (Bug reported by
   Nick Pasich).
 * An 'imap-list-depth' variable was introduced to control the maximum depth
-  of the folder traversal for the 'folders' command.
+  of the folder traversal for the 'folders' command if the folder separator
+  on the IMAP server is not the slash '/'.
 * If standard output is not a terminal device, the output of the 'folders'
   command applied to an IMAP account is no longer arranged into columns.
 * The new '-R' option causes all folders to be opened read-only.

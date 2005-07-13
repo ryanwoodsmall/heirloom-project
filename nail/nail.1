@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.305 (gritter) 7/5/05
+.\"     Sccsid: @(#)nail.1	2.306 (gritter) 7/13/05
 .\"
-.TH NAIL 1 "7/5/05" "nail 11.24" "User Commands"
+.TH NAIL 1 "7/13/05" "nail 11.24" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -2965,6 +2965,11 @@ command stops after it has reached a certain depth
 to avoid possible infinite loops.
 The value of this variable sets the maximum depth allowed.
 The default is 2.
+If the folder separator on the current IMAP server is a slash `/',
+this variable has no effect,
+and the
+.I folders
+command does not descend to subfolders.
 .TP
 .B indentprefix
 String used by the `\fI~m\fR' and `\fI~M\fR' tilde escapes
