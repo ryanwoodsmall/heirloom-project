@@ -1,3 +1,7 @@
+[11.25] released ...
+* The junk mail filter now also ignores the "X-pstn" header fields generated
+  by "postini" filtering software.
+
 [11.24] released 7/14/05
 * When the 'replyto' variable was set, sending a message resulted in a
   segmentation fault due to a NULL pointer dereference (Bug reported by

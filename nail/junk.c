@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.71 (gritter) 12/29/04";
+static char sccsid[] = "@(#)junk.c	1.72 (gritter) 7/14/05";
 #endif
 #endif /* not lint */
 
@@ -773,6 +773,7 @@ out:	if (i > 0) {
 				 asccasecmp(sp->field, "date*") == 0 ||
 				 asccasecmp(sp->field, "delivery-date*") == 0 ||
 				 ascncasecmp(sp->field, "x-spam", 6) == 0 ||
+				 ascncasecmp(sp->field, "x-pstn", 6) == 0 ||
 				 ascncasecmp(sp->field, "x-scanned", 9) == 0 ||
 				 asccasecmp(sp->field, "received*") == 0 &&
 				 	((2*c > i) || i < 4 ||

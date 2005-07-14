@@ -1,4 +1,4 @@
-#define	V	"11.24"
+#define	V	"11.25pre"
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.320 (gritter) 7/14/05";
+static char sccsid[] = "@(#)version.c	2.321 (gritter) 7/14/05";
 #endif
 #endif /* not lint */
 
@@ -79,7 +79,7 @@ hmac.c:	Sccsid @(#)hmac.c	1.7 (gritter) 10/2/04
 imap.c:static char sccsid[] = "@(#)imap.c	1.213 (gritter) 7/5/05";
 imap_gssapi.c:static char sccsid[] = "@(#)imap_gssapi.c	1.9 (gritter) 10/2/04";
 imap_search.c:static char sccsid[] = "@(#)imap_search.c	1.28 (gritter) 4/14/05";
-junk.c:static char sccsid[] = "@(#)junk.c	1.71 (gritter) 12/29/04";
+junk.c:static char sccsid[] = "@(#)junk.c	1.72 (gritter) 7/14/05";
 lex.c:static char sccsid[] = "@(#)lex.c	2.82 (gritter) 7/5/05";
 list.c:static char sccsid[] = "@(#)list.c	2.59 (gritter) 3/5/05";
 lzw.c: * Sccsid @(#)lzw.c	1.10 (gritter) 10/3/04
