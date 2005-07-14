@@ -1,4 +1,4 @@
-#define	V	"11.24pre"
+#define	V	"11.24"
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.319 (gritter) 7/13/05";
+static char sccsid[] = "@(#)version.c	2.320 (gritter) 7/14/05";
 #endif
 #endif /* not lint */
 
@@ -48,13 +48,13 @@ static char sccsid[] = "@(#)version.c	2.319 (gritter) 7/13/05";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = "nail " V " 7/13/05";
+const char *version = "nail " V " 7/14/05";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)nail " V " 7/13/05";
+= "@(#)nail " V " 7/14/05";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -91,7 +91,7 @@ md5.h:	Sccsid @(#)md5.h	1.7 (gritter) 10/2/04
 mime.c:static char sccsid[]  = "@(#)mime.c	2.60 (gritter) 7/13/05";
 names.c:static char sccsid[] = "@(#)names.c	2.21 (gritter) 6/9/05";
 nss.c:static char sccsid[] = "@(#)nss.c	1.40 (gritter) 7/13/05";
-openssl.c:static char sccsid[] = "@(#)openssl.c	1.21 (gritter) 7/13/05";
+openssl.c:static char sccsid[] = "@(#)openssl.c	1.22 (gritter) 7/14/05";
 pop3.c:static char sccsid[] = "@(#)pop3.c	2.41 (gritter) 7/5/05";
 popen.c:static char sccsid[] = "@(#)popen.c	2.19 (gritter) 12/26/04";
 quit.c:static char sccsid[] = "@(#)quit.c	2.27 (gritter) 11/3/04";
