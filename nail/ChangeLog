@@ -1,4 +1,7 @@
 [11.25] released ...
+* The "sort xyz" commands now uncollapse all threads of a previously threaded
+  folder view; messages in collapsed threads were previously not shown when
+  the folder was sorted.
 * The junk mail filter now also ignores the "X-pstn" header fields generated
   by "postini" filtering software.
 

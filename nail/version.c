@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.321 (gritter) 7/14/05";
+static char sccsid[] = "@(#)version.c	2.322 (gritter) 7/14/05";
 #endif
 #endif /* not lint */
 
@@ -102,7 +102,7 @@ smtp.c:static char sccsid[] = "@(#)smtp.c	2.34 (gritter) 7/13/05";
 ssl.c:static char sccsid[] = "@(#)ssl.c	1.36 (gritter) 10/2/04";
 strings.c:static char sccsid[] = "@(#)strings.c	2.5 (gritter) 10/2/04";
 temp.c:static char sccsid[] = "@(#)temp.c	2.7 (gritter) 10/2/04";
-thread.c:static char sccsid[] = "@(#)thread.c	1.55 (gritter) 3/5/05";
+thread.c:static char sccsid[] = "@(#)thread.c	1.56 (gritter) 7/14/05";
 tty.c:static char sccsid[] = "@(#)tty.c	2.27 (gritter) 7/13/05";
 v7.local.c:static char sccsid[] = "@(#)v7.local.c	2.9 (gritter) 10/2/04";
 vars.c:static char sccsid[] = "@(#)vars.c	2.10 (gritter) 10/2/04";

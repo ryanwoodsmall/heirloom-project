@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)thread.c	1.55 (gritter) 3/5/05";
+static char sccsid[] = "@(#)thread.c	1.56 (gritter) 7/14/05";
 #endif
 #endif /* not lint */
 
@@ -624,6 +624,7 @@ sort(void *vp)
 		}
 		mp->m_child = mp->m_younger = mp->m_elder = mp->m_parent = NULL;
 		mp->m_level = 0;
+		mp->m_collapsed = 0;
 	}
 	if (n > 0) {
 		qsort(ms, n, sizeof *ms, func);
