@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.40 (gritter) 7/13/05";
+static char sccsid[] = "@(#)nss.c	1.42 (gritter) 7/15/05";
 #endif
 #endif /* not lint */
 
@@ -64,6 +64,8 @@ static sigjmp_buf	nssjmp;
 #include <secerr.h>
 #include <smime.h>
 #include <ciferfam.h>
+#include <xconst.h>
+#include <genname.h>
 #include <private/pprio.h>
 
 #include "extern.h"
@@ -72,6 +74,7 @@ static sigjmp_buf	nssjmp;
 
 static char *password_cb(PK11SlotInfo *slot, PRBool retry, void *arg);
 static SECStatus bad_cert_cb(void *arg, PRFileDesc *fd);
+static enum okay nss_check_host(const char *server, struct sock *sp);
 static const char *bad_cert_str(void);
 static enum okay nss_init(void);
 static void nss_select_method(const char *uhp);
@@ -111,29 +114,87 @@ password_cb(PK11SlotInfo *slot, PRBool retry, void *arg)
 static SECStatus
 bad_cert_cb(void *arg, PRFileDesc *fd)
 {
-	if (PORT_GetError() == SSL_ERROR_BAD_CERT_DOMAIN) {
+	if (PORT_GetError() == SSL_ERROR_BAD_CERT_DOMAIN)
 		/*
-		 * If a certificate contains both a dNSName and a CN,
-		 * the NSS library uses only the dNSName to verify
-		 * the identity of the peer. Check the CN also.
+		 * We must not use this result. NSS verifies host names
+		 * according to RFC 2818, but we must verify host names
+		 * according to RFC 2595. The rules are different:
 		 *
-		 * RFC 2595, 2.4 is not clear on this issue.
+		 * - RFC 2818 says that if both a dNSName and a CN are
+		 *   contained in the peer certificate, only the dNSName
+		 *   is used. RFC 2595 encourages to use both.
+		 *
+		 * - RFC 2818 allows the wildcard '*' in any component
+		 *   of the host name. RFC 2595 allows it only as the
+		 *   "left-most name component".
+		 *
+		 * So ignore it and verify separately.
 		 */
-		CERTCertificate	*cert;
-		char	*cn;
-		int	eq;
-
-		if ((cert = SSL_PeerCertificate(fd)) != NULL) {
-			cn = CERT_GetCommonName(&cert->subject);
-			eq = asccasecmp(cn, (char *)arg) == 0;
-			PORT_Free(cn);
-			CERT_DestroyCertificate(cert);
-			if (eq)
-				return SECSuccess;
-		}
-	}
+		return SECSuccess;
 	fprintf(stderr, "Error in certificate: %s.\n", bad_cert_str());
 	return ssl_vrfy_decide() == OKAY ? SECSuccess : SECFailure;
+}
+
+/*
+ * Host name checking according to RFC 2595.
+ */
+static enum okay
+nss_check_host(const char *server, struct sock *sp)
+{
+	CERTCertificate	*cert;
+	char	*cn = NULL;
+	enum okay	ok = STOP;
+	PRArenaPool	*arena;
+	CERTGeneralName	*gn;
+	SECItem	altname;
+	AltNameEncodedContext	ec;
+	int	i;
+	const SEC_ASN1Template	gntempl[] = {
+		{ SEC_ASN1_SEQUENCE_OF, 0, SEC_AnyTemplate }
+	};
+
+	if ((cert = SSL_PeerCertificate(sp->s_prfd)) == NULL) {
+		fprintf(stderr, "no certificate from \"%s\"\n", server);
+		return STOP;
+	}
+	arena = PORT_NewArena(DER_DEFAULT_CHUNKSIZE);
+	if (CERT_FindCertExtension(cert, SEC_OID_X509_SUBJECT_ALT_NAME,
+				&altname) == SECSuccess &&
+			SEC_ASN1DecodeItem(arena, &ec, gntempl,
+				&altname) == SECSuccess &&
+			ec.encodedGenName != NULL) {
+		for (i = 0; ec.encodedGenName[i] != NULL; i++) {
+			gn = CERT_DecodeGeneralName(arena, ec.encodedGenName[i],
+					NULL);
+			if (gn->type == certDNSName) {
+				char	*dn = ac_alloc(gn->name.other.len + 1);
+				memcpy(dn, gn->name.other.data,
+						gn->name.other.len);
+				dn[gn->name.other.len] = '\0';
+				fprintf(stderr, "Comparing DNS name: \"%s\"\n",
+						dn);
+				if (rfc2595_hostname_match(server, dn)
+						== OKAY) {
+					ac_free(dn);
+					goto out;
+				}
+				ac_free(dn);
+			}
+		}
+	}
+	if ((cn = CERT_GetCommonName(&cert->subject)) != NULL) {
+		if (verbose)
+			fprintf(stderr, "Comparing common name: \"%s\"\n", cn);
+		ok = rfc2595_hostname_match(server, cn);
+	}
+	if (ok == STOP)
+		fprintf(stderr, "host certificate does not match \"%s\"\n",
+				server);
+out:	if (cn)
+		PORT_Free(cn);
+	PORT_FreeArena(arena, PR_FALSE);
+	CERT_DestroyCertificate(cert);
+	return ok;
 }
 
 static const char *
@@ -222,7 +283,7 @@ ssl_open(const char *server, struct sock *sp, const char *uhp)
 	}
 	SSL_SetURL(fdc, server);
 	SSL_SetPKCS11PinArg(fdc, NULL);
-	SSL_BadCertHook(fdc, bad_cert_cb, (void *)server);
+	SSL_BadCertHook(fdc, bad_cert_cb, NULL);
 	if (SSL_ResetHandshake(fdc, PR_FALSE) != SECSuccess) {
 		nss_gen_err("Cannot reset NSS handshake");
 		PR_Close(fdc);
@@ -234,6 +295,11 @@ ssl_open(const char *server, struct sock *sp, const char *uhp)
 		return STOP;
 	}
 	sp->s_prfd = fdc;
+	if (nss_check_host(server, sp) != OKAY && ssl_vrfy_decide() != OKAY) {
+		PR_Close(fdc);
+		sp->s_prfd = NULL;
+		return STOP;
+	}
 	sp->s_use_ssl = 1;
 	if (verbose) {
 		char	*cipher, *issuer, *subject;

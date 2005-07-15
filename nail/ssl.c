@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ssl.c	1.36 (gritter) 10/2/04";
+static char sccsid[] = "@(#)ssl.c	1.37 (gritter) 7/15/05";
 #endif
 #endif /* not lint */
 
@@ -385,5 +385,15 @@ ccertsave(void *v)
 	if (val == 0)
 		printf("Certificate(s) saved.\n");
 	return val;
+}
+enum okay
+rfc2595_hostname_match(const char *host, const char *pattern)
+{
+	if (pattern[0] == '*' && pattern[1] == '.') {
+		pattern++;
+		while (*host && *host != '.')
+			host++;
+	}
+	return asccasecmp(host, pattern) == 0 ? OKAY : STOP;
 }
 #endif	/* USE_SSL */

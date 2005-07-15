@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)openssl.c	1.22 (gritter) 7/14/05";
+static char sccsid[] = "@(#)openssl.c	1.23 (gritter) 7/15/05";
 #endif
 #endif /* not lint */
 
@@ -326,8 +326,9 @@ ssl_check_host(const char *server, struct sock *sp)
 					fprintf(stderr,
 						"Comparing DNS name: \"%s\"\n",
 						gen->d.ia5->data);
-				if (!asccasecmp((char *)gen->d.ia5->data,
-							(char *)server))
+				if (rfc2595_hostname_match(server,
+						(char *)gen->d.ia5->data)
+						== OKAY)
 					goto found;
 			}
 		}
@@ -339,7 +340,7 @@ ssl_check_host(const char *server, struct sock *sp)
 		if (verbose)
 			fprintf(stderr, "Comparing common name: \"%s\"\n",
 					data);
-		if (asccasecmp(data, server) == 0)
+		if (rfc2595_hostname_match(server, data) == OKAY)
 			goto found;
 	}
 	X509_free(cert);

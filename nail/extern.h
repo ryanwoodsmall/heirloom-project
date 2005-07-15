@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.155 (gritter) 7/13/05
+ *	Sccsid @(#)extern.h	2.156 (gritter) 7/15/05
  */
 
 /* aux.c */
@@ -480,6 +480,7 @@ FILE *smime_sign_assemble(FILE *hp, FILE *bp, FILE *sp);
 FILE *smime_encrypt_assemble(FILE *hp, FILE *yp);
 struct message *smime_decrypt_assemble(struct message *m, FILE *hp, FILE *bp);
 int ccertsave(void *v);
+enum okay rfc2595_hostname_match(const char *host, const char *pattern);
 /* strings.c */
 void *salloc(size_t size);
 void *csalloc(size_t nmemb, size_t size);

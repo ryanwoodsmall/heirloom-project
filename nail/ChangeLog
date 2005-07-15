@@ -1,4 +1,8 @@
 [11.25] released ...
+* Wildcard host names in certificates according to RFC 2595 are now accepted
+  (Bug reported by Svend Sorensen).
+* Since RFC 2595 allows wildcards at other places than RFC 2818 which is
+  implemented by Mozilla NSS, host name verification is now done separately.
 * The "sort xyz" commands now uncollapse all threads of a previously threaded
   folder view; messages in collapsed threads were previously not shown when
   the folder was sorted.
