@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.324 (gritter) 7/15/05";
+static char sccsid[] = "@(#)version.c	2.325 (gritter) 7/15/05";
 #endif
 #endif /* not lint */
 
@@ -90,7 +90,7 @@ md5.c:	Sccsid @(#)md5.c	1.7 (gritter) 10/2/04
 md5.h:	Sccsid @(#)md5.h	1.7 (gritter) 10/2/04	
 mime.c:static char sccsid[]  = "@(#)mime.c	2.60 (gritter) 7/13/05";
 names.c:static char sccsid[] = "@(#)names.c	2.21 (gritter) 6/9/05";
-nss.c:static char sccsid[] = "@(#)nss.c	1.42 (gritter) 7/15/05";
+nss.c:static char sccsid[] = "@(#)nss.c	1.43 (gritter) 7/15/05";
 openssl.c:static char sccsid[] = "@(#)openssl.c	1.23 (gritter) 7/15/05";
 pop3.c:static char sccsid[] = "@(#)pop3.c	2.41 (gritter) 7/5/05";
 popen.c:static char sccsid[] = "@(#)popen.c	2.19 (gritter) 12/26/04";

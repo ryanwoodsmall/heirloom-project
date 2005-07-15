@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.42 (gritter) 7/15/05";
+static char sccsid[] = "@(#)nss.c	1.43 (gritter) 7/15/05";
 #endif
 #endif /* not lint */
 
@@ -171,7 +171,9 @@ nss_check_host(const char *server, struct sock *sp)
 				memcpy(dn, gn->name.other.data,
 						gn->name.other.len);
 				dn[gn->name.other.len] = '\0';
-				fprintf(stderr, "Comparing DNS name: \"%s\"\n",
+				if (verbose)
+					fprintf(stderr,
+						"Comparing DNS name: \"%s\"\n",
 						dn);
 				if (rfc2595_hostname_match(server, dn)
 						== OKAY) {
