@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.5 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.6 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.5 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.6 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -1063,8 +1063,7 @@ static struct sctab {
  */
 
 #ifndef CHARCLASS_NAME_MAX
-#define
-	CHARCLASS_NAME_MAX	-1
+#define	CHARCLASS_NAME_MAX	-1
 #endif
 #ifndef CHAR_BIT
 #define	CHAR_BIT	-1
