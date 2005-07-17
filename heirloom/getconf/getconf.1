@@ -1,0 +1,60 @@
+.\"
+.\" Copyright (c) 2005 Gunnar Ritter
+.\"
+.\" This software is provided 'as-is', without any express or implied
+.\" warranty. In no event will the authors be held liable for any damages
+.\" arising from the use of this software.
+.\"
+.\" Permission is granted to anyone to use this software for any purpose,
+.\" including commercial applications, and to alter it and redistribute
+.\" it freely, subject to the following restrictions:
+.\"
+.\" 1. The origin of this software must not be misrepresented; you must not
+.\"    claim that you wrote the original software. If you use this software
+.\"    in a product, an acknowledgment in the product documentation would be
+.\"    appreciated but is not required.
+.\"
+.\" 2. Altered source versions must be plainly marked as such, and must not be
+.\"    misrepresented as being the original software.
+.\"
+.\" 3. This notice may not be removed or altered from any source distribution.
+.\"
+.\" Sccsid @(#)getconf.1	1.2 (gritter) 7/17/05
+.TH GETCONF 1 "7/17/05" "Heirloom Toolchest" "User Commands"
+.SH NAME
+getconf \- get configuration values
+.SH SYNOPSIS
+\fBgetconf\fR [\fB\-v\fI\ specification\fR] \fIsystem_var\fR
+.br
+\fBgetconf\fR [\fB\-v\fI\ specification\fR] \fIpath_var pathname\fR
+.br
+\fBgetconf \-a\fR
+.SH DESCRIPTION
+The
+.I getconf
+command prints values of system configuration variables.
+It is a command interface to the values returned by
+.IR sysconf (3),
+.IR confstr(3),
+and
+.IR pathconf (3).
+The
+.I system_var
+or
+.I path_var
+arguments, respectively, specify the parameter name to be queried,
+with or without the leading underscore.
+The
+.I pathname
+argument is passed to
+.IR pathconf (3).
+.PP
+The
+.B \-v
+option indicates that values according to a specific specification
+be queried.
+It has currently no effect.
+.PP
+With the
+.B \-a
+option, all known configuration variables are printed.

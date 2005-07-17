@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom.spec	1.30 (gritter) 6/28/05
+# Sccsid @(#)heirloom.spec	1.31 (gritter) 7/12/05
 #
 Summary: Heirloom Toolchest: A collection of standard Unix utilities
 Name: heirloom
@@ -8,7 +8,7 @@ Release: 1
 License: Other
 Source: %{name}-%{version}.tar.bz2
 Group: System Environment/Base
-Vendor: Gunnar Ritter <Gunnar.Ritter@pluto.uni-freiburg.de>
+Vendor: Gunnar Ritter <gunnarr@acm.org>
 URL: <http://heirloom.sourceforge.net>
 BuildRoot: %{_tmppath}/%{name}-root
 

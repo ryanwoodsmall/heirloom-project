@@ -7,7 +7,7 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	date dc dd deroff diff diff3 dircmp dirname df du \
 	echo ed env expand expr \
 	factor file find fmt fmtmsg fold \
-	getopt grep groups hd head hostname id join \
+	getconf getopt grep groups hd head hostname id join \
 	kill line listusers ln logins logname ls \
 	mail man mkdir mkfifo mknod more mvdir \
 	nawk news nice nl nohup oawk od \

@@ -36,7 +36,7 @@ links:
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SU3BIN)/$$i $(ROOT); \
 	done
-	for i in csplit date egrep fgrep find grep id mkdir nawk pg; \
+	for i in csplit date egrep fgrep find getconf grep id mkdir nawk pg; \
 	do \
 		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(S42BIN)/$$i $(ROOT); \
 	done
@@ -47,6 +47,10 @@ links:
 	for i in pax; \
 	do \
 		sh build/crossln $(ROOT)$(SV3BIN)/$$i $(ROOT)$(SUSBIN)/$$i $(ROOT); \
+	done
+	for i in getconf; \
+	do \
+		sh build/crossln $(ROOT)$(SUSBIN)/$$i $(ROOT)$(SV3BIN)/$$i $(ROOT); \
 	done
 	for i in od; \
 	do \
