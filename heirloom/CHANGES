@@ -1,6 +1,6 @@
 Release ...
 * The "getconf" utility has been added (derived from OpenSolaris code).
-* The "pathchk" utility has been added.
+* The "mesg" and "pathchk" utilities have been added.
 * printf: Handle unsigned values larger than INT_MAX correctly with "%u",
   "%o", "%x", and "%X".
 * printf: Handle SVID3 "position" fields in format specifications, such

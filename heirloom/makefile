@@ -9,7 +9,7 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	factor file find fmt fmtmsg fold \
 	getconf getopt grep groups hd head hostname id join \
 	kill line listusers ln logins logname ls \
-	mail man mkdir mkfifo mknod more mvdir \
+	mail man mesg mkdir mkfifo mknod more mvdir \
 	nawk news nice nl nohup oawk od \
 	paste pathchk pg pgrep pr printenv printf priocntl ps psrinfo pwd \
 	random renice rm rmdir \
