@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)printf.c	1.5 (gritter) 7/1/05";
+static const char sccsid[] USED = "@(#)printf.c	1.6 (gritter) 7/17/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,9 +99,11 @@ T(const char *cp) \
 }
 
 #define	getint(a, b)	strtol(a, b, 0)
+#define	getuns(a, b)	strtoul(a, b, 0)
 #define	getdouble(a, b)	strtod(a, b)
 
 getnum(integer, int, getint)
+getnum(unsgned, unsigned, getuns)
 getnum(floating, double, getdouble)
 
 static int
@@ -281,7 +283,10 @@ loop:	switch (*fp) {
 	case 'X':
 	case 'c':
 		if (a < ac)
-			n = *fp == 'c' ? *av[a++] & 0377 : integer(av[a++]);
+			n = *fp == 'c' ? *av[a++] & 0377 :
+				*fp == 'd' || *fp == 'i' ?
+					integer(av[a++]) :
+					unsgned(av[a++]);
 		else
 			n = 0;
 		c = fp[1];
