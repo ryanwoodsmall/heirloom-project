@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.6 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.7 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.6 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.7 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -68,6 +68,10 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.6 (gritter) 7/17/05";
 #include <assert.h>
 #include <libgen.h>
 
+/*
+ * Values applicable for the Heirloom Toolchest that partially
+ * override those of the host platform.
+ */
 #if defined (SU3)
 #define	PATH	SU3BIN ":" DEFBIN ":/bin:/usr/bin"
 #undef	POSIX2_VERSION
@@ -77,6 +81,140 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.6 (gritter) 7/17/05";
 #undef	POSIX2_VERSION
 #define	POSIX2_VERSION	199209
 #endif	/* !SU3 */
+
+#ifndef	BC_BASE_MAX
+#define	BC_BASE_MAX	99
+#endif
+#ifndef	BC_DIM_MAX
+#define	BC_DIM_MAX	2048
+#endif
+#undef	BC_SCALE_MAX
+#define	BC_SCALE_MAX	99
+#undef	BC_STRING_MAX
+#define	BC_STRING_MAX	1000
+#undef	EXPR_NEST_MAX
+#define	EXPR_NEST_MAX	32
+#undef	RE_DUP_MAX
+#define	RE_DUP_MAX	255
+#undef	POSIX2_UPE
+#define	POSIX2_UPE	1
+
+#include "heirloom.h"
+
+/*
+ * POSIX invariants, defined in case the host system does not provide
+ * them, or to override possible wrong definitions.
+ */
+#undef	_POSIX_AIO_LISTIO_MAX
+#define	_POSIX_AIO_LISTIO_MAX		2
+#undef	_POSIX_AIO_MAX
+#define	_POSIX_AIO_MAX			1
+#undef	_POSIX_ARG_MAX
+#define	_POSIX_ARG_MAX			4096
+#undef	_POSIX_CHILD_MAX
+#if defined (SU3)
+#define	_POSIX_CHILD_MAX		25
+#else	/* !SU3 */
+#define	_POSIX_CHILD_MAX		6
+#endif	/* !SU3 */
+#undef	_POSIX_CLOCKRES_MIN
+#define	_POSIX_CLOCKRES_MIN		20000000
+#undef	_POSIX_DELAYTIMER_MAX
+#define	_POSIX_DELAYTIMER_MAX		32
+#undef	_POSIX_HOST_NAME_MAX
+#define	_POSIX_HOST_NAME_MAX		255
+#undef	_POSIX_LINK_MAX
+#define	_POSIX_LINK_MAX			8
+#undef	_POSIX_LOGIN_NAME_MAX
+#define	_POSIX_LOGIN_NAME_MAX		9
+#undef	_POSIX_MAX_CANON
+#define	_POSIX_MAX_CANON		255
+#undef	_POSIX_MAX_INPUT
+#define	_POSIX_MAX_INPUT		255
+#undef	_POSIX_MQ_OPEN_MAX
+#define	_POSIX_MQ_OPEN_MAX		8
+#undef	_POSIX_MQ_PRIO_MAX
+#define	_POSIX_MQ_PRIO_MAX		32
+#undef	_POSIX_NAME_MAX
+#define	_POSIX_NAME_MAX			14
+#undef	_POSIX_NGROUPS_MAX
+#if defined (SU3)
+#define	_POSIX_NGROUPS_MAX		8
+#else	/* !SU3 */
+#define	_POSIX_NGROUPS_MAX		0
+#endif
+#undef	_POSIX_OPEN_MAX
+#if defined (SU3)
+#define	_POSIX_OPEN_MAX			20
+#else	/* !SU3 */
+#define	_POSIX_OPEN_MAX			16
+#endif
+#undef	_POSIX_PATH_MAX
+#if defined (SU3)
+#define	_POSIX_PATH_MAX			256
+#else	/* !SU3 */
+#define	_POSIX_PATH_MAX			255
+#endif	/* !SU3 */
+#undef	_POSIX_PIPE_BUF
+#define	_POSIX_PIPE_BUF			512
+#undef	_POSIX_RE_DUP_MAX
+#define	_POSIX_RE_DUP_MAX		255
+#undef	_POSIX_RTSIG_MAX
+#define	_POSIX_RTSIG_MAX		8
+#undef	_POSIX_SEM_NSEMS_MAX
+#define	_POSIX_SEM_NSEMS_MAX		256
+#undef	_POSIX_SEM_VALUE_MAX
+#define	_POSIX_SEM_VALUE_MAX		32767
+#undef	_POSIX_SIGQUEUE_MAX
+#define	_POSIX_SIGQUEUE_MAX		32
+#undef	_POSIX_SSIZE_MAX
+#define	_POSIX_SSIZE_MAX		32767
+#undef	_POSIX_STREAM_MAX
+#define	_POSIX_STREAM_MAX		8
+#undef	_POSIX_SYMLINK_MAX
+#define	_POSIX_SYMLINK_MAX		255
+#undef	_POSIX_SYMLOOP_MAX
+#define	_POSIX_SYMLOOP_MAX		8
+#undef	_POSIX_THREAD_DESTRUCTOR_ITERATIONS
+#define	_POSIX_THREAD_DESTRUCTOR_ITERATIONS	4
+#undef	_POSIX_THREAD_KEYS_MAX
+#define	_POSIX_THREAD_KEYS_MAX		128
+#undef	_POSIX_THREAD_THREADS_MAX
+#define	_POSIX_THREAD_THREADS_MAX	64
+#undef	_POSIX_TIMER_MAX
+#define	_POSIX_TIMER_MAX		32
+#undef	_POSIX_TTY_NAME_MAX
+#define	_POSIX_TTY_NAME_MAX		9
+#undef	_POSIX_TZNAME_MAX
+#if defined (SU3)
+#define	_POSIX_TZNAME_MAX		6
+#else	/* !SU3 */
+#define	_POSIX_TZNAME_MAX		3
+#endif	/* !SU3 */
+#undef	_POSIX2_BC_BASE_MAX
+#define	_POSIX2_BC_BASE_MAX		99
+#undef	_POSIX2_BC_DIM_MAX
+#define	_POSIX2_BC_DIM_MAX		2048
+#undef	_POSIX2_BC_SCALE_MAX
+#define	_POSIX2_BC_SCALE_MAX		99
+#undef	_POSIX2_BC_STRING_MAX
+#define	_POSIX2_BC_STRING_MAX		1000
+#undef	_POSIX2_CHARCLASS_NAME_MAX
+#define	_POSIX2_CHARCLASS_NAME_MAX	14
+#undef	_POSIX2_COLL_WEIGHTS_MAX
+#define	_POSIX2_COLL_WEIGHTS_MAX	2
+#undef	_POSIX2_EXPR_NEST_MAX
+#define	_POSIX2_EXPR_NEST_MAX		32
+#undef	_POSIX2_LINE_MAX
+#define	_POSIX2_LINE_MAX		2048
+#undef	_POSIX2_RE_DUP_MAX
+#define	_POSIX2_RE_DUP_MAX		255
+#undef	_XOPEN_IOV_MAX
+#define	_XOPEN_IOV_MAX			16
+#undef	_XOPEN_NAME_MAX
+#define	_XOPEN_NAME_MAX			255
+#undef	_XOPEN_PATH_MAX
+#define	_XOPEN_PATH_MAX			1024
 
 extern size_t confstr(int, char *, size_t);
 
@@ -126,176 +264,110 @@ static struct sctab {
  */
 
 	/* POSIX.2-1992 table 2-17 */
-#ifdef	_POSIX2_BC_BASE_MAX
 {
 	_POSIX2_BC_BASE_MAX,	"POSIX2_BC_BASE_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_BC_BASE_MAX */
-#ifdef	_POSIX2_BC_BASE_MAX
 {
 	_POSIX2_BC_BASE_MAX,	"_POSIX2_BC_BASE_MAX",	SELFCONF,  NOFLAGS
 },
-#endif	/* _POSIX2_BC_BASE_MAX */
-#ifdef	_POSIX2_BC_DIM_MAX
 {
 	_POSIX2_BC_DIM_MAX,	"POSIX2_BC_DIM_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_BC_DIM_MAX */
-#ifdef	_POSIX2_BC_DIM_MAX
 {
 	_POSIX2_BC_DIM_MAX,	"_POSIX2_BC_DIM_MAX",	SELFCONF,  NOFLAGS
 },
-#endif	/* _POSIX2_BC_DIM_MAX */
-#ifdef	_POSIX2_BC_SCALE_MAX
 {
 	_POSIX2_BC_SCALE_MAX,	"POSIX2_BC_SCALE_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_BC_SCALE_MAX */
-#ifdef	_POSIX2_BC_SCALE_MAX
 {
 	_POSIX2_BC_SCALE_MAX,	"_POSIX2_BC_SCALE_MAX",	SELFCONF,  NOFLAGS
 },
-#endif	/* _POSIX2_BC_SCALE_MAX */
-#ifdef	_POSIX2_BC_STRING_MAX
 {
 	_POSIX2_BC_STRING_MAX,	"POSIX2_BC_STRING_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_BC_STRING_MAX */
-#ifdef	_POSIX2_BC_STRING_MAX
 {
 	_POSIX2_BC_STRING_MAX,	"_POSIX2_BC_STRING_MAX", SELFCONF, NOFLAGS
 },
-#endif	/* _POSIX2_BC_STRING_MAX */
-#ifdef	_POSIX2_COLL_WEIGHTS_MAX
 {
 	_POSIX2_COLL_WEIGHTS_MAX, "POSIX2_COLL_WEIGHTS_MAX", SELFCONF,  NOFLAGS
 },
-#endif	/* _POSIX2_COLL_WEIGHTS_MAX */
-#ifdef	_POSIX2_COLL_WEIGHTS_MAX
 {
 	_POSIX2_COLL_WEIGHTS_MAX, "_POSIX2_COLL_WEIGHTS_MAX", SELFCONF, NOFLAGS
 },
-#endif	/* _POSIX2_COLL_WEIGHTS_MAX */
-#ifdef	_POSIX2_EXPR_NEST_MAX
 {
 	_POSIX2_EXPR_NEST_MAX,	"POSIX2_EXPR_NEST_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_EXPR_NEST_MAX */
-#ifdef	_POSIX2_EXPR_NEST_MAX
 {
 	_POSIX2_EXPR_NEST_MAX,	"_POSIX2_EXPR_NEST_MAX", SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_EXPR_NEST_MAX */
-#ifdef	_POSIX2_LINE_MAX
 {
 	_POSIX2_LINE_MAX,	"POSIX2_LINE_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_LINE_MAX */
-#ifdef	_POSIX2_LINE_MAX
 {
 	_POSIX2_LINE_MAX,	"_POSIX2_LINE_MAX",	SELFCONF,  NOFLAGS
 },
-#endif	/* _POSIX2_LINE_MAX */
-#ifdef	_POSIX2_RE_DUP_MAX
 {
 	_POSIX2_RE_DUP_MAX,	"POSIX2_RE_DUP_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_RE_DUP_MAX */
-#ifdef	_POSIX2_RE_DUP_MAX
 {
 	_POSIX2_RE_DUP_MAX,	"_POSIX2_RE_DUP_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_RE_DUP_MAX */
 	/* See limits.h section below for _POSIX_RE_DUP_MAX */
 
 	/* UNIX 98 */
-#ifdef	_POSIX_AIO_LISTIO_MAX
 {
 	_POSIX_AIO_LISTIO_MAX,	"_POSIX_AIO_LISTIO_MAX", SELFCONF, 	NOFLAGS
 },
-#endif	/* _POSIX_AIO_LISTIO_MAX */
-#ifdef	_POSIX_AIO_MAX
 {
 	_POSIX_AIO_MAX,		"_POSIX_AIO_MAX",	 SELFCONF, 	NOFLAGS
 },
-#endif	/* _POSIX_AIO_MAX */
-#ifdef	_POSIX_DELAYTIMER_MAX
 {
 	_POSIX_DELAYTIMER_MAX,	"_POSIX_DELAYTIMER_MAX", SELFCONF, 	NOFLAGS
 },
-#endif	/* _POSIX_DELAYTIMER_MAX */
-#ifdef	_POSIX_LOGIN_NAME_MAX
 {
 	_POSIX_LOGIN_NAME_MAX,	"_POSIX_LOGIN_NAME_MAX", SELFCONF, 	NOFLAGS
 },
-#endif	/* _POSIX_LOGIN_NAME_MAX */
-#ifdef	_POSIX_MQ_OPEN_MAX
 {
 	_POSIX_MQ_OPEN_MAX,	"_POSIX_MQ_OPEN_MAX",	 SELFCONF, 	NOFLAGS
 },
-#endif	/* _POSIX_MQ_OPEN_MAX */
-#ifdef	_POSIX_MQ_PRIO_MAX
 {
 	_POSIX_MQ_PRIO_MAX,	"_POSIX_MQ_PRIO_MAX",	 SELFCONF, 	NOFLAGS
 },
-#endif	/* _POSIX_MQ_PRIO_MAX */
-#ifdef	_POSIX_RTSIG_MAX
 {
 	_POSIX_RTSIG_MAX,	"_POSIX_RTSIG_MAX",	 SELFCONF,	NOFLAGS
 },
-#endif	/* _POSIX_RTSIG_MAX */
-#ifdef	_POSIX_SEM_NSEMS_MAX
 {
 	_POSIX_SEM_NSEMS_MAX,	"_POSIX_SEM_NSEMS_MAX",	 SELFCONF,	NOFLAGS
 },
-#endif	/* _POSIX_SEM_NSEMS_MAX */
-#ifdef	_POSIX_SEM_VALUE_MAX
 {
 	_POSIX_SEM_VALUE_MAX,	"_POSIX_SEM_VALUE_MAX",	 SELFCONF,	NOFLAGS
 },
-#endif	/* _POSIX_SEM_VALUE_MAX */
-#ifdef	_POSIX_SIGQUEUE_MAX
 {
 	_POSIX_SIGQUEUE_MAX,	"_POSIX_SIGQUEUE_MAX",	 SELFCONF,	NOFLAGS
 },
-#endif	/* _POSIX_SIGQUEUE_MAX */
-#ifdef	_POSIX_TTY_NAME_MAX
 {
 	_POSIX_TTY_NAME_MAX,	"_POSIX_TTY_NAME_MAX",	 SELFCONF,	NOFLAGS
 },
-#endif	/* _POSIX_TTY_NAME_MAX */
 
 	/* UNIX 03 */
-#ifdef	_POSIX_HOST_NAME_MAX
 {
 	_POSIX_HOST_NAME_MAX,	"_POSIX_HOST_NAME_MAX",	  SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_HOST_NAME_MAX */
-#ifdef	_POSIX_RE_DUP_MAX
 {
 	_POSIX_RE_DUP_MAX,	"_POSIX_RE_DUP_MAX",	  SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_RE_DUP_MAX */
-#ifdef	_POSIX_CLOCKRES_MIN
 {
 	_POSIX_CLOCKRES_MIN,	"_POSIX_CLOCKRES_MIN",	  SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_CLOCKRES_MIN */
-#ifdef	_POSIX_SYMLINK_MAX
 {
 	_POSIX_SYMLINK_MAX,	"_POSIX_SYMLINK_MAX",	  SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_SYMLINK_MAX */
-#ifdef	_POSIX_SYMLOOP_MAX
 {
 	_POSIX_SYMLOOP_MAX,	"_POSIX_SYMLOOP_MAX",	  SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_SYMLOOP_MAX */
-#ifdef	_POSIX2_CHARCLASS_NAME_MAX
 {
 	_POSIX2_CHARCLASS_NAME_MAX, "_POSIX2_CHARCLASS_NAME_MAX", SELFCONF,   NOFLAGS
 },
-#endif	/* CHARCLASS_NAME_MAX */
 
 	/* POSIX.2-1992 table 2-17 */
 {
@@ -306,23 +378,17 @@ static struct sctab {
 },
 
 	/* POSIX.2-1992 table 2-18 */
-#ifndef	BC_BASE_MAX
-#define	BC_BASE_MAX	99
-#endif
 {
 	BC_BASE_MAX,		"BC_BASE_MAX",		SELFCONF,   NOFLAGS
 },
-#ifndef	BC_DIM_MAX
-#define	BC_DIM_MAX	2048
-#endif
 {
 	BC_DIM_MAX,		"BC_DIM_MAX",		SELFCONF,   NOFLAGS
 },
 {
-	99,			"BC_SCALE_MAX",		SELFCONF,   NOFLAGS
+	BC_SCALE_MAX,		"BC_SCALE_MAX",		SELFCONF,   NOFLAGS
 },
 {
-	1000,			"BC_STRING_MAX",	SELFCONF,   NOFLAGS
+	BC_STRING_MAX,		"BC_STRING_MAX",	SELFCONF,   NOFLAGS
 },
 #ifdef	_SC_COLL_WEIGHTS_MAX
 {
@@ -330,7 +396,7 @@ static struct sctab {
 },
 #endif	/* _SC_COLL_WEIGHTS_MAX */
 {
-	32,			"EXPR_NEST_MAX",	SELFCONF,   NOFLAGS
+	EXPR_NEST_MAX,		"EXPR_NEST_MAX",	SELFCONF,   NOFLAGS
 },
 #ifdef	_SC_LINE_MAX
 {
@@ -338,7 +404,7 @@ static struct sctab {
 },
 #endif	/* _SC_LINE_MAX */
 {
-	255,			"RE_DUP_MAX",		SELFCONF,   NOFLAGS
+	RE_DUP_MAX,		"RE_DUP_MAX",		SELFCONF,   NOFLAGS
 },
 
 	/* POSIX.2-1992 table 2-19 */
@@ -413,101 +479,67 @@ static struct sctab {
 },
 #endif	/* _SC_2_SW_DEV */
 {
-	1,			"POSIX2_UPE",		SELFCONF,   NOFLAGS
+	POSIX2_UPE,		"POSIX2_UPE",		SELFCONF,   NOFLAGS
 },
 {
-	1,			"_POSIX2_UPE",		SELFCONF,   NOFLAGS
+	POSIX2_UPE,		"_POSIX2_UPE",		SELFCONF,   NOFLAGS
 },
 
 	/* POSIX.1-1990 table 2-3 */
-#ifdef	_POSIX_ARG_MAX
 {
 	_POSIX_ARG_MAX,		"_POSIX_ARG_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_ARG_MAX */
-#ifdef	_POSIX_CHILD_MAX
 {
 	_POSIX_CHILD_MAX,	"_POSIX_CHILD_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_CHILD_MAX */
-#ifdef	_POSIX_LINK_MAX
 {
 	_POSIX_LINK_MAX,	"_POSIX_LINK_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_LINK_MAX */
-#ifdef	_POSIX_MAX_CANON
 {
 	_POSIX_MAX_CANON,	"_POSIX_MAX_CANON",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_MAX_CANON */
-#ifdef	_POSIX_MAX_INPUT
 {
 	_POSIX_MAX_INPUT,	"_POSIX_MAX_INPUT",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_MAX_INPUT */
-#ifdef	_POSIX_NAME_MAX
 {
 	_POSIX_NAME_MAX,	"_POSIX_NAME_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_NAME_MAX */
-#ifdef	_POSIX_NGROUPS_MAX
 {
 	_POSIX_NGROUPS_MAX,	"_POSIX_NGROUPS_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_NGROUPS_MAX */
-#ifdef	_POSIX_OPEN_MAX
 {
 	_POSIX_OPEN_MAX,	"_POSIX_OPEN_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_OPEN_MAX */
-#ifdef	_POSIX_PATH_MAX
 {
 	_POSIX_PATH_MAX,	"_POSIX_PATH_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_PATH_MAX */
-#ifdef	_POSIX_PIPE_BUF
 {
 	_POSIX_PIPE_BUF,	"_POSIX_PIPE_BUF",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_PIPE_BUF */
-#ifdef	_POSIX_SSIZE_MAX
 {
 	_POSIX_SSIZE_MAX,	"_POSIX_SSIZE_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_SSIZE_MAX */
-#ifdef	_POSIX_STREAM_MAX
 {
 	_POSIX_STREAM_MAX,	"_POSIX_STREAM_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_STREAM_MAX */
-#ifdef	_POSIX_TIMER_MAX
 {
 	_POSIX_TIMER_MAX,	"_POSIX_TIMER_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_TIMER_MAX */
-#ifdef	_POSIX_THREAD_DESTRUCTOR_ITERATIONS
 {
 	_POSIX_THREAD_DESTRUCTOR_ITERATIONS,
 	"_POSIX_THREAD_DESTRUCTOR_ITERATIONS",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_THREAD_DESTRUCTOR_ITERATIONS */
-#ifdef	_POSIX_THREAD_KEYS_MAX
 {
 	_POSIX_THREAD_KEYS_MAX,
 	"_POSIX_THREAD_KEYS_MAX",		SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_THREAD_KEYS_MAX */
-#ifdef	_POSIX_THREAD_THREADS_MAX
 {
 	_POSIX_THREAD_THREADS_MAX,
 	"_POSIX_THREAD_THREADS_MAX",		SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_THREAD_THREADS_MAX */
-#ifdef	_POSIX_TZNAME_MAX
 {
 	_POSIX_TZNAME_MAX,	"_POSIX_TZNAME_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_TZNAME_MAX */
 
 	/* POSIX.1-1990 table 4-2 */
 #ifdef	_SC_ARG_MAX
@@ -1051,11 +1083,9 @@ static struct sctab {
 },
 #endif	/* _SC_2_C_VERSION */
 #else
-#ifdef	_POSIX2_C_VERSION
 {
 	_POSIX2_C_VERSION,	"_POSIX2_C_VERSION",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX2_C_VERSION */
 #endif
 
 /*
@@ -1155,11 +1185,9 @@ static struct sctab {
 	CHARCLASS_NAME_MAX,	"CHARCLASS_NAME_MAX",	  SELFCONF,   NOFLAGS
 },
 #endif	/* CHARCLASS_NAME_MAX */
-#ifdef	_POSIX_SSIZE_MAX
 {
 	_POSIX_SSIZE_MAX,	"SSIZE_MAX",	SELFCONF,   NOFLAGS
 },
-#endif	/* _POSIX_SSIZE_MAX */
 
 	/* POSIX.1-1988 */
 #ifdef	CHAR_BIT
@@ -1343,23 +1371,17 @@ static struct sctab {
 #endif	/* WORD_BIT */
 
 	/* XPG4 Version 2 */
-#ifdef	_XOPEN_IOV_MAX
 {
 	_XOPEN_IOV_MAX,		"_XOPEN_IOV_MAX",  SELFCONF, NOFLAGS
 },
-#endif	/* _XOPEN_IOV_MAX */
 
 	/* UNIX 03 */
-#ifdef	_XOPEN_NAME_MAX
 {
 	_XOPEN_NAME_MAX,	"_XOPEN_NAME_MAX", SELFCONF, NOFLAGS
 },
-#endif	/* _XOPEN_NAME_MAX */
-#ifdef	_XOPEN_PATH_MAX
 {
 	_XOPEN_PATH_MAX,	"_XOPEN_PATH_MAX", SELFCONF, NOFLAGS
 },
-#endif	/* _XOPEN_PATH_MAX */
 
 	/*
 	 * The following are defined via sysconf().  These are considered
@@ -2031,9 +2053,15 @@ static struct sctab {
 #endif	/* _SC_V6_LPBIG_OFFBIG */
 #ifdef	_SC_V6_LPBIG_OFFBIG
 {
-	_SC_V6_LPBIG_OFFBIG,	"POSIX_V6_LPBIG_OFFBIG",  SYSCONF,	NOFLAGS,
+	_SC_V6_LPBIG_OFFBIG,	"POSIX_V6_LPBIG_OFFBIG",  SYSCONF,	NOFLAGS
 },
 #endif	/* _SC_V6_LPBIG_OFFBIG */
+
+	/* local values */
+{
+	HEIRLOOM_TOOLCHEST_VERSION,	"HEIRLOOM_TOOLCHEST_VERSION",
+		SELFCONF,	NOFLAGS
+},
 {
 	0,		NULL,	0,	0		/* end of table */
 }
