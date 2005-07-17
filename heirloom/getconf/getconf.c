@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.11 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.12 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.11 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.12 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -69,14 +69,16 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.11 (gritter) 7/17/05";
  * Values applicable for the Heirloom Toolchest that partially
  * override those of the host platform.
  */
+#undef	POSIX2_VERSION
+#undef	_XOPEN_XCU_VERSION
 #if defined (SU3)
 #define	HEIRLOOM_PATH	SU3BIN ":" DEFBIN
-#undef	POSIX2_VERSION
 #define	POSIX2_VERSION	200112
+#define	_XOPEN_XCU_VERSION	600
 #else	/* !SU3 */
 #define	HEIRLOOM_PATH	SUSBIN ":" DEFBIN
-#undef	POSIX2_VERSION
 #define	POSIX2_VERSION	199209
+#define	_XOPEN_XCU_VERSION	4
 #endif	/* !SU3 */
 
 #ifndef	BC_BASE_MAX
@@ -1406,11 +1408,9 @@ static struct sctab {
 	_SC_XOPEN_VERSION,	"_XOPEN_VERSION",	SYSCONF,   NOFLAGS
 },
 #endif	/* _SC_XOPEN_VERSION */
-#ifdef	_SC_XOPEN_XCU_VERSION
 {
-	_SC_XOPEN_XCU_VERSION,	"_XOPEN_XCU_VERSION",	SYSCONF,   NOFLAGS
+	_XOPEN_XCU_VERSION,	"_XOPEN_XCU_VERSION",	SELFCONF,  NOFLAGS
 },
-#endif	/* _SC_XOPEN_XCU_VERSION */
 #ifdef	_SC_XOPEN_CRYPT
 {
 	_SC_XOPEN_CRYPT,	"_XOPEN_CRYPT",		SYSCONF,   NOFLAGS
