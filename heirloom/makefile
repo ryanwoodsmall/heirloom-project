@@ -11,7 +11,7 @@ SUBDIRS = build libwchar libcommon libuxre _install \
 	kill line listusers ln logins logname ls \
 	mail man mkdir mkfifo mknod more mvdir \
 	nawk news nice nl nohup oawk od \
-	paste pg pgrep pr printenv printf priocntl ps psrinfo pwd \
+	paste pathchk pg pgrep pr printenv printf priocntl ps psrinfo pwd \
 	random renice rm rmdir \
 	sdiff sed setpgrp shl sleep sort spell split stty su sum sync \
 	tabs tail tapecntl tar tcopy tee test time touch tr true tsort tty \

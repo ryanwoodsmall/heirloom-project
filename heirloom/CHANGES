@@ -1,5 +1,6 @@
 Release ...
 * The "getconf" utility has been added (derived from OpenSolaris code).
+* The "pathchk" utility has been added.
 * printf: Handle unsigned values larger than INT_MAX correctly with "%u",
   "%o", "%x", and "%X".
 * Some issues with building on AIX have been fixed.
