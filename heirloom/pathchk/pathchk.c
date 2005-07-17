@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pathchk.c	1.1 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)pathchk.c	1.2 (gritter) 7/17/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +41,10 @@ static const char sccsid[] USED = "@(#)pathchk.c	1.1 (gritter) 7/17/05";
 #include <unistd.h>
 #include <errno.h>
 #include <asciitype.h>
+
+#ifndef	_POSIX_NAME_MAX
+#define	_POSIX_NAME_MAX	14
+#endif	/* !_POSIX_NAME_MAX */
 
 static const char	*progname;		/* argv[0] to main() */
 static int		status;			/* exit status */
