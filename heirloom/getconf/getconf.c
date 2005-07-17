@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.10 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.11 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.10 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.11 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -91,6 +91,9 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.10 (gritter) 7/17/05";
 #define	BC_STRING_MAX	1000
 #undef	EXPR_NEST_MAX
 #define	EXPR_NEST_MAX	32
+#ifndef	LINE_MAX
+#define	LINE_MAX	2048
+#endif
 #undef	RE_DUP_MAX
 #define	RE_DUP_MAX	255
 #undef	POSIX2_UPE
@@ -394,11 +397,9 @@ static struct sctab {
 {
 	EXPR_NEST_MAX,		"EXPR_NEST_MAX",	SELFCONF,   NOFLAGS
 },
-#ifdef	_SC_LINE_MAX
 {
-	_SC_LINE_MAX,		"LINE_MAX",		SYSCONF,   NOFLAGS
+	LINE_MAX,		"LINE_MAX",		SELFCONF,   NOFLAGS
 },
-#endif	/* _SC_LINE_MAX */
 {
 	RE_DUP_MAX,		"RE_DUP_MAX",		SELFCONF,   NOFLAGS
 },
