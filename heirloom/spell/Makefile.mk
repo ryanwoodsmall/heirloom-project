@@ -32,8 +32,8 @@
 
 .c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(GNUFL) $(IWCHAR) $(ICOMMON) -c $<
 
-all:	spell compress spellprog spellin hlista hlistb hstop \
-		host_hashmake host_spellin hashmake hashcheck
+all:	host_hashmake host_spellin spell compress spellprog spellin \
+		hlista hlistb hstop hashmake hashcheck
 
 spell: spell.sh
 	echo '#!$(SHELL)' | cat - spell.sh | sed ' \
