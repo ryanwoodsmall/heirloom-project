@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.8 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.9 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.8 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.9 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -72,11 +72,11 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.8 (gritter) 7/17/05";
  * override those of the host platform.
  */
 #if defined (SU3)
-#define	PATH	SU3BIN ":" DEFBIN ":/bin:/usr/bin"
+#define	HEIRLOOM_PATH	SU3BIN ":" DEFBIN
 #undef	POSIX2_VERSION
 #define	POSIX2_VERSION	200112
 #else	/* !SU3 */
-#define	PATH	SUSBIN ":" DEFBIN ":/bin:/usr/bin"
+#define	HEIRLOOM_PATH	SUSBIN ":" DEFBIN
 #undef	POSIX2_VERSION
 #define	POSIX2_VERSION	199209
 #endif	/* !SU3 */
@@ -247,10 +247,9 @@ static const char	*progname;
 static struct sctab {
 	long value;
 	char *name;
-	enum { SELFCONF, SYSCONF, PATHCONF, CONFSTR, STRING } type;
+	enum { SELFCONF, SYSCONF, PATHCONF, CONFSTR, PATHVAR } type;
 	int flag;
 	long dfl;
-	char *string;
 /* bit fields for sctab.flag member */
 #define	NOFLAGS		0	/* no special indicators */
 #define	UNDEFINED	1	/* value is known undefined at compile time */
@@ -712,18 +711,15 @@ static struct sctab {
 
 	/* POSIX.2-1992 description of getconf utility */
 {
-	0,			"PATH",			STRING,   NOFLAGS,
-		0,	PATH
+	0,			"PATH",			PATHVAR,   NOFLAGS
 },
 
 	/* POSIX.2-1992 table B-18 */
 {
-	0,			"CS_PATH",		STRING,   NOFLAGS,
-		0,	PATH
+	0,			"CS_PATH",		PATHVAR,   NOFLAGS
 },
 {
-	0,			"_CS_PATH",		STRING,   NOFLAGS,
-		0,	PATH
+	0,			"_CS_PATH",		PATHVAR,   NOFLAGS
 },
 
 	/* command names for large file configuration information */
@@ -2152,8 +2148,7 @@ getconf(struct sctab *scp, int argc, char *name, char *file)
 		}
 
 		if (confstr((int)scp->value, buffer, len) == 0) {
-			fprintf(stderr, "confstr() not consitent with "
-					"headers\n");
+			fprintf(stderr, "confstr() behavior not consistent\n");
 			return (1);
 		}
 
@@ -2182,8 +2177,16 @@ getconf(struct sctab *scp, int argc, char *name, char *file)
 		}
 		printf("%ld\n", value);
 		break;
-	case STRING:
-		printf("%s\n", scp->string);
+	case PATHVAR:
+		buffer = NULL;
+#ifdef	_CS_PATH
+		if ((len = confstr(_CS_PATH, NULL, 0)) == 0 ||
+				(buffer = malloc(len)) == NULL ||
+				confstr(_CS_PATH, buffer, len) == 0)
+			buffer = NULL;
+#endif	/* _CS_PATH */
+		printf("%s:%s\n", HEIRLOOM_PATH,
+				buffer ? buffer : "/bin:/usr/bin");
 		break;
 	}
 	return (0);
