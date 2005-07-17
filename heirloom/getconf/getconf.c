@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.7 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.8 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.7 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.8 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -65,7 +65,6 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.7 (gritter) 7/17/05";
 #include <limits.h>
 #include <locale.h>
 #include <libintl.h>
-#include <assert.h>
 #include <libgen.h>
 
 /*
@@ -1075,18 +1074,16 @@ static struct sctab {
 #endif	/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
 	/* End of UNIX 03 compilation environments */
 
-#ifdef  _SC_2_C_VERSION
+#if defined _SC_2_C_VERSION
 	/* POSIX.2 table B-4 */
-#ifdef	_SC_2_C_VERSION
 {
 	_SC_2_C_VERSION,	"_POSIX2_C_VERSION",	SYSCONF,   NOFLAGS
 },
-#endif	/* _SC_2_C_VERSION */
-#else
+#elif defined _POSIX2_C_VERSION
 {
 	_POSIX2_C_VERSION,	"_POSIX2_C_VERSION",	SELFCONF,   NOFLAGS
 },
-#endif
+#endif	/* _SC_2_C_VERSION, _POSIX2_C_VERSION */
 
 /*
  * XPG4 support BEGINS
@@ -2138,11 +2135,11 @@ getconf(struct sctab *scp, int argc, char *name, char *file)
 		len = confstr((int)scp->value, NULL, (size_t)0);
 		if (len == 0) {
 			if (errno == EINVAL) {
-				 fprintf(stderr, INVAL_ARG,
+				fprintf(stderr, INVAL_ARG,
 				    progname, name);
 				return (1);
 			} else {
-				 printf("undefined\n");
+				printf("undefined\n");
 				return (0);
 			}
 		}
@@ -2150,13 +2147,17 @@ getconf(struct sctab *scp, int argc, char *name, char *file)
 		 * allocate space to store result of constr() into
 		 */
 		if ((buffer = malloc(len)) == NULL) {
-			 fprintf(stderr, "insufficient memory available");
+			fprintf(stderr, "insufficient memory available\n");
 			return (1);
 		}
 
-		assert(confstr((int)scp->value, buffer, len) != 0);
+		if (confstr((int)scp->value, buffer, len) == 0) {
+			fprintf(stderr, "confstr() not consitent with "
+					"headers\n");
+			return (1);
+		}
 
-		 printf("%s\n", buffer);
+		printf("%s\n", buffer);
 		free(buffer);
 		break;
 
