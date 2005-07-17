@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.9 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.10 (gritter) 7/17/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.9 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.10 (gritter) 7/17/05";
 #endif	/* !SU3 */
 
 /*
@@ -63,8 +63,6 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.9 (gritter) 7/17/05";
 #include <errno.h>
 #include <unistd.h>
 #include <limits.h>
-#include <locale.h>
-#include <libintl.h>
 #include <libgen.h>
 
 /*
