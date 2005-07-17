@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)printf.1	1.1 (gritter) 6/30/05
-.TH PRINTF 1 "6/30/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)printf.1	1.2 (gritter) 7/17/05
+.TH PRINTF 1 "7/17/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 printf \- print a text string
 .SH SYNOPSIS
@@ -64,8 +64,15 @@ to be printed.
 The percent `%' character in the
 .I format
 string introduces a conversion specification
-consisting of up to four parts;
-of which the first three are optional:
+consisting of up to five parts,
+of which the first four are optional:
+.TP 14
+.I position
+A positive decimal integer followed by a dollar `$' character
+that specifies the
+.I argument
+to be used instead of the next unused one
+for the following conversions.
 .TP 14
 .I flags
 Zero or more of
@@ -221,10 +228,13 @@ in the current character encoding is used.
 If the
 .I format
 string consumes at least an
-.I argument
+.IR argument ,
+no format specification contains a
+.I position
+part,
 but there are still unused
 .I arguments
-after it has been evaluated once,
+after the entire format string has been evaluated once,
 it is evaluated repeatedly until all arguments are consumed.
 Missing
 .I arguments

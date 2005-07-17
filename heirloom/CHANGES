@@ -3,6 +3,8 @@ Release ...
 * The "pathchk" utility has been added.
 * printf: Handle unsigned values larger than INT_MAX correctly with "%u",
   "%o", "%x", and "%X".
+* printf: Handle SVID3 "position" fields in format specifications, such
+  as "%7$s", that specify which argument is used next.
 * Some issues with building on AIX have been fixed.
 
 Release 050713

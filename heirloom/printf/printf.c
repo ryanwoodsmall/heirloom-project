@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)printf.c	1.6 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)printf.c	1.7 (gritter) 7/17/05";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,12 +50,14 @@ static const char sccsid[] USED = "@(#)printf.c	1.6 (gritter) 7/17/05";
 
 static char		*fp;		/* format pointer */
 static int		a;		/* current argument index */
+static int		ab;		/* beginning of arguments */
 static int		ac;		/* argc to main() */
 static char		**av;		/* argv to main() */
 static int		c;		/* last character (byte) read */
 static const char	*progname;	/* argv[0] to main() */
 static int		status;		/* exit status */
 static int		mb_cur_max;	/* MB_CUR_MAX */
+static int		dolflag;	/* n$ field encountered */
 
 static void
 usage(void)
@@ -219,6 +221,7 @@ try:	for (n = 0; *fp && n < prec; fp++) {
 	}
 }
 
+#define	nextarg()	(a < ac ? av[a++] : "")
 static void
 percent(void)
 {
@@ -233,6 +236,18 @@ percent(void)
 	if (*++fp == '\0') {
 		fp--;
 		return;
+	}
+	if (digitchar(*fp&0377)) {
+		n = 0;
+		for (sp = fp; digitchar(*sp&0377); sp++)
+			n = n * 10 + *sp - '0';
+		if (*sp == '$') {
+			a = n + ab - 1;
+			dolflag = 1;
+			fmt = sp;
+			fmt[0] = '%';
+			fp = &sp[1];
+		}
 	}
 loop:	switch (*fp) {
 	case '-':
@@ -270,7 +285,7 @@ loop:	switch (*fp) {
 	}
 	switch (*fp) {
 	case 'b':
-		bconv(width, prec, a < ac ? av[a++] : "");
+		bconv(width, prec, nextarg());
 		return;
 	case '%':
 		putchar('%');
@@ -282,13 +297,10 @@ loop:	switch (*fp) {
 	case 'x':
 	case 'X':
 	case 'c':
-		if (a < ac)
-			n = *fp == 'c' ? *av[a++] & 0377 :
-				*fp == 'd' || *fp == 'i' ?
-					integer(av[a++]) :
-					unsgned(av[a++]);
-		else
-			n = 0;
+		n = *fp == 'c' ? *(nextarg()) & 0377 :
+			*fp == 'd' || *fp == 'i' ?
+				integer(nextarg()) :
+				unsgned(nextarg());
 		c = fp[1];
 		fp[1] = '\0';
 		switch (star) {
@@ -311,10 +323,7 @@ loop:	switch (*fp) {
 	case 'E':
 	case 'g':
 	case 'G':
-		if (a < ac)
-			f = floating(av[a++]);
-		else
-			f = 0;
+		f = floating(nextarg());
 		c = fp[1];
 		fp[1] = '\0';
 		switch (star) {
@@ -335,7 +344,7 @@ loop:	switch (*fp) {
 	case 's':
 		c = fp[1];
 		fp[1] = '\0';
-		sp = a < ac ? av[a++] : "";
+		sp = nextarg();
 		switch (star) {
 		case 3:
 			printf(fmt, width, prec, sp);
@@ -372,7 +381,7 @@ main(int argc, char **argv)
 		usage();
 	ac = argc;
 	av = argv;
-	a = 2;
+	a = ab = 2;
 	do {
 		for (fp = av[1]; *fp; fp++) {
 			switch (c = *fp & 0377) {
@@ -386,7 +395,7 @@ main(int argc, char **argv)
 				putchar(c);
 			}
 		}
-	} while (a > 2 && a < ac);
+	} while (a > ab && a < ac && dolflag == 0);
 	if (ferror(stdout))
 		status |= 1;
 	return status;
