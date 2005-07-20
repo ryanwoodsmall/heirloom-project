@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.325 (gritter) 7/15/05";
+static char sccsid[] = "@(#)version.c	2.326 (gritter) 7/20/05";
 #endif
 #endif /* not lint */
 
@@ -48,18 +48,18 @@ static char sccsid[] = "@(#)version.c	2.325 (gritter) 7/15/05";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = "nail " V " 7/15/05";
+const char *version = "nail " V " 7/20/05";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)nail " V " 7/15/05";
+= "@(#)nail " V " 7/20/05";
 #endif	/* !lint */
 /* SLIST */
 /*
 aux.c:static char sccsid[] = "@(#)aux.c	2.82 (gritter) 3/4/05";
-base64.c:static char sccsid[] = "@(#)base64.c	2.11 (gritter) 10/9/04";
+base64.c:static char sccsid[] = "@(#)base64.c	2.12 (gritter) 7/20/05";
 cache.c:static char sccsid[] = "@(#)cache.c	1.59 (gritter) 7/5/05";
 cmd1.c:static char sccsid[] = "@(#)cmd1.c	2.95 (gritter) 4/15/05";
 cmd2.c:static char sccsid[] = "@(#)cmd2.c	2.45 (gritter) 5/28/05";

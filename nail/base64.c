@@ -23,7 +23,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)base64.c	2.11 (gritter) 10/9/04";
+static char sccsid[] = "@(#)base64.c	2.12 (gritter) 7/20/05";
 #endif
 #endif /* not lint */
 
@@ -66,7 +66,7 @@ ctob64(unsigned char *p, int pad)
 	if (pad == 2) {
 		b64[2] = b64[3] = '=';
 	} else if (pad == 1) {
-		b64[2] = b64table[((p[1] & 0xF) << 2) | ((p[2] & 0xC0) >> 6)];
+		b64[2] = b64table[((p[1] & 0xF) << 2)];
 		b64[3] = '=';
 	} else {
 		b64[2] = b64table[((p[1] & 0xF) << 2) | ((p[2] & 0xC0) >> 6)];

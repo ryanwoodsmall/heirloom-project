@@ -1,4 +1,10 @@
 [11.25] released ...
+* The base64 encoder used an invalid encoding for the last unit of data if
+  (bytes_of_input % 3 == 2); it wrote two encoded bits beyond the last byte
+  then. Most base64 decoders, including nail's own, ignore such bits since
+  base64 data is always a multiple of 8-bit bytes. This might explain why
+  no harm caused by this error has been found for years. (Bug reported by
+  Lukasz Iwaszkiewicz).
 * Wildcard host names in certificates according to RFC 2595 are now accepted
   (Bug reported by Svend Sorensen).
 * Since RFC 2595 allows wildcards at other places than RFC 2818 which is
