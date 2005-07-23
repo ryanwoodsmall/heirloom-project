@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.97 (gritter) 7/4/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.98 (gritter) 7/23/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.97 (gritter) 7/4/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.98 (gritter) 7/23/05";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.97 (gritter) 7/4/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.98 (gritter) 7/23/05";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.97 (gritter) 7/4/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.98 (gritter) 7/23/05";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -720,7 +720,7 @@ commands(void)
 			putfile();
 		}
 		exfile();
-		if (addr1==zero+1 && addr2==dol)
+		if (addr1==zero+1 && addr2==dol || addr1==addr2 && dol==zero)
 			fchange = 0;
 		if (c == 'z')
 			quit(0);

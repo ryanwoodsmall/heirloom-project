@@ -5,6 +5,8 @@ Release ...
   "%o", "%x", and "%X".
 * printf: Handle SVID3 "position" fields in format specifications, such
   as "%7$s", that specify which argument is used next.
+* ed: Do not print "expecting `w'" with the "q" command after a zero-byte
+  file has been written.
 * Some issues with building on AIX have been fixed.
 
 Release 050713
