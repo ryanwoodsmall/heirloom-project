@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.213 (gritter) 7/5/05";
+static char sccsid[] = "@(#)imap.c	1.214 (gritter) 7/24/05";
 #endif
 #endif /* not lint */
 
@@ -2721,8 +2721,13 @@ imap_copyuid(struct mailbox *mp, struct message *m, const char *name)
 			return STOP;
 		getcache(mp, &xm, NEED_HEADER);
 		getcache(mp, &xm, NEED_BODY);
-	} else
+	} else {
+		if ((m->m_flag & HAVE_HEADER) == 0)
+			getcache(mp, m, NEED_HEADER);
+		if ((m->m_flag & HAVE_BODY) == 0)
+			getcache(mp, m, NEED_BODY);
 		xm = *m;
+	}
 	xm.m_uid = newuid;
 	xm.m_flag &= ~MFULLYCACHED;
 	putcache(&xmb, &xm);

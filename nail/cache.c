@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.59 (gritter) 7/5/05";
+static char sccsid[] = "@(#)cache.c	1.60 (gritter) 7/24/05";
 #endif
 #endif /* not lint */
 
@@ -268,7 +268,7 @@ putcache(struct mailbox *mp, struct message *m)
 
 	if ((mp->mb_type != MB_IMAP && mp->mb_type != MB_CACHE) ||
 			m->m_uid == 0 || m->m_time == 0 ||
-			(m->m_flag & (MTOUCH|MFULLYCACHED) == MFULLYCACHED))
+			(m->m_flag & (MTOUCH|MFULLYCACHED)) == MFULLYCACHED)
 		return;
 	if (m->m_have & HAVE_BODY)
 		c = 'B';
