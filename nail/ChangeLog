@@ -14,6 +14,9 @@
   that directory explains its structure.
 * Wildcard host names in certificates according to RFC 2595 are now accepted
   (Bug reported by Svend Sorensen).
+* The new "maximum-unencoded-line-length" variable allows to configure the
+  limit on the line length that causes an ASCII text message to be sent in
+  quoted-printable if exceeded (on request by Greg Cox).
 * Since RFC 2595 allows wildcards at other places than RFC 2818 which is
   implemented by Mozilla NSS, host name verification is now done separately.
 * The "sort xyz" commands now uncollapse all threads of a previously threaded

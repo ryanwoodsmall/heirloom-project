@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.60 (gritter) 7/13/05";
+static char sccsid[]  = "@(#)mime.c	2.61 (gritter) 7/26/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -720,8 +720,9 @@ static enum mimeclean
 mime_isclean(FILE *f)
 {
 	long initial_pos;
-	unsigned curlen = 1, maxlen = 0;
+	unsigned curlen = 1, maxlen = 0, limit = -1;
 	enum mimeclean isclean = 0;
+	char	*cp;
 	int c;
 
 	initial_pos = ftell(f);
@@ -732,7 +733,8 @@ mime_isclean(FILE *f)
 			/*
 			 * RFC 821 imposes a maximum line length of 1000
 			 * characters including the terminating CRLF
-			 * sequence.
+			 * sequence. The configurable limit must not
+			 * exceed that including a safety zone.
 			 */
 			if (curlen > maxlen)
 				maxlen = curlen;
@@ -748,7 +750,11 @@ mime_isclean(FILE *f)
 	} while (c != EOF);
 	clearerr(f);
 	fseek(f, initial_pos, SEEK_SET);
-	if (maxlen > 950)
+	if ((cp = value("maximum-unencoded-line-length")) != NULL)
+		limit = atoi(cp);
+	if (limit < 0 || limit > 950)
+		limit = 950;
+	if (maxlen > limit)
 		isclean |= MIME_LONGLINES;
 	return isclean;
 }
