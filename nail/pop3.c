@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)pop3.c	2.41 (gritter) 7/5/05";
+static char sccsid[] = "@(#)pop3.c	2.42 (gritter) 7/29/05";
 #endif
 #endif /* not lint */
 
@@ -183,13 +183,12 @@ pop3catch(int s)
 	switch (s) {
 	case SIGINT:
 		fprintf(stderr, catgets(catd, CATSET, 102, "Interrupt\n"));
+		siglongjmp(pop3jmp, 1);
 		break;
 	case SIGPIPE:
 		fprintf(stderr, "Received SIGPIPE during POP3 operation\n");
-		sclose(&mb.mb_sock);
 		break;
 	}
-	siglongjmp(pop3jmp, 1);
 }
 
 static void

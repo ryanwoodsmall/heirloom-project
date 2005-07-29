@@ -1,3 +1,10 @@
+[11.26] released ...
+* In combination with OpenSSL, when a SIGPIPE was received on an SSL socket
+  during a call to SSL_read() e.g. because an IMAP connection had timed out,
+  a segmentation fault occurred because OpenSSL apparently cannot handle
+  calls to SSL_shutdown() from the signal handler. This has been fixed (bug
+  reported by Svend Sorensen).
+
 [11.25] released 7/29/05
 * The base64 encoder used an invalid encoding for the last unit of data if
   (bytes_of_input % 3 == 2); it wrote two encoded bits beyond the last byte

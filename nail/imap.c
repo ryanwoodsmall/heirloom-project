@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.214 (gritter) 7/24/05";
+static char sccsid[] = "@(#)imap.c	1.215 (gritter) 7/29/05";
 #endif
 #endif /* not lint */
 
@@ -558,13 +558,12 @@ imapcatch(int s)
 	switch (s) {
 	case SIGINT:
 		fprintf(stderr, catgets(catd, CATSET, 102, "Interrupt\n"));
-		break;
+		siglongjmp(imapjmp, 1);
+		/*NOTREACHED*/
 	case SIGPIPE:
 		fprintf(stderr, "Received SIGPIPE during IMAP operation\n");
-		sclose(&mb.mb_sock);
 		break;
 	}
-	siglongjmp(imapjmp, 1);
 }
 
 static void
