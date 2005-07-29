@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	1.31 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)tr_sus.sl	1.32 (gritter) 7/29/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.31 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	1.32 (gritter) 7/29/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	1.31 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)tr.sl	1.32 (gritter) 7/29/05";
 #endif
 
 #include	<unistd.h>
@@ -72,7 +72,7 @@ static const char sccsid[] USED = "@(#)tr.sl	1.31 (gritter) 5/29/05";
 #define	BORDER2	0x10FFFFL	/* Unicode limit */
 
 #define	HBITS0	8		/* singlebyte hash table bits */
-#define	HBITS1	14		/* multibyte hash table bits */
+#define	HBITS1	17		/* multibyte hash table bits */
 
 #define	OOM	((struct item *)-1)	/* out of memory indicator */
 
@@ -203,7 +203,20 @@ lookup(wint_t wc, struct item **it, int make)
 		ip = ip->i_nxt;
 	}
 	if (make && ip == NULL) {
-		if ((ip = calloc(1, sizeof *ip)) == NULL) {
+		/*
+		 * First, try to allocate an area of items for
+		 * improved performance.
+		 */
+		static struct item	*area;
+		static int	ac;
+		static const int	nac = 4096;
+
+	alloc:	if (area && ac < nac)
+			ip = &area[ac++];
+		else if ((area = calloc(nac, sizeof *area)) != NULL) {
+			ac = 0;
+			goto alloc;
+		} else if ((ip = calloc(1, sizeof *ip)) == NULL) {
 			if (borderc == BORDER2 && reserve) {
 				/*
 				 * Not enough memory to cover all of Unicode.
