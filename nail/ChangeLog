@@ -1,4 +1,4 @@
-[11.25] released ...
+[11.25] released 7/29/05
 * The base64 encoder used an invalid encoding for the last unit of data if
   (bytes_of_input % 3 == 2); it wrote two encoded bits beyond the last byte
   then. Most base64 decoders, including nail's own, ignore such bits since

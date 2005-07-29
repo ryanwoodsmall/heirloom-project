@@ -1,4 +1,4 @@
-#define	V	"11.25pre"
+#define	V	"11.25"
 /*
  * Nail - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.330 (gritter) 7/29/05";
+static char sccsid[] = "@(#)version.c	2.331 (gritter) 7/29/05";
 #endif
 #endif /* not lint */
 
