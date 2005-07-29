@@ -12,8 +12,8 @@
   written by previous nail versions may still suffer from this error. To get
   rid of them, delete them from the IMAP cache directory. The file README in
   that directory explains its structure.
-* Input data that lacks a terminating newline is now always treated as
-  application/octet-stream and encoded in base64.
+* When sending messages, input data that lacks a terminating newline is now
+  always encoded in quoted-printable.
 * Wildcard host names in certificates according to RFC 2595 are now accepted
   (Bug reported by Svend Sorensen).
 * The new "maximum-unencoded-line-length" variable allows to configure the

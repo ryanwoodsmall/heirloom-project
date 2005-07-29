@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.87 (gritter) 7/29/05";
+static char sccsid[] = "@(#)sendout.c	2.88 (gritter) 7/29/05";
 #endif
 #endif /* not lint */
 
@@ -204,6 +204,7 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 	size_t sz;
 	char *buf;
 	size_t bufsize, count;
+	int	lastc = EOF;
 
 	if ((fi = Fopen(ap->a_name, "r")) == NULL) {
 		perror(ap->a_name);
@@ -258,10 +259,13 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 			if ((sz = fread(buf, sizeof *buf, bufsize, fi)) == 0)
 				break;
 		}
+		lastc = buf[sz-1];
 		if (mime_write(buf, sizeof *buf, sz, fo, convert, TD_NONE,
 					NULL, (size_t)0) == 0)
 			err = -1;
 	}
+	if (convert == CONV_TOQP && lastc != '\n')
+		fwrite("=\n", 1, 2, fo);
 	if (ferror(fi))
 		err = -1;
 	Fclose(fi);
@@ -375,6 +379,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	enum mimeclean isclean;
 	enum conversion convert;
 	char *charset = NULL, *contenttype = NULL;
+	int	lastc = EOF;
 
 	if ((nfo = Ftemp(&tempMail, "Rs", "w", 0600, 1)) == NULL) {
 		perror(catgets(catd, CATSET, 178, "temporary mail file"));
@@ -426,7 +431,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 		iconv_close(iconvd);
 		iconvd = (iconv_t)-1;
 	}
-	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR|MIME_NOTERMNL)) == 0 &&
+	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR)) == 0 &&
 			isclean & MIME_HIGHBIT &&
 			charset != NULL && asccasecmp(charset, tcs)) {
 		if (iconvd != (iconv_t)-1)
@@ -483,6 +488,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 				if (sz == 0)
 					break;
 			}
+			lastc = buf[sz - 1];
 			if (mime_write(buf, sizeof *buf, sz, nfo, convert,
 					TD_ICONV, NULL, (size_t)0) == 0) {
 				Fclose(nfo);
@@ -497,6 +503,8 @@ infix(struct header *hp, FILE *fi, int dosign)
 				return NULL;
 			}
 		}
+		if (convert == CONV_TOQP && lastc != '\n')
+			fwrite("=\n", 1, 2, nfo);
 		free(buf);
 		if (ferror(fi)) {
 			Fclose(nfo);
