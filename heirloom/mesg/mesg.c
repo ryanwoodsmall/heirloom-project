@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)mesg.c	1.1 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)mesg.c	1.2 (gritter) 7/29/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -52,7 +52,7 @@ usage(void)
 }
 
 static void
-setmode(const char *tp, mode_t mode)
+smode(const char *tp, mode_t mode)
 {
 	if (chmod(tp, mode) < 0) {
 		fprintf(stderr, "%s: cannot change mode\n", progname);
@@ -115,10 +115,10 @@ main(int argc, char **argv)
 		status = (st.st_mode & 0020) == 0;
 		break;
 	case 'y':
-		setmode(tp, st.st_mode | 0020);
+		smode(tp, st.st_mode | 0020);
 		break;
 	case 'n':
-		setmode(tp, st.st_mode & ~(mode_t)0020);
+		smode(tp, st.st_mode & ~(mode_t)0020);
 		status = 1;
 		break;
 	}
