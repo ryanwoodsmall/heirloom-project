@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.102 (gritter) 6/9/05
+ *	Sccsid @(#)def.h	2.103 (gritter) 7/29/05
  */
 
 /*
@@ -141,7 +141,8 @@ enum mimeclean {
 	MIME_HIGHBIT	= 001,		/* characters >= 0200 */
 	MIME_LONGLINES	= 002,		/* has lines too long for RFC 2822 */
 	MIME_CTRLCHAR	= 004,		/* contains control characters */
-	MIME_HASNUL	= 010		/* contains \0 characters */
+	MIME_HASNUL	= 010,		/* contains \0 characters */
+	MIME_NOTERMNL	= 020		/* lacks a terminating newline */
 };
 
 enum tdflags {

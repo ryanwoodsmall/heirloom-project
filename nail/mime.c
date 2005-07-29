@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.61 (gritter) 7/26/05";
+static char sccsid[]  = "@(#)mime.c	2.62 (gritter) 7/29/05";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -255,7 +255,7 @@ getcharset(int isclean)
 {
 	char *charset;
 
-	if (isclean & (MIME_CTRLCHAR|MIME_HASNUL))
+	if (isclean & (MIME_CTRLCHAR|MIME_HASNUL|MIME_NOTERMNL))
 		charset = NULL;
 	else if (isclean & MIME_HIGHBIT) {
 		charset = wantcharset ? wantcharset : value("charset");
@@ -723,10 +723,11 @@ mime_isclean(FILE *f)
 	unsigned curlen = 1, maxlen = 0, limit = -1;
 	enum mimeclean isclean = 0;
 	char	*cp;
-	int c;
+	int c = EOF, lastc;
 
 	initial_pos = ftell(f);
 	do {
+		lastc = c;
 		c = getc(f);
 		curlen++;
 		if (c == '\n' || c == EOF) {
@@ -748,6 +749,8 @@ mime_isclean(FILE *f)
 			isclean |= MIME_CTRLCHAR;
 		}
 	} while (c != EOF);
+	if (lastc != '\n')
+		isclean |= MIME_NOTERMNL;
 	clearerr(f);
 	fseek(f, initial_pos, SEEK_SET);
 	if ((cp = value("maximum-unencoded-line-length")) != NULL)
@@ -789,7 +792,7 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 	int convert;
 
 	*isclean = mime_isclean(fp);
-	if (*isclean & MIME_HASNUL) {
+	if (*isclean & (MIME_HASNUL|MIME_NOTERMNL)) {
 		convert = CONV_TOB64;
 		if (*contenttype == NULL ||
 				ascncasecmp(*contenttype, "text/", 5) == 0)

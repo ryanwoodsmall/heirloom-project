@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.86 (gritter) 7/13/05";
+static char sccsid[] = "@(#)sendout.c	2.87 (gritter) 7/29/05";
 #endif
 #endif /* not lint */
 
@@ -426,7 +426,8 @@ infix(struct header *hp, FILE *fi, int dosign)
 		iconv_close(iconvd);
 		iconvd = (iconv_t)-1;
 	}
-	if ((isclean & MIME_HASNUL) == 0 && isclean & MIME_HIGHBIT &&
+	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR|MIME_NOTERMNL)) == 0 &&
+			isclean & MIME_HIGHBIT &&
 			charset != NULL && asccasecmp(charset, tcs)) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
