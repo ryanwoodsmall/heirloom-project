@@ -4,7 +4,7 @@ Notes for the 'nawk' utility
 Changes since the version published by Caldera in OS Utilities 0.1a
 (<http://unixtools.sourceforge.net/>) include:
 
-- The lex part of the code must be built with flex instead of Unix lex.
+- The lex part of the code can be built with both Unix lex and flex.
 - Support for multibyte characters.
 - Proper support for LC_TIME (locale-specifix radix character recognized
   in input data, but not in scripts).
@@ -17,4 +17,4 @@ reference for some of the changes; in addition, the manual page
 enclosed here has been derived from 'One True awk' since Caldera
 did not enclose one.
 
-	Gunnar Ritter						5/9/03
+	Gunnar Ritter						7/30/05
