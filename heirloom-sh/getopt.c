@@ -26,7 +26,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getopt.c	1.7 (gritter) 6/22/05
+ * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
  */
 /* from OpenSolaris "getopt.c	1.23	05/06/08 SMI" */
 
@@ -48,19 +48,29 @@
 #include <string.h>
 #include <stdio.h>
 
-/*
- * Generalized error processing macro. The parameter i is a pointer to
- * the failed option string. If it is NULL, the character in c is converted
- * to a string and displayed instead. s is the error text.
- *
- * This could be / should be a static function if it is used more, but
- * that would require moving the 'optstring[0]' test outside of the
- * function.
- */
-#define	ERR(s, c)	if (opterr && optstring[0] != ':') { \
-	char errbuf[256]; \
-	snprintf(errbuf, sizeof (errbuf), s, argv[0], c); \
-	write(2, errbuf, strlen(errbuf)); }
+#define	ERR(s, c)	err(s, c, optstring, argv[0])
+static void
+err(const char *s, int c, const char *optstring, const char *argv0)
+{
+	char errbuf[256], *ep = errbuf;
+	const char	*cp;
+
+	if (opterr && optstring[0] != ':') {
+		for (cp = argv0; *cp && ep<&errbuf[sizeof errbuf]; cp++, ep++)
+			*ep = *cp;
+		for (cp = ": "; *cp && ep<&errbuf[sizeof errbuf]; cp++, ep++)
+			*ep = *cp;
+		for (cp = s; *cp && ep<&errbuf[sizeof errbuf]; cp++, ep++)
+			*ep = *cp;
+		for (cp = " -- "; *cp && ep<&errbuf[sizeof errbuf]; cp++, ep++)
+			*ep = *cp;
+		if (ep<&errbuf[sizeof errbuf])
+			*ep++ = c;
+		if (ep<&errbuf[sizeof errbuf])
+			*ep++ = '\n';
+		write(2, errbuf, ep - errbuf);
+	}
+}
 
 /*
  * getopt_sp is required to keep state between successive calls to getopt()
@@ -136,7 +146,7 @@ getopt(int argc, char *const *argv, const char *optstring)
 	optarg = NULL;
 	if ((cp = parse(optstring, c)) == NULL) {
 		/* LINTED: variable format specifier */
-		ERR("%s: illegal option -- %c\n", c);
+		ERR("illegal option", c);
 		if (argv[optind][++getopt_sp] == '\0') {
 			optind++;
 			getopt_sp = 1;
@@ -170,7 +180,7 @@ getopt(int argc, char *const *argv, const char *optstring)
 			optarg = &argv[optind++][getopt_sp+1];
 		} else if (++optind >= argc) {
 			/* LINTED: variable format specifier */
-			ERR("%s: option requires an argument -- %c\n", c);
+			ERR("option requires an argument", c);
 			getopt_sp = 1;
 			optarg = NULL;
 			return (optstring[0] == ':' ? ':' : '?');

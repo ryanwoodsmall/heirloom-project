@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-sh.spec	1.4 (gritter) 6/20/05
+# Sccsid @(#)heirloom-sh.spec	1.5 (gritter) 7/12/05
 #
 Summary: The Heirloom Bourne Shell.
 Name: heirloom-sh
@@ -8,7 +8,7 @@ Release: 1
 License: Other
 Source: %{name}-%{version}.tar.bz2
 Group: System Environment/Base
-Vendor: Gunnar Ritter <Gunnar.Ritter@pluto.uni-freiburg.de>
+Vendor: Gunnar Ritter <gunnarr@acm.org>
 URL: <http://heirloom.sourceforge.net>
 BuildRoot: %{_tmppath}/%{name}-root
 
