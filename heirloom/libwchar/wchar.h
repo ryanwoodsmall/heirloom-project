@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)wchar.h	1.3 (gritter) 1/15/05	*/
+/*	Sccsid @(#)wchar.h	1.4 (gritter) 8/3/05	*/
 
 #ifndef	LIBWCHAR_WCHAR_H
 #define	LIBWCHAR_WCHAR_H	1
@@ -106,7 +106,8 @@ unsigned long long	wcstoull(const wchar_t *, wchar_t **, int);
 wchar_t		*wcswcs(const wchar_t *, const wchar_t *);
 int		wcswidth(const wchar_t *, size_t);
 size_t		wcsxfrm(wchar_t *, const wchar_t *, size_t);
-int		wctob(wint_t);
+/*int		wctob(wint_t);*/
+#define	wctob(c)	(c)
 wctype_t	wctype(const char *);
 int		wcwidth(wchar_t);
 wchar_t		*wmemchr(const wchar_t *, wchar_t, size_t);
