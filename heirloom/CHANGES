@@ -1,6 +1,10 @@
 Release ...
 * The "getconf" utility has been added (derived from OpenSolaris code).
 * The "mesg" and "pathchk" utilities have been added.
+* tr: A new implementation that is based on 6th and 7th edition code is
+  now used. It stores the translation tables in arrays of variable size.
+  This results in better performance, under some circumstances at the
+  expense of higher memory consumption.
 * printf: Handle unsigned values larger than INT_MAX correctly with "%u",
   "%o", "%x", and "%X".
 * printf: Handle SVID3 "position" fields in format specifications, such

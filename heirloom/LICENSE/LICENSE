@@ -33,7 +33,7 @@ The following tools have been rewritten from scratch:
 	printf	priocntl	ps	psrinfo	pwd	rm
 	rmdir	sdiff	setpgrp	shl	sleep	split	stty
 	su	sync	tabs	tape	tapecntl	tee
-	time	touch	tr	true	tty	uname	unexpand
+	time	touch	true	tty	uname	unexpand
 	users	wc	who	whoami	whodo	xargs	yes
 
 	* See below for the licenses on compression codes.
@@ -85,7 +85,8 @@ These utilities have been derived from Ancient Unix code:
 	col	comm	dc	deroff(1b)	diff	diff3
 	ed	egrep	expr	factor	fgrep	file	find
 	grep	join	mkdir	oawk	pr	random	sed
-	sort	sum	tail	tar	tsort	uniq	unit
+	sort	sum	tail	tar	tr	tsort	uniq
+	unit
 
 as well as the 'gmatch' and 'regexp' parts of libcommon.
 
@@ -348,4 +349,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								7/17/05
+Gunnar Ritter								8/2/05

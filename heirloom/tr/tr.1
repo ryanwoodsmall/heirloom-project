@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)tr.1	1.19 (gritter) 2/4/05
+.\" Sccsid @(#)tr.1	1.20 (gritter) 8/2/05
 .\" Parts taken from tr(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TR 1 "2/4/05" "Heirloom Toolchest" "User Commands"
+.TH TR 1 "8/2/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tr \- translate characters
 .SH SYNOPSIS
@@ -205,12 +205,7 @@ locale(7)
 .SH NOTES
 In multibyte locales,
 characters with a wide character value greater than 0x10FFFF
-(i.\|e. outside the Unicode range)
-are not fully supported with the
-.B \-c
-option
-or within character classes
-(other than case mapping).
+not supported.
 If memory is sparse,
 this limit is automatically lowered to 0xFFFF,
 covering only the basic multilingual plane (BMP) of Unicode.
