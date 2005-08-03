@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tapecntl.sl	1.35 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)tapecntl.sl	1.36 (gritter) 8/3/05";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -218,7 +218,7 @@ tape v%s usage:   %s [-<tape>] [-a arg] <command> [device]\n\
         setblk     - set block size (in bytes) for device\n\
         setcomp    - set compression (0 disabled, 1 enabled)\n\
         setdensity - set density code (in hexadecimal)\n",
-        "1.35",
+        "1.36",
         progname);
         exit(1);
 }
@@ -782,7 +782,7 @@ main(int argc, char **argv)
 	if (progname[0] == 'm' && progname[1] == 't') {
 		mt = 1;
 		m_options(argc, argv);
-	} else if (eq(progname, "tape")) {
+	} else if (strstr(progname, "cntl") == NULL) {
 		tape_options(argc, argv);
 	} else
 		t_options(argc, argv);
