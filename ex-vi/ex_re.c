@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_re.c	1.58 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_re.c	1.59 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -1031,7 +1031,7 @@ compile(int eof, int oknl)
 	free(re.Patbuf);
 	re.Patbuf = smalloc(2*LBSIZE + 1);
 	p = re.Patbuf;
-	end = re.Patbuf + sizeof re.Patbuf;
+	end = &re.Patbuf[2*LBSIZE + 1];
 	if (isalpha(eof) || isdigit(eof))
 		error(catgets(catd, 1, 133,
 	"Regular expressions cannot be delimited by letters or digits"));

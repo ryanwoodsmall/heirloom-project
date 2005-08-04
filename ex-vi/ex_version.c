@@ -70,7 +70,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Sccsid @(#)ex_version.c	1.139 (gritter) 8/4/05
+ * Sccsid @(#)ex_version.c	1.140 (gritter) 8/4/05
  */
 
 #include "ex.h"
@@ -103,7 +103,7 @@ ex_get.c:static char sccsid[] = "@(#)ex_get.c	1.18 (gritter) 8/4/05";
 ex_io.c:static char sccsid[] = "@(#)ex_io.c	1.41 (gritter) 8/4/05";
 ex_proto.h: *	Sccsid @(#)ex_proto.h	1.31 (gritter) 8/4/05
 ex_put.c:static char sccsid[] = "@(#)ex_put.c	1.32 (gritter) 2/17/05";
-ex_re.c:static char sccsid[] = "@(#)ex_re.c	1.58 (gritter) 8/4/05";
+ex_re.c:static char sccsid[] = "@(#)ex_re.c	1.59 (gritter) 8/4/05";
 ex_re.h: *	Sccsid @(#)ex_re.h	1.24 (gritter) 8/4/05
 ex_set.c:static char sccsid[] = "@(#)ex_set.c	1.11 (gritter) 11/24/04";
 ex_subr.c:static char sccsid[] = "@(#)ex_subr.c	1.39 (gritter) 8/4/05";
