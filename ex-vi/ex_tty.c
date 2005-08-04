@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_tty.c	1.29 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_tty.c	1.30 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -300,8 +300,6 @@ setsize(void)
 	i = TLINES;
 	if (TLINES <= 5)
 		TLINES = 24;
-	if (TLINES > TUBELINES)
-		TLINES = TUBELINES;
 	l = TLINES;
 	if (ospeed < B1200)
 		l = 9;	/* including the message line at the bottom */

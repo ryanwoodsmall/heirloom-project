@@ -72,7 +72,7 @@
  *
  *	from ex_argv.h	7.3 (Berkeley) 5/31/85
  *
- *	@(#)ex_argv.h	1.8 (gritter) 11/23/04
+ *	Sccsid @(#)ex_argv.h	1.9 (gritter) 8/4/05
  */
 
 /*

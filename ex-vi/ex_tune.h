@@ -72,7 +72,7 @@
  *
  *	from ex_tune.h	7.8.1 (2.11BSD) 1996/10/23
  *
- *	@(#)ex_tune.h	1.12 (gritter) 12/1/04
+ *	Sccsid @(#)ex_tune.h	1.13 (gritter) 8/4/05
  */
 
 /*

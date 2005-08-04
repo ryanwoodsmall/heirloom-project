@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_v.c	1.17 (gritter) 11/27/04";
+static char sccsid[] = "@(#)ex_v.c	1.18 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -126,20 +126,41 @@ static char sccsid[] = "@(#)ex_v.c	1.17 (gritter) 11/27/04";
  */
 
 JMP_BUF venv;
+static cell *atube;
+
+/*
+ * Determine and set the size for visual mode buffers.
+ */
+static void
+tubesizes(void)
+{
+	TUBELINES = TLINES;
+	/*
+	 * TUBECOLS should stay at 160 at least since this defines the
+	 * maximum length of opening on hardcopies and allows two lines
+	 * of open on terminals like adm3's (glass tty's) where it
+	 * switches to pseudo hardcopy mode when a line gets longer
+	 * than 80 characters.
+	 */
+	TUBECOLS = TCOLUMNS < 160 ? 160 : TCOLUMNS;
+	TUBESIZE = TLINES * TCOLUMNS;
+	free(vlinfo);
+	free(vtube);
+	free(atube);
+	vlinfo = malloc((TUBELINES+2) * sizeof *vlinfo);
+	vtube = malloc(TUBELINES * sizeof *vtube);
+	atube = malloc((TUBESIZE + LBSIZE) * sizeof *atube);
+	if (vlinfo == NULL || vtube == NULL || atube == NULL)
+		error("Screen too large");
+}
 
 /*
  * Enter open mode
  */
-#ifdef u370
-cell	atube[TUBESIZE+LBSIZE];
-#endif
 void 
 oop(void)
 {
 	register char *ic;
-#ifndef u370
-	cell atube[TUBESIZE + LBSIZE];
-#endif
 	struct termios f;	/* mjm: was register */
 	int resize;
 
@@ -150,6 +171,7 @@ oop(void)
 		inopen = 0;
 		addr1 = addr2 = dot;
 	}
+	tubesizes();
 #ifdef	SIGWINCH
 	signal(SIGWINCH, onwinch);
 #endif
@@ -258,9 +280,6 @@ void
 vop(void)
 {
 	register int c;
-#ifndef u370
-	cell atube[TUBESIZE + LBSIZE];
-#endif
 	struct termios f;	/* mjm: was register */
 	int resize;
 
@@ -299,6 +318,7 @@ toopen:
 		inopen = 0;
 		addr1 = addr2 = dot;
 	}
+	tubesizes();
 #ifdef	SIGWINCH
 	signal(SIGWINCH, onwinch);
 #endif

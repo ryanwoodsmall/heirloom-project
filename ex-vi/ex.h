@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	@(#)ex.h	1.53 (gritter) 2/17/05
+ *	Sccsid @(#)ex.h	1.54 (gritter) 8/4/05
  */
 
 /*

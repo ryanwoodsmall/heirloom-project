@@ -70,34 +70,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	@(#)config.h	1.12 (gritter) 2/19/05
+ *	@(#)config.h	1.13 (gritter) 8/4/05
  */
 
 /*
  * Configurable settings for the ex editor.
  */
-
-/*
- * Maximum screen size in visual mode.
- *
- * Because the routine "alloca" is not portable, TUBESIZE
- * bytes are allocated on the stack each time you go into visual
- * and then never freed by the system.  Thus if you have no terminals
- * which are larger than 24 * 80 you may well want to make TUBESIZE
- * smaller.  TUBECOLS should stay at 160 at least since this defines
- * the maximum length of opening on hardcopies and allows two lines
- * of open on terminals like adm3's (glass tty's) where it switches
- * to pseudo hardcopy mode when a line gets longer than 80 characters.
- */
-#ifndef VMUNIX
-#define TUBELINES       70      /* Number of screen lines for visual */
-#define TUBECOLS        160     /* Number of screen columns for visual */
-#define TUBESIZE        6000    /* Maximum screen size for visual */
-#else	/* VMUNIX */
-#define TUBELINES       100
-#define TUBECOLS        160
-#define TUBESIZE        16000
-#endif	/* VMUNIX */
 
 /*
  * Various buffer sizes.

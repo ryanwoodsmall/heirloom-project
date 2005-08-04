@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)ex.spec	1.7 (gritter) 1/22/05
+# Sccsid @(#)ex.spec	1.8 (gritter) 7/12/05
 #
 Summary: A port of the traditional ex/vi editors
 Name: ex
@@ -8,7 +8,7 @@ Release: 1
 License: BSD
 Source: %{name}-%{version}.tar.bz2
 Group: System Environment/Base
-Vendor: Gunnar Ritter <Gunnar.Ritter@pluto.uni-freiburg.de>
+Vendor: Gunnar Ritter <gunnarr@acm.org>
 URL: <http://ex-vi.sourceforge.net>
 BuildRoot: %{_tmppath}/%{name}-root
 

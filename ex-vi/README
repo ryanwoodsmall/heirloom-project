@@ -23,9 +23,7 @@ How to build
 First look at the Makefile and change the settings there to match your
 build environment. Explanations are provided directly in this file.
 
-You can tune the sizes of some internal buffers by editing config.h. In
-particular, you will have to raise the size of the 'TUBE' constants if
-you wish to use really large-sized terminals.
+You can tune the sizes of some internal buffers by editing config.h.
 
 Then type 'make' and 'make install'.
 
@@ -139,7 +137,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter                                           2/20/05
+Gunnar Ritter                                           8/4/05
 Freiburg i. Br.
 Germany
-<Gunnar.Ritter@pluto.uni-freiburg.de>
+<gunnarr@acm.org>
