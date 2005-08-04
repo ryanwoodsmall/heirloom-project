@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_io.c	1.41 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_io.c	1.42 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -407,9 +407,7 @@ samei(struct stat *sp, char *cp)
 void 
 rop(int c)
 {
-	register int i;
 	struct stat stbuf;
-	char magic[4];
 	static int ovro;	/* old value(READONLY) */
 	static int denied;	/* 1 if READONLY was set due to file permissions */
 
@@ -459,95 +457,6 @@ rop(int c)
 	case S_IFIFO:
 		error(catgets(catd, 1, 96, " Named pipe"));
 #endif
-
-	case S_IFREG:
-		/*
-		 * The magics are checked byte-wise now to avoid
-		 * endianness problems. Some quite old types
-		 * were omitted.
-		 *
-		 * Feel free too add more magics here, but do not
-		 * make this a copy of the `file' program.
-		 *
-		 * GR
-		 */
-		i = read(io, magic, sizeof(magic));
-		lseek(io, (off_t) 0, SEEK_SET);
-		if (i != sizeof(magic))
-			break;
-		switch (magic[0]&0377) {
-
-		case 01:	/* big endian a.out */
-			if (magic[1] != 05 && magic[1] != 07
-				&& magic[1] != 010 && magic[1] != 011
-				&& magic[1] != 013 && magic[1] != 030
-				&& magic[1] != 031)
-				break;
-			goto is_exec;
-		case 0314:	/* Linux/ia32 QMAGIC */
-			if (magic[1] != 0 || magic[2] != 0144)
-				break;
-			goto is_exec;
-		case 05:	/* data overlay on exec */
-		case 07:	/* unshared */
-		case 010:	/* shared text */
-		case 011:	/* separate I/D */
-		case 013:	/* VM/Unix demand paged */
-		case 030:	/* PDP-11 Overlay shared */
-		case 031:	/* PDP-11 Overlay sep I/D */
-			if (magic[1] == 01)
-is_exec:
-				error(catgets(catd, 1, 97, " Executable"));
-			break;
-
-		case 037:
-			switch (magic[1]&0377) {
-			case 036:	/* pack */
-			case 037:	/* compact */
-			case 0235:	/* compress */
-			case 0213:	/* gzip */
-			/*
-			 * We omit bzip2 here since it has
-			 * an ASCII header.
-			 */
-				error(catgets(catd, 1, 98, " Compressed Data"));
-			}
-			break;
-
-		case 0177:
-			if (magic[1] == 'E' && magic[2] == 'L'
-					&& magic[3] == 'F')
-				error(catgets(catd, 1, 99, " ELF object"));
-			break;
-
-		default:
-			break;
-		}
-#ifdef	notdef
-		/*
-		 * We do not forbid the editing of portable archives
-		 * because it is reasonable to edit them, especially
-		 * if they are archives of text files.  This is
-		 * especially useful if you archive source files together
-		 * and copy them to another system with ~%take, since
-		 * the files sometimes show up munged and must be fixed.
-		 */
-		case 0177545:
-		case 0177555:
-			error(catgets(catd, 1, 100, " Archive"));
-
-		default:
-#ifdef mbb
-			/* C/70 has a 10 bit byte */
-			if (magic & 03401600)
-#else
-			/* Everybody else has an 8 bit byte */
-			if (magic & 0100200)
-#endif
-				error(catgets(catd, 1, 101, " Non-ascii file"));
-			break;
-		}
-#endif	/* notdef */
 	}
 	if (c != 'r') {
 		if (value(READONLY) && denied) {
