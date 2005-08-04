@@ -71,7 +71,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)ex_proto.h	1.29 (gritter) 8/4/05
+ *	Sccsid @(#)ex_proto.h	1.31 (gritter) 8/4/05
  */
 
 /*
@@ -325,6 +325,8 @@ extern void onemt(int);
 extern char *movestr(char *, const char *);
 extern char *safecp(char *, const char *, size_t, char *, ...);
 extern char *safecat(char *, const char *, size_t, char *, ...);
+extern void grow(char *, char **, char **, char **, char **);
+extern void *smalloc(size_t);
 /* ex_tagio.c */
 extern int topen(char *, char *);
 extern int tseek(int, off_t);

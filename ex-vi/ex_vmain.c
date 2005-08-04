@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vmain.c	1.29 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_vmain.c	1.31 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -1264,7 +1264,7 @@ vremote(int cnt, void (*f)(int), int arg)
 void 
 vsave(void)
 {
-	char temp[LBSIZE];
+	char *temp = smalloc(LBSIZE);
 
 	CP(temp, linebuf);
 	if (FIXUNDO && vundkind == VCHNG || vundkind == VCAPU) {
@@ -1290,10 +1290,13 @@ vsave(void)
 	 * almost always be in a read buffer so this may well avoid disk i/o.
 	 */
 	getDOT();
-	if (strcmp(linebuf, temp) == 0)
+	if (strcmp(linebuf, temp) == 0) {
+		free(temp);
 		return;
+	}
 	strcLIN(temp);
 	putmark(dot);
+	free(temp);
 }
 
 #undef	forbid

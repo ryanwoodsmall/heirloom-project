@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops.c	1.26 (gritter) 1/13/05";
+static char sccsid[] = "@(#)ex_vops.c	1.28 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -143,7 +143,7 @@ vundo (
 	register int cnt;
 	register line *addr;
 	register char *cp;
-	char temp[LBSIZE];
+	char *temp = smalloc(LBSIZE);
 	bool savenote;
 	int (*OO)(int);
 	short oldhold = hold;
@@ -246,6 +246,7 @@ vundo (
 		beep();
 		break;
 	}
+	free(temp);
 }
 
 /*
@@ -259,7 +260,7 @@ vmacchng(int fromvis)
 {
 	line *savedot, *savedol;
 	char *savecursor;
-	char savelb[LBSIZE];
+	char *savelb;
 	int nlines, more;
 	/* register line *a1, *a2; */
 	/* char ch; */	/* DEBUG */
@@ -283,6 +284,7 @@ vmacchng(int fromvis)
 		vch_mac = VC_ONECHANGE;
 		break;
 	case VC_ONECHANGE:
+		savelb = smalloc(LBSIZE);
 		/* Save current state somewhere */
 #ifdef TRACE
 		vudump("before vmacchng hairy case");
@@ -330,6 +332,7 @@ vmacchng(int fromvis)
 #ifdef TRACE
 		vudump("after vmacchng");
 #endif
+		free(savelb);
 		break;
 	case VC_NOTINMAC:
 	case VC_MANYCHANGE:

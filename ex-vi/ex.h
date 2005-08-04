@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	Sccsid @(#)ex.h	1.54 (gritter) 8/4/05
+ *	Sccsid @(#)ex.h	1.55 (gritter) 8/4/05
  */
 
 /*
@@ -276,9 +276,8 @@ typedef	sigjmp_buf	JMP_BUF;
 #define	SETJMP(a)	sigsetjmp(a, 1)
 #define	LONGJMP(a, b)	siglongjmp(a, b)
 
-#ifndef	MAXBSIZE
-#define	MAXBSIZE	8192	/* Same as in 4.2BSD */
-#endif
+#undef	MAXBSIZE
+#define	MAXBSIZE	(2*LBSIZE)
 
 #include "ex_tune.h"
 #include "ex_vars.h"
@@ -387,7 +386,7 @@ var	short	erfile;		/* Error message file unit */
 var	line	*fendcore;	/* First address in line pointer space */
 var	char	file[FNSIZE];	/* Working file name */
 var	bool	fixedzero;	/* zero file size was fixed (for visual) */
-var	char	genbuf[MAXBSIZE]; /* Working buffer when manipulating linebuf */
+var	char	*genbuf;	/* Working buffer when manipulating linebuf */
 var	bool	hush;		/* Command line option - was given, hush up! */
 var	char	*globp;		/* (Untyped) input string to command mode */
 var	bool	holdcm;		/* Don't cursor address */
@@ -403,7 +402,8 @@ var	bool	laste;		/* Last command was an "e" (or "rec") */
 var	char	lastmac;	/* Last macro called for ** */
 var	char	lasttag[TAGSIZE];	/* Last argument to a tag command */
 var	char	*linebp;	/* Used in substituting in \n */
-var	char	linebuf[LBSIZE];	/* The primary line buffer */
+var	char	*linebuf;	/* The primary line buffer */
+var	int	LBSIZE;		/* Size of linebuf */
 var	bool	listf;		/* Command should run in list mode */
 var	line	names['z'-'a'+2];	/* Mark registers a-z,' */
 var	int	notecnt;	/* Count for notify (to visual from cmd) */

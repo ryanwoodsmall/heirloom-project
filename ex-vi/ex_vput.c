@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.49 (gritter) 2/15/05";
+static char sccsid[] = "@(#)ex_vput.c	1.50 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -223,7 +223,7 @@ vclrech(bool didphys)
 		splitw = 0;
 		didphys = 1;
 	}
-	if (didphys)
+	if (didphys && vtube)
 		vclrcell(vtube[WECHO], WCOLS);
 	heldech = 0;
 }

@@ -72,7 +72,7 @@
  *
  *	from ex_vis.h	7.4 (Berkeley) 5/31/85
  *
- *	Sccsid @(#)ex_vis.h	1.20 (gritter) 8/4/05
+ *	Sccsid @(#)ex_vis.h	1.21 (gritter) 8/4/05
  */
 
 /*

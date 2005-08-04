@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops3.c	1.19 (gritter) 1/2/05";
+static char sccsid[] = "@(#)ex_vops3.c	1.21 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -118,7 +118,7 @@ llfind(bool pastatom, int cnt, void (*f)(int), line *limit)
 	register int c;
 #endif
 	register int rc = 0;
-	char save[LBSIZE];
+	char *save = smalloc(LBSIZE);
 
 	/*
 	 * Initialize, saving the current line buffer state
@@ -284,6 +284,7 @@ begin:
 #endif
 ret:
 	strcLIN(save);
+	free(save);
 	return (rc);
 }
 
@@ -424,7 +425,7 @@ lmatchp(line *addr)
 void
 lsmatch(char *cp)
 {
-	char save[LBSIZE];
+	char *save = smalloc(LBSIZE);
 	register char *sp = save;
 	register char *scurs = cursor;
 
@@ -457,6 +458,7 @@ lsmatch(char *cp)
 	wdot = 0;
 	wcursor = 0;
 	cursor = scurs;
+	free(save);
 }
 
 int
@@ -674,7 +676,7 @@ vswitch(int cnt)
 		mbuf[1+n1] = '\0';
 		macpush(mbuf, 1);
 	} else {	/* cnt > 1 */
-		char *mbuf = malloc(MAXDIGS + cnt*(mb_cur_max+1) + 5);
+		char *mbuf = smalloc(MAXDIGS + cnt*(mb_cur_max+1) + 5);
 		register char *p = &mbuf[MAXDIGS + 1];
 		int num, n0, n1, m;
 

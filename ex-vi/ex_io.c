@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_io.c	1.40 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_io.c	1.41 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -839,7 +839,7 @@ int
 getfile(void)
 {
 	register short c;
-	register char *lp, *fp;
+	char *lp, *fp;
 
 	lp = linebuf;
 	fp = nextip;
@@ -858,10 +858,8 @@ getfile(void)
 			fp = genbuf;
 			cntch += ninbuf+1;
 		}
-		if (lp >= &linebuf[LBSIZE]) {
-			synced();
-			error(catgets(catd, 1, 118, " Line too long"));
-		}
+		if (lp >= &linebuf[LBSIZE])
+			grow(" Line too long", &lp, NULL, &fp, &nextip);
 		c = *fp++;
 		if (c == 0) {
 			cntnull++;

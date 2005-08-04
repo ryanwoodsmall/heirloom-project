@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vadj.c	1.11 (gritter) 3/4/05";
+static char sccsid[] = "@(#)ex_vadj.c	1.14 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -418,14 +418,14 @@ vopenup(int cnt, int could, int l)
 void 
 vadjAL(int p, int cnt)
 {
-	cell *tlines[TUBELINES];
+	cell **tlines = smalloc(TUBELINES * sizeof *tlines);
 	register int from, to;
 
 #ifdef ADEBUG
 	if (trace)
 		tfixnl(), fprintf(trace, "vadjal(%d, %d)\n", p, cnt);
 #endif
-	copy(tlines, vtube, sizeof vtube);	/*SASSIGN*/
+	copy(tlines, vtube, TUBELINES * sizeof *tlines);	/*SASSIGN*/
 	for (from = p, to = p + cnt; to <= WECHO; from++, to++)
 		vtube[to] = tlines[from];
 	for (to = p; from <= WECHO; from++, to++) {
@@ -437,6 +437,7 @@ vadjAL(int p, int cnt)
 	 * necessarily consistent with the rest of the display.
 	 */
 	vclrech(0);
+	free(tlines);
 }
 
 /*
@@ -509,7 +510,7 @@ void
 vscroll(register int cnt)
 {
 	register int from, to;
-	cell *tlines[TUBELINES];
+	cell **tlines;
 
 #ifdef ADEBUG
 	if (trace)
@@ -519,7 +520,8 @@ vscroll(register int cnt)
 		error(catgets(catd, 1, 219, "Internal error: vscroll"));
 	if (cnt == 0)
 		return;
-	copy(tlines, vtube, sizeof vtube);
+	tlines = smalloc(TUBELINES * sizeof *tlines);
+	copy(tlines, vtube, TUBELINES * sizeof *tlines);
 	for (to = ZERO, from = ZERO + cnt; to <= WECHO - cnt; to++, from++)
 		vtube[to] = tlines[from];
 	for (from = ZERO; to <= WECHO; to++, from++) {
@@ -528,6 +530,7 @@ vscroll(register int cnt)
 	}
 	for (from = 0; from <= vcnt; from++)
 		LINE(from) -= cnt;
+	free(tlines);
 }
 
 /*
@@ -680,7 +683,7 @@ vredraw(register int p)
 {
 	register int l;
 	register line *tp;
-	char temp[LBSIZE];
+	char *temp;
 	bool anydl = 0;
 	short oldhold = hold;
 
@@ -697,6 +700,7 @@ vredraw(register int p)
 	if (p < 0 /* || p > WECHO */)
 		error(catgets(catd, 1, 221, "Internal error: vredraw"));
 
+	temp = smalloc(LBSIZE);
 	/*
 	 * Trim the ragged edges (lines which are off the screen but
 	 * not yet logically discarded), save the current line, and
@@ -790,6 +794,7 @@ vredraw(register int p)
 	if (trace)
 		tvliny();
 #endif
+	free(temp);
 }
 
 /*
@@ -845,7 +850,7 @@ vdellin(int p, int cnt, int l)
 void 
 vadjDL(int p, int cnt)
 {
-	cell *tlines[TUBELINES];
+	cell **tlines = smalloc(TUBELINES * sizeof *tlines);
 	register int from, to;
 
 #ifdef ADEBUG
@@ -857,13 +862,14 @@ vadjDL(int p, int cnt)
 	 * v7 compiler (released with phototypesetter for v6)
 	 * can't hack it.
 	 */
-	copy(tlines, vtube, sizeof vtube);	/*SASSIGN*/
+	copy(tlines, vtube, TUBELINES * sizeof *tlines);	/*SASSIGN*/
 	for (from = p + cnt, to = p; from <= WECHO; from++, to++)
 		vtube[to] = tlines[from];
 	for (from = p; to <= WECHO; from++, to++) {
 		vtube[to] = tlines[from];
 		vclrcell(vtube[to], WCOLS);
 	}
+	free(tlines);
 }
 /*
  * Sync the screen, like redraw but more lazy and willing to leave
@@ -896,7 +902,7 @@ void
 vsync1(register int p)
 {
 	register int l;
-	char temp[LBSIZE];
+	char *temp;
 	register struct vlinfo *vp = &vlinfo[0];
 	short oldhold = hold;
 
@@ -911,6 +917,7 @@ vsync1(register int p)
 	}
 	if (state == HARDOPEN || splitw)
 		return;
+	temp = smalloc(LBSIZE);
 	vscrap();
 	CP(temp, linebuf);
 	if (vcnt == 0)
@@ -960,6 +967,7 @@ vsync1(register int p)
 	hold = oldhold;
 	if (heldech)
 		vclrech(0);
+	free(temp);
 }
 
 /*

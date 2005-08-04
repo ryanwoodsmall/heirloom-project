@@ -83,7 +83,7 @@ char *copyright =
 "@(#) Copyright (c) 1980 Regents of the University of California.\n\
  All rights reserved.\n";
 #endif
-static char sccsid[] UNUSED = "@(#)exrecover.c	1.21 (gritter) 11/27/04";
+static char sccsid[] UNUSED = "@(#)exrecover.c	1.22 (gritter) 8/4/05";
 #endif
 
 /* from exrecover.c	7.9.2 (2.11BSD) 1996/10/26 */
@@ -210,6 +210,8 @@ main(int argc, char *argv[])
 #ifdef	VMUNIX
 	poolsbrk(0);
 #endif
+	linebuf = calloc(LBSIZE = BUFSIZ<4096?4096:BUFSIZ, sizeof *linebuf);
+	genbuf = calloc(MAXBSIZE, sizeof *genbuf);
 #ifdef	LANGMSG
 	setlocale(LC_MESSAGES, "");
 	catd = catopen(CATNAME, NL_CAT_LOCALE);

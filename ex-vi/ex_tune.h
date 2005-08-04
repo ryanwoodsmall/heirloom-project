@@ -72,7 +72,7 @@
  *
  *	from ex_tune.h	7.8.1 (2.11BSD) 1996/10/23
  *
- *	Sccsid @(#)ex_tune.h	1.13 (gritter) 8/4/05
+ *	Sccsid @(#)ex_tune.h	1.14 (gritter) 8/4/05
  */
 
 /*
@@ -111,8 +111,7 @@
 /*
  * Maximums
  *
- * The definition of LBSIZE should be the same as BUFSIZ (512 usually).
- * Most other definitions are quite generous.
+ * Most definitions are quite generous.
  */
 /* FNSIZE is also defined in expreserve.c */
 #ifdef	_POSIX_PATH_MAX
@@ -121,20 +120,17 @@
 #define	FNSIZE		128		/* File name size */
 #endif
 #ifdef VMUNIX
-#define	LBSIZE		BUFSIZ		/* Line buffer size */
 #ifndef	ESIZE	/* see config.h */
 #define	ESIZE		512		/* Regular expression buffer size */
 #endif
 #define CRSIZE		BUFSIZ		/* Crypt buffer size */
 #else	/* !VMUNIX */
 #ifdef u370
-#define LBSIZE		4096
 #ifndef	ESIZE	/* see config.h */
 #define ESIZE		512
 #endif
 #define CRSIZE		4096
 #else
-#define	LBSIZE		512		/* Line length */
 #ifndef	ESIZE	/* see config.h */
 #define	ESIZE		128		/* Size of compiled re */
 #endif
@@ -186,7 +182,7 @@
 #undef NCARGS
 #ifndef VMUNIX
 #define	NARGS	100		/* Maximum number of names in "next" */
-#define	NCARGS	LBSIZE		/* Maximum arglist chars in "next" */
+#define	NCARGS	512		/* Maximum arglist chars in "next" */
 #else
 #define	NCARGS	5120
 #define	NARGS	(NCARGS/6)

@@ -72,7 +72,7 @@
  *
  *	from ex_re.h	7.3 (Berkeley) 5/31/85
  *
- *	Sccsid @(#)ex_re.h	1.23 (gritter) 8/4/05
+ *	Sccsid @(#)ex_re.h	1.24 (gritter) 8/4/05
  */
 
 /*
@@ -85,7 +85,7 @@
  * more and alternation.)
  */
 struct	regexp {
-	char	Patbuf[2*LBSIZE + 1];
+	char	*Patbuf;
 	long	Re_ident;
 	void	*Expbuf;
 	bool	Circfl;

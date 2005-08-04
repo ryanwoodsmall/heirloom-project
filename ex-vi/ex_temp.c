@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_temp.c	1.24 (gritter) 11/24/04";
+static char sccsid[] = "@(#)ex_temp.c	1.26 (gritter) 8/4/05";
 #endif
 #endif
 
@@ -236,7 +236,7 @@ putline(void)
 		}
 	}
 	tl = tline;
-	tline += (((lp - linebuf) + BNDRY - 1) >> SHFT) & 077776;
+	tline += (((lp - linebuf) + BNDRY - 1) >> SHFT) & TLNMSK;
 	return (tl);
 }
 
@@ -657,8 +657,9 @@ YANKreg(register int c)
 {
 	register line *addr;
 	register struct strreg *sp;
-	char savelb[LBSIZE];
+	char *savelb;
 
+	savelb = smalloc(LBSIZE);
 	if (isdigit(c))
 		kshift();
 	if (islower(c))
@@ -688,6 +689,7 @@ YANKreg(register int c)
 	rbflush();
 	killed();
 	CP(linebuf,savelb);
+	free(savelb);
 }
 
 void

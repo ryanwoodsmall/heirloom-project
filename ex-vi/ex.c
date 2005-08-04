@@ -77,7 +77,7 @@ char *copyright =
 "@(#) Copyright (c) 1980 Regents of the University of California.\n\
  All rights reserved.\n";
 
-static char sccsid[] = "@(#)ex.c	1.36 (gritter) 2/13/05";
+static char sccsid[] = "@(#)ex.c	1.37 (gritter) 8/4/05";
 #endif	/* DOSCCS */
 #endif	/* !lint */
 
@@ -293,6 +293,13 @@ main(register int ac, register char *av[])
 #ifdef	VMUNIX
 	poolsbrk(0);
 #endif
+
+	/*
+	 * Initialize the primary buffers which were originally static.
+	 * NOTE: Most of this must be repeated in ex_recover.c.
+	 */
+	linebuf = calloc(LBSIZE = BUFSIZ<4096?4096:BUFSIZ, sizeof *linebuf);
+	genbuf = calloc(MAXBSIZE, sizeof *genbuf);
 
 	/*
 	 * Immediately grab the tty modes so that we wont
@@ -588,9 +595,9 @@ argend:
 		else {
 			globp = 0;
 			if ((cp = getenv("HOME")) != 0 && *cp) {
-				safecat(safecp(genbuf, cp, sizeof genbuf,
+				safecat(safecp(genbuf, cp, MAXBSIZE,
 							"$HOME too long"),
-						"/.exrc", sizeof genbuf,
+						"/.exrc", MAXBSIZE,
 						"$HOME too long");
 				if (iownit(genbuf))
 					source(genbuf, 1);
