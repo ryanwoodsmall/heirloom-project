@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	Sccsid @(#)ex.h	1.55 (gritter) 8/4/05
+ *	Sccsid @(#)ex.h	1.56 (gritter) 8/6/05
  */
 
 /*
@@ -456,7 +456,7 @@ var	int	exitoneof;	/* exit command loop on EOF */
 #define	lastchar()	lastc
 #define	outchar(c)	(*Outchar)(c)
 #define	pastwh()	(ignore(skipwh()))
-#define	pline(no)	(*Pline)(no)
+#define	pline(no, max)	(*Pline)(no, max)
 #define	reset()		LONGJMP(resetlab,1)
 #define	resexit(a)	copy(resetlab, a, sizeof (JMP_BUF))
 #define	setexit()	SETJMP(resetlab)
@@ -526,7 +526,7 @@ var	line	*undadot;	/* If we saved all lines, dot reverts here */
 #define	UNDPUT		4
 
 extern	int	(*Outchar)(int);
-extern	void	(*Pline)(int);
+extern	void	(*Pline)(int, int);
 extern	int	(*Putchar)(int);
 
 #define	NOSTR	(char *) 0

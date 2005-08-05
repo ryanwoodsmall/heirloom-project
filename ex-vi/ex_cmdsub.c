@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_cmdsub.c	1.31 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_cmdsub.c	1.32 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -984,7 +984,7 @@ plines(line *adr1, register line *adr2, bool movedot)
 	pofix();
 	for (addr = adr1; addr <= adr2; addr++) {
 		getline(*addr);
-		pline(lineno(addr));
+		pline(lineno(addr), -1);
 		if (inopen) {
 			putchar('\n' | QUOTE);
 		}

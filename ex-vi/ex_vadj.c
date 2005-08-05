@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vadj.c	1.14 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_vadj.c	1.15 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -192,7 +192,7 @@ vreopen(int p, int lineno, int l)
 	 *		necessary to determine which way to go.
 	 */
 	vigoto(p, 0);
-	pline(lineno);
+	pline(lineno, WCOLS*WLINES);
 
 	/*
 	 * When we are typing part of a line for hardcopy open, don't

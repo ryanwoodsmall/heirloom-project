@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_subr.c	1.39 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_subr.c	1.40 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -84,7 +84,7 @@ static char sccsid[] = "@(#)ex_subr.c	1.39 (gritter) 8/4/05";
 #include "ex_tty.h"
 #include "ex_vis.h"
 
-static short	lastsc;
+short	lastsc;
 
 /*
  * Random routines, in alphabetical order.
@@ -631,7 +631,7 @@ plural(long i)
 			: catgets(catd, 1, 179, "s"));
 }
 
-static short	vcntcol;
+short	vcntcol;
 
 int 
 qcolumn(register char *lim, register char *gp)
@@ -651,7 +651,7 @@ qcolumn(register char *lim, register char *gp)
 			n = skipright(linebuf, lim);
 		x = lim[n], lim[n] = 0;
 	}
-	pline(0);
+	pline(0, inopen ? WLINES*WCOLS : -1);
 	if (lim != NULL)
 		lim[n] = x;
 	if (gp)

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.32 (gritter) 2/17/05";
+static char sccsid[] = "@(#)ex_put.c	1.33 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -101,7 +101,7 @@ static char sccsid[] = "@(#)ex_put.c	1.32 (gritter) 2/17/05";
  */
 int	(*Outchar)(int) = termchar;
 int	(*Putchar)(int) = normchar;
-void	(*Pline)(int) = normline;
+void	(*Pline)(int, int) = normline;
 
 int (*
 setlist(int t))(int)
@@ -115,9 +115,9 @@ setlist(int t))(int)
 }
 
 void (*
-setnumb(int t))(int)
+setnumb(int t))(int, int)
 {
-	register void (*P)(int);
+	register void (*P)(int, int);
 
 	numberf = t;
 	P = Pline;
@@ -273,13 +273,13 @@ slobber(int c)
  * Print a line with a number.
  */
 void
-numbline(int i)
+numbline(int i, int max)
 {
 
 	if (shudclob)
 		slobber(' ');
-	printf("%6d  ", i);
-	normline(0);
+	max -= printf("%6d  ", i);
+	normline(0, max);
 }
 
 /*
@@ -287,22 +287,47 @@ numbline(int i)
  */
 /*ARGSUSED*/
 void
-normline(int unused)
+normline(int unused, int max)
 {
+	extern short	vcntcol, lastsc;
+	short	ovc = -1;
 	register char *cp;
+	int	(*OO)(int);
 	int	c, n;
 
+	if (max > 0)
+		vcntcol = 0;
 	if (shudclob)
 		slobber(linebuf[0]);
 	/* pdp-11 doprnt is not reentrant so can't use "printf" here
 	   in case we are tracing */
 	cp = linebuf;
 	vcolbp = cp;
-	while (*cp) {
+	while (*cp && max) {
 		vcolbp = cp;
 		nextc(c, cp, n);
 		cp += n;
-		putchar(c);
+		if (max > 0) {
+			if (Outchar != qcount) {
+				OO = Outchar;
+				Outchar = qcount;
+				putchar(c);
+				Outchar = OO;
+			} else
+				putchar(c);
+			if ((vcntcol-1) % WCOLS == 0 && lastsc > 1)
+				vcntcol++;
+			if (vcntcol >= max) {
+				putchar('@');
+				vcntcol = ovc + 1;
+				lastsc = 1;
+				break;
+			}
+			ovc = vcntcol;
+			if (Outchar != qcount)
+				putchar(c);
+		} else
+			putchar(c);
 	}
 	if (!inopen) {
 		putchar('\n' | QUOTE);

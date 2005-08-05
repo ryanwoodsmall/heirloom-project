@@ -2,7 +2,9 @@ Release ...
 * The screen buffers for visual mode are now dynamically allocated, so
   vi usually does not return to ex mode with "screen too large" when the
   terminal is resized on a large monitor anymore.
-* ex (not vi) can now edit files with lines of arbitrary length.
+* ex can now edit files with lines of arbitrary length. vi currently only
+  shows the beginning of a line that does not fit onto the screen in its
+  entirety.
 * Viewing executables and compressed files is no longer inhibited.
 
 Release 3/25/05

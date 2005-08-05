@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vmain.c	1.31 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_vmain.c	1.32 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -100,11 +100,11 @@ vmain(void)
 	cell esave[TUBECOLS];
 	char *oglobp;
 	short d;
-	line *addr;
+	line *addr, *odot;
 	int ind, nlput;
 	int shouldpo = 0;
 	int onumber = 0, olist = 0;
-	void (*OPline)(int) = NULL;
+	void (*OPline)(int, int) = NULL;
 	int (*OPutchar)(int) = NULL;
 
 	CLOBBGRD(c);
@@ -514,13 +514,22 @@ reread:
 		 */
 		case CTRL('b'):
 			vsave();
+			odot = dot;
 			if (one + vcline != dot && vcnt > 2) {
 				addr = dot - vcline + 2 - (cnt-1)*basWLINES;
 				forbid (addr <= zero);
-				dot = (line*)addr;
 				vcnt = vcline = 0;
-			}
-			vzop(0, 0, '^');
+				do {
+					dot = addr;
+					vzop(0, 0, '^');
+					/*
+					 * When a single line fills the
+					 * entire screen, ^B can become
+					 * a no-op without the loop.
+					 */
+				} while (dot == odot && --addr > zero);
+			} else
+				vzop(0, 0, '^');
 			continue;
 
 		/*

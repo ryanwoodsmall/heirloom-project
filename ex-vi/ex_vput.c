@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.50 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_vput.c	1.51 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -1454,14 +1454,19 @@ def:
 		}
 	}
 #ifdef	MB
-	if (mb_cur_max > 1 && (d = colsc(c&TRIM&~MULTICOL)) > 1) {
-		if ((hold & HOLDPUPD) == 0)
-			*tp |= MULTICOL;
-		while (--d) {
+	if (mb_cur_max > 1) {
+		if ((d = colsc(c&TRIM&~MULTICOL)) > 1) {
 			if ((hold & HOLDPUPD) == 0)
-				*++tp = MULTICOL;
-			destcol++;
-			outcol++;
+				*tp |= MULTICOL;
+			while (--d) {
+				if ((hold & HOLDPUPD) == 0)
+					*++tp = MULTICOL;
+				destcol++;
+				outcol++;
+			}
+		} else if (d == 0) {
+			destcol--;
+			outcol--;
 		}
 	}
 #endif	/* MB */
