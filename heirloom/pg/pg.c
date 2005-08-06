@@ -30,11 +30,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pg_su3.sl	2.64 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)pg_su3.sl	2.65 (gritter) 8/7/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.64 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.65 (gritter) 8/7/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.64 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.65 (gritter) 8/7/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -621,10 +621,12 @@ checkf(void)
 }
 
 static int
-nextpos(w_type wc, const char *s, int n, int pos)
+nextpos(w_type wc, const char *s, int n, int pos, int *add)
 {
 	int	m;
 
+	if (add)
+		*add = 0;
 	switch (wc) {
 	/*
 	 * Cursor left.
@@ -646,6 +648,8 @@ nextpos(w_type wc, const char *s, int n, int pos)
 		break;
 	case '\n':
 		pos = -1;
+		if (add)
+			*add = 1;
 		break;
 	/*
 	 * Cursor right.
@@ -659,7 +663,8 @@ nextpos(w_type wc, const char *s, int n, int pos)
 		break;
 	default:
 		if (seqstart(*s&0377) && (m = known_sequence(s)) > 0) {
-			s += m - n;
+			if (add)
+				*add = m - n;
 			break;
 		} else {
 			m = width(wc);
@@ -677,17 +682,17 @@ endline(unsigned col, const char *s, const char *end)
 {
 	int pos = 0;
 	const char *olds = s;
-	int	m, n;
+	int	m, n, add;
 	w_type	wc;
 
 	if (fflag)
 		return end - s;
 	while (s < end) {
 		next(wc, s, n);
-		if ((pos = nextpos(wc, s, n, pos)) < 0) {
-			s++;
+		pos = nextpos(wc, s, n, pos, &add);
+		s += add;
+		if (pos < 0)
 			goto cend;
-		}
 		if (pos > col) {
 			if (pos == col + 1)
 				s += n;
@@ -1032,7 +1037,7 @@ print1(const char *s, const char *end)
 			s += n;
 			continue;
 		}
-		pos = nextpos(wc, s, n, pos);
+		pos = nextpos(wc, s, n, pos, NULL);
 		if ((mb_cur_max > 1 ? !iswprint(wc) : !isprint(wc)) &&
 				wc != '\n' && wc != '\r' &&
 				wc != '\b' && wc != '\t') {
