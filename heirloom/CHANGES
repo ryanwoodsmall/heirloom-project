@@ -9,6 +9,9 @@ Release ...
   "%o", "%x", and "%X".
 * printf: Handle SVID3 "position" fields in format specifications, such
   as "%7$s", that specify which argument is used next.
+* pg: If a line does not fit on the screen, do not print a newline to
+  force wraparound unless it is really necessary. This allows to select
+  words across the wrap for copy-and-paste in an xterm.
 * ed: Do not print "expecting `w'" with the "q" command after a zero-byte
   file has been written.
 * Some issues with building on AIX have been fixed.

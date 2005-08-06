@@ -30,11 +30,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pg_su3.sl	2.62 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)pg_su3.sl	2.63 (gritter) 8/6/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.62 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.63 (gritter) 8/6/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.62 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.63 (gritter) 8/6/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -1701,7 +1701,15 @@ printline(void)
 		sz = endline(ttycols, b, &b[llen]);
 		specjump = 1;
 		print1(b, &b[sz]);
-		if (b[sz-1] != '\n')
+		/*
+		 * Only force a line break if it is really necessary,
+		 * i.e. if the line is incomplete or if wraparound on
+		 * the terminal is known to be unreliable because of
+		 * tabulators. This allows text selection on an xterm
+		 * across line wraps.
+		 */
+		if (b[sz-1] != '\n' && (sz == llen ||
+					b[sz-1] == '\t' || b[sz] == '\t'))
 			write(1, "\n", 1);
 		specjump = 0;
 	}
