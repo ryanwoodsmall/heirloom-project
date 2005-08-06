@@ -30,11 +30,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pg_su3.sl	2.63 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)pg_su3.sl	2.64 (gritter) 8/6/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.63 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.64 (gritter) 8/6/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.63 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.64 (gritter) 8/6/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -620,13 +620,62 @@ checkf(void)
 	return OKAY;
 }
 
+static int
+nextpos(w_type wc, const char *s, int n, int pos)
+{
+	int	m;
+
+	switch (wc) {
+	/*
+	 * Cursor left.
+	 */
+	case '\b':
+		if (pos > 0)
+			pos--;
+		break;
+	/*
+	 * No cursor movement.
+	 */
+	/*case '\a':
+		break; nonprintable anyway */
+	/*
+	 * Special.
+	 */
+	case '\r':
+		pos = 0;
+		break;
+	case '\n':
+		pos = -1;
+		break;
+	/*
+	 * Cursor right.
+	 */
+	case '\t':
+		pos += TABSIZE - (pos % TABSIZE);
+		/*if (pos >= col) {
+			while (*s++ == '\t');
+			continue;
+		} don't use - it's safer to print '\n' at this point */
+		break;
+	default:
+		if (seqstart(*s&0377) && (m = known_sequence(s)) > 0) {
+			s += m - n;
+			break;
+		} else {
+			m = width(wc);
+			pos += m >= 0 ? m : n;
+		}
+	}
+	return pos;
+}
+
 /*
  * Return the last character that will fit on the line at col columns.
  */
 static size_t
 endline(unsigned col, const char *s, const char *end)
 {
-	unsigned pos = 0, ipos = 0;
+	int pos = 0;
 	const char *olds = s;
 	int	m, n;
 	w_type	wc;
@@ -634,48 +683,10 @@ endline(unsigned col, const char *s, const char *end)
 	if (fflag)
 		return end - s;
 	while (s < end) {
-		ipos = pos;
 		next(wc, s, n);
-		switch (wc) {
-		/*
-		 * Cursor left.
-		 */
-		case '\b':
-			if (pos > 0)
-				pos--;
-			break;
-		/*
-		 * No cursor movement.
-		 */
-		/*case '\a':
-			break; nonprintable anyway */
-		/*
-		 * Special.
-		 */
-		case '\r':
-			pos = 0;
-			break;
-		case '\n':
+		if ((pos = nextpos(wc, s, n, pos)) < 0) {
 			s++;
 			goto cend;
-		/*
-		 * Cursor right.
-		 */
-		case '\t':
-			pos += TABSIZE - (pos % TABSIZE);
-			/*if (pos >= col) {
-				while (*s++ == '\t');
-				continue;
-			} don't use - it's safer to print '\n' at this point */
-			break;
-		default:
-			if (seqstart(*s&0377) && (m = known_sequence(s)) > 0) {
-				s += m - n;
-				break;
-			} else {
-				m = width(wc);
-				pos += m >= 0 ? m : n;
-			}
 		}
 		if (pos > col) {
 			if (pos == col + 1)
@@ -1012,10 +1023,16 @@ print1(const char *s, const char *end)
 	char	buf[200], *bp;
 	w_type	wc;
 	int	i, m, n;
+	unsigned	pos = 0;
 
 	bp = buf;
 	while (s < end) {
 		next(wc, s, n);
+		if (pos == 0 && wc == '\b') {
+			s += n;
+			continue;
+		}
+		pos = nextpos(wc, s, n, pos);
 		if ((mb_cur_max > 1 ? !iswprint(wc) : !isprint(wc)) &&
 				wc != '\n' && wc != '\r' &&
 				wc != '\b' && wc != '\t') {
