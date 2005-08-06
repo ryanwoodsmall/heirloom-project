@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)tmac.an	1.9 (gritter) 2/18/04
+.\" Sccsid @(#)tmac.an	1.10 (gritter) 8/7/05
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -132,7 +132,7 @@
 \&\\$1 \|\\$2 \|\\$3 \|\\$4 \|\\$5 \|\\$6
 '	# HP-UX compatibility macros
 .if '\\$1'NAME' \{\
-.if !'\\*)H'' \{\
+.if !'\\*()H'' \{\
 .	ie \\n(.g==1 \{\
 .		ds }c C
 .	\}
