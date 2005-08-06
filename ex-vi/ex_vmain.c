@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vmain.c	1.33 (gritter) 8/6/05";
+static char sccsid[] = "@(#)ex_vmain.c	1.34 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -1379,7 +1379,13 @@ vzop(int hadcnt, int cnt, register int c)
 		break;
 
 	case '+':
-		forbid (addr >= dol);
+		if ((vtube[WLINES-1][0] == '~' && vtube[WLINES-1][1] == 0) ||
+				dot == dol) {
+			forbid (addr >= dol);
+		} else {
+			if (addr > dol)
+				addr = dol;
+		}
 		/* fall into ... */
 
 	case CR:
