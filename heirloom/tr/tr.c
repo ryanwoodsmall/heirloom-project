@@ -46,11 +46,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	2.1 (gritter) 8/2/05";
+static const char sccsid[] USED = "@(#)tr_sus.sl	2.2 (gritter) 8/6/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	2.1 (gritter) 8/2/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	2.2 (gritter) 8/6/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	2.1 (gritter) 8/2/05";
+static const char sccsid[] USED = "@(#)tr.sl	2.2 (gritter) 8/6/05";
 #endif
 
 #include <stdlib.h>
@@ -366,8 +366,8 @@ next(struct string *s)
 			return s->last;
 		}
 		s->max = NIL;
-		switch(*s->p) {
-#if defined (SUS) && defined (UCB)
+		switch(s->p ? *s->p : 0) {
+#if defined (SUS) || defined (UCB)
 		default:
 			s->p = savep;
 			break;
