@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)tr.1b	1.6 (gritter) 8/2/05
+.\" Sccsid @(#)tr.1b	1.7 (gritter) 8/6/05
 .\" Parts taken from tr(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TR 1B "8/2/05" "Heirloom Toolchest" "BSD System Compatibility"
+.TH TR 1B "8/6/05" "Heirloom Toolchest" "BSD System Compatibility"
 .SH NAME
 tr \- (BSD) translate characters
 .SH SYNOPSIS
@@ -180,13 +180,6 @@ ed(1),
 ascii(7),
 locale(7)
 .SH NOTES
-In multibyte locales,
-characters with a wide character value greater than 0x10FFFF
-are fully supported.
-If memory is sparse,
-this limit is automatically lowered to 0xFFFF,
-covering only the basic multilingual plane (BMP) of Unicode.
-.PP
 tr does not handle ASCII NUL in
 .I string1
 or
