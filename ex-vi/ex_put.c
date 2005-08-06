@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.33 (gritter) 8/6/05";
+static char sccsid[] = "@(#)ex_put.c	1.34 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -101,7 +101,7 @@ static char sccsid[] = "@(#)ex_put.c	1.33 (gritter) 8/6/05";
  */
 int	(*Outchar)(int) = termchar;
 int	(*Putchar)(int) = normchar;
-void	(*Pline)(int, int) = normline;
+int	(*Pline)(int, int) = normline;
 
 int (*
 setlist(int t))(int)
@@ -114,10 +114,10 @@ setlist(int t))(int)
 	return (P);
 }
 
-void (*
+int (*
 setnumb(int t))(int, int)
 {
-	register void (*P)(int, int);
+	register int (*P)(int, int);
 
 	numberf = t;
 	P = Pline;
@@ -272,21 +272,20 @@ slobber(int c)
 /*
  * Print a line with a number.
  */
-void
+int
 numbline(int i, int max)
 {
 
 	if (shudclob)
 		slobber(' ');
 	max -= printf("%6d  ", i);
-	normline(0, max);
+	return normline(0, max);
 }
 
 /*
  * Normal line output, no numbering.
  */
-/*ARGSUSED*/
-void
+int
 normline(int unused, int max)
 {
 	extern short	vcntcol, lastsc;
@@ -294,6 +293,7 @@ normline(int unused, int max)
 	register char *cp;
 	int	(*OO)(int);
 	int	c, n;
+	int	ret = 0;
 
 	if (max > 0)
 		vcntcol = 0;
@@ -321,6 +321,7 @@ normline(int unused, int max)
 				putchar('@');
 				vcntcol = ovc + 1;
 				lastsc = 1;
+				ret = 1;
 				break;
 			}
 			ovc = vcntcol;
@@ -332,6 +333,7 @@ normline(int unused, int max)
 	if (!inopen) {
 		putchar('\n' | QUOTE);
 	}
+	return ret;
 }
 
 /*

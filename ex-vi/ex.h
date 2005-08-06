@@ -72,7 +72,7 @@
  *
  *	from ex.h	7.7.1.1 (Berkeley) 8/12/86
  *
- *	Sccsid @(#)ex.h	1.56 (gritter) 8/6/05
+ *	Sccsid @(#)ex.h	1.57 (gritter) 8/6/05
  */
 
 /*
@@ -526,7 +526,7 @@ var	line	*undadot;	/* If we saved all lines, dot reverts here */
 #define	UNDPUT		4
 
 extern	int	(*Outchar)(int);
-extern	void	(*Pline)(int, int);
+extern	int	(*Pline)(int, int);
 extern	int	(*Putchar)(int);
 
 #define	NOSTR	(char *) 0

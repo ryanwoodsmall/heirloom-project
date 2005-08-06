@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vmain.c	1.32 (gritter) 8/6/05";
+static char sccsid[] = "@(#)ex_vmain.c	1.33 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -104,7 +104,7 @@ vmain(void)
 	int ind, nlput;
 	int shouldpo = 0;
 	int onumber = 0, olist = 0;
-	void (*OPline)(int, int) = NULL;
+	int (*OPline)(int, int) = NULL;
 	int (*OPutchar)(int) = NULL;
 
 	CLOBBGRD(c);

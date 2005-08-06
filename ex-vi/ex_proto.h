@@ -71,7 +71,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *	Sccsid @(#)ex_proto.h	1.32 (gritter) 8/6/05
+ *	Sccsid @(#)ex_proto.h	1.33 (gritter) 8/6/05
  */
 
 /*
@@ -192,12 +192,12 @@ extern int widthok(int c);
 extern int GETWC(char *);
 /* ex_put.c */
 extern int (*setlist(int))(int);
-extern void (*setnumb(int))(int, int);
+extern int (*setnumb(int))(int, int);
 extern int listchar(int);
 extern int normchar(register int);
 extern void slobber(int);
-extern void numbline(int, int);
-extern void normline(int, int);
+extern int numbline(int, int);
+extern int normline(int, int);
 extern int putchar(int);
 extern int termchar(int);
 extern void flush2(void);

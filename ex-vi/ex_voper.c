@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_voper.c	1.27 (gritter) 2/15/05";
+static char sccsid[] = "@(#)ex_voper.c	1.28 (gritter) 8/6/05";
 #endif
 #endif
 
@@ -715,6 +715,7 @@ errlab:
 		wcursor = 0;
 		if (readecho(c))
 			return;
+lloop:
 		if (!vglobp)
 			vscandir[0] = genbuf[0];
 		oglobp = globp;
@@ -790,6 +791,12 @@ slerr:
 				if (state == CRTOPEN && addr != dot)
 					vup1();
 				vupdown(addr - dot, NOSTR);
+					if (FLAGS(vcline)&VLONG &&
+							addr == odot &&
+							cursor == ocurs) {
+						cursor = NULL;
+						goto lloop;
+					}
 			}
 			return;
 		}

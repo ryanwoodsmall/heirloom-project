@@ -72,7 +72,7 @@
  *
  *	from ex_vis.h	7.4 (Berkeley) 5/31/85
  *
- *	Sccsid @(#)ex_vis.h	1.21 (gritter) 8/4/05
+ *	Sccsid @(#)ex_vis.h	1.22 (gritter) 8/6/05
  */
 
 /*
@@ -154,6 +154,7 @@ var	struct vlinfo  *vlinfo;
 #define	FLAGS(c)	(vlinfo[c].vflags)
 
 #define	VDIRT	1
+#define	VLONG	2		/* Line does not fit on a single screen */
 
 /*
  * Hacks to copy vlinfo structures around
