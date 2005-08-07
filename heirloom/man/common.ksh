@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.34 (gritter) 4/25/05
+#	Sccsid common.ksh	1.35 (gritter) 8/7/05
 #
 
 #
@@ -311,7 +311,7 @@ usage() {
 }
 
 progname=${0##*/} oldpwd="$PWD"
-debug= texts= section= MACSET= system= ontty= specpath=
+debug= texts= section= system= ontty= specpath=
 aflag= dflag= fflag= kflag= lflag= nflag= tflag= wflag=
 if test "x$1" = x-
 then
