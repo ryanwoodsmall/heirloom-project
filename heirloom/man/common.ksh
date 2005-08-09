@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.35 (gritter) 8/7/05
+#	Sccsid common.ksh	1.36 (gritter) 8/9/05
 #
 
 #
@@ -183,6 +183,9 @@ format() {
 			if test -z "$tflag" -a -n "$COL"
 			then
 				f_cmd="$f_cmd | $COL"
+			elif test -n "$tflag" -a -n "$DPOST"
+			then
+				f_cmd="$f_cmd | $DPOST"
 			fi
 			;;
 		html)
@@ -411,6 +414,9 @@ then
 		COL=*)
 			test -z "$COL" && COL="${line#*=}"
 			;;
+		DPOST=*)
+			test -z "$DPOST" && DPOST="${line#*=}"
+			;;
 		PAGER=*)
 			test -z "$PAGER" && PAGER="${line#*=}"
 			;;
@@ -506,6 +512,7 @@ then
 	echo "TROFF=$TROFF"
 	echo "NROFF=$NROFF"
 	echo "COL=$COL"
+	echo "DPOST=$DPOST"
 	echo "PAGER=$PAGER"
 	echo "EQN=$EQN"
 	echo "NEQN=$NEQN"
@@ -658,6 +665,7 @@ then
 	echo "But what do you want from section $psection?" >&2
 	exit 1
 fi
+
 
 
 
