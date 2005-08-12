@@ -14,6 +14,9 @@ Release ...
   words across the wrap for copy-and-paste in an xterm.
 * ed: Do not print "expecting `w'" with the "q" command after a zero-byte
   file has been written.
+* man: The tmac.an macros no longer use "@" as an escape character; its
+  previous use lead to weird output with Unix nroff when an "@" appeared
+  in titles or hanging labels.
 * Some issues with building on AIX have been fixed.
 
 Release 050713
