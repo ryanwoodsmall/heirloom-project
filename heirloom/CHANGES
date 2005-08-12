@@ -17,6 +17,9 @@ Release ...
 * man: The tmac.an macros no longer use "@" as an escape character; its
   previous use lead to weird output with Unix nroff when an "@" appeared
   in titles or hanging labels.
+* man: The "TCAT" post processor is now invoked separately for each manual
+  entry. Previously, when the -t option was given with multiple entries and
+  TCAT=dpost, only the first entry was actually printed.
 * Some issues with building on AIX have been fixed.
 
 Release 050713

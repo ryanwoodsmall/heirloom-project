@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.36 (gritter) 8/9/05
+#	Sccsid common.ksh	1.37 (gritter) 8/12/05
 #
 
 #
@@ -183,9 +183,9 @@ format() {
 			if test -z "$tflag" -a -n "$COL"
 			then
 				f_cmd="$f_cmd | $COL"
-			elif test -n "$tflag" -a -n "$DPOST"
+			elif test -n "$tflag" -a -n "$TCAT"
 			then
-				f_cmd="$f_cmd | $DPOST"
+				f_cmd="$f_cmd | $TCAT"
 			fi
 			;;
 		html)
@@ -414,8 +414,8 @@ then
 		COL=*)
 			test -z "$COL" && COL="${line#*=}"
 			;;
-		DPOST=*)
-			test -z "$DPOST" && DPOST="${line#*=}"
+		TCAT=*)
+			test -z "$TCAT" && TCAT="${line#*=}"
 			;;
 		PAGER=*)
 			test -z "$PAGER" && PAGER="${line#*=}"
@@ -437,9 +437,6 @@ then
 			;;
 		MACSET=*)
 			test -z "$MACSET" && MACSET="${line#*=}"
-			;;
-		TCAT=*)
-			test -z "$TCAT" && TCAT="${line#*=}"
 			;;
 		HTML1=*)
 			test -z "$HTML1" && HTML1="${line#*=}"
@@ -474,7 +471,6 @@ test -z "$TBL" && TBL=tbl
 test -z "$REFER" && REFER=refer
 test -z "$VGRIND" && VGRIND=vgrind
 test -z "$MACSET" && MACSET=-man
-test -z "$TCAT" && TCAT=cat
 test -z "$HTML1" && {
 	if (type w3m) >/dev/null 2>&1
 	then
@@ -512,7 +508,7 @@ then
 	echo "TROFF=$TROFF"
 	echo "NROFF=$NROFF"
 	echo "COL=$COL"
-	echo "DPOST=$DPOST"
+	echo "TCAT=$TCAT"
 	echo "PAGER=$PAGER"
 	echo "EQN=$EQN"
 	echo "NEQN=$NEQN"
@@ -520,7 +516,6 @@ then
 	echo "REFER=$REFER"
 	echo "VGRIND=$VGRIND"
 	echo "MACSET=$MACSET"
-	echo "TCAT=$TCAT"
 	echo
 fi
 
@@ -649,9 +644,6 @@ do
 		elif test -n "$ontty" -a -z "$tflag"
 		then
 			$PAGER $texts
-		elif test -n "$tflag"
-		then
-			$TCAT $texts
 		else
 			cat $texts
 		fi
