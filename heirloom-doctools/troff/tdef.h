@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.6 (gritter) 8/13/05
+ * Sccsid @(#)tdef.h	1.7 (gritter) 8/14/05
  */
 
 /*
@@ -308,6 +308,10 @@ endif EUC
  * on non-swapping systems, since the core image
  * will be over 1Mb.
 
+ * Note: As of 8/14/05, NBLIST has gone, and filep is
+ * grown dynamically as needed. XBLIST is an just an
+ * uninteresting relict to pass a special value.
+
  * BLK must be a power of 2
  */
 
@@ -315,12 +319,7 @@ typedef unsigned int filep;	/* this is good for 32 bit machines */
 
 #define	BLK	128	/* alloc block in tchars */
 
-#ifdef SMALLER
-#	define	NBLIST	512
-#else
-#	define	NBLIST	1024	/* allocation list.  smallish machines use 512 */
-				/* machines with paging can use 2048 */
-#endif
+#define	XBLIST	077777777
 
 /* Other things are stored in the temp file or corebuf:
  *	a single block for .rd input, at offset RD_OFFSET
@@ -636,6 +635,7 @@ void done3(int);
 void edone(int);
 void casepi(void);
 /* n3.c */
+void *growblist(void);
 void caseig(void);
 void casern(void);
 void maddhash(register struct contab *);

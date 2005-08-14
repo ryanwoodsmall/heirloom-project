@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.10 (gritter) 8/14/05
+ * Sccsid @(#)n1.c	1.11 (gritter) 8/14/05
  */
 
 /*
@@ -121,6 +121,7 @@ main(int argc, char **argv)
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
 	progname = argv[0];
+	growblist();
 	if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
 		signal(SIGHUP, catch);
 	if (signal(SIGINT, catch) == SIG_IGN) {
@@ -405,8 +406,8 @@ init2(void)
 	nxf = frame + 1;
 #ifdef INCORE
 	for (i = 0; i < NEV; i++) {
-		extern tchar corebuf[];
-		*(struct env *)&corebuf[i * sizeof(env)/sizeof(tchar)] = env;
+		extern tchar *corebuf;
+		((struct env *)corebuf)[i] = env;
 	}
 #else
 	for (i = NEV; i--; )
@@ -1016,7 +1017,7 @@ again:
 		i = *--pbp;
 	else if (ip) {
 #ifdef INCORE
-		extern tchar corebuf[];
+		extern tchar *corebuf;
 		i = corebuf[ip];
 		if (i == 0)
 			i = rbf();

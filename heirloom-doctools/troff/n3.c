@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.5 (gritter) 8/8/05
+ * Sccsid @(#)n3.c	1.6 (gritter) 8/14/05
  */
 
 /*
@@ -53,6 +53,8 @@
  */
 
 
+#include <stdlib.h>
+#include <string.h>
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
@@ -64,18 +66,47 @@
 #define	MHASH(x)	((x>>6)^x)&0177
 struct	contab *mhash[128];	/* 128 == the 0177 on line above */
 #define	blisti(i)	(((i)-ENV_BLK*BLK) / BLK)
-filep	blist[NBLIST];
+filep	*blist;
+int	nblist;
 tchar	*argtop;
 int	pagech = '%';
 int	strflg;
 
 #ifdef	INCORE
 	tchar *wbuf;
-	tchar corebuf[(ENV_BLK + NBLIST + 1) * BLK];
+	tchar *corebuf;
 #else
 	tchar wbuf[BLK];
 	tchar rbuf[BLK];
 #endif
+
+void *
+growblist(void)
+{
+	int	inc = 512;
+#ifdef	INCORE
+	tchar	*ocb;
+#endif	/* INCORE */
+
+	if (nblist+inc > XBLIST)
+		return NULL;
+	if ((blist = realloc(blist, (nblist+inc) * sizeof *blist)) == NULL)
+		return NULL;
+	memset(&blist[nblist], 0, inc * sizeof *blist);
+#ifdef	INCORE
+	ocb = corebuf;
+	if ((corebuf = realloc(corebuf, (ENV_BLK+nblist+inc+1)
+					* BLK * sizeof *corebuf)) == NULL)
+		return NULL;
+	if (ocb == NULL)
+		memset(corebuf, 0, (ENV_BLK+1) * BLK * sizeof *corebuf);
+	memset(&corebuf[(ENV_BLK+nblist+1) * BLK], 0,
+			inc * BLK * sizeof *corebuf);
+	wbuf += corebuf - ocb;
+#endif	/* INCORE */
+	nblist += inc;
+	return blist;
+}
 
 void
 caseig(void)
@@ -418,11 +449,13 @@ alloc (void)		/*return free blist[] block in nextb*/
 	register int i;
 	register filep j;
 
-	for (i = 0; i < NBLIST; i++) {
-		if (blist[i] == 0)
-			break;
-	}
-	if (i == NBLIST) {
+	do {
+		for (i = 0; i < nblist; i++) {
+			if (blist[i] == 0)
+				break;
+		}
+	} while (i == nblist && growblist() != NULL);
+	if (i == nblist) {
 		j = 0;
 	} else {
 		blist[i] = -1;
@@ -488,7 +521,7 @@ wbf (			/*store i into blist[offset] (?) */
 	if (!((++offset) & (BLK - 1))) {
 		wbfl();
 		j = blisti(--offset);
-		if (j < 0 || j >= NBLIST) {
+		if (j < 0 || j >= nblist && growblist() == NULL) {
 			errprint("Out of temp file space");
 			done2(01);
 		}
@@ -527,7 +560,7 @@ rbf (void)		/*return next char from blist[] block*/
 	register tchar i;
 	register filep j, p;
 
-	if (ip == NBLIST*BLK) {		/* for rdtty */
+	if (ip == XBLIST*BLK) {		/* for rdtty */
 		if (j = rdtty())
 			return(j);
 		else

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.7 (gritter) 8/14/05
+ * Sccsid @(#)n5.c	1.8 (gritter) 8/14/05
  */
 
 /*
@@ -586,9 +586,9 @@ e1:
 		return;
 #ifdef INCORE
 	{
-		extern tchar corebuf[];
-		*(struct env *)&corebuf[ev * sizeof(env)/sizeof(tchar)] = env;
-		env = *(struct env *)&corebuf[nxev * sizeof(env)/sizeof(tchar)];
+		extern tchar *corebuf;
+		((struct env *)corebuf)[ev] = env;
+		env = ((struct env *)corebuf)[nxev];
 	}
 #else
 	lseek(ibf, ev * (long)sizeof(env), 0);
@@ -810,7 +810,7 @@ caserd(void)
 	}
 	collect();
 	tty++;
-	pushi(NBLIST*BLK, PAIR('r','d'));
+	pushi(XBLIST*BLK, PAIR('r','d'));
 }
 
 
