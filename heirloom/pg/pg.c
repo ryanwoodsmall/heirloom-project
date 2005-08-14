@@ -30,11 +30,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)pg_su3.sl	2.65 (gritter) 8/7/05";
+static const char sccsid[] USED = "@(#)pg_su3.sl	2.66 (gritter) 8/14/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)pg_sus.sl	2.65 (gritter) 8/7/05";
+static const char sccsid[] USED = "@(#)pg_sus.sl	2.66 (gritter) 8/14/05";
 #else
-static const char sccsid[] USED = "@(#)pg.sl	2.65 (gritter) 8/7/05";
+static const char sccsid[] USED = "@(#)pg.sl	2.66 (gritter) 8/14/05";
 #endif
 
 #ifndef	USE_TERMCAP
@@ -455,7 +455,7 @@ ring(void)
 /*
  * Terminfo strings to pass through.
  */
-static const char	*ti_sequences[42];
+static const char	*ti_sequences[43];
 static int		esc1;
 
 #define	seqstart(c)	(esc1 ? (c) == esc1 : iscntrl(c))
@@ -540,6 +540,8 @@ fill_sequences(void)
 
 		ti_sequences[ix++] = "\33[m";
 		ti_sequences[ix++] = "\33[0m";
+		ti_sequences[ix++] = "\33[48m";
+
 		ti_sequences[ix++] = "\33[01;30m";
 		ti_sequences[ix++] = "\33[01;31m";
 		ti_sequences[ix++] = "\33[01;32m";

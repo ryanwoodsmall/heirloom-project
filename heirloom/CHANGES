@@ -12,6 +12,7 @@ Release ...
 * pg: If a line does not fit on the screen, do not print a newline to
   force wraparound unless it is really necessary. This allows to select
   words across the wrap for copy-and-paste in an xterm.
+* pg: Discard the ESC[48m sequence on a terminal that supports colors.
 * ed: Do not print "expecting `w'" with the "q" command after a zero-byte
   file has been written.
 * man: The tmac.an macros no longer use "@" as an escape character; its
