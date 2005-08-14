@@ -11,8 +11,13 @@ The source code is known to compile on:
 Linux		glibc, diet libc
 Solaris		9 and above
 HP-UX		B.11.11 and above
+AIX		5.1
 FreeBSD		5.4
 NetBSD		2.0
+
+New releases of this project are announced on Freshmeat. If you want to
+get notified by email on each release, use their subscription service at
+<http://freshmeat.net/projects/doctools/>.
 
 To build and install, see the settings in the "mk.config" and adjust
 them if necessary. You can also build a RPM package with the command
@@ -24,15 +29,18 @@ the compilation process. It is thus not possible to cross-compile.
 In order to use the utilities for formatting manual pages, note the
 following:
 
-- You will almost exclusively want to use "nroff -Tlp". By default,
-  nroff generates output for a Teletype Model 37 with half-line
-  capabilities which will lead to weird results with any xterm or
-  CRT terminal.
+- You will normally want to use "nroff -Tlp". By default, nroff generates
+  output for a Teletype Model 37 with half-line capabilities which will
+  lead to weird results with any xterm or CRT terminal.
+
+- Another choice is "nroff -Tlocale". This will generate UTF-8 output if
+  permitted by the current setting of the LC_CTYPE locale, and the same
+  as "nroff -Tlp" otherwise.
 
 - You need to filter the output of nroff through "col -x". 
 
-- The terminal description for "-Tlp" is now built-in with nroff.
-  For a small system distribution, it is thus not necessary to
+- The terminal descriptions for "-Tlp" and "-Tlocale" are built-in with
+  nroff. For a small system distribution, it is thus not necessary to
   install the "nterm" directory.
 
 - You need at least the "an" macro file to format manual pages. If
@@ -61,4 +69,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						8/13/05
+<gunnarr@acm.org>						8/14/05

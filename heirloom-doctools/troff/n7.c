@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.7 (gritter) 8/8/05
+ * Sccsid @(#)n7.c	1.8 (gritter) 8/14/05
  */
 
 /*
@@ -1082,7 +1082,7 @@ collectmb(tchar i)
 		return(busy = 0);
 	}
 	if ((i & MBMASK) == MIDDLEOFMB) {
-		if (mtbufp <= (mtbuf + MB_CUR_MAX)) {
+		if (mtbufp <= (mtbuf + mb_cur_max)) {
 			busy = 1;
 		} else {
 			*(mtbufp - 1) &= ~MBMASK;
@@ -1094,7 +1094,9 @@ collectmb(tchar i)
 gotmb:
 		mtbufp = mtbuf;
 		owc = cwc;
-		if (mbtowc(&cwc, mbbuf2, MB_CUR_MAX) <= 0) {
+		if ((*mbbuf2&~(wchar_t)0177) == 0) {
+			cwc = *mbbuf2;
+		} else if (mbtowc(&cwc, mbbuf2, mb_cur_max) <= 0) {
 			mtbufp = mtbuf;
 			while (*mtbufp) {
 				setcbits(*mtbufp, (*mtbufp & 0x1ff));

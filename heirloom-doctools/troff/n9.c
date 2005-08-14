@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.7 (gritter) 8/13/05
+ * Sccsid @(#)n9.c	1.8 (gritter) 8/14/05
  */
 
 /*
@@ -554,7 +554,7 @@ localize(void)
 
 	codeset = nl_langinfo(CODESET);
 
-	if (MB_CUR_MAX > 1)
+	if (mb_cur_max > 1)
 		multi_locale = 1;
 	else {
 		if (*codeset == '\0' ||

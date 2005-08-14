@@ -1,2 +1,10 @@
+Release ...
+* nroff: A special terminal name, -Tlocale, has been introduced. With this
+  option, UTF-8 output is generated if permitted by the current LC_CTYPE
+  locale, and regular -Tlp output otherwise.
+* -man: A defect in the supplied -man macro package caused headers and
+  footers to be garbled when they were printed between parts of a tbl table
+  that was split across pages.
+
 Release 050813
 * Initial release.

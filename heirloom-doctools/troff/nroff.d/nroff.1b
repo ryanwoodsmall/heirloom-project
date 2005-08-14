@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)nroff.1b	1.5 (gritter) 8/13/05
+.\" Sccsid @(#)nroff.1b	1.6 (gritter) 8/14/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH NROFF 1B "8/13/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH NROFF 1B "8/14/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 nroff \- (BSD) format documents for display or line-printer
 .SH SYNOPSIS
@@ -172,6 +172,15 @@ and
 .B 450
 for the \s-1DASI\s+1-450
 (Diablo Hyterm).
+A special
+.IR name ,
+.BR locale ,
+is also supported.
+It generates UTF-8 output if permitted by
+the current locale,
+and has the same effect as
+.I lp
+otherwise.
 .TP
 .B \-e
 Produce equally-spaced words in adjusted
@@ -190,7 +199,10 @@ See
 .TP
 .B LC_CTYPE
 Determines the mapping
-of bytes to characters.
+of bytes to characters,
+and the choice of output characters with the
+.I \-Tlocale
+option.
 .TP
 .B TYPESETTER
 Specifies a device name as with the

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.9 (gritter) 8/13/05
+ * Sccsid @(#)n1.c	1.10 (gritter) 8/14/05
  */
 
 /*
@@ -118,7 +118,8 @@ main(int argc, char **argv)
 	int eileenct;		/*count to test for "Eileen's loop"*/
 	char	**oargv;
 
-	(void)setlocale(LC_CTYPE, "");
+	setlocale(LC_CTYPE, "");
+	mb_cur_max = MB_CUR_MAX;
 	progname = argv[0];
 	if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
 		signal(SIGHUP, catch);
@@ -1066,8 +1067,14 @@ g2:
 		if (!multi_locale) {
 			twc = 0;
 			mbbuf1p = mbbuf1;
-		} else if ((n = mbtowc(&twc, mbbuf1, MB_CUR_MAX)) <= 0) {
-			if (mbbuf1p >= mbbuf1 + MB_CUR_MAX) {
+		} else if ((*mbbuf1&~(wchar_t)0177) == 0) {
+			twc = *mbbuf1;
+			i |= (BYTE_CHR);
+			setcsbits(i, 0);
+			twc = 0;
+			mbbuf1p = mbbuf1;
+		} else if ((n = mbtowc(&twc, mbbuf1, mb_cur_max)) <= 0) {
+			if (mbbuf1p >= mbbuf1 + mb_cur_max) {
 				i &= ~(MBMASK | CSMASK);
 				twc = 0;
 				mbbuf1p = mbbuf1;

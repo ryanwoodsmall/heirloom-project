@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.4 (gritter) 8/8/05
+ * Sccsid @(#)nii.c	1.5 (gritter) 8/14/05
  */
 
 /*
@@ -156,3 +156,4 @@ int	no_out;
 struct	widcache widcache[NWIDCACHE];
 struct	d d[NDI];
 struct	d *dip;
+int	mb_cur_max;

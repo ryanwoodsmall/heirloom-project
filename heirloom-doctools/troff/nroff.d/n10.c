@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.9 (gritter) 8/13/05
+ * Sccsid @(#)n10.c	1.14 (gritter) 8/14/05
  */
 
 /*
@@ -109,6 +109,8 @@ int	c_boxrule;
 int	c_lefthand;
 int	c_dagger;
 int	c_isalnum;
+
+int	utf8;
 
 static char tab_lp[] = "\
 lp\n\
@@ -264,6 +266,175 @@ rf 1 |\n\
 lc 1 |\n\
 rc 1 |\n";
 
+#ifdef	EUC
+static char tab_utf8[] = "\
+utf8\n\
+bset	0\n\
+breset	0\n\
+Hor	24\n\
+Vert	40\n\
+Newline	40\n\
+Char	24\n\
+Em	24\n\
+Halfline	20\n\
+Adj	24\n\
+twinit	\"\"\n\
+twrest	\"\"\n\
+twnl	\"\\n\"\n\
+hlr	\"\"\n\
+hlf	\"\"\n\
+flr	\"\\0337\"\n\
+bdon	\"\"\n\
+bdoff	\"\"\n\
+iton	\"\"\n\
+itoff	\"\"\n\
+ploton	\"\"\n\
+plotoff	\"\"\n\
+up	\"\"\n\
+down	\"\"\n\
+right	\"\"\n\
+left	\"\"\n\
+\n\
+charset\n\
+em 1 %\\342%\\200%\\224\n\
+en 1 %\\342%\\200%\\223\n\
+hy 1 %\\342%\\200%\\220\n\
+\\- 1 -\n\
+bu 1 %\\342%\\200%\\242\n\
+sq 1 %\\342%\\226%\\241\n\
+ru 1 %\\342%\\216%\\275\n\
+14 1 %\\302%\\274\n\
+12 1 %\\302%\\275\n\
+34 1 %\\302%\\276\n\
+fi 2 fi\n\
+fl 2 fl\n\
+ff 2 ff\n\
+Fi 3 ffi\n\
+Fl 3 ffl\n\
+de 1 %\\302%\\260\n\
+dg 1 %\\342%\\200%\\240\n\
+fm 1 '\n\
+ct 1 %\\302%\\242\n\
+rg 1 %\\302%\\256\n\
+co 1 %\\302%\\251\n\
+pl 1 +\n\
+mi 1 %\\342%\\210%\\222\n\
+eq 1 =\n\
+** 1 *\n\
+sc 1 %\\302%\\247\n\
+aa 1 '\n\
+ga 1 `\n\
+ul 1 %\\342%\\216%\\275\n\
+sl 1 /\n\
+*a 1 %\\316%\\261\n\
+*b 1 %\\316%\\262\n\
+*g 1 %\\316%\\263\n\
+*d 1 %\\316%\\264\n\
+*e 1 %\\316%\\265\n\
+*z 1 %\\316%\\266\n\
+*y 1 %\\316%\\267\n\
+*h 1 %\\316%\\270\n\
+*i 1 %\\316%\\271\n\
+*k 1 %\\316%\\272\n\
+*l 1 %\\316%\\273\n\
+*m 1 %\\316%\\274\n\
+*n 1 %\\316%\\275\n\
+*c 1 %\\316%\\276\n\
+*o 1 %\\316%\\277\n\
+*p 1 %\\317%\\200\n\
+*r 1 %\\317%\\201\n\
+*s 1 %\\317%\\203\n\
+*t 1 %\\317%\\204\n\
+*u 1 %\\317%\\205\n\
+*f 1 %\\317%\\206\n\
+*x 1 %\\317%\\207\n\
+*q 1 %\\317%\\210\n\
+*w 1 %\\317%\\211\n\
+*A 1 %\\316%\\221\n\
+*B 1 %\\316%\\222\n\
+*G 1 %\\316%\\223\n\
+*D 1 %\\316%\\224\n\
+*E 1 %\\316%\\225\n\
+*Z 1 %\\316%\\226\n\
+*Y 1 %\\316%\\227\n\
+*H 1 %\\316%\\230\n\
+*I 1 %\\316%\\231\n\
+*K 1 %\\316%\\232\n\
+*L 1 %\\316%\\233\n\
+*M 1 %\\316%\\234\n\
+*N 1 %\\316%\\235\n\
+*C 1 %\\316%\\236\n\
+*O 1 %\\316%\\237\n\
+*P 1 %\\316%\\240\n\
+*R 1 %\\316%\\241\n\
+*S 1 %\\316%\\243\n\
+*T 1 %\\316%\\244\n\
+*U 1 %\\316%\\245\n\
+*F 1 %\\316%\\246\n\
+*X 1 %\\316%\\247\n\
+*Q 1 %\\316%\\250\n\
+*W 1 %\\316%\\251\n\
+ts 1 %\\317%\\202\n\
+sr 1 %\\342%\\210%\\232\n\
+rn 1 %\\342%\\216%\\272\n\
+>= 1 %\\342%\\211%\\245\n\
+<= 1 %\\342%\\211%\\244\n\
+== 1 %\\342%\\211%\\241\n\
+~= 1 %\\342%\\211%\\203\n\
+~~ 1 %\\342%\\211%\\210\n\
+ap 1 %\\342%\\210%\\274\n\
+!= 1 %\\342%\\211%\\223\n\
+-> 1 %\\342%\\206%\\222\n\
+<- 1 %\\342%\\206%\\220\n\
+ua 1 %\\342%\\206%\\221\n\
+da 1 %\\342%\\206%\\223\n\
+mu 1 %\\303%\\227\n\
+di 1 %\\303%\\267\n\
++- 1 %\\302%\\261\n\
+cu 1 %\\342%\\210%\\252\n\
+ca 1 %\\342%\\210%\\251\n\
+sb 1 %\\342%\\212%\\202\n\
+sp 1 %\\342%\\212%\\201\n\
+ib 1 %\\342%\\212%\\207\n\
+ip 1 %\\342%\\212%\\206\n\
+if 1 %\\342%\\210%\\236\n\
+pd 1 %\\342%\\210%\\202\n\
+gr 1 %\\342%\\210%\\207\n\
+no 1 %\\302%\\254\n\
+is 1 %\\342%\\210%\\253\n\
+pt 1 %\\342%\\210%\\235\n\
+es 1 %\\342%\\210%\\205\n\
+mo 1 %\\342%\\210%\\210\n\
+br 1 %\\342%\\224%\\202\n\
+dd 1 %\\342%\\200%\\241\n\
+rh 1 %\\342%\\230%\\236\n\
+lh 1 %\\342%\\230%\\234\n\
+or 1 |\n\
+ci 1 %\\342%\\227%\\213\n\
+bx 1 %\\342%\\226%\\240\n\
+Sl 1 %\\342%\\204%\\223\n\
+fa 1 %\\342%\\210%\\200\n\
+te 1 %\\342%\\210%\\203\n\
+al 1 %\\342%\\204%\\265\n\
+Ox 1 %\\342%\\212%\\227\n\
+O+ 1 %\\342%\\212%\\225\n\
+tm 1 %\\342%\\204%\\242\n\
+`` 1 %\\342%\\200%\\234\n\
+'' 1 %\\342%\\200%\\235\n\
+-+ 1 %\\342%\\210%\\223\n\
+lt 1 %\\342%\\216%\\247\n\
+lb 1 %\\342%\\216%\\251\n\
+rt 1 %\\342%\\216%\\253\n\
+rb 1 %\\342%\\216%\\255\n\
+lk 1 %\\342%\\216%\\250\n\
+rk 1 %\\342%\\216%\\254\n\
+bv 1 %\\342%\\216%\\252\n\
+lf 1 %\\342%\\216%\\212\n\
+rf 1 %\\342%\\216%\\213\n\
+lc 1 %\\342%\\216%\\210\n\
+rc 1 %\\342%\\216%\\211\n";
+#endif	/* EUC */
+
 void
 ptinit(void)
 {
@@ -274,7 +445,24 @@ ptinit(void)
 	char check[50];
 
 	strcat(termtab, devname);
-	if ((fd = open(termtab, 0)) < 0) {
+	if (strcmp(devname, "locale") == 0) {
+#ifdef	EUC
+		wchar_t	wc;
+		if (mb_cur_max > 1 &&
+				mbtowc(&wc, "\303\266", 2) == 2 &&
+					wc == 0xF6 &&
+				mbtowc(&wc, "\342\202\254", 3) == 3 &&
+					wc == 0x20AC) {
+			codestr = tab_utf8;
+			nread = sizeof tab_utf8 - 1;
+			utf8 = 1;
+		} else
+#endif	/* EUC */
+		{
+			codestr = tab_lp;
+			nread = sizeof tab_lp - 1;
+		}
+	} else if ((fd = open(termtab, 0)) < 0) {
 		if (strcmp(devname, "lp")) {
 			errprint("cannot open %s", termtab);
 			exit(-1);
@@ -543,6 +731,7 @@ ptout1(void)
 {
 	register int k;
 	register char	*codep;
+	char	*savep;
 #ifdef EUC
 #ifdef NROFF
 	register int cnt = 0;
@@ -588,7 +777,7 @@ ptout1(void)
 #ifdef NROFF
 		if (multi_locale && ((k & MBMASK) || (k & CSMASK))) {
 			cnt = 0;
-			while ((*q & MBMASK1) && (cnt + 1 < (int)MB_CUR_MAX)) {
+			while ((*q & MBMASK1) && (cnt + 1 < mb_cur_max)) {
 				cnt++;
 				q++;
 			}
@@ -643,7 +832,34 @@ ptout1(void)
 			j++;
 		else
 			j = 1;	/* number of overstrikes for bold */
-		if (k < 128) {	/* ordinary ascii */
+#ifdef	EUC
+		if (k == '-' && utf8) {
+			/*
+			 * With -Tlocale and a UTF-8 locale, "-" is replaced
+			 * by a UTF-8 hyphen, and "\-" remains the ASCII
+			 * hyphen-minus character. This is because in manual
+			 * pages, "\-" represents the ASCII option
+			 * introduction character, and converting it to a
+			 * UTF-8 minus character would make it impossible
+			 * to copy-and-paste option descriptions.
+			 */
+			savep = "%\342%\200%\220";
+			goto loop;
+		} else if (k == '`' && utf8) {
+			/*
+			 * Similar considerations apply to ` ' vs. \` \'.
+			 * The former are typographic single quotes, while
+			 * the latter are commonly used for the ASCII syntax
+			 * quotes in manual pages.
+			 */
+			savep = "%\342%\200%\230";
+			goto loop;
+		} else if (k == '\'' && utf8) {
+			savep = "%\342%\200%\231";
+			goto loop;
+		} else
+#endif
+			if (k < 128) {	/* ordinary ascii */
 			oput(k);
 			while (--j > 0) {
 				oput('\b');
@@ -677,25 +893,35 @@ ptout1(void)
 		} else if (k >= nchtab + _SPECCHAR_ST) {
 			oput(k - nchtab - _SPECCHAR_ST);
 		} else {
-			int oj = j;
-			codep = t.codetab[k-_SPECCHAR_ST];
+			int oj, isesc, allesc;
+			savep = t.codetab[k-_SPECCHAR_ST];
+		loop:	codep = savep;
+			allesc = 1;
+			oj = j;
 			while (*codep != 0) {
 				if (*codep & 0200) {
 					codep = plot(codep);
 					oput(' ');
+					allesc = 0;
 				} else {
-					if (*codep == '%')	/* escape */
+					if (isesc = *codep=='%') /* escape */
 						codep++;
+					else
+						allesc = 0;
 					oput(*codep);
 					if (*codep == '\033')
 						oput(*++codep);
-					else if (*codep != '\b')
+					else if (*codep != '\b' && !isesc)
 						for (j = oj; --j > 0; ) {
 							oput('\b');
 							oput(*codep);
 						}
 					codep++;
 				}
+			}
+			if (allesc && --j > 0) {
+				oput('\b');
+				goto loop;
 			}
 		}
 		if (!w)
