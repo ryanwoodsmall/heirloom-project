@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.6 (gritter) 8/14/05
+ * Sccsid @(#)n3.c	1.7 (gritter) 8/15/05
  */
 
 /*
@@ -217,7 +217,7 @@ void
 caseds(void)
 {
 	ds++;
-	casede();
+	casede(1);
 }
 
 
@@ -225,12 +225,12 @@ void
 caseam(void)
 {
 	app++;
-	casede();
+	casede(1);
 }
 
 
 void
-casede(void)
+casede(int nomore)
 {
 	register int i, req;
 	register filep savoff;
@@ -242,6 +242,8 @@ casede(void)
 	skip();
 	if ((i = getrq()) == 0)
 		goto de1;
+	if (nomore == 0 && i >= 256)
+		i = maybemore(i, 1);
 	if ((offset = finds(i)) == 0)
 		goto de1;
 	if (ds)
@@ -1037,4 +1039,53 @@ stackdump (void)	/* dumps stack of macros in process */
 			fdprintf(stderr, "%c%c ", p->mname&0177, (p->mname>>BYTE)&0177);
 		fdprintf(stderr, "\n");
 	}
+}
+
+/*
+ * To handle requests with more than two characters, an additional
+ * table is maintained. On places where more than two characters are
+ * allowed, the characters collected are passed in "sofar", and "create"
+ * specifies whether the request is a new one. The routine returns an
+ * integer which is above the regular PAIR() values.
+ */
+int
+maybemore(int sofar, int create)
+{
+	static char	**had;
+	static int	hadn;
+	static int	alcd;
+	char	c, *buf, pb[] = { '\n', 0 };
+	int	i = 2, n, sz;
+
+	buf = malloc((sz = 2) * sizeof *buf);
+	buf[0] = sofar&0377;
+	buf[1] = (sofar>>8)&0377;
+	do {
+		c = getch0() & 0377;
+		if (i+1 >= sz)
+			buf = realloc(buf, (sz += 8) * sizeof *buf);
+		buf[i++] = c;
+	} while (c && c != ' ' && c != '\n');
+	buf[i-1] = 0;
+	buf[i] = 0;
+	if (i == 3)
+		goto retn;
+	for (n = 0; n < hadn; n++)
+		if (strcmp(had[n], buf) == 0)
+			break;
+	if (n == hadn) {
+		if (create == 0) {
+		retn:	buf[i-1] = c;
+			cpushback(&buf[2]);
+			free(buf);
+			return sofar;
+		}
+		if (n >= alcd)
+			had = realloc(had, (alcd += 20) * sizeof *had);
+		had[n] = buf;
+		hadn = n+1;
+	}
+	pb[0] = c;
+	cpushback(pb);
+	return 0200000 + n;
 }

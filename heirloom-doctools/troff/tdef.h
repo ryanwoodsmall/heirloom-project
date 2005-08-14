@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.7 (gritter) 8/14/05
+ * Sccsid @(#)tdef.h	1.8 (gritter) 8/15/05
  */
 
 /*
@@ -411,7 +411,7 @@ struct	s {	/* stack frame */
 };
 
 extern struct contab {
-	unsigned short	rq;
+	unsigned int	rq;
 	struct	contab *link;
 	void	(*f)(int);
 	unsigned mx;
@@ -645,7 +645,7 @@ void caserm(void);
 void caseas(void);
 void caseds(void);
 void caseam(void);
-void casede(void);
+void casede(int);
 int findmn(register int);
 void clrmn(register int);
 filep finds(register int);
@@ -674,6 +674,7 @@ void casetl(void);
 void casepc(void);
 void casepm(void);
 void stackdump(void);
+int maybemore(int, int);
 /* n4.c */
 void setn(void);
 int wrc(int);
