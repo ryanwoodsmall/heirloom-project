@@ -1,0 +1,64 @@
+README file for the Heirloom Documentation Tools
+================================================
+
+The Heirloom Documentation Tools provide troff, nroff, and related
+utilities to format manual pages and other documents for output on
+terminals and printers. They are portable and partially enhanced
+versions of the utilities released by Sun as part of OpenSolaris.
+
+The source code is known to compile on:
+
+Linux		glibc, diet libc
+Solaris		9 and above
+HP-UX		B.11.11 and above
+FreeBSD		5.4
+NetBSD		2.0
+
+To build and install, see the settings in the "mk.config" and adjust
+them if necessary. You can also build a RPM package with the command
+"rpmbuild -tb heirloom-doctools-<version>.tar.bz2".
+
+troff currently reads several binary files which are built during
+the compilation process. It is thus not possible to cross-compile.
+
+In order to use the utilities for formatting manual pages, note the
+following:
+
+- You will almost exclusively want to use "nroff -Tlp". By default,
+  nroff generates output for a Teletype Model 37 with half-line
+  capabilities which will lead to weird results with any xterm or
+  CRT terminal.
+
+- You need to filter the output of nroff through "col -x". 
+
+- The terminal description for "-Tlp" is now built-in with nroff.
+  For a small system distribution, it is thus not necessary to
+  install the "nterm" directory.
+
+- You need at least the "an" macro file to format manual pages. If
+  you also want to use the Berkeley "doc" macros, you also need
+  "doc*" and "andoc". "nroff -mandoc" will then switch automatically
+  between the two macro packages.
+
+- Thus a complete pipeline to format manual pages for viewing is:
+  tbl input.1 | neqn | nroff -Tlp -mandoc | col -x
+
+- To print manual pages with troff, use
+  tbl input.1 | eqn | troff -mandoc | dpost | lp
+
+- You should of course configure your "man" command such that it
+  executes these pipelines automatically for you.
+
+The troff driver for the Autologic APS-5 is currently still included.
+It is untested and will likely vanish from this package unless somebody
+complains and is willing and able to support it.
+
+The project homepage is currently at <http://heirloom.sourceforge.net>.
+
+Report bugs to
+
+Gunnar Ritter
+Freiburg i. Br.
+Germany
+<http://heirloom.sourceforge.net>
+<gunnarr@acm.org>						8/13/05
