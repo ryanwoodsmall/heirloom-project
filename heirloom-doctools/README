@@ -37,6 +37,12 @@ following:
   permitted by the current setting of the LC_CTYPE locale, and the same
   as "nroff -Tlp" otherwise.
 
+- Macro names are normally restricted to two characters for compatibility
+  with previous versions of nroff. With "nroff -x", long macro names are
+  accepted. You will normally want to enable this because you are much
+  more likely to encounter manual pages written with groff in mind than
+  manual pages that require strict Unix compatibility.
+
 - You need to filter the output of nroff through "col -x". 
 
 - The terminal descriptions for "-Tlp" and "-Tlocale" are built-in with
@@ -49,10 +55,10 @@ following:
   between the two macro packages.
 
 - Thus a complete pipeline to format manual pages for viewing is:
-  tbl input.1 | neqn | nroff -Tlp -mandoc | col -x
+  tbl input.1 | neqn | nroff -x -Tlp -mandoc | col -x
 
 - To print manual pages with troff, use
-  tbl input.1 | eqn | troff -mandoc | dpost | lp
+  tbl input.1 | eqn | troff -x -mandoc | dpost | lp
 
 - You should of course configure your "man" command such that it
   executes these pipelines automatically for you.
@@ -69,4 +75,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						8/14/05
+<gunnarr@acm.org>						8/15/05

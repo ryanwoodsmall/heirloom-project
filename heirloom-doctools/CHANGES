@@ -2,11 +2,12 @@ Release ...
 * nroff: A special terminal name, -Tlocale, has been introduced. With this
   option, UTF-8 output is generated if permitted by the current LC_CTYPE
   locale, and regular -Tlp output otherwise.
-* [nt]roff: It is now possible to use ".de" with more than two-character
-  name arguments, as in ".de longname", and to invoke such macros later
-  with ".longname". No compatibility problems should results because
-  [nt]roff previously produced no output at all when such definitions
-  were encountered.
+* [nt]roff: A new option, "-x", enables the recognition of extended
+  features that may affect compatibility with previous versions. The "-X"
+  option disables these features; this is currently the default.
+* [nt]roff: With the -x option, it is now possible to use ".de" with more
+  than two-character name arguments, as in ".de longname", and to invoke such
+  macros later with ".longname".
 * [nt]roff: The static block list limit NBLIST has been removed, memory
   is now dynamically allocated as needed.
 * [nt]roff: There is no static limit on the number of macros/strings and

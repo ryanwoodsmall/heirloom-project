@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.14 (gritter) 8/15/05
+ * Sccsid @(#)n1.c	1.15 (gritter) 8/15/05
  */
 
 /*
@@ -225,6 +225,12 @@ main(int argc, char **argv)
 		case 'T':
 			strcpy(devname, &argv[0][2]);
 			dotT++;
+			continue;
+		case 'x':
+			xflag = 1;
+			continue;
+		case 'X':
+			xflag = 0;
 			continue;
 #ifdef NROFF
 		case 'h':

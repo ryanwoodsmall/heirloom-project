@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)nroff.1b	1.6 (gritter) 8/14/05
+.\" Sccsid @(#)nroff.1b	1.7 (gritter) 8/15/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH NROFF 1B "8/14/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH NROFF 1B "8/15/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 nroff \- (BSD) format documents for display or line-printer
 .SH SYNOPSIS
@@ -40,7 +40,7 @@ nroff \- (BSD) format documents for display or line-printer
 .ad l
 .nh
 \fB/usr/ucb/nroff\fR
-[\fB\-ehiqz\fR]
+[\fB\-ehiqxz\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
@@ -191,6 +191,14 @@ Use output tabs during horizontal spacing
 to speed output and reduce output character count.
 Tab settings are assumed to be every
 8 nominal character widths.
+.TP
+.B \-x
+Enable extended requests
+that may cause compatibility problems
+with previous versions of nroff.
+.TP
+.B \-X
+Disable extended requests (default).
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

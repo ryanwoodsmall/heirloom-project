@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.10 (gritter) 8/15/05
+ * Sccsid @(#)n3.c	1.11 (gritter) 8/15/05
  */
 
 /*
@@ -1083,6 +1083,8 @@ maybemore(int sofar, int create)
 	char	c, *buf, pb[] = { '\n', 0 };
 	int	i = 2, n, sz;
 
+	if (xflag == 0)
+		return sofar;
 	buf = malloc((sz = 2) * sizeof *buf);
 	buf[0] = sofar&0377;
 	buf[1] = (sofar>>8)&0377;
