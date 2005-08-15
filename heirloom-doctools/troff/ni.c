@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.6 (gritter) 8/13/05
+ * Sccsid @(#)ni.c	1.9 (gritter) 8/15/05
  */
 
 /*
@@ -66,7 +66,9 @@ char	devname[20]	 = "post";	/* default typesetter */
 char	tmp_name[] = "/var/tmp/trtmpXXXXXX";
 char	obuf[OBUFSZ];	/* characters collected here for typesetter output */
 char	*obufp = obuf;
-struct numtab numtab[NN] = {
+int	NN;
+struct numtab *numtab;
+struct numtab initnumtab[] = {
 	{ PAIR('%', 0) },
 	{ PAIR('n', 'l') },
 	{ PAIR('y', 'r') },
@@ -126,8 +128,10 @@ int	ldrch = LEADER;
 extern void	caseft(void), caseps(void), casevs(void), casefp(void),
        		casess(void), casecs(void), casebd(void), caselg(void);
 
+int	NM;
+struct contab *contab;
 #define	C(a,b)	{a, 0, (void(*)(int))b, 0}
-struct contab contab[NM] = {
+struct contab initcontab[] = {
 	C(PAIR('d', 's'), caseds),
 	C(PAIR('a', 's'), caseas),
 	C(PAIR('s', 'p'), casesp),
@@ -216,6 +220,7 @@ struct contab contab[NM] = {
 	C(PAIR('l', 'f'), caself),
 	C(PAIR('d', 'b'), casedb),
 /*	C(PAIR('!', 0), casesy), */	/* synonym for .sy */
+	C(0,              0)
 };
 
 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.8 (gritter) 8/15/05
+ * Sccsid @(#)tdef.h	1.12 (gritter) 8/15/05
  */
 
 /*
@@ -157,7 +157,7 @@
 
 #define	NFONT	10	/* maximum number of fonts (including specials) */
 #define	EXTRAFONT 500	/* extra space for swapping a font */
-#define	NN	400	/* number registers */
+extern	int	NN;	/* number registers */
 #define	NNAMES	15	 /* predefined reg names */
 #define	NIF	15	/* if-else nesting */
 #define	NS	128	/* name buffer */
@@ -166,7 +166,7 @@
 #define	EVLSZ	10	/* size of ev stack */
 #define	DSIZE	512	/* disk sector size in chars */
 
-#define	NM	500	/* requests + macros */
+extern	int	NM;	/* requests + macros */
 #define	DELTA	1024	/* delta core bytes */
 #define	NHYP	10	/* max hyphens per word */
 #define	NHEX	128	/* byte size of exception word list */
@@ -415,7 +415,7 @@ extern struct contab {
 	struct	contab *link;
 	void	(*f)(int);
 	unsigned mx;
-} contab[NM];
+} *contab, initcontab[];
 
 extern struct numtab {
 	short	r;		/* name */
@@ -423,7 +423,7 @@ extern struct numtab {
 	short	inc;
 	int	val;
 	struct	numtab *link;
-} numtab[NN];
+} *numtab, initnumtab[];
 
 #define	PN	0
 #define	NL	1
@@ -635,6 +635,7 @@ void done3(int);
 void edone(int);
 void casepi(void);
 /* n3.c */
+void *growcontab(void);
 void *growblist(void);
 void caseig(void);
 void casern(void);
@@ -676,6 +677,7 @@ void casepm(void);
 void stackdump(void);
 int maybemore(int, int);
 /* n4.c */
+void *grownumtab(void);
 void setn(void);
 int wrc(int);
 void setn1(int, int, tchar);

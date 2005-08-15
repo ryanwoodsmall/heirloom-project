@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.7 (gritter) 8/15/05
+ * Sccsid @(#)n3.c	1.9 (gritter) 8/15/05
  */
 
 /*
@@ -81,6 +81,31 @@ int	strflg;
 #endif
 
 void *
+growcontab(void)
+{
+	int	i, inc = 130;
+	struct contab	*onc;
+
+	onc = contab;
+	if ((contab = realloc(contab, (NM+inc) * sizeof *contab)) == NULL)
+		return NULL;
+	memset(&contab[NM], 0, inc * sizeof *contab);
+	if (NM == 0) {
+		for (i = 0; initcontab[i].f; i++)
+			contab[i] = initcontab[i];
+	} else {
+		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
+			if (mhash[i])
+				mhash[i] += contab - onc;
+		for (i = 0; i < NM; i++)
+			if (contab[i].link)
+				contab[i].link += contab - onc;
+	}
+	NM += inc;
+	return contab;
+}
+
+void *
 growblist(void)
 {
 	int	inc = 512;
@@ -102,7 +127,8 @@ growblist(void)
 		memset(corebuf, 0, (ENV_BLK+1) * BLK * sizeof *corebuf);
 	memset(&corebuf[(ENV_BLK+nblist+1) * BLK], 0,
 			inc * BLK * sizeof *corebuf);
-	wbuf += corebuf - ocb;
+	if (wbuf)
+		wbuf += corebuf - ocb;
 #endif	/* INCORE */
 	nblist += inc;
 	return blist;
@@ -324,7 +350,7 @@ finds(register int mn)
 			if (contab[i].rq == 0)
 				break;
 		}
-		if (i == NM || (nextb = alloc()) == 0) {
+		if (i == NM && growcontab() == NULL || (nextb = alloc()) == 0) {
 			app = 0;
 			if (macerr++ > 1)
 				done2(02);

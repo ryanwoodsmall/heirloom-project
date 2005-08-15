@@ -9,6 +9,8 @@ Release ...
   were encountered.
 * [nt]roff: The static block list limit NBLIST has been removed, memory
   is now dynamically allocated as needed.
+* [nt]roff: There is no static limit on the number of macros/strings and
+  the number of number registers anymore.
 * -man: A defect in the supplied -man macro package caused headers and
   footers to be garbled when they were printed between parts of a tbl table
   that was split across pages.

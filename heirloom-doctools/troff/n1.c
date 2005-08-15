@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.12 (gritter) 8/15/05
+ * Sccsid @(#)n1.c	1.14 (gritter) 8/15/05
  */
 
 /*
@@ -122,6 +122,8 @@ main(int argc, char **argv)
 	mb_cur_max = MB_CUR_MAX;
 	progname = argv[0];
 	growblist();
+	growcontab();
+	grownumtab();
 	if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
 		signal(SIGHUP, catch);
 	if (signal(SIGINT, catch) == SIG_IGN) {

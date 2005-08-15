@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.5 (gritter) 8/8/05
+ * Sccsid @(#)n4.c	1.6 (gritter) 8/15/05
  */
 
 /*
@@ -46,6 +46,8 @@
  * contributors.
  */
 
+#include	<stdlib.h>
+#include	<string.h>
 #include	<ctype.h>
 #include "tdef.h"
 #ifdef NROFF
@@ -64,6 +66,31 @@ int	regcnt = NNAMES;
 int	falsef	= 0;	/* on if inside false branch of if */
 #define	NHASH(i)	((i>>6)^i)&0177
 struct	numtab	*nhash[128];	/* 128 == the 0177 on line above */
+
+void *
+grownumtab(void)
+{
+	int	i, inc = 20;
+	struct numtab	*onc;
+
+	onc = numtab;
+	if ((numtab = realloc(numtab, (NN+inc) * sizeof *numtab)) == NULL)
+		return NULL;
+	memset(&numtab[NN], 0, inc * sizeof *numtab);
+	if (NN == 0) {
+		for (i = 0; initnumtab[i].r; i++)
+			numtab[i] = initnumtab[i];
+	} else {
+		for (i = 0; i < sizeof nhash / sizeof *nhash; i++)
+			if (nhash[i])
+				nhash[i] += numtab - onc;
+		for (i = 0; i < NN; i++)
+			if (numtab[i].link)
+				numtab[i].link += numtab - onc;
+	}
+	NN += inc;
+	return numtab;
+}
 
 void
 setn(void)
@@ -274,15 +301,17 @@ findr(register int i)
 	for (p = nhash[h]; p; p = p->link)
 		if (i == p->r)
 			return(p - numtab);
-	for (p = numtab; p < &numtab[NN]; p++) {
-		if (p->r == 0) {
-			p->r = i;
-			p->link = nhash[h];
-			nhash[h] = p;
-			regcnt++;
-			return(p - numtab);
+	do {
+		for (p = numtab; p < &numtab[NN]; p++) {
+			if (p->r == 0) {
+				p->r = i;
+				p->link = nhash[h];
+				nhash[h] = p;
+				regcnt++;
+				return(p - numtab);
+			}
 		}
-	}
+	} while (p == &numtab[NN] && grownumtab() != NULL);
 	errprint("too many number registers (%d).", NN);
 	done2(04); 
 	/* NOTREACHED */
