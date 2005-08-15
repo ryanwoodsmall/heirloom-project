@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.14 (gritter) 8/14/05
+ * Sccsid @(#)n10.c	1.15 (gritter) 8/15/05
  */
 
 /*
@@ -462,7 +462,7 @@ ptinit(void)
 			codestr = tab_lp;
 			nread = sizeof tab_lp - 1;
 		}
-	} else if ((fd = open(termtab, 0)) < 0) {
+	} else if ((fd = open(termtab, O_RDONLY)) < 0) {
 		if (strcmp(devname, "lp")) {
 			errprint("cannot open %s", termtab);
 			exit(-1);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.15 (gritter) 8/15/05
+ * Sccsid @(#)n1.c	1.16 (gritter) 8/15/05
  */
 
 /*
@@ -1209,7 +1209,7 @@ n1:
 	if (p[0] == '-' && p[1] == 0) {
 		ifile = 0;
 		strcpy(cfname[ifi], "<standard input>");
-	} else if ((ifile = open(p, 0)) < 0) {
+	} else if ((ifile = open(p, O_RDONLY)) < 0) {
 		errprint("cannot open file %s", p);
 		nfo -= mflg;
 		done(02);
@@ -1348,7 +1348,8 @@ caseso(void)
 
 	lgf++;
 	nextf[0] = 0;
-	if (skip() || !getname() || ((i = open(nextf, 0)) < 0) || (ifi >= NSO)) {
+	if (skip() || !getname() || ((i = open(nextf, O_RDONLY)) < 0) ||
+			(ifi >= NSO)) {
 		errprint("can't open file %s", nextf);
 		done(02);
 	}
@@ -1398,7 +1399,7 @@ casecf(void)
 	char	buf[512];
 	extern int hpos, esc, po;
 	nextf[0] = 0;
-	if (skip() || !getname() || (fd = open(nextf, 0)) < 0) {
+	if (skip() || !getname() || (fd = open(nextf, O_RDONLY)) < 0) {
 		errprint("can't open file %s", nextf);
 		done(02);
 	}
