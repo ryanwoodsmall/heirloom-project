@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)cpio.1	1.88 (gritter) 8/6/05
-.TH CPIO 1 "8/6/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)cpio.1	1.89 (gritter) 8/14/05
+.TH CPIO 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cpio \- copy file archives in and out
 .SH SYNOPSIS
@@ -733,7 +733,7 @@ from the archive stored on
 overwriting recent files:
 .RS 2
 .sp
-cpio \-idmu \-I /dev/rmt/c0s0 '[Mm]akefile' '*/[Mm]akefile'
+cpio \-idmu \-I /dev/rmt/c0s0 \'[Mm]akefile\' \'*/[Mm]akefile\'
 .RE
 .PP
 List the files contained in a software distribution archive:
@@ -757,7 +757,7 @@ or
 and their contents:
 .RS 2
 .sp
-find project \-depth \-print | egrep \-v '/(CVS|SCCS)(/|$)' |
+find project \-depth \-print | egrep \-v \'/(CVS|SCCS)(/|$)\' |
 .br
       cpio \-o \-H ustar | gzip \-c > project.tar.gz
 .RE

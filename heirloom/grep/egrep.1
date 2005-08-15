@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)egrep.1	1.41 (gritter) 1/24/05
+.\" Sccsid @(#)egrep.1	1.42 (gritter) 8/14/05
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EGREP 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH EGREP 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 egrep \- search a file for a pattern using full regular expressions
 .SH SYNOPSIS
@@ -193,10 +193,10 @@ then ^ $
 then | and newline.
 .PP
 Care should be taken when using the characters
-$ * [ ^ | ? ' " ( ) and \e in the expression
+$ * [ ^ | ? \' " ( ) and \e in the expression
 as they are also meaningful to the Shell.
 It is safest to enclose the entire expression
-argument in single quotes ' '.
+argument in single quotes \' \'.
 .PP
 Both
 .B /usr/5bin/egrep

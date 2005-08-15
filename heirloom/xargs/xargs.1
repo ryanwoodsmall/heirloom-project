@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)xargs.1	1.7 (gritter) 12/5/04
-.TH XARGS 1 "12/5/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)xargs.1	1.8 (gritter) 8/14/05
+.TH XARGS 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 xargs \- construct argument list(s) and execute command
 .SH SYNOPSIS
@@ -47,7 +47,7 @@ using blanks and newline characters as delimiters.
 Special characters are: backslash
 .RB ( \e ),
 which causes any following character to be interpreted literally,
-and single (') and double (") quotes,
+and single (\') and double (") quotes,
 which cause following characters except newline
 to be taken literally until the quote character appears again.
 .PP
@@ -209,7 +209,7 @@ and each character is preceded with a backslash:
 .RS
 .nf
 .sp
-find .//. \-print | sed 's/./\e\e&/g' | awk '{
+find .//. \-print | sed \'s/./\e\e&/g\' | awk \'{
         if (NR > 1) {
                 printf("%s", line)
                 if ($0 !~ /\e\e\e/\e\e\e//)
@@ -220,7 +220,7 @@ find .//. \-print | sed 's/./\e\e&/g' | awk '{
 }
 END {
         print(line)
-}' | xargs \fIcommand\fR
+}\' | xargs \fIcommand\fR
 .fi
 .sp
 .RE

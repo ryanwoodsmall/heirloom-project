@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)getconf.1	1.3 (gritter) 7/17/05
-.TH GETCONF 1 "7/17/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)getconf.1	1.4 (gritter) 8/14/05
+.TH GETCONF 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 getconf \- get configuration values
 .SH SYNOPSIS
@@ -81,7 +81,7 @@ Thus after executing
 .RS
 .sp
 .nf
-PATH=`getconf PATH` export PATH
+PATH=\`getconf PATH\` export PATH
 .fi
 .sp
 .RE
@@ -97,7 +97,7 @@ Thus if POSIX.1-2001 behavior is required by a script,
 .RS
 .sp
 .nf
-posix2_version=`getconf POSIX2_VERSION`
+posix2_version=\`getconf POSIX2_VERSION\`
 if test ${posix2_version:\-0} \-lt 200112
 then
       echo "error: POSIX.1-2001 or later required" >&2

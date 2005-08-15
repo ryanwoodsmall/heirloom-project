@@ -1,4 +1,4 @@
-Release ...
+Release 050815
 * The "getconf" utility has been added (derived from OpenSolaris code).
 * The "mesg" and "pathchk" utilities have been added.
 * tr: A new implementation that is based on 6th and 7th edition code is

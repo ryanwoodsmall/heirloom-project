@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)nl.1	1.9 (gritter) 1/24/05
-.TH NL 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)nl.1	1.10 (gritter) 8/14/05
+.TH NL 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 nl \- line numbering filter
 .SH SYNOPSIS
@@ -237,21 +237,21 @@ and thus the condition is never met:
 .RS
 .sp
 .nf
-nl \-ba \-d'
-\&' file
+nl \-ba \-d\'
+\&\' file
 .fi
 .sp
 .RE
 Note that there is no white space
 other than the newline character
-between ' '.
+between \' \'.
 .PP
 To number all lines that are not empty
 and contain at least one non-blank character:
 .RS
 .sp
 .nf
-nl \-bp'[^      ]' file
+nl \-bp\'[^      ]\' file
 .fi
 .sp
 .RE

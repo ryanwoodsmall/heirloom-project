@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)find.1	1.43 (gritter) 2/24/05
+.\" Sccsid @(#)find.1	1.44 (gritter) 8/14/05
 .\" Parts taken from find(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH FIND 1 "2/24/05" "Heirloom Toolchest" "User Commands"
+.TH FIND 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 find \- find files
 .SH SYNOPSIS
@@ -348,13 +348,13 @@ and operation continues with the next directory entry found.
 To remove all files named
 `a.out' or `*.o' that have not been accessed for a week:
 .IP "" .2i
-find / \\( \-name a.out \-o \-name '*.o' \\)
+find / \\( \-name a.out \-o \-name \'*.o\' \\)
 \-atime +7 \-exec rm {} \\;
 .PP
 The rm command is executed once for each file.
 The form
 .IP "" .2i
-find / \\( \-name a.out \-o \-name '*.o' \\)
+find / \\( \-name a.out \-o \-name \'*.o\' \\)
 \-atime +7 \-exec rm {} +
 .PP
 is faster since the rm command is executed with a set of pathnames.
@@ -420,10 +420,10 @@ as shown by the following command sequence:
 .RS
 .sp
 .nf
-$ mkdir \-p 'dummy
-> /etc'
-$ touch 'dummy
-> /etc/passwd'
+$ mkdir \-p \'dummy
+> /etc\'
+$ touch \'dummy
+> /etc/passwd\'
 $ find . \-print
 \&.
 \&./dummy
@@ -508,9 +508,9 @@ that contain newline characters, as in
 .in +2
 .sp
 .nf
-$ find . \-name '* 
-> *' \-prune \-o ! \-name '*
-> *' \-print
+$ find . \-name \'* 
+> *\' \-prune \-o ! \-name \'*
+> *\' \-print
 .sp
 .fi
 .in -2
@@ -534,7 +534,7 @@ file names that leave the specified path hierarchy
 should be filtered out:
 .in +2
 .sp
-find . \-depth | egrep '^\e./' | cpio \-oc \-O /dev/rmt/c0s0
+find . \-depth | egrep \'^\e./\' | cpio \-oc \-O /dev/rmt/c0s0
 .sp
 .in -2
 (note the escaped regular expression meta-character).

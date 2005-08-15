@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)pgrep.1	1.8 (gritter) 11/8/04
-.TH PGREP 1 "11/8/04" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pgrep.1	1.9 (gritter) 8/14/05
+.TH PGREP 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pgrep, pkill \- find or signal processes by name and other attributes
 .SH SYNOPSIS
@@ -176,7 +176,7 @@ select all processes that fail to fulfill the given criteria.
 Require the entire process name to be matched,
 as if
 .I pattern
-was surrounded by '^( )$'.
+was surrounded by `^( )$'.
 .SH EXAMPLES
 .PP
 Determine the process ID of the
@@ -192,7 +192,7 @@ Print all processes that have a first argument starting with
 along with their arguments:
 .RS
 .sp
-pgrep \-l -f '^/bin/'
+pgrep \-l \-f \'^/bin/\'
 .sp
 .RE
 Send a SIGHUP signal to all processes that are owned by either the

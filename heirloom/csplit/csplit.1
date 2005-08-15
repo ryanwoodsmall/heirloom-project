@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)csplit.1	1.8 (gritter) 1/24/05
-.TH CSPLIT 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)csplit.1	1.9 (gritter) 8/14/05
+.TH CSPLIT 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 csplit \- context split
 .SH SYNOPSIS
@@ -143,7 +143,7 @@ Create individual files
 document:
 .RS
 .sp
-csplit \-k \-f section doc.ms '/^\.[NS]H/' {100}
+csplit \-k \-f section doc.ms \'/^\.[NS]H/\' {100}
 .RE
 .SH "ENVIRONMENT VARIABLES"
 .TP

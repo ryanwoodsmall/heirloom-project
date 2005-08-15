@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.34 (gritter) 8/6/05
-.TH PAX 1 "8/6/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pax.1	1.35 (gritter) 8/14/05
+.TH PAX 1 "8/14/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
 .SH SYNOPSIS
@@ -785,7 +785,7 @@ from the archive stored on
 overwriting recent files:
 .RS 2
 .sp
-pax \-r \-f /dev/rmt/c0s0 '[Mm]akefile' '*/[Mm]akefile'
+pax \-r \-f /dev/rmt/c0s0 \'[Mm]akefile\' \'*/[Mm]akefile\'
 .RE
 .PP
 List the files contained in a software distribution archive:
@@ -809,7 +809,7 @@ or
 and their contents:
 .RS 2
 .sp
-find project \-depth \-print | egrep \-v '/(CVS|SCCS)(/|$)' |
+find project \-depth \-print | egrep \-v \'/(CVS|SCCS)(/|$)\' |
 .br
       pax \-wd \-x ustar | gzip \-c > project.tar.gz
 .RE
