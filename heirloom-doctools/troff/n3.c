@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.12 (gritter) 8/15/05
+ * Sccsid @(#)n3.c	1.13 (gritter) 8/15/05
  */
 
 /*
@@ -79,6 +79,8 @@ int	strflg;
 	tchar wbuf[BLK];
 	tchar rbuf[BLK];
 #endif
+
+static int	getls(int);
 
 void *
 growcontab(void)
@@ -253,7 +255,7 @@ void
 caseds(void)
 {
 	ds++;
-	casede(1);
+	casede();
 }
 
 
@@ -261,12 +263,12 @@ void
 caseam(void)
 {
 	app++;
-	casede(0);
+	casede();
 }
 
 
 void
-casede(int nomore)
+casede(void)
 {
 	register int i, req;
 	register filep savoff;
@@ -278,7 +280,7 @@ casede(int nomore)
 	skip();
 	if ((i = getrq()) == 0)
 		goto de1;
-	if (nomore == 0 && i >= 256)
+	if (i >= 256)
 		i = maybemore(i, 1);
 	if ((offset = finds(i)) == 0)
 		goto de1;
@@ -768,6 +770,8 @@ getsn(void)
 		return(0);
 	if (i == '(')
 		return(getrq());
+	else if (i == '[')
+		return(getls(']'));
 	else 
 		return(i);
 }
@@ -1083,6 +1087,10 @@ stackdump (void)	/* dumps stack of macros in process */
 	}
 }
 
+static char	**had;
+static int	hadn;
+static int	alcd;
+
 /*
  * To handle requests with more than two characters, an additional
  * table is maintained. On places where more than two characters are
@@ -1093,9 +1101,6 @@ stackdump (void)	/* dumps stack of macros in process */
 int
 maybemore(int sofar, int create)
 {
-	static char	**had;
-	static int	hadn;
-	static int	alcd;
 	char	c, *buf, pb[] = { '\n', 0 };
 	int	i = 2, n, sz;
 
@@ -1132,4 +1137,28 @@ maybemore(int sofar, int create)
 	pb[0] = c;
 	cpushback(pb);
 	return 0200000 + n;
+}
+
+static int
+getls(int termc)
+{
+	char	c, *buf = NULL;
+	int	i = 0, n, sz = 0;
+
+	do {
+		c = getch0() & 0377;
+		if (i >= sz)
+			buf = realloc(buf, (sz += 8) * sizeof *buf);
+		buf[i++] = c;
+	} while (c != termc);
+	buf[i-1] = 0;
+	if (i == 1)
+		goto not;
+	for (n = 0; n < hadn; n++)
+		if (strcmp(had[n], buf) == 0)
+			break;
+	if (n == hadn)
+	not:	n = -1;
+	free(buf);
+	return n >= 0 ? 0200000 + n : 0;
 }

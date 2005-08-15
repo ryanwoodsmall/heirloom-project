@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.6 (gritter) 8/15/05
+ * Sccsid @(#)n4.c	1.7 (gritter) 8/15/05
  */
 
 /*
@@ -704,6 +704,8 @@ caserr(void)
 
 	lgf++;
 	while (!skip() && (i = getrq()) ) {
+		if (i >= 256)
+			i = maybemore(i, 0);
 		j = usedr(i);
 		if (j < 0)
 			continue;
@@ -722,7 +724,9 @@ casenr(void)
 
 	lgf++;
 	skip();
-	if ((i = findr(getrq())) == -1)
+	if ((j = getrq()) >= 256)
+		j = maybemore(j, 1);
+	if ((i = findr(j)) == -1)
 		goto rtn;
 	skip();
 	j = inumb(&numtab[i].val);
@@ -748,6 +752,8 @@ caseaf(void)
 	lgf++;
 	if (skip() || !(i = getrq()) || skip())
 		return;
+	if (i >= 256)
+		i = maybemore(i, 1);
 	k = 0;
 	j = getch();
 	if (!ischar(jj = cbits(j)) || !isalpha(jj)) {

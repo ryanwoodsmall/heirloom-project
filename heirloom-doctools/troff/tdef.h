@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.12 (gritter) 8/15/05
+ * Sccsid @(#)tdef.h	1.13 (gritter) 8/15/05
  */
 
 /*
@@ -418,7 +418,7 @@ extern struct contab {
 } *contab, initcontab[];
 
 extern struct numtab {
-	short	r;		/* name */
+	int	r;		/* name */
 	short	fmt;
 	short	inc;
 	int	val;
@@ -646,7 +646,7 @@ void caserm(void);
 void caseas(void);
 void caseds(void);
 void caseam(void);
-void casede(int);
+void casede(void);
 int findmn(register int);
 void clrmn(register int);
 filep finds(register int);
