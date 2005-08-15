@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.9 (gritter) 8/15/05
+ * Sccsid @(#)n5.c	1.10 (gritter) 8/15/05
  */
 
 /*
@@ -223,6 +223,15 @@ int
 max(int aa, int bb)
 {
 	if (aa > bb)
+		return(aa);
+	else 
+		return(bb);
+}
+
+int 
+min(int aa, int bb)
+{
+	if (aa < bb)
 		return(aa);
 	else 
 		return(bb);

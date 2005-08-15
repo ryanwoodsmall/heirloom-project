@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.13 (gritter) 8/15/05
+ * Sccsid @(#)n3.c	1.14 (gritter) 8/15/05
  */
 
 /*
@@ -892,11 +892,31 @@ rtn:
 void
 seta(void)
 {
-	register int i;
+	register int c, i;
+	char q[] = { 0, 0 };
 
-	i = cbits(getch()) - '0';
-	if (i > 0 && i <= APERMAC && i <= frame->nargs)
-		pushback(*(((tchar **)(frame + 1)) + i - 1));
+	switch (c = cbits(getch())) {
+	case '@':
+		q[0] = '"';
+		/*FALLTHRU*/
+	case '*':
+		if (xflag == 0)
+			goto dfl;
+		for (i = min(APERMAC, frame->nargs); i >= 1; i--) {
+			if (q[0])
+				cpushback(q);
+			pushback(*(((tchar **)(frame + 1)) + i - 1));
+			if (q[0])
+				cpushback(q);
+			if (i > 1)
+				cpushback(" ");
+		}
+		break;
+	default:
+	dfl:	i = c - '0';
+		if (i > 0 && i <= APERMAC && i <= frame->nargs)
+			pushback(*(((tchar **)(frame + 1)) + i - 1));
+	}
 }
 
 

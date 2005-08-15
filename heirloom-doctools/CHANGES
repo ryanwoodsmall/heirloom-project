@@ -9,6 +9,8 @@ Release ...
   ".nr", and similar requests with more than two-character name arguments,
   as in ".de longname", and to access such macros later with ".longname",
   strings with "\*[longname]", and number registers with "\n[longname]".
+* [nt]roff: The "\$@" and "\$*" escape sequences to print all arguments
+  to a macro are now understood with the -x option.
 * [nt]roff: The static block list limit NBLIST has been removed, memory
   is now dynamically allocated as needed.
 * [nt]roff: There is no static limit on the number of macros/strings and

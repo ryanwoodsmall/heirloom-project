@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.13 (gritter) 8/15/05
+ * Sccsid @(#)tdef.h	1.14 (gritter) 8/15/05
  */
 
 /*
@@ -719,6 +719,7 @@ void caselc(void);
 void casehy(void);
 void casenh(void);
 int max(int, int);
+int min(int, int);
 void casece(void);
 void casein(void);
 void casell(void);
