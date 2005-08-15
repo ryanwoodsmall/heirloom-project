@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.4 (gritter) 7/24/05
+ * Sccsid @(#)n8.c	1.5 (gritter) 8/16/05
  */
 
 /*
@@ -221,9 +221,9 @@ int
 suffix(void)
 {
 	register tchar *w;
-	register char	*s, *s0;
+	register const char	*s, *s0;
 	tchar i;
-	extern char	*suftab[];
+	extern const char	*suftab[];
 
 again:
 	if (!alph(cbits(i = cbits(*hyend))))
@@ -312,7 +312,7 @@ digram(void)
 	register int val;
 	tchar * nhyend, *maxw = 0;
 	int	maxval;
-	extern char	bxh[26][13], bxxh[26][13], xxh[26][13], xhx[26][13], hxx[26][13];
+	extern const char	bxh[26][13], bxxh[26][13], xxh[26][13], xhx[26][13], hxx[26][13];
 
 again:
 	if (!(w = chkvow(hyend + 1)))
@@ -346,7 +346,7 @@ again:
 
 
 int 
-dilook(int a, int b, char t[26][13])
+dilook(int a, int b, const char t[26][13])
 {
 	register int i, j;
 

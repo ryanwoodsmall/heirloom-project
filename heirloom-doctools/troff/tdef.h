@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.14 (gritter) 8/15/05
+ * Sccsid @(#)tdef.h	1.15 (gritter) 8/16/05
  */
 
 /*
@@ -415,7 +415,8 @@ extern struct contab {
 	struct	contab *link;
 	void	(*f)(int);
 	unsigned mx;
-} *contab, initcontab[];
+} *contab;
+extern const struct contab initcontab[];
 
 extern struct numtab {
 	int	r;		/* name */
@@ -423,7 +424,8 @@ extern struct numtab {
 	short	inc;
 	int	val;
 	struct	numtab *link;
-} *numtab, initnumtab[];
+} *numtab;
+extern const struct numtab initnumtab[];
 
 #define	PN	0
 #define	NL	1
@@ -799,7 +801,7 @@ int maplow(register int);
 int vowel(int);
 tchar *chkvow(tchar *);
 void digram(void);
-int dilook(int, int, char [26][13]);
+int dilook(int, int, const char [26][13]);
 /* n9.c */
 tchar setz(void);
 void setline(void);

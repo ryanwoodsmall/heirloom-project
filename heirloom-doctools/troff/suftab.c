@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)suftab.c	1.3 (gritter) 7/23/05
+ * Sccsid @(#)suftab.c	1.4 (gritter) 8/16/05
  */
 
 /*
@@ -50,7 +50,7 @@
  * Suffix table
  */
 
-static	unsigned char sufa[] = {
+static	const unsigned char sufa[] = {
 	02,0200+'t',	/* -TA */
 	02,0200+'s',	/* -SA */
 	03,0200+'t','r',	/* -TRA */
@@ -71,7 +71,7 @@ static	unsigned char sufa[] = {
 	00
 };
 
-static	unsigned char sufc[] = {
+static	const unsigned char sufc[] = {
 	04,'e','t',0200+'i',	/* ET-IC */
 	07,'a','l',0200+'i','s',0200+'t','i',	/* AL-IS-TIC */
 	04,'s',0200+'t','i',	/* S-TIC */
@@ -99,7 +99,7 @@ static	unsigned char sufc[] = {
 	00
 };
 
-static	unsigned char sufd[] = {
+static	const unsigned char sufd[] = {
 	04,0200+'w','o','r',	/* -WORD */
 	04,0200+'l','o','r',	/* -LORD */
 	04,0200+'f','o','r',	/* -FORD */
@@ -147,7 +147,7 @@ static	unsigned char sufd[] = {
 	00
 };
 
-static	unsigned char sufe[] = {
+static	const unsigned char sufe[] = {
 	05,'a','r',0200+'i','z',	/* AR-IZE */
 	05,'a','n',0200+'i','z',	/* AN-IZE */
 	05,'a','l',0200+'i','z',	/* AL-IZE */
@@ -250,7 +250,7 @@ static	unsigned char sufe[] = {
 	00
 };
 
-static	unsigned char suff[] = {
+static	const unsigned char suff[] = {
 	03,0200+'o','f',	/* -OFF */
 	05,0200+'p','r','o','o',	/* -PROOF */
 	04,0200+'s','e','l',	/* -SELF */
@@ -259,7 +259,7 @@ static	unsigned char suff[] = {
 	00
 };
 
-static	unsigned char sufg[] = {
+static	const unsigned char sufg[] = {
 	03,0200+'l','o',	/* -LOG */
 	04,0200+'l','o','n',	/* -LONG */
 	05,'t',0200+'t','i','n',	/* T-TING */
@@ -291,7 +291,7 @@ static	unsigned char sufg[] = {
 	00
 };
 
-static	unsigned char sufh[] = {
+static	const unsigned char sufh[] = {
 	05,0200+'m','o','u','t',	/* -MOUTH */
 	05,0200+'w','o','r','t',	/* -WORTH */
 	04,0200+'w','i','t',	/* -WITH */
@@ -317,7 +317,7 @@ static	unsigned char sufh[] = {
 	00
 };
 
-static	unsigned char sufi[] = {
+static	const unsigned char sufi[] = {
 	03,0200+'t','r',	/* -TRI */
 	03,0200+'c','h',	/* -CHI */
 	0200+03,'i','f',	/* IF-I */
@@ -327,7 +327,7 @@ static	unsigned char sufi[] = {
 	00
 };
 
-static	unsigned char sufk[] = {
+static	const unsigned char sufk[] = {
 	04,0200+'w','o','r',	/* -WORK */
 	04,0200+'m','a','r',	/* -MARK */
 	04,0200+'b','o','o',	/* -BOOK */
@@ -337,7 +337,7 @@ static	unsigned char sufk[] = {
 	00
 };
 
-static	unsigned char sufl[] = {
+static	const unsigned char sufl[] = {
 	03,0200+'f','u',	/* -FUL */
 	05,'s',0200+'w','e','l',	/* S-WELL */
 	04,0200+'t','e','l',	/* -TELL */
@@ -379,7 +379,7 @@ static	unsigned char sufl[] = {
 	00
 };
 
-static	unsigned char sufm[] = {
+static	const unsigned char sufm[] = {
 	03,0200+'n','u',	/* -NUM */
 	05,'o',0200+'r','i',0200+'u',	/* O-RI-UM */
 	040+03,'i',0200+'u',	/* I-UM */
@@ -398,7 +398,7 @@ static	unsigned char sufm[] = {
 	00
 };
 
-static	unsigned char sufn[] = {
+static	const unsigned char sufn[] = {
 	05,0200+'k','n','o','w', /* -KNOWN */
 	04,0200+'t','o','w',	/* -TOWN */
 	04,0200+'d','o','w',	/* -DOWN */
@@ -449,12 +449,12 @@ static	unsigned char sufn[] = {
 	00
 };
 
-static	unsigned char sufo[] = {
+static	const unsigned char sufo[] = {
 	05,0200+'m','a','c',0200+'r',	/* -MAC-RO */
 	00
 };
 
-static	unsigned char sufp[] = {
+static	const unsigned char sufp[] = {
 	05,0200+'g','r','o','u',	/* -GROUP */
 	02,0200+'u',	/* -UP */
 	04,0200+'s','h','i',	/* -SHIP */
@@ -462,7 +462,7 @@ static	unsigned char sufp[] = {
 	00
 };
 
-static	unsigned char sufr[] = {
+static	const unsigned char sufr[] = {
 	04,0200+'z','a','r',	/* -ZARR */
 	0300+02,'r',	/* R/R */
 	03,0200+'t','o',	/* -TOR */
@@ -520,7 +520,7 @@ static	unsigned char sufr[] = {
 	00
 };
 
-static	unsigned char sufs[] = {
+static	const unsigned char sufs[] = {
 	040+04,'u',0200+'o','u',	/* U-OUS */
 	05,0200+'t','i','o','u',	/* -TIOUS */
 	05,0200+'g','i','o','u',	/* -GIOUS */
@@ -543,7 +543,7 @@ static	unsigned char sufs[] = {
 	00
 };
 
-static	unsigned char suft[] = {
+static	const unsigned char suft[] = {
 	06,'i','o','n',0200+'i','s',	/* ION-IST */
 	05,'i','n',0200+'i','s',	/* IN-IST */
 	05,'a','l',0200+'i','s',	/* AL-IST */
@@ -578,7 +578,7 @@ static	unsigned char suft[] = {
 	00
 };
 
-static	unsigned char sufy[] = {
+static	const unsigned char sufy[] = {
 	040+04,'e','s',0200+'t',	/* ES-TY */
 	040+05,'q','u','i',0200+'t',	/* QUI-TY */
 	04,0200+'t','i',0200+'t',	/* -TI-TY */
@@ -624,7 +624,7 @@ static	unsigned char sufy[] = {
 	00
 };
 
-unsigned char	*suftab[] = {
+const unsigned char	*suftab[] = {
 	sufa,
 	0,
 	sufc,

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.9 (gritter) 8/15/05
+ * Sccsid @(#)ni.c	1.10 (gritter) 8/16/05
  */
 
 /*
@@ -68,7 +68,7 @@ char	obuf[OBUFSZ];	/* characters collected here for typesetter output */
 char	*obufp = obuf;
 int	NN;
 struct numtab *numtab;
-struct numtab initnumtab[] = {
+const struct numtab initnumtab[] = {
 	{ PAIR('%', 0) },
 	{ PAIR('n', 'l') },
 	{ PAIR('y', 'r') },
@@ -131,7 +131,7 @@ extern void	caseft(void), caseps(void), casevs(void), casefp(void),
 int	NM;
 struct contab *contab;
 #define	C(a,b)	{a, 0, (void(*)(int))b, 0}
-struct contab initcontab[] = {
+const struct contab initcontab[] = {
 	C(PAIR('d', 's'), caseds),
 	C(PAIR('a', 's'), caseas),
 	C(PAIR('s', 'p'), casesp),
