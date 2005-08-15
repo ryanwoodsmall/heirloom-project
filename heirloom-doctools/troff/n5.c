@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.8 (gritter) 8/14/05
+ * Sccsid @(#)n5.c	1.9 (gritter) 8/15/05
  */
 
 /*
@@ -368,6 +368,8 @@ casewh(void)
 		return;
 	skip();
 	j = getrq();
+	if (j >= 256)
+		j = maybemore(j, 0);
 	if ((k = findn(i)) != NTRAP) {
 		mlist[k] = j;
 		return;
@@ -394,10 +396,13 @@ casech(void)
 	skip();
 	if (!(j = getrq()))
 		return;
-	else 
+	else  {
+		if (j >= 256)
+			j = maybemore(j, 0);
 		for (k = 0; k < NTRAP; k++)
 			if (mlist[k] == j)
 				break;
+	}
 	if (k == NTRAP)
 		return;
 	skip();
@@ -542,6 +547,8 @@ caseem(void)
 	lgf++;
 	skip();
 	em = getrq();
+	if (em >= 256)
+		em = maybemore(em, 1);
 }
 
 
@@ -1032,8 +1039,11 @@ caseit(void)
 	skip();
 	i = atoi();
 	skip();
-	if (!nonumb && (itmac = getrq()))
+	if (!nonumb && (itmac = getrq())) {
+		if (itmac >= 256)
+			itmac = maybemore(itmac, 1);
 		it = i;
+	}
 	noscale = 0;
 }
 

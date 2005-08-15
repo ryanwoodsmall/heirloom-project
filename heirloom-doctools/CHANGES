@@ -5,9 +5,9 @@ Release ...
 * [nt]roff: A new option, "-x", enables the recognition of extended
   features that may affect compatibility with previous versions. The "-X"
   option disables these features; this is currently the default.
-* [nt]roff: With the -x option, it is now possible to use ".de" with more
-  than two-character name arguments, as in ".de longname", and to invoke such
-  macros later with ".longname".
+* [nt]roff: With the -x option, it is now possible to use ".de" and similar
+  requests with more than two-character name arguments, as in ".de longname",
+  and to invoke such macros later with ".longname".
 * [nt]roff: The static block list limit NBLIST has been removed, memory
   is now dynamically allocated as needed.
 * [nt]roff: There is no static limit on the number of macros/strings and

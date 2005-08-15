@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.11 (gritter) 8/15/05
+ * Sccsid @(#)n3.c	1.12 (gritter) 8/15/05
  */
 
 /*
@@ -156,10 +156,17 @@ casern(void)
 
 	lgf++;
 	skip();
-	if ((i = getrq()) == 0 || (oldmn = findmn(i)) < 0)
+	if ((i = getrq()) == 0)
+		return;
+	if (i >= 256)
+		i = maybemore(i, 0);
+	if ((oldmn = findmn(i)) < 0)
 		return;
 	skip();
-	clrmn(findmn(j = getrq()));
+	j = getrq();
+	if (j >= 256)
+		j = maybemore(j, 1);
+	clrmn(findmn(j));
 	if (j) {
 		munhash(&contab[oldmn]);
 		contab[oldmn].rq = j;
@@ -225,8 +232,11 @@ caserm(void)
 	int j;
 
 	lgf++;
-	while (!skip() && (j = getrq()) != 0)
+	while (!skip() && (j = getrq()) != 0) {
+		if (j >= 256)
+			j = maybemore(j, 0);
 		clrmn(findmn(j));
+	}
 	lgf--;
 }
 
@@ -395,6 +405,8 @@ copyb(void)
 
 	if (skip() || !(j = getrq()))
 		j = '.';
+	if (j >= 256)
+		maybemore(j, 1);
 	req = j;
 	k = j >> BYTE;
 	j &= BYTEMASK;
@@ -919,6 +931,8 @@ casedi(void)
 		wbt((tchar)0);
 	diflg++;
 	dip = &d[dilev];
+	if (i >= 256)
+		i = maybemore(i, 1);
 	dip->op = finds(i);
 	dip->curd = i;
 	clrmn(oldmn);
@@ -942,6 +956,8 @@ casedt(void)
 		return;
 	skip();
 	dip->dimac = getrq();
+	if (dip->dimac >= 256)
+		dip->dimac = maybemore(dip->dimac, 1);
 }
 
 
