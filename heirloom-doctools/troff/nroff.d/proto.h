@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid %W% (gritter) %G%
+ * Sccsid @(#)proto.h	1.2 (gritter) 8/16/05
  */
 
 /* n10.c */
@@ -21,7 +21,7 @@ void newpage();
 void pttrailer();
 /* n6.c */
 int width(register tchar);
-tchar setch(void);
+tchar setch(int);
 tchar setabs(void);
 int findft(register int);
 void caseps(void);

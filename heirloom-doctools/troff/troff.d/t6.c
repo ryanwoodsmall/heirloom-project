@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.4 (gritter) 8/15/05
+ * Sccsid @(#)t6.c	1.5 (gritter) 8/16/05
  */
 
 /*
@@ -257,7 +257,7 @@ xbits(register tchar i, int bitf)
 	}
 }
 
-tchar setch(void)
+tchar setch(int delim)
 {
 	register int j;
 	char	temp[10];
@@ -269,6 +269,10 @@ tchar setch(void)
 	s = temp;
 	if ((*s++ = getach()) == 0 || (*s++ = getach()) == 0)
 		return(0);
+	if (delim == '[' && getach() != ']') {
+		while (getach() != ']');
+		return(0);
+	}
 	*s = '\0';
 	for (j = 0; j < nchtab; j++)
 		if (strcmp(&chname[chtab[j]], temp) == 0)
