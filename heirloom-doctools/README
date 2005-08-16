@@ -35,7 +35,11 @@ following:
 
 - Another choice is "nroff -Tlocale". This will generate UTF-8 output if
   permitted by the current setting of the LC_CTYPE locale, and the same
-  as "nroff -Tlp" otherwise.
+  as "nroff -Tlp" otherwise. UTF-8 output looks nicer and helps to spot
+  out typesetting errors in manual pages like using "-" instead of "\-",
+  so it is recommended for developers. (End users might prefer to wait
+  some time until more of the many pages which do this wrong have been
+  fixed.)
 
 - Macro names are normally restricted to two characters for compatibility
   with previous versions of nroff. With "nroff -x", long macro names are
@@ -75,4 +79,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						8/15/05
+<gunnarr@acm.org>						8/16/05
