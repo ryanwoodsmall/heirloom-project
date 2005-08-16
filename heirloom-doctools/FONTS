@@ -29,6 +29,15 @@ with this method:
       page that contains the text begins. It is recommended that it is
       put at a place before any text at the top of the input file.
 
+As an example,
+      
+      .\" top of file
+      .supply van_____
+      .afm VA van_____
+      .\" anything
+      .ft VA
+      Here is some text in Monotype Van Dijck Regular.
+
 Making new fonts available is easy with this method. If you buy a
 PostScript font for use with troff, select the Windows version. You
 will get a set of files from your vendor. Only two of them are of
@@ -54,6 +63,6 @@ interest for troff:
       request, troff (actually, dpost) includes the glyph data into
       the .ps output.
 
-That is all.
+That's it.
 
         Gunnar Ritter                                           8/17/05
