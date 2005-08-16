@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.9 (gritter) 8/16/05
+ * Sccsid @(#)dpost.c	1.10 (gritter) 8/17/05
  */
 
 /*
@@ -1455,44 +1455,46 @@ loadfont (
 	return;
 
     if ( s1 == NULL || s1[0] == '\0' )
+	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
+    else sprintf(temp, "%s/afm/%s.afm", s1, s);
+
+    if ( (fin = open(temp, 0)) >= 0 )  {
+	struct afmtab	*a;
+	struct stat	st;
+	char	*contents;
+	if ((a = calloc(1, sizeof *a)) == NULL ||
+			fstat(fin, &st) < 0 ||
+			(contents = malloc(st.st_size+1)) == NULL ||
+			read(fin, contents, st.st_size) != st.st_size) {
+		free(a);
+		close(fin);
+		goto fail;
+	}
+	close(fin);
+	a->path = temp;
+	a->file = s;
+	sprintf(a->Font.intname, "%d", n);
+	if (afmget(a, contents, st.st_size) < 0) {
+		free(a);
+		free(contents);
+		goto fail;
+	}
+	free(contents);
+	fontbase[n] = &a->Font;
+	widthtab[n] = a->fontab;
+	codetab[n] = a->codetab;
+	fitab[n] = a->fitab;
+    	t_fp(n, a->fontname, fontbase[n]->intname, a);
+	goto done;
+    }
+    if ( s1 == NULL || s1[0] == '\0' )
 	sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, s);
     else sprintf(temp, "%s/%s.out", s1, s);
 
     if ( (fin = open(temp, 0)) < 0 )  {
-	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
-        if ( (fin = open(temp, 0)) < 0 )  {
     fail:   sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, mapfont(s));
 	    if ( (fin = open(temp, 0)) < 0 )
 	        error(FATAL, "can't open font table %s", temp);
-	} else {
-		struct afmtab	*a;
-		struct stat	st;
-		char	*contents;
-		if ((a = calloc(1, sizeof *a)) == NULL ||
-				fstat(fin, &st) < 0 ||
-				(contents = malloc(st.st_size+1)) == NULL ||
-				read(fin, contents, st.st_size) != st.st_size) {
-			free(a);
-			close(fin);
-			goto fail;
-		}
-		close(fin);
-		a->path = temp;
-		a->file = s;
-		sprintf(a->Font.intname, "%d", n);
-		if (afmget(a, contents, st.st_size) < 0) {
-			free(a);
-			free(contents);
-			goto fail;
-		}
-		free(contents);
-		fontbase[n] = &a->Font;
-		widthtab[n] = a->fontab;
-		codetab[n] = a->codetab;
-		fitab[n] = a->fitab;
-    		t_fp(n, a->fontname, fontbase[n]->intname, a);
-		goto done;
-	}
     }	/* End if */
 
     if ( fontbase[n] != NULL )		/* something's already there */
@@ -1856,6 +1858,66 @@ t_init(void)
 
 /*****************************************************************************/
 
+static struct supplylist {
+	struct supplylist	*next;
+	char	*name;
+} *supplylist;
+
+void
+t_supply(char *name)		/* supply a font */
+{
+	struct supplylist	*sp;
+
+	sp = calloc(1, sizeof *sp);
+	sp->name = strdup(name);
+	sp->next = supplylist;
+	supplylist = sp;
+}
+
+static void
+supply1(char *name)
+{
+    FILE *fp;
+    char line[4096], *lp, *font;
+    const char comm[] = "%!PS-AdobeFont-1.0:";
+
+    sprintf(temp, "%s/dev%s/pfa/%s.pfa", fontdir, devname, name);
+    if ((fp = fopen(temp, "r")) == NULL)
+	    error(FATAL, "can't open %s", temp);
+    if (fgets(line, sizeof line, fp) == NULL)
+	    error(FATAL, "missing data in %s", temp);
+    if (strncmp(line, comm, strlen(comm)) != 0)
+	    error(FATAL, "file %s does not start with \"%s\"", temp, comm);
+    lp = &line[strlen(comm)];
+    while (*lp == ' ' || *lp == '\t')
+	    lp++;
+    font = lp;
+    while (*lp && *lp != ' ' && *lp != '\t' && *lp != '\n')
+	    lp++;
+    *lp = '\0';
+    fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    while (fgets(line, sizeof line, fp) != NULL)
+	    fputs(line, tf);
+    fclose(fp);
+    fprintf(tf, "%%%%EndResource\n");
+}
+
+static void
+t_dosupply(void)
+{
+	struct supplylist	*sp, *sq = NULL;
+
+	for (sp = supplylist; sp; sp = sp->next) {
+		free(sq);
+		supply1(sp->name);
+		sq = sp;
+	}
+	free(sq);
+	supplylist = NULL;
+}
+
+/*****************************************************************************/
+
 
 void
 t_page (
@@ -1896,6 +1958,9 @@ t_page (
     fprintf(tf, "%s %d %d\n", ENDPAGE, lastpg, printed);
 
     redirect(pg);
+
+    if (supplylist)
+	    t_dosupply();
 
     fprintf(tf, "%s %d %d\n", PAGE, pg, printed+1);
     fprintf(tf, "save\n");
@@ -2219,67 +2284,6 @@ t_slant (
 
 /*****************************************************************************/
 
-static struct supplylist {
-	struct supplylist	*next;
-	char	*name;
-} *supplylist;
-
-void
-t_supply(char *name)		/* supply a font */
-{
-	struct supplylist	*sp;
-
-	sp = calloc(1, sizeof *sp);
-	sp->name = strdup(name);
-	sp->next = supplylist;
-	supplylist = sp;
-}
-
-static void
-supply1(char *name)
-{
-    FILE *fp;
-    char line[4096], *lp, *font;
-    const char comm[] = "%!PS-AdobeFont-1.0:";
-
-    sprintf(temp, "%s/dev%s/pfa/%s.pfa", fontdir, devname, name);
-    if ((fp = fopen(temp, "r")) == NULL)
-	    error(FATAL, "can't open %s", temp);
-    if (fgets(line, sizeof line, fp) == NULL)
-	    error(FATAL, "missing data in %s", temp);
-    if (strncmp(line, comm, strlen(comm)) != 0)
-	    error(FATAL, "file %s does not start with \"%s\"", temp, comm);
-    lp = &line[strlen(comm)];
-    while (*lp == ' ' || *lp == '\t')
-	    lp++;
-    font = lp;
-    while (*lp && *lp != ' ' && *lp != '\t' && *lp != '\n')
-	    lp++;
-    *lp = '\0';
-    fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
-    while (fgets(line, sizeof line, fp) != NULL)
-	    fputs(line, tf);
-    fclose(fp);
-    fprintf(tf, "%%%%EndResource\n");
-}
-
-static void
-t_dosupply(void)
-{
-	struct supplylist	*sp, *sq = NULL;
-
-	endtext();
-	for (sp = supplylist; sp; sp = sp->next) {
-		free(sq);
-		supply1(sp->name);
-		sq = sp;
-	}
-	free(sq);
-	supplylist = NULL;
-}
-
-/*****************************************************************************/
-
 
 void
 t_reset (
@@ -2594,9 +2598,6 @@ oput (
 
     if ( textcount > MAXSTACK )		/* don't put too much on the stack? */
 	endtext();
-
-    if ( supplylist )
-        t_dosupply();
 
     if ( font != lastfont || size != lastsize )
 	t_sf();
