@@ -1,4 +1,4 @@
-Release ...
+Release 050816
 * nroff: A special terminal name, -Tlocale, has been introduced. With this
   option, UTF-8 output is generated if permitted by the current LC_CTYPE
   locale, and regular -Tlp output otherwise.
