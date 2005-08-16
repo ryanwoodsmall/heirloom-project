@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.1 (gritter) 8/16/05
+ * Sccsid @(#)afm.h	1.2 (gritter) 8/17/05
  */
 
 extern struct afmtab {
@@ -39,7 +39,7 @@ extern struct afmtab {
 	int	lineno;
 	int	nchars;
 	int	capheight;
-} *afmtab;
+} **afmtab;
 extern int nafm;
 
 extern int	afmget(struct afmtab *, char *, size_t);

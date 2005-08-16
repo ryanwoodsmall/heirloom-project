@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.6 (gritter) 8/16/05
+ * Sccsid @(#)t10.c	1.7 (gritter) 8/17/05
  */
 
 /*
@@ -79,6 +79,8 @@ int	Unitwidth;
 int	nfonts;
 int	nsizes;
 int	nchtab;
+
+long	realpage;
 
 /* these characters are used as various signals or values
  * in miscellaneous places.
@@ -594,6 +596,8 @@ ptesc(void)
 void
 ptsupply(char *name)
 {
+	if (ascii)
+		return;
 	fdprintf(ptid, "x Psupply %s\n", name);
 }
 
@@ -602,13 +606,17 @@ newpage(int n)	/* called at end of each output page (we hope) */
 {
 	int i;
 
+	realpage++;
 	ptlead();
 	vpos = 0;
 	if (ascii)
 		return;
 	fdprintf(ptid, "p%d\n", n);	/* new page */
 	for (i = 0; i <= nfonts; i++)
-		if (fontbase[i]->namefont && fontbase[i]->namefont[0])
+		if (fontbase[i]->spare1)
+			fdprintf(ptid, "x font %d %s\n", i,
+				afmtab[fontbase[i]->spare1-1]->file);
+		else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
 			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();
 	ptfont();

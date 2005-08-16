@@ -15,9 +15,11 @@ The new method can access PostScript font files directly. It is only
 available with "troff -x". Two requests are available to handle fonts
 with this method:
 
-    .afm yy basename
+    .afm yy basename [register]
       reads metrics from the file "fontdir/afm/basename.afm". The font
-      is then available with ".ft yy", "\f(yy", etc.
+      is then available with ".ft yy", "\f(yy", etc. The optional
+      "register" argument can be used to specify a font position to
+      which this font is to be mounted, as with the ".fp" command.
 
     .supply basename
       causes dpost to include data from "fontdir/pfa/basename.pfa" into
@@ -52,4 +54,4 @@ interest for troff:
 
 That is all.
 
-        Gunnar Ritter                                           8/16/05
+        Gunnar Ritter                                           8/17/05

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.8 (gritter) 8/16/05
+ * Sccsid @(#)t6.c	1.9 (gritter) 8/17/05
  */
 
 /*
@@ -826,7 +826,7 @@ tchar xlss(void)
 	return(HX);
 }
 
-struct afmtab *afmtab;
+struct afmtab **afmtab;
 int nafm;
 extern int Nfont;
 extern void growfonts(int);
@@ -835,11 +835,12 @@ void
 caseafm(void)
 {
 	extern int sprintf(char *, const char *, ...);
+	extern long	realpage;
 	struct stat	st;
-	int	c, i = 0, rq, fd;
+	int	c, i = 0, j, rq, fd;
 	char	*file = NULL, *path, *contents;
 	size_t	sz = 0;
-	struct afmtab	afm;
+	struct afmtab	*a;
 	int	nf = nafm + NFONT + 1;
 
 	skip();
@@ -853,7 +854,10 @@ caseafm(void)
 		file[i++] = c;
 	} while (c && c != ' ' && c != '\n');
 	file[i-1] = 0;
-	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 10);
+	skip();
+	if (j = atoi())
+		nf = j;
+	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 14);
 	sprintf(path, "%s/dev%s/afm/%s.afm", fontfile, devname, file);
 	if ((fd = open(path, O_RDONLY)) < 0) {
 		errprint("Can't open %s", path);
@@ -877,14 +881,14 @@ caseafm(void)
 	}
 	contents[st.st_size] = 0;
 	close(fd);
-	memset(&afm, 0, sizeof afm);
-	afm.path = path;
-	afm.file = file;
-	afm.rq = rq;
-	afm.Font.namefont[0] = rq&0377;
-	afm.Font.namefont[1] = (rq>>8)&0377;
-	sprintf(afm.Font.intname, "%d", nf);
-	if (afmget(&afm, contents, st.st_size) < 0) {
+	a = calloc(1, sizeof *a);
+	a->path = path;
+	a->file = file;
+	a->rq = rq;
+	a->Font.namefont[0] = rq&0377;
+	a->Font.namefont[1] = (rq>>8)&0377;
+	sprintf(a->Font.intname, "%d", nf);
+	if (afmget(a, contents, st.st_size) < 0) {
 		free(file);
 		free(path);
 		free(contents);
@@ -892,18 +896,24 @@ caseafm(void)
 	}
 	free(contents);
 	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
-	afmtab[nafm] = afm;
+	afmtab[nafm] = a;
 	if (nf >= Nfont)
 		growfonts(nf+1);
-	fontbase[nf] = &afmtab[nafm].Font;
+	a->Font.spare1 = nafm+1;
+	if (nf <= NFONT)
+		*fontbase[nf] = afmtab[nafm]->Font;
+	else
+		fontbase[nf] = &afmtab[nafm]->Font;
 	fontlab[nf] = rq;
-	fontab[nf] = afmtab[nafm].fontab;
-	kerntab[nf] = afmtab[nafm].kerntab;
-	codetab[nf] = afmtab[nafm].codetab;
-	fitab[nf] = afmtab[nafm].fitab;
+	fontab[nf] = afmtab[nafm]->fontab;
+	kerntab[nf] = afmtab[nafm]->kerntab;
+	codetab[nf] = afmtab[nafm]->codetab;
+	fitab[nf] = afmtab[nafm]->fitab;
 	nafm++;
-	nfonts++;
-	ptfpcmd(nf, afm.file);
+	if (nf > nfonts)
+		nfonts = nf;
+	if (realpage)
+		ptfpcmd(nf, a->file);
 }
 
 void
