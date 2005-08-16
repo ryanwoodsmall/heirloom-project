@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.15 (gritter) 8/16/05
+ * Sccsid @(#)tdef.h	1.16 (gritter) 8/16/05
  */
 
 /*
@@ -62,6 +62,7 @@
 #	define	VERT	t.Vert
 #	define	INCH	240	/* increments per inch */
 #	define	SPS	INCH/10	/* space size */
+#	define	SES	SPS	/* sentence space size */
 #	define	SS	INCH/10	/* " */
 #	define	TRAILER	0
 #	define	PO	0 /* page offset */
@@ -80,6 +81,7 @@
 #	define	HOR	Hor	/* horizontal resolution in goobies */
 #	define	VERT	Vert	/* vertical resolution in goobies */
 #	define	SPS	(EM/3)	/* space size  */
+#	define	SES	SPS	/* sentence space size */
 #	define	SS	12	/* space size in 36ths of an em */
 #	define	PO	(INCH)	/* page offset 1 inch */
 /* #	define	EM	(POINT * pts) */
@@ -447,6 +449,7 @@ extern const struct numtab initnumtab[];
 
 #define	ics	env._ics
 #define	sps	env._sps
+#define	ses	env._ses
 #define	spacesz	env._spacesz
 #define	lss	env._lss
 #define	lss1	env._lss1
@@ -520,6 +523,7 @@ extern const struct numtab initnumtab[];
 extern struct env {
 	int	_ics;
 	int	_sps;
+	int	_ses;
 	int	_spacesz;
 	int	_lss;
 	int	_lss1;

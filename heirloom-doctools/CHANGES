@@ -4,13 +4,19 @@ Release ...
   locale, and regular -Tlp output otherwise.
 * [nt]roff: A new option, "-x", enables the recognition of extended
   features that may affect compatibility with previous versions. The "-X"
-  option disables these features; this is currently the default.
+  option disables these features; this is currently the default. Note
+  that the features enabled with -x are under development and subject
+  to change.
 * [nt]roff: With the -x option, it is now possible to use ".de", ".ds",
   ".nr", and similar requests with more than two-character name arguments,
   as in ".de longname", and to access such macros later with ".longname",
   strings with "\*[longname]", and number registers with "\n[longname]".
 * [nt]roff: The "\$@" and "\$*" escape sequences to print all arguments
   to a macro are now understood with the -x option.
+* troff: The ".ss" command now accepts a second numeric argument with the
+  -x option. If it is zero, no second space character is printed between
+  sentences. Otherwise, a second space character with the same width as
+  the first one is printed.
 * [nt]roff: The static block list limit NBLIST has been removed, memory
   is now dynamically allocated as needed.
 * [nt]roff: There is no static limit on the number of macros/strings and

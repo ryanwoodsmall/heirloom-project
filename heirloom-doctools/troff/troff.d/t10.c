@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.4 (gritter) 8/15/05
+ * Sccsid @(#)t10.c	1.5 (gritter) 8/16/05
  */
 
 /*
@@ -161,6 +161,7 @@ ptinit(void)
 	 * that now require code to be executed.
 	 */
 	sps = SPS;
+	ses = SES;
 	ics = ICS;
 	for (i = 0; i < 16; i++)
 		tabtab[i] = DTAB * (i + 1);

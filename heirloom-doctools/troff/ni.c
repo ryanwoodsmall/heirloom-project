@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.10 (gritter) 8/16/05
+ * Sccsid @(#)ni.c	1.11 (gritter) 8/16/05
  */
 
 /*
@@ -233,6 +233,7 @@ tchar oline[LNSIZE+1];
 struct	env env = {
 /* int	ics	 */	0,
 /* int	sps	 */	0,
+/* int	ses	 */	0,
 /* int	spacesz	 */	0,
 /* int	lss	 */	0,
 /* int	lss1	 */	0,
