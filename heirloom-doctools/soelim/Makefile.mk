@@ -11,7 +11,8 @@ soelim: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o soelim
 
 install:
-	$(INSTALL) -c -s soelim $(ROOT)$(BINDIR)/soelim
+	$(INSTALL) -c soelim $(ROOT)$(BINDIR)/soelim
+	$(STRIP) $(ROOT)$(BINDIR)/soelim
 	$(INSTALL) -c -m 644 soelim.1b $(ROOT)$(MANDIR)/man1b/soelim.1b
 
 clean:

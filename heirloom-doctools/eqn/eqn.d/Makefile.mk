@@ -23,7 +23,8 @@ e.def: e.c
 
 install:
 	test -d $(ROOT)$(BINDIR) || mkdir -p $(ROOT)$(BINDIR)
-	$(INSTALL) -c -s eqn $(ROOT)$(BINDIR)/eqn
+	$(INSTALL) -c eqn $(ROOT)$(BINDIR)/eqn
+	$(STRIP) $(ROOT)$(BINDIR)/eqn
 	test -d $(ROOT)$(MANDIR)/man1b || mkdir -p $(ROOT)$(MANDIR)/man1b
 	$(INSTALL) -c -m 644 eqn.1b $(ROOT)$(MANDIR)/man1b/eqn.1b
 

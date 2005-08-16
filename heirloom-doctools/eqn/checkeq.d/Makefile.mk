@@ -12,7 +12,8 @@ checkeq: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o checkeq
 
 install:
-	$(INSTALL) -c -s checkeq $(ROOT)$(BINDIR)/checkeq
+	$(INSTALL) -c checkeq $(ROOT)$(BINDIR)/checkeq
+	$(STRIP) $(ROOT)$(BINDIR)/checkeq
 	rm -f $(ROOT)$(MANDIR)/man1b/checkeq.1b
 	ln -s eqn.1b $(ROOT)$(MANDIR)/man1b/checkeq.1b
 

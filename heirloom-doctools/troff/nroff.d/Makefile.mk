@@ -15,7 +15,8 @@ nroff: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o nroff
 
 install:
-	$(INSTALL) -c -s nroff $(ROOT)$(BINDIR)/nroff
+	$(INSTALL) -c nroff $(ROOT)$(BINDIR)/nroff
+	$(STRIP) $(ROOT)$(BINDIR)/nroff
 	$(INSTALL) -c -m 644 nroff.1b $(ROOT)$(MANDIR)/man1b/nroff.1b
 
 clean:

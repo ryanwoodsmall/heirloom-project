@@ -21,7 +21,8 @@ makedev: makedev.o
 	$(CC) $(LDFLAGS) makedev.o $(LIBS) -o $@
 
 install:
-	$(INSTALL) -c -s troff $(ROOT)$(BINDIR)/troff
+	$(INSTALL) -c troff $(ROOT)$(BINDIR)/troff
+	$(STRIP) $(ROOT)$(BINDIR)/troff
 	$(INSTALL) -c -m 644 troff.1b $(ROOT)$(MANDIR)/man1b/troff.1b
 
 clean:

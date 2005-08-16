@@ -22,7 +22,8 @@ e.c: e.y
 e.def: e.c
 
 install:
-	$(INSTALL) -c -s neqn $(ROOT)$(BINDIR)/neqn
+	$(INSTALL) -c neqn $(ROOT)$(BINDIR)/neqn
+	$(STRIP) $(ROOT)$(BINDIR)/neqn
 	rm -f $(ROOT)$(MANDIR)/man1b/neqn.1b
 	ln -s eqn.1b $(ROOT)$(MANDIR)/man1b/neqn.1b
 

@@ -12,7 +12,8 @@ tbl: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o tbl
 
 install:
-	$(INSTALL) -c -s tbl $(ROOT)$(BINDIR)/tbl
+	$(INSTALL) -c tbl $(ROOT)$(BINDIR)/tbl
+	$(STRIP) $(ROOT)$(BINDIR)/tbl
 	$(INSTALL) -c -m 644 tbl.1b $(ROOT)$(MANDIR)/man1b/tbl.1b
 
 clean:

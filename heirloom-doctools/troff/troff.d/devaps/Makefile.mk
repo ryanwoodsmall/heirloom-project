@@ -29,7 +29,8 @@ HM.out: HB.out
 	ln -s HB.out $@
 
 install: all
-	$(INSTALL) -c -s daps $(ROOT)$(BINDIR)/daps
+	$(INSTALL) -c daps $(ROOT)$(BINDIR)/daps
+	$(STRIP) $(ROOT)$(BINDIR)/daps
 	mkdir -p $(ROOT)$(FNTDIR)/devaps
 	for i in *.add *.out version; \
 	do \

@@ -16,7 +16,8 @@ ps_include.h: ps_include.ps ps_include.awk
 	rm -f $@; awk -f ps_include.awk ps_include.ps >$@
 
 install:
-	$(INSTALL) -c -s dpost $(ROOT)$(BINDIR)/dpost
+	$(INSTALL) -c dpost $(ROOT)$(BINDIR)/dpost
+	$(STRIP) $(ROOT)$(BINDIR)/dpost
 
 clean:
 	rm -f $(OBJ) dpost core ps_include.h log *~
