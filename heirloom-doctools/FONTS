@@ -16,12 +16,12 @@ available with "troff -x". Two requests are available to handle fonts
 with this method:
 
     .afm yy basename
-      reads metrics from the file "fontdir/basename.afm". The font is then
-      available with ".ft yy", "\f(yy", etc.
+      reads metrics from the file "fontdir/afm/basename.afm". The font
+      is then available with ".ft yy", "\f(yy", etc.
 
     .supply basename
-      causes dpost to include data from "fontdir/basename.pfa" into the
-      generated PostScript. This is useful to include fonts that have
+      causes dpost to include data from "fontdir/pfa/basename.pfa" into
+      the generated PostScript. This is useful to include fonts that have
       not yet been downloaded into the printer, or for generating PDFs
       with additional fonts.
 
@@ -33,9 +33,9 @@ interest for troff:
     xxxxxxxx.afm
       This is the metrics file. troff accesses it to learn the widths
       of characters in the font. Put this file (or a symbolic link to
-      it) into the directory /usr/ucblib/doctools/font/devpost. Then
-      you can use the ".afm yy xxxxxxxx" request followed by ".ft yy"
-      to select that font in troff.
+      it) into the directory /usr/ucblib/doctools/font/devpost/afm.
+      Then you can use the ".afm yy xxxxxxxx" request followed by
+      ".ft yy" to select that font in troff.
 
     xxxxxxxx.pfb
       This file contains the actual glyph data. troff does not really
@@ -45,8 +45,8 @@ interest for troff:
       .ps file usually contains text. It is thus necessary to convert
       it. Assuming that you have Ghostscript installed, simply execute
       "pfbtopfa xxxxxxxx.pfb xxxxxxxx.pfa". This will generate a .pfa
-      file which you should also put into the troff font directory
-      /usr/ucblib/doctools/font/devpost. With a ".supply xxxxxxxx"
+      file which you should put into the troff font directory
+      /usr/ucblib/doctools/font/devpost/pfa. With a ".supply xxxxxxxx"
       request, troff (actually, dpost) includes the glyph data into
       the .ps output.
 

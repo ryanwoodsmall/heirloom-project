@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.7 (gritter) 8/16/05
+ * Sccsid @(#)t6.c	1.8 (gritter) 8/16/05
  */
 
 /*
@@ -854,7 +854,7 @@ caseafm(void)
 	} while (c && c != ' ' && c != '\n');
 	file[i-1] = 0;
 	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 10);
-	sprintf(path, "%s/dev%s/%s.afm", fontfile, devname, file);
+	sprintf(path, "%s/dev%s/afm/%s.afm", fontfile, devname, file);
 	if ((fd = open(path, O_RDONLY)) < 0) {
 		errprint("Can't open %s", path);
 		free(file);

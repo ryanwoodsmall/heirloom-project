@@ -30,6 +30,10 @@ links: fonts
 
 install: all
 	test -d $(ROOT)$(FNTDIR) || mkdir -p $(ROOT)$(FNTDIR)
+	test -d $(ROOT)$(FNTDIR)/devpost/afm || \
+		mkdir -p $(ROOT)$(FNTDIR)/devpost/afm
+	test -d $(ROOT)$(FNTDIR)/devpost/pfa || \
+		mkdir -p $(ROOT)$(FNTDIR)/devpost/pfa
 	cp -R devpost $(ROOT)$(FNTDIR)
 
 clean:

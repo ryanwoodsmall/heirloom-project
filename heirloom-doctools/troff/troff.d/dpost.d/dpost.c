@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.8 (gritter) 8/16/05
+ * Sccsid @(#)dpost.c	1.9 (gritter) 8/16/05
  */
 
 /*
@@ -1459,7 +1459,7 @@ loadfont (
     else sprintf(temp, "%s/%s.out", s1, s);
 
     if ( (fin = open(temp, 0)) < 0 )  {
-	sprintf(temp, "%s/dev%s/%s.afm", fontdir, devname, s);
+	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
         if ( (fin = open(temp, 0)) < 0 )  {
     fail:   sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, mapfont(s));
 	    if ( (fin = open(temp, 0)) < 0 )
@@ -2242,7 +2242,7 @@ supply1(char *name)
     char line[4096], *lp, *font;
     const char comm[] = "%!PS-AdobeFont-1.0:";
 
-    sprintf(temp, "%s/dev%s/%s.pfa", fontdir, devname, name);
+    sprintf(temp, "%s/dev%s/pfa/%s.pfa", fontdir, devname, name);
     if ((fp = fopen(temp, "r")) == NULL)
 	    error(FATAL, "can't open %s", temp);
     if (fgets(line, sizeof line, fp) == NULL)
