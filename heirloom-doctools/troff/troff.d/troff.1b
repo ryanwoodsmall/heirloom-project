@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.6 (gritter) 8/15/05
+.\" Sccsid @(#)troff.1b	1.7 (gritter) 8/16/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "8/15/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "8/16/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -40,7 +40,7 @@ troff \- (BSD) typeset or format documents
 .ad l
 .nh
 \fB/usr/ucb/troff\fR
-[\fB\-afiz\fR]
+[\fB\-afixXz\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
