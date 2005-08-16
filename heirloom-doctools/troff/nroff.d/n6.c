@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.5 (gritter) 8/16/05
+ * Sccsid @(#)n6.c	1.6 (gritter) 8/16/05
  */
 
 /*
@@ -56,9 +56,9 @@
  * n6.c -- width functions, sizes and fonts
 */
 
-int	bdtab[NFONT+1] ={ 0, 0, 0, 3, 3, 0, };
+int	initbdtab[NFONT+1] ={ 0, 0, 0, 3, 3, 0, };
 int	sbold = 0;
-int	fontlab[NFONT+1] = { 0, 'R', 'I', 'B', PAIR('B','I'), 'S', 0 };
+int	initfontlab[NFONT+1] = { 0, 'R', 'I', 'B', PAIR('B','I'), 'S', 0 };
 
 extern	int	nchtab;
 
@@ -504,3 +504,8 @@ xlss(void)
 		*pbp++ = MOT | VMOT | NMOT | -i;
 	return(HX);
 }
+
+void
+caseafm(void){;}
+void
+casesupply(void){;}

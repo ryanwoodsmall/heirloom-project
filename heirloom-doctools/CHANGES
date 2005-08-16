@@ -1,3 +1,8 @@
+Release ...
+* troff: Can now directly handle .afm/.pfa files (i.e. PostScript fonts)
+  to select fonts with the -x option. New requests ".afm" and ".supply"
+  have been introduced for this. See the file "FONTS" for details.
+
 Release 050816
 * nroff: A special terminal name, -Tlocale, has been introduced. With this
   option, UTF-8 output is generated if permitted by the current LC_CTYPE

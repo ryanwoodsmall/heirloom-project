@@ -1,0 +1,55 @@
+Font handling in troff with PostScript devices
+==============================================
+
+troff understands two ways to select PostScript fonts.
+
+The old method requires font tables to be generated manually. This
+tedious process is described in "troff/troff.d/font/README". It is
+not recommended anymore that this is done for adding fonts, but it
+is still the usual method to select fonts from the PostScript base
+font set. All one- or two character file names in the font directory
+(usually /usr/ucblib/doctools/font/devpost) represent fonts that can
+be used with the ".fp" and ".ft" requests.
+
+The new method can access PostScript font files directly. It is only
+available with "troff -x". Two requests are available to handle fonts
+with this method:
+
+    .afm yy basename
+      reads metrics from the file "fontdir/basename.afm". The font is then
+      available with ".ft yy", "\f(yy", etc.
+
+    .supply basename
+      causes dpost to include data from "fontdir/basename.pfa" into the
+      generated PostScript. This is useful to include fonts that have
+      not yet been downloaded into the printer, or for generating PDFs
+      with additional fonts.
+
+Making new fonts available is easy with this method. If you buy a
+PostScript font for use with troff, select the Windows version. You
+will get a set of files from your vendor. Only two of them are of
+interest for troff:
+
+    xxxxxxxx.afm
+      This is the metrics file. troff accesses it to learn the widths
+      of characters in the font. Put this file (or a symbolic link to
+      it) into the directory /usr/ucblib/doctools/font/devpost. Then
+      you can use the ".afm yy xxxxxxxx" request followed by ".ft yy"
+      to select that font in troff.
+
+    xxxxxxxx.pfb
+      This file contains the actual glyph data. troff does not really
+      need this file, but your printer or PDF converter does. In many
+      cases, it is most convenient to include the data directly into
+      the .ps file generated. A .pfb file contains binary data, but a
+      .ps file usually contains text. It is thus necessary to convert
+      it. Assuming that you have Ghostscript installed, simply execute
+      "pfbtopfa xxxxxxxx.pfb xxxxxxxx.pfa". This will generate a .pfa
+      file which you should also put into the troff font directory
+      /usr/ucblib/doctools/font/devpost. With a ".supply xxxxxxxx"
+      request, troff (actually, dpost) includes the glyph data into
+      the .ps output.
+
+That is all.
+
+        Gunnar Ritter                                           8/16/05

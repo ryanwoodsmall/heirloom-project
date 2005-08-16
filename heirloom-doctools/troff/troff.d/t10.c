@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.5 (gritter) 8/16/05
+ * Sccsid @(#)t10.c	1.6 (gritter) 8/16/05
  */
 
 /*
@@ -46,12 +46,15 @@
  * contributors.
  */
 
+#include <stdlib.h>
 #include "tdef.h"
 #include <ctype.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include "ext.h"
+#include "dev.h"
+#include "afm.h"
 #include "proto.h"
 /*
  * troff10.c
@@ -64,10 +67,10 @@ int	hpos	 = 0;	/* ditto horizontal */
 
 short	*chtab;
 char	*chname;
-char	*fontab[NFONT+1];
-char	*kerntab[NFONT+1];
-char	*fitab[NFONT+1];
-char	*codetab[NFONT+1];
+char	**fontab;
+char	**kerntab;
+char	**fitab;
+char	**codetab;
 
 int	Inch;
 int	Hor;
@@ -99,9 +102,37 @@ int	c_boxrule;
 int	c_lefthand;
 int	c_dagger;
 
-#include "dev.h"
 struct dev dev;
-struct Font *fontbase[NFONT+1];
+struct Font **fontbase;
+
+extern int *cstab;
+extern int *ccstab;
+
+int Nfont;
+
+void
+growfonts(int n)
+{
+	fontbase = realloc(fontbase, n * sizeof *fontbase);
+	memset(&fontbase[Nfont], 0, (n - Nfont) * sizeof *fontbase);
+	fontab = realloc(fontab, n * sizeof *fontab);
+	memset(&fontab[Nfont], 0, (n - Nfont) * sizeof *fontab);
+	kerntab = realloc(kerntab, n * sizeof *kerntab);
+	memset(&kerntab[Nfont], 0, (n - Nfont) * sizeof *kerntab);
+	codetab = realloc(codetab, n * sizeof *codetab);
+	memset(&codetab[Nfont], 0, (n - Nfont) * sizeof *codetab);
+	fitab = realloc(fitab, n * sizeof *fitab);
+	memset(&fitab[Nfont], 0, (n - Nfont) * sizeof *fitab);
+	fontlab = realloc(fontlab, n * sizeof *fontlab);
+	memset(&fontlab[Nfont], 0, (n - Nfont) * sizeof *fontlab);
+	cstab = realloc(cstab, n * sizeof *cstab);
+	memset(&cstab[Nfont], 0, (n - Nfont) * sizeof *cstab);
+	ccstab = realloc(ccstab, n * sizeof *ccstab);
+	memset(&ccstab[Nfont], 0, (n - Nfont) * sizeof *ccstab);
+	bdtab = realloc(bdtab, n * sizeof *bdtab);
+	memset(&bdtab[Nfont], 0, (n - Nfont) * sizeof *bdtab);
+	Nfont = n;
+}
 
 void
 ptinit(void)
@@ -109,6 +140,7 @@ ptinit(void)
 	int	i, fin, nw;
 	char	*filebase, *p;
 
+	growfonts(NFONT+1);
 	/* open table for device,
 	 * read in resolution, size info, font info, etc.
 	 * and set params
@@ -557,6 +589,12 @@ ptesc(void)
 	} else
 		fdprintf(ptid, "H%d\n", hpos);
 	esc = 0;
+}
+
+void
+ptsupply(char *name)
+{
+	fdprintf(ptid, "x Psupply %s\n", name);
 }
 
 void

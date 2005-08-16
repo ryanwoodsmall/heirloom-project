@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.6 (gritter) 8/16/05
+ * Sccsid @(#)t6.c	1.7 (gritter) 8/16/05
  */
 
 /*
@@ -60,21 +60,22 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "ext.h"
+#include "afm.h"
 #include "proto.h"
 
 /* fitab[f][c] is 0 if c is not on font f */
 	/* if it's non-zero, c is in fontab[f] at position
 	 * fitab[f][c].
 	 */
-extern	struct Font *fontbase[NFONT+1];
-extern	char *codetab[NFONT+1];
+extern	struct Font **fontbase;
+extern	char **codetab;
 extern int nchtab;
 
-int	fontlab[NFONT+1];
+int	*fontlab;
 short	*pstab;
-int	cstab[NFONT+1];
-int	ccstab[NFONT+1];
-int	bdtab[NFONT+1];
+int	*cstab;
+int	*ccstab;
+int	*bdtab;
 int	sbold = 0;
 
 int
@@ -823,4 +824,102 @@ tchar xlss(void)
 	else
 		*pbp++ = MOT | VMOT | NMOT | -i;
 	return(HX);
+}
+
+struct afmtab *afmtab;
+int nafm;
+extern int Nfont;
+extern void growfonts(int);
+
+void
+caseafm(void)
+{
+	extern int sprintf(char *, const char *, ...);
+	struct stat	st;
+	int	c, i = 0, rq, fd;
+	char	*file = NULL, *path, *contents;
+	size_t	sz = 0;
+	struct afmtab	afm;
+	int	nf = nafm + NFONT + 1;
+
+	skip();
+	if ((rq = getrq()) == 0)
+		return;
+	skip();
+	do {
+		c = getach() & 0377;
+		if (i >= sz)
+			file = realloc(file, (sz += 8) * sizeof *file);
+		file[i++] = c;
+	} while (c && c != ' ' && c != '\n');
+	file[i-1] = 0;
+	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 10);
+	sprintf(path, "%s/dev%s/%s.afm", fontfile, devname, file);
+	if ((fd = open(path, O_RDONLY)) < 0) {
+		errprint("Can't open %s", path);
+		free(file);
+		free(path);
+		return;
+	}
+	if (fstat(fd, &st) < 0) {
+		errprint("Can't stat %s", path);
+		free(file);
+		free(path);
+		return;
+	}
+	contents = malloc(st.st_size + 1);
+	if (read(fd, contents, st.st_size) != st.st_size) {
+		errprint("Can't read %s", path);
+		free(file);
+		free(path);
+		free(contents);
+		return;
+	}
+	contents[st.st_size] = 0;
+	close(fd);
+	memset(&afm, 0, sizeof afm);
+	afm.path = path;
+	afm.file = file;
+	afm.rq = rq;
+	afm.Font.namefont[0] = rq&0377;
+	afm.Font.namefont[1] = (rq>>8)&0377;
+	sprintf(afm.Font.intname, "%d", nf);
+	if (afmget(&afm, contents, st.st_size) < 0) {
+		free(file);
+		free(path);
+		free(contents);
+		return;
+	}
+	free(contents);
+	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
+	afmtab[nafm] = afm;
+	if (nf >= Nfont)
+		growfonts(nf+1);
+	fontbase[nf] = &afmtab[nafm].Font;
+	fontlab[nf] = rq;
+	fontab[nf] = afmtab[nafm].fontab;
+	kerntab[nf] = afmtab[nafm].kerntab;
+	codetab[nf] = afmtab[nafm].codetab;
+	fitab[nf] = afmtab[nafm].fitab;
+	nafm++;
+	nfonts++;
+	ptfpcmd(nf, afm.file);
+}
+
+void
+casesupply(void)
+{
+	int	c, i = 0, sz = 0;
+	char	*file = NULL;
+
+	skip();
+	do {
+		c = getach() & 0377;
+		if (i >= sz)
+			file = realloc(file, (sz += 8) * sizeof *file);
+		file[i++] = c;
+	} while (c && c != ' ' && c != '\n');
+	file[i-1] = 0;
+	ptsupply(file);
+	free(file);
 }

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.16 (gritter) 8/16/05
+ * Sccsid @(#)tdef.h	1.17 (gritter) 8/16/05
  */
 
 /*
@@ -157,7 +157,7 @@
 
 /* array sizes, and similar limits: */
 
-#define	NFONT	10	/* maximum number of fonts (including specials) */
+#define	NFONT	10	/* maximum number of fonts (including specials, !afm) */
 #define	EXTRAFONT 500	/* extra space for swapping a font */
 extern	int	NN;	/* number registers */
 #define	NNAMES	15	 /* predefined reg names */

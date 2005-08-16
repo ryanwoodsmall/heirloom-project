@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.7 (gritter) 8/13/05
+ * Sccsid @(#)dpost.c	1.8 (gritter) 8/16/05
  */
 
 /*
@@ -266,6 +266,8 @@
  */
 
 
+#include	<sys/types.h>
+#include	<sys/stat.h>
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
@@ -282,6 +284,7 @@
 #include	"ext.h"			/* external variable definitions */
 #include	"dev.h"			/* typesetter and font descriptions */
 #include	"dpost.h"		/* a few definitions just used here */
+#include	"afm.h"
 
 
 char		*prologue = DPOST;	/* the basic PostScript prologue */
@@ -436,6 +439,7 @@ int		lastend;		/* where last character on this line was */
 
 struct  {
 
+	struct afmtab	*afm;		/* AFM data, if any */
 	char	*name;			/* name of the font loaded here */
 	int	number;			/* its internal number */
 
@@ -1304,6 +1308,13 @@ devcntrl(
 		t_slant(n);
 		break;
 
+	case 'P':			/* additional PostScript features */
+		if (strcmp(&str[1], "supply") == 0) {
+			fscanf(fp, "%s", str);
+			t_supply(str);
+		}
+		break;
+
 	case 'X':			/* copy through - from troff */
 		fscanf(fp, " %[^: \n]:", str);
 		fgets(buf, sizeof(buf), fp);
@@ -1448,9 +1459,40 @@ loadfont (
     else sprintf(temp, "%s/%s.out", s1, s);
 
     if ( (fin = open(temp, 0)) < 0 )  {
-	sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, mapfont(s));
-	if ( (fin = open(temp, 0)) < 0 )
-	    error(FATAL, "can't open font table %s", temp);
+	sprintf(temp, "%s/dev%s/%s.afm", fontdir, devname, s);
+        if ( (fin = open(temp, 0)) < 0 )  {
+    fail:   sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, mapfont(s));
+	    if ( (fin = open(temp, 0)) < 0 )
+	        error(FATAL, "can't open font table %s", temp);
+	} else {
+		struct afmtab	*a;
+		struct stat	st;
+		char	*contents;
+		if ((a = calloc(1, sizeof *a)) == NULL ||
+				fstat(fin, &st) < 0 ||
+				(contents = malloc(st.st_size+1)) == NULL ||
+				read(fin, contents, st.st_size) != st.st_size) {
+			free(a);
+			close(fin);
+			goto fail;
+		}
+		close(fin);
+		a->path = temp;
+		a->file = s;
+		sprintf(a->Font.intname, "%d", n);
+		if (afmget(a, contents, st.st_size) < 0) {
+			free(a);
+			free(contents);
+			goto fail;
+		}
+		free(contents);
+		fontbase[n] = &a->Font;
+		widthtab[n] = a->fontab;
+		codetab[n] = a->codetab;
+		fitab[n] = a->fitab;
+    		t_fp(n, a->fontname, fontbase[n]->intname, a);
+		goto done;
+	}
     }	/* End if */
 
     if ( fontbase[n] != NULL )		/* something's already there */
@@ -1471,8 +1513,9 @@ loadfont (
     codetab[n] = (char *) widthtab[n] + 2 * nw;
     fitab[n] = (char *) widthtab[n] + 3 * nw;
 
-    t_fp(n, fontbase[n]->namefont, fontbase[n]->intname);
+    t_fp(n, fontbase[n]->namefont, fontbase[n]->intname, NULL);
 
+done:
     if ( debug == ON )
 	fontprint(n);
 
@@ -1961,7 +2004,8 @@ void
 t_fp (
     int n,			/* this position */
     char *s,			/* now has this font mounted */
-    char *si			/* its internal number */
+    char *si,			/* its internal number */
+    void *a
 )
 
 
@@ -1980,6 +2024,7 @@ t_fp (
 
     fontname[n].name = s;
     fontname[n].number = atoi(si);
+    fontname[n].afm = a;
 
     if ( n == lastfont )		/* force a call to t_sf() */
 	lastfont = -1;
@@ -2114,7 +2159,8 @@ t_sf(void)
 	seenfonts[fnum] = 1;
     }	/* End if */
 
-    fprintf(tf, "%d %s f\n", pstab[size-1], fontname[font].name);
+    fprintf(tf, "%d %s%s f\n", pstab[size-1], fontname[font].afm ? "/" : "",
+		    fontname[font].name);
 
     if ( fontheight != 0 || fontslant != 0 )
 	fprintf(tf, "%d %d changefont\n", fontslant, (fontheight != 0) ? fontheight : pstab[size-1]);
@@ -2171,6 +2217,66 @@ t_slant (
 
 }   /* End of t_slant */
 
+/*****************************************************************************/
+
+static struct supplylist {
+	struct supplylist	*next;
+	char	*name;
+} *supplylist;
+
+void
+t_supply(char *name)		/* supply a font */
+{
+	struct supplylist	*sp;
+
+	sp = calloc(1, sizeof *sp);
+	sp->name = strdup(name);
+	sp->next = supplylist;
+	supplylist = sp;
+}
+
+static void
+supply1(char *name)
+{
+    FILE *fp;
+    char line[4096], *lp, *font;
+    const char comm[] = "%!PS-AdobeFont-1.0:";
+
+    sprintf(temp, "%s/dev%s/%s.pfa", fontdir, devname, name);
+    if ((fp = fopen(temp, "r")) == NULL)
+	    error(FATAL, "can't open %s", temp);
+    if (fgets(line, sizeof line, fp) == NULL)
+	    error(FATAL, "missing data in %s", temp);
+    if (strncmp(line, comm, strlen(comm)) != 0)
+	    error(FATAL, "file %s does not start with \"%s\"", temp, comm);
+    lp = &line[strlen(comm)];
+    while (*lp == ' ' || *lp == '\t')
+	    lp++;
+    font = lp;
+    while (*lp && *lp != ' ' && *lp != '\t' && *lp != '\n')
+	    lp++;
+    *lp = '\0';
+    fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    while (fgets(line, sizeof line, fp) != NULL)
+	    fputs(line, tf);
+    fclose(fp);
+    fprintf(tf, "%%%%EndResource\n");
+}
+
+static void
+t_dosupply(void)
+{
+	struct supplylist	*sp, *sq = NULL;
+
+	endtext();
+	for (sp = supplylist; sp; sp = sp->next) {
+		free(sq);
+		supply1(sp->name);
+		sq = sp;
+	}
+	free(sq);
+	supplylist = NULL;
+}
 
 /*****************************************************************************/
 
@@ -2488,6 +2594,9 @@ oput (
 
     if ( textcount > MAXSTACK )		/* don't put too much on the stack? */
 	endtext();
+
+    if ( supplylist )
+        t_dosupply();
 
     if ( font != lastfont || size != lastsize )
 	t_sf();
@@ -2950,8 +3059,8 @@ documentfonts(void)
     sprintf(temp, "%s/dev%s/%s.name", fontdir, realdev, fontname[font].name);
 
     if ( (fp_in = fopen(temp, "r")) != NULL )  {
-	if ( (fp_out = fopen(temp_file, "a")) != NULL )  {
-	    if ( fscanf(fp_in, "%s", temp) == 1 )  {
+	if ( fscanf(fp_in, "%s", temp) == 1 )  {
+    print:  if ( (fp_out = fopen(temp_file, "a")) != NULL )  {
 		if ( docfonts++ == 0 )
 		    fprintf(fp_out, "%s", DOCUMENTFONTS);
 		else if ( (docfonts - 1) % 8  == 0 )
@@ -2960,7 +3069,11 @@ documentfonts(void)
 	    }	/* End if */
 	    fclose(fp_out);
 	}   /* End if */
-	fclose(fp_in);
+	if (fp_in != NULL)
+	    fclose(fp_in);
+    } else if (fontname[font].afm != NULL){
+	strcpy(temp, fontname[font].afm->fontname);
+	goto print;
     }	/* End if */
 
 }   /* End of documentfonts */

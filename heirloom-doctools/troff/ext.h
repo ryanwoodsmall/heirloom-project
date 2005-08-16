@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.8 (gritter) 8/15/05
+ * Sccsid @(#)ext.h	1.9 (gritter) 8/16/05
  */
 
 /*
@@ -50,9 +50,9 @@ extern	char	**argp;
 extern	char	*chname;
 extern	char	*eibuf;
 extern	char	*enda;
-extern	char	*fitab[];
-extern	char	*fontab[];
-extern	char	*kerntab[];
+extern	char	**fitab;
+extern	char	**fontab;
+extern	char	**kerntab;
 extern	char	*ibufp;
 extern	char	*obufp;
 extern	char	*unlkp;
@@ -80,7 +80,7 @@ extern	short	*pstab;
 extern	int	app;
 extern	int	ascii;
 extern	int	bd;
-extern	int	bdtab[];
+extern	int	*bdtab;
 extern	int	ccs;
 extern	int	copyf;
 extern	int	cs;
@@ -103,7 +103,7 @@ extern	int	evi;
 extern	int	evlist[EVLSZ];
 extern	int	fc;
 extern	int	flss;
-extern	int	fontlab[];
+extern	int	*fontlab;
 extern	int	gflag;
 extern	int	hflg;
 extern	int	ibf;

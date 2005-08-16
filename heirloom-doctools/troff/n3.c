@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.15 (gritter) 8/15/05
+ * Sccsid @(#)n3.c	1.16 (gritter) 8/16/05
  */
 
 /*
@@ -81,11 +81,12 @@ int	strflg;
 #endif
 
 static int	getls(int);
+static void	addcon(int, char *, void(*)(int));
 
 void *
 growcontab(void)
 {
-	int	i, inc = 130;
+	int	i, inc = 256;
 	struct contab	*onc;
 
 	onc = contab;
@@ -95,6 +96,8 @@ growcontab(void)
 	if (NM == 0) {
 		for (i = 0; initcontab[i].f; i++)
 			contab[i] = initcontab[i];
+		addcon(i++, "afm", (void(*)(int))caseafm);
+		addcon(i++, "supply", (void(*)(int))casesupply);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
@@ -1184,4 +1187,16 @@ getls(int termc)
 	not:	n = -1;
 	free(buf);
 	return n >= 0 ? 0200000 + n : 0;
+}
+
+static void
+addcon(int t, char *rs, void(*f)(int))
+{
+	int	n = hadn;
+
+	if (hadn++ >= alcd)
+		had = realloc(had, (alcd += 20) * sizeof *had);
+	had[n] = rs;
+	contab[t].rq = 0200000 + n;
+	contab[t].f = f;
 }

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.16 (gritter) 8/16/05
+ * Sccsid @(#)n10.c	1.17 (gritter) 8/16/05
  */
 
 /*
@@ -81,6 +81,8 @@ char	*chname = xchname;
 short	*chtab = xchtab;
 int	nchtab = 0;
 
+int	*bdtab;
+int	*fontlab;
 
 int	Inch;
 int	Hor;
@@ -443,7 +445,10 @@ ptinit(void)
 	int nread, fd;
 	struct stat stbuf;
 	char check[50];
+	extern int initbdtab[], initfontlab[];
 
+	bdtab = initbdtab;
+	fontlab = initfontlab;
 	strcat(termtab, devname);
 	if (strcmp(devname, "locale") == 0) {
 #ifdef	EUC

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.3 (gritter) 8/9/05
+ * Sccsid @(#)misc.c	1.4 (gritter) 8/16/05
  */
 
 /*
@@ -98,6 +98,18 @@ error(int kind, char *mesg, ...)
 
 
 /*****************************************************************************/
+/* for the AFM handling functions from troff */
+void
+errprint(char *fmt, ...)
+{
+	va_list	ap;
+
+	fprintf(stderr, "%s: ", prog_name);
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	putc('\n', stderr);
+}
 
 /*****************************************************************************/
 
