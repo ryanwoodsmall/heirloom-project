@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.2 (gritter) 8/17/05
+ * Sccsid @(#)afm.c	1.3 (gritter) 8/17/05
  */
 
 #include <stdlib.h>
@@ -128,7 +128,7 @@ addmetrics(struct afmtab *a, char *_line)
 					*lp != ' ' && *lp != '\t' &&
 					*lp != ';'; lp++);
 			c = *lp;
-			*lp = 0;
+			*lp++ = 0;
 			if (c == ';')
 				continue;
 			break;
@@ -138,6 +138,21 @@ addmetrics(struct afmtab *a, char *_line)
 			B[1] = strtol(xp, &xp, 10);
 			B[2] = strtol(xp, &xp, 10);
 			B[3] = strtol(xp, &xp, 10);
+			break;
+		case 'L':
+			if (C == 'f') {
+				xp = &lp[1];
+				while (*xp == ' ' || *xp == '\t')
+					xp++;
+				switch (*xp) {
+				case 'i':
+					a->Font.ligfont |= LFI;
+					break;
+				case 'l':
+					a->Font.ligfont |= LFL;
+					break;
+				}
+			}
 			break;
 		default:
 			lp++;
@@ -171,7 +186,11 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	int	n = 0;
 
 	a->lineno = 1;
-	for (cp = contents; cp < &contents[size]; cp++) {
+	for (cp = contents; cp < &contents[size]; a->lineno++, cp++) {
+		while (*cp == ' ' || *cp == '\t' || *cp == '\r')
+			cp++;
+		if (*cp == '\n')
+			continue;
 		if (state == NONE && thisword(cp, "StartFontMetrics"))
 			state = FONTMETRICS;
 		else if (state == FONTMETRICS && thisword(cp, "EndFontMetrics"))
@@ -203,7 +222,6 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			state = FONTMETRICS;
 		while (cp < &contents[size] && *cp != '\n')
 			cp++;
-		a->lineno++;
 	}
 	if (a->fontname == NULL) {
 		errprint("Missing \"FontName\" in %s", a->path);
