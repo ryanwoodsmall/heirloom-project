@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.7 (gritter) 8/17/05
+ * Sccsid @(#)t10.c	1.9 (gritter) 8/17/05
  */
 
 /*
@@ -188,6 +188,7 @@ ptinit(void)
 		p += 3 * nw + dev.nchtab + 128 - 32;
 	}
 	fontbase[0] = (struct Font *) p;	/* the last shall be first */
+	memset(fontbase[0], 0, sizeof *fontbase[0]);
 	fontbase[0]->nwfont = EXTRAFONT - dev.nchtab - (128-32) - sizeof (struct Font);
 	fontab[0] = p + sizeof (struct Font);
 	close(fin);
@@ -615,7 +616,7 @@ newpage(int n)	/* called at end of each output page (we hope) */
 	for (i = 0; i <= nfonts; i++)
 		if (fontbase[i]->spare1)
 			fdprintf(ptid, "x font %d %s\n", i,
-				afmtab[fontbase[i]->spare1-1]->file);
+				afmtab[fontbase[i]->spare1-1&BYTEMASK]->file);
 		else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
 			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();

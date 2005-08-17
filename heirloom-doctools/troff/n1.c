@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.17 (gritter) 8/16/05
+ * Sccsid @(#)n1.c	1.18 (gritter) 8/17/05
  */
 
 /*
@@ -68,11 +68,9 @@ char *xxxvers = "@(#)roff:n1.c	2.13";
 #include <stdarg.h>
 #include <unistd.h>
 #ifdef 	EUC
-#ifdef	NROFF
 #include <stddef.h>
 #include <limits.h>
 #include <wchar.h>
-#endif	/* NROFF */
 #endif	/* EUC */
 
 #include "tdef.h"
@@ -94,11 +92,9 @@ char	cfname[NSO+1][NS];	/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
 char	*progname;	/* program name (troff) */
 #ifdef	EUC
-#ifdef	NROFF
 char	mbbuf1[MB_LEN_MAX + 1];
 char	*mbbuf1p = mbbuf1;
 wchar_t	twc = 0;
-#endif	/* NROFF */
 #endif	/* EUC */
 
 static void printn(long, long);
@@ -139,9 +135,7 @@ main(int argc, char **argv)
 	nrehash();
 	init0();
 #ifdef EUC
-#ifdef NROFF
-	(void)localize();
-#endif /* NROFF */
+	localize();
 #endif /* EUC */
 	if ((p = getenv("TYPESETTER")) != 0)
 		strcpy(devname, p);
@@ -1020,8 +1014,8 @@ tchar getch0(void)
 	register int	j;
 	register tchar i;
 #ifdef	EUC
-#ifdef	NROFF
 	register int	n;
+#ifdef	NROFF
 	int col_index;
 #endif	/* NROFF */
 #endif	/* EUC */
@@ -1072,8 +1066,32 @@ g2:
 		if (i >= 040 && i < 0177)
 #else
 #ifndef	NROFF
-		i = *ibufp++ & 0177;
+		i = *ibufp++ & 0377;
 		ioff++;
+		*mbbuf1p++ = i;
+		*mbbuf1p = 0;
+		if (multi_locale && (*mbbuf1&~(wchar_t)0177)) {
+			mbstate_t	state;
+			memset(&state, 0, sizeof state);
+			if ((n = mbrtowc(&twc, mbbuf1, mbbuf1p-mbbuf1, &state))
+					==(size_t)-1) {
+				mbbuf1p = mbbuf1;
+				*mbbuf1p = 0;
+				i &= 0177;
+			} else if (n == (size_t)-2)
+				goto again;
+			else {
+				mbbuf1p = mbbuf1;
+				*mbbuf1p = 0;
+				if ((i = mapwc(twc)) != 0)
+					goto g4;
+			}
+		} else {
+			mbbuf1p = mbbuf1;
+			*mbbuf1p = 0;
+			if (!raw)
+				i &= 0177;
+		}
 		if (i >= 040 && i < 0177)
 #else
 		i = *ibufp++ & 0377;

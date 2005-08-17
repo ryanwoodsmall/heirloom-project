@@ -1,9 +1,9 @@
 VPATH=..
 OBJ = t10.o t6.o hytab.o n1.o n2.o n3.o n4.o n5.o \
-	n7.o n8.o n9.o ni.o nii.o suftab.o afm.o \
+	n7.o n8.o n9.o ni.o nii.o suftab.o afm.o unimap.o \
 	mapmalloc.o version.o
 
-FLAGS = -DUSG -DINCORE -I. -I.. -DMACDIR='"$(MACDIR)"' \
+FLAGS = -DUSG -DINCORE $(EUC) -I. -I.. -DMACDIR='"$(MACDIR)"' \
 	-DFNTDIR='"$(FNTDIR)"' -DTABDIR='"$(TABDIR)"'
 
 .c.o:
@@ -33,7 +33,8 @@ mrproper: clean
 draw.o: draw.c
 makedev.o: makedev.c dev.h
 t10.o: t10.c ../tdef.h ../ext.h dev.h afm.h
-t6.o: t6.c ../tdef.h dev.h ../ext.h afm.h
+t6.o: t6.c ../tdef.h dev.h ../ext.h afm.h unimap.h
+unimap.o: unimap.h
 ta.o: ta.c dev.h
 hytab.o: ../hytab.c
 mapmalloc.o: ../mapmalloc.c
@@ -45,7 +46,7 @@ n5.o: ../n5.c ../tdef.h ../ext.h
 n7.o: ../n7.c ../tdef.h ./proto.h ../ext.h
 n8.o: ../n8.c ../tdef.h ../ext.h
 n9.o: ../n9.c ../tdef.h ./proto.h ../ext.h
-ni.o: ../ni.c ../tdef.h
+ni.o: ../ni.c ../tdef.h ./proto.h
 nii.o: ../nii.c ../tdef.h ./proto.h ../ext.h
 suftab.o: ../suftab.c
 version.o: ../version.c

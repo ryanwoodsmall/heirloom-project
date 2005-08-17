@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.3 (gritter) 8/17/05
+ * Sccsid @(#)afm.c	1.5 (gritter) 8/17/05
  */
 
 #include <stdlib.h>
@@ -72,6 +72,24 @@ mapname(const char *psname)
 	return 0;
 }
 
+/*
+ * After all characters have been read, construct a font-specific
+ * encoding for the rest.
+ */
+static void
+remap(struct afmtab *a)
+{
+	int	i, j = 128 - 32;
+
+	for (i = 1; i < a->nchars; i++) {
+		if (a->codetab[i] == -1 && a->nametab[i] != NULL) {
+			while (a->fitab[j] != 0)
+				j++;
+			a->fitab[j] = i;
+		}
+	}
+}
+
 static char *
 thisword(const char *text, const char *wrd)
 {
@@ -89,11 +107,12 @@ thisword(const char *text, const char *wrd)
 }
 
 static void
-addchar(struct afmtab *a, int C, int tp, int WX, int B[4])
+addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 {
 	a->fontab = realloc(a->fontab, (a->nchars+1) * sizeof *a->fontab);
 	a->kerntab = realloc(a->kerntab, (a->nchars+1) * sizeof *a->kerntab);
 	a->codetab = realloc(a->codetab, (a->nchars+1) * sizeof *a->codetab);
+	a->nametab = realloc(a->nametab, (a->nchars+1) * sizeof *a->nametab);
 	a->fontab[a->nchars] = WX / dev.unitwidth +
 		(WX % dev.unitwidth >= dev.unitwidth / 2);
 	if (B[1] < -dev.unitwidth)
@@ -101,7 +120,13 @@ addchar(struct afmtab *a, int C, int tp, int WX, int B[4])
 	if (B[3] > a->capheight)
 		a->kerntab[a->nchars] |= 2;
 	a->codetab[a->nchars] = C;
-	a->fitab[tp - 32] = a->nchars;
+	if (tp >= 32)
+		a->fitab[tp - 32] = a->nchars;
+	if (N) {
+		a->nametab[a->nchars] = malloc(strlen(N) + 1);
+		strcpy(a->nametab[a->nchars], N);
+	} else
+		a->nametab[a->nchars] = 0;
 	a->nchars++;
 }
 
@@ -166,12 +191,12 @@ addmetrics(struct afmtab *a, char *_line)
 				lp++;
 		}
 	}
-	if (C == -1 || N == NULL || a->nchars > 255)
+	if (N == NULL)
 		return;
-	if (C > 32 && C < 127)
-		addchar(a, C, C, WX, B);
+	if (C < 0 || C > 32)
+		addchar(a, C, C, WX, B, N);
 	if ((tp = mapname(N)) != 0)
-		addchar(a, C, tp, WX, B);
+		addchar(a, C, tp, WX, B, NULL);
 }
 
 int
@@ -209,11 +234,16 @@ afmget(struct afmtab *a, char *contents, size_t size)
 				(th = thisword(cp, "StartCharMetrics")) != 0) {
 			n = strtol(th, NULL, 10);
 			state = CHARMETRICS;
-			a->fitab = calloc(n + 128 - 32, sizeof *a->fitab);
+			a->fitab = calloc(n + 128 - 32 + nchtab,
+					sizeof *a->fitab);
 			a->fontab = malloc(sizeof *a->fontab);
-			a->kerntab = malloc(sizeof *a->kerntab);
-			a->codetab = malloc(sizeof *a->codetab);
 			a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
+			a->kerntab = malloc(sizeof *a->kerntab);
+			a->kerntab[0] = 0;
+			a->codetab = malloc(sizeof *a->codetab);
+			a->codetab[0] = 0;
+			a->nametab = malloc(sizeof *a->nametab);
+			a->nametab[0] = 0;
 			a->nchars = 1;
 		} else if (state == CHARMETRICS && n-- > 0) {
 			addmetrics(a, cp);
@@ -227,6 +257,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		errprint("Missing \"FontName\" in %s", a->path);
 		return -1;
 	}
-	a->Font.nwfont = a->nchars;
+	remap(a);
+	a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
 	return 0;
 }

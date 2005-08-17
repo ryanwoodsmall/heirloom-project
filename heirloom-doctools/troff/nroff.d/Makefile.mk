@@ -36,7 +36,7 @@ n5.o: ../n5.c ../tdef.h ../ext.h
 n7.o: ../n7.c ../tdef.h ./proto.h ../ext.h
 n8.o: ../n8.c ../tdef.h ../ext.h
 n9.o: ../n9.c ../tdef.h ./proto.h ../ext.h
-ni.o: ../ni.c ../tdef.h
+ni.o: ../ni.c ../tdef.h ./proto.h
 nii.o: ../nii.c ../tdef.h ./proto.h ../ext.h
 suftab.o: ../suftab.c
 version.o: ../version.c

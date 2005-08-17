@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.7 (gritter) 8/16/05
+.\" Sccsid @(#)troff.1b	1.8 (gritter) 8/17/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "8/16/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "8/17/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -201,6 +201,10 @@ Disable extended requests (default).
 .BR LANG ", " LC_ALL
 See
 .IR locale (7).
+.TP
+.B LC_CTYPE
+Determines the mapping
+of bytes to characters.
 .TP
 .B TYPESETTER
 Specifies a device name as with the

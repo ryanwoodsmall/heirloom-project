@@ -19,28 +19,13 @@
  *
  * CDDL HEADER END
  */
-
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.4 (gritter) 8/17/05
+ * Sccsid @(#)unimap.h	1.1 (gritter) 8/17/05
  */
 
-extern struct afmtab {
-	struct Font	Font;
-	char	*path;
-	char	*file;
-	char	*fontname;
-	char	*fontab;
-	char	*kerntab;
-	char	*codetab;
-	char	*fitab;
-	char	**nametab;
-	int	rq;
-	int	lineno;
-	int	nchars;
-	int	capheight;
-} **afmtab;
-extern int nafm;
-
-extern int	afmget(struct afmtab *, char *, size_t);
+extern const struct unimap {
+	int		code;
+	const char	*psc;
+} unimap[];

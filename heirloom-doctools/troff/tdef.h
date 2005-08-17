@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.17 (gritter) 8/16/05
+ * Sccsid @(#)tdef.h	1.18 (gritter) 8/17/05
  */
 
 /*
@@ -178,7 +178,7 @@ extern	int	NM;	/* requests + macros */
 #define	WDSIZE	540	/* word buffer size */
 #define	LNSIZE	680	/* line buffer size */
 #define	NDI	5	/* number of diversions */
-#define	NCHARS	512	/* maximum size of troff character set */
+#define	NCHARS	768	/* maximum size of troff character set */
 #define	NTRTAB	NCHARS	/* number of items in trtab[] */
 #define	NWIDCACHE NCHARS	/* number of items in widcache */
 #define	NTRAP	20	/* number of traps */

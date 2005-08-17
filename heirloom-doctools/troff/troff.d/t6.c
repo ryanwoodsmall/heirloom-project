@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.9 (gritter) 8/17/05
+ * Sccsid @(#)t6.c	1.13 (gritter) 8/17/05
  */
 
 /*
@@ -222,6 +222,8 @@ int
 abscw(int n)	/* return index of abs char n in fontab[], etc. */
 {	register int i, ncf;
 
+	if ((i = fontbase[xfont]->spare1&BYTEMASK) >= 0)
+		return afmtab[i]->fitab[n-32]&BYTEMASK;
 	ncf = fontbase[xfont]->nwfont & BYTEMASK;
 	for (i = 0; i < ncf; i++)
 		if (codetab[xfont][i] == n)
@@ -258,27 +260,57 @@ xbits(register tchar i, int bitf)
 	}
 }
 
+static tchar
+postchar(const char *temp)
+{
+	extern int	nchtab;
+	struct afmtab	*a;
+	int	i, j;
+
+	if ((i = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0) {
+		a = afmtab[i];
+		for (j = 1; j < a->nchars; j++)
+			if (a->nametab[j] != NULL &&
+					strcmp(a->nametab[j], temp) == 0)
+				for (i = 0; i < a->nchars + 128 - 32 + nchtab;
+						i++)
+					if ((a->fitab[i]&BYTEMASK) == j)
+						return i + 32 + nchtab + 128;
+	}
+	return(0);
+}
+
 tchar setch(int delim)
 {
 	register int j;
-	char	temp[10];
-	register char	*s;
+	char	*temp = NULL;
+	int	c, n, sz = 0;
 	extern char	*chname;
 	extern short	*chtab;
 	extern int	nchtab;
 
-	s = temp;
-	if ((*s++ = getach()) == 0 || (*s++ = getach()) == 0)
-		return(0);
-	if (delim == '[' && getach() != ']') {
-		while (getach() != ']');
-		return(0);
+	n = 0;
+	for (;;) {
+		c = getach();
+		if (c == 0 && n < 2) {
+			free(temp);
+			return(0);
+		}
+		if (n >= sz)
+			temp = realloc(temp, sz += 10);
+		if (delim == '[' ? c == ']' : n == 2) {
+			temp[n] = 0;
+			break;
+		}
+		temp[n++] = c;
 	}
-	*s = '\0';
 	for (j = 0; j < nchtab; j++)
 		if (strcmp(&chname[chtab[j]], temp) == 0)
 			return(j + 128 | chbits);
-	return(0);
+	if ((c = postchar(temp)) != 0)
+		c |= chbits;
+	free(temp);
+	return c;
 }
 
 tchar setabs(void)		/* set absolute char from \C'...' */
@@ -932,4 +964,21 @@ casesupply(void)
 	file[i-1] = 0;
 	ptsupply(file);
 	free(file);
+}
+
+#include "unimap.h"
+
+int
+mapwc(int c)
+{
+	int	i, j;
+
+	for (i = 0; unimap[i].psc; i++)
+		if (unimap[i].code == c) {
+			if ((j = postchar(unimap[i].psc)) != 0)
+				return j;
+			else
+				break;
+		}
+	return 0;
 }

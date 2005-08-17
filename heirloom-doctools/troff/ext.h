@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.9 (gritter) 8/16/05
+ * Sccsid @(#)ext.h	1.10 (gritter) 8/17/05
  */
 
 /*
@@ -198,7 +198,6 @@ extern	struct	d	d[NDI];
 extern	struct	d	*dip;
 
 #ifdef	EUC
-#ifdef	NROFF
 #include <stddef.h>
 extern	int	multi_locale;
 extern  int	csi_width[];
@@ -207,5 +206,4 @@ extern	char	*mbbuf1p;
 extern	wchar_t	twc;
 extern	int	(*wdbdg)(wchar_t, wchar_t, int);
 extern	wchar_t	*(*wddlm)(wchar_t, wchar_t, int);
-#endif	/* NROFF */
 #endif	/* EUC */

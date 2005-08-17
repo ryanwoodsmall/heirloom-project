@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.10 (gritter) 8/17/05
+ * Sccsid @(#)dpost.c	1.12 (gritter) 8/17/05
  */
 
 /*
@@ -2179,6 +2179,68 @@ setfont (
 
 
 /*****************************************************************************/
+static void
+printencsep(int *colp)
+{
+	if (*colp >= 60) {
+		putc('\n', tf);
+		*colp = 0;
+	} else {
+		putc(' ', tf);
+		(*colp)++;
+	}
+}
+
+static void
+printencvector(struct afmtab *a)
+{
+	int	i, j, k, col = 0;
+	static int	vecno = 1;
+
+	fprintf(tf, "/Encoding-@%d [\n", vecno);
+	col = 0;
+	/*
+	 * First, write excess entries into the positiongs from 1 to 31
+	 * for later squeezing of characters >= 0400.
+	 */
+	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++);
+	col += fprintf(tf, "/.notdef");
+	printencsep(&col);
+	for (j = 1; j < 32; j++) {
+		if (i < a->nchars + 128 - 32 + nchtab &&
+				(k = a->fitab[i]&0377) != 0 &&
+				a->nametab[k] != NULL) {
+			col += fprintf(tf, "/%s", a->nametab[k]);
+			printencsep(&col);
+			i++;
+		} else {
+			col += fprintf(tf, "/.notdef");
+			printencsep(&col);
+		}
+	}
+	col += fprintf(tf, "/space");
+	printencsep(&col);
+	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++)
+		if ((k = a->fitab[i]&0377) != 0 && a->nametab[k] != NULL) {
+			col += fprintf(tf, "/%s", a->nametab[k]);
+			printencsep(&col);
+		} else {
+			col += fprintf(tf, "/.notdef");
+			printencsep(&col);
+		}
+	fprintf(tf, "] def\n");
+	fprintf(tf, "\
+/%s findfont\n\
+dup length dict begin\n\
+  {1 index /FID ne {def} {pop pop} ifelse} forall\n\
+  /Encoding Encoding-@%d def\n\
+  currentdict\n\
+end\n\
+/%s-@ exch definefont pop\n",
+		a->fontname, vecno, a->fontname);
+	vecno++;
+}
+/*****************************************************************************/
 
 
 void
@@ -2219,13 +2281,23 @@ t_sf(void)
     if ( tf == stdout )  {
 	lastfont = font;
 	lastsize = size;
-	if ( seenfonts[fnum] == 0 )
+	if ( seenfonts[fnum] == 0 ) {
 	    documentfonts();
+	    if (fontname[font].afm) {
+		fprintf(tf, "cleartomark restore\n");
+		fprintf(tf, "%s", BEGINGLOBAL);
+		printencvector(fontname[font].afm);
+		fprintf(tf, "%s", ENDGLOBAL);
+		fprintf(tf, "save mark\n");
+		reset();
+	    }
+	}
 	seenfonts[fnum] = 1;
     }	/* End if */
 
-    fprintf(tf, "%d %s%s f\n", pstab[size-1], fontname[font].afm ? "/" : "",
-		    fontname[font].name);
+    fprintf(tf, "%d %s%s%s f\n", pstab[size-1], fontname[font].afm ? "/" : "",
+		    fontname[font].name,
+		    fontname[font].afm ? "-@" : "");
 
     if ( fontheight != 0 || fontslant != 0 )
 	fprintf(tf, "%d %d changefont\n", fontslant, (fontheight != 0) ? fontheight : pstab[size-1]);
@@ -2902,9 +2974,13 @@ addoctal (
  *
  * Adds c to the current string as an octal escape \ddd.
  *
+ *
+ * If c is not a byte, try to squeeze it into the control area.
  */
 
 
+    if (c >= 0400)
+	    c -= 0377;
     switch ( encoding )  {
 	case 0:
 	case 1:
@@ -3038,7 +3114,7 @@ documentfonts(void)
 {
 
 
-    FILE	*fp_in;			/* PostScript font name read from here */
+    FILE	*fp_in = NULL;		/* PostScript font name read from here */
     FILE	*fp_out;		/* and added to this file */
 
 
@@ -3059,7 +3135,7 @@ documentfonts(void)
 
     sprintf(temp, "%s/dev%s/%s.name", fontdir, realdev, fontname[font].name);
 
-    if ( (fp_in = fopen(temp, "r")) != NULL )  {
+    if (fontname[font].afm == NULL && (fp_in = fopen(temp, "r")) != NULL )  {
 	if ( fscanf(fp_in, "%s", temp) == 1 )  {
     print:  if ( (fp_out = fopen(temp_file, "a")) != NULL )  {
 		if ( docfonts++ == 0 )
