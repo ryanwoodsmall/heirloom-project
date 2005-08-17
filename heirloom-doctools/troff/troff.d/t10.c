@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.10 (gritter) 8/18/05
+ * Sccsid @(#)t10.c	1.11 (gritter) 8/18/05
  */
 
 /*
@@ -614,7 +614,7 @@ newpage(int n)	/* called at end of each output page (we hope) */
 		return;
 	fdprintf(ptid, "p%d\n", n);	/* new page */
 	for (i = 0; i <= nfonts; i++)
-		if (fontbase[i]->spare1)
+		if (afmtab && fontbase[i]->spare1)
 			fdprintf(ptid, "x font %d %s\n", i,
 				afmtab[(fontbase[i]->spare1&BYTEMASK)-1]->file);
 		else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
