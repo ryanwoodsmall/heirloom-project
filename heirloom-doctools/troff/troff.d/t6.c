@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.13 (gritter) 8/17/05
+ * Sccsid @(#)t6.c	1.14 (gritter) 8/18/05
  */
 
 /*
@@ -222,7 +222,7 @@ int
 abscw(int n)	/* return index of abs char n in fontab[], etc. */
 {	register int i, ncf;
 
-	if ((i = fontbase[xfont]->spare1&BYTEMASK) >= 0)
+	if ((i = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0)
 		return afmtab[i]->fitab[n-32]&BYTEMASK;
 	ncf = fontbase[xfont]->nwfont & BYTEMASK;
 	for (i = 0; i < ncf; i++)
