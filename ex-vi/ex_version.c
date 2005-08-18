@@ -70,12 +70,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Sccsid @(#)ex_version.c	1.144 (gritter) 8/6/05
+ * Sccsid @(#)ex_version.c	1.145 (gritter) 8/18/05
  */
 
 #include "ex.h"
 
-static char *versionstring = "@(#)Version 4.0 (gritter) 8/6/05";
+static char *versionstring = "@(#)Version 4.0 (gritter) 8/18/05";
 
 void 
 printver(void)
@@ -127,6 +127,6 @@ ex_vput.c:static char sccsid[] = "@(#)ex_vput.c	1.51 (gritter) 8/6/05";
 ex_vwind.c:static char sccsid[] = "@(#)ex_vwind.c	1.9 (gritter) 11/23/04";
 expreserve.c:static char sccsid[] UNUSED = "@(#)expreserve.c	1.23 (gritter) 11/27/04";
 exrecover.c:static char sccsid[] UNUSED = "@(#)exrecover.c	1.22 (gritter) 8/4/05";
-mapmalloc.c: *	Sccsid @(#)mapmalloc.c	1.6 (gritter) 6/19/05
+mapmalloc.c: *	Sccsid @(#)mapmalloc.c	1.7 (gritter) 8/18/05
 printf.c:static char sccsid[] = "@(#)printf.c	1.15 (gritter) 12/1/04";
 */
