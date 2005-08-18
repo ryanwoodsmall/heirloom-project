@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.17 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.18 (gritter) 8/18/05
  */
 
 /*
@@ -312,11 +312,17 @@ tchar setch(int delim)
 		}
 		temp[n++] = c;
 	}
-	for (j = 0; j < nchtab; j++)
-		if (strcmp(&chname[chtab[j]], temp) == 0)
-			return(j + 128 | chbits);
-	if ((c = postchar(temp)) != 0)
-		c |= chbits;
+	c = 0;
+	if (delim == '[') {
+		if ((c = postchar(temp)) != 0)
+			c |= chbits;
+	}
+	if (c == 0)
+		for (j = 0; j < nchtab; j++)
+			if (strcmp(&chname[chtab[j]], temp) == 0) {
+				c = j + 128 | chbits;
+				break;
+			}
 	free(temp);
 	return c;
 }

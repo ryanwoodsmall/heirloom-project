@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.14 (gritter) 8/18/05
+ * Sccsid @(#)dpost.c	1.15 (gritter) 8/18/05
  */
 
 /*
@@ -442,7 +442,7 @@ int		lastend;		/* where last character on this line was */
 struct  {
 
 	struct afmtab	*afm;		/* AFM data, if any */
-	char	*asciimap;		/* map specials into ASCII area */
+	char	*afmmap;		/* map of non-ASCII characters */
 	char	*name;			/* name of the font loaded here */
 	int	number;			/* its internal number */
 
@@ -2209,7 +2209,7 @@ printencvector(struct afmtab *a)
 {
 	int	i, j, k, col = 0, s;
 	static int	vecno = 1;
-	char	*asciimap = NULL;
+	char	*afmmap = NULL;
 
 	fprintf(tf, "/Encoding-@%d [\n", vecno);
 	col = 0;
@@ -2217,16 +2217,19 @@ printencvector(struct afmtab *a)
 	 * First, write excess entries into the positiongs from 1 to 31
 	 * for later squeezing of characters >= 0400.
 	 */
-	for (s = 1; s < a->nchars + 128 - 32 + nchtab && s < 256 - 32; s++);
-	if (s < a->nchars + 128 - 32 + nchtab)
-		asciimap = calloc(128, sizeof *asciimap);
+	s = 128 - 32 + nchtab;
+	afmmap = calloc(256, sizeof *afmmap);
 	col += fprintf(tf, "/.notdef");
 	printencsep(&col);
 	for (j = 1; j < 32; j++) {
+		while (s < a->nchars + 128 - 32 + nchtab &&
+				((k = a->fitab[s]&0377) == 0 ||
+				 a->nametab[k] == NULL))
+			s++;
 		if (s < a->nchars + 128 - 32 + nchtab &&
 				(k = a->fitab[s]&0377) != 0 &&
 				a->nametab[k] != NULL) {
-			asciimap[s - 0400 + 32] = j;
+			afmmap[s - 128 + 32 - nchtab] = j;
 			col += fprintf(tf, "/%s", a->nametab[k]);
 			printencsep(&col);
 			s++;
@@ -2237,21 +2240,28 @@ printencvector(struct afmtab *a)
 	}
 	col += fprintf(tf, "/space");
 	printencsep(&col);
-	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++)
+	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++) {
 		if ((k = a->fitab[i]&0377) != 0 && a->nametab[k] != NULL) {
 			col += fprintf(tf, "/%s", a->nametab[k]);
 			printencsep(&col);
-		} else if (s < a->nchars + 128 - 32 + nchtab &&
+		} else {
+			while (s < a->nchars + 128 - 32 + nchtab &&
+					((k = a->fitab[s]&0377) == 0 ||
+				 	a->nametab[k] == NULL))
+				s++;
+			if (s < a->nchars + 128 - 32 + nchtab &&
 				(k = a->fitab[s]&0377) != 0 &&
 				a->nametab[k] != NULL) {
-			asciimap[s - 0400 + 32] = i + 32;
-			col += fprintf(tf, "/%s", a->nametab[k]);
-			printencsep(&col);
-			s++;
-		} else {
-			col += fprintf(tf, "/.notdef");
-			printencsep(&col);
+				afmmap[s - 128 + 32 - nchtab] = i + 32;
+				col += fprintf(tf, "/%s", a->nametab[k]);
+				printencsep(&col);
+				s++;
+			} else {
+				col += fprintf(tf, "/.notdef");
+				printencsep(&col);
+			}
 		}
+	}
 	fprintf(tf, "] def\n");
 	fprintf(tf, "\
 /%s findfont\n\
@@ -2263,7 +2273,7 @@ end\n\
 /%s-@ exch definefont pop\n",
 		a->fontname, vecno, a->fontname);
 	vecno++;
-	return asciimap;
+	return afmmap;
 }
 /*****************************************************************************/
 
@@ -2311,7 +2321,7 @@ t_sf(void)
 	    if (fontname[font].afm) {
 		fprintf(tf, "cleartomark restore\n");
 		fprintf(tf, "%s", BEGINGLOBAL);
-		fontname[font].asciimap = printencvector(fontname[font].afm);
+		fontname[font].afmmap = printencvector(fontname[font].afm);
 		fprintf(tf, "%s", ENDGLOBAL);
 		fprintf(tf, "save mark\n");
 		reset();
@@ -3007,8 +3017,8 @@ addoctal (
  */
 
 
-    if (c >= 0400 && c <= 0677 && fontname[font].asciimap)
-	    c = fontname[font].asciimap[c - 0400];
+    if (c >= 128 + nchtab && fontname[font].afmmap)
+	    c = fontname[font].afmmap[c - 128 - nchtab]&0377;
     switch ( encoding )  {
 	case 0:
 	case 1:

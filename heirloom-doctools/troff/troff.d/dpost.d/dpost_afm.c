@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.6 (gritter) 8/18/05
+ * Sccsid @(#)afm.c	1.7 (gritter) 8/18/05
  */
 
 #include <stdlib.h>
@@ -220,7 +220,7 @@ mapname(const char *psname)
 static void
 remap(struct afmtab *a)
 {
-	int	i, j = 128 - 32;
+	int	i, j = 128 - 32 + nchtab;
 
 	for (i = 1; i < a->nchars; i++) {
 		if (a->codetab[i] == -1 && a->nametab[i] != NULL) {
@@ -277,9 +277,9 @@ addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 	 * Only map a character directly if it maps to an ASCII
 	 * equivalent or if it is above.
 	 */
-	if (C < 0 || C > 127 || asciiequiv(C, N)) {
+	if (C < 0 || N == NULL || C < 127 && asciiequiv(C, N)) {
 		a->codetab[a->nchars] = C;
-		if (tp >= 32)
+		if (tp >= 32 && C >= 0)
 			a->fitab[tp - 32] = a->nchars;
 	} else
 		a->codetab[a->nchars] = -1;

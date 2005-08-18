@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.18 (gritter) 8/17/05
+ * Sccsid @(#)tdef.h	1.19 (gritter) 8/18/05
  */
 
 /*
@@ -817,3 +817,4 @@ void setdraw(void);
 void casefc(void);
 tchar setfield(int);
 void localize(void);
+void caselc_ctype(void);
