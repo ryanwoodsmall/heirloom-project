@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.15 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.16 (gritter) 8/18/05
  */
 
 /*
@@ -873,7 +873,7 @@ caseafm(void)
 	char	*file = NULL, *path, *contents;
 	size_t	sz = 0;
 	struct afmtab	*a;
-	int	nf = nafm + NFONT + 1;
+	int	nf = nfonts + 1;
 
 	skip();
 	if ((rq = getrq()) == 0)
@@ -887,7 +887,7 @@ caseafm(void)
 	} while (c && c != ' ' && c != '\n');
 	file[i-1] = 0;
 	skip();
-	if (j = atoi())
+	if ((j = atoi()) > 0 && j <= nfonts)
 		nf = j;
 	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 14);
 	sprintf(path, "%s/dev%s/afm/%s.afm", fontfile, devname, file);
