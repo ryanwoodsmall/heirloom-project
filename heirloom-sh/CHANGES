@@ -1,3 +1,7 @@
+Release ...
+* A bug in the supplied realloc() replacement could result in heap
+  corruption. (No resulting failures have been observed with sh so far.)
+
 Release 050706
 * Spell checking for the "cd" command is now optionally available. It can
   be enabled in the makefile at wish.
