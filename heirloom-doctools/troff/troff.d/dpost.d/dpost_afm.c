@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.7 (gritter) 8/18/05
+ * Sccsid @(#)afm.c	1.8 (gritter) 8/18/05
  */
 
 #include <stdlib.h>
@@ -263,6 +263,8 @@ thisword(const char *text, const char *wrd)
 static void
 addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 {
+	int	ae;
+
 	a->fontab = realloc(a->fontab, (a->nchars+1) * sizeof *a->fontab);
 	a->kerntab = realloc(a->kerntab, (a->nchars+1) * sizeof *a->kerntab);
 	a->codetab = realloc(a->codetab, (a->nchars+1) * sizeof *a->codetab);
@@ -277,12 +279,14 @@ addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 	 * Only map a character directly if it maps to an ASCII
 	 * equivalent or if it is above.
 	 */
-	if (C < 0 || N == NULL || C < 127 && asciiequiv(C, N)) {
+	ae = asciiequiv(C, N);
+	if (C < 0 || C < 127 && ae)
 		a->codetab[a->nchars] = C;
+	else
+		a->codetab[a->nchars] = -1;
+	if (N == NULL || C < 127 && ae)
 		if (tp >= 32 && C >= 0)
 			a->fitab[tp - 32] = a->nchars;
-	} else
-		a->codetab[a->nchars] = -1;
 	if (N) {
 		a->nametab[a->nchars] = malloc(strlen(N) + 1);
 		strcpy(a->nametab[a->nchars], N);

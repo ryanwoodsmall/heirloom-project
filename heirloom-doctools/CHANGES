@@ -14,6 +14,8 @@ Release ...
 * troff: The ".fallback" request for selecting the order in which fonts
   are searched for missing characters in the current font has been added.
 * The file "NEWS" describes new troff language features.
+* A bug in the supplied realloc() replacement could result in heap
+  corruption.
 
 Release 050816
 * nroff: A special terminal name, -Tlocale, has been introduced. With this
