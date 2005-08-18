@@ -47,9 +47,10 @@ can be used to deactivate new features for compatibility reasons.
 	width n1 is added to each character. If the point size is above or
 	equal to s2, white space of width n2 is added. If the point size
 	is between s1 and s2, the amount of white space added is computed
-	as the linear function (current point size) * (n2 - n1) / (s2 - s1).
-	The default unit for all numeric arguments is "p". Negative numbers
-	are accepted and cause a decrease of letter space.
+	as a value between n1 and n2 using the current point size s:
+	(s * n2 - s * n1 + s2 * n1 - s1 * n2) / (s2 - s1). The default unit
+	for all numeric arguments is "p". Negative numbers are accepted and
+	cause a decrease of letter space.
 
 \[name]
 	selects the character "name" as defined in the .afm file for the
@@ -68,4 +69,4 @@ can be used to deactivate new features for compatibility reasons.
 	prints all arguments to a macro, each one surrounded by double
 	quotes, separated by spaces.
 
-                                                                8/18/05
+                                                                8/19/05

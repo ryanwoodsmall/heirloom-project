@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.24 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.25 (gritter) 8/19/05
  */
 
 /*
@@ -148,6 +148,7 @@ getcw(register int i)
 	register int	x, j;
 	int nocache = 0;
 	int	ofont = xfont;
+	int	s;
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
@@ -219,19 +220,22 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = ((k&BYTEMASK) * xpts + (Unitwidth / 2)) / Unitwidth;
-	if (xpts*Unitwidth <= tkftab[ofont].s1 && tkftab[ofont].n1) {
+	s = xpts*Unitwidth;
+	if (s <= tkftab[ofont].s1 && tkftab[ofont].n1) {
 		nocache = 1;
 		k += tkftab[ofont].n1;
-	} else if (xpts*Unitwidth >= tkftab[ofont].s2 && tkftab[ofont].n2) {
+	} else if (s >= tkftab[ofont].s2 && tkftab[ofont].n2) {
 		nocache = 1;
 		k += tkftab[ofont].n2;
-	} else if (xpts*Unitwidth > tkftab[ofont].s1 &&
-			xpts*Unitwidth < tkftab[ofont].s2) {
-		int	s, n;
-		if ((n = tkftab[ofont].n2-tkftab[ofont].n1) != 0 &&
-				(s = tkftab[ofont].s2-tkftab[ofont].s1) != 0) {
+	} else if (s > tkftab[ofont].s1 && s < tkftab[ofont].s2) {
+		int	r;
+		r = (s * tkftab[ofont].n2 - s * tkftab[ofont].n1
+				+ tkftab[ofont].s2 * tkftab[ofont].n1
+				- tkftab[ofont].s1 * tkftab[ofont].n2)
+			/ (tkftab[ofont].s2 - tkftab[ofont].s1);
+		if (r != 0) {
 			nocache = 1;
-			k += xpts*Unitwidth * n / s;
+			k += r;
 		}
 	}
 	if (nocache|bd)
