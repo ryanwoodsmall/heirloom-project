@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.16 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.17 (gritter) 8/18/05
  */
 
 /*
@@ -62,20 +62,18 @@
 #include "ext.h"
 #include "afm.h"
 #include "proto.h"
+#include "troff.h"
 
 /* fitab[f][c] is 0 if c is not on font f */
 	/* if it's non-zero, c is in fontab[f] at position
 	 * fitab[f][c].
 	 */
-extern	struct Font **fontbase;
-extern	char **codetab;
-extern int nchtab;
-
 int	*fontlab;
 short	*pstab;
 int	*cstab;
 int	*ccstab;
 int	*bdtab;
+struct tkftab	*tkftab;
 int	sbold = 0;
 
 int
@@ -201,6 +199,20 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = ((k&BYTEMASK) * xpts + (Unitwidth / 2)) / Unitwidth;
+	if (xpts <= tkftab[xfont].s1 && tkftab[xfont].n1) {
+		nocache = 1;
+		k += tkftab[xfont].n1;
+	} else if (xpts >= tkftab[xfont].s2 && tkftab[xfont].n2) {
+		nocache = 1;
+		k += tkftab[xfont].n2;
+	} else if (xpts > tkftab[xfont].s1 && xpts < tkftab[xfont].s2) {
+		int	s, n;
+		if ((n = tkftab[xfont].n2-tkftab[xfont].n1) != 0 &&
+				(s = tkftab[xfont].s2-tkftab[xfont].s1) != 0) {
+			nocache = 1;
+			k += k * n / s;
+		}
+	}
 	if (nocache|bd)
 		widcache[i].fontpts = 0;
 	else {
@@ -263,7 +275,6 @@ xbits(register tchar i, int bitf)
 static tchar
 postchar(const char *temp)
 {
-	extern int	nchtab;
 	struct afmtab	*a;
 	int	i, j;
 
@@ -285,9 +296,6 @@ tchar setch(int delim)
 	register int j;
 	char	*temp = NULL;
 	int	c, n, sz = 0;
-	extern char	*chname;
-	extern short	*chtab;
-	extern int	nchtab;
 
 	n = 0;
 	for (;;) {
@@ -316,7 +324,6 @@ tchar setch(int delim)
 tchar setabs(void)		/* set absolute char from \C'...' */
 {
 	int n;
-	extern int	nchtab;
 
 	getch();
 	n = 0;
@@ -695,7 +702,6 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	register int k;
 	int n;
 	char longname[NS], shortname[20];
-	extern int nchtab;
 
 	zapwcache(0);
 	if (truename)
@@ -729,6 +735,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	if ((fontlab[pos] = f) == 'S')
 		smnt = pos;
 	bdtab[pos] = cstab[pos] = ccstab[pos] = 0;
+	memset(&tkftab[pos], 0, sizeof tkftab[pos]);
 		/* if there is a directory, no place to store its name. */
 		/* if position isn't zero, no place to store its value. */
 		/* only time a FONTPOS is pushed back is if it's a */
@@ -860,14 +867,11 @@ tchar xlss(void)
 
 struct afmtab **afmtab;
 int nafm;
-extern int Nfont;
-extern void growfonts(int);
 
 void
 caseafm(void)
 {
 	extern int sprintf(char *, const char *, ...);
-	extern long	realpage;
 	struct stat	st;
 	int	c, i = 0, j, rq, fd;
 	char	*file = NULL, *path, *contents;
@@ -941,6 +945,8 @@ caseafm(void)
 	kerntab[nf] = afmtab[nafm]->kerntab;
 	codetab[nf] = afmtab[nafm]->codetab;
 	fitab[nf] = afmtab[nafm]->fitab;
+	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
+	memset(&tkftab[nf], 0, sizeof tkftab[nf]);
 	nafm++;
 	if (nf > nfonts)
 		nfonts = nf;
@@ -964,6 +970,43 @@ casesupply(void)
 	file[i-1] = 0;
 	ptsupply(file);
 	free(file);
+}
+
+int
+tkfnum(void)
+{
+	skip();
+	dfact = INCH;
+	dfactd = 72;
+	res = VERT;
+	return inumb(NULL);
+}
+
+void
+casetkf(void)
+{
+	int	i, j, s1, n1, s2, n2;
+
+	skip();
+	i = getrq();
+	if ((j = findft(i)) < 0)
+		return;
+	s1 = tkfnum();
+	if (!nonumb) {
+		n1 = tkfnum();
+		if (!nonumb) {
+			s2 = tkfnum();
+			if (!nonumb) {
+				n2 = tkfnum();
+				if (!nonumb) {
+					tkftab[j].s1 = s1;
+					tkftab[j].n1 = n1;
+					tkftab[j].s2 = s2;
+					tkftab[j].n2 = n2;
+				}
+			}
+		}
+	}
 }
 
 #include "unimap.h"

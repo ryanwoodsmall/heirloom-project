@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.11 (gritter) 8/18/05
+ * Sccsid @(#)t10.c	1.12 (gritter) 8/18/05
  */
 
 /*
@@ -56,6 +56,7 @@
 #include "dev.h"
 #include "afm.h"
 #include "proto.h"
+#include "troff.h"
 /*
  * troff10.c
  * 
@@ -107,9 +108,6 @@ int	c_dagger;
 struct dev dev;
 struct Font **fontbase;
 
-extern int *cstab;
-extern int *ccstab;
-
 int Nfont;
 
 void
@@ -133,6 +131,8 @@ growfonts(int n)
 	memset(&ccstab[Nfont], 0, (n - Nfont) * sizeof *ccstab);
 	bdtab = realloc(bdtab, n * sizeof *bdtab);
 	memset(&bdtab[Nfont], 0, (n - Nfont) * sizeof *bdtab);
+	tkftab = realloc(tkftab, n * sizeof *tkftab);
+	memset(&tkftab[Nfont], 0, (n - Nfont) * sizeof *tkftab);
 	Nfont = n;
 }
 

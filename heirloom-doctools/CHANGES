@@ -8,6 +8,7 @@ Release ...
   locale-specific subset of them is available.
 * troff: It is now possible to use "\[name]", where name is a character
   defined in the .afm file for the current font.
+* troff: The ".tkf" request for tracking letter space has been added.
 
 Release 050816
 * nroff: A special terminal name, -Tlocale, has been introduced. With this

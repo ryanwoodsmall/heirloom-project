@@ -32,8 +32,8 @@ mrproper: clean
 
 draw.o: draw.c
 makedev.o: makedev.c dev.h
-t10.o: t10.c ../tdef.h ../ext.h dev.h afm.h
-t6.o: t6.c ../tdef.h dev.h ../ext.h afm.h unimap.h
+t10.o: t10.c ../tdef.h ../ext.h dev.h afm.h troff.h
+t6.o: t6.c ../tdef.h dev.h ../ext.h afm.h unimap.h troff.h
 unimap.o: unimap.h
 ta.o: ta.c dev.h
 hytab.o: ../hytab.c
