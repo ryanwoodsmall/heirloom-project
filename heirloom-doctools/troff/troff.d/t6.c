@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.18 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.19 (gritter) 8/18/05
  */
 
 /*
@@ -199,13 +199,14 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = ((k&BYTEMASK) * xpts + (Unitwidth / 2)) / Unitwidth;
-	if (xpts <= tkftab[xfont].s1 && tkftab[xfont].n1) {
+	if (xpts*Unitwidth <= tkftab[xfont].s1 && tkftab[xfont].n1) {
 		nocache = 1;
 		k += tkftab[xfont].n1;
-	} else if (xpts >= tkftab[xfont].s2 && tkftab[xfont].n2) {
+	} else if (xpts*Unitwidth >= tkftab[xfont].s2 && tkftab[xfont].n2) {
 		nocache = 1;
 		k += tkftab[xfont].n2;
-	} else if (xpts > tkftab[xfont].s1 && xpts < tkftab[xfont].s2) {
+	} else if (xpts*Unitwidth > tkftab[xfont].s1 &&
+			xpts*Unitwidth < tkftab[xfont].s2) {
 		int	s, n;
 		if ((n = tkftab[xfont].n2-tkftab[xfont].n1) != 0 &&
 				(s = tkftab[xfont].s2-tkftab[xfont].s1) != 0) {
