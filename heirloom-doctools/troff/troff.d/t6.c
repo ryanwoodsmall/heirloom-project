@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.22 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.23 (gritter) 8/18/05
  */
 
 /*
@@ -185,7 +185,7 @@ getcw(register int i)
 			if (j != 0)
 				goto found;
 			for (ii=0; ii <= nfonts; ii++) {
-				if (ii == smnt)
+				if (ii == smnt || fitab[ii] == NULL)
 					continue;
 				j = fitab[ii][i] & BYTEMASK;
 				if (j != 0) {
@@ -294,12 +294,12 @@ xbits(register tchar i, int bitf)
 }
 
 static tchar
-postchar(const char *temp)
+postchar1(const char *temp, int f)
 {
 	struct afmtab	*a;
 	int	i, j;
 
-	if (afmtab && (i = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0) {
+	if (afmtab && (i = (fontbase[f]->spare1&BYTEMASK) - 1) >= 0) {
 		a = afmtab[i];
 		for (j = 1; j < a->nchars; j++)
 			if (a->nametab[j] != NULL &&
@@ -312,11 +312,33 @@ postchar(const char *temp)
 	return(0);
 }
 
+static tchar
+postchar(const char *temp, int *fp)
+{
+	int	i, j;
+	tchar	c;
+
+	*fp = xfont;
+	if ((c = postchar1(temp, *fp)) != 0)
+		return c;
+	if (fallbacktab[xfont]) {
+		for (j = 0; fallbacktab[xfont][j] != 0; j++) {
+			if ((i = findft(fallbacktab[xfont][j])) < 0)
+				continue;
+			if ((c = postchar1(temp, i)) != 0) {
+				*fp = i;
+				return c;
+			}
+		}
+	}
+	return 0;
+}
+
 tchar setch(int delim)
 {
 	register int j;
 	char	*temp = NULL;
-	int	c, n, sz = 0;
+	int	c, f, n, sz = 0;
 
 	n = 0;
 	for (;;) {
@@ -335,8 +357,10 @@ tchar setch(int delim)
 	}
 	c = 0;
 	if (delim == '[') {
-		if ((c = postchar(temp)) != 0)
-			c |= chbits;
+		if ((c = postchar(temp, &f)) != 0) {
+			c &= ~FMASK;
+			setfbits(c, f);
+		}
 	}
 	if (c == 0)
 		for (j = 0; j < nchtab; j++)
@@ -1061,13 +1085,13 @@ casefallback(void)
 #include "unimap.h"
 
 int
-mapwc(int c)
+mapwc(int c, int *fp)
 {
 	int	i, j;
 
 	for (i = 0; unimap[i].psc; i++)
 		if (unimap[i].code == c) {
-			if ((j = postchar(unimap[i].psc)) != 0)
+			if ((j = postchar(unimap[i].psc, fp)) != 0)
 				return j;
 			else
 				break;
