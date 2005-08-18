@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.12 (gritter) 8/17/05
+ * Sccsid @(#)dpost.c	1.13 (gritter) 8/18/05
  */
 
 /*
@@ -330,6 +330,8 @@ int		maxencoding = MAXENCODING;
 
 char		seenfonts[MAXINTERNAL+1];
 int		docfonts = 0;
+struct afmtab	*afmfonts[MAXINTERNAL+1];
+int		afmcount = 0;
 
 
 /*
@@ -1462,6 +1464,12 @@ loadfont (
 	struct afmtab	*a;
 	struct stat	st;
 	char	*contents;
+	int	i;
+	for (i = 0; i < afmcount; i++)
+		if (afmfonts[i] && strcmp(afmfonts[i]->path, temp) == 0) {
+			a = afmfonts[i];
+			goto have;
+		}
 	if ((a = calloc(1, sizeof *a)) == NULL ||
 			fstat(fin, &st) < 0 ||
 			(contents = malloc(st.st_size+1)) == NULL ||
@@ -1471,16 +1479,18 @@ loadfont (
 		goto fail;
 	}
 	close(fin);
-	a->path = temp;
+	a->path = malloc(strlen(temp) + 1);
+	strcpy(a->path, temp);
 	a->file = s;
-	sprintf(a->Font.intname, "%d", n);
 	if (afmget(a, contents, st.st_size) < 0) {
 		free(a);
 		free(contents);
 		goto fail;
 	}
 	free(contents);
-	fontbase[n] = &a->Font;
+	afmfonts[afmcount] = a;
+	sprintf(a->Font.intname, "%d", dev.nfonts + ++afmcount);
+have:   fontbase[n] = &a->Font;
 	widthtab[n] = a->fontab;
 	codetab[n] = a->codetab;
 	fitab[n] = a->fitab;
@@ -1907,6 +1917,9 @@ t_dosupply(void)
 {
 	struct supplylist	*sp, *sq = NULL;
 
+	endtext();
+	fprintf(tf, "cleartomark restore\n");
+	fprintf(tf, "%s", BEGINGLOBAL);
 	for (sp = supplylist; sp; sp = sp->next) {
 		free(sq);
 		supply1(sp->name);
@@ -1914,6 +1927,8 @@ t_dosupply(void)
 	}
 	free(sq);
 	supplylist = NULL;
+	fprintf(tf, "%s", ENDGLOBAL);
+	fprintf(tf, "save mark\n");
 }
 
 /*****************************************************************************/
@@ -1958,9 +1973,6 @@ t_page (
     fprintf(tf, "%s %d %d\n", ENDPAGE, lastpg, printed);
 
     redirect(pg);
-
-    if (supplylist)
-	    t_dosupply();
 
     fprintf(tf, "%s %d %d\n", PAGE, pg, printed+1);
     fprintf(tf, "save\n");
@@ -2670,6 +2682,9 @@ oput (
 
     if ( textcount > MAXSTACK )		/* don't put too much on the stack? */
 	endtext();
+
+    if (supplylist)
+	    t_dosupply();
 
     if ( font != lastfont || size != lastsize )
 	t_sf();

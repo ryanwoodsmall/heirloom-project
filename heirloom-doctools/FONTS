@@ -25,9 +25,7 @@ with this method:
       causes dpost to include data from "fontdir/pfa/basename.pfa" into
       the generated PostScript. This is useful to include fonts that have
       not yet been downloaded into the printer, or for generating PDFs
-      with additional fonts. The ".supply" command must occur before the
-      page that contains the text begins. It is recommended that it is
-      put at a place before any text at the top of the input file.
+      with additional fonts.
 
 As an example,
       
@@ -65,4 +63,4 @@ interest for troff:
 
 That's it.
 
-        Gunnar Ritter                                           8/17/05
+        Gunnar Ritter                                           8/18/05
