@@ -6,9 +6,14 @@ Release ...
   with the new font setup. In an UTF-8 locale, the characters that are
   present in standard PostScript fonts are supported; otherwise, a
   locale-specific subset of them is available.
+* [nt]roff: The ".lc_ctype" request can be used to set the LC_CTYPE
+  localization setting from within a document.
 * troff: It is now possible to use "\[name]", where name is a character
   defined in the .afm file for the current font.
 * troff: The ".tkf" request for tracking letter space has been added.
+* troff: The ".fallback" request for selecting the order in which fonts
+  are searched for missing characters in the current font has been added.
+* The file "NEWS" describes new troff language features.
 
 Release 050816
 * nroff: A special terminal name, -Tlocale, has been introduced. With this

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.19 (gritter) 8/18/05
+ * Sccsid @(#)t6.c	1.22 (gritter) 8/18/05
  */
 
 /*
@@ -72,6 +72,7 @@ int	*fontlab;
 short	*pstab;
 int	*cstab;
 int	*ccstab;
+int	**fallbacktab;
 int	*bdtab;
 struct tkftab	*tkftab;
 int	sbold = 0;
@@ -146,6 +147,7 @@ getcw(register int i)
 	register char	*p;
 	register int	x, j;
 	int nocache = 0;
+	int	ofont = xfont;
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
@@ -159,17 +161,35 @@ getcw(register int i)
 		goto g1;
 	}
 	if ((j = fitab[xfont][i] & BYTEMASK) == 0) {	/* it's not on current font */
+		int ii, jj;
 		/* search through search list of xfont
 		 * to see what font it ought to be on.
+		 * first searches explicit fallbacks, then
 		 * searches S, then remaining fonts in wraparound order.
 		 */
 		nocache = 1;
-		if (smnt) {
-			int ii, jj;
-			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
+		if (fallbacktab[xfont]) {
+			for (jj = 0; fallbacktab[xfont][jj] != 0; jj++) {
+				if ((ii = findft(fallbacktab[xfont][jj])) < 0)
+					continue;
 				j = fitab[ii][i] & BYTEMASK;
 				if (j != 0) {
-					p = fontab[ii];
+					xfont = ii;
+					goto found;
+				}
+			}
+		}
+		if (smnt) {
+			ii = smnt;
+			j = fitab[ii][i] & BYTEMASK;
+			if (j != 0)
+				goto found;
+			for (ii=0; ii <= nfonts; ii++) {
+				if (ii == smnt)
+					continue;
+				j = fitab[ii][i] & BYTEMASK;
+				if (j != 0) {
+				found:	p = fontab[ii];
 					k = *(p + j);
 					if (xfont == sbold)
 						bd = bdtab[ii];
@@ -185,33 +205,33 @@ getcw(register int i)
  g0:
 	p = fontab[xfont];
 	if (setwdf)
-		numtab[CT].val |= kerntab[xfont][j];
+		numtab[CT].val |= kerntab[ofont][j];
 	k = *(p + j);
  g1:
 	if (!bd)
-		bd = bdtab[xfont];
-	if (cs = cstab[xfont]) {
+		bd = bdtab[ofont];
+	if (cs = cstab[ofont]) {
 		nocache = 1;
-		if (ccs = ccstab[xfont])
+		if (ccs = ccstab[ofont])
 			x = ccs; 
 		else 
 			x = xpts;
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = ((k&BYTEMASK) * xpts + (Unitwidth / 2)) / Unitwidth;
-	if (xpts*Unitwidth <= tkftab[xfont].s1 && tkftab[xfont].n1) {
+	if (xpts*Unitwidth <= tkftab[ofont].s1 && tkftab[ofont].n1) {
 		nocache = 1;
-		k += tkftab[xfont].n1;
-	} else if (xpts*Unitwidth >= tkftab[xfont].s2 && tkftab[xfont].n2) {
+		k += tkftab[ofont].n1;
+	} else if (xpts*Unitwidth >= tkftab[ofont].s2 && tkftab[ofont].n2) {
 		nocache = 1;
-		k += tkftab[xfont].n2;
-	} else if (xpts*Unitwidth > tkftab[xfont].s1 &&
-			xpts*Unitwidth < tkftab[xfont].s2) {
+		k += tkftab[ofont].n2;
+	} else if (xpts*Unitwidth > tkftab[ofont].s1 &&
+			xpts*Unitwidth < tkftab[ofont].s2) {
 		int	s, n;
-		if ((n = tkftab[xfont].n2-tkftab[xfont].n1) != 0 &&
-				(s = tkftab[xfont].s2-tkftab[xfont].s1) != 0) {
+		if ((n = tkftab[ofont].n2-tkftab[ofont].n1) != 0 &&
+				(s = tkftab[ofont].s2-tkftab[ofont].s1) != 0) {
 			nocache = 1;
-			k += k * n / s;
+			k += xpts*Unitwidth * n / s;
 		}
 	}
 	if (nocache|bd)
@@ -742,6 +762,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	if ((fontlab[pos] = f) == 'S')
 		smnt = pos;
 	bdtab[pos] = cstab[pos] = ccstab[pos] = 0;
+	fallbacktab[pos] = NULL;
 	memset(&tkftab[pos], 0, sizeof tkftab[pos]);
 		/* if there is a directory, no place to store its name. */
 		/* if position isn't zero, no place to store its value. */
@@ -953,6 +974,7 @@ caseafm(void)
 	codetab[nf] = afmtab[nafm]->codetab;
 	fitab[nf] = afmtab[nafm]->fitab;
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
+	fallbacktab[nf] = NULL;
 	memset(&tkftab[nf], 0, sizeof tkftab[nf]);
 	nafm++;
 	if (nf > nfonts)
@@ -1010,10 +1032,30 @@ casetkf(void)
 					tkftab[j].n1 = n1;
 					tkftab[j].s2 = s2;
 					tkftab[j].n2 = n2;
+					zapwcache(0);
 				}
 			}
 		}
 	}
+}
+
+void
+casefallback(void)
+{
+	int	*fb = NULL;
+	int	i, j, n = 0;
+
+	skip();
+	i = getrq();
+	if ((j = findft(i)) < 0)
+		return;
+	do {
+		skip();
+		i = getrq();
+		fb = realloc(fb, (n+2) * sizeof *fb);
+		fb[n++] = i;
+	} while (i);
+	fallbacktab[j] = fb;
 }
 
 #include "unimap.h"

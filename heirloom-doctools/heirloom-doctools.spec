@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-doctools.spec	1.8 (gritter) 8/18/05
+# Sccsid @(#)heirloom-doctools.spec	1.9 (gritter) 8/18/05
 #
 Summary: The Heirloom Documentation Tools.
 Name: heirloom-doctools
@@ -59,7 +59,7 @@ done | sort -u | sed '
 	1i\
 %defattr(-,root,root)\
 %{mandir}\
-%doc README CHANGES FONTS LICENSE/*
+%doc README CHANGES FONTS NEWS LICENSE/*
 ' >filelist.rpm
 
 %clean

@@ -1,0 +1,71 @@
+New features in the Heirloom Documentation Tools troff language
+===============================================================
+
+Unless otherwise noted, new features become effective with the -x option
+only. In the future, the -x option may become the default; the -X option
+can be used to deactivate new features for compatibility reasons.
+
+.afm yy basename [register]
+	reads metrics from the file "fontdir/afm/basename.afm". The font
+	is then available with ".ft yy", "\f(yy", etc. The optional
+	"register" argument can be used to specify a font position to
+	which this font is to be mounted, as with the ".fp" command.
+
+.de longname
+.ds longname
+.nr longname
+	The names of macros, strings, and number registers can be longer
+	than two characters now.
+
+.fallback ff aa bb ...
+	Selects the fallback sequence for font ff. If the current font
+	is ff and a character is not found, font aa is searched first,
+	then font bb, etc. If the character still has not been found,
+	it is searched for in font S, then in font 0, 1, and so forth.
+
+.lc_ctype localename
+	sets the LC_CTYPE locale setting to localename. The default is
+	the value of the LC_CTYPE environment variable. This request is
+	useful to specify an input character set regardless of environment
+	influences.
+
+.ss n m
+	with the second argument "m" determines whether additional white
+	space is added between sentences. If m is zero, no additional
+	white space is added. Otherwise, a space of size n is added as
+	usual.
+
+.supply basename
+	causes dpost to include data from "fontdir/pfa/basename.pfa" into
+	the generated PostScript. This is useful to include fonts that have
+	not yet been downloaded into the printer, or for generating PDFs
+	with additional fonts.
+
+.tkf ff s1 n1 s2 n2
+	specifies tracking of letter space for font ff. If the current font
+	is ff and the point size is below or equal to s1, white space of
+	width n1 is added to each character. If the point size is above or
+	equal to s2, white space of width n2 is added. If the point size
+	is between s1 and s2, the amount of white space added is computed
+	as the linear function (current point size) * (n2 - n1) / (s2 - s1).
+	The default unit for all numeric arguments is "p". Negative numbers
+	are accepted and cause a decrease of letter space.
+
+\[name]
+	selects the character "name" as defined in the .afm file for the
+	current font.
+
+\*[name]
+	refers to the string "name".
+
+\n[name]
+	refers to the number register "name".
+
+\$*
+	prints all arguments to a macro, separated by spaces.
+
+\$@
+	prints all arguments to a macro, each one surrounded by double
+	quotes, separated by spaces.
+
+                                                                8/18/05
