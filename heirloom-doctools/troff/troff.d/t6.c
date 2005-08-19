@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.27 (gritter) 8/19/05
+ * Sccsid @(#)t6.c	1.28 (gritter) 8/19/05
  */
 
 /*
@@ -1118,6 +1118,7 @@ casehidechar(void)
 		if (i < n)
 			fitab[xfont][i - 32] = 0;
 	}
+	zapwcache(0);
 }
 
 #include "unimap.h"
