@@ -23,6 +23,12 @@ can be used to deactivate new features for compatibility reasons.
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
 
+.hidechar ff c d ...					troff only
+	Hides the characters c, d, etc. from font ff. If the characters
+	appear in input afterwards, they are searched in other fonts
+	using the fallback sequence. This is useful e.g. for combining
+	characters from a regular and an expert font.
+
 .lc_ctype localename
 	sets the LC_CTYPE locale setting to localename. The default is
 	the value of the LC_CTYPE environment variable. This request is

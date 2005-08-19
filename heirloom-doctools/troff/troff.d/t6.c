@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.26 (gritter) 8/19/05
+ * Sccsid @(#)t6.c	1.27 (gritter) 8/19/05
  */
 
 /*
@@ -184,6 +184,17 @@ getcw(register int i)
 			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
 				j = fitab[ii][i] & BYTEMASK;
 				if (j != 0) {
+					/*
+					 * troff traditionally relies on the
+					 * device postprocessor to find the
+					 * appropriate character since it
+					 * searches the fonts in the same
+					 * order. This does not work with the
+					 * new requests anymore, so change
+					 * the font explicitly.
+					 */
+					if (xflag)
+						xfont = ii;
 				found:	p = fontab[ii];
 					k = *(p + j);
 					if (xfont == sbold)
@@ -1086,6 +1097,27 @@ casefallback(void)
 		fb[n++] = i;
 	} while (i);
 	fallbacktab[j] = fb;
+}
+
+void
+casehidechar(void)
+{
+	int	i, j, n, m;
+	tchar	k;
+
+	skip();
+	i = getrq();
+	if ((j = findft(i)) < 0)
+		return;
+	while ((i = cbits(k = getch())) != '\n') {
+		if (fbits(k) != xfont || ismot(k) || i == ' ')
+			continue;
+		n = 128 - 32 + nchtab;
+		if (afmtab && (m=(fontbase[xfont]->spare1&BYTEMASK)-1) >= 0)
+			n += afmtab[m]->nchars;
+		if (i < n)
+			fitab[xfont][i - 32] = 0;
+	}
 }
 
 #include "unimap.h"

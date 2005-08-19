@@ -13,6 +13,8 @@ Release ...
 * troff: The ".tkf" request for tracking letter space has been added.
 * troff: The ".fallback" request for selecting the order in which fonts
   are searched for missing characters in the current font has been added.
+* troff: The ".hidechar" request hides characters from a font which are
+  then searched using the fallback sequence.
 * The file "NEWS" describes new troff language features.
 * A bug in the supplied realloc() replacement could result in heap
   corruption.
