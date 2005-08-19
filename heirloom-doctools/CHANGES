@@ -15,6 +15,9 @@ Release ...
   are searched for missing characters in the current font has been added.
 * troff: The ".hidechar" request hides characters from a font which are
   then searched using the fallback sequence.
+* troff/dpost: The "\X'Sync'" escape forces dpost to write position and
+  font information to the generated PostScript. This is sometimes useful
+  to ensure that following "\X'PS: ...'" escapes work as expected.
 * The file "NEWS" describes new troff language features.
 * A bug in the supplied realloc() replacement could result in heap
   corruption.

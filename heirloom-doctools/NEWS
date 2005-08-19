@@ -82,4 +82,10 @@ any character in the current LC_CTYPE locale
 	Otherwise, the .fallback sequence is searched for it. This
 	mechanism only works with fonts mounted by the .afm request.
 
+\X'Sync'
+	forces dpost to write position and font information to the
+	generated PostScript exactly at the place where this escape
+	sequence occurs. This is sometimes useful to ensure that
+	following "\X'PS: ...'" commands work as expected.
+
                                                                 8/19/05
