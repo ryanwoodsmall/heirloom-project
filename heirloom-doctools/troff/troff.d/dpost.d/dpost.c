@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.15 (gritter) 8/18/05
+ * Sccsid @(#)dpost.c	1.16 (gritter) 8/19/05
  */
 
 /*
@@ -2228,6 +2228,7 @@ printencvector(struct afmtab *a)
 			s++;
 		if (s < a->nchars + 128 - 32 + nchtab &&
 				(k = a->fitab[s]&0377) != 0 &&
+				k < a->nchars &&
 				a->nametab[k] != NULL) {
 			afmmap[s - 128 + 32 - nchtab] = j;
 			col += fprintf(tf, "/%s", a->nametab[k]);
@@ -2241,7 +2242,8 @@ printencvector(struct afmtab *a)
 	col += fprintf(tf, "/space");
 	printencsep(&col);
 	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++) {
-		if ((k = a->fitab[i]&0377) != 0 && a->nametab[k] != NULL) {
+		if ((k = a->fitab[i]&0377) != 0 && k < a->nchars &&
+				a->nametab[k] != NULL) {
 			col += fprintf(tf, "/%s", a->nametab[k]);
 			printencsep(&col);
 		} else {
@@ -2251,6 +2253,7 @@ printencvector(struct afmtab *a)
 				s++;
 			if (s < a->nchars + 128 - 32 + nchtab &&
 				(k = a->fitab[s]&0377) != 0 &&
+				k < a->nchars &&
 				a->nametab[k] != NULL) {
 				afmmap[s - 128 + 32 - nchtab] = i + 32;
 				col += fprintf(tf, "/%s", a->nametab[k]);

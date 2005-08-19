@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.8 (gritter) 8/18/05
+ * Sccsid @(#)afm.c	1.9 (gritter) 8/19/05
  */
 
 #include <stdlib.h>
@@ -280,13 +280,16 @@ addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 	 * equivalent or if it is above.
 	 */
 	ae = asciiequiv(C, N);
-	if (C < 0 || C < 127 && ae)
+	if (tp)
+		a->codetab[a->nchars] = tp;
+	else if (C > 32 && C < 127 && ae)
 		a->codetab[a->nchars] = C;
 	else
 		a->codetab[a->nchars] = -1;
-	if (N == NULL || C < 127 && ae)
-		if (tp >= 32 && C >= 0)
-			a->fitab[tp - 32] = a->nchars;
+	if (C > 32 && C < 127 && ae)
+		a->fitab[C - 32] = a->nchars;
+	if (tp)
+		a->fitab[tp - 32] = a->nchars;
 	if (N) {
 		a->nametab[a->nchars] = malloc(strlen(N) + 1);
 		strcpy(a->nametab[a->nchars], N);
@@ -358,10 +361,8 @@ addmetrics(struct afmtab *a, char *_line)
 	}
 	if (N == NULL)
 		return;
-	if (C < 0 || C > 32)
-		addchar(a, C, C, WX, B, N);
-	if ((tp = mapname(N)) != 0)
-		addchar(a, C, tp, WX, B, NULL);
+	tp = mapname(N);
+	addchar(a, C, tp, WX, B, N);
 }
 
 int

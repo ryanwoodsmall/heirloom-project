@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.25 (gritter) 8/19/05
+ * Sccsid @(#)t6.c	1.26 (gritter) 8/19/05
  */
 
 /*
@@ -181,13 +181,7 @@ getcw(register int i)
 			}
 		}
 		if (smnt) {
-			ii = smnt;
-			j = fitab[ii][i] & BYTEMASK;
-			if (j != 0)
-				goto found;
-			for (ii=0; ii <= nfonts; ii++) {
-				if (ii == smnt || fitab[ii] == NULL)
-					continue;
+			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
 				j = fitab[ii][i] & BYTEMASK;
 				if (j != 0) {
 				found:	p = fontab[ii];
@@ -329,6 +323,14 @@ postchar(const char *temp, int *fp)
 		for (j = 0; fallbacktab[xfont][j] != 0; j++) {
 			if ((i = findft(fallbacktab[xfont][j])) < 0)
 				continue;
+			if ((c = postchar1(temp, i)) != 0) {
+				*fp = i;
+				return c;
+			}
+		}
+	}
+	if (smnt) {
+		for (i=smnt, j=0; j < nfonts; j++, i=i % nfonts + 1) {
 			if ((c = postchar1(temp, i)) != 0) {
 				*fp = i;
 				return c;
