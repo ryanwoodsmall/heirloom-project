@@ -1,6 +1,9 @@
 Font handling in troff with PostScript devices
 ==============================================
 
+The basics
+----------
+
 troff understands two ways to select PostScript fonts.
 
 The old method requires font tables to be generated manually. This
@@ -59,4 +62,108 @@ interest for troff:
 
 That's it.
 
-        Gunnar Ritter                                           8/19/05
+
+Replacing the default fonts with .afm fonts
+-------------------------------------------
+
+The old default fonts do not contain information about international
+characters etc. Many of the extended features thus cannot be used with
+them. If possible, they should thus be replaced by .afm equivalents.
+With the Adobe fonts, it looks like this (note that your terminal and
+text editor/viewer must support UTF-8 for viewing the text of example):
+
+	.lc_ctype de_DE.utf8
+	.afm R tir_____ 1
+	.afm I tii_____ 2
+	.afm B tib_____ 3
+	.afm BI tibi____ 4
+	.afm S sy______ 10
+	Deutscher Text mit „Anführungszeichen“
+	.sp
+	The first five small letters of the Greek alphabet: α β γ δ ε
+
+Many troff documents refer to the first three fonts by register rather
+than by name. It is thus recommended that the base fonts of a document
+are mounted explicitly on these places. The same applies to the Symbol
+font, which should always be mounted on register number ten.
+
+
+Using fonts with old style numerals
+-----------------------------------
+
+A font with old style numerals but otherwise standard characters usually
+does not require any special mechanism. It can simply be mounted, selected,
+and used.
+
+
+Using fonts with small capital letters
+--------------------------------------
+
+Small capital fonts normally need letter space tracking. Thus e.g.
+to use the Stempel Garamond small capital font, write something like
+
+	.supply gsrsc___
+	.afm SC gsrsc___
+	.tkf SC 1 .2 24 2
+	.ft SC
+	This text prints in Small Capitals.
+
+
+Using a combination of expert and standard fonts for small capitals
+-------------------------------------------------------------------
+
+An expert font contains small capital letters but no upper-case capital
+letters. Since it would be very inconvenient to change the font
+explicitly for each upper-case letter, the fallback sequence is useful
+in this case. The expert font is selected as text font, but for each
+upper-case capital letter encountered, troff changes automatically to
+the standard font. An example with the Monotype Fournier type:
+
+	.supply fn______
+	.afm R fn______ 1
+	.supply fny_____
+	.afm E fny_____
+	.tkf E 1 .2 24 2
+	.fallback E R
+	.ft E
+	This text prints in Small Capitals.
+
+
+Using a combination of expert and standard fonts for old style numerals
+-----------------------------------------------------------------------
+
+This also uses the fallback sequence, but since the standard numerals
+are present in the standard font, they have to be hidden first so that
+troff does not select them:
+
+	.supply fn______
+	.afm R fn______ 1
+	.supply fny_____
+	.afm E fny_____
+	.fallback R E
+	.hidechar R 0123456789
+	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
+
+
+Using the expert font for both small capitals and old style numberals
+---------------------------------------------------------------------
+
+The examples above can also be combined. Since the .tkf request does not
+affect the tracking of fonts that are selected by the fallback sequence,
+it is sufficient to mount each font once:
+
+	.supply fn______
+	.afm R fn______ 1
+	.supply fny_____
+	.afm E fny_____
+	.fallback R E
+	.fallback E R
+	.tkf E 1 .2 24 2
+	.hidechar R 0123456789
+	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
+	.br
+	.ft E
+	But this text prints in Small Capitals.
+
+
+Gunnar Ritter                                                 8/19/05
