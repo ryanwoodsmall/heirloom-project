@@ -22,7 +22,7 @@ with this method:
       which this font is to be mounted, as with the ".fp" command.
 
     .supply basename
-      causes dpost to include data from "fontdir/pfa/basename.pfa" into
+      causes dpost to include data from "fontdir/pfb/basename.pfb" into
       the generated PostScript. This is useful to include fonts that have
       not yet been downloaded into the printer, or for generating PDFs
       with additional fonts.
@@ -52,15 +52,11 @@ interest for troff:
       This file contains the actual glyph data. troff does not really
       need this file, but your printer or PDF converter does. In many
       cases, it is most convenient to include the data directly into
-      the .ps file generated. A .pfb file contains binary data, but a
-      .ps file usually contains text. It is thus necessary to convert
-      it. Assuming that you have Ghostscript installed, simply execute
-      "pfbtopfa xxxxxxxx.pfb xxxxxxxx.pfa". This will generate a .pfa
-      file which you should put into the troff font directory
-      /usr/ucblib/doctools/font/devpost/pfa. With a ".supply xxxxxxxx"
+      the .ps file generated. Put the file into the troff font directory
+      /usr/ucblib/doctools/font/devpost/pfb. With a ".supply xxxxxxxx"
       request, troff (actually, dpost) includes the glyph data into
       the .ps output.
 
 That's it.
 
-        Gunnar Ritter                                           8/18/05
+        Gunnar Ritter                                           8/19/05

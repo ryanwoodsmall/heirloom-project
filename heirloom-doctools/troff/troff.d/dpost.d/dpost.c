@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.16 (gritter) 8/19/05
+ * Sccsid @(#)dpost.c	1.17 (gritter) 8/19/05
  */
 
 /*
@@ -1885,21 +1885,124 @@ t_supply(char *name)		/* supply a font */
 	supplylist = sp;
 }
 
+static unsigned long
+ple32(const char *cp)
+{
+	return (unsigned long)(cp[0]&0377) +
+		((unsigned long)(cp[1]&0377) << 8) +
+		((unsigned long)(cp[2]&0377) << 16) +
+		((unsigned long)(cp[3]&0377) << 24);
+}
+
+static const char ps_adobe_font_1_0[] = "%!PS-AdobeFont-1.0:";
+
+static void
+supplypfb(char *name, char *path, FILE *fp)
+{
+    char	buf[30];
+    char	*font = NULL;
+    int	sz = 0;
+    long	length;
+    int	i, c = EOF, n, type = 0;
+
+    if (fread(buf, 1, 6, fp) != 6)
+	    error(FATAL, "no data in %s", path);
+    if ((buf[0]&0377) != 0200 || (type = buf[1]) != 1)
+	    error(FATAL, "invalid header in %s", path);
+    length = ple32(&buf[2]);
+    n = 0;
+    while (ps_adobe_font_1_0[n] && --length > 0 && (c = getc(fp)) != EOF) {
+	    if (c != ps_adobe_font_1_0[n++])
+		    error(FATAL, "file %s does not start with \"%s\"",
+				    path, ps_adobe_font_1_0);
+    }
+    while (--length > 0 && (c = getc(fp)) != EOF && (c == ' ' || c == '\t'));
+    n = 0;
+    do {
+	    if (n+1 >= sz)
+		    font = realloc(font, sz += 20);
+	    font[n++] = c;
+	    if (--length <= 0)
+		    break;
+	    c = getc(fp);
+    } while (c != ' ' && c != '\t' && c != '\n' && c != '\r');
+    font[n] = '\0';
+    while (c != '\r' && --length > 0)
+	    c = getc(fp);
+    if ((c = getc(fp)) != '\n')
+	    ungetc(c, fp);
+    else
+	    length--;
+    fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    free(font);
+    for (;;) {
+    	switch (type) {
+    	case 1:
+	    	while (length > 0 && (c = getc(fp)) != EOF) {
+			length--;
+		    	switch (c) {
+		    	case '\r':
+    				if ((c = getc(fp)) != '\n')
+	    				ungetc(c, fp);
+    				else
+	    				length--;
+				putc('\n', tf);
+				break;
+		    	case 0:
+				continue;
+		    	default:
+				putc(c, tf);
+		    	}
+	    	}
+	    	if (c == EOF)
+		    	error(FATAL, "short text data in %s", path);
+	    	break;
+    	case 2:
+	    	while (length) {
+	    		n = length > sizeof buf ? sizeof buf : length;
+	    		if (fread(buf, 1, n, fp) != n)
+		    		error(FATAL, "short binary data in %s", path);
+	    		for (i = 0; i < n; i++)
+		    		fprintf(tf, "%02x", buf[i]&0377);
+	    		putc('\n', tf);
+			length -= n;
+	    	}
+	    	break;
+    	case 3:
+    		fprintf(tf, "%%%%EndResource\n");
+		return;
+	default:
+	        error(FATAL, "invalid header type %d in %s", path, type);
+    	}
+        if ((n = fread(buf, 1, 6, fp)) != 6 && (buf[1] != 3 || n < 2))
+	        error(FATAL, "missing header in %s", path);
+        if ((buf[0]&0377) != 0200)
+	        error(FATAL, "invalid header in %s", path);
+	if ((type = buf[1]) != 3)
+        	length = ple32(&buf[2]);
+    }
+}
+
 static void
 supply1(char *name)
 {
     FILE *fp;
     char line[4096], *lp, *font;
-    const char comm[] = "%!PS-AdobeFont-1.0:";
 
+    sprintf(temp, "%s/dev%s/pfb/%s.pfb", fontdir, devname, name);
+    if ((fp = fopen(temp, "r")) != NULL) {
+	    supplypfb(name, temp, fp);
+	    return;
+    }
     sprintf(temp, "%s/dev%s/pfa/%s.pfa", fontdir, devname, name);
     if ((fp = fopen(temp, "r")) == NULL)
 	    error(FATAL, "can't open %s", temp);
     if (fgets(line, sizeof line, fp) == NULL)
 	    error(FATAL, "missing data in %s", temp);
-    if (strncmp(line, comm, strlen(comm)) != 0)
-	    error(FATAL, "file %s does not start with \"%s\"", temp, comm);
-    lp = &line[strlen(comm)];
+    if (strncmp(line, ps_adobe_font_1_0, strlen(ps_adobe_font_1_0)) != 0)
+	    error(FATAL, "file %s does not start with \"%s\"",
+			    temp, ps_adobe_font_1_0);
+    lp = &line[strlen(ps_adobe_font_1_0)];
     while (*lp == ' ' || *lp == '\t')
 	    lp++;
     font = lp;

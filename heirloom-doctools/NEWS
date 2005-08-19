@@ -36,7 +36,7 @@ can be used to deactivate new features for compatibility reasons.
 	usual.
 
 .supply basename					troff only
-	causes dpost to include data from "fontdir/pfa/basename.pfa" into
+	causes dpost to include data from "fontdir/pfb/basename.pfb" into
 	the generated PostScript. This is useful to include fonts that have
 	not yet been downloaded into the printer, or for generating PDFs
 	with additional fonts.

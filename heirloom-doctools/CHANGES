@@ -1,5 +1,5 @@
 Release ...
-* troff: Can now directly handle .afm/.pfa files (i.e. PostScript fonts)
+* troff: Can now directly handle .afm/.pfb files (i.e. PostScript fonts)
   to select fonts with the -x option. New requests ".afm" and ".supply"
   have been introduced for this. See the file "FONTS" for details.
 * troff: Handles input characters according to LC_CTYPE now in combination
