@@ -1,4 +1,7 @@
 [11.26] released ...
+* When the "next" or newline command is typed as the first command after a
+  folder has been opened, the first (new) message is printed even if a
+  folder hook has been executed previously (bugreport by Stephen Isard).
 * In combination with OpenSSL, when a SIGPIPE was received on an SSL socket
   during a call to SSL_read() e.g. because an IMAP connection had timed out,
   a segmentation fault occurred because OpenSSL apparently cannot handle

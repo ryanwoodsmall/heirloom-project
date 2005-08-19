@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.82 (gritter) 7/5/05";
+static char sccsid[] = "@(#)lex.c	2.83 (gritter) 8/19/05";
 #endif
 #endif /* not lint */
 
@@ -620,7 +620,7 @@ out:
 			muvec[1] = 0;
 			type(muvec);
 		}
-	if (!sourcing && (com->c_argtype & T) == 0)
+	if (!sourcing && !inhook && (com->c_argtype & T) == 0)
 		sawcom = 1;
 	return(0);
 }
