@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.18 (gritter) 8/19/05
+ * Sccsid @(#)dpost.c	1.19 (gritter) 8/19/05
  */
 
 /*
@@ -2311,10 +2311,9 @@ static char *
 printencvector(struct afmtab *a)
 {
 	int	i, j, k, col = 0, s, w;
-	static int	vecno = 1;
 	char	*afmmap = NULL;
 
-	fprintf(tf, "/Encoding-@%d [\n", vecno);
+	fprintf(tf, "/Encoding-@%s [\n", a->Font.intname);
 	col = 0;
 	/*
 	 * First, write excess entries into the positiongs from 1 to 31
@@ -2374,12 +2373,11 @@ printencvector(struct afmtab *a)
 /%s findfont\n\
 dup length dict begin\n\
   {1 index /FID ne {def} {pop pop} ifelse} forall\n\
-  /Encoding Encoding-@%d def\n\
+  /Encoding Encoding-@%s def\n\
   currentdict\n\
 end\n\
-/%s-@ exch definefont pop\n",
-		a->fontname, vecno, a->fontname);
-	vecno++;
+/%s-@%s exch definefont pop\n",
+		a->fontname, a->Font.intname, a->fontname, a->Font.intname);
 	return afmmap;
 }
 /*****************************************************************************/
@@ -2437,9 +2435,11 @@ t_sf(void)
 	seenfonts[fnum] = 1;
     }	/* End if */
 
-    fprintf(tf, "%d %s%s%s f\n", pstab[size-1], fontname[font].afm ? "/" : "",
-		    fontname[font].name,
-		    fontname[font].afm ? "-@" : "");
+    if (fontname[font].afm)
+    	fprintf(tf, "%d /%s-@%s f\n", pstab[size-1], fontname[font].name,
+		    fontname[font].afm->Font.intname);
+    else
+    	fprintf(tf, "%d %s f\n", pstab[size-1], fontname[font].name);
 
     if ( fontheight != 0 || fontslant != 0 )
 	fprintf(tf, "%d %d changefont\n", fontslant, (fontheight != 0) ? fontheight : pstab[size-1]);
