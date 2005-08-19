@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.19 (gritter) 8/19/05
+ * Sccsid @(#)dpost.c	1.20 (gritter) 8/19/05
  */
 
 /*
@@ -1311,13 +1311,6 @@ devcntrl(
 		t_slant(n);
 		break;
 
-	case 'P':			/* additional PostScript features */
-		if (strcmp(&str[1], "supply") == 0) {
-			fscanf(fp, "%s", str);
-			t_supply(str);
-		}
-		break;
-
 	case 'X':			/* copy through - from troff */
 		fscanf(fp, " %[^: \n]:", str);
 		fgets(buf, sizeof(buf), fp);
@@ -1326,6 +1319,8 @@ devcntrl(
 		    picture(buf);
 		else if ( strcmp(str, "InlinePicture") == 0 )
 		    inlinepic(fp, buf);
+		else if ( strcmp(str, "Supply") == 0 )
+		    t_supply(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -1878,8 +1873,13 @@ void
 t_supply(char *name)		/* supply a font */
 {
 	struct supplylist	*sp;
+	char	*np;
 
 	sp = calloc(1, sizeof *sp);
+	while (*name == ' ' || *name == '\t')
+		name++;
+	for (np = name; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
+	*np = 0;
 	sp->name = strdup(name);
 	sp->next = supplylist;
 	supplylist = sp;
