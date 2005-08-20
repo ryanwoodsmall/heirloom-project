@@ -82,7 +82,7 @@ any character in the current LC_CTYPE locale
 	In troff, the character is converted to a PostScript character
 	name. If it is found in the current font, it is printed.
 	Otherwise, the .fallback sequence is searched for it. This
-	mechanism only works with fonts mounted by the .afm request.
+	mechanism only works with fonts mounted by the .fpost request.
 
 \X'Sync'
 	forces dpost to write position and font information to the
