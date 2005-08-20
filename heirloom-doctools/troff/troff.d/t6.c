@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.31 (gritter) 8/20/05
+ * Sccsid @(#)t6.c	1.32 (gritter) 8/20/05
  */
 
 /*
@@ -1125,11 +1125,8 @@ mapwc(int c, int *fp)
 	int	i, j;
 
 	for (i = 0; unimap[i].psc; i++)
-		if (unimap[i].code == c) {
+		if (unimap[i].code == c)
 			if ((j = postchar(unimap[i].psc, fp)) != 0)
 				return j;
-			else
-				break;
-		}
 	return 0;
 }
