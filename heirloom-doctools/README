@@ -44,6 +44,10 @@ them if necessary. You can also build a RPM package with the command
 troff currently reads several binary files which are built during
 the compilation process. It is thus not possible to cross-compile.
 
+The locale-dependent character input in troff assumes that the C library
+represents wchar_t values as Unicode characters. This is the case on any
+modern Unix system.
+
 In order to use the utilities for formatting manual pages, note the
 following:
 
