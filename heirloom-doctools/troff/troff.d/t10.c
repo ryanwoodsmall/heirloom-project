@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.14 (gritter) 8/19/05
+ * Sccsid @(#)t10.c	1.16 (gritter) 8/20/05
  */
 
 /*
@@ -597,11 +597,11 @@ ptesc(void)
 }
 
 void
-ptsupply(char *name)
+ptsupply(char *fontname, char *file, char *type)
 {
 	if (ascii)
 		return;
-	fdprintf(ptid, "x X Supply %s\n", name);
+	fdprintf(ptid, "x X Supply %s %s %s\n", fontname, file, type);
 }
 
 void

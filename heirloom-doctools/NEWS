@@ -5,12 +5,6 @@ Unless otherwise noted, new features become effective with the -x option
 only. In the future, the -x option may become the default; the -X option
 can be used to deactivate new features for compatibility reasons.
 
-.afm yy basename [register]				troff only
-	reads metrics from the file "fontdir/afm/basename.afm". The font
-	is then available with ".ft yy", "\f(yy", etc. The optional
-	"register" argument can be used to specify a font position to
-	which this font is to be mounted, as with the ".fp" command.
-
 .de longname
 .ds longname
 .nr longname
@@ -22,6 +16,20 @@ can be used to deactivate new features for compatibility reasons.
 	is ff and a character is not found, font aa is searched first,
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
+
+.fpost r yy basename [pfb|pfa]				troff only
+	reads metrics from the file "fontdir/afm/basename.afm". The font
+	is then available with ".ft yy", "\f(yy", etc.; "yy" may be the
+	name of an existing ditroff-style font, such as "R", or may be
+	freely chosen. The "r" argument specifies a register on which
+	the font is to be mounted; if it is zero or too large, the font
+	is mounted on a free position. Contrasting to the ".fp" request,
+	the "r" argument may consist of more than a single digit. If
+	the optional "pfb|pfa" argument is present, data from the file
+	"fontdir/pfb/basename.pfb" (or pfa, respectively) is included
+	into the generated PostScript. This is useful to include fonts
+	that have not yet been downloaded into the printer, or for
+	generating PDFs with additional fonts.
 
 .hidechar ff c d ...					troff only
 	Hides the characters c, d, etc. from font ff. If the characters
@@ -40,12 +48,6 @@ can be used to deactivate new features for compatibility reasons.
 	space is added between sentences. If m is zero, no additional
 	white space is added. Otherwise, a space of size n is added as
 	usual.
-
-.supply basename					troff only
-	causes dpost to include data from "fontdir/pfb/basename.pfb" into
-	the generated PostScript. This is useful to include fonts that have
-	not yet been downloaded into the printer, or for generating PDFs
-	with additional fonts.
 
 .tkf ff s1 n1 s2 n2					troff only
 	specifies tracking of letter space for font ff. If the current font
@@ -88,4 +90,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-                                                                8/19/05
+                                                                8/20/05

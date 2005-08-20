@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.22 (gritter) 8/20/05
+ * Sccsid @(#)dpost.c	1.24 (gritter) 8/20/05
  */
 
 /*
@@ -1869,21 +1869,39 @@ t_init(void)
 
 static struct supplylist {
 	struct supplylist	*next;
-	char	*name;
+	char	*font;
+	char	*file;
+	char	*type;
 } *supplylist;
 
 void
-t_supply(char *name)		/* supply a font */
+t_supply(char *font)		/* supply a font */
 {
 	struct supplylist	*sp;
-	char	*np;
+	char	*np, *file, *type;
 
-	sp = calloc(1, sizeof *sp);
-	while (*name == ' ' || *name == '\t')
-		name++;
-	for (np = name; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
+	while (*font == ' ' || *font == '\t')
+		font++;
+	for (np = font; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
+	if (*np == '\0' || *np == '\n')
+		return;
+	*np = '\0';
+	file = &np[1];
+	while (*file == ' ' || *file == '\t')
+		file++;
+	for (np = file; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
+	if (*np == '\0' || *np == '\n')
+		return;
+	*np = '\0';
+	type = &np[1];
+	while (*type == ' ' || *type == '\t')
+		type++;
+	for (np = type; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
 	*np = 0;
-	sp->name = strdup(name);
+	sp = calloc(1, sizeof *sp);
+	sp->font = strdup(font);
+	sp->file = strdup(file);
+	sp->type = strdup(type);
 	sp->next = supplylist;
 	supplylist = sp;
 }
@@ -1900,11 +1918,9 @@ ple32(const char *cp)
 static const char ps_adobe_font_1_0[] = "%!PS-AdobeFont-1.0:";
 
 static void
-supplypfb(char *name, char *path, FILE *fp)
+supplypfb(char *font, char *file, char *path, FILE *fp)
 {
     char	buf[30];
-    char	*font = NULL;
-    int	sz = 0;
     long	length;
     int	i, c = EOF, n, type = 0;
 
@@ -1919,17 +1935,7 @@ supplypfb(char *name, char *path, FILE *fp)
 		    error(FATAL, "file %s does not start with \"%s\"",
 				    path, ps_adobe_font_1_0);
     }
-    while (--length > 0 && (c = getc(fp)) != EOF && (c == ' ' || c == '\t'));
-    n = 0;
-    do {
-	    if (n+1 >= sz)
-		    font = realloc(font, sz += 20);
-	    font[n++] = c;
-	    if (--length <= 0)
-		    break;
-	    c = getc(fp);
-    } while (c != ' ' && c != '\t' && c != '\n' && c != '\r');
-    font[n] = '\0';
+    while (--length > 0 && (c = getc(fp)) != EOF && c != '\r' && c != '\n');
     while (c != '\r' && --length > 0)
 	    c = getc(fp);
     if ((c = getc(fp)) != '\n')
@@ -1937,7 +1943,6 @@ supplypfb(char *name, char *path, FILE *fp)
     else
 	    length--;
     fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
-    free(font);
     for (;;) {
     	switch (type) {
     	case 1:
@@ -1987,31 +1992,23 @@ supplypfb(char *name, char *path, FILE *fp)
 }
 
 static void
-supply1(char *name)
+supply1(char *font, char *file, char *type)
 {
     FILE *fp;
-    char line[4096], *lp, *font;
+    char line[4096];
 
-    sprintf(temp, "%s/dev%s/pfb/%s.pfb", fontdir, devname, name);
-    if ((fp = fopen(temp, "r")) != NULL) {
-	    supplypfb(name, temp, fp);
-	    return;
-    }
-    sprintf(temp, "%s/dev%s/pfa/%s.pfa", fontdir, devname, name);
+    sprintf(temp, "%s/dev%s/%s/%s.%s", fontdir, devname, type, file, type);
     if ((fp = fopen(temp, "r")) == NULL)
 	    error(FATAL, "can't open %s", temp);
+    if (strcmp(type, "pfb") == 0) {
+	    supplypfb(font, file, temp, fp);
+	    return;
+    }
     if (fgets(line, sizeof line, fp) == NULL)
 	    error(FATAL, "missing data in %s", temp);
     if (strncmp(line, ps_adobe_font_1_0, strlen(ps_adobe_font_1_0)) != 0)
 	    error(FATAL, "file %s does not start with \"%s\"",
 			    temp, ps_adobe_font_1_0);
-    lp = &line[strlen(ps_adobe_font_1_0)];
-    while (*lp == ' ' || *lp == '\t')
-	    lp++;
-    font = lp;
-    while (*lp && *lp != ' ' && *lp != '\t' && *lp != '\n')
-	    lp++;
-    *lp = '\0';
     fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
     while (fgets(line, sizeof line, fp) != NULL)
 	    fputs(line, tf);
@@ -2029,7 +2026,10 @@ t_dosupply(void)
 	fprintf(tf, "%s", BEGINGLOBAL);
 	for (sp = supplylist; sp; sp = sp->next) {
 		free(sq);
-		supply1(sp->name);
+		supply1(sp->font, sp->file, sp->type);
+		free(sp->font);
+		free(sp->file);
+		free(sp->type);
 		sq = sp;
 	}
 	free(sq);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.28 (gritter) 8/19/05
+ * Sccsid @(#)t6.c	1.30 (gritter) 8/20/05
  */
 
 /*
@@ -938,30 +938,40 @@ struct afmtab **afmtab;
 int nafm;
 
 void
-caseafm(void)
+casefpost(void)
 {
 	extern int sprintf(char *, const char *, ...);
 	struct stat	st;
 	int	c, i = 0, j, rq, fd;
-	char	*file = NULL, *path, *contents;
-	size_t	sz = 0;
+	char	*file = NULL, *path, *contents, *supply = NULL;
+	size_t	sz = 0, ssz = 0;
 	struct afmtab	*a;
 	int	nf = nfonts + 1;
 
+	skip();
+	if ((j = atoi()) > 0 && j <= nfonts)
+		nf = j;
 	skip();
 	if ((rq = getrq()) == 0)
 		return;
 	skip();
 	do {
-		c = getach() & 0377;
+		c = getach();
 		if (i >= sz)
 			file = realloc(file, (sz += 8) * sizeof *file);
 		file[i++] = c;
-	} while (c && c != ' ' && c != '\n');
-	file[i-1] = 0;
-	skip();
-	if ((j = atoi()) > 0 && j <= nfonts)
-		nf = j;
+	} while (c);
+	if (cbits(ch) == ' ') {
+		skip();
+		i = 0;
+		do {
+			c = getach();
+			if (i >= ssz)
+				supply = realloc(supply, (sz += 4) *
+						sizeof *supply);
+			supply[i++] = c;
+		} while (c);
+	}
 	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 14);
 	sprintf(path, "%s/dev%s/afm/%s.afm", fontfile, devname, file);
 	if ((fd = open(path, O_RDONLY)) < 0) {
@@ -1020,26 +1030,12 @@ caseafm(void)
 	nafm++;
 	if (nf > nfonts)
 		nfonts = nf;
+	if (supply) {
+		ptsupply(a->fontname, a->file, supply);
+		free(supply);
+	}
 	if (realpage)
 		ptfpcmd(nf, a->file);
-}
-
-void
-casesupply(void)
-{
-	int	c, i = 0, sz = 0;
-	char	*file = NULL;
-
-	skip();
-	do {
-		c = getach() & 0377;
-		if (i >= sz)
-			file = realloc(file, (sz += 8) * sizeof *file);
-		file[i++] = c;
-	} while (c && c != ' ' && c != '\n');
-	file[i-1] = 0;
-	ptsupply(file);
-	free(file);
 }
 
 int
