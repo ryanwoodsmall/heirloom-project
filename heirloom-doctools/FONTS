@@ -124,11 +124,11 @@ An expert font contains small capital letters but no upper-case capital
 letters. Since it would be very inconvenient to change the font
 explicitly for each upper-case letter, the fallback sequence is useful
 in this case. The expert font is selected as text font, but for each
-upper-case capital letter encountered, troff changes automatically to
-the standard font. An example with the Monotype Fournier type:
+upper-case letter encountered, troff changes automatically to the
+standard font. An example with the Monotype Fournier type:
 
-	.fpost 1 R fn______
-	.fpost 0 E fny_____
+	.fpost 1 R fn______ pfb
+	.fpost 0 E fny_____ pfb
 	.tkf E 1 .2 24 2
 	.fallback E R
 	.ft E
@@ -142,22 +142,22 @@ This also uses the fallback sequence, but since the standard numerals
 are present in the standard font, they have to be hidden first so that
 troff does not select them:
 
-	.fpost 1 R fn______
-	.fpost 0 E fny_____
+	.fpost 1 R fn______ pfb
+	.fpost 0 E fny_____ pfb
 	.fallback R E
 	.hidechar R 0123456789
 	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
 
 
-Using the expert font for both small capitals and old style numberals
----------------------------------------------------------------------
+Using the expert font for both small capitals and old style numerals
+--------------------------------------------------------------------
 
 The examples above can also be combined. Since the .tkf request does not
 affect the tracking of fonts that are selected by the fallback sequence,
 it is sufficient to mount each font once:
 
-	.fpost 1 R fn______
-	.fpost 0 E fny_____
+	.fpost 1 R fn______ pfb
+	.fpost 0 E fny_____ pfb
 	.fallback R E
 	.fallback E R
 	.tkf E 1 .2 24 2
