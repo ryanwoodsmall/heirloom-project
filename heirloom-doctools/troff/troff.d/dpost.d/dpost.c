@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.24 (gritter) 8/20/05
+ * Sccsid @(#)dpost.c	1.25 (gritter) 8/20/05
  */
 
 /*
@@ -1916,6 +1916,7 @@ ple32(const char *cp)
 }
 
 static const char ps_adobe_font_1_0[] = "%!PS-AdobeFont-1.0:";
+static const char ps_truetypefont_[] = "%!PS-TrueTypeFont-";
 
 static void
 supplypfb(char *font, char *file, char *path, FILE *fp)
@@ -2006,9 +2007,10 @@ supply1(char *font, char *file, char *type)
     }
     if (fgets(line, sizeof line, fp) == NULL)
 	    error(FATAL, "missing data in %s", temp);
-    if (strncmp(line, ps_adobe_font_1_0, strlen(ps_adobe_font_1_0)) != 0)
-	    error(FATAL, "file %s does not start with \"%s\"",
-			    temp, ps_adobe_font_1_0);
+    if (strncmp(line, ps_adobe_font_1_0, strlen(ps_adobe_font_1_0)) &&
+		    strncmp(line, ps_truetypefont_, strlen(ps_truetypefont_)))
+	    error(FATAL, "file %s does not start with \"%s\" or \"%s\"",
+			    temp, ps_adobe_font_1_0, ps_truetypefont_);
     fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
     while (fgets(line, sizeof line, fp) != NULL)
 	    fputs(line, tf);

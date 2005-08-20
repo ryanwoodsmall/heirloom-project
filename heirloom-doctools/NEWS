@@ -17,7 +17,7 @@ can be used to deactivate new features for compatibility reasons.
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
 
-.fpost r yy basename [pfb|pfa]				troff only
+.fpost r yy basename [pfb|pfa|t42]
 	reads metrics from the file "fontdir/afm/basename.afm". The font
 	is then available with ".ft yy", "\f(yy", etc.; "yy" may be the
 	name of an existing ditroff-style font, such as "R", or may be
@@ -25,11 +25,11 @@ can be used to deactivate new features for compatibility reasons.
 	the font is to be mounted; if it is zero or too large, the font
 	is mounted on a free position. Contrasting to the ".fp" request,
 	the "r" argument may consist of more than a single digit. If
-	the optional "pfb|pfa" argument is present, data from the file
-	"fontdir/pfb/basename.pfb" (or pfa, respectively) is included
-	into the generated PostScript. This is useful to include fonts
-	that have not yet been downloaded into the printer, or for
-	generating PDFs with additional fonts.
+	the optional "pfb|pfa|t42" argument is present, data from the
+	file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively) is
+	included into the generated PostScript. This is useful to
+	include fonts that have not yet been downloaded into the
+	printer, or for generating PDFs with additional fonts.
 
 .hidechar ff c d ...					troff only
 	Hides the characters c, d, etc. from font ff. If the characters

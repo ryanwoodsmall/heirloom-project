@@ -18,7 +18,7 @@ The new method can access PostScript font files directly. It is only
 available with "troff -x". A new request is available to handle fonts
 with this method:
 
-    .fpost r yy basename [pfb|pfa]
+    .fpost r yy basename [pfb|pfa|t42]
       reads metrics from the file "fontdir/afm/basename.afm". The font
       is then available with ".ft yy", "\f(yy", etc.; "yy" may be the
       name of an existing ditroff-style font, such as "R", or may be
@@ -26,11 +26,11 @@ with this method:
       the font is to be mounted; if it is zero or too large, the font
       is mounted on a free position. Contrasting to the ".fp" request,
       the "r" argument may consist of more than a single digit. If
-      the optional "pfb|pfa" argument is present, data from the file
-      "fontdir/pfb/basename.pfb" (or pfa, respectively) is included
-      into the generated PostScript. This is useful to include fonts
-      that have not yet been downloaded into the printer, or for
-      generating PDFs with additional fonts.
+      the optional "pfb|pfa|t42" argument is present, data from the
+      file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively) is
+      included into the generated PostScript. This is useful to
+      include fonts that have not yet been downloaded into the
+      printer, or for generating PDFs with additional fonts.
 
 As an example,
       
@@ -39,8 +39,8 @@ As an example,
       Here is some text in Monotype Van Dijck Regular.
 
 Making new fonts available is easy with this method. If you buy a
-PostScript font for use with troff, select the Windows version. You
-will get a set of files from your vendor. Only two of them are of
+PostScript Type 1 font for use with troff, select the Windows version.
+You will get a set of files from your vendor. Only two of them are of
 interest for troff:
 
     xxxxxxxx.afm
@@ -55,15 +55,25 @@ interest for troff:
       the .ps file generated. Put the file into the troff font directory
       /usr/ucblib/doctools/font/devpost/pfb.
 
-That's it.
+For TrueType fonts, an additional conversion step is necessary. troff
+cannot handle TrueType fonts directly, but it can handle PostScript
+Type 42 fonts, which are a special representation of them. You can
+use the "ttftot42" utility from <http://www.nih.at/ttftot42/> to
+generate a Type 42 font from a TrueType font. It will produce a .afm
+file, which you need to put into /usr/ucblib/doctools/font/devpost/afm
+as for a Type 1 font, and a .t42 file, which troff expects to find in
+/usr/ucblib/doctools/font/devpost/t42. You can then use the Type 42
+font just like a Type 1 font. The only drawback with this is that a
+Type 42 font requires special support from the PostScript interpreter;
+an aging printer may not be able to process them.
 
 
-Replacing the default ditroff fonts with .afm fonts
----------------------------------------------------
+Replacing the default ditroff fonts with AFM fonts
+--------------------------------------------------
 
 The old ditroff fonts do not contain information about international
 characters etc. Many of the extended features thus cannot be used with
-them. If possible, they should thus be replaced by .afm equivalents.
+them. If possible, they should thus be replaced by AFM equivalents.
 With the Adobe fonts, it looks like this (note that your terminal and
 text editor/viewer must support UTF-8 for viewing the text of example):
 
