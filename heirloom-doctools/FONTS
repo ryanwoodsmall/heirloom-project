@@ -168,4 +168,15 @@ it is sufficient to mount each font once:
 	But this text prints in Small Capitals.
 
 
+Limitations
+-----------
+
+troff can currently only access the first 255 characteres defined
+in an AFM file. This is sufficient for traditional PostScript fonts
+which almost uniformly contain fewer characters, but limits the use
+of internationalized TrueType fonts. If only a few characters need
+to be accessed, it is possible reorder the character entry lines in
+the AFM file to work around.
+
+
 Gunnar Ritter                                                 8/20/05
