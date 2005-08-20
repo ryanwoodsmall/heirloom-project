@@ -11,6 +11,14 @@ can be used to deactivate new features for compatibility reasons.
 	The names of macros, strings, and number registers can be longer
 	than two characters now.
 
+.ev name
+	Environments can be named, or be given an arbitrary number.
+
+.evc name
+	Copy the environment "name" into the current environment. The
+	temporary state of the current environment is reset, and
+	incompletely filled lines are discarded.
+
 .fallback ff aa bb ...					troff only
 	Selects the fallback sequence for font ff. If the current font
 	is ff and a character is not found, font aa is searched first,

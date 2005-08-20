@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.21 (gritter) 8/20/05
+ * Sccsid @(#)tdef.h	1.23 (gritter) 8/20/05
  */
 
 /*
@@ -593,7 +593,7 @@ extern struct env {
 	int	_tabtab[NTAB];
 	tchar	_line[LNSIZE];
 	tchar	_word[WDSIZE];
-} env;
+} env, initenv;
 
 /* n1.c */
 int tryfile(char *, char *, int);
@@ -746,6 +746,7 @@ void casert(void);
 void caseem(void);
 void casefl(void);
 void caseev(void);
+void caseevc(void);
 void caseel(void);
 void caseie(void);
 void caseif(int);

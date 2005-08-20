@@ -18,6 +18,10 @@ Release ...
   are searched for missing characters in the current font has been added.
 * troff: The ".hidechar" request hides characters from a font which are
   then searched using the fallback sequence.
+* [nt]roff: Environments selected with the ".ev" command can be given
+  names, and their number is no longer statically limited.
+* [nt]roff: The ".evc" request copies another environment to the current
+  one.
 * troff/dpost: The "\X'Sync'" escape forces dpost to write position and
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.

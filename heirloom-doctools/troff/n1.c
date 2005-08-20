@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.20 (gritter) 8/20/05
+ * Sccsid @(#)n1.c	1.21 (gritter) 8/20/05
  */
 
 /*
@@ -408,6 +408,7 @@ init2(void)
 	frame = stk = (struct s *)setbrk(DELTA);
 	dip = &d[0];
 	nxf = frame + 1;
+	initenv = env;
 #ifdef INCORE
 	for (i = 0; i < NEV; i++) {
 		extern tchar *corebuf;

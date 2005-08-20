@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.6 (gritter) 8/15/05
+ * Sccsid @(#)nii.c	1.7 (gritter) 8/20/05
  */
 
 /*
@@ -131,14 +131,11 @@ filep	apptr;
 int	diflg;
 filep	roff;
 int	wbfi;
-int	evi;
 int	vflag;
 int	noscale;
 int	po1;
 int	nlist[NTRAP];
 int	mlist[NTRAP];
-int	evlist[EVLSZ];
-int	ev;
 int	tty;
 int	sfont	= FT;	/* appears to be "standard" font; used by .ul */
 int	sv;
@@ -158,3 +155,4 @@ struct	widcache widcache[NWIDCACHE];
 struct	d d[NDI];
 struct	d *dip;
 int	mb_cur_max;
+struct env	initenv;

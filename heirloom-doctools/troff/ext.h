@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.10 (gritter) 8/17/05
+ * Sccsid @(#)ext.h	1.11 (gritter) 8/20/05
  */
 
 /*
@@ -98,9 +98,6 @@ extern	int	eqflg;
 extern	int	error;
 extern	int	esc;
 extern	int	eschar;
-extern	int	ev;
-extern	int	evi;
-extern	int	evlist[EVLSZ];
 extern	int	fc;
 extern	int	flss;
 extern	int	*fontlab;
