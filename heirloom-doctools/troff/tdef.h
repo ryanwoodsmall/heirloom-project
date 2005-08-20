@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.20 (gritter) 8/18/05
+ * Sccsid @(#)tdef.h	1.21 (gritter) 8/20/05
  */
 
 /*
@@ -681,6 +681,7 @@ void casetl(void);
 void casepc(void);
 void casepm(void);
 void stackdump(void);
+char *macname(int);
 int maybemore(int, int);
 /* n4.c */
 void *grownumtab(void);

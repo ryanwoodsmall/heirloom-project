@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.21 (gritter) 8/20/05
+ * Sccsid @(#)n3.c	1.22 (gritter) 8/20/05
  */
 
 /*
@@ -1067,14 +1067,23 @@ casepc(void)
 }
 
 
+/*
+ * Tables for names with more than two characters. Any number in
+ * contab.rq or numtab.rq that is greater or equal to MAXRQ2 refers
+ * to a long name.
+ */
+#define	MAXRQ2	0200000
+
+static char	**had;
+static int	hadn;
+static int	alcd;
+
 void
 casepm(void)
 {
 	register int i, k;
-	register char	*p;
 	int	xx, cnt, tcnt, kk, tot;
 	filep j;
-	char	pmline[10];
 
 	kk = cnt = tcnt = 0;
 	tot = !skip();
@@ -1082,7 +1091,6 @@ casepm(void)
 		if ((xx = contab[i].rq) == 0 || contab[i].mx == 0)
 			continue;
 		tcnt++;
-		p = pmline;
 		j = (filep) contab[i].mx;
 		k = 1;
 		while ((j = blist[blisti(j)]) != (unsigned) ~0) {
@@ -1090,13 +1098,8 @@ casepm(void)
 		}
 		cnt++;
 		kk += k;
-		if (!tot) {
-			*p++ = xx & 0177;
-			if (!(*p++ = (xx >> BYTE) & 0177))
-				*(p - 1) = ' ';
-			*p++ = 0;
-			fdprintf(stderr, "%s %d\n", pmline, k);
-		}
+		if (!tot)
+			fdprintf(stderr, "%s %d\n", macname(xx), k);
 	}
 	fdprintf(stderr, "pm: total %d, macros %d, space %d\n", tcnt, cnt, kk);
 }
@@ -1108,14 +1111,25 @@ stackdump (void)	/* dumps stack of macros in process */
 
 	if (frame != stk) {
 		for (p = frame; p != stk; p = p->pframe)
-			fdprintf(stderr, "%c%c ", p->mname&0177, (p->mname>>BYTE)&0177);
+			fdprintf(stderr, "%s ", macname(p->mname));
 		fdprintf(stderr, "\n");
 	}
 }
 
-static char	**had;
-static int	hadn;
-static int	alcd;
+char *
+macname(int rq)
+{
+	static char	buf[3];
+	if (rq < MAXRQ2) {
+		buf[0] = rq&0177;
+		buf[1] = (rq>>BYTE)&0177;
+		buf[2] = 0;
+		return buf;
+	} else if (rq - MAXRQ2 < hadn)
+		return had[rq - MAXRQ2];
+	else
+		return "???";
+}
 
 /*
  * To handle requests with more than two characters, an additional
@@ -1165,7 +1179,7 @@ maybemore(int sofar, int create)
 	pb[0] = c;
 	cpushback(pb);
 	raw = r;
-	return 0200000 + n;
+	return MAXRQ2 + n;
 }
 
 static int
@@ -1189,7 +1203,7 @@ getls(int termc)
 	if (n == hadn)
 	not:	n = -1;
 	free(buf);
-	return n >= 0 ? 0200000 + n : 0;
+	return n >= 0 ? MAXRQ2 + n : 0;
 }
 
 static void
@@ -1200,6 +1214,6 @@ addcon(int t, char *rs, void(*f)(int))
 	if (hadn++ >= alcd)
 		had = realloc(had, (alcd += 20) * sizeof *had);
 	had[n] = rs;
-	contab[t].rq = 0200000 + n;
+	contab[t].rq = MAXRQ2 + n;
 	contab[t].f = f;
 }

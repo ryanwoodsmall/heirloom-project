@@ -22,6 +22,8 @@ Release ...
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.
 * The file "NEWS" describes new troff language features.
+* [nt]roff: The output of long names with ".pm" and stack dumps has been
+  fixed.
 * A bug in the supplied realloc() replacement could result in heap
   corruption.
 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.19 (gritter) 8/18/05
+ * Sccsid @(#)n1.c	1.20 (gritter) 8/20/05
  */
 
 /*
@@ -667,9 +667,8 @@ control(register int a, register int b)
 		if (frame_cnt > MAX_RECURSION_DEPTH) {
 			errprint(
 			    "Exceeded maximum stack size (%d) when "
-			    "executing macro %c%c. Stack dump follows",
-			    MAX_RECURSION_DEPTH,
-			    frame->mname & 0177, (frame->mname >> BYTE) & 0177);
+			    "executing macro %s. Stack dump follows",
+			    MAX_RECURSION_DEPTH, macname(frame->mname));
 			edone(02);
 		}
 	}
