@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.26 (gritter) 8/20/05
+ * Sccsid @(#)dpost.c	1.27 (gritter) 8/20/05
  */
 
 /*
@@ -1388,7 +1388,7 @@ fontinit(void)
 
 
     sprintf(temp, "%s/dev%s/DESC.out", fontdir, devname);
-    if ( (fin = open(temp, 0)) < 0 )
+    if ( (fin = open(temp, O_RDONLY)) < 0 )
 	error(FATAL, "can't open tables for %s", temp);
 
     read(fin, &dev, sizeof(struct dev));
@@ -1459,7 +1459,7 @@ loadfont (
 	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
     else sprintf(temp, "%s/afm/%s.afm", s1, s);
 
-    if ( (fin = open(temp, 0)) >= 0 )  {
+    if ( (fin = open(temp, O_RDONLY)) >= 0 )  {
 	struct afmtab	*a;
 	struct stat	st;
 	char	*contents;
@@ -1500,9 +1500,9 @@ have:   fontbase[n] = &a->Font;
 	sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, s);
     else sprintf(temp, "%s/%s.out", s1, s);
 
-    if ( (fin = open(temp, 0)) < 0 )  {
+    if ( (fin = open(temp, O_RDONLY)) < 0 )  {
     fail:   sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, mapfont(s));
-	    if ( (fin = open(temp, 0)) < 0 )
+	    if ( (fin = open(temp, O_RDONLY)) < 0 )
 	        error(FATAL, "can't open font table %s", temp);
     }	/* End if */
 

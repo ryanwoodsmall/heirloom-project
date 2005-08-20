@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)daps.c	1.6 (gritter) 8/13/05
+ * Sccsid @(#)daps.c	1.7 (gritter) 8/20/05
  */
 
 /*
@@ -2751,7 +2751,7 @@ fileinit (void)
 
 
 	sprintf(temp, "%s/dev%s/DESC.out", fontdir, devname);
-	if ( (fin = open(temp, 0)) < 0 )	/* file didn't open - abort */
+	if ( (fin = open(temp, O_RDONLY)) < 0 )	/* file didn't open - abort */
 		error(FATAL, "can't open tables for %s", temp);
 
 	READ(fin, &dev, sizeof(struct dev));	/* init dev structure */
@@ -2914,7 +2914,7 @@ loadfont (
 		 sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, name);
 	else sprintf(temp, "%s/%s.out", fdir, name);
 
-	if ( (fin = open(temp, 0)) < 0 )			/* open the font file */
+	if ( (fin = open(temp, O_RDONLY)) < 0 )			/* open the font file */
 		error(FATAL, "can't open font table %s", temp);
 
 	norig = fontbase[num]->nwfont & BMASK;	/* 'space' available in pos num */
@@ -2969,7 +2969,7 @@ load_alt (
 
 	sprintf(cmd, "%s/dev%s/%s.add", fontdir, devname, fontname[font].name);
 
-	if ( (fin = open(cmd, 0)) < 0 )		/* couldn't open the file */
+	if ( (fin = open(cmd, O_RDONLY)) < 0 )	/* couldn't open the file */
 		error(FATAL, "can't open file %s", cmd);
 
 	nw = fontname[font].nwfont & BMASK;			/* number of width entries */
