@@ -75,13 +75,14 @@ The old ditroff fonts do not contain information about international
 characters etc. Many of the extended features thus cannot be used with
 them. If possible, they should thus be replaced by AFM equivalents.
 With the Adobe fonts, it looks like this (note that your terminal and
-text editor/viewer must support UTF-8 for viewing the text of example):
+text editor/viewer must support UTF-8 to display this example properly):
 
 	.fpost 1 R tir_____
 	.fpost 2 I tii_____
 	.fpost 3 B tib_____
 	.fpost 4 BI tibi____
 	.fpost 10 S sy______
+	.\" de_DE.utf8 is for GNU libc; de_DE.UTF-8 may work elsewhere.
 	.lc_ctype de_DE.utf8
 	Deutscher Text mit „Anführungszeichen“
 	.sp
