@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.25 (gritter) 8/20/05
+ * Sccsid @(#)dpost.c	1.26 (gritter) 8/20/05
  */
 
 /*
@@ -1319,7 +1319,7 @@ devcntrl(
 		    picture(buf);
 		else if ( strcmp(str, "InlinePicture") == 0 )
 		    inlinepic(fp, buf);
-		else if ( strcmp(str, "Supply") == 0 )
+		else if ( strcmp(str, "SupplyFont") == 0 )
 		    t_supply(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
@@ -1872,6 +1872,7 @@ static struct supplylist {
 	char	*font;
 	char	*file;
 	char	*type;
+	int	done;
 } *supplylist;
 
 void
@@ -1898,6 +1899,9 @@ t_supply(char *font)		/* supply a font */
 		type++;
 	for (np = type; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
 	*np = 0;
+	for (sp = supplylist; sp; sp = sp->next)
+		if (strcmp(sp->font, font) == 0)
+			return;
 	sp = calloc(1, sizeof *sp);
 	sp->font = strdup(font);
 	sp->file = strdup(file);
@@ -2019,25 +2023,15 @@ supply1(char *font, char *file, char *type)
 }
 
 static void
-t_dosupply(void)
+t_dosupply(char *font)
 {
-	struct supplylist	*sp, *sq = NULL;
+	struct supplylist	*sp;
 
-	endtext();
-	fprintf(tf, "cleartomark restore\n");
-	fprintf(tf, "%s", BEGINGLOBAL);
-	for (sp = supplylist; sp; sp = sp->next) {
-		free(sq);
-		supply1(sp->font, sp->file, sp->type);
-		free(sp->font);
-		free(sp->file);
-		free(sp->type);
-		sq = sp;
-	}
-	free(sq);
-	supplylist = NULL;
-	fprintf(tf, "%s", ENDGLOBAL);
-	fprintf(tf, "save mark\n");
+	for (sp = supplylist; sp; sp = sp->next)
+		if (sp->done == 0 && strcmp(sp->font, font) == 0) {
+			supply1(sp->font, sp->file, sp->type);
+			sp->done = 1;
+		}
 }
 
 /*****************************************************************************/
@@ -2431,6 +2425,7 @@ t_sf(void)
 	    if (fontname[font].afm) {
 		fprintf(tf, "cleartomark restore\n");
 		fprintf(tf, "%s", BEGINGLOBAL);
+		t_dosupply(fontname[font].afm->fontname);
 		fontname[font].afmmap = printencvector(fontname[font].afm);
 		fprintf(tf, "%s", ENDGLOBAL);
 		fprintf(tf, "save mark\n");
@@ -2817,9 +2812,6 @@ oput (
 
     if ( textcount > MAXSTACK )		/* don't put too much on the stack? */
 	endtext();
-
-    if (supplylist)
-	    t_dosupply();
 
     if ( font != lastfont || size != lastsize )
 	t_sf();

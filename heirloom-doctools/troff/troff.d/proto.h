@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.10 (gritter) 8/20/05
+ * Sccsid @(#)proto.h	1.11 (gritter) 8/20/05
  */
 
 /* t6.c */
@@ -54,7 +54,7 @@ void ptfpcmd(int, char *);
 void ptlead(void);
 void ptesc(void);
 void newpage(int);
-void ptsupply(char *, char *, char *);
+void ptsupplyfont(char *, char *, char *);
 void pttrailer(void);
 void ptstop(void);
 void dostop(void);
