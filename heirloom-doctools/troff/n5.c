@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.14 (gritter) 8/21/05
+ * Sccsid @(#)n5.c	1.15 (gritter) 8/21/05
  */
 
 /*
@@ -642,7 +642,10 @@ getev(int *nxevp, char **namep)
 	cpushback(name);
 	raw = r;
 	nxev = atoi();
-	if (nonumb && name[1]) {
+	if (nonumb && xflag && name[1]) {
+		while (ch)
+			c = getach();
+		cpushback(name);
 		free(name);
 		name = NULL;
 		i = sz = 0;
