@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.25 (gritter) 8/21/05
+ * Sccsid @(#)n3.c	1.26 (gritter) 8/21/05
  */
 
 /*
@@ -104,6 +104,7 @@ growcontab(void)
 		addcon(i++, "evc", (void(*)(int))caseevc);
 		addcon(i++, "return", (void(*)(int))casereturn);
 		addcon(i++, "chop", (void(*)(int))casechop);
+		addcon(i++, "fzoom", (void(*)(int))casefzoom);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])

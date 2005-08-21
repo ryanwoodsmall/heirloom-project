@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.17 (gritter) 8/20/05
+ * Sccsid @(#)t10.c	1.18 (gritter) 8/21/05
  */
 
 /*
@@ -82,6 +82,8 @@ int	nsizes;
 int	nchtab;
 
 long	realpage;
+
+static float	mzoom;
 
 /* these characters are used as various signals or values
  * in miscellaneous places.
@@ -135,6 +137,8 @@ growfonts(int n)
 	memset(&tkftab[Nfont], 0, (n - Nfont) * sizeof *tkftab);
 	fallbacktab = realloc(fallbacktab, n * sizeof *fallbacktab);
 	memset(&fallbacktab[Nfont], 0, (n - Nfont) * sizeof *fallbacktab);
+	zoomtab = realloc(zoomtab, n * sizeof *zoomtab);
+	memset(&zoomtab[Nfont], 0, (n - Nfont) * sizeof *zoomtab);
 	Nfont = n;
 }
 
@@ -344,7 +348,7 @@ ptout0(tchar *pi)
 	if (k == XON) {
 		if (xfont != mfont)
 			ptfont();
-		if (xpts != mpts)
+		if (xpts != mpts || zoomtab[xfont] != mzoom)
 			ptps();
 		if (lead)
 			ptlead();
@@ -363,7 +367,7 @@ ptout0(tchar *pi)
 	}
 			;
 	if (k == CHARHT) {
-		if (xpts != mpts)
+		if (xpts != mpts || zoomtab[xfont] != mzoom)
 			ptps();
 		fdprintf(ptid, "x H %d\n", sbits(i));
 		return(pi+outsize);
@@ -421,7 +425,7 @@ ptout0(tchar *pi)
 	esc += j;
 	if (xfont != mfont)
 		ptfont();
-	if (xpts != mpts)
+	if (xpts != mpts || zoomtab[xfont] != mzoom)
 		ptps();
 	if (lead)
 		ptlead();
@@ -544,6 +548,7 @@ void
 ptps(void)
 {
 	register int i, j, k;
+	float	z;
 
 	i = xpts;
 	for (j = 0; i > (k = pstab[j]); j++)
@@ -551,8 +556,12 @@ ptps(void)
 			k = pstab[--j];
 			break;
 		}
-	fdprintf(ptid, "s%d\n", k);	/* really should put out string rep of size */
+	if ((z = zoomtab[xfont]) == 0 || z == 1)
+		fdprintf(ptid, "s%d\n", k);	/* really should put out string rep of size */
+	else
+		fdprintf(ptid, "s%d %f\n", -23, (double)k*z);
 	mpts = i;
+	mzoom = z;
 }
 
 void

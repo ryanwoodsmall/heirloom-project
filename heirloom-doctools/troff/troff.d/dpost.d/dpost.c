@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.28 (gritter) 8/21/05
+ * Sccsid @(#)dpost.c	1.29 (gritter) 8/21/05
  */
 
 /*
@@ -402,13 +402,15 @@ char		*downloaded;		/* nonzero means it's been downloaded */
 
 int		nfonts = 0;		/* number of font positions */
 int		size = 1;		/* current size - internal value */
+#define	FRACTSIZE	-23		/* if size == FRACTSIZE then ... */
+float		fractsize = 0;		/* fractional point size */
 int		font = 0;		/* font position we're using now */
 int		hpos = 0;		/* where troff wants to be - horizontally */
 int		vpos = 0;		/* same but vertically */
 float		lastw = 0;		/* width of the last input character */
 int		lastc = 0;		/* and its name (or index) */
 
-int		fontheight = 0;		/* points from x H ... */
+float		fontheight = 0;		/* points from x H ... */
 int		fontslant = 0;		/* angle from x S ... */
 
 int		res;			/* resolution assumed in input file */
@@ -425,6 +427,7 @@ float		widthfac = 1.0;		/* for emulation = res/dev.res */
 
 
 int		lastsize = -1;		/* last internal size we used */
+float		lastfractsize = -1;	/* last fractional size */
 int		lastfont = -1;		/* last font we told printer about */
 float		lastx = -1;		/* printer's current position */
 int		lasty = -1;
@@ -1118,7 +1121,8 @@ conv(
 	    case 'D':			/* drawing functions */
 		    endtext();
 		    getdraw();
-		    if ( size != lastsize )
+		    if ( size != lastsize || size == FRACTSIZE &&
+				    fractsize != lastfractsize)
 			t_sf();
 		    switch ((c=getc(fp))) {
 			case 'p':	/* draw a path */
@@ -1167,7 +1171,13 @@ conv(
 
 	    case 's':			/* use this point size */
 		    fscanf(fp, "%d", &n);	/* ignore fractional sizes */
-		    setsize(t_size(n));
+		    if (n != FRACTSIZE)
+		    	setsize(t_size(n), 0);
+		    else {
+			    float f;
+			    fscanf(fp, "%f", &f);
+			    setsize(FRACTSIZE, f);
+		    }
 		    break;
 
 	    case 'f':			/* use font mounted here */
@@ -1859,7 +1869,7 @@ t_init(void)
     }	/* End if */
 
     hpos = vpos = 0;			/* upper left corner */
-    setsize(t_size(10));		/* start somewhere */
+    setsize(t_size(10), 0);		/* start somewhere */
     reset();				/* force position and font stuff - later */
 
 }   /* End of t_init */
@@ -2157,7 +2167,7 @@ t_size (
 
 void
 setsize (
-    int n			/* new internal size */
+    int n, float f			/* new internal size */
 )
 
 
@@ -2173,6 +2183,7 @@ setsize (
 
 
     size = n;
+    fractsize = f;
 
 }   /* End of setsize */
 
@@ -2420,6 +2431,7 @@ t_sf(void)
     if ( tf == stdout )  {
 	lastfont = font;
 	lastsize = size;
+	lastfractsize = fractsize;
 	if ( seenfonts[fnum] == 0 ) {
 	    documentfonts();
 	    if (fontname[font].afm) {
@@ -2435,14 +2447,22 @@ t_sf(void)
 	seenfonts[fnum] = 1;
     }	/* End if */
 
+    if (size != FRACTSIZE)
+        fprintf(tf, "%d ", pstab[size-1]);
+    else
+	fprintf(tf, "%f ", (double)fractsize);
     if (fontname[font].afm)
-    	fprintf(tf, "%d /%s-@%s f\n", pstab[size-1], fontname[font].name,
+    	fprintf(tf, "/%s-@%s f\n", fontname[font].name,
 		    fontname[font].afm->Font.intname);
     else
-    	fprintf(tf, "%d %s f\n", pstab[size-1], fontname[font].name);
+    	fprintf(tf, "%s f\n", fontname[font].name);
 
-    if ( fontheight != 0 || fontslant != 0 )
-	fprintf(tf, "%d %d changefont\n", fontslant, (fontheight != 0) ? fontheight : pstab[size-1]);
+    if ( fontheight != 0 || fontslant != 0 ) {
+	if (size != FRACTSIZE)
+	    fprintf(tf, "%d %f changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : pstab[size-1]);
+	else
+	    fprintf(tf, "%d %f changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : (double)fractsize);
+    }
 
 }   /* End of t_sf */
 
@@ -2466,7 +2486,7 @@ t_charht (
  *
  */
 
-    fontheight = (n == pstab[size-1]) ? 0 : n;
+    fontheight = size == FRACTSIZE ? fractsize : (n == pstab[size-1]) ? 0 : n;
     lastfont = -1;
 
 }   /* End of t_charht */
@@ -2780,7 +2800,10 @@ put1 (
     }	/* End else */
 
     if ( i != 0 && (code = p[i] & BMASK) != 0 )  {
-	lastw = widthfac * (((pw[i] & BMASK) * pstab[size-1] + unitwidth/2) / unitwidth);
+	if (size != FRACTSIZE)
+	    lastw = widthfac * (((pw[i] & BMASK) * pstab[size-1] + unitwidth/2) / unitwidth);
+	else
+	    lastw = widthfac * (((pw[i] & BMASK) * fractsize + unitwidth/2) / unitwidth);
 	oput(code);
     }	/* End if */
 
@@ -2813,7 +2836,8 @@ oput (
     if ( textcount > MAXSTACK )		/* don't put too much on the stack? */
 	endtext();
 
-    if ( font != lastfont || size != lastsize )
+    if ( font != lastfont || size != lastsize ||
+		    size == FRACTSIZE && fractsize != lastfractsize)
 	t_sf();
 
     if ( vpos != lasty )

@@ -18,42 +18,50 @@ The new method can access PostScript font files directly. It is only
 available with "troff -x". A new request is available to handle fonts
 with this method:
 
-    .fpost r yy basename [pfb|pfa|t42]
-      reads metrics from the file "fontdir/afm/basename.afm". The font
-      is then available with ".ft yy", "\f(yy", etc.; "yy" may be the
-      name of an existing ditroff-style font, such as "R", or may be
-      freely chosen. The "r" argument specifies a register on which
-      the font is to be mounted; if it is zero or too large, the font
-      is mounted on a free position. Contrasting to the ".fp" request,
-      the "r" argument may consist of more than a single digit. If
-      the optional "pfb|pfa|t42" argument is present, data from the
-      file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively) is
-      included into the generated PostScript. This is useful to
-      include fonts that have not yet been downloaded into the
-      printer, or for generating PDFs with additional fonts.
+  .fpost r yy basename [pfb|pfa|t42]
+	reads metrics from the file "fontdir/afm/basename.afm". The font
+	is then available with ".ft yy", "\f(yy", etc. "yy" may be freely
+	chosen. The "r" argument specifies a register on which the font
+	is to be mounted. If it is zero or too large, the font is mounted
+	on a free position (not on position zero). Contrasting to the
+	".fp" request, the "r" argument may consist of more than a single
+	digit.
+	  "yy" may be the name of an existing ditroff-style font, such
+	as "R". In this case, the same register must be reused. For best
+	compatibility with conventional troff usage, it is recommended
+	that the base fonts of a document are mounted as "1 R", "2 I".
+	  If the optional "pfb|pfa|t42" argument is present, data from
+	the file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively)
+	is included into the generated PostScript. This is useful to
+	include fonts that have not yet been downloaded into the
+	printer, or for generating PDFs with additional fonts.
 
 As an example,
       
-      .fpost 0 VA van_____ pfb
-      .ft VA
-      Here is some text in Monotype Van Dijck Regular.
+	.fpost 0 VA van_____ pfb
+	.ft VA
+	Here is some text in Monotype Van Dijck Regular.
+
+
+Installing fonts
+----------------
 
 Making new fonts available is easy with this method. If you buy a
 PostScript Type 1 font for use with troff, select the Windows version.
 You will get a set of files from your vendor. Only two of them are of
 interest for troff:
 
-    xxxxxxxx.afm
-      This is the metrics file. troff accesses it to learn the widths
-      of characters in the font. Put this file (or a symbolic link to
-      it) into the directory /usr/ucblib/doctools/font/devpost/afm.
+  xxxxxxxx.afm
+	This is the metrics file. troff accesses it to learn the widths
+	of characters in the font. Put this file (or a symbolic link to
+	it) into the directory /usr/ucblib/doctools/font/devpost/afm.
 
-    xxxxxxxx.pfb
-      This file contains the actual glyph data. troff does not really
-      need this file, but your printer or PDF converter does. In many
-      cases, it is most convenient to include the data directly into
-      the .ps file generated. Put the file into the troff font directory
-      /usr/ucblib/doctools/font/devpost/pfb.
+  xxxxxxxx.pfb
+	This file contains the actual glyph data. troff does not really
+	need this file, but your printer or PDF converter does. In many
+	cases, it is most convenient to include the data directly into
+	the .ps file generated. Put the file (or a symbolic link to it)
+	into the directory /usr/ucblib/doctools/font/devpost/pfb.
 
 For TrueType fonts, an additional conversion step is necessary. troff
 cannot handle TrueType fonts directly, but it can handle PostScript
@@ -169,6 +177,21 @@ it is sufficient to mount each font once:
 	But this text prints in Small Capitals.
 
 
+Combining different fonts
+-------------------------
+
+Different fonts often have different visual sizes even if they are set
+in the same nominal point size. To adjust this, the ".fzoom" request
+is available. It only applies to characters that are actually in the
+current font, not to characters from another font that have been
+selected using the fallback sequence.
+
+	.fpost 1 R pl______ pfb
+	.fpost 6 H hv______
+	.fzoom H .92
+	Text in \fHHelvetica\fP must be adjusted to fit with Plantin.
+
+
 Limitations
 -----------
 
@@ -180,4 +203,4 @@ to be accessed, it is possible reorder the character entry lines in
 the AFM file to work around.
 
 
-Gunnar Ritter                                                 8/20/05
+Gunnar Ritter                                                 8/21/05

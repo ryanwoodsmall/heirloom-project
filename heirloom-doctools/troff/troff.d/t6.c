@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.33 (gritter) 8/21/05
+ * Sccsid @(#)t6.c	1.35 (gritter) 8/21/05
  */
 
 /*
@@ -73,6 +73,7 @@ short	*pstab;
 int	*cstab;
 int	*ccstab;
 int	**fallbacktab;
+float	*zoomtab;
 int	*bdtab;
 struct tkftab	*tkftab;
 int	sbold = 0;
@@ -149,6 +150,7 @@ getcw(register int i)
 	int nocache = 0;
 	int	ofont = xfont;
 	int	s;
+	float	z = 1;
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
@@ -213,6 +215,9 @@ getcw(register int i)
 	if (setwdf)
 		numtab[CT].val |= kerntab[ofont][j];
 	k = *(p + j);
+	if ((z = zoomtab[xfont]) == 0)
+		z = 1;
+	k *= z;
  g1:
 	if (!bd)
 		bd = bdtab[ofont];
@@ -225,7 +230,7 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = ((k&BYTEMASK) * xpts + (Unitwidth / 2)) / Unitwidth;
-	s = xpts*Unitwidth;
+	s = z*xpts*Unitwidth;
 	if (s <= tkftab[ofont].s1 && tkftab[ofont].n1) {
 		nocache = 1;
 		k += tkftab[ofont].n1;
@@ -371,8 +376,10 @@ tchar setch(int delim)
 			break;
 		}
 		temp[n++] = c;
-		if (delim != '[' && n == 2)
+		if (delim != '[' && n == 2) {
+			temp[n] = 0;
 			break;
+		}
 	}
 	c = 0;
 	if (delim == '[') {
@@ -805,6 +812,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	if ((fontlab[pos] = f) == 'S')
 		smnt = pos;
 	bdtab[pos] = cstab[pos] = ccstab[pos] = 0;
+	zoomtab[pos] = 0;
 	fallbacktab[pos] = NULL;
 	memset(&tkftab[pos], 0, sizeof tkftab[pos]);
 		/* if there is a directory, no place to store its name. */
@@ -1027,6 +1035,7 @@ casefpost(void)
 	codetab[nf] = afmtab[nafm]->codetab;
 	fitab[nf] = afmtab[nafm]->fitab;
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
+	zoomtab[nf] = 0;
 	fallbacktab[nf] = NULL;
 	memset(&tkftab[nf], 0, sizeof tkftab[nf]);
 	nafm++;
@@ -1117,6 +1126,35 @@ casehidechar(void)
 			fitab[xfont][i - 32] = 0;
 	}
 	zapwcache(0);
+}
+
+void
+casefzoom(void)
+{
+	char	*buf = NULL, *bp;
+	int	c, i, j;
+	int	n = 0, sz = 0;
+	float	f;
+
+	skip();
+	i = getrq();
+	if ((j = findft(i)) < 0)
+		return;
+	skip();
+	do {
+		c = getach();
+		if (n >= sz)
+			buf = realloc(buf, (sz += 8) * sizeof *buf);
+		buf[n++] = c;
+	} while (c);
+	f = strtof(buf, &bp);
+	if (*bp == '\0' && f >= 0) {
+		zoomtab[j] = f;
+		zapwcache(0);
+		if (realpage && j == xfont)
+			ptps();
+	}
+	free(buf);
 }
 
 #include "unimap.h"

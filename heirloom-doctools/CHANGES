@@ -9,6 +9,7 @@ Release ...
   with the new font setup. In an UTF-8 locale, most characters that are
   present in standard, Expert, and Symbol PostScript fonts are supported;
   otherwise, a locale-specific subset of them is available.
+* troff: The ".fzoom" request allows to zoom the characters of a font.
 * [nt]roff: The ".lc_ctype" request can be used to set the LC_CTYPE
   localization setting from within a document.
 * troff: It is now possible to use "\[name]", where name is a character

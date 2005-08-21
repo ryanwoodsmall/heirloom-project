@@ -29,19 +29,30 @@ can be used to deactivate new features for compatibility reasons.
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
 
-.fpost r yy basename [pfb|pfa|t42]
+.fpost r yy basename [pfb|pfa|t42]			troff only
 	reads metrics from the file "fontdir/afm/basename.afm". The font
-	is then available with ".ft yy", "\f(yy", etc.; "yy" may be the
-	name of an existing ditroff-style font, such as "R", or may be
-	freely chosen. The "r" argument specifies a register on which
-	the font is to be mounted; if it is zero or too large, the font
-	is mounted on a free position. Contrasting to the ".fp" request,
-	the "r" argument may consist of more than a single digit. If
-	the optional "pfb|pfa|t42" argument is present, data from the
-	file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively) is
-	included into the generated PostScript. This is useful to
+	is then available with ".ft yy", "\f(yy", etc. "yy" may be freely
+	chosen. The "r" argument specifies a register on which the font
+	is to be mounted. If it is zero or too large, the font is mounted
+	on a free position (not on position zero). Contrasting to the
+	".fp" request, the "r" argument may consist of more than a single
+	digit.
+	  "yy" may be the name of an existing ditroff-style font, such
+	as "R". In this case, the same register must be reused. For best
+	compatibility with conventional troff usage, it is recommended
+	that the base fonts of a document are mounted as "1 R", "2 I".
+	  If the optional "pfb|pfa|t42" argument is present, data from
+	the file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively)
+	is included into the generated PostScript. This is useful to
 	include fonts that have not yet been downloaded into the
 	printer, or for generating PDFs with additional fonts.
+
+.fzoom ff z						troff only
+	zooms font ff by "z", where "z" is a positive floating-point
+	number. This request is useful for adjusting fonts with different
+	visual sizes but identical nominal points; the zoom is thus not
+	applied to characters from another font that have been found by
+	the fallback sequence.
 
 .hidechar ff c d ...					troff only
 	hides the characters c, d, etc. from font ff. If the characters
@@ -73,7 +84,8 @@ can be used to deactivate new features for compatibility reasons.
 	as a value between n1 and n2 using the current point size s:
 	(s * n2 - s * n1 + s2 * n1 - s1 * n2) / (s2 - s1). The default unit
 	for all numeric arguments is "p". Negative numbers are accepted and
-	cause a decrease of letter space.
+	cause a decrease of letter space. Tracking also applies to haracters
+	from another font that have been selected by the fallback sequence.
 
 \$*
 	prints all arguments to a macro, separated by spaces.
@@ -107,7 +119,7 @@ any character in the current LC_CTYPE locale
 	Otherwise, the .fallback sequence is searched for it. This
 	mechanism only works with fonts mounted by the .fpost request.
 
-\X'Sync'
+\X'Sync'						troff only
 	forces dpost to write position and font information to the
 	generated PostScript exactly at the place where this escape
 	sequence occurs. This is sometimes useful to ensure that

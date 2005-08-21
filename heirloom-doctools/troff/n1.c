@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.23 (gritter) 8/21/05
+ * Sccsid @(#)n1.c	1.24 (gritter) 8/21/05
  */
 
 /*
@@ -558,6 +558,12 @@ loop:
 		printn(va_arg(ap, long), 10);
 	} else if (c == 'O') {
 		printn(va_arg(ap, long), 8);
+	} else if (c == 'f') {
+		extern int sprintf(char *, const char *, ...);
+		char	tmp[40];
+		sprintf(s = tmp, "%f", va_arg(ap, double));
+		while (c = *s++)
+			putchar(c);
 	}
 	goto loop;
 }
@@ -623,6 +629,9 @@ loop:
 		str = sprintn(str, va_arg(ap, long), 10);
 	} else if (c == 'O') {
 		str = sprintn(str, va_arg(ap, unsigned) , 8);
+	} else if (c == 'f') {
+		extern int sprintf(char *, const char *, ...);
+		str += sprintf(str, "%f", va_arg(ap, double));
 	}
 	goto loop;
 }
