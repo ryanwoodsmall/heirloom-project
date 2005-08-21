@@ -89,6 +89,10 @@ text editor/viewer must support UTF-8 to display this example properly):
 	.fpost 2 I tii_____
 	.fpost 3 B tib_____
 	.fpost 4 BI tibi____
+	.fpost 5 CW com_____
+	.fpost 6 H hv______
+	.fpost 7 HB hvb_____
+	.fpost 8 HX hvbo____
 	.fpost 10 S sy______
 	.\" de_DE.utf8 is for GNU libc; de_DE.UTF-8 may work elsewhere.
 	.lc_ctype de_DE.utf8
@@ -103,7 +107,9 @@ to the .fpost request can be omitted.
 Many troff documents refer to the first three fonts by register rather
 than by name. It is thus recommended that the base fonts of a document
 are mounted explicitly on these places. The same applies to the Symbol
-font, which should always be mounted on register number ten.
+font, which should always be mounted on register number ten. Font nine
+should not be replaced, it contains only a few special characters from
+the Times font which are used as fallbacks for other fonts.
 
 
 Using fonts with old style numerals
@@ -203,4 +209,4 @@ to be accessed, it is possible reorder the character entry lines in
 the AFM file to work around.
 
 
-Gunnar Ritter                                                 8/21/05
+Gunnar Ritter                                                 8/22/05
