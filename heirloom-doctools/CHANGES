@@ -22,6 +22,9 @@ Release ...
   names, and their number is no longer statically limited.
 * [nt]roff: The ".evc" request copies another environment to the current
   one.
+* [nt]roff: The ".chop" request deletes the last character from a macro,
+  string, or diversion.
+* [nt]roff: The ".return" request returns immediately from a macro.
 * troff/dpost: The "\X'Sync'" escape forces dpost to write position and
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.

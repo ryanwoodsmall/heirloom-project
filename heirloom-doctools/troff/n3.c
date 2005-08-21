@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.23 (gritter) 8/20/05
+ * Sccsid @(#)n3.c	1.25 (gritter) 8/21/05
  */
 
 /*
@@ -102,6 +102,8 @@ growcontab(void)
 		addcon(i++, "fallback", (void(*)(int))casefallback);
 		addcon(i++, "hidechar", (void(*)(int))casehidechar);
 		addcon(i++, "evc", (void(*)(int))caseevc);
+		addcon(i++, "return", (void(*)(int))casereturn);
+		addcon(i++, "chop", (void(*)(int))casechop);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
@@ -1060,11 +1062,39 @@ casetl(void)
 	}
 }
 
-
 void
 casepc(void)
 {
 	pagech = chget(IMP);
+}
+
+void
+casechop(void)
+{
+	int	a = app;
+	int	i, j;
+	filep	savip, savoffset;
+
+	skip();
+	if ((i = getrq()) == 0)
+		return;
+	if (i >= 256)
+		i = maybemore(i, 0);
+	if ((j = findmn(i)) < 0)
+		return;
+	savip = ip;
+	ip = (filep)contab[j].mx;
+	app = 1;
+	while ((i = rbf()) != 0)
+		i = 1;
+	app = a;
+	savoffset = offset;
+	if (ip > (filep)contab[j].mx) {
+		offset = ip - 1;
+		wbf(0);
+	}
+	ip = savip;
+	offset = savoffset;
 }
 
 

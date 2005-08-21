@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.23 (gritter) 8/20/05
+ * Sccsid @(#)tdef.h	1.25 (gritter) 8/21/05
  */
 
 /*
@@ -679,6 +679,7 @@ void casedi(void);
 void casedt(void);
 void casetl(void);
 void casepc(void);
+void casechop(void);
 void casepm(void);
 void stackdump(void);
 char *macname(int);
@@ -750,6 +751,7 @@ void caseevc(void);
 void caseel(void);
 void caseie(void);
 void caseif(int);
+void casereturn(void);
 void eatblk(int);
 int cmpstr(tchar);
 void caserd(void);

@@ -5,6 +5,10 @@ Unless otherwise noted, new features become effective with the -x option
 only. In the future, the -x option may become the default; the -X option
 can be used to deactivate new features for compatibility reasons.
 
+.chop name
+	removes the last character of the macro, string, or diversion
+	"name".
+
 .de longname
 .ds longname
 .nr longname
@@ -15,12 +19,12 @@ can be used to deactivate new features for compatibility reasons.
 	Environments can be named, or be given an arbitrary number.
 
 .evc name
-	Copy the environment "name" into the current environment. The
-	temporary state of the current environment is reset, and
+	copies the environment "name" into the current environment.
+	The temporary state of the current environment is reset, and
 	incompletely filled lines are discarded.
 
 .fallback ff aa bb ...					troff only
-	Selects the fallback sequence for font ff. If the current font
+	selects the fallback sequence for font ff. If the current font
 	is ff and a character is not found, font aa is searched first,
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
@@ -40,7 +44,7 @@ can be used to deactivate new features for compatibility reasons.
 	printer, or for generating PDFs with additional fonts.
 
 .hidechar ff c d ...					troff only
-	Hides the characters c, d, etc. from font ff. If the characters
+	hides the characters c, d, etc. from font ff. If the characters
 	appear in input afterwards, they are searched in other fonts
 	using the fallback sequence. This is useful e.g. for combining
 	characters from a regular and an expert font.
@@ -50,6 +54,9 @@ can be used to deactivate new features for compatibility reasons.
 	the value of the LC_CTYPE environment variable. This request is
 	useful to specify an input character set regardless of environment
 	influences.
+
+.return
+	immediately returns from the current macro to the level above.
 
 .ss n m							troff only
 	with the second argument "m" determines whether additional white
@@ -98,4 +105,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-                                                                8/20/05
+                                                                8/21/05
