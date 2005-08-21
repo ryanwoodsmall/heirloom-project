@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.26 (gritter) 8/21/05
+ * Sccsid @(#)n3.c	1.27 (gritter) 8/21/05
  */
 
 /*
@@ -1180,10 +1180,10 @@ maybemore(int sofar, int create)
 		return sofar;
 	raw = 1;
 	buf = malloc((sz = 2) * sizeof *buf);
-	buf[0] = sofar&0377;
-	buf[1] = (sofar>>8)&0377;
+	buf[0] = sofar&BYTEMASK;
+	buf[1] = (sofar>>BYTE)&BYTEMASK;
 	do {
-		c = getch0() & 0377;
+		c = getch0();
 		if (i+1 >= sz)
 			buf = realloc(buf, (sz += 8) * sizeof *buf);
 		buf[i++] = c;
@@ -1218,24 +1218,28 @@ static int
 getls(int termc)
 {
 	char	c, *buf = NULL;
-	int	i = 0, n, sz = 0;
+	int	i = 0, j = 0, n = -1, sz = 0;
 
 	do {
-		c = getch0() & 0377;
+		c = getach();
 		if (i >= sz)
 			buf = realloc(buf, (sz += 8) * sizeof *buf);
 		buf[i++] = c;
-	} while (c != termc);
-	buf[i-1] = 0;
-	if (i == 1)
-		goto not;
-	for (n = 0; n < hadn; n++)
-		if (strcmp(had[n], buf) == 0)
-			break;
-	if (n == hadn)
-	not:	n = -1;
+	} while (c && c != termc);
+	buf[--i] = 0;
+	if (i == 0 || c != termc)
+		j = 0;
+	else if (i <= 2) {
+		j = PAIR(buf[0], buf[1]);
+	} else {
+		for (n = 0; n < hadn; n++)
+			if (strcmp(had[n], buf) == 0)
+				break;
+		if (n == hadn)
+			n = -1;
+	}
 	free(buf);
-	return n >= 0 ? MAXRQ2 + n : 0;
+	return n >= 0 ? MAXRQ2 + n : j;
 }
 
 static void

@@ -36,6 +36,7 @@ Release ...
 * The file "NEWS" describes new troff language features.
 * [nt]roff: The output of long names with ".pm" and stack dumps has been
   fixed.
+* [nt]roff: Nested long-name string references \*[\*...] now work.
 * A bug in the supplied realloc() replacement could result in heap
   corruption.
 
