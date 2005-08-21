@@ -25,6 +25,10 @@ Release ...
 * [nt]roff: The ".chop" request deletes the last character from a macro,
   string, or diversion.
 * [nt]roff: The ".return" request returns immediately from a macro.
+* [nt]roff: The "\:" escape inserts an optional line break but generates
+  no hyphen if the line is split.
+* [nt]roff: The "\~" escape is similar to "\ " but inserts a space that
+  stretches like a regular " " when the line is adjusted.
 * troff/dpost: The "\X'Sync'" escape forces dpost to write position and
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.

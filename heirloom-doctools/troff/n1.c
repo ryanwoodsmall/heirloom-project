@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.21 (gritter) 8/20/05
+ * Sccsid @(#)n1.c	1.23 (gritter) 8/21/05
  */
 
 /*
@@ -372,6 +372,7 @@ init1(char a)
 	for (i = NTRTAB; --i; )
 		trtab[i] = i;
 	trtab[UNPAD] = ' ';
+	trtab[STRETCH] = ' ';
 }
 
 
@@ -854,6 +855,11 @@ g0:
 	case ' ':	/* unpaddable space */
 		i = UNPAD;
 		goto gx;
+	case '~':	/* stretchable but unbreakable space */
+		if (xflag == 0)
+			break;
+		i = STRETCH;
+		goto gx;
 	case '\'':	/* \(aa */
 		i = ACUTE;
 		goto gx;
@@ -883,6 +889,11 @@ g0:
 		return(i);
 	case '%':	/* ohc */
 		i = OHC;
+		return(i);
+	case ':':	/* optional line break but no hyphenation */
+		if (xflag == 0)
+			break;
+		i = OHC | ZBIT;
 		return(i);
 	case 'g':	/* return format of a number register */
 		setaf();

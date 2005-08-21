@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.25 (gritter) 8/21/05
+ * Sccsid @(#)tdef.h	1.26 (gritter) 8/21/05
  */
 
 /*
@@ -128,6 +128,7 @@
 #define	CONT	025	/* \c character */
 #define	PRESC	026	/* printable escape */
 #define	UNPAD	027	/* unpaddable blank */
+#define	STRETCH	037	/* stretchable but unbreakable blank */
 #define	XPAR	030	/* transparent mode indicator */
 #define	FLSS	031
 #define	WORDSP	032	/* paddable word space */

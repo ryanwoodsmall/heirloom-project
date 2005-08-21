@@ -75,22 +75,30 @@ can be used to deactivate new features for compatibility reasons.
 	for all numeric arguments is "p". Negative numbers are accepted and
 	cause a decrease of letter space.
 
-\[name]							troff only
-	selects the character "name" as defined in the .afm file for the
-	current font.
-
-\*[name]
-	refers to the string "name".
-
-\n[name]
-	refers to the number register "name".
-
 \$*
 	prints all arguments to a macro, separated by spaces.
 
 \$@
 	prints all arguments to a macro, each one surrounded by double
 	quotes, separated by spaces.
+
+\*[name]
+	refers to the string "name".
+
+\:
+	is similar to "\%", but only inserts an optional line break and
+	does not cause a hyphen to be printed if the line is split.
+
+\[name]							troff only
+	selects the character "name" as defined in the .afm file for the
+	current font.
+
+\n[name]
+	refers to the number register "name".
+
+\~
+	is similar to "\ ", but inserts space that stretches when the
+	line is adjusted like a regular " ".
 
 any character in the current LC_CTYPE locale
 	In nroff, any printable character is just passed through.

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.9 (gritter) 8/16/05
+ * Sccsid @(#)n7.c	1.11 (gritter) 8/21/05
  */
 
 /*
@@ -102,7 +102,7 @@ void
 tbreak(void)
 {
 	register int pad, k;
-	register tchar	*i, j;
+	register tchar	*i, j, c;
 	register int resol = 0;
 
 	trap = 0;
@@ -161,12 +161,12 @@ tbreak(void)
 	adrem = (adrem / resol) * resol;
 	for (i = line; nc > 0; ) {
 #ifndef EUC
-		if ((cbits(j = *i++)) == ' ') {
+		if ((c = cbits(j = *i++)) == ' ' || c == STRETCH) {
 #else
 #ifndef NROFF
-		if ((cbits(j = *i++)) == ' ') {
+		if ((c = cbits(j = *i++)) == ' ' || c == STRETCH) {
 #else
-		if ((cbits(j = *i++) & ~MBMASK) == ' ') {
+		if ((c = cbits(j = *i++) & ~MBMASK) || c == STRETCH) {
 #endif /* NROFF */
 #endif /* EUC */
 			pad = 0;
@@ -174,12 +174,15 @@ tbreak(void)
 				pad += width(j);
 				nc--;
 #ifndef EUC
-			} while ((cbits(j = *i++)) == ' ');
+			} while ((c = cbits(j = *i++)) == ' ' ||
+					c == STRETCH);
 #else
 #ifndef NROFF
-			} while ((cbits(j = *i++)) == ' ');
+			} while ((c = cbits(j = *i++)) == ' ' ||
+					c == STRETCH);
 #else
-			} while ((cbits(j = *i++) & ~MBMASK) == ' ');
+			} while ((c = cbits(j = *i++) & ~MBMASK) ||
+					c == STRETCH);
 #endif /* NROFF */
 #endif /* EUC */
 			i--;
@@ -258,7 +261,7 @@ d1:
 void
 text(void)
 {
-	register tchar i;
+	register tchar i, c;
 	static int	spcnt;
 
 	nflush++;
@@ -282,7 +285,7 @@ text(void)
 	pendt++;
 	if (spcnt)
 		goto t2;
-	while ((cbits(i = GETCH())) == ' ') {
+	while ((c = cbits(i = GETCH())) == ' ' || c == STRETCH) {
 		spcnt++;
 		numtab[HP].val += sps;
 		widthp = sps;
@@ -646,19 +649,19 @@ int
 movword(void)
 {
 	register int w;
-	register tchar i, *wp;
+	register tchar i, *wp, c;
 	int	savwch, hys;
 
 	over = 0;
 	wp = wordp;
 	if (!nwd) {
 #ifndef EUC
-		while (cbits(i = *wp++) == ' ') {
+		while ((c = cbits(i = *wp++)) == ' ') {
 #else
 #ifndef NROFF
-		while (cbits(i = *wp++) == ' ') {
+		while ((c = cbits(i = *wp++)) == ' ') {
 #else
-		while ((cbits(i = *wp++) & ~MBMASK) == ' ') {
+		while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
 #endif /* NROFF */
 #endif /* EUC */
 			wch--;
@@ -715,7 +718,8 @@ m1:
 		goto m1;
 	}
 m2:
-	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH) {
+	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH &&
+			*(linep - 1) != (ohc | ZBIT)) {
 		*linep = (*(linep - 1) & SFMASK) | HYPHEN;
 		w = width(*linep);
 		nel -= w;
@@ -767,6 +771,7 @@ int
 getword(int x)
 {
 	register int j, k;
+	int	lastj = 0;
 	register tchar i, *wp;
 	int noword;
 #ifdef EUC
@@ -893,14 +898,14 @@ g0:
 		return(1);
 	}
 	if (hyoff != 1) {
-		if (j == ohc) {
+		if (j == ohc && !iszbit(i)) {
 			hyoff = 2;
 			*hyp++ = wordp;
 			if (hyp > (hyptr + NHYP - 1))
 				hyp = hyptr + NHYP - 1;
 			goto g1;
 		}
-		if (j == '-' || j == EMDASH)
+		if (j == '-' || j == EMDASH || j == ohc && iszbit(i))
 			if (wordp > word + 1) {
 				hyoff = 2;
 				*hyp++ = wordp + 1;
@@ -946,6 +951,9 @@ g1:
 #endif /* EUC */
 	if (j != ' ') {
 		static char *sentchar = ".?!:";	/* sentence terminators */
+		if (j == STRETCH && lastj != j)
+			nwd++;
+		lastj = j;
 		if (j != '\n')
 #ifdef EUC
 #ifdef NROFF
@@ -991,7 +999,7 @@ g1:
 rtn:
 	for (wp = word; *wp; wp++) {
 		j = cbits(*wp);
-		if (j == ' ')
+		if (j == ' ' || j == STRETCH)
 			continue;
 		if (!ischar(j) || (!isdigit(j) && j != '-'))
 			break;

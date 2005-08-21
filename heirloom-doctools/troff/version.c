@@ -6,27 +6,27 @@
 #define	USED
 #endif
 #ifdef	NROFF
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.79 (gritter) 8/21/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.81 (gritter) 8/21/05";
 #else	/* !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.79 (gritter) 8/21/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.81 (gritter) 8/21/05";
 #endif	/* !NROFF */
 /* SLIST */
 /*
 ext.h: * Sccsid @(#)ext.h	1.11 (gritter) 8/20/05
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
 mapmalloc.c: *	Sccsid @(#)mapmalloc.c	2.1 (gritter) 8/18/05
-n1.c: * Sccsid @(#)n1.c	1.21 (gritter) 8/20/05
+n1.c: * Sccsid @(#)n1.c	1.23 (gritter) 8/21/05
 n2.c: * Sccsid @(#)n2.c	1.7 (gritter) 8/18/05
 n3.c: * Sccsid @(#)n3.c	1.25 (gritter) 8/21/05
 n4.c: * Sccsid @(#)n4.c	1.7 (gritter) 8/15/05
 n5.c: * Sccsid @(#)n5.c	1.15 (gritter) 8/21/05
-n7.c: * Sccsid @(#)n7.c	1.9 (gritter) 8/16/05
+n7.c: * Sccsid @(#)n7.c	1.11 (gritter) 8/21/05
 n8.c: * Sccsid @(#)n8.c	1.5 (gritter) 8/16/05
-n9.c: * Sccsid @(#)n9.c	1.10 (gritter) 8/18/05
+n9.c: * Sccsid @(#)n9.c	1.11 (gritter) 8/21/05
 ni.c: * Sccsid @(#)ni.c	1.11 (gritter) 8/16/05
 nii.c: * Sccsid @(#)nii.c	1.7 (gritter) 8/20/05
 suftab.c: * Sccsid @(#)suftab.c	1.4 (gritter) 8/16/05
-tdef.h: * Sccsid @(#)tdef.h	1.25 (gritter) 8/21/05
+tdef.h: * Sccsid @(#)tdef.h	1.26 (gritter) 8/21/05
 nroff.d/n10.c: * Sccsid @(#)n10.c	1.17 (gritter) 8/16/05
 nroff.d/n6.c: * Sccsid @(#)n6.c	1.10 (gritter) 8/20/05
 nroff.d/proto.h: * Sccsid @(#)proto.h	1.7 (gritter) 8/20/05
