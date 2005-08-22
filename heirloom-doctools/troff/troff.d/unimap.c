@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.c	1.6 (gritter) 8/19/05
+ * Sccsid @(#)unimap.c	1.7 (gritter) 8/22/05
  */
 
 #include "unimap.h"
@@ -32,6 +32,7 @@ const struct unimap	unimap[] = {
 	{ 0x00A2,	"cent" },
 	{ 0x00A2,	"centoldstyle" },
 	{ 0x00A3,	"sterling" },
+	{ 0x00A3,	"sterlingalt" },	/* FournierMT-RegularAlt */
 	{ 0x00A4,	"currency" },
 	{ 0x00A5,	"yen" },
 	{ 0x00A6,	"brokenbar" },
@@ -103,19 +104,26 @@ const struct unimap	unimap[] = {
 	{ 0x00D0,	"Ethsmall" },
 	{ 0x00D1,	"Ntilde" },
 	{ 0x00D1,	"Ntildesmall" },
+	{ 0x00D1,	"Ntildealt" },		/* BulmerMT-ItalicAlt */
 	{ 0x00D2,	"Ograve" },
 	{ 0x00D2,	"Ogravesmall" },
+	{ 0x00D2,	"Ogravealt" },		/* BulmerMT-ItalicAlt */
 	{ 0x00D3,	"Oacute" },
 	{ 0x00D3,	"Oacutesmall" },
+	{ 0x00D3,	"Oacutealt" },		/* BulmerMT-ItalicAlt */
 	{ 0x00D4,	"Ocircumflex" },
 	{ 0x00D4,	"Ocircumflexsmall" },
+	{ 0x00D4,	"Ocircumflexalt" },	/* BulmerMT-ItalicAlt */
 	{ 0x00D5,	"Otilde" },
 	{ 0x00D5,	"Otildesmall" },
+	{ 0x00D5,	"Otildealt" },		/* BulmerMT-ItalicAlt */
 	{ 0x00D6,	"Odieresis" },
 	{ 0x00D6,	"Odieresissmall" },
+	{ 0x00D6,	"Odieresisalt" },	/* BulmerMT-ItalicAlt */
 	{ 0x00D7,	"multiply" },
 	{ 0x00D8,	"Oslash" },
 	{ 0x00D8,	"Oslashsmall" },
+	{ 0x00D8,	"Oslashalt" },		/* BulmerMT-ItalicAlt */
 	{ 0x00D9,	"Ugrave" },
 	{ 0x00D9,	"Ugravesmall" },
 	{ 0x00DA,	"Uacute" },
@@ -126,6 +134,7 @@ const struct unimap	unimap[] = {
 	{ 0x00DC,	"Udieresissmall" },
 	{ 0x00DD,	"Yacute" },
 	{ 0x00DD,	"Yacutesmall" },
+	{ 0x00DD,	"Yacutealt" },		/* BulmerMT-ItalicAlt */
 	{ 0x00DE,	"Thorn" },
 	{ 0x00DE,	"Thornsmall" },
 	{ 0x00DF,	"germandbls" },
@@ -173,6 +182,7 @@ const struct unimap	unimap[] = {
 	{ 0x0161,	"scaron" },
 	{ 0x0178,	"Ydieresis" },
 	{ 0x0178,	"Ydieresissmall" },
+	{ 0x0178,	"Ydieresisalt" },	/* BulmerMT-ItalicAlt */
 	{ 0x017D,	"Zcaron" },
 	{ 0x017D,	"Zcaronsmall" },
 	{ 0x017E,	"zcaron" },
@@ -249,6 +259,7 @@ const struct unimap	unimap[] = {
 	{ 0x201A,	"quotesinglbase" },
 	{ 0x201B,	"quotesingle" },
 	{ 0x201C,	"quotedblleft" },
+	{ 0x201C,	"quotealtdblleft" },	/* BulmerMT-RegularAlt */
 	{ 0x201D,	"quotedblright" },
 	{ 0x201E,	"quotedblbase" },
 	{ 0x2020,	"dagger" },
@@ -360,6 +371,7 @@ const struct unimap	unimap[] = {
 	{ 0x2663,	"club" },
 	{ 0x2665,	"heart" },
 	{ 0x2666,	"diamond" },
+	{ 0xF8FF,	"apple" },
 	{ 0xFB00,	"ff" },
 	{ 0xFB01,	"fi" },
 	{ 0xFB02,	"fl" },
