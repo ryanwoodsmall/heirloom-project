@@ -12,7 +12,7 @@ const char creator[] = "Heirloom Documentation Tools - dpost 1.36 (gritter) 8/22
 color.c: * Sccsid @(#)color.c	1.3 (gritter) 8/9/05
 comments.h: * Sccsid @(#)comments.h	1.4 (gritter) 8/13/05
 dev.h: * Sccsid @(#)dev.h	1.3 (gritter) 8/9/05
-dpost.c: * Sccsid @(#)dpost_version.c	1.36 (gritter) 8/22/05
+dpost.c: * Sccsid @(#)dpost.c	1.30 (gritter) 8/22/05
 dpost.h: * Sccsid @(#)dpost.h	1.3 (gritter) 8/9/05
 dpost_afm.c: * Sccsid @(#)dpost_afm.c	1.1 (gritter) 8/20/05
 draw.c: * Sccsid @(#)draw.c	1.3 (gritter) 8/9/05
