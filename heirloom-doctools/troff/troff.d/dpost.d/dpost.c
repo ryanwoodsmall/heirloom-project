@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.29 (gritter) 8/21/05
+ * Sccsid %W% (gritter) %G%
  */
 
 /*
@@ -369,9 +369,10 @@ int		fsize;			/* max size of a font files in bytes */
 int		unitwidth;		/* set to dev.unitwidth */
 char		*chname;		/* special character strings */
 short		*chtab;			/* used to locate character names */
-char		*fitab[NFONT+1];	/* locates char info on each font */
-char		*widthtab[NFONT+1];	/* character width data for each font */
-char		*codetab[NFONT+1];	/* and codes to get characters printed */
+char		**fitab;		/* locates char info on each font */
+int		**fontab;		/* character width data for each font */
+char		**codetab;		/* and codes to get characters printed */
+char		**kerntab;		/* for makefont() */
 
 
 /*
@@ -1419,9 +1420,13 @@ fontinit(void)
     chname = (char *) (chtab + nchtab);
     fsize = 3 * 255 + nchtab + 128 - 32 + sizeof(struct Font);
 
+    fitab = calloc(NFONT+1, sizeof *fitab);
+    fontab = calloc(NFONT+1, sizeof *fontab);
+    codetab = calloc(NFONT+1, sizeof *codetab);
+    kerntab = calloc(NFONT+1, sizeof *kerntab);
+
     for ( i = 1; i <= NFONT; i++ )  {	/* so loadfont() knows nothing's there */
 	fontbase[i] = NULL;
-	widthtab[i] = codetab[i] = fitab[i] = NULL;
     }	/* End for */
 
     if ( (downloaded = (char *) calloc(nchtab + 128, sizeof(char))) == NULL )
@@ -1446,6 +1451,7 @@ loadfont (
 
     int		fin;			/* for reading *s.out file */
     int		nw;			/* number of width table entries */
+    char	*p;
 
 
 /*
@@ -1500,7 +1506,7 @@ loadfont (
 	afmfonts[afmcount] = a;
 	sprintf(a->Font.intname, "%d", dev.nfonts + ++afmcount);
 have:   fontbase[n] = &a->Font;
-	widthtab[n] = a->fontab;
+	fontab[n] = a->fontab;
 	codetab[n] = a->codetab;
 	fitab[n] = a->fitab;
     	t_fp(n, a->fontname, fontbase[n]->intname, a);
@@ -1530,9 +1536,8 @@ have:   fontbase[n] = &a->Font;
 	smnt = n;
 
     nw = fontbase[n]->nwfont & BMASK;
-    widthtab[n] = (char *) fontbase[n] + sizeof(struct Font);
-    codetab[n] = (char *) widthtab[n] + 2 * nw;
-    fitab[n] = (char *) widthtab[n] + 3 * nw;
+    p = (char *) fontbase[n] + sizeof(struct Font);
+    makefont(n, p, NULL, p + 2 * nw, p + 3 * nw, nw);
 
     t_fp(n, fontbase[n]->namefont, fontbase[n]->intname, NULL);
 
@@ -1624,11 +1629,11 @@ fontprint (
     n = fontbase[i]->nwfont & BMASK;
 
     fprintf(tf, "base=0%lo, nchars=%d, spec=%d, name=%s, widtab=0%lo, fitab=0%lo\n",
-	    (long)p, n, fontbase[i]->specfont, fontbase[i]->namefont, (long)widthtab[i], (long)fitab[i]);
+	    (long)p, n, fontbase[i]->specfont, fontbase[i]->namefont, (long)fontab[i], (long)fitab[i]);
 
     fprintf(tf, "widths:\n");
     for ( j = 0; j <= n; j++ )  {
-	fprintf(tf, " %2d", widthtab[i][j] & BMASK);
+	fprintf(tf, " %2d", fontab[i][j]);
 	if ( j % 20 == 19 ) putc('\n', tf);
     }	/* End for */
 
@@ -2747,7 +2752,7 @@ put1 (
     register int	i;		/* character code from fitab */
     register int	j;		/* number of fonts we've checked so far */
     register int	k;		/* font we're currently looking at */
-    char		*pw = NULL;	/* font widthtab and */
+    int			*pw = NULL;	/* font widthtab and */
     char		*p = NULL;	/* and codetab where c was found */
     int			code;		/* code used to get c printed */
     int			ofont;		/* font when we started */
@@ -2767,7 +2772,7 @@ put1 (
  * that starts with the first special font and skips font position 0. If character
  * c is found somewhere besides the current font we change to that font and use
  * fitab[k][c] to locate missing data in the other two tables. The width of the
- * character can be found at widthtab[k][c] while codetab[k][c] is whatever we
+ * character can be found at fontab[k][c] while codetab[k][c] is whatever we
  * need to tell the printer to have character c printed. lastc records the real
  * name of the character because it's lost by the time oput() gets called but
  * charlib() may need it.
@@ -2786,13 +2791,13 @@ put1 (
 
     if ( (i = fitab[k][c] & BMASK) != 0 )  {	/* it's on this font */
 	p = codetab[font];
-	pw = widthtab[font];
+	pw = fontab[font];
     } else if ( smnt > 0 )  {		/* on special (we hope) */
 	for ( k=smnt, j=0; j <= nfonts; j++, k = (k+1) % (nfonts+1) )  {
 	    if ( k == 0 )  continue;
 	    if ( (i = fitab[k][c] & BMASK) != 0 )  {
 		p = codetab[k];
-		pw = widthtab[k];
+		pw = fontab[k];
 		setfont(k);
 		break;
 	    }	/* End if */
@@ -2801,9 +2806,9 @@ put1 (
 
     if ( i != 0 && (code = p[i] & BMASK) != 0 )  {
 	if (size != FRACTSIZE)
-	    lastw = widthfac * (((pw[i] & BMASK) * pstab[size-1] + unitwidth/2) / unitwidth);
+	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else
-	    lastw = widthfac * (((pw[i] & BMASK) * fractsize + unitwidth/2) / unitwidth);
+	    lastw = widthfac * ((pw[i] * fractsize + unitwidth/2) / unitwidth);
 	oput(code);
     }	/* End if */
 

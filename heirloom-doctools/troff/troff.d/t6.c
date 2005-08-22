@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.36 (gritter) 8/21/05
+ * Sccsid @(#)t6.c	1.37 (gritter) 8/22/05
  */
 
 /*
@@ -145,7 +145,7 @@ int
 getcw(register int i)
 {
 	register int	k;
-	register char	*p;
+	register int	*p;
 	register int	x, j;
 	int nocache = 0;
 	int	ofont = xfont;
@@ -229,7 +229,7 @@ getcw(register int i)
 			x = xpts;
 		cs = (cs * EMPTS(x)) / 36;
 	}
-	k = ((k&BYTEMASK) * xpts + (Unitwidth / 2)) / Unitwidth;
+	k = (k * xpts + (Unitwidth / 2)) / Unitwidth;
 	s = xpts*Unitwidth;
 	if (s <= tkftab[ofont].s1 && tkftab[ofont].n1) {
 		nocache = 1;
@@ -777,7 +777,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 {
 	extern int sprintf(char *, const char *, ...);
 	register int k;
-	int n;
+	int n, nw;
 	char longname[NS], shortname[20];
 
 	zapwcache(0);
@@ -795,14 +795,17 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	}
 	n = fontbase[pos]->nwfont & BYTEMASK;
 	read(k, (char *) fontbase[pos], 3*n + nchtab + 128 - 32 + sizeof(struct Font));
-	kerntab[pos] = (char *) fontab[pos] + (fontbase[pos]->nwfont & BYTEMASK);
-	/* have to reset the fitab pointer because the width may be different */
-	fitab[pos] = (char *) fontab[pos] + 3 * (fontbase[pos]->nwfont & BYTEMASK);
-	if ((fontbase[pos]->nwfont & BYTEMASK) > n) {
+	nw = fontbase[pos]->nwfont & BYTEMASK;
+	if (nw > n) {
 		errprint("Font %s too big for position %d", shortname,
 			pos);
 		return(-1);
 	}
+	makefont(pos, &((char *)fontbase[pos])[sizeof(struct Font)],
+		&((char *)fontbase[pos])[sizeof(struct Font) + nw],
+		&((char *)fontbase[pos])[sizeof(struct Font) + 2*nw],
+		&((char *)fontbase[pos])[sizeof(struct Font) + 3*nw],
+		nw);
 	fontbase[pos]->nwfont = n;	/* so can load a larger one again later */
 	close(k);
 	if (pos == smnt) {

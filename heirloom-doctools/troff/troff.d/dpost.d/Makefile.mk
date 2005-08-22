@@ -32,4 +32,4 @@ misc.o: misc.c gen.h ext.h path.h
 pictures.o: pictures.c comments.h gen.h path.h
 ps_include.o: ps_include.c ps_include.h gen.h
 request.o: request.c gen.h request.h path.h
-afm.o: dev.h afm.h
+dpost_afm.o: dev.h afm.h ../afm.c

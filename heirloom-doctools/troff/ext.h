@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.11 (gritter) 8/20/05
+ * Sccsid @(#)ext.h	1.12 (gritter) 8/22/05
  */
 
 /*
@@ -50,9 +50,6 @@ extern	char	**argp;
 extern	char	*chname;
 extern	char	*eibuf;
 extern	char	*enda;
-extern	char	**fitab;
-extern	char	**fontab;
-extern	char	**kerntab;
 extern	char	*ibufp;
 extern	char	*obufp;
 extern	char	*unlkp;

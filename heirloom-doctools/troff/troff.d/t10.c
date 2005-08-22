@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.18 (gritter) 8/21/05
+ * Sccsid @(#)t10.c	1.19 (gritter) 8/22/05
  */
 
 /*
@@ -68,7 +68,7 @@ int	hpos	 = 0;	/* ditto horizontal */
 
 short	*chtab;
 char	*chname;
-char	**fontab;
+int	**fontab;
 char	**kerntab;
 char	**fitab;
 char	**codetab;
@@ -187,16 +187,14 @@ ptinit(void)
 		if (smnt == 0 && fontbase[i]->specfont == 1)
 			smnt = i;	/* first special font */
 		p += sizeof(struct Font);	/* that's what's on the beginning */
-		fontab[i] = p;
-		kerntab[i] = p + nw;
-		codetab[i] = p + 2 * nw;
-		fitab[i] = p + 3 * nw;	/* skip width, kern, code */
+		makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
 		p += 3 * nw + dev.nchtab + 128 - 32;
 	}
 	fontbase[0] = (struct Font *) p;	/* the last shall be first */
 	memset(fontbase[0], 0, sizeof *fontbase[0]);
-	fontbase[0]->nwfont = EXTRAFONT - dev.nchtab - (128-32) - sizeof (struct Font);
-	fontab[0] = p + sizeof (struct Font);
+	nw = EXTRAFONT - dev.nchtab - (128-32) - sizeof (struct Font);
+	fontbase[0]->nwfont = nw;
+	makefont(0, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
 	close(fin);
 	/* there are a lot of things that used to be constant
 	 * that now require code to be executed.

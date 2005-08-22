@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.10 (gritter) 8/22/05
+ * Sccsid @(#)afm.c	1.11 (gritter) 8/22/05
  */
 
 #include <stdlib.h>
@@ -461,4 +461,32 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	remap(a);
 	a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
 	return 0;
+}
+
+/*
+ * This is for legacy font support. It exists at this place because both
+ * troff and dpost need it in combination with AFM support.
+ */
+void
+makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
+		char *devfitab, int nw)
+{
+	int	i;
+
+	free(fontab[nf]);
+	free(kerntab[nf]);
+	free(codetab[nf]);
+	free(fitab[nf]);
+	fontab[nf] = calloc(nw, sizeof *fontab);
+	kerntab[nf] = calloc(nw, sizeof *kerntab);
+	codetab[nf] = calloc(nw, sizeof *codetab);
+	fitab[nf] = calloc(nw, sizeof *fitab);
+	if (devfontab) for (i = 0; i < nw; i++)
+		fontab[nf][i] = devfontab[i]&0377;
+	if (devkerntab) for (i = 0; i < nw; i++)
+		kerntab[nf][i] = devkerntab[i]&0377;
+	if (devcodetab) for (i = 0; i < nw; i++)
+		codetab[nf][i] = devcodetab[i]&0377;
+	if (devfitab) for (i = 0; i < nw; i++)
+		fitab[nf][i] = devfitab[i]&0377;
 }

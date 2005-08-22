@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.3 (gritter) 8/21/05
+ * Sccsid @(#)troff.h	1.4 (gritter) 8/22/05
  */
 
 extern struct tkftab {
@@ -35,7 +35,6 @@ extern struct tkftab {
 
 extern	int		Nfont;
 extern	struct Font	**fontbase;
-extern	char		**codetab;
 extern	int		*cstab;
 extern	int		*ccstab;
 extern	int		**fallbacktab;
