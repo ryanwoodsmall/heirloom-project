@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.15 (gritter) 8/21/05
+ * Sccsid @(#)n5.c	1.16 (gritter) 8/22/05
  */
 
 /*
@@ -47,6 +47,7 @@
  */
 
 #include <stdlib.h>
+#include <ctype.h>
 #ifdef 	EUC
 #ifdef	NROFF
 #include <stddef.h>
@@ -615,53 +616,31 @@ static int
 getev(int *nxevp, char **namep)
 {
 	char	*name = NULL;
-	int	r = raw;
-	int nxev;
+	int nxev = 0;
 	char	c;
 	int	i = 0, sz = 0;
 
 	*namep = NULL;
 	*nxevp = 0;
-	raw = 1;
-	if (skip()) {
-		raw = r;
+	if (skip())
 		return 0;
-	}
-	noscale++;
-	c = ch;
-	ch = 0;
-	for (;;) {
-		if (i+1 >= sz)
-			name = realloc(name, (sz += 8) * sizeof *name);
-		name[i++] = c;
-		if (c == 0 || c == ' ' || c == '\n')
-			break;
-		c = getch0();
-	}
-	name[i] = 0;
-	cpushback(name);
-	raw = r;
-	nxev = atoi();
-	if (nonumb && xflag && name[1]) {
-		while (ch)
-			c = getach();
-		cpushback(name);
-		free(name);
-		name = NULL;
-		i = sz = 0;
+	c = cbits(ch);
+	if (isdigit(c) || c == '(') {
+		noscale++;
+		nxev = atoi();
+		noscale = 0;
+		if (nonumb) {
+			flushi();
+			return 0;
+		}
+	} else {
 		do {
 			c = getach();
 			if (i >= sz)
 				name = realloc(name, (sz += 8) * sizeof *name);
 			name[i++] = c;
 		} while (c);
-	} else {
-		free(name);
-		name = NULL;
 	}
-	noscale = 0;
-	if (nonumb && name == NULL)
-		return 0;
 	flushi();
 	*namep = name;
 	*nxevp = nxev;
