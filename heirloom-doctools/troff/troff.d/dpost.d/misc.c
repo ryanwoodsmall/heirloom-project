@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.4 (gritter) 8/16/05
+ * Sccsid @(#)misc.c	1.5 (gritter) 8/23/05
  */
 
 /*
@@ -195,7 +195,8 @@ in_olist (
 
 int 
 cat (
-    char *file			/* copy this file to stdout */
+    char *file,			/* copy this file to out */
+    FILE *out
 )
 
 
@@ -216,12 +217,12 @@ cat (
  */
 
 
-    fflush(stdout);
+    fflush(out);
 
     if ( (fd_in = open(file, O_RDONLY)) == -1 )
 	return(FALSE);
 
-    fd_out = fileno(stdout);
+    fd_out = fileno(out);
     while ( (count = read(fd_in, buf, sizeof(buf))) > 0 )
 	write(fd_out, buf, count);
 

@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)comments.h	1.4 (gritter) 8/13/05
+ * Sccsid @(#)comments.h	1.5 (gritter) 8/23/05
  */
 
 /*
@@ -47,10 +47,10 @@
 #define MINCONFORMING			"%!PS-Adobe-\n"
 #define OLDCONFORMING			"%!PS-Adobe-1.0\n"
 
-#define CONFORMING			"%!PS-Adobe-2.0\n"
-#define CONFORMINGEPS			"%!PS-Adobe-2.0 EPS\n"
-#define CONFORMINGQUERY			"%!PS-Adobe-2.0 Query\n"
-#define CONFORMINGEXITSERVER		"%!PS-Adobe-2.0 ExitServer\n"
+#define CONFORMING			"%!PS-Adobe-3.0\n"
+#define CONFORMINGEPS			"%!PS-Adobe-3.0 EPS\n"
+#define CONFORMINGQUERY			"%!PS-Adobe-3.0 Query\n"
+#define CONFORMINGEXITSERVER		"%!PS-Adobe-3.0 ExitServer\n"
 
 /*
  *

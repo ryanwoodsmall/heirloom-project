@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.33 (gritter) 8/23/05
+ * Sccsid @(#)dpost.c	1.34 (gritter) 8/23/05
  */
 
 /*
@@ -569,6 +569,11 @@ int		printed = 0;		/* charge for this many pages */
 
 
 FILE		*tf = NULL;		/* PostScript output goes here */
+FILE		*gf = NULL;		/* global data goes here */
+FILE		*rf = NULL;		/* resource data goes here */
+FILE		*sf = NULL;		/* supplied resource comments go here */
+int		sfcount;		/* count of supplied resources */
+int		ostdout;		/* old standard output */
 FILE		*fp_acct = NULL;	/* accounting stuff written here */
 
 
@@ -604,6 +609,9 @@ main(int agc, char *agv[])
 
 
 {
+    const char	template[] = "/var/tmp/dpost.XXXXXX";
+    char	*tp;
+    FILE	*fp;
 
 
 /*
@@ -614,6 +622,30 @@ main(int agc, char *agv[])
  *
  */
 
+    ostdout = dup(1);
+    if (close(mkstemp(tp = strdup(template))) < 0 ||
+		    freopen(tp, "r+", stdout) == NULL) {
+	    perror(tp);
+	    return 2;
+    }
+    unlink(tp);
+    if (close(mkstemp(tp = strdup(template))) < 0 ||
+			    (gf = fopen(tp, "r+")) == NULL) {
+	    perror(tp);
+	    return 2;
+    }
+    if (close(mkstemp(tp = strdup(template))) < 0 ||
+			    (rf = fopen(tp, "r+")) == NULL) {
+	    perror(tp);
+	    return 2;
+    }
+    unlink(tp);
+    if (close(mkstemp(tp = strdup(template))) < 0 ||
+			    (sf = fopen(tp, "r+")) == NULL) {
+	    perror(tp);
+	    return 2;
+    }
+    unlink(tp);
 
     argc = agc;				/* global so everyone can use them */
     argv = agv;
@@ -621,11 +653,13 @@ main(int agc, char *agv[])
     prog_name = argv[0];		/* just for error messages */
 
     init_signals();			/* sets up interrupt handling */
-    header();				/* PostScript file structuring comments */
     options();				/* command line options */
     arguments();			/* translate all the input files */
     done();				/* add trailing comments etc. */
     account();				/* job accounting data */
+
+    fp = fdopen(ostdout, "w");
+    header(fp);			/* PostScript file structuring comments */
 
     return(x_stat);			/* everything probably went OK */
 
@@ -670,7 +704,7 @@ init_signals(void)
 
 
 void
-header(void)
+header(FILE *fp)
 
 
 {
@@ -679,6 +713,8 @@ header(void)
     int		ch;			/* return value from getopt() */
     int		old_optind = optind;	/* for restoring optind - should be 1 */
     time_t	now;
+    int		n;
+    char	buf[4096];
 
 
 /*
@@ -703,19 +739,38 @@ header(void)
     optind = old_optind;		/* get ready for option scanning */
 
     time(&now);
-    fprintf(stdout, "%s", NONCONFORMING);
-    fprintf(stdout, "%s %s\n", CREATOR, creator);
-    fprintf(stdout, "%s %s", CREATIONDATE, ctime(&now));
-    fprintf(stdout, "%s %s\n", DOCUMENTFONTS, ATEND);
-    fprintf(stdout, "%s %s\n", PAGES, ATEND);
-    fprintf(stdout, "%s", ENDCOMMENTS);
+    fprintf(fp, "%s", CONFORMING);
+    fprintf(fp, "%s %s\n", CREATOR, creator);
+    fprintf(fp, "%s %s", CREATIONDATE, ctime(&now));
+    fprintf(fp, "%s %s\n", DOCUMENTFONTS, ATEND);
+    fprintf(fp, "%s %s\n", PAGES, ATEND);
+    fflush(sf);
+    rewind(sf);
+    while ((n = fread(buf, 1, sizeof buf, sf)) > 0)
+	    fwrite(buf, 1, n, fp);
+    fprintf(fp, "%s", ENDCOMMENTS);
 
-    if ( cat(prologue) == FALSE )
+    fprintf(fp, "%s\n", "%%BeginProlog");
+    fflush(rf);
+    rewind(rf);
+    while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
+	    fwrite(buf, 1, n, fp);
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.34");
+    if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
+    fprintf(fp, "%s\n", "%%EndResource");
 
-    fprintf(stdout, "%s", ENDPROLOG);
-    fprintf(stdout, "%s", BEGINSETUP);
-    fprintf(stdout, "mark\n");
+    fprintf(fp, "%s", ENDPROLOG);
+    fprintf(fp, "%s", BEGINSETUP);
+    fflush(gf);
+    rewind(gf);
+    while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
+	    fwrite(buf, 1, n, fp);
+    fprintf(fp, "mark\n");
+    fflush(stdout);
+    rewind(stdout);
+    while ((n = fread(buf, 1, sizeof buf, stdout)) > 0)
+	    fwrite(buf, 1, n, fp);
 
 }   /* End of header */
 
@@ -805,7 +860,7 @@ options(void)
 		    break;
 
 	    case 'C':			/* copy file to straight to output */
-		    if ( cat(optarg) == FALSE )
+		    if ( cat(optarg, stdout) == FALSE )
 			error(FATAL, "can't read %s", optarg);
 		    break;
 
@@ -945,7 +1000,7 @@ setup(void)
     fprintf(stdout, "%d setdecoding\n", encoding);
 
     if ( formsperpage > 1 )  {		/* followed by stuff for multiple pages */
-	if ( cat(formfile) == FALSE )
+	if ( cat(formfile, stdout) == FALSE )
 	    error(FATAL, "can't read %s", formfile);
 	fprintf(stdout, "%d setupforms\n", formsperpage);
     }	/* End if */
@@ -1020,7 +1075,7 @@ done(void)
 
     if ( temp_file != NULL )  {
 	if ( docfonts > 0 )  {
-	    cat(temp_file);
+	    cat(temp_file, stdout);
 	    putc('\n', stdout);
 	}   /* End if */
 	unlink(temp_file);
@@ -1968,7 +2023,11 @@ supplypfb(char *font, char *file, char *path, FILE *fp)
 	    ungetc(c, fp);
     else
 	    length--;
-    fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    if (sfcount++ == 0)
+        fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    else
+        fprintf(sf, "%%%%+ font %s\n", font);
+    fprintf(rf, "%%%%BeginResource: Font %s\n", font);
     for (;;) {
     	switch (type) {
     	case 1:
@@ -1980,12 +2039,12 @@ supplypfb(char *font, char *file, char *path, FILE *fp)
 	    				ungetc(c, fp);
     				else
 	    				length--;
-				putc('\n', tf);
+				putc('\n', rf);
 				break;
 		    	case 0:
 				continue;
 		    	default:
-				putc(c, tf);
+				putc(c, rf);
 		    	}
 	    	}
 	    	if (c == EOF)
@@ -1997,13 +2056,13 @@ supplypfb(char *font, char *file, char *path, FILE *fp)
 	    		if (fread(buf, 1, n, fp) != n)
 		    		error(FATAL, "short binary data in %s", path);
 	    		for (i = 0; i < n; i++)
-		    		fprintf(tf, "%02x", buf[i]&0377);
-	    		putc('\n', tf);
+		    		fprintf(rf, "%02x", buf[i]&0377);
+	    		putc('\n', rf);
 			length -= n;
 	    	}
 	    	break;
     	case 3:
-    		fprintf(tf, "%%%%EndResource\n");
+    		fprintf(rf, "%%%%EndResource\n");
 		return;
 	default:
 	        error(FATAL, "invalid header type %d in %s", path, type);
@@ -2036,11 +2095,15 @@ supply1(char *font, char *file, char *type)
 		    strncmp(line, ps_truetypefont_, strlen(ps_truetypefont_)))
 	    error(FATAL, "file %s does not start with \"%s\" or \"%s\"",
 			    temp, ps_adobe_font_1_0, ps_truetypefont_);
-    fprintf(tf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    if (sfcount++ == 0)
+        fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
+    else
+        fprintf(sf, "%%%%+ font %s\n", font);
+    fprintf(rf, "%%%%BeginResource: Font %s\n", font);
     while (fgets(line, sizeof line, fp) != NULL)
-	    fputs(line, tf);
+	    fputs(line, rf);
     fclose(fp);
-    fprintf(tf, "%%%%EndResource\n");
+    fprintf(rf, "%%%%EndResource\n");
 }
 
 static void
@@ -2320,10 +2383,10 @@ static void
 printencsep(int *colp)
 {
 	if (*colp >= 60) {
-		putc('\n', tf);
+		putc('\n', gf);
 		*colp = 0;
 	} else {
-		putc(' ', tf);
+		putc(' ', gf);
 		(*colp)++;
 	}
 }
@@ -2334,7 +2397,7 @@ printencvector(struct afmtab *a)
 	int	i, j, k, col = 0, s, w;
 	char	*afmmap = NULL;
 
-	fprintf(tf, "/Encoding-@%s [\n", a->Font.intname);
+	fprintf(gf, "/Encoding-@%s [\n", a->Font.intname);
 	col = 0;
 	/*
 	 * First, write excess entries into the positiongs from 1 to 31
@@ -2343,7 +2406,7 @@ printencvector(struct afmtab *a)
 	s = 128 - 32;
 	w = 128;
 	afmmap = calloc(256 + nchtab, sizeof *afmmap);
-	col += fprintf(tf, "/.notdef");
+	col += fprintf(gf, "/.notdef");
 	printencsep(&col);
 	for (j = 1; j < 32; j++) {
 		while (s < a->nchars + 128 - 32 + nchtab &&
@@ -2355,20 +2418,20 @@ printencvector(struct afmtab *a)
 				k < a->nchars &&
 				a->nametab[k] != NULL) {
 			afmmap[s - 128 + 32] = j;
-			col += fprintf(tf, "/%s", a->nametab[k]);
+			col += fprintf(gf, "/%s", a->nametab[k]);
 			printencsep(&col);
 			s++;
 		} else {
-			col += fprintf(tf, "/.notdef");
+			col += fprintf(gf, "/.notdef");
 			printencsep(&col);
 		}
 	}
-	col += fprintf(tf, "/space");
+	col += fprintf(gf, "/space");
 	printencsep(&col);
 	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++) {
 		if (i < 128 - 32 && (k = a->fitab[i]) != 0 && k < a->nchars &&
 				a->nametab[k] != NULL) {
-			col += fprintf(tf, "/%s", a->nametab[k]);
+			col += fprintf(gf, "/%s", a->nametab[k]);
 			printencsep(&col);
 		} else {
 			while (s < a->nchars + 128 - 32 + nchtab &&
@@ -2380,17 +2443,17 @@ printencvector(struct afmtab *a)
 				k < a->nchars &&
 				a->nametab[k] != NULL) {
 				afmmap[s - 128 + 32] = i + 32;
-				col += fprintf(tf, "/%s", a->nametab[k]);
+				col += fprintf(gf, "/%s", a->nametab[k]);
 				printencsep(&col);
 				s++;
 			} else {
-				col += fprintf(tf, "/.notdef");
+				col += fprintf(gf, "/.notdef");
 				printencsep(&col);
 			}
 		}
 	}
-	fprintf(tf, "] def\n");
-	fprintf(tf, "\
+	fprintf(gf, "] def\n");
+	fprintf(gf, "\
 /%s findfont\n\
 dup length dict begin\n\
   {1 index /FID ne {def} {pop pop} ifelse} forall\n\
@@ -2399,21 +2462,21 @@ dup length dict begin\n\
 end\n",
 		a->fontname, a->Font.intname);
 	if (strcmp(a->fontname, "Symbol") == 0) {
-		fprintf(tf, "/Symbol-tmp-@%s exch definefont pop\n",
+		fprintf(gf, "/Symbol-tmp-@%s exch definefont pop\n",
 			a->Font.intname);
-		fprintf(tf, "/Symbol-tmp-@%s /Symbol-@%s Sdefs cf\n",
+		fprintf(gf, "/Symbol-tmp-@%s /Symbol-@%s Sdefs cf\n",
 			a->Font.intname, a->Font.intname);
-		fprintf(tf, "/Symbol-tmp-@%s undefinefont\n",
+		fprintf(gf, "/Symbol-tmp-@%s undefinefont\n",
 			a->Font.intname);
 	} else if (strcmp(a->fontname, "Times-Roman") == 0) {
-		fprintf(tf, "/Times-Roman-tmp-@%s exch definefont pop\n",
+		fprintf(gf, "/Times-Roman-tmp-@%s exch definefont pop\n",
 			a->Font.intname);
-		fprintf(tf, "/Times-Roman-tmp-@%s /Times-Roman-@%s S1defs cf\n",
+		fprintf(gf, "/Times-Roman-tmp-@%s /Times-Roman-@%s S1defs cf\n",
 			a->Font.intname, a->Font.intname);
-		fprintf(tf, "/Times-Roman-tmp-@%s undefinefont\n",
+		fprintf(gf, "/Times-Roman-tmp-@%s undefinefont\n",
 			a->Font.intname);
 	} else
-		fprintf(tf, "/%s-@%s exch definefont pop\n",
+		fprintf(gf, "/%s-@%s exch definefont pop\n",
 			a->fontname, a->Font.intname);
 	return afmmap;
 }
@@ -2462,12 +2525,8 @@ t_sf(void)
 	if ( seenfonts[fnum] == 0 ) {
 	    documentfonts();
 	    if (fontname[font].afm) {
-		fprintf(tf, "cleartomark restore\n");
-		fprintf(tf, "%s", BEGINGLOBAL);
 		t_dosupply(fontname[font].afm->fontname);
 		fontname[font].afmmap = printencvector(fontname[font].afm);
-		fprintf(tf, "%s", ENDGLOBAL);
-		fprintf(tf, "save mark\n");
 		reset();
 	    }
 	}
@@ -3254,7 +3313,7 @@ charlib (
 	if ( code != 1 )  {		/* get the bitmap or whatever */
 	    sprintf(temp, "%s/dev%s/charlib/%s.map", fontdir, realdev, name);
 	    if ( access(temp, 04) == 0 && tf == stdout )
-		cat(temp);
+		cat(temp, gf);
 	}   /* End if */
 	fprintf(tf, "%d %d m\n", stringstart = hpos + lastw, vpos);
     }	/* End if */
@@ -3287,12 +3346,7 @@ doglobal (
 
 
     if ( tf == stdout )  {
-	endtext();
-	fprintf(tf, "cleartomark restore\n");
-	fprintf(tf, "%s", BEGINGLOBAL);
-	val = cat(name);
-	fprintf(tf, "%s", ENDGLOBAL);
-	fprintf(tf, "save mark\n");
+	val = cat(name, gf);
 	reset();
     }	/* End if */
 

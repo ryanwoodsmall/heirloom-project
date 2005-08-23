@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.7 (gritter) 8/23/05
+ * Sccsid @(#)gen.h	1.8 (gritter) 8/23/05
  */
 
 /*
@@ -79,7 +79,7 @@ void newcolor(char *);
 void setcolor(void);
 /* dpost.c */
 void init_signals(void);
-void header(void);
+void header(FILE *);
 void options(void);
 void setpaths(char *);
 void setup(void);
@@ -149,7 +149,7 @@ void settext(char *);
 void error(int, char *, ...);
 void out_list(char *);
 int in_olist(int);
-int cat(char *);
+int cat(char *, FILE *);
 int str_convert(char **, int);
 char *tempname(const char *);
 /* pictures.c */
