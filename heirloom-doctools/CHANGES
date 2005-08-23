@@ -6,9 +6,11 @@ Release ...
 * troff: Can now handle Type 42 fonts (i.e. TrueType fonts that have been
   converted for use by PostScript interpreters).
 * troff: Handles input characters according to LC_CTYPE now in combination
-  with the new font setup. In an UTF-8 locale, most characters that are
+  with the new font setup. In a UTF-8 locale, most characters that are
   present in standard, Expert, and Symbol PostScript fonts are supported;
   otherwise, a locale-specific subset of them is available.
+* troff: A PostScript device with a resolution of 7200 dpi, named "7200",
+  is available, and is used by default.
 * troff: The ".fzoom" request allows to zoom the characters of a font.
 * [nt]roff: The ".lc_ctype" request can be used to set the LC_CTYPE
   localization setting from within a document.

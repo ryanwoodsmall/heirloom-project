@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.5 (gritter) 8/22/05
+ * Sccsid @(#)afm.h	1.7 (gritter) 8/23/05
  */
 
 extern struct afmtab {
@@ -33,9 +33,10 @@ extern struct afmtab {
 	char	*fontname;
 	int	*fontab;
 	char	*kerntab;
-	char	*codetab;
-	char	*fitab;
+	short	*codetab;
+	short	*fitab;
 	char	**nametab;
+	int	nspace;
 	int	rq;
 	int	lineno;
 	int	nchars;
@@ -43,10 +44,10 @@ extern struct afmtab {
 } **afmtab;
 extern int nafm;
 
-extern	char		**fitab;
+extern	short		**fitab;
 extern	int		**fontab;
 extern	char		**kerntab;
-extern	char		**codetab;
+extern	short		**codetab;
 
 extern	int	afmget(struct afmtab *, char *, size_t);
 extern	void	makefont(int, char *, char *, char *, char *, int);

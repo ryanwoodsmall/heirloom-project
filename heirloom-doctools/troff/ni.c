@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.11 (gritter) 8/16/05
+ * Sccsid @(#)ni.c	1.12 (gritter) 8/23/05
  */
 
 /*
@@ -60,7 +60,7 @@ char	devname[20] = "37";
 
 char	termtab[NS] = FNTDIR;           /* rest added in ptinit() */
 char	fontfile[NS] = FNTDIR;          /* rest added in casefp() */
-char	devname[20]	 = "post";	/* default typesetter */
+char	devname[20]	 = "7200";	/* default typesetter */
 
 #endif
 char	tmp_name[] = "/var/tmp/trtmpXXXXXX";

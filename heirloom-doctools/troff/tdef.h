@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.26 (gritter) 8/21/05
+ * Sccsid @(#)tdef.h	1.28 (gritter) 8/23/05
  */
 
 /*
@@ -217,14 +217,18 @@ endif EUC
 /* in the following, "L" should really be a tchar, but ... */
 
 #define	MOT	(01L<<15)	/* motion character indicator */
-#define	MOTV	(07L<<15)	/* clear for motion part */
 #define	VMOT	(01L<<16)	/* vert motion bit */
 #define	NMOT	(01L<<17)	/* negative motion indicator*/
-#define	MAXMOT	32767	/* bad way to write this!!! */
+#define	BMBITS	077777L		/* basic absolute motion bits */
+#define	XMBITS	0x7FFC0000L	/* extended absolute motion bits */
+#define	XMSHIFT	3		/* extended absolute motion shift */
+#define	MAXMOT	0x0FFFFFFFL	/* bad way to write this!!! */
+
 #define	ismot(n)	((n) & MOT)
 #define	isvmot(n)	((n) & VMOT)	/* must have tested MOT previously */
 #define	isnmot(n)	((n) & NMOT)	/* ditto */
-#define	absmot(n)	(unsigned)(0177777 & (n) & ~MOT)	/* (short) is cheap mask */
+#define	absmot(n)	(unsigned long)(BMBITS&(n) | ((n)&XMBITS)>>XMSHIFT)
+#define	sabsmot(n)	((n)&BMBITS | ((n)&~BMBITS)<<XMSHIFT)
 
 #define	ZBIT	0x80000000 	/*  (01L << 31) */	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
@@ -268,9 +272,9 @@ endif EUC
 #endif /* EUC */
 
 #define	ZONE	5	/* 5 hrs for EST */
-#define	TABMASK	 037777
-#define	RTAB	(unsigned) 0100000
-#define	CTAB	040000
+#define	TABMASK	0x3FFFFFFF
+#define	RTAB	(unsigned) 0x80000000
+#define	CTAB	0x40000000
 
 #define	TABBIT	02		/* bits in gchtab */
 #define	LDRBIT	04

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.4 (gritter) 8/22/05
+ * Sccsid @(#)troff.h	1.5 (gritter) 8/23/05
  */
 
 extern struct tkftab {
@@ -47,3 +47,4 @@ extern	short		*chtab;
 extern	long		realpage;
 
 extern	void		growfonts(int);
+extern	void		loadafm(int, int, char *, char *);

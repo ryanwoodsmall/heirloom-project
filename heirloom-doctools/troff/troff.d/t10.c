@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.19 (gritter) 8/22/05
+ * Sccsid @(#)t10.c	1.22 (gritter) 8/23/05
  */
 
 /*
@@ -70,8 +70,8 @@ short	*chtab;
 char	*chname;
 int	**fontab;
 char	**kerntab;
-char	**fitab;
-char	**codetab;
+short	**fitab;
+short	**codetab;
 
 int	Inch;
 int	Hor;
@@ -146,7 +146,7 @@ void
 ptinit(void)
 {
 	int	i, fin, nw;
-	char	*filebase, *p;
+	char	*filebase, *p, *ap;
 
 	growfonts(NFONT+1);
 	/* open table for device,
@@ -187,7 +187,13 @@ ptinit(void)
 		if (smnt == 0 && fontbase[i]->specfont == 1)
 			smnt = i;	/* first special font */
 		p += sizeof(struct Font);	/* that's what's on the beginning */
-		makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
+		if ((ap = strstr(fontbase[i]->namefont, ".afm")) != NULL) {
+			*ap = 0;
+			if (ap == &fontbase[i]->namefont[1])
+				fontlab[i] &= BYTEMASK;
+			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL);
+		} else
+			makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
 		p += 3 * nw + dev.nchtab + 128 - 32;
 	}
 	fontbase[0] = (struct Font *) p;	/* the last shall be first */
@@ -325,7 +331,8 @@ ptout(register tchar i)
 tchar *
 ptout0(tchar *pi)
 {
-	register short j, k, w = 0;
+	register int j;
+	register short k, w = 0;
 	short	z, dx, dy, dx2, dy2, n;
 	register tchar	i;
 	int outsize;	/* size of object being printed */

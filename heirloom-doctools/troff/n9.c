@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.11 (gritter) 8/21/05
+ * Sccsid @(#)n9.c	1.12 (gritter) 8/23/05
  */
 
 /*
@@ -213,10 +213,10 @@ setbra(void)
 	j = brabuf + 1;
 	cnt = 0;
 #ifdef NROFF
-	dwn = (2 * t.Halfline) | MOT | VMOT;
+	dwn = sabsmot(2 * t.Halfline) | MOT | VMOT;
 #endif
 #ifndef NROFF
-	dwn = EM | MOT | VMOT;
+	dwn = sabsmot(EM) | MOT | VMOT;
 #endif
 	while (((k = cbits(i = getch())) != delim) && (k != '\n') &&  (j <= (brabuf + NC - 4))) {
 		*j++ = i | ZBIT;
@@ -231,10 +231,10 @@ setbra(void)
 	}
 	*j = 0;
 #ifdef NROFF
-	*--j = *brabuf = (cnt * t.Halfline) | MOT | NMOT | VMOT;
+	*--j = *brabuf = sabsmot(cnt * t.Halfline) | MOT | NMOT | VMOT;
 #endif
 #ifndef NROFF
-	*--j = *brabuf = (cnt * EM) / 2 | MOT | NMOT | VMOT;
+	*--j = *brabuf = sabsmot((cnt * EM) / 2) | MOT | NMOT | VMOT;
 #endif
 	*--j &= ~ZBIT;
 	pushback(brabuf);
@@ -363,8 +363,10 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 	drawbuf[1] = type | chbits | ZBIT;
 	drawbuf[2] = '.' | chbits | ZBIT;	/* use default drawing character */
 	for (k = 0, j = 3; k < i; k++) {
-		drawbuf[j++] = MOT | ((dx[k] >= 0) ? dx[k] : (NMOT | -dx[k]));
-		drawbuf[j++] = MOT | VMOT | ((dy[k] >= 0) ? dy[k] : (NMOT | -dy[k]));
+		drawbuf[j++] = MOT | ((dx[k] >= 0) ?
+				sabsmot(dx[k]) : (NMOT | sabsmot(-dx[k])));
+		drawbuf[j++] = MOT | VMOT | ((dy[k] >= 0) ?
+				sabsmot(dy[k]) : (NMOT | sabsmot(-dy[k])));
 	}
 	if (type == DRAWELLIPSE) {
 		drawbuf[5] = drawbuf[4] | NMOT;	/* so the net vertical is zero */
@@ -495,7 +497,7 @@ s1:
 			length %= j;
 		}
 		if (length)
-			jj = length | MOT;
+			jj = sabsmot(length) | MOT;
 		else 
 			jj = getch0();
 	} else {

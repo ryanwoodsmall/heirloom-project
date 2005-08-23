@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.12 (gritter) 8/22/05
+ * Sccsid @(#)ext.h	1.13 (gritter) 8/23/05
  */
 
 /*
@@ -185,7 +185,7 @@ extern	tchar	nrbits;
 extern	tchar	oline[];
 extern	struct widcache {	/* width cache, indexed by character */
 	short	fontpts;
-	short	width;
+	int	width;
 } widcache[NWIDCACHE];
 extern	char gchtab[];
 extern	struct	d	d[NDI];

@@ -19,6 +19,12 @@ fonts: makedev
 	do \
 		../makedev $$i || exit; \
 	done
+	cd dev7200 && \
+	for i in DESC $(FONTS); \
+	do \
+		test -f $$i || continue; \
+		../makedev $$i || exit; \
+	done
 
 links: fonts
 	cd devpost && \
@@ -29,15 +35,20 @@ links: fonts
 	rm -f GI.out; ln -s HI.out GI.out
 
 install: all
+	$(INSTALL) -c makedev $(ROOT)$(BINDIR)/makedev
+	$(STRIP) $(ROOT)$(BINDIR)/makedev
 	test -d $(ROOT)$(FNTDIR) || mkdir -p $(ROOT)$(FNTDIR)
-	test -d $(ROOT)$(FNTDIR)/devpost/afm || \
-		mkdir -p $(ROOT)$(FNTDIR)/devpost/afm
-	test -d $(ROOT)$(FNTDIR)/devpost/pfb || \
-		mkdir -p $(ROOT)$(FNTDIR)/devpost/pfb
 	cp -R devpost $(ROOT)$(FNTDIR)
+	cp -R dev7200 $(ROOT)$(FNTDIR)
+	test -d $(ROOT)$(FNTDIR)/dev7200/pfb || \
+		mkdir -p $(ROOT)$(FNTDIR)/dev7200/pfb
+	rm -f $(ROOT)$(FNTDIR)/dev7200/charlib
+	ln -s ../devpost/charlib $(ROOT)$(FNTDIR)/dev7200/charlib
+	rm -f $(ROOT)$(FNTDIR)/dev7200/postscript
+	ln -s ../devpost/postscript $(ROOT)$(FNTDIR)/dev7200/postscript
 
 clean:
-	rm -f makedev makedev.o devpost/*.out core log *~
+	rm -f makedev makedev.o devpost/*.out dev7200/*.out core log *~
 
 mrproper: clean
 

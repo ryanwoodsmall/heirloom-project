@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.30 (gritter) 8/22/05
+ * Sccsid @(#)dpost.c	1.33 (gritter) 8/23/05
  */
 
 /*
@@ -369,9 +369,9 @@ int		fsize;			/* max size of a font files in bytes */
 int		unitwidth;		/* set to dev.unitwidth */
 char		*chname;		/* special character strings */
 short		*chtab;			/* used to locate character names */
-char		**fitab;		/* locates char info on each font */
+short		**fitab;		/* locates char info on each font */
 int		**fontab;		/* character width data for each font */
-char		**codetab;		/* and codes to get characters printed */
+short		**codetab;		/* and codes to get characters printed */
 char		**kerntab;		/* for makefont() */
 
 
@@ -1283,7 +1283,10 @@ devcntrl(
 	case 'T':			/* device name */
 		fscanf(fp, "%s", devname);
 		getdevmap();
-		strcpy(devname, realdev);
+		if (strcmp(devname, "7200"))
+			strcpy(devname, realdev);
+		else
+			realdev = devname;
 		break;
 
 	case 't':			/* trailer */
@@ -1308,7 +1311,7 @@ devcntrl(
 		ungetc('\n', fp);	/* fgets() goes too far */
 		str1[0] = '\0';		/* in case there's nothing to come in */
 		sscanf(buf, "%s", str1);
-		loadfont(n, mapdevfont(str), str1);
+		loadfont(n, mapdevfont(str), str1, 0);
 		break;
 
 	/* these don't belong here... */
@@ -1442,7 +1445,8 @@ void
 loadfont (
     int n,			/* load this font position */
     char *s,			/* with the .out file for this font */
-    char *s1			/* taken from here - possibly */
+    char *s1,			/* taken from here - possibly */
+    int forcespecial		/* this is definitively a special font */
 )
 
 
@@ -1471,7 +1475,9 @@ loadfont (
     if ( fontbase[n] != NULL && strcmp(s, fontbase[n]->namefont) == 0 )
 	return;
 
-    if ( s1 == NULL || s1[0] == '\0' )
+    if (strstr(s, ".afm") != NULL)
+	sprintf(temp, "%s/dev%s/afm/%s", fontdir, devname, s);
+    else if ( s1 == NULL || s1[0] == '\0' )
 	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
     else sprintf(temp, "%s/afm/%s.afm", s1, s);
 
@@ -1532,16 +1538,16 @@ have:   fontbase[n] = &a->Font;
     read(fin, fontbase[n], fsize);
     close(fin);
 
-    if ( smnt == 0 && fontbase[n]->specfont == 1 )
-	smnt = n;
-
-    nw = fontbase[n]->nwfont & BMASK;
     p = (char *) fontbase[n] + sizeof(struct Font);
+    nw = fontbase[n]->nwfont & BMASK;
     makefont(n, p, NULL, p + 2 * nw, p + 3 * nw, nw);
 
     t_fp(n, fontbase[n]->namefont, fontbase[n]->intname, NULL);
 
 done:
+    if ( smnt == 0 && (fontbase[n]->specfont == 1 || forcespecial) )
+	smnt = n;
+
     if ( debug == ON )
 	fontprint(n);
 
@@ -1580,7 +1586,7 @@ loadspecial(void)
 	for ( i = 1, p = chname + dev.lchname; i <= dev.nfonts; i++ )  {
 	    nw = *p & BMASK;
 	    if ( ((struct Font *) p)->specfont == 1 )
-		loadfont(++nfonts, ((struct Font *)p)->namefont, NULL);
+		loadfont(++nfonts, ((struct Font *)p)->namefont, NULL, 1);
 	    p += 3 * nw + dev.nchtab + 128 - 32 + sizeof(struct Font);
 	}   /* End for */
 
@@ -1599,7 +1605,7 @@ loaddefault(void)
   int i;
 
   for (i = 0; defaultFonts[i] != NULL ; i++)
-    loadfont(++nfonts, defaultFonts[i], NULL);
+    loadfont(++nfonts, defaultFonts[i], NULL, defaultFonts[i][0] == 'S');
 }
 
 
@@ -1639,13 +1645,13 @@ fontprint (
 
     fprintf(tf, "\ncodetab:\n");
     for ( j = 0; j <= n; j++ )  {
-	fprintf(tf, " %2d", codetab[i][j] & BMASK);
+	fprintf(tf, " %2d", codetab[i][j]);
 	if ( j % 20 == 19 ) putc('\n', tf);
     }	/* End for */
 
     fprintf(tf, "\nfitab:\n");
     for ( j = 0; j <= dev.nchtab + 128-32; j++ )  {
-	fprintf(tf, " %2d", fitab[i][j] & BMASK);
+	fprintf(tf, " %2d", fitab[i][j]);
 	if ( j % 20 == 19 ) putc('\n', tf);
     }	/* End for */
 
@@ -2341,11 +2347,11 @@ printencvector(struct afmtab *a)
 	printencsep(&col);
 	for (j = 1; j < 32; j++) {
 		while (s < a->nchars + 128 - 32 + nchtab &&
-				((k = a->fitab[s]&0377) == 0 ||
+				((k = a->fitab[s]) == 0 ||
 				 a->nametab[k] == NULL))
 			s++;
 		if (s < a->nchars + 128 - 32 + nchtab &&
-				(k = a->fitab[s]&0377) != 0 &&
+				(k = a->fitab[s]) != 0 &&
 				k < a->nchars &&
 				a->nametab[k] != NULL) {
 			afmmap[s - 128 + 32] = j;
@@ -2360,17 +2366,17 @@ printencvector(struct afmtab *a)
 	col += fprintf(tf, "/space");
 	printencsep(&col);
 	for (i = 1; i < a->nchars + 128 - 32 + nchtab && i < 256 - 32; i++) {
-		if ((k = a->fitab[i]&0377) != 0 && k < a->nchars &&
+		if (i < 128 - 32 && (k = a->fitab[i]) != 0 && k < a->nchars &&
 				a->nametab[k] != NULL) {
 			col += fprintf(tf, "/%s", a->nametab[k]);
 			printencsep(&col);
 		} else {
 			while (s < a->nchars + 128 - 32 + nchtab &&
-					((k = a->fitab[s]&0377) == 0 ||
+					((k = a->fitab[s]) == 0 ||
 				 	a->nametab[k] == NULL))
 				s++;
 			if (s < a->nchars + 128 - 32 + nchtab &&
-				(k = a->fitab[s]&0377) != 0 &&
+				(k = a->fitab[s]) != 0 &&
 				k < a->nchars &&
 				a->nametab[k] != NULL) {
 				afmmap[s - 128 + 32] = i + 32;
@@ -2390,9 +2396,25 @@ dup length dict begin\n\
   {1 index /FID ne {def} {pop pop} ifelse} forall\n\
   /Encoding Encoding-@%s def\n\
   currentdict\n\
-end\n\
-/%s-@%s exch definefont pop\n",
-		a->fontname, a->Font.intname, a->fontname, a->Font.intname);
+end\n",
+		a->fontname, a->Font.intname);
+	if (strcmp(a->fontname, "Symbol") == 0) {
+		fprintf(tf, "/Symbol-tmp-@%s exch definefont pop\n",
+			a->Font.intname);
+		fprintf(tf, "/Symbol-tmp-@%s /Symbol-@%s Sdefs cf\n",
+			a->Font.intname, a->Font.intname);
+		fprintf(tf, "/Symbol-tmp-@%s undefinefont\n",
+			a->Font.intname);
+	} else if (strcmp(a->fontname, "Times-Roman") == 0) {
+		fprintf(tf, "/Times-Roman-tmp-@%s exch definefont pop\n",
+			a->Font.intname);
+		fprintf(tf, "/Times-Roman-tmp-@%s /Times-Roman-@%s S1defs cf\n",
+			a->Font.intname, a->Font.intname);
+		fprintf(tf, "/Times-Roman-tmp-@%s undefinefont\n",
+			a->Font.intname);
+	} else
+		fprintf(tf, "/%s-@%s exch definefont pop\n",
+			a->fontname, a->Font.intname);
 	return afmmap;
 }
 /*****************************************************************************/
@@ -2753,7 +2775,7 @@ put1 (
     register int	j;		/* number of fonts we've checked so far */
     register int	k;		/* font we're currently looking at */
     int			*pw = NULL;	/* font widthtab and */
-    char		*p = NULL;	/* and codetab where c was found */
+    short		*p = NULL;	/* and codetab where c was found */
     int			code;		/* code used to get c printed */
     int			ofont;		/* font when we started */
 
@@ -2789,13 +2811,13 @@ put1 (
 
     k = ofont = font;
 
-    if ( (i = fitab[k][c] & BMASK) != 0 )  {	/* it's on this font */
+    if ( (i = fitab[k][c]) != 0 )  {	/* it's on this font */
 	p = codetab[font];
 	pw = fontab[font];
     } else if ( smnt > 0 )  {		/* on special (we hope) */
 	for ( k=smnt, j=0; j <= nfonts; j++, k = (k+1) % (nfonts+1) )  {
 	    if ( k == 0 )  continue;
-	    if ( (i = fitab[k][c] & BMASK) != 0 )  {
+	    if ( (i = fitab[k][c]) != 0 )  {
 		p = codetab[k];
 		pw = fontab[k];
 		setfont(k);
@@ -2804,7 +2826,7 @@ put1 (
 	}   /* End for */
     }	/* End else */
 
-    if ( i != 0 && (code = p[i] & BMASK) != 0 )  {
+    if ( i != 0 && (code = p[i]) != 0 )  {
 	if (size != FRACTSIZE)
 	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else

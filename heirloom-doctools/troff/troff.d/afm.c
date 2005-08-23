@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.11 (gritter) 8/22/05
+ * Sccsid @(#)afm.c	1.14 (gritter) 8/23/05
  */
 
 #include <stdlib.h>
@@ -50,14 +50,184 @@ const struct names {
 	{ "fi",	"fi" },
 	{ "fl",	"fl" },
 	{ "dg",	"dagger" },
+	{ "dd",	"daggerdbl" },
 	{ "bu",	"bullet" },
 	{ "de",	"ring" },
 	{ "em",	"emdash" },
 	{ "en",	"endash" },
-	{ "sc",	"paragraph" },
+	{ "sc",	"section" },
+	{ "aa","acute" },
+	{ "ga","grave" },
 	{ "``",	"quotedblleft" },
 	{ "''",	"quotedblright" },
 	{ 0,	0 }
+};
+
+/*
+ * Names for the Symbol font only.
+ */
+const struct names Snames[] = {
+	{ "!=",	"notequal" },
+	{ "**",	"asteriskmath" },
+	{ "*A",	"Alpha" },
+	{ "*B",	"Beta" },
+	{ "*C",	"Xi" },
+	{ "*D",	"Delta" },
+	{ "*E",	"Epsilon" },
+	{ "*F",	"Phi" },
+	{ "*G",	"Gamma" },
+	{ "*H",	"Theta" },
+	{ "*I",	"Iota" },
+	{ "*K",	"Kappa" },
+	{ "*L",	"Lambda" },
+	{ "*M",	"Mu" },
+	{ "*N",	"Nu" },
+	{ "*O",	"Omicron" },
+	{ "*P",	"Pi" },
+	{ "*Q",	"Psi" },
+	{ "*R",	"Rho" },
+	{ "*S",	"Sigma" },
+	{ "*T",	"Tau" },
+	{ "*U",	"Upsilon" },
+	{ "*W",	"Omega" },
+	{ "*X",	"Chi" },
+	{ "*Y",	"Eta" },
+	{ "*Z",	"Zeta" },
+	{ "*a",	"alpha" },
+	{ "*b",	"beta" },
+	{ "*c",	"xi" },
+	{ "*d",	"delta" },
+	{ "*e",	"epsilon" },
+	{ "*f",	"phi" },
+	{ "*g",	"gamma" },
+	{ "*h",	"theta" },
+	{ "*i",	"iota" },
+	{ "*k",	"kappa" },
+	{ "*l",	"lambda" },
+	{ "*m",	"mu" },
+	{ "*n",	"nu" },
+	{ "*o",	"omicron" },
+	{ "*p",	"pi" },
+	{ "*q",	"psi" },
+	{ "*r",	"rho" },
+	{ "*s",	"sigma" },
+	{ "*t",	"tau" },
+	{ "*u",	"upsilon" },
+	{ "*w",	"omega" },
+	{ "*x",	"chi" },
+	{ "*y",	"eta" },
+	{ "*z",	"zeta" },
+	{ "+-",	"plusminus" },
+	{ "->",	"arrowright" },
+	{ "<",	"less" },
+	{ "<-",	"arrowleft" },
+	{ "<=",	"lessequal" },
+	{ "==",	"equivalence" },
+	{ ">",	"greater" },
+	{ ">=",	"greaterequal" },
+	{ "O+",	"circleplus" },
+	{ "Ox",	"circlemultiply" },
+	{ "^",	"logicaland" },
+	{ "al",	"aleph" },
+	{ "ap",	"similar" },
+	{ "br",	"parenleftex" },
+	{ "bu",	"bullet" },
+	{ "bv",	"braceex" },
+	{ "ca",	"intersection" },
+	{ "co",	"copyrightserif" },
+	{ "cu",	"union" },
+	{ "da",	"arrowdown" },
+	{ "de",	"degree" },
+	{ "di",	"divide" },
+	{ "eq",	"equal" },
+	{ "es",	"emptyset" },
+	{ "fa",	"universal" },
+	{ "fm",	"minute" },
+	{ "gr",	"gradient" },
+	{ "ib",	"reflexsubset" },
+	{ "if",	"infinity" },
+	{ "ip",	"reflexsuperset" },
+	{ "is",	"integral" },
+	{ "lb",	"braceleftbt" },
+	{ "lc",	"bracketlefttp" },
+	{ "lf",	"bracketleftbt" },
+	{ "lk",	"braceleftmid" },
+	{ "lt",	"bracelefttp" },
+	{ "mi",	"minus" },
+	{ "mo",	"element" },
+	{ "mu",	"multiply" },
+	{ "no",	"logicalnot" },
+	{ "or",	"bar" },
+	{ "or",	"logicalor" },
+	{ "pd",	"partialdiff" },
+	{ "pl",	"plus" },
+	{ "pt",	"proportional" },
+	{ "rb",	"bracerightbt" },
+	{ "rc",	"bracketrighttp" },
+	{ "rf",	"bracketrightbt" },
+	{ "rg",	"registerserif" },
+	{ "rk",	"bracerightmid" },
+	{ "rn",	"radicalex" },
+	{ "rt",	"bracerighttp" },
+	{ "sb",	"propersubset" },
+	{ "sl",	"fraction" },
+	{ "sp",	"propersuperset" },
+	{ "sr",	"radical" },
+	{ "te",	"existential" },
+	{ "tm",	"trademarkserif" },
+	{ "ts",	"sigma1" },
+	{ "ua",	"arrowup" },
+	{ "ul",	"underscore" },
+	{ "vr",	"bracketleftex" },
+	{ "~~",	"approxequal" },
+	{ 0,	0 },
+};
+
+/*
+ * These names are only used with the S1 font. They are characters from
+ * the Times that serve as fallbacks and should not be superseded by
+ * characters from other fonts.
+ */
+const struct names S1names[] = {
+	{ "or",	"bar" },
+	{ "14",	"onequarter" },
+	{ "34",	"threequarters" },
+	{ "12",	"onehalf" },
+	{ "\\-","endash" },
+	{ "\\'","acute" },
+	{ "\\`","grave" },
+	{ "ru",	"underscore" },
+	{ 0,	0 }
+};
+
+/*
+ * Figures from charlib.
+ */
+#define	NCHARLIB	16
+static const struct charlib {
+	const char	*name;
+	int		width;
+	int		kern;
+	int		code;
+	int		symbol;
+} charlib[] = {
+	{ "bx",	 500,	2,	1,	0 },
+	{ "ci",	 750,	0,	1,	0 },
+	{ "sq",	 500,	2,	1,	0 },
+	{ "ff",	 600,	2,	1,	0 },	/* widths of the ligatures */
+	{ "Fi",	 840,	2,	1,	0 },	/* are likely wrong, but */
+	{ "Fl",	 840,	2,	1,	0 },	/* they are normally not used */
+	{ "~=",	 550,	0,	1,	1 },
+	{ "L1", 1100,	1,	2,	1 },
+	{ "LA",	1100,	1,	2,	1 },
+	{ "LV",	1100,	3,	2,	1 },
+	{ "LH",	2100,	1,	2,	1 },
+	{ "Lb",	2100,	1,	2,	1 },
+	{ "lh",	1000,	0,	2,	1 },
+	{ "rh",	1000,	0,	2,	1 },
+	{ "Sl",	 500,	2,	1,	1 },
+	{ "ob",	 380,	0,	1,	1 },
+	{    0,	   0,	0,	0,	0 }
 };
 
 /*
@@ -85,6 +255,7 @@ static const struct asciimap {
 	{ 0x002B,	"plus" },
 	{ 0x002C,	"comma" },
 	{ 0x002D,	"hyphen" },
+	{ 0x002D,	"minus" },		/* Symbol */
 	{ 0x002E,	"period" },
 	{ 0x002F,	"slash" },
 	{ 0x0030,	"zero" },
@@ -230,38 +401,69 @@ static const struct asciimap {
 	{ 0x007C,	"bar" },
 	{ 0x007D,	"braceright" },
 	{ 0x007E,	"asciitilde" },
+	{ 0x007E,	"similar" },		/* Symbol */
 	{ 0,		0 }
 };
 
 static int
-mapname(const char *psname)
+mapname(const char *psname, int isS, int isS1)
 {
 	int	i, j;
 
+	if (isS) {
+		for (i = 0; Snames[i].trname; i++)
+			if (strcmp(Snames[i].psname, psname) == 0)
+				break;
+		if (Snames[i].trname)
+			for (j = 0; j < nchtab; j++)
+				if (strcmp(Snames[i].trname,
+						&chname[chtab[j]]) == 0)
+					return j + 128;
+	}
+	if (isS1) {
+		for (i = 0; S1names[i].trname; i++)
+			if (strcmp(S1names[i].psname, psname) == 0)
+				break;
+		if (S1names[i].trname)
+			for (j = 0; j < nchtab; j++)
+				if (strcmp(S1names[i].trname,
+						&chname[chtab[j]]) == 0)
+					return j + 128;
+	}
 	for (i = 0; names[i].trname; i++)
 		if (strcmp(names[i].psname, psname) == 0)
 			break;
-	if (names[i].trname)
+	if (names[i].trname) {
 		for (j = 0; j < nchtab; j++)
 			if (strcmp(names[i].trname, &chname[chtab[j]]) == 0)
 				return j + 128;
+	}
 	return 0;
 }
 
 /*
  * After all characters have been read, construct a font-specific
- * encoding for the rest.
+ * encoding for the rest. Also move the name table to permanent space.
  */
 static void
 remap(struct afmtab *a)
 {
 	int	i, j = 128 - 32 + nchtab;
+	char	*space, *tp;
 
 	for (i = 1; i < a->nchars; i++) {
 		if (a->codetab[i] == -1 && a->nametab[i] != NULL) {
 			while (a->fitab[j] != 0)
 				j++;
 			a->fitab[j] = i;
+		}
+	}
+	space = malloc(a->nspace);
+	for (i = 0; i < a->nchars; i++) {
+		if (a->nametab[i]) {
+			tp = a->nametab[i];
+			a->nametab[i] = space;
+			while (*space++ = *tp++);
 		}
 	}
 }
@@ -295,18 +497,31 @@ thisword(const char *text, const char *wrd)
 	return NULL;
 }
 
+static int
+unitconv(int i)
+{
+	float	d;
+	int	Units, Point, uw;
+
+	Units = 1000;
+	Point = dev.res / 72;
+	uw = Units / Point;
+	if (uw > dev.unitwidth) {
+		d = uw / dev.unitwidth;
+		return i / d + (i % (int)d >= d/2);
+	} else if (uw < dev.unitwidth)
+		return i * dev.unitwidth / uw;
+	else
+		return i;
+}
+
 static void
-addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
+addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N)
 {
 	int	ae;
 
-	a->fontab = realloc(a->fontab, (a->nchars+1) * sizeof *a->fontab);
-	a->kerntab = realloc(a->kerntab, (a->nchars+1) * sizeof *a->kerntab);
-	a->codetab = realloc(a->codetab, (a->nchars+1) * sizeof *a->codetab);
-	a->nametab = realloc(a->nametab, (a->nchars+1) * sizeof *a->nametab);
-	a->fontab[a->nchars] = WX / dev.unitwidth +
-		(WX % dev.unitwidth >= dev.unitwidth / 2);
-	if (B[1] < -dev.unitwidth)
+	a->fontab[a->nchars] = unitconv(WX);
+	if (B[1] <= -10)
 		a->kerntab[a->nchars] |= 1;
 	if (B[3] > a->capheight)
 		a->kerntab[a->nchars] |= 2;
@@ -315,7 +530,9 @@ addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 	 * equivalent or to a troff special character.
 	 */
 	ae = asciiequiv(C, N);
-	if (tp)
+	if (cl)
+		a->codetab[a->nchars] = cl;
+	else if (tp)
 		a->codetab[a->nchars] = tp;
 	else if (C > 32 && C < 127 && ae)
 		a->codetab[a->nchars] = C;
@@ -325,16 +542,35 @@ addchar(struct afmtab *a, int C, int tp, int WX, int B[4], char *N)
 		a->fitab[C - 32] = a->nchars;
 	if (tp)
 		a->fitab[tp - 32] = a->nchars;
-	if (N) {
-		a->nametab[a->nchars] = malloc(strlen(N) + 1);
-		strcpy(a->nametab[a->nchars], N);
-	} else
-		a->nametab[a->nchars] = 0;
+	a->nametab[a->nchars] = N;
 	a->nchars++;
 }
 
+/*
+ * Add charlib figues to the "S" font.
+ */
 static void
-addmetrics(struct afmtab *a, char *_line)
+addcharlib(struct afmtab *a, int symbol)
+{
+	int	i, j;
+	int	B[4] = { 0, 0, 0, 0 };
+
+	for (j = 0; j < nchtab; j++)
+		for (i = 0; charlib[i].name; i++) {
+			if (charlib[i].symbol && !symbol)
+				continue;
+			if (strcmp(charlib[i].name, &chname[chtab[j]]) == 0) {
+				B[1] = charlib[i].kern & 1 ? -11 : 0;
+				B[3] = charlib[i].kern & 2 ?
+					a->capheight + 1 : 0;
+				addchar(a, -1, j+128, charlib[i].code,
+						charlib[i].width, B, NULL);
+			}
+		}
+}
+
+static void
+addmetrics(struct afmtab *a, char *_line, int isSymbol)
 {
 	char	*lp = _line, c, *xp;
 	int	C = -1, WX = 0, tp;
@@ -357,6 +593,7 @@ addmetrics(struct afmtab *a, char *_line)
 					*lp != ';'; lp++);
 			c = *lp;
 			*lp++ = 0;
+			a->nspace += lp - N;
 			if (c == ';')
 				continue;
 			break;
@@ -396,8 +633,9 @@ addmetrics(struct afmtab *a, char *_line)
 	}
 	if (N == NULL)
 		return;
-	tp = mapname(N);
-	addchar(a, C, tp, WX, B, N);
+	tp = mapname(N, isSymbol,
+			a->file[0]=='S' && a->file[1]=='1' && a->file[2]==0);
+	addchar(a, C, tp, 0, WX, B, N);
 }
 
 int
@@ -409,7 +647,8 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		CHARMETRICS
 	} state = NONE;
 	char	*cp, *th, *tp;
-	int	n = 0;
+	int	n = 0, i;
+	int	isSymbol = 0;
 
 	a->lineno = 1;
 	for (cp = contents; cp < &contents[size]; a->lineno++, cp++) {
@@ -428,6 +667,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->fontname = malloc(tp - th + 1);
 			memcpy(a->fontname, th, tp - th);
 			a->fontname[tp - th] = 0;
+			isSymbol = strcmp(a->fontname, "Symbol") == 0;
 		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "CapHeight")) != NULL) {
 			a->capheight = strtol(th, NULL, 10);
@@ -435,19 +675,22 @@ afmget(struct afmtab *a, char *contents, size_t size)
 				(th = thisword(cp, "StartCharMetrics")) != 0) {
 			n = strtol(th, NULL, 10);
 			state = CHARMETRICS;
-			a->fitab = calloc(n + 128 - 32 + nchtab,
+			a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab,
 					sizeof *a->fitab);
-			a->fontab = malloc(sizeof *a->fontab);
+			a->fontab = malloc((n+NCHARLIB+1)*sizeof *a->fontab);
 			a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
-			a->kerntab = malloc(sizeof *a->kerntab);
+			a->kerntab = malloc((n+NCHARLIB+1)*sizeof *a->kerntab);
 			a->kerntab[0] = 0;
-			a->codetab = malloc(sizeof *a->codetab);
+			a->codetab = malloc((n+NCHARLIB+1)*sizeof *a->codetab);
 			a->codetab[0] = 0;
-			a->nametab = malloc(sizeof *a->nametab);
+			for (i = 1; i < n+NCHARLIB+1; i++)
+				a->codetab[i] = -1;
+			a->nametab = malloc((n+NCHARLIB+1)*sizeof *a->nametab);
 			a->nametab[0] = 0;
 			a->nchars = 1;
+			addcharlib(a, a->file[0]=='S' && a->file[1]==0);
 		} else if (state == CHARMETRICS && n-- > 0) {
-			addmetrics(a, cp);
+			addmetrics(a, cp, isSymbol);
 		} else if (state == CHARMETRICS &&
 				thisword(cp, "EndCharMetrics"))
 			state = FONTMETRICS;
@@ -487,6 +730,6 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 		kerntab[nf][i] = devkerntab[i]&0377;
 	if (devcodetab) for (i = 0; i < nw; i++)
 		codetab[nf][i] = devcodetab[i]&0377;
-	if (devfitab) for (i = 0; i < nw; i++)
+	if (devfitab) for (i = 0; i < 128 - 32 + nchtab; i++)
 		fitab[nf][i] = devfitab[i]&0377;
 }

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.27 (gritter) 8/21/05
+ * Sccsid @(#)n3.c	1.28 (gritter) 8/23/05
  */
 
 /*
@@ -597,7 +597,7 @@ wbfl (void)			/*flush current blist[] block*/
 	if (woff == 0)
 		return;
 #ifndef INCORE
-	lseek(ibf, ((long)woff) * sizeof(tchar), 0);
+	lseek(ibf, woff * sizeof(tchar), 0);
 	write(ibf, (char *)wbuf, wbfi * sizeof(tchar));
 #endif
 	if ((woff & (~(BLK - 1))) == (roff & (~(BLK - 1))))
@@ -623,7 +623,7 @@ rbf (void)		/*return next char from blist[] block*/
 	j = ip & ~(BLK - 1);
 	if (j != roff) {
 		roff = j;
-		lseek(ibf, (long)j * sizeof(tchar), 0);
+		lseek(ibf, j * sizeof(tchar), 0);
 		if (read(ibf, (char *)rbuf, BLK * sizeof(tchar)) <= 0)
 			i = 0;
 		else
@@ -668,7 +668,7 @@ rbf0(register filep p)
 
 	if ((i = p & ~(BLK - 1)) != roff) {
 		roff = i;
-		lseek(ibf, (long)roff * sizeof(tchar), 0);
+		lseek(ibf, roff * sizeof(tchar), 0);
 		if (read(ibf, (char *)rbuf, BLK * sizeof(tchar)) == 0)
 			return(0);
 	}

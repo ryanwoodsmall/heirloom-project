@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)XXX.sl	1.3 (gritter) 8/9/05";
+static const char sccsid[] USED = "@(#)XXX.sl	1.4 (gritter) 8/23/05";
 /* Note added 9/25/83
 	Setting the parameter biggestfont in the DESC file
 	to be at least as big as the number of characters
@@ -253,7 +253,8 @@ dofont(char *name)	/* create fitab and width tab for font */
 		fitab[i] = 0;
 	for (i = 0; i < FSIZE; i++)
 		width[i] = kern[i] = code[i] = 0;
-	font.specfont = font.ligfont = spacewidth = 0;
+	memset(&font, 0, sizeof font);
+	spacewidth = 0;
 	while (fscanf(fin, "%s", cmd) != EOF) {
 		if (cmd[0] == '#')
 			skipline(fin);

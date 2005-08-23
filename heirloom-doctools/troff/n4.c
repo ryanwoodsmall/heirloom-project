@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.7 (gritter) 8/15/05
+ * Sccsid @(#)n4.c	1.8 (gritter) 8/23/05
  */
 
 /*
@@ -583,7 +583,7 @@ long
 atoi1(register tchar ii)
 {
 	register int i, j, digits;
-	register long	acc;
+	register long long	acc;
 	int	neg, abs, field;
 
 	neg = abs = field = digits = 0;

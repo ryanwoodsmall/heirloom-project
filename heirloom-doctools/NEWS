@@ -41,6 +41,8 @@ can be used to deactivate new features for compatibility reasons.
 	as "R". In this case, the same register must be reused. For best
 	compatibility with conventional troff usage, it is recommended
 	that the base fonts of a document are mounted as "1 R", "2 I".
+	The initial fonts on positions 9 (S1) and 10 (S) should not be
+	changed, as these contain special metrics for drawing commands.
 	  If the optional "pfb|pfa|t42" argument is present, data from
 	the file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively)
 	is included into the generated PostScript. This is useful to
@@ -125,4 +127,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-                                                                8/21/05
+                                                                8/23/05

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.37 (gritter) 8/22/05
+ * Sccsid @(#)t6.c	1.40 (gritter) 8/23/05
  */
 
 /*
@@ -163,7 +163,7 @@ getcw(register int i)
 		/* and default is 12 */
 		goto g1;
 	}
-	if ((j = fitab[xfont][i] & BYTEMASK) == 0) {	/* it's not on current font */
+	if ((j = fitab[xfont][i]) == 0) {	/* it's not on current font */
 		int ii, jj;
 		/* search through search list of xfont
 		 * to see what font it ought to be on.
@@ -175,7 +175,7 @@ getcw(register int i)
 			for (jj = 0; fallbacktab[xfont][jj] != 0; jj++) {
 				if ((ii = findft(fallbacktab[xfont][jj])) < 0)
 					continue;
-				j = fitab[ii][i] & BYTEMASK;
+				j = fitab[ii][i];
 				if (j != 0) {
 					xfont = ii;
 					goto found;
@@ -184,7 +184,7 @@ getcw(register int i)
 		}
 		if (smnt) {
 			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
-				j = fitab[ii][i] & BYTEMASK;
+				j = fitab[ii][i];
 				if (j != 0) {
 					/*
 					 * troff traditionally relies on the
@@ -230,7 +230,7 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = (k * xpts + (Unitwidth / 2)) / Unitwidth;
-	s = xpts*Unitwidth;
+	s = xpts*INCH/72;
 	if (s <= tkftab[ofont].s1 && tkftab[ofont].n1) {
 		nocache = 1;
 		k += tkftab[ofont].n1;
@@ -270,7 +270,7 @@ abscw(int n)	/* return index of abs char n in fontab[], etc. */
 {	register int i, ncf;
 
 	if (afmtab && (i = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0)
-		return afmtab[i]->fitab[n-32]&BYTEMASK;
+		return afmtab[i]->fitab[n-32];
 	ncf = fontbase[xfont]->nwfont & BYTEMASK;
 	for (i = 0; i < ncf; i++)
 		if (codetab[xfont][i] == n)
@@ -320,7 +320,7 @@ postchar1(const char *temp, int f)
 					strcmp(a->nametab[j], temp) == 0)
 				for (i = 0; i < a->nchars + 128 - 32 + nchtab;
 						i++)
-					if ((a->fitab[i]&BYTEMASK) == j)
+					if (a->fitab[i] == j)
 						return i + 32 + nchtab + 128;
 	}
 	return(0);
@@ -705,7 +705,7 @@ tchar makem(register int i)
 
 	if ((j = i) < 0)
 		j = -j;
-	j |= MOT;
+	j = sabsmot(j) | MOT;
 	if (i < 0)
 		j |= NMOT;
 	if (vflag)
@@ -778,7 +778,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	extern int sprintf(char *, const char *, ...);
 	register int k;
 	int n, nw;
-	char longname[NS], shortname[20];
+	char longname[NS], shortname[20], *ap;
 
 	zapwcache(0);
 	if (truename)
@@ -795,18 +795,25 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	}
 	n = fontbase[pos]->nwfont & BYTEMASK;
 	read(k, (char *) fontbase[pos], 3*n + nchtab + 128 - 32 + sizeof(struct Font));
-	nw = fontbase[pos]->nwfont & BYTEMASK;
-	if (nw > n) {
-		errprint("Font %s too big for position %d", shortname,
-			pos);
-		return(-1);
+	if ((ap = strstr(fontbase[pos]->namefont, ".afm")) != NULL) {
+		*ap = 0;
+		if (ap == &fontbase[pos]->namefont[1])
+			f &= BYTEMASK;
+		loadafm(pos, f, fontbase[pos]->namefont, NULL);
+	} else {
+		nw = fontbase[pos]->nwfont & BYTEMASK;
+		if (nw > n) {
+			errprint("Font %s too big for position %d", shortname,
+				pos);
+			return(-1);
+		}
+		makefont(pos, &((char *)fontbase[pos])[sizeof(struct Font)],
+			&((char *)fontbase[pos])[sizeof(struct Font) + nw],
+			&((char *)fontbase[pos])[sizeof(struct Font) + 2*nw],
+			&((char *)fontbase[pos])[sizeof(struct Font) + 3*nw],
+			nw);
+		fontbase[pos]->nwfont = n;	/* so can load a larger one again later */
 	}
-	makefont(pos, &((char *)fontbase[pos])[sizeof(struct Font)],
-		&((char *)fontbase[pos])[sizeof(struct Font) + nw],
-		&((char *)fontbase[pos])[sizeof(struct Font) + 2*nw],
-		&((char *)fontbase[pos])[sizeof(struct Font) + 3*nw],
-		nw);
-	fontbase[pos]->nwfont = n;	/* so can load a larger one again later */
 	close(k);
 	if (pos == smnt) {
 		smnt = 0; 
@@ -827,7 +834,8 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 		/* will all be in the last one because the "x font ..." */
 		/* comes out too soon.  pushing back FONTPOS doesn't work */
 		/* with .ft commands because input is flushed after .xx cmds */
-	ptfpcmd(pos, shortname);
+	if (realpage && ap == NULL)
+		ptfpcmd(pos, shortname);
 	if (pos == 0)
 		ch = (tchar) FONTPOS | (tchar) f << 16;
 	return(pos);
@@ -941,9 +949,9 @@ tchar xlss(void)
 	dfact = 1;
 	getch();
 	if (i >= 0)
-		*pbp++ = MOT | VMOT | i;
+		*pbp++ = MOT | VMOT | sabsmot(i);
 	else
-		*pbp++ = MOT | VMOT | NMOT | -i;
+		*pbp++ = MOT | VMOT | NMOT | sabsmot(-i);
 	return(HX);
 }
 
@@ -953,17 +961,13 @@ int nafm;
 void
 casefpost(void)
 {
-	extern int sprintf(char *, const char *, ...);
-	struct stat	st;
-	int	c, i = 0, j, rq, fd;
-	char	*file = NULL, *path, *contents, *supply = NULL;
+	int	c, i = 0, j, rq;
+	char	*file = NULL, *supply = NULL;
 	size_t	sz = 0, ssz = 0;
-	struct afmtab	*a;
-	int	nf = nfonts + 1;
 
 	skip();
-	if ((j = atoi()) > 0 && j <= nfonts)
-		nf = j;
+	if ((j = atoi()) == 0)
+		j = -1;
 	skip();
 	if ((rq = getrq()) == 0)
 		return;
@@ -985,45 +989,73 @@ casefpost(void)
 			supply[i++] = c;
 		} while (c);
 	}
+	loadafm(j, rq, file, supply);
+	free(file);
+	free(supply);
+}
+
+void
+loadafm(int nf, int rq, char *file, char *supply)
+{
+	extern int sprintf(char *, const char *, ...);
+	struct stat	st;
+	int	fd;
+	char	*path, *contents;
+	struct afmtab	*a;
+	int	i, have = 0;
+
+	if (nf < 0 || nf > nfonts)
+		nf = nfonts + 1;
 	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 14);
 	sprintf(path, "%s/dev%s/afm/%s.afm", fontfile, devname, file);
+	a = calloc(1, sizeof *a);
+	for (i = 0; i < nafm; i++)
+		if (strcmp(afmtab[i]->path, path) == 0) {
+			*a = *afmtab[i];
+			have = 1;
+			break;
+		}
+	a->path = path;
+	a->file = malloc(strlen(file) + 1);
+	strcpy(a->file, file);
+	a->rq = rq;
+	a->Font.namefont[0] = rq&0377;
+	a->Font.namefont[1] = (rq>>8)&0377;
+	sprintf(a->Font.intname, "%d", nf);
+	if (have)
+		goto done;
 	if ((fd = open(path, O_RDONLY)) < 0) {
 		errprint("Can't open %s", path);
-		free(file);
+		free(a->file);
+		free(a);
 		free(path);
 		return;
 	}
 	if (fstat(fd, &st) < 0) {
 		errprint("Can't stat %s", path);
-		free(file);
+		free(a->file);
+		free(a);
 		free(path);
 		return;
 	}
 	contents = malloc(st.st_size + 1);
 	if (read(fd, contents, st.st_size) != st.st_size) {
 		errprint("Can't read %s", path);
-		free(file);
+		free(a->file);
+		free(a);
 		free(path);
 		free(contents);
 		return;
 	}
 	contents[st.st_size] = 0;
 	close(fd);
-	a = calloc(1, sizeof *a);
-	a->path = path;
-	a->file = file;
-	a->rq = rq;
-	a->Font.namefont[0] = rq&0377;
-	a->Font.namefont[1] = (rq>>8)&0377;
-	sprintf(a->Font.intname, "%d", nf);
 	if (afmget(a, contents, st.st_size) < 0) {
-		free(file);
 		free(path);
 		free(contents);
 		return;
 	}
 	free(contents);
-	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
+done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	afmtab[nafm] = a;
 	if (nf >= Nfont)
 		growfonts(nf+1);
@@ -1033,10 +1065,19 @@ casefpost(void)
 	else
 		fontbase[nf] = &afmtab[nafm]->Font;
 	fontlab[nf] = rq;
-	fontab[nf] = afmtab[nafm]->fontab;
-	kerntab[nf] = afmtab[nafm]->kerntab;
-	codetab[nf] = afmtab[nafm]->codetab;
-	fitab[nf] = afmtab[nafm]->fitab;
+	free(fontab[nf]);
+	free(kerntab[nf]);
+	free(codetab[nf]);
+	free(fitab[nf]);
+	fontab[nf] = malloc(a->nchars * sizeof *fontab[nf]);
+	kerntab[nf] = malloc(a->nchars * sizeof *kerntab[nf]);
+	codetab[nf] = malloc(a->nchars * sizeof *codetab[nf]);
+	fitab[nf] = malloc((a->nchars+128-32+nchtab) * sizeof *fitab[nf]);
+	memcpy(fontab[nf], a->fontab, a->nchars * sizeof *fontab[nf]);
+	memcpy(kerntab[nf], a->kerntab, a->nchars * sizeof *kerntab[nf]);
+	memcpy(codetab[nf], a->codetab, a->nchars * sizeof *codetab[nf]);
+	memcpy(fitab[nf], a->fitab, (a->nchars+128-32+nchtab) *
+			sizeof *fitab[nf]);
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
 	zoomtab[nf] = 0;
 	fallbacktab[nf] = NULL;
@@ -1044,10 +1085,8 @@ casefpost(void)
 	nafm++;
 	if (nf > nfonts)
 		nfonts = nf;
-	if (supply) {
+	if (supply)
 		ptsupplyfont(a->fontname, a->file, supply);
-		free(supply);
-	}
 	if (realpage)
 		ptfpcmd(nf, a->file);
 }

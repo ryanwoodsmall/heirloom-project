@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.12 (gritter) 8/21/05
+ * Sccsid @(#)n7.c	1.13 (gritter) 8/23/05
  */
 
 /*
@@ -585,7 +585,7 @@ findt(int a)
 {
 	register int i, j, k;
 
-	k = 32767;
+	k = MAXMOT;
 	if (dip != d) {
 		if (dip->dimac && (i = dip->ditrap - a) > 0)
 			k = i;

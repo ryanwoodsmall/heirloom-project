@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.9 (gritter) 8/20/05
+.\" Sccsid @(#)troff.1b	1.11 (gritter) 8/23/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "8/20/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "8/23/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -165,8 +165,14 @@ are:
 .RS
 .TP
 .B post
-for PostScript output (default),
+for PostScript output with 720\|dpi,
 with
+.I dpost
+as postprocessor
+.TP
+.B 7200
+for PostScript output with 7200\|dpi (default),
+also with
 .I dpost
 as postprocessor
 .TP
