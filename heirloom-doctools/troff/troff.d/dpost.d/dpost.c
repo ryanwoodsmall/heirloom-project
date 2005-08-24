@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.34 (gritter) 8/23/05
+ * Sccsid @(#)dpost.c	1.35 (gritter) 8/24/05
  */
 
 /*
@@ -755,7 +755,7 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.34");
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.35");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s\n", "%%EndResource");
@@ -3240,18 +3240,18 @@ addoctal (
     switch ( encoding )  {
 	case 0:
 	case 1:
-	    fprintf(tf, "\\%o", c);
+	    fprintf(tf, "\\%03o", c);
 	    break;
 
 	case 2:
 	case 3:
-	    sprintf(strptr, "\\%o", c);
+	    sprintf(strptr, "\\%03o", c);
 	    strptr += strlen(strptr);
 	    break;
 
 	case MAXENCODING+1:
 	case MAXENCODING+2:
-	    fprintf(tf, "\\%o", c);
+	    fprintf(tf, "\\%03o", c);
 	    break;
     }	/* End switch */
 
