@@ -23,8 +23,19 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.7 (gritter) 8/23/05
+ * Sccsid @(#)afm.h	1.8 (gritter) 8/25/05
  */
+
+struct kernpair {
+	short	ch1;
+	short	ch2;
+	short	k;
+};
+
+struct namecache {
+	short	afpos;
+	short	fival[2];
+};
 
 extern struct afmtab {
 	struct Font	Font;
@@ -36,6 +47,11 @@ extern struct afmtab {
 	short	*codetab;
 	short	*fitab;
 	char	**nametab;
+	struct namecache	*namecache;
+	int	nameprime;
+	struct kernpair	*kernpairs;
+	int	nkernpairs;
+	int	kernprime;
 	int	nspace;
 	int	rq;
 	int	lineno;
@@ -50,4 +66,6 @@ extern	char		**kerntab;
 extern	short		**codetab;
 
 extern	int	afmget(struct afmtab *, char *, size_t);
+extern	struct namecache	*afmnamelook(struct afmtab *, const char *);
+extern	int	afmgetkern(struct afmtab *, int, int);
 extern	void	makefont(int, char *, char *, char *, char *, int);

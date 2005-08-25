@@ -177,6 +177,14 @@ selected using the fallback sequence.
 	Text in \fHHelvetica\fP must be adjusted to fit with Plantin.
 
 
+Pairwise kerning
+----------------
+
+Pairwise kerning is normally enabled with the -x option, and otherwise
+disabled. The ".kern" request disables it in -x mode. Adjustments to the
+kerning pairs of a font must be made directly in the respective AFM files.
+
+
 Limitations
 -----------
 
@@ -188,4 +196,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 8/23/05
+Gunnar Ritter                                                 8/25/05

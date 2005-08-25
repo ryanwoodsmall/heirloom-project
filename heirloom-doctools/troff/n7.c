@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.13 (gritter) 8/23/05
+ * Sccsid @(#)n7.c	1.15 (gritter) 8/25/05
  */
 
 /*
@@ -350,7 +350,7 @@ void
 nofill(void)
 {
 	register int j;
-	register tchar i;
+	register tchar i, lasti = 0;
 
 	if (!pendnf) {
 		over = 0;
@@ -376,6 +376,9 @@ nofill(void)
 			return;
 		}
 		j = width(i);
+		if (lasti)
+			j += kernadjust(i, lasti);
+		lasti = i;
 		widthp = j;
 		numtab[HP].val += j;
 		storeline(i, j);
@@ -772,7 +775,7 @@ getword(int x)
 {
 	register int j, k;
 	int	lastj = 0;
-	register tchar i, *wp;
+	register tchar i, *wp, lasti = 0;
 	int noword;
 #ifdef EUC
 #ifdef NROFF
@@ -804,11 +807,11 @@ getword(int x)
 			switch(*mtbufp & MBMASK) {
 			case LASTOFMB:
 			case BYTE_CHR:
-				storeword(*mtbufp++, -1);
+				storeword(*mtbufp++, -1, 0);
 				break;
 
 			default:
-				storeword(*mtbufp++, 0);
+				storeword(*mtbufp++, 0, 0);
 			}
 		}
 		mtbufp = mtbuf;
@@ -838,7 +841,7 @@ getword(int x)
 		if (j == ' ') {
 			numtab[HP].val += sps;
 			widthp = sps;
-			storeword(i, sps);
+			storeword(i, sps, 0);
 			continue;
 		}
 		break;
@@ -855,7 +858,7 @@ getword(int x)
 		if (*wddelim != ' ') {
 			if (!*wddelim) {
 				storeword(((*wdbdg)(wceoll, cwc, 1) < 3) ?
-					  ZWDELIM(1) : ZWDELIM(2), 0);
+					  ZWDELIM(1) : ZWDELIM(2), 0, 0);
 			} else {
 				while (*wddelim) {
 					if ((n = wctomb(mbbuf3, *wddelim++))
@@ -867,12 +870,12 @@ getword(int x)
 							m = *(mbbuf3p-- - n--) &
 							    0xff | MIDDLEOFMB |
 							    ZBIT;
-							storeword(m, 0);
+							storeword(m, 0, 0);
 						}
 						m = *mbbuf3p & 0xff | LASTOFMB;
-						storeword(m, -1);
+						storeword(m, -1, 0);
 					} else {
-						storeword(' ' | chbits, sps);
+						storeword(' ' | chbits, sps, 0);
 						break;
 					}
 				}
@@ -884,10 +887,10 @@ getword(int x)
 a0:
 #endif /* NROFF */
 #endif /* EUC */
-	storeword(' ' | chbits, sps);
+	storeword(' ' | chbits, sps, 0);
 	if (spflg) {
 		if (xflag == 0 || ses != 0)
-			storeword(' ' | chbits, sps);
+			storeword(' ' | chbits, sps, 0);
 		spflg = 0;
 	}
 g0:
@@ -916,10 +919,10 @@ g0:
 	j = width(i);
 	numtab[HP].val += j;
 #ifndef EUC
-	storeword(i, j);
+	storeword(i, j, lasti);
 #else
 #ifndef NROFF
-	storeword(i, j);
+	storeword(i, j, lasti);
 #else
 	if (multi_locale) {
 		mtbufp = mtbuf;
@@ -927,19 +930,20 @@ g0:
 			switch(*mtbufp & MBMASK) {
 			case LASTOFMB:
 			case BYTE_CHR:
-				storeword(*mtbufp++, j);
+				storeword(*mtbufp++, j, 0);
 				break;
 
 			default:
-				storeword(*mtbufp++, 0);
+				storeword(*mtbufp++, 0, 0);
 			}
 		}
 		mtbufp = mtbuf;
 	} else {
-		storeword(i, j);
+		storeword(i, j, lasti);
 	}
 #endif /* NROFF */
 #endif /* EUC */
+	lasti = i;
 g1:
 	j = cbits(i = GETCH());
 #ifdef EUC
@@ -969,7 +973,7 @@ g1:
 				if ((wbf = (*wdbdg)(owc, cwc, 1)) < 5) {
 					pendmb++;
 					storeword((wbf < 3) ? ZWDELIM(1) :
-						  ZWDELIM(2), 0);
+						  ZWDELIM(2), 0, 0);
 					*wordp = 0;
 					goto rtn;
 				} else goto g0;
@@ -1016,7 +1020,7 @@ rtn:
 
 
 void
-storeword(register tchar c, register int w)
+storeword(register tchar c, register int w, tchar lastc)
 {
 
 	if (wordp >= &word[WDSIZE - 3]) {
@@ -1033,6 +1037,8 @@ storeword(register tchar c, register int w)
 s1:
 	if (w == -1)
 		w = width(c);
+	if (lastc)
+		w += kernadjust(c, lastc);
 	widthp = w;
 	wne += w;
 	*wordp++ = c;

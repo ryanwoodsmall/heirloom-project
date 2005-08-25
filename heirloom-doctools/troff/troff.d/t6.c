@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.40 (gritter) 8/23/05
+ * Sccsid @(#)t6.c	1.43 (gritter) 8/25/05
  */
 
 /*
@@ -77,6 +77,7 @@ float	*zoomtab;
 int	*bdtab;
 struct tkftab	*tkftab;
 int	sbold = 0;
+int	kern = 0;
 
 int
 width(register tchar j)
@@ -278,6 +279,39 @@ abscw(int n)	/* return index of abs char n in fontab[], etc. */
 	return 0;
 }
 
+int
+kernadjust(tchar c, tchar d)
+{
+	struct afmtab	*a;
+	int	f, i, j, k, n, s;
+	float	z;
+
+	if (!kern || ismot(c) || ismot(d) || iszbit(c) || iszbit(d))
+		return 0;
+	if (sfbits(c) != sfbits(d))
+		return 0;
+	if ((f = fbits(c)) == 0)
+		f = xfont;
+	if ((s = sbits(c)) == 0)
+		s = xpts;
+	else
+		s = pstab[s-1];
+	i = cbits(c);
+	j = cbits(d);
+	if (i > 32 && j > 32) {
+		if (afmtab && (n = (fontbase[f]->spare1&BYTEMASK)-1) >= 0) {
+			a = afmtab[n];
+			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
+				k = (k * s + (Unitwidth / 2)) / Unitwidth;
+				if ((z = zoomtab[f]) != 0)
+					k *= z;
+				return k;
+			}
+		}
+	}
+	return 0;
+}
+
 void
 xbits(register tchar i, int bitf)
 {
@@ -310,18 +344,19 @@ xbits(register tchar i, int bitf)
 static tchar
 postchar1(const char *temp, int f)
 {
+	struct namecache	*np;
 	struct afmtab	*a;
-	int	i, j;
+	int	i;
 
 	if (afmtab && (i = (fontbase[f]->spare1&BYTEMASK) - 1) >= 0) {
 		a = afmtab[i];
-		for (j = 1; j < a->nchars; j++)
-			if (a->nametab[j] != NULL &&
-					strcmp(a->nametab[j], temp) == 0)
-				for (i = 0; i < a->nchars + 128 - 32 + nchtab;
-						i++)
-					if (a->fitab[i] == j)
-						return i + 32 + nchtab + 128;
+		np = afmnamelook(a, temp);
+		if (np->afpos != 0) {
+			if (np->fival[0])
+				return np->fival[0] + 32 + nchtab + 128;
+			else
+				return np->fival[1] + 32 + nchtab + 128;
+		}
 	}
 	return(0);
 }
@@ -1197,6 +1232,12 @@ casefzoom(void)
 			ptps();
 	}
 	free(buf);
+}
+
+void
+casekern(void)
+{
+	kern = skip() || atoi() ? 1 : 0;
 }
 
 #include "unimap.h"

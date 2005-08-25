@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.12 (gritter) 8/21/05
+ * Sccsid @(#)proto.h	1.14 (gritter) 8/25/05
  */
 
 /* t6.c */
@@ -9,6 +9,7 @@ int width(register tchar);
 void zapwcache(int);
 int getcw(register int);
 int abscw(int);
+int kernadjust(tchar, tchar);
 void xbits(register tchar, int);
 tchar setch(int);
 tchar setabs(void);
@@ -42,13 +43,14 @@ void casetkf(void);
 void casefallback(void);
 void casehidechar(void);
 void casefzoom(void);
+void casekern(void);
 int mapwc(int, int *);
 /* t10.c */
 void ptinit(void);
 void specnames(void);
 int findch(register char *);
 void ptout(register tchar);
-tchar *ptout0(tchar *);
+tchar *ptout0(tchar *, tchar *);
 void ptps(void);
 void ptfont(void);
 void ptfpcmd(int, char *);

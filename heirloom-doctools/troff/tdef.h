@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.28 (gritter) 8/23/05
+ * Sccsid @(#)tdef.h	1.29 (gritter) 8/25/05
  */
 
 /*
@@ -801,7 +801,7 @@ int movword(void);
 void horiz(int);
 void setnel(void);
 int getword(int);
-void storeword(register tchar, register int);
+void storeword(register tchar, register int, tchar);
 /* n8.c */
 void hyphen(tchar *);
 int punct(int);

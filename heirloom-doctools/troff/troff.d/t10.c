@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.22 (gritter) 8/23/05
+ * Sccsid @(#)t10.c	1.25 (gritter) 8/25/05
  */
 
 /*
@@ -216,6 +216,7 @@ ptinit(void)
 	lss = lss1 = VS;
 	ll = ll1 = lt = lt1 = LL;
 	specnames();	/* install names like "hyphen", etc. */
+	kern = xflag;
 	if (ascii)
 		return;
 	fdprintf(ptid, "x T %s\n", devname);
@@ -317,7 +318,7 @@ ptout(register tchar i)
 	lead += dip->blss + lss;
 	dip->blss = 0;
 	for (k = oline; k < olinep; )
-		k = ptout0(k);	/* now passing a pointer! */
+		k = ptout0(k, olinep);	/* now passing a pointer! */
 	olinep = oline;
 	lead += dip->alss;
 	a = dip->alss;
@@ -329,7 +330,7 @@ ptout(register tchar i)
 }
 
 tchar *
-ptout0(tchar *pi)
+ptout0(tchar *pi, tchar *pend)
 {
 	register int j;
 	register short k, w = 0;
@@ -402,13 +403,22 @@ ptout0(tchar *pi)
 	if (k < 040 && k != DRAWFCN)
 		return(pi+outsize);
 	if (k >= 32) {
-		if (widcache[k-32].fontpts == (xfont<<8) + xpts  && !setwdf) {
+		if (widcache[k-32].fontpts == (xfont<<8) + xpts  && !setwdf &&
+				kern == 0) {
 			w = widcache[k-32].width;
 			bd = 0;
 			cs = 0;
 		} else
 			w = getcw(k-32);
 	}
+	if (xfont != mfont)
+		ptfont();
+	if (xpts != mpts || zoomtab[xfont] != mzoom)
+		ptps();
+	if (lead)
+		ptlead();
+	if (&pi[outsize] < pend)
+		w += kernadjust(pi[0], pi[outsize]);
 	j = z = 0;
 	if (k != DRAWFCN) {
 		if (cs) {
@@ -428,12 +438,6 @@ ptout0(tchar *pi)
 		}
 	}
 	esc += j;
-	if (xfont != mfont)
-		ptfont();
-	if (xpts != mpts || zoomtab[xfont] != mzoom)
-		ptps();
-	if (lead)
-		ptlead();
 	/* put out the real character here */
 	if (k == DRAWFCN) {
 		if (esc)

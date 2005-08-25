@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.5 (gritter) 8/23/05
+ * Sccsid @(#)troff.h	1.6 (gritter) 8/24/05
  */
 
 extern struct tkftab {
@@ -43,6 +43,8 @@ extern	float		*zoomtab;
 extern	int		nchtab;
 extern	char		*chname;
 extern	short		*chtab;
+
+extern	int		kern;
 
 extern	long		realpage;
 
