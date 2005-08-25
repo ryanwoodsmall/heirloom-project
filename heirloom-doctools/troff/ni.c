@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.12 (gritter) 8/23/05
+ * Sccsid @(#)ni.c	1.13 (gritter) 8/25/05
  */
 
 /*
@@ -91,8 +91,9 @@ int	pto = 10000;
 int	pfrom = 1;
 int	print = 1;
 char	nextf[NS] = MACDIR "/";
-char	mfiles[NMF][NS];
+char	**mfiles;
 int	nmfi = 0;
+int	NMF;
 #ifndef NROFF
 int	oldbits = -1;
 #endif

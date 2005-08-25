@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.29 (gritter) 8/25/05
+ * Sccsid @(#)tdef.h	1.30 (gritter) 8/25/05
  */
 
 /*
@@ -175,7 +175,7 @@ extern	int	NM;	/* requests + macros */
 #define	NHEX	128	/* byte size of exception word list */
 #define	NTAB	40	/* tab stops */
 #define	NSO	5	/* "so" depth */
-#define	NMF	5	/* number of -m flags */
+extern	int	NMF;	/* size of space for -m flags */
 #define	WDSIZE	540	/* word buffer size */
 #define	LNSIZE	680	/* line buffer size */
 #define	NDI	5	/* number of diversions */

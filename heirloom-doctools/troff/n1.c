@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.28 (gritter) 8/25/05
+ * Sccsid @(#)n1.c	1.29 (gritter) 8/25/05
  */
 
 /*
@@ -192,7 +192,8 @@ main(int argc, char **argv)
 			continue;
 		case 'c':
 		case 'm':
-			if (mflg++ >= NMF) {
+			if (mflg++ >= NMF && (mfiles = realloc(mfiles,
+						++NMF * sizeof *mfiles)) == 0) {
 				errprint("Too many macro packages: %s",
 					 argv[0]);
 				continue;
@@ -326,6 +327,7 @@ Lt:
 int
 tryfile(register char *pat, register char *fn, int idx)
 {
+	mfiles[idx] = malloc(strlen(pat) + strlen(fn) + 1);
 	strcpy(mfiles[idx], pat);
 	strcat(mfiles[idx], fn);
 	if (access(mfiles[idx], 4) == -1)

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.13 (gritter) 8/23/05
+ * Sccsid @(#)ext.h	1.14 (gritter) 8/25/05
  */
 
 /*
@@ -59,7 +59,7 @@ extern	char	cfname[NSO+1][NS];
 extern	char	devname[];
 extern	char	fontfile[];
 extern	char	ibuf[IBUFSZ];
-extern	char	mfiles[NMF][NS];
+extern	char	**mfiles;
 extern	char	nextf[];
 extern	char	obuf[],	*obufp;
 extern	char	termtab[],	fontfile[];
