@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.35 (gritter) 8/24/05
+ * Sccsid @(#)dpost.c	1.36 (gritter) 8/25/05
  */
 
 /*
@@ -755,7 +755,7 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.35");
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.36");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s\n", "%%EndResource");
@@ -1544,6 +1544,7 @@ loadfont (
 	for (i = 0; i < afmcount; i++)
 		if (afmfonts[i] && strcmp(afmfonts[i]->path, temp) == 0) {
 			a = afmfonts[i];
+			close(fin);
 			goto have;
 		}
 	if ((a = calloc(1, sizeof *a)) == NULL ||
