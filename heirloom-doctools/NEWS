@@ -111,6 +111,9 @@ can be used to deactivate new features for compatibility reasons.
 	selects the character "name" as defined in the .afm file for the
 	current font.
 
+\E
+	is similar to "\e", but is not interpreted in copy mode.
+
 \n[name]
 	refers to the number register "name".
 

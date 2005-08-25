@@ -35,6 +35,8 @@ Release ...
   no hyphen if the line is split.
 * [nt]roff: The "\~" escape is similar to "\ " but inserts a space that
   stretches like a regular " " when the line is adjusted.
+* [nt]roff: The "\E" escape is similar to "\e" but is not interpreted in
+  copy mode.
 * troff/dpost: The "\X'Sync'" escape forces dpost to write position and
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.27 (gritter) 8/25/05
+ * Sccsid @(#)n1.c	1.28 (gritter) 8/25/05
  */
 
 /*
@@ -933,6 +933,11 @@ gx:
 		if ((i = setch(k)) == 0)
 			goto g0;
 		return(i);
+	case 'E':	/* printable version of current eschar */
+		if (xflag == 0)
+			goto dfl;
+		i = PRESC;
+		goto gx;
 	case 's':	/* size indicator */
 		setps();
 		goto g0;
