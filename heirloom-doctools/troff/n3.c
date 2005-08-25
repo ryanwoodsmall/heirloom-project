@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.30 (gritter) 8/25/05
+ * Sccsid @(#)n3.c	1.31 (gritter) 8/25/05
  */
 
 /*
@@ -1177,21 +1177,22 @@ macname(int rq)
 int
 maybemore(int sofar, int create)
 {
-	char	c, *buf, pb[] = { '\n', 0 };
-	int	i = 2, n, sz, r = raw;
+	char	c, buf[NC+1], pb[] = { '\n', 0 };
+	int	i = 2, n, r = raw;
 
 	if (xflag == 0)
 		return sofar;
 	raw = 1;
-	buf = malloc((sz = 2) * sizeof *buf);
 	buf[0] = sofar&BYTEMASK;
 	buf[1] = (sofar>>BYTE)&BYTEMASK;
 	do {
 		c = getch0();
-		if (i+1 >= sz)
-			buf = realloc(buf, (sz += 8) * sizeof *buf);
+		if (i+1 >= sizeof buf) {
+			buf[i] = 0;
+			goto retn;
+		}
 		buf[i++] = c;
-	} while (c && c != ' ' && c != '\n');
+	} while (c && c != ' ' && c != '\t' && c != '\n');
 	buf[i-1] = 0;
 	buf[i] = 0;
 	if (i == 3)
@@ -1203,7 +1204,6 @@ maybemore(int sofar, int create)
 		if (create == 0) {
 		retn:	buf[i-1] = c;
 			cpushback(&buf[2]);
-			free(buf);
 			raw = r;
 			return sofar;
 		}
@@ -1221,13 +1221,13 @@ maybemore(int sofar, int create)
 static int
 getls(int termc)
 {
-	char	c, *buf = NULL;
-	int	i = 0, j = 0, n = -1, sz = 0;
+	char	c, buf[NC];
+	int	i = 0, j = 0, n = -1;
 
 	do {
 		c = getach();
-		if (i >= sz)
-			buf = realloc(buf, (sz += 8) * sizeof *buf);
+		if (i >= sizeof buf)
+			return 0;
 		buf[i++] = c;
 	} while (c && c != termc);
 	buf[--i] = 0;
@@ -1242,7 +1242,6 @@ getls(int termc)
 		if (n == hadn)
 			n = -1;
 	}
-	free(buf);
 	return n >= 0 ? MAXRQ2 + n : j;
 }
 
