@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.36 (gritter) 8/25/05
+ * Sccsid @(#)dpost.c	1.37 (gritter) 8/25/05
  */
 
 /*
@@ -755,7 +755,7 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.36");
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.37");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s\n", "%%EndResource");
@@ -2064,6 +2064,7 @@ supplypfb(char *font, char *file, char *path, FILE *fp)
 	    	break;
     	case 3:
     		fprintf(rf, "%%%%EndResource\n");
+		fclose(fp);
 		return;
 	default:
 	        error(FATAL, "invalid header type %d in %s", path, type);
