@@ -44,6 +44,7 @@ Release ...
 * The "picpack" preprocessor has been added.
 * The file "NEWS" describes new troff language features.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
+* [nt]roff: There is no static limit on the ".hw" table anymore.
 * [nt]roff: The output of long names with ".pm" and stack dumps has been
   fixed.
 * [nt]roff: Nested long-name string references \*[\*...] now work.

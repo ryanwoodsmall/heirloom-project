@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.5 (gritter) 8/16/05
+ * Sccsid @(#)n8.c	1.6 (gritter) 8/25/05
  */
 
 /*
@@ -47,6 +47,7 @@
  */
 
 #include	<ctype.h>
+#include	<stdlib.h>
 #include	"tdef.h"
 #include "ext.h"
 #define	HY_BIT	0200	/* stuff in here only works for ascii */
@@ -57,11 +58,27 @@
  * hyphenation
  */
 
-char	hbuf[NHEX];
-char	*nexth = hbuf;
+char	*hbuf;
+int	NHEX;
+char	*nexth;
 tchar	*hyend;
 #define THRESH 160 /*digram goodness threshold*/
 int	thresh = THRESH;
+
+static char *
+growhbuf(char **pp)
+{
+	char	*nhbuf;
+	int	inc = 4;
+
+	if ((nhbuf = realloc(hbuf, (NHEX+inc) * sizeof *hbuf)) == NULL)
+		return NULL;
+	NHEX += inc;
+	nexth += nhbuf - hbuf;
+	if (pp)
+		*pp += nhbuf - hbuf;
+	return hbuf = nhbuf;
+}
 
 void
 hyphen(tchar *wp)
@@ -141,12 +158,14 @@ void
 casehw(void)
 {
 	register int i, k;
-	register char	*j;
+	char	*j;
 	tchar t;
 
+	if (nexth == NULL)
+		growhbuf(NULL);
 	k = 0;
 	while (!skip()) {
-		if ((j = nexth) >= (hbuf + NHEX - 2))
+		if ((j = nexth) >= (hbuf + NHEX - 2) && growhbuf(&j) == NULL)
 			goto full;
 		for (; ; ) {
 			if (ismot(t = getch()))
@@ -167,7 +186,7 @@ casehw(void)
 			}
 			*j++ = maplow(i) | k;
 			k = 0;
-			if (j >= (hbuf + NHEX - 2))
+			if (j >= (hbuf + NHEX - 2) && growhbuf(&j) == NULL)
 				goto full;
 		}
 	}
@@ -188,7 +207,7 @@ exword(void)
 	e = hbuf;
 	while (1) {
 		save = e;
-		if (*e == 0)
+		if (e == NULL || *e == 0)
 			return(0);
 		w = wdstart;
 		while (*e && w <= hyend && (*e & 0177) == maplow(cbits(*w))) {

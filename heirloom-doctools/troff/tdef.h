@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.30 (gritter) 8/25/05
+ * Sccsid @(#)tdef.h	1.31 (gritter) 8/25/05
  */
 
 /*
@@ -172,7 +172,6 @@ extern	int	NN;	/* number registers */
 extern	int	NM;	/* requests + macros */
 #define	DELTA	1024	/* delta core bytes */
 #define	NHYP	10	/* max hyphens per word */
-#define	NHEX	128	/* byte size of exception word list */
 #define	NTAB	40	/* tab stops */
 #define	NSO	5	/* "so" depth */
 extern	int	NMF;	/* size of space for -m flags */
