@@ -7,6 +7,7 @@
   a segmentation fault occurred because OpenSSL apparently cannot handle
   calls to SSL_shutdown() from the signal handler. This has been fixed (bug
   reported by Svend Sorensen).
+* Building without socket support works again (Patch by Fernando J. Pereda).
 
 [11.25] released 7/29/05
 * The base64 encoder used an invalid encoding for the last unit of data if

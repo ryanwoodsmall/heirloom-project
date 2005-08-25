@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.215 (gritter) 7/29/05";
+static char sccsid[] = "@(#)imap.c	1.216 (gritter) 8/25/05";
 #endif
 #endif /* not lint */
 
@@ -50,13 +50,13 @@ static char sccsid[] = "@(#)imap.c	1.215 (gritter) 7/29/05";
  * IMAP v4r1 client following RFC 2060.
  */
 
-#ifdef	HAVE_SOCKETS
-
 #include "rcv.h"
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+
+#ifdef	HAVE_SOCKETS
 
 #include "md5.h"
 
@@ -3271,6 +3271,9 @@ ccache(void *vp)
 	return 0;
 }
 #else	/* !HAVE_SOCKETS */
+
+#include "extern.h"
+
 static void 
 noimap(void)
 {
