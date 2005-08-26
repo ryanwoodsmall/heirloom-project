@@ -28,6 +28,8 @@ Release ...
   are searched for missing characters in the current font has been added.
 * troff: The ".hidechar" request hides characters from a font which are
   then searched using the fallback sequence.
+* troff: Ligatures from expert fonts can be used transparently with the
+  ".flig" request.
 * [nt]roff: Environments selected with the ".ev" command can be given
   names, and their number is no longer statically limited.
 * [nt]roff: The ".evc" request copies another environment to the current

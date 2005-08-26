@@ -5,8 +5,8 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)dpost.sl	1.45 (gritter) 8/26/05";
-const char creator[] = "Heirloom Documentation Tools - dpost 1.45 (gritter) 8/26/05";
+static const char sccsid[] USED = "@(#)dpost.sl	1.46 (gritter) 8/27/05";
+const char creator[] = "Heirloom Documentation Tools - dpost 1.46 (gritter) 8/27/05";
 /* SLIST */
 /*
 color.c: * Sccsid @(#)color.c	1.3 (gritter) 8/9/05
@@ -26,6 +26,6 @@ pictures.c: * Sccsid @(#)pictures.c	1.3 (gritter) 8/9/05
 ps_include.c: * Sccsid @(#)ps_include.c	1.5 (gritter) 8/13/05
 request.c: * Sccsid @(#)request.c	1.3 (gritter) 8/9/05
 request.h: * Sccsid @(#)request.h	1.3 (gritter) 8/9/05
-../afm.c: * Sccsid @(#)afm.c	1.17 (gritter) 8/26/05
+../afm.c: * Sccsid @(#)afm.c	1.18 (gritter) 8/27/05
 ../afm.h: * Sccsid @(#)afm.h	1.9 (gritter) 8/26/05
 */

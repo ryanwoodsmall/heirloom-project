@@ -29,6 +29,16 @@ can be used to deactivate new features for compatibility reasons.
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
 
+.flig ff ligatures					troff only
+	defines the set of ligatures to be used with font ff. The
+	"ligatures" parameter is the sum of the values 1 for ff, 2 for
+	fi, 4 for fl, 8 for ffi, and 16 for ffl. Thus ".flig R 31"
+	enables all these ligatures in font R. The default is specific
+	to a font and is determined from its AFM file. Enabling the ff,
+	ffi, and ffl ligatures with PostScript fonts usually requires
+	an expert font that has been selected for character substitution
+	using the ".fallback" request.
+
 .fpost r yy afmname [supplyname]			troff only
 	reads metrics from "afmname". If the TROFFONTS environment variable
 	is set, each of the colon-separated directories in it is tried for
@@ -151,4 +161,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-                                                                8/26/05
+Gunnar Ritter                                                   8/27/05

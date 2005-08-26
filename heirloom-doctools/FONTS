@@ -178,6 +178,21 @@ it is sufficient to mount each font once:
 	But this text prints in Small Capitals.
 
 
+Using the expert font for ligatures
+-----------------------------------
+
+PostScript fonts usually do not contain ligatures for ff, ffi, and ffl
+in the base font; an expert font delivers them in addition. Automatic
+substitution of such ligatures can be enabled using the ".flig" request
+in combination with the fallback sequence:
+
+	.fpost 1 R fn______ pfb
+	.fpost 0 E fny_____ pfb
+	.fallback R E
+	.flig R 31
+	effective office offline
+
+
 Combining different fonts
 -------------------------
 
@@ -212,4 +227,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 8/26/05
+Gunnar Ritter                                                 8/27/05

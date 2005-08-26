@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.45 (gritter) 8/26/05
+ * Sccsid @(#)t6.c	1.46 (gritter) 8/27/05
  */
 
 /*
@@ -753,8 +753,10 @@ tchar getlg(tchar i)
 {
 	tchar j, k;
 	register int lf;
+	int f;
 
-	if ((lf = fontbase[fbits(i)]->ligfont) == 0) /* font lacks ligatures */
+	f = fbits(i);
+	if ((lf = fontbase[f]->ligfont) == 0) /* font lacks ligatures */
 		return(i);
 	j = getch0();
 	if (cbits(j) == 'i' && (lf & LFI))
@@ -789,6 +791,32 @@ caselg(void)
 	if (skip())
 		return;
 	lg = atoi();
+}
+
+void
+caseflig(void)
+{
+	int	i, j;
+
+	skip();
+	i = getrq();
+	if ((j = findft(i)) < 0 || skip())
+		return;
+	fontbase[j]->ligfont = atoi() & 037;
+	/*
+	 * If the font still contains the charlib substitutes for ff,
+	 * Fi, and Fl, hide them. The ".flig" request is intended for
+	 * use in combination with expert fonts only.
+	 */
+	if (fontbase[j]->ligfont & LFF)
+		if (codetab[j][fitab[j][LIG_FF-32]] < 32)
+			fitab[j][LIG_FF-32] = 0;
+	if (fontbase[j]->ligfont & LFFI)
+		if (codetab[j][fitab[j][LIG_FFI-32]] < 32)
+			fitab[j][LIG_FFI-32] = 0;
+	if (fontbase[j]->ligfont & LFFL)
+		if (codetab[j][fitab[j][LIG_FFL-32]] < 32)
+			fitab[j][LIG_FFL-32] = 0;
 }
 
 void
