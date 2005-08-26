@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.44 (gritter) 8/26/05
+ * Sccsid @(#)t6.c	1.45 (gritter) 8/26/05
  */
 
 /*
@@ -1029,6 +1029,68 @@ casefpost(void)
 	free(supply);
 }
 
+char *
+onefont(char *prefix, char *file, char *type)
+{
+	char	*path, *fp, *tp;
+
+	path = malloc(strlen(prefix) + strlen(file) + 2);
+	strcpy(path, prefix);
+	strcat(path, "/");
+	strcat(path, file);
+	if (type) {
+		for (fp = file; *fp; fp++);
+		for (tp = type; *tp; tp++);
+		while (tp >= type && fp >= file && *fp-- == *tp--);
+		if (tp >= type) {
+			tp = malloc(strlen(path) + strlen(type) + 2);
+			strcpy(tp, path);
+			strcat(tp, ".");
+			strcat(tp, type);
+			free(path);
+			path = tp;
+		}
+	}
+	return path;
+}
+
+static char *
+getfontpath(char *file, char *type)
+{
+	extern int sprintf(char *, const char *, ...);
+	char	*path, *troffonts, *tp, *tq, c;
+
+	if ((troffonts = getenv("TROFFONTS")) != NULL) {
+		tp = malloc(strlen(troffonts) + 1);
+		strcpy(tp, troffonts);
+		troffonts = tp;
+		do {
+			for (tq = tp; *tq && *tq != ':'; tq++);
+			c = *tq;
+			*tq = 0;
+			path = onefont(tp, file, type);
+			if (access(path, 0) == 0) {
+				free(troffonts);
+				return path;
+			}
+			free(path);
+			tp = &tq[1];
+		} while (c);
+		free(troffonts);
+	}
+	if (type) {
+		tp = malloc(strlen(fontfile) + strlen(devname)
+				+ strlen(type) + 10);
+		sprintf(tp, "%s/dev%s/%s", fontfile, devname, type);
+	} else {
+		tp = malloc(strlen(fontfile) + strlen(devname) + 10);
+		sprintf(tp, "%s/dev%s", fontfile, devname);
+	}
+	path = onefont(tp, file, type);
+	free(tp);
+	return path;
+}
+
 void
 loadafm(int nf, int rq, char *file, char *supply)
 {
@@ -1039,10 +1101,14 @@ loadafm(int nf, int rq, char *file, char *supply)
 	struct afmtab	*a;
 	int	i, have = 0;
 
+	if (nafm == 254) {
+		/* because of the spare1 field */
+		errprint("Too many AFM fonts, can't load %s", file);
+		return;
+	}
 	if (nf < 0 || nf > nfonts)
 		nf = nfonts + 1;
-	path = malloc(strlen(fontfile) + strlen(devname) + strlen(file) + 14);
-	sprintf(path, "%s/dev%s/afm/%s.afm", fontfile, devname, file);
+	path = getfontpath(file, "afm");
 	a = calloc(1, sizeof *a);
 	for (i = 0; i < nafm; i++)
 		if (strcmp(afmtab[i]->path, path) == 0) {
@@ -1120,10 +1186,18 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	nafm++;
 	if (nf > nfonts)
 		nfonts = nf;
-	if (supply)
-		ptsupplyfont(a->fontname, a->file, supply);
+	if (supply) {
+		char	*data;
+		if (strcmp(supply, "pfb") == 0 || strcmp(supply, "pfa") == 0 ||
+				strcmp(supply, "t42") == 0)
+			data = getfontpath(file, supply);
+		else
+			data = getfontpath(supply, NULL);
+		ptsupplyfont(a->fontname, data);
+		free(data);
+	}
 	if (realpage)
-		ptfpcmd(nf, a->file);
+		ptfpcmd(nf, a->path);
 }
 
 int

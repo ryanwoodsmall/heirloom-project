@@ -9,34 +9,47 @@ Heirloom troff understands two ways to select PostScript fonts.
 The new method can access PostScript font files directly. Fonts are
 selected using a new request that is only available with "troff -x":
 
-  .fpost r yy basename [pfb|pfa|t42]
-	reads metrics from the file "fontdir/afm/basename.afm". The font
-	is then available with ".ft yy", "\f(yy", etc. "yy" may be freely
-	chosen. The "r" argument specifies a register on which the font
-	is to be mounted. If it is zero or too large, the font is mounted
-	on a free position (not on position zero). Contrasting to the
-	".fp" request, the "r" argument may consist of more than a single
-	digit.
+  .fpost r yy afmname [supplyname]
+	reads metrics from "afmname". If the TROFFONTS environment variable
+	is set, each of the colon-separated directories in it is tried for
+	the file "afmname.afm", or, if "afmname" has the ".afm" extension
+	itself, for "afmname". Otherwise, the font is loaded from the file
+	"/usr/ucblib/doctools/font/dev7200/afm/afmname.afm".
+	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
+	be freely chosen. The "r" argument specifies a register on which
+	the font is to be mounted. If it is zero, the font is mounted on
+	a free position (not on position zero). Contrasting to the ".fp"
+	request, the "r" argument may consist of more than a single digit.
 	  "yy" may be the name of an existing ditroff-style font, such
 	as "R". In this case, the same register must be reused. For best
 	compatibility with conventional troff usage, it is recommended
 	that the base fonts of a document are mounted as "1 R", "2 I".
 	The initial fonts on positions 9 (S1) and 10 (S) should not be
 	changed, as these contain special metrics for drawing commands.
-	  If the optional "pfb|pfa|t42" argument is present, data from
-	the file "fontdir/pfb/basename.pfb" (or pfa/t42, respectively)
-	is included into the generated PostScript. This is useful to
-	include fonts that have not yet been downloaded into the
-	printer, or for generating PDFs with additional fonts.
+	  If the optional "supplyname" argument is present, glyph data
+	is included in the generated PostScript file. If "supplyname"
+	is one of "pfb", "pfa", or "t42", the file "supplyname.pfb" (or
+	likewise) is searched in the directories in TROFFONTS first as
+	described for the AFM file above, and if it is not found there,
+	in "/usr/ucblib/doctools/font/dev7200/pfb/supplyname.pfb" (or
+	likewise). "supplyname" may also be the basename of a file like
+	"afmname" above.
 
-As an example,
+As a simple example,
       
 	.fpost 0 VA van_____ pfb
 	.ft VA
 	Here is some text in Monotype Van Dijck Regular.
 
+But it is also possible to have different names for the metrics and
+glyph data files, as in
+
+	.fpost 0 BM modified.afm bm______.pfb
+	.ft BM
+	This text prints in Monotype Bembo using modified metrics.
+
 The new default higher-resolution "7200" PostScript device always uses
-this method; it supports the conventional ".fp" request for backwards
+AFM files; it supports the conventional ".fp" request for backwards
 compatibility to select pre-installed fonts from the PDF base set.
 
 With fonts selected by this method, localized input processing is
@@ -69,14 +82,17 @@ are of interest for troff:
   xxxxxxxx.afm
 	This is the metrics file. troff accesses it to learn the widths
 	of characters in the font. Put this file (or a symbolic link to
-	it) into the directory /usr/ucblib/doctools/font/dev7200/afm.
+	it) into the directory /usr/ucblib/doctools/font/dev7200/afm, or
+	use a custom directory and include it into the value of the
+	TROFFONTS environment variable.
 
   xxxxxxxx.pfb
 	This file contains the actual glyph data. troff does not really
 	need this file, but your printer or PDF converter does. In many
 	cases, it is most convenient to include the data directly into
 	the .ps file generated. Put the file (or a symbolic link to it)
-	into the directory /usr/ucblib/doctools/font/dev7200/pfb.
+	into the directory /usr/ucblib/doctools/font/dev7200/pfb, or 
+	use a custom directory and set TROFFONTS appropriately.
 
 For TrueType fonts, an additional conversion step is necessary. troff
 cannot handle TrueType fonts directly, but it can handle PostScript
@@ -196,4 +212,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 8/25/05
+Gunnar Ritter                                                 8/26/05

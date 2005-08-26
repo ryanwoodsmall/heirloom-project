@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.11 (gritter) 8/23/05
+.\" Sccsid @(#)troff.1b	1.12 (gritter) 8/26/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "8/23/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "8/26/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -212,6 +212,11 @@ of bytes to characters.
 Specifies a device name as with the
 .I \-T
 option.
+.TP
+.B TROFFONTS
+A colon-separated list of directory names
+to search for PostScript fonts
+before the device font directory.
 .TP
 .B TROFFMACS
 Specifies the location to search for macro files with the

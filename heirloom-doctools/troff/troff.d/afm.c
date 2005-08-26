@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.16 (gritter) 8/25/05
+ * Sccsid @(#)afm.c	1.17 (gritter) 8/26/05
  */
 
 #include <stdlib.h>
@@ -708,7 +708,7 @@ addmetrics(struct afmtab *a, char *_line, int isSymbol)
 	if (N == NULL)
 		return;
 	tp = mapname(N, isSymbol,
-			a->file[0]=='S' && a->file[1]=='1' && a->file[2]==0);
+			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
 	addchar(a, C, tp, 0, WX, B, N);
 }
 
@@ -726,6 +726,14 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	int	n = 0, i;
 	int	isSymbol = 0;
 
+	if ((cp = strrchr(a->file, '/')) == NULL)
+		cp = a->file;
+	else
+		cp++;
+	a->base = malloc(strlen(cp) + 1);
+	strcpy(a->base, cp);
+	if ((cp = strrchr(a->base, '.')) != NULL)
+		*cp = '\0';
 	a->lineno = 1;
 	for (cp = contents; cp < &contents[size]; a->lineno++, cp++) {
 		while (*cp == ' ' || *cp == '\t' || *cp == '\r')
@@ -764,7 +772,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->nametab = malloc((n+NCHARLIB+1)*sizeof *a->nametab);
 			a->nametab[0] = 0;
 			a->nchars = 1;
-			addcharlib(a, a->file[0]=='S' && a->file[1]==0);
+			addcharlib(a, a->base[0]=='S' && a->base[1]==0);
 			a->nameprime = nextprime(n+NCHARLIB+1);
 			a->namecache = calloc(a->nameprime,
 					sizeof *a->namecache);
@@ -823,7 +831,7 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 	fontab[nf] = calloc(nw, sizeof *fontab);
 	kerntab[nf] = calloc(nw, sizeof *kerntab);
 	codetab[nf] = calloc(nw, sizeof *codetab);
-	fitab[nf] = calloc(nw, sizeof *fitab);
+	fitab[nf] = calloc(128 - 32 + nchtab, sizeof *fitab);
 	if (devfontab) for (i = 0; i < nw; i++)
 		fontab[nf][i] = devfontab[i]&0377;
 	if (devkerntab) for (i = 0; i < nw; i++)

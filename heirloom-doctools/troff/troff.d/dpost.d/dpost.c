@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.37 (gritter) 8/25/05
+ * Sccsid @(#)dpost.c	1.38 (gritter) 8/26/05
  */
 
 /*
@@ -755,7 +755,7 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.37");
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.38");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s\n", "%%EndResource");
@@ -1312,7 +1312,7 @@ devcntrl(
 {
 
 
-    char	str[50], buf[256], str1[50];
+    char	str[50], buf[4096], str1[50];
     int		c, n;
 
 
@@ -1530,7 +1530,9 @@ loadfont (
     if ( fontbase[n] != NULL && strcmp(s, fontbase[n]->namefont) == 0 )
 	return;
 
-    if (strstr(s, ".afm") != NULL)
+    if (strchr(s, '/') != NULL)
+	strcpy(temp, s);
+    else if (strstr(s, ".afm") != NULL)
 	sprintf(temp, "%s/dev%s/afm/%s", fontdir, devname, s);
     else if ( s1 == NULL || s1[0] == '\0' )
 	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
@@ -1541,6 +1543,13 @@ loadfont (
 	struct stat	st;
 	char	*contents;
 	int	i;
+	if ((p = strrchr(s, '/')) == NULL)
+		p = s;
+	else
+		p++;
+	if (p[0] == 'S' && (p[1] == '\0' || isdigit(p[1]&0377) &&
+				p[2] == '\0' || p[2] == '.'))
+		forcespecial = 1;
 	for (i = 0; i < afmcount; i++)
 		if (afmfonts[i] && strcmp(afmfonts[i]->path, temp) == 0) {
 			a = afmfonts[i];
@@ -1567,6 +1576,8 @@ loadfont (
 	free(contents);
 	afmfonts[afmcount] = a;
 	sprintf(a->Font.intname, "%d", dev.nfonts + ++afmcount);
+	if (forcespecial)
+		a->Font.specfont = 1;
 have:   fontbase[n] = &a->Font;
 	fontab[n] = a->fontab;
 	codetab[n] = a->codetab;
@@ -1956,7 +1967,7 @@ void
 t_supply(char *font)		/* supply a font */
 {
 	struct supplylist	*sp;
-	char	*np, *file, *type;
+	char	*np, *file, *type = NULL, c;
 
 	while (*font == ' ' || *font == '\t')
 		font++;
@@ -1968,21 +1979,23 @@ t_supply(char *font)		/* supply a font */
 	while (*file == ' ' || *file == '\t')
 		file++;
 	for (np = file; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
-	if (*np == '\0' || *np == '\n')
-		return;
+	c = *np;
 	*np = '\0';
-	type = &np[1];
-	while (*type == ' ' || *type == '\t')
-		type++;
-	for (np = type; *np && *np != ' ' && *np != '\t' && *np != '\n'; np++);
-	*np = 0;
+	if (c != '\0' && c != '\n') {
+		type = &np[1];
+		while (*type == ' ' || *type == '\t')
+			type++;
+		for (np = type; *np && *np != ' ' &&
+				*np != '\t' && *np != '\n'; np++);
+		*np = '\0';
+	}
 	for (sp = supplylist; sp; sp = sp->next)
 		if (strcmp(sp->font, font) == 0)
 			return;
 	sp = calloc(1, sizeof *sp);
 	sp->font = strdup(font);
 	sp->file = strdup(file);
-	sp->type = strdup(type);
+	sp->type = type && *type ? strdup(type) : NULL;
 	sp->next = supplylist;
 	supplylist = sp;
 }
@@ -2000,7 +2013,7 @@ static const char ps_adobe_font_1_0[] = "%!PS-AdobeFont-1.0:";
 static const char ps_truetypefont_[] = "%!PS-TrueTypeFont-";
 
 static void
-supplypfb(char *font, char *file, char *path, FILE *fp)
+supplypfb(char *font, char *path, FILE *fp)
 {
     char	buf[30];
     long	length;
@@ -2082,21 +2095,29 @@ static void
 supply1(char *font, char *file, char *type)
 {
     FILE *fp;
-    char line[4096];
+    char line[4096], c;
 
-    sprintf(temp, "%s/dev%s/%s/%s.%s", fontdir, devname, type, file, type);
-    if ((fp = fopen(temp, "r")) == NULL)
-	    error(FATAL, "can't open %s", temp);
+    if (strchr(file, '/') == 0) {
+    	sprintf(temp, "%s/dev%s/%s/%s.%s", fontdir, devname, type, file, type);
+	file = temp;
+    }
+    if ((fp = fopen(file, "r")) == NULL)
+	    error(FATAL, "can't open %s", file);
+    if (type == NULL) {
+	c = getc(fp);
+	ungetc(c, fp);
+	type = c == '\200' ? "pfb" : "anything";
+    }
     if (strcmp(type, "pfb") == 0) {
-	    supplypfb(font, file, temp, fp);
+	    supplypfb(font, file, fp);
 	    return;
     }
     if (fgets(line, sizeof line, fp) == NULL)
-	    error(FATAL, "missing data in %s", temp);
+            error(FATAL, "missing data in %s", file);
     if (strncmp(line, ps_adobe_font_1_0, strlen(ps_adobe_font_1_0)) &&
 		    strncmp(line, ps_truetypefont_, strlen(ps_truetypefont_)))
 	    error(FATAL, "file %s does not start with \"%s\" or \"%s\"",
-			    temp, ps_adobe_font_1_0, ps_truetypefont_);
+			    file, ps_adobe_font_1_0, ps_truetypefont_);
     if (sfcount++ == 0)
         fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
     else

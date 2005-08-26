@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.8 (gritter) 8/25/05
+ * Sccsid @(#)afm.h	1.9 (gritter) 8/26/05
  */
 
 struct kernpair {
@@ -41,6 +41,7 @@ extern struct afmtab {
 	struct Font	Font;
 	char	*path;
 	char	*file;
+	char	*base;
 	char	*fontname;
 	int	*fontab;
 	char	*kerntab;
