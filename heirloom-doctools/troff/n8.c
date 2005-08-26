@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.10 (gritter) 8/26/05
+ * Sccsid @(#)n8.c	1.11 (gritter) 8/26/05
  */
 
 /*
@@ -363,6 +363,10 @@ digram(void)
 	tchar * nhyend, *maxw = 0;
 	int	maxval;
 	extern const char	bxh[26][13], bxxh[26][13], xxh[26][13], xhx[26][13], hxx[26][13];
+
+	for (w = wdstart; w <= wdend; w++)
+		if (cbits(*w) & ~0177)
+			return;
 
 again:
 	if (!(w = chkvow(hyend + 1)))
