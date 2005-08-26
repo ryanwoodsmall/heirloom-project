@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.43 (gritter) 8/25/05
+ * Sccsid @(#)t6.c	1.44 (gritter) 8/26/05
  */
 
 /*
@@ -1243,7 +1243,7 @@ casekern(void)
 #include "unimap.h"
 
 int
-mapwc(int c, int *fp)
+un2tr(int c, int *fp)
 {
 	int	i, j;
 
@@ -1252,4 +1252,27 @@ mapwc(int c, int *fp)
 			if ((j = postchar(unimap[i].psc, fp)) != 0)
 				return j;
 	return 0;
+}
+
+int
+tr2un(int i)
+{
+	struct afmtab	*a;
+	int	c, n;
+
+	if (i < 32)
+		return -1;
+	else if (i < 128)
+		return i;
+	if ((n = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0) {
+		a = afmtab[n];
+		if (i - 32 >= nchtab + 128)
+			i -= nchtab + 128;
+		if ((n = a->fitab[i - 32]) < a->nchars &&
+				a->nametab[n] != NULL)
+			for (c = 0; unimap[c].psc; c++)
+				if (strcmp(unimap[c].psc, a->nametab[n]) == 0)
+					return unimap[c].code;
+	}
+	return -1;
 }

@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.14 (gritter) 8/25/05
+ * Sccsid @(#)proto.h	1.15 (gritter) 8/26/05
  */
 
 /* t6.c */
@@ -44,7 +44,8 @@ void casefallback(void);
 void casehidechar(void);
 void casefzoom(void);
 void casekern(void);
-int mapwc(int, int *);
+int un2tr(int, int *);
+int tr2un(int);
 /* t10.c */
 void ptinit(void);
 void specnames(void);

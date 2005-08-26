@@ -3,6 +3,8 @@ SUBDIRS = eqn/eqn.d \
 	eqn/checkeq.d \
 	eqn/eqnchar.d \
 	tbl \
+	troff/libhnj \
+	troff/libhnj/hyphen.d \
 	troff/troff.d/font \
 	troff/troff.d/dpost.d \
 	troff/troff.d \

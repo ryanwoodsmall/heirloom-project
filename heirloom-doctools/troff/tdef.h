@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.31 (gritter) 8/25/05
+ * Sccsid @(#)tdef.h	1.32 (gritter) 8/25/05
  */
 
 /*
@@ -814,6 +814,7 @@ int vowel(int);
 tchar *chkvow(tchar *);
 void digram(void);
 int dilook(int, int, const char [26][13]);
+void casehylang(void);
 /* n9.c */
 tchar setz(void);
 void setline(void);

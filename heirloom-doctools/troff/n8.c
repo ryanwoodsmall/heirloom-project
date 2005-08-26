@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.6 (gritter) 8/25/05
+ * Sccsid @(#)n8.c	1.10 (gritter) 8/26/05
  */
 
 /*
@@ -46,11 +46,18 @@
  * contributors.
  */
 
+#ifdef	EUC
+#include	<wctype.h>
+#endif
 #include	<ctype.h>
 #include	<stdlib.h>
+#include	<string.h>
 #include	"tdef.h"
 #include "ext.h"
-#define	HY_BIT	0200	/* stuff in here only works for ascii */
+#include "proto.h"
+#include "libhnj/hyphen.h"
+#define	HY_BIT	0200	/* generic stuff in here only works for ascii */
+#define	HY_BIT2	0x80000000
 
 /*
  * troff8.c
@@ -58,17 +65,21 @@
  * hyphenation
  */
 
-char	*hbuf;
+int	*hbuf;
 int	NHEX;
-char	*nexth;
+int	*nexth;
 tchar	*hyend;
 #define THRESH 160 /*digram goodness threshold*/
 int	thresh = THRESH;
 
-static char *
-growhbuf(char **pp)
+static	HyphenDict	*dicthnj;
+
+static	void		hyphenhnj(void);
+
+static int *
+growhbuf(int **pp)
 {
-	char	*nhbuf;
+	int	*nhbuf;
 	int	inc = 4;
 
 	if ((nhbuf = realloc(hbuf, (NHEX+inc) * sizeof *hbuf)) == NULL)
@@ -104,7 +115,10 @@ hyphen(tchar *wp)
 	hyp = hyptr;
 	*hyp = 0;
 	hyoff = 2;
-	if (!exword() && !suffix())
+	if (dicthnj) {
+		if (!exword())
+			hyphenhnj();
+	} else if (!exword() && !suffix())
 		digram();
 	*hyp++ = 0;
 	if (*hyptr) 
@@ -135,6 +149,14 @@ punct(int i)
 int 
 alph(int i)
 {
+#ifndef	NROFF
+#ifdef	EUC
+	if (i & ~0177) {
+		int	u = tr2un(i);
+		return iswalpha(u);
+	} else
+#endif	/* EUC */
+#endif	/* !NROFF */
 	if (i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z')
 		return(1);
 	else
@@ -158,7 +180,7 @@ void
 casehw(void)
 {
 	register int i, k;
-	char	*j;
+	int	*j;
 	tchar t;
 
 	if (nexth == NULL)
@@ -181,7 +203,7 @@ casehw(void)
 					return;
 			}
 			if (i == '-') {
-				k = HY_BIT;
+				k = HY_BIT2;
 				continue;
 			}
 			*j++ = maplow(i) | k;
@@ -201,8 +223,8 @@ int
 exword(void)
 {
 	register tchar *w;
-	register char	*e;
-	char	*save;
+	register int	*e;
+	int	*save;
 
 	e = hbuf;
 	while (1) {
@@ -210,7 +232,7 @@ exword(void)
 		if (e == NULL || *e == 0)
 			return(0);
 		w = wdstart;
-		while (*e && w <= hyend && (*e & 0177) == maplow(cbits(*w))) {
+		while (*e && w <= hyend && (*e&~HY_BIT2) == maplow(cbits(*w))) {
 			e++; 
 			w++;
 		};
@@ -218,7 +240,7 @@ exword(void)
 			if (w-1 == hyend || (w == wdend && maplow(cbits(*w)) == 's')) {
 				w = wdstart;
 				for (e = save; *e; e++) {
-					if (*e & HY_BIT)
+					if (*e & HY_BIT2)
 						*hyp++ = w;
 					if (hyp > (hyptr + NHYP - 1))
 						hyp = hyptr + NHYP - 1;
@@ -245,7 +267,7 @@ suffix(void)
 	extern const char	*suftab[];
 
 again:
-	if (!alph(cbits(i = cbits(*hyend))))
+	if (!alph(cbits(i = cbits(*hyend))) || cbits(i) >= 128)
 		return(0);
 	if (i < 'a')
 		i -= 'A' - 'a';
@@ -291,6 +313,15 @@ mark:
 int 
 maplow(register int i)
 {
+#ifndef	NROFF
+#ifdef	EUC
+	if (ischar(i) && i & ~0177) {
+		i = tr2un(i);
+		if (iswupper(i))
+			i = towlower(i);
+	} else
+#endif	/* EUC */
+#endif	/* !NROFF */
 	if (ischar(i) && isupper(i)) 
 		i = tolower(i);
 	return(i);
@@ -375,4 +406,72 @@ dilook(int a, int b, const char t[26][13])
 	return(i & 017);
 }
 
+void
+casehylang(void)
+{
+	extern int sprintf(char *, const char *, ...);
+	int	c, i = 0, sz = 0;
+	char	*file = NULL, *path = NULL;
 
+	if (dicthnj)
+		hnj_hyphen_free(dicthnj);
+	dicthnj = NULL;
+	skip();
+	do {
+		c = getach();
+		if (i >= sz)
+			file = realloc(file, (sz += 8) * sizeof *file);
+		file[i++] = c;
+	} while (c);
+	if (i == 1) {
+		free(file);
+		return;
+	}
+	if (strchr(file, '/') == NULL) {
+		path = malloc(strlen(file) + strlen(HYPDIR) + 12);
+		sprintf(path, "%s/hyph_%s.dic", HYPDIR, file);
+	} else {
+		path = malloc(strlen(file) + 1);
+		strcpy(path, file);
+	}
+	if ((dicthnj = hnj_hyphen_load(path)) == NULL) {
+		errprint("Can't load %s", path);
+		free(file);
+		free(path);
+		return;
+	}
+	free(file);
+	free(path);
+}
+
+static void
+hyphenhnj(void)
+{
+	tchar	*wp;
+	char	cb[WDSIZE], *cp, hb[WDSIZE];
+	int	i, j, m;
+
+	cp = cb;
+	for (wp = wdstart; wp <= wdend; wp++)
+		if (cp < &cb[sizeof cb - 1]) {
+#ifdef	NROFF
+			m = cbits(*wp);
+			if (m & ~0177)
+				return;
+#else
+			m = tr2un(cbits(*wp));
+			if (m < 0 || m & ~0377)
+				return;	/* only supporting ISO-8859-1 so far */
+#endif
+			*cp++ = m;
+		}
+	*cp = '\0';
+	j = cp - cb;
+	hnj_hyphen_hyphenate(dicthnj, cb, j, hb);
+	for (i = 0; i < j; i++)
+		if (hb[i] - '0' & 1) {
+			*hyp++ = &wdstart[i+1];
+			if (hyp > (hyptr + NHYP - 1))
+				hyp = hyptr + NHYP - 1;
+		}
+}
