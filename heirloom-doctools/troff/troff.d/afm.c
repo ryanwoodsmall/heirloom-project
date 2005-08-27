@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.18 (gritter) 8/27/05
+ * Sccsid @(#)afm.c	1.19 (gritter) 8/27/05
  */
 
 #include <stdlib.h>
@@ -743,7 +743,9 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			cp++;
 		if (*cp == '\n')
 			continue;
-		if (state == NONE && thisword(cp, "StartFontMetrics"))
+		if (thisword(cp, "Comment"))
+			/*EMPTY*/;
+		else if (state == NONE && thisword(cp, "StartFontMetrics"))
 			state = FONTMETRICS;
 		else if (state == FONTMETRICS && thisword(cp, "EndFontMetrics"))
 			state = NONE;
