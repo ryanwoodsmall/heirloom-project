@@ -18,7 +18,7 @@ Release ...
 * [nt]roff: Hyphenation for languages other than English has been added
   using the "libhnj" variant from the OpenOffice project. The ".hylang"
   request has been introduced to select between languages. Hyphenation
-  files for German and Latin have been derived from TeX sources.
+  files have been derived from TeX sources.
 * troff: The ".fzoom" request allows to zoom the characters of a font.
 * [nt]roff: The ".lc_ctype" request can be used to set the LC_CTYPE
   localization setting from within a document.
