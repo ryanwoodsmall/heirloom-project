@@ -22,9 +22,11 @@
 %
 % CDDL HEADER END
 %
-%ident	"@(#)dpost.ps	1.7	05/06/08 SMI"
+% from OpenSolaris "dpost.ps	1.7	05/06/08 SMI"
 %
-% Version 3.16 prologue for troff files.
+% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
+%
+% Sccsid @(#)dpost.ps	1.2 (gritter) 8/27/05
 %
 
 /#copies 1 store
@@ -221,3 +223,15 @@
 	/underscore		[0 80 500 0]
 	/endash			[7 90 650 0]
 ] def
+
+% from Adobe's pdfmark Reference Manual for Acrobat 7.0, 11/30/04, p. 10
+/pdfmark where				% Is pdfmark already available?
+	{ pop }				% Yes: do nothing (use that definition)
+	{				% No: define pdfmark as follows:
+	/globaldict where		% globaldict is preferred because
+		{ pop globaldict }	% globaldict is always visible; else,
+		{ userdict }		% use userdict otherwise.
+	ifelse
+	/pdfmark /cleartomark load put
+	}				% Define pdfmark to remove all objects
+ifelse					% up to and including the mark object.

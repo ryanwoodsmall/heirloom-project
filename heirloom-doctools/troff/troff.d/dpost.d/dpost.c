@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.38 (gritter) 8/26/05
+ * Sccsid @(#)dpost.c	1.39 (gritter) 8/27/05
  */
 
 /*
@@ -701,6 +701,27 @@ init_signals(void)
 
 
 /*****************************************************************************/
+static char *
+pdfdate(time_t *tp, char *buf, size_t size)
+{
+	struct tm	*tmptr;
+	int	tzdiff, tzdiff_hour, tzdiff_min;
+
+	tzdiff = *tp - mktime(gmtime(tp));
+	tzdiff_hour = (int)(tzdiff / 60);
+	tzdiff_min = tzdiff_hour % 60;
+	tzdiff_hour /= 60;
+	tmptr = localtime(tp);
+	if (tmptr->tm_isdst > 0)
+		tzdiff_hour++;
+	snprintf(buf, size, "(D:%04d%02d%02d%02d%02d%02d%+03d'%02d')",
+			tmptr->tm_year + 1900,
+			tmptr->tm_mon + 1, tmptr->tm_mday,
+			tmptr->tm_hour, tmptr->tm_min, tmptr->tm_sec,
+			tzdiff_hour, tzdiff_min);
+	return buf;
+}
+/*****************************************************************************/
 
 
 void
@@ -715,6 +736,7 @@ header(FILE *fp)
     time_t	now;
     int		n;
     char	buf[4096];
+    char	crdbuf[40];
 
 
 /*
@@ -755,13 +777,18 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.38");
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.39");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s\n", "%%EndResource");
-
     fprintf(fp, "%s", ENDPROLOG);
+
     fprintf(fp, "%s", BEGINSETUP);
+    fprintf(fp, "\
+[ /CreationDate %s\n\
+  /Creator (%s)\n\
+  /DOCINFO pdfmark\n", pdfdate(&now, crdbuf, sizeof crdbuf), creator);
+
     fflush(gf);
     rewind(gf);
     while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
