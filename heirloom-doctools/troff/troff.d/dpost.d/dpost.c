@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.40 (gritter) 8/27/05
+ * Sccsid @(#)dpost.c	1.41 (gritter) 8/28/05
  */
 
 /*
@@ -795,10 +795,8 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.40");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
-    fprintf(fp, "%s\n", "%%EndResource");
     fprintf(fp, "%s", ENDPROLOG);
 
     fprintf(fp, "%s", BEGINSETUP);
