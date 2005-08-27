@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mallint.h	1.3 (gritter) 8/26/05
+ * Sccsid @(#)mallint.h	1.4 (gritter) 8/27/05
  */
 
 /*	Copyright (c) 1988 AT&T	*/
@@ -176,5 +176,9 @@ typedef struct _t_ {
 #define	MAX_GETCORE (size_t)(SSIZE_MAX & ~(ALIGN - 1))	/* round down ALIGN */
 #define	MAX_MALLOC (size_t)(SIZE_MAX - CORESIZE - 3 * ALIGN) /* overflow chk */
 #define	MAX_ALIGN	(1 + (size_t)SSIZE_MAX)
+
+#ifndef	SIZE_MAX
+#define	SIZE_MAX	INT_MAX
+#endif
 
 extern void	*GETCORE(ssize_t);

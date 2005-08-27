@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)picpack.sl	1.4 (gritter) 8/25/05";
+static const char sccsid[] USED = "@(#)picpack.sl	1.5 (gritter) 8/27/05";
 
 /*
  *
@@ -103,6 +103,7 @@ static const char sccsid[] USED = "@(#)picpack.sl	1.4 (gritter) 8/25/05";
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<stdarg.h>
 
 #include	"gen.h"			/* general purpose definitions */
 #include	"ext.h"			/* external variable definitions */
@@ -610,3 +611,48 @@ fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 		*llen = n;
 	return *line;
 }
+/*	from OpenSolaris "misc.c	1.6	05/06/08 SMI"	*/
+/*	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T	*/
+/*	  All Rights Reserved  	*/
+/*
+ * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
+ * Use is subject to license terms.
+ */
+/*
+ * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
+ */
+void
+error(int kind, char *mesg, ...)
+{
+
+
+/*
+ *
+ * Called when we've run into some kind of program error. *mesg is printed using
+ * the control string arguments a?. We'll quit if we're not ignoring errors and
+ * kind is FATAL.
+ *
+ */
+
+
+    if ( mesg != NULL && *mesg != '\0' )  {
+	va_list ap;
+
+	fprintf(stderr, "%s: ", prog_name);
+	va_start(ap, mesg);
+	vfprintf(stderr, mesg, ap);
+	va_end(ap);
+	if ( lineno > 0 )
+	    fprintf(stderr, " (line %ld)", lineno);
+	if ( position > 0 )
+	    fprintf(stderr, " (near byte %ld)", position);
+	putc('\n', stderr);
+    }	/* End if */
+
+    if ( kind == FATAL && ignore == OFF )  {
+	if ( temp_file != NULL )
+	    unlink(temp_file);
+	exit(x_stat | 01);
+    }	/* End if */
+
+}   /* End of error */
