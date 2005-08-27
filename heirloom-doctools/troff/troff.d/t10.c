@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.26 (gritter) 8/26/05
+ * Sccsid @(#)t10.c	1.27 (gritter) 8/28/05
  */
 
 /*
@@ -181,6 +181,7 @@ ptinit(void)
 	p = chname + dev.lchname;
 	for (i = 1; i <= nfonts; i++) {
 		fontbase[i] = (struct Font *) p;
+		fontbase[i]->spare1 = 0;
 		nw = *p & BYTEMASK;	/* 1st thing is width count */
 		fontlab[i] = PAIR(fontbase[i]->namefont[0], fontbase[i]->namefont[1]);
 		/* for now, still 2 char names */

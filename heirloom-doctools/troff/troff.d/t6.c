@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.47 (gritter) 8/27/05
+ * Sccsid @(#)t6.c	1.48 (gritter) 8/28/05
  */
 
 /*
@@ -866,6 +866,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 			f &= BYTEMASK;
 		loadafm(pos, f, fontbase[pos]->namefont, NULL);
 	} else {
+		fontbase[pos]->spare1 = 0;
 		nw = fontbase[pos]->nwfont & BYTEMASK;
 		if (nw > n) {
 			errprint("Font %s too big for position %d", shortname,
