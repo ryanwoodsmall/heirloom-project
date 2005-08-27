@@ -79,15 +79,15 @@ can be used to deactivate new features for compatibility reasons.
 	characters from a regular and an expert font.
 
 .hylang language
-	Sets the hyphenation language to "language", where language is
-	one of de_CH, de_DE, en_AU, en_CA, en_GB, en_US, fr_CA, or fr_FR.
-	Other languages can be made available by adding hyphenation files
-	to the directory /usr/ucblib/doctools/hyphen; the file format is
-	the same as for OpenOffice <http://www.openoffice.org>, which is
-	in turn derived from Knuth's file format for TeX.  Currently only
-	hyphenation files that use the "ISO8859-1" character encoding are
-	supported. If no "language" argument is present, the hyphenation
-	is reset to the traditional troff mechanism.
+	Sets the hyphenation language to "language", where language
+	is one of de_DE, de_DE@traditional, en_US, fr_FR, or la_VA
+	(some alternative country codes are also provided). Other
+	languages can be made available by adding hyphenation files to
+	the directory /usr/ucblib/doctools/hyphen; the file format is
+	the same as for OpenOffice <http://www.openoffice.org>. Currently
+	only hyphenation files that use the "ISO8859-1" character
+	encoding are supported. If no "language" argument is present,
+	the hyphenation is reset to the traditional troff mechanism.
 
 .kern [0|1]						troff only
 	Disables (0) or enables pairwise kerning. The default is enabled

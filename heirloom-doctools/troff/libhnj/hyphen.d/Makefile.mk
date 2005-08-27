@@ -8,6 +8,8 @@ install: all
 	done
 	rm -f $(ROOT)$(HYPDIR)/hyph_de_CH.dic
 	ln -s hyph_de_DE.dic $(ROOT)$(HYPDIR)/hyph_de_CH.dic
+	rm -f $(ROOT)$(HYPDIR)/hyph_de_CH@traditional.dic
+	ln -s hyph_de_DE@traditional.dic $(ROOT)$(HYPDIR)/hyph_de_CH@traditional.dic
 	rm -f $(ROOT)$(HYPDIR)/hyph_en_CA.dic
 	ln -s hyph_en_US.dic $(ROOT)$(HYPDIR)/hyph_en_CA.dic
 	rm -f $(ROOT)$(HYPDIR)/hyph_en_GB.dic
