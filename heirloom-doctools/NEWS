@@ -83,12 +83,11 @@ can be used to deactivate new features for compatibility reasons.
 	is one of de_DE, de_DE@traditional, en_US, fr_FR, it_IT, or
 	la_VA. Other languages can be made available by adding hyphenation
 	files to the directory /usr/ucblib/doctools/hyphen; see the notes
-	in "troff/libhnj/hyphen.d" for details. Currently only hyphenation
-	files that use the "ISO8859-1" character encoding are supported.
-	If no "language" argument is present, the hyphenation is reset to
-	the traditional troff mechanism. Note that hyphenation is disabled
-	by default if troff is used directly, and can be switched on using
-	the ".hy" request, which is what many macro packages do.
+	in "troff/libhnj/hyphen.d" for details. If no "language" argument
+	is present, the hyphenation is reset to the traditional troff
+	mechanism. Note that hyphenation is disabled by default if troff
+	is used directly, and can be switched on using the ".hy" request,
+	which is what many macro packages do.
 
 .kern [0|1]						troff only
 	Disables (0) or enables pairwise kerning. The default is enabled
