@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.39 (gritter) 8/27/05
+ * Sccsid @(#)dpost.c	1.40 (gritter) 8/27/05
  */
 
 /*
@@ -598,7 +598,7 @@ char		*optnames = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:OP:R:S:T:DI";
  */
 
 
-char		temp[150];
+char		temp[4096];
 
 
 /*****************************************************************************/
@@ -666,6 +666,24 @@ main(int agc, char *agv[])
 }   /* End of main */
 
 
+/*****************************************************************************/
+int
+sget(char *buf, size_t size, FILE *fp)
+{
+	int	c, n = 0;
+
+	do
+		c = getc(fp);
+	while (isspace(c));
+	if (c != EOF) do {
+		if (n+1 < size)
+			buf[n++] = c;
+		c = getc(fp);
+	} while (c != EOF && !isspace(c));
+	ungetc(c, fp);
+	buf[n] = 0;
+	return n > 1 ? 1 : c == EOF ? EOF : 0;
+}
 /*****************************************************************************/
 
 
@@ -777,7 +795,7 @@ header(FILE *fp)
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.39");
+    fprintf(fp, "%s: procset dpost %s 0\n", "%%BeginResource", "1.40");
     if ( cat(prologue, fp) == FALSE )
 	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s\n", "%%EndResource");
@@ -1151,7 +1169,7 @@ conv(
 
     register int	c;		/* usually first char in next command */
     int			m, n, n1, m1;	/* when we need to read integers */
-    char		str[50];	/* for special chars and font numbers */
+    char		str[4096];	/* for special chars and font numbers */
     char		b;
 
 
@@ -1191,7 +1209,7 @@ conv(
 		    break;
 
 	    case 'C':			/* special character */
-		    fscanf(fp, "%s", str);
+		    sget(str, sizeof str, fp);
 		    put1s(str);
 		    break;
 
@@ -1264,7 +1282,7 @@ conv(
 		    break;
 
 	    case 'f':			/* use font mounted here */
-		    fscanf(fp, "%s", str);
+		    sget(str, sizeof str, fp);
 		    setfont(t_font(str));
 		    break;
 
@@ -1339,7 +1357,7 @@ devcntrl(
 {
 
 
-    char	str[50], buf[4096], str1[50];
+    char	str[50], buf[4096], str1[4096];
     int		c, n;
 
 
@@ -1354,7 +1372,7 @@ devcntrl(
  */
 
 
-    fscanf(fp, "%s", str);		/* get the control function name */
+    sget(str, sizeof str, fp);		/* get the control function name */
 
     switch ( str[0] )  {		/* only the first character counts */
 
@@ -1363,7 +1381,7 @@ devcntrl(
 		break;
 
 	case 'T':			/* device name */
-		fscanf(fp, "%s", devname);
+		sget(devname, sizeof devname, fp);
 		getdevmap();
 		if (strcmp(devname, "7200"))
 			strcpy(devname, realdev);
@@ -1388,7 +1406,8 @@ devcntrl(
 		break;
 
 	case 'f':			/* load font in a position */
-		fscanf(fp, "%d %s", &n, str);
+		fscanf(fp, "%d", &n);
+		sget(str, sizeof str, fp);
 		fgets(buf, sizeof buf, fp);	/* in case there's a filename */
 		ungetc('\n', fp);	/* fgets() goes too far */
 		str1[0] = '\0';		/* in case there's nothing to come in */
@@ -1408,7 +1427,18 @@ devcntrl(
 		break;
 
 	case 'X':			/* copy through - from troff */
-		fscanf(fp, " %[^: \n]:", str);
+		do
+			c = getc(fp);
+		while (isspace(c));
+		n = 0;
+		if (c != EOF) do {
+			if (n + 1 < sizeof str)
+				str[n++] = c;
+			c = getc(fp);
+		} while (c != EOF && !isspace(c) && c != ':');
+		str[n] = 0;
+		if (c != ':')
+			ungetc(c, fp);
 		fgets(buf, sizeof(buf), fp);
 		ungetc('\n', fp);
 		if ( strcmp(str, "PI") == 0 || strcmp(str, "PictureInclusion") == 0 )
@@ -1483,7 +1513,7 @@ fontinit(void)
  */
 
 
-    sprintf(temp, "%s/dev%s/DESC.out", fontdir, devname);
+    snprintf(temp, sizeof temp, "%s/dev%s/DESC.out", fontdir, devname);
     if ( (fin = open(temp, O_RDONLY)) < 0 )
 	error(FATAL, "can't open tables for %s", temp);
 
@@ -1560,10 +1590,10 @@ loadfont (
     if (strchr(s, '/') != NULL)
 	strcpy(temp, s);
     else if (strstr(s, ".afm") != NULL)
-	sprintf(temp, "%s/dev%s/afm/%s", fontdir, devname, s);
+	snprintf(temp, sizeof temp, "%s/dev%s/afm/%s", fontdir, devname, s);
     else if ( s1 == NULL || s1[0] == '\0' )
-	sprintf(temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
-    else sprintf(temp, "%s/afm/%s.afm", s1, s);
+	snprintf(temp, sizeof temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
+    else snprintf(temp, sizeof temp, "%s/afm/%s.afm", s1, s);
 
     if ( (fin = open(temp, O_RDONLY)) >= 0 )  {
 	struct afmtab	*a;
@@ -1602,7 +1632,8 @@ loadfont (
 	}
 	free(contents);
 	afmfonts[afmcount] = a;
-	sprintf(a->Font.intname, "%d", dev.nfonts + ++afmcount);
+	snprintf(a->Font.intname, sizeof a->Font.intname,
+			"%d", dev.nfonts + ++afmcount);
 	if (forcespecial)
 		a->Font.specfont = 1;
 have:   fontbase[n] = &a->Font;
@@ -1613,11 +1644,12 @@ have:   fontbase[n] = &a->Font;
 	goto done;
     }
     if ( s1 == NULL || s1[0] == '\0' )
-	sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, s);
-    else sprintf(temp, "%s/%s.out", s1, s);
+	snprintf(temp, sizeof temp, "%s/dev%s/%s.out", fontdir, devname, s);
+    else snprintf(temp, sizeof temp, "%s/%s.out", s1, s);
 
     if ( (fin = open(temp, O_RDONLY)) < 0 )  {
-    fail:   sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, mapfont(s));
+    fail:   snprintf(temp, sizeof temp, "%s/dev%s/%s.out",
+			    fontdir, devname, mapfont(s));
 	    if ( (fin = open(temp, O_RDONLY)) < 0 )
 	        error(FATAL, "can't open font table %s", temp);
     }	/* End if */
@@ -1826,14 +1858,16 @@ getdevmap(void)
  */
 
 
-    sprintf(temp, "%s/dev%s/fontmaps/%s", fontdir, realdev, devname);
+    snprintf(temp, sizeof temp, "%s/dev%s/fontmaps/%s",
+		    fontdir, realdev, devname);
 
     if ( devfontmap == NULL && (fp = fopen(temp, "r")) != NULL )  {
 	devfontmap = (Devfontmap *) malloc(10 * sizeof(Devfontmap));
 
-	while ( fscanf(fp, "%s", temp) != EOF )  {
+	while ( sget(temp, sizeof temp, fp) == 1 ) {
 	    if ( temp[0] != '#' && strlen(temp) < 3 )
-		if ( fscanf(fp, "%s", &temp[3]) == 1 && strlen(&temp[3]) < 3 )  {
+		if ( sget(&temp[3], sizeof temp - 3, fp) == 1 &&
+				strlen(&temp[3]) < 3 )  {
 		    strcpy((devfontmap + i)->name, temp);
 		    strcpy((devfontmap + i)->use, &temp[3]);
 		    if ( ++i % 10 == 0 )
@@ -2125,7 +2159,8 @@ supply1(char *font, char *file, char *type)
     char line[4096], c;
 
     if (strchr(file, '/') == 0) {
-    	sprintf(temp, "%s/dev%s/%s/%s.%s", fontdir, devname, type, file, type);
+    	snprintf(temp, sizeof temp, "%s/dev%s/%s/%s.%s",
+			fontdir, devname, type, file, type);
 	file = temp;
     }
     if ((fp = fopen(file, "r")) == NULL)
@@ -2563,7 +2598,7 @@ t_sf(void)
 	fnum = 0;
 
     if ( fnum > 0 && seenfonts[fnum] == 0 && hostfontdir != NULL )  {
-	sprintf(temp, "%s/%s", hostfontdir, fontname[font].name);
+	snprintf(temp, sizeof temp, "%s/%s", hostfontdir, fontname[font].name);
 	if ( access(temp, 04) == 0 )
 	    doglobal(temp);
     }	/* End if */
@@ -3295,7 +3330,7 @@ addoctal (
 
 	case 2:
 	case 3:
-	    sprintf(strptr, "\\%03o", c);
+	    snprintf(strptr, sizeof strings - (strptr - strings), "\\%03o", c);
 	    strptr += strlen(strptr);
 	    break;
 
@@ -3345,12 +3380,13 @@ charlib (
     endtext();
 
     if ( lastc < 128 )  {		/* just a simple ASCII character */
-	sprintf(tname, "%.3o", lastc);
+	snprintf(tname, sizeof tname, "%.3o", lastc);
 	name = tname;
     } else name = &chname[chtab[lastc - 128]];
 
     if ( downloaded[lastc] == 0 )  {
-	sprintf(temp, "%s/dev%s/charlib/%s", fontdir, realdev, name);
+	snprintf(temp, sizeof temp, "%s/dev%s/charlib/%s",
+			fontdir, realdev, name);
 	if ( access(temp, 04) == 0 && doglobal(temp) == TRUE )  {
 	    downloaded[lastc] = 1;
 	    t_sf();
@@ -3361,7 +3397,8 @@ charlib (
 	xymove(hpos, vpos);
 	fprintf(tf, "%d build_%s\n", (int) lastw, name);
 	if ( code != 1 )  {		/* get the bitmap or whatever */
-	    sprintf(temp, "%s/dev%s/charlib/%s.map", fontdir, realdev, name);
+	    snprintf(temp, sizeof temp, "%s/dev%s/charlib/%s.map",
+			    fontdir, realdev, name);
 	    if ( access(temp, 04) == 0 && tf == stdout )
 		cat(temp, gf);
 	}   /* End if */
@@ -3434,10 +3471,11 @@ documentfonts(void)
 	if ( (temp_file = tempname("dpost")) == NULL )
 	    return;
 
-    sprintf(temp, "%s/dev%s/%s.name", fontdir, realdev, fontname[font].name);
+    snprintf(temp, sizeof temp, "%s/dev%s/%s.name",
+		    fontdir, realdev, fontname[font].name);
 
     if (fontname[font].afm == NULL && (fp_in = fopen(temp, "r")) != NULL )  {
-	if ( fscanf(fp_in, "%s", temp) == 1 )  {
+	if ( sget(temp, sizeof temp, fp_in) == 1 )  {
     print:  if ( (fp_out = fopen(temp_file, "a")) != NULL )  {
 		if ( docfonts++ == 0 )
 		    fprintf(fp_out, "%s", DOCUMENTFONTS);
