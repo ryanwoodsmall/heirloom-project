@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.8 (gritter) 8/28/05
+ * Sccsid @(#)nii.c	1.9 (gritter) 8/28/05
  */
 
 /*
@@ -156,4 +156,4 @@ struct	d d[NDI];
 struct	d *dip;
 int	mb_cur_max;
 struct env	initenv;
-int	kern;
+int	lastkern;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.18 (gritter) 8/28/05
+ * Sccsid @(#)n7.c	1.19 (gritter) 8/28/05
  */
 
 /*
@@ -332,7 +332,7 @@ t5:
 		pendt = 0;
 	adsp = adrem = 0;
 	if (ad) {
-		nel += kern;
+		nel += lastkern;
 		if (nwd == 1)
 			adsp = nel; 
 		else 
@@ -664,7 +664,7 @@ movword(void)
 {
 	register int w;
 	register tchar i, *wp, c;
-	int	savwch, hys, k;
+	int	savwch, hys;
 
 	over = 0;
 	wp = wordp;
@@ -705,9 +705,7 @@ movword(void)
 		}
 		i = *wp++;
 		w = width(i);
-		k = kernadjust(i, *wp);
-		w += k;
-		kern += k;
+		w += kernadjust(i, *wp);
 		wne -= w;
 		wch--;
 		storeline(i, w);

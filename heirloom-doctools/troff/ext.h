@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.15 (gritter) 8/28/05
+ * Sccsid @(#)ext.h	1.16 (gritter) 8/28/05
  */
 
 /*
@@ -106,8 +106,8 @@ extern	int	ifile;
 extern	int	ifl[NSO];
 extern	int	iflg;
 extern	int	init;
+extern	int	lastkern;
 extern	int	lead;
-extern	int	kern;
 extern	int	lg;
 extern	int	lgf;
 extern	int	macerr;
