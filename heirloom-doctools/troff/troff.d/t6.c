@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.50 (gritter) 8/28/05
+ * Sccsid @(#)t6.c	1.51 (gritter) 8/28/05
  */
 
 /*
@@ -232,12 +232,13 @@ getcw(register int i)
 	}
 	k = (k * xpts + (Unitwidth / 2)) / Unitwidth;
 	s = xpts*INCH/72;
+	kern = 0;
 	if (s <= tkftab[ofont].s1 && tkftab[ofont].n1) {
 		nocache = 1;
-		k += tkftab[ofont].n1;
+		kern = tkftab[ofont].n1;
 	} else if (s >= tkftab[ofont].s2 && tkftab[ofont].n2) {
 		nocache = 1;
-		k += tkftab[ofont].n2;
+		kern = tkftab[ofont].n2;
 	} else if (s > tkftab[ofont].s1 && s < tkftab[ofont].s2) {
 		int	r;
 		r = (s * tkftab[ofont].n2 - s * tkftab[ofont].n1
@@ -246,9 +247,10 @@ getcw(register int i)
 			/ (tkftab[ofont].s2 - tkftab[ofont].s1);
 		if (r != 0) {
 			nocache = 1;
-			k += r;
+			kern = r;
 		}
 	}
+	k += kern;
 	if (nocache|bd)
 		widcache[i].fontpts = 0;
 	else {
