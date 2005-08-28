@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.19 (gritter) 8/27/05
+ * Sccsid @(#)afm.c	1.20 (gritter) 8/28/05
  */
 
 #include <stdlib.h>
@@ -522,6 +522,8 @@ remap(struct afmtab *a)
 			np = afmnamelook(a, a->nametab[i]);
 			np->afpos = i;
 			np->fival[0] = j;
+			if (strcmp(a->nametab[i], "space") == 0)
+				np->fival[1] = 0;
 		}
 	}
 	space = malloc(a->nspace);
@@ -613,7 +615,8 @@ addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N)
 		a->fitab[C - 32] = a->nchars;
 		if (np)
 			np->fival[0] = C - 32;
-	}
+	} else if (C == 32 && np)
+		np->fival[0] = 0;
 	if (tp) {
 		a->fitab[tp - 32] = a->nchars;
 		if (np)
@@ -781,6 +784,10 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->nameprime = nextprime(n+NCHARLIB+1);
 			a->namecache = calloc(a->nameprime,
 					sizeof *a->namecache);
+			for (i = 0; i < a->nameprime; i++) {
+				a->namecache[i].fival[0] = -1;
+				a->namecache[i].fival[1] = -1;
+			}
 		} else if (state == CHARMETRICS && n-- > 0) {
 			addmetrics(a, cp, isSymbol);
 		} else if (state == CHARMETRICS &&
@@ -858,7 +865,7 @@ kernlook(struct afmtab *a, int ch1, int ch2)
 
 	h = hash((unsigned)ch1<<16 | (unsigned)ch2, a->kernprime);
 	kp = &a->kernpairs[c = h];
-	while (kp->ch1 != 0 || kp->ch2 != 0) {
+	while (kp->ch1 != 0 && kp->ch2 != 0) {
 		if (kp->ch1 == ch1 && kp->ch2 == ch2)
 			break;
 		c += n&1 ? -((n+1)/2) * ((n+1)/2) : ((n+1)/2) * ((n+1)/2);
@@ -906,9 +913,9 @@ addkernpair(struct afmtab *a, char *_line)
 		*lp = c;
 		n = unitconv(strtol(&lp[1], NULL, 10));
 		for (i = 0; i < 2; i++)
-			if (np1->fival[i])
+			if (np1->fival[i] >= 0)
 				for (j = 0; j < 2; j++)
-					if (np2->fival[j]) {
+					if (np2->fival[j] >= 0) {
 						kp = kernlook(a, np1->fival[i],
 								np2->fival[j]);
 						kp->ch1 = np1->fival[i];

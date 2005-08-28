@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.49 (gritter) 8/28/05
+ * Sccsid @(#)t6.c	1.50 (gritter) 8/28/05
  */
 
 /*
@@ -300,7 +300,7 @@ kernadjust(tchar c, tchar d)
 		s = pstab[s-1];
 	i = cbits(c);
 	j = cbits(d);
-	if (i > 32 && j > 32) {
+	if (i >= 32 && j >= 32) {
 		if (afmtab && (n = (fontbase[f]->spare1&BYTEMASK)-1) >= 0) {
 			a = afmtab[n];
 			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
@@ -354,10 +354,12 @@ postchar1(const char *temp, int f)
 		a = afmtab[i];
 		np = afmnamelook(a, temp);
 		if (np->afpos != 0) {
-			if (np->fival[0])
+			if (np->fival[0] >= 0)
 				return np->fival[0] + 32 + nchtab + 128;
-			else
+			else if (np->fival[1] >= 0)
 				return np->fival[1] + 32 + nchtab + 128;
+			else
+				return 0;
 		}
 	}
 	return(0);

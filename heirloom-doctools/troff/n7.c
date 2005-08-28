@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.16 (gritter) 8/28/05
+ * Sccsid %W% (gritter) %G%
  */
 
 /*
@@ -185,6 +185,7 @@ tbreak(void)
 					c == STRETCH);
 #endif /* NROFF */
 #endif /* EUC */
+			pad += kernadjust(i[-2], i[-1]);
 			i--;
 			pad += adsp;
 			--nwd;
@@ -261,7 +262,8 @@ d1:
 void
 text(void)
 {
-	register tchar i, c;
+	register tchar i, c, lasti = 0;
+	int	k = 0;
 	static int	spcnt;
 
 	nflush++;
@@ -289,6 +291,12 @@ text(void)
 		spcnt++;
 		numtab[HP].val += sps;
 		widthp = sps;
+		lasti = i;
+	}
+	if (lasti) {
+		k = kernadjust(lasti, i);
+		numtab[HP].val += k;
+		widthp += k;
 	}
 	if (nlflg) {
 t1:
@@ -302,7 +310,7 @@ t2:
 		tbreak();
 		if (nc || wch)
 			goto rtn;
-		un += spcnt * sps;
+		un += spcnt * sps + k;
 		spcnt = 0;
 		setnel();
 		if (trap)
@@ -673,6 +681,8 @@ movword(void)
 			wne -= sps;
 		}
 		wp--;
+		if (wp > wordp)
+			wne -= kernadjust(wp[-1], wp[0]);
 	}
 	if (wne > nel && !hyoff && hyf && (!nwd || nel > 3 * sps) &&
 	   (!(hyf & 02) || (findt1() > lss)))
@@ -786,7 +796,7 @@ getword(int x)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
 	char *mbbuf3p;
-	int wbf, n;
+	int wbf, n, k = 0;
 	tchar m;
 #endif /* NROFF */
 #endif /* EUC */
@@ -848,6 +858,8 @@ getword(int x)
 			storeword(i, sps);
 			continue;
 		}
+		k = kernadjust(j, ' ' | j & SFMASK);
+		numtab[HP].val += k;
 		break;
 	}
 #ifdef EUC
@@ -891,7 +903,7 @@ getword(int x)
 a0:
 #endif /* NROFF */
 #endif /* EUC */
-	storeword(' ' | chbits, sps);
+	storeword(' ' | chbits, sps + k);
 	if (spflg) {
 		if (xflag == 0 || ses != 0)
 			storeword(' ' | chbits, sps);
