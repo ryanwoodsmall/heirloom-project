@@ -6,9 +6,9 @@
 #define	USED
 #endif
 #ifdef	NROFF
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.123 (gritter) 8/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.124 (gritter) 8/29/05";
 #else	/* !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.123 (gritter) 8/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.124 (gritter) 8/29/05";
 #endif	/* !NROFF */
 /* SLIST */
 /*
@@ -19,7 +19,7 @@ mallint.h: * Sccsid @(#)mallint.h	1.4 (gritter) 8/27/05
 malloc.c: * Sccsid @(#)malloc.c	1.3 (gritter) 8/26/05
 n1.c: * Sccsid @(#)n1.c	1.30 (gritter) 8/26/05
 n2.c: * Sccsid @(#)n2.c	1.7 (gritter) 8/18/05
-n3.c: * Sccsid @(#)n3.c	1.35 (gritter) 8/28/05
+n3.c: * Sccsid @(#)n3.c	1.36 (gritter) 8/29/05
 n4.c: * Sccsid @(#)n4.c	1.8 (gritter) 8/23/05
 n5.c: * Sccsid @(#)n5.c	1.18 (gritter) 8/28/05
 n7.c: * Sccsid @(#)n7.c	1.22 (gritter) 8/29/05
