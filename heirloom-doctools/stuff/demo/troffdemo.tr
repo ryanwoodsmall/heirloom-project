@@ -1,0 +1,102 @@
+.\" Heirloom troff demonstration page
+.\" Sccsid @(#)troffdemo.tr	1.2 (gritter) 8/28/05
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.fpost 1 R awrg____ pfb
+.fpost 2 I awi_____ pfb
+.fpost 0 E axrg____ pfb
+.fpost 0 IE axi_____ pfb
+.fpost 0 O awor____ pfb
+.fallback R E
+.fallback E R
+.fallback I IE
+.flig R 31
+.flig I 31
+.hidechar R 0123456789
+.hidechar I 0123456789
+.tkf E 1 .3 24 3
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.ss 12 0
+.hy
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.ds rh \fO\[ornament28a]\fP
+.de F
+.	sp
+.	in \w'\\*(rh \|'u
+.	ti 0
+\\*(rh
+..
+.de P
+.	ti 1m
+..
+.ds : \^:
+.ds ; \^;
+.ds ! \^!
+.ds ? \^?
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.sp |2c
+\s(14\fO\l'\n(.lu\[ornament23b]'
+.sp |25.1c
+\s(14\fO\l'\n(.lu\[ornament23a]'
+.vs 15
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.sp |3.7c
+.po \n(.ou+3P
+.ll \n(.lu-6P
+.ad c
+.ps 24
+\fRHeirloom Documentation Tools
+.sp 1c
+\fITroff\| Demonstration Page
+.sp .9c
+\s(14\fO\[ornament10]
+.sp
+.ps 12
+\fEGunnar Ritter\fR
+.br
+8/28/05
+.sp 2v
+.ad b
+.ps 12
+.\"
+The \fItroff\fP\^ text processor
+from the Heirloom Documentation Tools project
+is a variant of the Unix application
+originally written by \fEJoseph F. Osanna\|\(dg\fR
+and \fEBrian W. Kernighan.\fR
+It has been derived from source code provided by
+the OpenSolaris project.
+One of the areas where Heirloom \fItroff\fP\^ has been specifically enhanced
+are its capabilities to work with PostScript fonts\*:
+.F
+PostScript Type 1 fonts can be used
+as supplied by their vendor
+without any need for conversion\*;
+\fItroff\fP\^ can access the font metrics
+in the \s-1AFM\s0 files directly,
+and the \fIdpost\fR\^ post-processor
+can embed glyph data from \s-1PFB\s0 files
+into the PostScript output it generates.
+.F
+``Expert'' fonts can be used,
+and \fItroff\fR\^ can be configured
+such that it accesses them transparently
+in alternation with the base font
+to produce extra ligatures, as in the words
+``effective,'' ``office,'' ``offline'',
+\fESmall Capitals\fR,
+or the old-style numerals 0 1 2 3 4 5 6 7 8 9
+without the need to type escape sequences for individual characters.
+.F
+Pairwise kerning and letter space tracking are supported\*;
+the page title provides an example for the former,
+and the latter is used for the \fESmall Capitals\fR in this document.
+.F
+The default resolution is now at 7200\ dpi\*;
+PostScript font metrics can thus be used
+without any loss of accuracy.
+.sp
+.in 0
+Heirloom \fItroff\fP\^ is free software\*;
+its \fIC\fP\^ source code can be obtained at no charge from
+<http://heirloom.sourceforge.net/doctools.html>.
+It runs on a wide variety of Unix systems.
