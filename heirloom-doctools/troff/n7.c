@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.21 (gritter) 8/28/05
+ * Sccsid @(#)n7.c	1.22 (gritter) 8/29/05
  */
 
 /*
@@ -360,6 +360,7 @@ nofill(void)
 {
 	register int j;
 	register tchar i, nexti;
+	int k, oev;
 
 	if (!pendnf) {
 		over = 0;
@@ -387,12 +388,18 @@ nofill(void)
 			ckul();
 			return;
 		}
-		nexti = GETCH();
 		j = width(i);
-		j += kernadjust(i, nexti);
 		widthp = j;
 		numtab[HP].val += j;
 		storeline(i, j);
+		oev = ev;
+		nexti = GETCH();
+		if (ev == oev) {
+			k = kernadjust(i, nexti);
+			ne += k;
+			nel += k;
+			numtab[HP].val += k;
+		}
 	}
 	if (ce) {
 		ce--;
@@ -964,8 +971,8 @@ g0:
 	if (1) {
 		int	oev = ev;
 		nexti = GETCH();
-		k = kernadjust(i, nexti);
 		if (ev == oev) {
+			k = kernadjust(i, nexti);
 			wne += k;
 			widthp += k;
 			numtab[HP].val += k;
