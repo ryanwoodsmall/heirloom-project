@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid %W% (gritter) %G%
+ * Sccsid @(#)n7.c	1.17 (gritter) 8/28/05
  */
 
 /*
@@ -787,7 +787,7 @@ setnel(void)
 int
 getword(int x)
 {
-	register int j, k;
+	register int j, k = 0;
 	int	lastj = 0;
 	register tchar i, *wp, nexti;
 	int noword;
@@ -796,7 +796,7 @@ getword(int x)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
 	char *mbbuf3p;
-	int wbf, n, k = 0;
+	int wbf, n;
 	tchar m;
 #endif /* NROFF */
 #endif /* EUC */

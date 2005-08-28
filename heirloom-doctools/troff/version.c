@@ -22,7 +22,7 @@ n2.c: * Sccsid @(#)n2.c	1.7 (gritter) 8/18/05
 n3.c: * Sccsid @(#)n3.c	1.35 (gritter) 8/28/05
 n4.c: * Sccsid @(#)n4.c	1.8 (gritter) 8/23/05
 n5.c: * Sccsid @(#)n5.c	1.17 (gritter) 8/23/05
-n7.c: * Sccsid @(#)version.c	1.117 (gritter) 8/28/05
+n7.c: * Sccsid @(#)n7.c	1.17 (gritter) 8/28/05
 n8.c: * Sccsid @(#)n8.c	1.11 (gritter) 8/26/05
 n9.c: * Sccsid @(#)n9.c	1.14 (gritter) 8/25/05
 ni.c: * Sccsid @(#)ni.c	1.13 (gritter) 8/25/05
