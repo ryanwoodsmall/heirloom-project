@@ -135,8 +135,9 @@ can be used to deactivate new features for compatibility reasons.
 	does not cause a hyphen to be printed if the line is split.
 
 \[name]							troff only
-	selects the character "name" as defined in the .afm file for the
-	current font.
+	selects the character "name" as defined in the AFM file for the
+	current font. The file "stuff/showfont.sh" can be used to display
+	the characters in a PostScript font along with their names.
 
 \E
 	is similar to "\e", but is not interpreted in copy mode.
@@ -161,4 +162,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   8/27/05
+Gunnar Ritter                                                   8/28/05
