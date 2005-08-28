@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.17 (gritter) 8/23/05
+ * Sccsid @(#)n5.c	1.18 (gritter) 8/28/05
  */
 
 /*
@@ -576,7 +576,6 @@ static struct evnames {
 } *evnames;
 static struct env	*evp;
 static int	*evlist;
-static int	ev;
 static int	evi;
 static int	evlsz;
 static int	Nev = NEV;

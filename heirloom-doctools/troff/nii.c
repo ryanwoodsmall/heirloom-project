@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.9 (gritter) 8/28/05
+ * Sccsid @(#)nii.c	1.10 (gritter) 8/28/05
  */
 
 /*
@@ -136,6 +136,7 @@ int	noscale;
 int	po1;
 int	nlist[NTRAP];
 int	mlist[NTRAP];
+int	ev;
 int	tty;
 int	sfont	= FT;	/* appears to be "standard" font; used by .ul */
 int	sv;
