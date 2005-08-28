@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.52 (gritter) 8/28/05
+ * Sccsid @(#)t6.c	1.53 (gritter) 8/28/05
  */
 
 /*
@@ -52,6 +52,8 @@
  * width functions, sizes and fonts
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include "tdef.h"
 #include "dev.h"
@@ -1333,7 +1335,7 @@ casefzoom(void)
 			buf = realloc(buf, (sz += 8) * sizeof *buf);
 		buf[n++] = c;
 	} while (c);
-	f = strtof(buf, &bp);
+	f = strtod(buf, &bp);
 	if (*bp == '\0' && f >= 0) {
 		zoomtab[j] = f;
 		zapwcache(0);
