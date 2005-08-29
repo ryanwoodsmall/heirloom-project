@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.41 (gritter) 8/28/05
+ * Sccsid @(#)dpost.c	1.42 (gritter) 8/29/05
  */
 
 /*
@@ -95,22 +95,6 @@
  * related output to separate routines. It makes dpost work harder, but changing
  * things is easy. For example adding stuff to support widthshow took less than
  * an hour.
- *
- * According to Adobe's structuring conventions, the output produced by dpost is
- * still nonconforming. Global definitions that are occasionally made in individual
- * pages are the primary problem. Among other things they handle downloading host
- * resident fonts and defining special characters not generally available on
- * PostScript printers. The approach used here works on a demand basis and violates
- * page independence. A definition is made once in the first page that needs it
- * and is bracketed by PostScript code that ensures the definition is exported to
- * the global environment where it will be available for use by all the pages that
- * follow.  Simple changes, like downloading definitions the first time they're
- * used in each page, restores page independence but wouldn't be an efficient
- * solution. Other approaches are also available, but every one I've considered
- * sacrifices much in efficiency - just to maintain page independence. I'll leave
- * things be for now. Global definitions made in individual pages are bracketed
- * by %%BeginGlobal and %%EndGlobal comments and can easily be pulled out of
- * individual pages and put in the prologue by utility programs like postreverse.
  *
  * I've also added code that handles the DOCUMENTFONTS comment, although it's
  * only produced for those fonts in directory /usr/lib/font/devpost that have an
@@ -263,8 +247,16 @@
  * 
  * 	Subcommands like "i" are often spelled out like "init".
  *
+ *
+ *
+ * To get dpost output conforming to Adobe's structuring conventions (DSC),
+ * all output is accumulated in temporary files first. When the document is
+ * completed, files that contain global data are output first, followed by
+ * regular commands, all surrounded by DSC comments. Speed problems, which
+ * were the reason why this was not done by previous versions of dpost, are
+ * no longer of concern in 2005 since several hundred pages of text are
+ * processed now in less than a second.
  */
-
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -285,6 +277,16 @@
 #include	"dev.h"			/* typesetter and font descriptions */
 #include	"dpost.h"		/* a few definitions just used here */
 #include	"afm.h"
+
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)		_IO_getc_unlocked(f)
+#endif
+#if defined (__GLIBC__) && defined (_IO_putc_unlocked)
+#undef	putc
+#define	putc(c, f)	_IO_putc_unlocked(c, f)
+#endif
 
 
 char		*prologue = DPOST;	/* the basic PostScript prologue */
@@ -440,6 +442,17 @@ int		lastend;		/* where last character on this line was */
  * fontname[] keeps track of the mounted fonts. Filled in (by t_fp()) from data
  * in the binary font files.
  *
+ * When font metrics are directly read from AFM files, all characters that
+ * are not ASCII are put into the remaining positions in a PostScript encoding
+ * vector. Their position in this vector in recorded in afmmap, and characters
+ * from troff are translated if necessary.
+ *
+ * Currently only one encoding vector per physical font is built, and thus at
+ * most 255 characters from it can be accessed. If access to more characters
+ * becomes required in the future, multiple virtual fonts, each with its own
+ * encoding vector, could be created for each physical font. dpost then had
+ * to change between them if necessary without an explicit request by troff.
+ *
  */
 
 
@@ -579,17 +592,6 @@ FILE		*fp_acct = NULL;	/* accounting stuff written here */
 
 /*
  *
- * Need the list of valid options in header() and options(), so I've moved the
- * definition here.
- *
- */
-
-
-char		*optnames = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:OP:R:S:T:DI";
-
-
-/*
- *
  * Very temporary space that can be used to do things like building up pathnames
  * immediately before opening a file. Contents may not be preserved across calls
  * to subroutines defined in this file, so it probably should only be used in low
@@ -609,7 +611,7 @@ main(int agc, char *agv[])
 
 
 {
-    const char	template[] = "/var/tmp/dpost.XXXXXX";
+    const char	template[] = "/var/tmp/dpostXXXXXX";
     char	*tp;
     FILE	*fp;
 
@@ -656,11 +658,11 @@ main(int agc, char *agv[])
     options();				/* command line options */
     arguments();			/* translate all the input files */
     done();				/* add trailing comments etc. */
-    account();				/* job accounting data */
 
     fp = fdopen(ostdout, "w");
     header(fp);			/* PostScript file structuring comments */
 
+    account();				/* job accounting data */
     return(x_stat);			/* everything probably went OK */
 
 }   /* End of main */
@@ -741,42 +743,25 @@ pdfdate(time_t *tp, char *buf, size_t size)
 }
 /*****************************************************************************/
 
-
 void
 header(FILE *fp)
 
 
 {
 
+/*
+ *
+ * Print the DSC header, followed by the data generated so far. This function
+ * is now called after all input has been processed.
+ *
+ */
 
-    int		ch;			/* return value from getopt() */
-    int		old_optind = optind;	/* for restoring optind - should be 1 */
+
     time_t	now;
     int		n;
     char	buf[4096];
     char	crdbuf[40];
 
-
-/*
- *
- * Scans the option list looking for things, like the prologue file, that we need
- * right away but could be changed from the default. Doing things this way is an
- * attempt to conform to Adobe's latest file structuring conventions. In particular
- * they now say there should be nothing executed in the prologue, and they have
- * added two new comments that delimit global initialization calls. Once we know
- * where things really are we write out the job header, follow it by the prologue,
- * and then add the ENDPROLOG and BEGINSETUP comments.
- *
- */
-
-
-    while ( (ch = getopt(argc, argv, optnames)) != EOF )
-	if ( ch == 'L' )
-	    setpaths(optarg);
-	else if ( ch == '?' )
-	    error(FATAL, "");
-
-    optind = old_optind;		/* get ready for option scanning */
 
     time(&now);
     fprintf(fp, "%s", CONFORMING);
@@ -827,11 +812,9 @@ options(void)
 
 {
 
+    const char		optnames[] = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:OP:R:S:T:DI";
 
     int		ch;			/* name returned by getopt() */
-
-    extern char	*optarg;		/* option argument set by getopt() */
-    extern int	optind;
 
 
 /*
