@@ -64,6 +64,11 @@ the following example properly:
 	.sp
 	The first five small letters of the Greek alphabet: α β γ δ ε
 
+Note that any use of AFM files requires that the output of troff is
+passed to the exactly matching version of dpost, i.e. to the one that
+was delivered with the same release of this package. Sending such
+troff output directly to a print spooler will thus usually not work.
+
 The old ditroff method requires font tables to be generated manually.
 It is still supported, and is still the default for the lower-resolution
 "post" PostScript device, but it is not recommended anymore that it is
