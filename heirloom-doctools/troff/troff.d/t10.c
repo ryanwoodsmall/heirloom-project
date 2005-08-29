@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.27 (gritter) 8/28/05
+ * Sccsid @(#)t10.c	1.28 (gritter) 8/29/05
  */
 
 /*
@@ -376,11 +376,11 @@ ptout0(tchar *pi, tchar *pend)
 	if (k == CHARHT) {
 		if (xpts != mpts || zoomtab[xfont] != mzoom)
 			ptps();
-		fdprintf(ptid, "x H %d\n", sbits(i));
+		fdprintf(ptid, "x H %d\n", (int)sbits(i));
 		return(pi+outsize);
 	}
 	if (k == SLANT) {
-		fdprintf(ptid, "x S %d\n", sfbits(i)-180);
+		fdprintf(ptid, "x S %d\n", (int)sfbits(i)-180);
 		return(pi+outsize);
 	}
 	if (k == WORDSP) {
@@ -486,7 +486,7 @@ ptout0(tchar *pi, tchar *pend)
 			break;
 		case DRAWSPLINE:	/* spline */
 		default:	/* something else; copy it like spline */
-			fdprintf(ptid, "D%c %d %d", cbits(pi[1]), dx, dy);
+			fdprintf(ptid, "D%c %d %d", (int)cbits(pi[1]), dx, dy);
 			w = 0;
 			hpos += dx;
 			vpos += dy;
