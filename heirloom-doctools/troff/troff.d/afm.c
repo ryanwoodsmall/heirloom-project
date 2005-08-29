@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.20 (gritter) 8/28/05
+ * Sccsid @(#)afm.c	1.21 (gritter) 8/29/05
  */
 
 #include <stdlib.h>
@@ -801,9 +801,9 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		} else if (state == KERNDATA &&
 				(th = thisword(cp, "StartKernPairs")) != 0) {
 			a->nkernpairs = n = strtol(th, NULL, 10);
-			a->kernprime = nextprime(a->nkernpairs);
+			a->kernprime = nextprime(4 * a->nkernpairs);
 			state = KERNPAIRS;
-			a->kernpairs = calloc(4 * a->kernprime,
+			a->kernpairs = calloc(a->kernprime,
 					sizeof *a->kernpairs);
 		} else if (state == KERNPAIRS && n-- > 0) {
 			addkernpair(a, cp);
