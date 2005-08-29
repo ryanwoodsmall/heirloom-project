@@ -23,15 +23,15 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.6 (gritter) 8/24/05
+ * Sccsid @(#)troff.h	1.7 (gritter) 8/29/05
  */
 
-extern struct tkftab {
+extern struct tracktab {
 	int	s1;
 	int	n1;
 	int	s2;
 	int	n2;
-} *tkftab;
+} *tracktab;
 
 extern	int		Nfont;
 extern	struct Font	**fontbase;

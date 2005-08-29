@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.4 (gritter) 8/29/05
+.\" Sccsid @(#)troffdemo.tr	1.5 (gritter) 8/29/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Mount fonts from the Adobe Caslon family, including ornaments.
 .fpost 1 R awrg____ pfb
@@ -14,9 +14,9 @@
 .flig I 31
 .hidechar R 0123456789
 .hidechar I 0123456789
-.tkf R 1 .10 24 0
-.tkf I 1 .10 24 0
-.tkf E 1 .3 24 3
+.track R 1 .10 24 0
+.track I 1 .10 24 0
+.track E 1 .3 24 3
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Disable sentence spacing.
 .ss 12 0

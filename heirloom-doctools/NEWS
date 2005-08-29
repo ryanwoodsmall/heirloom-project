@@ -108,7 +108,7 @@ can be used to deactivate new features for compatibility reasons.
 	white space is added. Otherwise, a space of size n is added as
 	usual.
 
-.tkf ff s1 n1 s2 n2					troff only
+.track ff s1 n1 s2 n2					troff only
 	specifies tracking of letter space for font ff. If the current font
 	is ff and the point size is below or equal to s1, white space of
 	width n1 is added to each character. If the point size is above or
@@ -117,7 +117,8 @@ can be used to deactivate new features for compatibility reasons.
 	as a value between n1 and n2 using the current point size s:
 	(s * n2 - s * n1 + s2 * n1 - s1 * n2) / (s2 - s1). The default unit
 	for all numeric arguments is "p". Negative numbers are accepted and
-	cause a decrease of letter space. Tracking also applies to haracters
+	cause a decrease of letter space. No adjustment is performed on the
+	last character of an output line. Tracking also applies to characters
 	from another font that have been selected by the fallback sequence.
 
 \$*
@@ -162,4 +163,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   8/28/05
+Gunnar Ritter                                                   8/29/05

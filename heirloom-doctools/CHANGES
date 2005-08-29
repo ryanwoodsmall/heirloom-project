@@ -24,7 +24,7 @@ Release ...
   localization setting from within a document.
 * troff: It is now possible to use "\[name]", where name is a character
   defined in the .afm file for the current font.
-* troff: The ".tkf" request for tracking letter space has been added.
+* troff: The ".track" request for tracking letter space has been added.
 * troff: The ".fallback" request for selecting the order in which fonts
   are searched for missing characters in the current font has been added.
 * troff: The ".hidechar" request hides characters from a font which are

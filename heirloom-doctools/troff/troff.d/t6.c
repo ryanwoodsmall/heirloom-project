@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.53 (gritter) 8/28/05
+ * Sccsid @(#)t6.c	1.54 (gritter) 8/29/05
  */
 
 /*
@@ -77,7 +77,7 @@ int	*ccstab;
 int	**fallbacktab;
 float	*zoomtab;
 int	*bdtab;
-struct tkftab	*tkftab;
+struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
 
@@ -235,18 +235,18 @@ getcw(register int i)
 	k = (k * xpts + (Unitwidth / 2)) / Unitwidth;
 	s = xpts*INCH/72;
 	lastkern = 0;
-	if (s <= tkftab[ofont].s1 && tkftab[ofont].n1) {
+	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1) {
 		nocache = 1;
-		lastkern = tkftab[ofont].n1;
-	} else if (s >= tkftab[ofont].s2 && tkftab[ofont].n2) {
+		lastkern = tracktab[ofont].n1;
+	} else if (s >= tracktab[ofont].s2 && tracktab[ofont].n2) {
 		nocache = 1;
-		lastkern = tkftab[ofont].n2;
-	} else if (s > tkftab[ofont].s1 && s < tkftab[ofont].s2) {
+		lastkern = tracktab[ofont].n2;
+	} else if (s > tracktab[ofont].s1 && s < tracktab[ofont].s2) {
 		int	r;
-		r = (s * tkftab[ofont].n2 - s * tkftab[ofont].n1
-				+ tkftab[ofont].s2 * tkftab[ofont].n1
-				- tkftab[ofont].s1 * tkftab[ofont].n2)
-			/ (tkftab[ofont].s2 - tkftab[ofont].s1);
+		r = (s * tracktab[ofont].n2 - s * tracktab[ofont].n1
+				+ tracktab[ofont].s2 * tracktab[ofont].n1
+				- tracktab[ofont].s1 * tracktab[ofont].n2)
+			/ (tracktab[ofont].s2 - tracktab[ofont].s1);
 		if (r != 0) {
 			nocache = 1;
 			lastkern = r;
@@ -897,7 +897,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	bdtab[pos] = cstab[pos] = ccstab[pos] = 0;
 	zoomtab[pos] = 0;
 	fallbacktab[pos] = NULL;
-	memset(&tkftab[pos], 0, sizeof tkftab[pos]);
+	memset(&tracktab[pos], 0, sizeof tracktab[pos]);
 		/* if there is a directory, no place to store its name. */
 		/* if position isn't zero, no place to store its value. */
 		/* only time a FONTPOS is pushed back is if it's a */
@@ -1219,7 +1219,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
 	zoomtab[nf] = 0;
 	fallbacktab[nf] = NULL;
-	memset(&tkftab[nf], 0, sizeof tkftab[nf]);
+	memset(&tracktab[nf], 0, sizeof tracktab[nf]);
 	nafm++;
 	if (nf > nfonts)
 		nfonts = nf;
@@ -1238,7 +1238,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 }
 
 int
-tkfnum(void)
+tracknum(void)
 {
 	skip();
 	dfact = INCH;
@@ -1248,7 +1248,7 @@ tkfnum(void)
 }
 
 void
-casetkf(void)
+casetrack(void)
 {
 	int	i, j, s1, n1, s2, n2;
 
@@ -1256,18 +1256,18 @@ casetkf(void)
 	i = getrq();
 	if ((j = findft(i)) < 0)
 		return;
-	s1 = tkfnum();
+	s1 = tracknum();
 	if (!nonumb) {
-		n1 = tkfnum();
+		n1 = tracknum();
 		if (!nonumb) {
-			s2 = tkfnum();
+			s2 = tracknum();
 			if (!nonumb) {
-				n2 = tkfnum();
+				n2 = tracknum();
 				if (!nonumb) {
-					tkftab[j].s1 = s1;
-					tkftab[j].n1 = n1;
-					tkftab[j].s2 = s2;
-					tkftab[j].n2 = n2;
+					tracktab[j].s1 = s1;
+					tracktab[j].n1 = n1;
+					tracktab[j].s2 = s2;
+					tracktab[j].n2 = n2;
 					zapwcache(0);
 				}
 			}
