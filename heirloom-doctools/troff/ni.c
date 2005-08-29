@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.13 (gritter) 8/25/05
+ * Sccsid @(#)ni.c	1.14 (gritter) 8/29/05
  */
 
 /*
@@ -84,6 +84,7 @@ const struct numtab initnumtab[] = {
 	{ PAIR('s', 'b') },
 	{ PAIR('c', '.') },
 	{ PAIR('$', '$') },
+	{ 0 }
 };
 
 
