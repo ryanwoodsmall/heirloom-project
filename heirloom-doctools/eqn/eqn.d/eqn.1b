@@ -1,5 +1,5 @@
 '\" e
-.\" Sccsid @(#)eqn.1b	1.2 (gritter) 8/12/05
+.\" Sccsid @(#)eqn.1b	1.3 (gritter) 8/30/05
 .\" Derived from eqn(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,14 +32,18 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH EQN 1B "8/12/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH EQN 1B "8/30/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .EQ
 delim $$
 .EN
 .SH NAME
 eqn, neqn, checkeq \- (BSD) typeset mathematics
 .SH SYNOPSIS
-\fB/usr/ucb/eqn\fR [\fB\-d\fIxy\fR] [\fB\-f\fIn\fR] [\fB\-s\fIn\fR]
+\fB/usr/ucb/eqn\fR
+[\fB\-d\fIxy\fR]
+[\fB\-f\fIn\fR]
+[\fB\-r\fIn\fR]
+[\fB\-s\fIn\fR]
 [\fIfile\fR] ...
 .br
 \fB/usr/ucb/neqn\fR [\fIfile\fR] ...
@@ -311,6 +315,20 @@ and can be used to communicate
 with 
 .I troff
 when all else fails.
+.PP
+The
+.BI \-r n
+option tells
+.I eqn
+that the resolution of
+.I troff
+is
+.I n
+dpi.
+It is necessary to give this argument
+if the resolution of the output device differs
+from the default 7200\ dpi,
+as in `eqn \-r720 | troff \-Tpost'.
 .SH "SEE ALSO"
 .PP
 troff(1b), tbl(1b), ms(7), eqnchar(7)
@@ -322,7 +340,7 @@ Typesetting Mathematics\(emUser's Guide
 J. F. Ossanna,
 .ul
 NROFF/TROFF User's Manual
-.SH BUGS
+.SH NOTES
 .PP
 To embolden digits, parens, etc.,
 it is necessary to quote them,

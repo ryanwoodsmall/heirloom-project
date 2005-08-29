@@ -49,6 +49,8 @@ Release ...
   to ensure that following "\X'PS: ...'" escapes work as expected.
 * The "-mpictures" macros have been added from Plan 9 sources.
 * The "picpack" preprocessor has been added.
+* eqn: The default resolution has been changed to 7200 dpi to match that
+  of troff. The "-r" option was introduced to change it.
 * The file "NEWS" describes new troff language features.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
 * [nt]roff: There is no static limit on the ".hw" table anymore.

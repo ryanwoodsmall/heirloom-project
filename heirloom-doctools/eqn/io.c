@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.7 (gritter) 8/13/05
+ * Sccsid @(#)io.c	1.8 (gritter) 8/30/05
  */
 
 # include "e.h"
@@ -219,6 +219,7 @@ setfile(int argc, char **argv) {
 		case 'p': deltaps = atoi(&svargv[1][2]); break;
 		case 'f': gfont = svargv[1][2]; break;
 		case 'e': noeqn++; break;
+		case 'r': resolution = atoi(&svargv[1][2]); break;
 		case 0:	goto endargs; 
 		default: dbg = 1;
 		}
