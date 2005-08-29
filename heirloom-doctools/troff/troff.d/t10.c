@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.29 (gritter) 8/29/05
+ * Sccsid @(#)t10.c	1.30 (gritter) 8/29/05
  */
 
 /*
@@ -419,7 +419,7 @@ ptout0(tchar *pi, tchar *pend)
 	if (lead)
 		ptlead();
 	if (&pi[outsize] < pend)
-		w += kernadjust(pi[0], pi[outsize]);
+		w += getkw(pi[0], pi[outsize]);
 	j = z = 0;
 	if (k != DRAWFCN) {
 		if (cs) {

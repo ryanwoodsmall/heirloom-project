@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.54 (gritter) 8/29/05
+ * Sccsid @(#)t6.c	1.55 (gritter) 8/29/05
  */
 
 /*
@@ -286,11 +286,21 @@ abscw(int n)	/* return index of abs char n in fontab[], etc. */
 int
 kernadjust(tchar c, tchar d)
 {
+	if (!kern || ismot(c) || ismot(d))
+		return 0;
+	c = trtab[cbits(c)] | c & SFMASK;
+	d = trtab[cbits(d)] | c & SFMASK;
+	return getkw(c, d);
+}
+
+int
+getkw(tchar c, tchar d)
+{
 	struct afmtab	*a;
 	int	f, i, j, k, n, s;
 	float	z;
 
-	if (!kern || ismot(c) || ismot(d) || iszbit(c) || iszbit(d))
+	if (!kern || iszbit(c) || iszbit(d))
 		return 0;
 	if (sfbits(c) != sfbits(d))
 		return 0;
