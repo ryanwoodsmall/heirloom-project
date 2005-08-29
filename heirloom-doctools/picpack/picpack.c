@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)picpack.sl	1.5 (gritter) 8/27/05";
+static const char sccsid[] USED = "@(#)picpack.sl	1.6 (gritter) 8/29/05";
 
 /*
  *
@@ -449,7 +449,7 @@ do_inline(
 {
 
 
-    off_t	size;			/* and its size in bytes - from fstat */
+    long	size;			/* and its size in bytes - from fstat */
     FILE	*fp;			/* for reading file *name */
     int		ch;			/* next character from picture file */
     int		lastch = '\n';		/* so we know when to put out \! */
