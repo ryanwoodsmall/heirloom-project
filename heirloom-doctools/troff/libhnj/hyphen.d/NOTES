@@ -18,38 +18,41 @@ use with troff:
    c) Delete everything except the \patterns{} and \hyphenation{} parts;
       the latter may be missing.
 
-   d) Recode the \hyphenation{} part, if any, to the same format as the
+   d) Delete all remaining comments, i.e. any "%" character and following
+      ones to the end of the line.
+
+   e) Recode the \hyphenation{} part, if any, to the same format as the
       \patterns{} part. Replace each hyphen by a "9", and insert an "8"
       after any letter that is not followed by a hyphen. The first and
       last characters of each word are not hyphenated anyway, so there
       is no need to insert an "8" there. Surround each word by dots. In
       effect, "phil-an-thropic" becomes ".ph8i8l9a8n9t8h8r8o8p8ic."
 
-   e) Delete remaining part separators, if any.
+   f) Delete remaining part separators, if any.
 
-   f) Reformat the file such that each pattern is on a single line, and
+   g) Reformat the file such that each pattern is on a single line, and
       delete any other white space.
 
-   g) Replace any non-ASCII characters in one of the TeX encodings by
+   h) Replace any non-ASCII characters in one of the TeX encodings by
       their ISO-8859-1 equivalents. If this is not possible, delete the
       individual pattern (or contact me if you are willing and feel able
       to contribute support for hyphenation of other encodings to troff).
 
-   h) Run "perl substring.pl tmp_file". This will print a lot of output,
+   i) Run "perl substring.pl tmp_file". This will print a lot of output,
       and will finally generate the file "hyphen.mashed". Move it to
       "hyph_<lc>_<CC>[@extra].dic", where "lc" is a language code, and
       "CC" is a country code, as appropriate. The optional "@extra" part
       may be added to describe special variations.
 
-   i) Add the line "ISO8859-1" as the first line of the new file.
+   j) Add the line "ISO8859-1" as the first line of the new file.
 
-   j) Insert copyright/authorship statements from the original file into
+   k) Insert copyright/authorship statements from the original file into
       the new one using "%" as a comment character. Supply any information
       that is additionally demanded by the license of the original.
 
-   k) Insert a prominent remark that you changed the file, and that you
+   l) Insert a prominent remark that you changed the file, and that you
       will accept bug reports for your variant.
 
-   l) Contribute your work if you like.
+   m) Contribute your work if you like.
 
-Gunnar Ritter                                                      8/27/05
+Gunnar Ritter                                                      8/29/05
