@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.9 (gritter) 8/30/05
+.\" Sccsid @(#)troffdemo.tr	1.10 (gritter) 8/30/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .papersize a4
 .ll 17c
@@ -92,7 +92,7 @@ and \fItroff\fR\^ can be configured
 such that it accesses them transparently
 in alternation with the base font
 to produce extra ligatures, as in the words
-``effective,'' ``office,'' ``offline'',
+``effective,'' ``office,'' ``offline,''
 \fESmall Capitals\fR,
 or the old-style numerals 0 1 2 3 4 5 6 7 8 9
 without the need to type escape sequences for individual characters.
