@@ -107,7 +107,9 @@ can be used to deactivate new features for compatibility reasons.
 	and the postprocessor is instructed to generate appropriate device
 	setup commands. The last action is the real reason why this request
 	exists; without it, PostScript printers may displace the pages of
-	the document.
+	the document. The default are "letter" measurements but no device
+	setup commands. This request should be used early in a document;
+	if it is given multiple times, the last one will setup the device.
 
 .return
 	immediately returns from the current macro to the level above.
@@ -173,4 +175,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   8/30/05
+Gunnar Ritter                                                   8/31/05
