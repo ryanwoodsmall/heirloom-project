@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.19 (gritter) 8/30/05
+ * Sccsid @(#)n5.c	1.20 (gritter) 8/30/05
  */
 
 /*
@@ -594,12 +594,14 @@ findev(int *number, char *name)
 				*number = -1 - i;
 				return &evp[i];
 			}
+		*number = -1 - i;
 		return NULL;
 	} else if (*number >= NEV) {
 		for (i = 0; i < Nev-NEV; i++)
 			if (evnames[i].name == NULL &&
 					evnames[i].number == *number)
 				return &evp[i];
+		*number = -1 - i;
 		return NULL;
 	} else {
 #ifdef	INCORE
