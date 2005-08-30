@@ -99,6 +99,16 @@ can be used to deactivate new features for compatibility reasons.
 	useful to specify an input character set regardless of environment
 	influences.
 
+.papersize executive|letter|legal|leger|tabloid|aN|bN|cN|x y	troff only
+	sets the paper size to the given format, which may be either one
+	of the predefined American or international formats (such as a4),
+	or a user-defined format "x y". The page length is set from these
+	parameters, the page offset and line length are adjusted as needed,
+	and the postprocessor is instructed to generate appropriate device
+	setup commands. The last action is the real reason why this request
+	exists; without it, PostScript printers may displace the pages of
+	the document.
+
 .return
 	immediately returns from the current macro to the level above.
 
@@ -163,4 +173,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   8/29/05
+Gunnar Ritter                                                   8/30/05

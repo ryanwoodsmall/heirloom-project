@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.42 (gritter) 8/29/05
+ * Sccsid @(#)dpost.c	1.43 (gritter) 8/30/05
  */
 
 /*
@@ -602,6 +602,9 @@ FILE		*fp_acct = NULL;	/* accounting stuff written here */
 
 char		temp[4096];
 
+/*****************************************************************************/
+
+static void	t_papersize(char *);
 
 /*****************************************************************************/
 
@@ -1428,6 +1431,8 @@ devcntrl(
 		    inlinepic(fp, buf);
 		else if ( strcmp(str, "SupplyFont") == 0 )
 		    t_supply(buf);
+		else if ( strcmp(str, "PaperSize") == 0 )
+		    t_papersize(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -2185,7 +2190,20 @@ t_dosupply(char *font)
 }
 
 /*****************************************************************************/
+static void
+t_papersize(char *buf)
+{
+	int	x, y;
 
+	if (sscanf(buf, "%d %d", &x, &y) != 2)
+		return;
+	x = x * 72 / res;
+	y = y * 72 / res;
+	fprintf(gf, "/pagebbox [0 0 %d %d] def\n", x, y);
+	fprintf(gf, "userdict /gotpagebbox true put\n");
+}
+
+/*****************************************************************************/
 
 void
 t_page (

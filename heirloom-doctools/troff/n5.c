@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.18 (gritter) 8/28/05
+ * Sccsid @(#)n5.c	1.19 (gritter) 8/30/05
  */
 
 /*
@@ -358,7 +358,7 @@ casepl(void)
 
 	skip();
 	if ((i = vnumb(&pl)) == 0)
-		pl = 11 * INCH; /*11in*/
+		pl = defaultpl ? defaultpl : 11 * INCH; /*11in*/
 	else 
 		pl = i;
 	if (numtab[NL].val > pl)

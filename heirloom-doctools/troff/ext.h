@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.17 (gritter) 8/28/05
+ * Sccsid @(#)ext.h	1.18 (gritter) 8/30/05
  */
 
 /*
@@ -81,6 +81,7 @@ extern	int	*bdtab;
 extern	int	ccs;
 extern	int	copyf;
 extern	int	cs;
+extern	int	defaultpl;
 extern	int	dfact;
 extern	int	dfactd;
 extern	int	diflg;

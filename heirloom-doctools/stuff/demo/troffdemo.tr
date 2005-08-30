@@ -1,5 +1,9 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.5 (gritter) 8/29/05
+.\" Sccsid @(#)troffdemo.tr	1.8 (gritter) 8/30/05
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.papersize a4
+.ll 17c
+.po 2c
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Mount fonts from the Adobe Caslon family, including ornaments.
 .fpost 1 R awrg____ pfb
@@ -14,8 +18,8 @@
 .flig I 31
 .hidechar R 0123456789
 .hidechar I 0123456789
-.track R 1 .10 24 0
-.track I 1 .10 24 0
+.track R 1 .125 24 0
+.track I 1 .125 24 0
 .track E 1 .3 24 3
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Disable sentence spacing.
@@ -39,9 +43,9 @@
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" The ornament lines.
 .sp |2c
-\h'-.1c'\s(14\fO\l'\n(.lu\[ornament23b]'
+\h'-.35c'\s(14\fO\l'\n(.lu\[ornament23b]'
 .sp |25.1c
-\h'-.1c'\s(14\fO\l'\n(.lu\[ornament23a]'
+\h'-.35c'\s(14\fO\l'\n(.lu\[ornament23a]'
 .vs 15
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Begin of title
@@ -59,7 +63,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-8/29/05
+8/30/05
 .sp 2v
 .ad b
 .ps 12

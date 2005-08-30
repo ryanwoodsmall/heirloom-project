@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.55 (gritter) 8/29/05
+ * Sccsid @(#)t6.c	1.56 (gritter) 8/30/05
  */
 
 /*
@@ -1359,6 +1359,94 @@ void
 casekern(void)
 {
 	kern = skip() || atoi() ? 1 : 0;
+}
+
+void
+casepapersize(void)
+{
+	const struct {
+		char	*name;
+		int	width;
+		int	heigth;
+	} papersizes[] = {
+		{ "executive",	 518,	 756 },
+		{ "letter",	 612,	 792 },
+		{ "legal",	 612,	 992 },
+		{ "leger",	1224,	 792 },
+		{ "tabloid",	 792,	1224 },
+		{ "a0",		2384,	3370 },
+		{ "a1",		1684,	2384 },
+		{ "a2",		1191,	1684 },
+		{ "a3",		 842,	1191 },
+		{ "a4",		 595,	 842 },
+		{ "a5",		 420,	 595 },
+		{ "a6",		 298,	 420 },
+		{ "a7",		 210,	 298 },
+		{ "a8",		 147,	 210 },
+		{ "a9",		 105,	 147 },
+		{ "b0",		2835,	4008 },
+		{ "b1",		2004,	2835 },
+		{ "b2",		1417,	2004 },
+		{ "b3",		1000,	1417 },
+		{ "b4",		 709,	1000 },
+		{ "b5",		 499,	 709 },
+		{ "b6",		 354,	 499 },
+		{ "b7",		 249,	 354 },
+		{ "b8",		 176,	 249 },
+		{ "b9",		 125,	 176 },
+		{ "c0",		2599,	3677 },
+		{ "c1",		1837,	2599 },
+		{ "c2",		1298,	1837 },
+		{ "c3",		 918,	1298 },
+		{ "c4",		 649,	 918 },
+		{ "c5",		 459,	 649 },
+		{ "c6",		 323,	 459 },
+		{ "c7",		 230,	 323 },
+		{ "c8",		 162,	 230 },
+		{ "c9",		 113,	 162 },
+		{ NULL,		   0,	   0 }
+	};
+	char	c;
+	int	x = 0, y = 0, n;
+	char	buf[NC];
+
+	if (skip())
+		return;
+	c = cbits(ch);
+	if (isdigit(c) || c == '(') {
+		x = atoi();
+		if (!nonumb) {
+			skip();
+			y = atoi();
+		}
+		if (nonumb || x == 0 || y == 0)
+			return;
+	} else {
+		n = 0;
+		do {
+			c = getach();
+			if (n+1 < sizeof buf)
+				buf[n++] = c;
+		} while (c);
+		buf[n] = 0;
+		for (n = 0; papersizes[n].name != NULL; n++)
+			if (strcmp(buf, papersizes[n].name) == 0) {
+				x = papersizes[n].width * INCH / 72;
+				y = papersizes[n].heigth * INCH / 72;
+				break;
+			}
+		if (x == 0 || y == 0) {
+			errprint("Unknown paper size %s", buf);
+			return;
+		}
+	}
+	pl = defaultpl = y;
+	if (numtab[NL].val > pl)
+		numtab[NL].val = pl;
+	po = x > 6 * PO ? PO : x / 8;
+	ll = ll1 = lt = lt1 = x - 2 * po;
+	setnel();
+	ptpapersize(x, y);
 }
 
 #include "unimap.h"
