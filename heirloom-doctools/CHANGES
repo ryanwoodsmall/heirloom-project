@@ -62,6 +62,7 @@ Release ...
   fixed.
 * [nt]roff: Nested long-name string references \*[\*...] now work.
 * [nt]roff: Tabulators as in ".XY\t" are now correctly handled with -x.
+* The "-man" macro no longer produces cut marks when used with troff.
 * A new malloc() replacement has been added for performance reasons.
 * A bug in the previously supplied realloc() replacement could result in
   heap corruption.

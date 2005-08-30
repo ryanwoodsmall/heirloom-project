@@ -1,3 +1,6 @@
+Release ...
+* The "-man" macro no longer produces cut marks when used with troff.
+
 Release 050815
 * The "getconf" utility has been added (derived from OpenSolaris code).
 * The "mesg" and "pathchk" utilities have been added.

@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)tmac.an	1.12 (gritter) 8/14/05
+.\" Sccsid @(#)tmac.an	1.13 (gritter) 8/31/05
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -81,6 +81,7 @@
 'bp
 .ev
 ..
+.ig
 '	# the cut mark
 .if n .ig
 .de }C
@@ -99,6 +100,7 @@
 .}N
 .pl 1
 .ll \\n(LLu
+..
 ..
 .em }K
 '	# set title and heading
