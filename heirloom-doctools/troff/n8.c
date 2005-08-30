@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.11 (gritter) 8/26/05
+ * Sccsid @(#)n8.c	1.12 (gritter) 8/31/05
  */
 
 /*
@@ -98,15 +98,15 @@ hyphen(tchar *wp)
 	register tchar *i;
 
 	i = wp;
-	while (punct(cbits(*i++)))
+	while (punct(*i++))
 		;
-	if (!alph(cbits(*--i)))
+	if (!alph(*--i))
 		return;
 	wdstart = i++;
-	while (alph(cbits(*i++)))
+	while (alph(*i++))
 		;
 	hyend = wdend = --i - 1;
-	while (punct(cbits(*i++)))
+	while (punct(*i++))
 		;
 	if (*--i)
 		return;
@@ -139,7 +139,7 @@ hyphen(tchar *wp)
 int 
 punct(int i)
 {
-	if (!i || alph(i))
+	if (!cbits(i) || alph(i))
 		return(0);
 	else
 		return(1);
@@ -147,17 +147,18 @@ punct(int i)
 
 
 int 
-alph(int i)
+alph(int j)
 {
+	int i = cbits(j);
 #ifndef	NROFF
 #ifdef	EUC
-	if (i & ~0177) {
-		int	u = tr2un(i);
+	if (!ismot(j) && i & ~0177) {
+		int	u = tr2un(i, fbits(j));
 		return iswalpha(u);
 	} else
 #endif	/* EUC */
 #endif	/* !NROFF */
-	if (i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z')
+	if (!ismot(j) && i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z')
 		return(1);
 	else
 		return(0);
@@ -206,7 +207,7 @@ casehw(void)
 				k = HY_BIT2;
 				continue;
 			}
-			*j++ = maplow(i) | k;
+			*j++ = maplow(i, xfont) | k;
 			k = 0;
 			if (j >= (hbuf + NHEX - 2) && growhbuf(&j) == NULL)
 				goto full;
@@ -232,12 +233,15 @@ exword(void)
 		if (e == NULL || *e == 0)
 			return(0);
 		w = wdstart;
-		while (*e && w <= hyend && (*e&~HY_BIT2) == maplow(cbits(*w))) {
+		while (*e && w <= hyend &&
+				(*e&~HY_BIT2) == maplow(cbits(*w), fbits(*w))) {
 			e++; 
 			w++;
 		};
 		if (!*e) {
-			if (w-1 == hyend || (w == wdend && maplow(cbits(*w)) == 's')) {
+			if (w-1 == hyend || (w == wdend &&
+						maplow(cbits(*w), fbits(*w))
+						== 's')) {
 				w = wdstart;
 				for (e = save; *e; e++) {
 					if (*e & HY_BIT2)
@@ -267,7 +271,8 @@ suffix(void)
 	extern const char	*suftab[];
 
 again:
-	if (!alph(cbits(i = cbits(*hyend))) || cbits(i) >= 128)
+	i = cbits(*hyend);
+	if (i >= 128 || !alph(*hyend))
 		return(0);
 	if (i < 'a')
 		i -= 'A' - 'a';
@@ -278,7 +283,8 @@ again:
 			return(0);
 		s = s0 + i - 1;
 		w = hyend - 1;
-		while (s > s0 && w >= wdstart && (*s & 0177) == maplow(cbits(*w))) {
+		while (s > s0 && w >= wdstart &&
+				(*s & 0177) == maplow(cbits(*w), fbits(*w))) {
 			s--;
 			w--;
 		}
@@ -311,12 +317,12 @@ mark:
 
 
 int 
-maplow(register int i)
+maplow(register int i, int f)
 {
 #ifndef	NROFF
 #ifdef	EUC
-	if (ischar(i) && i & ~0177) {
-		i = tr2un(i);
+	if (!ismot(i) && i & ~0177) {
+		i = tr2un(i, f);
 		if (iswupper(i))
 			i = towlower(i);
 	} else
@@ -331,7 +337,7 @@ maplow(register int i)
 int 
 vowel(int i)
 {
-	switch (maplow(i)) {
+	switch (maplow(i, xfont)) {
 	case 'a':
 	case 'e':
 	case 'i':
@@ -404,7 +410,7 @@ dilook(int a, int b, const char t[26][13])
 {
 	register int i, j;
 
-	i = t[maplow(a)-'a'][(j = maplow(b)-'a')/2];
+	i = t[maplow(a, xfont)-'a'][(j = maplow(b, xfont)-'a')/2];
 	if (!(j & 01))
 		i >>= 4;
 	return(i & 017);
@@ -463,7 +469,7 @@ hyphenhnj(void)
 			if (m & ~0177)
 				return;
 #else
-			m = tr2un(cbits(*wp));
+			m = tr2un(cbits(*wp), fbits(*wp));
 			if (m < 0 || m & ~0377)
 				return;	/* only supporting ISO-8859-1 so far */
 #endif

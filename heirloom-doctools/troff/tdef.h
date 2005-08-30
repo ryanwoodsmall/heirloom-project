@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.33 (gritter) 8/28/05
+ * Sccsid @(#)tdef.h	1.34 (gritter) 8/31/05
  */
 
 /*
@@ -809,7 +809,7 @@ void caseht(void);
 void casehw(void);
 int exword(void);
 int suffix(void);
-int maplow(register int);
+int maplow(register int, int);
 int vowel(int);
 tchar *chkvow(tchar *);
 void digram(void);

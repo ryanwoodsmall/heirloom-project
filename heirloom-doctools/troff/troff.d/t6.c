@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.56 (gritter) 8/30/05
+ * Sccsid @(#)t6.c	1.57 (gritter) 8/31/05
  */
 
 /*
@@ -1464,7 +1464,7 @@ un2tr(int c, int *fp)
 }
 
 int
-tr2un(int i)
+tr2un(tchar i, int f)
 {
 	struct afmtab	*a;
 	int	c, n;
@@ -1473,7 +1473,7 @@ tr2un(int i)
 		return -1;
 	else if (i < 128)
 		return i;
-	if ((n = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0) {
+	if ((n = (fontbase[f]->spare1&BYTEMASK) - 1) >= 0) {
 		a = afmtab[n];
 		if (i - 32 >= nchtab + 128)
 			i -= nchtab + 128;

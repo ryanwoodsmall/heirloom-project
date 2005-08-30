@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.7 (gritter) 8/18/05
+ * Sccsid @(#)n2.c	1.8 (gritter) 8/31/05
  */
 
 /*
@@ -63,6 +63,7 @@
 #include <setjmp.h>
 #include "ext.h"
 #ifdef EUC
+#include <limits.h>
 #ifdef NROFF
 #include <stddef.h>
 #ifdef	__sun
@@ -70,7 +71,6 @@
 #else
 #include <wchar.h>
 #endif
-#include <limits.h>
 #include <ctype.h>
 #include <unistd.h>
 
@@ -166,6 +166,7 @@ pchar1(register tchar i)
 		ptout(i);
 }
 
+#ifndef	NROFF
 void
 outascii (	/* print i in best-guess ascii */
     tchar i
@@ -200,11 +201,18 @@ outascii (	/* print i in best-guess ascii */
 	else if (j == WORDSP)
 		;	/* nothing at all */
 	else if (j > 0177) {
-#ifndef	NROFF
 		extern int nchtab;
-		if (j < 128 + nchtab)
-#endif
-		{
+#ifdef	EUC
+		wchar_t	wc;
+		char	mb[MB_LEN_MAX+1];
+		int	n;
+		wc = tr2un(j, fbits(i));
+		if (wc != -1 && (n = wctomb(mb, wc)) > 0) {
+			mb[n] = 0;
+			oputs(mb);
+		} else
+#endif	/* EUC */
+		if (j < 128 + nchtab) {
 			oput('\\');
 			oput('(');
 			oput(chname[chtab[j-128]]);
@@ -212,6 +220,7 @@ outascii (	/* print i in best-guess ascii */
 		}
 	}
 }
+#endif
 
 
 /*
@@ -229,7 +238,7 @@ void
 oputs(register char *i)
 {
 	while (*i != 0)
-		oput(*i++);
+		oput(*i++&0377);
 }
 
 

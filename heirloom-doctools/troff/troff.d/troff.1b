@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.12 (gritter) 8/26/05
+.\" Sccsid @(#)troff.1b	1.13 (gritter) 8/31/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "8/26/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "8/31/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -40,7 +40,7 @@ troff \- (BSD) typeset or format documents
 .ad l
 .nh
 \fB/usr/ucb/troff\fR
-[\fB\-afixXz\fR]
+[\fB\-af\&ixXz\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
@@ -188,7 +188,7 @@ Refrain from feeding out paper and stopping
 phototypesetter at the end of the run.
 .TP
 .B \-a
-Send a printable ASCII approximation
+Send a printable text-only approximation
 of the results to the standard output.
 .TP
 .B \-x

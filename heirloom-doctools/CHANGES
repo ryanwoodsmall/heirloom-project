@@ -49,6 +49,8 @@ Release ...
 * troff/dpost: The "\X'Sync'" escape forces dpost to write position and
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.
+* troff: The "-a" option now generates locale-dependent output, with best
+  results in UTF-8 locales.
 * The "-mpictures" macros have been added from Plan 9 sources.
 * The "picpack" preprocessor has been added.
 * eqn: The default resolution has been changed to 7200 dpi to match that
