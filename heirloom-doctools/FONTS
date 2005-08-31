@@ -44,9 +44,9 @@ As a simple example,
 But it is also possible to have different names for the metrics and
 glyph data files, as in
 
-	.fpost 0 BM modified.afm bm______.pfb
+	.fpost 0 BM mykerning.afm bm______.pfb
 	.ft BM
-	This text prints in Monotype Bembo using modified metrics.
+	This text prints in Monotype Bembo using modified kerning.
 
 The new default higher-resolution "7200" PostScript device always uses
 AFM files; it supports the conventional ".fp" request for backwards
@@ -67,7 +67,8 @@ the following example properly:
 Note that any use of AFM files requires that the output of troff is
 passed to the exactly matching version of dpost, i.e. to the one that
 was delivered with the same release of this package. Sending such
-troff output directly to a print spooler will thus usually not work.
+troff output directly to a print spooler that invokes a system version
+of dpost will thus usually not work.
 
 The old ditroff method requires font tables to be generated manually.
 It is still supported, and is still the default for the lower-resolution
@@ -86,30 +87,36 @@ are of interest for troff:
 
   xxxxxxxx.afm
 	This is the metrics file. troff accesses it to learn the widths
-	of characters in the font. Put this file (or a symbolic link to
-	it) into the directory /usr/ucblib/doctools/font/dev7200/afm, or
-	use a custom directory and include it into the value of the
-	TROFFONTS environment variable.
+	of characters in the font.
 
   xxxxxxxx.pfb
 	This file contains the actual glyph data. troff does not really
 	need this file, but your printer or PDF converter does. In many
 	cases, it is most convenient to include the data directly into
-	the .ps file generated. Put the file (or a symbolic link to it)
-	into the directory /usr/ucblib/doctools/font/dev7200/pfb, or 
-	use a custom directory and set TROFFONTS appropriately.
+	the .ps file generated, as described for ".fpost" above.
+
+Create a directory to hold your fonts. For compatibility with future
+versions of troff, it is recommended that it is put outside the troff
+hierarchy /usr/ucblib/doctools; something below /usr/local may be a
+good choice. For each font you want to install, copy or link both the
+AFM and the PFB file into the directory. Set the TROFFONTS environment
+variable to this directory; if you have multiple font directories, you
+can separate them in TROFFONTS by colons, just as in the PATH variable
+for the shell, e.g. "TROFFONTS=/usr/local/share/fonts:/usr/share/fonts
+export TROFFONTS". Write the definition in your .profile to make it
+permanent. You can now use the fonts with troff. If you want to install
+more fonts later, it is sufficient to put them into the font directory.
 
 For TrueType fonts, an additional conversion step is necessary. troff
 cannot handle TrueType fonts directly, but it can handle PostScript
 Type 42 fonts, which are a special representation of them. You can
 use the "ttftot42" utility from <http://www.nih.at/ttftot42/> to
 generate a Type 42 font from a TrueType font. It will produce a .afm
-file, which you need to put into /usr/ucblib/doctools/font/dev7200/afm
-as for a Type 1 font, and a .t42 file, which troff expects to find in
-/usr/ucblib/doctools/font/dev7200/t42. You can then use the Type 42
-font just like a Type 1 font. The only drawback with this is that a
-Type 42 font requires special support from the PostScript interpreter;
-an aging printer may not be able to process it.
+file and a .t42 file; put both files into your font directory as with
+Type 1 fonts. You can then use the Type 42 font just like a Type 1
+font. The only drawback with this is that a Type 42 font requires
+special support from the PostScript interpreter; an aging printer
+may not be able to process it.
 
 
 Using fonts with old style numerals
@@ -232,4 +239,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 8/29/05
+Gunnar Ritter                                                 8/31/05
