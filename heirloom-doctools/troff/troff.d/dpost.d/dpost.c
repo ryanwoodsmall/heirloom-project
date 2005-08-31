@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.43 (gritter) 8/30/05
+ * Sccsid @(#)dpost.c	1.44 (gritter) 8/31/05
  */
 
 /*
@@ -2078,12 +2078,12 @@ supplypfb(char *font, char *path, FILE *fp)
 				    path, ps_adobe_font_1_0);
     }
     while (--length > 0 && (c = getc(fp)) != EOF && c != '\r' && c != '\n');
-    while (c != '\r' && --length > 0)
-	    c = getc(fp);
-    if ((c = getc(fp)) != '\n')
-	    ungetc(c, fp);
-    else
-	    length--;
+    if (c != '\n') {
+    	if ((c = getc(fp)) != '\n')
+	    	ungetc(c, fp);
+    	else
+	    	length--;
+    }
     if (sfcount++ == 0)
         fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
     else
