@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.10 (gritter) 8/30/05
+.\" Sccsid @(#)troffdemo.tr	1.11 (gritter) 8/31/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .papersize a4
 .ll 17c
@@ -11,6 +11,7 @@
 .fpost 0 E axrg____ pfb
 .fpost 0 IE axi_____ pfb
 .fpost 0 O awor____ pfb
+.\" Configure to use small caps, ligatures, and old-style numerals.
 .fallback R E
 .fallback E R
 .fallback I IE
@@ -18,12 +19,14 @@
 .flig I 31
 .hidechar R 0123456789
 .hidechar I 0123456789
-.track R 1 .5 24 0
-.track I 1 .5 24 0
+.\" The expert font needs letter space tracking for use as small caps.
 .track E 1 .3 24 3
+.\" Adobe Caslon also needs minor tracking for the roman and the italic.
+.track R 1 .4 24 0
+.track I 1 .4 24 0
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-.\" Disable sentence spacing.
-.ss 8 0
+.\" Use a narrow word space, and disable sentence spacing.
+.ss 9 0
 .\" Enable automatic hyphenation.
 .hy
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -63,7 +66,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-8/30/05
+8/31/05
 .sp 2v
 .ad b
 .ps 12
