@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.57 (gritter) 8/31/05
+ * Sccsid @(#)t6.c	1.58 (gritter) 9/2/05
  */
 
 /*
@@ -1208,7 +1208,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	if (nf >= Nfont)
 		growfonts(nf+1);
 	a->Font.spare1 = nafm+1;
-	if (nf <= NFONT)
+	if (nf <= NFONT && fontbase[nf])
 		*fontbase[nf] = afmtab[nafm]->Font;
 	else
 		fontbase[nf] = &afmtab[nafm]->Font;
