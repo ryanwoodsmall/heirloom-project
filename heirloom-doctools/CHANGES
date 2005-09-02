@@ -54,6 +54,7 @@ Release ...
 * The "picpack" preprocessor has been added.
 * eqn: The default resolution has been changed to 7200 dpi to match that
   of troff. The "-r" option was introduced to change it.
+* eqn: Handles "\[]" and "\*[]" now.
 * The file "NEWS" describes new troff language features.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
 * [nt]roff: There is no static limit on the ".hw" table anymore.

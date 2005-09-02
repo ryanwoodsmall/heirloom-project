@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)text.c	1.4 (gritter) 8/13/05
+ * Sccsid @(#)text.c	1.5 (gritter) 9/2/05
  */
 
 # include "e.h"
@@ -145,6 +145,15 @@ trans(int c,char *p1) {
 		if (c=='*' && cs[csp-1] == '(') {
 			cs[csp++] = p1[psp++];
 			cs[csp++] = p1[psp++];
+		} else if (c == '[' || c == '*' && cs[csp-1] == '[') {
+			do
+				cs[csp++] = p1[psp++];
+			while (p1[psp-1] != ' ' && p1[psp-1] != '\t' &&
+					p1[psp-1] != '\n' && p1[psp-1] != ']');
+			if (cs[csp-1] != ']') {
+				csp--;
+				psp--;
+			}
 		}
 		break;
 	case '\'':
