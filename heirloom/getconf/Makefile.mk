@@ -1,6 +1,7 @@
 all: getconf getconf_su3
 
-PATHS = -DSUSBIN='"$(SUSBIN)"' -DSU3BIN='"$(SU3BIN)"' -DDEFBIN='"$(DEFBIN)"'
+PATHS = -DSUSBIN='"$(SUSBIN)"' -DSU3BIN='"$(SU3BIN)"' -DDEFBIN='"$(DEFBIN)"' \
+	-DUCBBIN='"$(UCBBIN)"'
 
 getconf: getconf.o
 	$(LD) $(LDFLAGS) getconf.o $(LCOMMON) $(LWCHAR) $(LIBS) -o getconf

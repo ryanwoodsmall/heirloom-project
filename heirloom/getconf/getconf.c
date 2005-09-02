@@ -42,9 +42,9 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)getconf_su3.sl	1.12 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf_su3.sl	1.13 (gritter) 9/2/05";
 #else	/* !SU3 */
-static const char sccsid[] USED = "@(#)getconf.sl	1.12 (gritter) 7/17/05";
+static const char sccsid[] USED = "@(#)getconf.sl	1.13 (gritter) 9/2/05";
 #endif	/* !SU3 */
 
 /*
@@ -72,11 +72,11 @@ static const char sccsid[] USED = "@(#)getconf.sl	1.12 (gritter) 7/17/05";
 #undef	POSIX2_VERSION
 #undef	_XOPEN_XCU_VERSION
 #if defined (SU3)
-#define	HEIRLOOM_PATH	SU3BIN ":" DEFBIN
+#define	HEIRLOOM_PATH	SU3BIN ":" DEFBIN ":" UCBBIN
 #define	POSIX2_VERSION	200112
 #define	_XOPEN_XCU_VERSION	600
 #else	/* !SU3 */
-#define	HEIRLOOM_PATH	SUSBIN ":" DEFBIN
+#define	HEIRLOOM_PATH	SUSBIN ":" DEFBIN ":" UCBBIN
 #define	POSIX2_VERSION	199209
 #define	_XOPEN_XCU_VERSION	4
 #endif	/* !SU3 */

@@ -1,4 +1,6 @@
 Release ...
+* getconf: /usr/ucb is now put at the end of the Heirloom directory list
+  for the PATH variable.
 * The "-man" macro no longer produces cut marks when used with troff.
 
 Release 050815
