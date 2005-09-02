@@ -174,12 +174,15 @@ are disabled.
 	is similar to "\ ", but inserts space that stretches when the
 	line is adjusted like a regular " ".
 
-any character in the current LC_CTYPE locale
+any character in the current LC_CTYPE locale in text input
 	In nroff, any printable character is just passed through.
-	In troff, the character is converted to a PostScript character
-	name. If it is found in the current font, it is printed.
-	Otherwise, the .fallback sequence is searched for it. This
-	mechanism only works with fonts mounted by the .fpost request.
+	  In troff, a non-ASCII character is converted to a named
+	PostScript character. If it is found in the current font, it
+	is printed. Otherwise, the .fallback sequence is searched for
+	it. This mechanism only works with AFM file fonts, i.e. those
+	mounted by the .fpost request, or those of the 7200 dpi device.
+	  In macro, string, and number register names, only ASCII
+	characters may be used.
 
 \X'Sync'						troff only
 	forces dpost to write position and font information to the
