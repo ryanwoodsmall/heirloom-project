@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.38 (gritter) 8/30/05
+ * Sccsid @(#)n3.c	1.39 (gritter) 9/2/05
  */
 
 /*
@@ -784,7 +784,7 @@ getsn(void)
 		return(0);
 	if (i == '(')
 		return(getrq());
-	else if (i == '[')
+	else if (i == '[' && xflag != 0)
 		return(getls(']'));
 	else 
 		return(i);
@@ -1188,7 +1188,7 @@ maybemore(int sofar, int create)
 	char	c, buf[NC+1], pb[] = { '\n', 0 };
 	int	i = 2, n, r = raw;
 
-	if (xflag == 0)
+	if (xflag < 2)
 		return sofar;
 	raw = 1;
 	buf[0] = sofar&BYTEMASK;

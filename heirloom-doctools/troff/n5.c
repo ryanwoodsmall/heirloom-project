@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.20 (gritter) 8/30/05
+ * Sccsid @(#)n5.c	1.21 (gritter) 9/2/05
  */
 
 /*
@@ -626,7 +626,7 @@ getev(int *nxevp, char **namep)
 	if (skip())
 		return 0;
 	c = cbits(ch);
-	if (isdigit(c) || c == '(') {
+	if (xflag == 0 || isdigit(c) || c == '(') {
 		noscale++;
 		nxev = atoi();
 		noscale = 0;
@@ -661,6 +661,8 @@ caseev(void)
 		nxev =  evlist[--evi];
 		goto e1;
 	}
+	if (xflag == 0 && ((nxev >= NEV) || (nxev < 0) || (evi >= EVLSZ)))
+		goto cannot;
 	if (evi >= evlsz) {
 		evlsz = evi + 1;
 		if ((evlist = realloc(evlist, evlsz * sizeof *evlist)) == NULL)

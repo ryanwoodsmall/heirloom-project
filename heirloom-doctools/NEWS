@@ -1,9 +1,12 @@
 New features in the Heirloom Documentation Tools troff language
 ===============================================================
 
-Unless otherwise noted, new features become effective with the -x option
-only. In the future, the -x option may become the default; the -X option
-can be used to deactivate new features for compatibility reasons.
+With the "-x" option, new features become available by the names as
+shown. Without the "-x" option, long requests can be invoked with
+the ".do" prefix as described below; other features are available by
+default since they should not normally create compatibility problems.
+With the "-X" option, all extensions except for locale-dependent input
+are disabled.
 
 .chop name
 	removes the last character of the macro, string, or diversion
@@ -13,7 +16,16 @@ can be used to deactivate new features for compatibility reasons.
 .ds longname
 .nr longname
 	The names of macros, strings, and number registers can be longer
-	than two characters now.
+	than two characters now with the "-x" option.
+
+.do request arguments
+	has the same effect as executing ".request arguments" with the
+	"-x" option enabled, even if that was not given on the command
+	line.  Thus ".do papersize a4" works like ".papersize a4",
+	".do de longname" defines a macro with a long name, and
+	".do longname" executes it. It is possible to contract extended
+	request names without the "-x" option, such as ".dopapersize",
+	although such usage seems questionable.
 
 .ev name
 	Environments can be named, or be given an arbitrary number.
@@ -91,7 +103,7 @@ can be used to deactivate new features for compatibility reasons.
 
 .kern [0|1]						troff only
 	Disables (0) or enables pairwise kerning. The default is enabled
-	with the -x option, and otherwise disabled.
+	unless the "-X" option is given.
 
 .lc_ctype localename
 	sets the LC_CTYPE locale setting to localename. The default is
@@ -175,4 +187,4 @@ any character in the current LC_CTYPE locale
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   8/31/05
+Gunnar Ritter                                                   9/2/05

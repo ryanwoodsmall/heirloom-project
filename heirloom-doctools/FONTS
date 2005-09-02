@@ -7,7 +7,8 @@ The basics
 Heirloom troff understands two ways to select PostScript fonts.
 
 The new method can access PostScript font files directly. Fonts are
-selected using a new request that is only available with "troff -x":
+selected using a new request that is available with "troff -x", or
+as ".do fpost" without "-x":
 
   .fpost r yy afmname [supplyname]
 	reads metrics from "afmname". If the TROFFONTS environment variable
@@ -223,9 +224,9 @@ selected using the fallback sequence.
 Pairwise kerning
 ----------------
 
-Pairwise kerning is normally enabled with the -x option, and otherwise
-disabled. The ".kern" request disables it in -x mode. Adjustments to the
-kerning pairs of a font must be made directly in the respective AFM files.
+Pairwise kerning is enabled unless the -X option is given. The ".kern"
+request disables it. Adjustments to the kerning pairs of a font must be
+made directly in the respective AFM files.
 
 
 Limitations
@@ -239,4 +240,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 8/31/05
+Gunnar Ritter                                                 9/2/05

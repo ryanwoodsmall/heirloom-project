@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.30 (gritter) 8/26/05
+ * Sccsid @(#)n1.c	1.31 (gritter) 9/2/05
  */
 
 /*
@@ -113,6 +113,7 @@ main(int argc, char **argv)
 	register tchar i;
 	int eileenct;		/*count to test for "Eileen's loop"*/
 	char	**oargv;
+	int	_xflag;
 
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
@@ -222,7 +223,7 @@ main(int argc, char **argv)
 			dotT++;
 			continue;
 		case 'x':
-			xflag = 1;
+			xflag = 2;
 			continue;
 		case 'X':
 			xflag = 0;
@@ -267,9 +268,11 @@ start:
 	rargc = argc;
 	nmfi = 0;
 	init2();
+	_xflag = xflag;
 	setjmp(sjbuf);
 	eileenct = 0;		/*reset count for "Eileen's loop"*/
 loop:
+	xflag = _xflag;
 	copyf = lgf = nb = nflush = nlflg = 0;
 	if (ip && rbf0(ip) == 0 && ejf && frame->pframe <= ejl) {
 		nflush++;
@@ -311,6 +314,12 @@ loop:
 		copyf--;
 		if ((j = getrq()) >= 256)
 			j = maybemore(j, 0);
+		if (xflag != 0 && j == PAIR('d', 'o')) {
+			xflag = 2;
+			skip();
+			if ((j = getrq()) >= 256)
+				j = maybemore(j, 0);
+		}
 		control(j, 1);
 		flushi();
 		goto loop;

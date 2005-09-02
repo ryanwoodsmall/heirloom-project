@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.11 (gritter) 8/30/05
+ * Sccsid @(#)nii.c	1.12 (gritter) 9/2/05
  */
 
 /*
@@ -142,7 +142,7 @@ int	sfont	= FT;	/* appears to be "standard" font; used by .ul */
 int	sv;
 int	esc;
 int	widthp;
-int	xflag;
+int	xflag = 1;
 int	xfont;
 int	setwdf;
 int	over;
