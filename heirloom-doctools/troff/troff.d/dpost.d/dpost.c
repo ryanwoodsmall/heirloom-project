@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.44 (gritter) 8/31/05
+ * Sccsid @(#)dpost.c	1.45 (gritter) 9/2/05
  */
 
 /*
@@ -1201,6 +1201,7 @@ conv(
 		    fscanf(fp, "%d", &m);
 		    endtext();
 		    oput(m);
+		    endtext();
 		    break;
 
 	    case 'D':			/* drawing functions */
