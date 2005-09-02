@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.58 (gritter) 9/2/05
+ * Sccsid @(#)t6.c	1.59 (gritter) 9/2/05
  */
 
 /*
@@ -413,18 +413,18 @@ postchar(const char *temp, int *fp)
 tchar setch(int delim)
 {
 	register int j;
-	char	*temp = NULL;
-	int	c, f, n, sz = 0;
+	char	temp[NC];
+	int	c, f, n;
 
 	n = 0;
-	for (;;) {
+	do {
 		c = getach();
-		if (c == 0 && n < 2) {
-			free(temp);
+		if (c == 0 && n < 2)
 			return(0);
+		if (n >= sizeof temp) {
+			temp[n-1] = 0;
+			break;
 		}
-		if (n >= sz)
-			temp = realloc(temp, sz += 10);
 		if (delim == '[' && c == ']') {
 			temp[n] = 0;
 			break;
@@ -434,7 +434,7 @@ tchar setch(int delim)
 			temp[n] = 0;
 			break;
 		}
-	}
+	} while (c);
 	c = 0;
 	if (delim == '[') {
 		if ((c = postchar(temp, &f)) != 0) {
@@ -448,7 +448,6 @@ tchar setch(int delim)
 				c = j + 128 | chbits;
 				break;
 			}
-	free(temp);
 	return c;
 }
 
