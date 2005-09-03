@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.45 (gritter) 9/2/05
+ * Sccsid @(#)dpost.c	1.46 (gritter) 9/3/05
  */
 
 /*
@@ -2057,7 +2057,7 @@ ple32(const char *cp)
 		((unsigned long)(cp[3]&0377) << 24);
 }
 
-static const char ps_adobe_font_1_0[] = "%!PS-AdobeFont-1.0:";
+static const char ps_adobe_font_[] = "%!PS-AdobeFont-";
 static const char ps_truetypefont_[] = "%!PS-TrueTypeFont-";
 
 static void
@@ -2073,10 +2073,10 @@ supplypfb(char *font, char *path, FILE *fp)
 	    error(FATAL, "invalid header in %s", path);
     length = ple32(&buf[2]);
     n = 0;
-    while (ps_adobe_font_1_0[n] && --length > 0 && (c = getc(fp)) != EOF) {
-	    if (c != ps_adobe_font_1_0[n++])
+    while (ps_adobe_font_[n] && --length > 0 && (c = getc(fp)) != EOF) {
+	    if (c != ps_adobe_font_[n++])
 		    error(FATAL, "file %s does not start with \"%s\"",
-				    path, ps_adobe_font_1_0);
+				    path, ps_adobe_font_);
     }
     while (--length > 0 && (c = getc(fp)) != EOF && c != '\r' && c != '\n');
     if (c != '\n') {
@@ -2163,10 +2163,10 @@ supply1(char *font, char *file, char *type)
     }
     if (fgets(line, sizeof line, fp) == NULL)
             error(FATAL, "missing data in %s", file);
-    if (strncmp(line, ps_adobe_font_1_0, strlen(ps_adobe_font_1_0)) &&
+    if (strncmp(line, ps_adobe_font_, strlen(ps_adobe_font_)) &&
 		    strncmp(line, ps_truetypefont_, strlen(ps_truetypefont_)))
 	    error(FATAL, "file %s does not start with \"%s\" or \"%s\"",
-			    file, ps_adobe_font_1_0, ps_truetypefont_);
+			    file, ps_adobe_font_, ps_truetypefont_);
     if (sfcount++ == 0)
         fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
     else
