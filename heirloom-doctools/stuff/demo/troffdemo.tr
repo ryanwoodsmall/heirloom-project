@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.11 (gritter) 8/31/05
+.\" Sccsid @(#)troffdemo.tr	1.12 (gritter) 9/3/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .papersize a4
 .ll 17c
@@ -44,29 +44,44 @@
 .ds ! \^!
 .ds ? \^?
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-.\" The ornament lines.
-.sp |2c
-\h'-.35c'\s(14\fO\l'\n(.lu\[ornament23b]'
-.sp |25.1c
-\h'-.35c'\s(14\fO\l'\n(.lu\[ornament23a]'
-.vs 15
+.\" Build and draw the ornaments at the top of the page.
+.de repeat1
+.	if \\n-[repetitions]>0 \{
+.		as \\$2 \\$1
+.		repeat1 \\$1 \\$2
+.	\}
+..
+.de repeat
+.	nr repetitions \\$1 1
+.	rm \\$2
+.	repeat1 \\$3 \\$2
+..
+.nr hl \n(.l/2
+.ps 23
+.ft O
+.repeat 10 left \[ornament26d]
+.repeat 10 right \[ornament26a]
+.sp |2.2c
+.ce
+\[ornament2a]\*[left]\*[right]\[ornament3a]
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Begin of title
-.sp |3.7c
+.sp |3.9c
 .po \n(.ou+3P
 .ll \n(.lu-6P
 .ad c
 .ps 24
+.vs 15
 \fRHeirloom Documentation Tools
 .sp 1c
 \fITroff\| Demonstration Page
-.sp .9c
-\s(14\fO\[ornament10]
-.sp
+.sp 1c
+\s(21\fO\[ornament10]
+.sp .4c
 .ps 12
 \fEGunnar Ritter\fR
 .br
-8/31/05
+9/3/05
 .sp 2v
 .ad b
 .ps 12
