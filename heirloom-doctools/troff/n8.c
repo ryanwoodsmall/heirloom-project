@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.12 (gritter) 8/31/05
+ * Sccsid @(#)n8.c	1.13 (gritter) 9/3/05
  */
 
 /*
@@ -458,29 +458,64 @@ static void
 hyphenhnj(void)
 {
 	tchar	*wp;
-	char	cb[WDSIZE], *cp, hb[WDSIZE];
+	char	cb[3*WDSIZE+1], *cp, hb[3*WDSIZE+1];
+	int	wpos[3*WDSIZE+1], *wpp;
 	int	i, j, m;
 
 	cp = cb;
+	wpp = wpos;
 	for (wp = wdstart; wp <= wdend; wp++)
 		if (cp < &cb[sizeof cb - 1]) {
-#ifdef	NROFF
 			m = cbits(*wp);
-			if (m & ~0177)
-				return;
+			if (m == LIG_FI) {
+				*cp++ = 'f';
+				*wpp++ = wp - wdstart;
+				*cp++ = 'i';
+				*wpp++ = -1;
+			} else if (m == LIG_FL) {
+				*cp++ = 'f';
+				*wpp++ = wp - wdstart;
+				*cp++ = 'l';
+				*wpp++ = -1;
+			} else if (m == LIG_FF) {
+				*cp++ = 'f';
+				*wpp++ = wp - wdstart;
+				*cp++ = 'f';
+				*wpp++ = -1;
+			} else if (m == LIG_FFI) {
+				*cp++ = 'f';
+				*wpp++ = wp - wdstart;
+				*cp++ = 'f';
+				*wpp++ = -1;
+				*cp++ = 'i';
+				*wpp++ = -1;
+			} else if (m == LIG_FFL) {
+				*cp++ = 'f';
+				*wpp++ = wp - wdstart;
+				*cp++ = 'f';
+				*wpp++ = -1;
+				*cp++ = 'l';
+				*wpp++ = -1;
+			} else {
+#ifdef	NROFF
+				if (m & ~0177)
+					return;
 #else
-			m = tr2un(cbits(*wp), fbits(*wp));
-			if (m < 0 || m & ~0377)
-				return;	/* only supporting ISO-8859-1 so far */
+				m = tr2un(m, fbits(*wp));
+				if (m < 0 || m & ~0377)
+					/* only supporting ISO-8859-1 so far */
+					return;
 #endif
-			*cp++ = m;
+				*cp++ = m;
+				*wpp++ = wp - wdstart;
+			}
 		}
 	*cp = '\0';
 	j = cp - cb;
 	hnj_hyphen_hyphenate(dicthnj, cb, j, hb);
 	for (i = 0; i < j; i++)
-		if (hb[i] - '0' & 1) {
-			*hyp++ = &wdstart[i+1];
+		if (hb[i] - '0' & 1 && wpos[i+1] >= 0) {
+			*hyp++ = &wdstart[wpos[i+1]];
 			if (hyp > (hyptr + NHYP - 1))
 				hyp = hyptr + NHYP - 1;
 		}
