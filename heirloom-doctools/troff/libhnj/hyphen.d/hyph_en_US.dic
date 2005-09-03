@@ -1,4 +1,4 @@
-ISO8859-1
+UTF-8
 % This file has been derived from Donald Knuth's `hyphen.tex',
 % to which the following applies:
 % -----------------------------------------------------------------
@@ -12,7 +12,7 @@ ISO8859-1
 % For sending bug reports, follow the instructions on
 % <http://heirloom.sourceforge.net/doctools.html>.
 % -----------------------------------------------------------------
-% Sccsid @(#)hyph_en_US.dic	1.1 (gritter) 8/27/05
+% Sccsid @(#)hyph_en_US.dic	1.2 (gritter) 9/3/05
 .1ca
 .1ci2
 .1co

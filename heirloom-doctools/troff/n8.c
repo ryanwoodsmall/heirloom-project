@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.13 (gritter) 9/3/05
+ * Sccsid @(#)n8.c	1.14 (gritter) 9/3/05
  */
 
 /*
@@ -500,14 +500,28 @@ hyphenhnj(void)
 #ifdef	NROFF
 				if (m & ~0177)
 					return;
-#else
-				m = tr2un(m, fbits(*wp));
-				if (m < 0 || m & ~0377)
-					/* only supporting ISO-8859-1 so far */
-					return;
-#endif
 				*cp++ = m;
 				*wpp++ = wp - wdstart;
+#else
+				m = tr2un(m, fbits(*wp));
+				if (m > 0 && m <= 0x7f) {
+					*cp++ = m;
+					*wpp++ = wp - wdstart;
+				} else if (m >= 0x80 && m <= 0x7ff) {
+					*cp++ = m >> 6 & 037 | 0300;
+					*wpp++ = wp - wdstart;
+					*cp++ = m & 077 | 0200;
+					*wpp++ = -1;
+				} else if (m >= 0x800 && m <= 0xffff) {
+					*cp++ = m >> 12 & 017 | 0340;
+					*wpp++ = wp - wdstart;
+					*cp++ = m >> 6 & 077 | 0200;
+					*wp++ = -1;
+					*cp++ = m & 077 | 0200;
+					*wpp++ = -1;
+				} else
+					return;
+#endif
 			}
 		}
 	*cp = '\0';

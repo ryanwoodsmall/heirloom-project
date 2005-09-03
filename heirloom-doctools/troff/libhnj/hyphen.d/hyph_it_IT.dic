@@ -1,4 +1,4 @@
-ISO8859-1
+UTF-8
 % This file has been derived from `ithyph.tex',
 % to which the following applies:
 % -----------------------------------------------------------------
@@ -29,7 +29,7 @@ ISO8859-1
 % For sending bug reports, follow the instructions on
 % <http://heirloom.sourceforge.net/doctools.html>.
 % -----------------------------------------------------------------
-% Sccsid @(#)hyph_it_IT.dic	1.1 (gritter) 8/27/05
+% Sccsid @(#)hyph_it_IT.dic	1.2 (gritter) 9/3/05
 .a3p2n
 .a1p
 .anti1
