@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.6 (gritter) 9/4/05
+ * Sccsid @(#)makedev.c	1.7 (gritter) 9/4/05
  */
 
 /*
@@ -343,7 +343,7 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 	return cpout;
 }
 
-int
+static int
 getlig(FILE *fin)	/* pick up ligature list */
 {
 	int lig;
