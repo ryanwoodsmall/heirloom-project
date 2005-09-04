@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.64 (gritter) 9/4/05
+ * Sccsid @(#)t6.c	1.65 (gritter) 9/4/05
  */
 
 /*
@@ -647,9 +647,10 @@ setfont(int a)
 {
 	register int i, j;
 
-	if (a)
-		i = getrq();
-	else 
+	if (a) {
+		if ((i = getrq()) >= 256)
+			i = maybemore(i, 0);
+	} else 
 		i = getsn();
 	if (!i || i == 'P') {
 		j = font1;
@@ -866,28 +867,29 @@ casefp(void)
 		errprint("fp: bad font position %d", i);
 	else if (skip() || !(j = getrq()))
 		errprint("fp: no font name");
-	else if (skip() || !getname())
-		setfp(i, j, 0);
-	else		/* 3rd argument = filename */
-		setfp(i, j, nextf);
+	else {
+		if (j >= 256)
+			j = maybemore(j, 1);
+		if (skip() || !getname())
+			setfp(i, j, 0);
+		else		/* 3rd argument = filename */
+			setfp(i, j, nextf);
+	}
 }
 
 int
 setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts] */
 {
 	extern int snprintf(char *, size_t, const char *, ...);
-	char longname[4096], shortname[20], *ap;
+	char longname[4096], *shortname, *ap;
 	char *fpout;
 	int nw;
 
 	zapwcache(0);
 	if (truename)
-		strcpy(shortname, truename);
-	else {
-		shortname[0] = f & BYTEMASK;
-		shortname[1] = f >> BYTE;
-		shortname[2] = '\0';
-	}
+		shortname = truename;
+	else
+		shortname = macname(f);
 	snprintf(longname, sizeof longname, "%s/dev%s/%s",
 			fontfile, devname, shortname);
 	if ((fpout = readfont(longname, &dev)) == NULL)
@@ -1063,6 +1065,8 @@ casefpost(void)
 	skip();
 	if ((rq = getrq()) == 0)
 		return;
+	if (rq >= 256)
+		rq = maybemore(rq, 1);
 	skip();
 	do {
 		c = getach();

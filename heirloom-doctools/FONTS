@@ -27,6 +27,7 @@ as ".do fpost" without "-x":
 	that the base fonts of a document are mounted as "1 R", "2 I".
 	The initial fonts on positions 9 (S1) and 10 (S) should not be
 	changed, as these contain special metrics for drawing commands.
+	  "yy" may also consist of more than two characters.
 	  If the optional "supplyname" argument is present, glyph data
 	is included in the generated PostScript file. If "supplyname"
 	is one of "pfb", "pfa", or "t42", the file "supplyname.pfb" (or

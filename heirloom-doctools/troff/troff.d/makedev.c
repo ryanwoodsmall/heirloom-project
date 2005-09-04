@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.7 (gritter) 9/4/05
+ * Sccsid @(#)makedev.c	1.8 (gritter) 9/4/05
  */
 
 /*
@@ -252,7 +252,7 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 	char *cpout;
 
 	if ((fin = fopen(name, "r")) == NULL) {
-		errprint("Can't font %s", name);
+		errprint("Can't load font %s", name);
 		return NULL;
 	}
 	for (i = 0; i < NFITAB; i++)
