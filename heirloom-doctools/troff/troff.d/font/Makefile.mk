@@ -13,7 +13,7 @@ all:
 install: all
 	test -d $(ROOT)$(FNTDIR) || mkdir -p $(ROOT)$(FNTDIR)
 	cp -R devpost $(ROOT)$(FNTDIR)
-	cd $(ROOT)$(FNTDIR) && \
+	cd $(ROOT)$(FNTDIR)/devpost && \
 		for i in G HM HK HL; \
 		do \
 			rm -f $$i; ln -s H $$i || exit; \
