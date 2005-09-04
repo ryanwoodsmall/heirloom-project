@@ -20,6 +20,8 @@ Release ...
   files have been derived from TeX sources.
 * troff: The paper size can be selected with the ".papersize" request.
   This is important for correct placement of pages on PostScript printers.
+* troff: Any point size can now be used with PostScript devices, including
+  fractional sizes.
 * troff: The ".fzoom" request allows to zoom the characters of a font.
 * [nt]roff: The ".lc_ctype" request can be used to set the LC_CTYPE
   localization setting from within a document.

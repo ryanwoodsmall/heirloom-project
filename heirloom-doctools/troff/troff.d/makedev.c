@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.5 (gritter) 9/4/05
+ * Sccsid @(#)makedev.c	1.6 (gritter) 9/4/05
  */
 
 /*
@@ -115,7 +115,7 @@ static struct	dev	dev;
 static struct	Font	font;
 
 #define	NSIZE	100	/* maximum number of sizes */
-static short	size[NSIZE];
+static int	size[NSIZE];
 #define	NCH	256	/* max number of characters with funny names */
 static char	chname[5*NCH];	/* character names, including \0 for each */
 static short	chtab[NCH];	/* index of character in chname */
@@ -146,6 +146,7 @@ readdesc(const char *name)
 	size_t sz, fsz;
 	char *dir, *dp, *dq;
 
+	memset(&dev, 0, sizeof dev);
 	if ((fin = fopen(name, "r")) == NULL) {
 		errprint("can't open tables for %s", name);
 		return NULL;
@@ -171,6 +172,8 @@ readdesc(const char *name)
 			fscanf(fin, "%d", &dev.biggestfont);
 		} else if (strcmp(cmd, "spare2") == 0) {
 			fscanf(fin, "%d", &dev.spare2);
+		} else if (strcmp(cmd, "anysize") == 0) {
+			dev.anysize = 1;
 		} else if (strcmp(cmd, "sizes") == 0) {
 			dev.nsizes = 0;
 			while (fscanf(fin, "%d", &v) != EOF && v != 0)

@@ -33,4 +33,4 @@ pictures.o: pictures.c comments.h gen.h path.h
 ps_include.o: ps_include.c ps_include.h gen.h
 request.o: request.c gen.h request.h path.h
 dpost_afm.o: ../dev.h afm.h ../afm.c
-dpost_makedev.o: ../dev.h
+dpost_makedev.o: ../dev.h ../makedev.c

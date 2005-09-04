@@ -123,6 +123,10 @@ are disabled.
 	setup commands. This request should be used early in a document;
 	if it is given multiple times, the last one will setup the device.
 
+.ps x.y							troff only
+	accepts any points size now with PostScript devices, including
+	fractional sizes.
+
 .return
 	immediately returns from the current macro to the level above.
 
@@ -170,6 +174,11 @@ are disabled.
 \n[name]
 	refers to the number register "name".
 
+\s'size'
+	sets the current point size and allows any numerical expression
+	in "size". This is particularly useful for specifying large sizes
+	with more than two numerals, or for fractional sizes.
+
 \~
 	is similar to "\ ", but inserts space that stretches when the
 	line is adjusted like a regular " ".
@@ -190,4 +199,4 @@ any character in the current LC_CTYPE locale in text input
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   9/2/05
+Gunnar Ritter                                                   9/4/05

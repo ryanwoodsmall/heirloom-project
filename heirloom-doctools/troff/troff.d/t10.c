@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.33 (gritter) 9/4/05
+ * Sccsid @(#)t10.c	1.34 (gritter) 9/4/05
  */
 
 /*
@@ -174,8 +174,10 @@ ptinit(void)
 	filebase = setbrk(dev.filesize + 2*EXTRAFONT);	/* enough room for whole file */
 	memcpy(filebase, &descp[sizeof dev], dev.filesize); /* all at once */
 	free(descp);
-	pstab = (short *) filebase;
-	chtab = pstab + nsizes + 1;
+	pstab = (int *) filebase;
+	for (i = 0; pstab[i]; i++)
+		pstab[i] = pts2u(pstab[i]);
+	chtab = (short *)(pstab + nsizes + 1);
 	chname = (char *) (chtab + dev.nchtab);
 	p = chname + dev.lchname;
 	for (i = 1; i <= nfonts; i++) {
@@ -213,6 +215,10 @@ ptinit(void)
 	spacesz = SS;
 	lss = lss1 = VS;
 	ll = ll1 = lt = lt1 = LL;
+	apts = pts2u(apts);
+	apts1 = pts2u(apts1);
+	pts = pts2u(pts);
+	pts1 = pts2u(pts1);
 	specnames();	/* install names like "hyphen", etc. */
 	kern = xflag;
 	if (ascii)
@@ -401,7 +407,7 @@ ptout0(tchar *pi, tchar *pend)
 	if (k < 040 && k != DRAWFCN)
 		return(pi+outsize);
 	if (k >= 32) {
-		if (widcache[k-32].fontpts == (xfont<<8) + xpts  && !setwdf &&
+		if (widcache[k-32].fontpts == xfont + (xpts<<8)  && !setwdf &&
 				kern == 0) {
 			w = widcache[k-32].width;
 			bd = 0;
@@ -555,7 +561,8 @@ void
 ptps(void)
 {
 	register int i, j, k;
-	float	z;
+	double	s, z;
+	int	found;
 
 	i = xpts;
 	for (j = 0; i > (k = pstab[j]); j++)
@@ -563,10 +570,16 @@ ptps(void)
 			k = pstab[--j];
 			break;
 		}
-	if ((z = zoomtab[xfont]) == 0 || z == 1)
-		fdprintf(ptid, "s%d\n", k);	/* really should put out string rep of size */
+	found = k == i;
+	if (dev.anysize)
+		k = i;
+	s = u2pts(k);
+	if ((z = zoomtab[xfont]) != 0 && dev.anysize)
+		s *= z;
+	if (dev.anysize && (!found || z != 0 && z != 1))
+		fdprintf(ptid, "s%d %f\n", -23, s);
 	else
-		fdprintf(ptid, "s%d %f\n", -23, (double)k*z);
+		fdprintf(ptid, "s%d\n", (int)s);	/* really should put out string rep of size */
 	mpts = i;
 	mzoom = z;
 }

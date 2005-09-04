@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.18 (gritter) 8/30/05
+ * Sccsid @(#)ext.h	1.19 (gritter) 9/4/05
  */
 
 /*
@@ -73,7 +73,7 @@ extern	filep	roff;
 extern	filep	woff;
 extern	short	*chtab;
 extern	int	*pnp;
-extern	short	*pstab;
+extern	int	*pstab;
 extern	int	app;
 extern	int	ascii;
 extern	int	bd;
@@ -187,7 +187,7 @@ extern	tchar	ch;
 extern	tchar	nrbits;
 extern	tchar	oline[];
 extern	struct widcache {	/* width cache, indexed by character */
-	short	fontpts;
+	int	fontpts;
 	int	width;
 } widcache[NWIDCACHE];
 extern	char gchtab[];

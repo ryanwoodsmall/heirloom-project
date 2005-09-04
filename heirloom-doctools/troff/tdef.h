@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.34 (gritter) 8/31/05
+ * Sccsid @(#)tdef.h	1.36 (gritter) 9/4/05
  */
 
 /*
@@ -85,8 +85,8 @@
 #	define	SS	12	/* space size in 36ths of an em */
 #	define	PO	(INCH)	/* page offset 1 inch */
 /* #	define	EM	(POINT * pts) */
-#define	EM	(((long) INCH * pts + 36) / 72)	/* don't lose significance */
-#define	EMPTS(pts)	(((long) INCH * (pts) + 36) / 72)
+#define	EM	(((long) INCH * u2pts(pts) + 36) / 72)	/* don't lose significance */
+#define	EMPTS(pts)	(((long) INCH * u2pts(pts) + 36) / 72)
 #	define	ASCII	0
 #	define	PTID	1
 #	define	LG	1
@@ -193,15 +193,15 @@ extern	int	NMF;	/* size of space for -m flags */
 /*
 	Internal character representation:
 	Internally, every character is carried around as
-	a 32 bit cookie, called a "tchar" (typedef long).
-	Bits are numbered 31..0 from left to right.
+	a 64 bit cookie, called a "tchar" (typedef long long).
+	Bits are numbered 63..0 from left to right.
 	If bit 15 is 1, the character is motion, with
 		if bit 16 it's vertical motion
 		if bit 17 it's negative motion
 	If bit 15 is 0, the character is a real character.
-		if bit 31	zero motion
-		bits 30..24	size
-		bits 23..16	font
+		if bit 63	zero motion
+		bits 62..40	size
+		bits 39..32	font
 ifndef EUC
 		bit 8		absolute char number in 7..0
 	This implies at most 256-32 characters in a single font,
@@ -213,15 +213,15 @@ else
 endif EUC
 */
 
-/* in the following, "L" should really be a tchar, but ... */
+/* in the following, "LL" should really be a tchar, but ... */
 
-#define	MOT	(01L<<15)	/* motion character indicator */
-#define	VMOT	(01L<<16)	/* vert motion bit */
-#define	NMOT	(01L<<17)	/* negative motion indicator*/
-#define	BMBITS	077777L		/* basic absolute motion bits */
-#define	XMBITS	0x7FFC0000L	/* extended absolute motion bits */
+#define	MOT	(01LL<<15)	/* motion character indicator */
+#define	VMOT	(01LL<<16)	/* vert motion bit */
+#define	NMOT	(01LL<<17)	/* negative motion indicator*/
+#define	BMBITS	077777LL	/* basic absolute motion bits */
+#define	XMBITS	0x7FFC0000LL	/* extended absolute motion bits */
 #define	XMSHIFT	3		/* extended absolute motion shift */
-#define	MAXMOT	0x0FFFFFFFL	/* bad way to write this!!! */
+#define	MAXMOT	0x0FFFFFFFLL	/* bad way to write this!!! */
 
 #define	ismot(n)	((n) & MOT)
 #define	isvmot(n)	((n) & VMOT)	/* must have tested MOT previously */
@@ -229,23 +229,23 @@ endif EUC
 #define	absmot(n)	(unsigned long)(BMBITS&(n) | ((n)&XMBITS)>>XMSHIFT)
 #define	sabsmot(n)	((n)&BMBITS | ((n)&~BMBITS)<<XMSHIFT)
 
-#define	ZBIT	0x80000000 	/*  (01L << 31) */	/* zero width char */
+#define	ZBIT		(01LL << 63) 	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
 #define	ABSCHAR		0400	/* absolute char number in this font */
 
-#define	SMASK		(0177L << 24)
-#define	FMASK		(0377L << 16)
+#define	SMASK		(037777777LL << 40)
+#define	FMASK		(0377LL << 32)
 #define	SFMASK		(SMASK|FMASK)	/* size and font in a tchar */
-#define	sbits(n)	(unsigned)(((n) >> 24) & 0177)
-#define	fbits(n)	(((n) >> 16) & 0377)
-#define	sfbits(n)	(unsigned)(0177777 & (((n) & SFMASK) >> 16))
+#define	sbits(n)	(unsigned)(((n) >> 40) & 037777777)
+#define	fbits(n)	(((n) >> 32) & 0377)
+#define	sfbits(n)	(unsigned)(037777777777UL & (((n) & SFMASK) >> 32))
 #define	cbits(n)	(unsigned)(0177777 & (n))	/* isolate bottom 16 bits  */
 #define	absbits(n)	(cbits(n) & ~ABSCHAR)
 
-#define	setsbits(n,s)	n = (n & ~SMASK) | (tchar)(s) << 24
-#define	setfbits(n,f)	n = (n & ~FMASK) | (tchar)(f) << 16
-#define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 16
-#define	setcbits(n,c)	n = (n & ~077777L | (c))	/* set character bits */
+#define	setsbits(n,s)	n = (n & ~SMASK) | (tchar)(s) << 40
+#define	setfbits(n,f)	n = (n & ~FMASK) | (tchar)(f) << 32
+#define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 32
+#define	setcbits(n,c)	n = (n & ~077777LL | (c))	/* set character bits */
 
 #define	BYTEMASK	0377
 #define	BYTE	8
@@ -341,7 +341,7 @@ typedef unsigned int filep;	/* this is good for 32 bit machines */
 #define	ENV_BLK		((NEV * sizeof(env) / sizeof(tchar) + BLK-1) / BLK)
 				/* rounded up to even BLK */
 
-typedef	long	tchar;
+typedef	long long	tchar;
 
 #define	atoi()		((int) atoi0())
 
@@ -803,8 +803,8 @@ int getword(int);
 void storeword(register tchar, register int);
 /* n8.c */
 void hyphen(tchar *);
-int punct(int);
-int alph(int);
+int punct(tchar);
+int alph(tchar);
 void caseht(void);
 void casehw(void);
 int exword(void);

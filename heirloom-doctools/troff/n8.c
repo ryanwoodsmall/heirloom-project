@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.14 (gritter) 9/3/05
+ * Sccsid @(#)n8.c	1.15 (gritter) 9/4/05
  */
 
 /*
@@ -137,7 +137,7 @@ hyphen(tchar *wp)
 
 
 int 
-punct(int i)
+punct(tchar i)
 {
 	if (!cbits(i) || alph(i))
 		return(0);
@@ -147,7 +147,7 @@ punct(int i)
 
 
 int 
-alph(int j)
+alph(tchar j)
 {
 	int i = cbits(j);
 #ifndef	NROFF

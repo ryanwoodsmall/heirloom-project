@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.5 (gritter) 9/4/05
+ * Sccsid @(#)dev.h	1.6 (gritter) 9/4/05
  */
 
 /*
@@ -60,6 +60,7 @@ struct dev {
 	int	nfonts;		/* number of fonts physically available */
 	int	nsizes;		/* number of sizes it has */
 	int	sizescale;	/* scaling for fractional point sizes */
+	int	anysize;	/* device can print any size */
 	int	paperwidth;	/* max line length in units */
 	int	paperlength;	/* max paper length in units */
 	int	nchtab;		/* number of funny names in chtab */

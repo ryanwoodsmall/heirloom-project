@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.61 (gritter) 9/4/05
+ * Sccsid @(#)t6.c	1.63 (gritter) 9/4/05
  */
 
 /*
@@ -71,7 +71,7 @@
 	 * fitab[f][c].
 	 */
 int	*fontlab;
-short	*pstab;
+int	*pstab;
 int	*cstab;
 int	*ccstab;
 int	**fallbacktab;
@@ -115,7 +115,7 @@ width(register tchar j)
 		xpts = ppts;
 	} else 
 		xbits(j, 0);
-	if (widcache[i-32].fontpts == (xfont<<8) + xpts && !setwdf)
+	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf)
 		k = widcache[i-32].width;
 	else {
 		k = getcw(i-32);
@@ -218,7 +218,7 @@ getcw(register int i)
 	if (setwdf)
 		numtab[CT].val |= kerntab[ofont][j];
 	k = *(p + j);
-	if ((z = zoomtab[xfont]) == 0)
+	if (dev.anysize == 0 || (z = zoomtab[xfont]) == 0)
 		z = 1;
 	k *= z;
  g1:
@@ -227,13 +227,13 @@ getcw(register int i)
 	if (cs = cstab[ofont]) {
 		nocache = 1;
 		if (ccs = ccstab[ofont])
-			x = ccs; 
+			x = pts2u(ccs); 
 		else 
 			x = xpts;
 		cs = (cs * EMPTS(x)) / 36;
 	}
-	k = (k * xpts + (Unitwidth / 2)) / Unitwidth;
-	s = xpts*INCH/72;
+	k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+	s = xpts;
 	lastkern = 0;
 	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1) {
 		nocache = 1;
@@ -256,7 +256,7 @@ getcw(register int i)
 	if (nocache|bd)
 		widcache[i].fontpts = 0;
 	else {
-		widcache[i].fontpts = (xfont<<8) + xpts;
+		widcache[i].fontpts = xfont + (xpts<<8);
 		widcache[i].width = k;
 	}
 	return(k);
@@ -310,16 +310,15 @@ getkw(tchar c, tchar d)
 		return 0;
 	if ((s = sbits(c)) == 0)
 		s = xpts;
-	else
-		s = pstab[s-1];
 	i = cbits(c);
 	j = cbits(d);
 	if (i >= 32 && j >= 32) {
 		if (afmtab && (n = (fontbase[f]->afmpos)-1) >= 0) {
 			a = afmtab[n];
 			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
-				k = (k * s + (Unitwidth / 2)) / Unitwidth;
-				if ((z = zoomtab[f]) != 0)
+				k = (k * u2pts(s) + (Unitwidth / 2))
+					/ Unitwidth;
+				if (dev.anysize && (z = zoomtab[f]) != 0)
 					k *= z;
 				lastkern += k;
 				return k;
@@ -337,7 +336,7 @@ xbits(register tchar i, int bitf)
 	xfont = fbits(i);
 	k = sbits(i);
 	if (k) {
-		xpts = pstab[--k];
+		xpts = dev.anysize ? k : pstab[--k];
 		oldbits = sfbits(i);
 		pfont = xfont;
 		ppts = xpts;
@@ -414,7 +413,8 @@ tchar setch(int delim)
 {
 	register int j;
 	char	temp[NC];
-	int	c, f, n;
+	tchar	c;
+	int	f, n;
 
 	n = 0;
 	do {
@@ -487,9 +487,10 @@ caseps(void)
 	if (skip())
 		i = apts1;
 	else {
-		noscale++;
-		i = inumb(&apts);	/* this is a disaster for fractional point sizes */
-		noscale = 0;
+		dfact = INCH;
+		dfactd = 72;
+		res = VERT;
+		i = inumb(&apts);
 		if (nonumb)
 			return;
 	}
@@ -509,6 +510,8 @@ casps1(register int i)
 	if (i <= 0)
 		return;
 */
+	if (xflag == 0)
+		i = pts2u(u2pts(i));
 	apts1 = apts;
 	apts = i;
 	pts1 = pts;
@@ -521,6 +524,8 @@ findps(register int i)
 {
 	register int j, k;
 
+	if (dev.anysize)
+		return i;
 	for (j=k=0 ; pstab[j] != 0 ; j++)
 		if (abs(pstab[j]-i) < abs(pstab[k]-i))
 			k = j;
@@ -534,7 +539,9 @@ mchbits(void)
 	register int i, j, k;
 
 	i = pts;
-	for (j = 0; i > (k = pstab[j]); j++)
+	if (dev.anysize)
+		j = i - 1;
+	else for (j = 0; i > (k = pstab[j]); j++)
 		if (!k) {
 			k = pstab[--j];
 			break;
@@ -560,13 +567,16 @@ setps(void)
 		    isdigit(j)) {	/* \sdd */
 			j = 10 * i + j - '0';
 			ch = 0;
+			j = pts2u(j);
 		} else		/* \sd */
-			j = i;
+			j = pts2u(i);
 	} else if (i == '(') {		/* \s(dd */
 		j = cbits(getch()) - '0';
 		j = 10 * j + cbits(getch()) - '0';
 		if (j == 0)		/* \s(00 */
 			j = apts1;
+		else
+			j = pts2u(j);
 	} else if (i == '+' || i == '-') {	/* \s+, \s- */
 		j = cbits(getch());
 		if (ischar(j) && isdigit(j)) {		/* \s+d, \s-d */
@@ -577,7 +587,16 @@ setps(void)
 		}
 		if (i == '-')
 			j = -j;
+		j = pts2u(j);
 		j += apts;
+	} else if (i == '\'' && xflag) {
+		dfact = INCH;
+		dfactd = 72;
+		res = VERT;
+		j = inumb(&apts);
+		if (nonumb)
+			return;
+		getch();
 	}
 	casps1(j);
 }
@@ -673,7 +692,7 @@ setwd(void)
 		wid += k;
 		numtab[HP].val += k;
 		if (!ismot(i)) {
-			emsz = POINT * xpts;
+			emsz = POINT * u2pts(xpts);
 		} else if (isvmot(i)) {
 			k = absmot(i);
 			if (isnmot(i))
@@ -1466,4 +1485,16 @@ tr2un(tchar i, int f)
 					return unimap[c].code;
 	}
 	return -1;
+}
+
+int
+pts2u(int p)
+{
+	return p * INCH / 72;
+}
+
+double
+u2pts(int u)
+{
+	return u * 72.0 / INCH;
 }

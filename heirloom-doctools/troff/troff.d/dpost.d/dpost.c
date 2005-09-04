@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.47 (gritter) 9/4/05
+ * Sccsid @(#)dpost.c	1.48 (gritter) 9/4/05
  */
 
 /*
@@ -363,7 +363,7 @@ char		*realdev = DEVNAME;	/* a good description of target printer */
 
 struct dev	dev;			/* DESC starts this way */
 struct Font	*fontbase[NFONT+1];	/* FONT files begin this way */
-short		*pstab;			/* list of available sizes */
+int		*pstab;			/* list of available sizes */
 int		nsizes = 1;		/* and the number of sizes in that list */
 int		smnt;			/* index of first special font */
 int		nchtab;			/* number of special character names */
@@ -1513,8 +1513,8 @@ fontinit(void)
 
     filebase = &descp[sizeof dev];
 
-    pstab = (short *) filebase;
-    chtab = pstab + nsizes + 1;
+    pstab = (int *) filebase;
+    chtab = (short *)(pstab + nsizes + 1);
     chname = (char *) (chtab + nchtab);
     fsize = 3 * 255 + nchtab + 128 - 32 + sizeof(struct Font);
 

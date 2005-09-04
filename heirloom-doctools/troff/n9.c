@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.14 (gritter) 8/25/05
+ * Sccsid @(#)n9.c	1.15 (gritter) 9/4/05
  */
 
 /*
@@ -216,7 +216,7 @@ setbra(void)
 	dwn = sabsmot(2 * t.Halfline) | MOT | VMOT;
 #endif
 #ifndef NROFF
-	dwn = sabsmot(EM) | MOT | VMOT;
+	dwn = sabsmot((int)EM) | MOT | VMOT;
 #endif
 	while (((k = cbits(i = getch())) != delim) && (k != '\n') &&  (j <= (brabuf + NC - 4))) {
 		*j++ = i | ZBIT;
@@ -234,7 +234,7 @@ setbra(void)
 	*--j = *brabuf = sabsmot(cnt * t.Halfline) | MOT | NMOT | VMOT;
 #endif
 #ifndef NROFF
-	*--j = *brabuf = sabsmot((cnt * EM) / 2) | MOT | NMOT | VMOT;
+	*--j = *brabuf = sabsmot((cnt * (int)EM) / 2) | MOT | NMOT | VMOT;
 #endif
 	*--j &= ~ZBIT;
 	pushback(brabuf);
