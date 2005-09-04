@@ -20,8 +20,6 @@ install: all
 		done && \
 		rm -f GI; ln -s HI GI
 	cp -R dev7200 $(ROOT)$(FNTDIR)
-	test -d $(ROOT)$(FNTDIR)/dev7200/pfb || \
-		mkdir -p $(ROOT)$(FNTDIR)/dev7200/pfb
 	rm -f $(ROOT)$(FNTDIR)/dev7200/charlib
 	ln -s ../devpost/charlib $(ROOT)$(FNTDIR)/dev7200/charlib
 	rm -f $(ROOT)$(FNTDIR)/dev7200/postscript

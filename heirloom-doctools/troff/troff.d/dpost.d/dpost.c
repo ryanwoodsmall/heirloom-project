@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.48 (gritter) 9/4/05
+ * Sccsid @(#)dpost.c	1.49 (gritter) 9/4/05
  */
 
 /*
@@ -1574,10 +1574,10 @@ loadfont (
     if (strchr(s, '/') != NULL)
 	strcpy(temp, s);
     else if (strstr(s, ".afm") != NULL)
-	snprintf(temp, sizeof temp, "%s/dev%s/afm/%s", fontdir, devname, s);
+	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s);
     else if ( s1 == NULL || s1[0] == '\0' )
-	snprintf(temp, sizeof temp, "%s/dev%s/afm/%s.afm", fontdir, devname, s);
-    else snprintf(temp, sizeof temp, "%s/afm/%s.afm", s1, s);
+	snprintf(temp, sizeof temp, "%s/dev%s/%s.afm", fontdir, devname, s);
+    else snprintf(temp, sizeof temp, "%s/%s.afm", s1, s);
 
     if ( (fin = open(temp, O_RDONLY)) >= 0 )  {
 	struct afmtab	*a;
@@ -2137,8 +2137,8 @@ supply1(char *font, char *file, char *type)
     char line[4096], c;
 
     if (strchr(file, '/') == 0) {
-    	snprintf(temp, sizeof temp, "%s/dev%s/%s/%s.%s",
-			fontdir, devname, type, file, type);
+    	snprintf(temp, sizeof temp, "%s/dev%s/%s.%s",
+			fontdir, devname, file, type);
 	file = temp;
     }
     if ((fp = fopen(file, "r")) == NULL)

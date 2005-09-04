@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.63 (gritter) 9/4/05
+ * Sccsid @(#)t6.c	1.64 (gritter) 9/4/05
  */
 
 /*
@@ -1134,14 +1134,8 @@ getfontpath(char *file, char *type)
 		} while (c);
 		free(troffonts);
 	}
-	if (type) {
-		tp = malloc(strlen(fontfile) + strlen(devname)
-				+ strlen(type) + 10);
-		sprintf(tp, "%s/dev%s/%s", fontfile, devname, type);
-	} else {
-		tp = malloc(strlen(fontfile) + strlen(devname) + 10);
-		sprintf(tp, "%s/dev%s", fontfile, devname);
-	}
+	tp = malloc(strlen(fontfile) + strlen(devname) + 10);
+	sprintf(tp, "%s/dev%s", fontfile, devname);
 	path = onefont(tp, file, type);
 	free(tp);
 	return path;
