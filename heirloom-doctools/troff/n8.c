@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.15 (gritter) 9/4/05
+ * Sccsid @(#)n8.c	1.16 (gritter) 9/5/05
  */
 
 /*
@@ -500,10 +500,11 @@ hyphenhnj(void)
 #ifdef	NROFF
 				if (m & ~0177)
 					return;
+				m = maplow(m, fbits(*wp));
 				*cp++ = m;
 				*wpp++ = wp - wdstart;
 #else
-				m = tr2un(m, fbits(*wp));
+				m = maplow(m, fbits(*wp));
 				if (m > 0 && m <= 0x7f) {
 					*cp++ = m;
 					*wpp++ = wp - wdstart;
