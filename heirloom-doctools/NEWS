@@ -171,6 +171,14 @@ are disabled.
 \E
 	is similar to "\e", but is not interpreted in copy mode.
 
+\n(.s
+	prints a decimal fraction if the current point size is not an
+	integer. Since standard number registers cannot hold decimal
+	fractions, point sizes must be saved and restored as follows:
+		.nr os \n(.sp
+		    . . .
+		.ps \n(osu
+
 \n[name]
 	refers to the number register "name".
 

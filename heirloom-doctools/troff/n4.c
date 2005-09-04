@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.9 (gritter) 9/4/05
+ * Sccsid @(#)n4.c	1.10 (gritter) 9/4/05
  */
 
 /*
@@ -98,6 +98,7 @@ setn(void)
 	register int i, j;
 	register tchar ii;
 	int	f;
+	double	fl;
 
 	f = nform = 0;
 	if ((i = cbits(ii = getach())) == '+')
@@ -113,7 +114,13 @@ setn(void)
 	if ((i & 0177) == '.')
 		switch (i >> BYTE) {
 		case 's': 
-			i = u2pts(pts);
+			i = fl = u2pts(pts);
+			if (i != fl) {
+				char	tb[20];
+				roff_sprintf(tb, "%f", fl);
+				cpushback(tb);
+				return;
+			}
 			break;
 		case 'v': 
 			i = lss;		
