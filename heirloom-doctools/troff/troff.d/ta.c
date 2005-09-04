@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)ta.c	1.5 (gritter) 8/13/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ta.sl	1.6 (gritter) 9/5/05";
 
 /*
  * University Copyright- Copyright (c) 1982, 1986, 1988
@@ -144,7 +144,7 @@ int	res	= 972;		/* input assumed computed according to this resolution */
 FILE	*tf;			/* output file */
 char	*fontdir	= FNTDIR;
 #define	devname	troff_devname
-extern char devname[];
+char	devname[20]	= "hp2621";
 
 FILE *fp;		/* input file pointer */
 
@@ -190,6 +190,8 @@ void setfont(int);
 void done(void);
 void callunix(char []);
 int readch(void);
+
+static int sget(char *, size_t, FILE *);
 
 int
 main(int argc, char **argv)
@@ -244,7 +246,7 @@ outlist(char *s)	/* process list of page numbers to be printed */
 	int n1, n2, i;
 
 	nolist = 0;
-	while (*s) {
+	while (*s && nolist < sizeof olist/sizeof *olist - 1) {
 		n1 = 0;
 		if (isdigit((unsigned char)*s))
 			do
@@ -292,7 +294,7 @@ conv(register FILE *fp)
 {
 	register int c, k;
 	int m, n, n1, m1;
-	char str[100], buf[300];
+	char str[4096], buf[4096];
 
 	while ((c = getc(fp)) != EOF) {
 		switch (c) {
@@ -316,7 +318,7 @@ conv(register FILE *fp)
 			put1(getc(fp));
 			break;
 		case 'C':
-			fscanf(fp, "%s", str);
+			sget(str, sizeof str, fp);
 			put1s(str);
 			break;
 		case 't':	/* straight text */
@@ -355,7 +357,7 @@ conv(register FILE *fp)
 			setsize(t_size(n));
 			break;
 		case 'f':
-			fscanf(fp, "%s", str);
+			sget(str, sizeof str, fp);
 			setfont(t_font(str));
 			break;
 		case 'H':	/* absolute horizontal motion */
@@ -417,17 +419,17 @@ conv(register FILE *fp)
 void
 devcntrl(FILE *fp)	/* interpret device control functions */
 {
-	char str[20];
+	char str[4096];
 	int n;
 
-	fscanf(fp, "%s", str);
+	sget(str, sizeof str, fp);
 	switch (str[0]) {	/* crude for now */
 	case 'i':	/* initialize */
 		fileinit();
 		t_init(0);
 		break;
 	case 'T':	/* device name */
-		fscanf(fp, "%s", devname);
+		sget(devname, sizeof devname, fp);
 		break;
 	case 't':	/* trailer */
 		t_trailer();
@@ -442,7 +444,8 @@ devcntrl(FILE *fp)	/* interpret device control functions */
 		fscanf(fp, "%d", &res);
 		break;
 	case 'f':	/* font used */
-		fscanf(fp, "%d %s", &n, str);
+		fscanf(fp, "%d", &n);
+		sget(str, sizeof str, fp);
 		loadfont(n, str);
 		break;
 	}
@@ -490,8 +493,6 @@ error(int f, const char *s, ...)
 	on the 202 (we hope).
 */
 
-
-char	devname[20]	= "hp2621";
 
 #define	ESC	033
 #define	HOME	'H'
@@ -571,7 +572,7 @@ void
 t_page(int n)	/* do whatever new page functions */
 {
 	int m, i;
-	char buf[100], *bp;
+	char buf[1024], *bp;
 
 	pgnum[np++] = n;
 	pgadr[np] = ftell(fp);
@@ -590,7 +591,7 @@ t_page(int n)	/* do whatever new page functions */
 
   next:
 	for (bp = buf; (*bp = readch()); )
-		if (*bp++ == '\n')
+		if (*bp++ == '\n' || bp >= &buf[sizeof buf - 1])
 			break;
 	*bp = 0;
 	switch (buf[0]) {
@@ -860,3 +861,21 @@ char *spectab[] ={
 	"or", "|",
 	0, 0,
 };
+
+static int
+sget(char *buf, size_t size, FILE *fp)
+{
+	int	c, n = 0;
+
+	do
+		c = getc(fp);
+	while (isspace(c));
+	if (c != EOF) do {
+		if (n+1 < size)
+			buf[n++] = c;
+		c = getc(fp);
+	} while (c != EOF && !isspace(c));
+	ungetc(c, fp);
+	buf[n] = 0;
+	return n > 1 ? 1 : c == EOF ? EOF : 0;
+}

@@ -10,7 +10,7 @@ FLAGS = -DUSG -DINCORE -DKERN $(EUC) -I. -I.. -DMACDIR='"$(MACDIR)"' \
 .c.o:
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(FLAGS) -c $<
 
-all: troff
+all: troff ta
 
 troff: $(OBJ) $(LIBHNJ)/libhnj.a
 	$(CC) $(LDFLAGS) $(OBJ) -L$(LIBHNJ) -lhnj $(LIBS) -o troff
@@ -21,6 +21,8 @@ ta: draw.o ta.o
 install:
 	$(INSTALL) -c troff $(ROOT)$(BINDIR)/troff
 	$(STRIP) $(ROOT)$(BINDIR)/troff
+	$(INSTALL) -c ta $(ROOT)$(BINDIR)/ta
+	$(STRIP) $(ROOT)$(BINDIR)/ta
 	$(INSTALL) -c -m 644 troff.1b $(ROOT)$(MANDIR)/man1b/troff.1b
 
 clean:
