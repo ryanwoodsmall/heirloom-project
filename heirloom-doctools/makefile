@@ -7,10 +7,10 @@ SUBDIRS = eqn/eqn.d \
 	troff/libhnj/hyphen.d \
 	troff/troff.d/font \
 	troff/troff.d/dpost.d \
-	troff/troff.d \
 	troff/troff.d/devaps \
 	troff/troff.d/tmac.d \
 	troff/troff.d/postscript \
+	troff/troff.d \
 	troff/nroff.d \
 	troff/nroff.d/terms.d \
 	picpack \

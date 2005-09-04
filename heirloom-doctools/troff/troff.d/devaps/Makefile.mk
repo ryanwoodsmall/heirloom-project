@@ -1,4 +1,4 @@
-VPATH=..
+VPATH = ..
 
 OBJ = daps.o build.o draw.o getopt.o daps_version.o
 
