@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.39 (gritter) 9/2/05
+ * Sccsid @(#)n3.c	1.40 (gritter) 9/4/05
  */
 
 /*
@@ -80,6 +80,7 @@ int	strflg;
 	tchar rbuf[BLK];
 #endif
 
+static void	caseshift(void);
 static int	getls(int);
 static void	addcon(int, char *, void(*)(int));
 
@@ -109,6 +110,7 @@ growcontab(void)
 		addcon(i++, "hylang", (void(*)(int))casehylang);
 		addcon(i++, "flig", (void(*)(int))caseflig);
 		addcon(i++, "papersize", (void(*)(int))casepapersize);
+		addcon(i++, "shift", (void(*)(int))caseshift);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
@@ -809,7 +811,7 @@ setstr(void)
 	}
 }
 
-
+static int	APERMAC = 9;
 
 void
 collect(void)
@@ -839,11 +841,11 @@ collect(void)
 		memp += sizeof(struct s);
 		/*
 		 *	CPERMAC (the total # of characters for ALL arguments)
-		 *	to a macros, has been carefully chosen
-		 *	so that the distance between stack frames is < DELTA 
+		 *	to a macro
 		 */
 #define	CPERMAC	200
-#define	APERMAC	9
+		if (xflag)
+			APERMAC = 200;
 		memp += APERMAC * sizeof(tchar *);
 		memp += CPERMAC * sizeof(tchar);
 		nxf = (struct s*)memp;
@@ -926,13 +928,46 @@ seta(void)
 				cpushback(" ");
 		}
 		break;
+	case '(':
+		if (xflag == 0)
+			goto dfl;
+		c = cbits(getch());
+		i = 10 * (c - '0');
+		c = cbits(getch());
+		i += c - '0';
+		goto assign;
+	case '[':
+		if (xflag == 0)
+			goto dfl;
+		i = 0;
+		while ((c = cbits(getch())) != ']' && c != '\n' && c != 0)
+			i = 10 * i + (c - '0');
+		goto assign;
 	default:
 	dfl:	i = c - '0';
-		if (i > 0 && i <= APERMAC && i <= frame->nargs)
+	assign:	if (i > 0 && i <= APERMAC && i <= frame->nargs)
 			pushback(*(((tchar **)(frame + 1)) + i - 1));
 	}
 }
 
+void
+caseshift(void)
+{
+	int	i, j;
+
+	if (skip())
+		i = 1;
+	else
+		i = atoi();
+	if (nonumb)
+		return;
+	if (i > 0 && i <= APERMAC && i <= frame->nargs) {
+		frame->nargs -= i;
+		for (j = 1; j <= frame->nargs; j++)
+			*(((tchar **)(frame + 1)) + j - 1) =
+				*(((tchar **)(frame + 1)) + j + i - 1);
+	}
+}
 
 void
 caseda(void)

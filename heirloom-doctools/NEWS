@@ -130,6 +130,10 @@ are disabled.
 .return
 	immediately returns from the current macro to the level above.
 
+.shift [n]
+	shifts the arguments to the current macro by "n", or 1 if "n"
+	is missing.
+
 .ss n m							troff only
 	with the second argument "m" determines whether additional white
 	space is added between sentences. If m is zero, no additional
@@ -148,6 +152,10 @@ are disabled.
 	cause a decrease of letter space. No adjustment is performed on the
 	last character of an output line. Tracking also applies to characters
 	from another font that have been selected by the fallback sequence.
+
+\$(nn
+\$[nnn]
+	refer to arguments "nn" or "nnn" to a macro.
 
 \$*
 	prints all arguments to a macro, separated by spaces.

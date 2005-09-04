@@ -47,6 +47,9 @@ Release ...
   stretches like a regular " " when the line is adjusted.
 * [nt]roff: The "\E" escape is similar to "\e" but is not interpreted in
   copy mode.
+* [nt]roff: The ".shift" request shifts the arguments to a macro.
+* [nt]roff: The "\$(.." and "\$[...]" escapes can be used to refer to
+  macro arguments.
 * troff/dpost: The "\X'Sync'" escape forces dpost to write position and
   font information to the generated PostScript. This is sometimes useful
   to ensure that following "\X'PS: ...'" escapes work as expected.
