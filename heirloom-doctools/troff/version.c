@@ -6,9 +6,9 @@
 #define	USED
 #endif
 #ifdef	NROFF
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.148 (gritter) 9/4/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.149 (gritter) 9/4/05";
 #else	/* !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.148 (gritter) 9/4/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.149 (gritter) 9/4/05";
 #endif	/* !NROFF */
 /* SLIST */
 /*
@@ -19,7 +19,7 @@ mallint.h: * Sccsid @(#)mallint.h	1.4 (gritter) 8/27/05
 malloc.c: * Sccsid @(#)malloc.c	1.3 (gritter) 8/26/05
 n1.c: * Sccsid @(#)n1.c	1.32 (gritter) 9/2/05
 n2.c: * Sccsid @(#)n2.c	1.8 (gritter) 8/31/05
-n3.c: * Sccsid @(#)n3.c	1.40 (gritter) 9/4/05
+n3.c: * Sccsid @(#)n3.c	1.41 (gritter) 9/4/05
 n4.c: * Sccsid @(#)n4.c	1.10 (gritter) 9/4/05
 n5.c: * Sccsid @(#)n5.c	1.21 (gritter) 9/2/05
 n7.c: * Sccsid @(#)n7.c	1.23 (gritter) 8/29/05
@@ -40,7 +40,7 @@ troff.d/draw.c: * Sccsid @(#)draw.c	1.3 (gritter) 8/8/05
 troff.d/makedev.c: * Sccsid @(#)makedev.c	1.8 (gritter) 9/4/05
 troff.d/proto.h: * Sccsid @(#)proto.h	1.21 (gritter) 9/4/05
 troff.d/t10.c: * Sccsid @(#)t10.c	1.34 (gritter) 9/4/05
-troff.d/t6.c: * Sccsid @(#)t6.c	1.65 (gritter) 9/4/05
+troff.d/t6.c: * Sccsid @(#)t6.c	1.66 (gritter) 9/4/05
 troff.d/troff.h: * Sccsid @(#)troff.h	1.11 (gritter) 9/4/05
 troff.d/unimap.c: * Sccsid @(#)unimap.c	1.7 (gritter) 8/22/05
 troff.d/unimap.h: * Sccsid @(#)unimap.h	1.1 (gritter) 8/17/05

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.40 (gritter) 9/4/05
+ * Sccsid @(#)n3.c	1.41 (gritter) 9/4/05
  */
 
 /*
@@ -1195,11 +1195,15 @@ stackdump (void)	/* dumps stack of macros in process */
 	}
 }
 
+static char	laststr[NC+1];
+
 char *
 macname(int rq)
 {
 	static char	buf[3];
-	if (rq < MAXRQ2) {
+	if (rq < 0) {
+		return laststr;
+	} else if (rq < MAXRQ2) {
 		buf[0] = rq&0177;
 		buf[1] = (rq>>BYTE)&0177;
 		buf[2] = 0;
@@ -1265,23 +1269,23 @@ maybemore(int sofar, int create)
 static int
 getls(int termc)
 {
-	char	c, buf[NC];
-	int	i = 0, j = 0, n = -1;
+	char	c;
+	int	i = 0, j = -1, n = -1;
 
 	do {
 		c = getach();
-		if (i >= sizeof buf)
+		if (i >= sizeof laststr)
 			return -1;
-		buf[i++] = c;
+		laststr[i++] = c;
 	} while (c && c != termc);
-	buf[--i] = 0;
+	laststr[--i] = 0;
 	if (i == 0 || c != termc)
 		j = 0;
 	else if (i <= 2) {
-		j = PAIR(buf[0], buf[1]);
+		j = PAIR(laststr[0], laststr[1]);
 	} else {
 		for (n = 0; n < hadn; n++)
-			if (strcmp(had[n], buf) == 0)
+			if (strcmp(had[n], laststr) == 0)
 				break;
 		if (n == hadn)
 			n = -1;
