@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.12 (gritter) 9/3/05
+.\" Sccsid @(#)troffdemo.tr	1.13 (gritter) 9/4/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .papersize a4
 .ll 17c
@@ -57,10 +57,10 @@
 .	repeat1 \\$3 \\$2
 ..
 .nr hl \n(.l/2
-.ps 23
+.ps 22.9
 .ft O
-.repeat 10 left \[ornament26d]
-.repeat 10 right \[ornament26a]
+.repeat 9 left \[ornament26d]
+.repeat 9 right \[ornament26a]
 .sp |2.2c
 .ce
 \[ornament2a]\*[left]\*[right]\[ornament3a]
@@ -81,7 +81,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/3/05
+9/4/05
 .sp 2v
 .ad b
 .ps 12
