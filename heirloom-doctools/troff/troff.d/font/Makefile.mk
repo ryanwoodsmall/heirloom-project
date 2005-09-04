@@ -8,35 +8,17 @@ FLAGS = -I. -I.. -DFNTDIR='"$(FNTDIR)"'
 .c.o:
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(FLAGS) -c $<
 
-all: makedev fonts links
+all: links
 
-makedev: makedev.o
-	$(CC) $(LDFLAGS) makedev.o $(LIBS) -o makedev
-
-fonts: makedev
-	cd devpost && \
-	for i in DESC $(FONTS); \
-	do \
-		../makedev $$i || exit; \
-	done
-	cd dev7200 && \
-	for i in DESC $(FONTS); \
-	do \
-		test -f $$i || continue; \
-		../makedev $$i || exit; \
-	done
-
-links: fonts
+links:
 	cd devpost && \
 	for i in G HM HK HL; \
 	do \
-		rm -f $$i.out; ln -s H.out $$i.out || exit; \
+		rm -f $$i; ln -s H $$i || exit; \
 	done && \
-	rm -f GI.out; ln -s HI.out GI.out
+	rm -f GI; ln -s HI GI
 
 install: all
-	$(INSTALL) -c makedev $(ROOT)$(BINDIR)/makedev
-	$(STRIP) $(ROOT)$(BINDIR)/makedev
 	test -d $(ROOT)$(FNTDIR) || mkdir -p $(ROOT)$(FNTDIR)
 	cp -R devpost $(ROOT)$(FNTDIR)
 	cp -R dev7200 $(ROOT)$(FNTDIR)
@@ -48,8 +30,6 @@ install: all
 	ln -s ../devpost/postscript $(ROOT)$(FNTDIR)/dev7200/postscript
 
 clean:
-	rm -f makedev makedev.o devpost/*.out dev7200/*.out core log *~
+	rm -f core log *~
 
 mrproper: clean
-
-makedev.o: makedev.c ../dev.h

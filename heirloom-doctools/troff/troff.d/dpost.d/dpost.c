@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.46 (gritter) 9/3/05
+ * Sccsid @(#)dpost.c	1.47 (gritter) 9/4/05
  */
 
 /*
@@ -361,8 +361,8 @@ char		*realdev = DEVNAME;	/* a good description of target printer */
  */
 
 
-struct dev	dev;			/* DESC.out starts this way */
-struct Font	*fontbase[NFONT+1];	/* FONT.out files begin this way */
+struct dev	dev;			/* DESC starts this way */
+struct Font	*fontbase[NFONT+1];	/* FONT files begin this way */
 short		*pstab;			/* list of available sizes */
 int		nsizes = 1;		/* and the number of sizes in that list */
 int		smnt;			/* index of first special font */
@@ -475,7 +475,7 @@ struct  {
  * device. gotspecial keeps track of whether we've done it yet. seenpage is set
  * to TRUE after we've seen the first page command in the input file. It controls
  * what's done in t_font() and is needed because nfonts is no longer set when the
- * DESC.out file is read, but rather is updated from "x font" commands in the
+ * DESC file is read, but rather is updated from "x font" commands in the
  * input files.
  *
  */
@@ -1477,21 +1477,21 @@ fontinit(void)
 {
 
 
-    int		fin;			/* for reading the DESC.out file */
+    char	*descp;			/* for reading the DESC file */
     char	*filebase;		/* the whole thing goes here */
     int		i;			/* loop index */
 
 
 /*
  *
- * Reads *realdev's DESC.out file and uses what's there to initialize things like
+ * Reads *realdev's DESC file and uses what's there to initialize things like
  * the list of available point sizes. Old versions of the program used *devname's
- * DESC.out file to initialize nfonts, but that meant we needed to have *devname's
+ * DESC file to initialize nfonts, but that meant we needed to have *devname's
  * binary font files available for emulation. That restriction has been removed
  * and we now set nfonts using the "x font" commands in the input file, so by the
  * time we get here all we really need is *realdev. In fact devcntrl() reads the
  * device name from the "x T ..." command, but almost immediately replaces it with
- * string *realdev so we end up using *realdev's DESC.out file. Later on (in
+ * string *realdev so we end up using *realdev's DESC file. Later on (in
  * t_font()) we mount all of *realdev's special fonts after the last legitimate
  * font position, just to be sure device emulation works reasonably well - there's
  * no guarantee *devname's special fonts match what's needed when *realdev's tables
@@ -1500,22 +1500,18 @@ fontinit(void)
  */
 
 
-    snprintf(temp, sizeof temp, "%s/dev%s/DESC.out", fontdir, devname);
-    if ( (fin = open(temp, O_RDONLY)) < 0 )
+    snprintf(temp, sizeof temp, "%s/dev%s/DESC", fontdir, devname);
+    if ( (descp = readdesc(temp)) < 0 )
 	error(FATAL, "can't open tables for %s", temp);
 
-    read(fin, &dev, sizeof(struct dev));
+    memcpy(&dev, descp, sizeof dev);
 
     nfonts = 0;				/* was dev.nfonts - now set in t_fp() */
     nsizes = dev.nsizes;
     nchtab = dev.nchtab;
     unitwidth = dev.unitwidth;
 
-    if ( (filebase = malloc(dev.filesize)) == NULL )
-	error(FATAL, "no memory for description file");
-
-    read(fin, filebase, dev.filesize);	/* all at once */
-    close(fin);
+    filebase = &descp[sizeof dev];
 
     pstab = (short *) filebase;
     chtab = pstab + nsizes + 1;
@@ -1543,7 +1539,7 @@ fontinit(void)
 void
 loadfont (
     int n,			/* load this font position */
-    char *s,			/* with the .out file for this font */
+    char *s,			/* with the file for this font */
     char *s1,			/* taken from here - possibly */
     int forcespecial		/* this is definitively a special font */
 )
@@ -1552,14 +1548,15 @@ loadfont (
 {
 
 
-    int		fin;			/* for reading *s.out file */
+    char	*fpout = NULL;		/* for reading *s file */
+    int		fin;			/* for reading *s.afm file */
     int		nw;			/* number of width table entries */
     char	*p;
 
 
 /*
  *
- * Loads font position n with the binary font file for *s.out provided it's not
+ * Loads font position n with the binary font file for *s provided it's not
  * already there. If *s1 is NULL or points to the empty string we read files from
  * directory *fontdir/dev*devname, otherwise directory *s1 is used. If the first
  * open fails we try to map font *s into one we expect will be available, and then
@@ -1631,25 +1628,19 @@ have:   fontbase[n] = &a->Font;
 	goto done;
     }
     if ( s1 == NULL || s1[0] == '\0' )
-	snprintf(temp, sizeof temp, "%s/dev%s/%s.out", fontdir, devname, s);
-    else snprintf(temp, sizeof temp, "%s/%s.out", s1, s);
+	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s);
+    else snprintf(temp, sizeof temp, "%s/%s", s1, s);
 
-    if ( (fin = open(temp, O_RDONLY)) < 0 )  {
-    fail:   snprintf(temp, sizeof temp, "%s/dev%s/%s.out",
+    if ( access(temp, R_OK) < 0 ) 
+            snprintf(temp, sizeof temp, "%s/dev%s/%s",
 			    fontdir, devname, mapfont(s));
-	    if ( (fin = open(temp, O_RDONLY)) < 0 )
-	        error(FATAL, "can't open font table %s", temp);
-    }	/* End if */
+    if ((fpout = readfont(temp, &dev)) == NULL)
+    fail:   error(FATAL, "can't open font table %s", temp);
 
     if ( fontbase[n] != NULL )		/* something's already there */
 	free(fontbase[n]);		/* so release the memory first */
 
-    fontbase[n] = (struct Font *) malloc(fsize);
-    if ( fontbase[n] == NULL )
-	error(FATAL, "Out of space in loadfont %s", s);
-
-    read(fin, fontbase[n], fsize);
-    close(fin);
+    fontbase[n] = (struct Font *)fpout;
 
     p = (char *) fontbase[n] + sizeof(struct Font);
     nw = fontbase[n]->nwfont & BMASK;
@@ -1689,7 +1680,7 @@ loadspecial(void)
  * no consistency in special fonts across different devices, and relying on having
  * them mounted in the input file doesn't guarantee the whole collection will be
  * there. The special fonts are determined and mounted using the copy of the
- * DESC.out file that's been read into memory. Initially had this stuff at the
+ * DESC file that's been read into memory. Initially had this stuff at the
  * end of fontinit(), but we now don't know nfonts until much later.
  *
  */

@@ -55,6 +55,8 @@ Release ...
 * eqn: The default resolution has been changed to 7200 dpi to match that
   of troff. The "-r" option was introduced to change it.
 * eqn: Handles "\[]" and "\*[]" now.
+* troff, dpost: Device and font descriptions are now read directly from
+  text files; the "makedev" utility is no longer needed.
 * The file "NEWS" describes new troff language features.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
 * [nt]roff: There is no static limit on the ".hw" table anymore.

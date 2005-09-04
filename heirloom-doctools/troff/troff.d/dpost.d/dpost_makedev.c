@@ -23,33 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.10 (gritter) 9/4/05
+ * Sccsid @(#)dpost_makedev.c	1.1 (gritter) 9/4/05
  */
 
-extern struct tracktab {
-	int	s1;
-	int	n1;
-	int	s2;
-	int	n2;
-} *tracktab;
-
-extern	struct dev	dev;
-extern	int		Nfont;
-extern	struct Font	**fontbase;
-extern	int		*cstab;
-extern	int		*ccstab;
-extern	int		**fallbacktab;
-extern	float		*zoomtab;
-
-extern	int		nchtab;
-extern	char		*chname;
-extern	short		*chtab;
-
-extern	int		kern;
-
-extern	long		realpage;
-
-extern	void		growfonts(int);
-extern	void		loadafm(int, int, char *, char *);
-extern	int		getkw(tchar, tchar);
-extern	void		ptpapersize(int, int);
+#include "../makedev.c"

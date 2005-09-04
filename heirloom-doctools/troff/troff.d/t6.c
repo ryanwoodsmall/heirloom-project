@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.59 (gritter) 9/2/05
+ * Sccsid @(#)t6.c	1.61 (gritter) 9/4/05
  */
 
 /*
@@ -274,7 +274,7 @@ int
 abscw(int n)	/* return index of abs char n in fontab[], etc. */
 {	register int i, ncf;
 
-	if (afmtab && (i = (fontbase[xfont]->spare1&BYTEMASK) - 1) >= 0)
+	if (afmtab && (i = (fontbase[xfont]->afmpos) - 1) >= 0)
 		return afmtab[i]->fitab[n-32];
 	ncf = fontbase[xfont]->nwfont & BYTEMASK;
 	for (i = 0; i < ncf; i++)
@@ -315,7 +315,7 @@ getkw(tchar c, tchar d)
 	i = cbits(c);
 	j = cbits(d);
 	if (i >= 32 && j >= 32) {
-		if (afmtab && (n = (fontbase[f]->spare1&BYTEMASK)-1) >= 0) {
+		if (afmtab && (n = (fontbase[f]->afmpos)-1) >= 0) {
 			a = afmtab[n];
 			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
 				k = (k * s + (Unitwidth / 2)) / Unitwidth;
@@ -365,7 +365,7 @@ postchar1(const char *temp, int f)
 	struct afmtab	*a;
 	int	i;
 
-	if (afmtab && (i = (fontbase[f]->spare1&BYTEMASK) - 1) >= 0) {
+	if (afmtab && (i = (fontbase[f]->afmpos) - 1) >= 0) {
 		a = afmtab[i];
 		np = afmnamelook(a, temp);
 		if (np->afpos != 0) {
@@ -856,10 +856,10 @@ casefp(void)
 int
 setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts] */
 {
-	extern int sprintf(char *, const char *, ...);
-	register int k;
-	int n, nw;
-	char longname[NS], shortname[20], *ap;
+	extern int snprintf(char *, size_t, const char *, ...);
+	char longname[4096], shortname[20], *ap;
+	char *fpout;
+	int nw;
 
 	zapwcache(0);
 	if (truename)
@@ -869,34 +869,25 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 		shortname[1] = f >> BYTE;
 		shortname[2] = '\0';
 	}
-	sprintf(longname, "%s/dev%s/%s.out", fontfile, devname, shortname);
-	if ((k = open(longname, O_RDONLY)) < 0) {
-		errprint("Can't open %s", longname);
+	snprintf(longname, sizeof longname, "%s/dev%s/%s",
+			fontfile, devname, shortname);
+	if ((fpout = readfont(longname, &dev)) == NULL)
 		return(-1);
-	}
-	n = fontbase[pos]->nwfont & BYTEMASK;
-	read(k, (char *) fontbase[pos], 3*n + nchtab + 128 - 32 + sizeof(struct Font));
+	fontbase[pos] = (struct Font *)fpout;
 	if ((ap = strstr(fontbase[pos]->namefont, ".afm")) != NULL) {
 		*ap = 0;
 		if (ap == &fontbase[pos]->namefont[1])
 			f &= BYTEMASK;
 		loadafm(pos, f, fontbase[pos]->namefont, NULL);
+		free(fpout);
 	} else {
-		fontbase[pos]->spare1 = 0;
 		nw = fontbase[pos]->nwfont & BYTEMASK;
-		if (nw > n) {
-			errprint("Font %s too big for position %d", shortname,
-				pos);
-			return(-1);
-		}
 		makefont(pos, &((char *)fontbase[pos])[sizeof(struct Font)],
 			&((char *)fontbase[pos])[sizeof(struct Font) + nw],
 			&((char *)fontbase[pos])[sizeof(struct Font) + 2*nw],
 			&((char *)fontbase[pos])[sizeof(struct Font) + 3*nw],
 			nw);
-		fontbase[pos]->nwfont = n;	/* so can load a larger one again later */
 	}
-	close(k);
 	if (pos == smnt) {
 		smnt = 0; 
 		sbold = 0; 
@@ -1147,11 +1138,6 @@ loadafm(int nf, int rq, char *file, char *supply)
 	struct afmtab	*a;
 	int	i, have = 0;
 
-	if (nafm == 254) {
-		/* because of the spare1 field */
-		errprint("Too many AFM fonts, can't load %s", file);
-		return;
-	}
 	if (nf < 0 || nf > nfonts)
 		nf = nfonts + 1;
 	path = getfontpath(file, "afm");
@@ -1206,11 +1192,8 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	afmtab[nafm] = a;
 	if (nf >= Nfont)
 		growfonts(nf+1);
-	a->Font.spare1 = nafm+1;
-	if (nf <= NFONT && fontbase[nf])
-		*fontbase[nf] = afmtab[nafm]->Font;
-	else
-		fontbase[nf] = &afmtab[nafm]->Font;
+	a->Font.afmpos = nafm+1;
+	fontbase[nf] = &afmtab[nafm]->Font;
 	fontlab[nf] = rq;
 	free(fontab[nf]);
 	free(kerntab[nf]);
@@ -1317,7 +1300,7 @@ casehidechar(void)
 		if (fbits(k) != xfont || ismot(k) || i == ' ')
 			continue;
 		n = 128 - 32 + nchtab;
-		if (afmtab && (m=(fontbase[xfont]->spare1&BYTEMASK)-1) >= 0)
+		if (afmtab && (m=(fontbase[xfont]->afmpos)-1) >= 0)
 			n += afmtab[m]->nchars;
 		if (i < n)
 			fitab[xfont][i - 32] = 0;
@@ -1472,7 +1455,7 @@ tr2un(tchar i, int f)
 		return -1;
 	else if (i < 128)
 		return i;
-	if ((n = (fontbase[f]->spare1&BYTEMASK) - 1) >= 0) {
+	if ((n = (fontbase[f]->afmpos) - 1) >= 0) {
 		a = afmtab[n];
 		if (i - 32 >= nchtab + 128)
 			i -= nchtab + 128;

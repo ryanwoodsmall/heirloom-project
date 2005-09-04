@@ -32,7 +32,7 @@ install: all
 	$(INSTALL) -c daps $(ROOT)$(BINDIR)/daps
 	$(STRIP) $(ROOT)$(BINDIR)/daps
 	mkdir -p $(ROOT)$(FNTDIR)/devaps
-	for i in *.add *.out version; \
+	for i in $(FONTS) *.add *.out version; \
 	do \
 		$(INSTALL) -c -m 644 $$i $(ROOT)$(FNTDIR)/devaps/$$i || exit; \
 	done
@@ -43,5 +43,5 @@ clean:
 mrproper: clean
 
 build.o: build.c daps.h
-daps.o: daps.c aps.h ../dev.h daps.h daps.g
-makedev.o: makedev.c ../dev.h
+daps.o: daps.c aps.h dev.h daps.h daps.g
+makedev.o: makedev.c dev.h

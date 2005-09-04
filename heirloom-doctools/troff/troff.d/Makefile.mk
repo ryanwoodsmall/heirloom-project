@@ -1,7 +1,7 @@
 LIBHNJ = ../libhnj
 VPATH=..
 OBJ = t10.o t6.o hytab.o n1.o n2.o n3.o n4.o n5.o \
-	n7.o n8.o n9.o ni.o nii.o suftab.o afm.o unimap.o \
+	n7.o n8.o n9.o ni.o nii.o suftab.o makedev.o afm.o unimap.o \
 	malloc.o calloc.o version.o
 
 FLAGS = -DUSG -DINCORE -DKERN $(EUC) -I. -I.. -DMACDIR='"$(MACDIR)"' \
@@ -18,16 +18,13 @@ troff: $(OBJ) $(LIBHNJ)/libhnj.a
 ta: draw.o ta.o
 	$(CC) $(LDFLAGS) draw.o ta.o $(LIBS) -lm -o $@
 
-makedev: makedev.o
-	$(CC) $(LDFLAGS) makedev.o $(LIBS) -o $@
-
 install:
 	$(INSTALL) -c troff $(ROOT)$(BINDIR)/troff
 	$(STRIP) $(ROOT)$(BINDIR)/troff
 	$(INSTALL) -c -m 644 troff.1b $(ROOT)$(MANDIR)/man1b/troff.1b
 
 clean:
-	rm -f $(OBJ) draw.o ta.o makedev.o troff ta makedev core log *~
+	rm -f $(OBJ) draw.o ta.o troff ta core log *~
 
 mrproper: clean
 

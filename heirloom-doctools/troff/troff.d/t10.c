@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.31 (gritter) 8/30/05
+ * Sccsid @(#)t10.c	1.33 (gritter) 9/4/05
  */
 
 /*
@@ -145,8 +145,8 @@ growfonts(int n)
 void
 ptinit(void)
 {
-	int	i, fin, nw;
-	char	*filebase, *p, *ap;
+	int	i, nw;
+	char	*filebase, *p, *ap, *descp;
 
 	growfonts(NFONT+1);
 	/* open table for device,
@@ -155,12 +155,10 @@ ptinit(void)
 	 */
 	strcat(termtab, "/dev");
 	strcat(termtab, devname);
-	strcat(termtab, "/DESC.out");	/* makes "..../devXXX/DESC.out" */
-	if ((fin = open(termtab, O_RDONLY)) < 0) {
-		errprint("can't open tables for %s", termtab);
+	strcat(termtab, "/DESC");	/* makes "..../devXXX/DESC" */
+	if ((descp = readdesc(termtab)) == NULL)
 		done3(1);
-	}
-	read(fin, (char *) &dev, sizeof(struct dev ));
+	memcpy(&dev, descp, sizeof dev);
 	Inch = dev.res;
 	Hor = dev.hor;
 	Vert = dev.vert;
@@ -174,14 +172,14 @@ ptinit(void)
 		done3(1);
 	}
 	filebase = setbrk(dev.filesize + 2*EXTRAFONT);	/* enough room for whole file */
-	read(fin, filebase, dev.filesize);	/* all at once */
+	memcpy(filebase, &descp[sizeof dev], dev.filesize); /* all at once */
+	free(descp);
 	pstab = (short *) filebase;
 	chtab = pstab + nsizes + 1;
 	chname = (char *) (chtab + dev.nchtab);
 	p = chname + dev.lchname;
 	for (i = 1; i <= nfonts; i++) {
 		fontbase[i] = (struct Font *) p;
-		fontbase[i]->spare1 = 0;
 		nw = *p & BYTEMASK;	/* 1st thing is width count */
 		fontlab[i] = PAIR(fontbase[i]->namefont[0], fontbase[i]->namefont[1]);
 		/* for now, still 2 char names */
@@ -202,7 +200,6 @@ ptinit(void)
 	nw = EXTRAFONT - dev.nchtab - (128-32) - sizeof (struct Font);
 	fontbase[0]->nwfont = nw;
 	makefont(0, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
-	close(fin);
 	/* there are a lot of things that used to be constant
 	 * that now require code to be executed.
 	 */
@@ -643,9 +640,9 @@ newpage(int n)	/* called at end of each output page (we hope) */
 		return;
 	fdprintf(ptid, "p%d\n", n);	/* new page */
 	for (i = 0; i <= nfonts; i++)
-		if (afmtab && fontbase[i]->spare1)
+		if (afmtab && fontbase[i]->afmpos)
 			fdprintf(ptid, "x font %d %s\n", i,
-				afmtab[(fontbase[i]->spare1&BYTEMASK)-1]->path);
+				afmtab[(fontbase[i]->afmpos)-1]->path);
 		else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
 			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();

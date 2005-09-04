@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.3 (gritter) 8/8/05
+ * Sccsid @(#)makedev.c	1.5 (gritter) 9/4/05
  */
 
 /*
@@ -92,6 +92,10 @@
 	(Which suggests that they ought to be together?)
 	Later, we might allow for codes which are actually
 	sequences of formatting info so characters can be drawn.
+
+	As of 9/4/05, troff reads the text files directly, and this
+	code is called directly during initialization to fill the
+	binary structures in core.
 */
 
 #include	"stdio.h"
@@ -99,89 +103,87 @@
 #include	"fcntl.h"
 #include	"unistd.h"
 #include	"stdlib.h"
+#include	"ctype.h"
 #include	"dev.h"
+
+extern void	errprint(const char *, ...);
 
 #define	BYTEMASK	0377
 #define	skipline(f)	while(getc(f) != '\n')
 
-struct	dev	dev;
-struct	Font	font;
+static struct	dev	dev;
+static struct	Font	font;
 
 #define	NSIZE	100	/* maximum number of sizes */
-short	size[NSIZE];
+static short	size[NSIZE];
 #define	NCH	256	/* max number of characters with funny names */
-char	chname[5*NCH];	/* character names, including \0 for each */
-short	chtab[NCH];	/* index of character in chname */
+static char	chname[5*NCH];	/* character names, including \0 for each */
+static short	chtab[NCH];	/* index of character in chname */
 
 #define	NFITAB	(NCH + 128-32)	/* includes ascii chars, but not non-graphics */
-char	fitab[NFITAB];	/* font index table: position of char i on this font. */
+static char	fitab[NFITAB];	/* font index table: position of char i on this font. */
 			/* zero if not there */
 
 #define	FSIZE	256	/* size of a physical font (e.g., 102 for cat) */
-char	width[FSIZE];	/* width table for a physical font */
-char	kern[FSIZE];	/* ascender+descender info */
-char	code[FSIZE];	/* actual device codes for a physical font */
+static char	width[FSIZE];	/* width table for a physical font */
+static char	kern[FSIZE];	/* ascender+descender info */
+static char	code[FSIZE];	/* actual device codes for a physical font */
 
 #define	NFONT	60	/* max number of default fonts */
-char	fname[NFONT][10];	/* temp space to hold default font names */
+static char	fname[NFONT][10];	/* temp space to hold default font names */
 
-int	fflag	= 0;	/* on if font table to be written */
-int	fdout;	/* output file descriptor */
-char	*fout	= "DESC.out";
+static void *_readfont(const char *, size_t *);
+static int getlig(FILE *);
+static int sget(char *, size_t, FILE *);
 
-
-int dofont(char *);
-int getlig(FILE *);
-
-int main(int argc, char *argv[])
+void *
+readdesc(const char *name)
 {
 	FILE *fin;
-	char cmd[100], *p;
+	char cmd[4096], *p;
 	int i, totfont, v;
+	char *cpout, *fpout;
+	size_t sz, fsz;
+	char *dir, *dp, *dq;
 
-    if (argc < 2) {
-        fprintf(stderr, "Usage:  makedev [DESC] [fonts]\n");
-        exit(1);
-    }
-
-	if ((fin = fopen("DESC", "r")) == NULL) {
-		fprintf(stderr, "makedev: can't open %s\n", argv[1]);
-		exit(1);
+	if ((fin = fopen(name, "r")) == NULL) {
+		errprint("can't open tables for %s", name);
+		return NULL;
 	}
-	while (fscanf(fin, "%s", cmd) != EOF) {
+	while (sget(cmd, sizeof cmd, fin) != EOF) {
 		if (cmd[0] == '#')	/* comment */
 			skipline(fin);
 		else if (strcmp(cmd, "res") == 0) {
-			fscanf(fin, "%hd", &dev.res);
+			fscanf(fin, "%d", &dev.res);
 		} else if (strcmp(cmd, "hor") == 0) {
-			fscanf(fin, "%hd", &dev.hor);
+			fscanf(fin, "%d", &dev.hor);
 		} else if (strcmp(cmd, "vert") == 0) {
-			fscanf(fin, "%hd", &dev.vert);
+			fscanf(fin, "%d", &dev.vert);
 		} else if (strcmp(cmd, "unitwidth") == 0) {
-			fscanf(fin, "%hd", &dev.unitwidth);
+			fscanf(fin, "%d", &dev.unitwidth);
 		} else if (strcmp(cmd, "sizescale") == 0) {
-			fscanf(fin, "%hd", &dev.sizescale);
+			fscanf(fin, "%d", &dev.sizescale);
 		} else if (strcmp(cmd, "paperwidth") == 0) {
-			fscanf(fin, "%hd", &dev.paperwidth);
+			fscanf(fin, "%d", &dev.paperwidth);
 		} else if (strcmp(cmd, "paperlength") == 0) {
-			fscanf(fin, "%hd", &dev.paperlength);
+			fscanf(fin, "%d", &dev.paperlength);
 		} else if (strcmp(cmd, "biggestfont") == 0) {
-			fscanf(fin, "%hd", &dev.biggestfont);
+			fscanf(fin, "%d", &dev.biggestfont);
 		} else if (strcmp(cmd, "spare2") == 0) {
-			fscanf(fin, "%hd", &dev.spare2);
+			fscanf(fin, "%d", &dev.spare2);
 		} else if (strcmp(cmd, "sizes") == 0) {
 			dev.nsizes = 0;
 			while (fscanf(fin, "%d", &v) != EOF && v != 0)
 				size[dev.nsizes++] = v;
 			size[dev.nsizes] = 0;	/* need an extra 0 at the end */
 		} else if (strcmp(cmd, "fonts") == 0) {
-			fscanf(fin, "%hd", &dev.nfonts);
+			fscanf(fin, "%d", &dev.nfonts);
 			for (i = 0; i < dev.nfonts; i++)
-				fscanf(fin, "%s", fname[i]);
+				sget(fname[i], sizeof fname[i], fin);
 		} else if (strcmp(cmd, "charset") == 0) {
 			p = chname;
 			dev.nchtab = 0;
-			while (fscanf(fin, "%s", p) != EOF) {
+			while (sget(p, sizeof chname-(p-chname), fin) != EOF) {
 				chtab[dev.nchtab++] = p - chname;
 				while (*p++)	/* skip to end of name */
 					;
@@ -189,69 +191,79 @@ int main(int argc, char *argv[])
 			dev.lchname = p - chname;
 			chtab[dev.nchtab++] = 0;	/* terminate properly */
 		} else
-			fprintf(stderr, "makedev: unknown command %s\n", cmd);
+			errprint("Unknown command %s in %s", cmd, name);
 	}
-	if (argc > 0 && strcmp(argv[1], "DESC") == 0) {
-		fdout = creat(fout, 0666);
-		if (fdout < 0) {
-			fprintf(stderr, "makedev: can't open %s\n", fout);
-			exit(1);
-		}
-		write(fdout, &dev, sizeof(struct dev));
-		write(fdout, size, (dev.nsizes+1) * sizeof(size[0]));	/* we need a 0 on the end */
-		write(fdout, chtab, dev.nchtab * sizeof(chtab[0]));
-		write(fdout, chname, dev.lchname);
-		totfont = 0;
-		for (i = 0; i < dev.nfonts; i++) {
-			totfont += dofont(fname[i]);
-			write(fdout, &font, sizeof(struct Font));
-			write(fdout, width, font.nwfont & BYTEMASK);
-			write(fdout, kern, font.nwfont & BYTEMASK);
-			write(fdout, code, font.nwfont & BYTEMASK);
-			write(fdout, fitab, dev.nchtab+128-32);
-		}
-		lseek(fdout, 0L, 0);	/* back to beginning to install proper size */
-		dev.filesize =		/* excluding dev struct itself */
-			(dev.nsizes+1) * sizeof(size[0])
-			+ dev.nchtab * sizeof(chtab[0])
-			+ dev.lchname * sizeof(char)
-			+ totfont * sizeof(char);
-		write(fdout, &dev, sizeof(struct dev));
-		close(fdout);
-		argc--;
-		argv++;
+	fclose(fin);
+	cpout = calloc(1, sz = sizeof dev +
+			sizeof *size * (dev.nsizes+1) +
+			sizeof *chtab * dev.nchtab +
+			sizeof *chname * dev.lchname);
+	memcpy(cpout, &dev, sizeof dev);
+	v = sizeof dev;
+	memcpy(&cpout[v], size, sizeof *size * (dev.nsizes+1));
+	v += sizeof *size * (dev.nsizes+1);
+	memcpy(&cpout[v], chtab, sizeof *chtab * dev.nchtab);
+	v += sizeof *chtab * dev.nchtab;
+	memcpy(&cpout[v], chname, sizeof *chname * dev.lchname);
+	v += sizeof *chname * dev.lchname;
+	dp = dir = malloc(strlen(name) + sizeof fname[0] + 2);
+	strcpy(dir, name);
+	for (dq = dir; *dq; dq++)
+		if (*dq == '/')
+			dp = &dq[1];
+	totfont = 0;
+	for (i = 0; i < dev.nfonts; i++) {
+		strcpy(dp, fname[i]);
+		if ((fpout = _readfont(dir, &fsz)) == NULL)
+			return NULL;
+		sz += fsz;
+		cpout = realloc(cpout, sz);
+		memcpy(&cpout[v], fpout, fsz);
+		v += fsz;
+		free(fpout);
+		totfont += fsz;
 	}
-	for (i = 1; i < argc; i++)
-		dofont(argv[i]);
-	exit(0);
+	/* back to beginning to install proper size */
+	dev.filesize =		/* excluding dev struct itself */
+		(dev.nsizes+1) * sizeof(size[0])
+		+ dev.nchtab * sizeof(chtab[0])
+		+ dev.lchname * sizeof(chname[0])
+		+ totfont * sizeof(char);
+	memcpy(cpout, &dev, sizeof dev);
+	return cpout;
 }
 
-int
-dofont(char *name)	/* create fitab and width tab for font */
+void *
+readfont(const char *name, struct dev *dp)
+{
+	dev = *dp;
+	return _readfont(name, NULL);
+}
+
+static void *
+_readfont(const char *name, size_t *szp)	/* create fitab and width tab for font */
 {
 	FILE *fin;
-	int fdout;
 	int i, nw = 0, spacewidth, n = 0, v;
-	char buf[100], ch[10], s1[10], s2[10], s3[10], cmd[30];
+	char buf[100], ch[100], s1[100], s2[100], s3[100], cmd[30];
+	char *cpout;
 
 	if ((fin = fopen(name, "r")) == NULL) {
-		fprintf(stderr, "makedev: can't open font %s\n", name);
-		exit(2);
+		errprint("Can't font %s", name);
+		return NULL;
 	}
-	sprintf(cmd, "%s.out", name);
-	fdout = creat(cmd, 0666);
 	for (i = 0; i < NFITAB; i++)
 		fitab[i] = 0;
 	for (i = 0; i < FSIZE; i++)
 		width[i] = kern[i] = code[i] = 0;
 	font.specfont = font.ligfont = spacewidth = 0;
-	while (fscanf(fin, "%s", cmd) != EOF) {
+	while (sget(cmd, sizeof cmd, fin) != EOF) {
 		if (cmd[0] == '#')
 			skipline(fin);
 		else if (strcmp(cmd, "name") == 0)
-			fscanf(fin, "%s", font.namefont);
+			sget(font.namefont, sizeof font.namefont, fin);
 		else if (strcmp(cmd, "internalname") == 0)
-			fscanf(fin, "%s", font.intname);
+			sget(font.intname, sizeof font.intname, fin);
 		else if (strcmp(cmd, "special") == 0)
 			font.specfont = 1;
 		else if (strcmp(cmd, "spare1") == 0)
@@ -265,7 +277,7 @@ dofont(char *name)	/* create fitab and width tab for font */
 			skipline(fin);
 			nw = 0;
 			/* widths are origin 1 so fitab==0 can mean "not there" */
-			while (fgets(buf, 100, fin) != NULL) {
+			while (fgets(buf, sizeof buf, fin) != NULL) {
 				sscanf(buf, "%s %s %s %s", ch, s1, s2, s3);
 				if (s1[0] != '"') {	/* it's a genuine new character */
 					nw++;
@@ -279,18 +291,18 @@ dofont(char *name)	/* create fitab and width tab for font */
 					code[nw] = i;
 				}
 				/* otherwise it's a synonym for previous character,
-				/* so leave previous values intact
+				* so leave previous values intact
 				*/
 				if (strlen(ch) == 1)	/* it's ascii */
 					fitab[ch[0] - 32] = nw;	/* fitab origin omits non-graphics */
-				else {		/* it has a funny name */
+				else if (strcmp(ch, "---") != 0) {	/* it has a 2-char name */
 					for (i = 0; i < dev.nchtab; i++)
 						if (strcmp(&chname[chtab[i]], ch) == 0) {
 							fitab[i + 128-32] = nw;	/* starts after the ascii */
 							break;
 						}
 					if (i >= dev.nchtab)
-						fprintf(stderr, "makedev: font %s: %s not in charset\n", name, ch);
+						errprint("font %s: %s not in charset\n", name, ch);
 				}
 			}
 			nw++;
@@ -298,7 +310,7 @@ dofont(char *name)	/* create fitab and width tab for font */
 				n = dev.biggestfont;
 			else {
 				if (dev.biggestfont > 0)
-					fprintf(stderr, "font %s too big\n", name);
+					errprint("font %s too big\n", name);
 				n = nw;
 			}
 			font.nwfont = n;
@@ -308,16 +320,24 @@ dofont(char *name)	/* create fitab and width tab for font */
 		width[0] = dev.res * dev.unitwidth / 72 / 3;
 	fclose(fin);
 
-	write(fdout, &font, sizeof(struct Font));
-	write(fdout, width, font.nwfont & BYTEMASK);
-	write(fdout, kern, font.nwfont & BYTEMASK);
-	write(fdout, code, font.nwfont & BYTEMASK);
-	write(fdout, fitab, dev.nchtab+128-32);
-	close(fdout);
-	v = sizeof(struct Font) + 3 * n + dev.nchtab + 128-32;
-	fprintf(stderr, "%3s: %3d chars, width %3d, size %3d\n",
-		font.namefont, nw, width[0], v);
-	return v;
+	cpout = calloc(1, sizeof font +
+			sizeof *width * (font.nwfont & BYTEMASK) +
+			sizeof *kern * (font.nwfont & BYTEMASK) +
+			sizeof *code * (font.nwfont & BYTEMASK) +
+			sizeof *fitab * dev.nchtab+128-32);
+	memcpy(cpout, &font, sizeof font);
+	v = sizeof font;
+	memcpy(&cpout[v], width, sizeof *width * (font.nwfont & BYTEMASK));
+	v +=  sizeof *width * (font.nwfont & BYTEMASK);
+	memcpy(&cpout[v], kern, sizeof *kern * (font.nwfont & BYTEMASK));
+	v += sizeof *kern * (font.nwfont & BYTEMASK);
+	memcpy(&cpout[v], code, sizeof *code * (font.nwfont & BYTEMASK));
+	v += sizeof *code * (font.nwfont & BYTEMASK);
+	memcpy(&cpout[v], fitab, sizeof *fitab * dev.nchtab+128-32);
+	v += sizeof *fitab * dev.nchtab+128-32;
+	if (szp)
+		*szp = v;
+	return cpout;
 }
 
 int
@@ -327,7 +347,7 @@ getlig(FILE *fin)	/* pick up ligature list */
 	char temp[100];
 
 	lig = 0;
-	while (fscanf(fin, "%s", temp) != EOF && strcmp(temp, "0") != 0) {
+	while (sget(temp, sizeof temp, fin) != EOF && strcmp(temp, "0") != 0) {
 		if (strcmp(temp, "fi") == 0)
 			lig |= LFI;
 		else if (strcmp(temp, "fl") == 0)
@@ -339,8 +359,26 @@ getlig(FILE *fin)	/* pick up ligature list */
 		else if (strcmp(temp, "ffl") == 0)
 			lig |= LFFL;
 		else
-			fprintf(stderr, "illegal ligature %s\n", temp);
+			errprint("illegal ligature %s\n", temp);
 	}
 	skipline(fin);
 	return lig;
+}
+
+static int
+sget(char *buf, size_t size, FILE *fp)
+{
+	int	c, n = 0;
+
+	do
+		c = getc(fp);
+	while (isspace(c));
+	if (c != EOF) do {
+		if (n+1 < size)
+			buf[n++] = c;
+		c = getc(fp);
+	} while (c != EOF && !isspace(c));
+	ungetc(c, fp);
+	buf[n] = 0;
+	return n > 1 ? 1 : c == EOF ? EOF : 0;
 }
