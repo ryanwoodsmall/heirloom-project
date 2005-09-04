@@ -8,19 +8,17 @@ FLAGS = -I. -I.. -DFNTDIR='"$(FNTDIR)"'
 .c.o:
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(FLAGS) -c $<
 
-all: links
-
-links:
-	cd devpost && \
-	for i in G HM HK HL; \
-	do \
-		rm -f $$i; ln -s H $$i || exit; \
-	done && \
-	rm -f GI; ln -s HI GI
+all:
 
 install: all
 	test -d $(ROOT)$(FNTDIR) || mkdir -p $(ROOT)$(FNTDIR)
 	cp -R devpost $(ROOT)$(FNTDIR)
+	cd $(ROOT)$(FNTDIR) && \
+		for i in G HM HK HL; \
+		do \
+			rm -f $$i; ln -s H $$i || exit; \
+		done && \
+		rm -f GI; ln -s HI GI
 	cp -R dev7200 $(ROOT)$(FNTDIR)
 	test -d $(ROOT)$(FNTDIR)/dev7200/pfb || \
 		mkdir -p $(ROOT)$(FNTDIR)/dev7200/pfb
