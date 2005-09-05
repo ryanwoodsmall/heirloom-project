@@ -19,8 +19,8 @@ selected using an extended ".fp" request:
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
 	be freely chosen. The "r" argument specifies a register on which
 	the font is to be mounted. If it is zero, the font is mounted on
-	a free position (not on position zero). Contrasting to the ".fp"
-	request, the "r" argument may consist of more than a single digit.
+	a free position (not on position zero). The "r" argument may
+	consist of more than a single digit.
 	  "yy" may be the name of an existing ditroff-style font, such
 	as "R". In this case, the same register must be reused. For best
 	compatibility with conventional troff usage, it is recommended
