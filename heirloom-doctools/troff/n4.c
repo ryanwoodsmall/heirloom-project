@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.10 (gritter) 9/4/05
+ * Sccsid @(#)n4.c	1.11 (gritter) 9/5/05
  */
 
 /*
@@ -205,8 +205,8 @@ setn(void)
 			break;
 		case 'z': 
 			i = dip->curd;
-			*pbp++ = (i >> BYTE) & BYTEMASK;
-			*pbp++ = i & BYTEMASK;
+			pbbuf[pbp++] = (i >> BYTE) & BYTEMASK;
+			pbbuf[pbp++] = i & BYTEMASK;
 			return;
 		case 'b': 
 			i = bdtab[font];
@@ -782,10 +782,17 @@ setaf (void)	/* return format of number register */
 	if (i == -1)
 		return;
 	if (numtab[i].fmt > 20)	/* it was probably a, A, i or I */
-		*pbp++ = numtab[i].fmt;
-	else
-		for (j = (numtab[i].fmt ? numtab[i].fmt : 1); j; j--)
-			*pbp++ = '0';
+		pbbuf[pbp++] = numtab[i].fmt;
+	else {
+		for (j = (numtab[i].fmt ? numtab[i].fmt : 1); j; j--) {
+			if (pbp >= pbsize-3)
+				if (growpbbuf() == NULL) {
+					errprint("no space for .af");
+					done(2);
+				}
+			pbbuf[pbp++] = '0';
+		}
+	}
 }
 
 

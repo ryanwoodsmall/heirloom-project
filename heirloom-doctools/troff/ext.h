@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.19 (gritter) 9/4/05
+ * Sccsid @(#)ext.h	1.20 (gritter) 9/5/05
  */
 
 /*
@@ -180,9 +180,10 @@ extern	struct	s	*ejl;
 extern	struct	s	*frame,	*stk,	*nxf;
 extern	tchar	**hyp;
 extern	tchar	*olinep;
-extern	tchar	pbbuf[NC];
-extern	tchar	*pbp;
-extern	tchar	*lastpbp;
+extern	tchar	*pbbuf;
+extern	int	pbsize;
+extern	int	pbp;
+extern	int	lastpbp;
 extern	tchar	ch;
 extern	tchar	nrbits;
 extern	tchar	oline[];

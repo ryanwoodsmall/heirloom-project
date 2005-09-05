@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.32 (gritter) 9/2/05
+ * Sccsid @(#)n1.c	1.33 (gritter) 9/5/05
  */
 
 /*
@@ -121,6 +121,7 @@ main(int argc, char **argv)
 	growblist();
 	growcontab();
 	grownumtab();
+	growpbbuf();
 	if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
 		signal(SIGHUP, catch);
 	if (signal(SIGINT, catch) == SIG_IGN) {
@@ -928,7 +929,7 @@ gx:
 		return(i);
 	}
 	if (copyf) {
-		*pbp++ = j;
+		pbbuf[pbp++] = j;
 		return(eschar);
 	}
 	switch (k) {
@@ -1058,7 +1059,7 @@ tchar getch0(void)
 
 again:
 	if (pbp > lastpbp)
-		i = *--pbp;
+		i = pbbuf[--pbp];
 	else if (ip) {
 #ifdef INCORE
 		extern tchar *corebuf;
@@ -1214,11 +1215,13 @@ pushback(register tchar *b)
 	while (*b++)
 		;
 	b--;
-	while (b > ob && pbp < &pbbuf[NC-3])
-		*pbp++ = *--b;
-	if (pbp >= &pbbuf[NC-3]) {
-		errprint("pushback overflow");
-		done(2);
+	while (b > ob) {
+		if (pbp >= pbsize-3)
+			if (growpbbuf() == NULL) {
+				errprint("pushback overflow");
+				done(2);
+			}
+		pbbuf[pbp++] = *--b;
 	}
 }
 
@@ -1230,12 +1233,26 @@ cpushback(register char *b)
 	while (*b++)
 		;
 	b--;
-	while (b > ob && pbp < &pbbuf[NC-3])
-		*pbp++ = *--b;
-	if (pbp >= &pbbuf[NC-3]) {
-		errprint("cpushback overflow");
-		done(2);
+	while (b > ob) {
+		if (pbp >= pbsize-3)
+			if (growpbbuf() == NULL) {
+				errprint("cpushback overflow");
+				done(2);
+			}
+		pbbuf[pbp++] = *--b;
 	}
+}
+
+tchar *
+growpbbuf(void)
+{
+	tchar	*npb;
+	int	inc = NC;
+
+	if ((npb = realloc(pbbuf, (pbsize + inc) * sizeof *pbbuf)) == NULL)
+		return NULL;
+	pbsize += inc;
+	return pbbuf = npb;
 }
 
 int
@@ -1554,9 +1571,12 @@ setrpt(void)
 	if (i < 0 || cbits(j = getch0()) == RPT)
 		return;
 	i &= BYTEMASK;
-	while (i>0 && pbp < &pbbuf[NC-3]) {
+	while (i>0) {
+		if (pbp >= pbsize-3)
+			if (growpbbuf() == NULL)
+				break;
 		i--;
-		*pbp++ = j;
+		pbbuf[pbp++] = j;
 	}
 }
 

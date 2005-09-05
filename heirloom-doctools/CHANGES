@@ -65,6 +65,8 @@ Release ...
 * The file "NEWS" describes new troff language features.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
 * [nt]roff: There is no static limit on the ".hw" table anymore.
+* [nt]roff: There is no static limit on the pushback buffer anymore; this
+  makes it possible to use longer arguments to macros.
 * [nt]roff: The output of long names with ".pm" and stack dumps has been
   fixed.
 * [nt]roff: Nested long-name string references \*[\*...] now work.

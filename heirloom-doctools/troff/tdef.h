@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.36 (gritter) 9/4/05
+ * Sccsid @(#)tdef.h	1.37 (gritter) 9/5/05
  */
 
 /*
@@ -412,7 +412,7 @@ struct	s {	/* stack frame */
 	tchar	prchar;
 	int	ppendt;
 	tchar	pch;
-	tchar	*lastpbp;
+	int	lastpbp;
 	int	mname;
 };
 
@@ -619,6 +619,7 @@ void setxon(void);
 tchar getch0(void);
 void pushback(register tchar *);
 void cpushback(register char *);
+tchar *growpbbuf(void);
 int nextfile(void);
 int popf(void);
 void flushi(void);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.12 (gritter) 9/2/05
+ * Sccsid @(#)nii.c	1.13 (gritter) 9/5/05
  */
 
 /*
@@ -81,9 +81,10 @@ char	*ibufp;
 char	*xbufp;
 char	*eibuf;
 char	*xeibuf;
-tchar	pbbuf[NC];	/* pushback buffer for arguments, \n, etc. */
-tchar	*pbp = pbbuf;	/* next free slot in pbbuf */
-tchar	*lastpbp = pbbuf;	/* pbp in previous stack frame */
+tchar	*pbbuf;		/* pushback buffer for arguments, \n, etc. */
+int	pbsize;		/* number of members allocated for pbbuf */
+int	pbp;		/* next free slot in pbbuf */
+int	lastpbp;	/* pbp in previous stack frame */
 int	nx;
 int	mflg;
 tchar	ch = 0;

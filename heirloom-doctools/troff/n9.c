@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.15 (gritter) 9/4/05
+ * Sccsid @(#)n9.c	1.16 (gritter) 9/5/05
  */
 
 /*
@@ -188,13 +188,18 @@ setov(void)
 		}
 	else 
 		return;
-	*pbp++ = makem(w[0] / 2);
+	pbbuf[pbp++] = makem(w[0] / 2);
 	for (k = 0; o[k]; k++)
 		;
 	while (k>0) {
 		k--;
-		*pbp++ = makem(-((w[k] + w[k+1]) / 2));
-		*pbp++ = o[k];
+		if (pbp >= pbsize-4)
+			if (growpbbuf() == NULL) {
+				errprint("no space for .ov");
+				done(2);
+			}
+		pbbuf[pbp++] = makem(-((w[k] + w[k+1]) / 2));
+		pbbuf[pbp++] = o[k];
 	}
 }
 
@@ -489,10 +494,13 @@ s1:
 		/*plain tab or leader*/
 		if ((j = width(rchar)) > 0) {
 			int nchar = length / j;
-			while (nchar-->0 && pbp < &pbbuf[NC-3]) {
+			while (nchar-->0) {
+				if (pbp >= pbsize-3)
+					if (growpbbuf() == NULL)
+						break;
 				numtab[HP].val += j;
 				widthp = j;
-				*pbp++ = rchar;
+				pbbuf[pbp++] = rchar;
 			}
 			length %= j;
 		}
@@ -521,8 +529,12 @@ s1:
 		pushback(fbuf);
 		if ((j = width(rchar)) != 0 && length > 0) {
 			int nchar = length / j;
-			while (nchar-- > 0 && pbp < &pbbuf[NC-3])
-				*pbp++ = rchar;
+			while (nchar-- > 0) {
+				if (pbp >= pbsize-3)
+					if (growpbbuf() == NULL)
+						break;
+				pbbuf[pbp++] = rchar;
+			}
 			length %= j;
 		}
 		length = (length / HOR) * HOR;
