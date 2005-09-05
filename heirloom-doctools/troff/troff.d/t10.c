@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.36 (gritter) 9/5/05
+ * Sccsid @(#)t10.c	1.37 (gritter) 9/5/05
  */
 
 /*
@@ -207,7 +207,6 @@ ptinit(void)
 	 */
 	sps = SPS;
 	ses = SES;
-	ics = ICS;
 	for (i = 0; i < 16; i++)
 		tabtab[i] = DTAB * (i + 1);
 	pl = 11 * INCH;
@@ -219,6 +218,7 @@ ptinit(void)
 	apts1 = pts2u(apts1);
 	pts = pts2u(pts);
 	pts1 = pts2u(pts1);
+	ics = ICS;
 	specnames();	/* install names like "hyphen", etc. */
 	kern = xflag;
 	if (ascii)
