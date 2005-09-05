@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.3 (gritter) 7/23/05
+ * Sccsid @(#)t6.c	1.4 (gritter) 9/5/05
  */
 
  /* t6.c: compute tab stops */
@@ -201,7 +201,7 @@ fprintf(tabout, ".nr TW \\n(%d\n", ncol+CRIGHT-1);
 if (boxflg || allflg || dboxflg)
 	fprintf(tabout, ".nr TW +%d*\\n(%d\n", sep[ncol-1], TMP);
 fprintf(tabout,
- ".if t .if \\n(TW>\\n(.li .tm Table at line %d file %s is too wide - \\n(TW units\n", iline-1, ifile);
+ ".if t .if \\n(TW>\\n(.l .tm Table at line %d file %s is too wide - \\n(TW units\n", iline-1, ifile);
 return;
 }
 void
