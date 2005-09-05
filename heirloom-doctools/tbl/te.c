@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)te.c	1.9 (gritter) 8/13/05
+ * Sccsid @(#)te.c	1.10 (gritter) 9/5/05
  */
 
  /* te.c: error message control, input line count */
@@ -61,6 +61,7 @@ for (;;)
 				error(errmsg(errno));
 			if (swapin()==0)
 				return(0);
+			continue;
 			}
 		if (n + MAXCHS >= *zp)
 			{
@@ -83,7 +84,7 @@ for (;;)
 		nbl++;
 	if (linstart && nbl % 2) /* fold escaped nl if in table */
 		{
-		s++;
+		n--;
 		continue;
 		}
 	break;

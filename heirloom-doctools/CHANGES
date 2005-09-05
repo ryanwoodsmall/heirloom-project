@@ -72,6 +72,10 @@ Release ...
 * [nt]roff: Nested long-name string references \*[\*...] now work.
 * [nt]roff: Tabulators as in ".XY\t" are now correctly handled with -x.
 * The "-man" macro no longer produces cut marks when used with troff.
+* tbl: Two bugs that had been introduced with support for lines of unlimited
+  length have been fixed. They resulted in printing a stray character when
+  more than one input file was used, and in improper handling of input lines
+  continued with a backslash.
 * A new malloc() replacement has been added for performance reasons.
 * A bug in the previously supplied realloc() replacement could result in
   heap corruption.
