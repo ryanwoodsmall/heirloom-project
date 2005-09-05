@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.37 (gritter) 9/5/05
+ * Sccsid @(#)tdef.h	1.38 (gritter) 9/5/05
  */
 
 /*
@@ -634,7 +634,7 @@ void getpn(register char *);
 void setrpt(void);
 void casedb(void);
 /* n2.c */
-void pchar(register tchar);
+int pchar(register tchar);
 void pchar1(register tchar);
 void outascii(tchar);
 void oputs(register char *);
@@ -692,18 +692,18 @@ int maybemore(int, int);
 /* n4.c */
 void *grownumtab(void);
 void setn(void);
-int wrc(int);
+int wrc(tchar);
 void setn1(int, int, tchar);
 void nrehash(void);
 void nunhash(register struct numtab *);
 int findr(register int);
 int usedr(register int);
-int fnumb(register int, register int (*)(int));
-int decml(register int, register int (*)(int));
-int roman(int, int (*)(int));
-int roman0(int, int (*)(int), char *, char *);
-int abc(int, int (*)(int));
-int abc0(int, int (*)(int));
+int fnumb(register int, register int (*)(tchar));
+int decml(register int, register int (*)(tchar));
+int roman(int, int (*)(tchar));
+int roman0(int, int (*)(tchar), char *, char *);
+int abc(int, int (*)(tchar));
+int abc0(int, int (*)(tchar));
 long atoi0(void);
 long ckph(void);
 long atoi1(register tchar);

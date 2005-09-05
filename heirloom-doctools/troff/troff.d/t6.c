@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.69 (gritter) 9/5/05
+ * Sccsid @(#)t6.c	1.71 (gritter) 9/5/05
  */
 
 /*
@@ -218,7 +218,7 @@ getcw(register int i)
 	if (setwdf)
 		numtab[CT].val |= kerntab[ofont][j];
 	k = *(p + j);
-	if (dev.anysize == 0 || (z = zoomtab[xfont]) == 0)
+	if (dev.anysize == 0 || xflag == 0 || (z = zoomtab[xfont]) == 0)
 		z = 1;
 	k *= z;
  g1:
@@ -318,7 +318,8 @@ getkw(tchar c, tchar d)
 			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
 				k = (k * u2pts(s) + (Unitwidth / 2))
 					/ Unitwidth;
-				if (dev.anysize && (z = zoomtab[f]) != 0)
+				if (dev.anysize && xflag &&
+						(z = zoomtab[f]) != 0)
 					k *= z;
 				lastkern += k;
 				return k;
@@ -336,7 +337,7 @@ xbits(register tchar i, int bitf)
 	xfont = fbits(i);
 	k = sbits(i);
 	if (k) {
-		xpts = dev.anysize ? k : pstab[--k];
+		xpts = dev.anysize && xflag ? k : pstab[--k];
 		oldbits = sfbits(i);
 		pfont = xfont;
 		ppts = xpts;
@@ -524,8 +525,11 @@ findps(register int i)
 {
 	register int j, k;
 
-	if (dev.anysize)
+	if (dev.anysize && xflag) {
+		if (i <= 0)
+			i = pstab[0];
 		return i;
+	}
 	for (j=k=0 ; pstab[j] != 0 ; j++)
 		if (abs(pstab[j]-i) < abs(pstab[k]-i))
 			k = j;
@@ -539,7 +543,7 @@ mchbits(void)
 	register int i, j, k;
 
 	i = pts;
-	if (dev.anysize)
+	if (dev.anysize && xflag)
 		j = i - 1;
 	else for (j = 0; i > (k = pstab[j]); j++)
 		if (!k) {

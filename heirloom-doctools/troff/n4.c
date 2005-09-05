@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.11 (gritter) 9/5/05
+ * Sccsid @(#)n4.c	1.12 (gritter) 9/5/05
  */
 
 /*
@@ -234,7 +234,7 @@ tchar	numbuf[17];
 tchar	*numbufp;
 
 int 
-wrc(int i)
+wrc(tchar i)
 {
 	if (numbufp >= &numbuf[16])
 		return(0);
@@ -342,7 +342,7 @@ usedr (	/* returns -1 if nr i has never been used */
 
 
 int 
-fnumb(register int i, register int (*f)(int))
+fnumb(register int i, register int (*f)(tchar))
 {
 	register int j;
 
@@ -370,7 +370,7 @@ fnumb(register int i, register int (*f)(int))
 
 
 int 
-decml(register int i, register int (*f)(int))
+decml(register int i, register int (*f)(tchar))
 {
 	register int j, k;
 
@@ -383,7 +383,7 @@ decml(register int i, register int (*f)(int))
 
 
 int 
-roman(int i, int (*f)(int))
+roman(int i, int (*f)(tchar))
 {
 
 	if (!i)
@@ -396,7 +396,7 @@ roman(int i, int (*f)(int))
 
 
 int 
-roman0(int i, int (*f)(int), char *onesp, char *fivesp)
+roman0(int i, int (*f)(tchar), char *onesp, char *fivesp)
 {
 	register int q, rem, k;
 
@@ -423,7 +423,7 @@ roman0(int i, int (*f)(int), char *onesp, char *fivesp)
 
 
 int 
-abc(int i, int (*f)(int))
+abc(int i, int (*f)(tchar))
 {
 	if (!i)
 		return((*f)('0' | nrbits));
@@ -433,7 +433,7 @@ abc(int i, int (*f)(int))
 
 
 int 
-abc0(int i, int (*f)(int))
+abc0(int i, int (*f)(tchar))
 {
 	register int j, k;
 

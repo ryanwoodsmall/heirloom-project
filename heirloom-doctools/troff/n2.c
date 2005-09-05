@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.8 (gritter) 8/31/05
+ * Sccsid @(#)n2.c	1.9 (gritter) 9/5/05
  */
 
 /*
@@ -84,7 +84,7 @@ extern	jmp_buf	sjbuf;
 int	toolate;
 int	error;
 
-void
+int
 pchar(register tchar i)
 {
 	register int j;
@@ -101,21 +101,21 @@ pchar(register tchar i)
 				dip->alss = j;
 			ralss = dip->alss;
 		}
-		return;
+		return 1;
 	}
 	if (ismot(i)) {
 		pchar1(i); 
-		return;
+		return 1;
 	}
 	switch (j = cbits(i)) {
 	case 0:
 	case IMP:
 	case RIGHT:
 	case LEFT:
-		return;
+		return 1;
 	case HX:
 		hx = 1;
-		return;
+		return 1;
 	case PRESC:
 		if (dip == &d[0])
 			j = eschar;	/* fall through */
@@ -132,6 +132,7 @@ pchar(register tchar i)
 #endif /* EUC */
 	}
 	pchar1(i);
+	return 1;
 }
 
 

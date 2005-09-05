@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.35 (gritter) 9/5/05
+ * Sccsid @(#)t10.c	1.36 (gritter) 9/5/05
  */
 
 /*
@@ -571,12 +571,12 @@ ptps(void)
 			break;
 		}
 	found = k == i;
-	if (dev.anysize)
+	if (dev.anysize && xflag)
 		k = i;
 	s = u2pts(k);
-	if ((z = zoomtab[xfont]) != 0 && dev.anysize)
+	if ((z = zoomtab[xfont]) != 0 && dev.anysize && xflag)
 		s *= z;
-	if (dev.anysize && (!found || z != 0 && z != 1))
+	if (dev.anysize && xflag && (!found || z != 0 && z != 1))
 		fdprintf(ptid, "s%d %f\n", -23, s);
 	else
 		fdprintf(ptid, "s%d\n", (int)s);	/* really should put out string rep of size */
