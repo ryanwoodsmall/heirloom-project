@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.67 (gritter) 9/5/05
+ * Sccsid @(#)t6.c	1.68 (gritter) 9/5/05
  */
 
 /*
@@ -864,7 +864,7 @@ casefp(void)
 	char *file, *supply;
 
 	skip();
-	if ((i = cbits(getch()) - '0') < 0 || i > nfonts)
+	if ((i = xflag ? atoi() : cbits(getch()) - '0') < 0 || i > nfonts)
 	bad:	errprint("fp: bad font position %d", i);
 	else if (skip() || !(j = getrq()))
 		errprint("fp: no font name");
