@@ -1,16 +1,16 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.13 (gritter) 9/4/05
+.\" Sccsid @(#)troffdemo.tr	1.14 (gritter) 9/5/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .papersize a4
 .ll 17c
 .po 2c
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Mount fonts from the Adobe Caslon family, including ornaments.
-.fpost 1 R awrg____ pfb
-.fpost 2 I awi_____ pfb
-.fpost 0 E axrg____ pfb
-.fpost 0 IE axi_____ pfb
-.fpost 0 O awor____ pfb
+.fp 1 R awrg____ pfb
+.fp 2 I awi_____ pfb
+.fp 0 E axrg____ pfb
+.fp 0 IE axi_____ pfb
+.fp 0 O awor____ pfb
 .\" Configure to use small caps, ligatures, and old-style numerals.
 .fallback R E
 .fallback E R
@@ -81,7 +81,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/4/05
+9/5/05
 .sp 2v
 .ad b
 .ps 12

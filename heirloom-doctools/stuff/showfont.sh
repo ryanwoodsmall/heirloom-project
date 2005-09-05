@@ -8,7 +8,7 @@
 # they are included.
 #
 
-# Sccsid @(#)showfont.sh	1.2 (gritter) 8/28/05
+# Sccsid @(#)showfont.sh	1.3 (gritter) 9/5/05
 
 for i
 do (
@@ -27,7 +27,7 @@ do (
 	fi
 	cat <<-!
 		.nr PE 10.8i
-		.fpost 0 X $i $supply
+		.fp 0 X $i $supply
 		.ps 10
 		.vs 14
 		.ta 12pC 24p

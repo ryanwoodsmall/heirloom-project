@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.34 (gritter) 9/4/05
+ * Sccsid @(#)t10.c	1.35 (gritter) 9/5/05
  */
 
 /*
@@ -192,7 +192,7 @@ ptinit(void)
 			*ap = 0;
 			if (ap == &fontbase[i]->namefont[1])
 				fontlab[i] &= BYTEMASK;
-			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL);
+			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL, 1);
 		} else
 			makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
 		p += 3 * nw + dev.nchtab + 128 - 32;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.66 (gritter) 9/4/05
+ * Sccsid @(#)t6.c	1.67 (gritter) 9/5/05
  */
 
 /*
@@ -861,19 +861,36 @@ void
 casefp(void)
 {
 	register int i, j;
+	char *file, *supply;
 
 	skip();
-	if ((i = cbits(getch()) - '0') <= 0 || i > nfonts)
-		errprint("fp: bad font position %d", i);
+	if ((i = cbits(getch()) - '0') < 0 || i > nfonts)
+	bad:	errprint("fp: bad font position %d", i);
 	else if (skip() || !(j = getrq()))
 		errprint("fp: no font name");
 	else {
 		if (j >= 256)
 			j = maybemore(j, 1);
-		if (skip() || !getname())
+		if (skip() || !getname()) {
+			if (i == 0)
+				goto bad;
 			setfp(i, j, 0);
-		else		/* 3rd argument = filename */
-			setfp(i, j, nextf);
+		} else {		/* 3rd argument = filename */
+			file = malloc(strlen(nextf) + 1);
+			strcpy(file, nextf);
+			if (!skip() && getname()) {
+				supply = malloc(strlen(nextf) + 1);
+				strcpy(supply, nextf);
+			} else
+				supply = NULL;
+			if (loadafm(i?i:-1, j, file, supply, 0) == 0) {
+				if (i == 0)
+					goto bad;
+				setfp(i, j, file);
+			}
+			free(file);
+			free(supply);
+		}
 	}
 }
 
@@ -899,7 +916,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 		*ap = 0;
 		if (ap == &fontbase[pos]->namefont[1])
 			f &= BYTEMASK;
-		loadafm(pos, f, fontbase[pos]->namefont, NULL);
+		loadafm(pos, f, fontbase[pos]->namefont, NULL, 1);
 		free(fpout);
 	} else {
 		nw = fontbase[pos]->nwfont & BYTEMASK;
@@ -1052,43 +1069,6 @@ tchar xlss(void)
 struct afmtab **afmtab;
 int nafm;
 
-void
-casefpost(void)
-{
-	int	c, i = 0, j, rq;
-	char	*file = NULL, *supply = NULL;
-	size_t	sz = 0, ssz = 0;
-
-	skip();
-	if ((j = atoi()) == 0)
-		j = -1;
-	skip();
-	if ((rq = getrq()) == 0)
-		return;
-	if (rq >= 256)
-		rq = maybemore(rq, 1);
-	skip();
-	do {
-		c = getach();
-		if (i >= sz)
-			file = realloc(file, (sz += 8) * sizeof *file);
-		file[i++] = c;
-	} while (c);
-	if (cbits(ch) == ' ' && skip() == 0) {
-		i = 0;
-		do {
-			c = getach();
-			if (i >= ssz)
-				supply = realloc(supply, (sz += 4) *
-						sizeof *supply);
-			supply[i++] = c;
-		} while (c);
-	}
-	loadafm(j, rq, file, supply);
-	free(file);
-	free(supply);
-}
-
 char *
 onefont(char *prefix, char *file, char *type)
 {
@@ -1145,8 +1125,8 @@ getfontpath(char *file, char *type)
 	return path;
 }
 
-void
-loadafm(int nf, int rq, char *file, char *supply)
+int
+loadafm(int nf, int rq, char *file, char *supply, int required)
 {
 	extern int sprintf(char *, const char *, ...);
 	struct stat	st;
@@ -1175,18 +1155,19 @@ loadafm(int nf, int rq, char *file, char *supply)
 	if (have)
 		goto done;
 	if ((fd = open(path, O_RDONLY)) < 0) {
-		errprint("Can't open %s", path);
+		if (required)
+			errprint("Can't open %s", path);
 		free(a->file);
 		free(a);
 		free(path);
-		return;
+		return 0;
 	}
 	if (fstat(fd, &st) < 0) {
 		errprint("Can't stat %s", path);
 		free(a->file);
 		free(a);
 		free(path);
-		return;
+		return -1;
 	}
 	contents = malloc(st.st_size + 1);
 	if (read(fd, contents, st.st_size) != st.st_size) {
@@ -1195,14 +1176,14 @@ loadafm(int nf, int rq, char *file, char *supply)
 		free(a);
 		free(path);
 		free(contents);
-		return;
+		return -1;
 	}
 	contents[st.st_size] = 0;
 	close(fd);
 	if (afmget(a, contents, st.st_size) < 0) {
 		free(path);
 		free(contents);
-		return;
+		return -1;
 	}
 	free(contents);
 done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
@@ -1244,6 +1225,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	}
 	if (realpage)
 		ptfpcmd(nf, a->path);
+	return 1;
 }
 
 int

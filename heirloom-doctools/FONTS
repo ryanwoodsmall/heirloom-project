@@ -7,15 +7,15 @@ The basics
 Heirloom troff understands two ways to select PostScript fonts.
 
 The new method can access PostScript font files directly. Fonts are
-selected using a new request that is available with "troff -x", or
-as ".do fpost" without "-x":
+selected using an extended ".fp" request:
 
-  .fpost r yy afmname [supplyname]
+  .fp r yy afmname [supplyname]
 	reads metrics from "afmname". If the TROFFONTS environment variable
 	is set, each of the colon-separated directories in it is tried for
 	the file "afmname.afm", or, if "afmname" has the ".afm" extension
 	itself, for "afmname". Otherwise, the font is loaded from the file
-	"/usr/ucblib/doctools/font/dev7200/afmname.afm".
+	"/usr/ucblib/doctools/font/dev7200/afmname.afm". If this fails, a
+	legacy ditroff font is assumed (see below).
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
 	be freely chosen. The "r" argument specifies a register on which
 	the font is to be mounted. If it is zero, the font is mounted on
@@ -39,14 +39,14 @@ as ".do fpost" without "-x":
 
 As a simple example,
       
-	.fpost 0 VA van_____ pfb
+	.fp 0 VA van_____ pfb
 	.ft VA
 	Here is some text in Monotype Van Dijck Regular.
 
 But it is also possible to have different names for the metrics and
 glyph data files, as in
 
-	.fpost 0 BM mykerning.afm bm______.pfb
+	.fp 0 BM mykerning.afm bm______.pfb
 	.ft BM
 	This text prints in Monotype Bembo using modified kerning.
 
@@ -56,7 +56,8 @@ compatibility to select pre-installed fonts from the PDF base set.
 
 With fonts selected by this method, localized input processing is
 performed according to the LC_CTYPE environment variable, or according
-to a document-specific value set by the new ".lc_ctype" request. Note
+to a document-specific value set by the new ".lc_ctype" request which
+requires that the "-x" command line option is used with troff. Note
 that your terminal and text editor/pager must support UTF-8 to display
 the following example properly:
 
@@ -95,7 +96,7 @@ are of interest for troff:
 	This file contains the actual glyph data. troff does not really
 	need this file, but your printer or PDF converter does. In many
 	cases, it is most convenient to include the data directly into
-	the .ps file generated, as described for ".fpost" above.
+	the .ps file generated, as described for ".fp" above.
 
 Create a directory to hold your fonts. For compatibility with future
 versions of troff, it is recommended that it is put outside the troff
@@ -135,7 +136,7 @@ Using fonts with small capital letters
 Small capital fonts normally need letter space tracking. Thus e.g.
 to use the Stempel Garamond small capital font, write something like
 
-	.fpost 0 SC gsrsc___ pfb
+	.fp 0 SC gsrsc___ pfb
 	.track SC 1 .2 24 2
 	.ft SC
 	This text prints in Small Capitals.
@@ -151,8 +152,8 @@ in this case. The expert font is selected as text font, but for each
 upper-case letter encountered, troff changes automatically to the
 standard font. An example with the Monotype Fournier type:
 
-	.fpost 1 R fn______ pfb
-	.fpost 0 E fny_____ pfb
+	.fp 1 R fn______ pfb
+	.fp 0 E fny_____ pfb
 	.track E 1 .2 24 2
 	.fallback E R
 	.ft E
@@ -166,8 +167,8 @@ This also uses the fallback sequence, but since the standard numerals
 are present in the standard font, they have to be hidden first so that
 troff does not select them:
 
-	.fpost 1 R fn______ pfb
-	.fpost 0 E fny_____ pfb
+	.fp 1 R fn______ pfb
+	.fp 0 E fny_____ pfb
 	.fallback R E
 	.hidechar R 0123456789
 	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
@@ -180,8 +181,8 @@ The examples above can also be combined. Since the .track request does not
 affect the tracking of fonts that are selected by the fallback sequence,
 it is sufficient to mount each font once:
 
-	.fpost 1 R fn______ pfb
-	.fpost 0 E fny_____ pfb
+	.fp 1 R fn______ pfb
+	.fp 0 E fny_____ pfb
 	.fallback R E
 	.fallback E R
 	.track E 1 .2 24 2
@@ -200,8 +201,8 @@ in the base font; an expert font delivers them in addition. Automatic
 substitution of such ligatures can be enabled using the ".flig" request
 in combination with the fallback sequence:
 
-	.fpost 1 R fn______ pfb
-	.fpost 0 E fny_____ pfb
+	.fp 1 R fn______ pfb
+	.fp 0 E fny_____ pfb
 	.fallback R E
 	.flig R 31
 	effective office offline
@@ -216,8 +217,8 @@ is available. It only applies to characters that are actually in the
 current font, not to characters from another font that have been
 selected using the fallback sequence.
 
-	.fpost 1 R pl______ pfb
-	.fpost 6 H hv______
+	.fp 1 R pl______ pfb
+	.fp 6 H hv______
 	.fzoom H .92
 	Text in \fHHelvetica\fP must be adjusted to fit with Plantin.
 
@@ -241,4 +242,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 9/4/05
+Gunnar Ritter                                                 9/5/05

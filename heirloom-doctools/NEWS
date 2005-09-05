@@ -52,12 +52,13 @@ are disabled.
 	an expert font that has been selected for character substitution
 	using the ".fallback" request.
 
-.fpost r yy afmname [supplyname]			troff only
+.fp r yy afmname [supplyname]				troff only
 	reads metrics from "afmname". If the TROFFONTS environment variable
 	is set, each of the colon-separated directories in it is tried for
 	the file "afmname.afm", or, if "afmname" has the ".afm" extension
 	itself, for "afmname". Otherwise, the font is loaded from the file
-	"/usr/ucblib/doctools/font/dev7200/afmname.afm".
+	"/usr/ucblib/doctools/font/dev7200/afmname.afm". If this fails, a
+	legacy ditroff font is assumed.
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
 	be freely chosen. The "r" argument specifies a register on which
 	the font is to be mounted. If it is zero, the font is mounted on
@@ -209,8 +210,7 @@ any character in the current LC_CTYPE locale in text input
 	  In troff, a non-ASCII character is converted to a named
 	PostScript character. If it is found in the current font, it
 	is printed. Otherwise, the .fallback sequence is searched for
-	it. This mechanism only works with AFM file fonts, i.e. those
-	mounted by the .fpost request, or those of the 7200 dpi device.
+	it. This mechanism does not work with legacy ditroff fonts.
 	  In macro, string, and number register names, only ASCII
 	characters may be used.
 
@@ -220,4 +220,4 @@ any character in the current LC_CTYPE locale in text input
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   9/4/05
+Gunnar Ritter                                                   9/5/05

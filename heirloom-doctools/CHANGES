@@ -1,8 +1,8 @@
 Release ...
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript
-  Type 1 fonts) to select fonts. The new request ".fpost" has been
-  introduced for this, and the "TROFFONTS" environment variable specifies
-  path names to search for font files. See the file "FONTS" for details.
+  Type 1 fonts) to select fonts. The ".fp" request has been extended
+  for this, and the "TROFFONTS" environment variable specifies path
+  names to search for font files. See the file "FONTS" for details.
 * troff: Can now handle Type 42 fonts (i.e. TrueType fonts that have been
   converted for use by PostScript interpreters).
 * troff: Handles input characters according to LC_CTYPE now in combination

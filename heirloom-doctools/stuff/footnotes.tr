@@ -7,7 +7,7 @@
 .\" If the smaller size of regular numeral is chosen instead, the
 .\" width of the letter parts becomes too small.
 .\"
-.\" Sccsid @(#)footnotes.tr	1.1 (gritter) 8/30/05
+.\" Sccsid @(#)footnotes.tr	1.2 (gritter) 9/5/05
 .\"
 .\" This is only to improve the readability of the output.
 .sp 2c
@@ -17,8 +17,8 @@
 .ss 10 0
 .\" This example uses Monotype Van Dijck, but the same works with
 .\" any PostScript expert font; just replace the AFM file name.
-.fpost 1 R van_____ pfb
-.fpost 0 E vany____ pfb
+.fp 1 R van_____ pfb
+.fp 0 E vany____ pfb
 .fallback R E
 .\" First, initialize the footnote count.
 .nr FEcount 0 1
