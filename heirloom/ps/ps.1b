@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1b	1.18 (gritter) 12/27/04
+.\" Sccsid @(#)ps.1b	1.19 (gritter) 9/5/05
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -66,7 +66,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
-.TH PS 1B "12/27/04" "Heirloom Toolchest" "BSD System Compatibility"
+.TH PS 1B "9/5/05" "Heirloom Toolchest" "BSD System Compatibility"
 .SH NAME
 ps \- (BSD) process status
 .SH SYNOPSIS
@@ -332,7 +332,7 @@ option, the following properties
 can be given:
 .PP
 .TS
-lfB2 l2 l.
+l2fB l2 l.
 user	USER	Effective user name.
 ruser	RUSER	Real user name.
 group	GROUP	Effective group name.
