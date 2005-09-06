@@ -115,7 +115,7 @@ description for ".xflag" below.
 	useful to specify an input character set regardless of environment
 	influences.
 
-.papersize executive|letter|legal|leger|tabloid|aN|bN|cN|x y	troff only
+.papersize executive|letter|legal|ledger|tabloid|aN|bN|cN|x y	troff only
 	sets the paper size to the given format, which may be either one
 	of the predefined American or international formats (such as a4),
 	or a user-defined format "x y". The page length is set from these
@@ -229,4 +229,4 @@ any character in the current LC_CTYPE locale in text input
 	sequence occurs. This is sometimes useful to ensure that
 	following "\X'PS: ...'" commands work as expected.
 
-Gunnar Ritter                                                   9/6/05
+Gunnar Ritter                                                   9/7/05
