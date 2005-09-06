@@ -1,6 +1,7 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.16 (gritter) 9/6/05
+.\" Sccsid @(#)troffdemo.tr	1.17 (gritter) 9/6/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.do xflag 2
 .papersize a4
 .ll 17c
 .po 2c

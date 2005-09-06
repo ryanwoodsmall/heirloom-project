@@ -56,11 +56,12 @@ compatibility to select pre-installed fonts from the PDF base set.
 
 With fonts selected by this method, localized input processing is
 performed according to the LC_CTYPE environment variable, or according
-to a document-specific value set by the new ".lc_ctype" request which
-requires that the "-x" command line option is used with troff. Note
+to a document-specific value set by the new ".lc_ctype" request. Note
 that your terminal and text editor/pager must support UTF-8 to display
 the following example properly:
 
+	.\" Enable long request names.
+	.do xflag 2
 	.\" de_DE.utf8 is for GNU libc; de_DE.UTF-8 may work elsewhere.
 	.lc_ctype de_DE.utf8
 	Deutscher Text mit „Anführungszeichen“
@@ -136,6 +137,7 @@ Using fonts with small capital letters
 Small capital fonts normally need letter space tracking. Thus e.g.
 to use the Stempel Garamond small capital font, write something like
 
+	.do xflag 2
 	.fp 0 SC gsrsc___ pfb
 	.track SC 1 .2 24 2
 	.ft SC
@@ -152,6 +154,7 @@ in this case. The expert font is selected as text font, but for each
 upper-case letter encountered, troff changes automatically to the
 standard font. An example with the Monotype Fournier type:
 
+	.do xflag 2
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.track E 1 .2 24 2
@@ -167,6 +170,7 @@ This also uses the fallback sequence, but since the standard numerals
 are present in the standard font, they have to be hidden first so that
 troff does not select them:
 
+	.do xflag 2
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -181,6 +185,7 @@ The examples above can also be combined. Since the .track request does not
 affect the tracking of fonts that are selected by the fallback sequence,
 it is sufficient to mount each font once:
 
+	.do xflag 2
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -201,6 +206,7 @@ in the base font; an expert font delivers them in addition. Automatic
 substitution of such ligatures can be enabled using the ".flig" request
 in combination with the fallback sequence:
 
+	.do xflag 2
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -217,6 +223,7 @@ is available. It only applies to characters that are actually in the
 current font, not to characters from another font that have been
 selected using the fallback sequence.
 
+	.do xflag 2
 	.fp 1 R pl______ pfb
 	.fp 6 H hv______
 	.fzoom H .92
