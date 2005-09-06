@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.15 (gritter) 9/6/05
+.\" Sccsid @(#)troffdemo.tr	1.16 (gritter) 9/6/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .papersize a4
 .ll 17c
@@ -120,7 +120,7 @@ the page title provides an example for the former,
 and the latter is used for the \fESmall Capitals\fR, and,
 at a minor rate, to adjust the regular font of this document.
 .F
-The default resolution is now at 72\^000\ dpi\*;
+The default resolution is now at 72,000\ dpi\*;
 PostScript font metrics can thus be used
 without any loss of accuracy.
 .sp
