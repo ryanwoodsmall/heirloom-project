@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.24 (gritter) 9/5/05
+ * Sccsid @(#)n7.c	1.25 (gritter) 9/6/05
  */
 
 /*
@@ -805,7 +805,7 @@ getword(int x)
 	register int j, k = 0;
 	int	lastj = 0;
 	register tchar i, *wp, nexti;
-	int noword;
+	int noword, gotspc = 0;
 #ifdef EUC
 #ifdef NROFF
 	wchar_t *wddelim;
@@ -871,10 +871,15 @@ getword(int x)
 			numtab[HP].val += sps;
 			widthp = sps;
 			storeword(i, sps);
+			gotspc++;
 			continue;
 		}
-		k = kernadjust(j, ' ' | j & SFMASK);
-		numtab[HP].val += k;
+		if (gotspc) {
+			k = kernadjust(' ' | i & SFMASK, i);
+			numtab[HP].val += k;
+			wne += k;
+			widthp += k;
+		}
 		break;
 	}
 #ifdef EUC
