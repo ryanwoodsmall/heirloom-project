@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.51 (gritter) 9/6/05
+ * Sccsid @(#)dpost.c	1.52 (gritter) 9/6/05
  */
 
 /*
@@ -779,12 +779,12 @@ header(FILE *fp)
     fprintf(fp, "%s", ENDCOMMENTS);
 
     fprintf(fp, "%s\n", "%%BeginProlog");
+    if ( cat(prologue, fp) == FALSE )
+	error(FATAL, "can't read %s", prologue);
     fflush(rf);
     rewind(rf);
     while ((n = fread(buf, 1, sizeof buf, rf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    if ( cat(prologue, fp) == FALSE )
-	error(FATAL, "can't read %s", prologue);
     fprintf(fp, "%s", ENDPROLOG);
 
     fprintf(fp, "%s", BEGINSETUP);
@@ -3421,11 +3421,15 @@ doglobal (
  * needed to have it exported to the global environment. TRUE is returned if we
  * successfully add file *name to the output file.
  *
+ * Actually, all files included this way are procsets, so they go into
+ * the resource section of the PostScript output and not in the global
+ * setup file.
+ *
  */
 
 
     if ( tf == stdout )  {
-	val = cat(name, gf);
+	val = cat(name, rf);
 	reset();
     }	/* End if */
 

@@ -1,4 +1,5 @@
-%ident	"@(#)lp:filter/postscript/font/devpost/charlib/ci	1.2"
+%%BeginResource: procset dpost_charci 1.0 0
+% from OpenSolaris "lp:filter/postscript/font/devpost/charlib/ci	1.2"
 %
 % CDDL HEADER START
 %
@@ -20,6 +21,8 @@
 %
 % CDDL HEADER END
 %
+% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
+%
 /build_ci {
     pop
     size 3 mul 8 div /rad exch def
@@ -28,3 +31,4 @@
     rad add exch rad add exch rad 0 360 arc
     stroke
 } def
+%%EndResource

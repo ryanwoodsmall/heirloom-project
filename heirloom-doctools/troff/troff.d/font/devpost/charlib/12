@@ -1,4 +1,5 @@
-%ident	"@(#)lp:filter/postscript/font/devpost/charlib/12	1.2"
+%%BeginResource: procset dpost_char12 1.0 0
+% from OpenSolaris "lp:filter/postscript/font/devpost/charlib/12	1.2"
 %
 % CDDL HEADER START
 %
@@ -20,6 +21,8 @@
 %
 % CDDL HEADER END
 %
+% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
+%
 /build_12 {
     pop
     /optsize ptsize def
@@ -38,3 +41,4 @@
 
     optsize ofont f
 } def
+%%EndResource

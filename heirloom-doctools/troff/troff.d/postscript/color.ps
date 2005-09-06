@@ -1,4 +1,5 @@
-%ident	"@(#)lp:filter/postscript/postscript/color.ps	1.1"
+%%BeginResource: procset dpost_color 1.2 0
+% from OpenSolaris "lp:filter/postscript/postscript/color.ps	1.1"
 %
 % CDDL HEADER START
 %
@@ -20,6 +21,9 @@
 %
 % CDDL HEADER END
 %
+% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
+%
+% Sccsid @(#)color.ps	1.2 (gritter) 9/6/05
 %
 % Color and reverse video support for dpost. A call made to setcolor with two
 % arguments implies reverse video printing.
@@ -85,3 +89,4 @@ end def
 	closepath fill
 	textcolor exec setrgbcolor
 } bind def
+%%EndResource
