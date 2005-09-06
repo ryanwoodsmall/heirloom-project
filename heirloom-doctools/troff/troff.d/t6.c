@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.71 (gritter) 9/5/05
+ * Sccsid @(#)t6.c	1.72 (gritter) 9/6/05
  */
 
 /*
@@ -612,6 +612,9 @@ tchar setht(void)		/* set character height from \H'...' */
 	tchar c;
 
 	getch();
+	dfact = INCH;
+	dfactd = 72;
+	res = VERT;
 	n = inumb(&apts);
 	getch();
 	if (n == 0 || nonumb)

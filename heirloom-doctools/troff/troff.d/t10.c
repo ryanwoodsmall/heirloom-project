@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.37 (gritter) 9/5/05
+ * Sccsid @(#)t10.c	1.38 (gritter) 9/6/05
  */
 
 /*
@@ -341,6 +341,7 @@ ptout0(tchar *pi, tchar *pend)
 	short	z, dx, dy, dx2, dy2, n;
 	register tchar	i;
 	int outsize;	/* size of object being printed */
+	double	f;
 
 	outsize = 1;	/* default */
 	i = *pi;
@@ -379,7 +380,11 @@ ptout0(tchar *pi, tchar *pend)
 	if (k == CHARHT) {
 		if (xpts != mpts || zoomtab[xfont] != mzoom)
 			ptps();
-		fdprintf(ptid, "x H %d\n", (int)sbits(i));
+		j = f = u2pts(sbits(i));
+		if (j != f && xflag && dev.anysize)
+			fdprintf(ptid, "x H %f\n", f);
+		else
+			fdprintf(ptid, "x H %d\n", j);
 		return(pi+outsize);
 	}
 	if (k == SLANT) {
