@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.38 (gritter) 9/6/05
+ * Sccsid @(#)t10.c	1.39 (gritter) 9/6/05
  */
 
 /*
@@ -337,8 +337,8 @@ tchar *
 ptout0(tchar *pi, tchar *pend)
 {
 	register int j;
-	register short k, w = 0;
-	short	z, dx, dy, dx2, dy2, n;
+	register int k, w = 0;
+	int	z, dx, dy, dx2, dy2, n;
 	register tchar	i;
 	int outsize;	/* size of object being printed */
 	double	f;
