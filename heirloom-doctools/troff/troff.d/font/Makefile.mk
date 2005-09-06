@@ -19,11 +19,11 @@ install: all
 			rm -f $$i; ln -s H $$i || exit; \
 		done && \
 		rm -f GI; ln -s HI GI
-	cp -R dev7200 $(ROOT)$(FNTDIR)
-	rm -f $(ROOT)$(FNTDIR)/dev7200/charlib
-	ln -s ../devpost/charlib $(ROOT)$(FNTDIR)/dev7200/charlib
-	rm -f $(ROOT)$(FNTDIR)/dev7200/postscript
-	ln -s ../devpost/postscript $(ROOT)$(FNTDIR)/dev7200/postscript
+	cp -R devps $(ROOT)$(FNTDIR)
+	rm -f $(ROOT)$(FNTDIR)/devps/charlib
+	ln -s ../devpost/charlib $(ROOT)$(FNTDIR)/devps/charlib
+	rm -f $(ROOT)$(FNTDIR)/devps/postscript
+	ln -s ../devpost/postscript $(ROOT)$(FNTDIR)/devps/postscript
 
 clean:
 	rm -f core log *~

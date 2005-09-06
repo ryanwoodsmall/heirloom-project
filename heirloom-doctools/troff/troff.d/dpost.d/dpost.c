@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.52 (gritter) 9/6/05
+ * Sccsid @(#)dpost.c	1.53 (gritter) 9/6/05
  */
 
 /*
@@ -1369,7 +1369,7 @@ devcntrl(
 	case 'T':			/* device name */
 		sget(devname, sizeof devname, fp);
 		getdevmap();
-		if (strcmp(devname, "7200"))
+		if (strcmp(devname, "7200") && strcmp(devname, "ps"))
 			strcpy(devname, realdev);
 		else
 			realdev = devname;

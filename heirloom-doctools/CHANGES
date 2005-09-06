@@ -9,7 +9,7 @@ Release ...
   with the new font setup. In a UTF-8 locale, most characters that are
   present in standard, Expert, and Symbol PostScript fonts are supported;
   otherwise, a locale-specific subset of them is available.
-* troff: A PostScript device with a resolution of 7200 dpi, named "7200",
+* troff: A PostScript device with a resolution of 72000 dpi, named "ps",
   is available, and is used by default.
 * troff: Support for pairwise kerning has been added.
 * dpost: The PostScript output is now expected to conform to Adobe's
@@ -57,7 +57,7 @@ Release ...
   results in UTF-8 locales.
 * The "-mpictures" macros have been added from Plan 9 sources.
 * The "picpack" preprocessor has been added.
-* eqn: The default resolution has been changed to 7200 dpi to match that
+* eqn: The default resolution has been changed to 72000 dpi to match that
   of troff. The "-r" option was introduced to change it.
 * eqn: Handles "\[]" and "\*[]" now.
 * troff, dpost: Device and font descriptions are now read directly from

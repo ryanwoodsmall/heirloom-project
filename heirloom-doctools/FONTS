@@ -14,7 +14,7 @@ selected using an extended ".fp" request:
 	is set, each of the colon-separated directories in it is tried for
 	the file "afmname.afm", or, if "afmname" has the ".afm" extension
 	itself, for "afmname". Otherwise, the font is loaded from the file
-	"/usr/ucblib/doctools/font/dev7200/afmname.afm". If this fails, a
+	"/usr/ucblib/doctools/font/devps/afmname.afm". If this fails, a
 	legacy ditroff font is assumed (see below).
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
 	be freely chosen. The "r" argument specifies a register on which
@@ -33,7 +33,7 @@ selected using an extended ".fp" request:
 	is one of "pfb", "pfa", or "t42", the file "supplyname.pfb" (or
 	likewise) is searched in the directories in TROFFONTS first as
 	described for the AFM file above, and if it is not found there,
-	in "/usr/ucblib/doctools/font/dev7200/supplyname.pfb" (or
+	in "/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
 	"afmname" above.
 
@@ -50,7 +50,7 @@ glyph data files, as in
 	.ft BM
 	This text prints in Monotype Bembo using modified kerning.
 
-The new default higher-resolution "7200" PostScript device always uses
+The new default higher-resolution "ps" PostScript device always uses
 AFM files; it supports the conventional ".fp" request for backwards
 compatibility to select pre-installed fonts from the PDF base set.
 
@@ -242,4 +242,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 9/5/05
+Gunnar Ritter                                                 9/6/05
