@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.33 (gritter) 9/5/05
+ * Sccsid @(#)n1.c	1.34 (gritter) 9/6/05
  */
 
 /*
@@ -105,6 +105,8 @@ static void vfdprintf(int fd, const char *fmt, va_list ap);
 int	debug = 0;	/*debug flag*/
 #endif	/* DEBUG */
 
+static int	_xflag;
+
 int
 main(int argc, char **argv)
 {
@@ -113,7 +115,6 @@ main(int argc, char **argv)
 	register tchar i;
 	int eileenct;		/*count to test for "Eileen's loop"*/
 	char	**oargv;
-	int	_xflag;
 
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
@@ -1592,4 +1593,15 @@ casedb(void)
 	debug = max(atoi(), 0);
 	noscale = 0;
 #endif	/* DEBUG */
+}
+
+void
+casexflag(void)
+{
+	int	i;
+
+	skip();
+	i = atoi();
+	if (!nonumb)
+		_xflag = xflag = i & 3;
 }

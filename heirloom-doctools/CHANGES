@@ -62,6 +62,8 @@ Release ...
 * eqn: Handles "\[]" and "\*[]" now.
 * troff, dpost: Device and font descriptions are now read directly from
   text files; the "makedev" utility is no longer needed.
+* [nt]roff: The ".xflag" request controls the availability of extensions
+  like the "-x" and "-X" command line options.
 * The file "NEWS" describes new troff language features.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
 * [nt]roff: There is no static limit on the ".hw" table anymore.

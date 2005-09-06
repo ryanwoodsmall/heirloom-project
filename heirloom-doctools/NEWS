@@ -6,7 +6,8 @@ shown. Without the "-x" option, long requests can be invoked with
 the ".do" prefix as described below; other features are available by
 default since they should not normally create compatibility problems.
 With the "-X" option, all extensions except for locale-dependent input
-are disabled.
+and the AFM font selection using ".fp" are disabled. See also the
+description for ".xflag" below.
 
 .chop name
 	removes the last character of the macro, string, or diversion
@@ -155,6 +156,14 @@ are disabled.
 	cause a decrease of letter space. No adjustment is performed on the
 	last character of an output line. Tracking also applies to characters
 	from another font that have been selected by the fallback sequence.
+
+.xflag [0|1|2]
+	controls the availability of newer features like the "-x" and "-X"
+	command line options: ".do xflag 0" corresponds to "-X" and disables
+	all extensions, ".do xflag 1" corresponds to the default behavior,
+	and ".do xflag 2" corresponds to "-x" and enables long request names.
+	Note that ".do xflag 0" is not reversible anymore since the ".xflag"
+	request itself is only available at xflag level one and above.
 
 \$(nn
 \$[nnn]

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.39 (gritter) 9/6/05
+ * Sccsid @(#)tdef.h	1.40 (gritter) 9/6/05
  */
 
 /*
@@ -633,6 +633,7 @@ void casesy(void);
 void getpn(register char *);
 void setrpt(void);
 void casedb(void);
+void casexflag(void);
 /* n2.c */
 int pchar(register tchar);
 void pchar1(register tchar);
