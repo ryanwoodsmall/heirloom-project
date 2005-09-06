@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.17 (gritter) 9/6/05
+.\" Sccsid @(#)troffdemo.tr	1.18 (gritter) 9/6/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .do xflag 2
 .papersize a4
@@ -90,12 +90,13 @@
 The \fItroff\fP\^ text processor
 from the Heirloom Documentation Tools project
 is a variant of the Unix application
-originally written by \fEJoseph F. Osanna\|\(dg\fR
+originally written by \fEJoseph F. Osanna\fR
 and \fEBrian W. Kernighan.\fR
 It has been derived from source code provided by
 the OpenSolaris project.
-One of the areas where Heirloom \fItroff\fP\^ has been specifically enhanced
-are its capabilities to work with PostScript fonts\*:
+Amongst many enhancements,
+Heirloom \fItroff\fP\^ provides extended
+capabilities to work with PostScript fonts\*:
 .F
 PostScript Type 1 fonts can be used
 as supplied by their vendor
