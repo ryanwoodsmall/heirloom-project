@@ -46,11 +46,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)tr_sus.sl	2.2 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)tr_sus.sl	2.3 (gritter) 9/7/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	2.2 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tr.sl	2.3 (gritter) 9/7/05";
 #else
-static const char sccsid[] USED = "@(#)tr.sl	2.2 (gritter) 8/6/05";
+static const char sccsid[] USED = "@(#)tr.sl	2.3 (gritter) 9/7/05";
 #endif
 
 #include <stdlib.h>
@@ -320,7 +320,7 @@ next(struct string *s)
 					if(iswctype(c, s->type))
 						break;
 				} while(s->last++ < s->max);
-				if(s->last >= s->max) goto skip;
+				if(s->last > s->max) goto skip;
 			}
 			return(s->last);
 		}

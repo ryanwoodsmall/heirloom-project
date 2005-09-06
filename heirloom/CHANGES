@@ -2,6 +2,8 @@ Release ...
 * getconf: /usr/ucb is now put at the end of the Heirloom directory list
   for the PATH variable.
 * The "-man" macro no longer produces cut marks when used with troff.
+* tr: When evaluating '[:class:]' expressions, the last position of the
+  coded character set was not included; this has been fixed.
 
 Release 050815
 * The "getconf" utility has been added (derived from OpenSolaris code).
