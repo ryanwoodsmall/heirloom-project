@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.27 (gritter) 9/6/05
+ * Sccsid @(#)n7.c	1.28 (gritter) 9/6/05
  */
 
 /*
@@ -332,14 +332,10 @@ t5:
 		pendt = 0;
 	adsp = adrem = 0;
 	if (ad) {
-#ifndef	NROFF
 		if (nc > 0) {
-			lastkern = 0;
 			width(line[nc-1]);
-			kernadjust(line[nc-1], line[nc]);
-			nel += lastkern;
+			nel += lasttrack;
 		}
-#endif
 		if (nwd == 1)
 			adsp = nel; 
 		else 
@@ -404,7 +400,7 @@ nofill(void)
 		if (ev == oev) {
 			k = kernadjust(i, nexti);
 			ne += k;
-			nel += k;
+			nel -= k;
 			numtab[HP].val += k;
 		}
 	}
@@ -677,7 +673,7 @@ int
 movword(void)
 {
 	register int w;
-	register tchar i, *wp, c;
+	register tchar i, *wp, c, *lp, *lastlp;
 	int	savwch, hys;
 
 	over = 0;
@@ -718,13 +714,14 @@ movword(void)
 			}
 		}
 		i = *wp++;
-		lastkern = 0;
 		w = width(i);
 		w += kernadjust(i, *wp);
 		wne -= w;
 		wch--;
 		storeline(i, w);
 	}
+	*linep = *wp;
+	lastlp = linep;
 	if (nel >= 0) {
 		nwd++;
 		return(0);	/* line didn't fill up */
@@ -753,9 +750,9 @@ m2:
 	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH &&
 			*(linep - 1) != (ohc | ZBIT)) {
 		*linep = (*(linep - 1) & SFMASK) | HYPHEN;
-		w = -lastkern;
-		w += width(*linep);
+		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
+		w += width(*linep);
 		nel -= w;
 		ne += w;
 		linep++;
@@ -767,9 +764,9 @@ m4:
 	return(1);	/* line filled up */
 m5:
 	nc--;
-	lastkern = 0;
+	for (lp = &linep[1]; lp < lastlp && *lp == IMP; lp++);
 	w = width(*linep);
-	w += kernadjust(linep[0], *wp);
+	w += kernadjust(*linep, *lp);
 	ne -= w;
 	nel += w;
 	wne += w;

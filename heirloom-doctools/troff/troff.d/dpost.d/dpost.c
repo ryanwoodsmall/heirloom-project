@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.53 (gritter) 9/6/05
+ * Sccsid @(#)dpost.c	1.54 (gritter) 9/6/05
  */
 
 /*
@@ -499,6 +499,8 @@ int		seenpage = FALSE;
 
 
 float		pointslop = SLOP;	/* horizontal error in points */
+#define	HIGHRES	1200			/* pointslop = 0 if res >= HIGHRES */
+int		Sflag;			/* unless -S gives explicit slop */
 int		slop;			/* and machine units */
 int		rvslop;			/* to extend box in reverse video mode */
 
@@ -920,6 +922,7 @@ options(void)
 	    case 'S':			/* horizontal position error */
 		    if ( (pointslop = atof(optarg)) < 0 )
 			pointslop = 0;
+		    Sflag = 1;
 		    break;
 
 	    case 'T':			/* target printer */
@@ -1980,6 +1983,8 @@ t_init(void)
 	fontinit();
 	gotspecial = FALSE;
 	widthfac = (float) res /dev.res;
+	if (Sflag == 0 && res >= HIGHRES)
+		pointslop = 0;
 	slop = pointslop * res / POINTS + .5;
 	rvslop = res * .025;
 	setup();

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.73 (gritter) 9/6/05
+ * Sccsid @(#)t6.c	1.74 (gritter) 9/6/05
  */
 
 /*
@@ -86,6 +86,7 @@ width(register tchar j)
 {
 	register int i, k;
 
+	lasttrack = 0;
 	if (j & (ZBIT|MOT)) {
 		if (iszbit(j))
 			return(0);
@@ -234,13 +235,13 @@ getcw(register int i)
 	}
 	k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
 	s = xpts;
-	lastkern = 0;
+	lasttrack = 0;
 	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1) {
 		nocache = 1;
-		lastkern = tracktab[ofont].n1;
+		lasttrack = tracktab[ofont].n1;
 	} else if (s >= tracktab[ofont].s2 && tracktab[ofont].n2) {
 		nocache = 1;
-		lastkern = tracktab[ofont].n2;
+		lasttrack = tracktab[ofont].n2;
 	} else if (s > tracktab[ofont].s1 && s < tracktab[ofont].s2) {
 		int	r;
 		r = (s * tracktab[ofont].n2 - s * tracktab[ofont].n1
@@ -249,10 +250,10 @@ getcw(register int i)
 			/ (tracktab[ofont].s2 - tracktab[ofont].s1);
 		if (r != 0) {
 			nocache = 1;
-			lastkern = r;
+			lasttrack = r;
 		}
 	}
-	k += lastkern;
+	k += lasttrack;
 	if (nocache|bd)
 		widcache[i].fontpts = 0;
 	else {
@@ -286,6 +287,7 @@ abscw(int n)	/* return index of abs char n in fontab[], etc. */
 int
 kernadjust(tchar c, tchar d)
 {
+	lastkern = 0;
 	if (!kern || ismot(c) || ismot(d))
 		return 0;
 	c = trtab[cbits(c)] | c & SFMASK;
@@ -300,6 +302,7 @@ getkw(tchar c, tchar d)
 	int	f, i, j, k, n, s;
 	float	z;
 
+	lastkern = 0;
 	if (!kern || iszbit(c) || iszbit(d) || ismot(c) || ismot(d))
 		return 0;
 	if (sfbits(c) != sfbits(d))
@@ -321,7 +324,7 @@ getkw(tchar c, tchar d)
 				if (dev.anysize && xflag &&
 						(z = zoomtab[f]) != 0)
 					k *= z;
-				lastkern += k;
+				lastkern = k;
 				return k;
 			}
 		}
