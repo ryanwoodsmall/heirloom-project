@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.49 (gritter) 9/4/05
+ * Sccsid @(#)dpost.c	1.50 (gritter) 9/6/05
  */
 
 /*
@@ -3391,7 +3391,7 @@ charlib (
 	    snprintf(temp, sizeof temp, "%s/dev%s/charlib/%s.map",
 			    fontdir, realdev, name);
 	    if ( access(temp, 04) == 0 && tf == stdout )
-		cat(temp, gf);
+		cat(temp, tf);
 	}   /* End if */
 	fprintf(tf, "%d %d m\n", stringstart = hpos + lastw, vpos);
     }	/* End if */
