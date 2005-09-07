@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.57 (gritter) 9/7/05
+ * Sccsid @(#)dpost.c	1.58 (gritter) 9/8/05
  */
 
 /*
@@ -2561,6 +2561,8 @@ end\n",
 	} else
 		fprintf(gf, "/%s-@%s exch definefont pop\n",
 			a->fontname, a->Font.intname);
+	fprintf(gf, "/@%s /%s-@%s def\n", a->Font.intname,
+			a->fontname, a->Font.intname);
 	return afmmap;
 }
 /*****************************************************************************/
@@ -2620,8 +2622,7 @@ t_sf(void)
     else
 	fprintf(tf, "%f ", (double)fractsize);
     if (fontname[font].afm)
-    	fprintf(tf, "/%s-@%s f\n", fontname[font].name,
-		    fontname[font].afm->Font.intname);
+    	fprintf(tf, "@%s f\n", fontname[font].afm->Font.intname);
     else
     	fprintf(tf, "%s f\n", fontname[font].name);
 
