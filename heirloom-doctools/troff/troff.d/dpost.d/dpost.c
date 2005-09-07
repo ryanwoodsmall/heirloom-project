@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.55 (gritter) 9/6/05
+ * Sccsid @(#)dpost.c	1.56 (gritter) 9/7/05
  */
 
 /*
@@ -521,6 +521,7 @@ int		rvslop;			/* to extend box in reverse video mode */
 int		textcount = 0;		/* strings accumulated so far */
 int		stringstart = 0;	/* where the next one starts */
 int		spacecount = 0;		/* spaces seen so far on current line */
+int		charcount = 0;		/* characters on current line */
 
 
 /*
@@ -3060,6 +3061,7 @@ starttext(void)
 	    case 0:
 	    case 1:
 		putc('(', tf);
+		charcount = 1;
 		break;
 
 	    case 2:
@@ -3077,10 +3079,12 @@ starttext(void)
 		if ( lastend == -1 )
 		    lastend = hpos;
 		putc('(', tf);
+		charcount = 1;
 		break;
 
 	    case MAXENCODING+2:			/* follow a funny baseline */
 		putc('(', tf);
+		charcount = 1;
 		break;
 	}   /* End switch */
 	textcount = 1;
@@ -3149,6 +3153,7 @@ endtext(void)
 		fprintf(tf, ")%d %d t\n", stringstart, lasty);
 		break;
 	}   /* End switch */
+	charcount = 0;
     }	/* End if */
 
     textcount = 0;
@@ -3181,7 +3186,13 @@ endstring(void)
     switch ( encoding )  {
 	case 0:
 	case 1:
-	    fprintf(tf, ")%d(", stringstart);
+	    charcount += fprintf(tf, ")%d", stringstart);
+	    if (charcount >= 60) {
+		    putc('\n', tf);
+		    charcount = 0;
+	    }
+	    putc('(', tf);
+	    charcount++;
 	    textcount++;
 	    lastx = stringstart = hpos;
 	    break;
@@ -3208,7 +3219,13 @@ endstring(void)
 	    break;
 
 	case MAXENCODING+1:
-	    fprintf(tf, ")%d(", stringstart);
+	    charcount += fprintf(tf, ")%d", stringstart);
+	    if (charcount >= 60) {
+		    putc('\n', tf);
+		    charcount = 0;
+	    }
+	    putc('(', tf);
+	    charcount++;
 	    textcount++;
 	    lastx = stringstart = hpos;
 	    break;
@@ -3275,6 +3292,7 @@ addchar (
 	case 0:
 	case 1:
 	    putc(c, tf);
+	    charcount++;
 	    break;
 
 	case 2:
@@ -3285,6 +3303,7 @@ addchar (
 	case MAXENCODING+1:
 	case MAXENCODING+2:
 	    putc(c, tf);
+	    charcount++;
 	    break;
     }	/* End switch */
 
@@ -3321,7 +3340,7 @@ addoctal (
     switch ( encoding )  {
 	case 0:
 	case 1:
-	    fprintf(tf, "\\%03o", c);
+	    charcount += fprintf(tf, "\\%03o", c);
 	    break;
 
 	case 2:
@@ -3332,7 +3351,7 @@ addoctal (
 
 	case MAXENCODING+1:
 	case MAXENCODING+2:
-	    fprintf(tf, "\\%03o", c);
+	    charcount += fprintf(tf, "\\%03o", c);
 	    break;
     }	/* End switch */
 
