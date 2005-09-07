@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.56 (gritter) 9/7/05
+ * Sccsid @(#)dpost.c	1.57 (gritter) 9/7/05
  */
 
 /*
@@ -3073,6 +3073,7 @@ starttext(void)
 		line[1].spaces = 0;
 		line[1].start = hpos;
 		line[1].width = 0;
+		charcount = 0;
 		break;
 
 	    case MAXENCODING+1:			/* reverse video */
@@ -3128,7 +3129,7 @@ endtext(void)
 		line[textcount].width = lastx - line[textcount].start;
 		if ( spacecount != 0 || textcount != 1 )  {
 		    for ( i = textcount; i > 0; i-- )
-			fprintf(tf, "(%s)%d %d", line[i].str, line[i].spaces, line[i].width);
+			fprintf(tf, "(%s)%d %d\n", line[i].str, line[i].spaces, line[i].width);
 		    fprintf(tf, " %d %d %d t\n", textcount, stringstart, lasty);
 		} else fprintf(tf, "(%s)%d %d w\n", line[1].str, stringstart, lasty);
 		break;
@@ -3211,9 +3212,11 @@ endstring(void)
 		line[textcount].start = lastx;
 		line[textcount].width = 0;
 		line[textcount].spaces = 1;
+		charcount = 1;
 	    } else {
 		*strptr++ = ' ';
 		line[textcount].spaces++;
+		charcount++;
 	    }	/* End else */
 	    lastx += dx;
 	    break;
@@ -3292,18 +3295,31 @@ addchar (
 	case 0:
 	case 1:
 	    putc(c, tf);
-	    charcount++;
+	    if (charcount++ >= 72) {
+		    putc('\\', tf);
+		    putc('\n', tf);
+		    charcount = 0;
+	    }
 	    break;
 
 	case 2:
 	case 3:
 	    *strptr++ = c;
+	    if (charcount++ >= 72) {
+		    *strptr++ = '\\';
+		    *strptr++ = '\n';
+		    charcount = 0;
+	    }
 	    break;
 
 	case MAXENCODING+1:
 	case MAXENCODING+2:
 	    putc(c, tf);
-	    charcount++;
+	    if (charcount++ >= 72) {
+		    putc('\\', tf);
+		    putc('\n', tf);
+		    charcount = 0;
+	    }
 	    break;
     }	/* End switch */
 
@@ -3320,6 +3336,8 @@ addoctal (
 
 
 {
+
+    int	n;
 
 
 /*
@@ -3341,17 +3359,34 @@ addoctal (
 	case 0:
 	case 1:
 	    charcount += fprintf(tf, "\\%03o", c);
+	    if (charcount >= 72) {
+		    putc('\\', tf);
+		    putc('\n', tf);
+		    charcount = 0;
+	    }
 	    break;
 
 	case 2:
 	case 3:
 	    snprintf(strptr, sizeof strings - (strptr - strings), "\\%03o", c);
-	    strptr += strlen(strptr);
+	    n = strlen(strptr);
+	    strptr += n;
+	    charcount += n;
+	    if (charcount >= 72) {
+		    *strptr++ = '\\';
+		    *strptr++ = '\n';
+		    charcount = 0;
+	    }
 	    break;
 
 	case MAXENCODING+1:
 	case MAXENCODING+2:
 	    charcount += fprintf(tf, "\\%03o", c);
+	    if (charcount >= 72) {
+		    putc('\\', tf);
+		    putc('\n', tf);
+		    charcount = 0;
+	    }
 	    break;
     }	/* End switch */
 
