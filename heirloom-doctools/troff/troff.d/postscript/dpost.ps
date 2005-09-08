@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.2 0
+%%BeginResource: procset dpost 4.3 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.2 (gritter) 9/6/05
+% Sccsid @(#)dpost.ps	4.3 (gritter) 9/8/05
 %
 
 /#copies 1 store
@@ -92,6 +92,8 @@
 /inch {72 mul} bind def
 /min {2 copy gt {exch} if pop} bind def
 
+/track 0 def
+
 /setup {
 	counttomark 2 idiv {def} repeat pop
 
@@ -137,7 +139,7 @@
 } def
 
 /decodingdefs [
-	{counttomark 2 idiv {y moveto show} repeat}
+	{counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
 	{neg /y exch def counttomark 2 idiv {y moveto show} repeat}
 	{neg moveto {2 index stringwidth pop sub exch div 0 32 4 -1 roll widthshow} repeat}
 	{neg moveto {spacewidth sub 0.0 32 4 -1 roll widthshow} repeat}

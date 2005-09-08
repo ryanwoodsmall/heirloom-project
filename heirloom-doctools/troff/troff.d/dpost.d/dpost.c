@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.58 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.59 (gritter) 9/8/05
  */
 
 /*
@@ -411,6 +411,8 @@ int		font = 0;		/* font position we're using now */
 int		hpos = 0;		/* where troff wants to be - horizontally */
 int		vpos = 0;		/* same but vertically */
 float		lastw = 0;		/* width of the last input character */
+int		track = 0;		/* tracking hint from troff */
+int		tracked;		/* records need to flush track */
 int		lastc = 0;		/* and its name (or index) */
 
 float		fontheight = 0;		/* points from x H ... */
@@ -608,6 +610,8 @@ char		temp[4096];
 /*****************************************************************************/
 
 static void	t_papersize(char *);
+static void	t_track(char *);
+static void	t_strack(void);
 
 /*****************************************************************************/
 
@@ -1439,6 +1443,8 @@ devcntrl(
 		    t_supply(buf);
 		else if ( strcmp(str, "PaperSize") == 0 )
 		    t_papersize(buf);
+		else if ( strcmp(str, "Track") == 0 )
+		    t_track(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -1457,6 +1463,8 @@ devcntrl(
 		    newcolor(buf);
 		    setcolor();
 		} else if ( strcmp(str, "Sync") == 0 )  {
+		    if (tracked)
+			    tracked = -1;
 		    t_sf();
 		    xymove(hpos, vpos);
 		} else if ( strcmp(str, "PS") == 0 || strcmp(str, "PostScript") == 0 )  {
@@ -1922,6 +1930,8 @@ reset(void)
     lastx = -(slop + 1);
     lasty = -1;
     lastfont = lastsize = -1;
+    if (tracked)
+	    tracked = -1;
 
 }   /* End of reset */
 
@@ -2203,7 +2213,6 @@ t_papersize(char *buf)
 }
 
 /*****************************************************************************/
-
 void
 t_page (
     int pg			/* troff's current page number */
@@ -2420,10 +2429,49 @@ t_font (
 	    loadspecial();
     }	/* End if */
 
+    if (tracked)
+        tracked = -1;
+
     return(n);
 
 }   /* End of t_font */
 
+
+/*****************************************************************************/
+static void
+t_track(char *buf)
+{
+	int	t;
+
+/*
+ * Handling of track kerning. troff provides this parameter as a hint
+ * only. dpost can use it in combination with the PostScript "ashow"
+ * operator. When the variable "track" is not zero, the printer is
+ * advised to perform tracking by the given amount. This relieves us
+ * of the need to adjust the character position explicitly after each
+ * character and thus greatly reduces the size of the output.
+ *
+ * Currently this is done in encoding 0 only.
+ */
+
+	if (encoding != 0)
+		return;
+	if (sscanf(buf, "%d", &t) != 1)
+		t = 0;
+	if (t != track) {
+		tracked = -1;
+		track = t;
+	} else if (t)
+		tracked = 1;
+}
+
+static void
+t_strack(void)
+{
+	endtext();
+	fprintf(tf, "/track %d def\n", track);
+	tracked = track != 0;
+}
 
 /*****************************************************************************/
 
@@ -2632,6 +2680,9 @@ t_sf(void)
 	else
 	    fprintf(tf, "%d %f changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : (double)fractsize);
     }
+
+    if (tracked < 0)
+	    t_strack();
 
 }   /* End of t_sf */
 
@@ -2968,11 +3019,14 @@ put1 (
 	}   /* End for */
     }	/* End else */
 
+    lastw = 0;
     if ( i != 0 && (code = p[i]) != 0 )  {
 	if (size != FRACTSIZE)
 	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else
 	    lastw = widthfac * ((pw[i] * fractsize + unitwidth/2) / unitwidth);
+	if (track && encoding == 0)
+		lastw += track;
 	oput(code);
     }	/* End if */
 
@@ -3355,6 +3409,7 @@ addoctal (
 	    	    c = fontname[font].afmmap[c - 128]&0377;
 	    else
 		    c = 32;
+	    lastw = 0;
     }
     switch ( encoding )  {
 	case 0:
