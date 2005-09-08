@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.62 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.63 (gritter) 9/8/05
  */
 
 /*
@@ -3392,7 +3392,7 @@ addchar (
 	case 1:
 	case 4:
 	    putc(c, tf);
-	    if (charcount++ >= 72) {
+	    if (charcount++ >= 72 && c != '\\') {
 		    putc('\\', tf);
 		    putc('\n', tf);
 		    charcount = 0;
@@ -3402,7 +3402,7 @@ addchar (
 	case 2:
 	case 3:
 	    *strptr++ = c;
-	    if (charcount++ >= 72) {
+	    if (charcount++ >= 72 && c != '\\') {
 		    *strptr++ = '\\';
 		    *strptr++ = '\n';
 		    charcount = 0;
@@ -3412,7 +3412,7 @@ addchar (
 	case MAXENCODING+1:
 	case MAXENCODING+2:
 	    putc(c, tf);
-	    if (charcount++ >= 72) {
+	    if (charcount++ >= 72 && c != '\\') {
 		    putc('\\', tf);
 		    putc('\n', tf);
 		    charcount = 0;
