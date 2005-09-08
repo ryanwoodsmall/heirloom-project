@@ -225,7 +225,6 @@ selected using the fallback sequence.
 
 	.do xflag 2
 	.fp 1 R pl______ pfb
-	.fp 6 H hv______
 	.fzoom H .92
 	Text in \fHHelvetica\fP must be adjusted to fit with Plantin.
 
@@ -249,4 +248,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 9/6/05
+Gunnar Ritter                                                 9/8/05
