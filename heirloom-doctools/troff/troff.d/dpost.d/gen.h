@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.8 (gritter) 8/23/05
+ * Sccsid @(#)gen.h	1.9 (gritter) 9/8/05
  */
 
 /*
@@ -107,7 +107,7 @@ void t_fp(int, char *, char *, void *);
 int t_font(char *);
 void setfont(int);
 void t_sf(void);
-void t_charht(int);
+void t_charht(int, float);
 void t_slant(int);
 void t_supply(char *);
 void t_reset(int);

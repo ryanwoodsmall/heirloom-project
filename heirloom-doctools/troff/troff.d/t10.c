@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.40 (gritter) 9/8/05
+ * Sccsid @(#)t10.c	1.41 (gritter) 9/8/05
  */
 
 /*
@@ -382,7 +382,7 @@ ptout0(tchar *pi, tchar *pend)
 			ptps();
 		j = f = u2pts(sbits(i));
 		if (j != f && xflag && dev.anysize)
-			fdprintf(ptid, "x H %f\n", f);
+			fdprintf(ptid, "x H -23 %f\n", f);
 		else
 			fdprintf(ptid, "x H %d\n", j);
 		return(pi+outsize);
@@ -582,7 +582,7 @@ ptps(void)
 	if ((z = zoomtab[xfont]) != 0 && dev.anysize && xflag)
 		s *= z;
 	if (dev.anysize && xflag && (!found || z != 0 && z != 1))
-		fdprintf(ptid, "s%d %f\n", -23, s);
+		fdprintf(ptid, "s-23 %f\n", s);
 	else
 		fdprintf(ptid, "s%d\n", (int)s);	/* really should put out string rep of size */
 	mpts = i;

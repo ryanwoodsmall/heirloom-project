@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.59 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.60 (gritter) 9/8/05
  */
 
 /*
@@ -1412,7 +1412,13 @@ devcntrl(
 	/* these don't belong here... */
 	case 'H':			/* char height */
 		fscanf(fp, "%d", &n);
-		t_charht(n);
+		if (n != FRACTSIZE)
+			t_charht(n, 0);
+		else {
+			float	f;
+			fscanf(fp, "%f", &f);
+			t_charht(FRACTSIZE, f);
+		}
 		break;
 
 	case 'S':			/* slant */
@@ -2692,7 +2698,7 @@ t_sf(void)
 
 void
 t_charht (
-    int n			/* use this as the character height */
+    int n, float f		/* use this as the character height */
 )
 
 
@@ -2706,7 +2712,10 @@ t_charht (
  *
  */
 
-    fontheight = size == FRACTSIZE ? fractsize : (n == pstab[size-1]) ? 0 : n;
+    if (n == FRACTSIZE)
+        fontheight = f;
+    else
+    	fontheight = (n == pstab[size-1]) ? 0 : n;
     lastfont = -1;
 
 }   /* End of t_charht */
