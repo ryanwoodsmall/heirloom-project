@@ -12,18 +12,43 @@ all:
 
 install: all
 	test -d $(ROOT)$(FNTDIR) || mkdir -p $(ROOT)$(FNTDIR)
-	cp -R devpost $(ROOT)$(FNTDIR)
+	test -d $(ROOT)$(FNTDIR)/devpost/charlib || \
+		mkdir -p $(ROOT)$(FNTDIR)/devpost/charlib
+	cd devpost && for i in ? ?? ?.name ??.name DESC*; \
+	do \
+		$(INSTALL) -c -m 644 $$i $(ROOT)$(FNTDIR)/devpost/ || exit; \
+	done
 	cd $(ROOT)$(FNTDIR)/devpost && \
 		for i in G HM HK HL; \
 		do \
 			rm -f $$i; ln -s H $$i || exit; \
 		done && \
 		rm -f GI; ln -s HI GI
-	cp -R devps $(ROOT)$(FNTDIR)
+	cd devpost/charlib && for i in ?? ??.map BRACKETS_NOTE README OLD_LH*; \
+	do \
+		$(INSTALL) -c -m 644 $$i $(ROOT)$(FNTDIR)/devpost/charlib \
+			|| exit; \
+	done
+	test -d $(ROOT)$(FNTDIR)/devps || mkdir -p $(ROOT)$(FNTDIR)/devps
+	cd devps && for i in ? ?.afm ?? ??.afm DESC MustRead.html; \
+	do \
+		$(INSTALL) -c -m 644 $$i $(ROOT)$(FNTDIR)/devps/ || exit; \
+	done
 	rm -f $(ROOT)$(FNTDIR)/devps/charlib
 	ln -s ../devpost/charlib $(ROOT)$(FNTDIR)/devps/charlib
 	rm -f $(ROOT)$(FNTDIR)/devps/postscript
 	ln -s ../devpost/postscript $(ROOT)$(FNTDIR)/devps/postscript
+	for j in devpslow devpsmed; \
+	do \
+		test -d $(ROOT)$(FNTDIR)/$$j || mkdir -p $(ROOT)$(FNTDIR)/$$j; \
+		$(INSTALL) -c -m 644 $$j/DESC $(ROOT)$(FNTDIR)/$$j/; \
+		(cd $(ROOT)$(FNTDIR)/devps && for i in *; \
+		do \
+			test $$i != DESC || continue; \
+			rm -f ../$$j/$$i; \
+			ln -s ../devps/$$i ../$$j/$$i ; \
+		done); \
+	done
 
 clean:
 	rm -f core log *~

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.64 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.65 (gritter) 9/8/05
  */
 
 /*
@@ -506,7 +506,6 @@ int		seenpage = FALSE;
 
 
 float		pointslop = SLOP;	/* horizontal error in points */
-#define	HIGHRES	1200			/* pointslop = 0 if res >= HIGHRES */
 int		Sflag;			/* unless -S gives explicit slop */
 int		slop;			/* and machine units */
 int		rvslop;			/* to extend box in reverse video mode */
@@ -1385,10 +1384,12 @@ devcntrl(
 	case 'T':			/* device name */
 		sget(devname, sizeof devname, fp);
 		getdevmap();
-		if (strcmp(devname, "7200") && strcmp(devname, "ps"))
-			strcpy(devname, realdev);
-		else
-			realdev = devname;
+		/*
+		 * This used to be "strcpy(devname, realdev);" but
+		 * it does not work when DESC is a text file because
+		 * the fonts are in a different directory.
+		 */
+		realdev = devname;
 		break;
 
 	case 't':			/* trailer */
@@ -2008,7 +2009,7 @@ t_init(void)
 	fontinit();
 	gotspecial = FALSE;
 	widthfac = (float) res /dev.res;
-	if (res >= HIGHRES) {
+	if (dev.afmfonts) {
 		if (Sflag == 0)
 			pointslop = 0;
 		if (eflag == 0)

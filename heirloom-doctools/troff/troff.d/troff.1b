@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.15 (gritter) 9/6/05
+.\" Sccsid @(#)troff.1b	1.16 (gritter) 9/8/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "9/6/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "9/8/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -159,20 +159,35 @@ to
 .TP
 .BI \-T device
 Prepare output for the specified device.
-Known
+Available
 .I devices
 are:
 .RS
+.TP 8n
+.B ps
+for PostScript output with 72,000\ dpi
+and AFM font metrics (default),
+also with
+.I dpost
+as postprocessor
+.TP
+.B psmed
+for PostScript output with 3,600\ dpi
+and AFM font metrics,
+also with
+.I dpost
+as postprocessor
+.TP
+.B pslow
+for PostScript output with 432\ dpi
+and AFM font metrics,
+also with
+.I dpost
+as postprocessor
 .TP
 .B post
 for PostScript output with 720\ dpi,
 with
-.I dpost
-as postprocessor
-.TP
-.B ps
-for PostScript output with 72\^000\ dpi (default),
-also with
 .I dpost
 as postprocessor
 .TP

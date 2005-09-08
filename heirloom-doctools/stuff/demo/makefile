@@ -1,7 +1,7 @@
 .SUFFIXES: .tr .ps .pdf
 
 .tr.ps:
-	troff $< | dpost >$@
+	troff $(TFLAGS) $< | dpost >$@
 
 .ps.pdf:
 	ps2pdf -sPAPERSIZE=a4 $< $@
