@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.61 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.62 (gritter) 9/8/05
  */
 
 /*
@@ -269,6 +269,7 @@
 #include	<math.h>
 #include	<ctype.h>
 #include	<time.h>
+#include	<limits.h>
 
 #include	"comments.h"		/* PostScript file structuring comments */
 #include	"gen.h"			/* general purpose definitions */
@@ -526,7 +527,7 @@ int		rvslop;			/* to extend box in reverse video mode */
 
 int		textcount = 0;		/* strings accumulated so far */
 int		stringstart = 0;	/* where the next one starts */
-int		laststrstart = 0;	/* save for optimization */
+int		laststrstart = INT_MIN;	/* save for optimization */
 int		spacecount = 0;		/* spaces seen so far on current line */
 int		charcount = 0;		/* characters on current line */
 
@@ -3166,7 +3167,7 @@ starttext(void)
 	}   /* End switch */
 	textcount = 1;
 	lastx = stringstart = hpos;
-	laststrstart = 0;
+	laststrstart = INT_MIN;
     }	/* End if */
 
 }   /* End of starttext */
@@ -3198,7 +3199,7 @@ endtext(void)
 		break;
 
 	    case 4:
-		if (laststrstart)
+		if (laststrstart != INT_MIN)
 			fprintf(tf, ")%d %d t\n",
 				stringstart - laststrstart, stringstart);
 		else
@@ -3271,7 +3272,7 @@ endstring(void)
 
     switch ( encoding )  {
 	case 4:
-	    if (laststrstart)
+	    if (laststrstart != INT_MIN)
 	        charcount += fprintf(tf, ")%d", stringstart - laststrstart);
 	    else {
 		    putc(')', tf);
