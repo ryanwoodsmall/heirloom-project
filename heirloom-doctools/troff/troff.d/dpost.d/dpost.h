@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.h	1.3 (gritter) 8/9/05
+ * Sccsid @(#)dpost.h	1.4 (gritter) 9/8/05
  */
 
 /*
@@ -93,10 +93,14 @@
  *
  */
 
-#define MAXENCODING	3
+#define MAXENCODING	4
 
 #ifndef DFLTENCODING
 #define DFLTENCODING	0
+#endif
+
+#ifndef HIGHDFLTENCODING
+#define HIGHDFLTENCODING	4
 #endif
 
 /*

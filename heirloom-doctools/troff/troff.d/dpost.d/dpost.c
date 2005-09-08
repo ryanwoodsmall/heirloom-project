@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.60 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.61 (gritter) 9/8/05
  */
 
 /*
@@ -311,12 +311,16 @@ int		picflag = ON;		/* enable/disable picture inclusion */
  * video, may temporarily change the encoding scheme and reset it to realencoding
  * when done.
  *
+ * Encoding 4 is new as of 9/8/05. It stores only the distances between words and
+ * thus saves a bit of output size. It is automatically enabled at high resolutions.
+ *
  */
 
 
 int		encoding = DFLTENCODING;
 int		realencoding = DFLTENCODING;
 int		maxencoding = MAXENCODING;
+int		eflag;
 
 
 /*
@@ -522,6 +526,7 @@ int		rvslop;			/* to extend box in reverse video mode */
 
 int		textcount = 0;		/* strings accumulated so far */
 int		stringstart = 0;	/* where the next one starts */
+int		laststrstart = 0;	/* save for optimization */
 int		spacecount = 0;		/* spaces seen so far on current line */
 int		charcount = 0;		/* characters on current line */
 
@@ -851,6 +856,8 @@ options(void)
 	    case 'e':			/* change the encoding scheme */
 		    if ( (encoding = atoi(optarg)) < 0 || encoding > MAXENCODING )
 			encoding = DFLTENCODING;
+		    else
+		        eflag = 1;
 		    realencoding = encoding;
 		    break;
 
@@ -2000,8 +2007,12 @@ t_init(void)
 	fontinit();
 	gotspecial = FALSE;
 	widthfac = (float) res /dev.res;
-	if (Sflag == 0 && res >= HIGHRES)
-		pointslop = 0;
+	if (res >= HIGHRES) {
+		if (Sflag == 0)
+			pointslop = 0;
+		if (eflag == 0)
+			realencoding = encoding = HIGHDFLTENCODING;
+	}
 	slop = pointslop * res / POINTS + .5;
 	rvslop = res * .025;
 	setup();
@@ -2457,10 +2468,10 @@ t_track(char *buf)
  * of the need to adjust the character position explicitly after each
  * character and thus greatly reduces the size of the output.
  *
- * Currently this is done in encoding 0 only.
+ * Currently this is done in encodings 0 and 4 only.
  */
 
-	if (encoding != 0)
+	if (encoding != 0 && encoding != 4)
 		return;
 	if (sscanf(buf, "%d", &t) != 1)
 		t = 0;
@@ -3034,7 +3045,7 @@ put1 (
 	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else
 	    lastw = widthfac * ((pw[i] * fractsize + unitwidth/2) / unitwidth);
-	if (track && encoding == 0)
+	if (track && (encoding == 0 || encoding == 4))
 		lastw += track;
 	oput(code);
     }	/* End if */
@@ -3124,6 +3135,7 @@ starttext(void)
 	switch ( encoding )  {
 	    case 0:
 	    case 1:
+	    case 4:
 		putc('(', tf);
 		charcount = 1;
 		break;
@@ -3154,6 +3166,7 @@ starttext(void)
 	}   /* End switch */
 	textcount = 1;
 	lastx = stringstart = hpos;
+	laststrstart = 0;
     }	/* End if */
 
 }   /* End of starttext */
@@ -3182,6 +3195,14 @@ endtext(void)
 	switch ( encoding )  {
 	    case 0:
 		fprintf(tf, ")%d t\n", stringstart);
+		break;
+
+	    case 4:
+		if (laststrstart)
+			fprintf(tf, ")%d %d t\n",
+				stringstart - laststrstart, stringstart);
+		else
+			fprintf(tf, ")%d t\n", stringstart);
 		break;
 
 	    case 1:
@@ -3249,9 +3270,19 @@ endstring(void)
 
 
     switch ( encoding )  {
+	case 4:
+	    if (laststrstart)
+	        charcount += fprintf(tf, ")%d", stringstart - laststrstart);
+	    else {
+		    putc(')', tf);
+		    charcount++;
+	    }
+	    laststrstart = stringstart;
+	    goto nx;
 	case 0:
 	case 1:
 	    charcount += fprintf(tf, ")%d", stringstart);
+         nx:
 	    if (charcount >= 60) {
 		    putc('\n', tf);
 		    charcount = 0;
@@ -3327,7 +3358,7 @@ endline(void)
 
     endtext();
 
-    if ( encoding == 0 || encoding == MAXENCODING+1 )
+    if ( encoding == 0 || encoding == 4 || encoding == MAXENCODING+1 )
 	fprintf(tf, "%d %d m\n", hpos, vpos);
 
     lastx = stringstart = lastend = hpos;
@@ -3358,6 +3389,7 @@ addchar (
     switch ( encoding )  {
 	case 0:
 	case 1:
+	case 4:
 	    putc(c, tf);
 	    if (charcount++ >= 72) {
 		    putc('\\', tf);
@@ -3423,6 +3455,7 @@ addoctal (
     switch ( encoding )  {
 	case 0:
 	case 1:
+	case 4:
 	    charcount += fprintf(tf, "\\%03o", c);
 	    if (charcount >= 72) {
 		    putc('\\', tf);
