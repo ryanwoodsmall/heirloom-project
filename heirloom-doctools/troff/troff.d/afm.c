@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.21 (gritter) 8/29/05
+ * Sccsid @(#)afm.c	1.22 (gritter) 9/8/05
  */
 
 #include <stdlib.h>
@@ -255,6 +255,7 @@ static const struct asciimap {
 	{ 0x0024,	"dollaralt" },		/* FournierMT-RegularAlt */
 	{ 0x0025,	"percent" },
 	{ 0x0026,	"ampersand" },
+	{ 0x0026,	"ampersandalt" },	/* AGaramondAlt-Italic */
 	{ 0x0027,	"quoteright" },
 	{ 0x0028,	"parenleft" },
 	{ 0x0029,	"parenright" },
@@ -304,42 +305,69 @@ static const struct asciimap {
 	{ 0x003F,	"question" },
 	{ 0x0040,	"at" },
 	{ 0x0041,	"A" },
+	{ 0x0041,	"Aswash" },		/* AGaramondAlt-Italic */
 	{ 0x0042,	"B" },
+	{ 0x0042,	"Bswash" },		/* AGaramondAlt-Italic */
 	{ 0x0043,	"C" },
+	{ 0x0043,	"Cswash" },		/* AGaramondAlt-Italic */
 	{ 0x0044,	"D" },
+	{ 0x0044,	"Dswash" },		/* AGaramondAlt-Italic */
 	{ 0x0045,	"E" },
+	{ 0x0045,	"Eswash" },		/* AGaramondAlt-Italic */
 	{ 0x0046,	"F" },
+	{ 0x0046,	"Fswash" },		/* AGaramondAlt-Italic */
 	{ 0x0047,	"G" },
+	{ 0x0047,	"Gswash" },		/* AGaramondAlt-Italic */
 	{ 0x0048,	"H" },
+	{ 0x0048,	"Hswash" },		/* AGaramondAlt-Italic */
 	{ 0x0049,	"I" },
+	{ 0x0049,	"Iswash" },		/* AGaramondAlt-Italic */
 	{ 0x004A,	"J" },
 	{ 0x004A,	"Jalt" },		/* FournierMT-RegularAlt */
 	{ 0x004A,	"Jalttwo" },		/* BulmerMT-ItalicAlt */
+	{ 0x004A,	"Jswash" },		/* AGaramondAlt-Italic */
 	{ 0x004A,	"JTallCapalt" },	/* FournierMT-RegularAlt */
 	{ 0x004B,	"K" },
 	{ 0x004B,	"Kalt" },		/* BulmerMT-ItalicAlt */
+	{ 0x004B,	"Kswash" },		/* AGaramondAlt-Italic */
 	{ 0x004C,	"L" },
+	{ 0x004C,	"Lswash" },		/* AGaramondAlt-Italic */
 	{ 0x004D,	"M" },
+	{ 0x004D,	"Mswash" },		/* AGaramondAlt-Italic */
 	{ 0x004E,	"N" },
 	{ 0x004E,	"Nalt" },		/* BulmerMT-ItalicAlt */
+	{ 0x004E,	"Nswash" },		/* AGaramondAlt-Italic */
 	{ 0x004F,	"O" },
 	{ 0x004F,	"Oalt" },		/* BulmerMT-ItalicAlt */
+	{ 0x004F,	"Oswash" },		/* AGaramondAlt-Italic */
 	{ 0x0050,	"P" },
+	{ 0x0050,	"Pswash" },		/* AGaramondAlt-Italic */
 	{ 0x0051,	"Q" },
 	{ 0x0051,	"Qalt" },		/* FournierMT-RegularAlt */
+	{ 0x0051,	"Qalttitling" },	/* AGaramondAlt-Regular */
+	{ 0x0051,	"Qswash" },		/* AGaramondAlt-Italic */
 	{ 0x0051,	"QTallCapalt" },	/* FournierMT-RegularAlt */
 	{ 0x0052,	"R" },
 	{ 0x0052,	"Ralternate" },		/* Bembo-Alt */
+	{ 0x0052,	"Rswash" },		/* AGaramondAlt-Italic */
 	{ 0x0053,	"S" },
+	{ 0x0053,	"Sswash" },		/* AGaramondAlt-Italic */
 	{ 0x0054,	"T" },
 	{ 0x0054,	"Talt" },		/* BulmerMT-ItalicAlt */
+	{ 0x0054,	"Tswash" },		/* AGaramondAlt-Italic */
 	{ 0x0055,	"U" },
+	{ 0x0055,	"Uswash" },		/* AGaramondAlt-Italic */
 	{ 0x0056,	"V" },
+	{ 0x0056,	"Vswash" },		/* AGaramondAlt-Italic */
 	{ 0x0057,	"W" },
+	{ 0x0057,	"Wswash" },		/* AGaramondAlt-Italic */
 	{ 0x0058,	"X" },
+	{ 0x0058,	"Xswash" },		/* AGaramondAlt-Italic */
 	{ 0x0059,	"Y" },
 	{ 0x0059,	"Yalt" },		/* BulmerMT-ItalicAlt */
+	{ 0x0059,	"Yswash" },		/* AGaramondAlt-Italic */
 	{ 0x005A,	"Z" },
+	{ 0x005A,	"Zswash" },		/* AGaramondAlt-Italic */
 	{ 0x005B,	"bracketleft" },
 	{ 0x005C,	"backslash" },
 	{ 0x005D,	"bracketright" },
@@ -351,6 +379,7 @@ static const struct asciimap {
 /*	{ 0x0060,	"grave" },	*/
 	{ 0x0061,	"a" },
 	{ 0x0061,	"Asmall" },
+	{ 0x0061,	"aswash" },		/* AGaramondAlt-Regular */
 	{ 0x0062,	"b" },
 	{ 0x0062,	"Bsmall" },
 	{ 0x0063,	"c" },
@@ -359,6 +388,7 @@ static const struct asciimap {
 	{ 0x0064,	"Dsmall" },
 	{ 0x0065,	"e" },
 	{ 0x0065,	"Esmall" },
+	{ 0x0065,	"eswash" },		/* AGaramondAlt-Regular */
 	{ 0x0066,	"f" },
 	{ 0x0066,	"Fsmall" },
 	{ 0x0067,	"g" },
@@ -378,6 +408,7 @@ static const struct asciimap {
 	{ 0x006D,	"Msmall" },
 	{ 0x006E,	"n" },
 	{ 0x006E,	"Nsmall" },
+	{ 0x006E,	"nswash" },		/* AGaramondAlt-Regular */
 	{ 0x006F,	"o" },
 	{ 0x006F,	"Osmall" },
 	{ 0x0070,	"p" },
@@ -386,14 +417,18 @@ static const struct asciimap {
 	{ 0x0071,	"Qsmall" },
 	{ 0x0072,	"r" },
 	{ 0x0072,	"Rsmall" },
+	{ 0x0072,	"rswash" },		/* AGaramondAlt-Regular */
 	{ 0x0073,	"s" },
 	{ 0x0073,	"Ssmall" },
 	{ 0x0074,	"t" },
 	{ 0x0074,	"Tsmall" },
+	{ 0x0074,	"tswash" },		/* AGaramondAlt-Regular */
+	{ 0x0074,	"tswashalt" },		/* AGaramondAlt-Regular */
 	{ 0x0075,	"u" },
 	{ 0x0075,	"Usmall" },
 	{ 0x0076,	"v" },
 	{ 0x0076,	"Vsmall" },
+	{ 0x0076,	"vswash" },		/* AGaramondAlt-Italic */
 	{ 0x0077,	"w" },
 	{ 0x0077,	"Wsmall" },
 	{ 0x0077,	"walt" },		/* FournierMT-RegularAlt */
@@ -404,6 +439,7 @@ static const struct asciimap {
 	{ 0x007A,	"z" },
 	{ 0x007A,	"Zsmall" },
 	{ 0x007A,	"zalt" },		/* FournierMT-ItalicAlt */
+	{ 0x007A,	"zswash" },		/* AGaramondAlt-Regular */
 	{ 0x007B,	"braceleft" },
 	{ 0x007C,	"bar" },
 	{ 0x007D,	"braceright" },
