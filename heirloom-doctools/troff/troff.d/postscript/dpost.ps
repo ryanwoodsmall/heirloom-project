@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.4 0
+%%BeginResource: procset dpost 4.5 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.4 (gritter) 9/8/05
+% Sccsid @(#)dpost.ps	4.5 (gritter) 9/8/05
 %
 
 /#copies 1 store
@@ -155,8 +155,8 @@
 /done {/lastpage where {pop lastpage} if} def
 
 /f {
-	dup /font exch def findfont exch
-	dup /ptsize exch def scaling div dup /size exch def scalefont setfont
+	dup /font exch def exch
+	dup /ptsize exch def scaling div dup /size exch def SF
 	linewidth ptsize mul scaling resolution 72 div mul div setlinewidth
 	/spacewidth ( ) stringwidth pop def
 } bind def
@@ -227,6 +227,20 @@
 	/underscore		[0 80 500 0]
 	/endash			[7 90 650 0]
 ] def
+
+% from Adobe's PostScript Language Reference Manual, 2nd ed. 1990, pp. 588-589
+/*SF {					% Complete selectfont emulation
+	exch findfont exch
+	dup type /arraytype eq {makefont}{scalefont} ifelse setfont
+} bind def
+/languagelevel where			% Determine language level
+	{pop languagelevel} {1} ifelse	% of implementation
+	2 lt {				% ifelse
+		/SF /*SF load def	% Level 1 interpreter present, so
+	} {				% else
+		/SF /selectfont load def% Level 2 interpreter present, so
+	}
+ifelse
 
 % from Adobe's pdfmark Reference Manual for Acrobat 7.0, 11/30/04, p. 10
 /pdfmark where				% Is pdfmark already available?
