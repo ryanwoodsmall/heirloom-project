@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.17 (gritter) 8/16/05
+ * Sccsid @(#)n10.c	1.18 (gritter) 9/8/05
  */
 
 /*
@@ -74,11 +74,11 @@ int	dtab;
 int	plotmode;
 int	esct;
 
-char	xchname[4 * (NROFFCHARS-_SPECCHAR_ST)];	/* hy, em, etc. */
-short	xchtab[NROFFCHARS-_SPECCHAR_ST];		/* indexes into chname[] */
+char	*xchname;		/* hy, em, etc. */
+short	*xchtab;		/* indexes into chname[] */
 char	*codestr;
-char	*chname = xchname;
-short	*chtab = xchtab;
+char	*chname;
+short	*chtab;
 int	nchtab = 0;
 
 int	*bdtab;
@@ -447,6 +447,12 @@ ptinit(void)
 	char check[50];
 	extern int initbdtab[], initfontlab[];
 
+	t.codetab = calloc(NROFFCHARS-_SPECCHAR_ST, sizeof *t.codetab);
+	t.width = calloc(NROFFCHARS, sizeof *t.width);
+	xchname = calloc(4 * (NROFFCHARS-_SPECCHAR_ST), sizeof *xchname);
+	xchtab = calloc(NROFFCHARS-_SPECCHAR_ST, sizeof *xchtab);
+	chname = xchname;
+	chtab = xchtab;
 	bdtab = initbdtab;
 	fontlab = initfontlab;
 	strcat(termtab, devname);

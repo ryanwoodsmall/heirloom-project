@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.75 (gritter) 9/7/05
+ * Sccsid @(#)t6.c	1.76 (gritter) 9/8/05
  */
 
 /*
@@ -1196,6 +1196,7 @@ loadafm(int nf, int rq, char *file, char *supply, int required)
 		return -1;
 	}
 	free(contents);
+	morechars(a->nchars+32+1+128-32+nchtab+32+nchtab+128);
 done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	afmtab[nafm] = a;
 	if (nf >= Nfont)

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.40 (gritter) 9/6/05
+ * Sccsid @(#)tdef.h	1.41 (gritter) 9/8/05
  */
 
 /*
@@ -178,7 +178,7 @@ extern	int	NMF;	/* size of space for -m flags */
 #define	WDSIZE	540	/* word buffer size */
 #define	LNSIZE	680	/* line buffer size */
 #define	NDI	5	/* number of diversions */
-#define	NCHARS	850	/* maximum size of troff character set */
+extern	int	NCHARS;	/* maximum size of troff character set */
 #define	NTRTAB	NCHARS	/* number of items in trtab[] */
 #define	NWIDCACHE NCHARS	/* number of items in widcache */
 #define	NTRAP	20	/* number of traps */
@@ -829,3 +829,4 @@ void casefc(void);
 tchar setfield(int);
 void localize(void);
 void caselc_ctype(void);
+void morechars(int);

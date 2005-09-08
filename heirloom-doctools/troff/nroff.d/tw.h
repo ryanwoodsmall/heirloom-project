@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tw.h	1.4 (gritter) 8/8/05
+ * Sccsid @(#)tw.h	1.5 (gritter) 9/8/05
  */
 
 /*
@@ -73,6 +73,6 @@ extern struct t {
 	char	*right;		/* ditto */
 	char	*left;		/* ditto */
 
-	char	*codetab[NROFFCHARS-_SPECCHAR_ST];
-	char	width[NROFFCHARS];
+	char	**codetab;
+	char	*width;
 } t;
