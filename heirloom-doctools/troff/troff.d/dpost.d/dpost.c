@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.65 (gritter) 9/8/05
+ * Sccsid @(#)dpost.c	1.68 (gritter) 9/9/05
  */
 
 /*
@@ -270,6 +270,7 @@
 #include	<ctype.h>
 #include	<time.h>
 #include	<limits.h>
+#include	<locale.h>
 
 #include	"comments.h"		/* PostScript file structuring comments */
 #include	"gen.h"			/* general purpose definitions */
@@ -277,6 +278,7 @@
 #include	"ext.h"			/* external variable definitions */
 #include	"dev.h"			/* typesetter and font descriptions */
 #include	"dpost.h"		/* a few definitions just used here */
+#include	"asciitype.h"
 #include	"afm.h"
 
 
@@ -572,6 +574,32 @@ Fontmap		fontmap[] = FONTMAP;	/* and general mapping tables - emulation */
 
 /*
  *
+ * Variables and functions for the pdfmark operator.
+ *
+ */
+static char	*Author;		/* DOCINFO /Author */
+static char	*Title;			/* DOCINFO /Title */
+static char	*Subject;		/* DOCINFO /Subject */
+static char	*Keywords;		/* DOCINFO /Keywords */
+static struct Bookmark {
+	char	*Title;			/* OUT /Title */
+	char	*title;			/* unencoded title */
+	int	Count;			/* OUT /Count */
+	int	Page;			/* OUT /Page */
+	int	level;			/* used to generate count */
+	long	offset;			/* offset in tf at first read */
+	int	hpos;			/* horizontal position */
+	int	vpos;			/* vertical position */
+} *Bookmarks;
+static size_t	nBookmarks;
+static int	pagelength = 792;	/* lenght of page in points */
+#define	MAXBOOKMARKLEVEL	20
+
+static void	orderbookmarks(void);
+
+
+/*
+ *
  * A few variables that are really only used if we're doing accounting. Designed
  * for our use at Murray Hill and probably won't suit your needs. Changes should
  * be easy and can be made in routine account().
@@ -617,6 +645,9 @@ char		temp[4096];
 static void	t_papersize(char *);
 static void	t_track(char *);
 static void	t_strack(void);
+static void	t_pdfmark(char *);
+
+static int	mb_cur_max;
 
 /*****************************************************************************/
 
@@ -638,6 +669,9 @@ main(int agc, char *agv[])
  * be *realdev. If there's more than one input file, each begins on a new page.
  *
  */
+
+    setlocale(LC_CTYPE, "");
+    mb_cur_max = MB_CUR_MAX;
 
     ostdout = dup(1);
     if (close(mkstemp(tp = strdup(template))) < 0 ||
@@ -691,12 +725,12 @@ sget(char *buf, size_t size, FILE *fp)
 
 	do
 		c = getc(fp);
-	while (isspace(c));
+	while (spacechar(c));
 	if (c != EOF) do {
 		if (n+1 < size)
 			buf[n++] = c;
 		c = getc(fp);
-	} while (c != EOF && !isspace(c));
+	} while (c != EOF && !spacechar(c));
 	ungetc(c, fp);
 	buf[n] = 0;
 	return n > 1 ? 1 : c == EOF ? EOF : 0;
@@ -773,9 +807,11 @@ header(FILE *fp)
 
 
     time_t	now;
-    int		n;
+    int		n, m;
+    long	offs, stop;
     char	buf[4096];
     char	crdbuf[40];
+    struct Bookmark	*bp;
 
 
     time(&now);
@@ -802,18 +838,55 @@ header(FILE *fp)
     fprintf(fp, "%s", BEGINSETUP);
     fprintf(fp, "\
 [ /CreationDate %s\n\
-  /Creator (%s)\n\
-  /DOCINFO pdfmark\n", pdfdate(&now, crdbuf, sizeof crdbuf), creator);
+  /Creator (%s)\n", pdfdate(&now, crdbuf, sizeof crdbuf), creator);
+    if (Author)
+	    fprintf(fp, "  /Author %s\n", Author);
+    if (Title)
+	    fprintf(fp, "  /Title %s\n", Title);
+    if (Subject)
+	    fprintf(fp, "  /Subject %s\n", Subject);
+    if (Keywords)
+	    fprintf(fp, "  /Keywords %s\n", Keywords);
+    fprintf(fp, "/DOCINFO pdfmark\n");
 
     fflush(gf);
     rewind(gf);
     while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
 	    fwrite(buf, 1, n, fp);
     fprintf(fp, "mark\n");
+
     fflush(stdout);
     rewind(stdout);
-    while ((n = fread(buf, 1, sizeof buf, stdout)) > 0)
-	    fwrite(buf, 1, n, fp);
+    if (Bookmarks) {
+	    orderbookmarks();
+	    bp = &Bookmarks[0];
+	    offs = 0;
+	    stop = bp->offset;
+	    for (;;) {
+		    if (stop < 0 || (m = stop - offs) > sizeof buf)
+			    m = sizeof buf;
+		    if ((n = fread(buf, 1, m, stdout)) == 0)
+			    break;
+		    fwrite(buf, 1, n, fp);
+		    offs += n;
+		    if (offs == stop) {
+			    fprintf(fp, "[ /Title %s\n"
+			                "  /Count %d\n"
+			                "  /Page %d\n"
+					"  /View [/FitH %d]\n"
+					"/OUT pdfmark\n",
+				bp->Title, bp->Count, bp->Page,
+				pagelength - bp->vpos);
+			    if (bp++ < &Bookmarks[nBookmarks])
+				    stop = bp->offset;
+			    else
+				    stop = -1;
+		    }
+	    }
+    } else {
+    	while ((n = fread(buf, 1, sizeof buf, stdout)) > 0)
+	    	fwrite(buf, 1, n, fp);
+    }
 
 }   /* End of header */
 
@@ -1438,13 +1511,13 @@ devcntrl(
 	case 'X':			/* copy through - from troff */
 		do
 			c = getc(fp);
-		while (isspace(c));
+		while (spacechar(c));
 		n = 0;
 		if (c != EOF) do {
 			if (n + 1 < sizeof str)
 				str[n++] = c;
 			c = getc(fp);
-		} while (c != EOF && !isspace(c) && c != ':');
+		} while (c != EOF && !spacechar(c) && c != ':');
 		str[n] = 0;
 		if (c != ':')
 			ungetc(c, fp);
@@ -1460,6 +1533,8 @@ devcntrl(
 		    t_papersize(buf);
 		else if ( strcmp(str, "Track") == 0 )
 		    t_track(buf);
+		else if ( strcmp(str, "PDFMark") == 0 )
+		    t_pdfmark(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -1616,7 +1691,7 @@ loadfont (
 		p = s;
 	else
 		p++;
-	if (p[0] == 'S' && (p[1] == '\0' || isdigit(p[1]&0377) &&
+	if (p[0] == 'S' && (p[1] == '\0' || digitchar(p[1]&0377) &&
 				p[2] == '\0' || p[2] == '.'))
 		forcespecial = 1;
 	for (i = 0; i < afmcount; i++)
@@ -2229,6 +2304,7 @@ t_papersize(char *buf)
 	y = y * 72 / res;
 	fprintf(gf, "/pagebbox [0 0 %d %d] def\n", x, y);
 	fprintf(gf, "userdict /gotpagebbox true put\n");
+	pagelength = y;
 }
 
 /*****************************************************************************/
@@ -3093,7 +3169,7 @@ oput (
     if ( ABS(hpos - lastx) > slop )
 	endstring();
 
-    if ( isascii(c) && isprint(c) )
+    if ( asciichar(c) && printchar(c) )
 	switch ( c )  {
 	    case '(':
 	    case ')':
@@ -3681,3 +3757,123 @@ redirect (
 
 /*****************************************************************************/
 
+static char *
+mbs2pdf(char *mp)
+{
+	char	*ustr;
+	wchar_t	wc;
+	int	i, n = 0, sz;
+
+	ustr = malloc(sz = 16);
+	i = sprintf(ustr, "<FEFF");
+	while (mp += n, *mp && *mp != '\n') {
+		if ((n = mbtowc(&wc, mp, mb_cur_max)) <= 0) {
+			error(NON_FATAL,
+				"illegal byte sequence %d in PDFMark operand",
+				*mp&0377);
+			n = 1;
+			continue;
+		}
+		if (wc < 0 || wc > 0xFFFF) {
+			error(NON_FATAL, "only BMP values allowed for PDFMark");
+			continue;
+		}
+		if (i + 6 >= sz)
+			ustr = realloc(ustr, sz += 16);
+		i += sprintf(&ustr[i], "%04X", (int)wc);
+	}
+	ustr[i++] = '>';
+	ustr[i] = 0;
+	return ustr;
+}
+
+static void
+t_pdfmark(char *buf)
+{
+	char	*bp, *tp;
+	int	n;
+
+	while (spacechar(*buf&0377))
+		buf++;
+	for (bp = buf; *bp && !spacechar(*bp&0377); bp++);
+	*bp++ = '\0';
+	while (spacechar(*bp&0377))
+		bp++;
+	if (strcmp(buf, "Author") == 0)
+		Author = mbs2pdf(bp);
+	else if (strcmp(buf, "Title") == 0)
+		Title = mbs2pdf(bp);
+	else if (strcmp(buf, "Subject") == 0)
+		Subject = mbs2pdf(bp);
+	else if (strcmp(buf, "Keywords") == 0)
+		Keywords = mbs2pdf(bp);
+	else if (strcmp(buf, "Bookmark") == 0) {
+		n = strtol(bp, &bp, 10);
+		while (spacechar(*bp&0377))
+			bp++;
+		if (n < 0 || n > MAXBOOKMARKLEVEL) {
+			error(NON_FATAL, "invalid PDFMark Bookmark level %d,"
+			                 "maximum is %d\n",
+				n, MAXBOOKMARKLEVEL);
+			return;
+		}
+		Bookmarks = realloc(Bookmarks, ++nBookmarks*sizeof *Bookmarks);
+		Bookmarks[nBookmarks-1].level = n;
+		Bookmarks[nBookmarks-1].Title = mbs2pdf(bp);
+		for (tp = bp; *tp; tp++)
+			if (*tp == '\n') {
+				*tp = '\0';
+				break;
+			}
+		Bookmarks[nBookmarks-1].title = strdup(bp);
+		Bookmarks[nBookmarks-1].Count = 0;
+		Bookmarks[nBookmarks-1].Page = printed + 1;
+		endtext();
+		Bookmarks[nBookmarks-1].offset = ftell(tf);
+		Bookmarks[nBookmarks-1].hpos = lastx > 0 ? lastx * 72 / res : 0;
+		Bookmarks[nBookmarks-1].vpos = lasty > 0 ? lasty * 72 / res : 0;
+	} else
+		error(NON_FATAL, "unknown PDFMark attribute %s", buf);
+}
+
+static void
+orderbookmarks(void)
+{
+
+	int	counts[MAXBOOKMARKLEVEL+1];
+	int	refs[MAXBOOKMARKLEVEL+1];
+	int	i, j, k, t;
+	int	lvl = 0;
+
+/*
+ * Generate the Count parameter from the given levels.
+ */
+
+	memset(&counts, 0, sizeof counts);
+	for (i = 0; i <= MAXBOOKMARKLEVEL; i++)
+		refs[i] = -1;
+	for (i = 0; i <= nBookmarks; i++) {
+		k = i < nBookmarks ? Bookmarks[i].level : 0;
+		if (i == nBookmarks || k <= lvl) {
+			for (j = k+1; j <= MAXBOOKMARKLEVEL; j++) {
+				t = j - 1;
+				if (refs[t] >= 0) {
+					Bookmarks[refs[t]].Count += counts[j];
+					refs[t] = -1;
+				}
+				counts[j] = 0;
+			}
+		}
+		if (k > 0 && refs[k-1] < 0) {
+			while (k > 0 && refs[k-1] < 0)
+				k--;
+			error(NON_FATAL, "PDFMark Bookmark \"%s\" at level %d "
+			                 "has no direct parent, "
+					 "using level %d\n",
+				Bookmarks[i].title, Bookmarks[i].level, k);
+		}
+		counts[k]++;
+		refs[k] = i;
+		lvl = k;
+	}
+}

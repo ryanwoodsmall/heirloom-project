@@ -1,10 +1,19 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.18 (gritter) 9/6/05
+.\" Sccsid @(#)troffdemo.tr	1.19 (gritter) 9/9/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.\" Enable long request names.
 .do xflag 2
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.\" Set the document size.
 .papersize a4
 .ll 17c
 .po 2c
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.\" Set PDF attributes.
+\X'PDFMark: Author Gunnar Ritter'
+\X'PDFMark: Keywords Heirloom Documentation Tools, troff, PostScript, fonts'
+\X'PDFMark: Subject Heirloom troff and PostScript fonts'
+\X'PDFMark: Title Heirloom Troff Demonstration Page'
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Mount fonts from the Adobe Caslon family, including ornaments.
 .fp 1 R awrg____ pfb
@@ -82,7 +91,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/6/05
+9/9/05
 .sp 2v
 .ad b
 .ps 12
