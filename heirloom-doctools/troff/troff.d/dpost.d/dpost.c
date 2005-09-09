@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.69 (gritter) 9/9/05
+ * Sccsid @(#)dpost.c	1.70 (gritter) 9/9/05
  */
 
 /*
@@ -3740,10 +3740,10 @@ mbs2pdf(char *mp)
 {
 	char	*ustr;
 	wchar_t	wc;
-	int	i, n = 0, sz;
+	int	c, i, n = 0, sz, w;
 
 	ustr = malloc(sz = 16);
-	i = sprintf(ustr, "<FEFF");
+	c = i = sprintf(ustr, "<FEFF");
 	while (mp += n, *mp && *mp != '\n') {
 		if ((n = mbtowc(&wc, mp, mb_cur_max)) <= 0) {
 			error(NON_FATAL,
@@ -3756,9 +3756,15 @@ mbs2pdf(char *mp)
 			error(NON_FATAL, "only BMP values allowed for PDFMark");
 			continue;
 		}
-		if (i + 6 >= sz)
+		if (i + 8 >= sz)
 			ustr = realloc(ustr, sz += 16);
-		i += sprintf(&ustr[i], "%04X", (int)wc);
+		w = sprintf(&ustr[i], "%04X", (int)wc);
+		i += w;
+		c += w;
+		if (c >= 60) {
+			ustr[i++] = '\n';
+			c = 0;
+		}
 	}
 	ustr[i++] = '>';
 	ustr[i] = 0;
