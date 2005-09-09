@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)asciitype.h	1.5 (gritter) 7/3/05	*/
+/*	Sccsid @(#)asciitype.h	1.6 (gritter) 9/9/05	*/
 
 /*
  * Locale-independent character classes.
@@ -52,6 +52,8 @@ extern const unsigned char	class_char[];
 #define	whitechar(c) (asciichar(c)&&(class_char[c]&(C_BLANK|C_WHITE)))
 #define	octalchar(c) (asciichar(c)&&(class_char[c]&(C_OCTAL)))
 #define	graphchar(c) (asciichar(c)&&(class_char[c]&\
+			(C_UPPER|C_LOWER|C_DIGIT|C_OCTAL|C_PUNCT)))
+#define	printchar(c) ((c)==' ' || asciichar(c)&&(class_char[c]&\
 			(C_UPPER|C_LOWER|C_DIGIT|C_OCTAL|C_PUNCT)))
 
 #define	upperconv(c) (lowerchar(c) ? (c)-'a'+'A' : (c))
