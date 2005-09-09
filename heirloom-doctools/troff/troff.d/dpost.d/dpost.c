@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.68 (gritter) 9/9/05
+ * Sccsid @(#)dpost.c	1.69 (gritter) 9/9/05
  */
 
 /*
@@ -585,11 +585,7 @@ static struct Bookmark {
 	char	*Title;			/* OUT /Title */
 	char	*title;			/* unencoded title */
 	int	Count;			/* OUT /Count */
-	int	Page;			/* OUT /Page */
 	int	level;			/* used to generate count */
-	long	offset;			/* offset in tf at first read */
-	int	hpos;			/* horizontal position */
-	int	vpos;			/* vertical position */
 } *Bookmarks;
 static size_t	nBookmarks;
 static int	pagelength = 792;	/* lenght of page in points */
@@ -807,11 +803,9 @@ header(FILE *fp)
 
 
     time_t	now;
-    int		n, m;
-    long	offs, stop;
+    int		n;
     char	buf[4096];
     char	crdbuf[40];
-    struct Bookmark	*bp;
 
 
     time(&now);
@@ -853,40 +847,13 @@ header(FILE *fp)
     rewind(gf);
     while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
 	    fwrite(buf, 1, n, fp);
+
     fprintf(fp, "mark\n");
 
     fflush(stdout);
     rewind(stdout);
-    if (Bookmarks) {
-	    orderbookmarks();
-	    bp = &Bookmarks[0];
-	    offs = 0;
-	    stop = bp->offset;
-	    for (;;) {
-		    if (stop < 0 || (m = stop - offs) > sizeof buf)
-			    m = sizeof buf;
-		    if ((n = fread(buf, 1, m, stdout)) == 0)
-			    break;
-		    fwrite(buf, 1, n, fp);
-		    offs += n;
-		    if (offs == stop) {
-			    fprintf(fp, "[ /Title %s\n"
-			                "  /Count %d\n"
-			                "  /Page %d\n"
-					"  /View [/FitH %d]\n"
-					"/OUT pdfmark\n",
-				bp->Title, bp->Count, bp->Page,
-				pagelength - bp->vpos);
-			    if (bp++ < &Bookmarks[nBookmarks])
-				    stop = bp->offset;
-			    else
-				    stop = -1;
-		    }
-	    }
-    } else {
-    	while ((n = fread(buf, 1, sizeof buf, stdout)) > 0)
-	    	fwrite(buf, 1, n, fp);
-    }
+    while ((n = fread(buf, 1, sizeof buf, stdout)) > 0)
+    	fwrite(buf, 1, n, fp);
 
 }   /* End of header */
 
@@ -1177,6 +1144,7 @@ done(void)
 
 {
 
+    struct Bookmark	*bp;
 
 /*
  *
@@ -1190,6 +1158,16 @@ done(void)
 
     fprintf(stdout, "%s", TRAILER);
     fprintf(stdout, "done\n");
+
+    if (Bookmarks) {
+	    orderbookmarks();
+	    for (bp = &Bookmarks[0]; bp < &Bookmarks[nBookmarks]; bp++)
+	    	fprintf(stdout, "[ /Title %s\n"
+	                	"  /Count %d\n"
+	                	"  /Dest /Bookmark$%d\n"
+				"/OUT pdfmark\n",
+			bp->Title, bp->Count, bp - &Bookmarks[0]);
+    }
 
     if ( temp_file != NULL )  {
 	if ( docfonts > 0 )  {
@@ -3827,11 +3805,12 @@ t_pdfmark(char *buf)
 			}
 		Bookmarks[nBookmarks-1].title = strdup(bp);
 		Bookmarks[nBookmarks-1].Count = 0;
-		Bookmarks[nBookmarks-1].Page = printed + 1;
 		endtext();
-		Bookmarks[nBookmarks-1].offset = ftell(tf);
-		Bookmarks[nBookmarks-1].hpos = lastx > 0 ? lastx * 72 / res : 0;
-		Bookmarks[nBookmarks-1].vpos = lasty > 0 ? lasty * 72 / res : 0;
+		fprintf(tf, "[ /Dest /Bookmark$%d\n"
+			    "  /View [/FitH %d]\n"
+			    "/DEST pdfmark\n",
+			nBookmarks - 1,
+			pagelength - (lasty > 0 ? lasty * 72 / res : 0));
 	} else
 		error(NON_FATAL, "unknown PDFMark attribute %s", buf);
 }
