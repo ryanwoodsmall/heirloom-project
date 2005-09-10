@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.76 (gritter) 9/10/05
+ * Sccsid @(#)dpost.c	1.77 (gritter) 9/10/05
  */
 
 /*
@@ -587,6 +587,7 @@ static struct Bookmark {
 	char	*title;			/* unencoded title */
 	int	Count;			/* OUT /Count */
 	int	level;			/* used to generate count */
+	int	closed;			/* the bookmark is closed initially */
 } *Bookmarks;
 static size_t	nBookmarks;
 static int	pagelength = 792;	/* lenght of page in points */
@@ -853,12 +854,15 @@ header(FILE *fp)
     fprintf(fp, "/DOCINFO pdfmark\n");
     if (Bookmarks) {
 	    orderbookmarks();
-	    for (bp = &Bookmarks[0]; bp < &Bookmarks[nBookmarks]; bp++)
-	    	fprintf(fp, "[ /Title %s\n"
-	                	"  /Count %d\n"
-	                	"  /Dest /Bookmark$%d\n"
-				"/OUT pdfmark\n",
-			bp->Title, bp->Count, bp - &Bookmarks[0]);
+	    for (bp = &Bookmarks[0]; bp < &Bookmarks[nBookmarks]; bp++) {
+	    	fprintf(fp, "[ /Title %s\n", bp->Title);
+		if (bp->Count)
+			fprintf(fp, "  /Count %d\n", bp->closed ?
+					-bp->Count : bp->Count);
+		fprintf(fp, "  /Dest /Bookmark$%d\n"
+		            "/OUT pdfmark\n",
+			bp - &Bookmarks[0]);
+	    }
     }
 
 
@@ -3792,7 +3796,8 @@ t_pdfmark(char *buf)
 		Subject = mbs2pdf(bp);
 	else if (strcmp(buf, "Keywords") == 0)
 		Keywords = mbs2pdf(bp);
-	else if (strcmp(buf, "Bookmark") == 0) {
+	else if (strcmp(buf, "Bookmark") == 0 ||
+			strcmp(buf, "BookmarkClosed") == 0) {
 		n = strtol(bp, &bp, 10);
 		while (spacechar(*bp&0377))
 			bp++;
@@ -3812,6 +3817,8 @@ t_pdfmark(char *buf)
 			}
 		Bookmarks[nBookmarks-1].title = strdup(bp);
 		Bookmarks[nBookmarks-1].Count = 0;
+		Bookmarks[nBookmarks-1].closed =
+			strcmp(buf, "BookmarkClosed") == 0;
 		endtext();
 		fprintf(tf, "[ /Dest /Bookmark$%d\n"
 			    "  /View [/FitH %d]\n"

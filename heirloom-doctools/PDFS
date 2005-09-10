@@ -53,7 +53,9 @@ window. When you create PDF files longer than a few pages for viewing
 on the screen, you should include bookmarks for each chapter or section
 because they enable the reader to navigate much more conveniently.
 
-Start with a bookmark for the title page:
+Start with a bookmark for the title page. "0" is the level of the
+bookmark in the tree structure, and the following arguments form the
+name of the bookmark:
 
 	\X'PDFMark: Bookmark 0 Title'
 
@@ -122,6 +124,11 @@ structure may result:
 
 Thus such dpost warnings should usually be taken seriously, and the
 document should be corrected.
+
+An alternate form of bookmarks, \X'PDFMark: BookmarkClosed ...', is
+available. The syntax is the same, but the initial view in the tree
+structure is collapsed, i.e. no children are shown by default. It the
+bookmark has no children, there is no difference to a regular bookmark.
 
 If all of the bookmarks in a document appear at the same wrong vertical
 position, this is usually a sign that the media size of troff/dpost did

@@ -274,6 +274,9 @@ x X PDFMark attribute value
 			become children of the previous bookmark of the
 			next higher level. The second part of "value"
 			gives the bookmark title.
+	BookmarkClosed	same as "Bookmark", but the initial view in the
+			tree structure is closed, i.e. no children are
+			visible.
 	Keywords	"value" is a comma-separated list of keywords
 			for cross-document searches.
 	Subject		"value" is the subject of the document.
@@ -305,4 +308,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   9/9/05
+Gunnar Ritter                                                   9/10/05
