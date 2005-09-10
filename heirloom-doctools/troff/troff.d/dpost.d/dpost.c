@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.73 (gritter) 9/10/05
+ * Sccsid @(#)dpost.c	1.74 (gritter) 9/10/05
  */
 
 /*
@@ -419,6 +419,7 @@ int		hpos = 0;		/* where troff wants to be - horizontally */
 int		vpos = 0;		/* same but vertically */
 float		lastw = 0;		/* width of the last input character */
 int		track = 0;		/* tracking hint from troff */
+int		lasttrack = 0;		/* previous tracking hint */
 int		tracked;		/* records need to flush track */
 int		lastc = 0;		/* and its name (or index) */
 
@@ -2502,6 +2503,7 @@ t_font (
 
     if (tracked)
         tracked = -1;
+    track = 0;
 
     return(n);
 
@@ -2529,11 +2531,11 @@ t_track(char *buf)
 		return;
 	if (sscanf(buf, "%d", &t) != 1)
 		t = 0;
-	if (t != track) {
+	if (t != lasttrack) {
 		tracked = -1;
-		track = t;
 	} else if (t)
 		tracked = 1;
+	track = t;
 }
 
 static void
@@ -2542,6 +2544,7 @@ t_strack(void)
 	endtext();
 	fprintf(tf, "/track %d def\n", track);
 	tracked = track != 0;
+	lasttrack = track;
 }
 
 /*****************************************************************************/
