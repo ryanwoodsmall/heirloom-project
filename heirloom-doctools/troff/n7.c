@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.28 (gritter) 9/6/05
+ * Sccsid @(#)n7.c	1.29 (gritter) 9/10/05
  */
 
 /*
@@ -170,6 +170,8 @@ tbreak(void)
 #endif /* NROFF */
 #endif /* EUC */
 			pad = 0;
+			if (i > line)
+				pad += kernadjust(i[-2], ' '| i[-2]&SFMASK);
 			do {
 				pad += width(j);
 				nc--;
@@ -335,6 +337,7 @@ t5:
 		if (nc > 0) {
 			width(line[nc-1]);
 			nel += lasttrack;
+			nel += kernadjust(line[nc-1], ' ' | line[nc-1]&SFMASK);
 		}
 		if (nwd == 1)
 			adsp = nel; 
@@ -715,7 +718,7 @@ movword(void)
 		}
 		i = *wp++;
 		w = width(i);
-		w += kernadjust(i, *wp);
+		w += kernadjust(i, *wp ? *wp : ' ' | i&SFMASK);
 		wne -= w;
 		wch--;
 		storeline(i, w);
@@ -753,6 +756,7 @@ m2:
 		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
 		w += width(*linep);
+		w += kernadjust(*linep, ' ' | *linep & SFMASK);
 		nel -= w;
 		ne += w;
 		linep++;
@@ -766,7 +770,7 @@ m5:
 	nc--;
 	for (lp = &linep[1]; lp < lastlp && *lp == IMP; lp++);
 	w = width(*linep);
-	w += kernadjust(*linep, *lp);
+	w += kernadjust(*linep, *lp ? *lp : ' ' | *linep&SFMASK);
 	ne -= w;
 	nel += w;
 	wne += w;
