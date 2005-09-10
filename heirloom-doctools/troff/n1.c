@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.35 (gritter) 9/8/05
+ * Sccsid @(#)n1.c	1.36 (gritter) 9/10/05
  */
 
 /*
@@ -572,10 +572,14 @@ loop:
 		printn(va_arg(ap, long), 10);
 	} else if (c == 'O') {
 		printn(va_arg(ap, long), 8);
-	} else if (c == 'f') {
+	} else if (c == 'e' || c == 'E' ||
+			c == 'f' || c == 'F' ||
+			c == 'g' || c == 'G') {
 		extern int sprintf(char *, const char *, ...);
 		char	tmp[40];
-		sprintf(s = tmp, "%f", va_arg(ap, double));
+		char	fmt[] = "%%";
+		fmt[1] = c;
+		sprintf(s = tmp, fmt, va_arg(ap, double));
 		while (c = *s++)
 			putchar(c);
 	}
@@ -643,9 +647,13 @@ loop:
 		str = sprintn(str, va_arg(ap, long), 10);
 	} else if (c == 'O') {
 		str = sprintn(str, va_arg(ap, unsigned) , 8);
-	} else if (c == 'f') {
+	} else if (c == 'e' || c == 'E' ||
+			c == 'f' || c == 'F' ||
+			c == 'g' || c == 'G') {
 		extern int sprintf(char *, const char *, ...);
-		str += sprintf(str, "%f", va_arg(ap, double));
+		char	fmt[] = "%%";
+		fmt[1] = c;
+		str += sprintf(str, fmt, va_arg(ap, double));
 	}
 	goto loop;
 }

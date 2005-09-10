@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.75 (gritter) 9/10/05
+ * Sccsid @(#)dpost.c	1.76 (gritter) 9/10/05
  */
 
 /*
@@ -2742,7 +2742,7 @@ t_sf(void)
     if (size != FRACTSIZE)
         fprintf(tf, "%d ", pstab[size-1]);
     else
-	fprintf(tf, "%f ", (double)fractsize);
+	fprintf(tf, "%g ", (double)fractsize);
     if (fontname[font].afm)
     	fprintf(tf, "@%s f\n", fontname[font].afm->Font.intname);
     else
@@ -2750,9 +2750,9 @@ t_sf(void)
 
     if ( fontheight != 0 || fontslant != 0 ) {
 	if (size != FRACTSIZE)
-	    fprintf(tf, "%d %f changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : pstab[size-1]);
+	    fprintf(tf, "%d %g changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : pstab[size-1]);
 	else
-	    fprintf(tf, "%d %f changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : (double)fractsize);
+	    fprintf(tf, "%d %g changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : (double)fractsize);
     }
 
     if (tracked < 0)
