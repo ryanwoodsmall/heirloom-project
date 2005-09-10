@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.16 (gritter) 9/8/05
+.\" Sccsid @(#)troff.1b	1.17 (gritter) 9/10/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "9/8/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "9/10/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -61,8 +61,8 @@ Its capabilities are described in the
 .I Nroff/Troff user's manual.
 .PP
 .I troff
-generates output in an ASCII format
-which requires a device-dependent postprocessor
+generates output in an intermediate ASCII format
+which must be passed through a device-dependent post-processor
 before it can be printed;
 see the description of the
 .I \-T
@@ -164,38 +164,40 @@ Available
 are:
 .RS
 .TP 8n
+.PD 0
 .B ps
 for PostScript output with 72,000\ dpi
 and AFM font metrics (default),
-also with
+with
 .I dpost
-as postprocessor
+as post-processor
 .TP
 .B psmed
 for PostScript output with 3,600\ dpi
 and AFM font metrics,
-also with
+with
 .I dpost
-as postprocessor
+as post-processor
 .TP
 .B pslow
 for PostScript output with 432\ dpi
 and AFM font metrics,
-also with
+with
 .I dpost
-as postprocessor
+as post-processor
 .TP
 .B post
 for PostScript output with 720\ dpi,
 with
 .I dpost
-as postprocessor
+as post-processor
 .TP
 .B aps
 for the Autologic APS-5,
 with
 .I daps
-as postprocessor
+as post-processor
+.PD
 .RE
 .TP
 .B \-f
@@ -261,7 +263,8 @@ from input that contains equations and tables, use
 .RE
 The resulting file can then be sent to a printer,
 displayed by a previewer,
-or changed by further postprocessing utilities.
+or passed to further post-processing utilities,
+such as a PDF distiller.
 .SH "SEE ALSO"
 J. F. Ossanna,
 .I Nroff/Troff user's manual
