@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.71 (gritter) 9/9/05
+ * Sccsid @(#)dpost.c	1.73 (gritter) 9/10/05
  */
 
 /*
@@ -802,6 +802,7 @@ header(FILE *fp)
  */
 
 
+    struct Bookmark	*bp;
     time_t	now;
     int		n;
     char	buf[4096];
@@ -812,8 +813,15 @@ header(FILE *fp)
     fprintf(fp, "%s", CONFORMING);
     fprintf(fp, "%s %s\n", CREATOR, creator);
     fprintf(fp, "%s %s", CREATIONDATE, ctime(&now));
-    fprintf(fp, "%s %s\n", DOCUMENTFONTS, ATEND);
-    fprintf(fp, "%s %s\n", PAGES, ATEND);
+    if ( temp_file != NULL )  {
+	if ( docfonts > 0 )  {
+	    cat(temp_file, fp);
+	    putc('\n', fp);
+	}   /* End if */
+	unlink(temp_file);
+    }	/* End if */
+    fprintf(fp, "%s %d\n", PAGES, printed);
+
     fflush(sf);
     rewind(sf);
     while ((n = fread(buf, 1, sizeof buf, sf)) > 0)
@@ -842,6 +850,16 @@ header(FILE *fp)
     if (Keywords)
 	    fprintf(fp, "  /Keywords %s\n", Keywords);
     fprintf(fp, "/DOCINFO pdfmark\n");
+    if (Bookmarks) {
+	    orderbookmarks();
+	    for (bp = &Bookmarks[0]; bp < &Bookmarks[nBookmarks]; bp++)
+	    	fprintf(fp, "[ /Title %s\n"
+	                	"  /Count %d\n"
+	                	"  /Dest /Bookmark$%d\n"
+				"/OUT pdfmark\n",
+			bp->Title, bp->Count, bp - &Bookmarks[0]);
+    }
+
 
     fflush(gf);
     rewind(gf);
@@ -1146,8 +1164,6 @@ done(void)
 
 {
 
-    struct Bookmark	*bp;
-
 /*
  *
  * Finished with all the input files, so mark the end of the pages with a TRAILER
@@ -1160,26 +1176,6 @@ done(void)
 
     fprintf(stdout, "%s", TRAILER);
     fprintf(stdout, "done\n");
-
-    if (Bookmarks) {
-	    orderbookmarks();
-	    for (bp = &Bookmarks[0]; bp < &Bookmarks[nBookmarks]; bp++)
-	    	fprintf(stdout, "[ /Title %s\n"
-	                	"  /Count %d\n"
-	                	"  /Dest /Bookmark$%d\n"
-				"/OUT pdfmark\n",
-			bp->Title, bp->Count, bp - &Bookmarks[0]);
-    }
-
-    if ( temp_file != NULL )  {
-	if ( docfonts > 0 )  {
-	    cat(temp_file, stdout);
-	    putc('\n', stdout);
-	}   /* End if */
-	unlink(temp_file);
-    }	/* End if */
-
-    fprintf(stdout, "%s %d\n", PAGES, printed);
 
 }   /* End of done */
 
@@ -3688,7 +3684,7 @@ documentfonts(void)
     print:  if ( (fp_out = fopen(temp_file, "a")) != NULL )  {
 		if ( docfonts++ == 0 )
 		    fprintf(fp_out, "%s", DOCUMENTFONTS);
-		else if ( (docfonts - 1) % 8  == 0 )
+		else if ( (docfonts - 1) % 4  == 0 )
 		    fprintf(fp_out, "\n%s", CONTINUECOMMENT);
 		fprintf(fp_out, " %s", temp);
 	    }	/* End if */
