@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.17 (gritter) 9/10/05
+.\" Sccsid @(#)troff.1b	1.18 (gritter) 9/11/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "9/10/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "9/11/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -167,27 +167,30 @@ are:
 .PD 0
 .B ps
 for PostScript output with 72,000\ dpi
-and AFM font metrics (default),
+and AFM fonts (default),
 with
 .I dpost
 as post-processor
 .TP
 .B psmed
 for PostScript output with 3,600\ dpi
-and AFM font metrics,
+and AFM fonts,
 with
 .I dpost
 as post-processor
 .TP
 .B pslow
 for PostScript output with 432\ dpi
-and AFM font metrics,
+and AFM fonts,
 with
 .I dpost
 as post-processor
 .TP
 .B post
-for PostScript output with 720\ dpi,
+for PostScript output with 720\ dpi
+and
+.I ditroff
+fonts,
 with
 .I dpost
 as post-processor
