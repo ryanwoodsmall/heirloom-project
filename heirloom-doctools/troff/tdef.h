@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.41 (gritter) 9/8/05
+ * Sccsid @(#)tdef.h	1.42 (gritter) 9/10/05
  */
 
 /*
@@ -229,7 +229,7 @@ endif EUC
 #define	absmot(n)	(unsigned long)(BMBITS&(n) | ((n)&XMBITS)>>XMSHIFT)
 #define	sabsmot(n)	((n)&BMBITS | ((n)&~BMBITS)<<XMSHIFT)
 
-#define	ZBIT		(01LL << 63) 	/* zero width char */
+#define	ZBIT		(01ULL << 63) 	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
 #define	ABSCHAR		0400	/* absolute char number in this font */
 

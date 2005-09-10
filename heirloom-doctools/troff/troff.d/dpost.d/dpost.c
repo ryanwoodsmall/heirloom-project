@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.77 (gritter) 9/10/05
+ * Sccsid @(#)dpost.c	1.78 (gritter) 9/10/05
  */
 
 /*
@@ -1585,7 +1585,7 @@ fontinit(void)
 
 
     snprintf(temp, sizeof temp, "%s/dev%s/DESC", fontdir, devname);
-    if ( (descp = readdesc(temp)) < 0 )
+    if ( (descp = readdesc(temp)) == 0 )
 	error(FATAL, "can't open tables for %s", temp);
 
     memcpy(&dev, descp, sizeof dev);
