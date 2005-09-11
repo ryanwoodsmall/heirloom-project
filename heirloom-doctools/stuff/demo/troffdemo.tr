@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.19 (gritter) 9/9/05
+.\" Sccsid @(#)troffdemo.tr	1.20 (gritter) 9/11/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -34,6 +34,9 @@
 .\" Adobe Caslon also needs minor tracking for the roman and the italic.
 .track R 1 .4 24 0
 .track I 1 .4 24 0
+.\" Perform some margin adjustments.
+.radj R y -20 , 65 \(hy 30
+.radj E \(hy 30
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Use a narrow word space, and disable sentence spacing.
 .ss 9 0
@@ -91,7 +94,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/9/05
+9/11/05
 .sp 2v
 .ad b
 .ps 12
@@ -131,9 +134,10 @@ the page title provides an example for the former,
 and the latter is used for the \fESmall Capitals\fR, and,
 at a minor rate, to adjust the regular font of this document.
 .F
-The default resolution is now at 72,000\ dpi\*;
-PostScript font metrics can thus be used
-without any loss of accuracy.
+Margin adjustments are available\*;
+in this document,
+they serve e.\|g. to prevent the ``y'' letters
+from exceeding beyond the right margin.
 .sp
 .in 0
 Heirloom \fItroff\fP\^ is free software\*;

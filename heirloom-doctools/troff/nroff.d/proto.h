@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.15 (gritter) 9/5/05
+ * Sccsid @(#)proto.h	1.16 (gritter) 9/11/05
  */
 
 /* n10.c */
@@ -46,12 +46,15 @@ void casebd(void);
 void casevs(void);
 void casess(void);
 tchar xlss(void);
-void casetrack(void);
-void casefallback(void);
-void casehidechar(void);
-void casefzoom(void);
-void casekern(void);
-void casepapersize(void);
+void casedummy(void);
+#define	casetrack	casedummy
+#define	casefallback	casedummy
+#define	casehidechar	casedummy
+#define	casefzoom	casedummy
+#define	casekern	casedummy
+#define	casepapersize	casedummy
+#define	caseladj	casedummy
+#define	caseradj	casedummy
 
 #define	kernadjust(a, b)	0
 #define	u2pts(i)		(i)

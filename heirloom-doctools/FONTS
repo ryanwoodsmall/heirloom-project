@@ -237,6 +237,39 @@ request disables it. Adjustments to the kerning pairs of a font must be
 made directly in the respective AFM files.
 
 
+Margin adjustment
+-----------------
+
+Since there are no margin adjustment tables in AFM files, adjustments
+must be given explicitly in troff source code using the ".ladj" and
+".radj" requests. Both accept a font specification followed by pairs
+of characters and adjustments:
+
+	.do xflag 2
+	.ps 10
+	.fp 1 R fn______ pfb
+	.ladj R V -50 J -40
+	.radj R \(hy 80
+
+Adjustments are given in units of 1/72000 inch multiplied by the actual
+point size, or 1/1000 of the em size when the line is printed. Thus in
+this example, the left margin is shifted to the left by .5 points when
+the leftmost letter is a "V", and by .4 points when the leftmost letter
+is a "J"; the right margin ist shifted to the right by .8 points when
+the rightmost letter is a hyphen.
+
+Left margin adjustments are evaluated before the letters that fit on the
+current line are computed, and can thus principally be of any length. In
+contrast, right margin adjustments are evaluated after this computation
+is finished, and the adjustment is simply added to the word space of the
+output line. Thus a positive right adjustment that is large in relation
+to the line length will cause visible holes, and a negative adjustment
+will ultimately cause the words on the line to be overprinted. This is
+not a problem for the typical application of margin adjustments, though;
+if a line with eight word spaces is shifted in the example above, each
+word space is enlarged by 1/100 em.
+
+
 Limitations
 -----------
 
@@ -248,4 +281,4 @@ accessed, it is possible reorder the character entry lines in the
 AFM file to work around.
 
 
-Gunnar Ritter                                                 9/9/05
+Gunnar Ritter                                                 9/11/05

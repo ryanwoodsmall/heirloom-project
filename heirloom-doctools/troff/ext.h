@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.22 (gritter) 9/8/05
+ * Sccsid @(#)ext.h	1.23 (gritter) 9/11/05
  */
 
 /*
@@ -206,3 +206,5 @@ extern	wchar_t	twc;
 extern	int	(*wdbdg)(wchar_t, wchar_t, int);
 extern	wchar_t	*(*wddlm)(wchar_t, wchar_t, int);
 #endif	/* EUC */
+extern	int	**ladjtab;
+extern	int	**radjtab;

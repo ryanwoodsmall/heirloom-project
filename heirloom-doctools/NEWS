@@ -109,8 +109,15 @@ description for ".xflag" below.
 	Disables (0) or enables pairwise kerning. The default is enabled
 	unless the "-X" option is given.
 
+.ladj ff char0 units0 char1 units1 char2 units2 ...	troff only
+	When the current font is "ff" and "char" appears at the left margin
+	of an output line in left-aligned, aligned, or nofill mode, the
+	margin is relocated by "units", where units is 1/72000 of an inch
+	multiplied by the current point size or 1/1000 of an em (as in AFM
+	character width definitions). Same for char1/units1 etc.
+
 .lc_ctype localename
-	sets the LC_CTYPE locale setting to localename. The default is
+	sets the LC_CTYPE locale setting to "localename". The default is
 	the value of the LC_CTYPE environment variable. This request is
 	useful to specify an input character set regardless of environment
 	influences.
@@ -130,6 +137,13 @@ description for ".xflag" below.
 .ps x.y							troff only
 	accepts any points size now with PostScript devices, including
 	fractional sizes.
+
+.radj ff char0 units0 char1 units1 char2 units2 ...	troff only
+	When the current font is "ff" and "char" appears at the right margin
+	of an output line in right-aligned or aligned mode, the margin is
+	relocated by "units", where units is 1/72000 of an inch multiplied
+	by the current point size or 1/1000 of an em (as in AFM character
+	width definitions). Same for char1/units1 etc.
 
 .return
 	immediately returns from the current macro to the level above.
@@ -308,4 +322,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   9/10/05
+Gunnar Ritter                                                   9/11/05

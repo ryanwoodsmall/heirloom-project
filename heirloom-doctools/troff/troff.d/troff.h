@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.12 (gritter) 9/5/05
+ * Sccsid @(#)troff.h	1.13 (gritter) 9/11/05
  */
 
 extern struct tracktab {

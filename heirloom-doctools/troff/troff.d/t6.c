@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.76 (gritter) 9/8/05
+ * Sccsid @(#)t6.c	1.77 (gritter) 9/11/05
  */
 
 /*
@@ -77,6 +77,8 @@ int	*ccstab;
 int	**fallbacktab;
 float	*zoomtab;
 int	*bdtab;
+int	**ladjtab;
+int	**radjtab;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
@@ -945,6 +947,10 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	bdtab[pos] = cstab[pos] = ccstab[pos] = 0;
 	zoomtab[pos] = 0;
 	fallbacktab[pos] = NULL;
+	free(ladjtab[pos]);
+	ladjtab[pos] = NULL;
+	free(radjtab[pos]);
+	radjtab[pos] = NULL;
 	memset(&tracktab[pos], 0, sizeof tracktab[pos]);
 		/* if there is a directory, no place to store its name. */
 		/* if position isn't zero, no place to store its value. */
@@ -1220,6 +1226,10 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
 	zoomtab[nf] = 0;
 	fallbacktab[nf] = NULL;
+	free(ladjtab[nf]);
+	ladjtab[nf] = NULL;
+	free(radjtab[nf]);
+	radjtab[nf] = NULL;
 	memset(&tracktab[nf], 0, sizeof tracktab[nf]);
 	nafm++;
 	if (nf > nfonts)
@@ -1440,6 +1450,47 @@ casepapersize(void)
 	ll = ll1 = lt = lt1 = x - 2 * po;
 	setnel();
 	ptpapersize(x, y);
+}
+
+static void
+madj(int **tp)
+{
+	int	i, j, n;
+	int	savfont = font, savfont1 = font1;
+	tchar	k;
+
+	skip();
+	i = getrq();
+	if ((j = findft(i)) < 0)
+		return;
+	font = font1 = j;
+	mchbits();
+	while (!skip() && (i = cbits(k = getch())) != '\n' && !skip()) {
+		noscale++;
+		n = atoi();
+		noscale--;
+		if (fbits(k) == j && !ismot(k)) {
+			n = unitconv(n);
+			if (tp[j] == NULL)
+				tp[j] = calloc(NCHARS, sizeof *tp);
+			tp[j][i] = n;
+		}
+	}
+	font = savfont;
+	font1 = savfont1;
+	mchbits();
+}
+
+void
+caseladj(void)
+{
+	madj(ladjtab);
+}
+
+void
+caseradj(void)
+{
+	madj(radjtab);
 }
 
 #include "unimap.h"

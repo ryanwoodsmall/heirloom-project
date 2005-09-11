@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.22 (gritter) 9/8/05
+ * Sccsid @(#)afm.c	1.23 (gritter) 9/11/05
  */
 
 #include <stdlib.h>
@@ -601,7 +601,7 @@ thisword(const char *text, const char *wrd)
 	return NULL;
 }
 
-static int
+int
 unitconv(int i)
 {
 	float	d;

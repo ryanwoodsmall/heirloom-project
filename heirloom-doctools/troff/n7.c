@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.29 (gritter) 9/10/05
+ * Sccsid @(#)n7.c	1.31 (gritter) 9/11/05
  */
 
 /*
@@ -334,11 +334,21 @@ t5:
 		pendt = 0;
 	adsp = adrem = 0;
 	if (ad) {
+#ifndef	NROFF
 		if (nc > 0) {
-			width(line[nc-1]);
+			c = line[nc-1];
+			width(c);
 			nel += lasttrack;
-			nel += kernadjust(line[nc-1], ' ' | line[nc-1]&SFMASK);
+			nel += kernadjust(c, ' ' | c&SFMASK);
+			if (admod != 1 && radjtab != NULL &&
+					radjtab[xfont] != NULL &&
+					(k = radjtab[xfont][cbits(c)]) != 0) {
+				k = (k * u2pts(xpts) + (Unitwidth / 2))
+					/ Unitwidth;
+				nel += k;
+			}
 		}
+#endif	/* !NROFF */
 		if (nwd == 1)
 			adsp = nel; 
 		else 
@@ -382,6 +392,15 @@ nofill(void)
 		nwd = 10000;
 	}
 	nexti = GETCH();
+#ifndef	NROFF
+	if (!ce && !pendnf && ladjtab != NULL &&
+			ladjtab[fbits(nexti)] != NULL &&
+			(k = ladjtab[fbits(nexti)][cbits(nexti)]) != 0) {
+		width(nexti);	/* set xpts */
+		k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+		storeline(makem(k), 0);
+	}
+#endif	/* !NROFF */
 	while ((j = (cbits(i = nexti))) != '\n') {
 		if (j == ohc) {
 			nexti = GETCH();
@@ -697,6 +716,16 @@ movword(void)
 		wp--;
 		if (wp > wordp)
 			wne -= kernadjust(wp[-1], wp[0]);
+#ifndef	NROFF
+		if (admod != 1 && admod != 2 && ladjtab != NULL &&
+				ladjtab[fbits(*wp)] != NULL &&
+				(w = ladjtab[fbits(*wp)][cbits(*wp)]) != 0) {
+			width(*wp);	/* set xpts */
+			w = (w * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+			nel -= w;
+			storeline(makem(w), 0);
+		}
+#endif	/* !NROFF */
 	}
 	if (wne > nel && !hyoff && hyf && (!nwd || nel > 3 * sps) &&
 	   (!(hyf & 02) || (findt1() > lss)))

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.42 (gritter) 9/10/05
+ * Sccsid @(#)t10.c	1.43 (gritter) 9/11/05
  */
 
 /*
@@ -139,6 +139,10 @@ growfonts(int n)
 	memset(&fallbacktab[Nfont], 0, (n - Nfont) * sizeof *fallbacktab);
 	zoomtab = realloc(zoomtab, n * sizeof *zoomtab);
 	memset(&zoomtab[Nfont], 0, (n - Nfont) * sizeof *zoomtab);
+	ladjtab = realloc(ladjtab, n * sizeof *ladjtab);
+	memset(&ladjtab[Nfont], 0, (n - Nfont) * sizeof *ladjtab);
+	radjtab = realloc(radjtab, n * sizeof *radjtab);
+	memset(&radjtab[Nfont], 0, (n - Nfont) * sizeof *radjtab);
 	Nfont = n;
 }
 
