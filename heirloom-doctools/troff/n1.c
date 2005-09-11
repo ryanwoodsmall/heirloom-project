@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.36 (gritter) 9/10/05
+ * Sccsid @(#)n1.c	1.37 (gritter) 9/11/05
  */
 
 /*
@@ -924,7 +924,7 @@ g0:
 	case ':':	/* optional line break but no hyphenation */
 		if (xflag == 0)
 			break;
-		i = OHC | ZBIT;
+		i = OHC | BLBIT;
 		return(i);
 	case 'g':	/* return format of a number register */
 		setaf();

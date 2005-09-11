@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.19 (gritter) 9/11/05
+ * Sccsid @(#)n9.c	1.20 (gritter) 9/11/05
  */
 
 /*
@@ -653,6 +653,18 @@ morechars(int n)
 					nnc * sizeof **raligntab);
 			memset(&raligntab[i][NCHARS], 0,
 					(nnc-NCHARS) * sizeof **raligntab);
+		}
+		if (kernafter != NULL && kernafter[i] != NULL) {
+			kernafter[i] = realloc(kernafter[i],
+					nnc * sizeof **kernafter);
+			memset(&kernafter[i][NCHARS], 0,
+					(nnc-NCHARS) * sizeof **kernafter);
+		}
+		if (kernbefore != NULL && kernbefore[i] != NULL) {
+			kernbefore[i] = realloc(kernbefore[i],
+					nnc * sizeof **kernbefore);
+			memset(&kernbefore[i][NCHARS], 0,
+					(nnc-NCHARS) * sizeof **kernbefore);
 		}
 	}
 #endif	/* !NROFF */

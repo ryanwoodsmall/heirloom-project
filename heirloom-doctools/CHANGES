@@ -12,9 +12,11 @@ Release ...
 * troff: A PostScript device with a resolution of 72000 dpi, named "ps",
   is available, and is used by default.
 * troff: Support for pairwise kerning has been added. The default tables
-  are read from the AFM files. In addition, a ".kernpair" has been
+  are read from the AFM files. In addition, a ".kernpair" request has been
   introduced to add or replace kerning pairs; it can construct kerning
-  pairs for characters from different fonts.
+  pairs for characters from different fonts. The ".kernafter" and
+  ".kernbefore" requests add a constant amount of space to specific
+  characters.
 * dpost: The PostScript output is now expected to conform to Adobe's
   Document Structuring Conventions, version 3.0.
 * dpost: PDF Bookmarks, titles and authorship information can be included

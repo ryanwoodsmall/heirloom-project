@@ -259,6 +259,21 @@ In this example, old-style numerals from Fournier Expert are mixed
 with the slash character from Fournier Regular, and are adjusted to
 achieve matching visual letter spacing.
 
+It is sometimes useful to add a certain amount of space whenever a
+character appears, for example before ";" or "?", or on the inner
+sides of guillemots in French/Swiss style. The ".kernafter" and
+".kernbefore" requests are useful for this:
+
+	.do xflag 2
+	.kernafter R ; 60 ? 60
+
+If the characters affected by these requests are also member of a
+regular kerning pair, the resulting added space is the sum of both
+definitions. These requests are applied at the same places as kerning
+pairs, i.e. they have no effect if following or preceding a motion
+command, "\&" or line margin, and they are additionally restricted to
+have no effect if the other character is a space.
+
 
 Margin alignment
 ----------------

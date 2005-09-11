@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.22 (gritter) 9/11/05
+.\" Sccsid @(#)troffdemo.tr	1.23 (gritter) 9/12/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -61,6 +61,8 @@
 .kernpair R B E r -30
 .kernpair R p R t -12
 .kernpair E \(ff R e -5
+.\" General spacing.
+.kernbefore R ; 60 : 60
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Use a narrow word space, and disable sentence spacing.
 .ss 9 0
@@ -75,11 +77,6 @@
 .	ti 0
 \\*(rh\ \c
 ..
-.\" Some spacing adjustments.
-.ds : \^:
-.ds ; \^;
-.ds ! \^!
-.ds ? \^?
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Build and draw the ornaments at the top of the page.
 .de repeat1
@@ -118,7 +115,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/11/05
+9/12/05
 .sp 2v
 .ad b
 .ps 12
@@ -132,11 +129,11 @@ It has been derived from source code provided by
 the OpenSolaris project.
 Amongst many enhancements,
 Heirloom \fItroff\fP\^ provides extended
-capabilities to work with PostScript fonts\*:
+capabilities to work with PostScript fonts:
 .F
 PostScript Type 1 fonts can be used
 as supplied by their vendor
-without any need for conversion\*;
+without any need for conversion;
 \fItroff\fP\^ can access the font metrics
 in the \s-1AFM\s0 files directly,
 and the \fIdpost\fR\^ post-processor
@@ -153,18 +150,18 @@ to produce extra ligatures, as in the words
 or the old-style numerals 0 1 2 3 4 5 6 7 8 9
 without the need to type escape sequences for individual characters.
 .F
-Pairwise kerning and letter space tracking are supported\*;
+Pairwise kerning and letter space tracking are supported;
 the page title provides an example for the former,
 and the latter is used for the \fESmall Capitals\fR, and,
 at a minor rate, to adjust the regular font of this document.
 .F
-Margin adjustments are available\*;
+Margin adjustments are available;
 in this document,
 they serve e.\|g. to prevent the ``y'' letters
 from exceeding beyond the right margin.
 .sp
 .in 0
-Heirloom \fItroff\fP\^ is free software\*;
+Heirloom \fItroff\fP\^ is free software;
 its \fIC\fP\^ source code can be obtained at no charge from
-<http://heirloom.sourceforge.net/doctools.html>.
+<http\&://heirloom.sourceforge.net/doctools.html>.
 It runs on a wide variety of Unix systems.

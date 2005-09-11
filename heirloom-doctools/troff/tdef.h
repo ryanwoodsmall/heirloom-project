@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.42 (gritter) 9/10/05
+ * Sccsid @(#)tdef.h	1.43 (gritter) 9/11/05
  */
 
 /*
@@ -231,6 +231,8 @@ endif EUC
 
 #define	ZBIT		(01ULL << 63) 	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
+#define	BLBIT		(01ULL << 31)	/* optional break-line char */
+#define	isblbit(n)	((n) & BLBIT)
 #define	ABSCHAR		0400	/* absolute char number in this font */
 
 #define	SMASK		(037777777LL << 40)

@@ -109,6 +109,15 @@ description for ".xflag" below.
 	Disables (0) or enables pairwise kerning. The default is enabled
 	unless the "-X" option is given.
 
+.kernafter ff char0 units0 char1 units1 ...		troff only
+.kernbefore ff char0 units0 char1 units1 ...		troff only
+	adds a constant amount of space if the current font is "ff" and
+	"char0" is the first (or second, respectively) character of a
+	pair of characters subject to kerning. The "units0" arguments is
+	1/72000 of an inch multiplied by the current point size or 1/1000
+	of an em (as in AFM kerning pair definitions). Same for char1/
+	units1 etc.
+
 .kernpair ff charf gg charg units			troff only
 	adds a kerning pair to the kerning table for character "charf"
 	from font "ff" and character "charg" from font "gg". The "units"

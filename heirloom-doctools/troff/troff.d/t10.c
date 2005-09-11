@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.44 (gritter) 9/11/05
+ * Sccsid @(#)t10.c	1.46 (gritter) 9/11/05
  */
 
 /*
@@ -143,6 +143,10 @@ growfonts(int n)
 	memset(&laligntab[Nfont], 0, (n - Nfont) * sizeof *laligntab);
 	raligntab = realloc(raligntab, n * sizeof *raligntab);
 	memset(&raligntab[Nfont], 0, (n - Nfont) * sizeof *raligntab);
+	kernafter = realloc(kernafter, n * sizeof *kernafter);
+	memset(&kernafter[Nfont], 0, (n - Nfont) * sizeof *kernafter);
+	kernbefore = realloc(kernbefore, n * sizeof *kernbefore);
+	memset(&kernbefore[Nfont], 0, (n - Nfont) * sizeof *kernbefore);
 	Nfont = n;
 }
 
@@ -350,6 +354,8 @@ ptout0(tchar *pi, tchar *pend)
 	outsize = 1;	/* default */
 	i = *pi;
 	k = cbits(i);
+	if (k == FILLER)
+		return(pi+outsize);
 	if (ismot(i)) {
 		j = absmot(i);
 		if (isnmot(i))

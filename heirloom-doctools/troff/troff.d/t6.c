@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.81 (gritter) 9/11/05
+ * Sccsid @(#)t6.c	1.82 (gritter) 9/11/05
  */
 
 /*
@@ -80,6 +80,8 @@ float	*zoomtab;
 int	*bdtab;
 int	**laligntab;
 int	**raligntab;
+int	**kernafter;
+int	**kernbefore;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
@@ -410,25 +412,27 @@ getkw(tchar c, tchar d)
 		s = xpts;
 	i = cbits(c);
 	j = cbits(d);
+	k = 0;
 	if (i >= 32 && j >= 32) {
-		if (ktable != NULL && (kp = klook(c, d)) != NULL) {
+		if (ktable != NULL && (kp = klook(c, d)) != NULL)
 			k = kp->n;
-			goto found;
-		} else if (fbits(c) == fbits(d) && afmtab &&
+		else if (fbits(c) == fbits(d) && afmtab &&
 				(n = (fontbase[f]->afmpos)-1) >= 0) {
 			a = afmtab[n];
-			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
-			found:	k = (k * u2pts(s) + (Unitwidth / 2))
-					/ Unitwidth;
-				if (dev.anysize && xflag &&
-						(z = zoomtab[f]) != 0)
-					k *= z;
-				lastkern = k;
-				return k;
-			}
+			k = afmgetkern(a, i - 32, j - 32);
 		}
+		if (j>32 && kernafter != NULL && kernafter[fbits(c)] != NULL)
+			k += kernafter[fbits(c)][i];
+		if (i>32 && kernbefore != NULL && kernbefore[fbits(d)] != NULL)
+			k += kernbefore[fbits(d)][j];
 	}
-	return 0;
+	if (k != 0) {
+		k = (k * u2pts(s) + (Unitwidth / 2)) / Unitwidth;
+		if (dev.anysize && xflag && (z = zoomtab[f]) != 0)
+			k *= z;
+	}
+	lastkern = k;
+	return k;
 }
 
 void
@@ -1608,17 +1612,17 @@ casekernpair(void)
 	if (skip())
 		goto done;
 	c = getch();
-	if (skip())
+	if (fbits(c) != f || skip())
 		goto done;
 	i = getrq();
-	if ((g = findft(i)) < 0 || skip())
+	if ((g = findft(i)) < 0)
 		goto done;
 	font = font1 = g;
 	mchbits();
 	if (skip())
 		goto done;
 	d = getch();
-	if (skip())
+	if (fbits(d) != g || skip())
 		goto done;
 	noscale++;
 	n = atoi();
@@ -1639,6 +1643,49 @@ done:
 	font = savfont;
 	font1 = savfont1;
 	mchbits();
+}
+
+static void
+kernsingle(int **tp)
+{
+	int     savfont = font, savfont1 = font1;
+	int	f, i, n;
+	tchar	c;
+
+	skip();
+	i = getrq();
+	if ((f = findft(i)) < 0)
+		return;
+	font = font1 = f;
+	mchbits();
+	while (!skip()) {
+		c = getch();
+		if (skip())
+			break;
+		noscale++;
+		n = atoi();
+		noscale--;
+		if (fbits(c) != f || (c = cbits(c)) <= 32)
+			continue;
+		if (tp[f] == NULL)
+			tp[f] = calloc(NCHARS, sizeof *tp);
+		tp[f][c] = unitconv(n);
+	}
+	font = savfont;
+	font1 = savfont1;
+	mchbits();
+}
+
+void
+casekernafter(void)
+{
+	kernsingle(kernafter);
+}
+
+void
+casekernbefore(void)
+{
+	kernsingle(kernbefore);
 }
 
 #include "unimap.h"

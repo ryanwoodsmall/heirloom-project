@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.32 (gritter) 9/11/05
+ * Sccsid @(#)n7.c	1.33 (gritter) 9/11/05
  */
 
 /*
@@ -780,7 +780,7 @@ m1:
 	}
 m2:
 	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH &&
-			*(linep - 1) != (ohc | ZBIT)) {
+			(*(linep - 1) & BLBIT) == 0) {
 		*linep = (*(linep - 1) & SFMASK) | HYPHEN;
 		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
@@ -971,14 +971,16 @@ g0:
 		return(1);
 	}
 	if (hyoff != 1) {
-		if (j == ohc && !iszbit(i)) {
+		if (j == ohc) {
 			hyoff = 2;
 			*hyp++ = wordp;
 			if (hyp > (hyptr + NHYP - 1))
 				hyp = hyptr + NHYP - 1;
+			if (isblbit(i) && wordp > word)
+				wordp[-1] |= BLBIT;
 			goto g1;
 		}
-		if (j == '-' || j == EMDASH || j == ohc && iszbit(i))
+		if (j == '-' || j == EMDASH)
 			if (wordp > word + 1) {
 				hyoff = 2;
 				*hyp++ = wordp + 1;
