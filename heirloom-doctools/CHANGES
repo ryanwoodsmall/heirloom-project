@@ -29,7 +29,7 @@ Release ...
 * troff: Any point size can now be used with PostScript devices, including
   fractional sizes.
 * troff: The ".fzoom" request allows to zoom the characters of a font.
-* troff: Margin adjustments are supported.
+* troff: Margin alignment is supported.
 * [nt]roff: The ".lc_ctype" request can be used to set the LC_CTYPE
   localization setting from within a document.
 * troff: It is now possible to use "\[name]", where name is a character

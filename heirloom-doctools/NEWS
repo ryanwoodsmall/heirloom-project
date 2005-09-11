@@ -116,12 +116,12 @@ description for ".xflag" below.
 	size or 1/1000 of an em (as in AFM kerning pair definitions). To
 	add a kerning pair that includes the space character, use "\ ".
 
-.ladj ff char0 units0 char1 units1 char2 units2 ...	troff only
-	When the current font is "ff" and "char" appears at the left margin
-	of an output line in left-aligned, aligned, or nofill mode, the
-	margin is relocated by "units", where units is 1/72000 of an inch
-	multiplied by the current point size or 1/1000 of an em (as in AFM
-	character width definitions). Same for char1/units1 etc.
+.lalign ff char0 units0 char1 units1 char2 units2 ...	troff only
+	When the current font is "ff" and "char0" appears at the left margin
+	of an output line in left-adjusted, both-adjusted, or nofill mode,
+	the margin is relocated by "units0", where units is 1/72000 of an
+	inch multiplied by the current point size or 1/1000 of an em (as
+	in AFM character width definitions). Same for char1/units1 etc.
 
 .lc_ctype localename
 	sets the LC_CTYPE locale setting to "localename". The default is
@@ -145,10 +145,10 @@ description for ".xflag" below.
 	accepts any points size now with PostScript devices, including
 	fractional sizes.
 
-.radj ff char0 units0 char1 units1 char2 units2 ...	troff only
-	When the current font is "ff" and "char" appears at the right margin
-	of an output line in right-aligned or aligned mode, the margin is
-	relocated by "units", where units is 1/72000 of an inch multiplied
+.ralign ff char0 units0 char1 units1 char2 units2 ...	troff only
+	When the current font is "ff" and "char0" appears at the right margin
+	of an output line in right-adjusted or aligned mode, the margin is
+	relocated by "units0", where units is 1/72000 of an inch multiplied
 	by the current point size or 1/1000 of an em (as in AFM character
 	width definitions). Same for char1/units1 etc.
 
