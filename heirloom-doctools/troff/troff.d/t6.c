@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.77 (gritter) 9/11/05
+ * Sccsid @(#)t6.c	1.79 (gritter) 9/11/05
  */
 
 /*
@@ -297,9 +297,101 @@ kernadjust(tchar c, tchar d)
 	return getkw(c, d);
 }
 
+#define	kprime		1021
+#define	khash(c, d)	(((2654435769U * (c) * (d) >> 16)&0x7fffffff) % kprime)
+
+static struct knode {
+	struct knode	*next;
+	tchar	c;
+	tchar	d;
+	int	n;
+} **ktable;
+
+static void
+kadd(tchar c, tchar d, int n)
+{
+	struct knode	*kn;
+	int	h;
+
+	if (ktable == NULL)
+		ktable = calloc(kprime, sizeof *ktable);
+	h = khash(c, d);
+	kn = calloc(1, sizeof *kn);
+	kn->c = c;
+	kn->d = d;
+	kn->n = n;
+	kn->next = ktable[h];
+	ktable[h] = kn;
+}
+
+static void
+kzap(int f)
+{
+	struct knode	*kp;
+	int	i;
+
+	if (ktable == NULL)
+		return;
+	for (i = 0; i < kprime; i++)
+		for (kp = ktable[i]; kp; kp = kp->next)
+			if (fbits(kp->c) == f || fbits(kp->d) == f)
+				kp->n = 0;
+}
+
+static tchar
+findchar(tchar c)
+{
+	int	f, i;
+
+	f = fbits(c);
+	c = cbits(c);
+	i = c - 32;
+	if (c != ' ' && i < nchtab + 128 - 32 && fitab[f][i] == 0) {
+		int	ii, jj;
+		if (fallbacktab[f]) {
+			for (jj = 0; fallbacktab[f][jj] != 0; jj++) {
+				if ((ii = findft(fallbacktab[f][jj])) < 0)
+					continue;
+				if (fitab[ii][i] != 0) {
+					f = ii;
+					goto found;
+				}
+			}
+		}
+		if (smnt) {
+			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
+				if (fitab[ii][i] != 0) {
+					f = ii;
+					goto found;
+				}
+			}
+		}
+		return 0;
+	}
+found:
+	setfbits(c, f);
+	return c;
+}
+
+static struct knode *
+klook(tchar c, tchar d)
+{
+	struct knode	*kp;
+	int	h;
+
+	c = findchar(c);
+	d = findchar(d);
+	h = khash(c, d);
+	for (kp = ktable[h]; kp; kp = kp->next)
+		if (kp->c == c && kp->d == d)
+			break;
+	return kp;
+}
+
 int
 getkw(tchar c, tchar d)
 {
+	struct knode	*kp;
 	struct afmtab	*a;
 	int	f, i, j, k, n, s;
 	float	z;
@@ -307,7 +399,7 @@ getkw(tchar c, tchar d)
 	lastkern = 0;
 	if (!kern || iszbit(c) || iszbit(d) || ismot(c) || ismot(d))
 		return 0;
-	if (sfbits(c) != sfbits(d))
+	if (sbits(c) != sbits(d))
 		return 0;
 	if ((f = fbits(c)) == 0)
 		f = xfont;
@@ -318,10 +410,14 @@ getkw(tchar c, tchar d)
 	i = cbits(c);
 	j = cbits(d);
 	if (i >= 32 && j >= 32) {
-		if (afmtab && (n = (fontbase[f]->afmpos)-1) >= 0) {
+		if (ktable != NULL && (kp = klook(c, d)) != NULL) {
+			k = kp->n;
+			goto found;
+		} else if (fbits(c) == fbits(d) && afmtab &&
+				(n = (fontbase[f]->afmpos)-1) >= 0) {
 			a = afmtab[n];
 			if ((k = afmgetkern(a, i - 32, j - 32)) != 0) {
-				k = (k * u2pts(s) + (Unitwidth / 2))
+			found:	k = (k * u2pts(s) + (Unitwidth / 2))
 					/ Unitwidth;
 				if (dev.anysize && xflag &&
 						(z = zoomtab[f]) != 0)
@@ -952,6 +1048,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	free(radjtab[pos]);
 	radjtab[pos] = NULL;
 	memset(&tracktab[pos], 0, sizeof tracktab[pos]);
+	kzap(pos);
 		/* if there is a directory, no place to store its name. */
 		/* if position isn't zero, no place to store its value. */
 		/* only time a FONTPOS is pushed back is if it's a */
@@ -1231,6 +1328,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	free(radjtab[nf]);
 	radjtab[nf] = NULL;
 	memset(&tracktab[nf], 0, sizeof tracktab[nf]);
+	kzap(nf);
 	nafm++;
 	if (nf > nfonts)
 		nfonts = nf;
@@ -1491,6 +1589,55 @@ void
 caseradj(void)
 {
 	madj(radjtab);
+}
+
+void
+casekernpair(void)
+{
+	int	savfont = font, savfont1 = font1;
+	int	f, g, i, n;
+	tchar	c, d;
+
+	skip();
+	i = getrq();
+	if ((f = findft(i)) < 0)
+		return;
+	font = font1 = f;
+	mchbits();
+	if (skip())
+		goto done;
+	c = getch();
+	if (skip())
+		goto done;
+	i = getrq();
+	if ((g = findft(i)) < 0 || skip())
+		goto done;
+	font = font1 = g;
+	mchbits();
+	if (skip())
+		goto done;
+	d = getch();
+	if (skip())
+		goto done;
+	noscale++;
+	n = atoi();
+	noscale--;
+	if ((c = cbits(c)) == 0)
+		goto done;
+	if (c == UNPAD)
+		c = ' ';
+	setfbits(c, f);
+	if ((d = cbits(d)) == 0)
+		goto done;
+	if (d == UNPAD)
+		d = ' ';
+	setfbits(d, g);
+	n = unitconv(n);
+	kadd(c, d, n);
+done:
+	font = savfont;
+	font1 = savfont1;
+	mchbits();
 }
 
 #include "unimap.h"

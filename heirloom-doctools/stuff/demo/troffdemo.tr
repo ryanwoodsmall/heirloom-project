@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.20 (gritter) 9/11/05
+.\" Sccsid @(#)troffdemo.tr	1.21 (gritter) 9/11/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -37,6 +37,30 @@
 .\" Perform some margin adjustments.
 .radj R y -20 , 65 \(hy 30
 .radj E \(hy 30
+.\" Additional kerning pairs.
+.kernpair R / E 0 -70
+.kernpair R / E 1 -20
+.kernpair R / E 2 -50
+.kernpair R / E 3 -15
+.kernpair R / E 4 -115
+.kernpair R / E 5 -40
+.kernpair R / E 6 -40
+.kernpair R / E 7 -50
+.kernpair R / E 8 -20
+.kernpair R / E 9 -100
+.kernpair E 0 R / 70
+.kernpair E 1 R / 80
+.kernpair E 2 R / 60
+.kernpair E 3 R / 70
+.kernpair E 4 R / 50
+.kernpair E 5 R / 70
+.kernpair E 6 R / 30
+.kernpair E 7 R / 40
+.kernpair E 8 R / 50
+.kernpair E 9 R / 32
+.kernpair R B E r -30
+.kernpair R p R t -12
+.kernpair E \(ff R e -5
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Use a narrow word space, and disable sentence spacing.
 .ss 9 0

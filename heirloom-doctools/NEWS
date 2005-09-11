@@ -109,6 +109,13 @@ description for ".xflag" below.
 	Disables (0) or enables pairwise kerning. The default is enabled
 	unless the "-X" option is given.
 
+.kernpair ff charf gg charg units			troff only
+	adds a kerning pair to the kerning table for character "charf"
+	from font "ff" and character "charg" from font "gg". The "units"
+	argument is 1/72000 of an inch multiplied by the current point
+	size or 1/1000 of an em (as in AFM kerning pair definitions). To
+	add a kerning pair that includes the space character, use "\ ".
+
 .ladj ff char0 units0 char1 units1 char2 units2 ...	troff only
 	When the current font is "ff" and "char" appears at the left margin
 	of an output line in left-aligned, aligned, or nofill mode, the

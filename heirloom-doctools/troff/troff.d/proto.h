@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.23 (gritter) 9/11/05
+ * Sccsid @(#)proto.h	1.24 (gritter) 9/11/05
  */
 
 /* t6.c */
@@ -47,6 +47,7 @@ void casekern(void);
 void casepapersize(void);
 void caseladj(void);
 void caseradj(void);
+void casekernpair(void);
 int un2tr(int, int *);
 int tr2un(tchar, int);
 int pts2u(int);

@@ -233,8 +233,31 @@ Pairwise kerning
 ----------------
 
 Pairwise kerning is enabled unless the -X option is given. The ".kern"
-request disables it. Adjustments to the kerning pairs of a font must be
-made directly in the respective AFM files.
+request disables it. Kerning tables are initially read from AFM files;
+this default kerning only applies if two adjacent characters are from
+the same font. There are two methods to adjust the kerning tables: In
+many cases, it is most convenient to create a private copy of the AFM
+file and to adjust the "KPX" entries in it. This has the advantage that
+the modified kerning pairs are immediately available for other documents.
+
+For cases where this is not suitable, or not possible because the
+characters in the kerning pair originate from a different font, troff
+provides the ".kernpair" request:
+
+	.do xflag 2
+	.fp 1 R fn______ pfb
+	.fp 0 E fny_____ pfb
+	.fallback R E
+	.hidechar R 0123456789
+	.kernpair E 0 R / 50
+	.kernpair R / E 1 -90
+	.kernpair E 1 R / 40
+	.kernpair R / E 2 -80
+	0/1/2
+
+In this example, old-style numerals from Fournier Expert are mixed
+with the slash character from Fournier Regular, and are adjusted to
+achieve matching visual letter spacing.
 
 
 Margin adjustment
