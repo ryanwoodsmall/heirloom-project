@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.78 (gritter) 9/10/05
+ * Sccsid @(#)dpost.c	1.79 (gritter) 9/11/05
  */
 
 /*
@@ -3743,13 +3743,42 @@ redirect (
 static char *
 mbs2pdf(char *mp)
 {
-	char	*ustr;
+	char	*ustr, *tp;
 	wchar_t	wc;
 	int	c, i, n = 0, sz, w;
 
+	for (tp = mp; *tp && (*tp&~0177) == 0 && *tp&~037; tp++);
+	if (*tp == 0) {
+		ustr = malloc(sz = 16);
+		*ustr = '(';
+		c = i = 1;
+		while (*mp) {
+			switch (*mp) {
+			case '(':
+			case ')':
+			case '\\':
+				ustr[i++] = '\\';
+				c++;
+				/*FALLTHRU*/
+			default:
+				ustr[i++] = *mp++;
+				c++;
+			}
+			if (i + 4 >= sz)
+				ustr = realloc(ustr, sz += 16);
+			if (c >= 60) {
+				ustr[i++] = '\\';
+				ustr[i++] = '\n';
+				c = 0;
+			}
+		}
+		ustr[i++] = ')';
+		ustr[i++] = 0;
+		return ustr;
+	}
 	ustr = malloc(sz = 16);
 	c = i = sprintf(ustr, "<FEFF");
-	while (mp += n, *mp && *mp != '\n') {
+	while (mp += n, *mp) {
 		if ((n = mbtowc(&wc, mp, mb_cur_max)) <= 0) {
 			error(NON_FATAL,
 				"illegal byte sequence %d in PDFMark operand",
@@ -3788,6 +3817,11 @@ t_pdfmark(char *buf)
 	*bp++ = '\0';
 	while (spacechar(*bp&0377))
 		bp++;
+	for (tp = bp; *tp; tp++)
+		if (*tp == '\n') {
+			*tp = '\0';
+			break;
+		}
 	if (strcmp(buf, "Author") == 0)
 		Author = mbs2pdf(bp);
 	else if (strcmp(buf, "Title") == 0)
@@ -3810,11 +3844,6 @@ t_pdfmark(char *buf)
 		Bookmarks = realloc(Bookmarks, ++nBookmarks*sizeof *Bookmarks);
 		Bookmarks[nBookmarks-1].level = n;
 		Bookmarks[nBookmarks-1].Title = mbs2pdf(bp);
-		for (tp = bp; *tp; tp++)
-			if (*tp == '\n') {
-				*tp = '\0';
-				break;
-			}
 		Bookmarks[nBookmarks-1].title = strdup(bp);
 		Bookmarks[nBookmarks-1].Count = 0;
 		Bookmarks[nBookmarks-1].closed =
