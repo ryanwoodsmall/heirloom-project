@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.80 (gritter) 9/11/05
+ * Sccsid @(#)t6.c	1.81 (gritter) 9/11/05
  */
 
 /*
@@ -55,6 +55,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "tdef.h"
 #include "dev.h"
 #include <ctype.h>
@@ -335,7 +336,7 @@ kzap(int f)
 	for (i = 0; i < kprime; i++)
 		for (kp = ktable[i]; kp; kp = kp->next)
 			if (fbits(kp->c) == f || fbits(kp->d) == f)
-				kp->n = 0;
+				kp->n = INT_MAX;
 }
 
 static tchar
@@ -385,7 +386,7 @@ klook(tchar c, tchar d)
 	for (kp = ktable[h]; kp; kp = kp->next)
 		if (kp->c == c && kp->d == d)
 			break;
-	return kp;
+	return kp && kp->n != INT_MAX ? kp : NULL;
 }
 
 int
