@@ -206,6 +206,10 @@ description for ".xflag" below.
 	prints all arguments to a macro, each one surrounded by double
 	quotes, separated by spaces.
 
+\&
+	inhibits kerning if put between two characters, in addition to
+	its previous functionality.
+
 \*[name]
 	refers to the string "name".
 
@@ -338,4 +342,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   9/11/05
+Gunnar Ritter                                                   9/12/05
