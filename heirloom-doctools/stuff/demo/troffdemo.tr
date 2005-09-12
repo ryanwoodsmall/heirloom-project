@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.23 (gritter) 9/12/05
+.\" Sccsid @(#)troffdemo.tr	1.24 (gritter) 9/13/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -17,12 +17,14 @@
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Mount fonts from the Adobe Caslon family, including ornaments.
 .fp 1 R awrg____ pfb
+.fp 0 V awrg____ pfb
 .fp 2 I awi_____ pfb
 .fp 0 E axrg____ pfb
 .fp 0 IE axi_____ pfb
 .fp 0 O awor____ pfb
 .\" Configure to use small caps, ligatures, and old-style numerals.
 .fallback R E
+.fallback V E
 .fallback E R
 .fallback I IE
 .flig R 31
@@ -31,6 +33,9 @@
 .hidechar I 0123456789
 .\" The expert font needs letter space tracking for use as small caps.
 .track E 1 .3 24 3
+.\" The caps font needs to be tracked and zoomed.
+.track V 1 .3 24 3
+.fzoom V .9
 .\" Adobe Caslon also needs minor tracking for the roman and the italic.
 .track R 1 .4 24 0
 .track I 1 .4 24 0
@@ -58,11 +63,15 @@
 .kernpair E 7 R / 40
 .kernpair E 8 R / 50
 .kernpair E 9 R / 32
-.kernpair R B E r -30
+.kernpair R B E r -15
 .kernpair R p R t -12
 .kernpair E \(ff R e -5
+.kernpair V \  V A -90
+.kernpair V M V \  -80
+.kernpair V \  V P -50
+.kernpair V B V \  -70
 .\" General spacing.
-.kernbefore R ; 60 : 60
+.kernbefore R ; 66 : 66
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Use a narrow word space, and disable sentence spacing.
 .ss 9 0
@@ -115,7 +124,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/12/05
+9/13/05
 .sp 2v
 .ad b
 .ps 12
@@ -134,10 +143,10 @@ capabilities to work with PostScript fonts:
 PostScript Type 1 fonts can be used
 as supplied by their vendor
 without any need for conversion;
-\fItroff\fP\^ can access the font metrics
-in the \s-1AFM\s0 files directly,
-and the \fIdpost\fR\^ post-processor
-can embed glyph data from \s-1PFB\s0 files
+\fItroff\fP\^ can access font metrics directly
+in the \fVAFM\fP files,
+and the \fIdpost\fR post-processor
+can embed glyph data from \fVPFB\fP files
 into the PostScript output it generates.
 .F
 ``Expert'' fonts can be used,
@@ -156,9 +165,8 @@ and the latter is used for the \fESmall Capitals\fR, and,
 at a minor rate, to adjust the regular font of this document.
 .F
 Margin adjustments are available;
-in this document,
 they serve e.\|g. to prevent the ``y'' letters
-from exceeding beyond the right margin.
+from exceeding too far beyond the right margin of this page.
 .sp
 .in 0
 Heirloom \fItroff\fP\^ is free software;
