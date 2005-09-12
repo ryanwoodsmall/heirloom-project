@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.33 (gritter) 9/11/05
+ * Sccsid @(#)n7.c	1.34 (gritter) 9/13/05
  */
 
 /*
@@ -46,9 +46,9 @@
  * contributors.
  */
 
+#include <stdlib.h>
 #ifdef EUC
 #ifdef NROFF
-#include <stdlib.h>
 #ifdef	__sun
 #include <widec.h>
 #else

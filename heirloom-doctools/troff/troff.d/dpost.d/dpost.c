@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.79 (gritter) 9/11/05
+ * Sccsid @(#)dpost.c	1.80 (gritter) 9/13/05
  */
 
 /*
@@ -3744,8 +3744,11 @@ static char *
 mbs2pdf(char *mp)
 {
 	char	*ustr, *tp;
+	int	c, i, sz;
+#ifdef	EUC
+	int	n = 0, w;
 	wchar_t	wc;
-	int	c, i, n = 0, sz, w;
+#endif
 
 	for (tp = mp; *tp && (*tp&~0177) == 0 && *tp&~037; tp++);
 	if (*tp == 0) {
@@ -3776,6 +3779,7 @@ mbs2pdf(char *mp)
 		ustr[i++] = 0;
 		return ustr;
 	}
+#ifdef	EUC
 	ustr = malloc(sz = 16);
 	c = i = sprintf(ustr, "<FEFF");
 	while (mp += n, *mp) {
@@ -3803,6 +3807,11 @@ mbs2pdf(char *mp)
 	ustr[i++] = '>';
 	ustr[i] = 0;
 	return ustr;
+#else	/* !EUC */
+	error(NON_FATAL,
+		"this instance of dpost only supports ASCII with PDFMark");
+	return NULL;
+#endif	/* !EUC */
 }
 
 static void
