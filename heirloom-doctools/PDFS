@@ -68,7 +68,7 @@ practical to include the command in the chapter/section macros, as e.g.
 	.de CH
 	.	bp
 	\\X'PDFMark: Bookmark 0 \\$1'
-	.	sp |\n[topmargin]u
+	.	sp |\\n[topmargin]u
 	.	ce
 	.	sp
 	..
@@ -135,4 +135,4 @@ position, this is usually a sign that the media size of troff/dpost did
 not match that of the distiller (see above).
 
 
-Gunnar Ritter                                                 9/10/05
+Gunnar Ritter                                                 9/13/05
