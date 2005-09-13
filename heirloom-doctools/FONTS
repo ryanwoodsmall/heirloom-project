@@ -228,6 +228,36 @@ selected using the fallback sequence.
 	.fzoom H .92
 	Text in \fHHelvetica\fP must be adjusted to fit with Plantin.
 
+The ".fzoom" request affects all characters set in the respective font on
+the current output line. To create single zoomed words, mount a font twice
+under different names, but zoom it only once.
+
+
+Tracking individual words
+-------------------------
+
+Tracking of individual words is used for highlighting text e.g. with German
+blackletter faces. Like the ".fzoom" request, the ".track" request applies
+to all characters in the respective font on an entire output line. Thus it
+is also necessary to mount a font twice but to track it only once when it
+is used for tracking individual words.
+
+
+Setting text in all-capital letters
+-----------------------------------
+
+When setting text in all-capital letters, it is normally necessary
+to zoom the font to a smaller size than that of the lower-case text
+surrounding it, and to track it as well. Mounting the regular font
+a second time is the most convenient way to handle this:
+
+	.do xflag 2
+	.fp 1 R fn______ pfb
+	.fp 0 XC fn______ pfb
+	.track XC 1 .2 24 2
+	.fzoom XC .9
+	Regular text followed by \f(XCALL-CAPITAL TEXT\fP which ends.
+
 
 Pairwise kerning
 ----------------
