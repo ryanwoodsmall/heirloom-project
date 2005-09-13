@@ -275,37 +275,38 @@ command, "\&" or line margin, and they are additionally restricted to
 have no effect if the other character is a space.
 
 
-Margin alignment
-----------------
+Hanging characters
+------------------
 
-Since there are no margin alignment tables in AFM files, values must
-be given explicitly in troff source code using the ".lalign" and
-".ralign" requests. Both accept a font specification followed by one
+Since there are no tables for hanging characters in AFM files, values
+must be given explicitly in troff source code using the ".lhang" and
+".rhang" requests. Both accept a font specification followed by one
 or more pairs of characters and values:
 
 	.do xflag 2
 	.ps 10
 	.fp 1 R fn______ pfb
-	.lalign R V -50 J -40
-	.ralign R \(hy 80
+	.lhang R V -50 J -40
+	.rhang R \(hy 80
 
 Adjustments are given in units of 1/72000 inch multiplied by the actual
 point size, or 1/1000 of the em size when the line is printed. Thus in
 this example, the left margin is shifted to the left by .5 points when
 the leftmost letter is a "V", and by .4 points when the leftmost letter
-is a "J"; the right margin ist shifted to the right by .8 points when
+is a "J"; the right margin is shifted to the right by .8 points when
 the rightmost letter is a hyphen.
 
-Left margin alignments are evaluated before the letters that fit on the
+Left margin adjustments are evaluated before the letters that fit on the
 current line are computed, and can thus principally be of any length. In
-contrast, right margin alignments are evaluated after this computation
+contrast, right margin adjustments are evaluated after this computation
 is finished, and the adjustment is simply added to the word space of the
 output line. Thus a positive right adjustment that is large in relation
 to the line length will cause visible holes, and a negative adjustment
 will ultimately cause the words on the line to be printed over each
-other. This is not a problem for the typical application of margin
-alignment, though; if a line with eight word spaces is shifted in the
-example above, each word space is enlarged by 1/100 em.
+other. This is not a problem for the typical application of hanging
+punctuation for visual alignment, though; if a line with eight word
+spaces is shifted in the example above, each word space is enlarged
+by only 1/100 em.
 
 
 Limitations

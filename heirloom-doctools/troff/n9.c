@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.20 (gritter) 9/11/05
+ * Sccsid @(#)n9.c	1.21 (gritter) 9/13/05
  */
 
 /*
@@ -642,17 +642,17 @@ morechars(int n)
 		trtab[i] = i;
 #ifndef	NROFF
 	for (i = 0; i <= nfonts; i++) {
-		if (laligntab != NULL && laligntab[i] != NULL) {
-			laligntab[i] = realloc(laligntab[i],
-					nnc * sizeof **laligntab);
-			memset(&laligntab[i][NCHARS], 0,
-					(nnc-NCHARS) * sizeof **laligntab);
+		if (lhangtab != NULL && lhangtab[i] != NULL) {
+			lhangtab[i] = realloc(lhangtab[i],
+					nnc * sizeof **lhangtab);
+			memset(&lhangtab[i][NCHARS], 0,
+					(nnc-NCHARS) * sizeof **lhangtab);
 		}
-		if (laligntab != NULL && raligntab[i] != NULL) {
-			raligntab[i] = realloc(raligntab[i],
-					nnc * sizeof **raligntab);
-			memset(&raligntab[i][NCHARS], 0,
-					(nnc-NCHARS) * sizeof **raligntab);
+		if (lhangtab != NULL && rhangtab[i] != NULL) {
+			rhangtab[i] = realloc(rhangtab[i],
+					nnc * sizeof **rhangtab);
+			memset(&rhangtab[i][NCHARS], 0,
+					(nnc-NCHARS) * sizeof **rhangtab);
 		}
 		if (kernafter != NULL && kernafter[i] != NULL) {
 			kernafter[i] = realloc(kernafter[i],

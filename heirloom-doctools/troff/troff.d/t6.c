@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.82 (gritter) 9/11/05
+ * Sccsid @(#)t6.c	1.83 (gritter) 9/13/05
  */
 
 /*
@@ -78,8 +78,8 @@ int	*ccstab;
 int	**fallbacktab;
 float	*zoomtab;
 int	*bdtab;
-int	**laligntab;
-int	**raligntab;
+int	**lhangtab;
+int	**rhangtab;
 int	**kernafter;
 int	**kernbefore;
 struct tracktab	*tracktab;
@@ -1048,10 +1048,10 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	bdtab[pos] = cstab[pos] = ccstab[pos] = 0;
 	zoomtab[pos] = 0;
 	fallbacktab[pos] = NULL;
-	free(laligntab[pos]);
-	laligntab[pos] = NULL;
-	free(raligntab[pos]);
-	raligntab[pos] = NULL;
+	free(lhangtab[pos]);
+	lhangtab[pos] = NULL;
+	free(rhangtab[pos]);
+	rhangtab[pos] = NULL;
 	memset(&tracktab[pos], 0, sizeof tracktab[pos]);
 	kzap(pos);
 		/* if there is a directory, no place to store its name. */
@@ -1328,10 +1328,10 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
 	zoomtab[nf] = 0;
 	fallbacktab[nf] = NULL;
-	free(laligntab[nf]);
-	laligntab[nf] = NULL;
-	free(raligntab[nf]);
-	raligntab[nf] = NULL;
+	free(lhangtab[nf]);
+	lhangtab[nf] = NULL;
+	free(rhangtab[nf]);
+	rhangtab[nf] = NULL;
 	memset(&tracktab[nf], 0, sizeof tracktab[nf]);
 	kzap(nf);
 	nafm++;
@@ -1556,7 +1556,7 @@ casepapersize(void)
 }
 
 static void
-madj(int **tp)
+hang(int **tp)
 {
 	int	i, j, n;
 	int	savfont = font, savfont1 = font1;
@@ -1585,15 +1585,15 @@ madj(int **tp)
 }
 
 void
-caselalign(void)
+caselhang(void)
 {
-	madj(laligntab);
+	hang(lhangtab);
 }
 
 void
-caseralign(void)
+caserhang(void)
 {
-	madj(raligntab);
+	hang(rhangtab);
 }
 
 void

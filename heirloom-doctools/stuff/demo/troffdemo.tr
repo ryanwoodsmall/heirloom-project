@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.24 (gritter) 9/13/05
+.\" Sccsid @(#)troffdemo.tr	1.25 (gritter) 9/13/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -39,9 +39,9 @@
 .\" Adobe Caslon also needs minor tracking for the roman and the italic.
 .track R 1 .4 24 0
 .track I 1 .4 24 0
-.\" Perform some margin alignments.
-.ralign R y -20 , 65 \(hy 30
-.ralign E \(hy 30
+.\" Hanging characters.
+.rhang R y -20 , 65 \(hy 30
+.rhang E \(hy 30
 .\" Additional kerning pairs.
 .kernpair R / E 0 -70
 .kernpair R / E 1 -20
