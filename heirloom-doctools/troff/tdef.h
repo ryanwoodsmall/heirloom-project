@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.43 (gritter) 9/11/05
+ * Sccsid @(#)tdef.h	1.44 (gritter) 9/16/05
  */
 
 /*
@@ -195,10 +195,10 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 	Internally, every character is carried around as
 	a 64 bit cookie, called a "tchar" (typedef long long).
 	Bits are numbered 63..0 from left to right.
-	If bit 15 is 1, the character is motion, with
+	If bit 31 is 1, the character is motion, with
 		if bit 16 it's vertical motion
 		if bit 17 it's negative motion
-	If bit 15 is 0, the character is a real character.
+	If bit 31 is 0, the character is a real character.
 		if bit 63	zero motion
 		bits 62..40	size
 		bits 39..32	font
@@ -215,7 +215,7 @@ endif EUC
 
 /* in the following, "LL" should really be a tchar, but ... */
 
-#define	MOT	(01LL<<15)	/* motion character indicator */
+#define	MOT	(01LL<<31)	/* motion character indicator */
 #define	VMOT	(01LL<<16)	/* vert motion bit */
 #define	NMOT	(01LL<<17)	/* negative motion indicator*/
 #define	BMBITS	077777LL	/* basic absolute motion bits */
@@ -231,8 +231,10 @@ endif EUC
 
 #define	ZBIT		(01ULL << 63) 	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
-#define	BLBIT		(01ULL << 31)	/* optional break-line char */
+#define	BLBIT		(01ULL << 30)	/* optional break-line char */
 #define	isblbit(n)	((n) & BLBIT)
+#define	COPYBIT		(01ULL << 29)	/* wide character in copy mode */
+#define	iscopy(n)	((n) & COPYBIT)
 #define	ABSCHAR		0400	/* absolute char number in this font */
 
 #define	SMASK		(037777777LL << 40)

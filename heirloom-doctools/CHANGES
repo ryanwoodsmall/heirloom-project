@@ -1,3 +1,10 @@
+Relase ...
+* troff: The handling of locale-dependent characters in copy mode has been
+  fixed. Previously when such a character was given e.g. in an argument to
+  a macro, it was chosen from the font in effect at the time when the macro
+  call was read, instead of the one in effect at the time when the macro
+  was executed.
+
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript
   Type 1 fonts) to select fonts. The ".fp" request has been extended
