@@ -74,6 +74,8 @@ Release ...
 * [nt]roff: The ".xflag" request controls the availability of extensions
   like the "-x" and "-X" command line options.
 * The file "NEWS" describes new troff language features.
+* tbl: The specification "decimalpoint(x)" can now be used to make the
+  character "x" the decimal point for numeric columns.
 * [nt]roff: There is no static limit on the number of "-m" options anymore.
 * [nt]roff: There is no static limit on the ".hw" table anymore.
 * [nt]roff: There is no static limit on the pushback buffer anymore; this

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.7 (gritter) 8/12/05
+ * Sccsid @(#)t..c	1.8 (gritter) 9/15/05
  */
 
 /* t..c : external declarations */
@@ -58,6 +58,7 @@ extern int evenflg;
 extern int evenup[];
 extern int boxflg;
 extern int dboxflg;
+extern int decimalpoint;
 extern int linsize;
 extern int tab;
 extern int pr1403;

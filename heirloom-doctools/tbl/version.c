@@ -5,14 +5,14 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/tbl.sl	1.12 (gritter) 9/5/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tbl.sl	1.13 (gritter) 9/15/05";
 /* SLIST */
 /*
-t..c: * Sccsid @(#)t..c	1.7 (gritter) 8/12/05
-t0.c: * Sccsid @(#)t0.c	1.4 (gritter) 7/23/05
+t..c: * Sccsid @(#)t..c	1.8 (gritter) 9/15/05
+t0.c: * Sccsid @(#)t0.c	1.5 (gritter) 9/15/05
 t1.c: * Sccsid @(#)t1.c	1.9 (gritter) 8/13/05
 t2.c: * Sccsid @(#)t2.c	1.3 (gritter) 7/23/05
-t3.c: * Sccsid @(#)t3.c	1.5 (gritter) 8/12/05
+t3.c: * Sccsid @(#)t3.c	1.6 (gritter) 9/15/05
 t4.c: * Sccsid @(#)t4.c	1.4 (gritter) 7/24/05
 t5.c: * Sccsid @(#)t5.c	1.5 (gritter) 8/12/05
 t6.c: * Sccsid @(#)t6.c	1.4 (gritter) 9/5/05
@@ -25,7 +25,7 @@ te.c: * Sccsid @(#)te.c	1.10 (gritter) 9/5/05
 tf.c: * Sccsid @(#)tf.c	1.3 (gritter) 7/23/05
 tg.c: * Sccsid @(#)tg.c	1.5 (gritter) 8/12/05
 ti.c: * Sccsid @(#)ti.c	1.3 (gritter) 7/23/05
-tm.c: * Sccsid @(#)tm.c	1.4 (gritter) 7/24/05
+tm.c: * Sccsid @(#)tm.c	1.5 (gritter) 9/15/05
 ts.c: * Sccsid @(#)ts.c	1.3 (gritter) 7/23/05
 tt.c: * Sccsid @(#)tt.c	1.3 (gritter) 7/23/05
 tu.c: * Sccsid @(#)tu.c	1.3 (gritter) 7/23/05

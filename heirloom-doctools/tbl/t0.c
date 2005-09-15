@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t0.c	1.4 (gritter) 7/23/05
+ * Sccsid @(#)t0.c	1.5 (gritter) 9/15/05
  */
 
  /* t0.c: storage allocation */
@@ -28,6 +28,7 @@ int expflg = 0;
 int ctrflg = 0;
 int boxflg = 0;
 int dboxflg = 0;
+int decimalpoint = '.';
 int tab = '\t';
 int linsize;
 int pr1403;

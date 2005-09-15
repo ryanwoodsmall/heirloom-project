@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t3.c	1.5 (gritter) 8/12/05
+ * Sccsid @(#)t3.c	1.6 (gritter) 9/15/05
  */
 
  /* t3.c: interpret commands affecting whole table */
@@ -44,6 +44,8 @@ struct optstr {char *optnam; int *optadd;} options [] = {
 	"TAB", &tab,
 	"linesize", &linsize,
 	"LINESIZE", &linsize,
+	"decimalpoint", &decimalpoint,
+	"DECIMALPOINT", &decimalpoint,
 	"delim", &delim1,
 	"DELIM", &delim1,
 	0,0};
@@ -58,6 +60,7 @@ for(lp= options; lp->optnam; lp++)
 	*(lp->optadd) = 0;
 texname = texstr[texct=0];
 tab = '\t';
+decimalpoint = '.';
 printf(".nr %d \\n(.s\n", LSIZE);
 gets1(&line, &linesize);
 /* see if this is a command line */
@@ -86,7 +89,7 @@ for(cp=line; (c = *cp) != ';'; cp++)
 					*t++ = ci;
 			else cp--;
 			*t++ = 0; *t=0;
-			if (lp->optadd == &tab)
+			if (lp->optadd == &tab || lp->optadd == &decimalpoint)
 				{
 				if (nb[0])
 					*(lp->optadd) = nb[0];

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tm.c	1.4 (gritter) 7/24/05
+ * Sccsid @(#)tm.c	1.5 (gritter) 9/15/05
  */
 
  /* tm.c: split numerical fields */
@@ -38,7 +38,7 @@ maknew(char *str)
 		{
 		for (dpoint=0; *str; str++)
 			{
-			if (*str=='.' && !ineqn(str,p) &&
+			if ((*str&0377)==decimalpoint && !ineqn(str,p) &&
 				(str>p && digit(*(str-1)) ||
 				digit(*(str+1))))
 					dpoint=str;
