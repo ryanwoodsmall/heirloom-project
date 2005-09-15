@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.8 (gritter) 9/15/05
+ * Sccsid @(#)t..c	1.9 (gritter) 9/15/05
  */
 
 /* t..c : external declarations */
@@ -33,7 +33,7 @@
 
 # define MAXLIN 200
 # define MAXHEAD 100
-# define MAXCOL 20
+# define MAXCOL 100
 # define MAXCHS 2000
 # define MAXSTR 1024
 # define MAXRPT 100
