@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.25 (gritter) 9/13/05
+.\" Sccsid @(#)troffdemo.tr	1.26 (gritter) 9/15/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -65,6 +65,7 @@
 .kernpair E 9 R / 32
 .kernpair R B E r -15
 .kernpair R p R t -12
+.kernpair R & R c 60
 .kernpair E \(ff R e -5
 .kernpair V \  V A -90
 .kernpair V M V \  -80
@@ -124,7 +125,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/13/05
+9/15/05
 .sp 2v
 .ad b
 .ps 12
@@ -164,9 +165,8 @@ the page title provides an example for the former,
 and the latter is used for the \fESmall Capitals\fR, and,
 at a minor rate, to adjust the regular font of this document.
 .F
-Margin adjustments are available;
-they serve e.\|g. to prevent the ``y'' letters
-from exceeding too far beyond the right margin of this page.
+Hanging characters can be used to achieve better visual alignment
+of commas, hyphens, &c. to the page margins.
 .sp
 .in 0
 Heirloom \fItroff\fP\^ is free software;
