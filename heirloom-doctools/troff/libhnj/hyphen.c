@@ -39,7 +39,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, August 2005.
  *
- * Sccsid @(#)hyphen.c	1.3 (gritter) 8/26/05
+ * Sccsid @(#)hyphen.c	1.4 (gritter) 9/15/05
  */
 
 #include <stdlib.h> /* for NULL, malloc */
@@ -345,7 +345,7 @@ hnj_hyphen_load (const char *fn)
 	    if (state_num >= 0)
 	      break;
 	  }
-        // KBH: FIXME state 0 fallback_state should always be -1?
+        /* KBH: FIXME state 0 fallback_state should always be -1? */
 	if (e->val) 
 	  dict->states[e->val].fallback_state = state_num;
       }
@@ -432,8 +432,9 @@ int hnj_hyphen_hyphenate (HyphenDict *dict,
 	{
 
 	  if (state == -1) {
-            // return 1;
-	    // KBH: FIXME shouldn't this be as follows?
+            /* return 1;
+	     * KBH: FIXME shouldn't this be as follows?
+	     */
             state = 0;
             goto try_next_letter;
           }          
@@ -482,9 +483,10 @@ int hnj_hyphen_hyphenate (HyphenDict *dict,
 	      hyphens[offset + k] = match[k];
 	}
 
-      // KBH: we need this to make sure we keep looking in a word
-      // for patterns even if the current character is not known in state 0
-      // since patterns for hyphenation may occur anywhere in the word
+      /* KBH: we need this to make sure we keep looking in a word
+       * for patterns even if the current character is not known in state 0
+       * since patterns for hyphenation may occur anywhere in the word
+       */
       try_next_letter: ;
 
     }

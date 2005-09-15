@@ -5,7 +5,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/tbl.sl	1.14 (gritter) 9/15/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/tbl.sl	4.1 (gritter) 9/15/05";
 /* SLIST */
 /*
 t..c: * Sccsid @(#)t..c	1.9 (gritter) 9/15/05

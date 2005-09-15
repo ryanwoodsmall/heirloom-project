@@ -6,9 +6,9 @@
 #define	USED
 #endif
 #ifdef	NROFF
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	1.183 (gritter) 9/13/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	4.1 (gritter) 9/15/05";
 #else	/* !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	1.183 (gritter) 9/13/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	4.1 (gritter) 9/15/05";
 #endif	/* !NROFF */
 /* SLIST */
 /*
@@ -46,6 +46,6 @@ troff.d/unimap.c: * Sccsid @(#)unimap.c	1.7 (gritter) 8/22/05
 troff.d/unimap.h: * Sccsid @(#)unimap.h	1.1 (gritter) 8/17/05
 libhnj/hnjalloc.c: * Sccsid @(#)hnjalloc.c	1.3 (gritter) 8/26/05
 libhnj/hnjalloc.h: * Sccsid @(#)hnjalloc.h	1.2 (gritter) 8/25/05
-libhnj/hyphen.c: * Sccsid @(#)hyphen.c	1.3 (gritter) 8/26/05
+libhnj/hyphen.c: * Sccsid @(#)hyphen.c	1.4 (gritter) 9/15/05
 libhnj/hyphen.h: * Sccsid @(#)hyphen.h	1.3 (gritter) 8/25/05
 */

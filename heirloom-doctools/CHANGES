@@ -1,4 +1,4 @@
-Release ...
+Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript
   Type 1 fonts) to select fonts. The ".fp" request has been extended
   for this, and the "TROFFONTS" environment variable specifies path

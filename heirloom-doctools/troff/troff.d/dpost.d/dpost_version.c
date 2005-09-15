@@ -5,8 +5,8 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)dpost.sl	1.94 (gritter) 9/13/05";
-const char creator[] = "Heirloom Documentation Tools - dpost 1.94 (gritter) 9/13/05";
+static const char sccsid[] USED = "@(#)dpost.sl	4.1 (gritter) 9/15/05";
+const char creator[] = "Heirloom Documentation Tools - dpost 4.1 (gritter) 9/15/05";
 /* SLIST */
 /*
 asciitype.c:	Sccsid @(#)asciitype.c	1.4 (gritter) 4/17/03	
