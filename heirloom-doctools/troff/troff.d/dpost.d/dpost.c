@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.80 (gritter) 9/13/05
+ * Sccsid @(#)dpost.c	1.81 (gritter) 9/16/05
  */
 
 /*
@@ -2739,7 +2739,8 @@ t_sf(void)
 		t_dosupply(fontname[font].afm->fontname);
 		fontname[font].afmmap = printencvector(fontname[font].afm);
 	    }
-	}
+	} else if (fontname[font].afm && fontname[font].afmmap == NULL)
+		fontname[font].afmmap = printencvector(fontname[font].afm);
 	seenfonts[fnum] = 1;
     }	/* End if */
 

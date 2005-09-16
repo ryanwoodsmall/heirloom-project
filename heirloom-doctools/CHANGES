@@ -10,6 +10,10 @@ Relase ...
   count following the "StartCharMetrics" keyword is too large. Previously,
   no characters outside the default troff character set were accessible
   with such files.
+* dpost: When an AFM-based font was mounted more than once in troff,
+  localized input characters are now printed properly in all positions.
+  Previously, localized characters were only printed properly on the
+  position that was used first in the document.
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript
