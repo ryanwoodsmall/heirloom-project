@@ -4,6 +4,12 @@ Relase ...
   a macro, it was chosen from the font in effect at the time when the macro
   call was read, instead of the one in effect at the time when the macro
   was executed.
+* troff: The lookup of kerning pairs from the predefined tables has been
+  fixed. It previously located inappropriate pairs in some cases.
+* troff: Is now more resistent against invalid AFM files whose character
+  count following the "StartCharMetrics" keyword is too large. Previously,
+  no characters outside the default troff character set were accessible
+  with such files.
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript

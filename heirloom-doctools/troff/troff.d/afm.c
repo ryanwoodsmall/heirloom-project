@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.23 (gritter) 9/11/05
+ * Sccsid @(#)afm.c	1.25 (gritter) 9/16/05
  */
 
 #include <stdlib.h>
@@ -824,12 +824,12 @@ afmget(struct afmtab *a, char *contents, size_t size)
 				a->namecache[i].fival[0] = -1;
 				a->namecache[i].fival[1] = -1;
 			}
-		} else if (state == CHARMETRICS && n-- > 0) {
-			addmetrics(a, cp, isSymbol);
 		} else if (state == CHARMETRICS &&
 				thisword(cp, "EndCharMetrics")) {
 			state = FONTMETRICS;
 			remap(a);
+		} else if (state == CHARMETRICS && n-- > 0) {
+			addmetrics(a, cp, isSymbol);
 #ifdef	KERN
 		} else if (state == FONTMETRICS &&
 				thisword(cp, "StartKernData") != 0) {
@@ -841,11 +841,11 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			state = KERNPAIRS;
 			a->kernpairs = calloc(a->kernprime,
 					sizeof *a->kernpairs);
-		} else if (state == KERNPAIRS && n-- > 0) {
-			addkernpair(a, cp);
 		} else if (state == KERNPAIRS &&
 				thisword(cp, "EndKernPairs")) {
 			state = KERNDATA;
+		} else if (state == KERNPAIRS && n-- > 0) {
+			addkernpair(a, cp);
 		} else if (state == KERNDATA &&
 				thisword(cp, "EndKernData")) {
 			state = FONTMETRICS;
@@ -901,7 +901,7 @@ kernlook(struct afmtab *a, int ch1, int ch2)
 
 	h = hash((unsigned)ch1<<16 | (unsigned)ch2, a->kernprime);
 	kp = &a->kernpairs[c = h];
-	while (kp->ch1 != 0 && kp->ch2 != 0) {
+	while (kp->ch1 != 0 || kp->ch2 != 0) {
 		if (kp->ch1 == ch1 && kp->ch2 == ch2)
 			break;
 		c += n&1 ? -((n+1)/2) * ((n+1)/2) : ((n+1)/2) * ((n+1)/2);
