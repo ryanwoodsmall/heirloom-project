@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.84 (gritter) 9/17/05
+ * Sccsid @(#)t6.c	1.85 (gritter) 9/18/05
  */
 
 /*
@@ -1711,11 +1711,47 @@ un2tr(int c, int *fp)
 {
 	int	i, j;
 
-	for (i = 0; unimap[i].psc; i++)
-		if (unimap[i].code == c)
-			if ((j = postchar(unimap[i].psc, fp)) != 0)
-				return j;
-	return 0;
+	switch (c) {
+	case 0x00A0:
+		*fp = xfont;
+		return UNPAD;
+	case 0x00AD:
+		*fp = xfont;
+		return ohc;
+	case 0x2002:
+		return makem((int)(EM)/2);
+	case 0x2003:
+		return makem((int)EM);
+	case 0x2004:
+		return makem((int)EM/3);
+	case 0x2005:
+		return makem((int)EM/4);
+	case 0x2006:
+		return makem((int)EM/6);
+	case 0x2007:
+		return makem(width('0' | chbits));
+	case 0x2008:
+		return makem(width('.' | chbits));
+	case 0x2009:
+		return makem((int)EM/6);
+	case 0x200A:
+		return makem((int)EM/12);
+	case 0x2010:
+		*fp = xfont;
+		return '-';
+	case 0x2027:
+		*fp = xfont;
+		return OHC | BLBIT;
+	case 0x2060:
+		*fp = xfont;
+		return FILLER;
+	default:
+		for (i = 0; unimap[i].psc; i++)
+			if (unimap[i].code == c)
+				if ((j = postchar(unimap[i].psc, fp)) != 0)
+					return j;
+		return 0;
+	}
 }
 
 int

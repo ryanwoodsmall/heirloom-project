@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.39 (gritter) 9/17/05
+ * Sccsid @(#)n1.c	1.40 (gritter) 9/18/05
  */
 
 /*
@@ -1195,7 +1195,7 @@ g4:
 #ifndef	NROFF
 	if (!copyf && iscopy(i)) {
 		int	f;
-		if ((i = un2tr(cbits(i), &f)) != 0) {
+		if ((i = un2tr(cbits(i), &f)) != 0 && !ismot(i)) {
 			i |= chbits & ~FMASK;
 			setfbits(i, f);
 		}

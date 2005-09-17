@@ -22,9 +22,10 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.c	1.7 (gritter) 8/22/05
+ * Sccsid @(#)unimap.c	1.8 (gritter) 9/18/05
  */
 
+#include "tdef.h"
 #include "unimap.h"
 
 const struct unimap	unimap[] = {
@@ -45,7 +46,6 @@ const struct unimap	unimap[] = {
 	{ 0x00AA,	"ordfeminine" },
 	{ 0x00AB,	"guillemotleft" },
 	{ 0x00AC,	"logicalnot" },
-	{ 0x00AD,	"hyphen" },
 	{ 0x00AE,	"registered" },
 	{ 0x00AE,	"registersans" },
 	{ 0x00AE,	"registerserif" },
@@ -251,6 +251,7 @@ const struct unimap	unimap[] = {
 	{ 0x03D2,	"Upsilon1" },
 	{ 0x03D5,	"phi1" },
 	{ 0x03D6,	"omega1" },
+	{ 0x2011,	"hyphen" },
 	{ 0x2012,	"figuredash" },
 	{ 0x2013,	"endash" },
 	{ 0x2014,	"emdash" },
