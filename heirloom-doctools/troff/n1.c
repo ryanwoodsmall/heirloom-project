@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.38 (gritter) 9/16/05
+ * Sccsid @(#)n1.c	1.39 (gritter) 9/17/05
  */
 
 /*
@@ -1122,7 +1122,7 @@ g2:
 			memset(&state, 0, sizeof state);
 			if ((n = mbrtowc(&twc, mbbuf1, mbbuf1p-mbbuf1, &state))
 					==(size_t)-1 ||
-					twc & ~(wchar_t)0177777) {
+					twc & ~(wchar_t)0x1FFFFF) {
 				mbbuf1p = mbbuf1;
 				*mbbuf1p = 0;
 				i &= 0177;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.45 (gritter) 9/17/05
+ * Sccsid @(#)tdef.h	1.46 (gritter) 9/17/05
  */
 
 /*
@@ -195,10 +195,10 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 	Internally, every character is carried around as
 	a 64 bit cookie, called a "tchar" (typedef long long).
 	Bits are numbered 63..0 from left to right.
-	If bit 16 is 1, the character is motion, with
-		if bit 17 it's vertical motion
-		if bit 18 it's negative motion
-	If bit 16 is 0, the character is a real character.
+	If bit 21 is 1, the character is motion, with
+		if bit 22 it's vertical motion
+		if bit 23 it's negative motion
+	If bit 21 is 0, the character is a real character.
 		if bit 63	zero motion
 		bits 62..40	size
 		bits 39..32	font
@@ -211,12 +211,12 @@ endif EUC && NROFF
 
 /* in the following, "LL" should really be a tchar, but ... */
 
-#define	MOT	(01LL<<16)	/* motion character indicator */
-#define	VMOT	(01LL<<17)	/* vert motion bit */
-#define	NMOT	(01LL<<18)	/* negative motion indicator*/
-#define	BMBITS	0177777LL	/* basic absolute motion bits */
-#define	XMBITS	0x07F80000LL	/* extended absolute motion bits */
-#define	XMSHIFT	4		/* extended absolute motion shift */
+#define	MOT	(01LL<<21)	/* motion character indicator */
+#define	VMOT	(01LL<<22)	/* vert motion bit */
+#define	NMOT	(01LL<<23)	/* negative motion indicator*/
+#define	BMBITS	0x001FFFFFLL	/* basic absolute motion bits */
+#define	XMBITS	0x03000000LL	/* extended absolute motion bits */
+#define	XMSHIFT	3		/* extended absolute motion shift */
 #define	MAXMOT	0x007FFFFFLL	/* bad way to write this!!! */
 
 #define	ismot(n)	((n) & MOT)
@@ -238,12 +238,12 @@ endif EUC && NROFF
 #define	sbits(n)	(unsigned)(((n) >> 40) & 037777777)
 #define	fbits(n)	(((n) >> 32) & 0377)
 #define	sfbits(n)	(unsigned)(037777777777UL & (((n) & SFMASK) >> 32))
-#define	cbits(n)	(unsigned)(0377777 & (n))	/* isolate bottom 17 bits  */
+#define	cbits(n)	(unsigned)(0x003FFFFFLL & (n))	/* isolate bottom 22 bits  */
 
 #define	setsbits(n,s)	n = (n & ~SMASK) | (tchar)(s) << 40
 #define	setfbits(n,f)	n = (n & ~FMASK) | (tchar)(f) << 32
 #define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 32
-#define	setcbits(n,c)	n = (n & ~0177777LL | (c))	/* set character bits */
+#define	setcbits(n,c)	n = (n & ~0x001FFFFFLL | (c))	/* set character bits */
 
 #define	BYTEMASK	0377
 #define	BYTE	8
