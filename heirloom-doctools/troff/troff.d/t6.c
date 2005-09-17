@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.83 (gritter) 9/13/05
+ * Sccsid @(#)t6.c	1.84 (gritter) 9/17/05
  */
 
 /*
@@ -950,7 +950,8 @@ caseflig(void)
 	int	i, j;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0 || skip())
 		return;
 	fontbase[j]->ligfont = atoi() & 037;
@@ -1077,7 +1078,11 @@ casecs(void)
 
 	noscale++;
 	skip();
-	if (!(i = getrq()) || (i = findft(i)) < 0)
+	if (!(i = getrq()))
+		goto rtn;
+	if (i >= 256)
+		i = maybemore(i, 0);
+	if ((i = findft(i)) < 0)
 		goto rtn;
 	skip();
 	cstab[i] = atoi();
@@ -1100,7 +1105,9 @@ casebd(void)
 	zapwcache(0);
 	k = 0;
 bd0:
-	if (skip() || !(i = getrq()) || (j = findft(i)) == -1) {
+	if (skip() || !(i = getrq()) ||
+			(i = i >= 256 ? maybemore(i, 0) : i,
+			(j = findft(i)) == -1)) {
 		if (k)
 			goto bd1;
 		else 
@@ -1368,7 +1375,8 @@ casetrack(void)
 	int	i, j, s1, n1, s2, n2;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0)
 		return;
 	s1 = tracknum();
@@ -1397,12 +1405,14 @@ casefallback(void)
 	int	i, j, n = 0;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0)
 		return;
 	do {
 		skip();
-		i = getrq();
+		if ((i = getrq()) >= 256)
+			i = maybemore(i, 0);
 		fb = realloc(fb, (n+2) * sizeof *fb);
 		fb[n++] = i;
 	} while (i);
@@ -1416,7 +1426,8 @@ casehidechar(void)
 	tchar	k;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0)
 		return;
 	while ((i = cbits(k = getch())) != '\n') {
@@ -1440,7 +1451,8 @@ casefzoom(void)
 	float	f;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0)
 		return;
 	skip();
@@ -1563,7 +1575,8 @@ hang(int **tp)
 	tchar	k;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0)
 		return;
 	font = font1 = j;
@@ -1604,7 +1617,8 @@ casekernpair(void)
 	tchar	c, d;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((f = findft(i)) < 0)
 		return;
 	font = font1 = f;
@@ -1614,7 +1628,8 @@ casekernpair(void)
 	c = getch();
 	if (fbits(c) != f || skip())
 		goto done;
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((g = findft(i)) < 0)
 		goto done;
 	font = font1 = g;
@@ -1653,7 +1668,8 @@ kernsingle(int **tp)
 	tchar	c;
 
 	skip();
-	i = getrq();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
 	if ((f = findft(i)) < 0)
 		return;
 	font = font1 = f;

@@ -14,6 +14,9 @@ Relase ...
   localized input characters are now printed properly in all positions.
   Previously, localized characters were only printed properly on the
   position that was used first in the document.
+* troff: Several requests for handling fonts did not recognize font names
+  with more than two characters correctly with the "-x" option; they have
+  been fixed.
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript
