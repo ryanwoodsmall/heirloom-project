@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.26 (gritter) 9/18/05
+ * Sccsid @(#)afm.c	1.27 (gritter) 9/18/05
  */
 
 #include <stdlib.h>
@@ -199,9 +199,7 @@ const struct names S1names[] = {
 	{ "34",	"threequarters" },
 	{ "12",	"onehalf" },
 	{ "\\-","endash" },
-	{ "\\'","acute" },
 	{ "aa","acute" },
-	{ "\\`","grave" },
 	{ "ga","grave" },
 	{ "ru",	"underscore" },
 	{ 0,	0 }
