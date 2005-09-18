@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.27 (gritter) 9/18/05
+ * Sccsid @(#)afm.c	1.28 (gritter) 9/18/05
  */
 
 #include <stdlib.h>
@@ -434,6 +434,15 @@ static const struct asciimap {
 };
 
 /*
+ * ASCII characters that are always taken from the S font.
+ */
+static const struct asciimap	Sascii[] = {
+	{ 0x002D,	"minus" },
+	{ 0x007E,	"similar" },
+	{ 0,		0 }
+};
+
+/*
  * ASCII characters that are always taken from the S1 font.
  */
 static const struct asciimap	S1ascii[] = {
@@ -574,7 +583,7 @@ remap(struct afmtab *a)
 }
 
 static int
-asciiequiv(int code, const char *psc, int isS1)
+asciiequiv(int code, const char *psc, int isS, int isS1)
 {
 	int	i;
 
@@ -583,6 +592,11 @@ asciiequiv(int code, const char *psc, int isS1)
 			if (asciimap[i].code == code &&
 					strcmp(asciimap[i].psc, psc) == 0)
 				return code;
+		if (isS) {
+			for (i = 0; Sascii[i].psc; i++)
+				if (strcmp(Sascii[i].psc, psc) == 0)
+					return Sascii[i].code;
+		}
 		if (isS1) {
 			for (i = 0; S1ascii[i].psc; i++)
 				if (strcmp(S1ascii[i].psc, psc) == 0)
@@ -628,7 +642,7 @@ unitconv(int i)
 
 static void
 addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
-		int isS1)
+		int isS, int isS1)
 {
 	struct namecache	*np = NULL;
 
@@ -645,7 +659,7 @@ addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 	 * Only map a character directly if it maps to an ASCII
 	 * equivalent or to a troff special character.
 	 */
-	C = asciiequiv(C, N, isS1);
+	C = asciiequiv(C, N, isS, isS1);
 	if (cl)
 		a->codetab[a->nchars] = cl;
 	else if (tp)
@@ -687,7 +701,8 @@ addcharlib(struct afmtab *a, int symbol)
 				B[3] = charlib[i].kern & 2 ?
 					a->capheight + 1 : 0;
 				addchar(a, -1, j+128, charlib[i].code,
-						charlib[i].width, B, NULL, 0);
+						charlib[i].width, B, NULL,
+						0, 0);
 			}
 		}
 }
@@ -758,7 +773,7 @@ addmetrics(struct afmtab *a, char *_line, int isSymbol)
 		return;
 	tp = mapname(N, isSymbol,
 			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
-	addchar(a, C, tp, 0, WX, B, N,
+	addchar(a, C, tp, 0, WX, B, N, isSymbol,
 			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
 }
 
