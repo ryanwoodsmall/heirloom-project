@@ -1,4 +1,4 @@
-Relase ...
+Release ...
 * troff: The handling of locale-dependent characters in copy mode has been
   fixed. Previously when such a character was given e.g. in an argument to
   a macro, it was chosen from the font in effect at the time when the macro
@@ -18,10 +18,12 @@ Relase ...
   with more than two characters correctly with the "-x" option; they have
   been fixed.
 * troff: The characters "\(aa", "\(ga", """, "\-", "<", ">", "@", "\", "^",
-  "|", and "~" are now always chosen from the Times Roman special font with
+  and "~" are now always chosen from the Times Roman special font with
   AFM-based devices too, as it has been the case with other devices. To get
   the character from another PostScript font, use the PostScript character
-  name, e.g. "\[less]".
+  name, e.g. "\[less]". In contrast, "\(12", "\(14", and "\(34" are now
+  chosen from the current font, as it has been the case with historic C/A/T
+  output, but not with -Tpost.
 * [nt]roff: The "-mm" macros no longer print "Sun Microsystems" in calls to
   ".AU" macros and the like.
 * troff: The "\S" escape sequence has been fixed; its use could lead to core

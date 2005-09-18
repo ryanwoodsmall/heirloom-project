@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.28 (gritter) 9/18/05
+ * Sccsid @(#)afm.c	1.29 (gritter) 9/18/05
  */
 
 #include <stdlib.h>
@@ -65,6 +65,9 @@ const struct names {
 	{ "sc",	"section" },
 	{ "``",	"quotedblleft" },
 	{ "''",	"quotedblright" },
+	{ "12",	"onehalf" },
+	{ "14",	"onequarter" },
+	{ "34",	"threequarters" },
 	{ 0,	0 }
 };
 
@@ -195,9 +198,6 @@ const struct names Snames[] = {
  */
 const struct names S1names[] = {
 	{ "or",	"bar" },
-	{ "14",	"onequarter" },
-	{ "34",	"threequarters" },
-	{ "12",	"onehalf" },
 	{ "\\-","endash" },
 	{ "aa","acute" },
 	{ "ga","grave" },
@@ -429,6 +429,7 @@ static const struct asciimap {
 	{ 0x007A,	"zalt" },		/* FournierMT-ItalicAlt */
 	{ 0x007A,	"zswash" },		/* AGaramondAlt-Regular */
 	{ 0x007B,	"braceleft" },
+ 	{ 0x007C,	"bar" },
 	{ 0x007D,	"braceright" },
 	{ 0,		0 }
 };
@@ -453,7 +454,6 @@ static const struct asciimap	S1ascii[] = {
  	{ 0x0040,	"at" },
  	{ 0x005C,	"backslash" },
  	{ 0x005E,	"circumflex" },
- 	{ 0x007C,	"bar" },
  	{ 0x007E,	"tilde" },
 	{ 0,		NULL }
 };
