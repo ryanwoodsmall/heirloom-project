@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.26 (gritter) 9/15/05
+.\" Sccsid @(#)troffdemo.tr	1.27 (gritter) 9/18/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -125,7 +125,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/15/05
+9/18/05
 .sp 2v
 .ad b
 .ps 12
@@ -171,5 +171,5 @@ of commas, hyphens, &c. to the page margins.
 .in 0
 Heirloom \fItroff\fP\^ is free software;
 its \fIC\fP\^ source code can be obtained at no charge from
-<http\&://heirloom.sourceforge.net/doctools.html>.
+\[less]http\&://heirloom.sourceforge.net/doctools.html\[greater].
 It runs on a wide variety of Unix systems.

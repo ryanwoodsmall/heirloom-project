@@ -17,6 +17,11 @@ Relase ...
 * troff: Several requests for handling fonts did not recognize font names
   with more than two characters correctly with the "-x" option; they have
   been fixed.
+* troff: The characters "\(aa", "\(ga", """, "\-", "<", ">", "@", "\", "^",
+  "|", and "~" are now always chosen from the Times Roman special font with
+  AFM-based devices too, as it has been the case with other devices. To get
+  the character from another PostScript font, use the PostScript character
+  name, e.g. "\[less]".
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript

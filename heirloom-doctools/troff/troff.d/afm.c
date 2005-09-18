@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.25 (gritter) 9/16/05
+ * Sccsid @(#)afm.c	1.26 (gritter) 9/18/05
  */
 
 #include <stdlib.h>
@@ -63,8 +63,6 @@ const struct names {
 	{ "em",	"emdash" },
 	{ "en",	"endash" },
 	{ "sc",	"section" },
-	{ "aa","acute" },
-	{ "ga","grave" },
 	{ "``",	"quotedblleft" },
 	{ "''",	"quotedblright" },
 	{ 0,	0 }
@@ -202,7 +200,9 @@ const struct names S1names[] = {
 	{ "12",	"onehalf" },
 	{ "\\-","endash" },
 	{ "\\'","acute" },
+	{ "aa","acute" },
 	{ "\\`","grave" },
+	{ "ga","grave" },
 	{ "ru",	"underscore" },
 	{ 0,	0 }
 };
@@ -249,8 +249,6 @@ static const struct asciimap {
 } asciimap[] = {
 	{ 0x0020,	"space" },
 	{ 0x0021,	"exclam" },
-	{ 0x0022,	"quotedbl" },
-	{ 0x0023,	"numbersign" },
 	{ 0x0024,	"dollar" },
 	{ 0x0024,	"dollaralt" },		/* FournierMT-RegularAlt */
 	{ 0x0025,	"percent" },
@@ -263,7 +261,6 @@ static const struct asciimap {
 	{ 0x002B,	"plus" },
 	{ 0x002C,	"comma" },
 	{ 0x002D,	"hyphen" },
-	{ 0x002D,	"minus" },		/* Symbol */
 	{ 0x002E,	"period" },
 	{ 0x002F,	"slash" },
 	{ 0x0030,	"zero" },
@@ -299,11 +296,8 @@ static const struct asciimap {
 	{ 0x0039,	"ninealt" },		/* BulmerMT-RegularAlt */
 	{ 0x003A,	"colon" },
 	{ 0x003B,	"semicolon" },
-	{ 0x003C,	"less" },
 	{ 0x003D,	"equal" },
-	{ 0x003E,	"greater" },
 	{ 0x003F,	"question" },
-	{ 0x0040,	"at" },
 	{ 0x0041,	"A" },
 	{ 0x0041,	"Aswash" },		/* AGaramondAlt-Italic */
 	{ 0x0042,	"B" },
@@ -369,14 +363,10 @@ static const struct asciimap {
 	{ 0x005A,	"Z" },
 	{ 0x005A,	"Zswash" },		/* AGaramondAlt-Italic */
 	{ 0x005B,	"bracketleft" },
-	{ 0x005C,	"backslash" },
 	{ 0x005D,	"bracketright" },
-	{ 0x005E,	"asciicircum" },
-/*	{ 0x005E,	"circumflex" },	*/
 	{ 0x005F,	"underscore" },
 	{ 0x0060,	"quoteleft" },
 	{ 0x0060,	"quotealtleft" },	/* BulmerMT-RegularAlt */
-/*	{ 0x0060,	"grave" },	*/
 	{ 0x0061,	"a" },
 	{ 0x0061,	"Asmall" },
 	{ 0x0061,	"aswash" },		/* AGaramondAlt-Regular */
@@ -441,11 +431,24 @@ static const struct asciimap {
 	{ 0x007A,	"zalt" },		/* FournierMT-ItalicAlt */
 	{ 0x007A,	"zswash" },		/* AGaramondAlt-Regular */
 	{ 0x007B,	"braceleft" },
-	{ 0x007C,	"bar" },
 	{ 0x007D,	"braceright" },
-	{ 0x007E,	"asciitilde" },
-	{ 0x007E,	"similar" },		/* Symbol */
 	{ 0,		0 }
+};
+
+/*
+ * ASCII characters that are always taken from the S1 font.
+ */
+static const struct asciimap	S1ascii[] = {
+ 	{ 0x0022,	"quotedbl" },
+ 	{ 0x0023,	"numbersign" },
+ 	{ 0x003C,	"less" },
+ 	{ 0x003E,	"greater" },
+ 	{ 0x0040,	"at" },
+ 	{ 0x005C,	"backslash" },
+ 	{ 0x005E,	"circumflex" },
+ 	{ 0x007C,	"bar" },
+ 	{ 0x007E,	"tilde" },
+	{ 0,		NULL }
 };
 
 static int
@@ -573,15 +576,21 @@ remap(struct afmtab *a)
 }
 
 static int
-asciiequiv(int code, const char *psc)
+asciiequiv(int code, const char *psc, int isS1)
 {
 	int	i;
 
-	if (psc != NULL)
+	if (psc != NULL) {
 		for (i = 0; asciimap[i].psc; i++)
 			if (asciimap[i].code == code &&
 					strcmp(asciimap[i].psc, psc) == 0)
-				return 1;
+				return code;
+		if (isS1) {
+			for (i = 0; S1ascii[i].psc; i++)
+				if (strcmp(S1ascii[i].psc, psc) == 0)
+					return S1ascii[i].code;
+		}
+	}
 	return 0;
 }
 
@@ -620,10 +629,10 @@ unitconv(int i)
 }
 
 static void
-addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N)
+addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
+		int isS1)
 {
 	struct namecache	*np = NULL;
-	int	ae;
 
 	if (N != NULL) {
 		np = afmnamelook(a, N);
@@ -638,16 +647,16 @@ addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N)
 	 * Only map a character directly if it maps to an ASCII
 	 * equivalent or to a troff special character.
 	 */
-	ae = asciiequiv(C, N);
+	C = asciiequiv(C, N, isS1);
 	if (cl)
 		a->codetab[a->nchars] = cl;
 	else if (tp)
 		a->codetab[a->nchars] = tp;
-	else if (C > 32 && C < 127 && ae)
+	else if (C > 32 && C < 127)
 		a->codetab[a->nchars] = C;
 	else
 		a->codetab[a->nchars] = -1;
-	if (C > 32 && C < 127 && ae) {
+	if (C > 32 && C < 127) {
 		a->fitab[C - 32] = a->nchars;
 		if (np)
 			np->fival[0] = C - 32;
@@ -680,7 +689,7 @@ addcharlib(struct afmtab *a, int symbol)
 				B[3] = charlib[i].kern & 2 ?
 					a->capheight + 1 : 0;
 				addchar(a, -1, j+128, charlib[i].code,
-						charlib[i].width, B, NULL);
+						charlib[i].width, B, NULL, 0);
 			}
 		}
 }
@@ -751,7 +760,8 @@ addmetrics(struct afmtab *a, char *_line, int isSymbol)
 		return;
 	tp = mapname(N, isSymbol,
 			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
-	addchar(a, C, tp, 0, WX, B, N);
+	addchar(a, C, tp, 0, WX, B, N,
+			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
 }
 
 int
