@@ -26,6 +26,8 @@ Relase ...
   ".AU" macros and the like.
 * troff: The "\S" escape sequence has been fixed; its use could lead to core
   dumps with the previous release.
+* eqn: All Greek upper-case letters, i.e. "ALPHA", "BETA", etc. are now
+  recognized.
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript

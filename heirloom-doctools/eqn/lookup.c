@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lookup.c	1.4 (gritter) 8/13/05
+ * Sccsid @(#)lookup.c	1.5 (gritter) 9/18/05
  */
 
 # include "e.h"
@@ -142,19 +142,23 @@ struct {
 #endif
 
 	"alpha",	"\\(*a",
+	"ALPHA",	"\\(*A",
 	"beta",	"\\(*b",
+	"BETA",	"\\(*B",
 	"gamma",	"\\(*g",
 	"GAMMA",	"\\(*G",
 	"delta",	"\\(*d",
 	"DELTA",	"\\(*D",
 	"epsilon",	"\\(*e",
-	"EPSILON",	"\\f1E\\fP",
+	"EPSILON",	"\\(*E",
 	"omega",	"\\(*w",
 	"OMEGA",	"\\(*W",
 	"lambda",	"\\(*l",
 	"LAMBDA",	"\\(*L",
 	"mu",	"\\(*m",
+	"MU",	"\\(*M",
 	"nu",	"\\(*n",
+	"NU",	"\\(*N",
 	"theta",	"\\(*h",
 	"THETA",	"\\(*H",
 	"phi",	"\\(*f",
@@ -166,17 +170,25 @@ struct {
 	"xi",	"\\(*c",
 	"XI",	"\\(*C",
 	"zeta",	"\\(*z",
+	"ZETA",	"\\(*Z",
 	"iota",	"\\(*i",
+	"IOTA",	"\\(*I",
 	"eta",	"\\(*y",
+	"ETA",	"\\(*Y",
 	"kappa",	"\\(*k",
+	"KAPPA",	"\\(*K",
 	"rho",	"\\(*r",
+	"RHO",	"\\(*R",
 	"tau",	"\\(*t",
+	"TAU",	"\\(*T",
 	"omicron",	"\\(*o",
+	"OMICRON",	"\\(*O",
 	"upsilon",	"\\(*u",
 	"UPSILON",	"\\(*U",
 	"psi",	"\\(*q",
 	"PSI",	"\\(*Q",
 	"chi",	"\\(*x",
+	"CHI",	"\\(*X",
 	"and",	"\\f1and\\fP",
 	"for",	"\\f1for\\fP",
 	"if",	"\\f1if\\fP",
