@@ -28,7 +28,7 @@
 .\"	TROFF Version	from OpenSolaris mmt.src	16.29
 .\"
 .\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-.\" Sccsid @(#)mmt	1.2 (gritter) 8/16/05
+.\" Sccsid @(#)mmt	1.3 (gritter) 9/18/05
 .nr :a 0 1
 .nr :b 0
 .nr :c 0
@@ -44,7 +44,7 @@
 .nr !2 0
 .nr !3 0
 .nr !N 0  
-.ds }2 Sun Microsystems Inc.
+.ds }2 Company Name
 .ds BU \s-2\(bu\s0
 .ds EM \(em
 .ds F \v'-.4m'\s-3\\n+(:p\s0\v'.4m'
@@ -1197,8 +1197,8 @@ PRIVATE\h'-\w'PRIVATE'u'\l'\w'PRIVATE'u'
 .ce
 PRIVATE\h'-\w'PRIVATE'u'\l'\w'PRIVATE'u'
 .sp \}
-.sp |1.1i-1v
-\t\fH\(su\fP \fB\s24s\s0\fP\h'((\w'\fH\s6microsystems\s0\fP'-\w'\fB\s24sun\s0\fP')/2)'\fB\s24u\s0\fP\h'((\w'\fH\s6microsystems\s0\fP'-\w'\fB\s24sun\s0\fP')/2)'\fB\s24n\s0\fP\h'-\w'\fH\s6microsystems\s0\fP'u'\v'.7m'\s6\fHmicrosystems\fP\s0\v'-.7m'
+.\".sp |1.1i-1v
+.\"\t\fH\(su\fP \fB\s24s\s0\fP\h'((\w'\fH\s6microsystems\s0\fP'-\w'\fB\s24sun\s0\fP')/2)'\fB\s24u\s0\fP\h'((\w'\fH\s6microsystems\s0\fP'-\w'\fB\s24sun\s0\fP')/2)'\fB\s24n\s0\fP\h'-\w'\fH\s6microsystems\s0\fP'u'\v'.7m'\s6\fHmicrosystems\fP\s0\v'-.7m'
 .vs 12p
 .sp |1.9i
 .mk :2
@@ -1397,7 +1397,7 @@ PRIVATE\h'-\w'PRIVATE'u'\l'\w'PRIVATE'u'
 \!.ll +.45i
 \!.lt +.45i
 \!.sp 3
-\!.tl '\s24\(bs\s0\s14\f3  Sun Microsystems Inc.\s0\fP''\s16Cover Sheet for Technical Memorandum\s0'
+\!.tl '\s24\(bs\s0\s14\f3  Company Name\s0\fP''\s16Cover Sheet for Technical Memorandum\s0'
 \!.if !\n(.A \l\\\\n(.lu
 \!.if \n(.A __________
 \!.br
@@ -1407,7 +1407,7 @@ PRIVATE\h'-\w'PRIVATE'u'\l'\w'PRIVATE'u'
 \!.ps 9
 \!.ft 2
 \!The information contained herein is for the use of
-\!employees of Sun Microsystems Inc.
+\!employees of Company Name
 \!and is not for publication\\\\p
 \!.ps
 \!.ft
@@ -2022,19 +2022,19 @@ PRIVATE\h'-\w'PRIVATE'u'\l'\w'PRIVATE'u'
 .(E 3 4v \}
 .el .ie \\$1SC \{\
 .(B
-\!.	tl \fISUN CONFIDENTIAL\fR
+\!.	tl \fICOMPANY NAME CONFIDENTIAL\fR
 \!.	tl The information contained herein should not be disclosed
 \!.	tl to unauthorized persons.  It is meant solely for use by
-\!.	tl authorized SUN MICROSYSTEMS INC. employees.
+\!.	tl authorized COMPANY NAME employees.
 .(E 3 4v \}
 .el .ie \\$1SP \{\
 .(B
-\!.	tl \fISUN PROPRIETARY\fR
+\!.	tl \fICOMPANY NAME PROPRIETARY\fR
 \!.	tl This document contains unpublished, proprietary information
-\!.	tl and describes subject matter proprietary to SUN MICROSYSTEMS
-\!.	tl INC.  This document may not be disclosed to third parties
+\!.	tl and describes subject matter proprietary to COMPANY NAME.
+\!.	tl This document may not be disclosed to third parties
 \!.	tl or copied or duplicated in any form without the prior
-\!.	tl written consent of SUN MICROSYSTEMS INC.
+\!.	tl written consent of COMPANY NAME.
 .(E 3 4v \}
 .el \{\
 .(B

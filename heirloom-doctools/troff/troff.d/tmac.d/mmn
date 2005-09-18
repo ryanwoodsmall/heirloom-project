@@ -28,7 +28,7 @@
 .\"	C NROFF Version	from OpenSolaris mmn.src	11.31
 .\"
 .\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-.\" Sccsid @(#)mmn	1.2 (gritter) 8/16/05
+.\" Sccsid @(#)mmn	1.3 (gritter) 9/18/05
 .nr :a 0 1
 .nr :b 0
 .nr :c 0
@@ -45,7 +45,7 @@
 .nr !2 0
 .nr !3 0
 .nr !N 0  
-.ds }2 Sun Microsystems Inc.
+.ds }2 Company Name
 .ds BU \(bu
 .ds EM "\ --\ 
 .ds F \u\\n+(:p\d
@@ -1431,12 +1431,12 @@ PRIVATE
 \!.ll +.45i
 \!.lt +.45i
 \!.sp 2
-\!.tl 'Sun Microsystems Inc.''Cover Sheet for Technical Memorandum'
+\!.tl 'Company Name''Cover Sheet for Technical Memorandum'
 \!\l\\\\n(.lu
 \!.br
 \!.fi
 \!The information contained herein is for the use of
-\!employees of Sun Microsystems Inc.
+\!employees of Company Name
 \!and is not for publication\\\\p
 \!.nf
 \!.sp -.5v
@@ -2047,19 +2047,19 @@ PRIVATE
 .(E 3 4v \}
 .el .ie \\$1SC \{\
 .(B
-\!.	tl \fISUN CONFIDENTIAL\fR
+\!.	tl \fICOMPANY NAME CONFIDENTIAL\fR
 \!.	tl The information contained herein should not be disclosed
 \!.	tl to unauthorized persons.  It is meant solely for use by
-\!.	tl authorized SUN MICROSYSTEMS INC. employees.
+\!.	tl authorized COMPANY NAME employees.
 .(E 3 4v \}
 .el .ie \\$1SP \{\
 .(B
-\!.	tl \fISUN PROPRIETARY\fR
+\!.	tl \fICOMPANY NAME PROPRIETARY\fR
 \!.	tl This document contains unpublished, proprietary information
-\!.	tl and describes subject matter proprietary to SUN MICROSYSTEMS
-\!.	tl INC.  This document may not be disclosed to third parties
+\!.	tl and describes subject matter proprietary to COMPANY NAME.
+\!.	tl This document may not be disclosed to third parties
 \!.	tl or copied or duplicated in any form without the prior
-\!.	tl written consent of SUN MICROSYSTEMS INC.
+\!.	tl written consent of COMPANY NAME.
 .(E 3 4v \}
 .el \{\
 .(B

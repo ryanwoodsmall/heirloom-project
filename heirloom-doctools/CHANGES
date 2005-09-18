@@ -22,6 +22,8 @@ Relase ...
   AFM-based devices too, as it has been the case with other devices. To get
   the character from another PostScript font, use the PostScript character
   name, e.g. "\[less]".
+* [nt]roff: The "-mm" macros no longer print "Sun Microsystems" in calls to
+  ".AU" macros and the like.
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript
