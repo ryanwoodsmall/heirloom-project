@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.85 (gritter) 9/18/05
+ * Sccsid @(#)t6.c	1.86 (gritter) 9/18/05
  */
 
 /*
@@ -349,7 +349,7 @@ findchar(tchar c)
 	f = fbits(c);
 	c = cbits(c);
 	i = c - 32;
-	if (c != ' ' && i < nchtab + 128 - 32 && fitab[f][i] == 0) {
+	if (c != ' ' && i > 0 && i < nchtab + 128 - 32 && fitab[f][i] == 0) {
 		int	ii, jj;
 		if (fallbacktab[f]) {
 			for (jj = 0; fallbacktab[f][jj] != 0; jj++) {
@@ -404,14 +404,16 @@ getkw(tchar c, tchar d)
 		return 0;
 	if (sbits(c) != sbits(d))
 		return 0;
-	if ((f = fbits(c)) == 0)
-		f = xfont;
-	if (cstab[f])
-		return 0;
-	if ((s = sbits(c)) == 0)
+	f = fbits(c);
+	if ((s = sbits(c)) == 0) {
 		s = xpts;
+		if (f == 0)
+			f = xfont;
+	}
 	i = cbits(c);
 	j = cbits(d);
+	if (i == SLANT || j == SLANT || cstab[f])
+		return 0;
 	k = 0;
 	if (i >= 32 && j >= 32) {
 		if (ktable != NULL && (kp = klook(c, d)) != NULL)
