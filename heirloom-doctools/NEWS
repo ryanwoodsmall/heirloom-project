@@ -245,6 +245,10 @@ description for ".xflag" below.
 	in "size". This is particularly useful for specifying large sizes
 	with more than two numerals, or for fractional sizes.
 
+\U'n'
+	selects the character with Unicode position "U+n", where "n" is
+	a hexadecimal number.
+
 \~
 	is similar to "\ ", but inserts space that stretches when the
 	line is adjusted like a regular " ".
@@ -343,4 +347,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   9/13/05
+Gunnar Ritter                                                   9/18/05

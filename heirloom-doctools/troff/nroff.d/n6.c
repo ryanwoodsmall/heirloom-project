@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.20 (gritter) 9/11/05
+ * Sccsid @(#)n6.c	1.21 (gritter) 9/18/05
  */
 
 /*
@@ -46,11 +46,16 @@
  * contributors.
  */
 
+#ifdef	EUC
+#include <limits.h>
+#include <stdlib.h>
+#include <wchar.h>
+#endif
+#include <ctype.h>
 #include "tdef.h"
 #include "tw.h"
 #include "proto.h"
 #include "ext.h"
-#include <ctype.h>
 
 /*
  * n6.c -- width functions, sizes and fonts
@@ -507,6 +512,31 @@ xlss(void)
 	else
 		pbbuf[pbp++] = MOT | VMOT | NMOT | sabsmot(-i);
 	return(HX);
+}
+
+tchar
+setuc0(int n)
+{
+	if (n & ~0177) {
+#ifdef	EUC
+		char	mb[MB_LEN_MAX+1];
+		tchar	tc[MB_LEN_MAX+1];
+		int	i, j, w;
+
+		if ((i = wctomb(mb, n)) > 0) {
+			if ((w = wcwidth(n)) < 0)
+				w = 0;
+			for (j = 0; j < i-1; j++)
+				tc[j] = mb[j]&0377 | MIDDLEOFMB;
+			tc[j] = mb[j]&0377 | LASTOFMB;
+			setcsbits(tc[j], w);
+			tc[++j] = 0;
+			pushback(tc);
+		}
+#endif
+		return 0;
+	} else
+		return n | chbits;
 }
 
 void

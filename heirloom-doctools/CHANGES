@@ -30,6 +30,8 @@ Release ...
   dumps with the previous release.
 * eqn: All Greek upper-case letters, i.e. "ALPHA", "BETA", etc. are now
   recognized.
+* [nt]roff: The escape sequence \U'n' sets the character at Unicode position
+  "U+n", where "n" is a hexadecimal number.
 
 Release 050915
 * troff: Can now directly handle .afm/.pfb/.pfa files (i.e. PostScript

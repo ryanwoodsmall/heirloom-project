@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.86 (gritter) 9/18/05
+ * Sccsid @(#)t6.c	1.88 (gritter) 9/18/05
  */
 
 /*
@@ -1069,7 +1069,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	if (realpage && ap == NULL)
 		ptfpcmd(pos, shortname);
 	if (pos == 0)
-		ch = (tchar) FONTPOS | (tchar) f << 16;
+		ch = (tchar) FONTPOS | (tchar) f << 22;
 	return(pos);
 }
 
@@ -1777,6 +1777,19 @@ tr2un(tchar i, int f)
 					return unimap[c].code;
 	}
 	return -1;
+}
+
+tchar
+setuc0(int n)
+{
+	int	f;
+	tchar	c;
+
+	if ((c = un2tr(n, &f)) != 0 && !ismot(c)) {
+		c |= chbits & ~FMASK;
+		setfbits(c, f);
+	}
+	return c;
 }
 
 int

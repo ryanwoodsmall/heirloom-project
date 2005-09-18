@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.47 (gritter) 9/13/05
+ * Sccsid @(#)t10.c	1.48 (gritter) 9/18/05
  */
 
 /*
@@ -407,7 +407,7 @@ ptout0(tchar *pi, tchar *pend)
 	}
 	if (k == FONTPOS) {
 		char temp[3];
-		n = i >> 16;
+		n = i >> 22;
 		temp[0] = n & BYTEMASK;
 		temp[1] = n >> BYTE;
 		temp[2] = 0;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.36 (gritter) 9/18/05
+ * Sccsid @(#)n7.c	1.37 (gritter) 9/18/05
  */
 
 /*
@@ -340,7 +340,7 @@ t5:
 			width(c);
 			nel += lasttrack;
 			nel += kernadjust(c, ' ' | c&SFMASK);
-			if (admod != 1 && rhangtab != NULL &&
+			if (admod != 1 && rhangtab != NULL && !ismot(c) &&
 					rhangtab[xfont] != NULL &&
 					(k = rhangtab[xfont][cbits(c)]) != 0) {
 				k = (k * u2pts(xpts) + (Unitwidth / 2))
@@ -394,7 +394,7 @@ nofill(void)
 	nexti = GETCH();
 #ifndef	NROFF
 	if (!ce && !pendnf && lhangtab != NULL && cbits(nexti) != SLANT &&
-			lhangtab[fbits(nexti)] != NULL &&
+			!ismot(nexti) && lhangtab[fbits(nexti)] != NULL &&
 			(k = lhangtab[fbits(nexti)][cbits(nexti)]) != 0) {
 		width(nexti);	/* set xpts */
 		k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
@@ -718,7 +718,7 @@ movword(void)
 			wne -= kernadjust(wp[-1], wp[0]);
 #ifndef	NROFF
 		if (admod != 1 && admod != 2 && lhangtab != NULL &&
-				cbits(*wp) != SLANT &&
+				cbits(*wp) != SLANT && !ismot(*wp) &&
 				lhangtab[fbits(*wp)] != NULL &&
 				(w = lhangtab[fbits(*wp)][cbits(*wp)]) != 0) {
 			width(*wp);	/* set xpts */
