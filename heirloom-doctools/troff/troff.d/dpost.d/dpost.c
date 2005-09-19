@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.81 (gritter) 9/16/05
+ * Sccsid @(#)dpost.c	1.82 (gritter) 9/19/05
  */
 
 /*
@@ -1441,9 +1441,13 @@ devcntrl(
 		/*
 		 * This used to be "strcpy(devname, realdev);" but
 		 * it does not work when DESC is a text file because
-		 * the fonts are in a different directory.
+		 * the fonts are in a different directory. As an
+		 * exception, -Taps output is processed old-style.
 		 */
-		realdev = devname;
+		if (strcmp(devname, "aps"))
+			realdev = devname;
+		else
+			strcpy(devname, realdev);
 		break;
 
 	case 't':			/* trailer */
