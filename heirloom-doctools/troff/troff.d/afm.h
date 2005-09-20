@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.10 (gritter) 9/11/05
+ * Sccsid @(#)afm.h	1.11 (gritter) 9/20/05
  */
 
 struct kernpair {
@@ -58,6 +58,7 @@ extern struct afmtab {
 	int	lineno;
 	int	nchars;
 	int	capheight;
+	int	xheight;
 } **afmtab;
 extern int nafm;
 

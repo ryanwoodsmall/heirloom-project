@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.29 (gritter) 9/18/05
+ * Sccsid @(#)afm.c	1.30 (gritter) 9/20/05
  */
 
 #include <stdlib.h>
@@ -651,9 +651,13 @@ addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		np->afpos = a->nchars;
 	}
 	a->fontab[a->nchars] = unitconv(WX);
+	/*
+	 * Crude heuristics mainly based on observations with the existing
+	 * fonts for -Tpost and on tests with eqn.
+	 */
 	if (B[1] <= -10)
 		a->kerntab[a->nchars] |= 1;
-	if (B[3] > a->capheight)
+	if (B[3] > (a->xheight + a->capheight) / 2)
 		a->kerntab[a->nchars] |= 2;
 	/*
 	 * Only map a character directly if it maps to an ASCII
@@ -800,6 +804,8 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	if ((cp = strrchr(a->base, '.')) != NULL)
 		*cp = '\0';
 	a->lineno = 1;
+	a->xheight = 500;
+	a->capheight = 700;
 	for (cp = contents; cp < &contents[size]; a->lineno++, cp++) {
 		while (*cp == ' ' || *cp == '\t' || *cp == '\r')
 			cp++;
@@ -820,6 +826,9 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->fontname[tp - th] = 0;
 			isSymbol = strcmp(a->fontname, "Symbol") == 0;
 		} else if (state == FONTMETRICS &&
+				(th = thisword(cp, "XHeight")) != NULL) {
+			a->xheight = strtol(th, NULL, 10);
+		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "CapHeight")) != NULL) {
 			a->capheight = strtol(th, NULL, 10);
 		} else if (state == FONTMETRICS &&
@@ -830,8 +839,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 					sizeof *a->fitab);
 			a->fontab = malloc((n+NCHARLIB+1)*sizeof *a->fontab);
 			a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
-			a->kerntab = malloc((n+NCHARLIB+1)*sizeof *a->kerntab);
-			a->kerntab[0] = 0;
+			a->kerntab = calloc(n+NCHARLIB+1, sizeof *a->kerntab);
 			a->codetab = malloc((n+NCHARLIB+1)*sizeof *a->codetab);
 			a->codetab[0] = 0;
 			for (i = 1; i < n+NCHARLIB+1; i++)

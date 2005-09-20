@@ -28,6 +28,9 @@ Release ...
   ".AU" macros and the like.
 * troff: The "\S" escape sequence has been fixed; its use could lead to core
   dumps with the previous release.
+* troff: The procedure to determine whether to set the "2" value of the
+  "\n(ct" register with AFM fonts should now work properly. This fixes the
+  position of accents above lower-case characters with eqn.
 * eqn: All Greek upper-case letters, i.e. "ALPHA", "BETA", etc. are now
   recognized.
 * [nt]roff: The escape sequence \U'n' sets the character at Unicode position
