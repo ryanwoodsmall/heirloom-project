@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.82 (gritter) 9/19/05
+ * Sccsid @(#)dpost.c	1.83 (gritter) 9/20/05
  */
 
 /*
@@ -339,7 +339,7 @@ int		eflag;
 
 char		seenfonts[MAXINTERNAL+1];
 int		docfonts = 0;
-struct afmtab	*afmfonts[MAXINTERNAL+1];
+struct afmtab	**afmfonts;
 int		afmcount = 0;
 
 
@@ -1703,6 +1703,7 @@ loadfont (
 		goto fail;
 	}
 	free(contents);
+	afmfonts = realloc(afmfonts, (afmcount+1) * sizeof *afmfonts);
 	afmfonts[afmcount] = a;
 	snprintf(a->Font.intname, sizeof a->Font.intname,
 			"%d", dev.nfonts + ++afmcount);

@@ -31,6 +31,8 @@ Release ...
 * troff: The procedure to determine whether to set the "2" value of the
   "\n(ct" register with AFM fonts should now work properly. This fixes the
   position of accents above lower-case characters with eqn.
+* dpost: The maximum number of fonts that can appear in a single PostScript
+  output file has been raised to 1536.
 * eqn: All Greek upper-case letters, i.e. "ALPHA", "BETA", etc. are now
   recognized.
 * [nt]roff: The escape sequence \U'n' sets the character at Unicode position

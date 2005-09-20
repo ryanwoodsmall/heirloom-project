@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.h	1.4 (gritter) 9/8/05
+ * Sccsid @(#)dpost.h	1.5 (gritter) 9/20/05
  */
 
 /*
@@ -78,7 +78,7 @@
  *
  */
 
-#define MAXINTERNAL	256
+#define MAXINTERNAL	1536
 
 /*
  *
