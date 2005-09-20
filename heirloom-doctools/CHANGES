@@ -1,4 +1,4 @@
-Release ...
+Release 050920
 * troff: The handling of locale-dependent characters in copy mode has been
   fixed. Previously when such a character was given e.g. in an argument to
   a macro, it was chosen from the font in effect at the time when the macro
