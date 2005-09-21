@@ -1,0 +1,71 @@
+.\"
+.\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, September 2005.
+.\"
+.\" Derived from Plan 9 v4 /opt/unix/plan9v4/sys/src/cmd/postscript/mcolor/mcolor.5
+.\"
+.\" Copyright (C) 2003, Lucent Technologies Inc. and others.
+.\" All Rights Reserved.
+.\"
+.\" Distributed under the terms of the Lucent Public License Version 1.02.
+.\"
+.\" Sccsid @(#)mcolor.7b	1.2 (gritter )9/21/05
+.TH MCOLOR 7B "9/21/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.ds dP /usr/ucblib/doctools/font/devpost/postscript
+.ds dT /usr/ucblib/doctools/tmac
+.SH NAME
+mcolor \- color and reverse video macro
+.SH SYNOPSIS
+.B troff \-mcolor
+[
+.I options
+]
+.I file ...
+.SH DESCRIPTION
+.I mcolor
+is a macro package for color selection and reverse video printing
+on PostScript printers.
+The package is compatible with most existing macro packages
+and includes the following macro:
+.TP 1.25i
+.BI .CL "\0color\0text"
+Prints
+.I text
+in
+.IR color .
+No arguments restores the default color (black).
+If
+.I text
+is omitted the selected
+.I color
+remains in effect until another
+.I color
+is selected.
+If two arguments are given the
+.I text
+is printed in
+.I color
+and then the default color is restored.
+.PP
+Both the text and background color can be selected.
+A
+.I color
+argument of
+.RI `` color1
+.B on
+.IR color2 ''
+prints text in
+.I color1
+on a background in
+.I color2 .
+.PP
+Named colors must be listed in the
+``colordict''
+dictionary in file
+.BR \*(dP/color.ps .
+.SH FILES
+.B \*(dT/color
+.br
+.B \*(dP/color.ps
+.SH SEE ALSO
+.BR troff (1B),
+.BR dpost (1)
