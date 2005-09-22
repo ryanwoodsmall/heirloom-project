@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.83 (gritter) 9/20/05
+ * Sccsid @(#)dpost.c	1.84 (gritter) 9/22/05
  */
 
 /*
@@ -2153,7 +2153,7 @@ supplypfb(char *font, char *path, FILE *fp)
 {
     char	buf[30];
     long	length;
-    int	i, c = EOF, n, type = 0;
+    int	i, c = EOF, n, type = 0, lastc = EOF;
 
     if (fread(buf, 1, 6, fp) != 6)
 	    error(FATAL, "no data in %s", path);
@@ -2190,11 +2190,13 @@ supplypfb(char *font, char *path, FILE *fp)
     				else
 	    				length--;
 				putc('\n', rf);
+				lastc = '\n';
 				break;
 		    	case 0:
 				continue;
 		    	default:
 				putc(c, rf);
+				lastc = c;
 		    	}
 	    	}
 	    	if (c == EOF)
@@ -2208,10 +2210,13 @@ supplypfb(char *font, char *path, FILE *fp)
 	    		for (i = 0; i < n; i++)
 		    		fprintf(rf, "%02x", buf[i]&0377);
 	    		putc('\n', rf);
+			lastc = '\n';
 			length -= n;
 	    	}
 	    	break;
     	case 3:
+		if (lastc != '\n')
+			putc('\n', rf);
     		fprintf(rf, "%%%%EndResource\n");
 		fclose(fp);
 		return;
