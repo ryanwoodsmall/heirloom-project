@@ -1,4 +1,6 @@
 Release ...
+* /usr/ucb/ps: The "-a" option has been fixed; it incorrectly printed a
+  list of all processes since release 050411.
 * getconf: /usr/ucb is now put at the end of the Heirloom directory list
   for the PATH variable.
 * The "-man" macro no longer produces cut marks when used with troff.

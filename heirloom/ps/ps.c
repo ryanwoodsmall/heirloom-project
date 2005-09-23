@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.107 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.108 (gritter) 9/24/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.107 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.108 (gritter) 9/24/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.107 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.108 (gritter) 9/24/05";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.107 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ps.sl	2.108 (gritter) 9/24/05";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.107 (gritter) 5/29/05";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.108 (gritter) 9/24/05";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
@@ -4331,17 +4331,25 @@ options(int ac, char **av)
 		agxsel = 0;
 		ucb_rflag = 0;
 	}
-	if (agxsel & (01|04))
+	switch (agxsel) {
+	case 01|04:
+	case 01|02|04:
 		add_criterion(CR_ALL, 0);
-	else if (agxsel == (02|04))
+		break;
+	case 02|04:
 		add_criterion(CR_WITHOUT_TTY, 0);
-	else {
-		if (agxsel & 01)
-			add_criterion(CR_ALL_WITH_TTY, 0);
-		if (agxsel & 02)
-			add_criterion(CR_ADD_UNINTERESTING, 0);
-		if (agxsel & 04)
-			add_criterion(CR_NO_TTY_NO_SESSION_LEADER, 0);
+		add_criterion(CR_ADD_UNINTERESTING, 0);
+		break;
+	case 01:
+	case 01|02:
+		add_criterion(CR_ALL_WITH_TTY, 0);
+		break;
+	case 02:
+		add_criterion(CR_ADD_UNINTERESTING, 0);
+		break;
+	case 04:
+		add_criterion(CR_NO_TTY_NO_SESSION_LEADER, 0);
+		break;
 	}
 	if (o0 == NULL) {
 		if (format == 'l') {
