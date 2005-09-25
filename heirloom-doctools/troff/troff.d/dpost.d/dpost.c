@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.86 (gritter) 9/25/05
+ * Sccsid @(#)dpost.c	1.87 (gritter) 9/25/05
  */
 
 /*
@@ -2609,27 +2609,33 @@ dup length dict begin\n\
   currentdict\n\
 end\n",
 		a->fontname, a->Font.intname, n);
-	if (strcmp(a->fontname, "Symbol") == 0) {
-		fprintf(gf, "/Symbol-tmp-@%s@%d exch definefont pop\n",
-			a->Font.intname, n);
-		fprintf(gf, "/Symbol-tmp-@%s@%d /Symbol-@%s-@%d Sdefs cf\n",
-			a->Font.intname, n, a->Font.intname, n);
-		fprintf(gf, "/Symbol-tmp-@%s@%d undefinefont\n",
-			a->Font.intname, n);
-	} else if (strcmp(a->fontname, "Times-Roman") == 0) {
-		fprintf(gf, "/Times-Roman-tmp-@%s@%d exch definefont pop\n",
-			a->Font.intname, n);
-		fprintf(gf, "/Times-Roman-tmp-@%s@%d /Times-Roman-@%s-@%d S1defs cf\n",
-			a->Font.intname, n, a->Font.intname, n);
-		fprintf(gf, "/Times-Roman-tmp-@%s@%d undefinefont\n",
-			a->Font.intname, n);
-	} else
+	if (strcmp(a->fontname, "Symbol") == 0 && n == 0) {
+		fprintf(gf, "/Symbol-tmp-@%s exch definefont pop\n",
+			a->Font.intname);
+		fprintf(gf, "/Symbol-tmp-@%s /Symbol-@%s Sdefs cf\n",
+			a->Font.intname, a->Font.intname);
+		fprintf(gf, "/Symbol-tmp-@%s undefinefont\n",
+			a->Font.intname);
+	} else if (strcmp(a->fontname, "Times-Roman") == 0 && n == 0) {
+		fprintf(gf, "/Times-Roman-tmp-@%s exch definefont pop\n",
+			a->Font.intname);
+		fprintf(gf, "/Times-Roman-tmp-@%s /Times-Roman-@%s S1defs cf\n",
+			a->Font.intname, a->Font.intname);
+		fprintf(gf, "/Times-Roman-tmp-@%s undefinefont\n",
+			a->Font.intname);
+	} else if (n)
 		fprintf(gf, "/%s-@%s@%d exch definefont pop\n",
 			a->fontname, a->Font.intname, n);
+	else
+		fprintf(gf, "/%s-@%s exch definefont pop\n",
+			a->fontname, a->Font.intname);
 	fprintf(gf, "/@%s", a->Font.intname);
-	if (n > 0)
+	if (n)
 		fprintf(gf, "@%d", n);
-	fprintf(gf, " /%s-@%s@%d def\n", a->fontname, a->Font.intname, n);
+	fprintf(gf, " /%s-@%s", a->fontname, a->Font.intname);
+	if (n)
+		fprintf(gf, "@%d", n);
+	fprintf(gf, " def\n");
 }
 
 static void
