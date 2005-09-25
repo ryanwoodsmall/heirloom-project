@@ -4,6 +4,9 @@ Release ...
 * dpost: If the data in a PFB file to be included does not end with a
   newline character, add one to the generated PostScript to achieve a
   consistent DSC structure (Bugreport by Sebastian Leusch).
+* dpost: The limit of characters with "x X" commands has been raised from
+  50 to 4096. This in particular allows to supply fonts with long path
+  names.
 * The "-mcolor" macros have been added from Plan 9 sources.
 
 Release 050920

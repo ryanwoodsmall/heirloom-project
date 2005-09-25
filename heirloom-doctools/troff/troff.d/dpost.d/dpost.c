@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.87 (gritter) 9/25/05
+ * Sccsid @(#)dpost.c	1.88 (gritter) 9/25/05
  */
 
 /*
@@ -1410,7 +1410,7 @@ devcntrl(
 {
 
 
-    char	str[50], buf[4096], str1[4096];
+    char	str[4096], buf[4096], str1[4096];
     int		c, n;
 
 
