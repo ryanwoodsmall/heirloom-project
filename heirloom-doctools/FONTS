@@ -342,14 +342,6 @@ by only 1/100 em.
 Limitations
 -----------
 
-dpost can currently only access the first 255 characteres defined
-in an AFM file. This is sufficient for traditional PostScript fonts
-which almost uniformly contain fewer characters, but limits the use
-of internationalized fonts. If only a few characters need to be
-accessed, it is possible reorder the character entry lines in the
-AFM file to work around. Otherwise it would be necessary to extend
-dpost. This is possible, but it is currently not a scheduled task.
-
 The PostScript/Unicode conversion tables currently only contain
 Western character names; other characters are simply ignored when
 they occur in input text. The "Adobe Glyph List" cannot be used for
@@ -361,4 +353,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 9/13/05
+Gunnar Ritter                                                 9/25/05
