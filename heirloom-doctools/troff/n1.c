@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.41 (gritter) 9/18/05
+ * Sccsid @(#)n1.c	1.42 (gritter) 9/27/05
  */
 
 /*
@@ -483,14 +483,10 @@ mesg(int f)
 }
 
 void
-errprint(const char *s, ...)	/* error message printer */
+verrprint(const char *s, va_list ap)
 {
-	va_list	ap;
-
 	fdprintf(stderr, "%s: ", progname);
-	va_start(ap, s);
 	vfdprintf(stderr, s, ap);
-	va_end(ap);
 	if (numtab[CD].val > 0)
 		fdprintf(stderr, "; line %d, file %s", numtab[CD].val,
 			 cfname[ifi]);
@@ -500,6 +496,16 @@ errprint(const char *s, ...)	/* error message printer */
 	if (debug)
 		abort();
 #endif	/* DEBUG */
+}
+
+void
+errprint(const char *s, ...)	/* error message printer */
+{
+	va_list	ap;
+
+	va_start(ap, s);
+	verrprint(s, ap);
+	va_end(ap);
 }
 
 

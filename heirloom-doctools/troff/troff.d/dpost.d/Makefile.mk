@@ -1,7 +1,7 @@
 VPATH=..
 OBJ = dpost.o dpost_draw.o color.o pictures.o ps_include.o dpost_afm.o \
 	dpost_makedev.o glob.o misc.o request.o dpost_version.o getopt.o \
-	asciitype.o
+	asciitype.o dpost_otf.o
 
 FLAGS = -I. -I.. -DFNTDIR='"$(FNTDIR)"' -DPSTDIR='"$(PSTDIR)"'
 
@@ -35,5 +35,6 @@ pictures.o: pictures.c comments.h gen.h path.h
 ps_include.o: ps_include.c ps_include.h gen.h
 request.o: request.c gen.h request.h path.h
 dpost_afm.o: ../dev.h afm.h ../afm.c
+dpost_otf.o: ../dev.h afm.h ../otf.c
 dpost_makedev.o: ../dev.h ../makedev.c
 asciitype.o: asciitype.h

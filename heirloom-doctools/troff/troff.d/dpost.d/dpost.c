@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.88 (gritter) 9/25/05
+ * Sccsid @(#)dpost.c	1.90 (gritter) 9/27/05
  */
 
 /*
@@ -341,6 +341,8 @@ char		seenfonts[MAXINTERNAL+1];
 int		docfonts = 0;
 struct afmtab	**afmfonts;
 int		afmcount = 0;
+
+int		got_otf;
 
 
 /*
@@ -820,6 +822,8 @@ header(FILE *fp)
     }	/* End if */
     fprintf(fp, "%s %d\n", PAGES, printed);
 
+    if (got_otf)
+        fprintf(fp, "%%%%DocumentNeededResources: ProcSet (FontSetInit)\n");
     fflush(sf);
     rewind(sf);
     while ((n = fread(buf, 1, sizeof buf, sf)) > 0)
@@ -2232,6 +2236,36 @@ supplypfb(char *font, char *path, FILE *fp)
 }
 
 static void
+supplyotf(char *font, char *path, FILE *fp)
+{
+	struct stat	st;
+	char	*contents;
+	size_t	size, offset, length;
+
+	if (fstat(fileno(fp), &st) < 0)
+		error(FATAL, "cannot stat %s", path);
+	size = st.st_size;
+	contents = malloc(size);
+	if (fread(contents, 1, size, fp) != size)
+		error(FATAL, "cannot read %s", path);
+	if (otfcff(path, contents, size, &offset, &length) != 0) {
+		free(contents);
+		return;
+	}
+	fprintf(rf, "%%%%IncludeResource: ProcSet (FontSetInit)\n");
+	fprintf(rf, "%%%%BeginResource: FontSet (%s)\n", font);
+	fprintf(rf, "/FontSetInit /ProcSet findresource begin\n");
+	fprintf(rf, "%%%%BeginData: %ld Binary Bytes\n",
+			(long)(length + 13 + strlen(font) + 12));
+	fprintf(rf, "/%s %12d StartData ", font, length);
+	fwrite(&contents[offset], 1, length, rf);
+	fprintf(rf, "\n%%%%EndData\n");
+	fprintf(rf, "%%%%EndResource\n");
+	free(contents);
+	got_otf = 1;
+}
+
+static void
 supply1(char *font, char *file, char *type)
 {
     FILE *fp;
@@ -2247,10 +2281,14 @@ supply1(char *font, char *file, char *type)
     if (type == NULL) {
 	c = getc(fp);
 	ungetc(c, fp);
-	type = c == '\200' ? "pfb" : "anything";
+	type = c == '\200' ? "pfb" : c == 'O' ? "otf" : "anything";
     }
     if (strcmp(type, "pfb") == 0) {
 	    supplypfb(font, file, fp);
+	    return;
+    }
+    if (strcmp(type, "otf") == 0) {
+	    supplyotf(font, file, fp);
 	    return;
     }
     if (fgets(line, sizeof line, fp) == NULL)

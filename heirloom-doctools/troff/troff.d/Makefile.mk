@@ -1,7 +1,7 @@
 LIBHNJ = ../libhnj
 VPATH=..
 OBJ = t10.o t6.o hytab.o n1.o n2.o n3.o n4.o n5.o \
-	n7.o n8.o n9.o ni.o nii.o suftab.o makedev.o afm.o unimap.o \
+	n7.o n8.o n9.o ni.o nii.o suftab.o makedev.o afm.o otf.o unimap.o \
 	malloc.o calloc.o version.o
 
 FLAGS = -DUSG -DINCORE -DKERN $(EUC) -I. -I.. -DMACDIR='"$(MACDIR)"' \
@@ -51,3 +51,4 @@ nii.o: ../nii.c ../tdef.h ./proto.h ../ext.h
 suftab.o: ../suftab.c
 version.o: ../version.c
 afm.o: dev.h afm.h
+otf.o: dev.h afm.h

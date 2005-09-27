@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.11 (gritter) 9/20/05
+ * Sccsid @(#)afm.h	1.12 (gritter) 9/27/05
  */
 
 struct kernpair {
@@ -67,8 +67,17 @@ extern	int		**fontab;
 extern	char		**kerntab;
 extern	short		**codetab;
 
+extern unsigned short	unitsPerEm;
+
 extern	int	afmget(struct afmtab *, char *, size_t);
+extern	int	otfget(struct afmtab *, char *, size_t);
+extern	int	otfcff(const char *, char *, size_t, size_t *, size_t *);
 extern	struct namecache	*afmnamelook(struct afmtab *, const char *);
 extern	int	afmgetkern(struct afmtab *, int, int);
 extern	void	makefont(int, char *, char *, char *, char *, int);
 extern	int	unitconv(int);
+extern	void	afmalloc(struct afmtab *, int);
+extern	void	afmremap(struct afmtab *);
+extern	int	afmmapname(const char *, int, int);
+extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
+			char *, int, int);

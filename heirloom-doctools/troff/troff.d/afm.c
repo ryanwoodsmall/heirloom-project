@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.30 (gritter) 9/20/05
+ * Sccsid @(#)afm.c	1.32 (gritter) 9/28/05
  */
 
 #include <stdlib.h>
@@ -36,7 +36,7 @@ extern	char		*chname;
 extern	short		*chtab;
 extern	int		nchtab;
 
-extern	void	errprint(char *, ...);
+extern	void	errprint(const char *, ...);
 
 #ifdef	KERN
 static	void	addkernpair(struct afmtab *, char *_line);
@@ -513,8 +513,8 @@ afmnamelook(struct afmtab *a, const char *name)
 	return np;
 }
 
-static int
-mapname(const char *psname, int isS, int isS1)
+int
+afmmapname(const char *psname, int isS, int isS1)
 {
 	int	i, j;
 
@@ -553,8 +553,8 @@ mapname(const char *psname, int isS, int isS1)
  * After all characters have been read, construct a font-specific
  * encoding for the rest. Also move the name table to permanent space.
  */
-static void
-remap(struct afmtab *a)
+void
+afmremap(struct afmtab *a)
 {
 	int	i, j = 128 - 32 + nchtab;
 	char	*space, *tp;
@@ -589,9 +589,8 @@ asciiequiv(int code, const char *psc, int isS, int isS1)
 
 	if (psc != NULL) {
 		for (i = 0; asciimap[i].psc; i++)
-			if (asciimap[i].code == code &&
-					strcmp(asciimap[i].psc, psc) == 0)
-				return code;
+			if (strcmp(asciimap[i].psc, psc) == 0)
+				return asciimap[i].code;
 		if (isS) {
 			for (i = 0; Sascii[i].psc; i++)
 				if (strcmp(Sascii[i].psc, psc) == 0)
@@ -628,7 +627,7 @@ unitconv(int i)
 	float	d;
 	int	Units, Point, uw;
 
-	Units = 1000;
+	Units = unitsPerEm;
 	Point = dev.res / 72;
 	uw = Units / Point;
 	if (uw > dev.unitwidth) {
@@ -640,8 +639,8 @@ unitconv(int i)
 		return i;
 }
 
-static void
-addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
+void
+afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		int isS, int isS1)
 {
 	struct namecache	*np = NULL;
@@ -668,11 +667,11 @@ addchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		a->codetab[a->nchars] = cl;
 	else if (tp)
 		a->codetab[a->nchars] = tp;
-	else if (C > 32 && C < 127)
+	else if (C > 32 && C < 127 && a->fitab[C - 32] == 0)
 		a->codetab[a->nchars] = C;
 	else
 		a->codetab[a->nchars] = -1;
-	if (C > 32 && C < 127) {
+	if (C > 32 && C < 127 && a->fitab[C - 32] == 0) {
 		a->fitab[C - 32] = a->nchars;
 		if (np)
 			np->fival[0] = C - 32;
@@ -704,7 +703,7 @@ addcharlib(struct afmtab *a, int symbol)
 				B[1] = charlib[i].kern & 1 ? -11 : 0;
 				B[3] = charlib[i].kern & 2 ?
 					a->capheight + 1 : 0;
-				addchar(a, -1, j+128, charlib[i].code,
+				afmaddchar(a, -1, j+128, charlib[i].code,
 						charlib[i].width, B, NULL,
 						0, 0);
 			}
@@ -775,10 +774,35 @@ addmetrics(struct afmtab *a, char *_line, int isSymbol)
 	}
 	if (N == NULL)
 		return;
-	tp = mapname(N, isSymbol,
+	tp = afmmapname(N, isSymbol,
 			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
-	addchar(a, C, tp, 0, WX, B, N, isSymbol,
+	afmaddchar(a, C, tp, 0, WX, B, N, isSymbol,
 			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
+}
+
+void
+afmalloc(struct afmtab *a, int n)
+{
+	int	i;
+
+	a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab, sizeof *a->fitab);
+	a->fontab = malloc((n+NCHARLIB+1)*sizeof *a->fontab);
+	a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
+	a->kerntab = calloc(n+NCHARLIB+1, sizeof *a->kerntab);
+	a->codetab = malloc((n+NCHARLIB+1)*sizeof *a->codetab);
+	a->codetab[0] = 0;
+	for (i = 1; i < n+NCHARLIB+1; i++)
+		a->codetab[i] = -1;
+	a->nametab = malloc((n+NCHARLIB+1)*sizeof *a->nametab);
+	a->nametab[0] = 0;
+	a->nchars = 1;
+	addcharlib(a, a->base[0]=='S' && a->base[1]==0);
+	a->nameprime = nextprime(n+NCHARLIB+1);
+	a->namecache = calloc(a->nameprime, sizeof *a->namecache);
+	for (i = 0; i < a->nameprime; i++) {
+		a->namecache[i].fival[0] = -1;
+		a->namecache[i].fival[1] = -1;
+	}
 }
 
 int
@@ -792,7 +816,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		KERNPAIRS
 	} state = NONE;
 	char	*cp, *th, *tp;
-	int	n = 0, i;
+	int	n = 0;
 	int	isSymbol = 0;
 
 	if ((cp = strrchr(a->file, '/')) == NULL)
@@ -803,9 +827,13 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	strcpy(a->base, cp);
 	if ((cp = strrchr(a->base, '.')) != NULL)
 		*cp = '\0';
-	a->lineno = 1;
 	a->xheight = 500;
 	a->capheight = 700;
+	unitsPerEm = 1000;
+	if (memcmp(contents, "OTTO", 4) == 0 ||
+			memcmp(contents, "\0\1\0\0", 4) == 0)
+		return otfget(a, contents, size);
+	a->lineno = 1;
 	for (cp = contents; cp < &contents[size]; a->lineno++, cp++) {
 		while (*cp == ' ' || *cp == '\t' || *cp == '\r')
 			cp++;
@@ -835,30 +863,11 @@ afmget(struct afmtab *a, char *contents, size_t size)
 				(th = thisword(cp, "StartCharMetrics")) != 0) {
 			n = strtol(th, NULL, 10);
 			state = CHARMETRICS;
-			a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab,
-					sizeof *a->fitab);
-			a->fontab = malloc((n+NCHARLIB+1)*sizeof *a->fontab);
-			a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
-			a->kerntab = calloc(n+NCHARLIB+1, sizeof *a->kerntab);
-			a->codetab = malloc((n+NCHARLIB+1)*sizeof *a->codetab);
-			a->codetab[0] = 0;
-			for (i = 1; i < n+NCHARLIB+1; i++)
-				a->codetab[i] = -1;
-			a->nametab = malloc((n+NCHARLIB+1)*sizeof *a->nametab);
-			a->nametab[0] = 0;
-			a->nchars = 1;
-			addcharlib(a, a->base[0]=='S' && a->base[1]==0);
-			a->nameprime = nextprime(n+NCHARLIB+1);
-			a->namecache = calloc(a->nameprime,
-					sizeof *a->namecache);
-			for (i = 0; i < a->nameprime; i++) {
-				a->namecache[i].fival[0] = -1;
-				a->namecache[i].fival[1] = -1;
-			}
+			afmalloc(a, n);
 		} else if (state == CHARMETRICS &&
 				thisword(cp, "EndCharMetrics")) {
 			state = FONTMETRICS;
-			remap(a);
+			afmremap(a);
 		} else if (state == CHARMETRICS && n-- > 0) {
 			addmetrics(a, cp, isSymbol);
 #ifdef	KERN

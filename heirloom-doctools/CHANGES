@@ -1,4 +1,6 @@
 Release ...
+* troff/dpost: Preliminary support for CFF-based OpenType fonts has been
+  added.
 * dpost: Can now access all characters in a large PostScript font, not only
   the first 255.
 * dpost: If the data in a PFB file to be included does not end with a
