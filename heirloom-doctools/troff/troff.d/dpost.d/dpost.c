@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.90 (gritter) 9/27/05
+ * Sccsid @(#)dpost.c	1.91 (gritter) 9/28/05
  */
 
 /*
@@ -2253,6 +2253,10 @@ supplyotf(char *font, char *path, FILE *fp)
 		return;
 	}
 	fprintf(rf, "%%%%IncludeResource: ProcSet (FontSetInit)\n");
+        if (sfcount++ == 0)
+        	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
+        else
+        fprintf(sf, "%%%%+ font %s\n", font);
 	fprintf(rf, "%%%%BeginResource: FontSet (%s)\n", font);
 	fprintf(rf, "/FontSetInit /ProcSet findresource begin\n");
 	fprintf(rf, "%%%%BeginData: %ld Binary Bytes\n",
