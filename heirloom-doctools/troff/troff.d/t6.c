@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.89 (gritter) 9/27/05
+ * Sccsid @(#)t6.c	1.90 (gritter) 9/29/05
  */
 
 /*
@@ -396,7 +396,7 @@ getkw(tchar c, tchar d)
 {
 	struct knode	*kp;
 	struct afmtab	*a;
-	int	f, i, j, k, n, s;
+	int	f, g, i, j, k, n, s;
 	float	z;
 
 	lastkern = 0;
@@ -405,6 +405,7 @@ getkw(tchar c, tchar d)
 	if (sbits(c) != sbits(d))
 		return 0;
 	f = fbits(c);
+	g = fbits(d);
 	if ((s = sbits(c)) == 0) {
 		s = xpts;
 		if (f == 0)
@@ -418,8 +419,8 @@ getkw(tchar c, tchar d)
 	if (i >= 32 && j >= 32) {
 		if (ktable != NULL && (kp = klook(c, d)) != NULL)
 			k = kp->n;
-		else if (fbits(c) == fbits(d) && afmtab &&
-				(n = (fontbase[f]->afmpos)-1) >= 0) {
+		else if ((n = (fontbase[f]->afmpos)-1) >= 0 &&
+				n == (fontbase[g]->afmpos)-1) {
 			a = afmtab[n];
 			k = afmgetkern(a, i - 32, j - 32);
 		}

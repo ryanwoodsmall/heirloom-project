@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.4 (gritter) 9/29/05
+ * Sccsid @(#)otf.c	1.5 (gritter) 9/29/05
  */
 
 #include <sys/types.h>
@@ -1165,7 +1165,7 @@ kernfinish(void)
 	int	i;
 
 	a->nkernpairs = nkerntmp;
-	a->kernprime = nextprime(4 * a->nkernpairs);
+	a->kernprime = nextprime(a->nkernpairs);
 	a->kernpairs = calloc(a->kernprime, sizeof *a->kernpairs);
 	for (i = 0; i < nkerntmp; i++)
 		*afmkernlook(a, kerntmp[i].ch1, kerntmp[i].ch2) = kerntmp[i];
