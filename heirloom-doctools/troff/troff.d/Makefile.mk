@@ -4,7 +4,7 @@ OBJ = t10.o t6.o hytab.o n1.o n2.o n3.o n4.o n5.o \
 	n7.o n8.o n9.o ni.o nii.o suftab.o makedev.o afm.o otf.o unimap.o \
 	malloc.o calloc.o version.o
 
-FLAGS = -DUSG -DINCORE -DKERN $(EUC) -I. -I.. -DMACDIR='"$(MACDIR)"' \
+FLAGS = -DUSG -DINCORE $(EUC) -I. -I.. -DMACDIR='"$(MACDIR)"' \
 	-DFNTDIR='"$(FNTDIR)"' -DTABDIR='"$(TABDIR)"' -DHYPDIR='"$(HYPDIR)"'
 
 .c.o:

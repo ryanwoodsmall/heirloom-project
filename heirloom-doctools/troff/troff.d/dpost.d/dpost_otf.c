@@ -23,7 +23,8 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost_otf.c	1.1 (gritter) 9/27/05
+ * Sccsid @(#)dpost_otf.c	1.2 (gritter) 9/29/05
  */
 
+#define	DPOST
 #include "../otf.c"

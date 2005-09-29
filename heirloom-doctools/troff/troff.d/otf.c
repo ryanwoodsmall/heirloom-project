@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.2 (gritter) 9/28/05
+ * Sccsid @(#)otf.c	1.4 (gritter) 9/29/05
  */
 
 #include <sys/types.h>
@@ -69,6 +69,7 @@ static int	pos_head;
 static int	pos_hmtx;
 static int	pos_OS_2;
 static int	pos_GSUB;
+static int	pos_GPOS;
 
 static unsigned short	*gid2sid;
 
@@ -534,14 +535,6 @@ getSID(int n)
 	return NULL;
 }
 
-static char *
-GID2SID(int gid)
-{
-	if (gid < 0 || gid >= nc)
-		return NULL;
-	return getSID(gid2sid[gid]);
-}
-
 static void
 error(const char *fmt, ...)
 {
@@ -688,6 +681,7 @@ get_table_directory(void)
 	pos_hmtx = -1;
 	pos_OS_2 = -1;
 	pos_GSUB = -1;
+	pos_GPOS = -1;
 	for (i = 0; i < numTables; i++) {
 		if (o + 16 >= size)
 			error("cannot get %dth table directory", i);
@@ -702,6 +696,8 @@ get_table_directory(void)
 			pos_OS_2 = i;
 		else if (memcmp(buf, "GSUB", 4) == 0)
 			pos_GSUB = i;
+		else if (memcmp(buf, "GPOS", 4) == 0)
+			pos_GPOS = i;
 		o += 16;
 		memcpy(table_directory[i].tag, buf, 4);
 		table_directory[i].checkSum = pbe32(&buf[4]);
@@ -937,9 +933,348 @@ get_OS_2(void)
 	}
 }
 
+#ifndef	DPOST
+static char *
+GID2SID(int gid)
+{
+	if (gid < 0 || gid >= nc)
+		return NULL;
+	return getSID(gid2sid[gid]);
+}
+
 static int	ScriptList;
 static int	FeatureList;
 static int	LookupList;
+
+struct cov {
+	int	offset;
+	int	CoverageFormat;
+	int	RangeCount;
+	int	GlyphCount;
+	int	cnt;
+	int	gid;
+};
+
+static struct cov *
+open_cov(int o)
+{
+	struct cov	*cp;
+
+	cp = calloc(1, sizeof *cp);
+	cp->offset = o;
+	switch (cp->CoverageFormat = pbe16(&contents[o])) {
+	default:
+		free(cp);
+		return NULL;
+	case 1:
+		cp->GlyphCount = pbe16(&contents[o+2]);
+		return cp;
+	case 2:
+		cp->RangeCount = pbe16(&contents[o+2]);
+		cp->gid = -1;
+		return cp;
+	}
+}
+
+static int
+get_cov(struct cov *cp)
+{
+	int	Start, End;
+
+	switch (cp->CoverageFormat) {
+	default:
+		return -1;
+	case 1:
+		if (cp->cnt < cp->GlyphCount)
+			return pbe16(&contents[cp->offset+4+2*cp->cnt++]);
+		return -1;
+	case 2:
+		while (cp->cnt < cp->RangeCount) {
+			Start = pbe16(&contents[cp->offset+4+6*cp->cnt]);
+			End = pbe16(&contents[cp->offset+4+6*cp->cnt+2]);
+			if (cp->gid > End) {
+				cp->gid = -1;
+				cp->cnt++;
+				continue;
+			}
+			if (cp->gid < Start)
+				cp->gid = Start;
+			return cp->gid++;
+		}
+		return -1;
+	}
+}
+
+static void
+free_cov(struct cov *cp)
+{
+	free(cp);
+}
+
+struct class {
+	int	offset;
+	int	ClassFormat;
+	int	StartGlyph;
+	int	GlyphCount;
+	int	ClassRangeCount;
+	int	cnt;
+	int	gid;
+};
+
+static struct class *
+open_class(int o)
+{
+	struct class	*cp;
+
+	cp = calloc(1, sizeof *cp);
+	cp->offset = o;
+	switch (cp->ClassFormat = pbe16(&contents[o])) {
+	default:
+		free(cp);
+		return NULL;
+	case 1:
+		cp->StartGlyph = pbe16(&contents[o+2]);
+		cp->GlyphCount = pbe16(&contents[o+4]);
+		return cp;
+	case 2:
+		cp->ClassRangeCount = pbe16(&contents[o+2]);
+		cp->gid = -1;
+		return cp;
+	}
+}
+
+static void
+get_class(struct class *cp, int *gp, int *vp)
+{
+	int	Start, End;
+
+	switch (cp->ClassFormat) {
+	case 1:
+		if (cp->cnt < cp->GlyphCount) {
+			*gp = cp->StartGlyph + cp->cnt;
+			*vp = pbe16(&contents[cp->offset+6+2*cp->cnt++]);
+			return;
+		}
+		goto dfl;
+	case 2:
+		while (cp->cnt < cp->ClassRangeCount) {
+			Start = pbe16(&contents[cp->offset+4+6*cp->cnt]);
+			End = pbe16(&contents[cp->offset+4+6*cp->cnt+2]);
+			if (cp->gid > End) {
+				cp->gid = -1;
+				cp->cnt++;
+				continue;
+			}
+			if (cp->gid < Start)
+				cp->gid = Start;
+			*gp = cp->gid++;
+			*vp = pbe16(&contents[cp->offset+4+6*cp->cnt+4]);
+			return;
+		}
+		/*FALLTHRU*/
+	default:
+	dfl:	*gp = -1;
+		*vp = -1;
+		return;
+	}
+}
+
+static void
+free_class(struct class *cp)
+{
+	free(cp);
+}
+
+static int
+get_value_size(int ValueFormat1, int ValueFormat2)
+{
+	int	i, sz = 0;
+
+	for (i = 0; i < 16; i++)
+		if (ValueFormat1 & (1<<i))
+			sz += 2;
+	for (i = 0; i < 16; i++)
+		if (ValueFormat2 & (1<<i))
+			sz += 2;
+	return sz;
+}
+
+static int
+get_x_adj(int ValueFormat1, int o)
+{
+	int	x = 0;
+	int	z = 0;
+
+	if (ValueFormat1 & 0x0001) {
+		x += (int16_t)pbe16(&contents[o+z]);
+		z += 2;
+	}
+	if (ValueFormat1 & 0x0002)
+		z += 2;
+	if (ValueFormat1 & 0x0004) {
+		x += (int16_t)pbe16(&contents[o+z]);
+		z += 2;
+	}
+	return x;
+}
+
+static struct kernpair	*kerntmp;
+static int	nkerntmp, akerntmp;
+
+static void
+kernpair1(int ch1, int ch2, int k)
+{
+	if (nkerntmp >= akerntmp) {
+		if (akerntmp == 0)
+			akerntmp = 4096;
+		else
+			akerntmp *= 2;
+		kerntmp = realloc(kerntmp, akerntmp * sizeof *kerntmp);
+	}
+	kerntmp[nkerntmp].ch1 = ch1;
+	kerntmp[nkerntmp].ch2 = ch2;
+	kerntmp[nkerntmp].k = k;
+	nkerntmp++;
+}
+
+static void
+kernpair(int first, int second, int x)
+{
+	char	*cp;
+	struct namecache	*np1, *np2;
+	int	i, j;
+
+	if ((cp = GID2SID(first)) == NULL)
+		return;
+	np1 = afmnamelook(a, cp);
+	if ((cp = GID2SID(second)) == NULL)
+		return;
+	np2 = afmnamelook(a, cp);
+	x = unitconv(x);
+	for (i = 0; i < 2; i++)
+		if (np1->fival[i] >= 0)
+			for (j = 0; j < 2; j++)
+				if (np2->fival[j] >= 0)
+					kernpair1(np1->fival[i],
+							np2->fival[j], x);
+}
+
+static void
+kernfinish(void)
+{
+	int	i;
+
+	a->nkernpairs = nkerntmp;
+	a->kernprime = nextprime(4 * a->nkernpairs);
+	a->kernpairs = calloc(a->kernprime, sizeof *a->kernpairs);
+	for (i = 0; i < nkerntmp; i++)
+		*afmkernlook(a, kerntmp[i].ch1, kerntmp[i].ch2) = kerntmp[i];
+	nkerntmp = akerntmp = 0;
+	free(kerntmp);
+	kerntmp = NULL;
+}
+
+static void
+get_PairValueRecord(int first, int ValueFormat1, int ValueFormat2, int o)
+{
+	int	second;
+	int	x;
+
+	second = pbe16(&contents[o]);
+	x = get_x_adj(ValueFormat1, o+2);
+	kernpair(first, second, x);
+}
+
+static void
+get_PairSet(int first, int ValueFormat1, int ValueFormat2, int o)
+{
+	int	PairValueCount;
+	int	i;
+	int	sz;
+
+	PairValueCount = pbe16(&contents[o]);
+	sz = get_value_size(ValueFormat1, ValueFormat2);
+	for (i = 0; i < PairValueCount; i++)
+		get_PairValueRecord(first, ValueFormat1, ValueFormat2,
+				o+2+(2+sz)*i);
+}
+
+static void
+get_PairPosFormat1(int o)
+{
+	struct cov	*cp;
+	int	Coverage;
+	int	ValueFormat1, ValueFormat2;
+	int	PairSetCount;
+	int	first;
+	int	i;
+
+	Coverage = o + pbe16(&contents[o+2]);
+	if ((cp = open_cov(Coverage)) == NULL)
+		return;
+	ValueFormat1 = pbe16(&contents[o+4]);
+	ValueFormat2 = pbe16(&contents[o+6]);
+	PairSetCount = pbe16(&contents[o+8]);
+	for (i = 0; i < PairSetCount && (first = get_cov(cp)) >= 0; i++)
+		get_PairSet(first, ValueFormat1, ValueFormat2,
+				o + pbe16(&contents[o+10+2*i]));
+	free_cov(cp);
+}
+
+static void
+get_PairPosFormat2(int o)
+{
+	struct class	*c1, *c2;
+	int	ValueFormat1, ValueFormat2;
+	int	ClassDef1, ClassDef2;
+	int	Class1Count, Class2Count;
+	int	g1, g2;
+	int	v1, v2;
+	int	sz;
+	int	x;
+
+	ValueFormat1 = pbe16(&contents[o+4]);
+	ValueFormat2 = pbe16(&contents[o+6]);
+	ClassDef1 = o + pbe16(&contents[o+8]);
+	ClassDef2 = o + pbe16(&contents[o+10]);
+	Class1Count = pbe16(&contents[o+12]);
+	Class2Count = pbe16(&contents[o+14]);
+	sz = get_value_size(ValueFormat1, ValueFormat2);
+	if ((c1 = open_class(ClassDef1)) != NULL) {
+		while (get_class(c1, &g1, &v1), g1 >= 0) {
+			if ((c2 = open_class(ClassDef2)) != NULL) {
+				while (get_class(c2, &g2, &v2), g2 >= 0) {
+					if (v1 >= 0 && v1 < Class1Count &&
+							v2 >= 0 &&
+							v2 < Class2Count) {
+						x = get_x_adj(ValueFormat1,
+							o + 16 +
+							v1*Class2Count*sz +
+							v2*sz);
+						kernpair(g1, g2, x);
+					}
+				}
+				free_class(c2);
+			}
+		}
+		free_class(c1);
+	}
+}
+
+static void
+get_kern(int o)
+{
+	int	PosFormat;
+
+	switch (PosFormat = pbe16(&contents[o])) {
+	case 1:
+		get_PairPosFormat1(o);
+		break;
+	case 2:
+		get_PairPosFormat2(o);
+		break;
+	}
+}
 
 static void
 get_Ligature(int first, int o)
@@ -1014,8 +1349,8 @@ get_LigatureSet(int first, int o)
 static void
 get_LigatureSubstFormat1(int o)
 {
+	struct cov	*cp;
 	int	Coverage;
-	int	GlyphCount;
 	int	LigSetCount;
 	int	i;
 	int	first;
@@ -1023,18 +1358,16 @@ get_LigatureSubstFormat1(int o)
 	if (pbe16(&contents[o]) != 1)
 		return;
 	Coverage = o + pbe16(&contents[o+2]);
-	if (pbe16(&contents[Coverage]) != 1)
+	if ((cp = open_cov(Coverage)) == NULL)
 		return;
-	GlyphCount = pbe16(&contents[Coverage+2]);
 	LigSetCount = pbe16(&contents[o+4]);
-	for (i = 0; i < LigSetCount && i < GlyphCount; i++) {
-		first = pbe16(&contents[Coverage+4+2*i]);
+	for (i = 0; i < LigSetCount && (first = get_cov(cp)) >= 0; i++)
 		get_LigatureSet(first, o + pbe16(&contents[o+6+2*i]));
-	}
+	free_cov(cp);
 }
 
 static void
-get_liga(int o)
+get_lookup(int o, int type, void (*func)(int))
 {
 	int	i, j, x, y;
 	int	LookupCount;
@@ -1044,17 +1377,17 @@ get_liga(int o)
 	for (i = 0; i < LookupCount; i++) {
 		x = pbe16(&contents[o+4+2*i]);
 		y = pbe16(&contents[LookupList+2+2*x]);
-		if (pbe16(&contents[LookupList+y]) == 4) {
+		if (pbe16(&contents[LookupList+y]) == type) {
 			SubTableCount = pbe16(&contents[LookupList+y+4]);
 			for (j = 0; j < SubTableCount; j++)
-				get_LigatureSubstFormat1(LookupList+y +
+				func(LookupList+y +
 					pbe16(&contents[LookupList+y+6+2*j]));
 		}
 	}
 }
 
 static void
-get_LangSys(int o)
+get_LangSys(int o, const char *name, int type, void (*func)(int))
 {
 	int	i, x;
 	int	FeatureCount;
@@ -1066,14 +1399,15 @@ get_LangSys(int o)
 		FeatureCount += ReqFeatureIndex;
 	for (i = 0; i < FeatureCount; i++) {
 		x = pbe16(&contents[o+6+2*i]);
-		if (memcmp(&contents[FeatureList+2+6*x], "liga", 4) == 0)
-			get_liga(FeatureList +
-				pbe16(&contents[FeatureList+2+6*x+4]));
+		if (memcmp(&contents[FeatureList+2+6*x], name, 4) == 0)
+			get_lookup(FeatureList +
+				pbe16(&contents[FeatureList+2+6*x+4]),
+				type, func);
 	}
 }
 
 static void
-get_GSUB(void)
+get_feature(int table, const char *name, int type, void (*func)(int))
 {
 	long	o;
 	int	i;
@@ -1081,9 +1415,9 @@ get_GSUB(void)
 	int	ScriptCount;
 	int	Script;
 
-	if (pos_GSUB < 0)
+	if (table < 0)
 		return;
-	o = table_directory[pos_GSUB].offset;
+	o = table_directory[table].offset;
 	if (pbe32(&contents[o]) != 0x00010000)
 		return;
 	ScriptList = o + pbe16(&contents[o+4]);
@@ -1097,10 +1431,13 @@ get_GSUB(void)
 			Script = ScriptList +
 				pbe16(&contents[ScriptList+2+6*i+4]);
 			DefaultLangSys = Script + pbe16(&contents[Script]);
-			get_LangSys(DefaultLangSys);
+			get_LangSys(DefaultLangSys, name, type, func);
 		}
 }
 
+#endif	/* !DPOST */
+
+#ifdef	DPOST
 int
 otfcff(const char *path,
 		char *_contents, size_t _size, size_t *offset, size_t *length)
@@ -1122,6 +1459,7 @@ otfcff(const char *path,
 		ok = -1;
 	return ok;
 }
+#endif	/* DPOST */
 
 int
 otfget(struct afmtab *_a, char *_contents, size_t _size)
@@ -1138,9 +1476,14 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		get_head();
 		get_OS_2();
 		if (ttf == 0) {
+			a->type = TYPE_OTF;
 			get_CFF();
 		}
-		get_GSUB();
+#ifndef	DPOST
+		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
+		get_feature(pos_GPOS, "kern", 2, get_kern);
+		kernfinish();
+#endif	/* !DPOST */
 		a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
 	} else
 		ok = -1;

@@ -23,12 +23,12 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.12 (gritter) 9/27/05
+ * Sccsid @(#)afm.h	1.13 (gritter) 9/29/05
  */
 
 struct kernpair {
-	short	ch1;
-	short	ch2;
+	unsigned short	ch1;
+	unsigned short	ch2;
 	short	k;
 };
 
@@ -59,6 +59,10 @@ extern struct afmtab {
 	int	nchars;
 	int	capheight;
 	int	xheight;
+	enum {
+		TYPE_AFM,
+		TYPE_OTF
+	}	type;
 } **afmtab;
 extern int nafm;
 
@@ -81,3 +85,5 @@ extern	void	afmremap(struct afmtab *);
 extern	int	afmmapname(const char *, int, int);
 extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
 			char *, int, int);
+extern	struct kernpair	*afmkernlook(struct afmtab *, int, int);
+extern	int	nextprime(int n);

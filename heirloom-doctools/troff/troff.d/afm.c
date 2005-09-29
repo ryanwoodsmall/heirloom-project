@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.32 (gritter) 9/28/05
+ * Sccsid @(#)afm.c	1.33 (gritter) 9/29/05
  */
 
 #include <stdlib.h>
@@ -38,7 +38,7 @@ extern	int		nchtab;
 
 extern	void	errprint(const char *, ...);
 
-#ifdef	KERN
+#ifndef	DPOST
 static	void	addkernpair(struct afmtab *, char *_line);
 #endif
 
@@ -458,11 +458,14 @@ static const struct asciimap	S1ascii[] = {
 	{ 0,		NULL }
 };
 
-static int
+int
 nextprime(int n)
 {
 	const int	primes[] = {
-		509, 1021, 2039, 4093, 8191, 16381, 32749, 65521
+		509, 1021, 2039, 4093, 8191, 16381, 32749, 65521,
+		131071, 262139, 524287, 1048573, 2097143, 4194301,
+		8388593, 16777213, 33554393, 67108859, 134217689,
+		268435399, 536870909, 1073741789, 2147483647
 	};
 	int	mprime = 7;
 	int	i;
@@ -870,7 +873,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			afmremap(a);
 		} else if (state == CHARMETRICS && n-- > 0) {
 			addmetrics(a, cp, isSymbol);
-#ifdef	KERN
+#ifndef	DPOST
 		} else if (state == FONTMETRICS &&
 				thisword(cp, "StartKernData") != 0) {
 			state = KERNDATA;
@@ -889,7 +892,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		} else if (state == KERNDATA &&
 				thisword(cp, "EndKernData")) {
 			state = FONTMETRICS;
-#endif	/* KERN */
+#endif	/* !DPOST */
 		}
 		while (cp < &contents[size] && *cp != '\n')
 			cp++;
@@ -930,11 +933,11 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 		fitab[nf][i] = devfitab[i]&0377;
 }
 
-#ifdef	KERN
-#define	hash(c, prime)	((2654435769U * (c) >> 16) % prime)
+#ifndef	DPOST
+#define	hash(c, prime)	((2654435769U * (c) >> 0) % prime)
 
-static struct kernpair *
-kernlook(struct afmtab *a, int ch1, int ch2)
+struct kernpair *
+afmkernlook(struct afmtab *a, int ch1, int ch2)
 {
 	struct kernpair	*kp;
 	unsigned	h, c, n = 0;
@@ -992,7 +995,8 @@ addkernpair(struct afmtab *a, char *_line)
 			if (np1->fival[i] >= 0)
 				for (j = 0; j < 2; j++)
 					if (np2->fival[j] >= 0) {
-						kp = kernlook(a, np1->fival[i],
+						kp = afmkernlook(a,
+								np1->fival[i],
 								np2->fival[j]);
 						kp->ch1 = np1->fival[i];
 						kp->ch2 = np2->fival[j];
@@ -1007,7 +1011,7 @@ afmgetkern(struct afmtab *a, int ch1, int ch2)
 	struct kernpair	*kp;
 
 	if (a->kernpairs) {
-		kp = kernlook(a, ch1, ch2);
+		kp = afmkernlook(a, ch1, ch2);
 		return kp->k;
 	} else
 		return 0;
