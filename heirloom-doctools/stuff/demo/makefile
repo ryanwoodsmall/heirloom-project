@@ -6,7 +6,8 @@
 .ps.pdf:
 	ps2pdf -sPAPERSIZE=a4 $< $@
 
-all: troffdemo.ps troffdemo.pdf
+all: troffdemo.ps troffdemo_otf.ps troffdemo.pdf troffdemo_otf.pdf
 
 clean:
-	rm -f troffdemo.pdf troffdemo.ps core log *~
+	rm -f troffdemo.pdf troffdemo.ps troffdemo_otf.ps \
+		troffdemo_otf.pdf core log *~
