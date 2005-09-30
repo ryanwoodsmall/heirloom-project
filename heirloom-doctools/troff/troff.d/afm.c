@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.33 (gritter) 9/29/05
+ * Sccsid @(#)afm.c	1.34 (gritter) 9/30/05
  */
 
 #include <stdlib.h>
@@ -571,8 +571,13 @@ afmremap(struct afmtab *a)
 			np = afmnamelook(a, a->nametab[i]);
 			np->afpos = i;
 			np->fival[0] = j;
-			if (strcmp(a->nametab[i], "space") == 0)
+			if (np->gid != 0 && a->gid2tr)
+				a->gid2tr[np->gid].ch1 = j + 32 + nchtab + 128;
+			if (strcmp(a->nametab[i], "space") == 0) {
 				np->fival[1] = 0;
+				if (np->gid != 0 && a->gid2tr)
+					a->gid2tr[np->gid].ch2 = 32;
+			}
 		}
 	}
 	space = malloc(a->nspace);
@@ -644,13 +649,14 @@ unitconv(int i)
 
 void
 afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
-		int isS, int isS1)
+		int isS, int isS1, int gid)
 {
 	struct namecache	*np = NULL;
 
 	if (N != NULL) {
 		np = afmnamelook(a, N);
 		np->afpos = a->nchars;
+		np->gid = gid;
 	}
 	a->fontab[a->nchars] = unitconv(WX);
 	/*
@@ -676,12 +682,16 @@ afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		a->codetab[a->nchars] = -1;
 	if (C > 32 && C < 127 && a->fitab[C - 32] == 0) {
 		a->fitab[C - 32] = a->nchars;
+		if (gid && a->gid2tr)
+			a->gid2tr[gid].ch1 = C;
 		if (np)
 			np->fival[0] = C - 32;
 	} else if (C == 32 && np)
 		np->fival[0] = 0;
 	if (tp) {
 		a->fitab[tp - 32] = a->nchars;
+		if (gid && a->gid2tr)
+			a->gid2tr[gid].ch2 = tp;
 		if (np)
 			np->fival[1] = tp - 32;
 	}
@@ -708,7 +718,7 @@ addcharlib(struct afmtab *a, int symbol)
 					a->capheight + 1 : 0;
 				afmaddchar(a, -1, j+128, charlib[i].code,
 						charlib[i].width, B, NULL,
-						0, 0);
+						0, 0, 0);
 			}
 		}
 }
@@ -780,7 +790,7 @@ addmetrics(struct afmtab *a, char *_line, int isSymbol)
 	tp = afmmapname(N, isSymbol,
 			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
 	afmaddchar(a, C, tp, 0, WX, B, N, isSymbol,
-			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
+			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0, 0);
 }
 
 void

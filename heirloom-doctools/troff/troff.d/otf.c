@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.5 (gritter) 9/29/05
+ * Sccsid @(#)otf.c	1.7 (gritter) 9/30/05
  */
 
 #include <sys/types.h>
@@ -762,7 +762,7 @@ onechar(int gid, int sid)
 	if ((N = getSID(sid)) != NULL)
 		a->nspace += strlen(N) + 1;
 	tp = afmmapname(N, 0, 0);
-	afmaddchar(a, gid, tp, 0, w, B, N, 0, 0);
+	afmaddchar(a, gid, tp, 0, w, B, N, 0, 0, gid);
 	gid2sid[gid] = sid;
 }
 
@@ -897,6 +897,7 @@ get_CFF(void)
 	nc = CFF.CharStrings->count;
 	gid2sid = calloc(nc, sizeof *gid2sid);
 	afmalloc(a, nc);
+	a->gid2tr = calloc(nc, sizeof *a->gid2tr);
 	get_CFF_Charset();
 	afmremap(a);
 }
@@ -1262,7 +1263,7 @@ get_PairPosFormat2(int o)
 }
 
 static void
-get_kern(int o)
+get_kern(int _t, int o, const char *_name)
 {
 	int	PosFormat;
 
@@ -1309,7 +1310,7 @@ get_Ligature(int first, int o)
 					if (strcmp(gn, "ffi") == 0)
 						a->Font.ligfont |= LFFI;
 					break;
-				case 'f':
+				case 'l':
 					gn = GID2SID(LigGlyph);
 					if (strcmp(gn, "ffl") == 0)
 						a->Font.ligfont |= LFFL;
@@ -1347,7 +1348,7 @@ get_LigatureSet(int first, int o)
 }
 
 static void
-get_LigatureSubstFormat1(int o)
+get_LigatureSubstFormat1(int _t, int o, const char *_name)
 {
 	struct cov	*cp;
 	int	Coverage;
@@ -1366,10 +1367,131 @@ get_LigatureSubstFormat1(int o)
 	free_cov(cp);
 }
 
-static void
-get_lookup(int o, int type, void (*func)(int))
+static struct feature *
+add_feature(const char *name)
 {
-	int	i, j, x, y;
+	int	i;
+	char	*np;
+
+	if (a->features == NULL)
+		a->features = calloc(1, sizeof *a->features);
+	for (i = 0; a->features[i]; i++)
+		if (strcmp(a->features[i]->name, name) == 0)
+			return a->features[i];
+	a->features = realloc(a->features, (i+2) * sizeof *a->features);
+	a->features[i] = calloc(1, sizeof **a->features);
+	a->features[i]->name = strdup(name);
+	for (np = a->features[i]->name; *np; np++)
+		if (*np == ' ') {
+			*np = 0;
+			break;
+		}
+	a->features[i+1] = NULL;
+	return a->features[i];
+}
+
+static void
+add_substitution_pair1(struct feature *fp, int ch1, int ch2)
+{
+	fp->pairs = realloc(fp->pairs, (fp->npairs+1) * sizeof *fp->pairs);
+	fp->pairs[fp->npairs].ch1 = ch1;
+	fp->pairs[fp->npairs].ch2 = ch2;
+	fp->npairs++;
+}
+
+static void
+add_substitution_pair(struct feature *fp, int ch1, int ch2)
+{
+	if (ch1 && ch2) {
+		if (a->gid2tr[ch1].ch1) {
+			if (a->gid2tr[ch2].ch1)
+				add_substitution_pair1(fp,
+						a->gid2tr[ch1].ch1,
+						a->gid2tr[ch2].ch1);
+			if (a->gid2tr[ch2].ch2)
+				add_substitution_pair1(fp,
+						a->gid2tr[ch1].ch1,
+						a->gid2tr[ch2].ch2);
+		}
+		if (a->gid2tr[ch1].ch2) {
+			if (a->gid2tr[ch2].ch1)
+				add_substitution_pair1(fp,
+						a->gid2tr[ch1].ch2,
+						a->gid2tr[ch2].ch1);
+			if (a->gid2tr[ch2].ch2)
+				add_substitution_pair1(fp,
+						a->gid2tr[ch1].ch2,
+						a->gid2tr[ch2].ch2);
+		}
+	}
+}
+
+static void
+get_SingleSubstitutionFormat1(int o, const char *name)
+{
+	struct feature	*fp;
+	struct cov	*cp;
+	int	c;
+	int	Coverage;
+	int	DeltaGlyphID;
+
+	if (pbe16(&contents[o]) != 1)
+		return;
+	Coverage = o + pbe16(&contents[o+2]);
+	if ((cp = open_cov(Coverage)) == NULL)
+		return;
+	DeltaGlyphID = pbe16(&contents[o+4]);
+	fp = add_feature(name);
+	while ((c = get_cov(cp)) >= 0)
+		add_substitution_pair(fp, c, c + DeltaGlyphID);
+	free_cov(cp);
+}
+
+static void
+get_SingleSubstitutionFormat2(int o, const char *name)
+{
+	struct feature	*fp;
+	struct cov	*cp;
+	int	Coverage;
+	int	GlyphCount;
+	int	c, i;
+
+	if (pbe16(&contents[o]) != 2)
+		return;
+	Coverage = o + pbe16(&contents[o+2]);
+	if ((cp = open_cov(Coverage)) == NULL)
+		return;
+	GlyphCount = pbe16(&contents[o+4]);
+	fp = add_feature(name);
+	for (i = 0; i < GlyphCount && (c = get_cov(cp)) >= 0; i++)
+		add_substitution_pair(fp, c, pbe16(&contents[o+6+2*i]));
+	free_cov(cp);
+}
+
+static void
+get_substitutions(int type, int o, const char *name)
+{
+	int	format;
+
+	format = pbe16(&contents[o]);
+	switch (type) {
+	case 1:
+		switch (format) {
+		case 1:
+			get_SingleSubstitutionFormat1(o, name);
+			break;
+		case 2:
+			get_SingleSubstitutionFormat2(o, name);
+			break;
+		}
+	}
+}
+
+static void
+get_lookup(int o, int type, const char *name,
+		void (*func)(int, int, const char *))
+{
+	int	i, j, t, x, y;
 	int	LookupCount;
 	int	SubTableCount;
 
@@ -1377,18 +1499,21 @@ get_lookup(int o, int type, void (*func)(int))
 	for (i = 0; i < LookupCount; i++) {
 		x = pbe16(&contents[o+4+2*i]);
 		y = pbe16(&contents[LookupList+2+2*x]);
-		if (pbe16(&contents[LookupList+y]) == type) {
+		if ((t = pbe16(&contents[LookupList+y])) == type || type < 0) {
 			SubTableCount = pbe16(&contents[LookupList+y+4]);
 			for (j = 0; j < SubTableCount; j++)
-				func(LookupList+y +
-					pbe16(&contents[LookupList+y+6+2*j]));
+				func(t, LookupList+y +
+					pbe16(&contents[LookupList+y+6+2*j]),
+					name);
 		}
 	}
 }
 
 static void
-get_LangSys(int o, const char *name, int type, void (*func)(int))
+get_LangSys(int o, const char *name, int type,
+		void (*func)(int, int, const char *))
 {
+	char	nb[5];
 	int	i, x;
 	int	FeatureCount;
 	int	ReqFeatureIndex;
@@ -1399,15 +1524,20 @@ get_LangSys(int o, const char *name, int type, void (*func)(int))
 		FeatureCount += ReqFeatureIndex;
 	for (i = 0; i < FeatureCount; i++) {
 		x = pbe16(&contents[o+6+2*i]);
-		if (memcmp(&contents[FeatureList+2+6*x], name, 4) == 0)
+		if (name == NULL ||
+			   memcmp(&contents[FeatureList+2+6*x], name, 4) == 0) {
+			memcpy(nb, &contents[FeatureList+2+6*x], 4);
+			nb[4] = 0;
 			get_lookup(FeatureList +
 				pbe16(&contents[FeatureList+2+6*x+4]),
-				type, func);
+				type, nb, func);
+		}
 	}
 }
 
 static void
-get_feature(int table, const char *name, int type, void (*func)(int))
+get_feature(int table, const char *name, int type,
+		void (*func)(int, int, const char *))
 {
 	long	o;
 	int	i;
@@ -1482,6 +1612,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 #ifndef	DPOST
 		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
 		get_feature(pos_GPOS, "kern", 2, get_kern);
+		get_feature(pos_GSUB, NULL, -1, get_substitutions);
 		kernfinish();
 #endif	/* !DPOST */
 		a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
@@ -1499,5 +1630,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 	CFF.CharStrings = 0;
 	free(ExtraStringSpace);
 	free(ExtraStrings);
+	free(a->gid2tr);
+	a->gid2tr = NULL;
 	return ok;
 }

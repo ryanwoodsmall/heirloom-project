@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.91 (gritter) 9/30/05
+ * Sccsid @(#)t6.c	1.92 (gritter) 9/30/05
  */
 
 /*
@@ -1747,6 +1747,77 @@ done:
 	font = savfont;
 	font1 = savfont1;
 	mchbits();
+}
+
+static int
+getfeature(struct afmtab *a, int f)
+{
+	char	name[NC];
+	int	ch1, ch2, c, i, j, minus;
+	struct feature	*fp;
+
+	if (skip())
+		return 0;
+	switch (c = getach()) {
+	case '-':
+		c = getach();
+		minus = 1;
+		break;
+	case '+':
+		c = getach();
+		/*FALLTHRU*/
+	default:
+		minus = 0;
+		break;
+	case 0:
+		return 0;
+	}
+	for (i = 0; i < sizeof name - 2; i++) {
+		name[i] = c;
+		if ((c = getach()) == 0)
+			break;
+	}
+	name[i+1] = 0;
+	for (i = 0; fp = a->features[i]; i++)
+		if (strcmp(fp->name, name) == 0) {
+			for (j = 0; j < fp->npairs; j++) {
+				ch1 = fp->pairs[j].ch1;
+				ch2 = fp->pairs[j].ch2;
+				if (minus) {
+					if (ftrtab[f][ch1] == ch2)
+						ftrtab[f][ch1] = ch1;
+				} else {
+					ftrtab[f][ch1] = ch2;
+				}
+			}
+			break;
+		}
+	if (fp == NULL)
+		errprint("no feature named %s in font %s", name, a->fontname);
+	return 1;
+}
+
+void
+casefeature(void)
+{
+	struct afmtab	*a;
+	int	f, i, j;
+
+	skip();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
+	if ((f = findft(i)) < 0)
+		return;
+	if ((j = (fontbase[f]->afmpos) - 1) < 0 ||
+			(a = afmtab[j])->type != TYPE_OTF) {
+		errprint("font %s is not an OpenType font", macname(i));
+		return;
+	}
+	if (a->features == NULL) {
+		errprint("font %s has no OpenType features", a->fontname);
+		return;
+	}
+	while (getfeature(a, f) != 0);
 }
 
 #include "unimap.h"

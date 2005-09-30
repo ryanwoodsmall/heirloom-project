@@ -1,8 +1,9 @@
 Release ...
-* troff/dpost: Preliminary support for CFF-based OpenType fonts has been
-  added.
+* troff/dpost: Support for CFF-based OpenType fonts has been added.
 * troff: A ".ftr" request has been introduced as a font-specific variant of
   the ".tr" request.
+* troff: A ".feature" request has been introduced to access special features
+  of OpenType fonts.
 * troff: Kerning is now applied to pairs of characters that originate from
   the same font mounted at two different positions.
 * dpost: Can now access all characters in a large PostScript font, not only

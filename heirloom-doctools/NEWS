@@ -43,6 +43,13 @@ description for ".xflag" below.
 	then font bb, etc. If the character still has not been found,
 	it is searched for in font S, then in font 0, 1, and so forth.
 
+.feature ff [+|-]name ...				troff only
+	enables (+) or disables (-) the OpenType feature "name" in font
+	ff. Only OpenType features that result in context-insensitive
+	single-character substitutions are supported. Typical features
+	are "onum" to enable old-style numerals, or "smcp" to enable
+	small capitals.
+
 .flig ff ligatures					troff only
 	defines the set of ligatures to be used with font ff. The
 	"ligatures" parameter is the sum of the values 1 for ff, 2 for
