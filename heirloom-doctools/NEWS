@@ -81,6 +81,11 @@ description for ".xflag" below.
 	likewise). "supplyname" may also be the basename of a file like
 	"afmname" above.
 
+.ftr ff abcd...						troff only
+	is a font-specific variant of the ".tr" request. If the current
+	character originates from font "ff", character "a" is translated
+	to character "b" on output, character "c" by character "d", etc.
+
 .fzoom ff z						troff only
 	zooms font ff by "z", where "z" is a positive floating-point
 	number. This request is useful for adjusting fonts with different
@@ -347,4 +352,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   9/18/05
+Gunnar Ritter                                                   9/30/05

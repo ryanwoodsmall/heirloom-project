@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.48 (gritter) 9/18/05
+ * Sccsid @(#)t10.c	1.49 (gritter) 9/30/05
  */
 
 /*
@@ -115,6 +115,8 @@ int Nfont;
 void
 growfonts(int n)
 {
+	int	i, j;
+
 	fontbase = realloc(fontbase, n * sizeof *fontbase);
 	memset(&fontbase[Nfont], 0, (n - Nfont) * sizeof *fontbase);
 	fontab = realloc(fontab, n * sizeof *fontab);
@@ -147,6 +149,12 @@ growfonts(int n)
 	memset(&kernafter[Nfont], 0, (n - Nfont) * sizeof *kernafter);
 	kernbefore = realloc(kernbefore, n * sizeof *kernbefore);
 	memset(&kernbefore[Nfont], 0, (n - Nfont) * sizeof *kernbefore);
+	ftrtab = realloc(ftrtab, n * sizeof *ftrtab);
+	for (i = Nfont; i < n; i++) {
+		ftrtab[i] = malloc(NCHARS * sizeof **ftrtab);
+		for (j = 0; j < NCHARS; j++)
+			ftrtab[i][j] = j;
+	}
 	Nfont = n;
 }
 

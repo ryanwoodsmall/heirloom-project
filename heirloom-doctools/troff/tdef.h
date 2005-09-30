@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.47 (gritter) 9/18/05
+ * Sccsid @(#)tdef.h	1.48 (gritter) 9/30/05
  */
 
 /*
@@ -289,6 +289,12 @@ endif EUC && NROFF
 #endif
 #define	oput(c)	if ((*obufp++ = cbits(c) & BYTEMASK), obufp >= &obuf[OBUFSZ]) flusho(); else
 #endif /* EUC */
+
+#ifdef	NROFF
+#define	ftrans(f, c)	(c)
+#else
+#define	ftrans(f, c)	(f >= 0 && f <= nfonts ? ftrtab[f][c] : (c))
+#endif
 
 /*
  * "temp file" parameters.  macros and strings

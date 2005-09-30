@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.90 (gritter) 9/29/05
+ * Sccsid @(#)t6.c	1.91 (gritter) 9/30/05
  */
 
 /*
@@ -82,6 +82,7 @@ int	**lhangtab;
 int	**rhangtab;
 int	**kernafter;
 int	**kernbefore;
+int	**ftrtab;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
@@ -114,6 +115,7 @@ width(register tchar j)
 	if (i==ohc)
 		return(0);
 	i = trtab[i];
+	i = ftrans(fbits(j), i);
 	if (i < 32)
 		return(0);
 	if (sfbits(j) == oldbits) {
@@ -296,7 +298,9 @@ kernadjust(tchar c, tchar d)
 	if (!kern || ismot(c) || ismot(d))
 		return 0;
 	c = trtab[cbits(c)] | c & SFMASK;
+	c = ftrans(fbits(c), cbits(c)) | c & SFMASK;
 	d = trtab[cbits(d)] | d & SFMASK;
+	d = ftrans(fbits(d), cbits(d)) | d & SFMASK;
 	return getkw(c, d);
 }
 
@@ -1580,6 +1584,7 @@ hang(int **tp)
 	int	savfont = font, savfont1 = font1;
 	tchar	k;
 
+	lgf++;
 	skip();
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 0);
@@ -1622,6 +1627,7 @@ casekernpair(void)
 	int	f, g, i, n;
 	tchar	c, d;
 
+	lgf++;
 	skip();
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 0);
@@ -1673,6 +1679,7 @@ kernsingle(int **tp)
 	int	f, i, n;
 	tchar	c;
 
+	lgf++;
 	skip();
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 0);
@@ -1708,6 +1715,38 @@ void
 casekernbefore(void)
 {
 	kernsingle(kernbefore);
+}
+
+void
+caseftr(void)
+{
+	int	savfont = font, savfont1 = font1;
+	int	f, i, j;
+	tchar	k;
+
+	lgf++;
+	skip();
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 0);
+	if ((f = findft(i)) < 0)
+		return;
+	font = font1 = f;
+	mchbits();
+	if (skip())
+		goto done;
+	while ((i = cbits(k=getch())) != '\n') {
+		if (ismot(k))
+			goto done;
+		if (ismot(k = getch()))
+			goto done;
+		if ((j = cbits(k)) == '\n')
+			j = ' ';
+		ftrtab[f][i] = j;
+	}
+done:
+	font = savfont;
+	font1 = savfont1;
+	mchbits();
 }
 
 #include "unimap.h"
