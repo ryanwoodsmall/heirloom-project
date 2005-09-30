@@ -23,8 +23,11 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.14 (gritter) 9/30/05
+ * Sccsid @(#)afm.h	1.15 (gritter) 9/30/05
  */
+
+#ifndef	TROFF_AFM_H
+#define	TROFF_AFM_H
 
 struct kernpair {
 	unsigned short	ch1;
@@ -101,3 +104,5 @@ extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
 			char *, int, int, int);
 extern	struct kernpair	*afmkernlook(struct afmtab *, int, int);
 extern	int	nextprime(int n);
+
+#endif	/* !TROFF_AFM_H */

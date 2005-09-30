@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.7 (gritter) 9/30/05
+ * Sccsid @(#)otf.c	1.8 (gritter) 9/30/05
  */
 
 #include <sys/types.h>
@@ -892,6 +892,10 @@ get_CFF(void)
 	memcpy(a->fontname, &contents[CFF.Name->offset[0]],
 			CFF.Name->offset[1] - CFF.Name->offset[0]);
 	a->fontname[CFF.Name->offset[1] - CFF.Name->offset[0]] = 0;
+#ifdef	DUMP
+	if (show & SHOW_NAME)
+		printf("name %s\n", a->fontname);
+#endif
 	if (CFF.CharStrings == NULL || CFF.CharStrings->count == 0)
 		error("no characters in font");
 	nc = CFF.CharStrings->count;
@@ -1119,6 +1123,10 @@ get_x_adj(int ValueFormat1, int o)
 	return x;
 }
 
+static void	kernpair(int, int, int);
+static void	kernfinish(void);
+
+#ifndef	DUMP
 static struct kernpair	*kerntmp;
 static int	nkerntmp, akerntmp;
 
@@ -1174,6 +1182,7 @@ kernfinish(void)
 	free(kerntmp);
 	kerntmp = NULL;
 }
+#endif	/* !DUMP */
 
 static void
 get_PairValueRecord(int first, int ValueFormat1, int ValueFormat2, int o)
@@ -1403,6 +1412,11 @@ static void
 add_substitution_pair(struct feature *fp, int ch1, int ch2)
 {
 	if (ch1 && ch2) {
+#ifdef	DUMP
+		if (show & SHOW_SUBSTITUTIONS)
+			printf("feature %s substitution %s %s\n",
+				fp->name, GID2SID(ch1), GID2SID(ch2));
+#endif
 		if (a->gid2tr[ch1].ch1) {
 			if (a->gid2tr[ch2].ch1)
 				add_substitution_pair1(fp,

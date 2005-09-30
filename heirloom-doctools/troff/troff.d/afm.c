@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.34 (gritter) 9/30/05
+ * Sccsid @(#)afm.c	1.35 (gritter) 9/30/05
  */
 
 #include <stdlib.h>
@@ -38,7 +38,7 @@ extern	int		nchtab;
 
 extern	void	errprint(const char *, ...);
 
-#ifndef	DPOST
+#if !defined (DPOST) && !defined (DUMP)
 static	void	addkernpair(struct afmtab *, char *_line);
 #endif
 
@@ -590,6 +590,7 @@ afmremap(struct afmtab *a)
 	}
 }
 
+#ifndef	DUMP
 static int
 asciiequiv(int code, const char *psc, int isS, int isS1)
 {
@@ -628,6 +629,7 @@ thisword(const char *text, const char *wrd)
 	}
 	return NULL;
 }
+#endif	/* !DUMP */
 
 int
 unitconv(int i)
@@ -647,6 +649,7 @@ unitconv(int i)
 		return i;
 }
 
+#ifndef	DUMP
 void
 afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		int isS, int isS1, int gid)
@@ -1026,4 +1029,5 @@ afmgetkern(struct afmtab *a, int ch1, int ch2)
 	} else
 		return 0;
 }
-#endif
+#endif	/* !DPOST */
+#endif	/* !DUMP */

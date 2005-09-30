@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.7 (gritter) 9/8/05
+ * Sccsid @(#)dev.h	1.8 (gritter) 9/30/05
  */
 
 /*
@@ -49,6 +49,9 @@
 /*
 	dev.h: characteristics of a typesetter
 */
+
+#ifndef	TROFF_DEV_H
+#define	TROFF_DEV_H
 
 struct dev {
 	unsigned	filesize;	/* number of bytes in file, */
@@ -90,3 +93,5 @@ struct Font {		/* characteristics of a font */
 
 extern	void		*readdesc(const char *);
 extern	void		*readfont(const char *, struct dev *);
+
+#endif	/* !TROFF_DEV_H */

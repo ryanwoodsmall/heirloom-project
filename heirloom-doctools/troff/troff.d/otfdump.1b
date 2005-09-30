@@ -1,0 +1,43 @@
+.\"
+.\" Sccsid @(#)otfdump.1b	1.1 (gritter) 9/30/05
+.TH OTFDUMP 1B "9/30/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.SH NAME
+otfdump \- (BSD) dump the contents of an OpenType font file
+.SH SYNOPSIS
+.HP
+.ad l
+.nh
+\fB/usr/ucb/otfdump\fR
+[\fB\-ckns\fR]
+font
+.br
+.hy 1
+.ad b
+.SH DESCRIPTION
+.I otfdump
+prints the contents of an OpenType font file
+in ASCII format
+just as
+.I troff
+interprets it.
+By default,
+all available information is printed.
+Options can be used to restrict the output:
+.TP
+.B \-c
+prints only the characters present in the font,
+in the format `\fBchar \fIstring \fBwidth \fInumber\fR'.
+.TP
+.B \-k
+prints only the kerning pairs present in the font,
+in the format `\fBkernpair \fIstring1 string2 \fBwidth \fInumber\fR'.
+.TP
+.B \-n
+prints only the PostScript name of the font,
+in the format `\fBname \fIstring\fR'.
+.TP
+.B \-s
+prints only the substitution features available with the font,
+in the format `\fBfeature \fIstring \fBsubstitution \fIstring1 string2\fR'.
+.SH "SEE ALSO"
+troff(1B)
