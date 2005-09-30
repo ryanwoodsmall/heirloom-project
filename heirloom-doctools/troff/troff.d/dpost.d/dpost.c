@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.91 (gritter) 9/28/05
+ * Sccsid @(#)dpost.c	1.92 (gritter) 9/30/05
  */
 
 /*
@@ -2241,6 +2241,7 @@ supplyotf(char *font, char *path, FILE *fp)
 	struct stat	st;
 	char	*contents;
 	size_t	size, offset, length;
+	int	fsType;
 
 	if (fstat(fileno(fp), &st) < 0)
 		error(FATAL, "cannot stat %s", path);
@@ -2248,8 +2249,12 @@ supplyotf(char *font, char *path, FILE *fp)
 	contents = malloc(size);
 	if (fread(contents, 1, size, fp) != size)
 		error(FATAL, "cannot read %s", path);
-	if (otfcff(path, contents, size, &offset, &length) != 0) {
+	if ((fsType = otfcff(path, contents, size, &offset, &length)) < 0) {
 		free(contents);
+		return;
+	}
+	if ((fsType&0x0002)==0x0002 || fsType & 0x0200) {
+		error(NON_FATAL, "may not embed %s", path);
 		return;
 	}
 	fprintf(rf, "%%%%IncludeResource: ProcSet (FontSetInit)\n");

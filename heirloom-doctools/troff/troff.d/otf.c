@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.8 (gritter) 9/30/05
+ * Sccsid @(#)otf.c	1.9 (gritter) 9/30/05
  */
 
 #include <sys/types.h>
@@ -57,6 +57,7 @@ static const char	*filename;
 unsigned short	unitsPerEm;
 static struct afmtab	*a;
 static int	nc;
+static int	fsType;
 
 static struct table_directory {
 	char	tag[4];
@@ -929,12 +930,20 @@ get_OS_2(void)
 	o = table_directory[pos_OS_2].offset;
 	if (pbe16(&contents[o]) > 0x0003)
 		goto dfl;
+	if (table_directory[pos_OS_2].length >= 10)
+		fsType = pbe16(&contents[o+8]);
+	else
+		fsType = 0;
 	if (table_directory[pos_OS_2].length >= 98) {
-		a->xheight = pbe16(&contents[o + 94]);
-		a->capheight = pbe16(&contents[o + 96]);
+		if (a) {
+			a->xheight = pbe16(&contents[o + 94]);
+			a->capheight = pbe16(&contents[o + 96]);
+		}
 	} else {
-	dfl:	a->xheight = 500;
-		a->capheight = 700;
+	dfl:	if (a) {
+			a->xheight = 500;
+			a->capheight = 700;
+		}
 	}
 }
 
@@ -1595,13 +1604,14 @@ otfcff(const char *path,
 	if (setjmp(breakpoint) == 0) {
 		get_offset_table();
 		get_table_directory();
+		get_OS_2();
 		if (pos_CFF < 0)
 			error("no CFF table");
 		*offset = table_directory[pos_CFF].offset;
 		*length = table_directory[pos_CFF].length;
 	} else
 		ok = -1;
-	return ok;
+	return ok == 0 ? fsType : ok;
 }
 #endif	/* DPOST */
 
