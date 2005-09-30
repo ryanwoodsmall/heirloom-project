@@ -5,28 +5,36 @@
 # one or more PostScript fonts. It accepts the AFM files of the respective
 # fonts as arguments, and expects these files to be in the current directory.
 # If matching PFB, PFA, or T42 files also exist in the current directory,
-# they are included.
+# they are included. Alternatively, it prints the characters in an OpenType
+# font.
 #
 
-# Sccsid @(#)showfont.sh	1.4 (gritter) 9/25/05
+# Sccsid @(#)showfont.sh	1.5 (gritter) 9/30/05
 
 pwd=`pwd`
 
 for i
 do (
-	base=`expr "$i" : '\(.*\)\.afm'`
-	if test -f "$base.pfa"
-	then
-		supply=$base.pfa
-	elif test -f "$base.pfb"
-	then
-		supply=$base.pfb
-	elif test -f "$base.t42"
-	then
-		supply=$base.t42
-	else
-		unset supply
-	fi
+	case $i in
+	*.otf)
+		supply=$i
+		;;
+	*)
+		base=`expr "$i" : '\(.*\)\.afm'`
+		if test -f "$base.pfa"
+		then
+			supply=$base.pfa
+		elif test -f "$base.pfb"
+		then
+			supply=$base.pfb
+		elif test -f "$base.t42"
+		then
+			supply=$base.t42
+		else
+			unset supply
+		fi
+		;;
+	esac
 	cat <<-!
 		.nr PE 10.8i
 		.fp 0 X $i $supply
@@ -51,31 +59,48 @@ do (
 		.wh \\n(PEu NC
 		.sp 6P
 	!
-	nawk <"$i" '
-		$1 == "FontName" {
+	case $i in
+	*.otf)
+		otfdump -n "$i" | nawk '{
 			printf(".ds FN \\fH\\s(12'"$i"' \\(em %s\n", $2)
 			print ".mk S"
 			print ".sp |4P"
 			print "\\*(FN"
 			print ".sp |\\nSu"
-		}
-		$1 == "StartCharMetrics" {
-			state = 1
-		}
-		state == 1 && $1 == "C" && \
-				match($0, /(^|;)[ 	]*N[	]*/) {
-			name = substr($0, RSTART+RLENGTH+1)
-			match(name, /[ 	;]/)
-			name = substr(name, 1, RSTART-1)
-			printf("\t\\s(11\\fX\\[%s]\t\\s8\\fH%s\n",\
-				name, name)
+		}'
+		otfdump -c "$i" | nawk '{
+			printf("\t\\s(11\\fX\\[%s]\t\\s8\\fH%s\n", $2, $2)
 			print ".br"
-			n++
-		}
-		state == 1 && $1 == "EndCharMetrics" {
-			state = 0
-		}
-	'
+		}'
+		;;
+	*)
+		nawk <"$i" '
+			$1 == "FontName" {
+				printf(".ds FN \\fH\\s(12'"$i"' \\(em %s\n", $2)
+				print ".mk S"
+				print ".sp |4P"
+				print "\\*(FN"
+				print ".sp |\\nSu"
+			}
+			$1 == "StartCharMetrics" {
+				state = 1
+			}
+			state == 1 && $1 == "C" && \
+					match($0, /(^|;)[ 	]*N[	]*/) {
+				name = substr($0, RSTART+RLENGTH+1)
+				match(name, /[ 	;]/)
+				name = substr(name, 1, RSTART-1)
+				printf("\t\\s(11\\fX\\[%s]\t\\s8\\fH%s\n",\
+					name, name)
+				print ".br"
+				n++
+			}
+			state == 1 && $1 == "EndCharMetrics" {
+				state = 0
+			}
+		'
+		;;
+	esac
 	cat <<-!
 		.wh \\n(PEu
 	!

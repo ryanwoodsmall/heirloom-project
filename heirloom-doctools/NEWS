@@ -6,8 +6,8 @@ shown. Without the "-x" option, long requests can be invoked with
 the ".do" prefix as described below; other features are available by
 default since they should not normally create compatibility problems.
 With the "-X" option, all extensions except for locale-dependent input
-and the AFM font selection using ".fp" are disabled. See also the
-description for ".xflag" below.
+and the AFM/OpenType font selection using ".fp" are disabled. See also
+the description for ".xflag" below.
 
 .chop name
 	removes the last character of the macro, string, or diversion
@@ -55,18 +55,20 @@ description for ".xflag" below.
 	"ligatures" parameter is the sum of the values 1 for ff, 2 for
 	fi, 4 for fl, 8 for ffi, and 16 for ffl. Thus ".flig R 31"
 	enables all these ligatures in font R. The default is specific
-	to a font and is determined from its AFM file. Enabling the ff,
-	ffi, and ffl ligatures with PostScript fonts usually requires
-	an expert font that has been selected for character substitution
-	using the ".fallback" request.
+	to a font and is determined from its AFM/OpenType file. Enabling
+	the ff, ffi, and ffl ligatures with PostScript Type 1 fonts
+	usually requires an expert font that has been selected for
+	character substitution using the ".fallback" request.
 
-.fp r yy afmname [supplyname]				troff only
-	reads metrics from "afmname". If the TROFFONTS environment variable
-	is set, each of the colon-separated directories in it is tried for
-	the file "afmname.afm", or, if "afmname" has the ".afm" extension
-	itself, for "afmname". Otherwise, the font is loaded from the file
-	"/usr/ucblib/doctools/font/devps/afmname.afm". If this fails, a
-	legacy ditroff font is assumed.
+.fp r yy metricsname [supplyname]			troff only
+	reads metrics from "metricsname", which must be in AFM or OpenType
+	format. If the TROFFONTS environment variable is set, each of the
+	colon-separated directories in it is tried for the files
+	"metricsname.afm", "metricsname.otf", or, if "metricsname" has an
+	".afm" or ".otf" extension itself, for "metricsname". Otherwise,
+	the font is loaded from the file
+	"/usr/ucblib/doctools/font/devps/metricsname.afm". If this fails,
+	a legacy ditroff font is assumed.
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
 	be freely chosen. The "r" argument specifies a register on which
 	the font is to be mounted. If it is zero, the font is mounted on
@@ -81,12 +83,12 @@ description for ".xflag" below.
 	  "yy" may also consist of more than two characters.
 	  If the optional "supplyname" argument is present, glyph data
 	is included in the generated PostScript file. If "supplyname"
-	is one of "pfb", "pfa", or "t42", the file "supplyname.pfb" (or
-	likewise) is searched in the directories in TROFFONTS first as
+	is one of "otf", "pfb", "pfa", or "t42", the file "supplyname.pfb"
+	(or likewise) is searched in the directories in TROFFONTS first as
 	described for the AFM file above, and if it is not found there,
 	in "/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
-	"afmname" above.
+	"metricsname" above.
 
 .ftr ff abcd...						troff only
 	is a font-specific variant of the ".tr" request. If the current
@@ -231,9 +233,9 @@ description for ".xflag" below.
 	does not cause a hyphen to be printed if the line is split.
 
 \[name]							troff only
-	selects the character "name" as defined in the AFM file for the
-	current font. The file "stuff/showfont.sh" can be used to display
-	the characters in a PostScript font along with their names.
+	selects the character "name" as defined in the AFM or OpenType file
+	for the current font. The file "stuff/showfont.sh" can be used to
+	display the characters in a PostScript font along with their names.
 
 \E
 	is similar to "\e", but is not interpreted in copy mode.
@@ -287,22 +289,22 @@ s-23 d.d
 	a direct size change has resulted in a font size that is not
 	contained in the DESC "sizes" table.
 
-x font n filename.afm
-	tells the post-processor that "filename.afm" contains the
-	metrics for the font on position "n". This is certainly the
-	change to intermediate output with the most impact. First,
-	it will trigger buffer overflows in many existing variants
-	of post-processors. Second, the way how information about
-	the font is exchanged in the following output is specific
-	to the current version of the AFM handling routines. For
-	all characters that are neither ASCII nor troff special,
-	troff produces "Nnnn" commands, where "nnn" is the position
-	of the character in an encoding that has been produced at
-	runtime while reading the AFM data. The post-processor thus
-	has to know about the encoding, and this is only guaranteed
-	if the AFM routines are the same as for troff.
-	  If this is a problem, use -Tpost and no AFM files. Sorry,
-	but direct handling of Type 1 fonts comes at a certain price.
+x font n filename
+	tells the post-processor that "filename" contains the metrics
+	for the font on position "n". This is certainly the change to
+	intermediate output with the most impact. First, it will trigger
+	buffer overflows in many existing variants of post-processors.
+	Second, the way how information about the font is exchanged in
+	the following output is specific to the current version of the
+	AFM/OpenType handling routines. For all characters that are
+	neither ASCII nor troff special, troff produces "Nnnn" commands,
+	where "nnn" is the position of the character in an encoding that
+	has been produced at runtime while reading the metrics data. The
+	post-processor thus has to know about the encoding, and this is
+	only guaranteed if the AFM/OpenType routines are the same as for
+	troff.
+	  If this is a problem, use -Tpost and no AFM or OpenType files.
+	Sorry, but direct handling of Type 1 fonts comes at a certain price.
 
 x H -23 d.d
 	tells the post-processor about the character height, with "d.d"

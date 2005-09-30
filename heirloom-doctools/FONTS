@@ -9,13 +9,15 @@ Heirloom troff understands two ways to select PostScript fonts.
 The new method can access PostScript font files directly. Fonts are
 selected using an extended ".fp" request:
 
-  .fp r yy afmname [supplyname]
-	reads metrics from "afmname". If the TROFFONTS environment variable
-	is set, each of the colon-separated directories in it is tried for
-	the file "afmname.afm", or, if "afmname" has the ".afm" extension
-	itself, for "afmname". Otherwise, the font is loaded from the file
-	"/usr/ucblib/doctools/font/devps/afmname.afm". If this fails, a
-	legacy ditroff font is assumed (see below).
+  .fp r yy metricsname [supplyname]
+	reads metrics from "metricsname", which must be in AFM or OpenType
+	format. If the TROFFONTS environment variable is set, each of the
+	colon-separated directories in it is tried for the files
+	"metricsname.afm", "metricsname.otf", or, if "metricsname" has an
+	".afm" or ".otf" extension itself, for "metricsname". Otherwise,
+	the font is loaded from the file
+	"/usr/ucblib/doctools/font/devps/metricsname.afm". If this fails,
+	a legacy ditroff font is assumed.
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
 	be freely chosen. The "r" argument specifies a register on which
 	the font is to be mounted. If it is zero, the font is mounted on
@@ -30,18 +32,25 @@ selected using an extended ".fp" request:
 	  "yy" may also consist of more than two characters.
 	  If the optional "supplyname" argument is present, glyph data
 	is included in the generated PostScript file. If "supplyname"
-	is one of "pfb", "pfa", or "t42", the file "supplyname.pfb" (or
-	likewise) is searched in the directories in TROFFONTS first as
+	is one of "otf", "pfb", "pfa", or "t42", the file "supplyname.pfb"
+	(or likewise) is searched in the directories in TROFFONTS first as
 	described for the AFM file above, and if it is not found there,
 	in "/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
-	"afmname" above.
+	"metricsname" above.
 
-As a simple example,
+As simple examples,
       
 	.fp 0 VA van_____ pfb
 	.ft VA
 	Here is some text in Monotype Van Dijck Regular.
+
+or
+      
+	.fp 0 AG AGaramondPro-Regular otf
+	.ft AG
+	Here is some text in Adobe Garamond Pro Regular.
+
 
 But it is also possible to have different names for the metrics and
 glyph data files, as in
@@ -68,11 +77,11 @@ the following example properly:
 	.sp
 	The first five small letters of the Greek alphabet: α β γ δ ε
 
-Note that any use of AFM files requires that the output of troff is
-passed to the exactly matching version of dpost, i.e. to the one that
-was delivered with the same release of this package. Sending such
-troff output directly to a print spooler that invokes a system version
-of dpost will thus usually not work.
+Note that any use of AFM or OpenType files requires that the output of
+troff is passed to the exactly matching version of dpost, i.e. to the
+one that was delivered with the same release of this package. Sending
+such troff output directly to a print spooler that invokes a system
+version of dpost will thus usually not work.
 
 The old ditroff method requires font tables to be generated manually.
 It is still supported, and is still the default for the lower-resolution
@@ -81,8 +90,8 @@ used for adding fonts. Localized input processing according to LC_CTYPE
 is not available with this method.
 
 
-Installing fonts
-----------------
+Installing PostScript Type 1 fonts
+----------------------------------
 
 Making additional fonts available is easy with the new method. If you
 buy a PostScript Type 1 font for use with troff, select the Windows
@@ -111,6 +120,22 @@ export TROFFONTS". Write the definition in your .profile to make it
 permanent. You can now use the fonts with troff. If you want to install
 more fonts later, it is sufficient to put them into the font directory.
 
+
+Installing OpenType fonts
+-------------------------
+
+The procedure for OpenType fonts is nearly the same as for Type 1 fonts,
+except that there is only one file "FontName.otf" with them that contains
+both metrics and glyph data. Just copy this file to a directory given in
+the TROFFONTS path.
+
+Only PostScript/CFF-based OpenType fonts are supported directly. OpenType
+fonts that contain TrueType glyph data are handled like TrueType fonts.
+
+
+Installing TrueType fonts
+-------------------------
+
 For TrueType fonts, an additional conversion step is necessary. troff
 cannot handle TrueType fonts directly, but it can handle PostScript
 Type 42 fonts, which are a special representation of them. You can
@@ -126,9 +151,17 @@ may not be able to process it.
 Using fonts with old style numerals
 -----------------------------------
 
-A font with old style numerals but otherwise standard characters usually
-does not require any special mechanism. It can simply be mounted, selected,
-and used.
+A Type 1 font with old style numerals but otherwise standard characters
+usually does not require any special mechanism. It can simply be mounted,
+selected, and used.
+
+Old-style numerals contained in OpenType fonts can be accessed conveniently
+by mapping them to the standard ASCII numbers with the ".feature" request:
+
+	.do xflag 2
+	.fp 1 R ACaslonPro-Regular otf
+	.feature R +onum
+	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
 
 
 Using fonts with small capital letters
@@ -143,12 +176,21 @@ to use the Stempel Garamond small capital font, write something like
 	.ft SC
 	This text prints in Small Capitals.
 
+With an OpenType font, the ".feature" request comes handy again:
+
+	.do xflag 2
+	.fp 0 SC ACaslonPro-Regular otf
+	.feature SC +smcp
+	.track SC 1 .3 24 3
+	.ft SC
+	This text prints in Small Capitals.
+
 
 Using a combination of expert and standard fonts for small capitals
 -------------------------------------------------------------------
 
-An expert font contains small capital letters but no upper-case capital
-letters. Since it would be very inconvenient to change the font
+A Type 1 expert font contains small capital letters but no upper-case
+capital letters. Since it would be very inconvenient to change the font
 explicitly for each upper-case letter, the fallback sequence is useful
 in this case. The expert font is selected as text font, but for each
 upper-case letter encountered, troff changes automatically to the
@@ -161,6 +203,9 @@ standard font. An example with the Monotype Fournier type:
 	.fallback E R
 	.ft E
 	This text prints in Small Capitals.
+
+For OpenType fonts, all small capital letters are contained within the
+base font, and the "smcp" feature accesses them as shown above.
 
 
 Using a combination of expert and standard fonts for old style numerals
@@ -201,8 +246,8 @@ it is sufficient to mount each font once:
 Using the expert font for ligatures
 -----------------------------------
 
-PostScript fonts usually do not contain ligatures for ff, ffi, and ffl
-in the base font; an expert font delivers them in addition. Automatic
+PostScript Type 1 fonts usually do not contain ligatures for ff, ffi, and
+ffl in the base font; an expert font delivers them in addition. Automatic
 substitution of such ligatures can be enabled using the ".flig" request
 in combination with the fallback sequence:
 
@@ -212,6 +257,9 @@ in combination with the fallback sequence:
 	.fallback R E
 	.flig R 31
 	effective office offline
+
+OpenType fonts usually do contain all ligatures that troff substitutes
+automatically, so no special procedure needs to be applied.
 
 
 Combining different fonts
@@ -263,16 +311,17 @@ Pairwise kerning
 ----------------
 
 Pairwise kerning is enabled unless the -X option is given. The ".kern"
-request disables it. Kerning tables are initially read from AFM files;
-this default kerning only applies if two adjacent characters are from
-the same font. There are two methods to adjust the kerning tables: In
-many cases, it is most convenient to create a private copy of the AFM
-file and to adjust the "KPX" entries in it. This has the advantage that
-the modified kerning pairs are immediately available for other documents.
+request disables it. Kerning tables are initially read from the AFM or
+OpenType files; this default kerning only applies if two adjacent
+characters are from the same font. There are two methods to adjust the
+kerning tables: In many cases, it is most convenient to create a private
+copy of the AFM file and to adjust the "KPX" entries in it. This has the
+advantage that the modified kerning pairs are immediately available for
+use in other documents.
 
-For cases where this is not suitable, or not possible because the
-characters in the kerning pair originate from a different font, troff
-provides the ".kernpair" request:
+For OpenType fonts, or for cases where this is not suitable with Type 1
+fonts, or not possible because the characters in the kerning pair originate
+from a different font, troff provides the ".kernpair" request:
 
 	.do xflag 2
 	.fp 1 R fn______ pfb
@@ -339,8 +388,30 @@ spaces is shifted in the example above, each word space is enlarged
 by only 1/100 em.
 
 
+Helper utilities
+----------------
+
+The "otfdump" utility shows the contents of an OpenType font file just
+as troff interprets it. It emits an ASCII format that is readable by
+humans and can also be used for further processing with shell scripts.
+It is useful to retrieve lists of characters and features supported
+with the font.
+
+The shell script "stuff/showfont.sh" in the source code distribution
+uses troff and possibly otfdump to print a map of all characters in an
+AFM or OpenType font.
+
+
 Limitations
 -----------
+
+dpost currently uses a method to embed OpenType fonts in PostScript
+documents that is only available with PostScript 3 interpreters; older
+printers that use PostScript Level 2 or below cannot handle such
+documents directly. The Ghostscript "ps2ps" utility can be used to
+create Level 2 documents from dpost output. Also you may have to
+update your copy of GhostScript in order to create PDF files with
+proper font embedding from such output.
 
 The PostScript/Unicode conversion tables currently only contain
 Western character names; other characters are simply ignored when
@@ -353,4 +424,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 9/25/05
+Gunnar Ritter                                                 9/30/05
