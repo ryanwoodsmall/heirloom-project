@@ -23,15 +23,19 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.1 (gritter) 9/30/05
+ * Sccsid @(#)otfdump.c	1.2 (gritter) 10/1/05
  */
 
-static enum {
+static enum show {
 	SHOW_CHARS		= 001,
 	SHOW_KERNPAIRS		= 002,
 	SHOW_SUBSTITUTIONS	= 004,
 	SHOW_NAME		= 010
 } show;
+
+#include <stdarg.h>
+
+static void	print(enum show, const char *, ...);
 
 #define	DUMP
 #include <stdio.h>
@@ -50,6 +54,23 @@ struct dev	dev;
 char	*chname;
 short	*chtab;
 int	nchtab;
+
+static int	prname;
+
+static void
+print(enum show s, const char *fmt, ...)
+{
+	va_list	ap;
+
+	if (show & s) {
+		if (prname)
+			printf("%s: ", filename);
+		va_start(ap, fmt);
+		vprintf(fmt, ap);
+		va_end(ap);
+		putchar('\n');
+	}
+}
 
 void
 verrprint(const char *s, va_list ap)
@@ -83,17 +104,42 @@ devinit(void)
 static void
 usage(void)
 {
-	errprint("usage: %s [-ckns] font", progname);
+	errprint("usage: %s [-ckns] font ...", progname);
 	exit(2);
+}
+
+static int
+dump(const char *name)
+{
+	struct afmtab	A;
+	struct stat	st;
+	FILE	*fp;
+
+	if ((fp = fopen(filename = name, "r")) == NULL) {
+		errprint("cannot open");
+		return 1;
+	}
+	memset(&A, 0, sizeof A);
+	a = &A;
+	a->file = a->path = (char *)filename;
+	if (fstat(fileno(fp), &st) < 0) {
+		errprint("cannot stat");
+		return 1;
+	}
+	size = st.st_size;
+	contents = malloc(size);
+	if (fread(contents, 1, size, fp) != size) {
+		errprint("cannot read");
+		return 1;
+	}
+	fclose(fp);
+	return otfget(a, contents, size) != 0;
 }
 
 int
 main(int argc, char **argv)
 {
-	static struct afmtab	A;
-	struct stat	st;
-	int	i;
-	FILE	*fp;
+	int	i, e = 0;
 
 	progname = basename(argv[0]);
 	devinit();
@@ -117,34 +163,19 @@ main(int argc, char **argv)
 	}
 	if (show == 0)
 		show = 0xFFFFFFFF;
-	if (argc != optind + 1)
+	if (argc < optind + 1)
 		usage();
-	if ((fp = fopen(filename = argv[optind], "r")) == NULL) {
-		errprint("cannot open");
-		return 1;
-	}
-	a = &A;
-	a->file = a->path = (char *)filename;
-	if (fstat(fileno(fp), &st) < 0) {
-		errprint("cannot stat");
-		return 1;
-	}
-	size = st.st_size;
-	contents = malloc(size);
-	if (fread(contents, 1, size, fp) != size) {
-		errprint("cannot read");
-		return 1;
-	}
-	fclose(fp);
-	return otfget(a, contents, size) != 0;
+	prname = argc > optind + 1;
+	for (i = optind; i < argc; i++)
+		e |= dump(argv[i]);
+	return e;
 }
 
 void
 afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		int isS, int isS1, int gid)
 {
-	if (show & SHOW_CHARS)
-		printf("char %s width %d\n", N, WX);
+	print(SHOW_CHARS, "char %s width %d", N, WX);
 }
 
 void
@@ -165,11 +196,11 @@ kernpair(int first, int second, int x)
 {
 	char	*s1, *s2;
 
-	if (x && show & SHOW_KERNPAIRS) {
+	if (x) {
 		s1 = GID2SID(first);
 		s2 = GID2SID(second);
 		if (s1 && s2)
-			printf("kernpair %s %s width %d\n",
+			print(SHOW_KERNPAIRS, "kernpair %s %s width %d",
 				s1, s2, unitconv(x));
 	}
 }

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.9 (gritter) 9/30/05
+ * Sccsid @(#)otf.c	1.10 (gritter) 10/1/05
  */
 
 #include <sys/types.h>
@@ -894,8 +894,7 @@ get_CFF(void)
 			CFF.Name->offset[1] - CFF.Name->offset[0]);
 	a->fontname[CFF.Name->offset[1] - CFF.Name->offset[0]] = 0;
 #ifdef	DUMP
-	if (show & SHOW_NAME)
-		printf("name %s\n", a->fontname);
+	print(SHOW_NAME, "name %s", a->fontname);
 #endif
 	if (CFF.CharStrings == NULL || CFF.CharStrings->count == 0)
 		error("no characters in font");
@@ -1422,8 +1421,7 @@ add_substitution_pair(struct feature *fp, int ch1, int ch2)
 {
 	if (ch1 && ch2) {
 #ifdef	DUMP
-		if (show & SHOW_SUBSTITUTIONS)
-			printf("feature %s substitution %s %s\n",
+		print(SHOW_SUBSTITUTIONS, "feature %s substitution %s %s",
 				fp->name, GID2SID(ch1), GID2SID(ch2));
 #endif
 		if (a->gid2tr[ch1].ch1) {
