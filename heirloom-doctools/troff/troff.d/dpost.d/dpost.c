@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.92 (gritter) 9/30/05
+ * Sccsid @(#)dpost.c	1.93 (gritter) 10/1/05
  */
 
 /*
@@ -712,6 +712,65 @@ main(int agc, char *agv[])
 
 }   /* End of main */
 
+/*****************************************************************************/
+int
+putint(int n, FILE *fp)
+{
+	char	buf[20];
+	int	c = 0, i;
+
+/*
+ *
+ * Print an integer in PostScript binary token representation.
+ *
+ */
+	if (n >= -128 && n <= 127) {
+		buf[c++] = 136;
+		buf[c++] = n;
+	} else if (n >= -32768 && n <= 32767) {
+		buf[c++] = 134;
+		buf[c++] = (n&0xff00) >> 8;
+		buf[c++] = (n&0x00ff);
+	} else {
+		buf[c++] = 132;
+		buf[c++] = (n&0xff000000) >> 24;
+		buf[c++] = (n&0x00ff0000) >> 16;
+		buf[c++] = (n&0x0000ff00) >> 8;
+		buf[c++] = (n&0x000000ff);
+	}
+	for (i = 0; i < c; i++)
+		putc(buf[i]&0377, fp);
+	return c;
+}
+
+int
+putstring1(const char *sp, int n, FILE *fp)
+{
+/*
+ *
+ * Print a string in PostScript binary token representation.
+ *
+ */
+	putc(142, fp);
+	putc(n, fp);
+	fwrite(sp, 1, n, fp);
+	return n + 2;
+}
+
+int
+putstring(const char *sp, int n, FILE *fp)
+{
+	int	c = 0;
+
+	while (n > 250) {
+		c += putstring1(sp, 250, fp);
+		sp += 250;
+		n -= 250;
+	}
+	if (n)
+		c += putstring1(sp, n, fp);
+	return c;
+}
 
 /*****************************************************************************/
 int
@@ -1107,7 +1166,7 @@ setup(void)
     fprintf(stdout, "/resolution %d def\n", res);
     fprintf(stdout, "setup\n");
     fprintf(stdout, "/Dsetup where { pop Dsetup } if\n");
-    fprintf(stdout, "%d setdecoding\n", encoding);
+    fprintf(stdout, "%d setdecoding\n", encoding == 5 ? 4 : encoding);
 
     if ( formsperpage > 1 )  {		/* followed by stuff for multiple pages */
 	if ( cat(formfile, stdout) == FALSE )
@@ -2584,10 +2643,10 @@ t_track(char *buf)
  * of the need to adjust the character position explicitly after each
  * character and thus greatly reduces the size of the output.
  *
- * Currently this is done in encodings 0 and 4 only.
+ * Currently this is done in encodings 0, 4, and 5 only.
  */
 
-	if (encoding != 0 && encoding != 4)
+	if (encoding != 0 && encoding != 4 && encoding != 5)
 		return;
 	if (sscanf(buf, "%d", &t) != 1)
 		t = 0;
@@ -3204,7 +3263,7 @@ put1 (
 	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else
 	    lastw = widthfac * ((pw[i] * fractsize + unitwidth/2) / unitwidth);
-	if (track && (encoding == 0 || encoding == 4))
+	if (track && (encoding == 0 || encoding == 4 || encoding == 5))
 		lastw += track;
 	oput(code);
     }	/* End if */
@@ -3260,7 +3319,8 @@ oput (
 	    case '(':
 	    case ')':
 	    case '\\':
-		    addchar('\\');
+		    if (encoding != 5)
+		    	addchar('\\');
 
 	    default:
 		    addchar(c);
@@ -3302,6 +3362,10 @@ starttext(void)
 	    case 4:
 		putc('(', tf);
 		charcount = 1;
+		break;
+
+	    case 5:
+		strptr = strings;
 		break;
 
 	    case 2:
@@ -3368,6 +3432,17 @@ endtext(void)
 		else
 			fprintf(tf, ")%d t\n", stringstart);
 		break;
+
+	    case 5:
+		putstring(strings, strptr - strings, tf);
+		strptr = strings;
+		if (laststrstart != INT_MIN)
+			putint(stringstart - laststrstart, tf);
+		putint(stringstart, tf);
+		putc('t', tf);
+		putc('\n', tf);
+		break;
+
 
 	    case 1:
 		fprintf(tf, ")%d %d t\n", stringstart, lasty);
@@ -3443,6 +3518,18 @@ endstring(void)
 	    }
 	    laststrstart = stringstart;
 	    goto nx;
+
+	case 5:
+	    putstring(strings, strptr - strings, tf);
+	    strptr = strings;
+	    charcount++;
+	    if (laststrstart != INT_MIN)
+		    charcount += putint(stringstart - laststrstart, tf);
+	    laststrstart = stringstart;
+	    textcount++;
+	    lastx = stringstart = hpos;
+	    break;
+
 	case 0:
 	case 1:
 	    charcount += fprintf(tf, ")%d", stringstart);
@@ -3524,6 +3611,12 @@ endline(void)
 
     if ( encoding == 0 || encoding == 4 || encoding == MAXENCODING+1 )
 	fprintf(tf, "%d %d m\n", hpos, vpos);
+    else if (encoding == 5) {
+	    putint(hpos, tf);
+	    putint(vpos, tf);
+	    putc('m', tf);
+	    putc('\n', tf);
+    }
 
     lastx = stringstart = lastend = hpos;
     lasty = vpos;
@@ -3562,6 +3655,10 @@ addchar (
 		    putc('\n', tf);
 		    charcount = 0;
 	    }
+	    break;
+
+	case 5:
+	    *strptr++ = c;
 	    break;
 
 	case 2:
@@ -3630,6 +3727,10 @@ addoctal (
 		    putc('\n', tf);
 		    charcount = 0;
 	    }
+	    break;
+
+	case 5:
+	    *strptr++ = c;
 	    break;
 
 	case 2:
