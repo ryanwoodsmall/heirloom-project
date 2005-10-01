@@ -3,7 +3,7 @@ OBJ = dpost.o dpost_draw.o color.o pictures.o ps_include.o dpost_afm.o \
 	dpost_makedev.o glob.o misc.o request.o dpost_version.o getopt.o \
 	asciitype.o dpost_otf.o
 
-FLAGS = -I. -I.. -DFNTDIR='"$(FNTDIR)"' -DPSTDIR='"$(PSTDIR)"'
+FLAGS = -I. -I.. -DFNTDIR='"$(FNTDIR)"' -DPSTDIR='"$(PSTDIR)"' $(EUC)
 
 .c.o:
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(FLAGS) -c $<
