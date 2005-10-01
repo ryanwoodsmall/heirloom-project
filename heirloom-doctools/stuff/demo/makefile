@@ -4,7 +4,7 @@
 	troff $(TFLAGS) $< | dpost >$@
 
 .ps.pdf:
-	ps2pdf -sPAPERSIZE=a4 $< $@
+	ps2pdf13 -sPAPERSIZE=a4 $< $@
 
 all: troffdemo.ps troffdemo_otf.ps troffdemo.pdf troffdemo_otf.pdf
 
