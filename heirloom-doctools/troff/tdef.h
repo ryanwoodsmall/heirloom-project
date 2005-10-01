@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.48 (gritter) 9/30/05
+ * Sccsid @(#)tdef.h	1.49 (gritter) 10/1/05
  */
 
 /*
@@ -293,7 +293,7 @@ endif EUC && NROFF
 #ifdef	NROFF
 #define	ftrans(f, c)	(c)
 #else
-#define	ftrans(f, c)	(f >= 0 && f <= nfonts ? ftrtab[f][c] : (c))
+#define	ftrans(f, c)	(f >= 0 && f <= nfonts ? ftrtab[f][ftrtab[f][c]] : (c))
 #endif
 
 /*
