@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.11 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.12 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -45,7 +45,6 @@ extern	int		nchtab;
 
 extern	void	errprint(const char *, ...);
 extern	void	verrprint(const char *, va_list);
-extern	void	fdprintf(int, char *, ...);
 extern	int	stderr;
 
 static jmp_buf	breakpoint;

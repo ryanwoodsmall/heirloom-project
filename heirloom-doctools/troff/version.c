@@ -7,11 +7,11 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	4.31 (gritter) 10/2/05";
+	"@(#)/usr/ucb/otfdump.sl	4.32 (gritter) 10/2/05";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	4.31 (gritter) 10/2/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	4.32 (gritter) 10/2/05";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	4.31 (gritter) 10/2/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	4.32 (gritter) 10/2/05";
 #endif	/* !DUMP, !NROFF */
 /* SLIST */
 /*
@@ -41,7 +41,7 @@ troff.d/afm.h: * Sccsid @(#)afm.h	1.15 (gritter) 9/30/05
 troff.d/dev.h: * Sccsid @(#)dev.h	1.8 (gritter) 9/30/05
 troff.d/draw.c: * Sccsid @(#)draw.c	1.3 (gritter) 8/8/05
 troff.d/makedev.c: * Sccsid @(#)makedev.c	1.10 (gritter) 9/8/05
-troff.d/otf.c: * Sccsid @(#)otf.c	1.11 (gritter) 10/2/05
+troff.d/otf.c: * Sccsid @(#)otf.c	1.12 (gritter) 10/2/05
 troff.d/otfdump.c: * Sccsid @(#)otfdump.c	1.2 (gritter) 10/1/05
 troff.d/proto.h: * Sccsid @(#)proto.h	1.30 (gritter) 9/30/05
 troff.d/t10.c: * Sccsid @(#)t10.c	1.49 (gritter) 9/30/05

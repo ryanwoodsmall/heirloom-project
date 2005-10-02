@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.6 (gritter) 9/27/05
+ * Sccsid @(#)misc.c	1.7 (gritter) 10/2/05
  */
 
 /*
@@ -115,18 +115,6 @@ errprint(char *fmt, ...)
 	va_start(ap, fmt);
 	verrprint(fmt, ap);
 	va_end(ap);
-}
-
-void
-fdprintf(int fd, char *fmt, ...)
-{
-	va_list	ap;
-
-	if (fd == 2) {
-		va_start(ap, fmt);
-		vfprintf(stderr, fmt, ap);
-		va_end(ap);
-	}
 }
 
 /*****************************************************************************/
