@@ -9,7 +9,7 @@
 # font.
 #
 
-# Sccsid @(#)showfont.sh	1.6 (gritter) 10/2/05
+# Sccsid @(#)showfont.sh	1.7 (gritter) 10/2/05
 
 pwd=`pwd`
 
@@ -64,6 +64,8 @@ do (
 		otfdump -n "$i" | nawk '{
 			printf(".ds FN \\fH\\s(12'"$i"' \\(em %s\n", $2)
 			print ".mk S"
+			print ".sp 0"
+			printf("\\X'"'"'PDFMark: Bookmark 0 %s'"'"'\n", $2)
 			print ".sp |4P"
 			print "\\*(FN"
 			print ".sp |\\nSu"
@@ -78,6 +80,8 @@ do (
 			$1 == "FontName" {
 				printf(".ds FN \\fH\\s(12'"$i"' \\(em %s\n", $2)
 				print ".mk S"
+				print ".sp 0"
+				printf("\\X'"'"'PDFMark: Bookmark 0 %s'"'"'\n", $2)
 				print ".sp |4P"
 				print "\\*(FN"
 				print ".sp |\\nSu"
