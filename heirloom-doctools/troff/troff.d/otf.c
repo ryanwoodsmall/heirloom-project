@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.20 (gritter) 10/3/05
+ * Sccsid @(#)otf.c	1.21 (gritter) 10/3/05
  */
 
 #include <sys/types.h>
@@ -2110,6 +2110,13 @@ get_kern(void)
 #endif	/* !DPOST */
 
 #ifdef	DPOST
+static void
+checkembed(void)
+{
+	if ((fsType&0x030e) == 0x0002 || fsType & 0x0200)
+		error("embedding not allowed");
+}
+
 int
 otfcff(const char *path,
 		char *_contents, size_t _size, size_t *offset, size_t *length)
@@ -2126,11 +2133,12 @@ otfcff(const char *path,
 		get_OS_2();
 		if (pos_CFF < 0)
 			error("no CFF table");
+		checkembed();
 		*offset = table_directories[pos_CFF].offset;
 		*length = table_directories[pos_CFF].length;
 	} else
 		ok = -1;
-	return ok == 0 ? fsType : ok;
+	return ok;
 }
 
 uint32_t
@@ -2288,8 +2296,7 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 		get_name();
 		if (ttf == 0)
 			error("not a TrueType font file");
-		if ((fsType&0x0002)==0x0002 || fsType & 0x0200)
-			error("embedding not allowed");
+		checkembed();
 		get_ttf();
 		fprintf(fp, "11 dict begin\n");
 		fprintf(fp, "/FontType 42 def\n");

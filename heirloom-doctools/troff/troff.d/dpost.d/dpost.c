@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.97 (gritter) 10/2/05
+ * Sccsid @(#)dpost.c	1.98 (gritter) 10/3/05
  */
 
 /*
@@ -2311,10 +2311,6 @@ supplyotf(char *font, char *path, FILE *fp)
 	fclose(fp);
 	if ((fsType = otfcff(path, contents, size, &offset, &length)) < 0) {
 		free(contents);
-		return;
-	}
-	if ((fsType&0x0002)==0x0002 || fsType & 0x0200) {
-		error(NON_FATAL, "%s: embedding not allowed", path);
 		return;
 	}
 	fprintf(rf, "%%%%IncludeResource: ProcSet (FontSetInit)\n");
