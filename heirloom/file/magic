@@ -1,5 +1,5 @@
 #
-#	Sccsid	@(#)magic	1.37 (gritter) 11/21/04
+#	Sccsid	@(#)magic	1.38 (gritter) 10/3/05
 #
 # This is the magic file for the Heirloom Toolchest file command.
 # The format is as follows:
@@ -439,7 +439,8 @@
 #
 # Font formats and related things.
 #
-0	belong	0x00010000	True type font data
+0	belong	0x00010000	TrueType font data
+0	string	OTTO		CFF-based OpenType font data
 0	string	%!PS-AdobeFont-1.0	PostScript Type 1 font text
 0	string	%!PS-AdobeFont-1.0	PostScript Type 1 font program data
 0	belong	04		X11 SNF font data, MSB first
