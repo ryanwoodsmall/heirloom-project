@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.17 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.18 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -2312,8 +2312,6 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 	free(ExtraStrings);
 	ExtraStrings = NULL;
 	nExtraStrings = 0;
-	free(a->gid2tr);
-	a->gid2tr = NULL;
 	return ok;
 }
 #endif	/* DPOST */
