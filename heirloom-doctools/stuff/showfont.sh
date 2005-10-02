@@ -9,14 +9,14 @@
 # font.
 #
 
-# Sccsid @(#)showfont.sh	1.5 (gritter) 9/30/05
+# Sccsid @(#)showfont.sh	1.6 (gritter) 10/2/05
 
 pwd=`pwd`
 
 for i
 do (
 	case $i in
-	*.otf)
+	*.otf|*.ttf)
 		supply=$i
 		;;
 	*)
@@ -60,7 +60,7 @@ do (
 		.sp 6P
 	!
 	case $i in
-	*.otf)
+	*.otf|*.ttf)
 		otfdump -n "$i" | nawk '{
 			printf(".ds FN \\fH\\s(12'"$i"' \\(em %s\n", $2)
 			print ".mk S"

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.35 (gritter) 9/30/05
+ * Sccsid @(#)afm.c	1.37 (gritter) 10/2/05
  */
 
 #include <stdlib.h>
@@ -634,8 +634,8 @@ thisword(const char *text, const char *wrd)
 int
 unitconv(int i)
 {
-	float	d;
-	int	Units, Point, uw;
+	float	d, uw, Point;
+	int	Units;
 
 	Units = unitsPerEm;
 	Point = dev.res / 72;
@@ -720,7 +720,8 @@ addcharlib(struct afmtab *a, int symbol)
 				B[3] = charlib[i].kern & 2 ?
 					a->capheight + 1 : 0;
 				afmaddchar(a, -1, j+128, charlib[i].code,
-						charlib[i].width, B, NULL,
+						charlib[i].width * unitsPerEm /
+						1024, B, NULL,
 						0, 0, 0);
 			}
 		}

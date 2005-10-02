@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.12 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.15 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -45,7 +45,6 @@ extern	int		nchtab;
 
 extern	void	errprint(const char *, ...);
 extern	void	verrprint(const char *, va_list);
-extern	int	stderr;
 
 static jmp_buf	breakpoint;
 static char	*contents;
@@ -54,6 +53,7 @@ static unsigned short	numTables;
 static int	ttf;
 static const char	*filename;
 unsigned short	unitsPerEm;
+short	xMin, yMin, xMax, yMax;
 static struct afmtab	*a;
 static int	nc;
 static int	fsType;
@@ -72,6 +72,7 @@ static int	pos_OS_2;
 static int	pos_GSUB;
 static int	pos_GPOS;
 static int	pos_post;
+static int	pos_kern;
 
 static unsigned short	*gid2sid;
 
@@ -523,16 +524,286 @@ static const char *const StandardStrings[] = {
 
 static const int	nStdStrings = 391;
 
+static const char *const MacintoshStrings[] = {
+	".notdef",	/* 0 */
+	".null",	/* 1 */
+	"nonmarkingreturn",	/* 2 */
+	"space",	/* 3 */
+	"exclam",	/* 4 */
+	"quotedbl",	/* 5 */
+	"numbersign",	/* 6 */
+	"dollar",	/* 7 */
+	"percent",	/* 8 */
+	"ampersand",	/* 9 */
+	"quotesingle",	/* 10 */
+	"parenleft",	/* 11 */
+	"parenright",	/* 12 */
+	"asterisk",	/* 13 */
+	"plus",	/* 14 */
+	"comma",	/* 15 */
+	"hyphen",	/* 16 */
+	"period",	/* 17 */
+	"slash",	/* 18 */
+	"zero",	/* 19 */
+	"one",	/* 20 */
+	"two",	/* 21 */
+	"three",	/* 22 */
+	"four",	/* 23 */
+	"five",	/* 24 */
+	"six",	/* 25 */
+	"seven",	/* 26 */
+	"eight",	/* 27 */
+	"nine",	/* 28 */
+	"colon",	/* 29 */
+	"semicolon",	/* 30 */
+	"less",	/* 31 */
+	"equal",	/* 32 */
+	"greater",	/* 33 */
+	"question",	/* 34 */
+	"at",	/* 35 */
+	"A",	/* 36 */
+	"B",	/* 37 */
+	"C",	/* 38 */
+	"D",	/* 39 */
+	"E",	/* 40 */
+	"F",	/* 41 */
+	"G",	/* 42 */
+	"H",	/* 43 */
+	"I",	/* 44 */
+	"J",	/* 45 */
+	"K",	/* 46 */
+	"L",	/* 47 */
+	"M",	/* 48 */
+	"N",	/* 49 */
+	"O",	/* 50 */
+	"P",	/* 51 */
+	"Q",	/* 52 */
+	"R",	/* 53 */
+	"S",	/* 54 */
+	"T",	/* 55 */
+	"U",	/* 56 */
+	"V",	/* 57 */
+	"W",	/* 58 */
+	"X",	/* 59 */
+	"Y",	/* 60 */
+	"Z",	/* 61 */
+	"bracketleft",	/* 62 */
+	"backslash",	/* 63 */
+	"bracketright",	/* 64 */
+	"asciicircum",	/* 65 */
+	"underscore",	/* 66 */
+	"grave",	/* 67 */
+	"a",	/* 68 */
+	"b",	/* 69 */
+	"c",	/* 70 */
+	"d",	/* 71 */
+	"e",	/* 72 */
+	"f",	/* 73 */
+	"g",	/* 74 */
+	"h",	/* 75 */
+	"i",	/* 76 */
+	"j",	/* 77 */
+	"k",	/* 78 */
+	"l",	/* 79 */
+	"m",	/* 80 */
+	"n",	/* 81 */
+	"o",	/* 82 */
+	"p",	/* 83 */
+	"q",	/* 84 */
+	"r",	/* 85 */
+	"s",	/* 86 */
+	"t",	/* 87 */
+	"u",	/* 88 */
+	"v",	/* 89 */
+	"w",	/* 90 */
+	"x",	/* 91 */
+	"y",	/* 92 */
+	"z",	/* 93 */
+	"braceleft",	/* 94 */
+	"bar",	/* 95 */
+	"braceright",	/* 96 */
+	"asciitilde",	/* 97 */
+	"Adieresis",	/* 98 */
+	"Aring",	/* 99 */
+	"Ccedilla",	/* 100 */
+	"Eacute",	/* 101 */
+	"Ntilde",	/* 102 */
+	"Odieresis",	/* 103 */
+	"Udieresis",	/* 104 */
+	"aacute",	/* 105 */
+	"agrave",	/* 106 */
+	"acircumflex",	/* 107 */
+	"adieresis",	/* 108 */
+	"atilde",	/* 109 */
+	"aring",	/* 110 */
+	"ccedilla",	/* 111 */
+	"eacute",	/* 112 */
+	"egrave",	/* 113 */
+	"ecircumflex",	/* 114 */
+	"edieresis",	/* 115 */
+	"iacute",	/* 116 */
+	"igrave",	/* 117 */
+	"icircumflex",	/* 118 */
+	"idieresis",	/* 119 */
+	"ntilde",	/* 120 */
+	"oacute",	/* 121 */
+	"ograve",	/* 122 */
+	"ocircumflex",	/* 123 */
+	"odieresis",	/* 124 */
+	"otilde",	/* 125 */
+	"uacute",	/* 126 */
+	"ugrave",	/* 127 */
+	"ucircumflex",	/* 128 */
+	"udieresis",	/* 129 */
+	"dagger",	/* 130 */
+	"degree",	/* 131 */
+	"cent",	/* 132 */
+	"sterling",	/* 133 */
+	"section",	/* 134 */
+	"bullet",	/* 135 */
+	"paragraph",	/* 136 */
+	"germandbls",	/* 137 */
+	"registered",	/* 138 */
+	"copyright",	/* 139 */
+	"trademark",	/* 140 */
+	"acute",	/* 141 */
+	"dieresis",	/* 142 */
+	"notequal",	/* 143 */
+	"AE",	/* 144 */
+	"Oslash",	/* 145 */
+	"infinity",	/* 146 */
+	"plusminus",	/* 147 */
+	"lessequal",	/* 148 */
+	"greaterequal",	/* 149 */
+	"yen",	/* 150 */
+	"mu",	/* 151 */
+	"partialdiff",	/* 152 */
+	"summation",	/* 153 */
+	"product",	/* 154 */
+	"pi",	/* 155 */
+	"integral",	/* 156 */
+	"ordfeminine",	/* 157 */
+	"ordmasculine",	/* 158 */
+	"Omega",	/* 159 */
+	"ae",	/* 160 */
+	"oslash",	/* 161 */
+	"questiondown",	/* 162 */
+	"exclamdown",	/* 163 */
+	"logicalnot",	/* 164 */
+	"radical",	/* 165 */
+	"florin",	/* 166 */
+	"approxequal",	/* 167 */
+	"Delta",	/* 168 */
+	"guillemotleft",	/* 169 */
+	"guillemotright",	/* 170 */
+	"ellipsis",	/* 171 */
+	"nonbreakingspace",	/* 172 */
+	"Agrave",	/* 173 */
+	"Atilde",	/* 174 */
+	"Otilde",	/* 175 */
+	"OE",	/* 176 */
+	"oe",	/* 177 */
+	"endash",	/* 178 */
+	"emdash",	/* 179 */
+	"quotedblleft",	/* 180 */
+	"quotedblright",	/* 181 */
+	"quoteleft",	/* 182 */
+	"quoteright",	/* 183 */
+	"divide",	/* 184 */
+	"lozenge",	/* 185 */
+	"ydieresis",	/* 186 */
+	"Ydieresis",	/* 187 */
+	"fraction",	/* 188 */
+	"currency",	/* 189 */
+	"guilsinglleft",	/* 190 */
+	"guilsinglright",	/* 191 */
+	"fi",	/* 192 */
+	"fl",	/* 193 */
+	"daggerdbl",	/* 194 */
+	"periodcentered",	/* 195 */
+	"quotesinglbase",	/* 196 */
+	"quotedblbase",	/* 197 */
+	"perthousand",	/* 198 */
+	"Acircumflex",	/* 199 */
+	"Ecircumflex",	/* 200 */
+	"Aacute",	/* 201 */
+	"Edieresis",	/* 202 */
+	"Egrave",	/* 203 */
+	"Iacute",	/* 204 */
+	"Icircumflex",	/* 205 */
+	"Idieresis",	/* 206 */
+	"Igrave",	/* 207 */
+	"Oacute",	/* 208 */
+	"Ocircumflex",	/* 209 */
+	"apple",	/* 210 */
+	"Ograve",	/* 211 */
+	"Uacute",	/* 212 */
+	"Ucircumflex",	/* 213 */
+	"Ugrave",	/* 214 */
+	"dotlessi",	/* 215 */
+	"circumflex",	/* 216 */
+	"tilde",	/* 217 */
+	"macron",	/* 218 */
+	"breve",	/* 219 */
+	"dotaccent",	/* 220 */
+	"ring",	/* 221 */
+	"cedilla",	/* 222 */
+	"hungarumlaut",	/* 223 */
+	"ogonek",	/* 224 */
+	"caron",	/* 225 */
+	"Lslash",	/* 226 */
+	"lslash",	/* 227 */
+	"Scaron",	/* 228 */
+	"scaron",	/* 229 */
+	"Zcaron",	/* 230 */
+	"zcaron",	/* 231 */
+	"brokenbar",	/* 232 */
+	"Eth",	/* 233 */
+	"eth",	/* 234 */
+	"Yacute",	/* 235 */
+	"yacute",	/* 236 */
+	"Thorn",	/* 237 */
+	"thorn",	/* 238 */
+	"minus",	/* 239 */
+	"multiply",	/* 240 */
+	"onesuperior",	/* 241 */
+	"twosuperior",	/* 242 */
+	"threesuperior",	/* 243 */
+	"onehalf",	/* 244 */
+	"onequarter",	/* 245 */
+	"threequarters",	/* 246 */
+	"franc",	/* 247 */
+	"Gbreve",	/* 248 */
+	"gbreve",	/* 249 */
+	"Idotaccent",	/* 250 */
+	"Scedilla",	/* 251 */
+	"scedilla",	/* 252 */
+	"Cacute",	/* 253 */
+	"cacute",	/* 254 */
+	"Ccaron",	/* 255 */
+	"ccaron",	/* 256 */
+	"dcroat"	/* 257 */
+};
+
+static const int	nMacintoshStrings = 258;
+
 static char	**ExtraStrings;
 static char	*ExtraStringSpace;
+static int	nExtraStrings;
 
 static char *
 getSID(int n)
 {
-	if (n >= 0 && n < nStdStrings)
-		return (char *)StandardStrings[n];
-	n -= nStdStrings;
-	if (CFF.String && n < CFF.String->count)
+	if (ttf) {
+		if (n >= 0 && n < nMacintoshStrings)
+			return (char *)MacintoshStrings[n];
+		n -= nMacintoshStrings;
+	} else {
+		if (n >= 0 && n < nStdStrings)
+			return (char *)StandardStrings[n];
+		n -= nStdStrings;
+	}
+	if (n < nExtraStrings)
 		return ExtraStrings[n];
 	return NULL;
 }
@@ -660,7 +931,6 @@ get_offset_table(void)
 		error("no offset table");
 	memcpy(buf, contents, 12);
 	if (pbe32(buf) == 0x00010000) {
-		error("cannot handle TrueType-based OpenType fonts");
 		ttf = 1;
 	} else if (memcmp(buf, "OTTO", 4) == 0) {
 		ttf = 0;
@@ -685,6 +955,7 @@ get_table_directory(void)
 	pos_GSUB = -1;
 	pos_GPOS = -1;
 	pos_post = -1;
+	pos_kern = -1;
 	for (i = 0; i < numTables; i++) {
 		if (o + 16 >= size)
 			error("cannot get %dth table directory", i);
@@ -703,6 +974,8 @@ get_table_directory(void)
 			pos_GPOS = i;
 		else if (memcmp(buf, "post", 4) == 0)
 			pos_post = i;
+		else if (memcmp(buf, "kern", 4) == 0)
+			pos_kern = i;
 		o += 16;
 		memcpy(table_directory[i].tag, buf, 4);
 		table_directory[i].checkSum = pbe32(&buf[4]);
@@ -758,6 +1031,8 @@ onechar(int gid, int sid)
 	char	*N;
 	int	B[4] = { 0, 0, 0, 0};
 
+	if (gid == 0 && sid != 0 || sid == 0 && gid != 0)
+		return;		/* require .notdef to be GID 0 */
 	if (pos_hmtx < 0)
 		error("no hmtx table");
 	if (table_directory[pos_hmtx].length < 4)
@@ -770,10 +1045,14 @@ onechar(int gid, int sid)
 			return;	/* just ignore this glyph */
 		w = pbe16(&contents[o + 4 * gid]);
 	}
-	if ((N = getSID(sid)) != NULL)
-		a->nspace += strlen(N) + 1;
-	tp = afmmapname(N, 0, 0);
-	afmaddchar(a, gid, tp, 0, w, B, N, 0, 0, gid);
+	if (a) {
+		if ((N = getSID(sid)) != NULL) {
+			a->nspace += strlen(N) + 1;
+			tp = afmmapname(N, 0, 0);
+		} else
+			tp = -1;
+		afmaddchar(a, gid, tp, 0, w, B, N, 0, 0, gid);
+	}
 	gid2sid[gid] = sid;
 }
 
@@ -872,6 +1151,18 @@ build_ExtraStrings(void)
 			*sp++ = contents[i];
 		*sp++ = 0;
 	}
+	nExtraStrings = c;
+}
+
+static void
+otfalloc(int _nc)
+{
+	nc = _nc;
+	gid2sid = calloc(nc, sizeof *gid2sid);
+	if (a) {
+		afmalloc(a, nc);
+		a->gid2tr = calloc(nc, sizeof *a->gid2tr);
+	}
 }
 
 static void
@@ -908,12 +1199,69 @@ get_CFF(void)
 #endif
 	if (CFF.CharStrings == NULL || CFF.CharStrings->count == 0)
 		error("no characters in font");
-	nc = CFF.CharStrings->count;
-	gid2sid = calloc(nc, sizeof *gid2sid);
-	afmalloc(a, nc);
-	a->gid2tr = calloc(nc, sizeof *a->gid2tr);
+	otfalloc(CFF.CharStrings->count);
 	get_CFF_Charset();
 	afmremap(a);
+}
+
+static void
+get_ttf(void)
+{
+	long	o;
+	int	numberOfGlyphs;
+	int	numberNewGlyphs;
+	int	i, j, n;
+	char	*cp, *sp;
+
+	if (pos_post < 0)
+		error("no post table");
+	o = table_directory[pos_post].offset;
+	if (pbe32(&contents[o]) != 0x00020000)
+		error("can only handle TrueType fonts with version 2.0 "
+				"post table");
+	numberOfGlyphs = pbe16(&contents[o+32]);
+	if (34+2*numberOfGlyphs > table_directory[pos_post].length)
+		error("numberOfGlyphs value in post table too large");
+	if (a) {
+		a->fontname = malloc(strlen(a->base) + 5);
+		strcpy(a->fontname, a->base);
+		strcat(a->fontname, ".TTF");
+#ifdef	DUMP
+		print(SHOW_NAME, "name %s", a->fontname);
+#endif
+	}
+	otfalloc(numberOfGlyphs);
+	numberNewGlyphs = 0;
+	for (i = 0; i < numberOfGlyphs; i++) {
+		n = pbe16(&contents[o+34+2*i]);
+		if (n >= 258) {
+			n -= 258;
+			if (n > numberNewGlyphs)
+				numberNewGlyphs = n;
+		}
+	}
+	ExtraStrings = calloc(numberNewGlyphs, sizeof *ExtraStrings);
+	sp = ExtraStringSpace = malloc(table_directory[pos_post].length -
+			34 - 2*numberOfGlyphs);
+	cp = &contents[o+34+2*numberOfGlyphs];
+	for (i = 0; i < numberNewGlyphs; i++) {
+		if (cp >= &contents[o + table_directory[pos_post].length])
+			break;
+		ExtraStrings[i] = sp;
+		n = *cp++ & 0377;
+		if (&cp[n] > &contents[o + table_directory[pos_post].length])
+			break;
+		for (j = 0; j < n; j++)
+			*sp++ = *cp++;
+		*sp++ = 0;
+	}
+	nExtraStrings = i;
+	for (i = 0; i < numberOfGlyphs; i++) {
+		n = pbe16(&contents[o+34+2*i]);
+		onechar(i, n);
+	}
+	if (a)
+		afmremap(a);
 }
 
 static void
@@ -927,6 +1275,10 @@ get_head(void)
 	if (pbe32(&contents[o]) != 0x00010000)
 		error("can only handle version 1.0 head tables");
 	unitsPerEm = pbe16(&contents[o + 18]);
+	xMin = pbe16(&contents[o + 36]);
+	yMin = pbe16(&contents[o + 38]);
+	xMax = pbe16(&contents[o + 40]);
+	xMax = pbe16(&contents[o + 42]);
 }
 
 static void
@@ -971,7 +1323,6 @@ get_OS_2(void)
 	}
 }
 
-#ifndef	DPOST
 static char *
 GID2SID(int gid)
 {
@@ -980,6 +1331,7 @@ GID2SID(int gid)
 	return getSID(gid2sid[gid]);
 }
 
+#ifndef	DPOST
 static int	ScriptList;
 static int	FeatureList;
 static int	LookupList;
@@ -1159,9 +1511,11 @@ get_x_adj(int ValueFormat1, int o)
 static void	kernpair(int, int, int);
 static void	kernfinish(void);
 
+static int	nkerntmp;
+
 #ifndef	DUMP
 static struct kernpair	*kerntmp;
-static int	nkerntmp, akerntmp;
+static int	akerntmp;
 
 static void
 kernpair1(int ch1, int ch2, int k)
@@ -1305,7 +1659,7 @@ get_PairPosFormat2(int o)
 }
 
 static void
-get_kern(int _t, int o, const char *_name)
+get_GPOS_kern(int _t, int o, const char *_name)
 {
 	int	PosFormat;
 
@@ -1611,6 +1965,62 @@ get_feature(int table, const char *name, int type,
 		}
 }
 
+static void
+get_kern_subtable(int o)
+{
+	int	length;
+	int	coverage;
+	int	nPairs;
+	int	i;
+	int	left, right, value;
+
+	if (pbe16(&contents[o]) != 0)
+		return;
+	length = pbe16(&contents[o+2]);
+	coverage = pbe16(&contents[o+4]);
+	if ((coverage&1) != 1 ||		/* check: horizontal data */
+			(coverage&2) != 0 ||	/* . . . kerning values */
+			(coverage&4) != 0 ||	/* . . . not perpendicular */
+			((coverage&0xff00) != 0))	/* . . . format 0 */
+		return;
+	nPairs = pbe16(&contents[o+6]);
+	for (i = 0; i < nPairs; i++) {
+		if (o + 14 + 3 * (i+1) > o + length)
+			break;
+		left = pbe16(&contents[o+14+3*i]);
+		right = pbe16(&contents[o+14+3*i+2]);
+		value = (int16_t)pbe16(&contents[o+14+3*i+4]);
+		kernpair(left, right, value);
+	}
+}
+
+static void
+get_kern(void)
+{
+	long	o;
+	int	nTables;
+	int	i, length;
+
+	if (pos_kern < 0)
+		return;
+	o = table_directory[pos_kern].offset;
+	if (pbe16(&contents[o]) != 0)
+		return;
+	nTables = pbe16(&contents[o+2]);
+	o += 4;
+	for (i = 0; i < nTables; i++) {
+		if (o > table_directory[pos_kern].offset +
+				table_directory[pos_kern].length)
+			return;
+		length = pbe16(&contents[o+2]);
+		if (o + length > table_directory[pos_kern].offset +
+				table_directory[pos_kern].length)
+			return;
+		get_kern_subtable(o);
+		o += length;
+	}
+}
+
 #endif	/* !DPOST */
 
 #ifdef	DPOST
@@ -1636,6 +2046,73 @@ otfcff(const char *path,
 		ok = -1;
 	return ok == 0 ? fsType : ok;
 }
+
+/*
+ * This should follow section 4.2 of the Type 42 specification
+ * more closely.
+ */
+static void
+build_sfnts(FILE *fp)
+{
+	int	i;
+	for (i = 0; i < size; i++) {
+		if (i % 36 == 0)
+			putc('\n', fp);
+		if (i && i % 64000 == 0)
+			fprintf(fp, "><");
+		fprintf(fp, "%02X", contents[i]&0377);
+	}
+}
+
+int
+otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
+{
+	char	*cp;
+	int	ok = 0;
+	int	i;
+
+	a = NULL;
+	filename = path;
+	contents = _contents;
+	size = _size;
+	if (setjmp(breakpoint) == 0) {
+		get_offset_table();
+		get_table_directory();
+		get_head();
+		get_OS_2();
+		get_post();
+		if (ttf == 0)
+			error("not a TrueType font file");
+		if ((fsType&0x0002)==0x0002 || fsType & 0x0200)
+			error("may not embed");
+		get_ttf();
+		fprintf(fp, "11 dict begin\n");
+		fprintf(fp, "/FontType 42 def\n");
+		fprintf(fp, "/FontMatrix [1 0 0 1 0 0] def\n");
+		fprintf(fp, "/FontName /%s def\n", font);
+		fprintf(fp, "/FontBBox [%d %d %d %d] def\n",
+				xMin * 1000 / unitsPerEm,
+				yMin * 1000 / unitsPerEm,
+				xMax * 1000 / unitsPerEm,
+				yMax * 1000 / unitsPerEm);
+		fprintf(fp, "/PaintType 0 def\n");
+		fprintf(fp, "/Encoding StandardEncoding def\n");
+		fprintf(fp, "/CharStrings %d dict dup begin\n", nc);
+		for (i = 0; i < nc; i++) {
+			if ((cp = GID2SID(i)) != NULL)
+				fprintf(fp, "/%s %d def\n", cp, i);
+			else
+				fprintf(fp, "/GLYPH@%d %d def\n", i, i);
+		}
+		fprintf(fp, "end readonly def\n");
+		fprintf(fp, "/sfnts[<");
+		build_sfnts(fp);
+		fprintf(fp, ">]def\n");
+		fprintf(fp, "FontName currentdict end definefont pop\n");
+	} else
+		ok = -1;
+	return ok;
+}
 #endif	/* DPOST */
 
 int
@@ -1656,11 +2133,16 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		if (ttf == 0) {
 			a->type = TYPE_OTF;
 			get_CFF();
+		} else {
+			a->type = TYPE_TTF;
+			get_ttf();
 		}
 #ifndef	DPOST
 		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
-		get_feature(pos_GPOS, "kern", 2, get_kern);
+		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern);
 		get_feature(pos_GSUB, NULL, -1, get_substitutions);
+		if (ttf && nkerntmp == 0)
+			get_kern();
 		kernfinish();
 #endif	/* !DPOST */
 		a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
@@ -1677,7 +2159,10 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 	free_INDEX(CFF.CharStrings);
 	CFF.CharStrings = 0;
 	free(ExtraStringSpace);
+	ExtraStringSpace = NULL;
 	free(ExtraStrings);
+	ExtraStrings = NULL;
+	nExtraStrings = 0;
 	free(a->gid2tr);
 	a->gid2tr = NULL;
 	return ok;

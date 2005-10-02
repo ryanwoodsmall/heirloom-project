@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.94 (gritter) 10/2/05
+ * Sccsid @(#)dpost.c	1.95 (gritter) 10/2/05
  */
 
 /*
@@ -2308,6 +2308,7 @@ supplyotf(char *font, char *path, FILE *fp)
 	contents = malloc(size);
 	if (fread(contents, 1, size, fp) != size)
 		error(FATAL, "cannot read %s", path);
+	fclose(fp);
 	if ((fsType = otfcff(path, contents, size, &offset, &length)) < 0) {
 		free(contents);
 		return;
@@ -2320,7 +2321,7 @@ supplyotf(char *font, char *path, FILE *fp)
         if (sfcount++ == 0)
         	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
         else
-        fprintf(sf, "%%%%+ font %s\n", font);
+        	fprintf(sf, "%%%%+ font %s\n", font);
 	fprintf(rf, "%%%%BeginResource: FontSet (%s)\n", font);
 	fprintf(rf, "/FontSetInit /ProcSet findresource begin\n");
 	fprintf(rf, "%%%%BeginData: %ld Binary Bytes\n",
@@ -2331,6 +2332,33 @@ supplyotf(char *font, char *path, FILE *fp)
 	fprintf(rf, "%%%%EndResource\n");
 	free(contents);
 	got_otf = 1;
+}
+
+static void
+supplyttf(char *font, char *path, FILE *fp)
+{
+	struct stat	st;
+	char	*contents;
+	size_t	size;
+
+	if (fstat(fileno(fp), &st) < 0)
+		error(FATAL, "cannot stat %s", path);
+	size = st.st_size;
+	contents = malloc(size);
+	if (fread(contents, 1, size, fp) != size)
+		error(FATAL, "cannot read %s", path);
+	fclose(fp);
+        if (sfcount++ == 0)
+        	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
+        else
+        	fprintf(sf, "%%%%+ font %s\n", font);
+	fprintf(rf, "%%%%BeginResource: Font %s\n", font);
+	if (otft42(font, path, contents, size, rf) < 0) {
+		free(contents);
+		return;
+	}
+	fprintf(rf, "%%%%EndResource\n");
+	free(contents);
 }
 
 static void
@@ -2349,7 +2377,8 @@ supply1(char *font, char *file, char *type)
     if (type == NULL) {
 	c = getc(fp);
 	ungetc(c, fp);
-	type = c == '\200' ? "pfb" : c == 'O' ? "otf" : "anything";
+	type = c == '\200' ? "pfb" : c == 'O' ? "otf" :
+		c == 0 ? "ttf" : "anything";
     }
     if (strcmp(type, "pfb") == 0) {
 	    supplypfb(font, file, fp);
@@ -2357,6 +2386,10 @@ supply1(char *font, char *file, char *type)
     }
     if (strcmp(type, "otf") == 0) {
 	    supplyotf(font, file, fp);
+	    return;
+    }
+    if (strcmp(type, "ttf") == 0) {
+	    supplyttf(font, file, fp);
 	    return;
     }
     if (fgets(line, sizeof line, fp) == NULL)

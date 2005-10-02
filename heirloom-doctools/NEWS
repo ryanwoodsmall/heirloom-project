@@ -61,12 +61,12 @@ the description for ".xflag" below.
 	character substitution using the ".fallback" request.
 
 .fp r yy metricsname [supplyname]			troff only
-	reads metrics from "metricsname", which must be in AFM or OpenType
-	format. If the TROFFONTS environment variable is set, each of the
-	colon-separated directories in it is tried for the files
-	"metricsname.afm", "metricsname.otf", or, if "metricsname" has an
-	".afm" or ".otf" extension itself, for "metricsname". Otherwise,
-	the font is loaded from the file
+	reads metrics from "metricsname", which must be in AFM, OpenType,
+	or TrueType format. If the TROFFONTS environment variable is set,
+	each of the colon-separated directories in it is tried for the files
+	"metricsname.afm", "metricsname.otf", "metricsname.ttf", or, if
+	"metricsname" has an ".afm", ".otf", or ".ttf" extension itself,
+	for "metricsname". Otherwise, the font is loaded from the file
 	"/usr/ucblib/doctools/font/devps/metricsname.afm". If this fails,
 	a legacy ditroff font is assumed.
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
@@ -83,10 +83,11 @@ the description for ".xflag" below.
 	  "yy" may also consist of more than two characters.
 	  If the optional "supplyname" argument is present, glyph data
 	is included in the generated PostScript file. If "supplyname"
-	is one of "otf", "pfb", "pfa", or "t42", the file "supplyname.pfb"
-	(or likewise) is searched in the directories in TROFFONTS first as
-	described for the AFM file above, and if it is not found there,
-	in "/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
+	is one of "otf", "pfb", "pfa", "ttf", or "t42", the file
+	"supplyname.pfb" (or likewise) is searched in the directories
+	in TROFFONTS first as described for the AFM file above, and if
+	it is not found there, in
+	"/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
 	"metricsname" above.
 
@@ -361,4 +362,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   9/30/05
+Gunnar Ritter                                                   10/2/05

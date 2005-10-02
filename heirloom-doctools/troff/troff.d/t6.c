@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.92 (gritter) 9/30/05
+ * Sccsid @(#)t6.c	1.93 (gritter) 10/2/05
  */
 
 /*
@@ -1270,8 +1270,11 @@ loadafm(int nf, int rq, char *file, char *supply, int required)
 	if (nf < 0 || nf > nfonts)
 		nf = nfonts + 1;
 	path = getfontpath(file, "afm");
-	if (access(path, 0) < 0)
+	if (access(path, 0) < 0) {
 		path = getfontpath(file, "otf");
+		if (access(path, 0) < 0)
+			path = getfontpath(file, "ttf");
+	}
 	a = calloc(1, sizeof *a);
 	for (i = 0; i < nafm; i++)
 		if (strcmp(afmtab[i]->path, path) == 0) {
@@ -1357,7 +1360,8 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 		char	*data;
 		if (strcmp(supply, "pfb") == 0 || strcmp(supply, "pfa") == 0 ||
 				strcmp(supply, "t42") == 0 ||
-				strcmp(supply, "otf") == 0)
+				strcmp(supply, "otf") == 0 ||
+				strcmp(supply, "ttf") == 0)
 			data = getfontpath(file, supply);
 		else
 			data = getfontpath(supply, NULL);

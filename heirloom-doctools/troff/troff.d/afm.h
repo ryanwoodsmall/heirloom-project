@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.15 (gritter) 9/30/05
+ * Sccsid @(#)afm.h	1.16 (gritter) 10/2/05
  */
 
 #ifndef	TROFF_AFM_H
@@ -78,7 +78,8 @@ extern struct afmtab {
 	int	xheight;
 	enum {
 		TYPE_AFM,
-		TYPE_OTF
+		TYPE_OTF,
+		TYPE_TTF
 	}	type;
 } **afmtab;
 extern int nafm;
@@ -92,7 +93,6 @@ extern unsigned short	unitsPerEm;
 
 extern	int	afmget(struct afmtab *, char *, size_t);
 extern	int	otfget(struct afmtab *, char *, size_t);
-extern	int	otfcff(const char *, char *, size_t, size_t *, size_t *);
 extern	struct namecache	*afmnamelook(struct afmtab *, const char *);
 extern	int	afmgetkern(struct afmtab *, int, int);
 extern	void	makefont(int, char *, char *, char *, char *, int);
@@ -104,5 +104,10 @@ extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
 			char *, int, int, int);
 extern	struct kernpair	*afmkernlook(struct afmtab *, int, int);
 extern	int	nextprime(int n);
+#ifdef	DPOST
+#include <stdio.h>
+extern	int	otfcff(const char *, char *, size_t, size_t *, size_t *);
+extern	int	otft42(char *, char *, char *, size_t, FILE *);
+#endif
 
 #endif	/* !TROFF_AFM_H */

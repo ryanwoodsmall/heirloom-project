@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.2 (gritter) 10/1/05
+ * Sccsid @(#)otfdump.c	1.4 (gritter) 10/2/05
  */
 
 static enum show {
@@ -122,6 +122,9 @@ dump(const char *name)
 	memset(&A, 0, sizeof A);
 	a = &A;
 	a->file = a->path = (char *)filename;
+	a->base = malloc(strlen(filename) + 1);
+	strcpy(a->base, filename);
+	a->base = basename(a->base);
 	if (fstat(fileno(fp), &st) < 0) {
 		errprint("cannot stat");
 		return 1;
@@ -175,7 +178,7 @@ void
 afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		int isS, int isS1, int gid)
 {
-	print(SHOW_CHARS, "char %s width %d", N, WX);
+	print(SHOW_CHARS, "char %s width %d", N, unitconv(WX));
 }
 
 void
@@ -197,6 +200,7 @@ kernpair(int first, int second, int x)
 	char	*s1, *s2;
 
 	if (x) {
+		nkerntmp++;
 		s1 = GID2SID(first);
 		s2 = GID2SID(second);
 		if (s1 && s2)

@@ -9,13 +9,13 @@ Heirloom troff understands two ways to select PostScript fonts.
 The new method can access PostScript font files directly. Fonts are
 selected using an extended ".fp" request:
 
-  .fp r yy metricsname [supplyname]
-	reads metrics from "metricsname", which must be in AFM or OpenType
-	format. If the TROFFONTS environment variable is set, each of the
-	colon-separated directories in it is tried for the files
-	"metricsname.afm", "metricsname.otf", or, if "metricsname" has an
-	".afm" or ".otf" extension itself, for "metricsname". Otherwise,
-	the font is loaded from the file
+  .fp r yy metricsname [supplyname]			troff only
+	reads metrics from "metricsname", which must be in AFM, OpenType,
+	or TrueType format. If the TROFFONTS environment variable is set,
+	each of the colon-separated directories in it is tried for the files
+	"metricsname.afm", "metricsname.otf", "metricsname.ttf", or, if
+	"metricsname" has an ".afm", ".otf", or ".ttf" extension itself,
+	for "metricsname". Otherwise, the font is loaded from the file
 	"/usr/ucblib/doctools/font/devps/metricsname.afm". If this fails,
 	a legacy ditroff font is assumed.
 	  The font is then available with ".ft yy", "\f(yy", etc. "yy" may
@@ -32,10 +32,11 @@ selected using an extended ".fp" request:
 	  "yy" may also consist of more than two characters.
 	  If the optional "supplyname" argument is present, glyph data
 	is included in the generated PostScript file. If "supplyname"
-	is one of "otf", "pfb", "pfa", or "t42", the file "supplyname.pfb"
-	(or likewise) is searched in the directories in TROFFONTS first as
-	described for the AFM file above, and if it is not found there,
-	in "/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
+	is one of "otf", "pfb", "pfa", "ttf", or "t42", the file
+	"supplyname.pfb" (or likewise) is searched in the directories
+	in TROFFONTS first as described for the AFM file above, and if
+	it is not found there, in
+	"/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
 	"metricsname" above.
 
@@ -77,11 +78,11 @@ the following example properly:
 	.sp
 	The first five small letters of the Greek alphabet: α β γ δ ε
 
-Note that any use of AFM or OpenType files requires that the output of
-troff is passed to the exactly matching version of dpost, i.e. to the
-one that was delivered with the same release of this package. Sending
-such troff output directly to a print spooler that invokes a system
-version of dpost will thus usually not work.
+Note that any use of AFM, OpenType, or TrueType files requires that the
+output of troff is passed to the exactly matching version of dpost, i.e.
+to the one that was delivered with the same release of this package.
+Sending such troff output directly to a print spooler that invokes a
+system version of dpost will thus usually not work.
 
 The old ditroff method requires font tables to be generated manually.
 It is still supported, and is still the default for the lower-resolution
@@ -121,31 +122,13 @@ permanent. You can now use the fonts with troff. If you want to install
 more fonts later, it is sufficient to put them into the font directory.
 
 
-Installing OpenType fonts
--------------------------
+Installing OpenType or TrueType fonts
+-------------------------------------
 
-The procedure for OpenType fonts is nearly the same as for Type 1 fonts,
-except that there is only one file "FontName.otf" with them that contains
-both metrics and glyph data. Just copy this file to a directory given in
-the TROFFONTS path.
-
-Only PostScript/CFF-based OpenType fonts are supported directly. OpenType
-fonts that contain TrueType glyph data are handled like TrueType fonts.
-
-
-Installing TrueType fonts
--------------------------
-
-For TrueType fonts, an additional conversion step is necessary. troff
-cannot handle TrueType fonts directly, but it can handle PostScript
-Type 42 fonts, which are a special representation of them. You can
-use the "ttftot42" utility from <http://www.nih.at/ttftot42/> to
-generate a Type 42 font from a TrueType font. It will produce a .afm
-file and a .t42 file; put both files into your font directory as with
-Type 1 fonts. You can then use the Type 42 font just like a Type 1
-font. The only drawback with this is that a Type 42 font requires
-special support from the PostScript interpreter; an aging printer
-may not be able to process it.
+The procedure for OpenType and TrueType fonts is nearly the same as for
+Type 1 fonts, except that there is only one file "FontName.otf" (or
+"FontName.ttf") with them that contains both metrics and glyph data.
+Just copy this file to a directory given in the TROFFONTS path.
 
 
 Using fonts with old style numerals
@@ -311,17 +294,18 @@ Pairwise kerning
 ----------------
 
 Pairwise kerning is enabled unless the -X option is given. The ".kern"
-request disables it. Kerning tables are initially read from the AFM or
-OpenType files; this default kerning only applies if two adjacent
-characters are from the same font. There are two methods to adjust the
-kerning tables: In many cases, it is most convenient to create a private
-copy of the AFM file and to adjust the "KPX" entries in it. This has the
-advantage that the modified kerning pairs are immediately available for
-use in other documents.
+request disables it. Kerning tables are initially read from the AFM,
+OpenType, or TrueType files; this default kerning only applies if two
+adjacent characters are from the same font. There are two methods to
+adjust the kerning tables: In many cases, it is most convenient to
+create a private copy of the AFM file and to adjust the "KPX" entries
+in it. This has the advantage that the modified kerning pairs are
+immediately available for use in other documents.
 
-For OpenType fonts, or for cases where this is not suitable with Type 1
-fonts, or not possible because the characters in the kerning pair originate
-from a different font, troff provides the ".kernpair" request:
+For OpenType or TrueType fonts, or for cases where this is not suitable
+with Type 1 fonts, or not possible because the characters in the kerning
+pair originate from a different font, troff provides the ".kernpair"
+request:
 
 	.do xflag 2
 	.fp 1 R fn______ pfb
@@ -391,27 +375,33 @@ by only 1/100 em.
 Helper utilities
 ----------------
 
-The "otfdump" utility shows the contents of an OpenType font file just
-as troff interprets it. It emits an ASCII format that is readable by
-humans and can also be used for further processing with shell scripts.
-It is useful to retrieve lists of characters and features supported
-with the font.
+The "otfdump" utility shows the contents of an OpenType or TrueType
+font file just as troff interprets it. It emits an ASCII format that
+is readable by humans and can also be used for further processing with
+shell scripts. It is useful to retrieve lists of characters and features
+supported with the font.
 
 The shell script "stuff/showfont.sh" in the source code distribution
 uses troff and possibly otfdump to print a map of all characters in an
-AFM or OpenType font.
+AFM, OpenType, or TrueType font.
 
 
 Limitations
 -----------
 
-dpost currently uses a method to embed OpenType fonts in PostScript
-documents that is only available with PostScript 3 interpreters; older
-printers that use PostScript Level 2 or below cannot handle such
-documents directly. The Ghostscript "ps2ps" utility can be used to
-create Level 2 documents from dpost output. Also you may have to
-update your copy of GhostScript in order to create PDF files with
+dpost uses a method to embed CFF-based (PostScript-style) OpenType
+fonts in PostScript documents that is only available with PostScript 3
+interpreters; older printers that use PostScript Level 2 or below cannot
+handle such documents directly. The Ghostscript "ps2ps" utility can be
+used to create Level 2 documents from dpost output. Also you may have
+to update your copy of GhostScript in order to create PDF files with
 proper font embedding from such output.
+
+troff can only handle TrueType fonts with version 2.0 "post" tables,
+i.e. those that contain PostScript glyph names.
+
+Embedding TrueType fonts in PostScript documents requires a PostScript 3
+interpreter or a PostScript Level 2 interpreter of at least version 2013.
 
 The PostScript/Unicode conversion tables currently only contain
 Western character names; other characters are simply ignored when
@@ -424,4 +414,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 9/30/05
+Gunnar Ritter                                                 10/2/05

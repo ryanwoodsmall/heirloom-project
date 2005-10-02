@@ -1,5 +1,7 @@
 Release ...
-* troff/dpost: Support for CFF-based OpenType fonts has been added.
+* troff/dpost: Support for OpenType fonts has been added. This includes
+  support for CFF-based (PostScript) OpenType fonts as well as support for
+  many TrueType fonts.
 * otfdump: New utility that prints the contents of an OpenType font file in
   an ASCII format just as troff interprets it.
 * troff: A ".ftr" request has been introduced as a font-specific variant of
