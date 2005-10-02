@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.18 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.19 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -852,10 +852,16 @@ getSID(int n)
 static void
 error(const char *fmt, ...)
 {
+	extern int	vsnprintf(char *, size_t, const char *, va_list);
+	extern int	snprintf(char *, size_t, const char *, ...);
+	char	buf[4096];
 	va_list	ap;
+	int	n;
 
+	n = snprintf(buf, sizeof buf, "%s: ", filename);
 	va_start(ap, fmt);
-	verrprint(fmt, ap);
+	vsnprintf(&buf[n], sizeof buf - n, fmt, ap);
+	errprint("%s", buf);
 	va_end(ap);
 	longjmp(breakpoint, 1);
 }
@@ -2278,7 +2284,7 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 		if (ttf == 0)
 			error("not a TrueType font file");
 		if ((fsType&0x0002)==0x0002 || fsType & 0x0200)
-			error("may not embed");
+			error("embedding not allowed");
 		get_ttf();
 		fprintf(fp, "11 dict begin\n");
 		fprintf(fp, "/FontType 42 def\n");
