@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.98 (gritter) 10/3/05
+ * Sccsid @(#)dpost.c	1.99 (gritter) 10/3/05
  */
 
 /*
@@ -760,15 +760,14 @@ putstring1(const char *sp, int n, FILE *fp)
 int
 putstring(const char *sp, int n, FILE *fp)
 {
-	int	c = 0;
+	int	c = 0, m;
 
-	while (n > 250) {
-		c += putstring1(sp, 250, fp);
-		sp += 250;
-		n -= 250;
-	}
-	if (n)
-		c += putstring1(sp, n, fp);
+	do {
+		m = n > 250 ? 250 : n;
+		c += putstring1(sp, m, fp);
+		sp += m;
+		n -= m;
+	} while (n > 0);
 	return c;
 }
 
