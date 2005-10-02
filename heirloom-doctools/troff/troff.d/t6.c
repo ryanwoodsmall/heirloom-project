@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.93 (gritter) 10/2/05
+ * Sccsid @(#)t6.c	1.94 (gritter) 10/3/05
  */
 
 /*
@@ -1006,8 +1006,9 @@ casefp(void)
 				supply = NULL;
 			if (loadafm(i?i:-1, j, file, supply, 0) == 0) {
 				if (i == 0)
-					goto bad;
-				setfp(i, j, file);
+					errprint("fp: cannot mount %s", file);
+				else
+					setfp(i, j, file);
 			}
 			free(file);
 			free(supply);

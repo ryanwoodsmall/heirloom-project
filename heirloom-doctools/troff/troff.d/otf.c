@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.19 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.20 (gritter) 10/3/05
  */
 
 #include <sys/types.h>
@@ -1011,6 +1011,11 @@ get_table_directories(void)
 		table_directories[i].checkSum = pbe32(&buf[4]);
 		table_directories[i].offset = pbe32(&buf[8]);
 		table_directories[i].length = pbe32(&buf[12]);
+		if (table_directories[i].offset +
+				table_directories[i].length > size)
+			error("invalid table directory, "
+					"size for entry %4.4s too large",
+					table_directories[i].tag);
 	}
 }
 
@@ -1080,7 +1085,7 @@ onechar(int gid, int sid)
 			a->nspace += strlen(N) + 1;
 			tp = afmmapname(N, 0, 0);
 		} else
-			tp = -1;
+			tp = 0;
 		afmaddchar(a, gid, tp, 0, w, B, N, 0, 0, gid);
 	}
 	gid2sid[gid] = sid;
@@ -1253,7 +1258,7 @@ get_ttf(void)
 	if (34+2*numberOfGlyphs > table_directories[pos_post].length)
 		error("numberOfGlyphs value in post table too large");
 	if (a) {
-		if (PostScript_name)
+		if (PostScript_name && strchr(PostScript_name, ' ') == NULL)
 			a->fontname = strdup(PostScript_name);
 		else {
 			a->fontname = malloc(strlen(a->base) + 5);
