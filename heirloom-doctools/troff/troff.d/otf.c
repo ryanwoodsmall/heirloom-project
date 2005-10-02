@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.10 (gritter) 10/1/05
+ * Sccsid @(#)otf.c	1.11 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -58,6 +58,7 @@ unsigned short	unitsPerEm;
 static struct afmtab	*a;
 static int	nc;
 static int	fsType;
+static int	isFixedPitch;
 
 static struct table_directory {
 	char	tag[4];
@@ -71,6 +72,7 @@ static int	pos_hmtx;
 static int	pos_OS_2;
 static int	pos_GSUB;
 static int	pos_GPOS;
+static int	pos_post;
 
 static unsigned short	*gid2sid;
 
@@ -683,6 +685,7 @@ get_table_directory(void)
 	pos_OS_2 = -1;
 	pos_GSUB = -1;
 	pos_GPOS = -1;
+	pos_post = -1;
 	for (i = 0; i < numTables; i++) {
 		if (o + 16 >= size)
 			error("cannot get %dth table directory", i);
@@ -699,6 +702,8 @@ get_table_directory(void)
 			pos_GSUB = i;
 		else if (memcmp(buf, "GPOS", 4) == 0)
 			pos_GPOS = i;
+		else if (memcmp(buf, "post", 4) == 0)
+			pos_post = i;
 		o += 16;
 		memcpy(table_directory[i].tag, buf, 4);
 		table_directory[i].checkSum = pbe32(&buf[4]);
@@ -756,10 +761,16 @@ onechar(int gid, int sid)
 
 	if (pos_hmtx < 0)
 		error("no hmtx table");
+	if (table_directory[pos_hmtx].length < 4)
+		error("empty hmtx table");
 	o = table_directory[pos_hmtx].offset;
-	if (table_directory[pos_hmtx].length < 4 * (gid+1))
-		return;	/* just ignore this glyph */
-	w = pbe16(&contents[o + 4 * gid]);
+	if (isFixedPitch)
+		w = pbe16(&contents[o]);
+	else {
+		if (table_directory[pos_hmtx].length < 4 * (gid+1))
+			return;	/* just ignore this glyph */
+		w = pbe16(&contents[o + 4 * gid]);
+	}
 	if ((N = getSID(sid)) != NULL)
 		a->nspace += strlen(N) + 1;
 	tp = afmmapname(N, 0, 0);
@@ -917,6 +928,21 @@ get_head(void)
 	if (pbe32(&contents[o]) != 0x00010000)
 		error("can only handle version 1.0 head tables");
 	unitsPerEm = pbe16(&contents[o + 18]);
+}
+
+static void
+get_post(void)
+{
+	long	o;
+
+	isFixedPitch = 0;
+	if (pos_post < 0)
+		return;
+	o = table_directory[pos_post].offset;
+	if (pbe32(&contents[o]) > 0x00030000)
+		return;
+	if (table_directory[pos_post].length >= 16)
+		isFixedPitch = pbe32(&contents[o+12]);
 }
 
 static void
@@ -1627,6 +1653,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		get_table_directory();
 		get_head();
 		get_OS_2();
+		get_post();
 		if (ttf == 0) {
 			a->type = TYPE_OTF;
 			get_CFF();
