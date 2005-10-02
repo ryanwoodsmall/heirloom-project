@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.93 (gritter) 10/1/05
+ * Sccsid @(#)dpost.c	1.94 (gritter) 10/2/05
  */
 
 /*
@@ -1166,7 +1166,7 @@ setup(void)
     fprintf(stdout, "/resolution %d def\n", res);
     fprintf(stdout, "setup\n");
     fprintf(stdout, "/Dsetup where { pop Dsetup } if\n");
-    fprintf(stdout, "%d setdecoding\n", encoding == 5 ? 4 : encoding);
+    fprintf(stdout, "%d setdecoding\n", encoding);
 
     if ( formsperpage > 1 )  {		/* followed by stuff for multiple pages */
 	if ( cat(formfile, stdout) == FALSE )

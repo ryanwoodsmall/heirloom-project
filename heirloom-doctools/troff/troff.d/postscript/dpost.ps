@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.5 0
+%%BeginResource: procset dpost 4.6 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.5 (gritter) 9/8/05
+% Sccsid @(#)dpost.ps	4.6 (gritter) 10/2/05
 %
 
 /#copies 1 store
@@ -143,6 +143,7 @@
 	{neg /y exch def counttomark 2 idiv {y moveto show} repeat}
 	{neg moveto {2 index stringwidth pop sub exch div 0 32 4 -1 roll widthshow} repeat}
 	{neg moveto {spacewidth sub 0.0 32 4 -1 roll widthshow} repeat}
+	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
 	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
 	{counttomark 2 idiv {y moveto show} repeat}
 	{neg setfunnytext}
