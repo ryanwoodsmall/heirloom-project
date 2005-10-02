@@ -1,6 +1,6 @@
 .\"
-.\" Sccsid @(#)otfdump.1b	1.2 (gritter) 10/1/05
-.TH OTFDUMP 1B "10/1/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)otfdump.1b	1.3 (gritter) 10/2/05
+.TH OTFDUMP 1B "10/2/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 otfdump \- (BSD) dump the contents of OpenType font files
 .SH SYNOPSIS
@@ -15,7 +15,7 @@ font ...
 .ad b
 .SH DESCRIPTION
 .I otfdump
-prints the contents of OpenType font files
+prints the contents of OpenType or TrueType font files
 in ASCII format
 just as
 .I troff
