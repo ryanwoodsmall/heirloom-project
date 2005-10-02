@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.4 (gritter) 10/2/05
+ * Sccsid @(#)otfdump.c	1.5 (gritter) 10/2/05
  */
 
 static enum show {
@@ -76,8 +76,6 @@ void
 verrprint(const char *s, va_list ap)
 {
 	fprintf(stderr, "%s: ", progname);
-	if (filename)
-		fprintf(stderr, "%s: ", filename);
 	vfprintf(stderr, s, ap);
 	putc('\n', stderr);
 }
@@ -116,7 +114,7 @@ dump(const char *name)
 	FILE	*fp;
 
 	if ((fp = fopen(filename = name, "r")) == NULL) {
-		errprint("cannot open");
+		errprint("%s: cannot open", filename);
 		return 1;
 	}
 	memset(&A, 0, sizeof A);
@@ -126,13 +124,13 @@ dump(const char *name)
 	strcpy(a->base, filename);
 	a->base = basename(a->base);
 	if (fstat(fileno(fp), &st) < 0) {
-		errprint("cannot stat");
+		errprint("%s: cannot stat", filename);
 		return 1;
 	}
 	size = st.st_size;
 	contents = malloc(size);
 	if (fread(contents, 1, size, fp) != size) {
-		errprint("cannot read");
+		errprint("%s: cannot read", filename);
 		return 1;
 	}
 	fclose(fp);
