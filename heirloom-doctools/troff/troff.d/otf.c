@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.16 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.17 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -61,6 +61,7 @@ static int	nc;
 static int	fsType;
 static int	isFixedPitch;
 static int	numGlyphs;
+static char	*PostScript_name;
 
 static struct table_directory {
 	char	tag[4];
@@ -86,6 +87,7 @@ static int	pos_GSUB;
 static int	pos_GPOS;
 static int	pos_post;
 static int	pos_kern;
+static int	pos_name;
 
 static struct table {
 	const char	*name;
@@ -108,6 +110,7 @@ static struct table {
 	{ "GPOS",	&pos_GPOS,	0 },
 	{ "post",	&pos_post,	0 },
 	{ "kern",	&pos_kern,	0 },
+	{ "name",	&pos_name,	0 },
 	{ "head",	&pos_head,	2 },	/* head must be last */
 	{ NULL,		NULL,		0 }
 };
@@ -1244,9 +1247,13 @@ get_ttf(void)
 	if (34+2*numberOfGlyphs > table_directories[pos_post].length)
 		error("numberOfGlyphs value in post table too large");
 	if (a) {
-		a->fontname = malloc(strlen(a->base) + 5);
-		strcpy(a->fontname, a->base);
-		strcat(a->fontname, ".TTF");
+		if (PostScript_name)
+			a->fontname = strdup(PostScript_name);
+		else {
+			a->fontname = malloc(strlen(a->base) + 5);
+			strcpy(a->fontname, a->base);
+			strcat(a->fontname, ".TTF");
+		}
 #ifdef	DUMP
 		print(SHOW_NAME, "name %s", a->fontname);
 #endif
@@ -1324,6 +1331,44 @@ get_maxp(void)
 	if (pos_maxp < 0)
 		error("no maxp table");
 	numGlyphs = pbe16(&contents[table_directories[pos_maxp].offset+4]);
+}
+
+static void
+get_name(void)
+{
+	long	o;
+	int	count;
+	int	stringOffset;
+	int	i;
+	int	platformID;
+	int	encodingID;
+	int	languageID;
+	int	nameID;
+	int	length;
+	int	offset;
+
+	if (pos_name < 0)
+		return;
+	o = table_directories[pos_name].offset;
+	if (pbe16(&contents[o]) != 0)
+		return;
+	count = pbe16(&contents[o+2]);
+	stringOffset = o + pbe16(&contents[o+4]);
+	for (i = 0; i < count; i++) {
+		platformID = pbe16(&contents[o+6+12*i]);
+		encodingID = pbe16(&contents[o+6+12*i+2]);
+		languageID = pbe16(&contents[o+6+12*i+4]);
+		nameID = pbe16(&contents[o+6+12*i+6]);
+		length = pbe16(&contents[o+6+12*i+8]);
+		offset = pbe16(&contents[o+6+12*i+10]);
+		if (nameID == 6 && platformID == 1 && encodingID == 0 &&
+				languageID == 0) {
+			PostScript_name = malloc(length + 1);
+			memcpy(PostScript_name,
+				&contents[stringOffset + offset], length);
+			PostScript_name[length] = 0;
+		}
+	}
 }
 
 static void
@@ -2229,6 +2274,7 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 		get_OS_2();
 		get_post();
 		get_maxp();
+		get_name();
 		if (ttf == 0)
 			error("not a TrueType font file");
 		if ((fsType&0x0002)==0x0002 || fsType & 0x0200)
@@ -2259,6 +2305,15 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 		fprintf(fp, "FontName currentdict end definefont pop\n");
 	} else
 		ok = -1;
+	free(PostScript_name);
+	PostScript_name = 0;
+	free(ExtraStringSpace);
+	ExtraStringSpace = NULL;
+	free(ExtraStrings);
+	ExtraStrings = NULL;
+	nExtraStrings = 0;
+	free(a->gid2tr);
+	a->gid2tr = NULL;
 	return ok;
 }
 #endif	/* DPOST */
@@ -2278,12 +2333,13 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		get_head();
 		get_OS_2();
 		get_post();
-		get_maxp();
 		if (ttf == 0) {
 			a->type = TYPE_OTF;
 			get_CFF();
 		} else {
 			a->type = TYPE_TTF;
+			get_maxp();
+			get_name();
 			get_ttf();
 		}
 #ifndef	DPOST
@@ -2297,6 +2353,8 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
 	} else
 		ok = -1;
+	free(PostScript_name);
+	PostScript_name = 0;
 	free_INDEX(CFF.Name);
 	CFF.Name = 0;
 	free_INDEX(CFF.Top_DICT);
