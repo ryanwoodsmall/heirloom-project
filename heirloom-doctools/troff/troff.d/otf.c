@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.15 (gritter) 10/2/05
+ * Sccsid @(#)otf.c	1.16 (gritter) 10/2/05
  */
 
 #include <sys/types.h>
@@ -35,6 +35,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <setjmp.h>
+#include <limits.h>
 #include "dev.h"
 #include "afm.h"
 
@@ -54,25 +55,62 @@ static int	ttf;
 static const char	*filename;
 unsigned short	unitsPerEm;
 short	xMin, yMin, xMax, yMax;
+short	indexToLocFormat;
 static struct afmtab	*a;
 static int	nc;
 static int	fsType;
 static int	isFixedPitch;
+static int	numGlyphs;
 
 static struct table_directory {
 	char	tag[4];
 	unsigned long	checkSum;
 	unsigned long	offset;
 	unsigned long	length;
-} *table_directory;
+} *table_directories;
+
 static int	pos_CFF;
 static int	pos_head;
+static int	pos_hhea;
+static int	pos_loca;
+static int	pos_prep;
+static int	pos_fpgm;
+static int	pos_vhea;
+static int	pos_glyf;
+static int	pos_cvt;
+static int	pos_maxp;
+static int	pos_vmtx;
 static int	pos_hmtx;
 static int	pos_OS_2;
 static int	pos_GSUB;
 static int	pos_GPOS;
 static int	pos_post;
 static int	pos_kern;
+
+static struct table {
+	const char	*name;
+	int	*pos;
+	int	in_sfnts;
+} tables[] = {
+	{ "CFF ",	&pos_CFF,	0 },
+	{ "hhea",	&pos_hhea,	1 },
+	{ "loca",	&pos_loca,	1 },
+	{ "prep",	&pos_prep,	1 },
+	{ "fpgm",	&pos_fpgm,	1 },
+	{ "vhea",	&pos_vhea,	1 },
+	{ "glyf",	&pos_glyf,	3 },	/* holds glyph data */
+	{ "cvt ",	&pos_cvt,	1 },
+	{ "maxp",	&pos_maxp,	1 },
+	{ "vmtx",	&pos_vmtx,	1 },
+	{ "hmtx",	&pos_hmtx,	1 },
+	{ "OS/2",	&pos_OS_2,	0 },
+	{ "GSUB",	&pos_GSUB,	0 },
+	{ "GPOS",	&pos_GPOS,	0 },
+	{ "post",	&pos_post,	0 },
+	{ "kern",	&pos_kern,	0 },
+	{ "head",	&pos_head,	2 },	/* head must be last */
+	{ NULL,		NULL,		0 }
+};
 
 static unsigned short	*gid2sid;
 
@@ -940,47 +978,30 @@ get_offset_table(void)
 }
 
 static void
-get_table_directory(void)
+get_table_directories(void)
 {
-	int	i, o;
+	int	i, j, o;
 	char	buf[16];
 
-	free(table_directory);
-	table_directory = calloc(numTables, sizeof *table_directory);
+	free(table_directories);
+	table_directories = calloc(numTables, sizeof *table_directories);
 	o = 12;
-	pos_CFF = -1;
-	pos_head = -1;
-	pos_hmtx = -1;
-	pos_OS_2 = -1;
-	pos_GSUB = -1;
-	pos_GPOS = -1;
-	pos_post = -1;
-	pos_kern = -1;
+	for (i = 0; tables[i].pos; i++)
+		*tables[i].pos = -1;
 	for (i = 0; i < numTables; i++) {
 		if (o + 16 >= size)
 			error("cannot get %dth table directory", i);
 		memcpy(buf, &contents[o], 16);
-		if (memcmp(buf, "CFF ", 4) == 0)
-			pos_CFF = i;
-		else if (memcmp(buf, "head", 4) == 0)
-			pos_head = i;
-		else if (memcmp(buf, "hmtx", 4) == 0)
-			pos_hmtx = i;
-		else if (memcmp(buf, "OS/2", 4) == 0)
-			pos_OS_2 = i;
-		else if (memcmp(buf, "GSUB", 4) == 0)
-			pos_GSUB = i;
-		else if (memcmp(buf, "GPOS", 4) == 0)
-			pos_GPOS = i;
-		else if (memcmp(buf, "post", 4) == 0)
-			pos_post = i;
-		else if (memcmp(buf, "kern", 4) == 0)
-			pos_kern = i;
+		for (j = 0; tables[j].name; j++)
+			if (memcmp(buf, tables[j].name, 4) == 0) {
+				*tables[j].pos = i;
+				break;
+			}
 		o += 16;
-		memcpy(table_directory[i].tag, buf, 4);
-		table_directory[i].checkSum = pbe32(&buf[4]);
-		table_directory[i].offset = pbe32(&buf[8]);
-		table_directory[i].length = pbe32(&buf[12]);
+		memcpy(table_directories[i].tag, buf, 4);
+		table_directories[i].checkSum = pbe32(&buf[4]);
+		table_directories[i].offset = pbe32(&buf[8]);
+		table_directories[i].length = pbe32(&buf[12]);
 	}
 }
 
@@ -1035,13 +1056,13 @@ onechar(int gid, int sid)
 		return;		/* require .notdef to be GID 0 */
 	if (pos_hmtx < 0)
 		error("no hmtx table");
-	if (table_directory[pos_hmtx].length < 4)
+	if (table_directories[pos_hmtx].length < 4)
 		error("empty hmtx table");
-	o = table_directory[pos_hmtx].offset;
+	o = table_directories[pos_hmtx].offset;
 	if (isFixedPitch)
 		w = pbe16(&contents[o]);
 	else {
-		if (table_directory[pos_hmtx].length < 4 * (gid+1))
+		if (table_directories[pos_hmtx].length < 4 * (gid+1))
 			return;	/* just ignore this glyph */
 		w = pbe16(&contents[o + 4 * gid]);
 	}
@@ -1173,7 +1194,7 @@ get_CFF(void)
 
 	if (pos_CFF < 0)
 		error("no CFF table");
-	CFF.baseoffset = o = table_directory[pos_CFF].offset;
+	CFF.baseoffset = o = table_directories[pos_CFF].offset;
 	if (o + 4 >= size)
 		error("no CFF header");
 	memcpy(buf, &contents[o], 4);
@@ -1215,12 +1236,12 @@ get_ttf(void)
 
 	if (pos_post < 0)
 		error("no post table");
-	o = table_directory[pos_post].offset;
+	o = table_directories[pos_post].offset;
 	if (pbe32(&contents[o]) != 0x00020000)
 		error("can only handle TrueType fonts with version 2.0 "
 				"post table");
 	numberOfGlyphs = pbe16(&contents[o+32]);
-	if (34+2*numberOfGlyphs > table_directory[pos_post].length)
+	if (34+2*numberOfGlyphs > table_directories[pos_post].length)
 		error("numberOfGlyphs value in post table too large");
 	if (a) {
 		a->fontname = malloc(strlen(a->base) + 5);
@@ -1241,15 +1262,15 @@ get_ttf(void)
 		}
 	}
 	ExtraStrings = calloc(numberNewGlyphs, sizeof *ExtraStrings);
-	sp = ExtraStringSpace = malloc(table_directory[pos_post].length -
+	sp = ExtraStringSpace = malloc(table_directories[pos_post].length -
 			34 - 2*numberOfGlyphs);
 	cp = &contents[o+34+2*numberOfGlyphs];
 	for (i = 0; i < numberNewGlyphs; i++) {
-		if (cp >= &contents[o + table_directory[pos_post].length])
+		if (cp >= &contents[o + table_directories[pos_post].length])
 			break;
 		ExtraStrings[i] = sp;
 		n = *cp++ & 0377;
-		if (&cp[n] > &contents[o + table_directory[pos_post].length])
+		if (&cp[n] > &contents[o + table_directories[pos_post].length])
 			break;
 		for (j = 0; j < n; j++)
 			*sp++ = *cp++;
@@ -1271,14 +1292,15 @@ get_head(void)
 
 	if (pos_head < 0)
 		error("no head table");
-	o = table_directory[pos_head].offset;
+	o = table_directories[pos_head].offset;
 	if (pbe32(&contents[o]) != 0x00010000)
 		error("can only handle version 1.0 head tables");
 	unitsPerEm = pbe16(&contents[o + 18]);
-	xMin = pbe16(&contents[o + 36]);
-	yMin = pbe16(&contents[o + 38]);
-	xMax = pbe16(&contents[o + 40]);
-	xMax = pbe16(&contents[o + 42]);
+	xMin = (int16_t)pbe16(&contents[o + 36]);
+	yMin = (int16_t)pbe16(&contents[o + 38]);
+	xMax = (int16_t)pbe16(&contents[o + 40]);
+	yMax = (int16_t)pbe16(&contents[o + 42]);
+	indexToLocFormat = pbe16(&contents[o + 50]);
 }
 
 static void
@@ -1289,11 +1311,19 @@ get_post(void)
 	isFixedPitch = 0;
 	if (pos_post < 0)
 		return;
-	o = table_directory[pos_post].offset;
+	o = table_directories[pos_post].offset;
 	if (pbe32(&contents[o]) > 0x00030000)
 		return;
-	if (table_directory[pos_post].length >= 16)
+	if (table_directories[pos_post].length >= 16)
 		isFixedPitch = pbe32(&contents[o+12]);
+}
+
+static void
+get_maxp(void)
+{
+	if (pos_maxp < 0)
+		error("no maxp table");
+	numGlyphs = pbe16(&contents[table_directories[pos_maxp].offset+4]);
 }
 
 static void
@@ -1303,14 +1333,14 @@ get_OS_2(void)
 
 	if (pos_OS_2 < 0)
 		goto dfl;
-	o = table_directory[pos_OS_2].offset;
+	o = table_directories[pos_OS_2].offset;
 	if (pbe16(&contents[o]) > 0x0003)
 		goto dfl;
-	if (table_directory[pos_OS_2].length >= 10)
+	if (table_directories[pos_OS_2].length >= 10)
 		fsType = pbe16(&contents[o+8]);
 	else
 		fsType = 0;
-	if (table_directory[pos_OS_2].length >= 98) {
+	if (table_directories[pos_OS_2].length >= 98) {
 		if (a) {
 			a->xheight = pbe16(&contents[o + 94]);
 			a->capheight = pbe16(&contents[o + 96]);
@@ -1947,7 +1977,7 @@ get_feature(int table, const char *name, int type,
 
 	if (table < 0)
 		return;
-	o = table_directory[table].offset;
+	o = table_directories[table].offset;
 	if (pbe32(&contents[o]) != 0x00010000)
 		return;
 	ScriptList = o + pbe16(&contents[o+4]);
@@ -2003,18 +2033,18 @@ get_kern(void)
 
 	if (pos_kern < 0)
 		return;
-	o = table_directory[pos_kern].offset;
+	o = table_directories[pos_kern].offset;
 	if (pbe16(&contents[o]) != 0)
 		return;
 	nTables = pbe16(&contents[o+2]);
 	o += 4;
 	for (i = 0; i < nTables; i++) {
-		if (o > table_directory[pos_kern].offset +
-				table_directory[pos_kern].length)
+		if (o > table_directories[pos_kern].offset +
+				table_directories[pos_kern].length)
 			return;
 		length = pbe16(&contents[o+2]);
-		if (o + length > table_directory[pos_kern].offset +
-				table_directory[pos_kern].length)
+		if (o + length > table_directories[pos_kern].offset +
+				table_directories[pos_kern].length)
 			return;
 		get_kern_subtable(o);
 		o += length;
@@ -2036,32 +2066,149 @@ otfcff(const char *path,
 	size = _size;
 	if (setjmp(breakpoint) == 0) {
 		get_offset_table();
-		get_table_directory();
+		get_table_directories();
 		get_OS_2();
 		if (pos_CFF < 0)
 			error("no CFF table");
-		*offset = table_directory[pos_CFF].offset;
-		*length = table_directory[pos_CFF].length;
+		*offset = table_directories[pos_CFF].offset;
+		*length = table_directories[pos_CFF].length;
 	} else
 		ok = -1;
 	return ok == 0 ? fsType : ok;
 }
 
-/*
- * This should follow section 4.2 of the Type 42 specification
- * more closely.
- */
+uint32_t
+CalcTableChecksum(uint32_t sum, const char *cp, int length)
+{
+	while (length > 0) {
+		sum += pbe32(cp);
+		cp += 4;
+		length -= 4;
+	}
+	return sum;
+}
+
+static void
+sfnts1(struct table *tp, int *offset, uint32_t *ccs, FILE *fp)
+{
+	uint32_t	checkSum;
+	int	o, length, m;
+
+	o = table_directories[*tp->pos].offset;
+	length = table_directories[*tp->pos].length;
+	if (tp->in_sfnts == 2)	/* head table */
+		memset(&contents[o+8], 0, 4);	/* checkSumAdjustment */
+	checkSum = CalcTableChecksum(0, &contents[o], length);
+	*ccs = CalcTableChecksum(*ccs, tp->name, 4);
+	*ccs += checkSum;
+	*ccs += *offset;
+	*ccs += length;
+	if (tp->in_sfnts == 2) {
+		*ccs -= 0xB1B0AFBA;
+		contents[o+8] = (*ccs&0xff000000) >> 24;
+		contents[o+9] = (*ccs&0x00ff0000) >> 16;
+		contents[o+10] = (*ccs&0x0000ff00) >> 8;
+		contents[o+11] = (*ccs&0x000000ff);
+	}
+	fprintf(fp, "%08X%08X%08X%08X",
+			pbe32(tp->name),
+			(unsigned int)checkSum,
+			*offset, length);
+	if ((m = length % 4) != 0)
+		length += 4 - m;
+	*offset += length;
+}
+
+static int
+start_of_next_glyph(int *start, int offset)
+{
+	int	i = *start;
+	int	last = INT_MAX;
+	int	cur;
+	int	o;
+	int	tms = 0;
+
+	if (pos_loca < 0)
+		error("no loca table");
+	o = table_directories[pos_loca].offset;
+	for (;;) {
+		if (i >= numGlyphs) {
+			i = 0;
+			if (tms++ == 4)
+				return -1;
+		}
+		cur = indexToLocFormat ? pbe32(&contents[o + 4*i]) :
+			pbe16(&contents[o + 2*i]) * 2;
+		if (offset > last && offset < cur) {
+			*start = i;
+			return cur;
+		}
+		if (cur < last)
+			last = cur;
+		i++;
+	}
+}
+
+static void
+sfnts2(struct table *tp, FILE *fp)
+{
+	int	i, o, length, next = -1;
+	int	start = 0;
+
+	o = table_directories[*tp->pos].offset;
+	length = table_directories[*tp->pos].length;
+	putc('<', fp);
+	for (i = 0; i < length; i++) {
+		if (i && i % 36 == 0)
+			putc('\n', fp);
+		if (i && i % 60000 == 0 && tp->in_sfnts == 3) {
+			/* split string at start of next glyph */
+			next = start_of_next_glyph(&start, i);
+		}
+		if (i == next)
+			fprintf(fp, "00><");
+		fprintf(fp, "%02X", contents[o+i]&0377);
+	}
+	while (i++ % 4)
+		fprintf(fp, "00");
+	fprintf(fp, "00>\n");
+}
+
 static void
 build_sfnts(FILE *fp)
 {
-	int	i;
-	for (i = 0; i < size; i++) {
-		if (i % 36 == 0)
+	int	i, o;
+	unsigned short	numTables;
+	unsigned short	searchRange;
+	unsigned short	entrySelector;
+	unsigned short	rangeShift;
+	uint32_t	ccs;
+
+	numTables = 0;
+	for (i = 0; tables[i].name; i++)
+		if (tables[i].in_sfnts && *tables[i].pos >= 0)
+			numTables++;
+	entrySelector = 0;
+	for (searchRange = 1; searchRange*2 < numTables; searchRange *= 2)
+		entrySelector++;
+	searchRange *= 16;
+	rangeShift = numTables * 16 - searchRange;
+	fprintf(fp, "<%08X%04hX%04hX%04hX%04hX\n", 0x00010000,
+			numTables, searchRange, entrySelector, rangeShift);
+	ccs = 0x00010000 + (numTables<<16) + searchRange +
+		(entrySelector<<16) + rangeShift;
+	o = 12 + numTables * 16;
+	for (i = 0; tables[i].name; i++) {
+		if (tables[i].in_sfnts && *tables[i].pos >= 0) {
+			sfnts1(&tables[i], &o, &ccs, fp);
+			if (tables[i+1].name == NULL)
+				fprintf(fp, "00>");
 			putc('\n', fp);
-		if (i && i % 64000 == 0)
-			fprintf(fp, "><");
-		fprintf(fp, "%02X", contents[i]&0377);
+		}
 	}
+	for (i = 0; tables[i].name; i++)
+		if (tables[i].in_sfnts && *tables[i].pos >= 0)
+			sfnts2(&tables[i], fp);
 }
 
 int
@@ -2077,10 +2224,11 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 	size = _size;
 	if (setjmp(breakpoint) == 0) {
 		get_offset_table();
-		get_table_directory();
+		get_table_directories();
 		get_head();
 		get_OS_2();
 		get_post();
+		get_maxp();
 		if (ttf == 0)
 			error("not a TrueType font file");
 		if ((fsType&0x0002)==0x0002 || fsType & 0x0200)
@@ -2105,9 +2253,9 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 				fprintf(fp, "/GLYPH@%d %d def\n", i, i);
 		}
 		fprintf(fp, "end readonly def\n");
-		fprintf(fp, "/sfnts[<");
+		fprintf(fp, "/sfnts[");
 		build_sfnts(fp);
-		fprintf(fp, ">]def\n");
+		fprintf(fp, "]def\n");
 		fprintf(fp, "FontName currentdict end definefont pop\n");
 	} else
 		ok = -1;
@@ -2126,10 +2274,11 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 	size = _size;
 	if (setjmp(breakpoint) == 0) {
 		get_offset_table();
-		get_table_directory();
+		get_table_directories();
 		get_head();
 		get_OS_2();
 		get_post();
+		get_maxp();
 		if (ttf == 0) {
 			a->type = TYPE_OTF;
 			get_CFF();
