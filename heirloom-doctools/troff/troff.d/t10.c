@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.49 (gritter) 9/30/05
+ * Sccsid @(#)t10.c	1.50 (gritter) 10/3/05
  */
 
 /*
@@ -358,6 +358,7 @@ ptout0(tchar *pi, tchar *pend)
 	register tchar	i;
 	int outsize;	/* size of object being printed */
 	double	f;
+	int tfont;
 
 	outsize = 1;	/* default */
 	i = *pi;
@@ -435,8 +436,12 @@ ptout0(tchar *pi, tchar *pend)
 			w = widcache[k-32].width;
 			bd = 0;
 			cs = 0;
-		} else
+		} else {
+			tfont = xfont;
 			w = getcw(k-32);
+			if (tfont != xfont)
+				k = ftrans(xfont, k);
+		}
 	}
 	if (xfont != mfont)
 		ptfont();

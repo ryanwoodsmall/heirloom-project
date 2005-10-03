@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.94 (gritter) 10/3/05
+ * Sccsid @(#)t6.c	1.95 (gritter) 10/3/05
  */
 
 /*
@@ -175,7 +175,7 @@ getcw(register int i)
 		goto g1;
 	}
 	if ((j = fitab[xfont][i]) == 0) {	/* it's not on current font */
-		int ii, jj;
+		int ii, jj, t;
 		/* search through search list of xfont
 		 * to see what font it ought to be on.
 		 * first searches explicit fallbacks, then
@@ -186,7 +186,8 @@ getcw(register int i)
 			for (jj = 0; fallbacktab[xfont][jj] != 0; jj++) {
 				if ((ii = findft(fallbacktab[xfont][jj])) < 0)
 					continue;
-				j = fitab[ii][i];
+				t = ftrans(ii, i + 32) - 32;
+				j = fitab[ii][t];
 				if (j != 0) {
 					xfont = ii;
 					goto found;
@@ -195,7 +196,8 @@ getcw(register int i)
 		}
 		if (smnt) {
 			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
-				j = fitab[ii][i];
+				t = ftrans(ii, i + 32) - 32;
+				j = fitab[ii][t];
 				if (j != 0) {
 					/*
 					 * troff traditionally relies on the
