@@ -32,7 +32,8 @@ install:
 	$(INSTALL) -c -m 644 otfdump.1b $(ROOT)$(MANDIR)/man1b/otfdump.1b
 
 clean:
-	rm -f $(OBJ) draw.o ta.o troff ta otfdump otfdump.o core log *~
+	rm -f $(OBJ) draw.o ta.o troff ta otfdump otfdump.o otfdump_version.o \
+		core log *~
 
 mrproper: clean
 
