@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.21 (gritter) 10/3/05
+ * Sccsid @(#)otf.c	1.22 (gritter) 10/3/05
  */
 
 #include <sys/types.h>
@@ -60,6 +60,8 @@ static struct afmtab	*a;
 static int	nc;
 static int	fsType;
 static int	isFixedPitch;
+static int	minMemType42;
+static int	maxMemType42;
 static int	numGlyphs;
 static char	*PostScript_name;
 
@@ -1327,6 +1329,7 @@ get_post(void)
 	long	o;
 
 	isFixedPitch = 0;
+	minMemType42 = maxMemType42 = -1;
 	if (pos_post < 0)
 		return;
 	o = table_directories[pos_post].offset;
@@ -1334,6 +1337,10 @@ get_post(void)
 		return;
 	if (table_directories[pos_post].length >= 16)
 		isFixedPitch = pbe32(&contents[o+12]);
+	if (table_directories[pos_post].length >= 20)
+		minMemType42 = pbe32(&contents[o+16]);
+	if (table_directories[pos_post].length >= 24)
+		maxMemType42 = pbe32(&contents[o+20]);
 }
 
 static void
@@ -2298,6 +2305,10 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 			error("not a TrueType font file");
 		checkembed();
 		get_ttf();
+		if (minMemType42 >= 0 && maxMemType42 >= 0 &&
+				(minMemType42 || maxMemType42))
+			fprintf(fp, "%%%%VMUsage: %d %d\n",
+					minMemType42, maxMemType42);
 		fprintf(fp, "11 dict begin\n");
 		fprintf(fp, "/FontType 42 def\n");
 		fprintf(fp, "/FontMatrix [1 0 0 1 0 0] def\n");
