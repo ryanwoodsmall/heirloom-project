@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.95 (gritter) 10/3/05
+ * Sccsid @(#)t6.c	1.96 (gritter) 10/4/05
  */
 
 /*
@@ -1816,7 +1816,8 @@ casefeature(void)
 	if ((f = findft(i)) < 0)
 		return;
 	if ((j = (fontbase[f]->afmpos) - 1) < 0 ||
-			(a = afmtab[j])->type != TYPE_OTF) {
+			(a = afmtab[j])->type != TYPE_OTF &&
+			a->type != TYPE_TTF) {
 		errprint("font %s is not an OpenType font", macname(i));
 		return;
 	}
