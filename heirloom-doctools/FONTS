@@ -394,7 +394,7 @@ fonts in PostScript documents that is only available with PostScript 3
 interpreters; older printers that use PostScript Level 2 or below cannot
 handle such documents directly. The Ghostscript "ps2ps" utility can be
 used to create Level 2 documents from dpost output. Also you may have
-to update your copy of GhostScript in order to create PDF files with
+to update your copy of Ghostscript in order to create PDF files with
 proper font embedding from such output.
 
 Embedding TrueType fonts in PostScript documents requires a PostScript 3
@@ -411,4 +411,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 10/3/05
+Gunnar Ritter                                                 10/4/05
