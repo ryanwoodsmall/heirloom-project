@@ -18,8 +18,8 @@ troff: $(OBJ) $(LIBHNJ)/libhnj.a
 ta: draw.o ta.o
 	$(CC) $(LDFLAGS) draw.o ta.o $(LIBS) -lm -o $@
 
-otfdump: otfdump.o
-	$(CC) $(LDFLAGS) otfdump.o $(LIBS) -o $@
+otfdump: otfdump.o otfdump_version.o
+	$(CC) $(LDFLAGS) otfdump.o otfdump_version.o $(LIBS) -o $@
 
 install:
 	$(INSTALL) -c troff $(ROOT)$(BINDIR)/troff
@@ -56,6 +56,7 @@ ni.o: ../ni.c ../tdef.h ./proto.h
 nii.o: ../nii.c ../tdef.h ./proto.h ../ext.h
 suftab.o: ../suftab.c
 version.o: ../version.c
+otfdump_version.o: ../version.c
 afm.o: dev.h afm.h
 otf.o: dev.h afm.h
-otfdump.o: afm.h afm.c otf.c otfdump.c dpost.d/getopt.c dev.h ../version.c
+otfdump.o: afm.h afm.c otf.c otfdump.c dpost.d/getopt.c dev.h

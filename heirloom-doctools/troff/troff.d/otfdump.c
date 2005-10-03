@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.5 (gritter) 10/2/05
+ * Sccsid %W% (gritter) %G%
  */
 
 static enum show {
@@ -45,7 +45,6 @@ static void	print(enum show, const char *, ...);
 #include "afm.c"
 #undef	stderr
 #include "dpost.d/getopt.c"
-#include "../version.c"
 
 #include <libgen.h>
 
