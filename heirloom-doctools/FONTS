@@ -397,9 +397,6 @@ used to create Level 2 documents from dpost output. Also you may have
 to update your copy of GhostScript in order to create PDF files with
 proper font embedding from such output.
 
-troff can only handle TrueType fonts with version 2.0 "post" tables,
-i.e. those that contain PostScript glyph names.
-
 Embedding TrueType fonts in PostScript documents requires a PostScript 3
 interpreter or a PostScript Level 2 interpreter of at least version 2013.
 
@@ -414,4 +411,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 10/2/05
+Gunnar Ritter                                                 10/3/05
