@@ -38,3 +38,4 @@ dpost_afm.o: ../dev.h afm.h ../afm.c
 dpost_otf.o: ../dev.h afm.h ../otf.c
 dpost_makedev.o: ../dev.h ../makedev.c
 asciitype.o: asciitype.h
+dpost_version.o: dpost_version.c ../../version.c
