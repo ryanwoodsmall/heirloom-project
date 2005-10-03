@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.6 (gritter) 10/3/05
+ * Sccsid @(#)otfdump.c	1.7 (gritter) 10/3/05
  */
 
 static enum show {
@@ -39,11 +39,8 @@ static void	print(enum show, const char *, ...);
 
 #define	DUMP
 #include <stdio.h>
-#undef	stderr
-#define	stderr	troff_stderr
 #include "otf.c"
 #include "afm.c"
-#undef	stderr
 #include "dpost.d/getopt.c"
 
 #include <libgen.h>
