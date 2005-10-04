@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.7 (gritter) 10/3/05
+ * Sccsid @(#)otfdump.c	1.8 (gritter) 10/5/05
  */
 
 static enum show {
@@ -172,7 +172,8 @@ void
 afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		int isS, int isS1, int gid)
 {
-	print(SHOW_CHARS, "char %s width %d", N, unitconv(WX));
+	if (N)
+		print(SHOW_CHARS, "char %s width %d", N, unitconv(WX));
 }
 
 void
