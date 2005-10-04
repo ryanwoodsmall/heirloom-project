@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.37 (gritter) 10/2/05
+ * Sccsid @(#)afm.c	1.38 (gritter) 10/4/05
  */
 
 #include <stdlib.h>
@@ -52,10 +52,15 @@ const struct names {
 	{ "hy",	"hyphen" },
 	{ "ct",	"cent" },
 	{ "fi",	"fi" },
+	{ "fi",	"f_i" },
 	{ "fl",	"fl" },
+	{ "fl",	"f_l" },
 	{ "ff", "ff" },
+	{ "ff", "f_f" },
 	{ "Fi", "ffi" },
+	{ "Fi", "f_f_i" },
 	{ "Fl", "ffl" },
+	{ "Fl", "f_f_l" },
 	{ "dg",	"dagger" },
 	{ "dd",	"daggerdbl" },
 	{ "bu",	"bullet" },

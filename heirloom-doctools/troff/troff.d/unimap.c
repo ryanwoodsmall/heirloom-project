@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.c	1.8 (gritter) 9/18/05
+ * Sccsid @(#)unimap.c	1.9 (gritter) 10/4/05
  */
 
 #include "tdef.h"
@@ -374,10 +374,15 @@ const struct unimap	unimap[] = {
 	{ 0x2666,	"diamond" },
 	{ 0xF8FF,	"apple" },
 	{ 0xFB00,	"ff" },
+	{ 0xFB00,	"f_f" },
 	{ 0xFB01,	"fi" },
+	{ 0xFB01,	"f_i" },
 	{ 0xFB02,	"fl" },
+	{ 0xFB02,	"f_l" },
 	{ 0xFB03,	"ffi" },
+	{ 0xFB03,	"f_f_i" },
 	{ 0xFB04,	"ffl" },
+	{ 0xFB04,	"f_f_l" },
 /*	{ 0x0000,	"hungarumlaut" },	??? */
 	{ -1,		0 }
 };
