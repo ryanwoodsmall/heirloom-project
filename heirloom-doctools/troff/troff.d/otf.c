@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.24 (gritter) 10/4/05
+ * Sccsid @(#)otf.c	1.25 (gritter) 10/5/05
  */
 
 #include <sys/types.h>
@@ -64,6 +64,8 @@ static int	minMemType42;
 static int	maxMemType42;
 static int	numGlyphs;
 static char	*PostScript_name;
+static char	*Copyright;
+static char	*Notice;
 
 static struct table_directory {
 	char	tag[4];
@@ -2167,9 +2169,37 @@ get_maxp(void)
 	numGlyphs = pbe16(&contents[table_directories[pos_maxp].offset+4]);
 }
 
+static char *
+build_string(int o, int length)
+{
+	char	*string, *sp;
+	int	i;
+
+	sp = string = malloc(3*length + 1);
+	for (i = 0; i < length; i++)
+		if ((contents[o+i] & 0200) == 0) {
+			switch (contents[o+i]) {
+			case '\\':
+			case '(':
+			case ')':
+				*sp++ = '\\';
+				/*FALLTHRU*/
+			default:
+				*sp++ = contents[o+i];
+			}
+		} else if ((contents[o+i]&0377) == 169) {
+			*sp++ = '(';
+			*sp++ = 'c';
+			*sp++ = ')';
+		}
+	*sp = 0;
+	return string;
+}
+
 static void
 get_name(void)
 {
+	char	**sp;
 	long	o;
 	int	count;
 	int	stringOffset;
@@ -2195,12 +2225,22 @@ get_name(void)
 		nameID = pbe16(&contents[o+6+12*i+6]);
 		length = pbe16(&contents[o+6+12*i+8]);
 		offset = pbe16(&contents[o+6+12*i+10]);
-		if (nameID == 6 && platformID == 1 && encodingID == 0 &&
-				languageID == 0) {
-			PostScript_name = malloc(length + 1);
-			memcpy(PostScript_name,
-				&contents[stringOffset + offset], length);
-			PostScript_name[length] = 0;
+		if (platformID == 1 && encodingID == 0 && languageID == 0) {
+			switch (nameID) {
+			case 0:
+				sp = &Copyright;
+				break;
+			case 6:
+				sp = &PostScript_name;
+				break;
+			case 7:
+				sp = &Notice;
+				break;
+			default:
+				sp = NULL;
+			}
+			if (sp)
+				*sp = build_string(stringOffset+offset, length);
 		}
 	}
 }
@@ -2218,7 +2258,7 @@ get_OS_2(void)
 	if (table_directories[pos_OS_2].length >= 10)
 		fsType = pbe16(&contents[o+8]);
 	else
-		fsType = 0;
+		fsType = -1;
 	if (table_directories[pos_OS_2].length >= 98) {
 		if (a) {
 			a->xheight = pbe16(&contents[o + 94]);
@@ -2941,8 +2981,18 @@ get_kern(void)
 static void
 checkembed(void)
 {
-	if ((fsType&0x030e) == 0x0002 || fsType & 0x0200)
+	/*
+	 * Do not check the embedding bits under the assumption that the
+	 * resulting PostScript file is sent to a printer. This follows
+	 * Adobe's "Font Embedding Guidelines for Adobe Third-party
+	 * Developers", 5/16/05, p. 8.
+	 *
+	 * It is the responsibility of a following distiller command or
+	 * the like to check the fsType bit then.
+	 *
+	if (fsType != -1 && (fsType&0x030e) == 0x0002 || fsType & 0x0200)
 		error("embedding not allowed");
+	*/
 }
 
 int
@@ -3141,6 +3191,12 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 				yMax * 1000 / unitsPerEm);
 		fprintf(fp, "/PaintType 0 def\n");
 		fprintf(fp, "/Encoding StandardEncoding def\n");
+		if (fsType != -1)
+			fprintf(fp, "/FSType %d def\n", fsType);
+		if (Notice)
+			fprintf(fp, "/Notice (%s) def\n", Notice);
+		if (Copyright)
+			fprintf(fp, "/Copyright (%s) def\n", Copyright);
 		fprintf(fp, "/CharStrings %d dict dup begin\n", nc);
 		for (i = 0; i < nc; i++) {
 			if ((cp = GID2SID(i)) != NULL)
@@ -3157,6 +3213,10 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 		ok = -1;
 	free(PostScript_name);
 	PostScript_name = 0;
+	free(Copyright);
+	Copyright = 0;
+	free(Notice);
+	Notice = 0;
 	free(ExtraStringSpace);
 	ExtraStringSpace = NULL;
 	ExtraStringSpacePos = 0;
@@ -3204,6 +3264,10 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		ok = -1;
 	free(PostScript_name);
 	PostScript_name = 0;
+	free(Copyright);
+	Copyright = 0;
+	free(Notice);
+	Notice = 0;
 	free_INDEX(CFF.Name);
 	CFF.Name = 0;
 	free_INDEX(CFF.Top_DICT);
