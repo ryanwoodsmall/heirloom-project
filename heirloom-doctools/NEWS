@@ -190,6 +190,13 @@ the description for ".xflag" below.
 	white space is added. Otherwise, a space of size n is added as
 	usual.
 
+.tr abcd...
+	produces unspecified results if used with PostScript characters
+	"\[name]", Unicode characters "\U'...'", or localized input. The
+	".ftr" request should be used for such characters instead. With
+	ASCII and traditional troff special characters, the ".tr" request
+	continues to work as expected.
+
 .track ff s1 n1 s2 n2					troff only
 	specifies tracking of letter space for font ff. If the current font
 	is ff and the point size is below or equal to s1, white space of
@@ -234,9 +241,10 @@ the description for ".xflag" below.
 	does not cause a hyphen to be printed if the line is split.
 
 \[name]							troff only
-	selects the character "name" as defined in the AFM or OpenType file
-	for the current font. The file "stuff/showfont.sh" can be used to
-	display the characters in a PostScript font along with their names.
+	selects the character "name" as defined in the AFM, OpenType, or
+	TrueType file for the current font. The script "stuff/showfont.sh"
+	can be used to display the characters in such fonts along with
+	their names.
 
 \E
 	is similar to "\e", but is not interpreted in copy mode.
@@ -254,6 +262,13 @@ the description for ".xflag" below.
 
 \n[name]
 	refers to the number register "name".
+
+\N'number'
+	produces unspecified results if "number" is outside the ASCII and
+	traditional troff special character names range because the order
+	of characters outside this range may vary. The "\[name]" request
+	should be used to refer to special characters in PostScript Type 1,
+	OpenType, and TrueType fonts.
 
 \s'size'
 	sets the current point size and allows any numerical expression
@@ -362,4 +377,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   10/2/05
+Gunnar Ritter                                                   10/4/05
