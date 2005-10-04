@@ -1,5 +1,5 @@
 [11.26] released ...
-* The new "-S variable=[value]" command line option sets the internal option
+* The new "-S variable[=value]" command line option sets the internal option
   "variable", and, in case of a string option, assigns "value" to it (based
   on a request by Dmitry Butskoy).
 * When the "next" or newline command is typed as the first command after a

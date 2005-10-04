@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.313 (gritter) 10/4/05
+.\"     Sccsid: @(#)nail.1	2.314 (gritter) 10/4/05
 .\"
 .TH NAIL 1 "10/4/05" "nail 11.26" "User Commands"
 .SH NAME
@@ -48,19 +48,19 @@ nail \- send and receive Internet mail
 [\fB\-c\fI\ cc-addr\fR] [\fB\-b\fI\ bcc-addr\fR] [\fB\-r\fI\ from-addr\fR]
 [\fB\-h\fI\ hops\fR]
 [\fB\-A\fI\ account\fR]
-[\fB\-S\fI\ variable\fB=\fR[\fIvalue\fR]]
+[\fB\-S\fI\ variable\fR[\fB=\fIvalue\fR]]
 \fIto-addr\fR .\ .\ .
 .HP
 .ad l
 \fBnail\fR [\fB\-BDdeHiInNRv~\fR] [\fB\-T\fI\ name\fR]
 [\fB\-A\fI\ account\fR]
-[\fB\-S\fI\ variable\fB=\fR[\fIvalue\fR]]
+[\fB\-S\fI\ variable\fR[\fB=\fIvalue\fR]]
 \fB\-f\fR [\fIname\fR]
 .HP
 .ad l
 \fBnail\fR [\fB\-BDdeinNRv~\fR]
 [\fB\-A\fI\ account\fR]
-[\fB\-S\fI\ variable\fB=\fR[\fIvalue\fR]]
+[\fB\-S\fI\ variable\fR[\fB=\fIvalue\fR]]
 [\fB\-u\fI\ user\fR]
 .br
 .PD
@@ -201,7 +201,7 @@ Specify subject on command line (only the first argument after the
 flag is used as a subject; be careful to quote subjects
 containing spaces).
 .TP
-\fB\-S\fI\ variable\fB=\fR[\fIvalue\fR]
+\fB\-S\fI\ variable\fR[\fB=\fIvalue\fR]
 Sets the internal option
 .I variable
 and, in case of a string option,
