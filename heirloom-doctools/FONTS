@@ -131,10 +131,68 @@ Type 1 fonts, except that there is only one file "FontName.otf" (or
 Just copy this file to a directory given in the TROFFONTS path.
 
 
-Using fonts with old style numerals
+Using OpenType features
+-----------------------
+
+High-quality OpenType fonts may contain feature tables that allow special
+typographic effects. For example, the Adobe Garamond Pro Regular font
+contains titling capitals that can be mapped to the input range of regular
+capitals with the ".feature" request in troff:
+
+	.do xflag 2
+	.fp 1 R AGaramondPro-Regular otf
+	.fp 0 T AGaramondPro-Regular otf
+	.feature T +titl
+	REGULAR CAPITALS
+	.sp
+	.ft T
+	TITLING CAPITALS
+
+To retrieve a list of features in an individual font that are available
+with troff, use "otfdump -s font.otf". Typical useful features are:
+
+	+c2sc		converts capitals to small capitals
+	+case		substitutions for use in combination with text
+			in all-capital letters
+	+onum		old-style numerals
+	+pnum		proportional (lining) numerals
+	+pnum +onum	proportional old-style numerals
+	+smcp		converts lower-case letters to small capitals
+	+smcp +c2sc	converts all letters to small capitals
+	+titl		titling characters
+	+zero		slashed zero
+
+Features such as "aalt" or "ornm" which only map sets of very special
+characters to different positions are normally not useful with troff since
+these characters can be accessed directly using "\[name]" escape sequences
+anyway. To make an individual alternate character the default, the ".ftr"
+request can be used:
+
+	.do xflag 2
+	.fp 2 I AGaramondPro-Italic otf
+	.ftr I Q\[Q.swash]
+	.ft I
+	Using a swash capital in the word ``Quality.''
+
+Feature mappings result in changes to the same internal data structures as
+the ".ftr" request. It is thus possible to make adjustments to mappings by
+using ".ftr" after ".feature", or to create personalized variants by using
+".ftr" based on the data obtained from "otfdump -s".
+
+The ".feature" request must still be active for a font when a character is
+printed; disabling a feature with ".feature F -feat" only works completely
+if all of its mappings are still in position. It is thus recommended that
+the ".feature" request is used only once for a font immediately after it
+has been mounted, and that a font is mounted multiple times, each time for
+enabling an individual feature set. Doing so has the additional advantage
+that switching between features is conveniently possible using the "\f"
+escape sequence.
+
+
+Using fonts with old-style numerals
 -----------------------------------
 
-A Type 1 font with old style numerals but otherwise standard characters
+A Type 1 font with old-style numerals but otherwise standard characters
 usually does not require any special mechanism. It can simply be mounted,
 selected, and used.
 
@@ -144,7 +202,7 @@ by mapping them to the standard ASCII numbers with the ".feature" request:
 	.do xflag 2
 	.fp 1 R ACaslonPro-Regular otf
 	.feature R +onum
-	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
+	The numerals 0 1 2 3 4 5 6 7 8 9 are in old-style.
 
 
 Using fonts with small capital letters
@@ -191,7 +249,7 @@ For OpenType fonts, all small capital letters are contained within the
 base font, and the "smcp" feature accesses them as shown above.
 
 
-Using a combination of expert and standard fonts for old style numerals
+Using a combination of expert and standard fonts for old-style numerals
 -----------------------------------------------------------------------
 
 This also uses the fallback sequence, but since the standard numerals
@@ -203,10 +261,10 @@ troff does not select them:
 	.fp 0 E fny_____ pfb
 	.fallback R E
 	.hidechar R 0123456789
-	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
+	The numerals 0 1 2 3 4 5 6 7 8 9 are in old-style.
 
 
-Using the expert font for both small capitals and old style numerals
+Using the expert font for both small capitals and old-style numerals
 --------------------------------------------------------------------
 
 The examples above can also be combined. Since the .track request does not
@@ -220,7 +278,7 @@ it is sufficient to mount each font once:
 	.fallback E R
 	.track E 1 .2 24 2
 	.hidechar R 0123456789
-	The numerals 0 1 2 3 4 5 6 7 8 9 are in old style.
+	The numerals 0 1 2 3 4 5 6 7 8 9 are in old-style.
 	.br
 	.ft E
 	But this text prints in Small Capitals.
@@ -399,6 +457,12 @@ proper font embedding from such output.
 
 Embedding TrueType fonts in PostScript documents requires a PostScript 3
 interpreter or a PostScript Level 2 interpreter of at least version 2013.
+
+troff only supports OpenType features that result in single-character
+substitutions insensitive of context (except for the "fi fl ff ffi ffl"
+ligatures and kerning which are enabled by default if possible). Also troff
+ignores any features that are not mapped to the "DFLT" or "latn" languages
+in an OpenType font.
 
 The PostScript/Unicode conversion tables currently only contain
 Western character names; other characters are simply ignored when
