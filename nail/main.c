@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.45 (gritter) 7/5/05";
+static char sccsid[] = "@(#)main.c	2.46 (gritter) 10/4/05";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -86,7 +86,7 @@ static void setscreensize(int dummy);
 int 
 main(int argc, char *argv[])
 {
-	const char optstr[] = "A:BHFINVT:Ra:b:c:dDefh:inqr:s:tu:v~";
+	const char optstr[] = "A:BHFINVT:RS:a:b:c:dDefh:inqr:s:tu:v~";
 	int i, existonly = 0, headersonly = 0, sendflag = 0;
 	struct name *to, *cc, *bcc, *smopts;
 	struct attachment *attach;
@@ -191,6 +191,11 @@ main(int argc, char *argv[])
 		case 'F':
 			Fflag = 1;
 			sendflag++;
+			break;
+		case 'S': {
+				char *args[] = { optarg, NULL };
+				set(args);
+			}
 			break;
 		case 'T':
 			/*
@@ -340,7 +345,7 @@ main(int argc, char *argv[])
 		case '?':
 usage:
 			fprintf(stderr, catgets(catd, CATSET, 135,
-"Usage: %s -eiIUdFntBDNHRV~ -T FILE -u USER -h hops -r address -s SUBJECT -a FILE -q FILE -f FILE -A ACCOUNT -b USERS -c USERS users\n"), progname);
+"Usage: %s -eiIUdFntBDNHRV~ -T FILE -u USER -h hops -r address -s SUBJECT -a FILE -q FILE -f FILE -A ACCOUNT -b USERS -c USERS -S OPTION users\n"), progname);
 			exit(2);
 		}
 	}
