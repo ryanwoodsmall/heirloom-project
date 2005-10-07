@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.25 (gritter) 10/5/05
+ * Sccsid @(#)otf.c	1.26 (gritter) 10/8/05
  */
 
 #include <sys/types.h>
@@ -3191,12 +3191,18 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 				yMax * 1000 / unitsPerEm);
 		fprintf(fp, "/PaintType 0 def\n");
 		fprintf(fp, "/Encoding StandardEncoding def\n");
-		if (fsType != -1)
-			fprintf(fp, "/FSType %d def\n", fsType);
-		if (Notice)
-			fprintf(fp, "/Notice (%s) def\n", Notice);
-		if (Copyright)
-			fprintf(fp, "/Copyright (%s) def\n", Copyright);
+		if (fsType != -1 || Notice || Copyright) {
+			fprintf(fp, "/FontInfo 3 dict dup begin\n");
+			if (fsType != -1)
+				fprintf(fp, "/FSType %d def\n", fsType);
+			if (Notice)
+				fprintf(fp, "/Notice (%s) readonly def\n",
+						Notice);
+			if (Copyright)
+				fprintf(fp, "/Copyright (%s) readonly def\n",
+						Copyright);
+			fprintf(fp, "end readonly def\n");
+		}
 		fprintf(fp, "/CharStrings %d dict dup begin\n", nc);
 		for (i = 0; i < nc; i++) {
 			if ((cp = GID2SID(i)) != NULL)
