@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.100 (gritter) 10/11/05
+ * Sccsid @(#)dpost.c	1.101 (gritter) 10/11/05
  */
 
 /*
@@ -325,7 +325,8 @@ int		realencoding = DFLTENCODING;
 int		maxencoding = MAXENCODING;
 int		eflag;
 
-static int	LanguageLevel;
+static int	LanguageLevel;	/* PostScript output language level */
+static int	Binary;		/* PostScript output contains binary data */
 
 /*
  *
@@ -874,6 +875,8 @@ header(FILE *fp)
     fprintf(fp, "%s %s", CREATIONDATE, ctime(&now));
     if (LanguageLevel > 1)
     	fprintf(fp, "%%%%LanguageLevel: %d\n", LanguageLevel);
+    if (Binary)
+	fprintf(fp, "%%%%DocumentData: Binary\n");
     if ( temp_file != NULL )  {
 	if ( docfonts > 0 )  {
 	    cat(temp_file, fp);
@@ -2139,8 +2142,10 @@ t_init(void)
 			pointslop = 0;
 		if (eflag == 0)
 			realencoding = encoding = HIGHDFLTENCODING;
-		if (encoding == 5)
-			LanguageLevel = MAX(LanguageLevel, 2);
+	}
+	if (encoding == 5) {
+	    LanguageLevel = MAX(LanguageLevel, 2);
+	    Binary++;
 	}
 	slop = pointslop * res / POINTS + .5;
 	rvslop = res * .025;
@@ -2333,6 +2338,7 @@ supplyotf(char *font, char *path, FILE *fp)
 	free(contents);
 	got_otf = 1;
 	LanguageLevel = MAX(LanguageLevel, 3);
+	Binary++;
 }
 
 static void
