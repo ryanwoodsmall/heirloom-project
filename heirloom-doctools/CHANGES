@@ -1,3 +1,7 @@
+Release ...
+* otfdump: Kerning information was omitted for all but the first font when
+  multiple font file arguments were given. This has been fixed.
+
 Release 051011
 * troff/dpost: Support for OpenType fonts has been added. This includes
   support for CFF-based (PostScript) OpenType fonts as well as support for
