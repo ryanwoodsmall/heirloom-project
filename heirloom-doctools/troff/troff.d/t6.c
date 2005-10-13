@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.96 (gritter) 10/4/05
+ * Sccsid @(#)t6.c	1.97 (gritter) 10/13/05
  */
 
 /*
@@ -986,6 +986,7 @@ casefp(void)
 	register int i, j;
 	char *file, *supply;
 
+	lgf++;
 	skip();
 	if ((i = xflag ? atoi() : cbits(getch()) - '0') < 0 || i > nfonts)
 	bad:	errprint("fp: bad font position %d", i);
@@ -1545,6 +1546,7 @@ casepapersize(void)
 	int	x = 0, y = 0, n;
 	char	buf[NC];
 
+	lgf++;
 	if (skip())
 		return;
 	c = cbits(ch);
@@ -1810,6 +1812,7 @@ casefeature(void)
 	struct afmtab	*a;
 	int	f, i, j;
 
+	lgf++;
 	skip();
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 0);
