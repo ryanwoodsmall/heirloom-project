@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.9 (gritter) 10/11/05
+ * Sccsid @(#)otfdump.c	1.10 (gritter) 10/13/05
  */
 
 static enum show {
@@ -108,6 +108,7 @@ dump(const char *name)
 	struct afmtab	A;
 	struct stat	st;
 	FILE	*fp;
+	char	*cp;
 
 	if ((fp = fopen(filename = name, "r")) == NULL) {
 		errprint("%s: cannot open", filename);
@@ -119,6 +120,8 @@ dump(const char *name)
 	a->base = malloc(strlen(filename) + 1);
 	strcpy(a->base, filename);
 	a->base = basename(a->base);
+	if ((cp = strrchr(a->base, '.')) != NULL)
+		*cp = '\0';
 	if (fstat(fileno(fp), &st) < 0) {
 		errprint("%s: cannot stat", filename);
 		return 1;

@@ -1,4 +1,6 @@
 Release ...
+* troff, dpost, otfdump: Handle TrueType files with version 3.0 "post" table
+  and no Microsoft/Unicode "cmap" subtable.
 * otfdump: Kerning information was omitted for all but the first font when
   multiple font file arguments were given. This has been fixed.
 * troff: Fonts that contain possible ligatures (fi, fl, etc.) in their file

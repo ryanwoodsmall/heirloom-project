@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.26 (gritter) 10/8/05
+ * Sccsid @(#)otf.c	1.27 (gritter) 10/13/05
  */
 
 #include <sys/types.h>
@@ -1485,7 +1485,7 @@ static const struct WGL {
 
 static int	nWGL = 642;
 
-static char	**ExtraStrings;
+static int	*ExtraStrings;
 static char	*ExtraStringSpace;
 static int	ExtraStringSpacePos;
 static int	nExtraStrings;
@@ -1493,7 +1493,9 @@ static int	nExtraStrings;
 static char *
 getSID(int n)
 {
-	if (ttf == 2) {
+	if (ttf == 3) {
+		/*EMPTY*/;
+	} else if (ttf == 2) {
 		if (n >= 0 && n < nWGL)
 			return (char *)WGL[n].s;
 		n -= nWGL;
@@ -1507,7 +1509,7 @@ getSID(int n)
 		n -= nStdStrings;
 	}
 	if (n < nExtraStrings)
-		return ExtraStrings[n];
+		return &ExtraStringSpace[ExtraStrings[n]];
 	return NULL;
 }
 
@@ -1846,7 +1848,7 @@ build_ExtraStrings(void)
 	sp = ExtraStringSpace = malloc(CFF.String->count +
 			CFF.String->offset[CFF.String->count]);
 	for (c = 0; c < CFF.String->count; c++) {
-		ExtraStrings[c] = sp;
+		ExtraStrings[c] = sp - ExtraStringSpace;
 		for (i = CFF.String->offset[c];
 				i < CFF.String->offset[c+1]; i++)
 			*sp++ = contents[i];
@@ -1944,7 +1946,7 @@ get_ttf_post_2_0(int o)
 	for (i = 0; i < numberNewGlyphs; i++) {
 		if (cp >= &contents[o + table_directories[pos_post].length])
 			break;
-		ExtraStrings[i] = sp;
+		ExtraStrings[i] = sp - ExtraStringSpace;
 		n = *cp++ & 0377;
 		if (&cp[n] > &contents[o + table_directories[pos_post].length])
 			break;
@@ -1987,13 +1989,13 @@ unichar(int gid, int c)
 			onechar(gid, i);
 			return;
 		}
-	if (ExtraStrings == NULL)
-		ExtraStrings = calloc(nc, sizeof *ExtraStrings);
-	if (ExtraStringSpace == NULL)
-		ExtraStringSpace = malloc(nc * 8);
+	ExtraStrings = realloc(ExtraStrings,
+			(nExtraStrings+1) * sizeof *ExtraStrings);
+	ExtraStringSpace = realloc(ExtraStringSpace,
+			ExtraStringSpacePos + 8);
 	sp = &ExtraStringSpace[ExtraStringSpacePos];
 	ExtraStringSpacePos += 8;
-	ExtraStrings[nExtraStrings] = sp;
+	ExtraStrings[nExtraStrings] = sp - ExtraStringSpace;
 	snprintf(sp, 8, "uni%04X", c);
 	onechar(gid, nWGL + nExtraStrings++);
 }
@@ -2043,12 +2045,14 @@ get_ms_unicode_cmap(int o)
 static void
 get_ttf_post_3_0(int o)
 {
+	extern int	snprintf(char *, size_t, const char *, ...);
 	int	numTables;
 	int	platformID;
 	int	encodingID;
 	int	offset;
-	int	i;
+	int	i, n;
 	int	gotit = 0;
+	char	*sp;
 
 	ttf = 2;
 	if (pos_cmap < 0)
@@ -2067,8 +2071,22 @@ get_ttf_post_3_0(int o)
 		if (platformID == 3 && encodingID == 1)
 			gotit |= get_ms_unicode_cmap(o + offset);
 	}
-	if (gotit <= 0)
-		error("no Microsoft/Unicode cmap subtable format 4 found");
+	if (gotit <= 0) {
+		ttf = 3;
+		ExtraStrings = calloc(numGlyphs, sizeof *ExtraStrings);
+		sp = ExtraStringSpace = malloc(n = 12 * numGlyphs);
+		strcpy(sp, ".notdef");
+		sp += 8;
+		nExtraStrings = 1;
+		onechar(0, 0);
+		for (i = 1; i < numGlyphs; i++) {
+			ExtraStrings[i] = sp - ExtraStringSpace;
+			sp += snprintf(sp, n - (sp - ExtraStringSpace),
+					"index0x%02X", i) + 1;
+			nExtraStrings++;
+			onechar(i, i);
+		}
+	}
 }
 
 static void
@@ -3208,7 +3226,7 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 			if ((cp = GID2SID(i)) != NULL)
 				fprintf(fp, "/%s %d def\n", cp, i);
 			else
-				fprintf(fp, "/GLYPH@%d %d def\n", i, i);
+				fprintf(fp, "/index0x%02X %d def\n", i, i);
 		}
 		fprintf(fp, "end readonly def\n");
 		fprintf(fp, "/sfnts[");
