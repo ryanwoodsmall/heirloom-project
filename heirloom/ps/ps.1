@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1	1.46 (gritter) 8/23/05
+.\" Sccsid @(#)ps.1	1.47 (gritter) 10/13/05
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,14 +32,14 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH PS 1 "8/23/05" "Heirloom Toolchest" "User Commands"
+.TH PS 1 "10/13/05" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ps \- process status
 .SH SYNOPSIS
 .HP
 .ad l
 .nh
-\fBps\fR [\-\fBaAcdefjlLPy\fR]
+\fBps\fR [\-\fBaAcdefjlLPRy\fR]
 [\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]], ...\fR]\ ...
 [\fB\-gGpstuU\fI\ criteria\fR, ...]\ ...
 [\fB\-r \fIsysname\fR]
@@ -223,6 +223,16 @@ See below for the meaning of columns.
 Prints the processor on which the process is currently running.
 Disables printing of flags and memory address.
 .TP 12
+.B \-R
+Resource usage format;
+prints process id,
+memory and resident set size,
+buffer reads and writes,
+messages sent and received,
+user and system time,
+and command.
+See below for the meaning of columns.
+.TP 12
 .B \-y
 Modifies the
 .B \-l
@@ -314,10 +324,30 @@ RSS	(ly)	T{
 The amount of memory in kilobytes
 currently present in core.
 T}
-SZ	(l)	T{
+SZ	(l,R)	T{
 The size in pages of the core image of the process.
 If the \fB\-y\fR option is also given,
 the size is printed in kilobytes.
+T}
+MRSZ	(R)	T{
+The amount of memory in pages
+currently present in core.
+T}
+PFLTS	(R)	T{
+The number of major page faults
+that have occurred with the process.
+T}
+BUFR	(R)	T{
+Buffer reads performed on behalf of the process.
+T}
+BUFW	(R)	T{
+Buffer writes performed on behalf of the process.
+T}
+MRCV	(R)	T{
+Messages received by the process.
+T}
+MSND	(R)	T{
+Messages sent by the process.
 T}
 WCHAN	(l)	T{
 The event for which the process is waiting or sleeping;
@@ -334,6 +364,12 @@ The cumulative execution time for the process.
 T}
 LTIME	(L)	T{
 The cumulative execution time for the lightweight process.
+T}
+UTIME	(R)	T{
+The cumulative time the process spent in user mode.
+T}
+KTIME	(R)	T{
+The cumulative time the process spent in system (kernel) mode.
 T}
 COMD	(all)	T{
 The command name;

@@ -6,6 +6,8 @@ Release ...
 * The "-man" macro no longer produces cut marks when used with troff.
 * tr: When evaluating '[:class:]' expressions, the last position of the
   coded character set was not included; this has been fixed.
+* ps: The "-R" option (resource usage format), which had been present
+  for some time, has been documented.
 
 Release 050815
 * The "getconf" utility has been added (derived from OpenSolaris code).
