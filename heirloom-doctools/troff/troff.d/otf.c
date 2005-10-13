@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.27 (gritter) 10/13/05
+ * Sccsid @(#)otf.c	1.28 (gritter) 10/13/05
  */
 
 #include <sys/types.h>
@@ -1485,7 +1485,7 @@ static const struct WGL {
 
 static int	nWGL = 642;
 
-static int	*ExtraStrings;
+static char	**ExtraStrings;
 static char	*ExtraStringSpace;
 static int	ExtraStringSpacePos;
 static int	nExtraStrings;
@@ -1509,7 +1509,7 @@ getSID(int n)
 		n -= nStdStrings;
 	}
 	if (n < nExtraStrings)
-		return &ExtraStringSpace[ExtraStrings[n]];
+		return ExtraStrings[n];
 	return NULL;
 }
 
@@ -1848,7 +1848,7 @@ build_ExtraStrings(void)
 	sp = ExtraStringSpace = malloc(CFF.String->count +
 			CFF.String->offset[CFF.String->count]);
 	for (c = 0; c < CFF.String->count; c++) {
-		ExtraStrings[c] = sp - ExtraStringSpace;
+		ExtraStrings[c] = sp;
 		for (i = CFF.String->offset[c];
 				i < CFF.String->offset[c+1]; i++)
 			*sp++ = contents[i];
@@ -1946,7 +1946,7 @@ get_ttf_post_2_0(int o)
 	for (i = 0; i < numberNewGlyphs; i++) {
 		if (cp >= &contents[o + table_directories[pos_post].length])
 			break;
-		ExtraStrings[i] = sp - ExtraStringSpace;
+		ExtraStrings[i] = sp;
 		n = *cp++ & 0377;
 		if (&cp[n] > &contents[o + table_directories[pos_post].length])
 			break;
@@ -1989,13 +1989,13 @@ unichar(int gid, int c)
 			onechar(gid, i);
 			return;
 		}
-	ExtraStrings = realloc(ExtraStrings,
-			(nExtraStrings+1) * sizeof *ExtraStrings);
-	ExtraStringSpace = realloc(ExtraStringSpace,
-			ExtraStringSpacePos + 8);
+	if (ExtraStrings == NULL)
+		ExtraStrings = calloc(nc, sizeof *ExtraStrings);
+	if (ExtraStringSpace == NULL)
+		ExtraStringSpace = malloc(nc * 8);
 	sp = &ExtraStringSpace[ExtraStringSpacePos];
 	ExtraStringSpacePos += 8;
-	ExtraStrings[nExtraStrings] = sp - ExtraStringSpace;
+	ExtraStrings[nExtraStrings] = sp;
 	snprintf(sp, 8, "uni%04X", c);
 	onechar(gid, nWGL + nExtraStrings++);
 }
@@ -2080,7 +2080,7 @@ get_ttf_post_3_0(int o)
 		nExtraStrings = 1;
 		onechar(0, 0);
 		for (i = 1; i < numGlyphs; i++) {
-			ExtraStrings[i] = sp - ExtraStringSpace;
+			ExtraStrings[i] = sp;
 			sp += snprintf(sp, n - (sp - ExtraStringSpace),
 					"index0x%02X", i) + 1;
 			nExtraStrings++;
