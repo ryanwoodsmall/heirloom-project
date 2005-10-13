@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.28 (gritter) 10/13/05
+ * Sccsid @(#)otf.c	1.29 (gritter) 10/13/05
  */
 
 #include <sys/types.h>
@@ -2076,6 +2076,7 @@ get_ttf_post_3_0(int o)
 		ExtraStrings = calloc(numGlyphs, sizeof *ExtraStrings);
 		sp = ExtraStringSpace = malloc(n = 12 * numGlyphs);
 		strcpy(sp, ".notdef");
+		ExtraStrings[0] = sp;
 		sp += 8;
 		nExtraStrings = 1;
 		onechar(0, 0);
