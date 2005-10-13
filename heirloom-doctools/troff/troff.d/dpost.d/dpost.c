@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.102 (gritter) 10/13/05
+ * Sccsid @(#)dpost.c	1.103 (gritter) 10/13/05
  */
 
 /*
@@ -2223,6 +2223,7 @@ static const char ps_truetypefont_[] = "%!PS-TrueTypeFont-";
 static void
 supplypfb(char *font, char *path, FILE *fp)
 {
+    const char	hex[] = "0123456789abcdef";
     char	buf[30];
     long	length;
     int	i, c = EOF, n, type = 0, lastc = EOF;
@@ -2279,8 +2280,10 @@ supplypfb(char *font, char *path, FILE *fp)
 	    		n = length > sizeof buf ? sizeof buf : length;
 	    		if (fread(buf, 1, n, fp) != n)
 		    		error(FATAL, "short binary data in %s", path);
-	    		for (i = 0; i < n; i++)
-		    		fprintf(rf, "%02x", buf[i]&0377);
+	    		for (i = 0; i < n; i++) {
+				putc(hex[(buf[i]&0360)>>4], rf);
+				putc(hex[buf[i]&017], rf);
+			}
 	    		putc('\n', rf);
 			lastc = '\n';
 			length -= n;

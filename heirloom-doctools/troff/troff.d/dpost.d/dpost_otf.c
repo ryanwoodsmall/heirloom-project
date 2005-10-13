@@ -23,8 +23,14 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost_otf.c	1.2 (gritter) 9/29/05
+ * Sccsid @(#)dpost_otf.c	1.3 (gritter) 10/13/05
  */
+
+#include <stdio.h>
+#if defined (__GLIBC__) && defined (_IO_putc_unlocked)
+#undef	putc
+#define	putc(c, f)	_IO_putc_unlocked(c, f)
+#endif
 
 #define	DPOST
 #include "../otf.c"

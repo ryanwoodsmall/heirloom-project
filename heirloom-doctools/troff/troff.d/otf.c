@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.30 (gritter) 10/13/05
+ * Sccsid @(#)otf.c	1.31 (gritter) 10/13/05
  */
 
 #include <sys/types.h>
@@ -3038,7 +3038,7 @@ otfcff(const char *path,
 	return ok;
 }
 
-uint32_t
+static uint32_t
 CalcTableChecksum(uint32_t sum, const char *cp, int length)
 {
 	while (length > 0) {
@@ -3113,6 +3113,7 @@ start_of_next_glyph(int *start, int offset)
 static void
 sfnts2(struct table *tp, FILE *fp)
 {
+	const char	hex[] = "0123456789ABCDEF";
 	int	i, o, length, next = -1;
 	int	start = 0;
 
@@ -3128,7 +3129,8 @@ sfnts2(struct table *tp, FILE *fp)
 		}
 		if (i == next)
 			fprintf(fp, "00><");
-		fprintf(fp, "%02X", contents[o+i]&0377);
+		putc(hex[(contents[o+i]&0360)>>4], fp);
+		putc(hex[contents[o+i]&017], fp);
 	}
 	while (i++ % 4)
 		fprintf(fp, "00");
