@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.29 (gritter) 10/13/05
+ * Sccsid @(#)otf.c	1.30 (gritter) 10/13/05
  */
 
 #include <sys/types.h>
@@ -3224,7 +3224,8 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 		}
 		fprintf(fp, "/CharStrings %d dict dup begin\n", nc);
 		for (i = 0; i < nc; i++) {
-			if ((cp = GID2SID(i)) != NULL)
+			if ((cp = GID2SID(i)) != NULL &&
+					(i == 0 || strcmp(cp, ".notdef")))
 				fprintf(fp, "/%s %d def\n", cp, i);
 			else
 				fprintf(fp, "/index0x%02X %d def\n", i, i);

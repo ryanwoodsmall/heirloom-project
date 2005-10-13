@@ -5,6 +5,8 @@ Release ...
   multiple font file arguments were given. This has been fixed.
 * troff: Fonts that contain possible ligatures (fi, fl, etc.) in their file
   names are now mounted correctly.
+* dpost: Allow only the glyph at position 0 to be named ".notdef" when
+  generating Type 42 font data.
 * dpost: No longer leaves a stale temporary file in /var/tmp.
 
 Release 051011
