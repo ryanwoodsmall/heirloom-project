@@ -23,9 +23,10 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.31 (gritter) 10/13/05
+ * Sccsid @(#)otf.c	1.32 (gritter) 10/14/05
  */
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -1516,8 +1517,6 @@ getSID(int n)
 static void
 error(const char *fmt, ...)
 {
-	extern int	vsnprintf(char *, size_t, const char *, va_list);
-	extern int	snprintf(char *, size_t, const char *, ...);
 	char	buf[4096];
 	va_list	ap;
 	int	n;
@@ -1980,7 +1979,6 @@ get_ttf_post_2_5(int o)
 static void
 unichar(int gid, int c)
 {
-	extern int	snprintf(char *, size_t, const char *, ...);
 	int	i;
 	char	*sp;
 
@@ -2045,7 +2043,6 @@ get_ms_unicode_cmap(int o)
 static void
 get_ttf_post_3_0(int o)
 {
-	extern int	snprintf(char *, size_t, const char *, ...);
 	int	numTables;
 	int	platformID;
 	int	encodingID;

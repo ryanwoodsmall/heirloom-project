@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.16 (gritter) 9/5/05
+ * Sccsid @(#)n8.c	1.17 (gritter) 10/14/05
  */
 
 /*
@@ -46,6 +46,7 @@
  * contributors.
  */
 
+#include	<stdio.h>
 #ifdef	EUC
 #include	<wctype.h>
 #endif
@@ -419,7 +420,6 @@ dilook(int a, int b, const char t[26][13])
 void
 casehylang(void)
 {
-	extern int sprintf(char *, const char *, ...);
 	int	c, i = 0, sz = 0;
 	char	*file = NULL, *path = NULL;
 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.49 (gritter) 10/1/05
+ * Sccsid @(#)tdef.h	1.50 (gritter) 10/14/05
  */
 
 /*
@@ -383,6 +383,7 @@ extern int	c_dagger;
 #ifdef stderr
 #	undef stderr
 #endif
+#define	stderr	xxstderr
 extern int	stderr;	/* this is NOT the stdio value! */
 
 #ifdef	DEBUG

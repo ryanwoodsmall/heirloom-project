@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.42 (gritter) 9/27/05
+ * Sccsid @(#)n1.c	1.43 (gritter) 10/14/05
  */
 
 /*
@@ -54,6 +54,7 @@ char *xxxvers = "@(#)roff:n1.c	2.13";
  *	input routines, escape function calling
  */
 
+#include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -581,7 +582,6 @@ loop:
 	} else if (c == 'e' || c == 'E' ||
 			c == 'f' || c == 'F' ||
 			c == 'g' || c == 'G') {
-		extern int sprintf(char *, const char *, ...);
 		char	tmp[40];
 		char	fmt[] = "%%";
 		fmt[1] = c;
@@ -656,7 +656,6 @@ loop:
 	} else if (c == 'e' || c == 'E' ||
 			c == 'f' || c == 'F' ||
 			c == 'g' || c == 'G') {
-		extern int sprintf(char *, const char *, ...);
 		char	fmt[] = "%%";
 		fmt[1] = c;
 		str += sprintf(str, fmt, va_arg(ap, double));
