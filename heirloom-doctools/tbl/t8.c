@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t8.c	1.5 (gritter) 8/13/05
+ * Sccsid @(#)t8.c	1.6 (gritter) 10/15/05
  */
 
  /* t8.c: write out one line of output table */
@@ -41,6 +41,7 @@ putline (
 int c, lf, ct, form, lwid, vspf, ip = -1, cmidx = 0, exvspen, vforml;
 int vct, chfont;
 char *s, *size, *fn;
+char space[40];
 watchout=vspf=exvspen=0;
 if (i==0) once=0;
 if (i==0 && ( allflg || boxflg || dboxflg))
@@ -54,12 +55,12 @@ for(c=0; c<ncol; c++)
 		{
 		for(ip=nl; ip<nlin; ip=next(ip))
 			if (!vspen(s=table[ip][c].col)) break;
-		if (s>(char *)0 && s<(char *)128)
-		fprintf(tabout, ".ne \\n(%c|u+\\n(.Vu\n",(int)s);
+		if (s!=(char *)0 && !point((intptr_t)s))
+		fprintf(tabout, ".ne %su+\\n(.Vu\n",nreg(space,s,'|'));
 		continue;
 		}
 	if (point((intptr_t)s)) continue;
-	fprintf(tabout, ".ne \\n(%c|u+\\n(.Vu\n",(int)s);
+	fprintf(tabout, ".ne %su+\\n(.Vu\n",nreg(space,s,'|'));
 	watchout=1;
 	}
 if (linestop[nl])
@@ -101,10 +102,11 @@ for(c=0; c<ncol; c++)
 	chfont |= (int)(font[stynum[nl]][c]);
 	if (point((intptr_t)s) ) continue;
 	lf=prev(nl);
+	nreg(space,s,'|');
 	if (lf>=0 && vspen(table[lf][c].col))
-		fprintf(tabout, ".if (\\n(%c|+\\n(^%c-1v)>\\n(#- .nr #- +(\\n(%c|+\\n(^%c-\\n(#--1v)\n",(int)s,'a'+c,(int)s,'a'+c);
+		fprintf(tabout, ".if (%s+\\n(^%c-1v)>\\n(#- .nr #- +(%s+\\n(^%c-\\n(#--1v)\n",space,'a'+c,space,'a'+c);
 	else
-		fprintf(tabout, ".if (\\n(%c|+\\n(#^-1v)>\\n(#- .nr #- +(\\n(%c|+\\n(#^-\\n(#--1v)\n",(int)s,(int)s);
+		fprintf(tabout, ".if (%s+\\n(#^-1v)>\\n(#- .nr #- +(%s+\\n(#^-\\n(#--1v)\n",space,space);
 	}
 if (allflg && once>0 )
 	fullwide(i,'-');
@@ -283,6 +285,7 @@ funnies(int stl, int lin)
 /* write out funny diverted things */
 int c, s, pl, lwid, dv, lf, ct = 0;
 char *fn;
+char space[40];
 fprintf(tabout, ".mk ##\n"); /* rmember current vertical position */
 fprintf(tabout, ".nr %d \\n(##\n", S1); /* bottom position */
 for(c=0; c<ncol; c++)
@@ -298,7 +301,7 @@ for(c=0; c<ncol; c++)
 		{
 		case 'n':
 		case 'c':
-			fprintf(tabout, "(\\n(%du+\\n(%du-\\n(%c-u)/2u\n",c+CLEFT,c-1+ctspan(lin,c)+CRIGHT, s);
+			fprintf(tabout, "(\\n(%du+\\n(%du-%su)/2u\n",c+CLEFT,c-1+ctspan(lin,c)+CRIGHT, nreg(space, (char *)s, '-'));
 			break;
 		case 'l':
 			fprintf(tabout, "\\n(%du\n",c+CLEFT);
@@ -307,7 +310,7 @@ for(c=0; c<ncol; c++)
 			fprintf(tabout, "\\n(%du\n",c+CMID);
 			break;
 		case 'r':
-			fprintf(tabout, "\\n(%du-\\n(%c-u\n", c+CRIGHT, s);
+			fprintf(tabout, "\\n(%du-%su\n", c+CRIGHT, nreg(space, (char *)s, '-'));
 			break;
 		}
 	fprintf(tabout, ".in +\\n(%du\n", SIND);
@@ -319,11 +322,14 @@ for(c=0; c<ncol; c++)
 		fprintf(tabout, ".sp |\\n(^%cu\n", 'a'+c);
 		if (ctop[stynum[stl]][c]==0)
 			{
-			fprintf(tabout, ".nr %d \\n(#-u-\\n(^%c-\\n(%c|+1v\n",TMP, 'a'+c, s);
+			fprintf(tabout, ".nr %d \\n(#-u-\\n(^%c-%s+1v\n",TMP, 'a'+c, nreg(space, (char *)s, '|'));
 			fprintf(tabout, ".if \\n(%d>0 .sp \\n(%du/2u\n", TMP, TMP);
 			}
 		}
-	fprintf(tabout, ".%c+\n",s);
+	if (s<128)
+		fprintf(tabout, ".%c+\n",s);
+	else
+		fprintf(tabout, ".do %d+\n",s);
 	fprintf(tabout, ".in -\\n(%du\n", SIND);
 	if (*fn>0) putfont("P");
 	fprintf(tabout, ".mk %d\n", S2);

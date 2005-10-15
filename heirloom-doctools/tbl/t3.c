@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t3.c	1.6 (gritter) 9/15/05
+ * Sccsid @(#)t3.c	1.7 (gritter) 10/15/05
  */
 
  /* t3.c: interpret commands affecting whole table */
@@ -59,6 +59,7 @@ int c, ci, found;
 for(lp= options; lp->optnam; lp++)
 	*(lp->optadd) = 0;
 texname = texstr[texct=0];
+texct2 = -1;
 tab = '\t';
 decimalpoint = '.';
 printf(".nr %d \\n(.s\n", LSIZE);

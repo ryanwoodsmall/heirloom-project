@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tf.c	1.3 (gritter) 7/23/05
+ * Sccsid @(#)tf.c	1.4 (gritter) 10/15/05
  */
 
  /* tf.c: save and restore fill mode around table */
@@ -54,6 +54,8 @@ int i;
 			fprintf(tabout, ".nr #%c 0\n", 'a'+i);
 	for(i=0; i<texct; i++)
 		fprintf(tabout, ".rm %c+\n",texstr[i]);
+	for(i=300; i<=texct2; i++)
+		fprintf(tabout, ".do rm %d+\n",i);
 fprintf(tabout, "%s\n", last);
 }
 void

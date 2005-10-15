@@ -18,10 +18,10 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t9.c	1.5 (gritter) 8/12/05
+ * Sccsid @(#)t9.c	1.6 (gritter) 10/15/05
  */
 
- /* t9.c: write lines for tables over 200 lines */
+ /* t9.c: write lines for tables over MAXLIN lines */
 # include "t..c"
 static int useln;
 void

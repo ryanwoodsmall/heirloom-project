@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.9 (gritter) 9/15/05
+ * Sccsid @(#)t..c	1.10 (gritter) 10/15/05
  */
 
 /* t..c : external declarations */
@@ -31,7 +31,7 @@
 # define getc(f) _IO_getc_unlocked(f)
 # endif
 
-# define MAXLIN 200
+# define MAXLIN 4000
 # define MAXHEAD 100
 # define MAXCOL 100
 # define MAXCHS 2000
@@ -78,6 +78,7 @@ extern char *leftover;
 extern char *last, *ifile;
 extern int texname;
 extern int texct;
+extern int texct2;
 extern char texstr[];
 extern int linstart;
 
@@ -167,6 +168,7 @@ void cleanfc(void);
 /* tg.c */
 int get_text(char *, int, int, char *, char *);
 void untext(void);
+char *nreg(char *, const char *, int);
 /* ti.c */
 int interv(int, int);
 int interh(int, int);

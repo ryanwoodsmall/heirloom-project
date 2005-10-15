@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tc.c	1.4 (gritter) 7/24/05
+ * Sccsid @(#)tc.c	1.5 (gritter) 10/15/05
  */
 
  /* tc.c: find character not in table to delimit fields */
@@ -92,5 +92,5 @@ return;
 int 
 point(int s)
 {
-return(s>= 128 || s<0);
+return(s>= 4096 || s<0);
 }
