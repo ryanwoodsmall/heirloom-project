@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.103 (gritter) 10/13/05
+ * Sccsid @(#)dpost.c	1.104 (gritter) 10/16/05
  */
 
 /*
@@ -2897,6 +2897,7 @@ t_sf(void)
 
 
     int		fnum;			/* internal font number */
+    int		cmd;			/* command to execute */
 
 
 /*
@@ -2924,6 +2925,13 @@ t_sf(void)
 	    doglobal(temp);
     }	/* End if */
 
+    cmd = 'f';
+    if (encoding == 4 || encoding == 5) {
+	if (font == lastfont && subfont == lastsubfont)
+	    cmd = 's';
+	else if (size == lastsize && fractsize == lastfractsize)
+	    cmd = 'F';
+    }
     if ( tf == stdout )  {
 	lastfont = font;
 	lastsubfont = subfont;
@@ -2940,16 +2948,21 @@ t_sf(void)
 	seenfonts[fnum] = 1;
     }	/* End if */
 
-    if (size != FRACTSIZE)
-        fprintf(tf, "%d ", pstab[size-1]);
-    else
-	fprintf(tf, "%g ", (double)fractsize);
-    if (fontname[font].afm && subfont)
-    	fprintf(tf, "@%s@%d f\n", fontname[font].afm->Font.intname, subfont);
-    else if (fontname[font].afm)
-    	fprintf(tf, "@%s f\n", fontname[font].afm->Font.intname);
-    else
-    	fprintf(tf, "%s f\n", fontname[font].name);
+    if (cmd == 'f' || cmd == 's') {
+        if (size != FRACTSIZE)
+            fprintf(tf, "%d ", pstab[size-1]);
+        else
+	    fprintf(tf, "%g ", (double)fractsize);
+    }
+    if (cmd == 'f' || cmd == 'F') {
+        if (fontname[font].afm && subfont)
+    	    fprintf(tf, "@%s@%d ", fontname[font].afm->Font.intname, subfont);
+        else if (fontname[font].afm)
+    	    fprintf(tf, "@%s ", fontname[font].afm->Font.intname);
+        else
+    	    fprintf(tf, "%s ", fontname[font].name);
+    }
+    fprintf(tf, "%c\n", cmd);
 
     if ( fontheight != 0 || fontslant != 0 ) {
 	if (size != FRACTSIZE)

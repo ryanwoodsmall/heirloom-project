@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.6 0
+%%BeginResource: procset dpost 4.7 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.6 (gritter) 10/2/05
+% Sccsid @(#)dpost.ps	4.7 (gritter) 10/16/05
 %
 
 /#copies 1 store
@@ -161,6 +161,8 @@
 	linewidth ptsize mul scaling resolution 72 div mul div setlinewidth
 	/spacewidth ( ) stringwidth pop def
 } bind def
+/F { ptsize exch f } bind def
+/s { font f } bind def
 
 /changefont {
 	/fontheight exch def
