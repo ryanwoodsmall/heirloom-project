@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.7 0
+%%BeginResource: procset dpost 4.8 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.7 (gritter) 10/16/05
+% Sccsid @(#)dpost.ps	4.8 (gritter) 10/17/05
 %
 
 /#copies 1 store
@@ -150,6 +150,8 @@
 ] def
 
 /setdecoding {/t decodingdefs 3 -1 roll get bind def} bind def
+
+/T { /track exch def } bind def
 
 /w {neg moveto show} bind def
 /m {neg dup /y exch def moveto} bind def
