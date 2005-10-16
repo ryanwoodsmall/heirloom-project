@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-doctools.spec	1.11 (gritter) 9/10/05
+# Sccsid @(#)heirloom-doctools.spec	1.12 (gritter) 10/16/05
 #
 Summary: The Heirloom Documentation Tools.
 Name: heirloom-doctools
@@ -35,7 +35,13 @@ BuildRoot: %{_tmppath}/%{name}-root
 %description
 The Heirloom Documentation Tools provide troff, nroff, and related
 utilities to format manual pages and other documents for output on
-terminals and printers.
+terminals and printers. They are portable and enhanced versions of
+the respective OpenSolaris utilities, which descend to ditroff and
+the historical Unix troff. troff provides advanced typographical
+features such as kerning, tracking, and hanging characters. It can
+access PostScript Type 1, OpenType, and TrueType fonts directly.
+Internationalized hyphenation, international paper sizes, and UTF-8
+input are supported.
 
 %prep
 rm -rf %{buildroot}
