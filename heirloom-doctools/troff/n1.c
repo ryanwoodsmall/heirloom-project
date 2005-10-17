@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.43 (gritter) 10/14/05
+ * Sccsid @(#)n1.c	1.44 (gritter) 10/18/05
  */
 
 /*
@@ -100,6 +100,7 @@ wchar_t	twc = 0;
 
 static void printn(long, long);
 static char *sprintn(char *s, long n, int b);
+#define	vfdprintf	xxvfdprintf
 static void vfdprintf(int fd, const char *fmt, va_list ap);
 
 #ifdef	DEBUG

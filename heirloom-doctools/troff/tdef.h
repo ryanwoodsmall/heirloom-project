@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.50 (gritter) 10/14/05
+ * Sccsid @(#)tdef.h	1.51 (gritter) 10/18/05
  */
 
 /*
@@ -615,6 +615,7 @@ void cvtime(void);
 int ctoi(register char *);
 void mesg(int);
 void errprint(const char *, ...);
+#define	fdprintf	xxfdprintf
 void fdprintf(int, char *, ...);
 char *roff_sprintf(char *, char *, ...);
 int control(register int, register int);
