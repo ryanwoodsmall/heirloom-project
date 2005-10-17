@@ -1,3 +1,6 @@
+Release ...
+* The "pic" utility has been added from Plan 9 sources.
+
 Release 051015
 * troff, dpost, otfdump: Handle TrueType files with version 3.0 "post" table
   and no Microsoft/Unicode "cmap" subtable.
