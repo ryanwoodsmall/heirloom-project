@@ -8,7 +8,7 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)pic.1b	1.2 (gritter) 10/18/05
+.\" Sccsid @(#)pic.1b	1.3 (gritter) 10/18/05
 .TH PIC 1B "10/18/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .\".de PS	\" start picture
 .\".	\" $1 is height, $2 is width, both in inches
@@ -200,7 +200,7 @@ coordinate pair, but it may be specified in other ways.
 	\f2place\fP \(+- \f2expr, expr\fP
 	\f2place\fP \(+- ( \f2expr, expr\fP )
 	( \f2position\fP,\f2 position\fP )	\f2x\fP\fR from one, \f2y\fP\fR the other\fP
-	\f2expr\fP [\fLof the way\fP] between \f2position\fP and \f2position\fP
+	\f2expr\fP [\fRof the way\fP] between \f2position\fP and \f2position\fP
 	\f2expr\fP < \f2position\fP , \f2position\fP >
 	( \f2position\fP )
 .sp
