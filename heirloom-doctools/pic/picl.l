@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picl.l	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)picl.l	1.4 (gritter) 10/18/05	*/
 %}
 %Start A str def sc br thru sh
 %e 1700
@@ -32,8 +32,6 @@
 #include "y.tab.h"
 
 #ifdef	FLEX_SCANNER
-#undef	input
-#undef	unput
 #undef	YY_INPUT
 #define	YY_INPUT(buf, result, max_size) { \
 	int	c = xxinput(); \
@@ -240,7 +238,7 @@ WS	[ \t]
 		  } else {
 			p = lookup(yytext);
 			if (p != NULL && p->s_type == DEFNAME) {
-				c = xxinput();
+				c = input();
 				xxunput(c);
 				if (c == '(')
 					dodef(p);
@@ -269,7 +267,7 @@ WS	[ \t]
 <A>{A}{B}* {	struct symtab *p;
 		p = lookup(yytext);
 		if (p != NULL && p->s_type == DEFNAME) {
-			c = xxinput();
+			c = input();
 			xxunput(c);
 			if (c == '(')	/* it's name(...) */
 				dodef(p);
@@ -304,6 +302,6 @@ WS	[ \t]
 #ifdef	FLEX_SCANNER
 void xxcruft(void)
 {
-	yyunput(0, 0);
+	unput(0);
 }
 #endif	/* FLEX_SCANNER */

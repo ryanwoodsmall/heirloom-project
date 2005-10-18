@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)pic.h	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)pic.h	1.4 (gritter) 10/18/05	*/
 
 #ifndef PI
 #define PI 3.1415926535897932384626433832795028841971693993751
@@ -94,6 +94,7 @@ typedef union {		/* the yacc stack type */
 	double	f;
 	struct symtab *st;
 } YYSTYPE;
+#define	YYSTYPE	YYSTYPE
 
 extern	YYSTYPE	yylval, yyval;
 

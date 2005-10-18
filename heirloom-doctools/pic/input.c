@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)input.c	1.4 (gritter) 10/18/05	*/
+/*	Sccsid @(#)input.c	1.5 (gritter) 10/18/05	*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +46,8 @@ void pushsrc(int type, char *ptr)	/* new input source */
 		printf("\n%3d ", srcp - src);
 		switch (srcp->type) {
 		case File:
-			printf("push file %s\n", ((Infile *)ptr)->fname);
+			printf("push file %s\n",
+				ptr ? ((Infile *)ptr)->fname : "(null)");
 			break;
 		case Macro:
 			printf("push macro <%s>\n", ptr);
