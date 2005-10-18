@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.156 (gritter) 7/15/05
+ *	Sccsid @(#)extern.h	2.157 (gritter) 10/18/05
  */
 
 /* aux.c */
@@ -465,7 +465,7 @@ int mkdate(FILE *fo, const char *field);
 int puthead(struct header *hp, FILE *fo, enum gfield w,
 		enum sendaction action, enum conversion convert,
 		char *contenttype, char *charset);
-int resend_msg(struct message *mp, struct name *to, int add_resent);
+enum okay resend_msg(struct message *mp, struct name *to, int add_resent);
 /* smtp.c */
 char *nodename(int mayoverride);
 char *myaddrs(struct header *hp);

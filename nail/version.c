@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.336 (gritter) 10/4/05";
+static char sccsid[] = "@(#)version.c	2.337 (gritter) 10/18/05";
 #endif
 #endif /* not lint */
 
@@ -48,13 +48,13 @@ static char sccsid[] = "@(#)version.c	2.336 (gritter) 10/4/05";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = "nail " V " 10/4/05";
+const char *version = "nail " V " 10/18/05";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)nail " V " 10/4/05";
+= "@(#)nail " V " 10/18/05";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -63,13 +63,13 @@ base64.c:static char sccsid[] = "@(#)base64.c	2.12 (gritter) 7/20/05";
 cache.c:static char sccsid[] = "@(#)cache.c	1.60 (gritter) 7/24/05";
 cmd1.c:static char sccsid[] = "@(#)cmd1.c	2.95 (gritter) 4/15/05";
 cmd2.c:static char sccsid[] = "@(#)cmd2.c	2.45 (gritter) 5/28/05";
-cmd3.c:static char sccsid[] = "@(#)cmd3.c	2.81 (gritter) 4/13/05";
+cmd3.c:static char sccsid[] = "@(#)cmd3.c	2.82 (gritter) 10/18/05";
 cmdtab.c:static char sccsid[] = "@(#)cmdtab.c	2.50 (gritter) 12/2/04";
 collect.c:static char sccsid[] = "@(#)collect.c	2.51 (gritter) 7/13/05";
 def.h: *	Sccsid @(#)def.h	2.103 (gritter) 7/29/05
 dotlock.c:static char sccsid[] = "@(#)dotlock.c	2.7 (gritter) 10/2/04";
 edit.c:static char sccsid[] = "@(#)edit.c	2.23 (gritter) 6/9/05";
-extern.h: *	Sccsid @(#)extern.h	2.156 (gritter) 7/15/05
+extern.h: *	Sccsid @(#)extern.h	2.157 (gritter) 10/18/05
 fio.c:static char sccsid[] = "@(#)fio.c	2.68 (gritter) 11/6/04";
 getname.c:static char sccsid[] = "@(#)getname.c	2.4 (gritter) 10/2/04";
 getopt.c:	Sccsid @(#)getopt.c	1.6 (gritter) 10/2/04	
@@ -97,7 +97,7 @@ popen.c:static char sccsid[] = "@(#)popen.c	2.19 (gritter) 12/26/04";
 quit.c:static char sccsid[] = "@(#)quit.c	2.27 (gritter) 11/3/04";
 rcv.h: *	Sccsid @(#)rcv.h	2.6 (gritter) 10/2/04
 send.c:static char sccsid[] = "@(#)send.c	2.82 (gritter) 3/22/05";
-sendout.c:static char sccsid[] = "@(#)sendout.c	2.88 (gritter) 7/29/05";
+sendout.c:static char sccsid[] = "@(#)sendout.c	2.89 (gritter) 10/18/05";
 smtp.c:static char sccsid[] = "@(#)smtp.c	2.34 (gritter) 7/13/05";
 ssl.c:static char sccsid[] = "@(#)ssl.c	1.37 (gritter) 7/15/05";
 strings.c:static char sccsid[] = "@(#)strings.c	2.5 (gritter) 10/2/04";

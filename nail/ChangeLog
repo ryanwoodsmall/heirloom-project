@@ -2,6 +2,8 @@
 * The new "-S variable[=value]" command line option sets the internal option
   "variable", and, in case of a string option, assigns "value" to it (based
   on a request by Dmitry Butskoy).
+* Use of the "resend" command with multiple messages at once now works as
+  documented (bug reported by Svend Sorensen).
 * When the "next" or newline command is typed as the first command after a
   folder has been opened, the first (new) message is printed even if a
   folder hook has been executed previously (bugreport by Stephen Isard).

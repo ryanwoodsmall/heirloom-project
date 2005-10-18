@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.81 (gritter) 4/13/05";
+static char sccsid[] = "@(#)cmd3.c	2.82 (gritter) 10/18/05";
 #endif
 #endif /* not lint */
 
@@ -1143,7 +1143,7 @@ resend1(void *v, int add_resent)
 	sn = nalloc(name, GTO);
 	to = usermap(sn);
 	for (ip = msgvec; *ip && ip - msgvec < msgCount; ip++) {
-		if (resend_msg(&message[*ip - 1], to, add_resent) != 0)
+		if (resend_msg(&message[*ip - 1], to, add_resent) != OKAY)
 			return 1;
 	}
 	return 0;

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.88 (gritter) 7/29/05";
+static char sccsid[] = "@(#)sendout.c	2.89 (gritter) 10/18/05";
 #endif
 #endif /* not lint */
 
@@ -974,7 +974,8 @@ try:	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
 		savedeadletter(mtf);
 	to = elide(to);
 	if (count(to) == 0) {
-		ok = OKAY;
+		if (senderr == 0)
+			ok = OKAY;
 		goto out;
 	}
 	if (mightrecord(mtf, to, recipient_record) != OKAY)
@@ -1361,7 +1362,7 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 	return 0;
 }
 
-int 
+enum okay 
 resend_msg(struct message *mp, struct name *to, int add_resent)
 {
 	FILE *ibuf, *nfo, *nfi;
@@ -1372,22 +1373,22 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 	memset(&head, 0, sizeof head);
 	if ((to = checkaddrs(to)) == NULL) {
 		senderr++;
-		return 1;
+		return STOP;
 	}
 	if ((nfo = Ftemp(&tempMail, "Rs", "w", 0600, 1)) == NULL) {
 		senderr++;
 		perror(catgets(catd, CATSET, 189, "temporary mail file"));
-		return 1;
+		return STOP;
 	}
 	if ((nfi = Fopen(tempMail, "r")) == NULL) {
 		senderr++;
 		perror(tempMail);
-		return 1;
+		return STOP;
 	}
 	rm(tempMail);
 	Ftfree(&tempMail);
 	if ((ibuf = setinput(&mb, mp, NEED_BODY)) == NULL)
-		return 1;
+		return STOP;
 	head.h_to = to;
 	to = fixhead(&head, to);
 	if (infix_resend(ibuf, nfo, mp, head.h_to, add_resent) != 0) {
@@ -1398,7 +1399,7 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 				". . . message not sent.\n"), stderr);
 		Fclose(nfo);
 		Fclose(nfi);
-		return 1;
+		return STOP;
 	}
 	fflush(nfo);
 	rewind(nfo);
@@ -1411,7 +1412,7 @@ resend_msg(struct message *mp, struct name *to, int add_resent)
 		if (value("record-resent") == NULL ||
 				mightrecord(nfi, to, 0) == OKAY)
 			ok = transfer(to, head.h_smopts, nfi, NULL);
-	} else
+	} else if (senderr == 0)
 		ok = OKAY;
 	Fclose(nfi);
 	return ok;
