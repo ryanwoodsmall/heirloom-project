@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)input.c	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)input.c	1.4 (gritter) 10/19/05	*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +17,11 @@
 #include <errno.h>
 #include "grap.h"
 #include "y.tab.h"
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)	_IO_getc_unlocked(f)
+#endif
 
 Infile	infile[10];
 Infile	*curfile = infile;
