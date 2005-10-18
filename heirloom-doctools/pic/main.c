@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)main.c	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)main.c	1.4 (gritter) 10/18/05	*/
 #include	<stdio.h>
 #include	<signal.h>
 #include	<stdlib.h>
@@ -17,7 +17,7 @@
 #include	"pic.h"
 #include	"y.tab.h"
 
-char	*version = "version July 5, 1993";
+extern const char	version[];
 
 obj	**objlist = 0;		/* store the elements here */
 int	nobjlist = 0;		/* size of objlist array */
@@ -200,14 +200,16 @@ void checkscale(char *s)	/* if s is "scale", adjust default variables */
 
 void getdata(void)
 {
-	char *p, buf[1000], buf1[100];
+	char *p, *buf = NULL, *buf1 = NULL;
+	size_t size = 0;
 	int ln;
 	void reset(void), openpl(char *), closepl(char *), print(void);
 	int yyparse(void);
+	char *fgetline(char **, size_t *, size_t *, FILE *);
 
 	curfile->lineno = 0;
 	printlf(1, curfile->fname);
-	while (fgets(buf, sizeof buf, curfile->fin) != NULL) {
+	while (fgetline(&buf, &size, NULL, curfile->fin) != NULL) {
 		curfile->lineno++;
 		if (*buf == '.' && *(buf+1) == 'P' && *(buf+2) == 'S') {
 			for (p = &buf[3]; *p == ' '; p++)
@@ -215,6 +217,7 @@ void getdata(void)
 			if (*p++ == '<') {
 				Infile svfile;
 				svfile = *curfile;
+				buf1 = realloc(buf1, size);
 				sscanf(p, "%s", buf1);
 				if ((curfile->fin=fopen(buf1, "r")) == NULL)
 					FATAL("can't open %s", buf1);
@@ -256,6 +259,7 @@ void getdata(void)
 			printlf(curfile->lineno+1, NULL);
 			fflush(stdout);
 		} else if (buf[0] == '.' && buf[1] == 'l' && buf[2] == 'f') {
+			buf1 = realloc(buf1, size);
 			if (sscanf(buf+3, "%d %s", &ln, buf1) == 2) {
 				free(curfile->fname);
 				printlf(curfile->lineno = ln, curfile->fname = tostring(buf1));
@@ -264,6 +268,8 @@ void getdata(void)
 		} else
 			fputs(buf, stdout);
 	}
+	free(buf);
+	free(buf1);
 }
 
 void reset(void)
