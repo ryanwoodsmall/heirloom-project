@@ -1,6 +1,7 @@
 Release ...
 * The "pic" and "grap" utilities have been added from Plan 9 sources.
 * The "vgrind" utility has been added from OpenSolaris sources.
+* "refer" and related utilites have been added from OpenSolaris sources.
 
 Release 051015
 * troff, dpost, otfdump: Handle TrueType files with version 3.0 "post" table

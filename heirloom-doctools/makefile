@@ -6,6 +6,7 @@ SUBDIRS = eqn/eqn.d \
 	pic \
 	grap \
 	vgrind \
+	refer \
 	troff/libhnj \
 	troff/libhnj/hyphen.d \
 	troff/troff.d/font \
