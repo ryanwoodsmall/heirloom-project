@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)inv5.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)inv5.c	1.4 (gritter) 10/22/05
  */
 
 #include <stdio.h>
@@ -58,7 +58,11 @@ recopy (FILE *ft, FILE *fb, FILE *fa, int nhash)
 	if (iflong)
 		getfun = (int(*)())getl;
 	else
+#ifdef	EUC
 		getfun = getw;
+#else
+		getfun = fgetc;
+#endif
 	for(i=0; i<n; i++)
 	{
 		if (iflong)

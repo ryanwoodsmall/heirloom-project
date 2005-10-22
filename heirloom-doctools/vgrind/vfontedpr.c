@@ -9,7 +9,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)vfontedpr.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)vfontedpr.c	1.4 (gritter) 10/22/05
  */
 
 #include <ctype.h>
@@ -20,7 +20,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#ifdef	EUC
 #include <wchar.h>
+#endif
 
 #if defined (__GLIBC__) && defined (_IO_getc_unlocked)
 #undef	getc

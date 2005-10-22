@@ -5,7 +5,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/refer.sl	1.2 (gritter) 10/22/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/refer.sl	1.3 (gritter) 10/22/05";
 /* SLIST */
 /*
 addbib.c: * Sccsid @(#)addbib.c	1.3 (gritter) 10/22/05
@@ -26,13 +26,13 @@ hunt9.c: * Sccsid @(#)hunt9.c	1.3 (gritter) 10/22/05
 inv1.c: * Sccsid @(#)inv1.c	1.3 (gritter) 10/22/05
 inv2.c: * Sccsid @(#)inv2.c	1.3 (gritter) 10/22/05
 inv3.c: * Sccsid @(#)inv3.c	1.3 (gritter) 10/22/05
-inv5.c: * Sccsid @(#)inv5.c	1.3 (gritter) 10/22/05
+inv5.c: * Sccsid @(#)inv5.c	1.4 (gritter) 10/22/05
 inv6.c: * Sccsid @(#)inv6.c	1.3 (gritter) 10/22/05
 lookbib.c: * Sccsid @(#)lookbib.c	1.3 (gritter) 10/22/05
 mkey1.c: * Sccsid @(#)mkey1.c	1.3 (gritter) 10/22/05
 mkey2.c: * Sccsid @(#)mkey2.c	1.3 (gritter) 10/22/05
 mkey3.c: * Sccsid @(#)mkey3.c	1.3 (gritter) 10/22/05
-refer..c: * Sccsid @(#)refer..c	1.3 (gritter) 10/22/05
+refer..c: * Sccsid @(#)refer..c	1.4 (gritter) 10/22/05
 refer0.c: * Sccsid @(#)refer0.c	1.3 (gritter) 10/22/05
 refer1.c: * Sccsid @(#)refer1.c	1.3 (gritter) 10/22/05
 refer2.c: * Sccsid @(#)refer2.c	1.3 (gritter) 10/22/05

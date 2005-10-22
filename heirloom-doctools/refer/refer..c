@@ -18,12 +18,19 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)refer..c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)refer..c	1.4 (gritter) 10/22/05
  */
 
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
+
+#ifndef	EUC
+#undef	getw
+#define	getw(f)		getc(f)
+#undef	putw
+#define	putw(c, f)	putc(c, f)
+#endif	/* !EUC */
 
 #define FLAG 003
 #define AFLAG 007

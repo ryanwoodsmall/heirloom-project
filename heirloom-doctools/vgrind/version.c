@@ -5,11 +5,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucblib/vfontedpr.sl	1.3 (gritter) 10/22/05";
+static const char sccsid[] USED = "@(#)/usr/ucblib/vfontedpr.sl	1.4 (gritter) 10/22/05";
 /* SLIST */
 /*
 regexp.c: * Sccsid @(#)regexp.c	1.3 (gritter) 10/22/05
 retest.c: * Sccsid @(#)retest.c	1.3 (gritter) 10/22/05
-vfontedpr.c: * Sccsid @(#)vfontedpr.c	1.3 (gritter) 10/22/05
+vfontedpr.c: * Sccsid @(#)vfontedpr.c	1.4 (gritter) 10/22/05
 vgrindefs.c: * Sccsid @(#)vgrindefs.c	1.3 (gritter) 10/22/05
 */
