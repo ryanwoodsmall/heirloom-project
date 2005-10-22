@@ -170,6 +170,11 @@ the description for ".xflag" below.
 	accepts any points size now with PostScript devices, including
 	fractional sizes.
 
+.recursionlimit n
+	sets the maximum stack depth for recursive invocations of macros to
+	n. If n is zero, the stack depth is unlimited. The default limit is
+	512.
+
 .rhang ff char0 units0 char1 units1 char2 units2 ...	troff only
 	When the current font is "ff" and "char0" appears at the right margin
 	of an output line in right-adjusted or aligned mode, the margin is
@@ -377,4 +382,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   10/4/05
+Gunnar Ritter                                                   10/22/05

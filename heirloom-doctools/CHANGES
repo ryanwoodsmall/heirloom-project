@@ -2,6 +2,8 @@ Release ...
 * The "pic" and "grap" utilities have been added from Plan 9 sources.
 * The "vgrind" utility has been added from OpenSolaris sources.
 * "refer" and related utilites have been added from OpenSolaris sources.
+* [nt]roff: The new ".recursionlimit" request allows to change the maximum
+  permitted recursion depth for macro invocations from the default 512.
 
 Release 051015
 * troff, dpost, otfdump: Handle TrueType files with version 3.0 "post" table

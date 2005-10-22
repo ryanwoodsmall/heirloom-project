@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.44 (gritter) 10/18/05
+ * Sccsid @(#)n1.c	1.45 (gritter) 10/22/05
  */
 
 /*
@@ -83,6 +83,7 @@ char *xxxvers = "@(#)roff:n1.c	2.13";
 #include "proto.h"
 
 #define	MAX_RECURSION_DEPTH	512
+static int	max_recursion_depth = MAX_RECURSION_DEPTH;
 
 jmp_buf sjbuf;
 filep	ipl[NSO];
@@ -423,6 +424,7 @@ init2(void)
 	ibufp = ibuf;
 	nx = mflg;
 	frame = stk = (struct s *)setbrk(DELTA);
+	stk->frame_cnt = 0;
 	dip = &d[0];
 	nxf = frame + 1;
 	initenv = env;
@@ -697,19 +699,12 @@ control(register int a, register int b)
 	 * invocation would exceed this value.
 	 */
 
-	if (frame != stk) {
-		int frame_cnt = 0;
-		struct s *p;
-
-		for (p = frame; p != stk; p = p->pframe)
-			frame_cnt++;
-		if (frame_cnt > MAX_RECURSION_DEPTH) {
-			errprint(
-			    "Exceeded maximum stack size (%d) when "
-			    "executing macro %s. Stack dump follows",
-			    MAX_RECURSION_DEPTH, macname(frame->mname));
-			edone(02);
-		}
+	if (max_recursion_depth > 0 && frame->frame_cnt > max_recursion_depth) {
+		errprint(
+		    "Exceeded maximum stack size (%d) when "
+		    "executing macro %s. Stack dump follows",
+		    max_recursion_depth, macname(frame->mname));
+		edone(02);
 	}
 
 #ifdef	DEBUG
@@ -1646,4 +1641,11 @@ casexflag(void)
 	i = atoi();
 	if (!nonumb)
 		_xflag = xflag = i & 3;
+}
+
+void
+caserecursionlimit(void)
+{
+	skip();
+	max_recursion_depth = atoi();
 }
