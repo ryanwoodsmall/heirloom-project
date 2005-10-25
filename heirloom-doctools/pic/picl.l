@@ -10,9 +10,9 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picl.l	1.4 (gritter) 10/18/05	*/
+/*	Sccsid @(#)picl.l	1.5 (gritter) 10/25/05	*/
 %}
-%Start A str def sc br thru sh
+%Start A str def xsc br thru sh
 %e 1700
 %k 120
 %a 1800
@@ -73,7 +73,7 @@ WS	[ \t]
 	case 0:
 		BEGIN A;
 		break;
-	case sc:
+	case xsc:
 		BEGIN A;
 		return('}');
 	case br:
@@ -85,7 +85,7 @@ WS	[ \t]
 <A>"\\"\n	;
 <A>\n		{ return(ST); }
 <A>";"		{ return(ST); }
-<A>"}"		{ BEGIN sc; return(ST); }
+<A>"}"		{ BEGIN xsc; return(ST); }
 <A>"]"		{ BEGIN br; return(ST); }
 <A>"{"{WS}*(#.*)?\n+	{ return(yylval.i = yytext[0]); }
 
