@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.9 (gritter) 9/8/05
+ * Sccsid @(#)gen.h	1.10 (gritter) 10/25/05
  */
 
 /*
@@ -70,7 +70,9 @@ extern const char	creator[];
 
 
 #define ABS(A)		((A) >= 0 ? (A) : -(A))
+#undef	MIN
 #define MIN(A, B)	((A) < (B) ? (A) : (B))
+#undef	MAX
 #define MAX(A, B)	((A) > (B) ? (A) : (B))
  
 /* color.c */
