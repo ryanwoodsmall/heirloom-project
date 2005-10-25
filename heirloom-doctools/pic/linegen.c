@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)linegen.c	1.2 (gritter) 10/18/05	*/
+/*	Sccsid @(#)linegen.c	1.3 (gritter) 10/25/05	*/
 #include <stdio.h>
 #include <math.h>
 #include "pic.h"
@@ -228,8 +228,8 @@ obj *linegen(int type)
 			extreme(nx += dx[i], ny += dy[i]);
 		else if (type == SPLINE && i < ndxy-1) {
 			/* to compute approx extreme of spline at p,
-			/* compute midway between p-1 and p+1,
-			/* then go 3/4 from there to p */
+			 * compute midway between p-1 and p+1,
+			 * then go 3/4 from there to p */
 			double ex, ey, xi, yi, xi1, yi1;
 			xi = nx + dx[i]; yi = ny + dy[i];	/* p */
 			xi1 = xi + dx[i+1]; yi1 = yi + dy[i+1];	/* p+1 */
