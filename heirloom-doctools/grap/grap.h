@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)grap.h	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)grap.h	1.4 (gritter) 10/25/05	*/
 extern void	FATAL(const char *, ...);
 extern void	WARNING(const char *, ...);
 
@@ -106,7 +106,7 @@ typedef union {		/* the yacc stack type */
 	Attr	*ap;
 } YYSTYPE;
 
-extern	YYSTYPE	yylval, yyval;
+extern	YYSTYPE	yylval;
 
 extern	int	dbg;
 
