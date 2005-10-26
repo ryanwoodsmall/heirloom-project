@@ -22,6 +22,7 @@ vgrind: vgrind.sh
 
 install:
 	$(INSTALL) -c vgrind $(ROOT)$(BINDIR)/vgrind
+	test -d $(ROOT)$(LIBDIR) || mkdir -p $(ROOT)$(LIBDIR)
 	$(INSTALL) -c vfontedpr $(ROOT)$(LIBDIR)/vfontedpr
 	$(STRIP) $(ROOT)$(LIBDIR)/vfontedpr
 	$(INSTALL) -c -m 644 vgrindefs.src $(ROOT)$(LIBDIR)/vgrindefs

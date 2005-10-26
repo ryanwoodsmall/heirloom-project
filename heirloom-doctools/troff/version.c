@@ -7,14 +7,14 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	4.67 (gritter) 10/22/05";
+	"@(#)/usr/ucb/otfdump.sl	5.1 (gritter) 10/25/05";
 #elif defined (DPOST)
-static const char sccsid[] USED = "@(#)dpost.sl  4.67 (gritter) 10/22/05";
-const char creator[] = "Heirloom Documentation Tools - dpost 4.67 (gritter) 10/22/05";
+static const char sccsid[] USED = "@(#)dpost.sl  5.1 (gritter) 10/25/05";
+const char creator[] = "Heirloom Documentation Tools - dpost 5.1 (gritter) 10/25/05";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	4.67 (gritter) 10/22/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	5.1 (gritter) 10/25/05";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	4.67 (gritter) 10/22/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	5.1 (gritter) 10/25/05";
 #endif	/* !DUMP, !NROFF */
 /* SLIST */
 /*
@@ -25,7 +25,7 @@ mallint.h: * Sccsid @(#)mallint.h	1.4 (gritter) 8/27/05
 malloc.c: * Sccsid @(#)malloc.c	1.3 (gritter) 8/26/05
 n1.c: * Sccsid @(#)n1.c	1.45 (gritter) 10/22/05
 n2.c: * Sccsid @(#)n2.c	1.11 (gritter) 9/30/05
-n3.c: * Sccsid @(#)n3.c	1.51 (gritter) 10/22/05
+n3.c: * Sccsid @(#)n3.c	1.52 (gritter) 10/25/05
 n4.c: * Sccsid @(#)n4.c	1.12 (gritter) 9/5/05
 n5.c: * Sccsid @(#)n5.c	1.21 (gritter) 9/2/05
 n7.c: * Sccsid @(#)n7.c	1.37 (gritter) 9/18/05
@@ -67,7 +67,7 @@ troff.d/dpost.d/dpost_draw.c: * Sccsid @(#)draw.c	1.3 (gritter) 8/9/05
 troff.d/dpost.d/dpost_makedev.c: * Sccsid @(#)dpost_makedev.c	1.1 (gritter) 9/4/05
 troff.d/dpost.d/dpost_otf.c: * Sccsid @(#)dpost_otf.c	1.3 (gritter) 10/13/05
 troff.d/dpost.d/ext.h: * Sccsid @(#)ext.h	1.3 (gritter) 8/9/05
-troff.d/dpost.d/gen.h: * Sccsid @(#)gen.h	1.9 (gritter) 9/8/05
+troff.d/dpost.d/gen.h: * Sccsid @(#)gen.h	1.10 (gritter) 10/25/05
 troff.d/dpost.d/getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
 troff.d/dpost.d/glob.c: * Sccsid @(#)glob.c	1.3 (gritter) 8/9/05
 troff.d/dpost.d/misc.c: * Sccsid @(#)misc.c	1.7 (gritter) 10/2/05

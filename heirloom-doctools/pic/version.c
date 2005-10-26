@@ -5,8 +5,8 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/pic.sl	1.8 (gritter) 10/25/05";
-const char version[] = "version July 5, 1993	1.8 (gritter) 10/25/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/pic.sl	5.1 (gritter) 10/25/05";
+const char version[] = "version July 5, 1993	5.1 (gritter) 10/25/05";
 /* SLIST */
 /*
 arcgen.c:	Sccsid @(#)arcgen.c	1.3 (gritter) 10/18/05	

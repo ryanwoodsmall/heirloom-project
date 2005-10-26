@@ -72,7 +72,7 @@ install: all
 	$(INSTALL) -c papers/Rbstjissue $(ROOT)$(REFDIR)/papers/Rbstjissue
 	$(INSTALL) -c papers/Rv7man $(ROOT)$(REFDIR)/papers/Rv7man
 	$(INSTALL) -c papers/runinv $(ROOT)$(REFDIR)/papers/runinv
-	cd $(ROOT)$(REFDIR)/papers && ./runinv
+	cd $(ROOT)$(REFDIR)/papers && PATH=$(ROOT)$(REFDIR):$$PATH ./runinv
 	for i in addbib.1b lookbib.1b refer.1b roffbib.1b sortbib.1b; \
 	do \
 		$(INSTALL) -c -m 644 $$i $(ROOT)$(MANDIR)/man1b/$$i || exit; \

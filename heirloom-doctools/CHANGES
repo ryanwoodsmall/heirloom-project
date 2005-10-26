@@ -1,4 +1,7 @@
 Release ...
+* The "make install" procedures of refer and vgrind have been fixed.
+
+Release 051025
 * The "pic" and "grap" utilities have been added from Plan 9 sources.
 * The "vgrind" utility has been added from OpenSolaris sources.
 * "refer" and related utilites have been added from OpenSolaris sources.

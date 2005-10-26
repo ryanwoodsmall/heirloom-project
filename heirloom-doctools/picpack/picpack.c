@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)picpack.sl	4.1 (gritter) 9/15/05";
+static const char sccsid[] USED = "@(#)picpack.sl	5.1 (gritter) 10/25/05";
 
 /*
  *

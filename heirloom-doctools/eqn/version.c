@@ -6,9 +6,9 @@
 #define	USED
 #endif
 #ifdef	NEQN
-static const char sccsid[] USED = "@(#)/usr/ucb/neqn.sl	4.2 (gritter) 9/18/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/neqn.sl	5.1 (gritter) 10/25/05";
 #else
-static const char sccsid[] USED = "@(#)/usr/ucb/eqn.sl	4.2 (gritter) 9/18/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/eqn.sl	5.1 (gritter) 10/25/05";
 #endif
 /* SLIST */
 /*

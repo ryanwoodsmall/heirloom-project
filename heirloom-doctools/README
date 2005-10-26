@@ -4,7 +4,8 @@ README file for the Heirloom Documentation Tools
 The Heirloom Documentation Tools provide troff, nroff, and related
 utilities to format manual pages and other documents for output on
 terminals and printers. They are portable and enhanced versions of
-the utilities released by Sun as part of OpenSolaris.
+the utilities released by Sun as part of OpenSolaris, and, for pic,
+grap, and some minor parts, by Lucent as part of Plan 9.
 
 nroff is most prominently used to format Unix manual pages for viewing
 them on a terminal. This implementation consumes relatively few system
@@ -97,4 +98,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						9/11/05
+<gunnarr@acm.org>						10/25/05
