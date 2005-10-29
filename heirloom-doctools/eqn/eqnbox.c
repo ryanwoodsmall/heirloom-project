@@ -18,14 +18,18 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)eqnbox.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)eqnbox.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
 
 void
 eqnbox(int p1, int p2, int lu) {
+#ifndef	NEQN
+	float b, h;
+#else	/* NEQN */
 	int b, h;
+#endif	/* NEQN */
 	char *sh;
 
 	yyval = p1;
@@ -33,8 +37,13 @@ eqnbox(int p1, int p2, int lu) {
 	eht[yyval] = h = b + max(eht[p1]-ebase[p1], 
 		eht[p2]-ebase[p2]);
 	ebase[yyval] = b;
+#ifndef	NEQN
+	if(dbg)printf(".\te:eb: S%d <- S%d S%d; b=%g, h=%g\n", 
+		yyval, p1, p2, b, h);
+#else	/* NEQN */
 	if(dbg)printf(".\te:eb: S%d <- S%d S%d; b=%d, h=%d\n", 
 		yyval, p1, p2, b, h);
+#endif	/* NEQN */
 	if (rfont[p1] == ITAL && lfont[p2] == ROM)
 		sh = "\\|";
 	else

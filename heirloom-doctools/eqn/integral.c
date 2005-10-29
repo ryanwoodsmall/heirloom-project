@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)integral.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)integral.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
@@ -38,8 +38,13 @@ integral(int p, int p1, int p2) {
 		bshiftb(p, SUB, p1);
 	else if (p2 != 0)
 		bshiftb(p, SUP, p2);
+#ifndef	NEQN
+	if(dbg)printf(".\tintegral: S%d; h=%g b=%g\n", 
+		p, eht[p], ebase[p]);
+#else	/* NEQN */
 	if(dbg)printf(".\tintegral: S%d; h=%d b=%d\n", 
 		p, eht[p], ebase[p]);
+#endif	/* NEQN */
 	lfont[p] = ROM;
 }
 

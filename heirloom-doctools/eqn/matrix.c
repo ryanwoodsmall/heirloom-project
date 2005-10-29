@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)matrix.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)matrix.c	1.4 (gritter) 10/29/05
  */
 
 #include "e.h"
@@ -39,7 +39,12 @@ column(int type, int p1) {
 
 void
 matrix(int p1) {
-	int nrow, ncol, i, j, k, hb, b, val[100];
+#ifndef	NEQN
+	float hb, b;
+#else	/* NEQN */
+	int hb, b;
+#endif	/* NEQN */
+	int nrow, ncol, i, j, k, val[100];
 	char *space;
 
 	space = "\\ \\ ";
@@ -57,7 +62,11 @@ matrix(int p1) {
 			b = max(b, ebase[lp[j]]);
 			j += nrow + 2;
 		}
+#ifndef	NEQN
+		if(dbg)printf(".\trow %d: b=%g, hb=%g\n", k, b, hb);
+#else	/* NEQN */
 		if(dbg)printf(".\trow %d: b=%d, hb=%d\n", k, b, hb);
+#endif	/* NEQN */
 		j = p1 + k;
 		for( i=0; i<ncol; i++ ) {
 			ebase[lp[j]] = b;
@@ -75,8 +84,13 @@ matrix(int p1) {
 	eht[yyval] = eht[val[0]];
 	ebase[yyval] = ebase[val[0]];
 	lfont[yyval] = rfont[yyval] = 0;
+#ifndef	NEQN
+	if(dbg)printf(".\tmatrix S%d: r=%d, c=%d, h=%g, b=%g\n",
+		yyval,nrow,ncol,eht[yyval],ebase[yyval]);
+#else	/* NEQN */
 	if(dbg)printf(".\tmatrix S%d: r=%d, c=%d, h=%d, b=%d\n",
 		yyval,nrow,ncol,eht[yyval],ebase[yyval]);
+#endif	/* NEQN */
 	printf(".ds %d \"", yyval);
 	for( i=0; i<ncol; i++ )  {
 		printf("\\*(%d%s", val[i], i==ncol-1 ? "" : space);

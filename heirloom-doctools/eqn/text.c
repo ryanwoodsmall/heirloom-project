@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)text.c	1.5 (gritter) 9/2/05
+ * Sccsid @(#)text.c	1.6 (gritter) 10/29/05
  */
 
 # include "e.h"
@@ -70,8 +70,13 @@ text(int t,char *p1) {
 		lfont[yyval] = lf;
 		rfont[yyval] = rf;
 	}
+#ifndef	NEQN
+	if(dbg)printf(".\t%dtext: S%d <- %s; b=%g,h=%g,lf=%c,rf=%c\n",
+		t, yyval, p, ebase[yyval], eht[yyval], lfont[yyval], rfont[yyval]);
+#else	/* NEQN */
 	if(dbg)printf(".\t%dtext: S%d <- %s; b=%d,h=%d,lf=%c,rf=%c\n",
 		t, yyval, p, ebase[yyval], eht[yyval], lfont[yyval], rfont[yyval]);
+#endif	/* NEQN */
 	printf(".ds %d \"%s\n", yyval, p);
 }
 

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sqrt.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)sqrt.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
@@ -33,16 +33,16 @@ sqrt(int p2) {
 	yyval = p2;
 #ifndef NEQN
 	eht[yyval] = VERT(EM(1.2, nps));
-	if(dbg)printf(".\tsqrt: S%d <- S%d;b=%d, h=%d\n", 
+	if(dbg)printf(".\tsqrt: S%d <- S%d;b=%g, h=%g\n", 
 		yyval, p2, ebase[yyval], eht[yyval]);
 	if (rfont[yyval] == ITAL)
 		printf(".as %d \\|\n", yyval);
 #endif /* NEQN */
 	nrwid(p2, ps, p2);
 #ifndef NEQN
-	printf(".ds %d \\v'%du'\\s%d\\v'-.2m'\\(sr\\l'\\n(%du\\(rn'\\v'.2m'\\s%d", 
+	printf(".ds %d \\v'%gp'\\s%d\\v'-.2m'\\(sr\\l'\\n(%du\\(rn'\\v'.2m'\\s%d", 
 		yyval, ebase[p2], nps, p2, ps);
-	printf("\\v'%du'\\h'-\\n(%du'\\*(%d\n", -ebase[p2], p2, p2);
+	printf("\\v'%gp'\\h'-\\n(%du'\\*(%d\n", -ebase[p2], p2, p2);
 	lfont[yyval] = ROM;
 #else /* NEQN */
 	printf(".ds %d \\v'%du'\\e\\L'%du'\\l'\\n(%du'",

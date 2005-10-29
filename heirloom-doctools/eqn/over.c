@@ -18,14 +18,19 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)over.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)over.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
 
 void
 boverb(int p1, int p2) {
-	int h, b, treg, d;
+	int treg;
+#ifndef	NEQN
+	float h, b, d;
+#else	/* NEQN */
+	int h, b, d;
+#endif	/* NEQN */
 
 	treg = oalloc();
 	yyval = p1;
@@ -37,23 +42,29 @@ boverb(int p1, int p2) {
 	h = eht[p1] + eht[p2];
 #endif /* NEQN */
 	b = eht[p2] - d;
+#ifndef	NEQN
+	if(dbg)printf(".\tb:bob: S%d <- S%d over S%d; b=%g, h=%g\n", 
+		yyval, p1, p2, b, h);
+#else	/* NEQN */
 	if(dbg)printf(".\tb:bob: S%d <- S%d over S%d; b=%d, h=%d\n", 
 		yyval, p1, p2, b, h);
+#endif	/* NEQN */
 	nrwid(p1, ps, p1);
 	nrwid(p2, ps, p2);
 	printf(".nr %d \\n(%d\n", treg, p1);
 	printf(".if \\n(%d>\\n(%d .nr %d \\n(%d\n", p2, treg, treg, p2);
 #ifndef NEQN
 	printf(".nr %d \\n(%d+\\s%d.5m\\s0\n", treg, treg, EFFPS(ps));
-#endif /* NEQN */
+	printf(".ds %d \\v'%gp'\\h'\\n(%du-\\n(%du/2u'\\*(%d\\\n", 
+		yyval, eht[p2]-ebase[p2]-d, treg, p2, p2);
+	printf("\\h'-\\n(%du-\\n(%du/2u'\\v'%gp'\\*(%d\\\n", 
+		p2, p1, -(eht[p2]-ebase[p2]+d+ebase[p1]), p1);
+	printf("\\h'-\\n(%du-\\n(%du/2u+.1m'\\v'%gp'\\l'\\n(%du-.2m'\\h'.1m'\\v'%gp'\n", 
+		 treg, p1, ebase[p1]+d, treg, d);
+#else /* NEQN */
 	printf(".ds %d \\v'%du'\\h'\\n(%du-\\n(%du/2u'\\*(%d\\\n", 
 		yyval, eht[p2]-ebase[p2]-d, treg, p2, p2);
 	printf("\\h'-\\n(%du-\\n(%du/2u'\\v'%du'\\*(%d\\\n", 
-#ifndef NEQN
-		p2, p1, -(eht[p2]-ebase[p2]+d+ebase[p1]), p1);
-	printf("\\h'-\\n(%du-\\n(%du/2u+.1m'\\v'%du'\\l'\\n(%du-.2m'\\h'.1m'\\v'%du'\n", 
-		 treg, p1, ebase[p1]+d, treg, d);
-#else /* NEQN */
 		p2, p1, -eht[p2]+ebase[p2]-ebase[p1], p1);
 	printf("\\h'-\\n(%du-\\n(%du-2u/2u'\\v'%du'\\l'\\n(%du'\\v'%du'\n", 
 		 treg, p1, ebase[p1], treg, d);

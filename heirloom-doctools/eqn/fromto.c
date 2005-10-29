@@ -18,14 +18,19 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fromto.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)fromto.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
 
 void
 fromto(int p1, int p2, int p3) {
-	int b, h1, b1, pss;
+	int pss;
+#ifndef	NEQN
+	float b, h1, b1;
+#else	/* NEQN */
+	int b, h1, b1;
+#endif	/* NEQN */
 	yyval = oalloc();
 	lfont[yyval] = rfont[yyval] = 0;
 	h1 = eht[yyval] = eht[p1];
@@ -48,25 +53,43 @@ fromto(int p1, int p2, int p3) {
 	}
 	printf(".ds %d ", yyval);	/* bottom of middle box */
 	if( p2>0 ) {
+#ifndef	NEQN
+		printf("\\v'%gp'\\h'\\n(%du-\\n(%du/2u'\\s%d\\*(%d\\s%d", 
+			eht[p2]-ebase[p2]+b1, yyval, p2, pss, p2, EFFPS(ps));
+		printf("\\h'-\\n(%du-\\n(%du/2u'\\v'%gp'\\\n", 
+			yyval, p2, -(eht[p2]-ebase[p2]+b1));
+#else	/* NEQN */
 		printf("\\v'%du'\\h'\\n(%du-\\n(%du/2u'\\s%d\\*(%d\\s%d", 
 			eht[p2]-ebase[p2]+b1, yyval, p2, pss, p2, EFFPS(ps));
 		printf("\\h'-\\n(%du-\\n(%du/2u'\\v'%du'\\\n", 
 			yyval, p2, -(eht[p2]-ebase[p2]+b1));
+#endif	/* NEQN */
 	}
 #ifndef NEQN
 	printf("\\h'\\n(%du-\\n(%du/2u'\\*(%d\\h'\\n(%du-\\n(%du/2u'\\\n", 
+		yyval, p1, p1, yyval, p1);
 #else /* NEQN */
 	printf("\\h'\\n(%du-\\n(%du/2u'\\*(%d\\h'\\n(%du-\\n(%du+2u/2u'\\\n", 
-#endif /* NEQN */
 		yyval, p1, p1, yyval, p1);
+#endif /* NEQN */
 	if( p3>0 ) {
+#ifndef	NEQN
+		printf("\\v'%gp'\\h'-\\n(%du-\\n(%du/2u'\\s%d\\*(%d\\s%d\\h'\\n(%du-\\n(%du/2u'\\v'%gp'\\\n", 
+			-(h1-b1+ebase[p3]), yyval, p3, pss, p3, EFFPS(ps), yyval, p3, (h1-b1+ebase[p3]));
+#else	/* NEQN */
 		printf("\\v'%du'\\h'-\\n(%du-\\n(%du/2u'\\s%d\\*(%d\\s%d\\h'\\n(%du-\\n(%du/2u'\\v'%du'\\\n", 
 			-(h1-b1+ebase[p3]), yyval, p3, pss, p3, EFFPS(ps), yyval, p3, (h1-b1+ebase[p3]));
+#endif	/* NEQN */
 	}
 	printf("\n");
 	ebase[yyval] = b + b1;
+#ifndef	NEQN
+	if(dbg)printf(".\tfrom to: S%d <- %d f %d t %d; h=%g b=%g\n", 
+		yyval, p1, p2, p3, eht[yyval], ebase[yyval]);
+#else	/* NEQN */
 	if(dbg)printf(".\tfrom to: S%d <- %d f %d t %d; h=%d b=%d\n", 
 		yyval, p1, p2, p3, eht[yyval], ebase[yyval]);
+#endif	/* NEQN */
 	ofree(p1);
 	if( p2>0 ) ofree(p2);
 	if( p3>0 ) ofree(p3);

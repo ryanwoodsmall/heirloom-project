@@ -18,14 +18,19 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)paren.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)paren.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
 
 void
 paren(int leftc, int p1, int rightc) {
-	int n, m, h1, j, b1, v;
+	int n, m, j;
+#ifndef	NEQN
+	float v, h1, b1;
+#else	/* NEQN */
+	int v, h1, b1;
+#endif	/* NEQN */
 	h1 = eht[p1]; b1 = ebase[p1];
 	yyval = p1;
 #ifndef NEQN
@@ -45,14 +50,15 @@ paren(int leftc, int p1, int rightc) {
 	eht[yyval] = VERT(EM(n, ps));
 	ebase[yyval] = b1 + (eht[yyval]-h1)/2;
 	v = b1 - h1/2 + VERT(EM(0.4, ps));
+	printf(".ds %d \\|\\v'%gp'", yyval, v);
 #else /* NEQN */
 	eht[yyval] = VERT(2 * n);
 	ebase[yyval] = (n)/2 * VERT(2);
 	if (n%2 == 0)
 		ebase[yyval] -= VERT(1);
 	v = b1 - h1/2 + VERT(1);
-#endif /* NEQN */
 	printf(".ds %d \\|\\v'%du'", yyval, v);
+#endif /* NEQN */
 	switch( leftc ) {
 		case 'n':	/* nothing */
 		case '\0':
@@ -89,9 +95,17 @@ paren(int leftc, int p1, int rightc) {
 			brack(m, (char *) &leftc, (char *) &leftc, (char *) &leftc);
 			break;
 		}
+#ifndef	NEQN
+	printf("\\v'%gp'\\*(%d", -v, p1);
+#else	/* NEQN */
 	printf("\\v'%du'\\*(%d", -v, p1);
+#endif	/* NEQN */
 	if( rightc ) {
+#ifndef	NEQN
+		printf("\\|\\v'%gp'", v);
+#else	/* NEQN */
 		printf("\\|\\v'%du'", v);
+#endif	/* NEQN */
 		switch( rightc ) {
 			case 'f':	/* floor */
 				if (n <= 1)
@@ -125,11 +139,20 @@ paren(int leftc, int p1, int rightc) {
 				brack(m, (char *) &rightc, (char *) &rightc, (char *) &rightc);
 				break;
 		}
+#ifndef	NEQN
+		printf("\\v'%gp'", -v);
+#else	/* NEQN */
 		printf("\\v'%du'", -v);
+#endif	/* NEQN */
 	}
 	printf("\n");
+#ifndef	NEQN
+	if(dbg)printf(".\tcurly: h=%g b=%g n=%d v=%g l=%c, r=%c\n", 
+		eht[yyval], ebase[yyval], n, v, leftc, rightc);
+#else	/* NEQN */
 	if(dbg)printf(".\tcurly: h=%d b=%d n=%d v=%d l=%c, r=%c\n", 
 		eht[yyval], ebase[yyval], n, v, leftc, rightc);
+#endif	/* NEQN */
 }
 
 void

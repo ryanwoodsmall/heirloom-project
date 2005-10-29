@@ -1,4 +1,6 @@
 Release ...
+* eqn: The generated troff program is now resolution-independent; the "-r"
+  option is no longer needed and is ignored.
 * dpost: The elements of overbars, brackets, and braces align better now, in
   particular in respect to documents distilled by Ghostscript.
 * In the "man" macro package, ".B" and similar font change macros now accept

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.8 (gritter) 8/30/05
+ * Sccsid @(#)io.c	1.9 (gritter) 10/29/05
  */
 
 # include "e.h"
@@ -144,8 +144,13 @@ do_inline(void) {
 void
 putout(int p1) {
 	extern int gsize, gfont;
+#ifndef	NEQN
+	float before, after;
+	if(dbg)printf(".\tanswer <- S%d, h=%g,b=%g\n",p1, eht[p1], ebase[p1]);
+#else	/* NEQN */
 	int before, after;
 	if(dbg)printf(".\tanswer <- S%d, h=%d,b=%d\n",p1, eht[p1], ebase[p1]);
+#endif	/* NEQN */
 	eqnht = eht[p1];
 	printf(".ds %d \\x'0'", p1);
 	/* suppposed to leave room for a subscript or superscript */
@@ -157,7 +162,11 @@ putout(int p1) {
 	if (spaceval != NULL)
 		printf("\\x'0-%s'", spaceval);
 	else if (before > 0)
+#ifndef	NEQN
+		printf("\\x'0-%gp'", before);
+#else	/* NEQN */
 		printf("\\x'0-%du'", before);
+#endif	/* NEQN */
 	printf("\\f%c\\s%d\\*(%d%s\\s\\n(99\\f\\n(98",
 		gfont, gsize, p1, rfont[p1] == ITAL ? "\\|" : "");
 #ifndef NEQN
@@ -166,7 +175,11 @@ putout(int p1) {
 	after = ebase[p1] - VERT(1);
 #endif /* NEQN */
 	if (spaceval == NULL && after > 0)
+#ifndef	NEQN
+		printf("\\x'%gp'", after);
+#else	/* NEQN */
 		printf("\\x'%du'", after);
+#endif	/* NEQN */
 	putchar('\n');
 	eqnreg = p1;
 	if (spaceval != NULL) {
@@ -176,8 +189,13 @@ putout(int p1) {
 
 }
 
+#ifndef	NEQN
+float
+max(float i,float j) {
+#else	/* NEQN */
 int
 max(int i,int j) {
+#endif	/* NEQN */
 	return (i>j ? i : j);
 }
 
@@ -219,7 +237,7 @@ setfile(int argc, char **argv) {
 		case 'p': deltaps = atoi(&svargv[1][2]); break;
 		case 'f': gfont = svargv[1][2]; break;
 		case 'e': noeqn++; break;
-		case 'r': resolution = atoi(&svargv[1][2]); break;
+		case 'r': /*resolution = atoi(&svargv[1][2]);*/ break;
 		case 0:	goto endargs; 
 		default: dbg = 1;
 		}

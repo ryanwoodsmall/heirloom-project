@@ -18,14 +18,19 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pile.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)pile.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
 
 void
 lpile(int type, int p1, int p2) {
-	int bi, hi, i, gap, h, b, nlist, nlist2, mid;
+	int i, nlist, nlist2, mid;
+#ifndef	NEQN
+	float h, b, bi, hi, gap;
+#else	/* NEQN */
+	int h, b, bi, hi, gap;
+#endif	/* NEQN */
 	yyval = oalloc();
 #ifndef NEQN
 	gap = VERT(EM(0.4, ps)); /* 4/10 m between blocks */
@@ -53,7 +58,11 @@ lpile(int type, int p1, int p2) {
 		printf(".\tS%d <- %c pile of:", yyval, type);
 		for( i=p1; i<p2; i++)
 			printf(" S%d", lp[i]);
+#ifndef	NEQN
+		printf(";h=%g b=%g\n", eht[yyval], ebase[yyval]);
+#else	/* NEQN */
 		printf(";h=%d b=%d\n", eht[yyval], ebase[yyval]);
+#endif	/* NEQN */
 	}
 	nrwid(lp[p1], ps, lp[p1]);
 	printf(".nr %d \\n(%d\n", yyval, lp[p1]);
@@ -62,32 +71,59 @@ lpile(int type, int p1, int p2) {
 		printf(".if \\n(%d>\\n(%d .nr %d \\n(%d\n", 
 			lp[i], yyval, yyval, lp[i]);
 	}
+#ifndef	NEQN
+	printf(".ds %d \\v'%gp'\\h'%du*\\n(%du'\\\n", yyval, ebase[yyval], 
+		type=='R' ? 1 : 0, yyval);
+#else	/* NEQN */
 	printf(".ds %d \\v'%du'\\h'%du*\\n(%du'\\\n", yyval, ebase[yyval], 
 		type=='R' ? 1 : 0, yyval);
+#endif	/* NEQN */
 	for(i = p2-1; i >=p1; i--) {
 		hi = eht[lp[i]]; 
 		bi = ebase[lp[i]];
 	switch(type) {
 
 	case 'L':
+#ifndef	NEQN
+		printf("\\v'%gp'\\*(%d\\h'-\\n(%du'\\v'0-%gp'\\\n", 
+			-bi, lp[i], lp[i], hi-bi+gap);
+#else	/* NEQN */
 		printf("\\v'%du'\\*(%d\\h'-\\n(%du'\\v'0-%du'\\\n", 
 			-bi, lp[i], lp[i], hi-bi+gap);
+#endif	/* NEQN */
 		continue;
 	case 'R':
+#ifndef	NEQN
+		printf("\\v'%gp'\\h'-\\n(%du'\\*(%d\\v'0-%gp'\\\n", 
+			-bi, lp[i], lp[i], hi-bi+gap);
+#else	/* NEQN */
 		printf("\\v'%du'\\h'-\\n(%du'\\*(%d\\v'0-%du'\\\n", 
 			-bi, lp[i], lp[i], hi-bi+gap);
+#endif	/* NEQN */
 		continue;
 	case 'C':
 	case '-':
+#ifndef	NEQN
+		printf("\\v'%gp'\\h'\\n(%du-\\n(%du/2u'\\*(%d", 
+			-bi, yyval, lp[i], lp[i]);
+		printf("\\h'-\\n(%du-\\n(%du/2u'\\v'0-%gp'\\\n", 
+			yyval, lp[i], hi-bi+gap);
+#else	/* NEQN */
 		printf("\\v'%du'\\h'\\n(%du-\\n(%du/2u'\\*(%d", 
 			-bi, yyval, lp[i], lp[i]);
 		printf("\\h'-\\n(%du-\\n(%du/2u'\\v'0-%du'\\\n", 
 			yyval, lp[i], hi-bi+gap);
+#endif	/* NEQN */
 		continue;
 		}
 	}
+#ifndef	NEQN
+	printf("\\v'%gp'\\h'%du*\\n(%du'\n", eht[yyval]-ebase[yyval]+gap, 
+		type!='R' ? 1 : 0, yyval);
+#else	/* NEQN */
 	printf("\\v'%du'\\h'%du*\\n(%du'\n", eht[yyval]-ebase[yyval]+gap, 
 		type!='R' ? 1 : 0, yyval);
+#endif	/* NEQN */
 	for( i=p1; i<p2; i++ )
 		ofree(lp[i]);
 	lfont[yyval] = rfont[yyval] = 0;

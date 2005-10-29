@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)size.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)size.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
@@ -42,8 +42,13 @@ size(int p1, int p2) {
 	int effps, effp1;
 
 	yyval = p2;
+#ifndef	NEQN
+	if(dbg)printf(".\tb:sb: S%d <- \\s%d S%d \\s%d; b=%g, h=%g\n", 
+		yyval, ps, p2, p1, ebase[yyval], eht[yyval]);
+#else	/* NEQN */
 	if(dbg)printf(".\tb:sb: S%d <- \\s%d S%d \\s%d; b=%d, h=%d\n", 
 		yyval, ps, p2, p1, ebase[yyval], eht[yyval]);
+#endif	/* NEQN */
 	effps = EFFPS(ps);
 	effp1 = EFFPS(p1);
 	printf(".ds %d \\s%d\\*(%d\\s%d\n", 

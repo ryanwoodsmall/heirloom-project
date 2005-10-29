@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glob.c	1.6 (gritter) 9/6/05
+ * Sccsid @(#)glob.c	1.7 (gritter) 10/29/05
  */
 
 #include "e.h"
@@ -28,7 +28,7 @@ int	lp[80];	/* stack for things like piles and matrices */
 int	ct;	/* pointer to lp */
 int	used[100];	/* available registers */
 int	ps;	/* default init point size */
-int	resolution = 72000;	/* resolution of ditroff */
+/*int	resolution = 72;	 * was: resolution of ditroff */
 int	deltaps	= 3;	/* default change in ps */
 int	gsize	= 10;	/* default initial point size */
 int	gfont	= ITAL;	/* italic */
@@ -39,8 +39,13 @@ int	linect;	/* line number in file */
 int	eqline;	/* line where eqn started */
 int	svargc;
 char	**svargv;
+#ifndef	NEQN
+float	eht[100];
+float	ebase[100];
+#else	/* NEQN */
 int	eht[100];
 int	ebase[100];
+#endif	/* NEQN */
 int	lfont[100];
 int	rfont[100];
 int	eqnreg;	/* register where final string appears */

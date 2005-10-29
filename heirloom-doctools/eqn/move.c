@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)move.c	1.3 (gritter) 8/12/05
+ * Sccsid @(#)move.c	1.4 (gritter) 10/29/05
  */
 
 # include "e.h"
@@ -26,7 +26,11 @@
 
 void
 move(int dir, int amt, int p) {
+#ifndef	NEQN
+	float a;
+#else	/* NEQN */
 	int a;
+#endif	/* NEQN */
 
 	yyval = p;
 #ifndef NEQN
@@ -36,11 +40,25 @@ move(int dir, int amt, int p) {
 #endif /* NEQN */
 	printf(".ds %d ", yyval);
 	if( dir == FWD || dir == BACK )	/* fwd, back */
+#ifndef	NEQN
+		printf("\\h'%s%gp'\\*(%d\n", (dir==BACK) ? "-" : "", a, p);
+#else	/* NEQN */
 		printf("\\h'%s%du'\\*(%d\n", (dir==BACK) ? "-" : "", a, p);
+#endif	/* NEQN */
 	else if (dir == UP)
+#ifndef	NEQN
+		printf("\\v'-%gp'\\*(%d\\v'%gp'\n", a, p, a);
+#else	/* NEQN */
 		printf("\\v'-%du'\\*(%d\\v'%du'\n", a, p, a);
+#endif	/* NEQN */
 	else if (dir == DOWN)
+#ifndef	NEQN
+		printf("\\v'%gp'\\*(%d\\v'-%gp'\n", a, p, a);
+	if(dbg)printf(".\tmove %d dir %d amt %g; h=%g b=%g\n", 
+		p, dir, a, eht[yyval], ebase[yyval]);
+#else	/* NEQN */
 		printf("\\v'%du'\\*(%d\\v'-%du'\n", a, p, a);
 	if(dbg)printf(".\tmove %d dir %d amt %d; h=%d b=%d\n", 
 		p, dir, a, eht[yyval], ebase[yyval]);
+#endif	/* NEQN */
 }
