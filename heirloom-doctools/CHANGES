@@ -1,4 +1,6 @@
 Release ...
+* dpost: The elements of overbars, brackets, and braces align better now, in
+  particular in respect to documents distilled by Ghostscript.
 * In the "man" macro package, ".B" and similar font change macros now accept
   more than six arguments.
 * tbl: The maximum length for "w(...)" width specifications has been raised
