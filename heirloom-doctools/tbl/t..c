@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.10 (gritter) 10/15/05
+ * Sccsid @(#)t..c	1.11 (gritter) 10/29/05
  */
 
 /* t..c : external declarations */
@@ -37,7 +37,7 @@
 # define MAXCHS 2000
 # define MAXSTR 1024
 # define MAXRPT 100
-# define CLLEN 10
+# define CLLEN 100
 # define SHORTLINE 4
 # define BIGBUF 8192
 extern int nlin, ncol, iline, nclin, nslin;
