@@ -49,6 +49,11 @@ The locale-dependent character input in troff assumes that the C library
 represents wchar_t values as Unicode characters. This is the case on any
 modern Unix system.
 
+The "pm" utility requires a C++ compiler. If such a compiler is not
+available, delete the "mpm" directory from the list of subdirectories
+to build in the top-level "makefile". The "pm" utility is rarely used,
+so it should not be too dramatic if it is missing.
+
 In order to use the utilities for formatting manual pages, note the
 following:
 
@@ -98,4 +103,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						10/25/05
+<gunnarr@acm.org>						10/30/05
