@@ -18,10 +18,15 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.6 (gritter) 10/29/05
+ * Sccsid @(#)e.h	1.7 (gritter) 10/30/05
  */
 
 #include <stdio.h>
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)	_IO_getc_unlocked(f)
+#endif
 
 #define	FATAL	1
 #define	ROM	'1'

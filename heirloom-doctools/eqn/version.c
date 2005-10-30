@@ -6,14 +6,14 @@
 #define	USED
 #endif
 #ifdef	NEQN
-static const char sccsid[] USED = "@(#)/usr/ucb/neqn.sl	5.2 (gritter) 10/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/neqn.sl	5.3 (gritter) 10/30/05";
 #else
-static const char sccsid[] USED = "@(#)/usr/ucb/eqn.sl	5.2 (gritter) 10/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/eqn.sl	5.3 (gritter) 10/30/05";
 #endif
 /* SLIST */
 /*
 diacrit.c: * Sccsid @(#)diacrit.c	1.4 (gritter) 10/29/05
-e.h: * Sccsid @(#)e.h	1.6 (gritter) 10/29/05
+e.h: * Sccsid @(#)e.h	1.7 (gritter) 10/30/05
 e.y: * Sccsid @(#)e.y	1.5 (gritter) 8/13/05
 eqnbox.c: * Sccsid @(#)eqnbox.c	1.4 (gritter) 10/29/05
 font.c: * Sccsid @(#)font.c	1.4 (gritter) 10/29/05
