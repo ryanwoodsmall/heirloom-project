@@ -3,11 +3,11 @@ MACS = acm.me bib chars.me deltext.me e eqn.me \
 	ms.cov ms.eqn ms.ref ms.tbl ms.ths ms.toc null.me refer.me \
 	s sh.me tbl.me thesis.me tz.map v vgrind \
 	an andoc doc doc-common doc-ditroff doc-nroff doc-syms \
-	pictures color
+	pictures color pm srefs
 
 .SUFFIXES: .in
 .in:
-	sed 's,@MACDIR@,$(MACDIR),' $< >$@
+	sed 's:@MACDIR@:$(MACDIR):; s:@LIBDIR@:$(LIBDIR):' $< >$@
 
 all: $(MACS)
 
@@ -22,6 +22,6 @@ install: all
 	$(INSTALL) -c -m 644 mpictures.7b $(ROOT)$(MANDIR)/man7b/mpictures.7b
 
 clean:
-	rm -f andoc bib doc e m s
+	rm -f andoc bib doc e m s pm
 
 mrproper: clean

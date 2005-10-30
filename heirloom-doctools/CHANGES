@@ -1,4 +1,7 @@
 Release ...
+* The "-mpm" macros and the "pm" program have been added from Plan 9 source
+  code. They form a "-ms"-like package for vertical justification; the file
+  "mpm/README" explains some details.
 * eqn: The generated troff program is now resolution-independent; the "-r"
   option is no longer needed and is ignored.
 * dpost: The elements of overbars, brackets, and braces align better now, in
