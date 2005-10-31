@@ -1,4 +1,4 @@
-Release ...
+Release 051031
 * The "-mpm" macros and the "pm" program have been added from Plan 9 source
   code. They form a "-ms"-like package for vertical justification; the file
   "mpm/README" explains some details.
