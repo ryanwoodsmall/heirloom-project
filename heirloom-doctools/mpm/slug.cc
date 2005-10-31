@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)slug.cc	1.4 (gritter) 10/30/05	*/
+/*	Sccsid @(#)slug.cc	1.5 (gritter) 10/31/05	*/
 #include	"misc.h"
 #include	"slug.h"
 #include	<math.h>
@@ -44,7 +44,7 @@ void slug::neutralize()
 
 void slug::dump()	// print contents of a slug
 {
-	printf("# %d %-4.4s parm %d dv %d base %d s%d f%d H%d\n#\t\t%s\n",
+	printf("# %d %-4.4s parm %d dv %d base %d s%g f%d H%d\n#\t\t%s\n",
 		serialno(), typname(), parm, dv, base,
 		size, font, hpos, headstr());
 }
@@ -106,8 +106,13 @@ void slug::slugout(int col)
 		printf(" # P %d X %d", userpn, hpos + col*offset);
 		return;
 	} else if (type == VBOX) {
-		if (numout++ > 0)	// BUG??? might miss something
-			printf("s%d\nf%d\n", size, font);
+		if (numout++ > 0) {	// BUG??? might miss something
+			if (size == (int)size)
+				printf("s%d\n", (int)size);
+			else
+				printf("s-23 %g\n", size);
+			printf("f%d\n", font);
+		}
 		printf("H%d\n", hpos + col*offset);
 	}
 	fwrite(bufptr(dp), sizeof(char), (this+1)->dp - dp, stdout);
@@ -329,7 +334,8 @@ slug getslug(FILE *fp)
 	}
 	static int baseV = 0;	// first V command of preceding slug
 	static int curV = 0, curH = 0;
-	static int font = 0, size = 0;
+	static int font = 0;
+	static double size = 0;
 	static int baseadj = 0;
 	static int ncol = 1, offset = 0;	// multi-column stuff
 	char str[4096], str2[4096], buf[4096], *p;
@@ -520,10 +526,18 @@ slug getslug(FILE *fp)
 			curV = baseV = ret.dv = 0;
 			ret.parm = n;	// just in case someone needs it
 			return ret;
-		case 's':	// size change snnn
-			fscanf(fp, "%d", &size);
-			sprintf(buf, "s%d\n", size);
-			adds(buf);
+		case 's': {	// size change snnn
+				int	isize;
+				fscanf(fp, "%d", &isize);
+				if (isize == -23) {
+					fscanf(fp, "%f", &size);
+					sprintf(buf, "s-23 %g\n", size);
+				} else {
+					size = isize;
+					sprintf(buf, "s%d\n", isize);
+				}
+				adds(buf);
+			}
 			break;
 		case 'f':	// font fnnn
 			fscanf(fp, "%d", &font);
