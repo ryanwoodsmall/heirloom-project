@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-doctools.spec	1.13 (gritter) 10/25/05
+# Sccsid @(#)heirloom-doctools.spec	1.14 (gritter) 10/31/05
 #
 Summary: The Heirloom Documentation Tools.
 Name: heirloom-doctools
@@ -25,6 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 %define	pubdir		/usr/pub
 
 %define	xcc		gcc
+%define	ccc		g++
 %define	cflags		'-O -fomit-frame-pointer'
 %define	cppflags	'-D__NO_STRING_INLINES -D_GNU_SOURCE'
 %define	yacc		'bison -y'
@@ -32,7 +33,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 #
 # Combine the settings defined above.
 #
-%define	makeflags	ROOT=%{buildroot} INSTALL=install YACC=%{yacc} MACDIR=%{macdir} FNTDIR=%{fntdir} TABDIR=%{tabdir} HYPDIR=%{hypdir} PUBDIR=%{pubdir} BINDIR=%{bindir} PSTDIR=%{pstdir} LIBDIR=%{libdir} REFDIR=%{refdir} MANDIR=%{mandir} CC=%{xcc} CFLAGS=%{cflags} CPPFLAGS=%{cppflags}
+%define	makeflags	ROOT=%{buildroot} INSTALL=install YACC=%{yacc} MACDIR=%{macdir} FNTDIR=%{fntdir} TABDIR=%{tabdir} HYPDIR=%{hypdir} PUBDIR=%{pubdir} BINDIR=%{bindir} PSTDIR=%{pstdir} LIBDIR=%{libdir} REFDIR=%{refdir} MANDIR=%{mandir} CC=%{xcc} CCC=%{ccc} CFLAGS=%{cflags} CPPFLAGS=%{cppflags}
 
 %description
 The Heirloom Documentation Tools provide troff, nroff, and related
