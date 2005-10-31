@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)slug.h	1.4 (gritter) 10/31/05	*/
+/*	Sccsid @(#)slug.h	1.5 (gritter) 10/31/05	*/
 enum slugtypes {
 	NONE,		// can't happen
 	VBOX,		// Vertical Box -- printable stuff
@@ -54,7 +54,7 @@ class slug {
 	int	dp;		// offset of data for this slug in inbuf
 	int	linenum;	// input line number (approx) for this slug
 	int	font;		// font in effect at slug beginning
-	double	size;		// size in effect at slug beginning
+	float	size;		// size in effect at slug beginning
 	int	seen;		// 0 until output
 	int	ncol;		// number of columns (1 or 2)
 	int	offset;		// horizontal offset for 2 columns

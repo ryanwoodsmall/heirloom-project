@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)slug.cc	1.5 (gritter) 10/31/05	*/
+/*	Sccsid @(#)slug.cc	1.6 (gritter) 10/31/05	*/
 #include	"misc.h"
 #include	"slug.h"
 #include	<math.h>
@@ -335,7 +335,7 @@ slug getslug(FILE *fp)
 	static int baseV = 0;	// first V command of preceding slug
 	static int curV = 0, curH = 0;
 	static int font = 0;
-	static double size = 0;
+	static float size = 0;
 	static int baseadj = 0;
 	static int ncol = 1, offset = 0;	// multi-column stuff
 	char str[4096], str2[4096], buf[4096], *p;
