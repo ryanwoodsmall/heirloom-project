@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.2 (gritter) 10/29/05
+.\" Sccsid @(#)an	2.3 (gritter) 10/31/05
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -277,10 +277,10 @@
 .ds ]F
 .if "\\$1"2" .if !"\\$5"" .ds ]F \^
 .ie !"\\$4"" \{\
-.ds }$1 "\\$1
-.ds }$2 "\\$2
-.ds }$3 "\\$3
-.ds }$4 "\\$4
+.do ds }$1 "\\$1
+.do ds }$2 "\\$2
+.do ds }$3 "\\$3
+.do ds }$4 "\\$4
 .do shift 4
 .}S \\*[}$2] \\*[}$1] "\\*[}$3]\f\\*[}$1]\\*[}$4]\\*(]F" \\$@
 .\}
