@@ -1,3 +1,10 @@
+Release ...
+* When a locale-dependent or font-specific character was used directly
+  after a macro that ended with a font switch, it was chosen from the
+  old font. This has been fixed.
+* The ".hidechar" request now works correctly if the selected font is
+  not the current font.
+
 Release 051031
 * The "-mpm" macros and the "pm" program have been added from Plan 9 source
   code. They form a "-ms"-like package for vertical justification; the file

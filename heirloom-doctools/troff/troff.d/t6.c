@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.98 (gritter) 10/14/05
+ * Sccsid @(#)t6.c	1.99 (gritter) 11/2/05
  */
 
 /*
@@ -502,12 +502,12 @@ postchar(const char *temp, int *fp)
 	int	i, j;
 	tchar	c;
 
-	*fp = xfont;
+	*fp = font;
 	if ((c = postchar1(temp, *fp)) != 0)
 		return c;
-	if (fallbacktab[xfont]) {
-		for (j = 0; fallbacktab[xfont][j] != 0; j++) {
-			if ((i = findft(fallbacktab[xfont][j])) < 0)
+	if (fallbacktab[font]) {
+		for (j = 0; fallbacktab[font][j] != 0; j++) {
+			if ((i = findft(fallbacktab[font][j])) < 0)
 				continue;
 			if ((c = postchar1(temp, i)) != 0) {
 				*fp = i;
@@ -1438,6 +1438,7 @@ casefallback(void)
 void
 casehidechar(void)
 {
+	int	savfont = font, savfont1 = font1;
 	int	i, j, n, m;
 	tchar	k;
 
@@ -1446,15 +1447,20 @@ casehidechar(void)
 		i = maybemore(i, 0);
 	if ((j = findft(i)) < 0)
 		return;
+	font = font1 = j;
+	mchbits();
 	while ((i = cbits(k = getch())) != '\n') {
-		if (fbits(k) != xfont || ismot(k) || i == ' ')
+		if (fbits(k) != j || ismot(k) || i == ' ')
 			continue;
 		n = 128 - 32 + nchtab;
-		if (afmtab && (m=(fontbase[xfont]->afmpos)-1) >= 0)
+		if (afmtab && (m=(fontbase[j]->afmpos)-1) >= 0)
 			n += afmtab[m]->nchars;
 		if (i < n)
-			fitab[xfont][i - 32] = 0;
+			fitab[j][i - 32] = 0;
 	}
+	font = savfont;
+	font1 = savfont1;
+	mchbits();
 	zapwcache(0);
 }
 
@@ -1838,10 +1844,10 @@ un2tr(int c, int *fp)
 
 	switch (c) {
 	case 0x00A0:
-		*fp = xfont;
+		*fp = font;
 		return UNPAD;
 	case 0x00AD:
-		*fp = xfont;
+		*fp = font;
 		return ohc;
 	case 0x2002:
 		return makem((int)(EM)/2);
@@ -1862,13 +1868,13 @@ un2tr(int c, int *fp)
 	case 0x200A:
 		return makem((int)EM/12);
 	case 0x2010:
-		*fp = xfont;
+		*fp = font;
 		return '-';
 	case 0x2027:
-		*fp = xfont;
+		*fp = font;
 		return OHC | BLBIT;
 	case 0x2060:
-		*fp = xfont;
+		*fp = font;
 		return FILLER;
 	default:
 		for (i = 0; unimap[i].psc; i++)
