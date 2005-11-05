@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.29 (gritter) 11/5/05
+.\" Sccsid @(#)troffdemo.tr	1.30 (gritter) 11/5/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -59,7 +59,7 @@
 .	fp 2 I ACaslonPro-Italic otf
 .	fp 0 E ACaslonPro-Regular otf
 .	fp 0 O ACaslonPro-Regular otf
-.	feature R +onum
+.	feature R +pnum +onum
 .	feature E +smcp
 .	ds rhand \[orn.045]
 .	ds orn1 \[orn.040]
@@ -67,16 +67,16 @@
 .	ds orn3 \[orn.035]
 .	ds orn4 \[orn.041]
 .	ds thistle \[orn.002]
-.	ds m0 R \[uniF643]
-.	ds m1 R \[uniF644]
-.	ds m2 R \[uniF645]
-.	ds m3 R \[uniF646]
-.	ds m4 R \[uniF647]
-.	ds m5 R \[uniF648]
-.	ds m6 R \[uniF649]
-.	ds m7 R \[uniF64A]
-.	ds m8 R \[uniF64B]
-.	ds m9 R \[uniF64C]
+.	ds m0 R \[zerooldstyle]
+.	ds m1 R \[oneoldstyle]
+.	ds m2 R \[twooldstyle]
+.	ds m3 R \[threeoldstyle]
+.	ds m4 R \[fouroldstyle]
+.	ds m5 R \[fiveoldstyle]
+.	ds m6 R \[sixoldstyle]
+.	ds m7 R \[sevenoldstyle]
+.	ds m8 R \[eightoldstyle]
+.	ds m9 R \[nineoldstyle]
 .\}
 .\" The expert font needs letter space tracking for use as small caps.
 .track E 1 .3 24 3
