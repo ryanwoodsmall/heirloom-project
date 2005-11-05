@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)grap.1b	1.2 (gritter) 10/18/05
-.TH GRAP 1B "10/18/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)grap.1b	1.3 (gritter) 11/5/05
+.TH GRAP 1B "11/5/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 grap \- (BSD) pic preprocessor for drawing graphs
 .SH SYNOPSIS
@@ -408,7 +408,7 @@ line for
 .\".EE
 .SH FILES
 .TP
-.B /usr/ucblib/doctools/tmac/grap.defines
+.B /usr/ucblib/grap.defines
 definitions of standard plotting characters, e.g., bullet
 .\".SH SOURCE
 .\".B /sys/src/cmd/grap

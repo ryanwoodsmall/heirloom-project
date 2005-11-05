@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)main.c	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)main.c	1.4 (gritter) 11/5/05	*/
 #include <stdio.h>
 #include <signal.h>
 #include <math.h>
@@ -21,7 +21,7 @@
 
 int	dbg	= 0;
 
-#define GRAPDEFINES MACDIR "/grap.defines"
+#define GRAPDEFINES LIBDIR "/grap.defines"
 char	*lib_defines	= GRAPDEFINES;
 
 int	lib	= 1;		/* 1 to include lib_defines */

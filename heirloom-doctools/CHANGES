@@ -4,6 +4,7 @@ Release ...
   old font. This has been fixed.
 * The ".hidechar" request now works correctly if the selected font is
   not the current font.
+* grap: The file "grap.defines" has been moved to $(LIBDIR).
 
 Release 051031
 * The "-mpm" macros and the "pm" program have been added from Plan 9 source

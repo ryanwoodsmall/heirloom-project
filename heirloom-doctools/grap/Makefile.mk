@@ -1,7 +1,7 @@
 OBJ = coord.o for.o frame.o grap.o grapl.o input.o label.o main.o misc.o \
 	plot.o print.o ticks.o version.o
 
-FLAGS = -DMACDIR='"$(MACDIR)"'
+FLAGS = -DLIBDIR='"$(LIBDIR)"'
 
 YFLAGS = -d
 
@@ -18,8 +18,8 @@ y.tab.h: grap.c
 install:
 	$(INSTALL) -c grap $(ROOT)$(BINDIR)/grap
 	$(STRIP) $(ROOT)$(BINDIR)/grap
-	test -d $(ROOT)$(MACDIR) || mkdir -p $(ROOT)$(MACDIR)
-	$(INSTALL) -c -m 644 grap.defines $(ROOT)$(MACDIR)/grap.defines
+	test -d $(ROOT)$(LIBDIR) || mkdir -p $(ROOT)$(LIBDIR)
+	$(INSTALL) -c -m 644 grap.defines $(ROOT)$(LIBDIR)/grap.defines
 	$(INSTALL) -c -m 644 grap.1b $(ROOT)$(MANDIR)/man1b/grap.1b
 
 clean:
