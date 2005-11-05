@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.28 (gritter) 9/30/05
+.\" Sccsid @(#)troffdemo.tr	1.29 (gritter) 11/5/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names.
 .do xflag 2
@@ -170,7 +170,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-9/30/05
+11/5/05
 .sp 2v
 .ad b
 .ps 12
@@ -197,7 +197,7 @@ into the PostScript output it generates.
 .F
 With both Type 1 ``expert'' and OpenType fonts,
 \fItroff\fR\^ can be configured
-such that sets extra characters transparently
+such that it sets extra characters transparently
 in alternation with base characters
 to produce extra ligatures, as in the words
 ``effective,'' ``office,'' ``offline,''
