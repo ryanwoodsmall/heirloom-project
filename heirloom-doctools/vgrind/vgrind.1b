@@ -40,9 +40,9 @@
 .\"	from 4.3BSD-Tahoe vgrind.1	6.2 (Berkeley) 5/5/86
 .\".TH VGRIND 1 "May 5, 1986"
 .\"
-.\" Sccsid @(#)vgrind.1b	1.2 (gritter) 10/22/05
+.\" Sccsid @(#)vgrind.1b	1.3 (gritter) 11/6/05
 .\"
-.TH VGRIND 1B "10/22/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH VGRIND 1B "11/6/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .UC 4
 .SH NAME
 vgrind \- (BSD) grind nice listings of programs
@@ -82,9 +82,9 @@ for lines bracketed by the
 .I troff-like
 macros:
 .IP .vS
-- starts processing
+\- starts processing
 .IP .vE
-- ends processing
+\- ends processing
 .LP
 These lines are formatted as described above.  The output from this
 filter can be passed to 
@@ -143,9 +143,13 @@ file (default is /usr/lib/vgrindefs)
 specifies the language to use.  Currently known are PASCAL
 .RB ( \-lp ),
 MODEL
-.RB ( \-lm ), C
+.RB ( \-lm ),
+C
 .RB ( \-lc
-or the default), CSH
+or the default),
+C++
+.RB ( \-lc++ ),
+CSH
 .RB ( \-lcsh ), 
 SHELL
 .RB ( \-lsh ),
@@ -172,14 +176,14 @@ and specifies selected pages to print.
 .IP \fB\-w\fP
 Sets the size of tabulators to four instead of the default eight.
 .SH FILES
-.ta 2i
+.\".ta \w'/usr/ucblib/tmac/vgrind 'u
 index	file where source for index is created
 .br
-/usr/ucbliblib/tmac/vgrind	macro package
+/usr/ucblib/tmac/vgrind	macro package
 .br
-/usr/usrliblib/vfontedpr		preprocessor
+/usr/ucblib/vfontedpr	preprocessor
 .br
-/usr/usrliblib/vgrindefs		language descriptions
+/usr/ucblib/vgrindefs	language descriptions
 .SH SEE ALSO
 troff(1B)
 .SH NOTES
@@ -187,6 +191,8 @@ Vfontedpr assumes that a certain programming style is followed:
 .PP
 For 
 .B C
+and
+.B C++
 \- function names can be preceded on a line only by spaces, tabs, or an
 asterisk.  The parenthesized arguments must also be on the same line.
 .PP
