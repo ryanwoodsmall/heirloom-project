@@ -1,4 +1,5 @@
 Release ...
+* The "checknr" utility has been added from OpenSolaris source code.
 * When a locale-dependent or font-specific character was used directly
   after a macro that ended with a font switch, it was chosen from the
   old font. This has been fixed.

@@ -19,6 +19,7 @@ SUBDIRS = eqn/eqn.d \
 	troff/nroff.d \
 	troff/nroff.d/terms.d \
 	picpack \
+	checknr \
 	soelim
 
 MAKEFILES = $(SUBDIRS:=/Makefile)

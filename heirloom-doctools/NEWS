@@ -175,15 +175,15 @@ the description for ".xflag" below.
 	n. If n is zero, the stack depth is unlimited. The default limit is
 	512.
 
+.return
+	immediately returns from the current macro to the level above.
+
 .rhang ff char0 units0 char1 units1 char2 units2 ...	troff only
 	When the current font is "ff" and "char0" appears at the right margin
 	of an output line in right-adjusted or aligned mode, the margin is
 	relocated to the right by "units0", where units is 1/72000 of an inch
 	multiplied by the current point size or 1/1000 of an em (as in AFM
 	character width definitions). Same for char1/units1 etc.
-
-.return
-	immediately returns from the current macro to the level above.
 
 .shift [n]
 	shifts the arguments to the current macro by "n", or 1 if "n"
@@ -382,4 +382,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   10/22/05
+Gunnar Ritter                                                   11/6/05
