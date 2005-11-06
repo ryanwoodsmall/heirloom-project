@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)text.c	1.6 (gritter) 10/29/05
+ * Sccsid @(#)text.c	1.7 (gritter) 11/6/05
  */
 
 # include "e.h"
@@ -83,16 +83,23 @@ text(int t,char *p1) {
 int
 trans(int c,char *p1) {
 	int f;
+	int half = 0;
 	f = ROM;
 	switch( c) {
+	case ')':
+		half = 1;
+		/*FALLTHRU*/
 	case '0': case '1': case '2': case '3': case '4':
 	case '5': case '6': case '7': case '8': case '9':
 	case ':': case ';': case '!': case '%':
-	case '(': case '[': case ')': case ']':
-	case ',':
+	case '(': case '[': case ']':
 		if (rf == ITAL)
-			shim();
+			shim(half);
 		roman(c); break;
+	case ',':
+		roman(c);
+		shim(0);
+		break;
 	case '.':
 		if (rf == ROM)
 			roman(c);
@@ -102,21 +109,21 @@ trans(int c,char *p1) {
 		break;
 	case '|':
 		if (rf == ITAL)
-			shim();
-		shim(); roman(c); shim(); break;
+			shim(0);
+		shim(0); roman(c); shim(0); break;
 	case '=':
 		if (rf == ITAL)
-			shim();
+			shim(0);
 		name4('e','q');
 		break;
 	case '+':
 		if (rf == ITAL)
-			shim();
+			shim(0);
 		name4('p', 'l');
 		break;
 	case '>': case '<':
 		if (rf == ITAL)
-			shim();
+			shim(0);
 		if (p1[psp]=='=') {	/* look ahead for == <= >= */
 			name4(c,'=');
 			psp++;
@@ -126,7 +133,7 @@ trans(int c,char *p1) {
 		break;
 	case '-':
 		if (rf == ITAL)
-			shim();
+			shim(0);
 		if (p1[psp]=='>') {
 			name4('-','>'); psp++;
 		} else {
@@ -135,16 +142,16 @@ trans(int c,char *p1) {
 		break;
 	case '/':
 		if (rf == ITAL)
-			shim();
+			shim(0);
 		name4('s','l');
 		break;
 	case '~': case ' ':
-		shim(); shim(); break;
+		shim(0); shim(0); break;
 	case '^':
-		shim(); break;
+		shim(0); break;
 	case '\\':	/* troff - pass 2 or 3 more chars */
 		if (rf == ITAL)
-			shim();
+			shim(0);
 		cs[csp++] = c; cs[csp++] = c = p1[psp++]; cs[csp++] = p1[psp++];
 		if (c=='(') cs[csp++] = p1[psp++];
 		if (c=='*' && cs[csp-1] == '(') {
@@ -196,8 +203,8 @@ trans(int c,char *p1) {
 }
 
 void
-shim(void) {
-	cs[csp++] = '\\'; cs[csp++] = '|';
+shim(int small) {
+	cs[csp++] = '\\'; cs[csp++] = small ? '^' : '|';
 }
 
 void

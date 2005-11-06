@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.7 (gritter) 10/30/05
+ * Sccsid @(#)e.h	1.8 (gritter) 11/6/05
  */
 
 #include <stdio.h>
@@ -172,6 +172,6 @@ void sqrt(int);
 /* text.c */
 void text(int, char *);
 int trans(int, char *);
-void shim(void);
+void shim(int);
 void roman(int);
 void name4(int, int);

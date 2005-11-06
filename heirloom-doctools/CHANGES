@@ -6,6 +6,8 @@ Release ...
   old font. This has been fixed.
 * The ".hidechar" request now works correctly if the selected font is
   not the current font.
+* eqn: More narrow spaces are inserted at some roman/italic font changes
+  now to better match the appearance of the current fonts.
 * grap: The file "grap.defines" has been moved to $(LIBDIR).
 
 Release 051031

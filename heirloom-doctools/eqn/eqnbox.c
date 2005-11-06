@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)eqnbox.c	1.4 (gritter) 10/29/05
+ * Sccsid @(#)eqnbox.c	1.5 (gritter) 11/6/05
  */
 
 # include "e.h"
@@ -45,7 +45,7 @@ eqnbox(int p1, int p2, int lu) {
 		yyval, p1, p2, b, h);
 #endif	/* NEQN */
 	if (rfont[p1] == ITAL && lfont[p2] == ROM)
-		sh = "\\|";
+		sh = "\\^";
 	else
 		sh = "";
 	if (lu) {
