@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)ptx.1b	1.4 (gritter) 11/6/05
+.\" Sccsid @(#)ptx.1b	1.5 (gritter) 11/6/05
 .\" Parts taken from ptx(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -76,6 +76,8 @@ or
 .IR troff (1B)
 macro
 for user-defined formatting.
+Once choice for this macro is supplied in the `\-mptx'
+macro package.
 The
 .I before keyword
 and
@@ -153,6 +155,8 @@ Determines the mapping of bytes to characters.
 /usr/5bin/sort
 .br
 /usr/ucblib/eign
+.br
+/usr/ucblib/doctools/tmac/ptx
 .SH NOTES
 Line length counts do not account for overstriking or
 proportional spacing.
