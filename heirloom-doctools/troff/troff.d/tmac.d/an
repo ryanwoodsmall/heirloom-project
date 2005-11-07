@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.3 (gritter) 10/31/05
+.\" Sccsid @(#)an	2.4 (gritter) 11/8/05
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -327,10 +327,12 @@
 .nr )E 1
 .ns
 .it 1 }N
+.nf
 .di ]B
 ..
 '	# end of TP (cf }N below)
 .de }1
+.fi
 .ds ]X \&\\*(]B\\
 .nr )E 0
 .if !"\\$1"" .nr )I \\$1n

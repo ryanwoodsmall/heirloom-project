@@ -1,3 +1,10 @@
+Release ...
+* [nt]roff: When text is written to a diversion in nofill mode, spacing
+  characters are preserved. This allows the text in the diversion to be
+  adjusted later when it is actually printed. The "-X" option disables
+  the new behavior.
+* -man macros: Fixed the output of a very long line following ".TP".
+
 Release 051107
 * The "checknr" utility has been added from OpenSolaris source code.
 * The "ptx" utility has been added from Unix 7th Edition source code.
