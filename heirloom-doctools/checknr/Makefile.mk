@@ -1,4 +1,3 @@
-VPATH=..
 OBJ = checknr.o
 
 FLAGS =

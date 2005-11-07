@@ -1,4 +1,3 @@
-VPATH=..
 OBJ = ptx.o
 
 FLAGS = -DLIBDIR='"$(LIBDIR)"' $(EUC)
