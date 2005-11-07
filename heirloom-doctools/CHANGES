@@ -1,4 +1,4 @@
-Release ...
+Release 051107
 * The "checknr" utility has been added from OpenSolaris source code.
 * The "ptx" utility has been added from Unix 7th Edition source code.
 * When a locale-dependent or font-specific character was used directly

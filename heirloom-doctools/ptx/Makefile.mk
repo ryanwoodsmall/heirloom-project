@@ -14,8 +14,8 @@ install:
 	$(INSTALL) -c ptx $(ROOT)$(BINDIR)/ptx
 	$(STRIP) $(ROOT)$(BINDIR)/ptx
 	$(INSTALL) -c -m 644 ptx.1b $(ROOT)$(MANDIR)/man1b/ptx.1b
-	test -d $(LIBDIR) || mkdir -p $(LIBDIR)
-	$(INSTALL) -c -m 644 eign $(LIBDIR)/eign
+	test -d $(ROOT)$(LIBDIR) || mkdir -p $(ROOT)$(LIBDIR)
+	$(INSTALL) -c -m 644 eign $(ROOT)$(LIBDIR)/eign
 
 clean:
 	rm -f $(OBJ) ptx core log *~
