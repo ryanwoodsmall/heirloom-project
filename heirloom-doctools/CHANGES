@@ -3,6 +3,8 @@ Release ...
   characters are preserved. This allows the text in the diversion to be
   adjusted later when it is actually printed. The "-X" option disables
   the new behavior.
+* [nt]roff: The static limit on the number of if-else constructs has
+  been removed.
 * -man macros: Fixed the output of a very long line following ".TP".
 
 Release 051107

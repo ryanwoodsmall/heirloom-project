@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.21 (gritter) 9/2/05
+ * Sccsid @(#)n5.c	1.22 (gritter) 11/8/05
  */
 
 /*
@@ -71,8 +71,22 @@ extern void mchbits(void);
  * misc processing requests
  */
 
-int	iflist[NIF];
-int	ifx;
+static int	*iflist;
+static int	ifx;
+
+static void
+growiflist(void)
+{
+	int	nnif = NIF + 15;
+
+	if ((iflist = realloc(iflist, nnif * sizeof *iflist)) == NULL) {
+		errprint("if-else overflow.");
+		ifx = 0;
+		edone(040);
+	}
+	memset(&iflist[NIF], 0, (nnif-NIF) * sizeof *iflist);
+	NIF = nnif;
+}
 
 void
 casead(void)
@@ -756,6 +770,8 @@ caseel(void)
 {
 	if (--ifx < 0) {
 		ifx = 0;
+		if (NIF == 0)
+			growiflist();
 		iflist[0] = 0;
 	}
 	caseif(2);
@@ -765,11 +781,8 @@ caseel(void)
 void
 caseie(void)
 {
-	if (ifx >= NIF) {
-		errprint("if-else overflow.");
-		ifx = 0;
-		edone(040);
-	}
+	if (ifx >= NIF)
+		growiflist();
 	caseif(1);
 	ifx++;
 }
@@ -784,7 +797,7 @@ caseif(int x)
 
 	if (x == 2) {
 		notflag = 0;
-		true = iflist[ifx];
+		true = iflist ? iflist[ifx] : 0;
 		goto i1;
 	}
 	true = 0;
@@ -828,8 +841,11 @@ caseif(int x)
 	}
 i1:
 	true ^= notflag;
-	if (x == 1)
+	if (x == 1) {
+		if (ifx >= NIF)
+			growiflist();
 		iflist[ifx] = !true;
+	}
 	if (true) {
 i2:
 		while ((cbits(i = getch())) == ' ')
