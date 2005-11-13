@@ -54,6 +54,18 @@ available, delete the "mpm" directory from the list of subdirectories
 to build in the top-level "makefile". The "pm" utility is rarely used,
 so it should not be too dramatic if it is missing.
 
+Several of the included yacc and lex programs need to access internals
+of the yacc and lex implementations beyond the respective POSIX
+specifications. This has been made to work with Unix yacc and lex as
+well as with many versions of Berkeley yacc, bison, and flex. However,
+recent changes in these programs may result in incompatibilities. If
+this happens, install the "Heirloom Development Tools" package first
+and use the yacc and lex versions provided with it. You could also fix
+the problem on your own, but now that portable Open Source versions of
+Unix yacc and lex are available, such changes can no longer be
+considered important, and will not be done as part of the regular
+maintenance of this project.
+
 In order to use the utilities for formatting manual pages, note the
 following:
 
@@ -103,4 +115,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						10/30/05
+<gunnarr@acm.org>						11/13/05

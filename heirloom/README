@@ -27,8 +27,20 @@ OpenBSD         3.4
 
 The following prerequisites are necessary:
 
-a lex command   Both Unix lex and flex can be used.
-a yacc command  Unix yacc, Berkeley yacc, and bison can be used.
+yacc and lex    Several of the included yacc and lex programs need to
+                access internals of the yacc and lex implementations
+                beyond the respective POSIX specifications. This has
+                been made to work with Unix yacc and lex as well as
+                with many versions of Berkeley yacc, bison, and flex.
+                However, recent changes in these programs may result
+                in incompatibilities. If this happens, install the
+                "Heirloom Development Tools" package first and use
+                the yacc and lex versions provided with it. You could
+                also fix the problem on your own, but now that portable
+                Open Source versions of Unix yacc and lex are available,
+                such changes can no longer be considered important, and
+                will not be made as part of the regular maintenance of
+                this project.
 make            Implementations known to work are GNU make, AIX make,
                 and NetBSD make. The build system is designed to be
                 portable, but in practice, other make commands have
@@ -297,4 +309,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                7/12/05
+<gunnarr@acm.org>                                                11/13/05
