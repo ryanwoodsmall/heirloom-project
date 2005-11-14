@@ -1,0 +1,32 @@
+README file for the Heirloom Development Tools
+==============================================
+
+The Heirloom Development Tools provide yacc, lex, and m4, as portable
+derivatives of the utilities released by Sun as part of OpenSolaris.
+The OpenSolaris utilities were in turn derived from the original Unix
+versions, and are assumed be conforming implementations of the POSIX
+standard.
+
+The source code is known to compile on:
+
+Linux		glibc
+Solaris		10 and above
+HP-UX		B.11.11
+FreeBSD		5.4
+
+It is likely to compile on other systems that provide the necessary
+wide-character functionality.
+
+To build and install, see the settings in the "mk.config" and adjust
+them if necessary. You can also build a RPM package with the command
+"rpmbuild -tb heirloom-devtools-<version>.tar.bz2".
+
+The project homepage is currently at <http://heirloom.sourceforge.net>.
+
+Report bugs to
+
+Gunnar Ritter
+Freiburg i. Br.
+Germany
+<http://heirloom.sourceforge.net>
+<gunnarr@acm.org>						11/10/05
