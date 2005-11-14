@@ -68,8 +68,10 @@ libbz2          <http://sources.redhat.com/bzip2>. It is needed if
                 compressed entries in zip files.
 
 Unless you are a developer, it is strongly recommended that you use the
-rpm command to build and install the Heirloom Toolchest on Linux. Simply
-execute
+RPM packaging system to build and install the Heirloom Toolchest on Linux.
+This requires the "heirloom-devtools" package to be installed; its source
+code is available from <http://heirloom.sourceforge.net/devtools.html>.
+Then simply execute
 
         rpmbuild -tb heirloom-<version>.tar.bz2
 
@@ -309,4 +311,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                11/13/05
+<gunnarr@acm.org>                                                11/14/05

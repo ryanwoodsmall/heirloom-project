@@ -8,6 +8,9 @@ Release ...
   coded character set was not included; this has been fixed.
 * ps: The "-R" option (resource usage format), which had been present
   for some time, has been documented.
+* RPM package builds now require the new "Heirloom Development Tools"
+  package from <http://heirloom.sourceforge.net/devtools.html> to be
+  installed.
 
 Release 050815
 * The "getconf" utility has been added (derived from OpenSolaris code).

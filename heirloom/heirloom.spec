@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom.spec	1.31 (gritter) 7/12/05
+# Sccsid @(#)heirloom.spec	1.32 (gritter) 11/14/05
 #
 Summary: Heirloom Toolchest: A collection of standard Unix utilities
 Name: heirloom
@@ -11,18 +11,16 @@ Group: System Environment/Base
 Vendor: Gunnar Ritter <gunnarr@acm.org>
 URL: <http://heirloom.sourceforge.net>
 BuildRoot: %{_tmppath}/%{name}-root
+BuildRequires: heirloom-devtools
 
 #
 # The problem here is that package names differ between Linux distributions:
 #
-# * yacc is in package byacc on RedHat and Caldera, but in package yacc
-#   on SuSE. (Now using bison, but who knows?)
 # * libz and libbz2 are in varying development packages.
 # 
 # For this reason, we use absolute path names and assume that all of this
 # stuff is in /usr.
 #
-BuildRequires: /usr/bin/flex /usr/bin/bison
 BuildRequires: /usr/lib/libz.so /usr/lib/libbz2.so
 BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 
@@ -52,7 +50,8 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 %define	cflagsu		'-O2 -fomit-frame-pointer -funroll-loops'
 %define	cflags		'-O -fomit-frame-pointer'
 %define	cppflags	'-D__NO_STRING_INLINES -D_GNU_SOURCE'
-%define	yacc		'bison -y'
+%define	yacc		/usr/ccs/bin/yacc
+%define	lex		/usr/ccs/bin/lex
 
 %define	lcurs		-lncurses
 %define	libz		-lz
@@ -70,7 +69,7 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 # Combine the settings defined above.
 #
 %define	p_flags	SHELL=%{shell} ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} SU3BIN=%{su3bin} UCBBIN=%{ucbbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
-%define	c_flags	CC=%{xcc} CFLAGS2=%{cflags2} CFLAGSS=%{cflagss} CFLAGSU=%{cflagsu} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LCURS=%{lcurs} LIBZ=%{libz} USE_ZLIB=%{use_zlib} LIBBZ2=%{libbz2} USE_BZLIB=%{use_bzlib} TTYGRP= YACC=%{yacc}
+%define	c_flags	CC=%{xcc} CFLAGS2=%{cflags2} CFLAGSS=%{cflagss} CFLAGSU=%{cflagsu} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LCURS=%{lcurs} LIBZ=%{libz} USE_ZLIB=%{use_zlib} LIBBZ2=%{libbz2} USE_BZLIB=%{use_bzlib} TTYGRP= YACC=%{yacc} LEX=%{lex}
 %define	makeflags %{p_flags} %{c_flags}
 
 %description
