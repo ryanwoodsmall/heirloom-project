@@ -40,7 +40,9 @@ get notified by email on each release, use their subscription service at
 
 To build and install, see the settings in the "mk.config" and adjust
 them if necessary. You can also build a RPM package with the command
-"rpmbuild -tb heirloom-doctools-<version>.tar.bz2".
+"rpmbuild -tb heirloom-doctools-<version>.tar.bz2". Building the RPM
+package requires the "heirloom-devtools" package to be installed; it
+is available from <http://heirloom.sourceforge.net/devtools.html>.
 
 troff currently reads several binary files which are built during
 the compilation process. It is thus not possible to cross-compile.
@@ -115,4 +117,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/13/05
+<gunnarr@acm.org>						11/14/05

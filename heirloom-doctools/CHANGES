@@ -6,6 +6,9 @@ Release ...
 * [nt]roff: The static limit on the number of if-else constructs has
   been removed.
 * -man macros: Fixed the output of a very long line following ".TP".
+* RPM package builds now require the new "Heirloom Development Tools"
+  package from <http://heirloom.sourceforge.net/devtools.html> to be
+  installed.
 
 Release 051107
 * The "checknr" utility has been added from OpenSolaris source code.
