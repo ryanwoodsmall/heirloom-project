@@ -21,6 +21,10 @@ To build and install, see the settings in the "mk.config" and adjust
 them if necessary. You can also build a RPM package with the command
 "rpmbuild -tb heirloom-devtools-<version>.tar.bz2".
 
+New releases of this project are announced on Freshmeat. If you want to
+get notified by email on each release, use their subscription service at
+<http://freshmeat.net/projects/devtools/>.
+
 The project homepage is currently at <http://heirloom.sourceforge.net>.
 
 Report bugs to
@@ -29,4 +33,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/10/05
+<gunnarr@acm.org>						11/15/05
