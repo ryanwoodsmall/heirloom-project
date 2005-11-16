@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.52 (gritter) 10/25/05
+ * Sccsid @(#)n3.c	1.53 (gritter) 11/16/05
  */
 
 /*
@@ -1005,9 +1005,16 @@ casedi(void)
 		goto rtn;
 	}
 	if (++dilev == NDI) {
-		--dilev;
-		errprint("Diversions nested too deep");
-		edone(02);
+		struct d	*nd;
+		const int	inc = 5;
+		if ((nd = realloc(d, (NDI+inc) * sizeof *d)) == NULL) {
+			--dilev;
+			errprint("Diversions nested too deep");
+			edone(02);
+		}
+		d = nd;
+		memset(&d[NDI], 0, inc * sizeof *d);
+		NDI += inc;
 	}
 	if (dip != d)
 		wbt((tchar)0);

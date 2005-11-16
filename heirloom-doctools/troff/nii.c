@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.17 (gritter) 11/8/05
+ * Sccsid @(#)nii.c	1.18 (gritter) 11/16/05
  */
 
 /*
@@ -154,7 +154,7 @@ int	dotT;
 char	*unlkp;
 int	no_out;
 struct	widcache *widcache;
-struct	d d[NDI];
+struct	d *d;
 struct	d *dip;
 int	mb_cur_max;
 struct env	initenv;
@@ -163,3 +163,4 @@ int	lasttrack;
 int	defaultpl;
 int	NCHARS;
 int	NIF;
+int	NDI;
