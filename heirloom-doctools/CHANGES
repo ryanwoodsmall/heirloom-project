@@ -8,6 +8,8 @@ Release ...
 * [nt]roff: The static limit on the number of nested diversions has been
   removed.
 * -man macros: Fixed the output of a very long line following ".TP".
+* -mdoc macros: Changed the names of Courier fonts to \f(CW \f(CI to
+  match those of troff.
 * RPM package builds now require the new "Heirloom Development Tools"
   package from <http://heirloom.sourceforge.net/devtools.html> to be
   installed.

@@ -29,7 +29,11 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     @(#)doc-common	8.1 (Berkeley) 6/8/93
+.\"     from 4.4BSD doc-common	8.1 (Berkeley) 6/8/93
+.\"
+.\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
+.\"
+.\" Sccsid @(#)doc-common	1.2 (gritter) 11/16/05
 .\"
 .\"     %beginstrip%
 .nr %A 1
@@ -170,10 +174,10 @@
 .\}
 ..
 .\" NS Os macro - Operating System (behaviour changes after first call)
-.\" .	ds vT \f(CODRAFT\fP\ \ \-\-\ \ \\*(vT\ \ \-\-\ \ \f(CODRAFT
-.\" .	ds dD \f(CODRAFT\fP\ \ \-\-\ \ \\*(dD\ \ \-\-\ \ \f(CODRAFT
-.\" .ds vT \s+4\f(CODRAFT\fP\s-4\ \ \-\-\ \ \\*(vT\ \ \-\-\ \ \s+4\f(CODRAFT\s-4
-.\" .ds dD \s+4\f(CODRAFT\fP\s-4\ \ \-\-\ \ \\*(dD\ \ \-\-\ \ \s+4\f(CODRAFT\s-4
+.\" .	ds vT \f(CIDRAFT\fP\ \ \-\-\ \ \\*(vT\ \ \-\-\ \ \f(CIDRAFT
+.\" .	ds dD \f(CIDRAFT\fP\ \ \-\-\ \ \\*(dD\ \ \-\-\ \ \f(CIDRAFT
+.\" .ds vT \s+4\f(CIDRAFT\fP\s-4\ \ \-\-\ \ \\*(vT\ \ \-\-\ \ \s+4\f(CIDRAFT\s-4
+.\" .ds dD \s+4\f(CIDRAFT\fP\s-4\ \ \-\-\ \ \\*(dD\ \ \-\-\ \ \s+4\f(CIDRAFT\s-4
 .de Os
 .ds oS Null
 .if "\\$1"" \{\

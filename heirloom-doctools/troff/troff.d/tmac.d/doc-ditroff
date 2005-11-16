@@ -29,28 +29,32 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     @(#)doc-ditroff	8.1 (Berkeley) 6/8/93
+.\"     from 4.4BSD doc-ditroff	8.1 (Berkeley) 6/8/93
+.\"
+.\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
+.\"
+.\" Sccsid @(#)doc-ditroff	1.2 (gritter) 11/16/05
 .\"
 .\" tmac.mdoc-ditroff
 .\"     %beginstrip%
 .\"
 .ds aD \fI\s10
-.ds aR \f(CO\s10
+.ds aR \f(CI\s10
 .ds cM \f(CB\s10
 .ds dF \fR\s10
 .ds eM \fI\s10
-.ds eR \fC\s10
-.ds eV \fC\s10
-.ds fA \f(CO\s10
+.ds eR \f(CW\s10
+.ds eV \f(CW\s10
+.ds fA \f(CI\s10
 .ds fD \f(CB\s10
 .ds fL \f(CB\s10
 .ds fN \f(CB\s10
 .ds fP \fP\s0
 .ds fS \s0
-.ds fT \f(CO\s10
+.ds fT \f(CI\s10
 .ds Hs \fR\s10
 .ds iC \f(CB\s10
-.ds lI \fC
+.ds lI \f(CW
 .ds lP \fR\|(\|\fP\s10
 .ds lp \fR(\fP\s10
 .ds rP \fR\|)\|\fP\s10
@@ -61,10 +65,10 @@
 .ds nM \f(CB\s10
 .ds nO \fR\s10
 .ds nT \s0
-.ds pA \fC\s10
+.ds pA \f(CW\s10
 .ds Pu \fR{\ .\ ,\ :\ ;\ (\ )\ [\ ]\ \fR}
 .ds rA \fR\s10
-.ds rT \f(CO\s10
+.ds rT \f(CI\s10
 .ds sH \fB\s10
 .ds sP \s0
 .ds sY \fB\s10
@@ -74,9 +78,9 @@
 .ds vA \fI\s10
 .ds Vs \fR\s10
 .ds vT \f(CB\s10
-.ds xR \fC\s10
+.ds xR \f(CW\s10
 .tr *\(**
-.nr sI \w\fC,u*5
+.nr sI \w\f(CW,u*5
 .nr Ti \n(sIu
 .nr Pp .5v
 .ds lS \0
@@ -142,9 +146,9 @@
 .em lM
 ..
 .\"
-.nr fW \w\fC0
+.nr fW \w\f(CW0
 .de sW
-.nr sW \w\fC\\$1
+.nr sW \w\f(CW\\$1
 .ie \\n(sW>=\\n(fW \{\
 .       ie \\n(sW%\\n(fW .nr sW (\\n(sW/\\n(fW)+1
 .       el .nr sW \\n(sW/\\n(fW
@@ -156,7 +160,7 @@
 ..
 .\"
 .de aW
-.nr sW \w\fC\\*(A\\$1
+.nr sW \w\f(CW\\*(A\\$1
 .ie \\n(sW>=\\n(fW \{\
 .       ie \\n(sW%\\n(fW .nr sW (\\n(sW/\\n(fW)+1
 .       el .nr sW \\n(sW/\\n(fW
