@@ -1,4 +1,6 @@
 Release ...
+* rm: The output of the question before descending to a directory with
+  the "-i" option has been fixed.
 * /usr/ucb/ps: The "-a" option has been fixed; it incorrectly printed a
   list of all processes since release 050411.
 * getconf: /usr/ucb is now put at the end of the Heirloom directory list

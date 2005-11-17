@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)rm_sus.sl	2.22 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)rm_sus.sl	2.23 (gritter) 11/17/05";
 #else
-static const char sccsid[] USED = "@(#)rm.sl	2.22 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)rm.sl	2.23 (gritter) 11/17/05";
 #endif
 
 #include	<sys/types.h>
@@ -206,7 +206,7 @@ rm(size_t pend, const char *base, const int olddir, int ssub, int level)
 						access(base, W_OK) < 0)
 #endif
 					)) {
-				msg("%s: directory %s: ? ", path);
+				msg("directory %s: ? ", path);
 				if (confirm() == 0)
 					return;
 			}
