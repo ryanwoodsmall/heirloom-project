@@ -107,7 +107,18 @@ following:
   tbl input.1 | eqn | troff -x -mandoc | dpost | lp
 
 - You should of course configure your "man" command such that it
-  executes these pipelines automatically for you.
+  executes these pipelines automatically for you. For the "man"
+  command from the Heirloom Toolchest, suitable entries in
+  "/etc/default/man" are:
+
+	NROFF=/usr/ucb/nroff -x -Tlocale
+	TROFF=/usr/ucb/troff -x
+	TBL=/usr/ucb/tbl
+	EQN=/usr/ucb/eqn
+	NEQN=/usr/ucb/neqn
+	TCAT=/usr/ucb/dpost
+	COL=col -x
+	MACSET=-mandoc
 
 The project homepage is currently at <http://heirloom.sourceforge.net>.
 
@@ -117,4 +128,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/14/05
+<gunnarr@acm.org>						11/18/05
