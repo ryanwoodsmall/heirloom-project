@@ -22,12 +22,12 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  */
-const char id[] = "@(#)lex.sl	2.1 (gritter) 11/13/05";
+const char id[] = "@(#)lex.sl	2.2 (gritter) 11/18/05";
 /* SLIST */
 /*
 allprint.c: * Sccsid @(#)allprint.c	1.3 (gritter) 6/18/05
 getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
-header.c: * Sccsid @(#)header.c	1.8 (gritter) 7/30/05
+header.c: * Sccsid @(#)header.c	1.9 (gritter) 11/18/05
 ldefs.c: * Sccsid @(#)ldefs.c	1.4 (gritter) 6/25/05
 libmain.c: * Sccsid @(#)libmain.c	1.3 (gritter) 6/18/05
 lsearch.c: * Sccsid @(#)lsearch.c	1.3 (gritter) 10/22/05
@@ -44,5 +44,4 @@ yyless.c: * Sccsid @(#)yyless.c	1.4 (gritter) 6/24/05
 yywrap.c: * Sccsid @(#)yywrap.c	1.3 (gritter) 6/18/05
 nceucform: * Sccsid @(#)nceucform	1.5 (gritter) 7/30/05
 ncform: * Sccsid @(#)ncform	1.3 (gritter) 6/18/05
-nrform: * Sccsid @(#)nrform	1.3 (gritter) 6/18/05
 */

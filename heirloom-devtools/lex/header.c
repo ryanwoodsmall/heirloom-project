@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)header.c	1.8 (gritter) 7/30/05
+ * Sccsid @(#)header.c	1.9 (gritter) 11/18/05
  */
 
 #include "ldefs.c"
@@ -293,6 +293,16 @@ static const char yylexid[] USED = \"%s\"\n",
 		fprintf(fout, "extern char *yysptr, yysbuf[];\n");
 	fprintf(fout, "int yytchar;\n");
 	fprintf(fout, "FILE *yyin = (FILE *)-1, *yyout = (FILE *)-1;\n");
+	fprintf(fout, "#if defined (__GNUC__)\n");
+	fprintf(fout,
+	    "static void _yyioinit(void) __attribute__ ((constructor));\n");
+	fprintf(fout, "#elif defined (__SUNPRO_C)\n");
+	fprintf(fout, "#pragma init (_yyioinit)\n");
+	fprintf(fout, "#elif defined (__HP_aCC) || defined (__hpux)\n");
+	fprintf(fout, "#pragma INIT \"_yyioinit\"\n");
+	fprintf(fout, "#endif\n");
+	fprintf(fout, "static void _yyioinit(void) {\n");
+	fprintf(fout, "yyin = stdin; yyout = stdout; }\n");
 	fprintf(fout, "extern int yylineno;\n");
 	fprintf(fout, "struct yysvf { \n");
 	fprintf(fout, "\tstruct yywork *yystoff;\n");
