@@ -1,4 +1,4 @@
-Release ...
+Release 051118
 * rm: The output of the question before descending to a directory with
   the "-i" option has been fixed.
 * /usr/ucb/ps: The "-a" option has been fixed; it incorrectly printed a
