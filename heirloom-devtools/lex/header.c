@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)header.c	1.9 (gritter) 11/18/05
+ * Sccsid @(#)header.c	1.10 (gritter) 11/18/05
  */
 
 #include "ldefs.c"
@@ -72,7 +72,6 @@ static const char yylexid[] USED = \"%s\"\n",
 		fprintf(fout, "#endif\n");
 		fprintf(fout, "#include <stdio.h>\n");
 		fprintf(fout, "#include <stdlib.h>\n");
-		fprintf(fout, "#include <inttypes.h>\n");
 		fprintf(fout, "#ifdef	__sun\n");
 		fprintf(fout, "#include <widec.h>\n");
 		fprintf(fout, "#else	/* !__sun */\n");
@@ -104,7 +103,6 @@ static const char yylexid[] USED = \"%s\"\n",
 	} else { /* ASCII compatibility mode. */
 		fprintf(fout, "#include <stdio.h>\n");
 		fprintf(fout, "#include <stdlib.h>\n");
-		fprintf(fout, "#include <inttypes.h>\n");
 	}
 	if (ZCH > NCH)
 		fprintf(fout, "# define U(x) ((x)&0377)\n");

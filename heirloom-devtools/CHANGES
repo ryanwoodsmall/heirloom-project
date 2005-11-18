@@ -1,10 +1,13 @@
 Release ...
-* The "yyin" and "yyout" file descriptors now point to "stdin" and "stdout"
-  when calling main() as it has been historically the case on Unix systems.
-  This requires the use of non-standard compiler features and currently
-  only works with gcc, Sun C, and HP ANSI C. Otherwise, these descriptors
-  are initialized at the first call to yylex(), as it had been the case with
-  the previous release.
+* lex: The "yyin" and "yyout" file descriptors now point to "stdin" and
+  "stdout" when calling main() as it has been historically the case on
+  Unix systems. This requires the use of non-standard compiler features
+  and currently only works with gcc, Sun C, and HP ANSI C. Otherwise,
+  these descriptors are initialized at the first call to yylex(), as it
+  had been the case with the previous release.
+* lex: The driver files have been moved to /usr/ccs/lib/lex to match the
+  location on historic Unix systems.
+* yacc, lex: The generated files no longer include <inttypes.h>.
 
 Release 051113
 * Initial release.

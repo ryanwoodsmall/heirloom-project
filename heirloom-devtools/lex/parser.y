@@ -37,13 +37,14 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)parser.y	1.6 (gritter) 6/24/05
+ * Sccsid @(#)parser.y	1.7 (gritter) 11/18/05
  */
 
 void yyerror(char *);
 
 #include <ctype.h>
 #include <wchar.h>
+#include <inttypes.h>
 #ifndef	__sun
 #define	wcsetno(c)	0
 #endif

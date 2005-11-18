@@ -34,7 +34,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nceucform	1.5 (gritter) 7/30/05
+ * Sccsid @(#)nceucform	1.6 (gritter) 11/18/05
  */
 
 #if defined(__cplusplus) || defined(__STDC__)
@@ -152,7 +152,7 @@ yylook()
 				}
 # endif
 			yyr = yyt;
-			if ( (uintptr_t)yyt > (uintptr_t)yycrank){
+			if ( yyt > yycrank){
 				yyt = yyr + yygid;
 				if (yyt <= yytop && yyt->verify+yysvec == yystate){
 					if(yyt->advance+yysvec == YYLERR)	/* error transitions */
@@ -166,7 +166,7 @@ yylook()
 					}
 				}
 # ifdef YYOPTIM
-			else if((uintptr_t)yyt < (uintptr_t)yycrank) {	/* r < yycrank */
+			else if(yyt < yycrank) {	/* r < yycrank */
 				yyt = yyr = yycrank+(yycrank-yyt);
 # ifdef LEXDEBUG
 				if(debug)fprintf(yyout,"compressed state\n");

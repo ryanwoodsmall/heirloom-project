@@ -2,7 +2,9 @@ XOBJ = main.o sub1.o sub2.o sub3.o header.o wcio.o parser.o getopt.o lsearch.o
 
 LOBJ = allprint.o libmain.o reject.o yyless.o yywrap.o
 
-.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) -DFORMPATH='"$(LIBDIR)"' $<
+LEXDIR = $(LIBDIR)/lex
+
+.c.o: ; $(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) -DFORMPATH='"$(LEXDIR)"' $<
 
 all: lex libl.a
 
@@ -14,11 +16,11 @@ libl.a: $(LOBJ)
 
 install: all
 	test -d $(ROOT)$(BINDIR) || mkdir -p $(ROOT)$(BINDIR)
-	test -d $(ROOT)$(LIBDIR) || mkdir -p $(ROOT)$(LIBDIR)
+	test -d $(ROOT)$(LEXDIR) || mkdir -p $(ROOT)$(LEXDIR)
 	$(INSTALL) -c -m 755 lex $(ROOT)$(BINDIR)/lex
 	$(STRIP) $(ROOT)$(BINDIR)/lex
-	$(INSTALL) -c -m 644 ncform $(ROOT)$(LIBDIR)/ncform
-	$(INSTALL) -c -m 644 nceucform $(ROOT)$(LIBDIR)/nceucform
+	$(INSTALL) -c -m 644 ncform $(ROOT)$(LEXDIR)/ncform
+	$(INSTALL) -c -m 644 nceucform $(ROOT)$(LEXDIR)/nceucform
 	$(INSTALL) -c -m 644 libl.a $(ROOT)$(LIBDIR)/libl.a
 	test -d $(ROOT)$(MANDIR)/man1 || mkdir -p $(ROOT)$(MANDIR)/man1
 	$(INSTALL) -c -m 644 lex.1 $(ROOT)$(MANDIR)/man1/lex.1

@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)y2.c	1.8 (gritter) 11/10/05
+ * Sccsid @(#)y2.c	1.9 (gritter) 11/18/05
  */
 
 #include "dextern"
@@ -514,7 +514,6 @@ static const char yyident[] USED = \"%s\"\n",
 	defout();
 	end_toks();	/* all tokens dumped - get ready for reductions */
 
-	fprintf(ftable, "\n#include <inttypes.h>\n");
 	fprintf(ftable, "\n#ifdef __STDC__\n");
 	fprintf(ftable, "#include <stdlib.h>\n");
 	fprintf(ftable, "#include <string.h>\n");
