@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ulimit.c	1.10 (gritter) 6/20/05
+ * Sccsid @(#)ulimit.c	1.11 (gritter) 11/21/05
  */
 /* from OpenSolaris "ulimit.c	1.12	05/06/08 SMI" */
 
@@ -39,6 +39,8 @@
  * ulimit builtin
  */
 
+#include <sys/types.h>
+#include <sys/time.h>
 #include <sys/resource.h>
 #include <stdlib.h>
 #include "defs.h"
