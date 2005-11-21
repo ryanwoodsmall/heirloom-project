@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.11 (gritter) 11/21/05
+ * Sccsid @(#)gen.h	1.12 (gritter) 11/21/05
  */
 
 /*
@@ -154,6 +154,7 @@ int in_olist(int);
 int cat(char *, FILE *);
 int str_convert(char **, int);
 char *tempname(const char *);
+char *fgetline(char **, size_t *, size_t *, FILE *);
 /* pictures.c */
 void picture(char *);
 FILE *picopen(char *);

@@ -10,6 +10,7 @@ Release ...
 * dpost: The inclusion of PostScript pictures has been fixed; it could
   generate invalid PostScript programs since release 051025 under certain
   circumstances.
+* dpost: PostScript pictures that contain binary data can be included now.
 * -man macros: Fixed the output of a very long line following ".TP".
 * -mdoc macros: Changed the names of Courier fonts to \f(CW \f(CI to
   match those of troff.

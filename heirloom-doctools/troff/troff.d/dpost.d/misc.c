@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.7 (gritter) 10/2/05
+ * Sccsid @(#)misc.c	1.8 (gritter) 11/21/05
  */
 
 /*
@@ -314,4 +314,42 @@ tempname(const char *sfx)
 	if (close(mkstemp(pat)) < 0)
 		return NULL;
 	return pat;
+}
+
+
+/*****************************************************************************/
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)		_IO_getc_unlocked(f)
+#endif
+
+#define	LSIZE	512
+
+char *fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
+{
+	int c;
+	size_t n = 0;
+
+	if (*line == NULL || *linesize < LSIZE + n + 1)
+		*line = realloc(*line, *linesize = LSIZE + n + 1);
+	for (;;) {
+		if (n >= *linesize - LSIZE / 2)
+			*line = realloc(*line, *linesize += LSIZE);
+		c = getc(fp);
+		if (c != EOF) {
+			(*line)[n++] = c;
+			(*line)[n] = '\0';
+			if (c == '\n')
+				break;
+		} else {
+			if (n > 0)
+				break;
+			else
+				return NULL;
+		}
+	}
+	if (llen)
+		*llen = n;
+	return *line;
 }

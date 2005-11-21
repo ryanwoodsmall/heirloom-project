@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ps_include.c	1.5 (gritter) 8/13/05
+ * Sccsid @(#)ps_include.c	1.6 (gritter) 11/21/05
  */
 
 /*
@@ -52,7 +52,8 @@
 			: calloc(n, sizeof(Section))))
 
 
-char	buf[512];
+static char	*buf;
+static size_t	bufsize;
 typedef struct {long start, end;} Section;
 
 static void print(FILE *, char **);
@@ -119,7 +120,7 @@ ps_include(
 	trailer.start = 0;
 	fseek(fin, 0L, 0);
 
-	while ( fgets(buf, sizeof(buf), fin) != NULL )
+	while ( fgetline(&buf, &bufsize, NULL, fin) != NULL )
 		if (!has("%%"))
 			continue;
 		else if (has("%%Page: ")) {
@@ -199,11 +200,14 @@ print(FILE *fout, char **s)
 static void
 copy(FILE *fin, FILE *fout, Section *s)
 {
+	size_t	len;
+
 	if (s->end <= s->start)
 		return;
 	fseek(fin, s->start, 0);
-	while (ftell(fin) < s->end && fgets(buf, sizeof(buf), fin) != NULL)
+	while (ftell(fin) < s->end &&
+			fgetline(&buf, &bufsize, &len, fin) != NULL)
 		if (buf[0] != '%')
-			fprintf(fout, "%s", buf);
+			fwrite(buf, 1, len, fout);
 }
 
