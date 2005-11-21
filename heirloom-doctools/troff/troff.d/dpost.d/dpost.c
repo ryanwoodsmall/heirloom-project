@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.105 (gritter) 10/17/05
+ * Sccsid @(#)dpost.c	1.106 (gritter) 11/21/05
  */
 
 /*
@@ -1345,7 +1345,7 @@ conv(
 		    if ( size != lastsize || size == FRACTSIZE &&
 				    fractsize != lastfractsize) {
 			subfont = 0;
-			t_sf();
+			t_sf(0);
 		    }
 		    switch ((c=getc(fp))) {
 			case 'p':	/* draw a path */
@@ -1608,7 +1608,7 @@ devcntrl(
 		    if (tracked)
 			    tracked = -1;
 		    subfont = 0;
-		    t_sf();
+		    t_sf(1);
 		    xymove(hpos, vpos);
 		} else if ( strcmp(str, "PS") == 0 || strcmp(str, "PostScript") == 0 )  {
 		    endtext();
@@ -2890,7 +2890,7 @@ printencvector(struct afmtab *a)
 
 
 void
-t_sf(void)
+t_sf(int forceflush)
 
 
 {
@@ -2926,7 +2926,7 @@ t_sf(void)
     }	/* End if */
 
     cmd = 'f';
-    if (encoding == 4 || encoding == 5) {
+    if (forceflush == 0 && (encoding == 4 || encoding == 5)) {
 	if (font == lastfont && subfont == lastsubfont)
 	    cmd = 's';
 	else if (size == lastsize && fractsize == lastfractsize)
@@ -3340,7 +3340,7 @@ oprep(void)
 
     if ( font != lastfont || size != lastsize || subfont != lastsubfont ||
 		    size == FRACTSIZE && fractsize != lastfractsize) {
-	t_sf();
+	t_sf(0);
     }
 
     if ( vpos != lasty )
@@ -3863,7 +3863,7 @@ charlib (
 			fontdir, realdev, name);
 	if ( access(temp, 04) == 0 && doglobal(temp) == TRUE )  {
 	    downloaded[lastc] = 1;
-	    t_sf();
+	    t_sf(0);
 	}   /* End if */
     }	/* End if */
 

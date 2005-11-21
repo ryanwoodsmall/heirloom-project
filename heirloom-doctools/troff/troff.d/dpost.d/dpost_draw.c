@@ -38,7 +38,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)draw.c	1.3 (gritter) 8/9/05
+ * Sccsid @(#)dpost_draw.c	1.4 (gritter) 11/21/05
  */
 
 /*
@@ -717,7 +717,7 @@ newbaseline (
 	endtext();
 	getbaseline();
 	fprintf(tf, "mark resolution %s newbaseline\n", p);
-	t_sf();
+	t_sf(1);
 	resetpos();
     }	/* End if */
 
