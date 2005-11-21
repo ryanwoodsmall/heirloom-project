@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)grapl.l	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)grapl.l	1.4 (gritter) 11/22/05	*/
 %}
 %Start A str def thru sh
 
@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "grap.h"
 #include "y.tab.h"
 

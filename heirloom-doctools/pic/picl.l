@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picl.l	1.5 (gritter) 10/25/05	*/
+/*	Sccsid @(#)picl.l	1.6 (gritter) 11/22/05	*/
 %}
 %Start A str def xsc br thru sh
 %e 1700
@@ -28,6 +28,7 @@
 /* #include <stdio.h> lex puts one out for us */
 #include <ctype.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "pic.h"
 #include "y.tab.h"
 
