@@ -34,7 +34,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)whodo.sl	1.38 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)whodo.sl	1.39 (gritter) 11/22/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -56,7 +56,7 @@ static const char sccsid[] USED = "@(#)whodo.sl	1.38 (gritter) 5/29/05";
 #include	<wchar.h>
 #include	<wctype.h>
 
-#ifdef	__FreeBSD__
+#if defined (__FreeBSD__) || defined (__DragonFly__)
 #include	<sys/sysctl.h>
 #endif
 
@@ -76,13 +76,15 @@ static const char sccsid[] USED = "@(#)whodo.sl	1.38 (gritter) 5/29/05";
 #endif
 
 #if !defined (__linux__) && !defined (__FreeBSD__) && !defined (__hpux) && \
-	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__) && \
+	!defined (__DragonFly__)
 #ifdef	sun
 #include	<sys/loadavg.h>
 #define	_STRUCTURED_PROC	1
 #endif
 #include	<sys/procfs.h>
-#endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__,
+	!__DragonFly__ */
 
 #ifndef	PRNODEV
 #define	PRNODEV		0
@@ -125,10 +127,11 @@ static int		uflag;			/* "uptime" format */
 static int		hz;			/* clock ticks per second */
 static char		*user;			/* look for one user only */
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__)
+	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__) || \
+	defined (__DragonFly__)
 static char		loadavg[64];		/* load average */
 #endif	/* __linux__ || __sun || __FreeBSD__ || __hpux || __NetBSD__ ||
-		__OpenBSD__ */
+		__OpenBSD__ || __DragonFly__ */
 static char		*progname;		/* argv0 to main */
 static const char	*unknown = " unknown";	/* unknown */
 static time_t		now;			/* time at program start */
@@ -322,7 +325,8 @@ uptime(void)
 		return unknown;
 	}
 	fclose(fp);
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+		|| defined (__DragonFly__)
 	int	name[2] = { CTL_KERN, KERN_BOOTTIME };
 	struct timeval	old;
 	size_t	oldlen = sizeof old;
@@ -341,7 +345,8 @@ uptime(void)
 
 	getprocs64(&pi, sizeof pi, NULL, 0, &idx, 1);
 	upsec = now - pi.pi_start;
-#else	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
+#else	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__,
+	!__DragonFly__ */
 	FILE *fp;
 	struct psinfo	pi;
 
@@ -354,7 +359,7 @@ uptime(void)
 	fclose(fp);
 	upsec = now - pi.pr_start.tv_sec;
 #endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__,
-		!__OpenBSD__ */
+		!__OpenBSD__, !__DragonFly__ */
 	if (upsec > 59) {
 		upmin = upsec / 60;
 		if (upmin > 59) {
@@ -418,10 +423,11 @@ printhead(struct tslot *t0)
 		if (cmd != WHODO) {
 			printf("%u %s", users, users > 1 ? "users" : "user");
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__)
+	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__) || \
+	defined (__DragonFly__)
 			printf(",  load average: %s", loadavg);
 #endif	/* __linux__ || __sun || __FreeBSD__ || __hpux || __NetBSD__ ||
-	__OpenBSD__ */
+	__OpenBSD__ || __DragonFly__ */
 			printf("\n");
 		} else
 			printf("%u user(s)\n", users);
@@ -662,14 +668,14 @@ queueproc(struct tslot *t0, struct pslot *ps)
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
 	!defined (__OpenBSD__)
 
-#if defined (__linux__) || defined (__FreeBSD__)
+#if defined (__linux__) || defined (__FreeBSD__) || defined (__DragonFly__)
 
 #define	GETVAL(a)		if ((v = getval(&cp, (a), ' ', 0)) == NULL) \
 					goto error
 
 #define	GETVAL_COMMA(a)		if ((v = getval(&cp, (a), ' ', ',')) == NULL) \
 					goto error
-#endif	/* __linux__ || __FreeBSD__ */
+#endif	/* __linux__ || __FreeBSD__ || __DragonFly__ */
 
 #if defined (__linux__)
 static struct pslot *
@@ -792,7 +798,7 @@ error:
 	return NULL;
 }
 
-#elif defined (__FreeBSD__)
+#elif defined (__FreeBSD__) || defined (__DragonFly__)
 
 enum okay {
 	OKAY,
@@ -926,7 +932,7 @@ readproc(char *pdir)
 	return p;
 }
 
-#else	/* !__linux__, !__FreeBSD__ */
+#else	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 static struct pslot *
 readproc(char *pdir)
 {
@@ -970,7 +976,7 @@ readproc(char *pdir)
 	return p;
 }
 
-#endif	/* !__linux__, !__FreeBSD__ */
+#endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 
 /*
  * Convert an entry in /proc to a slot entry, if advisable.
@@ -1280,7 +1286,7 @@ getload(void)
 	}
 }
 #elif defined (__sun) || defined (__FreeBSD__) || defined (__NetBSD__) || \
-	defined (__OpenBSD__)
+	defined (__OpenBSD__) || defined (__DragonFly__)
 
 #ifndef	LOADAVG_NSTATS
 #define	LOADAVG_NSTATS	3
@@ -1332,11 +1338,12 @@ getlogins(void)
 	struct tslot *t, *t0 = NULL, *tprev = NULL;
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__)
+	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__) || \
+	defined (__DragonFly__)
 	if (cmd != WHODO)
 		getload();
 #endif	/* __linux__ || __sun || __FreeBSD__ || __hpux || __NetBSD__ ||
-		__OpenBSD__ */
+		__OpenBSD__ ||  __DragonFly__*/
 	setutxent();
 	while ((ut = getutxent()) != NULL) {
 		if (ut->ut_type == USER_PROCESS) {

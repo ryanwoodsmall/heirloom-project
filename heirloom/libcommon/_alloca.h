@@ -19,8 +19,9 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)_alloca.h	1.3 (gritter) 11/7/04	*/
+/*	Sccsid @(#)_alloca.h	1.4 (gritter) 11/22/05	*/
 
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
+	defined (__DragonFly__)
 #include <stdlib.h>
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */

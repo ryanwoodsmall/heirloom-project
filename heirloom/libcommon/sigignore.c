@@ -19,10 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)sigignore.c	1.4 (gritter) 11/7/04	*/
+/*	Sccsid @(#)sigignore.c	1.5 (gritter) 11/22/05	*/
 
 #if defined (__FreeBSD__) || defined (__dietlibc__) || defined (__NetBSD__) || \
-	defined (__OpenBSD__)
+	defined (__OpenBSD__) || defined (__DragonFly__)
 #include <signal.h>
 #include "sigset.h"
 
@@ -41,4 +41,5 @@ sigignore(int sig)
 	sigaddset(&act.sa_mask, sig);
 	return sigaction(sig, &act, (struct sigaction *)0);
 }
-#endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __OpenBSD__ */
+#endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __OpenBSD__ ||
+	__DragonFly__ */

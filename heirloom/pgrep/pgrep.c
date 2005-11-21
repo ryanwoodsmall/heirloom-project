@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pgrep.sl	1.20 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)pgrep.sl	1.21 (gritter) 11/22/05";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -312,7 +312,7 @@ element(const char **listp, int override)
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
 	!defined (__OpenBSD__)
 
-#if defined (__linux__) || defined (__FreeBSD__)
+#if defined (__linux__) || defined (__FreeBSD__) || defined (__DragonFly__)
 
 #define	GETVAL_REQ(a)		if ((v = getval(&cp, (a), ' ', 0)) == NULL) \
 					return STOP
@@ -323,7 +323,7 @@ element(const char **listp, int override)
 #define	GETVAL_COMMA(a)		if ((v = getval(&cp, (a), ' ', ',')) == NULL) \
 					return STOP
 
-#endif	/* __linux__ || __FreeBSD__ */
+#endif	/* __linux__ || __FreeBSD__ || __DragonFly__ */
 
 
 #if defined (__linux__)
@@ -521,7 +521,7 @@ getproc(const char *dir, pid_t expected_pid)
 	return p;
 }
 
-#elif defined (__FreeBSD__)
+#elif defined (__FreeBSD__) || defined (__DragonFly__)
 
 static enum okay
 getproc_status(struct proc *p, pid_t expected_pid)
@@ -654,7 +654,7 @@ getproc(const char *dir, pid_t expected_pid)
 	return p;
 }
 
-#else	/* !__linux__, !__FreeBSD__ */
+#else	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 
 static const char *
 concat(const char *dir, const char *base)

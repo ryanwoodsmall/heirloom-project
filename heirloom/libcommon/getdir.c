@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)getdir.c	1.17 (gritter) 11/7/04	*/
+/*	Sccsid @(#)getdir.c	1.18 (gritter) 11/22/05	*/
 
 #ifndef	__linux__
 /*
@@ -43,12 +43,13 @@
 #define	dirent	dirent64
 extern int	getdents(int, struct dirent *, size_t);
 #elif defined	(__GLIBC__) || defined (__FreeBSD__) || defined (_AIX) || \
-	defined (__NetBSD__) || defined (__OpenBSD__)
+	defined (__NetBSD__) || defined (__OpenBSD__) || defined (__DragonFly__)
 #include	<dirent.h>
 #define	getdents(a, b, c)	getdirentries((a), (char *)(b), (c), &(db->g_offs))
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
+	defined (__DragonFly__)
 #undef	d_ino
-#endif	/* __FreeBSD__ || __NetBSD__ || __OpenBSD__ */
+#endif	/* __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__ */
 #elif defined	(__dietlibc__)
 #include	<dirent.h>
 #include	<unistd.h>
@@ -78,11 +79,12 @@ typedef	uint64_t	ino64_t;
 #define	DIBSIZE	5120
 
 struct	getdb {
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
+		&& !defined (__DragonFly__)
 	off_t		g_offs;
-#else	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#else	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
 	long		g_offs;
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
 	struct dirent	*g_dirp;
 	const char	*g_path;
 	struct direc	g_dic;
@@ -117,6 +119,8 @@ getdb_free(struct getdb *db)
 struct direc *
 getdir(struct getdb *db, int *err)
 {
+	int	reclen;
+
 	*err = 0;
 	while (db->g_dirp == NULL)
 	{
@@ -133,40 +137,50 @@ getdir(struct getdb *db, int *err)
 		/*LINTED*/
 		db->g_dirp = (struct dirent *)db->g_u.g_dirbuf;
 		while (db->g_dirp &&
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
+		&& !defined (__DragonFly__)
 				db->g_dirp->d_ino == 0
-#else	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#else	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
 				(db->g_dirp->d_fileno == 0 ||
 				  db->g_dirp->d_type == DT_WHT)
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
 		      )
 		{
-		next:	if ((db->g_num -= db->g_dirp->d_reclen) == 0 ||
-					db->g_dirp->d_reclen == 0)
+		next:
+#ifndef	__DragonFly__
+			reclen = db->g_dirp->d_reclen;
+#else
+			reclen = _DIRENT_DIRSIZ(db->g_dirp);
+#endif
+			if ((db->g_num -= reclen) == 0 || reclen == 0)
 				db->g_dirp = NULL;
 			else
 				db->g_dirp =
 					/*LINTED*/
 					(struct dirent *)((char *)db->g_dirp
-						+ db->g_dirp->d_reclen);
+						+ reclen);
 		}
 	}
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
+		&& !defined (__DragonFly__)
 	if (db->g_dirp->d_ino == 0)
 		goto next;
 	db->g_dic.d_ino = db->g_dirp->d_ino;
-#else	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#else	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
 	if (db->g_dirp->d_fileno == 0 || db->g_dirp->d_type == DT_WHT)
 		goto next;
 	db->g_dic.d_ino = db->g_dirp->d_fileno;
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
 	db->g_dic.d_name = db->g_dirp->d_name;
-	if ((db->g_num -= db->g_dirp->d_reclen) == 0 ||
-			db->g_dirp->d_reclen == 0)
+#ifndef	__DragonFly__
+		reclen = db->g_dirp->d_reclen;
+#else
+		reclen = _DIRENT_DIRSIZ(db->g_dirp);
+#endif
+	if ((db->g_num -= reclen) == 0 || reclen == 0)
 		db->g_dirp = NULL;
 	else
 		/*LINTED*/
-		db->g_dirp = (struct dirent *)((char *)db->g_dirp +
-				db->g_dirp->d_reclen);
+		db->g_dirp = (struct dirent *)((char *)db->g_dirp + reclen);
 	return &(db->g_dic);
 }

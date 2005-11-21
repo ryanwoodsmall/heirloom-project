@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.63 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.64 (gritter) 11/22/05";
 #else
-static const char sccsid[] USED = "@(#)df.sl	1.63 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)df.sl	1.64 (gritter) 11/22/05";
 #endif
 
 /*
@@ -65,7 +65,8 @@ typedef		unsigned long long	ull;
 #include	<stdlib.h>
 #if defined	(__linux__) || defined (__hpux) || defined (_AIX)
 #include	<mntent.h>
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+	|| defined (__DragonFly__)
 #include	<sys/param.h>
 #include	<sys/ucred.h>
 #include	<sys/mount.h>
@@ -104,11 +105,14 @@ static char	*fstype;		/* restrict to filesystem type */
 static char	*progname;		/* argv[0] to main() */
 #if defined	(__linux__) || defined (_AIX)
 static const char	*mtab = "/etc/mtab";	/* mount table */
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+	|| defined (__DragonFly__)
 /* nothing */
-#else	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
+#else	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__,
+	!__DragonFly__ */
 static const char	*mtab = "/etc/mnttab";	/* mount table */
-#endif	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__,
+	!__DragonFly__ */
 
 /*
  * perror()-alike.
@@ -442,7 +446,8 @@ printmnt(void)
 		printfs(mp->mnt_dir, mp->mnt_fsname, mp->mnt_type);
 	}
 	endmntent(fp);
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+		|| defined (__DragonFly__)
 	struct statfs	*sp = NULL;
 	int	cnt, i;
 
@@ -490,16 +495,18 @@ findfs(const char *fn)
 {
 #if defined	(__linux__) || defined (__hpux) || defined (_AIX)
 	struct mntent *mp;
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+		|| defined (__DragonFly__)
 	struct statfs	*sp = NULL;
 	int	count, i;
 #else	/* SVR4 */
 	struct mnttab mt;
 #endif	/* SVR4 */
 	struct stat s1, s2;
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
+		&& !defined (__DragonFly__)
 	FILE *fp;
-#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__, !__DragonFly__ */
 	int gotcha = 0;
 	const char	*m_special, *m_mountp, *m_fstype;
 
@@ -508,7 +515,8 @@ findfs(const char *fn)
 		pnerror(errno, mtab);
 		exit(errcnt);
 	}
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+		|| defined (__DragonFly__)
 	if ((count = getmntinfo(&sp, MNT_WAIT)) <= 0) {
 		pnerror(errno, "getmntinfo");
 		exit(errcnt);
@@ -537,7 +545,8 @@ findfs(const char *fn)
 		m_fstype =mp->mnt_type;
 		if (strcmp(m_fstype, MNTTYPE_IGNORE) == 0)
 			continue;
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+		|| defined (__DragonFly__)
 	for (i = 0; i < count; i++) {
 		m_special = sp[i].f_mntfromname;
 		m_mountp = sp[i].f_mntonname;
@@ -603,7 +612,8 @@ findfs(const char *fn)
 	}
 #if defined	(__linux__)
 	endmntent(fp);
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+		|| defined (__DragonFly__)
 	/* nothing */
 #else	/* SVR4 */
 	fclose(fp);
@@ -642,9 +652,10 @@ main(int argc, char **argv)
 			kflag = 1;
 			break;
 		case 'M':
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
+	&& !defined (__DragonFly__)
 			mtab = optarg;
-#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__, !__DragonFly__ */
 			break;
 		case 'P':
 			Pflag = 1;
@@ -718,9 +729,10 @@ main(int argc, char **argv)
 			lflag = 1;
 			break;
 		case 'M':
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
+	&& !defined (__DragonFly__)
 			mtab = optarg;
-#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__, !__DragonFly__ */
 			break;
 		case 't':
 			tflag = 1;

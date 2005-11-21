@@ -19,12 +19,12 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)utmpx.c	1.10 (gritter) 11/7/04	*/
+/*	Sccsid @(#)utmpx.c	1.11 (gritter) 11/22/05	*/
 
 #include <stdio.h>
 
 #if defined (__FreeBSD__) || defined (__dietlibc__) || defined (__NetBSD__) || \
-	defined (__UCLIBC__) || defined (__OpenBSD__)
+	defined (__UCLIBC__) || defined (__OpenBSD__) || defined (__DragonFly__)
 #include <sys/types.h>
 #include <sys/time.h>
 #include <utmp.h>
@@ -246,4 +246,4 @@ updwtmpx(const char *name, const struct utmpx *up)
 }
 
 #endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __UCLIBC__ ||
-	 	__OpenBSD__ */
+	 	__OpenBSD__ || __DragonFly__ */

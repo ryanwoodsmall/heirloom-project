@@ -2,7 +2,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)awk.lx.l	1.12 (gritter) 6/18/05>
+   Sccsid @(#)awk.lx.l	1.13 (gritter) 11/22/05>
  */
 /* UNIX(R) Regular Expression Tools
  
@@ -72,6 +72,7 @@
 #include	"awk.h"
 #include	"y.tab.h"
 #include	<pfmt.h>
+#include	<unistd.h>
 
 static void	awk_unputstr(const char *s);
 

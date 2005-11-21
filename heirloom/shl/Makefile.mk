@@ -10,7 +10,7 @@ install: all
 	u=`uname`; \
 	if test "$$u" != FreeBSD && test "$$u" != HP-UX && \
 		test "$$u" != AIX && test "$$u" != NetBSD && \
-		test "$$u" != OpenBSD ; \
+		test "$$u" != OpenBSD && test "$$u" != DragonFly ; \
 	then \
 		$(UCBINST) -c $(TTYGRP) -m 2755 shl $(ROOT)$(DEFBIN)/shl &&\
 		$(STRIP) $(ROOT)$(DEFBIN)/shl &&\

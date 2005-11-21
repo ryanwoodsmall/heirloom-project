@@ -51,7 +51,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tcopy.sl	1.14 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)tcopy.sl	1.15 (gritter) 11/22/05";
 
 #include <stdio.h>
 #include <signal.h>
@@ -65,7 +65,7 @@ static const char sccsid[] USED = "@(#)tcopy.sl	1.14 (gritter) 5/29/05";
 #include <sys/ioctl.h>
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__)
+	defined (__OpenBSD__) || defined (__DragonFly__)
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
 #include <sys/tape.h>
@@ -165,7 +165,7 @@ main(int argc, char **argv)
 			if (copy) {
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__)
+	defined (__OpenBSD__) || defined (__DragonFly__)
 				struct mtop op;
 				op.mt_op = MTWEOF;
 				op.mt_count = 1;

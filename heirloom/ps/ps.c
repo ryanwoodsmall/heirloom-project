@@ -33,20 +33,21 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.108 (gritter) 9/24/05";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.109 (gritter) 11/22/05";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.108 (gritter) 9/24/05";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.109 (gritter) 11/22/05";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.108 (gritter) 9/24/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.109 (gritter) 11/22/05";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.108 (gritter) 9/24/05";
+static const char sccsid[] USED = "@(#)ps.sl	2.109 (gritter) 11/22/05";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.108 (gritter) 9/24/05";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.109 (gritter) 11/22/05";
 
-#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
+#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
+	&& !defined (__DragonFly__)
 #define	_KMEMUSER
-#endif	/* !__linux__, !__sun, !__FreeBSD__ */
+#endif	/* !__linux__, !__sun, !__FreeBSD__, !__DragonFly__ */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/utsname.h>
@@ -75,7 +76,7 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.108 (gritter) 9/24/05";
 #include 	<termios.h>
 #if defined (__linux__)
 #include	<mntent.h>
-#elif defined (__FreeBSD__)
+#elif defined (__FreeBSD__) || defined (__DragonFly__)
 #include	<kvm.h>
 #include	<sys/param.h>
 #include	<sys/ucred.h>
@@ -86,6 +87,9 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.108 (gritter) 9/24/05";
 #include	<sys/user.h>
 #define	proc	process
 #undef	p_pgid
+#undef	p_pctcpu
+#if defined (__DragonFly__)
+#endif	/* __DragonFly__ */
 #elif defined (__hpux)
 #include	<mntent.h>
 #include	<sys/param.h>
@@ -1197,7 +1201,7 @@ outproc(struct proc *p)
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
 	!defined (__OpenBSD__)
 
-#if defined (__linux__) || defined (__FreeBSD__)
+#if defined (__linux__) || defined (__FreeBSD__) || defined (__DragonFly__)
 #define	GETVAL_REQ(a)		if ((v = getval(&cp, (a), ' ', 0)) == NULL) \
 					return STOP
 
@@ -1206,7 +1210,7 @@ outproc(struct proc *p)
 
 #define	GETVAL_COMMA(a)		if ((v = getval(&cp, (a), ' ', ',')) == NULL) \
 					return STOP
-#endif	/* __linux__ || __FreeBSD__ */
+#endif	/* __linux__ || __FreeBSD__ || __DragonFly__ */
 
 #if defined (__linux__)
 static void
@@ -1859,7 +1863,7 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 	}
 }
 
-#elif defined (__FreeBSD__)
+#elif defined (__FreeBSD__) || defined (__DragonFly__)
 
 static unsigned long
 getmem(void)
@@ -2106,7 +2110,7 @@ getproc_kvm(struct proc *p)
 	}
 	if ((kp = kvm_getprocs(kv, KERN_PROC_PID, p->p_pid, &c)) == NULL)
 		return OKAY;
-#if (__FreeBSD__) < 5
+#if (__FreeBSD__) < 5 || defined (__DragonFly__)
 	switch (kp->kp_proc.p_stat) {
 #else	/* __FreeBSD__ >= 5 */
 	switch (kp->ki_stat) {
@@ -2138,7 +2142,7 @@ getproc_kvm(struct proc *p)
 		break;
 	}
 	p->p_lstate[0] = p->p_state[0];
-#if (__FreeBSD__) < 5
+#if (__FreeBSD__) < 5 || defined (__DragonFly__)
 #define	ki_flag		kp_proc.p_flag
 #define	ki_oncpu	kp_proc.p_oncpu
 #define	ki_wchan	kp_proc.p_wchan
@@ -2148,10 +2152,12 @@ getproc_kvm(struct proc *p)
 		p->p_flag |= FL_SYS;
 	if (kp->ki_flag & P_TRACED)
 		p->p_flag |= FL_TRC;
-#if (__FreeBSD__) < 5
+#if (__FreeBSD__) < 5 || defined (__DragonFly__)
+#ifndef	__DragonFly__
 	p->p_intpri = kp->kp_proc.p_usrpri;
 	p->p_oldpri = kp->kp_proc.p_usrpri;
 	p->p_pri = kp->kp_proc.p_priority;
+#endif	/* !__DragonFly__ */
 	p->p_policy = SCHED_OTHER;
 	p->p_clname = "TS";
 #else	/* __FreeBSD__ >= 5 */
@@ -2166,8 +2172,10 @@ getproc_kvm(struct proc *p)
 	if (p->p_policy != SCHED_OTHER)
 		p->p_pri += 100;
 #endif	/* __FreeBSD__ >= 5 */
+#ifndef	__DragonFly__
 	p->p_psr = kp->ki_oncpu;
 	p->p_wchan = (unsigned long)kp->ki_wchan;
+#endif	/* !__DragonFly__ */
 	return OKAY;
 }
 
@@ -2190,7 +2198,7 @@ getproc(const char *dir, struct proc *p, pid_t expected_pid, pid_t lwp)
 	return result;
 }
 
-#else	/* !__linux__, !__FreeBSD__ */
+#else	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 
 #ifndef	__sun
 static unsigned long
@@ -2526,7 +2534,7 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 		return STOP;
 }
 
-#endif	/* !__linux__, !__FreeBSD__ */
+#endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 
 static void
 postproc(struct proc *p)
@@ -2541,13 +2549,14 @@ postproc(struct proc *p)
 	if (totalmem)
 		p->p_pctmem = (double)p->p_size * 100 / totalmem;
 #endif	/* !__sun */
-#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
+#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
+		&& !defined (__DragonFly__)
 	p->p_oldpri = 160 - p->p_pri;
 #endif	/* !__linux__, !__sun */
-#if !defined (__linux__) && !defined (__FreeBSD__)
+#if !defined (__linux__) && !defined (__FreeBSD__) && !defined (__DragonFly__)
 	p->p_policy = p->p_clname && strcmp(p->p_clname, "TS") ?
 		SCHED_RR : SCHED_OTHER;
-#endif	/* !__linux__, !__FreeBSD__ */
+#endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 }
 #endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
 
@@ -2666,11 +2675,11 @@ do_procs(void)
 			val = strtoul(dp->d_name, &x, 10);
 			if (*x != 0)
 				continue;
-#ifndef	__FreeBSD__
+#if !defined (__FreeBSD__) && !defined (__DragonFly__)
 			if (Lflag)
 				if (getLWPs(dp->d_name, &p, val) == OKAY)
 					continue;
-#endif	/* !__FreeBSD__ */
+#endif	/* !__FreeBSD__, !__DragonFly__ */
 			if (getproc(dp->d_name, &p, val, -1) == OKAY) {
 				postproc(&p);
 				if (selectproc(&p) == OKAY)
@@ -3970,7 +3979,8 @@ sysname(int ac, char **av)
 				}
 			}
 			endmntent(fp);
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
+	|| defined (__DragonFly__)
 			struct statfs	*sp = NULL;
 			int	cnt, i;
 
@@ -4456,7 +4466,7 @@ main(int argc, char **argv)
 #endif	/* !__sun */
 #if defined (__linux__) || defined (__sun)
 	getproc("self", &myproc, getpid(), -1);
-#elif defined (__FreeBSD__)
+#elif defined (__FreeBSD__) || defined (__DragonFly__)
 	getproc("curproc", &myproc, getpid(), -1);
 #elif defined (__hpux)
 	{

@@ -1,3 +1,6 @@
+Release ...
+* The tools have been ported to DragonFlyBSD 1.3.7-DEVELOPMENT.
+
 Release 051118
 * rm: The output of the question before descending to a directory with
   the "-i" option has been fixed.

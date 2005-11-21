@@ -24,6 +24,7 @@ AIX             5.1; VisualAge C, gcc
 FreeBSD         4.9, 5.2.1
 NetBSD          1.6, 2.0
 OpenBSD         3.4
+DragonFlyBSD	1.3.7-DEVELOPMENT
 
 The following prerequisites are necessary:
 
@@ -311,4 +312,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                11/14/05
+<gunnarr@acm.org>                                                11/22/05

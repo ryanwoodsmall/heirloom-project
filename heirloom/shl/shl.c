@@ -30,10 +30,11 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)shl.sl	1.26 (gritter) 6/19/05";
+static const char sccsid[] USED = "@(#)shl.sl	1.27 (gritter) 11/22/05";
 
 #if !defined (__FreeBSD__) && !defined (__hpux) && !defined (_AIX) && \
-	!defined (__NetBSD__) && !defined (__OpenBSD__)
+	!defined (__NetBSD__) && !defined (__OpenBSD__) && \
+	!defined (__DragonFly__)
 
 /*
  * UnixWare 2.1 needs _KMEMUSER to access some flags for STREAMS. Maybe other
@@ -1567,7 +1568,7 @@ struct command commands[] = {
 		NULL, 0 }
 };
 
-#else	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__ */
+#else	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__, __DragonFly__ */
 
 #include <stdio.h>
 
@@ -1578,4 +1579,4 @@ main(void)
 	return 1;
 }
 
-#endif	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__ */
+#endif	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__, __DragonFly__ */
