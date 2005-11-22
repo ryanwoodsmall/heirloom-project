@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.53 (gritter) 11/16/05
+ * Sccsid @(#)n3.c	1.54 (gritter) 11/22/05
  */
 
 /*
@@ -852,7 +852,7 @@ collect(void)
 		 *	CPERMAC (the total # of characters for ALL arguments)
 		 *	to a macro
 		 */
-#define	CPERMAC	200
+#define	CPERMAC	2000
 		if (xflag)
 			APERMAC = 200;
 		memp += APERMAC * sizeof(tchar *);

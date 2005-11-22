@@ -7,6 +7,8 @@ Release ...
   been removed.
 * [nt]roff: The static limit on the number of nested diversions has been
   removed.
+* [nt]roff: A maximum of 2000 characters (bytes) is now allowed as the
+  total of all arguments to a macro.
 * dpost: The inclusion of PostScript pictures has been fixed; it could
   generate invalid PostScript programs since release 051025 under certain
   circumstances.
