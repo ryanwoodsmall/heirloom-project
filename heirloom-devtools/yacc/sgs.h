@@ -24,7 +24,15 @@
  *
  * Sccsid @(#)main.c	1.2 (gritter) 6/14/05
  */
-static const char id[] = "@(#)yacc.sl	2.2 (gritter) 11/18/05";
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#define	USED	__attribute__ ((used))
+#elif defined __GNUC__
+#define	USED	__attribute__ ((unused))
+#else
+#define	USED
+#endif
+static const char sccsid[] USED = "@(#)yacc.sl	2.3 (gritter) 11/23/05";
+static const char id[] = "Heirloom Development Tools, 2.3 (gritter) 11/23/05";
 /* SLIST */
 /*
 dextern: * Sccsid @(#)dextern	1.6 (gritter) 11/10/05
