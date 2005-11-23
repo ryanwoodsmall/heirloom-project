@@ -13,6 +13,7 @@ Linux		glibc
 Solaris		10 and above
 HP-UX		B.11.11
 FreeBSD		5.4
+Open UNIX	8.0.0
 
 It is likely to compile on other systems that provide the necessary
 wide-character functionality.
@@ -33,4 +34,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/15/05
+<gunnarr@acm.org>						11/23/05
