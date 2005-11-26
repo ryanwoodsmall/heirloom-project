@@ -35,7 +35,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.7 (gritter) 7/2/05
+ * Sccsid @(#)main.c	1.8 (gritter) 11/26/05
  */
 
 #include <string.h>
@@ -83,7 +83,7 @@ main(int argc, char **argv)
 				break;
 #endif
 			case 'V':
-				fprintf(stderr, "lex: %s\n", id);
+				fprintf(stderr, "lex:%s , %s\n", pkg, rel);
 				break;
 			case 'Q':
 				v_stmp = optarg;

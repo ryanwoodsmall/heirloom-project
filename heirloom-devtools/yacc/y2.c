@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)y2.c	1.9 (gritter) 11/18/05
+ * Sccsid @(#)y2.c	1.10 (gritter) 11/26/05
  */
 
 #include "dextern"
@@ -218,7 +218,7 @@ setup(int argc, char *argv[])
 			options |= v_FLAG;
 			break;
 		case 'V':
-			fprintf(stderr, "yacc: %s\n", id);
+			fprintf(stderr, "yacc: %s , %s\n", pkg, rel);
 			break;
 		case 'Q':
 			v_stmp = optarg;
@@ -333,8 +333,7 @@ setup(int argc, char *argv[])
 #else\n\
 #define	YYUSED\n\
 #endif\n\
-static const char yyident[] USED = \"%s\"\n",
-				id);
+static const char yyident[] USED = \"yacc: %s\"\n", rel);
 	for (; t != MARK && t != ENDFILE; ) {
 		int tok_in_line;
 		switch (t) {

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)header.c	1.10 (gritter) 11/18/05
+ * Sccsid @(#)header.c	1.11 (gritter) 11/26/05
  */
 
 #include "ldefs.c"
@@ -54,7 +54,7 @@ static void
 chd1(void)
 {
 	if (*v_stmp == 'y') {
-		extern const char	id[];
+		extern const char	rel[];
 		fprintf(fout, "\
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4\n\
 #define	YYUSED	__attribute__ ((used))\n\
@@ -63,8 +63,7 @@ chd1(void)
 #else\n\
 #define	YYUSED\n\
 #endif\n\
-static const char yylexid[] USED = \"%s\"\n",
-				id);
+static const char yylexid[] USED = \"lex: %s\"\n", rel);
 	}
 	if (handleeuc) {
 		fprintf(fout, "#ifndef EUC\n");
