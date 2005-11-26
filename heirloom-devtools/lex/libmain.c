@@ -33,21 +33,16 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)libmain.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)libmain.c	1.4 (gritter) 11/26/05
  */
 
 #include "stdio.h"
 
-extern void exit();
-
-extern int  yylex();
+extern int  yylex(void);
 
 int
-main()
+main(void)
 {
 	yylex();
-	exit(0);
-
-	/*NOTREACHED*/
 	return (0);
 }

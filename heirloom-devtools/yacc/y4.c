@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)y4.c	1.4 (gritter) 6/24/05
+ * Sccsid @(#)y4.c	1.5 (gritter) 11/26/05
  */
 
 #include "dextern"
@@ -65,8 +65,8 @@ callopt(void)
 {
 	register int i, *p, j, k, *q;
 
-	ggreed = (int *) malloc(sizeof (int) * size);
-	pgo = (int *) malloc(sizeof (int) * size);
+	ggreed = malloc(sizeof (int) * size);
+	pgo = malloc(sizeof (int) * size);
 	yypgo = &nontrst[0].tvalue;
 
 	/* read the arrays from tempfile and set parameters */
@@ -286,7 +286,7 @@ stin(int i)
 		flag = 0;
 		for (r = q1; r < q2; r += 2) {
 			s = *r + n + amem;
-			if ((int) s < (int) amem)
+			if (s < amem)
 				goto nextn;
 			/*
 			 * Check if action table needs to
@@ -294,7 +294,7 @@ stin(int i)
 			 * expand it.
 			 */
 			while (s >= &amem[new_actsize]) {
-				exp_act((int **)NULL);
+				exp_act(NULL);
 				s = *r + n + amem;
 			}
 			if (*s == 0)
@@ -334,7 +334,7 @@ stin(int i)
 				/*
 				 * error( "out of space");
 				 */
-				exp_act((int **)NULL);
+				exp_act(NULL);
 			}
 			if (s > maxa)
 				maxa = s;
@@ -353,7 +353,7 @@ stin(int i)
 	}
 
 	/* error( "Error; failure to place state %d\n", i ); */
-	exp_act((int **)NULL);
+	exp_act(NULL);
 	nn = new_actsize - ACTSIZE;
 	goto more;
 	/* NOTREACHED */
@@ -470,7 +470,7 @@ exp_act(int **ptr)
 	new_actsize += ACTSIZE;
 
 	actbase = amem;
-	amem = (int *) realloc((char *)amem, sizeof (int) * new_actsize);
+	amem = realloc(amem, sizeof (int) * new_actsize);
 	if (amem == NULL)
 		error("couldn't expand action table");
 

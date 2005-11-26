@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lsearch.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)lsearch.c	1.4 (gritter) 11/26/05
  */
 
 /*	Copyright (c) 1988 AT&T	*/
@@ -51,9 +51,10 @@
 #include <sys/types.h>
 #include <stddef.h>
 #include <string.h>
+#include "search.h"
 
 void *
-lsearch(const void *ky, void *bs, size_t *nelp, size_t width,
+xlsearch(const void *ky, void *bs, unsigned *nelp, unsigned width,
 	int (*compar)(const void *, const void *))
 {
 	char *key = (char *)ky;

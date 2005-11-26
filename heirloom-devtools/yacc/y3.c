@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)y3.c	1.4 (gritter) 6/24/05
+ * Sccsid @(#)y3.c	1.5 (gritter) 11/26/05
  */
 
 #include "dextern"
@@ -492,9 +492,7 @@ wdef(wchar_t *s, int n)
 }
 
 void
-warray(s, v, n)
-wchar_t *s;
-int *v, n;
+warray(wchar_t *s, int *v, int n)
 {
 	register int i;
 	fprintf(ftable, "static YYCONST yytabelem %ls[]={\n", s);

@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)y1.c	1.6 (gritter) 11/10/05
+ * Sccsid @(#)y1.c	1.7 (gritter) 11/26/05
  */
 
 #include "dextern"
@@ -156,8 +156,8 @@ mktbls(void)
 	if (size < new_memsize)
 		size = new_memsize;
 
-	amem = (int *) malloc(sizeof (int) * new_actsize);
-	psmem = (ITEM *) malloc(sizeof (ITEM) * new_pstsize);
+	amem = malloc(sizeof (int) * new_actsize);
+	psmem = malloc(sizeof (ITEM) * new_pstsize);
 	if ((psmem == NULL) || (amem == NULL))
 		error("couldn't allocate initial table");
 	zzmemsz = psmem;
@@ -167,11 +167,10 @@ mktbls(void)
 	 * For lkst
 	 */
 #define	INIT_LSIZE	nnontersz*LKFACTOR
-	tmp_lset = (int *)
-		calloc((size_t)(TBITSET * (INIT_LSIZE+1)), sizeof (int));
+	tmp_lset = calloc((size_t)(TBITSET * (INIT_LSIZE+1)), sizeof (int));
 	if (tmp_lset == NULL)
 		error("could not allocate lookset array");
-	lkst = (LOOKSETS *) malloc(sizeof (LOOKSETS) * (INIT_LSIZE + 1));
+	lkst = malloc(sizeof (LOOKSETS) * (INIT_LSIZE + 1));
 	for (i = 0; i <= INIT_LSIZE; ++i)
 		lkst[i].lset = tmp_lset + TBITSET * i;
 	tmp_lset = NULL;
@@ -179,8 +178,7 @@ mktbls(void)
 	/*
 	 * For wsets
 	 */
-	tmp_lset = (int *)
-		calloc((size_t)(TBITSET * (nnontersz+1)), sizeof (int));
+	tmp_lset = calloc((size_t)(TBITSET * (nnontersz+1)), sizeof (int));
 	if (tmp_lset == NULL)
 		error("could not allocate lookset array");
 	wsets = (WSET *) malloc(sizeof (WSET) * (nnontersz + 1));
@@ -188,19 +186,19 @@ mktbls(void)
 		wsets[i].ws.lset = tmp_lset + TBITSET * i;
 	tmp_lset = NULL;
 
-	clset.lset = (int *)malloc(sizeof (int)*TBITSET);
-	tstates = (int *)malloc(sizeof (int)*(ntoksz + 1));
-	ntstates = (int *)malloc(sizeof (int)*(nnontersz + 1));
-	temp1 = (int *)malloc(sizeof (int)*size);
-	pres = (int ***)malloc(sizeof (int **)*(nnontersz + 2));
-	pfirst = (LOOKSETS **)malloc(sizeof (LOOKSETS *)*(nnontersz + 2));
-	pempty = (int *)malloc(sizeof (int)*(nnontersz + 1));
+	clset.lset = malloc(sizeof (int)*TBITSET);
+	tstates = malloc(sizeof (int)*(ntoksz + 1));
+	ntstates = malloc(sizeof (int)*(nnontersz + 1));
+	temp1 = malloc(sizeof (int)*size);
+	pres = malloc(sizeof (int **)*(nnontersz + 2));
+	pfirst = malloc(sizeof (LOOKSETS *)*(nnontersz + 2));
+	pempty = malloc(sizeof (int)*(nnontersz + 1));
 
-	pstate = (ITEM **)malloc(sizeof (ITEM *)*(nstatesz+2));
-	tystate = (int *)malloc(sizeof (int)*nstatesz);
-	indgo = (int *)malloc(sizeof (int)*nstatesz);
-	mstates = (int *)malloc(sizeof (int)*nstatesz);
-	defact = (int *)malloc(sizeof (int)*nstatesz);
+	pstate = malloc(sizeof (ITEM *)*(nstatesz+2));
+	tystate = malloc(sizeof (int)*nstatesz);
+	indgo = malloc(sizeof (int)*nstatesz);
+	mstates = malloc(sizeof (int)*nstatesz);
+	defact = malloc(sizeof (int)*nstatesz);
 
 	if ((lkst == NULL) || (wsets == NULL) || (tstates == NULL) ||
 	    (ntstates == NULL) || (temp1 == NULL) || (pres == NULL) ||
@@ -292,8 +290,7 @@ others(void)
 
 /* copies string q into p, returning next free char ptr */
 static wchar_t *
-chcopy(p, q)
-wchar_t *p, *q;
+chcopy(wchar_t *p, wchar_t *q)
 {
 	while (*p = *q++)
 		++p;
@@ -303,8 +300,7 @@ wchar_t *p, *q;
 #define	ISIZE 400
 /* creates output string for item pointed to by pp */
 wchar_t *
-writem(pp)
-int *pp;
+writem(int *pp)
 {
 	int i, *p;
 	static int isize = ISIZE;
@@ -312,7 +308,7 @@ int *pp;
 	wchar_t *q;
 
 	if (sarr == NULL) {
-		sarr = (wchar_t *)malloc(sizeof (wchar_t) * isize);
+		sarr = malloc(sizeof (wchar_t) * isize);
 		if (sarr == NULL)
 			error("could not allocate output string array");
 		for (i = 0; i < isize; ++i)
@@ -334,8 +330,7 @@ int *pp;
 
 			sarrbase = sarr;
 			isize += ISIZE;
-			sarr = (wchar_t *)
-				realloc((char *)sarr, sizeof (*sarr) * isize);
+			sarr = realloc(sarr, sizeof (*sarr) * isize);
 			if (sarr == NULL)
 				error("cannot expand sarr arrays");
 			q = q - sarrbase + sarr;
@@ -528,7 +523,7 @@ cpres(void)
 	 * been expanded, in which case the tables will be NPROD * N(where
 	 * N is the number of times the tables had to be expanded.)
 	 */
-	if ((pyield = (int **) malloc(sizeof (int *) * nprodsz)) == NULL)
+	if ((pyield = malloc(sizeof (int *) * nprodsz)) == NULL)
 		error("cannot allocate space for pyield array");
 
 	ptrpy = pyield;
@@ -1034,11 +1029,10 @@ exp_lkst(void)
 
 	lookbase = lkst;
 	lsetsize += LSETSIZE;
-	tmp_lset = (int *)
-		calloc((size_t)(TBITSET * (lsetsize-LSETSIZE)), sizeof (int));
+	tmp_lset = calloc(TBITSET * (lsetsize-LSETSIZE), sizeof (int));
 	if (tmp_lset == NULL)
 		error("could not expand lookset array");
-	lkst = (LOOKSETS *) realloc((char *)lkst, sizeof (LOOKSETS) * lsetsize);
+	lkst = realloc(lkst, sizeof (LOOKSETS) * lsetsize);
 	for (i = lsetsize-LSETSIZE, j = 0; i < lsetsize; ++i, ++j)
 		lkst[i].lset = tmp_lset + TBITSET * j;
 	tmp_lset = NULL;
@@ -1060,11 +1054,10 @@ exp_wsets(void)
 	int i, j;
 
 	wsetsz += WSETSIZE;
-	tmp_lset = (int *)
-		calloc((size_t)(TBITSET * (wsetsz-WSETSIZE)), sizeof (int));
+	tmp_lset = calloc(TBITSET * (wsetsz-WSETSIZE), sizeof (int));
 	if (tmp_lset == NULL)
 		error("could not expand lookset array");
-	wsets = (WSET *) realloc((char *)wsets, sizeof (WSET) * wsetsz);
+	wsets = realloc(wsets, sizeof (WSET) * wsetsz);
 	for (i = wsetsz-WSETSIZE, j = 0; i < wsetsz; ++i, ++j)
 		wsets[i].ws.lset = tmp_lset + TBITSET * j;
 	tmp_lset = NULL;
@@ -1077,12 +1070,11 @@ exp_states(void)
 {
 	nstatesz += NSTATES;
 
-	pstate = (ITEM **)
-		realloc((char *)pstate, sizeof (ITEM *)*(nstatesz+2));
-	mstates = (int *)realloc((char *)mstates, sizeof (int)*nstatesz);
-	defact = (int *)realloc((char *)defact, sizeof (int)*nstatesz);
-	tystate = (int *)realloc((char *)tystate, sizeof (int)*nstatesz);
-	indgo = (int *)realloc((char *)indgo, sizeof (int)*nstatesz);
+	pstate = realloc(pstate, sizeof (ITEM *)*(nstatesz+2));
+	mstates = realloc(mstates, sizeof (int)*nstatesz);
+	defact = realloc(defact, sizeof (int)*nstatesz);
+	tystate = realloc(tystate, sizeof (int)*nstatesz);
+	indgo = realloc(indgo, sizeof (int)*nstatesz);
 
 	if ((*pstate == NULL) || (tystate == NULL) || (defact == NULL) ||
 		(indgo == NULL) || (mstates == NULL))
@@ -1095,7 +1087,7 @@ exp_psmem(void)
 	int i;
 
 	new_pstsize += PSTSIZE;
-	psmem = (ITEM *) realloc((char *)psmem, sizeof (ITEM) * new_pstsize);
+	psmem = realloc(psmem, sizeof (ITEM) * new_pstsize);
 	if (psmem == NULL)
 		error("cannot expand pstate memory");
 

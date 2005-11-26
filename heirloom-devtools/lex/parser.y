@@ -37,7 +37,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)parser.y	1.7 (gritter) 11/18/05
+ * Sccsid @(#)parser.y	1.8 (gritter) 11/26/05
  */
 
 void yyerror(char *);
@@ -187,9 +187,9 @@ r:	CHAR
 		$$.i = mn0(DOT);
 		}
 	| CCL
-	={	$$.i = mn1(RCCL,$1.i); }
+	={	$$.i = mn1(RCCL,(intptr_t)$1.cp); }
 	| NCCL
-	={	$$.i = mn1(RNCCL,$1.i); }
+	={	$$.i = mn1(RNCCL,(intptr_t)$1.cp); }
 	| r '*'
 	={	$$.i = mn1(STAR,$1.i); }
 	| r '+'
@@ -259,11 +259,11 @@ r:	CHAR
 			}
 		}
 	| SCON r
-	={	$$.i = mn2(RSCON,$2.i,(uintptr_t)$1.cp); }
+	={	$$.i = mn2(RSCON,$2.i,(intptr_t)$1.cp); }
 
 	/* XCU4: add XSCON */
 	| XSCON r
-	={	$$.i = mn2(RXSCON,$2.i,(uintptr_t)$1.cp); }
+	={	$$.i = mn2(RXSCON,$2.i,(intptr_t)$1.cp); }
 	| '^' r
 	={	$$.i = mn1(CARAT,$2.i); }
 	| r '$'
@@ -335,16 +335,15 @@ yylex(void)
 						sectbegin = TRUE;
 						i = treesize*(sizeof(*name)+sizeof(*left)+
 							sizeof(*right)+sizeof(*nullstr)+sizeof(*parent))+ALITTLEEXTRA;
-						c = (int)myalloc(i,1);
-						if(c == 0)
+						p = myalloc(i,1);
+						if(p == NULL)
 							error("Too little core for parse tree");
-						p = (CHR *)c;
 						free(p);
-						name = (int *)myalloc(treesize,sizeof(*name));
-						left = (int *)myalloc(treesize,sizeof(*left));
-						right = (int *)myalloc(treesize,sizeof(*right));
+						name = myalloc(treesize,sizeof(*name));
+						left = myalloc(treesize,sizeof(*left));
+						right = myalloc(treesize,sizeof(*right));
 						nullstr = myalloc(treesize,sizeof(*nullstr));
-						parent = (int *)myalloc(treesize,sizeof(*parent));
+						parent = myalloc(treesize,sizeof(*parent));
 						if(name == 0 || left == 0 || right == 0 || parent == 0 || nullstr == 0)
 							error("Too little core for parse tree");
 						return(freturn(DELIM));
@@ -420,7 +419,7 @@ yylex(void)
 # ifdef DEBUG
 						if (debug) printf( "Size classes (%%k) now %d\n",pchlen);
 # endif
-						pchar=pcptr=(CHR *)myalloc(pchlen, sizeof(*pchar));
+						pchar=pcptr=myalloc(pchlen, sizeof(*pchar));
 						if (report==2) report=1;
 						continue;
 					case 't': case 'T': 	/* character set specifier */

@@ -36,50 +36,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)search.h	1.3 (gritter) 10/22/05
+ * Sccsid @(#)search.h	1.4 (gritter) 11/26/05
  */
 
 #include <sys/types.h>
 
 
-#if 0
-/* HSEARCH(3C) */
-typedef enum { FIND, ENTER } ACTION;
-
-struct qelem {
-	struct qelem	*q_forw;
-	struct qelem	*q_back;
-};
-
-typedef struct entry { char *key, *data; } ENTRY;
-
-int hcreate(size_t);
-void hdestroy(void);
-ENTRY *hsearch(ENTRY, ACTION);
-void insque(void *, void *);
-void remque(void *);
-
-
-/* TSEARCH(3C) */
-typedef enum { preorder, postorder, endorder, leaf } VISIT;
-
-void *tdelete(const void *_RESTRICT_KYWD, void **_RESTRICT_KYWD,
-	int (*)(const void *, const void *));
-void *tfind(const void *, void *const *, int (*)(const void *, const void *));
-void *tsearch(const void *, void **, int (*)(const void *, const void *));
-void twalk(const void *, void (*)(const void *, VISIT, int));
-
-
-/* BSEARCH(3C) */
-void *bsearch(const void *, const void *, size_t, size_t,
-	    int (*)(const void *, const void *));
-#endif
-
-
-/* LSEARCH(3C) */
-void *lfind(const void *, const void *, size_t *, size_t,
-	    int (*)(const void *, const void *));
-void *lsearch(const void *, void *, size_t *, size_t,
+void *xlsearch(const void *, void *, unsigned *, unsigned,
 	    int (*)(const void *, const void *));
 
 #endif	/* SEARCH_H */

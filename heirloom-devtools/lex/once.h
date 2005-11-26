@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)once.h	1.3 (gritter) 6/18/05
+ * Sccsid @(#)once.h	1.4 (gritter) 11/26/05
  */
 
 #include "ldefs.c"
@@ -118,8 +118,8 @@ int chset;	/* 1 = char set modified */
 FILE *fin, *fother;
 int fptr;
 int *name;
-int *left;
-int *right;
+intptr_t *left;
+intptr_t *right;
 int *parent;
 Boolean *nullstr;
 int tptr;

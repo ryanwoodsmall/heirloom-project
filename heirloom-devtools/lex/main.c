@@ -35,7 +35,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.8 (gritter) 11/26/05
+ * Sccsid @(#)main.c	1.9 (gritter) 11/26/05
  */
 
 #include <string.h>
@@ -92,7 +92,7 @@ main(int argc, char **argv)
 					"lex: -Q should be followed by [y/n]");
 				break;
 			case 'Y':
-				path = (char *)malloc(strlen(optarg) +
+				path = malloc(strlen(optarg) +
 				    sizeof ("/nceucform") + 1);
 				path = strcpy(path, optarg);
 				break;
@@ -256,15 +256,15 @@ main(int argc, char **argv)
 static void
 get1core(void)
 {
-	ccptr =	ccl = (CHR *)myalloc(CCLSIZE, sizeof (*ccl));
-	pcptr = pchar = (CHR *)myalloc(pchlen, sizeof (*pchar));
-	def = (CHR **)myalloc(DEFSIZE, sizeof (*def));
-	subs = (CHR **)myalloc(DEFSIZE, sizeof (*subs));
-	dp = dchar = (CHR *)myalloc(DEFCHAR, sizeof (*dchar));
-	sname = (CHR **)myalloc(STARTSIZE, sizeof (*sname));
+	ccptr =	ccl = myalloc(CCLSIZE, sizeof (*ccl));
+	pcptr = pchar = myalloc(pchlen, sizeof (*pchar));
+	def = myalloc(DEFSIZE, sizeof (*def));
+	subs = myalloc(DEFSIZE, sizeof (*subs));
+	dp = dchar = myalloc(DEFCHAR, sizeof (*dchar));
+	sname = myalloc(STARTSIZE, sizeof (*sname));
 	/* XCU4: exclusive start array */
-	exclusive = (int *)myalloc(STARTSIZE, sizeof (*exclusive));
-	sp = schar = (CHR *)myalloc(STARTCHAR, sizeof (*schar));
+	exclusive = myalloc(STARTSIZE, sizeof (*exclusive));
+	sp = schar = myalloc(STARTCHAR, sizeof (*schar));
 	if (ccl == 0 || def == 0 ||
 	    pchar == 0 || subs == 0 || dchar == 0 ||
 	    sname == 0 || exclusive == 0 || schar == 0)
@@ -283,16 +283,16 @@ static void
 get2core(void)
 {
 	int i;
-	gotof = (int *)myalloc(nstates, sizeof (*gotof));
-	nexts = (int *)myalloc(ntrans, sizeof (*nexts));
-	nchar = (CHR *)myalloc(ntrans, sizeof (*nchar));
-	state = (int **)myalloc(nstates, sizeof (*state));
-	atable = (int *)myalloc(nstates, sizeof (*atable));
-	sfall = (int *)myalloc(nstates, sizeof (*sfall));
-	cpackflg = (Boolean *)myalloc(nstates, sizeof (*cpackflg));
-	tmpstat = (CHR *)myalloc(tptr+1, sizeof (*tmpstat));
-	foll = (int **)myalloc(tptr+1, sizeof (*foll));
-	nxtpos = positions = (int *)myalloc(maxpos, sizeof (*positions));
+	gotof = myalloc(nstates, sizeof (*gotof));
+	nexts = myalloc(ntrans, sizeof (*nexts));
+	nchar = myalloc(ntrans, sizeof (*nchar));
+	state = myalloc(nstates, sizeof (*state));
+	atable =myalloc(nstates, sizeof (*atable));
+	sfall = myalloc(nstates, sizeof (*sfall));
+	cpackflg = myalloc(nstates, sizeof (*cpackflg));
+	tmpstat = myalloc(tptr+1, sizeof (*tmpstat));
+	foll = myalloc(tptr+1, sizeof (*foll));
+	nxtpos = positions = myalloc(maxpos, sizeof (*positions));
 	if (tmpstat == 0 || foll == 0 || positions == 0 ||
 	    gotof == 0 || nexts == 0 || nchar == 0 ||
 	    state == 0 || atable == 0 || sfall == 0 || cpackflg == 0)
@@ -323,9 +323,9 @@ free2core(void)
 static void
 get3core(void)
 {
-	verify = (int *)myalloc(outsize, sizeof (*verify));
-	advance = (int *)myalloc(outsize, sizeof (*advance));
-	stoff = (int *)myalloc(stnum+2, sizeof (*stoff));
+	verify = myalloc(outsize, sizeof (*verify));
+	advance = myalloc(outsize, sizeof (*advance));
+	stoff = myalloc(stnum+2, sizeof (*stoff));
 	if (verify == 0 || advance == 0 || stoff == 0)
 		error("Too little core for final packing");
 }
@@ -346,12 +346,12 @@ free3core(void)
 }
 #endif
 
-BYTE *
+void *
 myalloc(int a, int b)
 {
-	BYTE *i;
+	void *i;
 	i = calloc(a,  b);
-	if (i == 0)
+	if (i == NULL)
 		warning("calloc returns a 0");
 	return (i);
 }

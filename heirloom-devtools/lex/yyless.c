@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)yyless.c	1.4 (gritter) 6/24/05
+ * Sccsid @(#)yyless.c	1.5 (gritter) 11/26/05
  */
 
 #include <stdlib.h>
@@ -105,14 +105,15 @@ int x;
 	if (x >= 0 && x <= YYLENG)
 		ptr = x + YYTEXT;
 	else {
-#ifdef	_LP64
-		static int seen = 0;
+		if (sizeof (int) != sizeof (intptr_t)) {
+			static int seen = 0;
 
-		if (!seen) {
-			write(2, "warning: yyless pointer arg truncated\n", 39);
-			seen = 1;
+			if (!seen) {
+				write(2,
+				"warning: yyless pointer arg truncated\n", 39);
+				seen = 1;
+			}
 		}
-#endif	/* _LP64 */
 	/*
 	 * The cast on the next line papers over an unconscionable nonportable
 	 * glitch to allow the caller to hand the function a pointer instead of

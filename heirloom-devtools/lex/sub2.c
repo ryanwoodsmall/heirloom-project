@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sub2.c	1.5 (gritter) 6/24/05
+ * Sccsid @(#)sub2.c	1.6 (gritter) 11/26/05
  */
 
 #include "ldefs.c"
@@ -95,7 +95,7 @@ cfoll(int v)
 				if (pcptr > pchar + pchlen)
 					error(
 					"Too many packed character classes");
-				left[v] = (int)p;
+				left[v] = (intptr_t)p;
 				name[v] = RCCL;	/* RNCCL eliminated */
 #ifdef DEBUG
 				if (debug && *p) {
@@ -344,7 +344,7 @@ cgoto(void)
 #ifdef DEBUG
 		if (debug) {
 			if (stnum > 1)
-				printf("%ws:\n", sname[stnum/2]);
+				printf("%ls:\n", sname[stnum/2]);
 			pstate(stnum);
 		}
 #endif
@@ -1095,7 +1095,7 @@ layout(void)
 			}
 		} else {
 			int *fbarr;
-			fbarr = (int *)myalloc(2*MAXNCG, sizeof (*fbarr));
+			fbarr = myalloc(2*MAXNCG, sizeof (*fbarr));
 			if (fbarr == 0)
 				error("No space for char table reverse", 0);
 			for (i = 0; i < MAXNCG; i++)

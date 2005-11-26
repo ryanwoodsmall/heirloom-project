@@ -33,11 +33,12 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ldefs.c	1.4 (gritter) 6/25/05
+ * Sccsid @(#)ldefs.c	1.5 (gritter) 11/26/05
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #ifdef	__sun
 #include <widec.h>
@@ -203,8 +204,8 @@ extern int prev;	/* previous input character */
 extern int pres;	/* present input character */
 extern int peek;	/* next input character */
 extern int *name;
-extern int *left;
-extern int *right;
+extern intptr_t *left;
+extern intptr_t *right;
 extern int *parent;
 extern Boolean *nullstr;
 extern int tptr;
@@ -254,16 +255,16 @@ extern int optim;
 extern int *verify, *advance, *stoff;
 extern int scon;
 extern CHR *psave;
-extern CHR *getl();
-extern BYTE *myalloc();
+extern CHR *getl(CHR *);
+extern void *myalloc(int, int);
 
 void phead1(void);
 void phead2(void);
 void ptail(void);
 void statistics(void);
 void error_tail(void);
-void error();
-void warning();
+void error(const char *, ...);
+void warning(const char *, ...);
 void lgate(void);
 void scopy(CHR *s, CHR *t);
 void cclinter(int sw);
@@ -288,8 +289,8 @@ int cpyact(void);
 int lookup(CHR *s, CHR **t);
 int usescape(int c);
 int alpha(int c);
-int mn2(int a, int d, int c);
-int mn1(int a, int d);
+int mn2(int a, intptr_t d, intptr_t c);
+int mn1(int a, intptr_t d);
 int mn0(int a);
 int dupl(int n);
 

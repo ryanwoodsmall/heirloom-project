@@ -31,19 +31,19 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)yacc.sl	2.5 (gritter) 11/26/05";
+static const char sccsid[] USED = "@(#)yacc.sl	2.6 (gritter) 11/26/05";
 static const char pkg[] = "Heirloom Development Tools";
-static const char rel[] = "2.5 (gritter) 11/26/05";
+static const char rel[] = "2.6 (gritter) 11/26/05";
 /* SLIST */
 /*
 dextern: * Sccsid @(#)dextern	1.6 (gritter) 11/10/05
 getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
 libmai.c: * Sccsid @(#)libmai.c	1.3 (gritter) 6/18/05
 libzer.c: * Sccsid @(#)libzer.c	1.3 (gritter) 6/18/05
-y1.c: * Sccsid @(#)y1.c	1.6 (gritter) 11/10/05
-y2.c: * Sccsid @(#)y2.c	1.10 (gritter) 11/26/05
-y3.c: * Sccsid @(#)y3.c	1.4 (gritter) 6/24/05
-y4.c: * Sccsid @(#)y4.c	1.4 (gritter) 6/24/05
+y1.c: * Sccsid @(#)y1.c	1.7 (gritter) 11/26/05
+y2.c: * Sccsid @(#)y2.c	1.11 (gritter) 11/26/05
+y3.c: * Sccsid @(#)y3.c	1.5 (gritter) 11/26/05
+y4.c: * Sccsid @(#)y4.c	1.5 (gritter) 11/26/05
 y5.c: * Sccsid @(#)y5.c	1.1 (gritter) 6/25/05
-yaccpar: * Sccsid @(#)yaccpar	1.4 (gritter) 7/30/05
+yaccpar: * Sccsid @(#)yaccpar	1.5 (gritter) 11/26/05
 */

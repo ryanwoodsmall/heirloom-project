@@ -33,13 +33,14 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sub1.c	1.4 (gritter) 6/24/05
+ * Sccsid @(#)sub1.c	1.5 (gritter) 11/26/05
  */
 
 #include "ldefs.c"
 #include <limits.h>
 #include <wchar.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 /*
  * return next line of input, throw away trailing '\n'
@@ -100,10 +101,10 @@ digit(int c)
 
 /* VARARGS1 */
 void
-error(s, p, d)
-char *s;
-int p, d;
+error(const char *s, ...)
 {
+	va_list	ap;
+
 	/* if(!eof) */
 	if (!yyline)
 		fprintf(errorf, "Command line: ");
@@ -112,7 +113,9 @@ int p, d;
 		fprintf(errorf, "line %d: ", yyline);
 	}
 	fprintf(errorf, "Error: ");
-	fprintf(errorf, s, p, d);
+	va_start(ap, s);
+	vfprintf(errorf, s, ap);
+	va_end(ap);
 	putc('\n', errorf);
 	if (fatal)
 		error_tail();
@@ -136,10 +139,10 @@ error_tail(void)
 
 /* VARARGS1 */
 void
-warning(s, p, d)
-char *s;
-int p, d;
+warning(const char *s, ...)
 {
+	va_list	ap;
+
 	if (!eof)
 		if (!yyline)
 			fprintf(errorf, "Command line: ");
@@ -148,7 +151,9 @@ int p, d;
 			fprintf(errorf, "line %d: ", yyline);
 		}
 	fprintf(errorf, "Warning: ");
-	fprintf(errorf, s, p, d);
+	va_start(ap, s);
+	vfprintf(errorf, s, ap);
+	va_end(ap);
 	putc('\n', errorf);
 	fflush(errorf);
 	if (fout)
@@ -442,7 +447,9 @@ usescape(int c)
 
 	if (handleeuc && !isascii(c)) {
 		char tmpchar = c & 0x00ff;
-		mbtowc((wchar_t *)&c, &tmpchar, sizeof (tmpchar));
+		wchar_t	wc;
+		mbtowc(&wc, &tmpchar, sizeof (tmpchar));
+		c = wc;
 	}
 	return (c);
 }
@@ -473,11 +480,11 @@ cpycom(CHR *p)
 	else
 		fprintf(fout, "\n# line %d \"%s\"\n", yyline, sargv[optind]);
 
-	putc(*t++, fout);
-	putc(*t++, fout);
+	putc(*t, fout), t++;
+	putc(*t, fout), t++;
 	while (*t) {
 		while (*t == '*') {
-			putc(*t++, fout);
+			putc(*t, fout), t++;
 			if (*t == '/')
 				goto backcall;
 		}
@@ -486,7 +493,7 @@ cpycom(CHR *p)
 		 * that span more than one line
 		 */
 		if (*t != '\0')
-			putc(*t++, fout);
+			putc(*t, fout), t++;
 	}
 	putc('\n', fout);
 	while (c = gch()) {
@@ -665,7 +672,7 @@ gch(void)
 }
 
 int
-mn2(int a, int d, int c)
+mn2(int a, intptr_t d, intptr_t c)
 {
 	if (tptr >= treesize) {
 		tptr++;
@@ -712,7 +719,7 @@ mn2(int a, int d, int c)
 }
 
 int
-mn1(int a, int d)
+mn1(int a, intptr_t d)
 {
 	if (tptr >= treesize) {
 		tptr++;
@@ -881,13 +888,13 @@ sect1dump(void)
 		printf("str	trans\n");
 		i = -1;
 		while (def[++i])
-			printf("%ws\t%ws\n", def[i], subs[i]);
+			printf("%ls\t%ls\n", def[i], subs[i]);
 	}
 	if (sname[0]) {
 		printf("start names\n");
 		i = -1;
 		while (sname[++i])
-			printf("%ws\n", sname[i]);
+			printf("%ls\n", sname[i]);
 	}
 	if (chset == TRUE) {
 		printf("char set changed\n");
@@ -926,52 +933,56 @@ treedump(void)
 		} else
 			switch (name[t]) {
 			case RSTR:
-				printf("%d ", left[t]);
+				printf("%ld ", (long)left[t]);
 				allprint(right[t]);
 				break;
 			case RCCL:
 				printf("ccl ");
-				strpt(left[t]);
+				strpt((CHR *)left[t]);
 				break;
 			case RNCCL:
 				printf("nccl ");
-				strpt(left[t]);
+				strpt((CHR *)left[t]);
 				break;
 			case DIV:
-				printf("/ %d %d", left[t], right[t]);
+				printf("/ %ld %ld",
+					(long)left[t], (long)right[t]);
 				break;
 			case BAR:
-				printf("| %d %d", left[t], right[t]);
+				printf("| %ld %ld",
+					(long)left[t], (long)right[t]);
 				break;
 			case RCAT:
-				printf("cat %d %d", left[t], right[t]);
+				printf("cat %ld %ld",
+					(long)left[t], (long)right[t]);
 				break;
 			case PLUS:
-				printf("+ %d", left[t]);
+				printf("+ %ld", (long)left[t]);
 				break;
 			case STAR:
-				printf("* %d", left[t]);
+				printf("* %ld", (long)left[t]);
 				break;
 			case CARAT:
-				printf("^ %d", left[t]);
+				printf("^ %ld", (long)left[t]);
 				break;
 			case QUEST:
-				printf("? %d", left[t]);
+				printf("? %ld", (long)left[t]);
 				break;
 			case RNULLS:
 				printf("nullstring");
 				break;
 			case FINAL:
-				printf("final %d", left[t]);
+				printf("final %ld", (long)left[t]);
 				break;
 			case S1FINAL:
-				printf("s1final %d", left[t]);
+				printf("s1final %ld", (long)left[t]);
 				break;
 			case S2FINAL:
-				printf("s2final %d", left[t]);
+				printf("s2final %ld", (long)left[t]);
 				break;
 			case RNEWE:
-				printf("new %d %d", left[t], right[t]);
+				printf("new %ld %ld",
+					(long)left[t], (long)right[t]);
 				break;
 
 			/* XCU4: add RXSCON */
@@ -979,22 +990,23 @@ treedump(void)
 				p = (CHR *)right[t];
 				printf("exstart %s", sname[*p++-1]);
 				while (*p)
-					printf(", %ws", sname[*p++-1]);
-				printf(" %d", left[t]);
+					printf(", %ls", sname[*p++-1]);
+				printf(" %ld", (long)left[t]);
 				break;
 			case RSCON:
 				p = (CHR *)right[t];
 				printf("start %s", sname[*p++-1]);
 				while (*p)
-					printf(", %ws", sname[*p++-1]);
-				printf(" %d", left[t]);
+					printf(", %ls", sname[*p++-1]);
+				printf(" %ld", (long)left[t]);
 				break;
 			case DOT:
 				printf("dot");
 				break;
 			default:
 				printf(
-				"unknown %d %d %d", name[t], left[t], right[t]);
+				"unknown %d %ld %ld", name[t],
+					(long)left[t], (long)right[t]);
 				break;
 			}
 		if (nullstr[t])

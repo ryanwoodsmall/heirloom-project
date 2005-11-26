@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)y2.c	1.10 (gritter) 11/26/05
+ * Sccsid @(#)y2.c	1.11 (gritter) 11/26/05
  */
 
 #include "dextern"
@@ -185,23 +185,23 @@ setup(int argc, char *argv[])
 	unsigned int options = 0;
 	char *file_prefix = DEFAULT_PREFIX;
 	char *sym_prefix = "";
-#define	F_NAME_LENGTH	128
+#define	F_NAME_LENGTH	4096
 	char	fname[F_NAME_LENGTH+1];
 
 	foutput = NULL;
 	fdefine = NULL;
 	i = 1;
 
-	tokname = (wchar_t *)malloc(sizeof (wchar_t) * toksize);
-	tokset = (TOKSYMB *)malloc(sizeof (TOKSYMB) * ntoksz);
-	toklev = (int *)malloc(sizeof (int) * ntoksz);
-	nontrst = (NTSYMB *)malloc(sizeof (NTSYMB) * nnontersz);
-	mem0 = (int *)malloc(sizeof (int) * new_memsize);
-	prdptr = (int **)malloc(sizeof (int *) * (nprodsz+2));
-	levprd = (int *)malloc(sizeof (int) * (nprodsz+2));
-	had_act = (wchar_t *)calloc((nprodsz + 2), sizeof (wchar_t));
-	lhstext = (wchar_t *)malloc(sizeof (wchar_t) * LHS_TEXT_LEN);
-	rhstext = (wchar_t *)malloc(sizeof (wchar_t) * RHS_TEXT_LEN);
+	tokname = malloc(sizeof (wchar_t) * toksize);
+	tokset = malloc(sizeof (TOKSYMB) * ntoksz);
+	toklev = malloc(sizeof (int) * ntoksz);
+	nontrst = malloc(sizeof (NTSYMB) * nnontersz);
+	mem0 = malloc(sizeof (int) * new_memsize);
+	prdptr = malloc(sizeof (int *) * (nprodsz+2));
+	levprd = malloc(sizeof (int) * (nprodsz+2));
+	had_act = calloc(nprodsz + 2, sizeof (wchar_t));
+	lhstext = malloc(sizeof (wchar_t) * LHS_TEXT_LEN);
+	rhstext = malloc(sizeof (wchar_t) * RHS_TEXT_LEN);
 	aryfil(toklev, ntoksz, 0);
 	aryfil(levprd, nprodsz, 0);
 	for (ii = 0; ii < ntoksz; ++ii)
@@ -235,8 +235,7 @@ setup(int argc, char *argv[])
 			gen_testing = 1;	/* set YYDEBUG on */
 			break;
 		case 'Y':
-			cp = (char *)malloc(strlen(optarg)+
-				sizeof ("/yaccpar") + 1);
+			cp = malloc(strlen(optarg) + sizeof ("/yaccpar") + 1);
 			cp = strcpy(cp, optarg);
 			parser = strcat(cp, "/yaccpar");
 			break;
@@ -755,9 +754,8 @@ register wchar_t *s;
 	while (len >= (exp_cname - used_save)) {
 		exp_cname += CNAMSZ;
 		if (!used)
-			free((char *)cnames);
-		if ((cnames = (wchar_t *)
-			malloc(sizeof (wchar_t)*exp_cname)) == NULL)
+			free(cnames);
+		if ((cnames = malloc(sizeof (wchar_t)*exp_cname)) == NULL)
 			error("cannot expand string dump");
 		cnamp = cnames;
 		used = 0;
@@ -1454,12 +1452,11 @@ wchar_t *s;
 	int s_lhs = wcslen(s);
 	if (s_lhs >= lhs_len) {
 		lhs_len = s_lhs + 2;
-		lhstext = (wchar_t *)
-			realloc((char *)lhstext, sizeof (wchar_t)*lhs_len);
+		lhstext = realloc(lhstext, sizeof (wchar_t)*lhs_len);
 		if (lhstext == NULL)
 			error("couldn't expanded LHS length");
 	}
-	rhsfill((wchar_t *)0);
+	rhsfill(NULL);
 	wcscpy(lhstext, s); /* don't worry about too long of a name */
 }
 
@@ -1487,8 +1484,7 @@ rhsfill(wchar_t *s)	/* either name or 0 */
 		static wchar_t *textbase;
 		textbase = rhstext;
 		rhs_len += s_rhs + RHS_TEXT_LEN;
-		rhstext = (wchar_t *)
-			realloc((char *)rhstext, sizeof (wchar_t)*rhs_len);
+		rhstext = realloc(rhstext, sizeof (wchar_t)*rhs_len);
 		if (rhstext == NULL)
 			error("couldn't expanded RHS length");
 		loc = loc - textbase + rhstext;
@@ -1530,8 +1526,7 @@ lrprnt (void)	/* print out the left and right hand sides */
 				 * A double quote is found.
 				 */
 				idx2 = wcslen(rhstext)*2;
-				p = m_rhs = (wchar_t *)
-					malloc((idx2 + 1)*sizeof (wchar_t));
+				p = m_rhs = malloc((idx2 + 1)*sizeof (wchar_t));
 				if (m_rhs == NULL)
 					error(
 					"Couldn't allocate memory for RHS.");
@@ -1622,8 +1617,7 @@ static void
 exp_tokname(void)
 {
 	toksize += NAMESIZE;
-	tokname = (wchar_t *)
-		realloc((char *)tokname, sizeof (wchar_t) * toksize);
+	tokname = realloc(tokname, sizeof (wchar_t) * toksize);
 }
 
 
@@ -1637,10 +1631,9 @@ exp_prod(void)
 	int i;
 	nprodsz += NPROD;
 
-	prdptr = (int **) realloc((char *)prdptr, sizeof (int *) * (nprodsz+2));
-	levprd  = (int *)  realloc((char *)levprd, sizeof (int) * (nprodsz+2));
-	had_act = (wchar_t *)
-		realloc((char *)had_act, sizeof (wchar_t) * (nprodsz+2));
+	prdptr = realloc(prdptr, sizeof (int *) * (nprodsz+2));
+	levprd  = realloc(levprd, sizeof (int) * (nprodsz+2));
+	had_act = realloc(had_act, sizeof (wchar_t) * (nprodsz+2));
 	for (i = nprodsz-NPROD; i < nprodsz+2; ++i)
 		had_act[i] = 0;
 
@@ -1665,8 +1658,8 @@ exp_ntok(void)
 {
 	ntoksz += NTERMS;
 
-	tokset = (TOKSYMB *) realloc((char *)tokset, sizeof (TOKSYMB) * ntoksz);
-	toklev = (int *) realloc((char *)toklev, sizeof (int) * ntoksz);
+	tokset = realloc(tokset, sizeof (TOKSYMB) * ntoksz);
+	toklev = realloc(toklev, sizeof (int) * ntoksz);
 
 	if ((tokset == NULL) || (toklev == NULL))
 		error("couldn't expand NTERMS");
@@ -1678,8 +1671,7 @@ exp_nonterm(void)
 {
 	nnontersz += NNONTERM;
 
-	nontrst = (NTSYMB *)
-		realloc((char *)nontrst, sizeof (TOKSYMB) * nnontersz);
+	nontrst = realloc(nontrst, sizeof (TOKSYMB) * nnontersz);
 	if (nontrst == NULL)
 		error("couldn't expand NNONTERM");
 }
@@ -1692,8 +1684,7 @@ exp_mem(int flag)
 	new_memsize += MEMSIZE;
 
 	membase = tracemem;
-	tracemem = (int *)
-		realloc((char *)tracemem, sizeof (int) * new_memsize);
+	tracemem = realloc(tracemem, sizeof (int) * new_memsize);
 	if (tracemem == NULL)
 		error("couldn't expand mem table");
 	if (flag) {
@@ -1702,7 +1693,7 @@ exp_mem(int flag)
 		mem = mem - membase + tracemem;
 	} else {
 		size += MEMSIZE;
-		temp1 = (int *)realloc((char *)temp1, sizeof (int)*size);
+		temp1 = realloc(temp1, sizeof (int)*size);
 		optimmem = optimmem - membase + tracemem;
 	}
 }
@@ -1728,8 +1719,7 @@ findchtok(int chlit)
 	/* Not found.  Register it! */
 	if (++nmbchars > nmbcharsz) { /* Make sure there's enough space */
 		nmbcharsz += NMBCHARSZ;
-		mbchars = (MBCLIT *)
-		    realloc((char *)mbchars, sizeof (MBCLIT)*nmbcharsz);
+		mbchars = realloc(mbchars, sizeof (MBCLIT)*nmbcharsz);
 		if (mbchars == NULL)
 			error("too many character literals");
 	}
