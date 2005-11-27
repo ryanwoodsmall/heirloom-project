@@ -1,4 +1,7 @@
 Release ...
+* lex: The functions "allprint_w", "reject_w", "yyless_w", "reject_e",
+  and "yyless_e" are now included in libl.a for use with the "-w" and
+  "-e" options, respectively.
 * lex: The "yyin" and "yyout" file descriptors now point to "stdin" and
   "stdout" when calling main() as it has been historically the case on
   Unix systems. This requires the use of non-standard compiler features

@@ -28,14 +28,18 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)reject.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)reject.c	1.4 (gritter) 11/27/05
  */
 
 #include <stdio.h>
 
 #ifdef EUC
+#ifdef	__sun
 #include <euc.h>
 #include <widec.h>
+#else	/* !sun */
+#include <wchar.h>
+#endif	/* !sun */
 #include <limits.h>
 #endif
 
@@ -128,6 +132,9 @@ YYREJECT()
 	return (-1);
 }
 
+#ifdef	EUC
+static
+#endif
 #if defined(__cplusplus) || defined(__STDC__)
 int
 yyracc(int m)

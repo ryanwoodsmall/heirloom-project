@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)allprint.c	1.3 (gritter) 6/18/05
+ * Sccsid @(#)allprint.c	1.4 (gritter) 11/27/05
  */
 
 #include <stdio.h>
@@ -54,6 +54,7 @@ extern FILE *yyout;
 #ifdef WOPTION
 #define	CHR	wchar_t
 #define	sprint	sprint_w
+#define	allprint	allprint_w
 #endif
 
 #ifdef EOPTION
@@ -78,7 +79,7 @@ allprint(CHR c)
 		break;
 	default:
 		if (!iswprint(c))
-		    fprintf(yyout, "\\x%-2x", c);
+		    fprintf(yyout, "\\x%-2x", (int)c);
 		else
 		    putwc(c, yyout);
 		break;

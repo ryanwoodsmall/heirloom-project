@@ -1,6 +1,10 @@
 XOBJ = main.o sub1.o sub2.o sub3.o header.o wcio.o parser.o getopt.o lsearch.o
 
-LOBJ = allprint.o libmain.o reject.o yyless.o yywrap.o
+LOBJ = allprint.o libmain.o reject.o yyless.o yywrap.o \
+	allprint_w.o reject_w.o yyless_w.o reject_e.o yyless_e.o
+
+WFLAGS = -DEUC -DJLSLEX -DWOPTION
+EFLAGS = -DEUC -DJLSLEX -DEOPTION
 
 LEXDIR = $(LIBDIR)/lex
 
@@ -13,6 +17,21 @@ lex: $(XOBJ)
 
 libl.a: $(LOBJ)
 	$(AR) -rv libl.a $(LOBJ)
+
+allprint_w.o: allprint.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $(WFLAGS) allprint.c -o $@
+
+reject_w.o: reject.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $(WFLAGS) reject.c -o $@
+
+yyless_w.o: yyless.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $(WFLAGS) yyless.c -o $@
+
+reject_e.o: reject.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $(EFLAGS) reject.c -o $@
+
+yyless_e.o: yyless.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $(EFLAGS) yyless.c -o $@
 
 install: all
 	test -d $(ROOT)$(BINDIR) || mkdir -p $(ROOT)$(BINDIR)

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)yyless.c	1.5 (gritter) 11/26/05
+ * Sccsid @(#)yyless.c	1.6 (gritter) 11/27/05
  */
 
 #include <stdlib.h>
@@ -69,6 +69,7 @@ extern CHR yytext[];
 #define	YYINPUT yyinput
 #define	YYUNPUT yyunput
 #define	YYOUTPUT yyoutput
+#define yyless yyless_w
 #endif
 
 #ifdef EOPTION
@@ -83,6 +84,7 @@ extern CHR yywtext[];
 #define	YYINPUT yywinput
 #define	YYUNPUT yywunput
 #define	YYOUTPUT yywoutput
+#define yyless yyless_e
 #endif
 
 extern int YYLENG;
