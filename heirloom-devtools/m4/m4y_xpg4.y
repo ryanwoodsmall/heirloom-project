@@ -36,10 +36,11 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)m4y_xpg4.y	1.3 (gritter) 10/29/05
+ * Sccsid @(#)m4y_xpg4.y	1.4 (gritter) 11/27/05
  */
-extern long	evalval;
-#define	YYSTYPE	long
+#include <inttypes.h>
+extern int32_t	evalval;
+#define	YYSTYPE	int32_t
 #include "m4.h"
 %}
 
@@ -126,7 +127,7 @@ yylex(void) {
 	case '!':
 		return (peek('=', NE, '!'));
 	default: {
-		register int	base;
+		register int32_t	base;
 
 		evalval = 0;
 
@@ -140,7 +141,7 @@ yylex(void) {
 			base = 10;
 
 		for (;;) {
-			register int	c, dig;
+			register int32_t	c, dig;
 
 			c = *pe;
 

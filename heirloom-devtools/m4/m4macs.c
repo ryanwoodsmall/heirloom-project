@@ -33,9 +33,10 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)m4macs.c	1.4 (gritter) 11/27/05
+ * Sccsid @(#)m4macs.c	1.5 (gritter) 11/27/05
  */
 
+#include	<inttypes.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<sys/types.h>
@@ -211,7 +212,7 @@ doerrp(wchar_t **ap, int c)
 		fprintf(stderr, "%ls", ap[1]);
 }
 
-long	evalval;	/* return value from yacc stuff */
+int32_t	evalval;	/* return value from yacc stuff */
 wchar_t	*pe;	/* used by grammar */
 
 static void

@@ -36,10 +36,11 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)m4y.y	1.3 (gritter) 10/29/05
+ * Sccsid @(#)m4y.y	1.5 (gritter) 11/27/05
  */
-extern long	evalval;
-#define	YYSTYPE	long
+#include <inttypes.h>
+extern int32_t	evalval;
+#define	YYSTYPE	int32_t
 #include "m4.h"
 %}
 
@@ -50,6 +51,7 @@ extern long	evalval;
 %left '&'
 %right '!' '~'
 %nonassoc GT GE LT LE NE EQ
+%left LSHIFT RSHIFT
 %left '+' '-'
 %left '*' '/' '%'
 %right POWER
@@ -70,6 +72,8 @@ e	: e OROR e	{ $$ = ($1 != 0 || $3 != 0) ? 1 : 0; }
 	| e GE e	{ $$ = $1 >= $3; }
 	| e LT e	{ $$ = $1 < $3; }
 	| e LE e	{ $$ = $1 <= $3; }
+	| e LSHIFT e	{ $$ = $1 << $3; }
+	| e RSHIFT e	{ $$ = $1 >> $3; }
 	| e '|' e	{ $$ = ($1 | $3); }
 	| e '&' e	{ $$ = ($1 & $3); }
 	| e '^' e	{ $$ = ($1 ^ $3); }
@@ -88,7 +92,9 @@ e	: e OROR e	{ $$ = ($1 != 0 || $3 != 0) ? 1 : 0; }
 %%
 
 extern wchar_t *pe;
-static int peek(int c, int r1, int r2);
+
+static int peek(char c, int r1, int r2);
+static int peek3(char c1, int rc1, char c2, int rc2, int rc3);
 
 int
 yylex(void) {
@@ -108,9 +114,9 @@ yylex(void) {
 	case '*':
 		return (peek('*', POWER, '*'));
 	case '>':
-		return (peek('=', GE, GT));
+		return (peek3('=', GE, '>', RSHIFT, GT));
 	case '<':
-		return (peek('=', LE, LT));
+		return (peek3('=', LE, '<', LSHIFT, LT));
 	case '=':
 		return (peek('=', EQ, EQ));
 	case '|':
@@ -120,7 +126,7 @@ yylex(void) {
 	case '!':
 		return (peek('=', NE, '!'));
 	default: {
-		register int	base;
+		register int32_t	base;
 
 		evalval = 0;
 
@@ -134,7 +140,7 @@ yylex(void) {
 			base = 10;
 
 		for (;;) {
-			register int	c, dig;
+			register int32_t	c, dig;
 
 			c = *pe;
 
@@ -156,12 +162,27 @@ yylex(void) {
 }
 
 static int
-peek(int c, int r1, int r2)
+peek(char c, int r1, int r2)
 {
 	if (*++pe != c)
 		return (r2);
 	++pe;
 	return (r1);
+}
+
+static int
+peek3(char c1, int rc1, char c2, int rc2, int rc3)
+{
+	++pe;
+	if (*pe == c1) {
+		++pe;
+		return (rc1);
+	}
+	if (*pe == c2) {
+		++pe;
+		return (rc2);
+	}
+	return (rc3);
 }
 
 /*ARGSUSED*/

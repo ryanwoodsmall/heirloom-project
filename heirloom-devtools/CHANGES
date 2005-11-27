@@ -1,4 +1,9 @@
 Release ...
+* m4: The traditional variant now accepts the shift operators "<<" and
+  ">>" for the "eval" macro.
+* m4: The "eval" macro now uses 32-bit signed integer arithmetic
+  regardless of the host architecture, as specified by both SVID3 and
+  SUSv3.
 * lex: The functions "allprint_w", "reject_w", "yyless_w", "reject_e",
   and "yyless_e" are now included in libl.a for use with the "-w" and
   "-e" options, respectively.
