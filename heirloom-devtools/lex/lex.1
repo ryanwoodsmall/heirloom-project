@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)lex.1	1.4 (gritter) 10/22/05
+.\" Sccsid @(#)lex.1	1.5 (gritter) 11/27/05
 .\" Derived from lex(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -33,7 +33,7 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.TH LEX 1 "10/22/05" "Heirloom Development Tools" "User Commands"
+.TH LEX 1 "11/27/05" "Heirloom Development Tools" "User Commands"
 .SH NAME
 lex \- generator of lexical analysis programs
 .SH SYNOPSIS
@@ -41,6 +41,7 @@ lex \- generator of lexical analysis programs
 .ad l
 .nh
 \fBlex\fR [\fB\-ctvnVew\fR] [\fB\-Q\fR(\fBy\fR|\fBn\fR)]
+[\fB\-Y\ \fIdirectory\fR]
 [\fIfiles\fR\ ...]
 .br
 .ad b
@@ -86,6 +87,7 @@ This is the default.
 .B \-e
 Generates output that can handle multibyte characters,
 with \fIyytext[]\fR being of type \fIunsigned char[]\fR.
+This option is an extension.
 .TP
 .B \-n
 Opposite of
@@ -116,6 +118,12 @@ to be printed.
 .B \-w
 Generates output that can handle multibyte characters,
 with \fIyytext[]\fR being of type \fIwchar_t[]\fR.
+This option is an extension.
+.TP
+\fB\-Y \fIdirectory\fR
+Use `\fIdirectory\fR' to locate driver files,
+instead of the default `/usr/ccs/lib/lex'.
+This option is an extension.
 .SH "SEE ALSO"
 yacc(1)
 .br
