@@ -33,12 +33,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)m4macs.c	1.3 (gritter) 10/29/05
+ * Sccsid @(#)m4macs.c	1.4 (gritter) 11/27/05
  */
 
 #include	<limits.h>
 #include	<unistd.h>
 #include	<sys/types.h>
+#include	<sys/wait.h>
 #include	"m4.h"
 
 #define	arg(n)	(c < (n) ? nullstr: ap[n])
@@ -423,9 +424,26 @@ dosyscmd(wchar_t **ap, int c)
 static void
 dosysval(wchar_t **ap, int c)
 {
+	/* portable form of
 	pbnum((long)(sysrval < 0 ? sysrval :
 		(sysrval >> 8) & ((1 << 8) - 1)) |
 		((sysrval & ((1 << 8) - 1)) << 8));
+	*/
+	long	v;
+
+	if (sysrval == 0)
+		v = 0;
+	else if (WIFEXITED(sysrval))
+		v = WEXITSTATUS(sysrval);
+	else if (WIFSIGNALED(sysrval)) {
+		v = WTERMSIG(sysrval) << 8;
+#ifdef	WCOREDUMP
+		if (WCOREDUMP(sysrval))
+			v |= 0200 << 8;
+#endif
+	} else
+		v = sysrval;
+	pbnum(v);
 }
 
 static void
