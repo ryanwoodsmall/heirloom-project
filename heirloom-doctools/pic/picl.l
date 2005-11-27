@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picl.l	1.6 (gritter) 11/22/05	*/
+/*	Sccsid @(#)picl.l	1.7 (gritter) 11/27/05	*/
 %}
 %Start A str def xsc br thru sh
 %e 1700
@@ -96,7 +96,7 @@ WS	[ \t]
 			return(EOF);
 		  }
 		}
-<A>^".".*	{ yylval.p = tostring(yytext); return(TROFF); }
+<A>^['.].*	{ yylval.p = tostring(yytext); return(TROFF); }
 
 <A>print	return(yylval.i = PRINT);
 <A>box		return(yylval.i = BOX);
