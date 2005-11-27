@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)ticks.c	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)ticks.c	1.4 (gritter) 11/27/05	*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,6 +42,8 @@ void savetick(double f, char *s)	/* remember tick location and label */
 
 void dflt_tick(double f)
 {
+	if (f == 0)	/* avoid negative zero */
+		f = 0;
 	if (f >= 0.0)
 		savetick(f, tostring("%g"));
 	else
