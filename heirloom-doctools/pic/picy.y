@@ -10,13 +10,17 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picy.y	1.3 (gritter) 10/18/05	*/
+/*	Sccsid @(#)picy.y	1.4 (gritter) 11/28/05	*/
 
 #include <stdio.h>
 #include "pic.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef	RAND_MAX
+#define	RAND_MAX	32767
+#endif
 
 YYSTYPE	y;
 
@@ -334,7 +338,7 @@ expr:
 	| COS '(' expr ')'		{ $$ = cos($3); }
 	| ATAN2 '(' expr ',' expr ')'	{ $$ = atan2($3, $5); }
 	| SQRT '(' expr ')'		{ $$ = Sqrt($3); }
-	| RAND '(' ')'			{ $$ = (float)rand() / 32767.0; /* might be 2^31-1 */ }
+	| RAND '(' ')'			{ $$ = (float)rand() / RAND_MAX; }
 	| MAX '(' expr ',' expr ')'	{ $$ = $3 >= $5 ? $3 : $5; }
 	| MIN '(' expr ',' expr ')'	{ $$ = $3 <= $5 ? $3 : $5; }
 	| INT '(' expr ')'		{ $$ = (long) $3; }
