@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)mcolor.7b	1.2 (gritter )9/21/05
-.TH MCOLOR 7B "9/21/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)mcolor.7b	1.3 (gritter )11/28/05
+.TH MCOLOR 7B "11/28/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .ds dP /usr/ucblib/doctools/font/devpost/postscript
 .ds dT /usr/ucblib/doctools/tmac
 .SH NAME
@@ -32,7 +32,7 @@ Prints
 .I text
 in
 .IR color .
-No arguments restores the default color (black).
+No arguments restores the default color (black in RGB color space).
 If
 .I text
 is omitted the selected
@@ -58,7 +58,46 @@ prints text in
 on a background in
 .I color2 .
 .PP
-Named colors must be listed in the
+Once a color is in effect,
+it is re-installed at the top of each output page.
+.PP
+Arbitrary PostScript color parameters
+can be set by using
+.I color
+arguments like
+.RS
+.TP
+.PD 0
+\fIred green blue \fBrgb\fR
+e.\^g. `.CL ".2 .3 .4 rgb"'
+.TP
+\fIhue saturation brightness \fBhsb\fR
+e.\^g. `.CL ".5 .6 .7 hsb"'
+.TP
+\fIcyan magenta yellow black \fBcmyk\fR
+e.\^g. `.CL ".1 .2 .3 .4 cmyk"'
+.TP
+\fIgray \fBsetgray\fR
+e.\^g. `.CL ".5 setgray"'
+.TP
+[\fB$\fIsetcolorspace\fR] \fIcomp1 comp2 .\|.\|. compn \fBsetcolor\fR
+where \fB$\fIsetcolorspace\fR may be a PostScript procedure
+defined in the setup section using a
+`\eX\'PSSetup: $setcolorspace { .\|.\|. } bind def\''
+escape sequence.
+This parameter is required if the color space changes
+in the document.
+Otherwise, it may be sufficient
+to install the color space once in the setup section.
+.PD
+.RE
+.PP
+Each parameter must be a number in the range between 0.0 and 1.0.
+In the most general case, the value of the
+.I color
+argument is passed uninterpreted to the PostScript output.
+.PP
+Named colors (RGB only) must be listed in the
 ``colordict''
 dictionary in file
 .BR \*(dP/color.ps .

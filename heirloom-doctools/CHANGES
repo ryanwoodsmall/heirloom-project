@@ -12,6 +12,12 @@ Release ...
 * dpost: The inclusion of PostScript pictures has been fixed; it could
   generate invalid PostScript programs since release 051025 under certain
   circumstances.
+* dpost: A "x X PSSetup" device request to support a "\X'PSSetup: ...'"
+  escape sequence has been added. It can be used to include arbitrary
+  PostScript code in the setup section of the output file.
+* dpost/troff -mcolor: CMYK colors and arbitrary PostScript color spaces
+  can now be used. The "setcolor" procedure in "color.ps" has been renamed
+  to "_setcolor" in order to make this possible.
 * dpost: PostScript pictures that contain binary data can be included now.
 * pic: Troff commands that begin with a "'" are now passed through.
 * grap: Negative zeros in coordinate tick labels are now avoided.

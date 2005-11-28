@@ -360,6 +360,13 @@ x X PDFMark attribute value
 	as e.g. "\X'PDFMark: Keywords foo, bar, baz'" or
 	"\X'PDFMark: Bookmark 2 Title of subsection'".
 
+x X PSSetup commands
+	acts similar to "x X PS", but causes the commands to be written
+	to the global setup section of the PostScript output. The point
+	at which this request occurs in input is mostly not relevant;
+	all such requests are written to the setup section in original
+	order.
+
 x X SupplyFont fontname filename
 	results from the fourth argument to the extended ".fp" request
 	and instructs the post-processor to include "filename" as glyph
@@ -382,4 +389,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   11/6/05
+Gunnar Ritter                                                   11/28/05

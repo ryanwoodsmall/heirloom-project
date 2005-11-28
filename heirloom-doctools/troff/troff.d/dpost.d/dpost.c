@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.106 (gritter) 11/21/05
+ * Sccsid @(#)dpost.c	1.107 (gritter) 11/28/05
  */
 
 /*
@@ -1610,6 +1610,8 @@ devcntrl(
 		    subfont = 0;
 		    t_sf(1);
 		    xymove(hpos, vpos);
+		} else if ( strcmp(str, "PSSetup") == 0 ) {
+		    fprintf(gf, "%s", buf);
 		} else if ( strcmp(str, "PS") == 0 || strcmp(str, "PostScript") == 0 )  {
 		    endtext();
 		    /* xymove(hpos, vpos); ul90-22006 */
