@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.12 (gritter) 9/5/05
+ * Sccsid @(#)n4.c	1.13 (gritter) 11/29/05
  */
 
 /*
@@ -700,6 +700,20 @@ a1:
 a2:
 	nonumb = !field;
 	return(acc);
+}
+
+
+void
+setnr(const char *name, int val, int inc)
+{
+	int	i, j;
+
+	if ((j = makerq(name)) < 0)
+		return;
+	if ((i = findr(j)) < 0)
+		return;
+	numtab[i].val = val;
+	numtab[i].inc = inc;
 }
 
 

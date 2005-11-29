@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.54 (gritter) 11/22/05
+ * Sccsid @(#)n3.c	1.55 (gritter) 11/29/05
  */
 
 /*
@@ -119,6 +119,7 @@ growcontab(void)
 		addcon(i++, "ftr", (void(*)(int))caseftr);
 		addcon(i++, "feature", (void(*)(int))casefeature);
 		addcon(i++, "recursionlimit", (void(*)(int))caserecursionlimit);
+		addcon(i++, "psbb", (void(*)(int))casepsbb);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
@@ -1307,6 +1308,24 @@ getls(int termc)
 			n = -1;
 	}
 	return n >= 0 ? MAXRQ2 + n : j;
+}
+
+int
+makerq(const char *name)
+{
+	int	n;
+
+	if (name[0] == 0 || name[1] == 0 || name[2] == 0)
+		return PAIR(name[0], name[1]);
+	for (n = 0; n < hadn; n++)
+		if (strcmp(had[n], name) == 0)
+			return MAXRQ2 + n;
+	if (hadn++ >= alcd)
+		had = realloc(had, (alcd += 20) * sizeof *had);
+	had[n] = malloc(strlen(name) + 1);
+	strcpy(had[n], name);
+	hadn = n + 1;
+	return MAXRQ2 + n;
 }
 
 static void

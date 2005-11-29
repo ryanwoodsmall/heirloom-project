@@ -170,6 +170,14 @@ the description for ".xflag" below.
 	accepts any points size now with PostScript devices, including
 	fractional sizes.
 
+.psbb filename
+	reads the "%%BoundingBox" DSC comment from the PostScript document
+	"filename" and assigns the lower left x coordinate to the register
+	"\n[llx]", the lower left y coordinate to "\n[lly]", the upper
+	right x coordinate to "\n[urx]", and the upper right y coordinate
+	to "\n[ury]". All values are in points. If an error occurs, the
+	registers are set to zero.
+
 .recursionlimit n
 	sets the maximum stack depth for recursive invocations of macros to
 	n. If n is zero, the stack depth is unlimited. The default limit is
@@ -389,4 +397,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   11/28/05
+Gunnar Ritter                                                   11/29/05

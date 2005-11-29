@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)color.c	1.4 (gritter) 11/28/05
+ * Sccsid @(#)color.c	1.5 (gritter) 11/29/05
  */
 
 /*
@@ -119,9 +119,9 @@
 
 #define DEFAULTCOLOR	"black"
 
-char	color[50] = DEFAULTCOLOR;	/* current color */
-int	gotcolor = FALSE;		/* TRUE after *colorfile is downloaded */
-int	wantcolor = FALSE;		/* TRUE if we really ask for a color */
+static char	color[500] = DEFAULTCOLOR;	/* current color */
+static int	gotcolor = FALSE;		/* TRUE after *colorfile is downloaded */
+static int	wantcolor = FALSE;		/* TRUE if we really ask for a color */
 
 
 /*

@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.12 (gritter) 11/21/05
+ * Sccsid @(#)gen.h	1.13 (gritter) 11/29/05
  */
 
 /*
@@ -155,14 +155,15 @@ int cat(char *, FILE *);
 int str_convert(char **, int);
 char *tempname(const char *);
 char *fgetline(char **, size_t *, size_t *, FILE *);
+int sget(char *, size_t, FILE *);
 /* pictures.c */
 void picture(char *);
 FILE *picopen(char *);
 void inlinepic(FILE *, char *);
 void piccopy(FILE *, FILE *, long);
 /* ps_include.c */
-void ps_include(FILE *, FILE *, int, int, int, int, double, double, double,
-		double, double, double, double);
+void ps_include(const char *, FILE *, FILE *, int, int, int, int,
+		double, double, double, double, double, double, double);
 /* request.c */
 void saverequest(char *);
 void writerequest(int, FILE *);

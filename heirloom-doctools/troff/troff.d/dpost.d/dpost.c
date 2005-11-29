@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.107 (gritter) 11/28/05
+ * Sccsid @(#)dpost.c	1.108 (gritter) 11/29/05
  */
 
 /*
@@ -325,7 +325,7 @@ int		realencoding = DFLTENCODING;
 int		maxencoding = MAXENCODING;
 int		eflag;
 
-static int	LanguageLevel;	/* PostScript output language level */
+int		LanguageLevel;	/* PostScript output language level */
 static int	Binary;		/* PostScript output contains binary data */
 
 /*
@@ -774,24 +774,6 @@ putstring(const char *sp, int n, FILE *fp)
 	return c;
 }
 
-/*****************************************************************************/
-int
-sget(char *buf, size_t size, FILE *fp)
-{
-	int	c, n = 0;
-
-	do
-		c = getc(fp);
-	while (spacechar(c));
-	if (c != EOF) do {
-		if (n+1 < size)
-			buf[n++] = c;
-		c = getc(fp);
-	} while (c != EOF && !spacechar(c));
-	ungetc(c, fp);
-	buf[n] = 0;
-	return n > 1 ? 1 : c == EOF ? EOF : 0;
-}
 /*****************************************************************************/
 
 

@@ -30,9 +30,9 @@ dpost.o: dpost.c comments.h gen.h path.h ext.h ../dev.h dpost.h afm.h \
 	asciitype.h
 dpost_draw.o: dpost_draw.c gen.h ext.h
 glob.o: glob.c gen.h
-misc.o: misc.c gen.h ext.h path.h
+misc.o: misc.c gen.h ext.h path.h asciitype.h
 pictures.o: pictures.c comments.h gen.h path.h
-ps_include.o: ps_include.c ps_include.h gen.h
+ps_include.o: ps_include.c ps_include.h ext.h gen.h asciitype.h
 request.o: request.c gen.h request.h path.h
 dpost_afm.o: ../dev.h afm.h ../afm.c
 dpost_otf.o: ../dev.h afm.h ../otf.c

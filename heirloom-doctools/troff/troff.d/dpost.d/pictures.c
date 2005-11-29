@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pictures.c	1.5 (gritter) 11/21/05
+ * Sccsid @(#)pictures.c	1.6 (gritter) 11/29/05
  */
 
 /*
@@ -82,7 +82,7 @@
 #include "path.h"			/* just for TEMPDIR definition */
 
 
-FILE	*fp_pic = NULL;			/* in-line pictures go here */
+static FILE	*fp_pic = NULL;			/* in-line pictures go here */
 
 extern int	res, hpos, vpos;
 extern int	picflag;
@@ -105,9 +105,9 @@ picture (
     int		indent;		/* indent */
     int		length;		/* line length  */
     int		totrap;		/* distance to next trap */
-    char	name[100];	/* picture file and page string */
-    char	hwo[40], *p;	/* height, width and offset strings */
-    char	flags[20];	/* miscellaneous stuff */
+    char	name[4096];	/* picture file and page string */
+    char	hwo[4096], *p;	/* height, width and offset strings */
+    char	flags[4096];	/* miscellaneous stuff */
     int		page = 1;	/* page number pulled from name[] */
     double	frame[4];	/* height, width, y, and x offsets from hwo[] */
     char	units;		/* scale indicator for frame dimensions */
@@ -200,12 +200,12 @@ picture (
 	}   /* End switch */
 
     fprintf(tf, "cleartomark restore\n");
-    fprintf(tf, "[ /NamespacePush pdfmark\n");
+    fprintf(tf, "[ /NamespacePush pdfmark\n");
 
-    ps_include(fp_in, tf, page, whiteout, outline, scaleboth,
+    ps_include(name, fp_in, tf, page, whiteout, outline, scaleboth,
 		frame[3]+frame[1]/2, -vpos-frame[2]-frame[0]/2, frame[1], frame[0], adjx, adjy, -rot);
 
-    fprintf(tf, "[ /NamespacePop pdfmark\n");
+    fprintf(tf, "[ /NamespacePop pdfmark\n");
     fprintf(tf, "save mark\n");
     xymove(hpos, vpos);
     t_sf(1);
@@ -228,7 +228,7 @@ FILE *picopen(
 {
 
 
-    char	name[100];		/* pathnames */
+    char	name[4096];		/* pathnames */
     long	total;			/* and sizes - from *fp_pic */
     char	*tname;			/* pathname */
     FILE	*fp;			/* and pointer for the new temp file */
@@ -247,7 +247,7 @@ FILE *picopen(
 
 
     if ( fp_pic != NULL )  {
-	fseek(fp_pic, 0L, 0);
+	fseek(fp_pic, 0L, SEEK_SET);
 	while ( fscanf(fp_pic, "%s %ld\n", name, &total) != EOF )  {
 	    if ( strcmp(path, name) == 0 )  {
 		if ( (tname = tempname("dpost")) == NULL )
@@ -257,10 +257,10 @@ FILE *picopen(
 		unlink(tname);
 		free(tname);
 		piccopy(fp_pic, fp, total);
-		fseek(fp, 0L, 0);
+		fseek(fp, 0L, SEEK_SET);
 		return(fp);
 	    }   /* End if */
-	    fseek(fp_pic, total, 1);
+	    fseek(fp_pic, total, SEEK_CUR);
 	}   /* End while */
     }	/* End if */
 
@@ -285,7 +285,7 @@ inlinepic(
 
 
     char	*tname;			/* temp file pathname - for *fp_pic */
-    char	name[100];		/* picture file pathname */
+    char	name[4096];		/* picture file pathname */
     long	total;			/* and size - both from *buf */
 
 
@@ -311,7 +311,7 @@ inlinepic(
     if ( sscanf(buf, "%s %ld", name, &total) != 2 )
 	error(FATAL, "in-line picture error");
 
-    fseek(fp_pic, 0L, 2);
+    fseek(fp_pic, 0L, SEEK_END);
     fprintf(fp_pic, "%s %ld\n", name, total);
     getc(fp);
     fflush(fp_pic);

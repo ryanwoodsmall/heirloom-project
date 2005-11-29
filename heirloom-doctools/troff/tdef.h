@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.54 (gritter) 11/16/05
+ * Sccsid @(#)tdef.h	1.55 (gritter) 11/29/05
  */
 
 /*
@@ -699,6 +699,7 @@ void stackdump(void);
 char *macname(int);
 int maybemore(int, int);
 tchar setuc(void);
+int makerq(const char *);
 /* n4.c */
 void *grownumtab(void);
 void setn(void);
@@ -717,6 +718,7 @@ int abc0(int, int (*)(tchar));
 long atoi0(void);
 long ckph(void);
 long atoi1(register tchar);
+void setnr(const char *, int, int);
 void caserr(void);
 void casenr(void);
 void caseaf(void);
@@ -838,4 +840,5 @@ void casefc(void);
 tchar setfield(int);
 void localize(void);
 void caselc_ctype(void);
+void casepsbb(void);
 void morechars(int);

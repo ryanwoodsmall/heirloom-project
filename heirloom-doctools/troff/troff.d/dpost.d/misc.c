@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.8 (gritter) 11/21/05
+ * Sccsid @(#)misc.c	1.9 (gritter) 11/29/05
  */
 
 /*
@@ -54,10 +54,11 @@
 #include "gen.h"			/* a few general purpose definitions */
 #include "ext.h"			/* external variable declarations */
 #include "path.h"
+#include "asciitype.h"
 
 
-int	nolist = 0;			/* number of specified ranges */
-int	olist[50];			/* processing range pairs */
+static int	nolist = 0;		/* number of specified ranges */
+static int	olist[512];		/* processing range pairs */
 
 
 void
@@ -319,6 +320,7 @@ tempname(const char *sfx)
 
 /*****************************************************************************/
 
+
 #if defined (__GLIBC__) && defined (_IO_getc_unlocked)
 #undef	getc
 #define	getc(f)		_IO_getc_unlocked(f)
@@ -352,4 +354,26 @@ char *fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 	if (llen)
 		*llen = n;
 	return *line;
+}
+
+
+/*****************************************************************************/
+
+
+int
+sget(char *buf, size_t size, FILE *fp)
+{
+	int	c, n = 0;
+
+	do
+		c = getc(fp);
+	while (spacechar(c));
+	if (c != EOF) do {
+		if (n+1 < size)
+			buf[n++] = c;
+		c = getc(fp);
+	} while (c != EOF && !spacechar(c));
+	ungetc(c, fp);
+	buf[n] = 0;
+	return n > 1 ? 1 : c == EOF ? EOF : 0;
 }

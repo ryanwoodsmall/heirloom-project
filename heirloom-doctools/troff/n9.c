@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.22 (gritter) 9/30/05
+ * Sccsid @(#)n9.c	1.23 (gritter) 11/29/05
  */
 
 /*
@@ -48,6 +48,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "tdef.h"
 #ifdef NROFF
@@ -625,6 +629,126 @@ caselc_ctype(void)
 	localize();
 	free(buf);
 #endif
+}
+
+struct fg {
+	char	buf[512];
+	char	*bp;
+	char	*ep;
+	int	fd;
+	int	eof;
+};
+
+#define	getline	xxgetline
+static int
+getline(struct fg *fp, char **linebp, size_t *linesize)
+{
+	int	i, n = 0;
+
+	if (fp->bp == NULL)
+		fp->bp = fp->buf;
+	for (;;) {
+		if (fp->eof == 0 && fp->bp == fp->buf) {
+			if ((i = read(fp->fd, fp->buf, sizeof fp->buf)) <= 0)
+				fp->eof = 1;
+			fp->ep = &fp->buf[i];
+		}
+		for (;;) {
+			if (*linesize < n + 2)
+				*linebp = realloc(*linebp, *linesize += 128);
+			if (fp->bp >= fp->ep || *fp->bp == '\n')
+				break;
+			(*linebp)[n++] = *fp->bp++;
+		}
+		if (*fp->bp == '\n') {
+			(*linebp)[n++] = *fp->bp++;
+			break;
+		}
+		if (fp->eof)
+			break;
+		fp->bp = fp->buf;
+	}
+	(*linebp)[n] = 0;
+	return n;
+}
+
+static char *
+getcom(const char *cp, const char *tp)
+{
+	int	n;
+
+	n = strlen(tp);
+	if (strncmp(cp, tp, n))
+		return NULL;
+	if (cp[n] == ' ' || cp[n] == '\t' || cp[n] == '\n' || cp[n] == 0)
+		return (char *)&cp[n];
+	return NULL;
+}
+
+static void
+getpsbb(const char *name, int bb[4])
+{
+	struct fg	*fp;
+	char	*buf = NULL;
+	char	*cp;
+	size_t	size = 0;
+	int	fd, n;
+	int	lineno = 0;
+
+	if ((fd = open(name, O_RDONLY)) < 0) {
+		errprint("can't open %s", name);
+		return;
+	}
+	fp = calloc(1, sizeof *fp);
+	fp->fd = fd;
+	while ((n = getline(fp, &buf, &size)) > 0) {
+		if (++lineno == 1 && strncmp(buf, "%!PS-", 5)) {
+			errprint("%s is not a DSC-conforming "
+					"PostScript document", name);
+			break;
+		}
+		if ((cp = getcom(buf, "%%BoundingBox:")) != NULL) {
+			bb[0] = strtol(cp, &cp, 10);
+			if (*cp)
+				bb[1] = strtol(cp, &cp, 10);
+			if (*cp)
+				bb[2] = strtol(cp, &cp, 10);
+			if (*cp)
+				bb[3] = strtol(cp, &cp, 10);
+			break;
+		}
+		if (getcom(buf, "%%EndComments") != NULL) {
+			errprint("%s lacks a %%BoundingBox: DSC comment", name);
+			break;
+		}
+	}
+	free(fp);
+	free(buf);
+	close(fd);
+}
+
+void
+casepsbb(void)
+{
+	char	*buf = NULL;
+	int	c;
+	int	n = 0, sz = 0;
+	int	bb[4] = { 0, 0, 0, 0 };
+
+	lgf++;
+	skip();
+	do {
+		c = getach();
+		if (n >= sz)
+			buf = realloc(buf, (sz += 14) * sizeof *buf);
+		buf[n++] = c;
+	} while (c);
+	getpsbb(buf, bb);
+	free(buf);
+	setnr("llx", bb[0], 0);
+	setnr("lly", bb[1], 0);
+	setnr("urx", bb[2], 0);
+	setnr("ury", bb[3], 0);
 }
 
 void
