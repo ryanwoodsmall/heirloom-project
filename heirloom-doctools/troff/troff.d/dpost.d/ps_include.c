@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ps_include.c	1.7 (gritter) 11/29/05
+ * Sccsid @(#)ps_include.c	1.8 (gritter) 11/29/05
  */
 
 /*
@@ -41,9 +41,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "gen.h"
 #include "ext.h"
-#include "ps_include.h"
+#include "path.h"
 #include "asciitype.h"
 
 
@@ -58,7 +59,6 @@ static char	*buf;
 static size_t	bufsize;
 typedef struct {long start, end;} Section;
 
-static void print(FILE *, char **);
 static void copy(FILE *, FILE *, Section *);
 
 /*****************************************************************************/
@@ -83,6 +83,7 @@ ps_include(
 
 {
 
+    static int	gotinclude;
 
     int		foundpage = 0;		/* found the page when non zero */
     int		nglobal = 0;		/* number of global defs so far */
@@ -114,6 +115,10 @@ ps_include(
  *
  */
 
+	if (gotinclude == 0 && access(PSINCLUDEFILE, 04) == 0) {
+		doglobal(PSINCLUDEFILE);
+		gotinclude++;
+	}
 
 	llx = lly = 0;			/* default BoundingBox - 8.5x11 inches */
 	urx = 72 * 8.5;
@@ -195,10 +200,10 @@ fprintf(stderr, "trailer=(%d,%d)\n", trailer.start, trailer.end);
 */
 
 	/* all output here */
-	print(fout, PS_head);
+	fprintf(fout, "_ps_include_head\n");
 	var(llx); var(lly); var(urx); var(ury); var(w); var(o); var(s);
 	var(cx); var(cy); var(sx); var(sy); var(ax); var(ay); var(rot);
-	print(fout, PS_setup);
+	fprintf(fout, "_ps_include_setup\n");
 	if (epsf == 2) {
 		size_t	len;
 		rewind(fin);
@@ -213,18 +218,11 @@ fprintf(stderr, "trailer=(%d,%d)\n", trailer.start, trailer.end);
 		copy(fin, fout, &page);
 		copy(fin, fout, &trailer);
 	}
-	print(fout, PS_tail);
+	fprintf(fout, "_ps_include_tail\n");
 
 	if(nglobal)
 		free(global);
 
-}
-
-static void
-print(FILE *fout, char **s)
-{
-	while (*s)
-		fprintf(fout, "%s\n", *s++);
 }
 
 static void
