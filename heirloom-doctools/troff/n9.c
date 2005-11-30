@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.23 (gritter) 11/29/05
+ * Sccsid @(#)n9.c	1.24 (gritter) 11/30/05
  */
 
 /*
@@ -701,13 +701,14 @@ getpsbb(const char *name, int bb[4])
 	}
 	fp = calloc(1, sizeof *fp);
 	fp->fd = fd;
-	while ((n = getline(fp, &buf, &size)) > 0) {
-		if (++lineno == 1 && strncmp(buf, "%!PS-", 5)) {
+	for (;;) {
+		n = getline(fp, &buf, &size);
+		if (++lineno == 1 && (n == 0 || strncmp(buf, "%!PS-", 5))) {
 			errprint("%s is not a DSC-conforming "
 					"PostScript document", name);
 			break;
 		}
-		if ((cp = getcom(buf, "%%BoundingBox:")) != NULL) {
+		if (n > 0 && (cp = getcom(buf, "%%BoundingBox:")) != NULL) {
 			bb[0] = strtol(cp, &cp, 10);
 			if (*cp)
 				bb[1] = strtol(cp, &cp, 10);
@@ -717,7 +718,10 @@ getpsbb(const char *name, int bb[4])
 				bb[3] = strtol(cp, &cp, 10);
 			break;
 		}
-		if (getcom(buf, "%%EndComments") != NULL) {
+		if (n == 0 || getcom(buf, "%%EndComments") != NULL ||
+				buf[0] != '%' || buf[1] == ' ' ||
+				buf[1] == '\t' || buf[1] == '\r' ||
+				buf[1] == '\n') {
 			errprint("%s lacks a %%BoundingBox: DSC comment", name);
 			break;
 		}
