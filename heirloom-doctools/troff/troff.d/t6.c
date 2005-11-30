@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.99 (gritter) 11/2/05
+ * Sccsid @(#)t6.c	1.100 (gritter) 11/30/05
  */
 
 /*
@@ -162,7 +162,7 @@ getcw(register int i)
 	int nocache = 0;
 	int	ofont = xfont;
 	int	s;
-	float	z;
+	float	z = 1;
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
@@ -231,7 +231,6 @@ getcw(register int i)
 	k = *(p + j);
 	if (dev.anysize == 0 || xflag == 0 || (z = zoomtab[xfont]) == 0)
 		z = 1;
-	k *= z;
  g1:
 	if (!bd)
 		bd = bdtab[ofont];
@@ -243,7 +242,7 @@ getcw(register int i)
 			x = xpts;
 		cs = (cs * EMPTS(x)) / 36;
 	}
-	k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+	k = (k * z * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
 	s = xpts;
 	lasttrack = 0;
 	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1) {

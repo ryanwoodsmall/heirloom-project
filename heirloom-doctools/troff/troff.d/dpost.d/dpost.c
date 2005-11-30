@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.108 (gritter) 11/29/05
+ * Sccsid @(#)dpost.c	1.109 (gritter) 11/30/05
  */
 
 /*
@@ -3301,7 +3301,7 @@ put1 (
 	if (size != FRACTSIZE)
 	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else
-	    lastw = widthfac * ((pw[i] * fractsize + unitwidth/2) / unitwidth);
+	    lastw = widthfac * (int)((pw[i] * fractsize + unitwidth/2) / unitwidth);
 	if (track && (encoding == 0 || encoding == 4 || encoding == 5))
 		lastw += track;
 	oput(code);
