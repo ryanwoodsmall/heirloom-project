@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)mpictures.7b	1.2 (gritter) 8/25/05
-.TH MPICTURES 7B "8/25/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)mpictures.7b	1.3 (gritter) 12/1/05
+.TH MPICTURES 7B "12/1/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 mpictures \- (BSD) picture inclusion macros
 .SH SYNOPSIS
@@ -44,9 +44,13 @@ from the file (first page by default).
 .I height
 Vertical size of the frame, default
 .BR 3.0i .
+This argument is interpreted as a value in inches
+unless it ends with a `u' scale indicator.
 .TP
 .I width
 Horizontal size of the frame, current line length by default.
+This argument is interpreted as a value in inches
+unless it ends with a `u' scale indicator.
 .TP
 .I position
 .B l
@@ -116,11 +120,15 @@ The two arguments not already described are:
 .I xoffset
 Offset the frame from the left margin by this amount, default
 .BR 0i .
+This argument is interpreted as a value in inches
+unless it ends with a `u' scale indicator.
 .PD 0
 .TP
 .I yoffset
 Offset the frame from the current baseline,
 measuring positive downward, default
+This argument is interpreted as a value in inches
+unless it ends with a `u' scale indicator.
 .BR 0i .
 .PD
 .RE
