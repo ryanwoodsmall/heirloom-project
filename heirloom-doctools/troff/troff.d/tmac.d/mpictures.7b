@@ -8,7 +8,7 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)mpictures.7b	1.3 (gritter) 12/1/05
+.\" Sccsid @(#)mpictures.7b	1.4 (gritter) 12/1/05
 .TH MPICTURES 7B "12/1/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 mpictures \- (BSD) picture inclusion macros
@@ -147,6 +147,24 @@ If no
 comment is present, the picture is
 assumed to fill an 8.5\(mu11-inch page.
 Nothing prevents the picture from being placed off the page.
+.PP
+The `.psbb'
+.I troff
+request can be used to read the
+.B %%BoundingBox
+comment for further processing, as in
+.sp
+.RS
+.nf
+\&.psbb picture.eps
+\&.nr scale 4
+\&.nr y (\en[ury]p\-\en[lly]p)/\en[scale]
+\&.nr x (\en[urx]p\-\en[llx]p)/\en[scale]
+\&.PI picture.eps "\enyu,\enxu"
+\&.sp \enyu
+\&picture description
+.fi
+.RE
 .SH SEE ALSO
 .IR troff (1B)
 .SH DIAGNOSTICS
