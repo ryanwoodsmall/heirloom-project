@@ -1,4 +1,4 @@
-Release ...
+Release 051202
 * [nt]roff: When text is written to a diversion in nofill mode, spacing
   characters are preserved. This allows the text in the diversion to be
   adjusted later when it is actually printed. The "-X" option disables
