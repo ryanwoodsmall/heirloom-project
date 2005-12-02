@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)mpictures.7b	1.4 (gritter) 12/1/05
-.TH MPICTURES 7B "12/1/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)mpictures.7b	1.5 (gritter) 12/2/05
+.TH MPICTURES 7B "12/2/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 mpictures \- (BSD) picture inclusion macros
 .SH SYNOPSIS
@@ -127,9 +127,9 @@ unless it ends with a `u' scale indicator.
 .I yoffset
 Offset the frame from the current baseline,
 measuring positive downward, default
+.BR 0i .
 This argument is interpreted as a value in inches
 unless it ends with a `u' scale indicator.
-.BR 0i .
 .PD
 .RE
 .TP
