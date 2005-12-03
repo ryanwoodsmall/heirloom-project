@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.c	1.9 (gritter) 10/4/05
+ * Sccsid @(#)unimap.c	1.10 (gritter) 12/3/05
  */
 
 #include "tdef.h"
@@ -186,6 +186,7 @@ const struct unimap	unimap[] = {
 	{ 0x017D,	"Zcaron" },
 	{ 0x017D,	"Zcaronsmall" },
 	{ 0x017E,	"zcaron" },
+	{ 0x017F,	"longs" },
 	{ 0x0192,	"florin" },
 	{ 0x02C7,	"Caronsmall" },
 	{ 0x02C7,	"caron" },
