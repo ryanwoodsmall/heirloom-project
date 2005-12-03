@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.55 (gritter) 11/29/05
+ * Sccsid @(#)tdef.h	1.56 (gritter) 12/3/05
  */
 
 /*
@@ -163,8 +163,8 @@
 extern	int	NN;	/* number registers */
 #define	NNAMES	15	 /* predefined reg names */
 extern	int	NIF;	/* if-else nesting */
-#define	NS	128	/* name buffer */
-#define	NTM	256	/* tm buffer */
+#define	NS	1024	/* name buffer */
+#define	NTM	4096	/* tm buffer */
 #define	NEV	3	/* environments */
 #define	EVLSZ	10	/* size of ev stack */
 #define	DSIZE	512	/* disk sector size in chars */
