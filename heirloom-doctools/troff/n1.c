@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.46 (gritter) 11/16/05
+ * Sccsid @(#)n1.c	1.47 (gritter) 12/3/05
  */
 
 /*
@@ -152,13 +152,13 @@ main(int argc, char **argv)
 
 		case 'F':	/* switch font tables from default */
 			if (argv[0][2] != '\0') {
-				strcpy(termtab, &argv[0][2]);
-				strcpy(fontfile, &argv[0][2]);
+				termtab = &argv[0][2];
+				fontfile = &argv[0][2];
 			} else {
 				argv++; argc--;
 				if (argv[0] != '\0') {
-					strcpy(termtab, argv[0]);
-					strcpy(fontfile, argv[0]);
+					termtab = argv[0];
+					fontfile = argv[0];
 				} else
 					errprint("missing the font directory");
 			}

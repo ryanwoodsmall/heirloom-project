@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.50 (gritter) 10/3/05
+ * Sccsid @(#)t10.c	1.51 (gritter) 12/3/05
  */
 
 /*
@@ -169,6 +169,8 @@ ptinit(void)
 	 * read in resolution, size info, font info, etc.
 	 * and set params
 	 */
+	p = malloc(strlen(termtab) + strlen(devname) + 10);
+	termtab = strcpy(p, termtab);
 	strcat(termtab, "/dev");
 	strcat(termtab, devname);
 	strcat(termtab, "/DESC");	/* makes "..../devXXX/DESC" */

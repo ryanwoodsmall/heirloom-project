@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.19 (gritter) 9/11/05
+ * Sccsid @(#)n10.c	1.20 (gritter) 12/3/05
  */
 
 /*
@@ -442,6 +442,7 @@ ptinit(void)
 {
 	register int i;
 	register char *p, *cp;
+	char *tt;
 	int nread, fd;
 	struct stat stbuf;
 	char check[50];
@@ -455,7 +456,10 @@ ptinit(void)
 	chtab = xchtab;
 	bdtab = initbdtab;
 	fontlab = initfontlab;
-	strcat(termtab, devname);
+	tt = malloc(strlen(termtab) + strlen(devname) + 1);
+	strcpy(tt, termtab);
+	strcat(tt, devname);
+	termtab = tt;
 	if (strcmp(devname, "locale") == 0) {
 #ifdef	EUC
 		wchar_t	wc;

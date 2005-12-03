@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.15 (gritter) 9/6/05
+ * Sccsid @(#)ni.c	1.16 (gritter) 12/3/05
  */
 
 /*
@@ -52,14 +52,14 @@
 
 #ifdef NROFF
 
-char	termtab[NS] = TABDIR "/tab.";  /* term type added in ptinit() */
-char	fontfile[NS] = "";	/* not used */
+char	*termtab = TABDIR "/tab.";  /* term type added in ptinit() */
+char	*fontfile = "";		/* not used */
 char	devname[20] = "37";
 
 #else
 
-char	termtab[NS] = FNTDIR;           /* rest added in ptinit() */
-char	fontfile[NS] = FNTDIR;          /* rest added in casefp() */
+char	*termtab = FNTDIR;              /* rest added in ptinit() */
+char	*fontfile = FNTDIR;             /* rest added in casefp() */
 char	devname[20]	 = "ps";	/* default typesetter */
 
 #endif
