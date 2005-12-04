@@ -13,6 +13,10 @@ the description for ".xflag" below.
 	removes the last character of the macro, string, or diversion
 	"name".
 
+.close stream
+	closes the file "stream", which must have been obtained by a
+	previous ".open" request.
+
 .de longname
 .ds longname
 .ft longname
@@ -154,6 +158,14 @@ the description for ".xflag" below.
 	useful to specify an input character set regardless of environment
 	influences.
 
+.open stream filename
+	opens "filename" for writing while truncating existing contents
+	and associates "stream" with it for latter use with ".write" etc.
+
+.opena stream filename
+	works like ".open" but appends to "filename" instead of truncating
+	an existing file.
+
 .papersize executive|letter|legal|ledger|tabloid|aN|bN|cN|x y	troff only
 	sets the paper size to the given format, which may be either one
 	of the predefined American or international formats (such as a4),
@@ -207,6 +219,10 @@ the description for ".xflag" below.
 	white space is added. Otherwise, a space of size n is added as
 	usual.
 
+.tmc message
+	is similar to ".tm" and writes "message" to standard error, but
+	does not write a newline at the end.
+
 .tr abcd...
 	produces unspecified results if used with PostScript characters
 	"\[name]", Unicode characters "\U'...'", or localized input. The
@@ -226,6 +242,15 @@ the description for ".xflag" below.
 	cause a decrease of letter space. No adjustment is performed on the
 	last character of an output line. Tracking also applies to characters
 	from another font that have been selected by the fallback sequence.
+
+.write stream message
+	writes "message" to the file "stream", which must have been
+	previously opened by ".open". Like ".tm", "message" is interpreted
+	in copy mode.
+
+.writec stream message
+	is similar to ".write" and writes "message" to "stream", but does
+	not write a newline at the end.
 
 .xflag [0|1|2]
 	controls the availability of newer features like the "-x" and "-X"

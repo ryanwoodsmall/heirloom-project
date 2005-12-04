@@ -1,6 +1,11 @@
 Release ...
 * [nt]roff: The ".pso" request has been added; it reads the output of
   a command as input to troff.
+* [nt]roff: The ".tmc" request has been added; it works like ".tm" but
+  does not terminate the message with a newline.
+* [nt]roff: The ".open", ".opena", ".write", ".writec", and ".close"
+  requests have been added. They work like ".tm" but write to a named
+  file.
 * nroff: Recognize the "\s'n'" escape sequence and discard it for
   compatibility with troff.
 
