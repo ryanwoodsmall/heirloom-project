@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.48 (gritter) 12/4/05
+ * Sccsid @(#)n1.c	1.49 (gritter) 12/4/05
  */
 
 /*
@@ -59,6 +59,7 @@ char *xxxvers = "@(#)roff:n1.c	2.13";
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <setjmp.h>
 #include <time.h>
 #include <stdarg.h>
@@ -92,6 +93,7 @@ long	ioff;
 char	*ttyp;
 char	*cfname[NSO+1];		/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
+static int	cfpid[NSO+1];	/* .pso process IDs */
 char	*progname;	/* program name (troff) */
 #ifdef	EUC
 char	mbbuf1[MB_LEN_MAX + 1];
@@ -129,6 +131,8 @@ main(int argc, char **argv)
 	grownumtab();
 	growpbbuf();
 	morechars(1);
+	for (j = 0; j <= NSO; j++)
+		cfpid[j] = -1;
 	if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
 		signal(SIGHUP, catch);
 	if (signal(SIGINT, catch) == SIG_IGN) {
@@ -1332,6 +1336,10 @@ popf(void)
 	register int i;
 	register char	*p, *q;
 
+	if (cfpid[ifi] != -1) {
+		while (waitpid(cfpid[ifi], NULL, 0) != cfpid[ifi]);
+		cfpid[ifi] = -1;
+	}
 	ioff = offl[--ifi];
 	numtab[CD].val = cfline[ifi];		/*restore line counter*/
 	ip = ipl[ifi];
@@ -1471,25 +1479,18 @@ setuc(void)
 }
 
 
-void
-caseso(void)
+static void
+sopso(int i, pid_t pid)
 {
-	register int i = 0;
 	register char	*p, *q;
 
-	lgf++;
-	nextf[0] = 0;
-	if (skip() || !getname() || ((i = open(nextf, O_RDONLY)) < 0) ||
-			(ifi >= NSO)) {
-		errprint("can't open file %s", nextf);
-		done(02);
-	}
 	free(cfname[ifi+1]);
 	cfname[ifi+1] = malloc(NS);
 	strcpy(cfname[ifi+1], nextf);
 	cfline[ifi] = numtab[CD].val;		/*hold line counter*/
 	numtab[CD].val = 0;
 	flushi();
+	cfpid[ifi+1] = pid;
 	ifl[ifi] = ifile;
 	ifile = i;
 	offl[ifi] = ioff;
@@ -1506,6 +1507,60 @@ caseso(void)
 		while (p < eibuf)
 			*q++ = *p++;
 	}
+}
+
+void
+caseso(void)
+{
+	register int i = 0;
+
+	lgf++;
+	nextf[0] = 0;
+	if (skip() || !getname() || ((i = open(nextf, O_RDONLY)) < 0) ||
+			(ifi >= NSO)) {
+		errprint("can't open file %s", nextf);
+		done(02);
+	}
+	sopso(i, -1);
+}
+
+void
+casepso(void)
+{
+	int	pd[2];
+	int	c, i, k;
+	pid_t	pid;
+
+	lgf++;
+	nextf[0] = 0;
+	if (skip() || ifi >= NSO || pipe(pd) < 0) {
+		errprint("can't .pso");
+		done(02);
+	}
+	for (k = 0; ; k++) {
+		if ((c = cbits(i = getch())) == '\n' || c == 0)
+			break;
+		if (k + 1 >= NS)
+			nextf = realloc(nextf, NS += 14);
+		nextf[k] = c & BYTEMASK;
+	}
+	nextf[k] = 0;
+	switch (pid = fork()) {
+	case 0:
+		close(pd[0]);
+		close(1);
+		dup(pd[1]);
+		close(pd[1]);
+		execl(SHELL, "sh", "-c", nextf, NULL);
+		_exit(0177);
+		/*NOTREACHED*/
+	case -1:
+		errprint("can't fork");
+		done(02);
+		/*NOTREACHED*/
+	}
+	close(pd[1]);
+	sopso(pd[0], pid);
 }
 
 void

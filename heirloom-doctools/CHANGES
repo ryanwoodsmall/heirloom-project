@@ -1,4 +1,6 @@
 Release ...
+* [nt]roff: The ".pso" request has been added; it reads the output of
+  a command as input to troff.
 * nroff: Recognize the "\s'n'" escape sequence and discard it for
   compatibility with troff.
 
