@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.58 (gritter) 12/4/05
+ * Sccsid @(#)tdef.h	1.59 (gritter) 12/4/05
  */
 
 /*
@@ -194,7 +194,7 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 	Internal character representation:
 ifndef NROFF
 	Internally, every character is carried around as
-	a 64 bit cookie, called a "tchar" (typedef long long).
+	a 64 bit cookie, called a "tchar" (typedef int64_t).
 	Bits are numbered 63..0 from left to right.
 	If bit 21 is 1, the character is motion, with
 		if bit 22 it's vertical motion
@@ -205,7 +205,7 @@ ifndef NROFF
 		bits 39..32	font
 else NROFF
 	Internally, every character is carried around as
-	a 32 bit cookie, called a "tchar" (typedef long).
+	a 32 bit cookie, called a "tchar" (typedef int32_t).
 	Bits are numbered 31..0 from left to right.
 	If bit 15 is 1, the character is motion, with
 		if bit 16 it's vertical motion
@@ -397,10 +397,11 @@ typedef unsigned int filep;	/* this is good for 32 bit machines */
 #define	ENV_BLK		((NEV * sizeof(env) / sizeof(tchar) + BLK-1) / BLK)
 				/* rounded up to even BLK */
 
+#include <inttypes.h>
 #ifndef	NROFF
-typedef	long long	tchar;
+typedef	int64_t		tchar;
 #else	/* NROFF */
-typedef	long		tchar;
+typedef	int32_t		tchar;
 #endif	/* NROFF */
 
 #define	atoi()		((int) atoi0())
