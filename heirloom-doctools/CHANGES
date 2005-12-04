@@ -6,6 +6,11 @@ Release ...
 * [nt]roff: The ".open", ".opena", ".write", ".writec", and ".close"
   requests have been added. They work like ".tm" but write to a named
   file.
+* [nt]roff: A "-msafe" macro package has been added; it disables those
+  requests that allow to execute commands or to write to files. It is
+  mainly useful for viewing manual pages.
+* pic: An "-S" option has been added to disable the "sh" element.
+* grap: An "-S" option has been added to disable the "sh" command.
 * nroff: Recognize the "\s'n'" escape sequence and discard it for
   compatibility with troff.
 

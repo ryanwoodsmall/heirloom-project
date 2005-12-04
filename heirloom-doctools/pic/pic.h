@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)pic.h	1.5 (gritter) 10/25/05	*/
+/*	Sccsid @(#)pic.h	1.6 (gritter) 12/5/05	*/
 
 #ifndef PI
 #define PI 3.1415926535897932384626433832795028841971693993751
@@ -159,6 +159,7 @@ extern	double	curx, cury;
 extern	int	hvmode;
 extern	int	codegen;
 extern	char	*PEstring;
+extern	int	Sflag;
 
 char	*tostring(char *);
 char	*grow(char *, char *, int, int);

@@ -101,19 +101,23 @@ following:
   "doc*" and "andoc". "nroff -mandoc" will then switch automatically
   between the two macro packages.
 
+- It is recommended that the "-msafe" macro package is used when
+  viewing manual pages. It will remove those requests that allow to
+  call programs or to write to files.
+
 - Thus a complete pipeline to format manual pages for viewing is:
-  tbl input.1 | neqn | nroff -x -Tlp -mandoc | col -x
+  tbl input.1 | neqn | nroff -x -Tlp -msafe -mandoc | col -x
 
 - To print manual pages with troff, use
-  tbl input.1 | eqn | troff -x -mandoc | dpost | lp
+  tbl input.1 | eqn | troff -x -msafe -mandoc | dpost | lp
 
 - You should of course configure your "man" command such that it
   executes these pipelines automatically for you. For the "man"
   command from the Heirloom Toolchest, suitable entries in
   "/etc/default/man" are:
 
-	NROFF=/usr/ucb/nroff -x -Tlocale
-	TROFF=/usr/ucb/troff -x
+	NROFF=/usr/ucb/nroff -x -Tlocale -msafe
+	TROFF=/usr/ucb/troff -x -msafe
 	TBL=/usr/ucb/tbl
 	EQN=/usr/ucb/eqn
 	NEQN=/usr/ucb/neqn
@@ -129,4 +133,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/22/05
+<gunnarr@acm.org>						12/5/05

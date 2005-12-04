@@ -8,12 +8,12 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)grap.1b	1.3 (gritter) 11/5/05
-.TH GRAP 1B "11/5/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)grap.1b	1.4 (gritter) 12/5/05
+.TH GRAP 1B "12/5/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 grap \- (BSD) pic preprocessor for drawing graphs
 .SH SYNOPSIS
-\fB/usr/ucb/grap\fR [\fIfile\fR]
+\fB/usr/ucb/grap\fR [\fB\-SU\fR] [\fIfile\fR]
 .SH DESCRIPTION
 .I Grap
 is a
@@ -357,6 +357,13 @@ as with macros,
 may be any character and
 .I anything
 may include newlines.
+The
+.B \-S
+option disables execution of the shell command;
+the
+.B \-U
+option reverts the effect of a previous
+.IR \-S .
 .PP
 .B #
 .IR anything :

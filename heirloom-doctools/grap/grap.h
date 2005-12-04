@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)grap.h	1.4 (gritter) 10/25/05	*/
+/*	Sccsid @(#)grap.h	1.5 (gritter) 12/5/05	*/
 extern void	FATAL(const char *, ...);
 extern void	WARNING(const char *, ...);
 
@@ -123,6 +123,7 @@ extern	int	synerr;
 extern	int	codegen;
 extern	char	tempfile[];
 extern	FILE	*tfd;
+extern	int	Sflag;
 
 extern	Point	ptmin, ptmax;
 

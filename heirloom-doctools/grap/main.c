@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)main.c	1.4 (gritter) 11/5/05	*/
+/*	Sccsid @(#)main.c	1.5 (gritter) 12/5/05	*/
 #include <stdio.h>
 #include <signal.h>
 #include <math.h>
@@ -27,6 +27,7 @@ char	*lib_defines	= GRAPDEFINES;
 int	lib	= 1;		/* 1 to include lib_defines */
 FILE	*tfd	= NULL;
 char	tempfile[] = "/var/tmp/grapXXXXXX";
+int	Sflag;
 
 int	synerr	= 0;
 int	codegen	= 0;   		/* 1=>output for this picture; 0=>no output */
@@ -65,6 +66,12 @@ main(int argc, char *argv[])
 			break;
 		case 'l':	/* turn off /usr/lib inclusion */
 			lib = 0;
+			break;
+		case 'S':
+			Sflag = 1;
+			break;
+		case 'U':
+			Sflag = 0;
 			break;
 		}
 		argc--;

@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)pic.1b	1.4 (gritter) 10/18/05
-.TH PIC 1B "10/18/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)pic.1b	1.5 (gritter) 12/5/05
+.TH PIC 1B "12/5/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .\".de PS	\" start picture
 .\".	\" $1 is height, $2 is width, both in inches
 .\".if \\$1>0 .sp .35
@@ -25,7 +25,7 @@
 .SH NAME
 pic \- (BSD) troff preprocessor for drawing pictures
 .SH SYNOPSIS
-\fB/usr/ucb/pic\fR [\fIfiles\fR]
+\fB/usr/ucb/pic\fR [\fB\-SU\fR] [\fIfiles\fR]
 .SH DESCRIPTION
 .I Pic
 is a
@@ -314,6 +314,15 @@ may contain newlines.
 The
 .B undef
 statement removes the definition of a macro.
+.PP
+The
+.B \-S
+command line option will disable execution of
+.RB ` sh '
+command elements.
+.B \-U
+reverts the effect of a previous
+.IR \-S .
 .\".SH EXAMPLES
 .\".sp
 .\".nf

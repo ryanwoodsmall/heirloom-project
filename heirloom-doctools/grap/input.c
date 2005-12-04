@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)input.c	1.4 (gritter) 10/19/05	*/
+/*	Sccsid @(#)input.c	1.5 (gritter) 12/5/05	*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -593,7 +593,10 @@ void shell_exec(void)	/* do it */
 {
 	/* fprintf(tfd, "# run <%s>\n", shellbuf); */
 	*shellp = '\0';
-	system(shellbuf);
+	if (Sflag)
+		WARNING("-S inhibited execution of shell command");
+	else
+		system(shellbuf);
 }
 
 #define	LSIZE	128

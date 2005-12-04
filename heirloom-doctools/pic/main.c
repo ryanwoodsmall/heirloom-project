@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)main.c	1.5 (gritter) 10/25/05	*/
+/*	Sccsid @(#)main.c	1.6 (gritter) 12/5/05	*/
 #include	<stdio.h>
 #include	<signal.h>
 #include	<stdlib.h>
@@ -48,6 +48,7 @@ char	*filename	= "-";
 int	synerr	= 0;
 int	anyerr	= 0;	/* becomes 1 if synerr ever 1 */
 char	*cmdname;
+int	Sflag;
 
 double	xmin	= 30000;	/* min values found in actual data */
 double	ymin	= 30000;
@@ -77,6 +78,12 @@ main(int argc, char *argv[])
 		case 'V':
 			fprintf(stderr, "%s\n", version);
 			return 0;
+		case 'S':
+			Sflag = 1;
+			break;
+		case 'U':
+			Sflag = 0;
+			break;
 		}
 		argc--;
 		argv++;
