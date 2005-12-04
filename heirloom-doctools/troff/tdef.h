@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.57 (gritter) 12/4/05
+ * Sccsid @(#)tdef.h	1.58 (gritter) 12/4/05
  */
 
 /*
@@ -192,6 +192,7 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 
 /*
 	Internal character representation:
+ifndef NROFF
 	Internally, every character is carried around as
 	a 64 bit cookie, called a "tchar" (typedef long long).
 	Bits are numbered 63..0 from left to right.
@@ -202,13 +203,27 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 		if bit 63	zero motion
 		bits 62..40	size
 		bits 39..32	font
-if defined (EUC) && defined (NROFF)
+else NROFF
+	Internally, every character is carried around as
+	a 32 bit cookie, called a "tchar" (typedef long).
+	Bits are numbered 31..0 from left to right.
+	If bit 15 is 1, the character is motion, with
+		if bit 16 it's vertical motion
+		if bit 17 it's negative motion
+	If bit 15 is 0, the character is a real character.
+		if bit 31	zero motion
+		bits 28..24	size
+		bits 23..16	font
+ifdef EUC
 		bits 14,13	identifier for the colunm of print of character.
 		bits 12,11	multibyte position identifier
-	Currently, this applies only to nroff.
-endif EUC && NROFF
+	This applies only to nroff; troff stores wide characters
+	as PostScript characters.
+endif EUC
+endif NROFF
 */
 
+#ifndef	NROFF
 /* in the following, "LL" should really be a tchar, but ... */
 
 #define	MOT	(01LL<<21)	/* motion character indicator */
@@ -244,6 +259,43 @@ endif EUC && NROFF
 #define	setfbits(n,f)	n = (n & ~FMASK) | (tchar)(f) << 32
 #define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 32
 #define	setcbits(n,c)	n = (n & ~0x001FFFFFLL | (c))	/* set character bits */
+
+#else	/* NROFF */
+/* in the following, "L" should really be a tchar, but ... */
+
+#define	MOT	(01L<<15)	/* motion character indicator */
+#define	MOTV	(07L<<15)	/* clear for motion part */
+#define	VMOT	(01L<<16)	/* vert motion bit */
+#define	NMOT	(01L<<17)	/* negative motion indicator*/
+#define	MAXMOT	32767	/* bad way to write this!!! */
+#define	ismot(n)	((n) & MOT)
+#define	isvmot(n)	((n) & VMOT)	/* must have tested MOT previously */
+#define	isnmot(n)	((n) & NMOT)	/* ditto */
+#define	absmot(n)	(unsigned)(0177777 & (n) & ~MOT)	/* (short) is cheap mask */
+#define	sabsmot(n)	((n)&0177777)
+
+#define	ZBIT	0x80000000 	/*  (01L << 31) */	/* zero width char */
+#define	iszbit(n)	((n) & ZBIT)
+#define	BLBIT	0x40000000	/* optional break-line char */
+#define	isblbit(n)	((n) & BLBIT)
+#define	COPYBIT	0x20000000	 /* wide character in copy mode */
+#define	iscopy(n)	((n) & COPYBIT)
+#define	ABSCHAR		0400	/* absolute char number in this font */
+
+#define	SMASK		(0037L << 24)
+#define	FMASK		(0377L << 16)
+#define	SFMASK		(SMASK|FMASK)	/* size and font in a tchar */
+#define	sbits(n)	(unsigned)(((n) >> 24) & 0037)
+#define	fbits(n)	(((n) >> 16) & 0377)
+#define	sfbits(n)	(unsigned)(0177777 & (((n) & SFMASK) >> 16))
+#define	cbits(n)	(unsigned)(0177777 & (n))	/* isolate bottom 16 bits  */
+#define	absbits(n)	(cbits(n) & ~ABSCHAR)
+
+#define	setsbits(n,s)	n = (n & ~SMASK) | (tchar)(s) << 24
+#define	setfbits(n,f)	n = (n & ~FMASK) | (tchar)(f) << 16
+#define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 16
+#define	setcbits(n,c)	n = (n & ~077777L | (c))	/* set character bits */
+#endif	/* NROFF */
 
 #define	BYTEMASK	0377
 #define	BYTE	8
@@ -345,7 +397,11 @@ typedef unsigned int filep;	/* this is good for 32 bit machines */
 #define	ENV_BLK		((NEV * sizeof(env) / sizeof(tchar) + BLK-1) / BLK)
 				/* rounded up to even BLK */
 
+#ifndef	NROFF
 typedef	long long	tchar;
+#else	/* NROFF */
+typedef	long		tchar;
+#endif	/* NROFF */
 
 #define	atoi()		((int) atoi0())
 
