@@ -103,7 +103,11 @@ following:
 
 - It is recommended that the "-msafe" macro package is used when
   viewing manual pages. It will remove those requests that allow to
-  call programs or to write to files.
+  call programs or to write to files. If your man command runs with
+  privileges, you then also need to ensure that the "TROFFMACS"
+  environment variable is unset when nroff is executed. Otherwise,
+  a malicious user might replace the "safe" macro package with his
+  own version.
 
 - Thus a complete pipeline to format manual pages for viewing is:
   tbl input.1 | neqn | nroff -x -Tlp -msafe -mandoc | col -x
