@@ -1,3 +1,7 @@
+Release ...
+* nroff: Recognize the "\s'n'" escape sequence and discard it for
+  compatibility with troff.
+
 Release 051202
 * [nt]roff: When text is written to a diversion in nofill mode, spacing
   characters are preserved. This allows the text in the diversion to be
