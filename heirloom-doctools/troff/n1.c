@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.47 (gritter) 12/3/05
+ * Sccsid @(#)n1.c	1.48 (gritter) 12/4/05
  */
 
 /*
@@ -90,7 +90,7 @@ filep	ipl[NSO];
 long	offl[NSO];
 long	ioff;
 char	*ttyp;
-char	cfname[NSO+1][NS];	/*file name stack*/
+char	*cfname[NSO+1];		/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
 char	*progname;	/* program name (troff) */
 #ifdef	EUC
@@ -122,6 +122,7 @@ main(int argc, char **argv)
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
 	progname = argv[0];
+	nextf = calloc(1, NS = 1);
 	d = calloc(NDI = 5, sizeof *d);
 	growblist();
 	growcontab();
@@ -138,6 +139,7 @@ main(int argc, char **argv)
 	signal(SIGPIPE, catch);
 	signal(SIGTERM, kcatch);
 	oargv = argv;
+	cfname[0] = malloc(17);
 	strcpy(cfname[0], "<standard input>");
 	mrehash();
 	nrehash();
@@ -494,7 +496,7 @@ verrprint(const char *s, va_list ap)
 	vfdprintf(stderr, s, ap);
 	if (numtab[CD].val > 0)
 		fdprintf(stderr, "; line %d, file %s", numtab[CD].val,
-			 cfname[ifi]);
+			 cfname[ifi] ? cfname[ifi] : "");
 	fdprintf(stderr, "\n");
 	stackdump();
 #ifdef	DEBUG
@@ -1295,6 +1297,8 @@ n0:
 			done(0);
 		nfo++;
 		numtab[CD].val = ifile = stdi = mflg = 0;
+		free(cfname[ifi]);
+		cfname[ifi] = malloc(17);
 		strcpy(cfname[ifi], "<standard input>");
 		ioff = 0;
 		return(0);
@@ -1304,13 +1308,18 @@ n1:
 	numtab[CD].val = 0;
 	if (p[0] == '-' && p[1] == 0) {
 		ifile = 0;
+		free(cfname[ifi]);
+		cfname[ifi] = malloc(17);
 		strcpy(cfname[ifi], "<standard input>");
 	} else if ((ifile = open(p, O_RDONLY)) < 0) {
 		errprint("cannot open file %s", p);
 		nfo -= mflg;
 		done(02);
-	} else
+	} else {
+		free(cfname[ifi]);
+		cfname[ifi] = malloc(strlen(p) + 1);
 		strcpy(cfname[ifi],p);
+	}
 	nfo++;
 	ioff = 0;
 	return(0);
@@ -1399,6 +1408,8 @@ casenx(void)
 	nx++;
 	if (nmfi > 0)
 		nmfi--;
+	free(mfiles[nmfi]);
+	mfiles[nmfi] = malloc(NS);
 	strcpy(mfiles[nmfi], nextf);
 	nextfile();
 	nlflg++;
@@ -1416,7 +1427,7 @@ getname(void)
 	tchar i;
 
 	lgf++;
-	for (k = 0; k < (NS - 1); k++) {
+	for (k = 0; ; k++) {
 #ifndef EUC
 		if (((j = cbits(i = getch())) <= ' ') || (j > 0176))
 #else
@@ -1427,6 +1438,8 @@ getname(void)
 #endif /* NROFF */
 #endif /* EUC */
 			break;
+		if (k + 1 >= NS)
+			nextf = realloc(nextf, NS += 14);
 		nextf[k] = j & BYTEMASK;
 	}
 	nextf[k] = 0;
@@ -1471,6 +1484,8 @@ caseso(void)
 		errprint("can't open file %s", nextf);
 		done(02);
 	}
+	free(cfname[ifi+1]);
+	cfname[ifi+1] = malloc(NS);
 	strcpy(cfname[ifi+1], nextf);
 	cfline[ifi] = numtab[CD].val;		/*hold line counter*/
 	numtab[CD].val = 0;
@@ -1504,8 +1519,11 @@ caself(void)	/* set line number and file */
 	cfline[ifi] = numtab[CD].val = n - 2;
 	if (skip())
 		return;
-	if (getname())
+	if (getname()) {
+		free(cfname[ifi]);
+		cfname[ifi] = malloc(NS);
 		strcpy(cfname[ifi], nextf);
+	}
 }
 
 

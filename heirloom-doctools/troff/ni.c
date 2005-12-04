@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.16 (gritter) 12/3/05
+ * Sccsid @(#)ni.c	1.17 (gritter) 12/4/05
  */
 
 /*
@@ -91,7 +91,8 @@ const struct numtab initnumtab[] = {
 int	pto = 10000;
 int	pfrom = 1;
 int	print = 1;
-char	nextf[NS] = MACDIR "/";
+char	*nextf;
+int	NS;
 char	**mfiles;
 int	nmfi = 0;
 int	NMF;
