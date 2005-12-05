@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.20 (gritter) 12/3/05
+ * Sccsid @(#)n10.c	1.21 (gritter) 12/5/05
  */
 
 /*
@@ -708,9 +708,9 @@ twdone(void)
 	if (t.twrest)		/* has ptinit() been done yet? */
 		oputs(t.twrest);
 	flusho();
-	if (pipeflg) {
+	if (pipeflg != -1) {
 		close(ptid);
-		wait(&waitf);
+		waitpid(pipeflg, &waitf, 0);
 	}
 	restore_tty();
 }

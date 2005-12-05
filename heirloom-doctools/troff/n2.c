@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.11 (gritter) 9/30/05
+ * Sccsid @(#)n2.c	1.12 (gritter) 12/5/05
  */
 
 /*
@@ -379,7 +379,7 @@ edone(int x)
 void
 casepi(void)
 {
-	register int i;
+	register pid_t i;
 	int	id[2];
 
 	if (toolate || skip() || !getname() || pipe(id) == -1 || (i = fork()) == -1) {
@@ -387,10 +387,10 @@ casepi(void)
 		return;
 	}
 	ptid = id[1];
-	if (i > 0) {
+	if (i >= 0) {
 		close(id[0]);
 		toolate++;
-		pipeflg++;
+		pipeflg = i;
 		return;
 	}
 	close(0);

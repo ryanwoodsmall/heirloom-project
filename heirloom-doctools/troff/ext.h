@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.30 (gritter) 12/4/05
+ * Sccsid @(#)ext.h	1.31 (gritter) 12/5/05
  */
 
 /*
@@ -45,6 +45,8 @@
  * software developed by the University of California, Berkeley, and its
  * contributors.
  */
+
+#include <sys/types.h>
 
 extern	char	**argp;
 extern	char	*chname;
@@ -141,7 +143,7 @@ extern	int	over;
 extern	int	padc;
 extern	int	pfont;
 extern	int	pfrom;
-extern	int	pipeflg;
+extern	pid_t	pipeflg;
 extern	int	pl;
 extern	int	pnlist[];
 extern	int	po1;

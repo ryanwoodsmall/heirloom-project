@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.18 (gritter) 11/16/05
+ * Sccsid @(#)nii.c	1.19 (gritter) 12/5/05
  */
 
 /*
@@ -56,7 +56,7 @@
 struct 	s *frame, *stk, *ejl;
 struct	s *nxf;
 
-int	pipeflg;
+pid_t	pipeflg = -1;
 int	hflg;	/* used in nroff only */
 int	eqflg;	/* used in nroff only */
 
