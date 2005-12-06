@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.60 (gritter) 12/6/05
+ * Sccsid @(#)n3.c	1.61 (gritter) 12/6/05
  */
 
 /*
@@ -1249,12 +1249,12 @@ macname(int rq)
 /*
  * To handle requests with more than two characters, an additional
  * table is maintained. On places where more than two characters are
- * allowed, the characters collected are passed in "sofar", and "create"
+ * allowed, the characters collected are passed in "sofar", and "flags"
  * specifies whether the request is a new one. The routine returns an
  * integer which is above the regular PAIR() values.
  */
 int
-maybemore(int sofar, int create)
+maybemore(int sofar, int flags)
 {
 	char	c, buf[NC+1], pb[] = { '\n', 0 };
 	int	i = 2, n, r = raw;
@@ -1280,14 +1280,20 @@ maybemore(int sofar, int create)
 		if (strcmp(had[n], buf) == 0)
 			break;
 	if (n == hadn) {
-		if (create == 0) {
+		if ((flags & 1) == 0) {
 		retn:	buf[i-1] = c;
 			cpushback(&buf[2]);
 			raw = r;
-			if (warn & WARN_SPACE && i > 3 && findmn(sofar) >= 0) {
-				if (c == '\n')
-					buf[i-1] = 0;
+			if (flags & 2)
+				/*EMPTY*/;
+			else if (warn & WARN_SPACE && i > 3 &&
+					findmn(sofar) >= 0) {
+				buf[i-1] = 0;
 				errprint("missing space at request %s", buf);
+			/*} else if (warn & WARN_MAC && i > 3 &&
+					findmn(sofar) < 0) {
+				buf[i-1] = 0;
+				errprint("no such request %s", buf);*/
 			}
 			return sofar;
 		}

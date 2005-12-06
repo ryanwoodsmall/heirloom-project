@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.15 (gritter) 12/6/05
+ * Sccsid @(#)n4.c	1.16 (gritter) 12/6/05
  */
 
 /*
@@ -761,10 +761,13 @@ caserr(void)
 	lgf++;
 	while (!skip() && (i = getrq()) ) {
 		if (i >= 256)
-			i = maybemore(i, 0);
+			i = maybemore(i, 2);
 		j = usedr(i);
-		if (j < 0)
+		if (j < 0) {
+			if (warn & WARN_REG)
+				errprint("no such register %s", macname(i));
 			continue;
+		}
 		p = &numtab[j];
 		nunhash(p);
 		p->r = p->val = p->inc = p->fmt = 0;
@@ -781,7 +784,7 @@ casenr(void)
 	lgf++;
 	skip();
 	if ((j = getrq()) >= 256)
-		j = maybemore(j, 1);
+		j = maybemore(j, 3);
 	if ((i = findr(j)) == -1)
 		goto rtn;
 	skip();
@@ -809,7 +812,7 @@ caseaf(void)
 	if (skip() || !(i = getrq()) || skip())
 		return;
 	if (i >= 256)
-		i = maybemore(i, 1);
+		i = maybemore(i, 3);
 	k = 0;
 	j = getch();
 	if (!ischar(jj = cbits(j)) || !isalpha(jj)) {

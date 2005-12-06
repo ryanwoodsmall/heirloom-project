@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.25 (gritter) 12/6/05
+ * Sccsid @(#)n9.c	1.26 (gritter) 12/6/05
  */
 
 /*
@@ -770,7 +770,7 @@ casewarn(void)
 void
 nosuch(int rq)
 {
-	if (warn & WARN_MAC)
+	if (rq && rq != RIGHT && warn & WARN_MAC)
 		errprint("no such request %s", macname(rq));
 }
 
