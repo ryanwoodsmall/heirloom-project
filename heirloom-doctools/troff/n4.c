@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.16 (gritter) 12/6/05
+ * Sccsid @(#)n4.c	1.17 (gritter) 12/6/05
  */
 
 /*
@@ -792,6 +792,16 @@ casenr(void)
 	if (nonumb)
 		goto rtn;
 	numtab[i].val = j;
+	/*
+	 * It is common use in pre-processors and macro packages
+	 * to append a unit definition to a user-supplied number
+	 * in order to achieve a default scale. Catch this case
+	 * now to avoid a warning because of an illegal number.
+	 */
+	j = cbits(ch);
+	if ((j >= 'a' && j <= 'z' || j >= 'A' && j <= 'Z') &&
+			warn & WARN_SCALE)
+		goto rtn;
 	skip();
 	j = atoi();
 	if (nonumb)
