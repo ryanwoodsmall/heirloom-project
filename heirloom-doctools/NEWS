@@ -319,8 +319,24 @@ the description for ".xflag" below.
 		    . . .
 		.ps \n(osu
 
+\n[hours]
+	prints the hours portion of the current local time [0,23].
+
+\n[minutes]
+	prints the minutes portion of the current local time [0,59].
+
 \n[name]
 	refers to the number register "name".
+
+\n[seconds]
+	prints the seconds portion of the current local time [0,60].
+
+\n[.warn]
+	prints the bits representing the currently activated warning
+	categories.
+
+\n[year]
+	prints the current year (2005 etc.).
 
 \N'number'
 	produces unspecified results if "number" is outside the ASCII and

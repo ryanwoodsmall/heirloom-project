@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.17 (gritter) 12/6/05
+ * Sccsid @(#)n4.c	1.18 (gritter) 12/6/05
  */
 
 /*
@@ -97,6 +97,7 @@ grownumtab(void)
 void
 setn(void)
 {
+	extern const char	revision[];
 	register int i, j;
 	register tchar ii;
 	int	f;
@@ -215,6 +216,9 @@ setn(void)
 			break;
 		case 'F':
 			cpushback(cfname[ifi] ? cfname[ifi] : "");
+			return;
+		case 'Y':
+			cpushback((char *)revision);
 			return;
 
 		default:
