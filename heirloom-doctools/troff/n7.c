@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.39 (gritter) 12/6/05
+ * Sccsid @(#)n7.c	1.40 (gritter) 12/6/05
  */
 
 /*
@@ -357,7 +357,9 @@ t5:
 			adsp = nel / (nwd - 1);
 		adsp = (adsp / HOR) * HOR;
 		adrem = nel - adsp*(nwd-1);
-		if (admod == 0 && spreadwarn && adsp >= spreadlimit)
+		if (admod == 0 && nwd == 1 && warn & WARN_BREAK)
+			errprint("can't break line");
+		else if (admod == 0 && spreadwarn && adsp >= spreadlimit)
 			errprint("spreadlimit exceeded, %gm", (double)adsp/EM);
 	}
 	brflg = 1;

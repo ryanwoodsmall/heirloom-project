@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.8 (gritter) 9/30/05
+ * Sccsid @(#)dev.h	1.9 (gritter) 12/6/05
  */
 
 /*
@@ -92,6 +92,6 @@ struct Font {		/* characteristics of a font */
 #define	LFFL	020
 
 extern	void		*readdesc(const char *);
-extern	void		*readfont(const char *, struct dev *);
+extern	void		*readfont(const char *, struct dev *, int);
 
 #endif	/* !TROFF_DEV_H */

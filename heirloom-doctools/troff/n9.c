@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.24 (gritter) 11/30/05
+ * Sccsid @(#)n9.c	1.25 (gritter) 12/6/05
  */
 
 /*
@@ -753,6 +753,39 @@ casepsbb(void)
 	setnr("lly", bb[1], 0);
 	setnr("urx", bb[2], 0);
 	setnr("ury", bb[3], 0);
+}
+
+void
+casewarn(void)
+{
+	if (skip())
+		warn = -1;
+	else {
+		noscale++;
+		warn = atoi();
+		noscale--;
+	}
+}
+
+void
+nosuch(int rq)
+{
+	if (warn & WARN_MAC)
+		errprint("no such request %s", macname(rq));
+}
+
+void
+illseq(int wc, const char *mb, int n)
+{
+	if ((warn & WARN_INPUT) == 0)
+		return;
+	if (n == 0) {
+		if (wc & ~0177)
+			errprint("undefined wide character 0x%04x", wc);
+		else
+			errprint("ignoring '\\%o' in input", wc);
+	} else
+		errprint("illegal byte sequence at '\\%o' in input", *mb&0377);
 }
 
 void

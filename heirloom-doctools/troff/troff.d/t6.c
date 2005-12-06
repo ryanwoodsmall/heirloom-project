@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.100 (gritter) 11/30/05
+ * Sccsid @(#)t6.c	1.101 (gritter) 12/6/05
  */
 
 /*
@@ -564,6 +564,9 @@ tchar setch(int delim)
 				c = j + 128 | chbits;
 				break;
 			}
+	if (c == 0 && warn & WARN_CHAR)
+		errprint("missing glyph \\%c%s%s", delim, temp,
+				delim == '[' ? "]" : "");
 	return c;
 }
 
@@ -1008,9 +1011,11 @@ casefp(void)
 			} else
 				supply = NULL;
 			if (loadafm(i?i:-1, j, file, supply, 0) == 0) {
-				if (i == 0)
-					errprint("fp: cannot mount %s", file);
-				else
+				if (i == 0) {
+					if (warn & WARN_FONT)
+						errprint("fp: cannot mount %s",
+								file);
+				} else
 					setfp(i, j, file);
 			}
 			free(file);
@@ -1033,7 +1038,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 		shortname = macname(f);
 	snprintf(longname, sizeof longname, "%s/dev%s/%s",
 			fontfile, devname, shortname);
-	if ((fpout = readfont(longname, &dev)) == NULL)
+	if ((fpout = readfont(longname, &dev, warn & WARN_FONT)) == NULL)
 		return(-1);
 	fontbase[pos] = (struct Font *)fpout;
 	if ((ap = strstr(fontbase[pos]->namefont, ".afm")) != NULL) {
@@ -1880,6 +1885,7 @@ un2tr(int c, int *fp)
 			if (unimap[i].code == c)
 				if ((j = postchar(unimap[i].psc, fp)) != 0)
 					return j;
+		illseq(c, NULL, 0);
 		return 0;
 	}
 }

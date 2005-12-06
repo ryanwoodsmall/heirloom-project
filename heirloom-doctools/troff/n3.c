@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.59 (gritter) 12/6/05
+ * Sccsid @(#)n3.c	1.60 (gritter) 12/6/05
  */
 
 /*
@@ -128,6 +128,7 @@ growcontab(void)
 		addcon(i++, "writec", (void(*)(int))casewritec);
 		addcon(i++, "close", (void(*)(int))caseclose);
 		addcon(i++, "spreadwarn", (void(*)(int))casespreadwarn);
+		addcon(i++, "warn", (void(*)(int))casewarn);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
@@ -195,8 +196,10 @@ casern(void)
 		return;
 	if (i >= 256)
 		i = maybemore(i, 0);
-	if ((oldmn = findmn(i)) < 0)
+	if ((oldmn = findmn(i)) < 0) {
+		nosuch(i);
 		return;
+	}
 	skip();
 	j = getrq();
 	if (j >= 256)
@@ -818,6 +821,7 @@ setstr(void)
 
 	lgf++;
 	if ((i = getsn()) == 0 || (j = findmn(i)) == -1 || !contab[j].mx) {
+		nosuch(i);
 		lgf--;
 		return(0);
 	} else {
@@ -1010,7 +1014,8 @@ casedi(void)
 			numtab[DL].val = dip->maxl;
 			dip = &d[--dilev];
 			offset = dip->op;
-		}
+		} else if (warn & WARN_DI)
+			errprint(".di outside active diversion");
 		goto rtn;
 	}
 	if (++dilev == NDI) {
@@ -1153,8 +1158,10 @@ casechop(void)
 		return;
 	if (i >= 256)
 		i = maybemore(i, 0);
-	if ((j = findmn(i)) < 0)
+	if ((j = findmn(i)) < 0) {
+		nosuch(i);
 		return;
+	}
 	savip = ip;
 	ip = (filep)contab[j].mx;
 	app = 1;
@@ -1277,6 +1284,11 @@ maybemore(int sofar, int create)
 		retn:	buf[i-1] = c;
 			cpushback(&buf[2]);
 			raw = r;
+			if (warn & WARN_SPACE && i > 3 && findmn(sofar) >= 0) {
+				if (c == '\n')
+					buf[i-1] = 0;
+				errprint("missing space at request %s", buf);
+			}
 			return sofar;
 		}
 		if (n >= alcd)

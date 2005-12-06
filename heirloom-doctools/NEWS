@@ -251,6 +251,11 @@ the description for ".xflag" below.
 	last character of an output line. Tracking also applies to characters
 	from another font that have been selected by the fallback sequence.
 
+.warn [bits]
+	controls warning messages. If the "bits" argument is missing, all
+	warnings are enabled. ".warn 0" disables all warnings. See below
+	for defined bits.
+
 .write stream message
 	writes "message" to the file "stream", which must have been
 	previously opened by ".open". Like ".tm", "message" is interpreted
@@ -341,6 +346,34 @@ any character in the current LC_CTYPE locale in text input
 	it. This mechanism does not work with legacy ditroff fonts.
 	  In macro, string, and number register names, only ASCII
 	characters may be used.
+
+
+Warning bits
+============
+
+These are all warning bits for the ".warn" request that are currently
+defined:
+
+1	Warn when unknown glyph names like \(xx and \[xx] are found.
+2	Warn when illegal numeric expressions occur.
+4	Warn when a line in ".ad b" mode cannot be adjusted.
+16	Warn when a ".el" is found without a matching ".ie".
+32	Warn when an undefined scale indicator is used in a numeric
+	expression.
+256	Warn when a ".di" is executed but no diversion is currently
+	active.
+512	Warn when an undefined request, macro or string is called.
+1024	Warn when an undefined number register is accessed. The number
+	register will be set to zero immediately after the first access
+	so this warning can be printed only once per register name.
+16384	Warn when illegal byte sequences or characters that have no
+	known PostScript equivalent are read.
+32768	Warn when an undefined escape sequence is used.
+65536	Warn when an unknown long request name is used, but its first
+	two characters form a known regular request. The regular request
+	will be executed in this case.
+131072	Warn when a font cannot be found. This warning is enabled by
+	default.
 
 
 Changes to troff intermediate output

@@ -6,6 +6,8 @@ Release ...
 * [nt]roff: The ".open", ".opena", ".write", ".writec", and ".close"
   requests have been added. They work like ".tm" but write to a named
   file.
+* [nt]roff: The ".warn" request has been added; it enables additional
+  warning messages.
 * [nt]roff: The ".spreadlimit" request has been added; it can be used
   to print a warning when the adjustment computed for an output line
   exceeds a certain value.

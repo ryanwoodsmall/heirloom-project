@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.62 (gritter) 12/6/05
+ * Sccsid @(#)tdef.h	1.63 (gritter) 12/6/05
  */
 
 /*
@@ -404,8 +404,6 @@ typedef	int64_t		tchar;
 typedef	int32_t		tchar;
 #endif	/* NROFF */
 
-#define	atoi()		((int) atoi0())
-
 extern	int	Inch, Hor, Vert, Unitwidth;
 
 /* BSD systems have a function devname(); avoid a collision */
@@ -450,6 +448,22 @@ extern	int	debug;	/*debug flag*/
 #define	DB_GETC	04	/*print out message from getch()*/
 #define	DB_LOOP	010	/*print out message before "Eileen's loop" fix*/
 #endif	/* DEBUG */
+
+extern enum warn {
+	WARN_NONE	= 0,
+	WARN_CHAR	= 1,
+	WARN_NUMBER	= 2,
+	WARN_BREAK	= 4,
+	WARN_EL		= 16,
+	WARN_SCALE	= 32,
+	WARN_DI		= 256,
+	WARN_MAC	= 512,
+	WARN_REG	= 1024,
+	WARN_INPUT	= 16384,
+	WARN_ESCAPE	= 32768,
+	WARN_SPACE	= 65536,
+	WARN_FONT	= 131072
+} warn;
 
 struct	d {	/* diversion */
 	filep	op;
@@ -773,9 +787,11 @@ int roman(int, int (*)(tchar));
 int roman0(int, int (*)(tchar), char *, char *);
 int abc(int, int (*)(tchar));
 int abc0(int, int (*)(tchar));
-long atoi0(void);
-long ckph(void);
-long atoi1(register tchar);
+#define	atoi()	xxatoi()
+int atoi();
+long long atoi0(void);
+long long ckph(void);
+long long atoi1(register tchar);
 void setnr(const char *, int, int);
 void caserr(void);
 void casenr(void);
@@ -906,4 +922,7 @@ tchar setfield(int);
 void localize(void);
 void caselc_ctype(void);
 void casepsbb(void);
+void casewarn(void);
+void nosuch(int);
+void illseq(int, const char *, int);
 void morechars(int);

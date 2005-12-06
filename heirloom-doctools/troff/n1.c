@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.51 (gritter) 12/6/05
+ * Sccsid @(#)n1.c	1.52 (gritter) 12/6/05
  */
 
 /*
@@ -697,8 +697,10 @@ control(register int a, register int b)
 {
 	register int	j;
 
-	if (a == 0 || (j = findmn(a)) == -1)
+	if (a == 0 || (j = findmn(a)) == -1) {
+		nosuch(a);
 		return(0);
+	}
 
 	/*
 	 * Attempt to find endless recursion at runtime. Arbitrary
@@ -1039,6 +1041,8 @@ gx:
 	case 'd':	/* half em down */
 		return(sethl(k));
 	default:
+		if (warn & WARN_ESCAPE)
+			errprint("undefined escape sequence \\%c", k);
 	dfl:	return(j);
 	}
 	/* NOTREACHED */
@@ -1138,6 +1142,7 @@ g2:
 			if ((n = mbrtowc(&twc, mbbuf1, mbbuf1p-mbbuf1, &state))
 					==(size_t)-1 ||
 					twc & ~(wchar_t)0x1FFFFF) {
+				illseq(-1, mbbuf1, mbbuf1p-mbbuf1);
 				mbbuf1p = mbbuf1;
 				*mbbuf1p = 0;
 				i &= 0177;
@@ -1171,6 +1176,7 @@ g2:
 			mbbuf1p = mbbuf1;
 		} else if ((n = mbtowc(&twc, mbbuf1, mb_cur_max)) <= 0) {
 			if (mbbuf1p >= mbbuf1 + mb_cur_max) {
+				illseq(-1, mbbuf1, mb_cur_max);
 				i &= ~(MBMASK | CSMASK);
 				twc = 0;
 				mbbuf1p = mbbuf1;
@@ -1198,8 +1204,12 @@ g2:
 #endif	/* NROFF */
 #endif	/* EUC */
 			goto g4;
-		if (i != 0177) 
+		if (i != 0177) {
+			if (i != ifilt[i])
+				illseq(i, NULL, 0);
 			i = ifilt[i];
+		} else
+			illseq(i, NULL, 0);
 	}
 	if (cbits(i) == IMP && !raw)
 		goto again;

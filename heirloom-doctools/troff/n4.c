@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.14 (gritter) 12/4/05
+ * Sccsid @(#)n4.c	1.15 (gritter) 12/6/05
  */
 
 /*
@@ -66,6 +66,8 @@ int	regcnt = NNAMES;
 int	falsef	= 0;	/* on if inside false branch of if */
 #define	NHASH(i)	((i>>6)^i)&0177
 struct	numtab	*nhash[128];	/* 128 == the 0177 on line above */
+
+static int	_findr(register int i, int);
 
 void *
 grownumtab(void)
@@ -220,7 +222,7 @@ setn(void)
 		}
 	else {
 s0:
-		if ((j = findr(i)) == -1)
+		if ((j = _findr(i, 1)) == -1)
 			i = 0;
 		else {
 			i = numtab[j].val = (numtab[j].val+numtab[j].inc*f);
@@ -297,8 +299,14 @@ nunhash(register struct numtab *rp)
 	}
 }
 
-int 
-findr(register int i)
+int
+findr(int i)
+{
+	return _findr(i, 0);
+}
+
+static int 
+_findr(register int i, int rd)
 {
 	register struct numtab *p;
 	register int h = NHASH(i);
@@ -308,6 +316,8 @@ findr(register int i)
 	for (p = nhash[h]; p; p = p->link)
 		if (i == p->r)
 			return(p - numtab);
+	if (rd && warn & WARN_REG)
+		errprint("no such register %s", macname(i));
 	do {
 		for (p = numtab; p < &numtab[NN]; p++) {
 			if (p->r == 0) {
@@ -443,12 +453,32 @@ abc0(int i, int (*f)(tchar))
 	return(k + (*f)((i % 26 + nform) | nrbits));
 }
 
-long 
+static int	illscale;
+
+int
+atoi()
+{
+	int	n, c;
+
+	illscale = 0;
+	n = atoi0();
+	if (nonumb && ch && ch != ' ' && ch != '\n' && warn & WARN_NUMBER &&
+			illscale == 0) {
+		c = cbits(ch);
+		if ((c & ~0177) == 0 && isprint(c))
+			errprint("illegal number, char %c", c);
+		else
+			errprint("illegal number");
+	}
+	return n;
+}
+
+long long
 atoi0(void)
 {
 	register int c, k, cnt;
 	register tchar ii;
-	long	i, acc;
+	long long	i, acc;
 
 	i = 0; 
 	acc = 0;
@@ -571,11 +601,11 @@ a0:
 }
 
 
-long 
+long long
 ckph(void)
 {
 	register tchar i;
-	register long	j;
+	register long long	j;
 
 	if (cbits(i = getch()) == '(')
 		j = atoi0();
@@ -586,7 +616,7 @@ ckph(void)
 }
 
 
-long 
+long long
 atoi1(register tchar ii)
 {
 	register int i, j, digits;
@@ -673,6 +703,11 @@ a1:
 		i = 6;
 		break;
 	default:
+		if ((i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') &&
+				warn & WARN_SCALE) {
+			errprint("undefined scale indicator %c", i);
+			illscale = 1;
+		}
 		j = dfact;
 		ch = ii;
 		i = dfactd;

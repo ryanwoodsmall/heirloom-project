@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.10 (gritter) 9/8/05
+ * Sccsid @(#)makedev.c	1.11 (gritter) 12/6/05
  */
 
 /*
@@ -146,8 +146,8 @@ static char	code[FSIZE];	/* actual device codes for a physical font */
 #define	NFONT	60	/* max number of default fonts */
 static char	fname[NFONT][10];	/* temp space to hold default font names */
 
-static void *_readfont(const char *, size_t *);
-static int getlig(struct mfile *);
+static void *_readfont(const char *, size_t *, int);
+static int getlig(struct mfile *, int);
 static struct mfile *mopen(const char *);
 static void mclose(struct mfile *);
 static char *sget(struct mfile *);
@@ -242,7 +242,7 @@ readdesc(const char *name)
 	totfont = 0;
 	for (i = 0; i < dev.nfonts; i++) {
 		strcpy(dp, fname[i]);
-		if ((fpout = _readfont(dir, &fsz)) == NULL) {
+		if ((fpout = _readfont(dir, &fsz, 1)) == NULL) {
 			mclose(mp);
 			return NULL;
 		}
@@ -265,14 +265,14 @@ readdesc(const char *name)
 }
 
 void *
-readfont(const char *name, struct dev *dp)
+readfont(const char *name, struct dev *dp, int warn)
 {
 	dev = *dp;
-	return _readfont(name, NULL);
+	return _readfont(name, NULL, warn);
 }
 
 static void *
-_readfont(const char *name, size_t *szp)	/* create fitab and width tab for font */
+_readfont(const char *name, size_t *szp, int warn)	/* create fitab and width tab for font */
 {
 	struct mfile *mp;
 	int i, nw = 0, spacewidth, n = 0, v;
@@ -280,7 +280,8 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 	char *cpout;
 
 	if ((mp = mopen(name)) == NULL) {
-		errprint("Can't load font %s", name);
+		if (warn)
+			errprint("Can't load font %s", name);
 		return NULL;
 	}
 	for (i = 0; i < NFITAB; i++)
@@ -304,7 +305,7 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 		else if (strcmp(cmd, "spare1") == 0)
 			font.spare1 = cget(mp);
 		else if (strcmp(cmd, "ligatures") == 0) {
-			font.ligfont = getlig(mp);
+			font.ligfont = getlig(mp, warn);
 		} else if (strcmp(cmd, "spacewidth") == 0) {
 			dget(mp, &spacewidth);
 			width[0] = spacewidth;	/* width of space on this font */
@@ -333,7 +334,7 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 							fitab[i + 128-32] = nw;	/* starts after the ascii */
 							break;
 						}
-					if (i >= dev.nchtab)
+					if (i >= dev.nchtab && warn)
 						errprint("font %s: %s not in charset\n", name, ch);
 				}
 				skipline(mp);
@@ -342,7 +343,7 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 			if (dev.biggestfont >= nw)
 				n = dev.biggestfont;
 			else {
-				if (dev.biggestfont > 0)
+				if (dev.biggestfont > 0 && warn)
 					errprint("font %s too big\n", name);
 				n = nw;
 			}
@@ -374,7 +375,7 @@ _readfont(const char *name, size_t *szp)	/* create fitab and width tab for font 
 }
 
 static int
-getlig(struct mfile *mp)	/* pick up ligature list */
+getlig(struct mfile *mp, int warn)	/* pick up ligature list */
 {
 	int lig;
 	char *temp;
@@ -391,7 +392,7 @@ getlig(struct mfile *mp)	/* pick up ligature list */
 			lig |= LFFI;
 		else if (strcmp(temp, "ffl") == 0)
 			lig |= LFFL;
-		else
+		else if (warn)
 			errprint("illegal ligature %s\n", temp);
 	}
 	skipline(mp);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.109 (gritter) 11/30/05
+ * Sccsid @(#)dpost.c	1.110 (gritter) 12/6/05
  */
 
 /*
@@ -1775,7 +1775,7 @@ have:   fontbase[n] = &a->Font;
     if ( access(temp, R_OK) < 0 ) 
             snprintf(temp, sizeof temp, "%s/dev%s/%s",
 			    fontdir, devname, mapfont(s));
-    if ((fpout = readfont(temp, &dev)) == NULL)
+    if ((fpout = readfont(temp, &dev, 0)) == NULL)
     fail:   error(FATAL, "can't open font table %s", temp);
 
     if ( fontbase[n] != NULL )		/* something's already there */

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.17 (gritter) 12/4/05
+ * Sccsid @(#)ni.c	1.18 (gritter) 12/6/05
  */
 
 /*
@@ -130,6 +130,8 @@ int	ldrch = LEADER;
 
 extern void	caseft(void), caseps(void), casevs(void), casefp(void),
        		casess(void), casecs(void), casebd(void), caselg(void);
+
+enum warn	warn = WARN_FONT;
 
 int	NM;
 struct contab *contab;
