@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.63 (gritter) 12/6/05
+ * Sccsid @(#)tdef.h	1.64 (gritter) 12/6/05
  */
 
 /*
@@ -462,7 +462,9 @@ extern enum warn {
 	WARN_INPUT	= 16384,
 	WARN_ESCAPE	= 32768,
 	WARN_SPACE	= 65536,
-	WARN_FONT	= 131072
+	WARN_FONT	= 131072,
+	WARN_ALL	= 2147481855,	/* all except di, mac, reg */
+	WARN_W		= 2147483647
 } warn;
 
 struct	d {	/* diversion */

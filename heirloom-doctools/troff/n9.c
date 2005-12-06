@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.26 (gritter) 12/6/05
+ * Sccsid @(#)n9.c	1.27 (gritter) 12/6/05
  */
 
 /*
@@ -755,15 +755,88 @@ casepsbb(void)
 	setnr("ury", bb[3], 0);
 }
 
+static const struct {
+	enum warn	n;
+	const char	*s;
+} warnnames[] = {
+	{ WARN_NONE,	"none" },
+	{ WARN_CHAR,	"char" },
+	{ WARN_NUMBER,	"number" },
+	{ WARN_BREAK,	"break" },
+	{ WARN_EL,	"el" },
+	{ WARN_SCALE,	"scale" },
+	{ WARN_DI,	"di" },
+	{ WARN_MAC,	"mac" },
+	{ WARN_REG,	"reg" },
+	{ WARN_INPUT,	"input" },
+	{ WARN_ESCAPE,	"escape" },
+	{ WARN_SPACE,	"space" },
+	{ WARN_FONT,	"font" },
+	{ WARN_ALL,	"all" },
+	{ WARN_W,	"w" },
+	{ 0,		NULL }
+};
+
+static void
+warn1(void)
+{
+	char	name[NC], *xp;
+	int	c, i, sign;
+
+	switch (c = getach()) {
+	case '-':
+		c = getach();
+		sign = -1;
+		break;
+	case '+':
+		c = getach();
+		sign = 1;
+		break;
+	default:
+		sign = 0;
+		break;
+	case 0:
+		return;
+	}
+	for (i = 0; i < sizeof name - 2; i++) {
+		name[i] = c;
+		if ((c = getach()) == 0)
+			break;
+	}
+	name[i+1] = 0;
+	c = strtol(name, &xp, 0);
+	if (*xp) {
+		for (i = 0; warnnames[i].s; i++)
+			if (strcmp(name, warnnames[i].s) == 0) {
+				c = warnnames[i].n;
+				break;
+			}
+		if (warnnames[i].s == NULL) {
+			errprint("unknown warning category %s", name);
+			return;
+		}
+	}
+	switch (sign) {
+	case 1:
+		warn |= c;
+		break;
+	case -1:
+		warn &= ~c;
+		break;
+	default:
+		warn = c;
+	}
+}
+
 void
 casewarn(void)
 {
 	if (skip())
 		warn = -1;
 	else {
-		noscale++;
-		warn = atoi();
-		noscale--;
+		do
+			warn1();
+		while (!skip());
 	}
 }
 
