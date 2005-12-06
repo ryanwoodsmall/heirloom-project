@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.61 (gritter) 12/4/05
+ * Sccsid @(#)tdef.h	1.62 (gritter) 12/6/05
  */
 
 /*
@@ -793,6 +793,7 @@ void casefi(void);
 void casenf(void);
 void casers(void);
 void casens(void);
+void casespreadwarn(void);
 int chget(int);
 void casecc(void);
 void casec2(void);

@@ -50,7 +50,7 @@ n1.o: ../n1.c ../tdef.h ../ext.h ./proto.h
 n2.o: ../n2.c ../tdef.h ./proto.h ../ext.h
 n3.o: ../n3.c ../tdef.h ./proto.h ../ext.h
 n4.o: ../n4.c ../tdef.h ./proto.h ../ext.h
-n5.o: ../n5.c ../tdef.h ../ext.h
+n5.o: ../n5.c ../tdef.h ./proto.h ../ext.h
 n7.o: ../n7.c ../tdef.h ./proto.h ../ext.h
 n8.o: ../n8.c ../tdef.h ../ext.h ./proto.h
 n9.o: ../n9.c ../tdef.h ./proto.h ../ext.h

@@ -213,6 +213,14 @@ the description for ".xflag" below.
 	shifts the arguments to the current macro by "n", or 1 if "n"
 	is missing.
 
+.spreadlimit [n]
+	sets or toggles a limit that causes a warning to be printed when
+	it is exceeded by the adjustment that is computed for the current
+	output line in ".ad b" mode. The limit is initially 3m, but the
+	warning message is disabled. Calling this request without an
+	argument toggles the warning message; calling it with an argument
+	enables the warning and sets the limit to "n" (default scale m).
+
 .ss n m							troff only
 	with the second argument "m" determines whether additional white
 	space is added between sentences. If m is zero, no additional
@@ -426,4 +434,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   12/4/05
+Gunnar Ritter                                                   12/6/05

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.24 (gritter) 12/5/05
+ * Sccsid @(#)n5.c	1.25 (gritter) 12/6/05
  */
 
 /*
@@ -65,6 +65,10 @@
 #include <unistd.h>
 #include "tdef.h"
 #include "ext.h"
+#ifdef	NROFF
+#include "tw.h"
+#endif
+#include "proto.h"
 
 extern void mchbits(void);
 
@@ -162,6 +166,19 @@ void
 casens(void)
 {
 	dip->nls++;
+}
+
+
+void
+casespreadwarn(void)
+{
+	if (skip())
+		spreadwarn = !spreadwarn;
+	else {
+		dfact = EM;
+		spreadlimit = inumb(&spreadlimit);
+		spreadwarn = 1;
+	}
 }
 
 
