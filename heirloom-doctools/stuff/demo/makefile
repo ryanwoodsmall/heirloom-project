@@ -1,10 +1,14 @@
 .SUFFIXES: .tr .ps .pdf
 
+# You need at least Ghostscript 8.53 to create PDF/X documents.
+DISTFLAGS = -q -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite \
+	-sProcessColorModel=DeviceCMYK -dPDFX
+
 .tr.ps:
 	troff $(TFLAGS) $< | dpost >$@
 
 .ps.pdf:
-	ps2pdf13 -sPAPERSIZE=a4 $< $@
+	gs $(DISTFLAGS) -sPAPERSIZE=a4 -sOutputFile=$@ PDFX_def.ps $<
 
 all: troffdemo.ps troffdemo_otf.ps troffdemo.pdf troffdemo_otf.pdf
 
