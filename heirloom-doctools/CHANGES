@@ -21,6 +21,8 @@ Release ...
 * grap: An "-S" option has been added to disable the "sh" command.
 * nroff: Recognize the "\s'n'" escape sequence and discard it for
   compatibility with troff.
+* dpost: When writing Type 42 fonts, write the sfnts array in a different
+  order to avoid an error with Acrobat Distiller.
 
 Release 051202
 * [nt]roff: When text is written to a diversion in nofill mode, spacing

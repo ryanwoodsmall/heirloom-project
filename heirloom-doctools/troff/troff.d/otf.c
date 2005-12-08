@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.32 (gritter) 10/14/05
+ * Sccsid @(#)otf.c	1.33 (gritter) 12/8/05
  */
 
 #include <stdio.h>
@@ -99,26 +99,27 @@ static struct table {
 	const char	*name;
 	int	*pos;
 	int	in_sfnts;
+	uint32_t	checksum;
 } tables[] = {
 	{ "CFF ",	&pos_CFF,	0 },
-	{ "hhea",	&pos_hhea,	1 },
-	{ "loca",	&pos_loca,	1 },
-	{ "prep",	&pos_prep,	1 },
-	{ "fpgm",	&pos_fpgm,	1 },
-	{ "vhea",	&pos_vhea,	1 },
-	{ "glyf",	&pos_glyf,	3 },	/* holds glyph data */
-	{ "cvt ",	&pos_cvt,	1 },
-	{ "maxp",	&pos_maxp,	1 },
-	{ "vmtx",	&pos_vmtx,	1 },
-	{ "hmtx",	&pos_hmtx,	1 },
-	{ "OS/2",	&pos_OS_2,	0 },
-	{ "GSUB",	&pos_GSUB,	0 },
-	{ "GPOS",	&pos_GPOS,	0 },
-	{ "post",	&pos_post,	0 },
-	{ "kern",	&pos_kern,	0 },
-	{ "name",	&pos_name,	0 },
 	{ "cmap",	&pos_cmap,	0 },
-	{ "head",	&pos_head,	2 },	/* head must be last */
+	{ "cvt ",	&pos_cvt,	1 },
+	{ "fpgm",	&pos_fpgm,	1 },
+	{ "GPOS",	&pos_GPOS,	0 },
+	{ "GSUB",	&pos_GSUB,	0 },
+	{ "head",	&pos_head,	2 },
+	{ "hhea",	&pos_hhea,	1 },
+	{ "hmtx",	&pos_hmtx,	1 },
+	{ "kern",	&pos_kern,	0 },
+	{ "loca",	&pos_loca,	1 },
+	{ "maxp",	&pos_maxp,	1 },
+	{ "name",	&pos_name,	0 },
+	{ "OS/2",	&pos_OS_2,	0 },
+	{ "post",	&pos_post,	0 },
+	{ "prep",	&pos_prep,	1 },
+	{ "vhea",	&pos_vhea,	1 },
+	{ "vmtx",	&pos_vmtx,	1 },
+	{ "glyf",	&pos_glyf,	3 },	/* holds glyph data */
 	{ NULL,		NULL,		0 }
 };
 
@@ -3049,18 +3050,27 @@ CalcTableChecksum(uint32_t sum, const char *cp, int length)
 static void
 sfnts1(struct table *tp, int *offset, uint32_t *ccs, FILE *fp)
 {
-	uint32_t	checkSum;
-	int	o, length, m;
+	int	o, length;
 
 	o = table_directories[*tp->pos].offset;
 	length = table_directories[*tp->pos].length;
 	if (tp->in_sfnts == 2)	/* head table */
 		memset(&contents[o+8], 0, 4);	/* checkSumAdjustment */
-	checkSum = CalcTableChecksum(0, &contents[o], length);
+	tp->checksum = CalcTableChecksum(0, &contents[o], length);
 	*ccs = CalcTableChecksum(*ccs, tp->name, 4);
-	*ccs += checkSum;
+	*ccs += tp->checksum;
 	*ccs += *offset;
 	*ccs += length;
+	*offset += length;
+}
+
+static void
+sfnts1a(struct table *tp, int *offset, uint32_t *ccs, FILE *fp)
+{
+	int	o, length, m;
+
+	o = table_directories[*tp->pos].offset;
+	length = table_directories[*tp->pos].length;
 	if (tp->in_sfnts == 2) {
 		*ccs -= 0xB1B0AFBA;
 		contents[o+8] = (*ccs&0xff000000) >> 24;
@@ -3070,7 +3080,7 @@ sfnts1(struct table *tp, int *offset, uint32_t *ccs, FILE *fp)
 	}
 	fprintf(fp, "%08X%08X%08X%08X",
 			pbe32(tp->name),
-			(unsigned int)checkSum,
+			(unsigned int)tp->checksum,
 			*offset, length);
 	if ((m = length % 4) != 0)
 		length += 4 - m;
@@ -3137,7 +3147,7 @@ sfnts2(struct table *tp, FILE *fp)
 static void
 build_sfnts(FILE *fp)
 {
-	int	i, o;
+	int	i, o, n;
 	unsigned short	numTables;
 	unsigned short	searchRange;
 	unsigned short	entrySelector;
@@ -3158,14 +3168,19 @@ build_sfnts(FILE *fp)
 	ccs = 0x00010000 + (numTables<<16) + searchRange +
 		(entrySelector<<16) + rangeShift;
 	o = 12 + numTables * 16;
+	for (i = 0; tables[i].name; i++)
+		if (tables[i].in_sfnts && *tables[i].pos >= 0)
+			sfnts1(&tables[i], &o, &ccs, fp);
+	o = 12 + numTables * 16;
+	n = 0;
 	for (i = 0; tables[i].name; i++) {
 		if (tables[i].in_sfnts && *tables[i].pos >= 0) {
-			sfnts1(&tables[i], &o, &ccs, fp);
-			if (tables[i+1].name == NULL)
-				fprintf(fp, "00>");
-			putc('\n', fp);
+			if (n++)
+				putc('\n', fp);
+			sfnts1a(&tables[i], &o, &ccs, fp);
 		}
 	}
+	fprintf(fp, "00>\n");
 	for (i = 0; tables[i].name; i++)
 		if (tables[i].in_sfnts && *tables[i].pos >= 0)
 			sfnts2(&tables[i], fp);
