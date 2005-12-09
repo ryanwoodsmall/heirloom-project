@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)pic.1b	1.5 (gritter) 12/5/05
-.TH PIC 1B "12/5/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)pic.1b	1.6 (gritter) 12/9/05
+.TH PIC 1B "12/9/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .\".de PS	\" start picture
 .\".	\" $1 is height, $2 is width, both in inches
 .\".if \\$1>0 .sp .35
@@ -352,7 +352,7 @@ reverts the effect of a previous
 .\".SH SOURCE
 .\".B /sys/src/cmd/pic
 .SH "SEE ALSO"
-.IR grap (1), 
+.IR grap (1B), 
 .IR troff (1B)
 .br
 B. W. Kernighan,
