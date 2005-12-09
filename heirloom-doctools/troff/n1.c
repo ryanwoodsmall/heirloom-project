@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.53 (gritter) 12/6/05
+ * Sccsid @(#)n1.c	1.54 (gritter) 12/9/05
  */
 
 /*
@@ -236,7 +236,10 @@ main(int argc, char **argv)
 			dotT++;
 			continue;
 		case 'x':
-			xflag = 2;
+			if (argv[0][2])
+				xflag = strtol(&argv[0][2], NULL, 10);
+			else
+				xflag = 2;
 			continue;
 		case 'X':
 			xflag = 0;

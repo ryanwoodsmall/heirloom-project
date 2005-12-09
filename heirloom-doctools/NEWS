@@ -1,11 +1,11 @@
 New features in the Heirloom Documentation Tools troff language
 ===============================================================
 
-With the "-x" option, new features become available by the names as
-shown. Without the "-x" option, long requests can be invoked with
-the ".do" prefix as described below; other features are available by
-default since they should not normally create compatibility problems.
-With the "-X" option, all extensions except for locale-dependent input
+With the "-x2" option, new features become available by the names as
+shown. By default or with the "-x1" option, long requests can be invoked
+with the ".do" prefix as described below; other features are available
+by default since they should not normally create compatibility problems.
+With the "-x0" option, all extensions except for locale-dependent input
 and the AFM/OpenType font selection using ".fp" are disabled. See also
 the description for ".xflag" below.
 
@@ -22,15 +22,15 @@ the description for ".xflag" below.
 .ft longname
 .nr longname
 	The names of macros, strings, number registers, and fonts can be
-	longer than two characters now with the "-x" option.
+	longer than two characters now with the "-x2" option.
 
 .do request arguments
 	has the same effect as executing ".request arguments" with the
-	"-x" option enabled, even if that was not given on the command
+	"-x2" option enabled, even if that was not given on the command
 	line.  Thus ".do papersize a4" works like ".papersize a4",
 	".do de longname" defines a macro with a long name, and
 	".do longname" executes it. It is possible to contract extended
-	request names without the "-x" option, such as ".dopapersize",
+	request names without the "-x2" option, such as ".dopapersize",
 	although such usage seems questionable.
 
 .ev name
@@ -126,7 +126,7 @@ the description for ".xflag" below.
 
 .kern [0|1]						troff only
 	Disables (0) or enables pairwise kerning. The default is enabled
-	unless the "-X" option is given.
+	unless the "-x0" option is given.
 
 .kernafter ff char0 units0 char1 units1 ...		troff only
 .kernbefore ff char0 units0 char1 units1 ...		troff only
@@ -270,12 +270,13 @@ the description for ".xflag" below.
 	not write a newline at the end.
 
 .xflag [0|1|2]
-	controls the availability of newer features like the "-x" and "-X"
-	command line options: ".do xflag 0" corresponds to "-X" and disables
-	all extensions, ".do xflag 1" corresponds to the default behavior,
-	and ".do xflag 2" corresponds to "-x" and enables long request names.
-	Note that ".do xflag 0" is not reversible anymore since the ".xflag"
-	request itself is only available at xflag level one and above.
+	controls the availability of newer features like the "-x" option:
+	".do xflag 0" corresponds to "-x0" and disables all extensions,
+	".do xflag 1" corresponds to the default behavior (or "-x1"), and
+	".do xflag 2" corresponds to "-x2" and enables long request names.
+	Note that ".do xflag 0" is not reversible anymore since the ".do"
+	and ".xflag" requests are only available at xflag level one and
+	above.
 
 \$(nn
 \$[nnn]
@@ -409,7 +410,7 @@ Changes to troff intermediate output
 s-23 d.d
 	is a crude way to tell the post-processor that "d.d" is a
 	(possibly fractional) point size for the current font. This
-	command is only used if the "-X" option was not given, if
+	command is only used if the "-x0" option was not given, if
 	the "anysize" keyword is contained in the DESC file for the
 	device, and if either the ".fzoom" request has been used, or
 	a direct size change has resulted in a font size that is not
@@ -494,4 +495,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   12/6/05
+Gunnar Ritter                                                   12/9/05

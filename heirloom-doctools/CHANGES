@@ -14,6 +14,9 @@ Release ...
   exceeds a certain value.
 * [nt]roff: The "\n[hours]", "\n[minutes]", "\n[seconds]", and "\n[year]"
   registers have been added to print more parts of the current time.
+* [nr]roff: Availability of extensions is now controlled using an "-xN"
+  option, where "N" is the extension level. The previous "-x" and "-X"
+  options are still accepted.
 * [nt]roff: A "-msafe" macro package has been added; it disables those
   requests that allow to execute commands or to write to files. It is
   mainly useful for viewing manual pages.

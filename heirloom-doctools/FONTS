@@ -351,7 +351,7 @@ a second time is the most convenient way to handle this:
 Pairwise kerning
 ----------------
 
-Pairwise kerning is enabled unless the -X option is given. The ".kern"
+Pairwise kerning is enabled unless the -x0 option is given. The ".kern"
 request disables it. Kerning tables are initially read from the AFM,
 OpenType, or TrueType files; this default kerning only applies if two
 adjacent characters are from the same font. There are two methods to
@@ -475,4 +475,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 10/4/05
+Gunnar Ritter                                                 12/9/05

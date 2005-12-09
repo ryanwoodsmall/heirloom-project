@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.18 (gritter) 9/11/05
+.\" Sccsid @(#)troff.1b	1.19 (gritter) 12/9/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "9/11/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "12/9/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -40,7 +40,7 @@ troff \- (BSD) typeset or format documents
 .ad l
 .nh
 \fB/usr/ucb/troff\fR
-[\fB\-af\&ixXz\fR]
+[\fB\-af\&iz\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
@@ -49,6 +49,7 @@ troff \- (BSD) typeset or format documents
 [\fB\-s\fIN\fR]
 [\fB\-T\fIdevice\fR]
 [\fB\-u\fIN\fR]
+[\fB\-x\fIN\fR]
 .br
 .hy 1
 .ad b
@@ -111,13 +112,6 @@ Number first generated page
 Stop every
 .I N
 pages.
-.I Nroff
-will halt prior to every
-.I N
-pages (default
-.IR N =1)
-to allow paper loading or
-changing, and will resume upon receipt of a newline.
 .I Troff
 will stop the phototypesetter every
 .I N
@@ -211,14 +205,15 @@ phototypesetter at the end of the run.
 Send a printable text-only approximation
 of the results to the standard output.
 .TP
-.B \-x
-Enable all extensions,
-even those that likely cause compatibility problems
-with previous versions of
-.IR troff .
-.TP
-.B \-X
-Disable any extensions.
+.BI \-x N
+Enable extensions to previous versions of
+.I troff
+at level
+.IR N .
+Level 0 disables any extensions.
+Level 1 enables all extensions
+except for long requests and request arguments.
+Level 2 enables these in addition.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL
@@ -276,4 +271,4 @@ B. W. Kernighan,
 .I
 A TROFF Tutorial
 .br
-eqn(1), tbl(1)
+eqn(1B), tbl(1B)

@@ -85,7 +85,7 @@ following:
   fixed.)
 
 - Macro names are normally restricted to two characters for compatibility
-  with previous versions of nroff. With "nroff -x", long macro names are
+  with previous versions of nroff. With "nroff -x2", long macro names are
   accepted. You will normally want to enable this because you are much
   more likely to encounter manual pages written with groff in mind than
   manual pages that require strict Unix compatibility.
@@ -110,18 +110,18 @@ following:
   own version.
 
 - Thus a complete pipeline to format manual pages for viewing is:
-  tbl input.1 | neqn | nroff -x -Tlp -msafe -mandoc | col -x
+  tbl input.1 | neqn | nroff -x2 -Tlp -msafe -mandoc | col -x
 
 - To print manual pages with troff, use
-  tbl input.1 | eqn | troff -x -msafe -mandoc | dpost | lp
+  tbl input.1 | eqn | troff -x2 -msafe -mandoc | dpost | lp
 
 - You should of course configure your "man" command such that it
   executes these pipelines automatically for you. For the "man"
   command from the Heirloom Toolchest, suitable entries in
   "/etc/default/man" are:
 
-	NROFF=/usr/ucb/nroff -x -Tlocale -msafe
-	TROFF=/usr/ucb/troff -x -msafe
+	NROFF=/usr/ucb/nroff -x2 -Tlocale -msafe
+	TROFF=/usr/ucb/troff -x2 -msafe
 	TBL=/usr/ucb/tbl
 	EQN=/usr/ucb/eqn
 	NEQN=/usr/ucb/neqn
@@ -137,4 +137,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						12/5/05
+<gunnarr@acm.org>						12/9/05
