@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.110 (gritter) 12/6/05
+ * Sccsid @(#)dpost.c	1.111 (gritter) 12/10/05
  */
 
 /*
@@ -2234,7 +2234,7 @@ supplypfb(char *font, char *path, FILE *fp)
         fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
     else
         fprintf(sf, "%%%%+ font %s\n", font);
-    fprintf(rf, "%%%%BeginResource: Font %s\n", font);
+    fprintf(rf, "%%%%BeginResource: font %s\n", font);
     for (;;) {
     	switch (type) {
     	case 1:
@@ -2347,7 +2347,7 @@ supplyttf(char *font, char *path, FILE *fp)
         	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
         else
         	fprintf(sf, "%%%%+ font %s\n", font);
-	fprintf(rf, "%%%%BeginResource: Font %s\n", font);
+	fprintf(rf, "%%%%BeginResource: font %s\n", font);
 	otft42(font, path, contents, size, rf);
 	fprintf(rf, "%%%%EndResource\n");
 	free(contents);
@@ -2395,7 +2395,7 @@ supply1(char *font, char *file, char *type)
         fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
     else
         fprintf(sf, "%%%%+ font %s\n", font);
-    fprintf(rf, "%%%%BeginResource: Font %s\n", font);
+    fprintf(rf, "%%%%BeginResource: font %s\n", font);
     while (fgets(line, sizeof line, fp) != NULL)
 	    fputs(line, rf);
     fclose(fp);
