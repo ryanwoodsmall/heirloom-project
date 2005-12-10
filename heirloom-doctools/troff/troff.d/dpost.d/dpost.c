@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.111 (gritter) 12/10/05
+ * Sccsid @(#)dpost.c	1.112 (gritter) 12/10/05
  */
 
 /*
@@ -2418,14 +2418,18 @@ t_dosupply(char *font)
 static void
 t_papersize(char *buf)
 {
-	int	x, y;
+	int	x, y, setmedia = 0;
 
-	if (sscanf(buf, "%d %d", &x, &y) != 2)
+	if (sscanf(buf, "%d %d %d", &x, &y, &setmedia) < 2)
 		return;
 	x = x * 72 / res;
 	y = y * 72 / res;
 	fprintf(gf, "/pagebbox [0 0 %d %d] def\n", x, y);
 	fprintf(gf, "userdict /gotpagebbox true put\n");
+	if (setmedia)
+		fprintf(gf, "/setpagedevice where {pop "
+			"1 dict dup /PageSize [%d %d] put setpagedevice"
+			"} if\n", x, y);
 	pagelength = y;
 }
 

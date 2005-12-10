@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.102 (gritter) 12/6/05
+ * Sccsid @(#)t6.c	1.103 (gritter) 12/10/05
  */
 
 /*
@@ -1504,8 +1504,8 @@ casekern(void)
 	kern = skip() || atoi() ? 1 : 0;
 }
 
-void
-casepapersize(void)
+static void
+setpapersize(int setmedia)
 {
 	const struct {
 		char	*name;
@@ -1591,7 +1591,19 @@ casepapersize(void)
 	po = x > 6 * PO ? PO : x / 8;
 	ll = ll1 = lt = lt1 = x - 2 * po;
 	setnel();
-	ptpapersize(x, y);
+	ptpapersize(x, y, setmedia);
+}
+
+void
+casepapersize(void)
+{
+	return setpapersize(0);
+}
+
+void
+casemediasize(void)
+{
+	return setpapersize(1);
 }
 
 static void

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.13 (gritter) 9/11/05
+ * Sccsid @(#)troff.h	1.14 (gritter) 12/10/05
  */
 
 extern struct tracktab {
@@ -52,4 +52,4 @@ extern	long		realpage;
 extern	void		growfonts(int);
 extern	int		loadafm(int, int, char *, char *, int);
 extern	int		getkw(tchar, tchar);
-extern	void		ptpapersize(int, int);
+extern	void		ptpapersize(int, int, int);

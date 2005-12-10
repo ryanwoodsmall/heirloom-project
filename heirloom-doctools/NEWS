@@ -158,6 +158,18 @@ the description for ".xflag" below.
 	useful to specify an input character set regardless of environment
 	influences.
 
+.mediasize executive|letter|legal|ledger|tabloid|aN|bN|cN|x y	troff only
+	performs the same actions as the ".papersize" request and generates
+	a device setup command in addition (the PostScript Level 2 operator
+	"setpagedevice" with dpost). The effect of this command can be the
+	selection of a matching paper tray on a printer; on the other hand,
+	the document may not print at all if no such tray is available. In
+	general, it is recommended to use printer-specific options from a
+	PPD file when the file is submitted to the print spooling system
+	instead of this request. However, when generating PostScript as
+	intermediate format with the intent of PDF creation, use of this
+	request is recommended.
+
 .open stream filename
 	opens "filename" for writing while truncating existing contents
 	and associates "stream" with it for latter use with ".write" etc.
@@ -171,12 +183,12 @@ the description for ".xflag" below.
 	of the predefined American or international formats (such as a4),
 	or a user-defined format "x y". The page length is set from these
 	parameters, the page offset and line length are adjusted as needed,
-	and the post-processor is instructed to generate appropriate device
-	setup commands. The last action is the real reason why this request
-	exists; without it, PostScript printers may displace the pages of
-	the document. The default are "letter" measurements but no device
-	setup commands. This request should be used early in a document;
-	if it is given multiple times, the last one will setup the device.
+	and the post-processor is informed about the page metrics for its
+	internal calculations. The last action is the real reason why this
+	request exists; without it, PostScript printers may displace the
+	pages of the document. The default are "letter" measurements. This
+	request should be used early in a document; if it is given multiple
+	times, the last one will setup the device. See also ".mediasize".
 
 .ps x.y							troff only
 	accepts any points size now with PostScript devices, including
@@ -438,10 +450,11 @@ x H -23 d.d
 	as a fractional point unit. Only generated under comparable
 	circumstances as described for fractional point sizes.
 
-x X PaperSize x y
-	results from the ".papersize" request and gives the paper
-	size as "x" and "y" in points (1/72 i). It is not generated
-	otherwise.
+x X PaperSize x y setmedia
+	results from the ".mediasize" or ".papersize" requests and gives
+	the paper size as "x" and "y" in points (1/72 i). If "setmedia"
+	is non-zero, PostScript code for "setpagedevice" will also be
+	emitted. This command is not generated otherwise.
 
 x X PDFMark attribute value
 	includes information that is used by the distiller utility when
@@ -495,4 +508,4 @@ x X Track a
 	request.
 
 
-Gunnar Ritter                                                   12/9/05
+Gunnar Ritter                                                   12/10/05

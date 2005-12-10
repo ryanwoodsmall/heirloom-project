@@ -12,6 +12,9 @@ Release ...
 * [nt]roff: The ".spreadlimit" request has been added; it can be used
   to print a warning when the adjustment computed for an output line
   exceeds a certain value.
+* [nt]roff: The ".mediasize" request has been added; it causes dpost to
+  specify the page size using the PostScript "setpagedevice" operator.
+  This is mainly useful for creating PDF documents.
 * [nt]roff: The "\n[hours]", "\n[minutes]", "\n[seconds]", and "\n[year]"
   registers have been added to print more parts of the current time.
 * [nr]roff: Availability of extensions is now controlled using an "-xN"

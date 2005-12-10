@@ -17,14 +17,15 @@ Preparation: Setting the correct paper format
 ---------------------------------------------
 
 When generating PDF files, it is especially important to set a correct
-media size. While the ".papersize" troff request takes care of correct
-positioning of data on the output page, it does not include an advice
-to the distiller about the actual media size. The most convenient way
-to do this are ps2pdf command line arguments. For example, if you want
-to create an A4 document, use ".papersize a4" in troff combined with
-"ps2pdf -sPAPERSIZE=a4". To create a document with a custom media size,
-use e.g. ".papersize 298p 482p" and "ps2pdf -dDEVICEWIDTHPOINTS=298
--dDEVICEHEIGHTPOINTS=482".
+paper format using the ".mediasize" request. It is also possible to use
+the ".papersize" request, but since that does not forward information
+to the distiller about the media size, it is then necessary to specify
+this information on the Ghostscript command line. For example, if you
+want to create an A4 document, use ".mediasize a4", or alternatively,
+".papersize a4" in troff combined with "ps2pdf -sPAPERSIZE=a4" on the
+Ghostscript command line. To create a document with a custom media
+size, use e.g. ".mediasize 298p 482p", or ".papersize 298p 482p" and
+"ps2pdf -dDEVICEWIDTHPOINTS=298 -dDEVICEHEIGHTPOINTS=482".
 
 
 Specifying document description items
@@ -135,4 +136,4 @@ position, this is usually a sign that the media size of troff/dpost did
 not match that of the distiller (see above).
 
 
-Gunnar Ritter                                                 9/13/05
+Gunnar Ritter                                                 12/10/05
