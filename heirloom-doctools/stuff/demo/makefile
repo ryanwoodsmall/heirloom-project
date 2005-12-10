@@ -8,7 +8,7 @@ DISTFLAGS = -q -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite \
 	troff $(TFLAGS) $< | dpost >$@
 
 .ps.pdf:
-	gs $(DISTFLAGS) -sPAPERSIZE=a4 -sOutputFile=$@ PDFX_def.ps $<
+	gs $(DISTFLAGS) -sOutputFile=$@ PDFX_def.ps $<
 
 all: troffdemo.ps troffdemo_otf.ps troffdemo.pdf troffdemo_otf.pdf
 
