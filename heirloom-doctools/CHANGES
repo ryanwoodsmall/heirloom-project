@@ -1,4 +1,4 @@
-Release ...
+Release 051212
 * [nt]roff: The ".pso" request has been added; it reads the output of
   a command as input to troff.
 * [nt]roff: The ".tmc" request has been added; it works like ".tm" but
