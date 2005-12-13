@@ -1,3 +1,8 @@
+Release ...
+* [nt]roff: The "-msafe" macro now correctly removes the ".do pso",
+  ".do open", and ".do opena" requests in -x1 (default) mode. They
+  were previously removed in -x2 mode only.
+
 Release 051212
 * [nt]roff: The ".pso" request has been added; it reads the output of
   a command as input to troff.
