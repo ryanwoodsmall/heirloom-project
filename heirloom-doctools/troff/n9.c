@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.29 (gritter) 12/7/05
+ * Sccsid @(#)n9.c	1.30 (gritter) 12/14/05
  */
 
 /*
@@ -411,13 +411,14 @@ tchar
 setfield(int x)
 {
 	register tchar ii, jj, *fp;
-	register int i, j;
+	register int i, j, k;
 	int length, ws, npad, temp, type;
 	tchar **pp, *padptr[NPP];
 	tchar fbuf[FBUFSZ];
 	int savfc, savtc, savlc;
-	tchar rchar = 0;
+	tchar rchar = 0, nexti = 0;
 	int savepos;
+	int oev;
 
 	if (x == tabch) 
 		rchar = tabc | chbits;
@@ -447,9 +448,19 @@ setfield(int x)
 	fp = fbuf;
 	pp = padptr;
 	if (x == savfc) {
+		nexti = getch();
 		while (1) {
-			j = cbits(ii = getch());
+			j = cbits(ii = nexti);
 			jj = width(ii);
+			oev = ev;
+			if (j != savfc && j != '\n' &&
+					pp < (padptr + NPP - 1) &&
+					fp < (fbuf + FBUFSZ - 3))
+				nexti = getch();
+			else
+				nexti = 0;
+			if (ev == oev)
+				jj += kernadjust(ii, nexti);
 			widthp = jj;
 			numtab[HP].val += jj;
 			if (j == padc) {
@@ -497,16 +508,32 @@ s1:
 	} else if (type == 0) {
 		/*plain tab or leader*/
 		if ((j = width(rchar)) > 0) {
-			int nchar = length / j;
+			int nchar;
+			k = kernadjust(rchar, rchar);
+			if (length < j)
+				nchar = 0;
+			else {
+				nchar = 1;
+				length -= j;
+				nchar += length / (k+j);
+				length %= k+j;
+			}
+			if (pbp >= pbsize-3)
+				growpbbuf();
+			pbbuf[pbp++] = FILLER;
 			while (nchar-->0) {
-				if (pbp >= pbsize-3)
+				if (pbp >= pbsize-4)
 					if (growpbbuf() == NULL)
 						break;
 				numtab[HP].val += j;
 				widthp = j;
+				if (nchar > 0) {
+					numtab[HP].val += k;
+					widthp += k;
+				}
 				pbbuf[pbp++] = rchar;
 			}
-			length %= j;
+			pbbuf[pbp++] = FILLER;
 		}
 		if (length)
 			jj = sabsmot(length) | MOT;
@@ -515,8 +542,15 @@ s1:
 	} else {
 		/*center tab*/
 		/*right tab*/
-		while (((j = cbits(ii = getch())) != savtc) &&  (j != '\n') && (j != savlc)) {
+		nexti = getch();
+		while (((j = cbits(ii = nexti)) != savtc) &&  (j != '\n') && (j != savlc)) {
 			jj = width(ii);
+			oev = ev;
+			if (fp < (fbuf + FBUFSZ - 3)) {
+				nexti = getch();
+				if (ev == oev)
+					jj += kernadjust(ii, nexti);
+			}
 			ws += jj;
 			numtab[HP].val += jj;
 			widthp = jj;
@@ -532,14 +566,25 @@ s1:
 			length -= ws / 2; /*CTAB*/
 		pushback(fbuf);
 		if ((j = width(rchar)) != 0 && length > 0) {
-			int nchar = length / j;
+			int nchar;
+			k = kernadjust(rchar, rchar);
+			if (length < j)
+				nchar = 0;
+			else {
+				nchar = 1;
+				length -= j;
+				nchar += length / (k+j);
+				length %= k+j;
+			}
+			if (pbp >= pbsize-3)
+				growpbbuf();
+			pbbuf[pbp++] = FILLER;
 			while (nchar-- > 0) {
 				if (pbp >= pbsize-3)
 					if (growpbbuf() == NULL)
 						break;
 				pbbuf[pbp++] = rchar;
 			}
-			length %= j;
 		}
 		length = (length / HOR) * HOR;
 		jj = makem(length);

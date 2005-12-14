@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.19 (gritter) 12/9/05
+ * Sccsid @(#)n4.c	1.20 (gritter) 12/14/05
  */
 
 /*
@@ -832,10 +832,12 @@ caseaf(void)
 	register tchar j, jj;
 
 	lgf++;
-	if (skip() || !(i = getrq()) || skip())
+	if (skip() || !(i = getrq()))
 		return;
 	if (i >= 256)
 		i = maybemore(i, 3);
+	if (skip())
+		return;
 	k = 0;
 	j = getch();
 	if (!ischar(jj = cbits(j)) || !isalpha(jj)) {

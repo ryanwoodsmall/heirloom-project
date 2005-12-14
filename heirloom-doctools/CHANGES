@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: The ".af" request now handles long register names correctly.
+* troff: Kerning now works correctly in combination with leaders and
+  fields.
 * troff: The ".tm" and ".write" requests now correctly handle locale-
   dependent input characters as well as one-character escape sequences
   that are interpreted in copy mode such as "\&".
