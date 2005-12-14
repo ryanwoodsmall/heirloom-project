@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.27 (gritter) 12/6/05
+ * Sccsid @(#)n5.c	1.28 (gritter) 12/14/05
  */
 
 /*
@@ -510,16 +510,57 @@ casebp(void)
 static void
 tmtmcwr(int ab, int tmc, int wr)
 {
-	register int i;
+	const char tmtab[] = {
+		'a',000,000,000,000,000,000,000,
+		000,000,000,000,000,000,000,000,
+		'{','}','&',000,'%','c','e',' ',
+		'!',000,000,000,000,000,000,'~',
+		000
+	};
+	register int i, j;
+	tchar	c;
 	char	tmbuf[NTM];
 
 	lgf++;
 	copyf++;
 	if (skip() && ab)
 		errprint("User Abort");
-	for (i = 0; i < NTM - 2; )
-		if ((tmbuf[i++] = getch()) == '\n')
+	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
+		if ((c = getch()) == '\n') {
+			tmbuf[i++] = '\n';
 			break;
+		}
+		j = cbits(c);
+#if !defined (NROFF) && defined (EUC)
+		if (iscopy(c)) {
+			int	n;
+			if ((n = wctomb(&tmbuf[i], j)) > 0) {
+				i += n;
+				continue;
+			}
+		}
+#endif	/* !NROFF && EUC */
+		if (xflag == 0) {
+			tmbuf[i++] = c;
+			continue;
+		}
+		tmbuf[i++] = '\\';
+		if (c == (OHC|BLBIT))
+			j = ':';
+		else if (j >= 0 && j < sizeof tmtab && tmtab[j])
+			j = tmtab[j];
+		else if (j == ACUTE)
+			j = '\'';
+		else if (j == GRAVE)
+			j = '`';
+		else if (j == UNDERLINE)
+			j = '_';
+		else if (j == MINUS)
+			j = '-';
+		else
+			i--;
+		tmbuf[i++] = j;
+	}
 	if (i == NTM - 2)
 		tmbuf[i++] = '\n';
 	if (tmc)
