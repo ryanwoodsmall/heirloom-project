@@ -1,4 +1,4 @@
-Release ...
+Release 051216
 * m4: The traditional variant now accepts the shift operators "<<" and
   ">>" for the "eval" macro.
 * m4: The "eval" macro now uses 32-bit signed integer arithmetic

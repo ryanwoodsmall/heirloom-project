@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-devtools.spec	1.2 (gritter) 11/10/05
+# Sccsid @(#)heirloom-devtools.spec	1.3 (gritter) 12/16/05
 #
 Summary: The Heirloom Development Tools.
 Name: heirloom-devtools
@@ -44,7 +44,7 @@ make %{makeflags}
 make %{makeflags} install
 
 rm -f filelist.rpm
-for f in %{bindir} %{libdir}
+for f in %{bindir} %{susdir} %{libdir}
 do
 	if test -d %{buildroot}/$f
 	then
