@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.105 (gritter) 12/17/05
+ * Sccsid @(#)t6.c	1.106 (gritter) 12/18/05
  */
 
 /*
@@ -87,7 +87,7 @@ int	**ftrtab;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
-struct bbox	mediabox, bleedbox, trimbox;
+struct box	mediasize, bleedat, trimat;
 
 int
 width(register tchar j)
@@ -1592,11 +1592,11 @@ setpapersize(int setmedia)
 	po = x > 6 * PO ? PO : x / 8;
 	ll = ll1 = lt = lt1 = x - 2 * po;
 	setnel();
-	mediabox.urx = x;
-	mediabox.ury = y;
-	mediabox.flag |= 1;
+	mediasize.val[2] = x;
+	mediasize.val[3] = y;
+	mediasize.flag |= 1;
 	if (setmedia)
-		mediabox.flag |= 2;
+		mediasize.flag |= 2;
 	if (realpage)
 		ptpapersize();
 }
@@ -1614,7 +1614,7 @@ casemediasize(void)
 }
 
 static void
-pdfbox(struct bbox *bp)
+cutat(struct box *bp)
 {
 	int	c[4], i;
 
@@ -1627,25 +1627,23 @@ pdfbox(struct bbox *bp)
 		if (nonumb)
 			return;
 	}
-	bp->llx = c[0];
-	bp->lly = c[1];
-	bp->urx = c[2];
-	bp->ury = c[3];
+	for (i = 0; i < 4; i++)
+		bp->val[i] = c[i];
 	bp->flag |= 1;
 	if (realpage)
-		ptpdfbox();
+		ptcut();
 }
 
 void
-casetrimbox(void)
+casetrimat(void)
 {
-	return pdfbox(&trimbox);
+	return cutat(&trimat);
 }
 
 void
-casebleedbox(void)
+casebleedat(void)
 {
-	return pdfbox(&bleedbox);
+	return cutat(&bleedat);
 }
 
 static void

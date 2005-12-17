@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.114 (gritter) 12/17/05
+ * Sccsid @(#)dpost.c	1.115 (gritter) 12/18/05
  */
 
 /*
@@ -590,18 +590,15 @@ static struct Bookmark {
 	int	closed;			/* the bookmark is closed initially */
 } *Bookmarks;
 static size_t	nBookmarks;
-static int	pagelength = 792;	/* lenght of page in points */
+static double	pagelength = 792;	/* lenght of page in points */
 #define	MAXBOOKMARKLEVEL	20
 
 static void	orderbookmarks(void);
 
-static struct bbox {
-	int	llx;
-	int	lly;
-	int	urx;
-	int	ury;
+static struct box {
+	int	val[4];
 	int	flag;
-} mediabox, bleedbox, trimbox;
+} mediasize, bleedat, trimat;
 
 
 /*
@@ -650,7 +647,7 @@ char		temp[4096];
 /*****************************************************************************/
 
 static void	t_papersize(char *);
-static void	t_pdfbox(const char *, struct bbox *, char *);
+static void	t_cutat(const char *, struct box *, char *);
 static void	t_track(char *);
 static void	t_strack(void);
 static void	t_pdfmark(char *);
@@ -848,18 +845,20 @@ pdfdate(time_t *tp, char *buf, size_t size)
 /*****************************************************************************/
 
 static void
-pdfbox1(const char *boxname, struct bbox *bp, FILE *fp)
+pdfbox(const char *boxname, struct box *bp, FILE *fp)
 {
 	double	llx, lly, urx, ury;
 
 	if (bp->flag == 0)
 		return;
-	llx = bp->llx * 72.0 / res;
-	lly = bp->lly * 72.0 / res;
-	urx = bp->urx * 72.0 / res;
-	ury = bp->ury * 72.0 / res;
+	llx = bp->val[0] * 72.0 / res;
+	lly = pagelength - ((bp->val[1] + bp->val[3]) * 72.0 / res);
+	urx = (bp->val[0] + bp->val[2]) * 72.0 / res;
+	ury = pagelength - (bp->val[1] * 72.0 / res);
 	fprintf(fp,
-		"[ {ThisPage} 1 dict dup /%s [%g %g %g %g] put /PUT pdfmark\n",
+		"[ {ThisPage} 1 dict dup /%s _%s put /PUT pdfmark\n",
+		boxname, boxname);
+	fprintf(gf, "/_%s [%g %g %g %g] def\n",
 		boxname, llx, lly, urx, ury);
 }
 
@@ -950,8 +949,8 @@ header(FILE *fp)
     fflush(pf);
     rewind(pf);
     fprintf(fp, "/_custompagesetup {\n");
-    pdfbox1("TrimBox", &trimbox, fp);
-    pdfbox1("BleedBox", &bleedbox, fp);
+    pdfbox("TrimBox", &trimat, fp);
+    pdfbox("BleedBox", &bleedat, fp);
     while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
 	    fwrite(buf, 1, n, fp);
     fprintf(fp, "} def\n");
@@ -960,12 +959,12 @@ header(FILE *fp)
     rewind(gf);
     while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
 	    fwrite(buf, 1, n, fp);
-    if (mediabox.flag) {
-	    x = mediabox.urx * 72.0 / res;
-	    y = mediabox.ury * 72.0 / res;
+    if (mediasize.flag) {
+	    x = mediasize.val[2] * 72.0 / res;
+	    y = mediasize.val[3] * 72.0 / res;
 	    fprintf(fp, "/pagebbox [0 0 %g %g] def\n", x, y);
 	    fprintf(fp, "userdict /gotpagebbox true put\n");
-	    if (mediabox.flag & 2)
+	    if (mediasize.flag & 2)
 		fprintf(fp, "/setpagedevice where {pop "
 			"1 dict dup /PageSize [%g %g] put setpagedevice"
 			"} if\n", x, y);
@@ -1617,10 +1616,10 @@ devcntrl(
 		    t_supply(buf);
 		else if ( strcmp(str, "PaperSize") == 0 )
 		    t_papersize(buf);
-		else if ( strcmp(str, "TrimBox") == 0 )
-		    t_pdfbox(str, &trimbox, buf);
-		else if ( strcmp(str, "BleedBox") == 0 )
-		    t_pdfbox(str, &bleedbox, buf);
+		else if ( strcmp(str, "TrimAt") == 0 )
+		    t_cutat("Trim size", &trimat, buf);
+		else if ( strcmp(str, "BleedAt") == 0 )
+		    t_cutat("Bleed size", &bleedat, buf);
 		else if ( strcmp(str, "Track") == 0 )
 		    t_track(buf);
 		else if ( strcmp(str, "PDFMark") == 0 )
@@ -2473,11 +2472,11 @@ t_dosupply(char *font)
 /*****************************************************************************/
 
 static void
-boxcmp(const char *boxname, struct bbox *bp, int llx, int lly, int urx, int ury)
+boxcmp(const char *name, struct box *bp, int a, int b, int c, int d)
 {
-	if (bp->flag && (llx != bp->llx || lly != bp->lly ||
-				urx != bp->urx || ury != bp->ury))
-		error(NON_FATAL, "%s has changed, using new values", boxname);
+	if (bp->flag && (a != bp->val[0] || b != bp->val[1] ||
+				c != bp->val[2] || d != bp->val[3]))
+		error(NON_FATAL, "%s has changed, using new values", name);
 }
 
 static void
@@ -2487,27 +2486,25 @@ t_papersize(char *buf)
 
 	if (sscanf(buf, "%d %d %d", &x, &y, &setmedia) < 2)
 		return;
-	boxcmp("Media size", &mediabox, 0, 0, x, y);
-	mediabox.urx = x;
-	mediabox.ury = y;
-	mediabox.flag |= 1;
+	boxcmp("Media size", &mediasize, 0, 0, x, y);
+	mediasize.val[2] = x;
+	mediasize.val[3] = y;
+	mediasize.flag |= 1;
 	if (setmedia)
-		mediabox.flag |= 2;
-	pagelength = y * 72 / res;
+		mediasize.flag |= 2;
+	pagelength = y * 72.0 / res;
 }
 
 static void
-t_pdfbox(const char *boxname, struct bbox *bp, char *buf)
+t_cutat(const char *name, struct box *bp, char *buf)
 {
-	int	c[4];
+	int	c[4], i;
 
 	if (sscanf(buf, "%d %d %d %d", &c[0], &c[1], &c[2], &c[3]) < 4)
 		return;
-	boxcmp(boxname, bp, c[0], c[1], c[2], c[3]);
-	bp->llx = c[0];
-	bp->lly = c[1];
-	bp->urx = c[2];
-	bp->ury = c[3];
+	boxcmp(name, bp, c[0], c[1], c[2], c[3]);
+	for (i = 0; i < 4; i++)
+		bp->val[i] = c[i];
 	bp->flag |= 1;
 }
 
@@ -4191,10 +4188,10 @@ t_pdfmark(char *buf)
 			strcmp(buf, "BookmarkClosed") == 0;
 		endtext();
 		fprintf(tf, "[ /Dest /Bookmark$%d\n"
-			    "  /View [/FitH %d]\n"
+			    "  /View [/FitH %g]\n"
 			    "/DEST pdfmark\n",
 			nBookmarks - 1,
-			pagelength - (lasty >= 0 ? vpos * 72 / res : 0));
+			pagelength - (lasty >= 0 ? vpos * 72.0 / res : 0));
 	} else
 		error(NON_FATAL, "unknown PDFMark attribute %s", buf);
 }
