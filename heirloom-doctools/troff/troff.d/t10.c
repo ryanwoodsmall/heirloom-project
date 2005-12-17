@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.53 (gritter) 12/17/05
+ * Sccsid @(#)t10.c	1.54 (gritter) 12/17/05
  */
 
 /*
@@ -666,19 +666,29 @@ ptsupplyfont(char *fontname, char *file)
 }
 
 void
-ptpapersize(int x, int y, int setmedia)
+ptpapersize(void)
 {
-	if (ascii)
+	if (ascii || mediabox.flag == 0)
 		return;
-	fdprintf(ptid, "x X PaperSize %d %d %d\n", x, y, setmedia);
+	fdprintf(ptid, "x X PaperSize %d %d %d\n",
+			mediabox.urx, mediabox.ury, mediabox.flag&2?1:0);
+}
+
+static void
+pdfbox1(const char *boxname, struct bbox *bp)
+{
+	if (bp->flag)
+		fdprintf(ptid, "x X %s %d %d %d %d\n", boxname,
+			bp->llx, bp->lly, bp->urx, bp->ury);
 }
 
 void
-ptpdfbox(const char *boxname, int c[4])
+ptpdfbox(void)
 {
 	if (ascii)
 		return;
-	fdprintf(ptid, "x X %s %d %d %d %d\n", boxname, c[0], c[1], c[2], c[3]);
+	pdfbox1("TrimBox", &trimbox);
+	pdfbox1("BleedBox", &bleedbox);
 }
 
 void
@@ -700,6 +710,8 @@ newpage(int n)	/* called at end of each output page (we hope) */
 			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();
 	ptfont();
+	ptpapersize();
+	ptpdfbox();
 }
 
 void

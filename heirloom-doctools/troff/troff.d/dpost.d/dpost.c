@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.113 (gritter) 12/17/05
+ * Sccsid @(#)dpost.c	1.114 (gritter) 12/17/05
  */
 
 /*
@@ -595,6 +595,14 @@ static int	pagelength = 792;	/* lenght of page in points */
 
 static void	orderbookmarks(void);
 
+static struct bbox {
+	int	llx;
+	int	lly;
+	int	urx;
+	int	ury;
+	int	flag;
+} mediabox, bleedbox, trimbox;
+
 
 /*
  *
@@ -642,7 +650,7 @@ char		temp[4096];
 /*****************************************************************************/
 
 static void	t_papersize(char *);
-static void	t_pdfbox(const char *, char *);
+static void	t_pdfbox(const char *, struct bbox *, char *);
 static void	t_track(char *);
 static void	t_strack(void);
 static void	t_pdfmark(char *);
@@ -839,6 +847,24 @@ pdfdate(time_t *tp, char *buf, size_t size)
 }
 /*****************************************************************************/
 
+static void
+pdfbox1(const char *boxname, struct bbox *bp, FILE *fp)
+{
+	double	llx, lly, urx, ury;
+
+	if (bp->flag == 0)
+		return;
+	llx = bp->llx * 72.0 / res;
+	lly = bp->lly * 72.0 / res;
+	urx = bp->urx * 72.0 / res;
+	ury = bp->ury * 72.0 / res;
+	fprintf(fp,
+		"[ {ThisPage} 1 dict dup /%s [%g %g %g %g] put /PUT pdfmark\n",
+		boxname, llx, lly, urx, ury);
+}
+
+/*****************************************************************************/
+
 void
 header(FILE *fp)
 
@@ -856,6 +882,7 @@ header(FILE *fp)
     struct Bookmark	*bp;
     time_t	now;
     int		n;
+    double	x, y;
     char	buf[4096];
     char	crdbuf[40];
 
@@ -923,6 +950,8 @@ header(FILE *fp)
     fflush(pf);
     rewind(pf);
     fprintf(fp, "/_custompagesetup {\n");
+    pdfbox1("TrimBox", &trimbox, fp);
+    pdfbox1("BleedBox", &bleedbox, fp);
     while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
 	    fwrite(buf, 1, n, fp);
     fprintf(fp, "} def\n");
@@ -931,7 +960,16 @@ header(FILE *fp)
     rewind(gf);
     while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
 	    fwrite(buf, 1, n, fp);
-
+    if (mediabox.flag) {
+	    x = mediabox.urx * 72.0 / res;
+	    y = mediabox.ury * 72.0 / res;
+	    fprintf(fp, "/pagebbox [0 0 %g %g] def\n", x, y);
+	    fprintf(fp, "userdict /gotpagebbox true put\n");
+	    if (mediabox.flag & 2)
+		fprintf(fp, "/setpagedevice where {pop "
+			"1 dict dup /PageSize [%g %g] put setpagedevice"
+			"} if\n", x, y);
+    }
     fprintf(fp, "mark\n");
 
     fflush(stdout);
@@ -1580,9 +1618,9 @@ devcntrl(
 		else if ( strcmp(str, "PaperSize") == 0 )
 		    t_papersize(buf);
 		else if ( strcmp(str, "TrimBox") == 0 )
-		    t_pdfbox(str, buf);
+		    t_pdfbox(str, &trimbox, buf);
 		else if ( strcmp(str, "BleedBox") == 0 )
-		    t_pdfbox(str, buf);
+		    t_pdfbox(str, &bleedbox, buf);
 		else if ( strcmp(str, "Track") == 0 )
 		    t_track(buf);
 		else if ( strcmp(str, "PDFMark") == 0 )
@@ -2433,6 +2471,15 @@ t_dosupply(char *font)
 }
 
 /*****************************************************************************/
+
+static void
+boxcmp(const char *boxname, struct bbox *bp, int llx, int lly, int urx, int ury)
+{
+	if (bp->flag && (llx != bp->llx || lly != bp->lly ||
+				urx != bp->urx || ury != bp->ury))
+		error(NON_FATAL, "%s has changed, using new values", boxname);
+}
+
 static void
 t_papersize(char *buf)
 {
@@ -2440,30 +2487,28 @@ t_papersize(char *buf)
 
 	if (sscanf(buf, "%d %d %d", &x, &y, &setmedia) < 2)
 		return;
-	x = x * 72 / res;
-	y = y * 72 / res;
-	fprintf(gf, "/pagebbox [0 0 %d %d] def\n", x, y);
-	fprintf(gf, "userdict /gotpagebbox true put\n");
+	boxcmp("Media size", &mediabox, 0, 0, x, y);
+	mediabox.urx = x;
+	mediabox.ury = y;
+	mediabox.flag |= 1;
 	if (setmedia)
-		fprintf(gf, "/setpagedevice where {pop "
-			"1 dict dup /PageSize [%d %d] put setpagedevice"
-			"} if\n", x, y);
-	pagelength = y;
+		mediabox.flag |= 2;
+	pagelength = y * 72 / res;
 }
 
 static void
-t_pdfbox(const char *boxname, char *buf)
+t_pdfbox(const char *boxname, struct bbox *bp, char *buf)
 {
-	int	c[4], i;
-	float	f[4];
+	int	c[4];
 
 	if (sscanf(buf, "%d %d %d %d", &c[0], &c[1], &c[2], &c[3]) < 4)
 		return;
-	for (i = 0; i < 4; i++)
-		f[i] = c[i] * 72.0 / res;
-	fprintf(pf,
-		"[ {ThisPage} 1 dict dup /%s [%g %g %g %g] put /PUT pdfmark\n",
-		boxname, f[0], f[1], f[2], f[3]);
+	boxcmp(boxname, bp, c[0], c[1], c[2], c[3]);
+	bp->llx = c[0];
+	bp->lly = c[1];
+	bp->urx = c[2];
+	bp->ury = c[3];
+	bp->flag |= 1;
 }
 
 /*****************************************************************************/

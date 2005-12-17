@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.104 (gritter) 12/17/05
+ * Sccsid @(#)t6.c	1.105 (gritter) 12/17/05
  */
 
 /*
@@ -87,6 +87,7 @@ int	**ftrtab;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
+struct bbox	mediabox, bleedbox, trimbox;
 
 int
 width(register tchar j)
@@ -1591,7 +1592,13 @@ setpapersize(int setmedia)
 	po = x > 6 * PO ? PO : x / 8;
 	ll = ll1 = lt = lt1 = x - 2 * po;
 	setnel();
-	ptpapersize(x, y, setmedia);
+	mediabox.urx = x;
+	mediabox.ury = y;
+	mediabox.flag |= 1;
+	if (setmedia)
+		mediabox.flag |= 2;
+	if (realpage)
+		ptpapersize();
 }
 
 void
@@ -1607,7 +1614,7 @@ casemediasize(void)
 }
 
 static void
-pdfbox(const char *boxname)
+pdfbox(struct bbox *bp)
 {
 	int	c[4], i;
 
@@ -1620,19 +1627,25 @@ pdfbox(const char *boxname)
 		if (nonumb)
 			return;
 	}
-	ptpdfbox(boxname, c);
+	bp->llx = c[0];
+	bp->lly = c[1];
+	bp->urx = c[2];
+	bp->ury = c[3];
+	bp->flag |= 1;
+	if (realpage)
+		ptpdfbox();
 }
 
 void
 casetrimbox(void)
 {
-	return pdfbox("TrimBox");
+	return pdfbox(&trimbox);
 }
 
 void
 casebleedbox(void)
 {
-	return pdfbox("BleedBox");
+	return pdfbox(&bleedbox);
 }
 
 static void
