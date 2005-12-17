@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.103 (gritter) 12/10/05
+ * Sccsid @(#)t6.c	1.104 (gritter) 12/17/05
  */
 
 /*
@@ -1604,6 +1604,35 @@ void
 casemediasize(void)
 {
 	return setpapersize(1);
+}
+
+static void
+pdfbox(const char *boxname)
+{
+	int	c[4], i;
+
+	for (i = 0; i < 4; i++) {
+		if (skip())
+			return;
+		dfact = INCH;
+		dfactd = 72;
+		c[i] = atoi();
+		if (nonumb)
+			return;
+	}
+	ptpdfbox(boxname, c);
+}
+
+void
+casetrimbox(void)
+{
+	return pdfbox("TrimBox");
+}
+
+void
+casebleedbox(void)
+{
+	return pdfbox("BleedBox");
 }
 
 static void

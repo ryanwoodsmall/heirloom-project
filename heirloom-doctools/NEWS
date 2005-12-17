@@ -9,6 +9,18 @@ With the "-x0" option, all extensions except for locale-dependent input
 and the AFM/OpenType font selection using ".fp" are disabled. See also
 the description for ".xflag" below.
 
+.bleedbox llx lly urx ury
+	sets the "BleedBox" page parameter for PDF generation. The four
+	arguments give the position of the lower left x coordinate, lower 
+	left y coordinate, upper right x coordinate, and upper right y
+	coordinate. The default units are points. The BleedBox should be
+	a frame around the objects of the actual document including any
+	bleed areas (i.e. content that should extend to the end of the
+	trimmed final page but is extended a bit such to work around
+	possible cutting inaccuracies). Cut marks, color bars, and other
+	information for the printing office should be positioned outside
+	the BleedBox. See also the ".trimbox" request.
+
 .chop name
 	removes the last character of the macro, string, or diversion
 	"name".
@@ -263,6 +275,15 @@ the description for ".xflag" below.
 	last character of an output line. Tracking also applies to characters
 	from another font that have been selected by the fallback sequence.
 
+.trimbox llx lly urx ury
+	sets the "TrimBox" page parameter for PDF generation. The four
+	arguments give the position of the lower left x coordinate, lower 
+	left y coordinate, upper right x coordinate, and upper right y
+	coordinate. The default units are points. The TrimBox specifies
+	how the page is to be cut after it has been printed; it is sort
+	of an electronic equivalent for cut marks (which should continue
+	to be printed in addition). See also the ".bleedbox" request.
+
 .warn [+|-][bits|name] ...
 	controls warning messages, which may be given either numerically
 	as bits or symbolically as names. See below for defined bits and
@@ -450,10 +471,14 @@ x H -23 d.d
 	as a fractional point unit. Only generated under comparable
 	circumstances as described for fractional point sizes.
 
+x X BleedBox llx lly urx ury
+	results from the ".bleedbox" request and passes the given values
+	in device units.
+
 x X PaperSize x y setmedia
 	results from the ".mediasize" or ".papersize" requests and gives
-	the paper size as "x" and "y" in points (1/72 i). If "setmedia"
-	is non-zero, PostScript code for "setpagedevice" will also be
+	the paper size as "x" and "y" in device units. If "setmedia" is
+	non-zero, PostScript code for "setpagedevice" will also be
 	emitted. This command is not generated otherwise.
 
 x X PDFMark attribute value
@@ -507,5 +532,9 @@ x X Track a
 	the following output. It is only generated with the ".track"
 	request.
 
+x X TrimBox llx lly urx ury
+	results from the ".trimbox" request and passes the given values
+	in device units.
 
-Gunnar Ritter                                                   12/10/05
+
+Gunnar Ritter                                                   12/17/05

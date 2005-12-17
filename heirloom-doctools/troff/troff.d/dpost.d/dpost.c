@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.112 (gritter) 12/10/05
+ * Sccsid @(#)dpost.c	1.113 (gritter) 12/17/05
  */
 
 /*
@@ -621,6 +621,7 @@ FILE		*tf = NULL;		/* PostScript output goes here */
 FILE		*gf = NULL;		/* global data goes here */
 FILE		*rf = NULL;		/* resource data goes here */
 FILE		*sf = NULL;		/* supplied resource comments go here */
+FILE		*pf = NULL;		/* elements of _custompagesetup */
 int		sfcount;		/* count of supplied resources */
 int		ostdout;		/* old standard output */
 FILE		*fp_acct = NULL;	/* accounting stuff written here */
@@ -641,6 +642,7 @@ char		temp[4096];
 /*****************************************************************************/
 
 static void	t_papersize(char *);
+static void	t_pdfbox(const char *, char *);
 static void	t_track(char *);
 static void	t_strack(void);
 static void	t_pdfmark(char *);
@@ -692,6 +694,12 @@ main(int agc, char *agv[])
     unlink(tp);
     if (close(mkstemp(tp = strdup(template))) < 0 ||
 			    (sf = fopen(tp, "r+")) == NULL) {
+	    perror(tp);
+	    return 2;
+    }
+    unlink(tp);
+    if (close(mkstemp(tp = strdup(template))) < 0 ||
+			    (pf = fopen(tp, "r+")) == NULL) {
 	    perror(tp);
 	    return 2;
     }
@@ -912,6 +920,12 @@ header(FILE *fp)
 	    }
     }
 
+    fflush(pf);
+    rewind(pf);
+    fprintf(fp, "/_custompagesetup {\n");
+    while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
+	    fwrite(buf, 1, n, fp);
+    fprintf(fp, "} def\n");
 
     fflush(gf);
     rewind(gf);
@@ -1565,6 +1579,10 @@ devcntrl(
 		    t_supply(buf);
 		else if ( strcmp(str, "PaperSize") == 0 )
 		    t_papersize(buf);
+		else if ( strcmp(str, "TrimBox") == 0 )
+		    t_pdfbox(str, buf);
+		else if ( strcmp(str, "BleedBox") == 0 )
+		    t_pdfbox(str, buf);
 		else if ( strcmp(str, "Track") == 0 )
 		    t_track(buf);
 		else if ( strcmp(str, "PDFMark") == 0 )
@@ -2431,6 +2449,21 @@ t_papersize(char *buf)
 			"1 dict dup /PageSize [%d %d] put setpagedevice"
 			"} if\n", x, y);
 	pagelength = y;
+}
+
+static void
+t_pdfbox(const char *boxname, char *buf)
+{
+	int	c[4], i;
+	float	f[4];
+
+	if (sscanf(buf, "%d %d %d %d", &c[0], &c[1], &c[2], &c[3]) < 4)
+		return;
+	for (i = 0; i < 4; i++)
+		f[i] = c[i] * 72.0 / res;
+	fprintf(pf,
+		"[ {ThisPage} 1 dict dup /%s [%g %g %g %g] put /PUT pdfmark\n",
+		boxname, f[0], f[1], f[2], f[3]);
 }
 
 /*****************************************************************************/

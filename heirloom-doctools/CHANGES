@@ -1,4 +1,7 @@
 Release ...
+* troff: The ".trimbox" and ".bleedbox" requests have been added to
+  include advice about the "TrimBox" and "BleedBox" page parameters to
+  a PDF distiller command, particularly for PDF/X generation.
 * [nt]roff: The ".af" request now handles long register names correctly.
 * troff: Kerning now works correctly in combination with leaders and
   fields.

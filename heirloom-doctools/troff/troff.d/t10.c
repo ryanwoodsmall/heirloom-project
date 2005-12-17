@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.52 (gritter) 12/10/05
+ * Sccsid @(#)t10.c	1.53 (gritter) 12/17/05
  */
 
 /*
@@ -671,6 +671,14 @@ ptpapersize(int x, int y, int setmedia)
 	if (ascii)
 		return;
 	fdprintf(ptid, "x X PaperSize %d %d %d\n", x, y, setmedia);
+}
+
+void
+ptpdfbox(const char *boxname, int c[4])
+{
+	if (ascii)
+		return;
+	fdprintf(ptid, "x X %s %d %d %d %d\n", boxname, c[0], c[1], c[2], c[3]);
 }
 
 void
