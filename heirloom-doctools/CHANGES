@@ -1,4 +1,9 @@
 Release ...
+* [nt]roff: A new extension level "3" is available. In this level, undefined
+  long requests whose first two characters form an existing short request
+  are ignored instead of being interpreted as short requests. Also string
+  and number register references are interpreted at any position of a
+  long request name in this level.
 * troff: The ".trimat", ".bleedat, and ".cropat" " requests have been added
   to include advice about the "TrimBox", "BleedBox", and "CropBox" page
   parameters to a PDF distiller command, particularly for PDF/X generation.

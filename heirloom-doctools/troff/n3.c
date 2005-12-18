@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.65 (gritter) 12/18/05
+ * Sccsid @(#)n3.c	1.66 (gritter) 12/18/05
  */
 
 /*
@@ -1250,6 +1250,30 @@ macname(int rq)
 		return "???";
 }
 
+static tchar
+mgetach(void)
+{
+	static const char nmctab[] = {
+		000,000,000,000,000,000,000,000,
+		000,000,000,000,000,000,000,000,
+		001,001,001,000,001,001,000,001,
+		000,000,000,000,000,000,000,000,
+		000
+	};
+	tchar	i;
+	int	j;
+
+	lgf++;
+	j = cbits(i = getch());
+	if (ismot(i) || j == ' ' || j == '\n' || j >= 0200 ||
+			j < sizeof nmctab && nmctab[j]) {
+		ch = i;
+		j = 0;
+	}
+	lgf--;
+	return j & 0177;
+}
+
 /*
  * To handle requests with more than two characters, an additional
  * table is maintained. On places where more than two characters are
@@ -1265,11 +1289,12 @@ maybemore(int sofar, int flags)
 
 	if (xflag < 2)
 		return sofar;
-	raw = 1;
+	if (xflag < 3)
+		raw = 1;
 	buf[0] = sofar&BYTEMASK;
 	buf[1] = (sofar>>BYTE)&BYTEMASK;
 	do {
-		c = getch0();
+		c = xflag < 3 ? getch0() : mgetach();
 		if (i+1 >= sizeof buf) {
 			buf[i] = 0;
 			goto retn;
@@ -1286,18 +1311,19 @@ maybemore(int sofar, int flags)
 	if (n == hadn) {
 		if ((flags & 1) == 0) {
 		retn:	buf[i-1] = c;
-			cpushback(&buf[2]);
+			if (xflag < 3)
+				cpushback(&buf[2]);
 			raw = r;
 			if (flags & 2)
 				/*EMPTY*/;
-			else if (warn & WARN_SPACE && i > 3 &&
+			else if (warn & WARN_MAC && i > 3 && xflag >= 3) {
+				buf[i-1] = 0;
+				errprint("no such request %s", buf);
+				sofar = 0;
+			} else if (warn & WARN_SPACE && i > 3 &&
 					findmn(sofar) >= 0) {
 				buf[i-1] = 0;
 				errprint("missing space at request %s", buf);
-			/*} else if (warn & WARN_MAC && i > 3 &&
-					findmn(sofar) < 0) {
-				buf[i-1] = 0;
-				errprint("no such request %s", buf);*/
 			}
 			return sofar;
 		}
@@ -1308,7 +1334,8 @@ maybemore(int sofar, int flags)
 		hadn = n+1;
 	}
 	pb[0] = c;
-	cpushback(pb);
+	if (xflag < 3)
+		cpushback(pb);
 	raw = r;
 	return MAXRQ2 + n;
 }
@@ -1320,7 +1347,7 @@ getls(int termc)
 	int	i = 0, j = -1, n = -1;
 
 	do {
-		c = getach();
+		c = xflag < 3 ? getach() : mgetach();
 		if (i >= sizeof laststr)
 			return -1;
 		laststr[i++] = c;

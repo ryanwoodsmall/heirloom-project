@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.19 (gritter) 12/9/05
+.\" Sccsid @(#)troff.1b	1.20 (gritter) 12/18/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "12/9/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "12/18/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -210,10 +210,12 @@ Enable extensions to previous versions of
 .I troff
 at level
 .IR N .
-Level 0 disables any extensions.
-Level 1 enables all extensions
-except for long requests and request arguments.
-Level 2 enables these in addition.
+Level 0 disables any extensions;
+level 1 enables all extensions
+except for long requests and request arguments;
+level 2 enables these in addition
+but executes short requests which are prefixes of undefined long requests;
+level 3 ignores undefined long requests.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

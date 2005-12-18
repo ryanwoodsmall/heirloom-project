@@ -1,13 +1,59 @@
 New features in the Heirloom Documentation Tools troff language
 ===============================================================
 
-With the "-x2" option, new features become available by the names as
-shown. By default or with the "-x1" option, long requests can be invoked
-with the ".do" prefix as described below; other features are available
-by default since they should not normally create compatibility problems.
-With the "-x0" option, all extensions except for locale-dependent input
-and the AFM/OpenType font selection using ".fp" are disabled. See also
-the description for ".xflag" below.
+The "-xN" option and the ".xflag" request control the availability of
+extensions. Four levels are currently defined:
+
+0	disables all extensions except for locale-dependent input and
+	AFM/OpenType font selection using ".fp".
+
+1	enables extensions except for direct access to long names on
+	request lines, i.e., ".abcde" will be interpreted as request
+	".ab" with argument "cde". Long names can be accessed using
+	the ".do" request, e.g. ".do papersize a4". Long names in
+	escape sequences are recognized, though, e.g. "\*[xyz]"
+	refers to the string named "xyz" and not to the string named
+	"[". It is normally the only relevant difference, so input
+	written for traditional troff can almost always be used
+	without change in this mode. This level is the default.
+
+2	also enables direct access to long names on request lines.
+	If an undefined long name is read, its first two characters
+	are interpreted as a short request using the remaining
+	characters as argument. So if a macro "abcde" is defined,
+	".abcde" will execute it, but otherwise, ".abcde" continues
+	to execute ".ab". String and number register references are
+	only interpreted if they start in the first two characters
+	of a name, i.e. no string interpretation is performed on
+	input ".ab\*(xy".
+
+3	ignores undefined long requests even if they form a prefix
+	of a short request, and interprets string and number register
+	references in any position of a name.
+
+It is recommended to execute ".do xflag 3" in the first line of new
+troff programs that need not rely on any existing code.
+
+
+Locale-dependent input characters
+=================================
+
+nroff allows any printable character of the current locale to appear
+in its text input. Such characters are simply passed through.
+
+troff internally converts non-ASCII characters of the current locale
+to named PostScript characters once they are read in regular (not copy)
+mode. A character that is not present in the current font is searched
+using the ".fallback" sequence first, then in the special fonts. If
+the character cannot be found, it is discarded. Characters for which
+no PostScript name is known are also discarded.
+
+Only ASCII characters are allowed in request, string, font, and number
+register names.
+
+
+New and extended requests
+=========================
 
 .bleedat left-offset top-offset width height
 	sets the "BleedBox" page parameter for PDF generation. The four
@@ -43,16 +89,16 @@ the description for ".xflag" below.
 .ft longname
 .nr longname
 	The names of macros, strings, number registers, and fonts can be
-	longer than two characters now with the "-x2" option.
+	longer than two characters now (see also ".xflag").
 
 .do request arguments
 	has the same effect as executing ".request arguments" with the
-	"-x2" option enabled, even if that was not given on the command
+	"-x3" option enabled, even if that was not given on the command
 	line.  Thus ".do papersize a4" works like ".papersize a4",
 	".do de longname" defines a macro with a long name, and
 	".do longname" executes it. It is possible to contract extended
-	request names without the "-x2" option, such as ".dopapersize",
-	although such usage seems questionable.
+	request names without the "-x3" option, such as ".dopapersize",
+	although it is discouraged.
 
 .ev name
 	Environments can be named, or be given an arbitrary number.
@@ -313,14 +359,15 @@ the description for ".xflag" below.
 	is similar to ".write" and writes "message" to "stream", but does
 	not write a newline at the end.
 
-.xflag [0|1|2]
-	controls the availability of newer features like the "-x" option:
-	".do xflag 0" corresponds to "-x0" and disables all extensions,
-	".do xflag 1" corresponds to the default behavior (or "-x1"), and
-	".do xflag 2" corresponds to "-x2" and enables long request names.
-	Note that ".do xflag 0" is not reversible anymore since the ".do"
-	and ".xflag" requests are only available at xflag level one and
-	above.
+.xflag [0|1|2|3]
+	controls the availability of newer features like the "-x" option
+	as described above. Note that ".do xflag 0" is not reversible
+	anymore since the ".do" and ".xflag" requests are only available
+	at xflag level one and above.
+
+
+New and changed escape sequences
+================================
 
 \$(nn
 \$[nnn]
@@ -356,32 +403,8 @@ the description for ".xflag" below.
 \f[name]						troff only
 	selects font "name".
 
-\n(.s
-	prints a decimal fraction if the current point size is not an
-	integer. Since standard number registers cannot hold decimal
-	fractions, point sizes must be saved and restored as follows:
-		.nr os \n(.sp
-		    . . .
-		.ps \n(osu
-
-\n[hours]
-	prints the hours portion of the current local time [0,23].
-
-\n[minutes]
-	prints the minutes portion of the current local time [0,59].
-
 \n[name]
 	refers to the number register "name".
-
-\n[seconds]
-	prints the seconds portion of the current local time [0,60].
-
-\n[.warn]
-	prints the bits representing the currently activated warning
-	categories.
-
-\n[year]
-	prints the current year (2005 etc.).
 
 \N'number'
 	produces unspecified results if "number" is outside the ASCII and
@@ -403,14 +426,33 @@ the description for ".xflag" below.
 	is similar to "\ ", but inserts space that stretches when the
 	line is adjusted like a regular " ".
 
-any character in the current LC_CTYPE locale in text input
-	In nroff, any printable character is just passed through.
-	  In troff, a non-ASCII character is converted to a named
-	PostScript character. If it is found in the current font, it
-	is printed. Otherwise, the .fallback sequence is searched for
-	it. This mechanism does not work with legacy ditroff fonts.
-	  In macro, string, and number register names, only ASCII
-	characters may be used.
+
+New number registers
+====================
+
+\n(.s
+	prints a decimal fraction if the current point size is not an
+	integer. Since standard number registers cannot hold decimal
+	fractions, point sizes must be saved and restored as follows:
+		.nr os \n(.sp
+		    . . .
+		.ps \n(osu
+
+\n[hours]
+	prints the hours portion of the current local time [0,23].
+
+\n[minutes]
+	prints the minutes portion of the current local time [0,59].
+
+\n[seconds]
+	prints the seconds portion of the current local time [0,60].
+
+\n[.warn]
+	prints the bits representing the currently activated warning
+	categories.
+
+\n[year]
+	prints the current year (2005 etc.).
 
 
 Warning bits and names
@@ -440,7 +482,8 @@ currently defined:
 32768	escape	Warn when an undefined escape sequence is used.
 65536	space	Warn when an unknown long request name is used, but its
 		first two characters form a known regular request. The
-		regular request will be executed in this case.
+		regular request is then executed in xflag level 2, or
+		ignored in xflag level 3.
 131072	font	Warn when a font cannot be found. This warning is enabled
 		by default.
 	all	All warnings except "di", "mac", and "reg". This may be the
@@ -552,4 +595,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   12/18/05
+Gunnar Ritter                                                   12/19/05

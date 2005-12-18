@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.54 (gritter) 12/9/05
+ * Sccsid @(#)n1.c	1.55 (gritter) 12/19/05
  */
 
 /*
@@ -331,7 +331,7 @@ loop:
 		if ((j = getrq()) >= 256)
 			j = maybemore(j, 0);
 		if (xflag != 0 && j == PAIR('d', 'o')) {
-			xflag = 2;
+			xflag = 3;
 			skip();
 			if ((j = getrq()) >= 256)
 				j = maybemore(j, 0);
