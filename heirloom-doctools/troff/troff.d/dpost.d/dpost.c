@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.115 (gritter) 12/18/05
+ * Sccsid @(#)dpost.c	1.116 (gritter) 12/18/05
  */
 
 /*
@@ -295,6 +295,7 @@
 char		*prologue = DPOST;	/* the basic PostScript prologue */
 char		*colorfile = COLOR;	/* things needed for color support */
 char		*drawfile = DRAW;	/* and drawing */
+char		*cutmarksfile = CUTMARKS;
 char		*formfile = FORMFILE;	/* stuff for multiple pages per sheet */
 char		*baselinefile = BASELINE;
 
@@ -990,9 +991,10 @@ options(void)
 
 {
 
-    const char		optnames[] = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:OP:R:S:T:DI";
+    const char		optnames[] = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:OP:R:S:T:DIM";
 
     int		ch;			/* name returned by getopt() */
+    FILE	*otf = tf;
 
 
 /*
@@ -1080,6 +1082,13 @@ options(void)
 
 	    case 'L':			/* PostScript prologue file */
 		    setpaths(optarg);	/* already been done in header() */
+		    break;
+
+	    case 'M':			/* print cut marks */
+		    tf = stdout;
+		    doglobal(cutmarksfile);
+		    fprintf(pf, "_cutmarks\n");
+		    tf = otf;
 		    break;
 
 	    case 'O':			/* turn picture inclusion off */
