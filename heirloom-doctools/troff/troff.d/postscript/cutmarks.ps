@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.1 0
+%%BeginResource: procset dpost_cutmarks 1.2 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.1 (gritter) 12/18/05
+% Sccsid @(#)cutmarks.ps	1.2 (gritter) 12/18/05
 %
 
 /_cutmark_adj {scaling div} def
@@ -36,14 +36,30 @@
 	_cutmark_tbx exch _cutmark_adj sub 3 1 roll
 	_cutmark_tby exch _cutmark_adj sub lineto
 } def
+/_regmark {
+	/_regmark_d exch def
+	/_regmark_y exch def
+	/_regmark_x exch def
+	/_regmark_r _regmark_d 2 div def
+	_regmark_x _regmark_r add _regmark_y moveto
+	_regmark_x _regmark_y _regmark_r 0 360 arc
+	_regmark_x _regmark_d sub _regmark_y moveto
+	_regmark_x _regmark_d add _regmark_y lineto
+	_regmark_x _regmark_y _regmark_d sub moveto
+	_regmark_x _regmark_y _regmark_d add lineto
+} def
+
 
 /_cutmarks {
 	/_TrimBox where {
 		pop
+		% No need to save/restore the graphics state since
+		% this is called before color/font page setup anyway.
+		0 0 0 1 setcmykcolor
 		linewidth _cutmark_adj setlinewidth
 		newpath
 		/_cutmark_a 10 def
-		/_cutmark_b 20 def
+		/_cutmark_b 30 def
 		0 1 _cutmark_a 0 0 1 _cutmark_b 0 _cutmark
 		_cutmark_a 1 0 0 _cutmark_b 1 0 0 _cutmark
 		0 3 _cutmark_a 0 0 3 _cutmark_b 0 _cutmark
@@ -52,6 +68,25 @@
 		_cutmark_a neg 3 0 2 _cutmark_b neg 3 0 2 _cutmark
 		0 1 _cutmark_a neg 2 0 1 _cutmark_b neg 2 _cutmark
 		_cutmark_a 1 0 2 _cutmark_b 1 0 2 _cutmark
+		1 1 1 1 setcmykcolor
+		/_cutmark_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
+		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
+			1 _cutmark_tby 3 _cutmark_tby 1 _cutmark_tby sub
+				2 div add
+			_cutmark_d _regmark
+		2 _cutmark_tbx _cutmark_d add _cutmark_a _cutmark_adj add
+			1 _cutmark_tby 3 _cutmark_tby 1 _cutmark_tby sub
+				2 div add
+			_cutmark_d _regmark
+		0 _cutmark_tbx 2 _cutmark_tbx 0 _cutmark_tbx sub 2 div add
+			1 _cutmark_tby _cutmark_d sub
+				_cutmark_a _cutmark_adj sub
+			_cutmark_d _regmark
+		0 _cutmark_tbx 2 _cutmark_tbx 0 _cutmark_tbx sub 2 div add
+			3 _cutmark_tby _cutmark_d add
+				_cutmark_a _cutmark_adj add
+			_cutmark_d _regmark
+		0 0 0 1 setcmykcolor
 		stroke
 	} if
 } def
