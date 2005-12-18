@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.116 (gritter) 12/18/05
+ * Sccsid @(#)dpost.c	1.117 (gritter) 12/18/05
  */
 
 /*
@@ -599,7 +599,7 @@ static void	orderbookmarks(void);
 static struct box {
 	int	val[4];
 	int	flag;
-} mediasize, bleedat, trimat;
+} mediasize, bleedat, trimat, cropat;
 
 
 /*
@@ -846,7 +846,7 @@ pdfdate(time_t *tp, char *buf, size_t size)
 /*****************************************************************************/
 
 static void
-pdfbox(const char *boxname, struct box *bp, FILE *fp)
+pdfbox(const char *boxname, struct box *bp, FILE *fp, int perpage)
 {
 	double	llx, lly, urx, ury;
 
@@ -856,11 +856,14 @@ pdfbox(const char *boxname, struct box *bp, FILE *fp)
 	lly = pagelength - ((bp->val[1] + bp->val[3]) * 72.0 / res);
 	urx = (bp->val[0] + bp->val[2]) * 72.0 / res;
 	ury = pagelength - (bp->val[1] * 72.0 / res);
-	fprintf(fp,
-		"[ {ThisPage} 1 dict dup /%s _%s put /PUT pdfmark\n",
-		boxname, boxname);
 	fprintf(gf, "/_%s [%g %g %g %g] def\n",
 		boxname, llx, lly, urx, ury);
+	if (perpage)
+		fprintf(fp,
+			"[ {ThisPage} 1 dict dup /%s _%s put /PUT pdfmark\n",
+			boxname, boxname);
+	else
+		fprintf(gf, "[ /%s _%s /PAGES pdfmark\n", boxname, boxname);
 }
 
 /*****************************************************************************/
@@ -950,8 +953,9 @@ header(FILE *fp)
     fflush(pf);
     rewind(pf);
     fprintf(fp, "/_custompagesetup {\n");
-    pdfbox("TrimBox", &trimat, fp);
-    pdfbox("BleedBox", &bleedat, fp);
+    pdfbox("TrimBox", &trimat, fp, 1);
+    pdfbox("BleedBox", &bleedat, fp, 1);
+    pdfbox("CropBox", &cropat, fp, 0);
     while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
 	    fwrite(buf, 1, n, fp);
     fprintf(fp, "} def\n");
@@ -1629,6 +1633,8 @@ devcntrl(
 		    t_cutat("Trim size", &trimat, buf);
 		else if ( strcmp(str, "BleedAt") == 0 )
 		    t_cutat("Bleed size", &bleedat, buf);
+		else if ( strcmp(str, "CropAt") == 0 )
+		    t_cutat("Crop size", &cropat, buf);
 		else if ( strcmp(str, "Track") == 0 )
 		    t_track(buf);
 		else if ( strcmp(str, "PDFMark") == 0 )

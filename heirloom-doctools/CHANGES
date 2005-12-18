@@ -1,7 +1,7 @@
 Release ...
-* troff: The ".trimat" and ".bleedat" requests have been added to include
-  advice about the "TrimBox" and "BleedBox" page parameters to a PDF
-  distiller command, particularly for PDF/X generation.
+* troff: The ".trimat", ".bleedat, and ".cropat" " requests have been added
+  to include advice about the "TrimBox", "BleedBox", and "CropBox" page
+  parameters to a PDF distiller command, particularly for PDF/X generation.
 * dpost: The "-M" option has been added. It causes cut marks to be printed
   when used in combination with the ".trimat" troff request.
 * [nt]roff: The ".af" request now handles long register names correctly.

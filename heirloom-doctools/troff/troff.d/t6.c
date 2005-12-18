@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.106 (gritter) 12/18/05
+ * Sccsid @(#)t6.c	1.107 (gritter) 12/18/05
  */
 
 /*
@@ -87,7 +87,7 @@ int	**ftrtab;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
-struct box	mediasize, bleedat, trimat;
+struct box	mediasize, bleedat, trimat, cropat;
 
 int
 width(register tchar j)
@@ -1644,6 +1644,12 @@ void
 casebleedat(void)
 {
 	return cutat(&bleedat);
+}
+
+void
+casecropat(void)
+{
+	return cutat(&cropat);
 }
 
 static void

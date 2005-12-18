@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.17 (gritter) 12/18/05
+ * Sccsid @(#)troff.h	1.18 (gritter) 12/18/05
  */
 
 extern struct tracktab {
@@ -36,7 +36,7 @@ extern struct tracktab {
 extern struct box {
 	int	val[4];
 	int	flag;
-} mediasize, bleedat, trimat;
+} mediasize, bleedat, trimat, cropat;
 
 extern	struct dev	dev;
 extern	int		Nfont;

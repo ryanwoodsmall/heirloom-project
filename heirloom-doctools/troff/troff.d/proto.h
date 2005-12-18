@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.33 (gritter) 12/18/05
+ * Sccsid @(#)proto.h	1.34 (gritter) 12/18/05
  */
 
 /* t6.c */
@@ -48,6 +48,7 @@ void casepapersize(void);
 void casemediasize(void);
 void casetrimat(void);
 void casebleedat(void);
+void casecropat(void);
 void caselhang(void);
 void caserhang(void);
 void casekernpair(void);
