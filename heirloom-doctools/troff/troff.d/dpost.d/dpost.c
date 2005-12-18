@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.117 (gritter) 12/18/05
+ * Sccsid @(#)dpost.c	1.118 (gritter) 12/18/05
  */
 
 /*
@@ -601,6 +601,20 @@ static struct box {
 	int	flag;
 } mediasize, bleedat, trimat, cropat;
 
+/*
+ *
+ * For the -M option.
+ *
+ */
+
+static enum {
+	M_NONE	= 00,
+	M_CUT	= 01,
+	M_REG	= 02
+} Mflag;
+
+static void	setmarks(char *);
+
 
 /*
  *
@@ -956,6 +970,10 @@ header(FILE *fp)
     pdfbox("TrimBox", &trimat, fp, 1);
     pdfbox("BleedBox", &bleedat, fp, 1);
     pdfbox("CropBox", &cropat, fp, 0);
+    if (Mflag & M_CUT)
+	    fprintf(fp, "_cutmarks\n");
+    if (Mflag & M_REG)
+	    fprintf(fp, "_regmarks\n");
     while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
 	    fwrite(buf, 1, n, fp);
     fprintf(fp, "} def\n");
@@ -995,10 +1013,9 @@ options(void)
 
 {
 
-    const char		optnames[] = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:OP:R:S:T:DIM";
+    const char		optnames[] = "a:c:e:m:n:o:p:tw:x:y:A:C:J:F:H:L:M:OP:R:S:T:DI";
 
     int		ch;			/* name returned by getopt() */
-    FILE	*otf = tf;
 
 
 /*
@@ -1085,14 +1102,11 @@ options(void)
 		    break;
 
 	    case 'L':			/* PostScript prologue file */
-		    setpaths(optarg);	/* already been done in header() */
+		    setpaths(optarg);
 		    break;
 
 	    case 'M':			/* print cut marks */
-		    tf = stdout;
-		    doglobal(cutmarksfile);
-		    fprintf(pf, "_cutmarks\n");
-		    tf = otf;
+		    setmarks(optarg);
 		    break;
 
 	    case 'O':			/* turn picture inclusion off */
@@ -1139,6 +1153,13 @@ options(void)
 
     argc -= optind;			/* get ready for non-options args */
     argv += optind;
+
+    if (Mflag) {
+	    FILE	*otf = tf;
+	    tf = stdout;
+	    doglobal(cutmarksfile);
+	    tf = otf;
+    }
 
 }   /* End of options */
 
@@ -1190,9 +1211,41 @@ setpaths (
 	formfile = path;
     else if ( strncmp(name, "baseline", strlen("baseline")) == 0 )
 	baselinefile = path;
+    else if ( strncmp(name, "cutmarks", strlen("cutmarks")) == 0 )
+	cutmarksfile = path;
 
 }   /* End of setpaths */
 
+/*****************************************************************************/
+
+static int
+prefix(const char *str, const char *pfx)
+{
+	while (*pfx && *str == *pfx)
+		str++, pfx++;
+	return *str == 0;
+}
+
+static void
+setmarks(char *str)
+{
+	char	*sp;
+	int	c;
+
+	do {
+		for (sp = str; *sp && *sp != ':'; sp++);
+		c = *sp;
+		*sp = 0;
+		if (prefix(str, "cut"))
+			Mflag |= M_CUT;
+		else if (prefix(str, "registration"))
+			Mflag |= M_REG;
+		else
+			error(FATAL, "unknown mark: -M %s", str);
+		*sp = c;
+		str = &sp[1];
+	} while (c);
+}
 
 /*****************************************************************************/
 
