@@ -466,6 +466,7 @@ currently defined:
 		found.
 2	number	Warn when illegal numeric expressions occur.
 4	break	Warn when a line in ".ad b" mode cannot be adjusted.
+8	delim	Warn when a delimiter to an escape sequence is missing.
 16	el	Warn when a ".el" is found without a matching ".ie".
 32	scale	Warn when an undefined scale indicator is used in a
 		numeric expression.

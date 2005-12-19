@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.65 (gritter) 12/19/05
+ * Sccsid @(#)tdef.h	1.66 (gritter) 12/19/05
  */
 
 /*
@@ -454,6 +454,7 @@ extern enum warn {
 	WARN_CHAR	= 1,
 	WARN_NUMBER	= 2,
 	WARN_BREAK	= 4,
+	WARN_DELIM	= 8,
 	WARN_EL		= 16,
 	WARN_SCALE	= 32,
 	WARN_DI		= 256,
@@ -929,4 +930,5 @@ void casewarn(void);
 void nosuch(int);
 void illseq(int, const char *, int);
 void missing(void);
+void nodelim(int);
 void morechars(int);

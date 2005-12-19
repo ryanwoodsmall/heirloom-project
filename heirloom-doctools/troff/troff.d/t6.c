@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.108 (gritter) 12/19/05
+ * Sccsid @(#)t6.c	1.109 (gritter) 12/19/05
  */
 
 /*
@@ -719,7 +719,8 @@ setps(void)
 		j = inumb(&apts);
 		if (nonumb)
 			return;
-		getch();
+		if (cbits(getch()) != i)
+			nodelim(i);
 	}
 	casps1(j);
 }
@@ -833,6 +834,8 @@ setwd(void)
 		if ((k = base + emsz) > numtab[ST].val)
 			numtab[ST].val = k;
 	}
+	if (cbits(i) != delim)
+		nodelim(delim);
 	setn1(wid, 0, (tchar) 0);
 	numtab[HP].val = savhp;
 	apts = savapts;
@@ -865,16 +868,18 @@ tchar mot(void)
 {
 	register int j, n;
 	register tchar i;
+	int delim;
 
 	j = HOR;
-	getch(); /*eat delim*/
+	delim = cbits(getch()); /*eat delim*/
 	if (n = atoi()) {
 		if (vflag)
 			j = VERT;
 		i = makem(quant(n, j));
 	} else
 		i = 0;
-	getch();
+	if (cbits(getch()) != delim)
+		nodelim(delim);
 	vflag = 0;
 	dfact = 1;
 	return(i);

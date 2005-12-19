@@ -6,6 +6,8 @@ Release ...
   long request name in this level.
 * [nt]roff: The warning category "missing" is now available; it includes
   warnings about missing required arguments to requests.
+* [nt]roff: The warning category "delim" is now available; it includes
+  warnings about missing delimiters to escape sequences.
 * troff: The ".trimat", ".bleedat, and ".cropat" " requests have been added
   to include advice about the "TrimBox", "BleedBox", and "CropBox" page
   parameters to a PDF distiller command, particularly for PDF/X generation.

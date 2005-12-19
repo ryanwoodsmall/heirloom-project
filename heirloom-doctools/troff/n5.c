@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.29 (gritter) 12/19/05
+ * Sccsid @(#)n5.c	1.30 (gritter) 12/19/05
  */
 
 /*
@@ -1088,6 +1088,8 @@ cmpstr(tchar c)
 	sp = string;
 	while ((j = cbits(i = getch()))!=delim && j!='\n' && sp<&string[1280-1])
 		*sp++ = i;
+	if (j != delim)
+		nodelim(delim);
 	if (sp >= string + 1280) {
 		errprint("too-long string compare.");
 		edone(0100);
@@ -1114,6 +1116,8 @@ cmpstr(tchar c)
 		}
 		sp++;
 	}
+	if (j != delim)
+		nodelim(delim);
 	if (*sp)
 		val = 0;
 rtn:

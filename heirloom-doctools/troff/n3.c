@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.67 (gritter) 12/19/05
+ * Sccsid @(#)n3.c	1.68 (gritter) 12/19/05
  */
 
 /*
@@ -1354,6 +1354,8 @@ getls(int termc)
 			return -1;
 		laststr[i++] = c;
 	} while (c && c != termc);
+	if (c != termc)
+		nodelim(termc);
 	laststr[--i] = 0;
 	if (i == 0 || c != termc)
 		j = 0;

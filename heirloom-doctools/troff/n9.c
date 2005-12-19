@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.31 (gritter) 12/19/05
+ * Sccsid @(#)n9.c	1.32 (gritter) 12/19/05
  */
 
 /*
@@ -156,6 +156,8 @@ eat(register int c)
 
 	while ((i = cbits(getch())) != c &&  (i != '\n'))
 		;
+	if (c != ' ' && i != c)
+		nodelim(c);
 	return(i);
 }
 
@@ -232,6 +234,8 @@ setbra(void)
 		*j++ = dwn;
 		cnt++;
 	}
+	if (k != delim)
+		nodelim(delim);
 	if (--cnt < 0)
 		return;
 	else if (!cnt) {
@@ -808,6 +812,7 @@ static const struct {
 	{ WARN_CHAR,	"char" },
 	{ WARN_NUMBER,	"number" },
 	{ WARN_BREAK,	"break" },
+	{ WARN_DELIM,	"delim" },
 	{ WARN_EL,	"el" },
 	{ WARN_SCALE,	"scale" },
 	{ WARN_DI,	"di" },
@@ -903,6 +908,13 @@ missing(void)
 		else
 			errprint("missing argument");
 	}
+}
+
+void
+nodelim(int delim)
+{
+	if (warn & WARN_DELIM)
+		errprint("%c delimiter missing", delim);
 }
 
 void
