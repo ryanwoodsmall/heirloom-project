@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.66 (gritter) 12/18/05
+ * Sccsid @(#)n3.c	1.67 (gritter) 12/19/05
  */
 
 /*
@@ -195,7 +195,7 @@ casern(void)
 	register int i, j;
 
 	lgf++;
-	skip();
+	skip(1);
 	if ((i = getrq()) == 0)
 		return;
 	if (i >= 256)
@@ -204,7 +204,7 @@ casern(void)
 		nosuch(i);
 		return;
 	}
-	skip();
+	skip(1);
 	j = getrq();
 	if (j >= 256)
 		j = maybemore(j, 1);
@@ -271,10 +271,10 @@ mrehash(void)
 void
 caserm(void)
 {
-	int j;
+	int j, cnt = 0;
 
 	lgf++;
-	while (!skip() && (j = getrq()) != 0) {
+	while (!skip(!cnt++) && (j = getrq()) != 0) {
 		if (j >= 256)
 			j = maybemore(j, 0);
 		clrmn(findmn(j));
@@ -317,7 +317,7 @@ casede(void)
 		wbfl();
 	req = '.';
 	lgf++;
-	skip();
+	skip(1);
 	if ((i = getrq()) == 0)
 		goto de1;
 	if (i >= 256)
@@ -426,13 +426,15 @@ finds(register int mn)
 
 
 int 
-skip (void)			/*skip over blanks; return nlflg*/
+skip (int required)		/*skip over blanks; return nlflg*/
 {
 	register tchar i;
 
 	while (cbits(i = getch()) == ' ')
 		;
 	ch = i;
+	if (nlflg && required)
+		missing();
 	return(nlflg);
 }
 
@@ -445,7 +447,7 @@ copyb(void)
 	int	req, k;
 	filep savoff = 0;
 
-	if (skip() || !(j = getrq()))
+	if (skip(0) || !(j = getrq()))
 		j = '.';
 	if (j >= 256)
 		maybemore(j, 1);
@@ -513,7 +515,7 @@ copys(void)
 	register tchar i;
 
 	copyf++;
-	if (skip())
+	if (skip(0))
 		goto c0;
 	if (cbits(i = getch()) != '"')
 		wbf(i);
@@ -853,7 +855,7 @@ collect(void)
 	copyf++;
 	nxf->nargs = 0;
 	savnxf = nxf;
-	if (skip())
+	if (skip(0))
 		goto rtn;
 
 	{
@@ -892,7 +894,7 @@ collect(void)
 		savnxf, nxf, argpp, strp, lim, enda);
 #endif
 	strflg = 0;
-	while ((argpp != argppend) && (!skip())) {
+	while ((argpp != argppend) && (!skip(0))) {
 		*argpp++ = strp;
 		quote = 0;
 		if (cbits(i = getch()) == '"')
@@ -981,7 +983,7 @@ caseshift(void)
 {
 	int	i, j;
 
-	if (skip())
+	if (skip(0))
 		i = 1;
 	else
 		i = atoi();
@@ -1010,7 +1012,7 @@ casedi(void)
 	register int *k;
 
 	lgf++;
-	if (skip() || (i = getrq()) == 0) {
+	if (skip(0) || (i = getrq()) == 0) {
 		if (dip != d)
 			wbt((tchar)0);
 		if (dilev > 0) {
@@ -1057,11 +1059,11 @@ casedt(void)
 {
 	lgf++;
 	dip->dimac = dip->ditrap = dip->ditf = 0;
-	skip();
+	skip(1);
 	dip->ditrap = vnumb((int *)0);
 	if (nonumb)
 		return;
-	skip();
+	skip(1);
 	dip->dimac = getrq();
 	if (dip->dimac >= 256)
 		dip->dimac = maybemore(dip->dimac, 1);
@@ -1079,7 +1081,7 @@ casetl(void)
 	int oev;
 
 	dip->nls = 0;
-	skip();
+	skip(1);
 	if (ismot(delim = getch())) {
 		ch = delim;
 		delim = '\'';
@@ -1157,7 +1159,7 @@ casechop(void)
 	int	i, j;
 	filep	savip, savoffset;
 
-	skip();
+	skip(1);
 	if ((i = getrq()) == 0)
 		return;
 	if (i >= 256)
@@ -1201,7 +1203,7 @@ casepm(void)
 	filep j;
 
 	kk = cnt = tcnt = 0;
-	tot = !skip();
+	tot = !skip(0);
 	for (i = 0; i < NM; i++) {
 		if ((xx = contab[i].rq) == 0 || contab[i].mx == 0)
 			continue;

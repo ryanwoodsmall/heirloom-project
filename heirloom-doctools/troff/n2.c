@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.13 (gritter) 12/8/05
+ * Sccsid @(#)n2.c	1.14 (gritter) 12/19/05
  */
 
 /*
@@ -382,7 +382,9 @@ casepi(void)
 	register pid_t i;
 	int	id[2];
 
-	if (toolate || skip() || !getname() || pipe(id) == -1 || (i = fork()) == -1) {
+	if (skip(1))
+		return;
+	if (toolate || !getname() || pipe(id) == -1 || (i = fork()) == -1) {
 		errprint("Pipe not created.");
 		return;
 	}

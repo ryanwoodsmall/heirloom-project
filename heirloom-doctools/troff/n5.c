@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.28 (gritter) 12/14/05
+ * Sccsid @(#)n5.c	1.29 (gritter) 12/19/05
  */
 
 /*
@@ -102,7 +102,7 @@ casead(void)
 
 	ad = 1;
 	/*leave admod alone*/
-	if (skip())
+	if (skip(0))
 		return;
 	switch (i = cbits(getch())) {
 	case 'r':	/*right adj, left ragged*/
@@ -172,7 +172,7 @@ casens(void)
 void
 casespreadwarn(void)
 {
-	if (skip())
+	if (skip(0))
 		spreadwarn = !spreadwarn;
 	else {
 		dfact = EM;
@@ -187,7 +187,7 @@ chget(int c)
 {
 	tchar i = 0;
 
-	if (skip() || ismot(i = getch()) || cbits(i) == ' ' || cbits(i) == '\n') {
+	if (skip(0) || ismot(i = getch()) || cbits(i) == ' ' || cbits(i) == '\n') {
 		ch = i;
 		return(c);
 	} else 
@@ -236,7 +236,7 @@ casehy(void)
 	register int i;
 
 	hyf = 1;
-	if (skip())
+	if (skip(0))
 		return;
 	noscale++;
 	i = atoi();
@@ -279,7 +279,7 @@ casece(void)
 	register int i;
 
 	noscale++;
-	skip();
+	skip(0);
 	i = max(atoi(), 0);
 	if (nonumb)
 		i = 1;
@@ -294,7 +294,7 @@ casein(void)
 {
 	register int i;
 
-	if (skip())
+	if (skip(0))
 		i = in1;
 	else 
 		i = max(hnumb(&in), 0);
@@ -313,7 +313,7 @@ casell(void)
 {
 	register int i;
 
-	if (skip())
+	if (skip(0))
 		i = ll1;
 	else 
 		i = max(hnumb(&ll), INCH / 10);
@@ -328,7 +328,7 @@ caselt(void)
 {
 	register int i;
 
-	if (skip())
+	if (skip(0))
 		i = lt1;
 	else 
 		i = max(hnumb(&lt), 0);
@@ -342,7 +342,7 @@ caseti(void)
 {
 	register int i;
 
-	if (skip())
+	if (skip(1))
 		return;
 	i = max(hnumb(&in), 0);
 	tbreak();
@@ -357,7 +357,7 @@ casels(void)
 	register int i;
 
 	noscale++;
-	if (skip())
+	if (skip(0))
 		i = ls1;
 	else 
 		i = max(inumb(&ls), 1);
@@ -372,7 +372,7 @@ casepo(void)
 {
 	register int i;
 
-	if (skip())
+	if (skip(0))
 		i = po1;
 	else 
 		i = max(hnumb(&po), 0);
@@ -390,7 +390,7 @@ casepl(void)
 {
 	register int i;
 
-	skip();
+	skip(0);
 	if ((i = vnumb(&pl)) == 0)
 		pl = defaultpl ? defaultpl : 11 * INCH; /*11in*/
 	else 
@@ -406,11 +406,11 @@ casewh(void)
 	register int i, j, k;
 
 	lgf++;
-	skip();
+	skip(1);
 	i = vnumb((int *)0);
 	if (nonumb)
 		return;
-	skip();
+	skip(0);
 	j = getrq();
 	if (j >= 256)
 		j = maybemore(j, 0);
@@ -437,7 +437,7 @@ casech(void)
 	register int i, j, k;
 
 	lgf++;
-	skip();
+	skip(1);
 	if (!(j = getrq()))
 		return;
 	else  {
@@ -449,7 +449,7 @@ casech(void)
 	}
 	if (k == NTRAP)
 		return;
-	skip();
+	skip(0);
 	i = vnumb((int *)0);
 	if (nonumb)
 		mlist[k] = 0;
@@ -474,7 +474,7 @@ casepn(void)
 {
 	register int i;
 
-	skip();
+	skip(1);
 	noscale++;
 	i = max(inumb(&numtab[PN].val), 0);
 	noscale = 0;
@@ -494,7 +494,7 @@ casebp(void)
 	if (dip != d)
 		return;
 	savframe = frame;
-	skip();
+	skip(0);
 	if ((i = inumb(&numtab[PN].val)) < 0)
 		i = 0;
 	tbreak();
@@ -523,7 +523,7 @@ tmtmcwr(int ab, int tmc, int wr)
 
 	lgf++;
 	copyf++;
-	if (skip() && ab)
+	if (skip(0) && ab)
 		errprint("User Abort");
 	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
 		if ((c = getch()) == '\n') {
@@ -601,7 +601,7 @@ open1(int flags)
 	int	ns = nstreams;
 
 	lgf++;
-	if (skip() || !getname() || skip())
+	if (skip(1) || !getname() || skip(1))
 		return;
 	streams = realloc(streams, sizeof *streams * ++nstreams);
 	streams[ns].name = malloc(NS);
@@ -643,7 +643,7 @@ write1(int writec)
 	int	i;
 
 	lgf++;
-	if (skip() || !getname())
+	if (skip(1) || !getname())
 		return;
 	if ((i = getstream(nextf)) < 0)
 		return;
@@ -668,7 +668,7 @@ caseclose(void)
 	int	i;
 
 	lgf++;
-	if (skip() || !getname())
+	if (skip(1) || !getname())
 		return;
 	if ((i = getstream(nextf)) < 0)
 		return;
@@ -688,7 +688,7 @@ casesp(int a)
 		return;
 	i = findt1();
 	if (!a) {
-		skip();
+		skip(0);
 		j = vnumb((int *)0);
 		if (nonumb)
 			j = lss;
@@ -716,7 +716,7 @@ casert(void)
 {
 	register int a, *p;
 
-	skip();
+	skip(0);
 	if (dip != d)
 		p = &dip->dnl; 
 	else 
@@ -735,7 +735,7 @@ void
 caseem(void)
 {
 	lgf++;
-	skip();
+	skip(1);
 	em = getrq();
 	if (em >= 256)
 		em = maybemore(em, 1);
@@ -803,7 +803,7 @@ getev(int *nxevp, char **namep)
 
 	*namep = NULL;
 	*nxevp = 0;
-	if (skip())
+	if (skip(0))
 		return 0;
 	c = cbits(ch);
 	if (xflag == 0 || isdigit(c) || c == '(') {
@@ -969,7 +969,7 @@ caseif(int x)
 		goto i1;
 	}
 	true = 0;
-	skip();
+	skip(1);
 	if ((cbits(i = getch())) == '!') {
 		notflag = 1;
 	} else {
@@ -1133,7 +1133,7 @@ caserd(void)
 {
 
 	lgf++;
-	skip();
+	skip(0);
 	getname();
 	if (!iflg) {
 		if (quiet) {
@@ -1253,7 +1253,7 @@ caseta(void)
 
 	tabtab[0] = nonumb = 0;
 	for (i = 0; ((i < (NTAB - 1)) && !nonumb); i++) {
-		if (skip())
+		if (skip(0))
 			break;
 		tabtab[i] = max(hnumb(&tabtab[max(i-1,0)]), 0) & TABMASK;
 		if (!nonumb) 
@@ -1278,7 +1278,7 @@ casene(void)
 {
 	register int i, j;
 
-	skip();
+	skip(0);
 	i = vnumb((int *)0);
 	if (nonumb)
 		i = lss;
@@ -1299,7 +1299,7 @@ casetr(void)
 	tchar k;
 
 	lgf++;
-	skip();
+	skip(1);
 	while ((i = cbits(k=getch())) != '\n') {
 		if (ismot(k))
 			return;
@@ -1326,7 +1326,7 @@ caseul(void)
 	register int i;
 
 	noscale++;
-	if (skip())
+	if (skip(0))
 		i = 1;
 	else 
 		i = atoi();
@@ -1352,7 +1352,7 @@ caseuf(void)
 	register int i, j;
 	extern int findft(int);
 
-	if (skip() || !(i = getrq()) || i == 'S' ||  (j = findft(i))  == -1)
+	if (skip(0) || !(i = getrq()) || i == 'S' ||  (j = findft(i))  == -1)
 		ulfont = ULFONT; /*default underline position*/
 	else 
 		ulfont = j;
@@ -1371,9 +1371,9 @@ caseit(void)
 	lgf++;
 	it = itmac = 0;
 	noscale++;
-	skip();
+	skip(1);
 	i = atoi();
-	skip();
+	skip(1);
 	if (!nonumb && (itmac = getrq())) {
 		if (itmac >= 256)
 			itmac = maybemore(itmac, 1);
@@ -1391,11 +1391,11 @@ casemc(void)
 	if (icf > 1)
 		ic = 0;
 	icf = 0;
-	if (skip())
+	if (skip(1))
 		return;
 	ic = getch();
 	icf = 1;
-	skip();
+	skip(0);
 	i = max(hnumb((int *)0), 0);
 	if (!nonumb)
 		ics = i;
@@ -1411,7 +1411,7 @@ casemk(void)
 		j = dip->dnl; 
 	else 
 		j = numtab[NL].val;
-	if (skip()) {
+	if (skip(0)) {
 		dip->mkline = j;
 		return;
 	}
@@ -1426,7 +1426,7 @@ casesv(void)
 {
 	register int i;
 
-	skip();
+	skip(0);
 	if ((i = vnumb((int *)0)) < 0)
 		return;
 	if (nonumb)
@@ -1457,7 +1457,7 @@ casenm(void)
 	register int i;
 
 	lnmod = nn = 0;
-	if (skip())
+	if (skip(0))
 		return;
 	lnmod++;
 	noscale++;
@@ -1478,7 +1478,7 @@ getnm(int *p, int min)
 	register int i;
 
 	eat(' ');
-	if (skip())
+	if (skip(0))
 		return;
 	i = atoi();
 	if (nonumb)
@@ -1491,7 +1491,7 @@ void
 casenn(void)
 {
 	noscale++;
-	skip();
+	skip(0);
 	nn = max(atoi(), 1);
 	noscale = 0;
 }

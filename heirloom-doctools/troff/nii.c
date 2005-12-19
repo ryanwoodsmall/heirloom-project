@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.20 (gritter) 12/6/05
+ * Sccsid @(#)nii.c	1.21 (gritter) 12/19/05
  */
 
 /*
@@ -166,3 +166,4 @@ int	NIF;
 int	NDI;
 int	spreadwarn;
 int	spreadlimit;
+int	lastrq;

@@ -477,6 +477,7 @@ currently defined:
 		number register will be set to zero immediately after
 		the first access so this warning can be printed only
 		once per register name.
+8192	missing	Warn when a required argument to a request is missing.
 16384	input	Warn when illegal byte sequences or characters that have
 		no known PostScript equivalent are read.
 32768	escape	Warn when an undefined escape sequence is used.

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.107 (gritter) 12/18/05
+ * Sccsid @(#)t6.c	1.108 (gritter) 12/19/05
  */
 
 /*
@@ -604,7 +604,7 @@ caseps(void)
 {
 	register int i;
 
-	if (skip())
+	if (skip(0))
 		i = apts1;
 	else {
 		dfact = INCH;
@@ -764,7 +764,7 @@ tchar setslant(void)		/* set slant from \S'...' */
 void
 caseft(void)
 {
-	skip();
+	skip(0);
 	setfont(1);
 }
 
@@ -952,7 +952,7 @@ caselg(void)
 {
 
 	lg = 1;
-	if (skip())
+	if (skip(0))
 		return;
 	lg = atoi();
 }
@@ -962,10 +962,11 @@ caseflig(void)
 {
 	int	i, j;
 
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
-	if ((j = findft(i)) < 0 || skip())
+	if ((j = findft(i)) < 0 || skip(1))
 		return;
 	fontbase[j]->ligfont = atoi() & 037;
 	/*
@@ -991,22 +992,22 @@ casefp(void)
 	char *file, *supply;
 
 	lgf++;
-	skip();
+	skip(0);
 	if ((i = xflag ? atoi() : cbits(getch()) - '0') < 0 || i > nfonts)
 	bad:	errprint("fp: bad font position %d", i);
-	else if (skip() || !(j = getrq()))
+	else if (skip(0) || !(j = getrq()))
 		errprint("fp: no font name");
 	else {
 		if (j >= 256)
 			j = maybemore(j, 3);
-		if (skip() || !getname()) {
+		if (skip(0) || !getname()) {
 			if (i == 0)
 				goto bad;
 			setfp(i, j, 0);
 		} else {		/* 3rd argument = filename */
 			file = malloc(strlen(nextf) + 1);
 			strcpy(file, nextf);
-			if (!skip() && getname()) {
+			if (!skip(0) && getname()) {
 				supply = malloc(strlen(nextf) + 1);
 				strcpy(supply, nextf);
 			} else
@@ -1093,16 +1094,17 @@ casecs(void)
 	register int i, j;
 
 	noscale++;
-	skip();
+	if (skip(1))
+		goto rtn;
 	if (!(i = getrq()))
 		goto rtn;
 	if (i >= 256)
 		i = maybemore(i, 2);
 	if ((i = findft(i)) < 0)
 		goto rtn;
-	skip();
+	skip(1);
 	cstab[i] = atoi();
-	skip();
+	skip(0);
 	j = atoi();
 	if (nonumb)
 		ccstab[i] = 0;
@@ -1121,7 +1123,7 @@ casebd(void)
 	zapwcache(0);
 	k = 0;
 bd0:
-	if (skip() || !(i = getrq()) ||
+	if (skip(1) || !(i = getrq()) ||
 			(i = i >= 256 ? maybemore(i, 2) : i,
 			(j = findft(i)) == -1)) {
 		if (k)
@@ -1138,7 +1140,7 @@ bd0:
 		j = k;
 	}
 bd1:
-	skip();
+	skip(0);
 	noscale++;
 	bdtab[j] = atoi();
 	noscale = 0;
@@ -1149,7 +1151,7 @@ casevs(void)
 {
 	register int i;
 
-	skip();
+	skip(0);
 	vflag++;
 	dfact = INCH; /* default scaling is points! */
 	dfactd = 72;
@@ -1169,13 +1171,13 @@ casess(void)
 	register int i, j;
 
 	noscale++;
-	skip();
+	skip(1);
 	if (i = atoi()) {
 		spacesz = i & 0177;
 		zapwcache(0);
 		sps = width(' ' | chbits);
 		if (xflag) {
-			skip();
+			skip(0);
 			j = atoi();
 			if (!nonumb)
 				ses = j;
@@ -1383,7 +1385,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 int
 tracknum(void)
 {
-	skip();
+	skip(1);
 	dfact = INCH;
 	dfactd = 72;
 	res = VERT;
@@ -1395,7 +1397,8 @@ casetrack(void)
 {
 	int	i, j, s1, n1, s2, n2;
 
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((j = findft(i)) < 0)
@@ -1425,13 +1428,14 @@ casefallback(void)
 	int	*fb = NULL;
 	int	i, j, n = 0;
 
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((j = findft(i)) < 0)
 		return;
 	do {
-		skip();
+		skip(0);
 		if ((i = getrq()) >= 256)
 			i = maybemore(i, 2);
 		fb = realloc(fb, (n+2) * sizeof *fb);
@@ -1447,7 +1451,8 @@ casehidechar(void)
 	int	i, j, n, m;
 	tchar	k;
 
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((j = findft(i)) < 0)
@@ -1477,12 +1482,13 @@ casefzoom(void)
 	int	n = 0, sz = 0;
 	float	f;
 
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((j = findft(i)) < 0)
 		return;
-	skip();
+	skip(1);
 	do {
 		c = getach();
 		if (n >= sz)
@@ -1502,7 +1508,7 @@ casefzoom(void)
 void
 casekern(void)
 {
-	kern = skip() || atoi() ? 1 : 0;
+	kern = skip(0) || atoi() ? 1 : 0;
 }
 
 static void
@@ -1556,13 +1562,13 @@ setpapersize(int setmedia)
 	char	buf[NC];
 
 	lgf++;
-	if (skip())
+	if (skip(1))
 		return;
 	c = cbits(ch);
 	if (isdigit(c) || c == '(') {
 		x = atoi();
 		if (!nonumb) {
-			skip();
+			skip(1);
 			y = atoi();
 		}
 		if (nonumb || x == 0 || y == 0)
@@ -1619,7 +1625,7 @@ cutat(struct box *bp)
 	int	c[4], i;
 
 	for (i = 0; i < 4; i++) {
-		if (skip())
+		if (skip(1))
 			return;
 		dfact = INCH;
 		dfactd = 72;
@@ -1660,14 +1666,15 @@ hang(int **tp)
 	tchar	k;
 
 	lgf++;
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((j = findft(i)) < 0)
 		return;
 	font = font1 = j;
 	mchbits();
-	while (!skip() && (i = cbits(k = getch())) != '\n' && !skip()) {
+	while (!skip(0) && (i = cbits(k = getch())) != '\n' && !skip(1)) {
 		noscale++;
 		n = atoi();
 		noscale--;
@@ -1703,17 +1710,18 @@ casekernpair(void)
 	tchar	c, d;
 
 	lgf++;
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((f = findft(i)) < 0)
 		return;
 	font = font1 = f;
 	mchbits();
-	if (skip())
+	if (skip(1))
 		goto done;
 	c = getch();
-	if (fbits(c) != f || skip())
+	if (fbits(c) != f || skip(1))
 		goto done;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
@@ -1721,10 +1729,10 @@ casekernpair(void)
 		goto done;
 	font = font1 = g;
 	mchbits();
-	if (skip())
+	if (skip(1))
 		goto done;
 	d = getch();
-	if (fbits(d) != g || skip())
+	if (fbits(d) != g || skip(1))
 		goto done;
 	noscale++;
 	n = atoi();
@@ -1755,16 +1763,17 @@ kernsingle(int **tp)
 	tchar	c;
 
 	lgf++;
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((f = findft(i)) < 0)
 		return;
 	font = font1 = f;
 	mchbits();
-	while (!skip()) {
+	while (!skip(0)) {
 		c = getch();
-		if (skip())
+		if (skip(1))
 			break;
 		noscale++;
 		n = atoi();
@@ -1800,14 +1809,15 @@ caseftr(void)
 	tchar	k;
 
 	lgf++;
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((f = findft(i)) < 0)
 		return;
 	font = font1 = f;
 	mchbits();
-	if (skip())
+	if (skip(1))
 		goto done;
 	while ((i = cbits(k=getch())) != '\n') {
 		if (ismot(k))
@@ -1831,7 +1841,7 @@ getfeature(struct afmtab *a, int f)
 	int	ch1, ch2, c, i, j, minus;
 	struct feature	*fp;
 
-	if (skip())
+	if (skip(0))
 		return 0;
 	switch (c = getach()) {
 	case '-':
@@ -1879,7 +1889,8 @@ casefeature(void)
 	int	f, i, j;
 
 	lgf++;
-	skip();
+	if (skip(1))
+		return;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
 	if ((f = findft(i)) < 0)

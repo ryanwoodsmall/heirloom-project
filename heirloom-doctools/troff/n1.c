@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.55 (gritter) 12/19/05
+ * Sccsid @(#)n1.c	1.56 (gritter) 12/19/05
  */
 
 /*
@@ -332,7 +332,7 @@ loop:
 			j = maybemore(j, 0);
 		if (xflag != 0 && j == PAIR('d', 'o')) {
 			xflag = 3;
-			skip();
+			skip(1);
 			if ((j = getrq()) >= 256)
 				j = maybemore(j, 0);
 		}
@@ -724,6 +724,8 @@ control(register int a, register int b)
 		    max_recursion_depth, macname(frame->mname));
 		edone(02);
 	}
+
+	lastrq = a;
 
 #ifdef	DEBUG
 	if (debug & DB_MAC)
@@ -1430,7 +1432,7 @@ void
 casenx(void)
 {
 	lgf++;
-	skip();
+	skip(0);
 	getname();
 	nx++;
 	if (nmfi > 0)
@@ -1535,7 +1537,9 @@ caseso(void)
 
 	lgf++;
 	nextf[0] = 0;
-	if (skip() || !getname() || ((i = open(nextf, O_RDONLY)) < 0) ||
+	if (skip(1))
+		done(02);
+	if (!getname() || ((i = open(nextf, O_RDONLY)) < 0) ||
 			(ifi >= NSO)) {
 		errprint("can't open file %s", nextf);
 		done(02);
@@ -1552,7 +1556,9 @@ casepso(void)
 
 	lgf++;
 	nextf[0] = 0;
-	if (skip() || ifi >= NSO || pipe(pd) < 0) {
+	if (skip(1))
+		done(02);
+	if (ifi >= NSO || pipe(pd) < 0) {
 		errprint("can't .pso");
 		done(02);
 	}
@@ -1587,11 +1593,11 @@ caself(void)	/* set line number and file */
 {
 	int n;
 
-	if (skip())
+	if (skip(1))
 		return;
 	n = atoi();
 	cfline[ifi] = numtab[CD].val = n - 2;
-	if (skip())
+	if (skip(0))
 		return;
 	if (getname()) {
 		free(cfname[ifi]);
@@ -1609,7 +1615,9 @@ casecf(void)
 	char	buf[512];
 	extern int hpos, esc, po;
 	nextf[0] = 0;
-	if (skip() || !getname() || (fd = open(nextf, O_RDONLY)) < 0) {
+	if (skip(1))
+		return;
+	if (!getname() || (fd = open(nextf, O_RDONLY)) < 0) {
 		errprint("can't open file %s", nextf);
 		done(02);
 	}
@@ -1636,7 +1644,7 @@ casesy(void)	/* call system */
 
 	lgf++;
 	copyf++;
-	skip();
+	skip(1);
 	for (i = 0; i < NTM - 2; i++)
 		if ((sybuf[i] = getch()) == '\n')
 			break;
@@ -1717,7 +1725,7 @@ casedb(void)
 {
 #ifdef	DEBUG
 	debug = 0;
-	if (skip())
+	if (skip(1))
 		return;
 	noscale++;
 	debug = max(atoi(), 0);
@@ -1730,7 +1738,7 @@ casexflag(void)
 {
 	int	i;
 
-	skip();
+	skip(1);
 	i = atoi();
 	if (!nonumb)
 		_xflag = xflag = i & 3;
@@ -1739,6 +1747,6 @@ casexflag(void)
 void
 caserecursionlimit(void)
 {
-	skip();
+	skip(1);
 	max_recursion_depth = atoi();
 }

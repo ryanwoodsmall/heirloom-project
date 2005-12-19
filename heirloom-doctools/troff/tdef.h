@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.64 (gritter) 12/6/05
+ * Sccsid @(#)tdef.h	1.65 (gritter) 12/19/05
  */
 
 /*
@@ -459,6 +459,7 @@ extern enum warn {
 	WARN_DI		= 256,
 	WARN_MAC	= 512,
 	WARN_REG	= 1024,
+	WARN_MISSING	= 8192,
 	WARN_INPUT	= 16384,
 	WARN_ESCAPE	= 32768,
 	WARN_SPACE	= 65536,
@@ -744,7 +745,7 @@ void casede(void);
 int findmn(register int);
 void clrmn(register int);
 filep finds(register int);
-int skip(void);
+int skip(int);
 int copyb(void);
 void copys(void);
 filep alloc(void);
@@ -927,4 +928,5 @@ void casepsbb(void);
 void casewarn(void);
 void nosuch(int);
 void illseq(int, const char *, int);
+void missing(void);
 void morechars(int);

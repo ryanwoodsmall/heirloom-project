@@ -4,6 +4,8 @@ Release ...
   are ignored instead of being interpreted as short requests. Also string
   and number register references are interpreted at any position of a
   long request name in this level.
+* [nt]roff: The warning category "missing" is now available; it includes
+  warnings about missing required arguments to requests.
 * troff: The ".trimat", ".bleedat, and ".cropat" " requests have been added
   to include advice about the "TrimBox", "BleedBox", and "CropBox" page
   parameters to a PDF distiller command, particularly for PDF/X generation.

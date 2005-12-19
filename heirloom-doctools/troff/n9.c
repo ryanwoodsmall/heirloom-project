@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.30 (gritter) 12/14/05
+ * Sccsid @(#)n9.c	1.31 (gritter) 12/19/05
  */
 
 /*
@@ -397,11 +397,11 @@ casefc(void)
 	gchtab[fc] &= ~FCBIT;
 	fc = IMP;
 	padc = ' ';
-	if (skip() || ismot(j = getch()) || (i = cbits(j)) == '\n')
+	if (skip(0) || ismot(j = getch()) || (i = cbits(j)) == '\n')
 		return;
 	fc = i;
 	gchtab[fc] |= FCBIT;
-	if (skip() || ismot(ch) || (ch = cbits(ch)) == fc)
+	if (skip(0) || ismot(ch) || (ch = cbits(ch)) == fc)
 		return;
 	padc = ch;
 }
@@ -661,7 +661,7 @@ caselc_ctype(void)
 	char	c, *buf = NULL;
 	int	i = 0, sz = 0;
 
-	skip();
+	skip(1);
 	do {
 		c = getach()&0377;
 		if (i >= sz)
@@ -785,7 +785,7 @@ casepsbb(void)
 	int	bb[4] = { 0, 0, 0, 0 };
 
 	lgf++;
-	skip();
+	skip(1);
 	do {
 		c = getach();
 		if (n >= sz)
@@ -813,6 +813,7 @@ static const struct {
 	{ WARN_DI,	"di" },
 	{ WARN_MAC,	"mac" },
 	{ WARN_REG,	"reg" },
+	{ WARN_MISSING,	"missing" },
 	{ WARN_INPUT,	"input" },
 	{ WARN_ESCAPE,	"escape" },
 	{ WARN_SPACE,	"space" },
@@ -877,12 +878,12 @@ warn1(void)
 void
 casewarn(void)
 {
-	if (skip())
+	if (skip(0))
 		warn = -1;
 	else {
 		do
 			warn1();
-		while (!skip());
+		while (!skip(0));
 	}
 }
 
@@ -891,6 +892,17 @@ nosuch(int rq)
 {
 	if (rq && rq != RIGHT && warn & WARN_MAC)
 		errprint("no such request %s", macname(rq));
+}
+
+void
+missing(void)
+{
+	if (warn & WARN_MISSING) {
+		if (lastrq)
+			errprint("missing argument to .%s", macname(lastrq));
+		else
+			errprint("missing argument");
+	}
 }
 
 void

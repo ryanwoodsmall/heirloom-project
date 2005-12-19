@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.20 (gritter) 12/14/05
+ * Sccsid @(#)n4.c	1.21 (gritter) 12/19/05
  */
 
 /*
@@ -770,9 +770,10 @@ caserr(void)
 {
 	register int i, j;
 	register struct numtab *p;
+	int cnt = 0;
 
 	lgf++;
-	while (!skip() && (i = getrq()) ) {
+	while (!skip(!cnt++) && (i = getrq()) ) {
 		if (i >= 256)
 			i = maybemore(i, 2);
 		j = usedr(i);
@@ -795,12 +796,12 @@ casenr(void)
 	register int i, j;
 
 	lgf++;
-	skip();
+	skip(1);
 	if ((j = getrq()) >= 256)
 		j = maybemore(j, 3);
 	if ((i = findr(j)) == -1)
 		goto rtn;
-	skip();
+	skip(1);
 	j = inumb(&numtab[i].val);
 	if (nonumb)
 		goto rtn;
@@ -815,7 +816,7 @@ casenr(void)
 	if ((j >= 'a' && j <= 'z' || j >= 'A' && j <= 'Z') &&
 			warn & WARN_SCALE)
 		goto rtn;
-	skip();
+	skip(0);
 	j = atoi();
 	if (nonumb)
 		goto rtn;
@@ -832,11 +833,11 @@ caseaf(void)
 	register tchar j, jj;
 
 	lgf++;
-	if (skip() || !(i = getrq()))
+	if (skip(1) || !(i = getrq()))
 		return;
 	if (i >= 256)
 		i = maybemore(i, 3);
-	if (skip())
+	if (skip(1))
 		return;
 	k = 0;
 	j = getch();

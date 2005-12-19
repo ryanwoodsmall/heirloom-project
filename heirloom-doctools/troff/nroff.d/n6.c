@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.23 (gritter) 12/6/05
+ * Sccsid @(#)n6.c	1.24 (gritter) 12/19/05
  */
 
 /*
@@ -252,7 +252,7 @@ setslant (void)		/* set slant from \S'...' */
 void
 caseft(void)
 {
-	skip();
+	skip(0);
 	setfont(1);
 }
 
@@ -428,10 +428,10 @@ casefp(void)
 {
 	register int i, j;
 
-	skip();
+	skip(1);
 	if ((i = cbits(getch()) - '0') < 0 || i > nfonts)
 		return;
-	if (skip() || !(j = getrq()))
+	if (skip(1) || !(j = getrq()))
 		return;
 	fontlab[i] = j;
 }
@@ -450,7 +450,7 @@ casebd(void)
 
 	k = 0;
 bd0:
-	if (skip() || !(i = getrq()) || (j = findft(i)) == -1) {
+	if (skip(1) || !(i = getrq()) || (j = findft(i)) == -1) {
 		if (k)
 			goto bd1;
 		else 
@@ -465,7 +465,7 @@ bd0:
 		j = k;
 	}
 bd1:
-	skip();
+	skip(0);
 	noscale++;
 	bdtab[j] = atoi();
 	noscale = 0;
@@ -477,7 +477,7 @@ casevs(void)
 {
 	register int i;
 
-	skip();
+	skip(0);
 	vflag++;
 	dfact = INCH; /*default scaling is points!*/
 	dfactd = 72;
