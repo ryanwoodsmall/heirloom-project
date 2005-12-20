@@ -447,7 +447,7 @@ Adobe Myriad Pro for greek letters and mathematical symbols:
 	.fp 2 I MyriadPro-It otf
 	.fallback I R
 	.EQ
-	a ^=^ 2 pi {r sup 2}
+	a ^=^ pi {r sup 2}
 	.EN
 
 
