@@ -445,6 +445,7 @@ Adobe Myriad Pro for greek letters and mathematical symbols:
 	.do xflag 3
 	.fps math,greek 1 R MyriadPro-Regular otf
 	.fp 2 I MyriadPro-It otf
+	.fallback I R
 	.EQ
 	a ^=^ 2 pi {r sup 2}
 	.EN
