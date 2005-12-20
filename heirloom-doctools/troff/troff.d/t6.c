@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.109 (gritter) 12/19/05
+ * Sccsid @(#)t6.c	1.110 (gritter) 12/20/05
  */
 
 /*
@@ -991,7 +991,7 @@ caseflig(void)
 }
 
 void
-casefp(void)
+casefp(int spec)
 {
 	register int i, j;
 	char *file, *supply;
@@ -1017,7 +1017,7 @@ casefp(void)
 				strcpy(supply, nextf);
 			} else
 				supply = NULL;
-			if (loadafm(i?i:-1, j, file, supply, 0) == 0) {
+			if (loadafm(i?i:-1, j, file, supply, 0, spec) == 0) {
 				if (i == 0) {
 					if (warn & WARN_FONT)
 						errprint("fp: cannot mount %s",
@@ -1029,6 +1029,45 @@ casefp(void)
 			free(supply);
 		}
 	}
+}
+
+void
+casefps(void)
+{
+	const struct {
+		enum spec	spec;
+		const char	*name;
+	} tab[] = {
+		{ SPEC_MATH,	"math" },
+		{ SPEC_GREEK,	"greek" },
+		{ SPEC_PUNCT,	"punct" },
+		{ SPEC_LARGE,	"large" },
+		{ SPEC_S1,	"S1" },
+		{ SPEC_S,	"S" },
+		{ SPEC_NONE,	NULL }
+	};
+	char	name[NC];
+	int	c, i;
+	enum spec	s = SPEC_NONE;
+
+	if (skip(1))
+		return;
+	do {
+		for (i = 0; i < sizeof name - 2; i++) {
+			if ((c = getach()) == 0 || c == ':' || c == ',')
+				break;
+			name[i] = c;
+		}
+		name[i] = 0;
+		for (i = 0; tab[i].name; i++)
+			if (strcmp(tab[i].name, name) == 0) {
+				s |= tab[i].spec;
+				break;
+			}
+		if (tab[i].name == NULL)
+			errprint("fps: unknown special set %s", name);
+	} while (c);
+	casefp(s);
 }
 
 int
@@ -1052,7 +1091,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 		*ap = 0;
 		if (ap == &fontbase[pos]->namefont[1])
 			f &= BYTEMASK;
-		loadafm(pos, f, fontbase[pos]->namefont, NULL, 1);
+		loadafm(pos, f, fontbase[pos]->namefont, NULL, 1, SPEC_NONE);
 		free(fpout);
 	} else {
 		nw = fontbase[pos]->nwfont & BYTEMASK;
@@ -1273,7 +1312,7 @@ getfontpath(char *file, char *type)
 }
 
 int
-loadafm(int nf, int rq, char *file, char *supply, int required)
+loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 {
 	struct stat	st;
 	int	fd;
@@ -1291,7 +1330,8 @@ loadafm(int nf, int rq, char *file, char *supply, int required)
 	}
 	a = calloc(1, sizeof *a);
 	for (i = 0; i < nafm; i++)
-		if (strcmp(afmtab[i]->path, path) == 0) {
+		if (strcmp(afmtab[i]->path, path) == 0 &&
+				afmtab[i]->spec == spec) {
 			*a = *afmtab[i];
 			have = 1;
 			break;
@@ -1299,6 +1339,7 @@ loadafm(int nf, int rq, char *file, char *supply, int required)
 	a->path = path;
 	a->file = malloc(strlen(file) + 1);
 	strcpy(a->file, file);
+	a->spec = spec;
 	a->rq = rq;
 	a->Font.namefont[0] = rq&0377;
 	a->Font.namefont[1] = (rq>>8)&0377;

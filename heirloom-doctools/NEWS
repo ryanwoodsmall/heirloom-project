@@ -162,6 +162,20 @@ New and extended requests
 	likewise). "supplyname" may also be the basename of a file like
 	"metricsname" above.
 
+.fps math,greek,punct,large r yy metricsname [supplyname]	troff only
+	mounts a font with a special character map. By default, special
+	characters like "\(*a" are not assigned when a font is mounted
+	even if a matching named PostScript character (like "\[alpha]")
+	would have been available. The following special character maps
+	exist:
+
+	math	mathematical characters like \(<= \(cu \(-> \(if
+	greek	greek characters like \(*a \(*b \(*g \(*A \(*B \(*G
+	punct	the characters \(or \- \` \' " # < > @ \ ^ ~
+	large	parts of large characters like \(rc \(rk \(lb \(lk
+
+	The remaining arguments are handled as described for ".fp".
+
 .ftr ff abcd...						troff only
 	is a font-specific variant of the ".tr" request. If the current
 	character originates from font "ff", character "a" is translated
@@ -597,4 +611,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   12/19/05
+Gunnar Ritter                                                   12/20/05

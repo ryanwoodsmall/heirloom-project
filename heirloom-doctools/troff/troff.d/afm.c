@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.38 (gritter) 10/4/05
+ * Sccsid @(#)afm.c	1.40 (gritter) 12/20/05
  */
 
 #include <stdlib.h>
@@ -77,11 +77,9 @@ const struct names {
 };
 
 /*
- * Names for the Symbol font only.
+ * Names for Symbol fonts only.
  */
-const struct names Snames[] = {
-	{ "!=",	"notequal" },
-	{ "**",	"asteriskmath" },
+const struct names greeknames[] = {
 	{ "*A",	"Alpha" },
 	{ "*B",	"Beta" },
 	{ "*C",	"Xi" },
@@ -130,6 +128,12 @@ const struct names Snames[] = {
 	{ "*x",	"chi" },
 	{ "*y",	"eta" },
 	{ "*z",	"zeta" },
+	{ 0,	0 }
+};
+
+const struct names mathnames[] = {
+	{ "!=",	"notequal" },
+	{ "**",	"asteriskmath" },
 	{ "+-",	"plusminus" },
 	{ "->",	"arrowright" },
 	{ "<",	"less" },
@@ -143,9 +147,7 @@ const struct names Snames[] = {
 	{ "^",	"logicaland" },
 	{ "al",	"aleph" },
 	{ "ap",	"similar" },
-	{ "br",	"parenleftex" },
 	{ "bu",	"bullet" },
-	{ "bv",	"braceex" },
 	{ "ca",	"intersection" },
 	{ "co",	"copyrightserif" },
 	{ "cu",	"union" },
@@ -161,11 +163,6 @@ const struct names Snames[] = {
 	{ "if",	"infinity" },
 	{ "ip",	"reflexsuperset" },
 	{ "is",	"integral" },
-	{ "lb",	"braceleftbt" },
-	{ "lc",	"bracketlefttp" },
-	{ "lf",	"bracketleftbt" },
-	{ "lk",	"braceleftmid" },
-	{ "lt",	"bracelefttp" },
 	{ "mi",	"minus" },
 	{ "mo",	"element" },
 	{ "mu",	"multiply" },
@@ -175,13 +172,7 @@ const struct names Snames[] = {
 	{ "pd",	"partialdiff" },
 	{ "pl",	"plus" },
 	{ "pt",	"proportional" },
-	{ "rb",	"bracerightbt" },
-	{ "rc",	"bracketrighttp" },
-	{ "rf",	"bracketrightbt" },
 	{ "rg",	"registerserif" },
-	{ "rk",	"bracerightmid" },
-	{ "rn",	"radicalex" },
-	{ "rt",	"bracerighttp" },
 	{ "sb",	"propersubset" },
 	{ "sl",	"fraction" },
 	{ "sp",	"propersuperset" },
@@ -190,22 +181,48 @@ const struct names Snames[] = {
 	{ "tm",	"trademarkserif" },
 	{ "ts",	"sigma1" },
 	{ "ua",	"arrowup" },
-	{ "ul",	"underscore" },
-	{ "vr",	"bracketleftex" },
 	{ "~~",	"approxequal" },
 	{ 0,	0 },
 };
 
-/*
- * These names are only used with the S1 font. They are characters from
- * the Times that serve as fallbacks and should not be superseded by
- * characters from other fonts.
- */
-const struct names S1names[] = {
+const struct names largenames[] = {
+	{ "bv",	"braceex" },
+	{ "lb",	"braceleftbt" },
+	{ "lc",	"bracketlefttp" },
+	{ "lf",	"bracketleftbt" },
+	{ "lk",	"braceleftmid" },
+	{ "lt",	"bracelefttp" },
+	{ "rb",	"bracerightbt" },
+	{ "rc",	"bracketrighttp" },
+	{ "rf",	"bracketrightbt" },
+	{ "rk",	"bracerightmid" },
+	{ "rn",	"radicalex" },
+	{ "rt",	"bracerighttp" },
+	{ 0,	0 }
+};
+
+const struct names punctnames[] = {
 	{ "or",	"bar" },
 	{ "\\-","endash" },
 	{ "aa","acute" },
 	{ "ga","grave" },
+	{ 0,	0 }
+};
+
+/*
+ * These names are only used with the S font.
+ */
+const struct names Snames[] = {
+	{ "br",	"parenleftex" },
+	{ "ul",	"underscore" },
+	{ "vr",	"bracketleftex" },
+	{ 0,	0 }
+};
+
+/*
+ * These names are only used with the S1 font.
+ */
+const struct names S1names[] = {
 	{ "ru",	"underscore" },
 	{ 0,	0 }
 };
@@ -440,18 +457,18 @@ static const struct asciimap {
 };
 
 /*
- * ASCII characters that are always taken from the S font.
+ * ASCII characters that are always taken from the S (math) font.
  */
-static const struct asciimap	Sascii[] = {
+static const struct asciimap	mathascii[] = {
 	{ 0x002D,	"minus" },
 	{ 0x007E,	"similar" },
 	{ 0,		0 }
 };
 
 /*
- * ASCII characters that are always taken from the S1 font.
+ * ASCII characters that are always taken from the S1 (punct) font.
  */
-static const struct asciimap	S1ascii[] = {
+static const struct asciimap	punctascii[] = {
  	{ 0x0022,	"quotedbl" },
  	{ 0x0023,	"numbersign" },
  	{ 0x003C,	"less" },
@@ -521,40 +538,39 @@ afmnamelook(struct afmtab *a, const char *name)
 	return np;
 }
 
-int
-afmmapname(const char *psname, int isS, int isS1)
+static int
+mapname1(const char *psname, const struct names *np)
 {
 	int	i, j;
 
-	if (isS) {
-		for (i = 0; Snames[i].trname; i++)
-			if (strcmp(Snames[i].psname, psname) == 0)
-				break;
-		if (Snames[i].trname)
-			for (j = 0; j < nchtab; j++)
-				if (strcmp(Snames[i].trname,
-						&chname[chtab[j]]) == 0)
-					return j + 128;
-	}
-	if (isS1) {
-		for (i = 0; S1names[i].trname; i++)
-			if (strcmp(S1names[i].psname, psname) == 0)
-				break;
-		if (S1names[i].trname)
-			for (j = 0; j < nchtab; j++)
-				if (strcmp(S1names[i].trname,
-						&chname[chtab[j]]) == 0)
-					return j + 128;
-	}
-	for (i = 0; names[i].trname; i++)
-		if (strcmp(names[i].psname, psname) == 0)
+	for (i = 0; np[i].trname; i++)
+		if (strcmp(np[i].psname, psname) == 0)
 			break;
-	if (names[i].trname) {
+	if (np[i].trname)
 		for (j = 0; j < nchtab; j++)
-			if (strcmp(names[i].trname, &chname[chtab[j]]) == 0)
+			if (strcmp(np[i].trname, &chname[chtab[j]]) == 0)
 				return j + 128;
-	}
 	return 0;
+}
+
+int
+afmmapname(const char *psname, enum spec s)
+{
+	int	k;
+
+	if (s & SPEC_S && (k = mapname1(psname, Snames)) > 0)
+		return k;
+	if (s & SPEC_S1 && (k = mapname1(psname, S1names)) > 0)
+		return k;
+	if (s & (SPEC_MATH|SPEC_S) && (k = mapname1(psname, mathnames)) > 0)
+		return k;
+	if (s & (SPEC_GREEK|SPEC_S) && (k = mapname1(psname, greeknames)) > 0)
+		return k;
+	if (s & (SPEC_LARGE|SPEC_S) && (k = mapname1(psname, largenames)) > 0)
+		return k;
+	if (s & (SPEC_PUNCT|SPEC_S1) && (k = mapname1(psname, punctnames)) > 0)
+		return k;
+	return mapname1(psname, names);
 }
 
 /*
@@ -597,7 +613,7 @@ afmremap(struct afmtab *a)
 
 #ifndef	DUMP
 static int
-asciiequiv(int code, const char *psc, int isS, int isS1)
+asciiequiv(int code, const char *psc, enum spec s)
 {
 	int	i;
 
@@ -605,15 +621,15 @@ asciiequiv(int code, const char *psc, int isS, int isS1)
 		for (i = 0; asciimap[i].psc; i++)
 			if (strcmp(asciimap[i].psc, psc) == 0)
 				return asciimap[i].code;
-		if (isS) {
-			for (i = 0; Sascii[i].psc; i++)
-				if (strcmp(Sascii[i].psc, psc) == 0)
-					return Sascii[i].code;
+		if (s & (SPEC_MATH|SPEC_S)) {
+			for (i = 0; mathascii[i].psc; i++)
+				if (strcmp(mathascii[i].psc, psc) == 0)
+					return mathascii[i].code;
 		}
-		if (isS1) {
-			for (i = 0; S1ascii[i].psc; i++)
-				if (strcmp(S1ascii[i].psc, psc) == 0)
-					return S1ascii[i].code;
+		if (s & (SPEC_PUNCT|SPEC_S1)) {
+			for (i = 0; punctascii[i].psc; i++)
+				if (strcmp(punctascii[i].psc, psc) == 0)
+					return punctascii[i].code;
 		}
 	}
 	return 0;
@@ -657,7 +673,7 @@ unitconv(int i)
 #ifndef	DUMP
 void
 afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
-		int isS, int isS1, int gid)
+		enum spec s, int gid)
 {
 	struct namecache	*np = NULL;
 
@@ -679,7 +695,7 @@ afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 	 * Only map a character directly if it maps to an ASCII
 	 * equivalent or to a troff special character.
 	 */
-	C = asciiequiv(C, N, isS, isS1);
+	C = asciiequiv(C, N, s);
 	if (cl)
 		a->codetab[a->nchars] = cl;
 	else if (tp)
@@ -725,15 +741,14 @@ addcharlib(struct afmtab *a, int symbol)
 				B[3] = charlib[i].kern & 2 ?
 					a->capheight + 1 : 0;
 				afmaddchar(a, -1, j+128, charlib[i].code,
-						charlib[i].width * unitsPerEm /
-						1024, B, NULL,
-						0, 0, 0);
+					charlib[i].width * unitsPerEm / 1024,
+					B, NULL, SPEC_NONE, 0);
 			}
 		}
 }
 
 static void
-addmetrics(struct afmtab *a, char *_line, int isSymbol)
+addmetrics(struct afmtab *a, char *_line, enum spec s)
 {
 	char	*lp = _line, c, *xp;
 	int	C = -1, WX = 0, tp;
@@ -796,10 +811,10 @@ addmetrics(struct afmtab *a, char *_line, int isSymbol)
 	}
 	if (N == NULL)
 		return;
-	tp = afmmapname(N, isSymbol,
-			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0);
-	afmaddchar(a, C, tp, 0, WX, B, N, isSymbol,
-			a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0, 0);
+	if (a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0)
+		s |= SPEC_S1;
+	tp = afmmapname(N, s);
+	afmaddchar(a, C, tp, 0, WX, B, N, s, 0);
 }
 
 void
@@ -839,7 +854,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	} state = NONE;
 	char	*cp, *th, *tp;
 	int	n = 0;
-	int	isSymbol = 0;
+	enum spec	s = a->spec;
 
 	if ((cp = strrchr(a->file, '/')) == NULL)
 		cp = a->file;
@@ -874,7 +889,8 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->fontname = malloc(tp - th + 1);
 			memcpy(a->fontname, th, tp - th);
 			a->fontname[tp - th] = 0;
-			isSymbol = strcmp(a->fontname, "Symbol") == 0;
+			if (strcmp(a->fontname, "Symbol") == 0)
+				s |= SPEC_S;
 		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "XHeight")) != NULL) {
 			a->xheight = strtol(th, NULL, 10);
@@ -891,7 +907,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			state = FONTMETRICS;
 			afmremap(a);
 		} else if (state == CHARMETRICS && n-- > 0) {
-			addmetrics(a, cp, isSymbol);
+			addmetrics(a, cp, s);
 #ifndef	DPOST
 		} else if (state == FONTMETRICS &&
 				thisword(cp, "StartKernData") != 0) {

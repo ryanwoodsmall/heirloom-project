@@ -4,6 +4,8 @@ Release ...
   are ignored instead of being interpreted as short requests. Also string
   and number register references are interpreted at any position of a
   long request name in this level.
+* troff: The ".fps" request has been introduced to map troff special
+  characters like "\(*a" or "\(+-" to a custom font.
 * [nt]roff: The warning category "missing" is now available; it includes
   warnings about missing required arguments to requests.
 * [nt]roff: The warning category "delim" is now available; it includes

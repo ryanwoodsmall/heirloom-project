@@ -71,7 +71,7 @@ that your terminal and text editor/pager must support UTF-8 to display
 the following example properly:
 
 	.\" Enable long request names.
-	.do xflag 2
+	.do xflag 3
 	.\" de_DE.utf8 is for GNU libc; de_DE.UTF-8 may work elsewhere.
 	.lc_ctype de_DE.utf8
 	Deutscher Text mit „Anführungszeichen“
@@ -139,7 +139,7 @@ typographic effects. For example, the Adobe Garamond Pro Regular font
 contains titling capitals that can be mapped to the input range of regular
 capitals with the ".feature" request in troff:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R AGaramondPro-Regular otf
 	.fp 0 T AGaramondPro-Regular otf
 	.feature T +titl
@@ -168,7 +168,7 @@ these characters can be accessed directly using "\[name]" escape sequences
 anyway. To make an individual alternate character the default, the ".ftr"
 request can be used:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 2 I AGaramondPro-Italic otf
 	.ftr I Q\[Q.swash]
 	.ft I
@@ -199,7 +199,7 @@ selected, and used.
 Old-style numerals contained in OpenType fonts can be accessed conveniently
 by mapping them to the standard ASCII numbers with the ".feature" request:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R ACaslonPro-Regular otf
 	.feature R +onum
 	The numerals 0 1 2 3 4 5 6 7 8 9 are in old-style.
@@ -211,7 +211,7 @@ Using fonts with small capital letters
 Small capital fonts normally need letter space tracking. Thus e.g.
 to use the Stempel Garamond small capital font, write something like
 
-	.do xflag 2
+	.do xflag 3
 	.fp 0 SC gsrsc___ pfb
 	.track SC 1 .2 24 2
 	.ft SC
@@ -219,7 +219,7 @@ to use the Stempel Garamond small capital font, write something like
 
 With an OpenType font, the ".feature" request comes handy again:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 0 SC ACaslonPro-Regular otf
 	.feature SC +smcp
 	.track SC 1 .3 24 3
@@ -237,7 +237,7 @@ in this case. The expert font is selected as text font, but for each
 upper-case letter encountered, troff changes automatically to the
 standard font. An example with the Monotype Fournier type:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.track E 1 .2 24 2
@@ -256,7 +256,7 @@ This also uses the fallback sequence, but since the standard numerals
 are present in the standard font, they have to be hidden first so that
 troff does not select them:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -271,7 +271,7 @@ The examples above can also be combined. Since the .track request does not
 affect the tracking of fonts that are selected by the fallback sequence,
 it is sufficient to mount each font once:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -292,7 +292,7 @@ ffl in the base font; an expert font delivers them in addition. Automatic
 substitution of such ligatures can be enabled using the ".flig" request
 in combination with the fallback sequence:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -312,7 +312,7 @@ is available. It only applies to characters that are actually in the
 current font, not to characters from another font that have been
 selected using the fallback sequence.
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R pl______ pfb
 	.fzoom H .92
 	Text in \fHHelvetica\fP must be adjusted to fit with Plantin.
@@ -340,7 +340,7 @@ to zoom the font to a smaller size than that of the lower-case text
 surrounding it, and to track it as well. Mounting the regular font
 a second time is the most convenient way to handle this:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R fn______ pfb
 	.fp 0 XC fn______ pfb
 	.track XC 1 .2 24 2
@@ -365,7 +365,7 @@ with Type 1 fonts, or not possible because the characters in the kerning
 pair originate from a different font, troff provides the ".kernpair"
 request:
 
-	.do xflag 2
+	.do xflag 3
 	.fp 1 R fn______ pfb
 	.fp 0 E fny_____ pfb
 	.fallback R E
@@ -385,7 +385,7 @@ character appears, for example before ";" or "?", or on the inner
 sides of guillemots in French/Swiss style. The ".kernafter" and
 ".kernbefore" requests are useful for this:
 
-	.do xflag 2
+	.do xflag 3
 	.kernafter R ; 60 ? 60
 
 If the characters affected by these requests are also member of a
@@ -404,7 +404,7 @@ must be given explicitly in troff source code using the ".lhang" and
 ".rhang" requests. Both accept a font specification followed by one
 or more pairs of characters and values:
 
-	.do xflag 2
+	.do xflag 3
 	.ps 10
 	.fp 1 R fn______ pfb
 	.lhang R V -50 J -40
@@ -428,6 +428,26 @@ other. This is not a problem for the typical application of hanging
 punctuation for visual alignment, though; if a line with eight word
 spaces is shifted in the example above, each word space is enlarged
 by only 1/100 em.
+
+
+Mathematical and other special characters
+-----------------------------------------
+
+Special mathematical characters like "\(+-", greek letters like "\(*a",
+and even the punctuation characters \(or \- \` \' " # < > @ \ ^ ~ are
+normally not chosen from a font that has been mounted explicitly, but
+are taken from the special font instead. (They can always be accessed
+with their PostScript names (e.g. "\[numbersign]", "\[less]", "\[at]")).
+The ".fps" request can be used to override this behavior. In particular,
+this is useful to set mathematical text with a different font. To use
+Adobe Myriad Pro for greek letters and mathematical symbols:
+
+	.do xflag 3
+	.fps math,greek 1 R MyriadPro-Regular otf
+	.fp 2 I MyriadPro-It otf
+	.EQ
+	a ^=^ 2 pi {r sup 2}
+	.EN
 
 
 Helper utilities
@@ -475,4 +495,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 12/9/05
+Gunnar Ritter                                                 12/20/05

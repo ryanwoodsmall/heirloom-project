@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.118 (gritter) 12/18/05
+ * Sccsid @(#)dpost.c	1.119 (gritter) 12/20/05
  */
 
 /*
@@ -1838,15 +1838,14 @@ loadfont (
 	strcpy(temp, s);
     else if (strstr(s, ".afm") != NULL)
 	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s);
-    else if ( s1 == NULL || s1[0] == '\0' )
-	snprintf(temp, sizeof temp, "%s/dev%s/%s.afm", fontdir, devname, s);
-    else snprintf(temp, sizeof temp, "%s/%s.afm", s1, s);
+    else snprintf(temp, sizeof temp, "%s/dev%s/%s.afm", fontdir, devname, s);
 
     if ( (fin = open(temp, O_RDONLY)) >= 0 )  {
 	struct afmtab	*a;
 	struct stat	st;
 	char	*contents;
 	int	i;
+	enum spec	spec;
 	if ((p = strrchr(s, '/')) == NULL)
 		p = s;
 	else
@@ -1854,8 +1853,10 @@ loadfont (
 	if (p[0] == 'S' && (p[1] == '\0' || digitchar(p[1]&0377) &&
 				p[2] == '\0' || p[2] == '.'))
 		forcespecial = 1;
+	spec = s1 && *s1 ? atoi(s1) : SPEC_NONE;
 	for (i = 0; i < afmcount; i++)
-		if (afmfonts[i] && strcmp(afmfonts[i]->path, temp) == 0) {
+		if (afmfonts[i] && strcmp(afmfonts[i]->path, temp) == 0 &&
+				afmfonts[i]->spec == spec) {
 			a = afmfonts[i];
 			close(fin);
 			goto have;
@@ -1872,6 +1873,7 @@ loadfont (
 	a->path = malloc(strlen(temp) + 1);
 	strcpy(a->path, temp);
 	a->file = s;
+	a->spec = spec;
 	if (afmget(a, contents, st.st_size) < 0) {
 		free(a);
 		free(contents);

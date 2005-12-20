@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.56 (gritter) 12/18/05
+ * Sccsid @(#)t10.c	1.57 (gritter) 12/20/05
  */
 
 /*
@@ -210,7 +210,8 @@ ptinit(void)
 			*ap = 0;
 			if (ap == &fontbase[i]->namefont[1])
 				fontlab[i] &= BYTEMASK;
-			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL, 1);
+			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL,
+					1, SPEC_NONE);
 		} else
 			makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
 		p += 3 * nw + dev.nchtab + 128 - 32;
@@ -706,8 +707,9 @@ newpage(int n)	/* called at end of each output page (we hope) */
 	fdprintf(ptid, "p%d\n", n);	/* new page */
 	for (i = 0; i <= nfonts; i++)
 		if (afmtab && fontbase[i]->afmpos)
-			fdprintf(ptid, "x font %d %s\n", i,
-				afmtab[(fontbase[i]->afmpos)-1]->path);
+			fdprintf(ptid, "x font %d %s %d\n", i,
+				afmtab[(fontbase[i]->afmpos)-1]->path,
+				afmtab[(fontbase[i]->afmpos)-1]->spec);
 		else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
 			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();

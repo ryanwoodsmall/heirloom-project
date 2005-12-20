@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.32 (gritter) 12/19/05
+ * Sccsid @(#)n9.c	1.33 (gritter) 12/20/05
  */
 
 /*
@@ -896,7 +896,7 @@ void
 nosuch(int rq)
 {
 	if (rq && rq != RIGHT && warn & WARN_MAC)
-		errprint("no such request %s", macname(rq));
+		errprint("%s: no such request", macname(rq));
 }
 
 void
@@ -904,7 +904,7 @@ missing(void)
 {
 	if (warn & WARN_MISSING) {
 		if (lastrq)
-			errprint("missing argument to .%s", macname(lastrq));
+			errprint("%s: missing argument", macname(lastrq));
 		else
 			errprint("missing argument");
 	}

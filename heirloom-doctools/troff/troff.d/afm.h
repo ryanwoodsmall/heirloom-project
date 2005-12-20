@@ -23,11 +23,21 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.16 (gritter) 10/2/05
+ * Sccsid @(#)afm.h	1.18 (gritter) 12/20/05
  */
 
 #ifndef	TROFF_AFM_H
 #define	TROFF_AFM_H
+
+enum spec {
+	SPEC_NONE	= 00000,
+	SPEC_MATH	= 00001,
+	SPEC_GREEK	= 00002,
+	SPEC_PUNCT	= 00004,
+	SPEC_LARGE	= 00010,
+	SPEC_S1		= 01000,
+	SPEC_S		= 02000
+};
 
 struct kernpair {
 	unsigned short	ch1;
@@ -76,6 +86,7 @@ extern struct afmtab {
 	int	nchars;
 	int	capheight;
 	int	xheight;
+	enum spec	spec;
 	enum {
 		TYPE_AFM,
 		TYPE_OTF,
@@ -99,9 +110,9 @@ extern	void	makefont(int, char *, char *, char *, char *, int);
 extern	int	unitconv(int);
 extern	void	afmalloc(struct afmtab *, int);
 extern	void	afmremap(struct afmtab *);
-extern	int	afmmapname(const char *, int, int);
+extern	int	afmmapname(const char *, enum spec);
 extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
-			char *, int, int, int);
+			char *, enum spec, int);
 extern	struct kernpair	*afmkernlook(struct afmtab *, int, int);
 extern	int	nextprime(int n);
 #ifdef	DPOST

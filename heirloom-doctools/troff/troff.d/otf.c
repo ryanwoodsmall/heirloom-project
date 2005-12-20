@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.33 (gritter) 12/8/05
+ * Sccsid @(#)otf.c	1.35 (gritter) 12/20/05
  */
 
 #include <stdio.h>
@@ -1751,10 +1751,10 @@ onechar(int gid, int sid)
 	if (a) {
 		if ((N = getSID(sid)) != NULL) {
 			a->nspace += strlen(N) + 1;
-			tp = afmmapname(N, 0, 0);
+			tp = afmmapname(N, a->spec);
 		} else
 			tp = 0;
-		afmaddchar(a, gid, tp, 0, w, B, N, 0, 0, gid);
+		afmaddchar(a, gid, tp, 0, w, B, N, a->spec, gid);
 	}
 	gid2sid[gid] = sid;
 }

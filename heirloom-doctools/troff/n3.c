@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.68 (gritter) 12/19/05
+ * Sccsid @(#)n3.c	1.69 (gritter) 12/20/05
  */
 
 /*
@@ -133,6 +133,7 @@ growcontab(void)
 		addcon(i++, "trimat", (void(*)(int))casetrimat);
 		addcon(i++, "bleedat", (void(*)(int))casebleedat);
 		addcon(i++, "cropat", (void(*)(int))casecropat);
+		addcon(i++, "fps", (void(*)(int))casefps);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
@@ -1320,12 +1321,12 @@ maybemore(int sofar, int flags)
 				/*EMPTY*/;
 			else if (warn & WARN_MAC && i > 3 && xflag >= 3) {
 				buf[i-1] = 0;
-				errprint("no such request %s", buf);
+				errprint("%s: no such request", buf);
 				sofar = 0;
 			} else if (warn & WARN_SPACE && i > 3 &&
 					findmn(sofar) >= 0) {
 				buf[i-1] = 0;
-				errprint("missing space at request %s", buf);
+				errprint("%s: missing space", macname(sofar));
 			}
 			return sofar;
 		}
