@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.32 (gritter) 12/11/05
+.\" Sccsid @(#)troffdemo.tr	1.33 (gritter) 12/21/05
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names and warnings.
 .do xflag 2
@@ -171,7 +171,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-12/11/05
+12/21/05
 .sp 2v
 .ad b
 .ps 12
@@ -179,7 +179,7 @@
 The \fItroff\fP\^ text processor
 from the Heirloom Documentation Tools project
 is a variant of the Unix application
-originally written by \fEJoseph F. Osanna\fR
+originally written by \fEJoseph F. Ossanna\fR
 and \fEBrian W. Kernighan.\fR
 It has been derived from source code provided by
 the OpenSolaris project.
