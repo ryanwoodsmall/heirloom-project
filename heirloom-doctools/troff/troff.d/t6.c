@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.111 (gritter) 12/21/05
+ * Sccsid @(#)t6.c	1.112 (gritter) 12/22/05
  */
 
 /*
@@ -1959,6 +1959,7 @@ casefeature(void)
 int
 un2tr(int c, int *fp)
 {
+	struct unimap	*up, ***um;
 	struct afmtab	*a;
 	int	i, j;
 
@@ -1997,17 +1998,20 @@ un2tr(int c, int *fp)
 		*fp = font;
 		return FILLER;
 	default:
-		if ((i = (fontbase[font]->afmpos) - 1) >= 0 &&
-				(a = afmtab[i])->unitab)
-			for (i = 1; i < a->nunitab; i++)
-				if (a->unitab[i] == c) {
-					*fp = font;
-					return i;
-				}
-		for (i = 0; unimap[i].psc; i++)
-			if (unimap[i].code == c)
-				if ((j = postchar(unimap[i].psc, fp)) != 0)
+		if ((c&~0xffff) == 0 &&
+				(i = (fontbase[font]->afmpos) - 1) >= 0 &&
+				(um = (a = afmtab[i])->unimap) != NULL &&
+				um[c>>8] != NULL &&
+				(up = um[c>>8][c&0377]) != NULL) {
+			*fp = font;
+			return up->u.code;
+		}
+		if ((c&~0xffff) == 0 && unimap[c>>8] != NULL &&
+				(up = unimap[c>>8][c&0377]) != NULL)
+			do
+				if ((j = postchar(up->u.psc, fp)) != 0)
 					return j;
+			while ((up = up->next) != NULL);
 		illseq(c, NULL, 0);
 		*fp = font;
 		return ' ';
@@ -2032,9 +2036,9 @@ tr2un(tchar i, int f)
 			i -= nchtab + 128;
 		if ((n = a->fitab[i - 32]) < a->nchars &&
 				a->nametab[n] != NULL)
-			for (c = 0; unimap[c].psc; c++)
-				if (strcmp(unimap[c].psc, a->nametab[n]) == 0)
-					return unimap[c].code;
+			for (c = 0; rawunimap[c].psc; c++)
+				if (strcmp(rawunimap[c].psc, a->nametab[n])==0)
+					return rawunimap[c].code;
 	}
 	return -1;
 }

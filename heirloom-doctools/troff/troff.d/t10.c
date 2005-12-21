@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.57 (gritter) 12/20/05
+ * Sccsid @(#)t10.c	1.58 (gritter) 12/22/05
  */
 
 /*
@@ -57,6 +57,7 @@
 #include "afm.h"
 #include "proto.h"
 #include "troff.h"
+#include "unimap.h"
 /*
  * troff10.c
  * 
@@ -165,6 +166,7 @@ ptinit(void)
 	char	*filebase, *p, *ap, *descp;
 
 	growfonts(NFONT+1);
+	uninit();
 	/* open table for device,
 	 * read in resolution, size info, font info, etc.
 	 * and set params

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.36 (gritter) 12/21/05
+ * Sccsid @(#)otf.c	1.37 (gritter) 12/22/05
  */
 
 #include <stdio.h>
@@ -3034,6 +3034,36 @@ get_kern(void)
 
 #endif	/* !DPOST */
 
+#if !defined (DPOST) && !defined (DUMP)
+
+#include "unimap.h"
+
+static void
+mkunimap(void)
+{
+	struct unimap	***up, *u, *ut;
+	int	i, x, y;
+
+	up = calloc(256, sizeof *up);
+	for (i = 1; i < a->nunitab; i++)
+		if (a->unitab[i] != 0 && (a->unitab[i]&~0xffff) == 0) {
+			x = a->unitab[i] >> 8;
+			y = a->unitab[i] & 0377;
+			if (up[x] == NULL)
+				up[x] = calloc(256, sizeof **up);
+			u = calloc(1, sizeof *u);
+			u->u.code = i;
+			if (up[x][y] != NULL) {
+				for (ut = up[x][y]; ut->next;
+						ut = ut->next);
+				ut->next = u;
+			} else
+				up[x][y] = u;
+		}
+	a->unimap = up;
+}
+#endif	/* !DPOST && !DUMP */
+
 #ifdef	DPOST
 static void
 checkembed(void)
@@ -3332,13 +3362,16 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 			get_ttf();
 		}
 #ifndef	DPOST
-		get_cmap(0);
 		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
 		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern);
 		get_feature(pos_GSUB, NULL, -1, get_substitutions);
 		if (ttf && nkerntmp == 0)
 			get_kern();
 		kernfinish();
+		get_cmap(0);
+#ifndef	DUMP
+		mkunimap();
+#endif	/* !DUMP */
 #endif	/* !DPOST */
 		a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
 	} else

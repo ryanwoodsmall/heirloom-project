@@ -22,13 +22,13 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.c	1.10 (gritter) 12/3/05
+ * Sccsid @(#)unimap.c	1.11 (gritter) 12/22/05
  */
 
-#include "tdef.h"
+#include <stdlib.h>
 #include "unimap.h"
 
-const struct unimap	unimap[] = {
+const struct rawunimap	rawunimap[] = {
 	{ 0x00A1,	"exclamdown" },
 	{ 0x00A2,	"cent" },
 	{ 0x00A2,	"centoldstyle" },
@@ -387,3 +387,27 @@ const struct unimap	unimap[] = {
 /*	{ 0x0000,	"hungarumlaut" },	??? */
 	{ -1,		0 }
 };
+
+struct unimap	**unimap[256];
+
+void
+uninit(void)
+{
+	struct unimap	*up, *u;
+	int	i;
+	int	x, y;
+
+	for (i = 0; rawunimap[i].psc; i++) {
+		x = rawunimap[i].code >> 8;
+		y = rawunimap[i].code & 0377;
+		if (unimap[x] == NULL)
+			unimap[x] = calloc(256, sizeof *unimap);
+		u = calloc(1, sizeof *u);
+		u->u.psc = rawunimap[i].psc;
+		if (unimap[x][y] != NULL) {
+			for (up = unimap[x][y]; up->next; up = up->next);
+			up->next = u;
+		} else
+			unimap[x][y] = u;
+	}
+}

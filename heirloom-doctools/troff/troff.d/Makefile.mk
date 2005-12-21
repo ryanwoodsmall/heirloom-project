@@ -40,7 +40,7 @@ mrproper: clean
 
 draw.o: draw.c
 makedev.o: makedev.c dev.h
-t10.o: t10.c ../tdef.h ../ext.h dev.h afm.h troff.h
+t10.o: t10.c ../tdef.h ../ext.h dev.h afm.h unimap.h troff.h
 t6.o: t6.c ../tdef.h dev.h ../ext.h afm.h unimap.h troff.h
 unimap.o: unimap.h
 ta.o: ta.c dev.h
@@ -60,5 +60,5 @@ suftab.o: ../suftab.c
 version.o: ../version.c
 otfdump_version.o: ../version.c
 afm.o: dev.h afm.h
-otf.o: dev.h afm.h
+otf.o: dev.h afm.h unimap.h
 otfdump.o: afm.h afm.c otf.c otfdump.c dpost.d/getopt.c dev.h
