@@ -443,7 +443,7 @@ this is useful to set mathematical text with a different font. To use
 Adobe Myriad Pro for greek letters and mathematical symbols:
 
 	.do xflag 3
-	.fps math,greek 1 R MyriadPro-Regular otf
+	.fps math,greek,punct 1 R MyriadPro-Regular otf
 	.fp 2 I MyriadPro-It otf
 	.fallback I R
 	.EQ
@@ -496,4 +496,4 @@ in contrast allows them to be selected simply with a font change.
 Contributions of appropriate tables for other languages are welcome.
 
 
-Gunnar Ritter                                                 12/20/05
+Gunnar Ritter                                                 12/21/05
