@@ -43,10 +43,13 @@ in its text input. Such characters are simply passed through.
 
 troff internally converts non-ASCII characters of the current locale
 to named PostScript characters once they are read in regular (not copy)
-mode. A character that is not present in the current font is searched
-using the ".fallback" sequence first, then in the special fonts. If
-the character cannot be found, it is discarded. Characters for which
-no PostScript name is known are also discarded.
+mode. If the current font is an OpenType or a TrueType font and contains
+a custom Unicode mapping table, the input character is looked up in that
+table first. Otherwise, a default table is used. A character that is not
+present in the current font is searched using the ".fallback" sequence
+first, then in the special fonts. If the character cannot be found, it
+is discarded. Characters for which no PostScript name is known are
+replaced by spaces.
 
 Only ASCII characters are allowed in request, string, font, and number
 register names.
@@ -611,4 +614,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   12/20/05
+Gunnar Ritter                                                   12/21/05

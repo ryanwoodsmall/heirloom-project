@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.35 (gritter) 12/20/05
+ * Sccsid @(#)otf.c	1.36 (gritter) 12/21/05
  */
 
 #include <stdio.h>
@@ -1999,8 +1999,22 @@ unichar(int gid, int c)
 	onechar(gid, nWGL + nExtraStrings++);
 }
 
+static void
+addunitab(int c, int u)
+{
+#if !defined (DPOST) && !defined (DUMP)
+	if (c >= a->nunitab) {
+		a->unitab = realloc(a->unitab, (c+1) * sizeof *a->unitab);
+		memset(&a->unitab[a->nunitab], 0,
+				(c+1-a->nunitab) * sizeof *a->unitab);
+		a->nunitab = c+1;
+	}
+	a->unitab[c] = u;
+#endif
+}
+
 static int
-get_ms_unicode_cmap(int o)
+get_ms_unicode_cmap(int o, int addchar)
 {
 	int	length;
 	int	segCount;
@@ -2027,48 +2041,74 @@ get_ms_unicode_cmap(int o)
 		r = pbe16(&contents[idRangeOffset+2*i]);
 		for (c = s; c <= e; c++) {
 			if (r) {
-				x = r/2 + (c - s) + idRangeOffset+2*i;
-				gid = pbe16(&contents[glyphIdArray+2*x]);
+				x = r + 2*(c - s) + idRangeOffset+2*i;
+				gid = pbe16(&contents[x]);
 				if (gid != 0)
 					gid += d;
 			} else
 				gid = c + d;
 			gid &= 0xffff;
-			if (gid != 0)
-				unichar(gid, c);
+			if (gid != 0) {
+				if (addchar)
+					unichar(gid, c);
+				else if (gid < nc) {
+					addunitab(a->gid2tr[gid].ch1, c);
+					addunitab(a->gid2tr[gid].ch2, c);
+				}
+			}
 		}
 	}
 	return 1;
 }
 
-static void
-get_ttf_post_3_0(int o)
+static int
+get_cmap(int addchar)
 {
 	int	numTables;
 	int	platformID;
 	int	encodingID;
 	int	offset;
-	int	i, n;
+	int	i, o;
 	int	gotit = 0;
-	char	*sp;
 
-	ttf = 2;
-	if (pos_cmap < 0)
-		error("no cmap table");
+	if (pos_cmap < 0) {
+		if (addchar)
+			error("no cmap table");
+		return gotit;
+	}
 	o = table_directories[pos_cmap].offset;
-	if (pbe16(&contents[o]) != 0)
-		error("can only handle version 0 cmap tables");
+	if (pbe16(&contents[o]) != 0) {
+		if (addchar)
+			error("can only handle version 0 cmap tables");
+		return gotit;
+	}
 	numTables = pbe16(&contents[o+2]);
-	if (4 + 8*numTables > table_directories[pos_cmap].length)
-		error("cmap table too small for values inside");
-	otfalloc(numGlyphs);
+	if (4 + 8*numTables > table_directories[pos_cmap].length) {
+		if (addchar)
+			error("cmap table too small for values inside");
+		return gotit;
+	}
+	if (addchar)
+		otfalloc(numGlyphs);
 	for (i = 0; i < numTables; i++) {
 		platformID = pbe16(&contents[o+4+8*i]);
 		encodingID = pbe16(&contents[o+4+8*i+2]);
 		offset = pbe32(&contents[o+4+8*i+4]);
 		if (platformID == 3 && encodingID == 1)
-			gotit |= get_ms_unicode_cmap(o + offset);
+			gotit |= get_ms_unicode_cmap(o + offset, addchar);
 	}
+	return gotit;
+}
+
+static void
+get_ttf_post_3_0(int o)
+{
+	int	i, n;
+	int	gotit;
+	char	*sp;
+
+	ttf = 2;
+	gotit = get_cmap(1);
 	if (gotit <= 0) {
 		ttf = 3;
 		ExtraStrings = calloc(numGlyphs, sizeof *ExtraStrings);
@@ -3292,6 +3332,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 			get_ttf();
 		}
 #ifndef	DPOST
+		get_cmap(0);
 		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
 		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern);
 		get_feature(pos_GSUB, NULL, -1, get_substitutions);

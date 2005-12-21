@@ -485,15 +485,15 @@ ligatures and kerning which are enabled by default if possible). Also troff
 ignores any features that are not mapped to the "DFLT" or "latn" languages
 in an OpenType font.
 
-The PostScript/Unicode conversion tables currently only contain
-Western character names; other characters are simply ignored when
-they occur in input text. The "Adobe Glyph List" cannot be used for
-this task since it lists many characters in positions which are not
-appropriate for the troff input mechanism. For example, small capitals
-are put in the private area there which would make it necessary to
-transform ASCII input text in order to use them; the troff mechanism
-in contrast allows them to be selected simply with a font change.
-Contributions of appropriate tables for other languages are welcome.
+The default PostScript/Unicode conversion tables currently only contain
+Western character names; other characters are simply ignored when they
+occur in input text. The "Adobe Glyph List" cannot be used for this task
+since it lists many characters in positions which are not appropriate for
+the troff input mechanism. For example, small capitals are put in the
+private area there which would make it necessary to transform ASCII input
+text in order to use them; the troff mechanism in contrast allows them to
+be selected simply with a font change. Contributions of appropriate tables
+for other languages are welcome.
 
 
 Gunnar Ritter                                                 12/21/05

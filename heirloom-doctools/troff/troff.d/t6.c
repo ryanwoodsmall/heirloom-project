@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.110 (gritter) 12/20/05
+ * Sccsid @(#)t6.c	1.111 (gritter) 12/21/05
  */
 
 /*
@@ -1959,6 +1959,7 @@ casefeature(void)
 int
 un2tr(int c, int *fp)
 {
+	struct afmtab	*a;
 	int	i, j;
 
 	switch (c) {
@@ -1996,12 +1997,20 @@ un2tr(int c, int *fp)
 		*fp = font;
 		return FILLER;
 	default:
+		if ((i = (fontbase[font]->afmpos) - 1) >= 0 &&
+				(a = afmtab[i])->unitab)
+			for (i = 1; i < a->nunitab; i++)
+				if (a->unitab[i] == c) {
+					*fp = font;
+					return i;
+				}
 		for (i = 0; unimap[i].psc; i++)
 			if (unimap[i].code == c)
 				if ((j = postchar(unimap[i].psc, fp)) != 0)
 					return j;
 		illseq(c, NULL, 0);
-		return 0;
+		*fp = font;
+		return ' ';
 	}
 }
 
@@ -2017,6 +2026,8 @@ tr2un(tchar i, int f)
 		return i;
 	if ((n = (fontbase[f]->afmpos) - 1) >= 0) {
 		a = afmtab[n];
+		if (a->unitab && i < a->nunitab && a->unitab[i])
+			return a->unitab[i];
 		if (i - 32 >= nchtab + 128)
 			i -= nchtab + 128;
 		if ((n = a->fitab[i - 32]) < a->nchars &&

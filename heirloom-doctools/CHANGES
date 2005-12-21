@@ -4,6 +4,10 @@ Release ...
   are ignored instead of being interpreted as short requests. Also string
   and number register references are interpreted at any position of a
   long request name in this level.
+* troff: Unicode mapping tables from OpenType and TrueType fonts are now
+  used for converting input characters.
+* troff: Locale-dependent input characters for which no matching glyph can
+  be found are now replaced by spaces.
 * troff: The ".fps" request has been introduced to map troff special
   characters like "\(*a" or "\(+-" to a custom font.
 * [nt]roff: The warning category "missing" is now available; it includes
