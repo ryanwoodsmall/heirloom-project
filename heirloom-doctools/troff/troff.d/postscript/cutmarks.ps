@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.6 0
+%%BeginResource: procset dpost_cutmarks 1.7 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.6 (gritter) 12/22/05
+% Sccsid @(#)cutmarks.ps	1.7 (gritter) 12/22/05
 %
 
 /_cutmark_a 10 def
@@ -52,17 +52,32 @@
 	_regmark_x _regmark_y _regmark_d add lineto
 } def
 
-/_cutmark_color {
-	[/Separation (All) /DeviceGray {}] setcolorspace 1 setcolor
+/setseparationgray where {
+	% Cf. Adobe Technical Note #5044, "Color Separation Conventions
+	% for PostScript Language Programs", 5/24/96
+	pop
+} {
+	languagelevel 2 lt {
+		/setseparationgray {
+			1 exch sub setgray
+		} def
+	} {
+		/setseparationgray {
+			[/Separation /All /DeviceGray {}] setcolorspace
+			1 exch sub setcolor
+		} def
+	} ifelse
+} ifelse
+/_cutmark_setup {
+	0 setseparationgray
+	linewidth _cutmark_adj setlinewidth
 } def
-
 
 /_cutmarks {
 	/_TrimBox where {
 		pop
 		gsave
-		_cutmark_color
-		linewidth _cutmark_adj setlinewidth
+		_cutmark_setup
 		newpath
 		0 1 _cutmark_a 0 0 1 _cutmark_b 0 _cutmark
 		_cutmark_a 1 0 0 _cutmark_b 1 0 0 _cutmark
@@ -81,9 +96,8 @@
 	/_TrimBox where {
 		pop
 		gsave
-		_cutmark_color
+		_cutmark_setup
 		newpath
-		linewidth _cutmark_adj setlinewidth
 		/_cutmark_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
 		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
 			1 _cutmark_tby 3 _cutmark_tby 1 _cutmark_tby sub
