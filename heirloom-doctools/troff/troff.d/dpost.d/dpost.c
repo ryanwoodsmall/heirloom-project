@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.120 (gritter) 12/22/05
+ * Sccsid @(#)dpost.c	1.121 (gritter) 12/22/05
  */
 
 /*
@@ -970,12 +970,14 @@ header(FILE *fp)
     pdfbox("TrimBox", &trimat, fp, 1);
     pdfbox("BleedBox", &bleedat, fp, 1);
     pdfbox("CropBox", &cropat, fp, 0);
+    while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
+	    fwrite(buf, 1, n, fp);
+    fprintf(fp, "} def\n");
+    fprintf(fp, "/_marks {\n");
     if (Mflag & M_CUT)
 	    fprintf(fp, "_cutmarks\n");
     if (Mflag & M_REG)
 	    fprintf(fp, "_regmarks\n");
-    while ((n = fread(buf, 1, sizeof buf, pf)) > 0)
-	    fwrite(buf, 1, n, fp);
     fprintf(fp, "} def\n");
 
     fflush(gf);
@@ -2612,6 +2614,7 @@ t_page (
 
     endtext();				/* print the last line? */
 
+    fprintf(tf, "_marks\n");
     fprintf(tf, "cleartomark\n");
     fprintf(tf, "showpage\n");
     fprintf(tf, "restore\n");
