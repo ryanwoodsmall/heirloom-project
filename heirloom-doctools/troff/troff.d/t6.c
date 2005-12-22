@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.112 (gritter) 12/22/05
+ * Sccsid @(#)t6.c	1.113 (gritter) 12/22/05
  */
 
 /*
@@ -1956,11 +1956,28 @@ casefeature(void)
 
 #include "unimap.h"
 
-int
-un2tr(int c, int *fp)
+static int
+ufmap(int c, int f, int *fp)
 {
 	struct unimap	*up, ***um;
 	struct afmtab	*a;
+	int	i;
+
+	if ((c&~0xffff) == 0 &&
+			(i = (fontbase[f]->afmpos) - 1) >= 0 &&
+			(um = (a = afmtab[i])->unimap) != NULL &&
+			um[c>>8] != NULL &&
+			(up = um[c>>8][c&0377]) != NULL) {
+		*fp = f;
+		return up->u.code;
+	}
+	return 0;
+}
+
+int
+un2tr(int c, int *fp)
+{
+	struct unimap	*up;
 	int	i, j;
 
 	switch (c) {
@@ -1998,20 +2015,25 @@ un2tr(int c, int *fp)
 		*fp = font;
 		return FILLER;
 	default:
-		if ((c&~0xffff) == 0 &&
-				(i = (fontbase[font]->afmpos) - 1) >= 0 &&
-				(um = (a = afmtab[i])->unimap) != NULL &&
-				um[c>>8] != NULL &&
-				(up = um[c>>8][c&0377]) != NULL) {
-			*fp = font;
-			return up->u.code;
-		}
+		if ((i = ufmap(c, font, fp)) != 0)
+			return i;
 		if ((c&~0xffff) == 0 && unimap[c>>8] != NULL &&
 				(up = unimap[c>>8][c&0377]) != NULL)
 			do
 				if ((j = postchar(up->u.psc, fp)) != 0)
 					return j;
 			while ((up = up->next) != NULL);
+		if (fallbacktab[font])
+			for (j = 0; fallbacktab[font][j] != 0; j++) {
+				if ((i = findft(fallbacktab[font][j])) < 0)
+					continue;
+				if ((i = ufmap(c, i, fp)) != 0)
+					return i;
+			}
+		if (smnt)
+			for (i = smnt, j=0; j < nfonts; j++, i = i % nfonts + 1)
+				if ((i = ufmap(c, i, fp)) != 0)
+					return i;
 		illseq(c, NULL, 0);
 		*fp = font;
 		return ' ';
