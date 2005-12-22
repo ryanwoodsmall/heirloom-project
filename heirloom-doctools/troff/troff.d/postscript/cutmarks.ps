@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.4 0
+%%BeginResource: procset dpost_cutmarks 1.5 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.4 (gritter) 12/19/05
+% Sccsid @(#)cutmarks.ps	1.5 (gritter) 12/22/05
 %
 
 /_cutmark_a 10 def
@@ -52,13 +52,16 @@
 	_regmark_x _regmark_y _regmark_d add lineto
 } def
 
+/_cutmark_color {
+	[/Separation (All) /DeviceGray {}] setcolorspace
+} def
+
 
 /_cutmarks {
 	/_TrimBox where {
 		pop
-		% No need to save/restore the graphics state since
-		% this is called before color/font page setup anyway.
-		/_setcolor where {pop 0 0 0 1 setcmykcolor} if
+		gsave
+		_cutmark_color
 		linewidth _cutmark_adj setlinewidth
 		newpath
 		0 1 _cutmark_a 0 0 1 _cutmark_b 0 _cutmark
@@ -70,14 +73,16 @@
 		0 1 _cutmark_a neg 2 0 1 _cutmark_b neg 2 _cutmark
 		_cutmark_a 1 0 2 _cutmark_b 1 0 2 _cutmark
 		stroke
+		grestore
 	} if
 } def
 
 /_regmarks {
 	/_TrimBox where {
 		pop
+		gsave
+		_cutmark_color
 		newpath
-		1 1 1 1 setcmykcolor
 		linewidth _cutmark_adj setlinewidth
 		/_cutmark_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
 		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
@@ -97,7 +102,7 @@
 				_cutmark_a _cutmark_adj add
 			_cutmark_d _regmark
 		stroke
-		0 0 0 1 setcmykcolor
+		grestore
 	} if
 } def
 %%EndResource
