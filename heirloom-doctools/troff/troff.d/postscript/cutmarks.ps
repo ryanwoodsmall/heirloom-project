@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.7 0
+%%BeginResource: procset dpost_cutmarks 1.8 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.7 (gritter) 12/22/05
+% Sccsid @(#)cutmarks.ps	1.8 (gritter) 12/22/05
 %
 
 /_cutmark_a 10 def
@@ -54,16 +54,16 @@
 
 /setseparationgray where {
 	% Cf. Adobe Technical Note #5044, "Color Separation Conventions
-	% for PostScript Language Programs", 5/24/96
+	% for PostScript Language Programs", 5/24/96, p. 27
 	pop
 } {
 	languagelevel 2 lt {
 		/setseparationgray {
-			1 exch sub setgray
+			1 exch sub dup dup dup setcmykcolor
 		} def
 	} {
 		/setseparationgray {
-			[/Separation /All /DeviceGray {}] setcolorspace
+			[/Separation /All /DeviceCMYK {dup dup dup}] setcolorspace
 			1 exch sub setcolor
 		} def
 	} ifelse
