@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.26 (gritter) 12/20/05
+ * Sccsid @(#)n6.c	1.27 (gritter) 12/23/05
  */
 
 /*
@@ -126,23 +126,30 @@ tchar
 setch(int delim)
 {
 	register int j;
-	char	temp[10];
+	char	temp[40];
 	register char	*s;
 
 	s = temp;
 	if ((*s++ = getach()) == 0 || (*s++ = getach()) == 0)
 		return(0);
-	if (delim == '[' && getach() != ']') {
-		while (getach() != ']');
-		return(0);
+	if (delim == '[' && (j = getach()) != ']') {
+		*s++ = j;
+		while ((j = getach()) != ']' && j != 0)
+			if (s < &temp[sizeof temp - 1])
+				*s++ = j;
+		*s = '\0';
+		if (j != ']')
+			nodelim(']');
+		else if (warn & WARN_CHAR)
+			errprint("missing glyph [%s]", temp);
+		return ' ';
 	}
 	*s = '\0';
 	if ((j = findch(temp)) > 0)
 		return j | chbits;
 	else {
 		if (warn & WARN_CHAR)
-			errprint("missing glyph \\%c%s%s", delim, temp,
-					delim == '[' ? "]" : "");
+			errprint("missing glyph \\%c%s", delim, temp);
 		return 0;
 	}
 }
