@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.30 (gritter) 12/19/05
+ * Sccsid @(#)n5.c	1.31 (gritter) 12/25/05
  */
 
 /*
@@ -1484,7 +1484,7 @@ getnm(int *p, int min)
 	eat(' ');
 	if (skip(0))
 		return;
-	i = atoi();
+	i = atoi0();
 	if (nonumb)
 		return;
 	*p = max(i, min);
