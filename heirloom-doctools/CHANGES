@@ -1,3 +1,7 @@
+Release ...
+* [nt]roff: Using .wh with an undefined long macro name now works as with
+  undefined short names; the macro is executed once it has been created.
+
 Release 051227
 * [nt]roff: A new extension level "3" is available. In this level, undefined
   long requests whose first two characters form an existing short request
