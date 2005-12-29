@@ -18,9 +18,19 @@ Open UNIX	8.0.0
 It is likely to compile on other systems that provide the necessary
 wide-character functionality.
 
-To build and install, see the settings in the "mk.config" and adjust
-them if necessary. You can also build a RPM package with the command
-"rpmbuild -tb heirloom-devtools-<version>.tar.bz2".
+To build and install the RPM package:
+
+- Execute "rpmbuild -tb heirloom-devtools-<version>.tar.bz2". The
+  result can be found in /usr/src/redhat/RPMS/i386 (or likewise)
+  and can be installed using "rpm -U".
+
+To build and install manually:
+
+- Adjust the installation paths and compiler settings in the file
+  "mk.config", which is in makefile syntax.
+
+- Execute "make", followed by "make install". "make mrproper" will
+  destroy all generated files.
 
 New releases of this project are announced on Freshmeat. If you want to
 get notified by email on each release, use their subscription service at
@@ -34,4 +44,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/23/05
+<gunnarr@acm.org>						12/29/05

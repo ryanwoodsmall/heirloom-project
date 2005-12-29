@@ -39,11 +39,25 @@ New releases of this project are announced on Freshmeat. If you want to
 get notified by email on each release, use their subscription service at
 <http://freshmeat.net/projects/doctools/>.
 
-To build and install, see the settings in the "mk.config" and adjust
-them if necessary. You can also build a RPM package with the command
-"rpmbuild -tb heirloom-doctools-<version>.tar.bz2". Building the RPM
-package requires the "heirloom-devtools" package to be installed; it
-is available from <http://heirloom.sourceforge.net/devtools.html>.
+To build and install the RPM package:
+
+- Build and install the "heirloom-devtools" package available from
+  <http://heirloom.sourceforge.net/devtools.html>.
+
+- Execute "rpmbuild -tb heirloom-doctools-<version>.tar.bz2". The
+  result can be found in /usr/src/redhat/RPMS/i386 (or likewise)
+  and can be installed using "rpm -U".
+
+To build and install manually:
+
+- Build and install the "heirloom-devtools" package if necessary
+  (see below).
+
+- Adjust the installation paths and compiler settings in the file
+  "mk.config", which is in makefile syntax.
+
+- Execute "make", followed by "make install". "make mrproper" will
+  destroy all generated files.
 
 troff currently reads several binary files which are built during
 the compilation process. It is thus not possible to cross-compile.
@@ -137,4 +151,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						12/19/05
+<gunnarr@acm.org>						%G%
