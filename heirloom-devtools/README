@@ -7,13 +7,14 @@ The OpenSolaris utilities were in turn derived from the original Unix
 versions, and are assumed be conforming implementations of the POSIX
 standard.
 
-The source code is known to compile on:
+The source code has been compiled successfully on:
 
 Linux		glibc
 Solaris		10 and above
 HP-UX		B.11.11
 FreeBSD		5.4
 Open UNIX	8.0.0
+Mac OS X	10.4.3
 
 It is likely to compile on other systems that provide the necessary
 wide-character functionality.
@@ -44,4 +45,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						12/29/05
+<gunnarr@acm.org>						1/1/06
