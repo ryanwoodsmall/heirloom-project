@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.121 (gritter) 12/22/05
+ * Sccsid @(#)dpost.c	1.122 (gritter) 1/1/06
  */
 
 /*
@@ -3370,6 +3370,20 @@ put1s (
  */
 
 
+    if (s[0] == 'P' && s[1] == 'S' && s[2] != 0) {	/* PostScript name */ 
+         int	m;
+	 struct namecache	*np;
+	 struct afmtab	*a;
+	 if ((a = fontname[font].afm) != NULL &&
+			 (np = afmnamelook(a, &s[2])) != NULL &&
+			 ((m = np->fival[0]) != -1 ||
+			  (m = np->fival[1]) != -1)) {
+	     endtext();
+	     oput(m+32);
+	     endtext();
+	     return;
+	 }
+    }
     if ( strcmp(s, &chname[chtab[i]]) != 0 )
 	for ( i = 0; i < nchtab; i++ )
 	    if ( strcmp(&chname[chtab[i]], s) == 0 )

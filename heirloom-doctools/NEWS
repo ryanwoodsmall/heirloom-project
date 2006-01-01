@@ -513,6 +513,9 @@ currently defined:
 Changes to troff intermediate output
 ====================================
 
+CPSname	specifies that the PostScript character "name" is to be
+	printed in the current font.
+
 s-23 d.d
 	is a crude way to tell the post-processor that "d.d" is a
 	(possibly fractional) point size for the current font. This
@@ -528,14 +531,8 @@ x font n filename
 	intermediate output with the most impact. First, it will trigger
 	buffer overflows in many existing variants of post-processors.
 	Second, the way how information about the font is exchanged in
-	the following output is specific to the current version of the
-	AFM/OpenType handling routines. For all characters that are
-	neither ASCII nor troff special, troff produces "Nnnn" commands,
-	where "nnn" is the position of the character in an encoding that
-	has been produced at runtime while reading the metrics data. The
-	post-processor thus has to know about the encoding, and this is
-	only guaranteed if the AFM/OpenType routines are the same as for
-	troff.
+	the following output may be specific to the current version of
+	the AFM/OpenType handling routines.
 	  If this is a problem, use -Tpost and no AFM or OpenType files.
 	Sorry, but direct handling of Type 1 fonts comes at a certain price.
 
@@ -614,4 +611,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   12/21/05
+Gunnar Ritter                                                   1/1/06

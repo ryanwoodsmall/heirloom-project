@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.58 (gritter) 12/22/05
+ * Sccsid @(#)t10.c	1.59 (gritter) 1/1/06
  */
 
 /*
@@ -357,6 +357,7 @@ ptout(register tchar i)
 tchar *
 ptout0(tchar *pi, tchar *pend)
 {
+	struct afmtab	*a;
 	register int j;
 	register int k, w = 0;
 	int	z, dx, dy, dx2, dy2, n;
@@ -456,6 +457,10 @@ ptout0(tchar *pi, tchar *pend)
 		ptlead();
 	if (&pi[outsize] < pend)
 		w += getkw(pi[0], pi[outsize]);
+	if (afmtab && (j = (fontbase[xfont]->afmpos) - 1) >= 0)
+		a = afmtab[j];
+	else
+		a = NULL;
 	j = z = 0;
 	if (k != DRAWFCN) {
 		if (cs) {
@@ -568,9 +573,13 @@ ptout0(tchar *pi, tchar *pend)
 	} else {
 		if (esc)
 			ptesc();
-		if (k >= nchtab + 128)
-			fdprintf(ptid, "N%d\n", k - (nchtab+128));
-		else
+		if (k >= nchtab + 128) {
+			if (a && (j = a->fitab[k-nchtab-128-32]) < a->nchars &&
+					a->nametab[j] != NULL)
+				fdprintf(ptid, "CPS%s\n", a->nametab[j]);
+			else
+				fdprintf(ptid, "N%d\n", k - (nchtab+128));
+		} else
 			fdprintf(ptid, "C%s\n", &chname[chtab[k - 128]]);
 	}
 	if (bd) {
@@ -580,7 +589,11 @@ ptout0(tchar *pi, tchar *pend)
 		if (k < 128) {
 			fdprintf(ptid, "c%c\n", k);
 		} else if (k >= nchtab + 128) {
-			fdprintf(ptid, "N%d\n", k - (nchtab+128));
+			if (a && (j = a->fitab[k-nchtab-128-32]) < a->nchars &&
+					a->nametab[j] != NULL)
+				fdprintf(ptid, "CPS%s\n", a->nametab[j]);
+			else
+				fdprintf(ptid, "N%d\n", k - (nchtab+128));
 		} else
 			fdprintf(ptid, "C%s\n", &chname[chtab[k - 128]]);
 		if (z)
