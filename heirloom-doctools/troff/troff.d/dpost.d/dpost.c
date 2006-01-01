@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.122 (gritter) 1/1/06
+ * Sccsid @(#)dpost.c	1.123 (gritter) 1/2/06
  */
 
 /*
@@ -3378,9 +3378,7 @@ put1s (
 			 (np = afmnamelook(a, &s[2])) != NULL &&
 			 ((m = np->fival[0]) != -1 ||
 			  (m = np->fival[1]) != -1)) {
-	     endtext();
-	     oput(m+32);
-	     endtext();
+	     put1(m+32);
 	     return;
 	 }
     }
@@ -3471,6 +3469,8 @@ put1 (
 	    lastw = widthfac * (int)((pw[i] * fractsize + unitwidth/2) / unitwidth);
 	if (track && (encoding == 0 || encoding == 4 || encoding == 5))
 		lastw += track;
+	if (code == -1 && fontname[k].afm)
+		code = c + 32;
 	oput(code);
     }	/* End if */
 
