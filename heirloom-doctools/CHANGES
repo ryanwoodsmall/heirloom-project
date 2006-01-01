@@ -1,4 +1,7 @@
 Release ...
+* troff: The internal codes for PostScript characters are now unique across
+  all fonts. In effect, requests like ".tr" or ".lc" now handle arbitrary
+  characters correctly, including locale-dependent ones.
 * [nt]roff: The ".mk" request now accepts long register names.
 * [nt]roff: Using ".wh" with an undefined long macro name now works as with
   undefined short names; the macro is executed once it has been created.

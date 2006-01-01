@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.114 (gritter) 12/23/05
+ * Sccsid @(#)t6.c	1.115 (gritter) 1/1/06
  */
 
 /*
@@ -88,6 +88,7 @@ struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
 struct box	mediasize, bleedat, trimat, cropat;
+int	psmaxcode;
 
 int
 width(register tchar j)
@@ -167,8 +168,12 @@ getcw(register int i)
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
-		j = abscw(i + 32 - (nchtab+128));
-		goto g0;
+		if (afmtab && fontbase[xfont]->afmpos - 1 >= 0)
+			i -= nchtab + 128;
+		else {
+			j = abscw(i + 32 - (nchtab+128));
+			goto g0;
+		}
 	}
 	if (i == 0) {	/* a blank */
 		k = (fontab[xfont][0] * spacesz + 6) / 12;
@@ -285,8 +290,6 @@ int
 abscw(int n)	/* return index of abs char n in fontab[], etc. */
 {	register int i, ncf;
 
-	if (afmtab && (i = (fontbase[xfont]->afmpos) - 1) >= 0)
-		return afmtab[i]->fitab[n-32];
 	ncf = fontbase[xfont]->nwfont & BYTEMASK;
 	for (i = 0; i < ncf; i++)
 		if (codetab[xfont][i] == n)
@@ -1384,7 +1387,7 @@ loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 		return -1;
 	}
 	free(contents);
-	morechars(a->nchars+32+1+128-32+nchtab+32+nchtab+128);
+	morechars(a->nchars+32+1+128-32+nchtab+32+nchtab+128+psmaxcode+1);
 done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	afmtab[nafm] = a;
 	if (nf >= Nfont)
@@ -1399,11 +1402,11 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	fontab[nf] = malloc(a->nchars * sizeof *fontab[nf]);
 	kerntab[nf] = malloc(a->nchars * sizeof *kerntab[nf]);
 	codetab[nf] = malloc(a->nchars * sizeof *codetab[nf]);
-	fitab[nf] = malloc((a->nchars+128-32+nchtab) * sizeof *fitab[nf]);
+	fitab[nf] = malloc((128-32+nchtab+psmaxcode+1) * sizeof *fitab[nf]);
 	memcpy(fontab[nf], a->fontab, a->nchars * sizeof *fontab[nf]);
 	memcpy(kerntab[nf], a->kerntab, a->nchars * sizeof *kerntab[nf]);
 	memcpy(codetab[nf], a->codetab, a->nchars * sizeof *codetab[nf]);
-	memcpy(fitab[nf], a->fitab, (a->nchars+128-32+nchtab) *
+	memcpy(fitab[nf], a->fitab, (128-32+nchtab+psmaxcode+1) *
 			sizeof *fitab[nf]);
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
 	zoomtab[nf] = 0;
@@ -2094,4 +2097,31 @@ double
 u2pts(int u)
 {
 	return u * 72.0 / INCH;
+}
+
+#define	psnprime	1021
+
+static struct psnnode {
+	struct psnnode	*next;
+	const char	*name;
+	int	code;
+} **psntable;
+
+int
+ps2cc(const char *name)
+{
+	struct psnnode	*pp;
+	unsigned	h;
+
+	if (psntable == NULL)
+		psntable = calloc(psnprime, sizeof *psntable);
+	h = pjw(name) % psnprime;
+	for (pp = psntable[h]; pp; pp = pp->next)
+		if (strcmp(name, pp->name) == 0)
+			return pp->code;
+	pp = calloc(1, sizeof *pp);
+	pp->name = strdup(name);
+	pp->next = psntable[h];
+	psntable[h] = pp;
+	return pp->code = ++psmaxcode;
 }

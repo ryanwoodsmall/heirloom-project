@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.40 (gritter) 12/20/05
+ * Sccsid @(#)afm.c	1.41 (gritter) 1/1/06
  */
 
 #include <stdlib.h>
@@ -586,8 +586,13 @@ afmremap(struct afmtab *a)
 
 	for (i = 1; i < a->nchars; i++) {
 		if (a->codetab[i] == -1 && a->nametab[i] != NULL) {
+#if defined (DPOST) || defined (DUMP)
 			while (a->fitab[j] != 0)
 				j++;
+#else	/* TROFF */
+			extern int	ps2cc(const char *);
+			j = ps2cc(a->nametab[i]) + 128 - 32 + nchtab;
+#endif	/* TROFF */
 			a->fitab[j] = i;
 			np = afmnamelook(a, a->nametab[i]);
 			np->afpos = i;
@@ -822,7 +827,13 @@ afmalloc(struct afmtab *a, int n)
 {
 	int	i;
 
+#if defined (DPOST) || defined (DUMP)
 	a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab, sizeof *a->fitab);
+#else	/* TROFF */
+	extern int	psmaxcode;
+	a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab + psmaxcode+1,
+			sizeof *a->fitab);
+#endif	/* TROFF */
 	a->fontab = malloc((n+NCHARLIB+1)*sizeof *a->fontab);
 	a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
 	a->kerntab = calloc(n+NCHARLIB+1, sizeof *a->kerntab);

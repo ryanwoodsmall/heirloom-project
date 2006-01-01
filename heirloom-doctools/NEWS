@@ -327,13 +327,6 @@ New and extended requests
 	is similar to ".tm" and writes "message" to standard error, but
 	does not write a newline at the end.
 
-.tr abcd...
-	produces unspecified results if used with PostScript characters
-	"\[name]", Unicode characters "\U'...'", or localized input. The
-	".ftr" request should be used for such characters instead. With
-	ASCII and traditional troff special characters, the ".tr" request
-	continues to work as expected.
-
 .track ff s1 n1 s2 n2					troff only
 	specifies tracking of letter space for font ff. If the current font
 	is ff and the point size is below or equal to s1, white space of

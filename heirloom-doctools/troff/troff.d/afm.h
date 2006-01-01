@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.20 (gritter) 12/22/05
+ * Sccsid @(#)afm.h	1.21 (gritter) 1/1/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -118,6 +118,7 @@ extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
 			char *, enum spec, int);
 extern	struct kernpair	*afmkernlook(struct afmtab *, int, int);
 extern	int	nextprime(int n);
+extern	unsigned	pjw(const char *);
 #ifdef	DPOST
 #include <stdio.h>
 extern	int	otfcff(const char *, char *, size_t, size_t *, size_t *);
