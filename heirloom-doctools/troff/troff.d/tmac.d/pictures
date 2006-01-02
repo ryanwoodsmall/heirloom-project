@@ -8,7 +8,7 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)pictures	1.2 (gritter) 8/25/05
+.\" Sccsid @(#)pictures	1.3 (gritter) 1/2/06
 .de PI	\" Picture Include
 .	\" $1=file(page) $2=height,width,yoff,xoff $3=flags
 .	\" Height, width, xoff, and yoff are for the frame, flags is for the
@@ -31,11 +31,15 @@
 .nr Oi \\n(.i
 .nr Ol \\n(.l
 .	\" Remember the arguments - sometimes as both a string and number register.
-.nr $2 \\$2i
-.nr $3 \\$3i
-.nr $4 \\$4i
+.ie \\n(.$>=2 .nr $2 \\$2i
+.el .nr $2 0
+.ie \\n(.$>=3 .nr $3 \\$3i
+.el .nr $3 0
+.ie \\n(.$>=4 .nr $4 \\$4i
+.el .nr $4 0
 .ds $4 \\$4
-.nr $5 \\$5i
+.ie \\n(.$>=5 .nr $5 \\$5i
+.el .nr $5 0
 .ds $5 \\$6
 .ds $6 \\$7
 .	\" Accept a few unadvertised position flags.
