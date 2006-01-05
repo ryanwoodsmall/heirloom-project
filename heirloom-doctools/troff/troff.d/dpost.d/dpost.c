@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.123 (gritter) 1/2/06
+ * Sccsid @(#)dpost.c	1.124 (gritter) 1/5/06
  */
 
 /*
@@ -922,7 +922,7 @@ header(FILE *fp)
     fprintf(fp, "%s %d\n", PAGES, printed);
 
     if (got_otf)
-        fprintf(fp, "%%%%DocumentNeededResources: ProcSet (FontSetInit)\n");
+        fprintf(fp, "%%%%DocumentNeededResources: procset FontSetInit 0 0\n");
     fflush(sf);
     rewind(sf);
     while ((n = fread(buf, 1, sizeof buf, sf)) > 0)
@@ -2437,12 +2437,19 @@ supplyotf(char *font, char *path, FILE *fp)
 		free(contents);
 		return;
 	}
-	fprintf(rf, "%%%%IncludeResource: ProcSet (FontSetInit)\n");
+	/*
+	 * Adobe Technical Note #5176, "The Compact Font Format
+	 * Specification", Version 1.0, 12/4/2003, p. 53 proposes
+	 * a weird syntax for CFF DSC comments ("ProcSet" etc.);
+	 * Adobe Distiller 7 complains about it with DSC warnings
+	 * enabled. What follows is an attempt to fix this.
+	 */
+	fprintf(rf, "%%%%IncludeResource: procset FontSetInit 0 0\n");
         if (sfcount++ == 0)
         	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
         else
         	fprintf(sf, "%%%%+ font %s\n", font);
-	fprintf(rf, "%%%%BeginResource: FontSet (%s)\n", font);
+	fprintf(rf, "%%%%BeginResource: font %s\n", font);
 	fprintf(rf, "/FontSetInit /ProcSet findresource begin\n");
 	fprintf(rf, "%%%%BeginData: %ld Binary Bytes\n",
 			(long)(length + 13 + strlen(font) + 12));
