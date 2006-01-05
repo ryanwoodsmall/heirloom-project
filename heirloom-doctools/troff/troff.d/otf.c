@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.37 (gritter) 12/22/05
+ * Sccsid @(#)otf.c	1.38 (gritter) 1/5/06
  */
 
 #include <stdio.h>
@@ -1641,7 +1641,7 @@ get_offset_table(void)
 	if (size < 12)
 		error("no offset table");
 	memcpy(buf, contents, 12);
-	if (pbe32(buf) == 0x00010000) {
+	if (pbe32(buf) == 0x00010000 || memcmp(buf, "true", 4) == 0) {
 		ttf = 1;
 	} else if (memcmp(buf, "OTTO", 4) == 0) {
 		ttf = 0;
@@ -2042,6 +2042,10 @@ get_ms_unicode_cmap(int o, int addchar)
 		for (c = s; c <= e; c++) {
 			if (r) {
 				x = r + 2*(c - s) + idRangeOffset+2*i;
+				if (x+2 >=
+					    table_directories[pos_cmap].offset +
+					    table_directories[pos_cmap].length)
+					continue;
 				gid = pbe16(&contents[x]);
 				if (gid != 0)
 					gid += d;

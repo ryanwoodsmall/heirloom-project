@@ -7,6 +7,10 @@ Release ...
   undefined short names; the macro is executed once it has been created.
 * troff/dpost: PostScript characters are now passed as "CPSname" in the
   intermediate output (instead of "Nnnn").
+* troff/dpost/otfdump: Apple TrueType fonts with a "true" header magic can
+  now be read (thanks to Stefan Tramm).
+* troff/dpost/otfdump: TrueType handling has been made more robust against
+  an error in Microsoft/Unicode "cmap" subtables.
 
 Release 051227
 * [nt]roff: A new extension level "3" is available. In this level, undefined
