@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.9 (gritter) 11/29/05
+ * Sccsid @(#)misc.c	1.10 (gritter) 1/6/06
  */
 
 /*
@@ -86,6 +86,8 @@ error(int kind, char *mesg, ...)
 	    fprintf(stderr, " (line %ld)", lineno);
 	if ( position > 0 )
 	    fprintf(stderr, " (near byte %ld)", position);
+	if ( printed > 0 )
+	    fprintf(stderr, " (page %d)", printed);
 	putc('\n', stderr);
     }	/* End if */
 

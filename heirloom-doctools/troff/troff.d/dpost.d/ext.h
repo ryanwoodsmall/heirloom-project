@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.4 (gritter) 11/29/05
+ * Sccsid @(#)ext.h	1.5 (gritter) 1/6/06
  */
 
 /*
@@ -47,6 +47,7 @@ extern int	ignore;			/* what we do with FATAL errors */
 
 extern long	lineno;			/* line number */
 extern long	position;		/* byte position */
+extern int	printed;		/* pages printed so far */
 extern char	*prog_name;		/* and program name - for errors */
 extern char	*temp_file;		/* temporary file - for some programs */
 
