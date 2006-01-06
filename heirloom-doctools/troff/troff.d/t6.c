@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.115 (gritter) 1/1/06
+ * Sccsid @(#)t6.c	1.116 (gritter) 1/6/06
  */
 
 /*
@@ -1986,6 +1986,7 @@ ufmap(int c, int f, int *fp)
 int
 un2tr(int c, int *fp)
 {
+	extern char	ifilt[];
 	struct unimap	*up;
 	int	i, j;
 
@@ -2043,9 +2044,17 @@ un2tr(int c, int *fp)
 			for (i = smnt, j=0; j < nfonts; j++, i = i % nfonts + 1)
 				if ((i = ufmap(c, i, fp)) != 0)
 					return i;
-		illseq(c, NULL, 0);
 		*fp = font;
-		return ' ';
+		if (c < 040 && c == ifilt[c] || c >= 040 && c < 0177)
+			return c;
+		else if ((c & ~0177) == 0) {
+			illseq(c, NULL, 0);
+			return 0;
+		} else {
+			if (warn & WARN_CHAR)
+				errprint("no glyph available for %U", c);
+			return ' ';
+		}
 	}
 }
 

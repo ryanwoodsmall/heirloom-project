@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.34 (gritter) 12/23/05
+ * Sccsid @(#)n9.c	1.35 (gritter) 1/6/06
  */
 
 /*
@@ -926,7 +926,7 @@ illseq(int wc, const char *mb, int n)
 		return;
 	if (n == 0) {
 		if (wc & ~0177)
-			errprint("undefined wide character 0x%x", wc);
+			errprint("ignoring '%U' in input", wc);
 		else
 			errprint("ignoring '\\%o' in input", wc);
 	} else
