@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.8 0
+%%BeginResource: procset dpost_cutmarks 1.9 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,11 +23,12 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.8 (gritter) 12/22/05
+% Sccsid @(#)cutmarks.ps	1.9 (gritter) 1/6/06
 %
 
 /_cutmark_a 10 def
 /_cutmark_b 30 def
+/_cutmarklinewidth .3 def
 
 /_cutmark_adj {scaling div} def
 /_cutmark_yadj {pagebbox 3 get exch sub} def
@@ -40,16 +41,47 @@
 	_cutmark_tby exch _cutmark_adj sub lineto
 } def
 /_regmark {
+	newpath
 	/_regmark_d exch def
 	/_regmark_y exch def
 	/_regmark_x exch def
 	/_regmark_r _regmark_d 2 div def
+	/_regmark_w _cutmarklinewidth _cutmark_adj 2 div def
 	_regmark_x _regmark_r add _regmark_y moveto
 	_regmark_x _regmark_y _regmark_r 0 360 arc
 	_regmark_x _regmark_d sub _regmark_y moveto
+	_regmark_x _regmark_r 2 div sub _regmark_y lineto
+	_regmark_x _regmark_r 2 div add _regmark_y moveto
 	_regmark_x _regmark_d add _regmark_y lineto
 	_regmark_x _regmark_y _regmark_d sub moveto
+	_regmark_x _regmark_y _regmark_r 2 div sub lineto
+	_regmark_x _regmark_y _regmark_r 2 div add moveto
 	_regmark_x _regmark_y _regmark_d add lineto
+	stroke
+	newpath
+	_regmark_x _regmark_w add _regmark_y _regmark_w add moveto
+	_regmark_x _regmark_r 2 div add _regmark_y _regmark_w add lineto
+	_regmark_x _regmark_w add _regmark_y _regmark_w add
+		_regmark_r 2 div _regmark_w sub 0 90 arc
+	fill
+	newpath
+	_regmark_x _regmark_w sub _regmark_y _regmark_w add moveto
+	_regmark_x _regmark_w sub _regmark_y _regmark_r 2 div add lineto
+	_regmark_x _regmark_w sub _regmark_y _regmark_w add
+		_regmark_r 2 div _regmark_w sub 90 180 arc
+	fill
+	newpath
+	_regmark_x _regmark_w sub _regmark_y _regmark_w sub moveto
+	_regmark_x _regmark_r 2 div sub _regmark_y _regmark_w sub lineto
+	_regmark_x _regmark_w sub _regmark_y _regmark_w sub
+		_regmark_r 2 div _regmark_w sub 180 270 arc
+	fill
+	newpath
+	_regmark_x _regmark_w add _regmark_y _regmark_w sub moveto
+	_regmark_x _regmark_w add _regmark_y _regmark_r 2 div sub lineto
+	_regmark_x _regmark_w add _regmark_y _regmark_w sub
+		_regmark_r 2 div _regmark_w sub 270 360 arc
+	fill
 } def
 
 /setseparationgray where {
@@ -70,7 +102,7 @@
 } ifelse
 /_cutmark_setup {
 	0 setseparationgray
-	linewidth _cutmark_adj setlinewidth
+	_cutmarklinewidth _cutmark_adj setlinewidth
 } def
 
 /_cutmarks {
@@ -97,7 +129,7 @@
 		pop
 		gsave
 		_cutmark_setup
-		newpath
+		0 setlinecap
 		/_cutmark_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
 		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
 			1 _cutmark_tby 3 _cutmark_tby 1 _cutmark_tby sub
@@ -115,7 +147,6 @@
 			3 _cutmark_tby _cutmark_d add
 				_cutmark_a _cutmark_adj add
 			_cutmark_d _regmark
-		stroke
 		grestore
 	} if
 } def
