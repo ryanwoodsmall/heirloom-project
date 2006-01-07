@@ -342,15 +342,24 @@ New and extended requests
 
 .trimat left-offset top-offset width height
 	sets the "TrimBox" page parameter for PDF generation and enables
-	printing of visible cut marks, registration marks, and/or color
-	bars when used with "dpost -M cut:registration:colorbars". The
-	four arguments give the offset from the left and top margins of
-	the document (as set by ".mediasize"), and width and height of
+	printing of marks with "dpost -M...".
+	  The four arguments give the offset from the left and top margins
+	of the document (as set by ".mediasize"), and width and height of
 	the box. The default units are points. The TrimBox specifies how
 	the page is to be cut after it has been printed; it is sort of
 	an electronic equivalent for cut marks (which should continue to
 	be printed in addition). See also the ".cropat" and ".bleedat"
 	requests.
+	  dpost can currently print the following marks:
+
+		-M cutmarks		cut marks
+		-M registrationmarks	registration marks
+		-M startargets		star targets
+		-M colorbars		color bars
+		-M all			all of the above
+	
+	Mark names can be abbreviated and combined by colons, e.g.
+	"-Mcut:reg" will print cut marks and registration marks.
 
 .warn [+|-][bits|name] ...
 	controls warning messages, which may be given either numerically

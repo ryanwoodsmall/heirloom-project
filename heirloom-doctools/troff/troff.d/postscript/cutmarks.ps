@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.12 0
+%%BeginResource: procset dpost_cutmarks 1.13 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.12 (gritter) 1/7/06
+% Sccsid @(#)cutmarks.ps	1.13 (gritter) 1/7/06
 %
 
 /_cutmark_a 10 def
@@ -82,24 +82,24 @@
 
 /_wedge {
 	newpath
-	/_rosetta_b exch def
-	/_rosetta_a exch def
-	/_rosetta_X _rosetta_x _rosetta_a cos _rosetta_c mul add def
-	/_rosetta_Y _rosetta_y _rosetta_a sin _rosetta_c mul add def
-	_rosetta_X _rosetta_Y moveto
-	_rosetta_X _rosetta_Y _rosetta_r _rosetta_c sub
-		_rosetta_a _rosetta_b sub _rosetta_a _rosetta_b add arc
+	/_startgt_b exch def
+	/_startgt_a exch def
+	/_startgt_X _startgt_x _startgt_a cos _startgt_c mul add def
+	/_startgt_Y _startgt_y _startgt_a sin _startgt_c mul add def
+	_startgt_X _startgt_Y moveto
+	_startgt_X _startgt_Y _startgt_r _startgt_c sub
+		_startgt_a _startgt_b sub _startgt_a _startgt_b add arc
 	fill
 } def
-/_rosetta {
+/_startgt {
 	newpath
-	/_rosetta_d exch def
-	/_rosetta_y exch def
-	/_rosetta_x exch def
-	/_rosetta_r _rosetta_d 2 div def
-	/_rosetta_c _rosetta_r 8 div def
-	_rosetta_x _rosetta_r add _rosetta_y moveto
-	_rosetta_x _rosetta_y _rosetta_r 0 360 arc
+	/_startgt_d exch def
+	/_startgt_y exch def
+	/_startgt_x exch def
+	/_startgt_r _startgt_d 2 div def
+	/_startgt_c _startgt_r 8 div def
+	_startgt_x _startgt_r add _startgt_y moveto
+	_startgt_x _startgt_y _startgt_r 0 360 arc
 	stroke
 	0 10 350 {2.5 _wedge} for
 } def
@@ -167,14 +167,24 @@
 			3 _cutmark_tby _cutmark_d add
 				_cutmark_a _cutmark_adj add
 			_cutmark_d _regmark
+		grestore
+	} if
+} def
+
+/_startargets {
+	/_TrimBox where {
+		pop
+		gsave
+		_cutmark_setup
+		/_cutmark_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
 		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
 			3 _cutmark_tby _cutmark_d add
 				_cutmark_a _cutmark_adj add
-			_cutmark_d 1.5 mul _rosetta
+			_cutmark_d 1.5 mul _startgt
 		2 _cutmark_tbx _cutmark_d add _cutmark_a _cutmark_adj add
 			1 _cutmark_tby _cutmark_d sub
 				_cutmark_a _cutmark_adj sub
-			_cutmark_d 1.5 mul _rosetta
+			_cutmark_d 1.5 mul _startgt
 		grestore
 	} if
 } def
@@ -204,44 +214,43 @@
 		_cutmark_setup
 		/_block_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
 		0 setlinecap
-		2 _cutmark_tbx _cutmark_d 3 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 3 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			0 0 0 1 _block
-		2 _cutmark_tbx _cutmark_d 4 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 4 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			1 1 1 0 _block
-		2 _cutmark_tbx _cutmark_d 5 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 5 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			1 0 1 0 _block
-		2 _cutmark_tbx _cutmark_d 6 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 6 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			0 1 1 0 _block
-		2 _cutmark_tbx _cutmark_d 7 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 7 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			1 1 0 0 _block
-		2 _cutmark_tbx _cutmark_d 8 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 8 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			0 0 1 0 _block
-		2 _cutmark_tbx _cutmark_d 9 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 9 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			0 1 0 0 _block
-		2 _cutmark_tbx _cutmark_d 10 mul sub _cutmark_a _cutmark_adj add
-			1 _cutmark_tby _cutmark_d 1.5 mul sub
+		2 _cutmark_tbx _block_d 10 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _block_d 1.5 mul sub
 				_cutmark_a _cutmark_adj sub
 			1 0 0 0 _block
 		.1 .1 1.05 {
 			/_bars_z exch def
-		%0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
-			0 _cutmark_tbx _cutmark_d 1 _bars_z sub 10 mul 2 add
+			0 _cutmark_tbx _block_d 1 _bars_z sub 10 mul 2 add
 					mul add _cutmark_a _cutmark_adj sub
-				1 _cutmark_tby _cutmark_d 1.5 mul sub
+				1 _cutmark_tby _block_d 1.5 mul sub
 					_cutmark_a _cutmark_adj sub
 				0 0 0 _bars_z _block
 		} for

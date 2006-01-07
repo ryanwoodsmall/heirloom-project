@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.125 (gritter) 1/7/06
+ * Sccsid @(#)dpost.c	1.126 (gritter) 1/7/06
  */
 
 /*
@@ -608,10 +608,12 @@ static struct box {
  */
 
 static enum {
-	M_NONE	= 00,
-	M_CUT	= 01,
-	M_REG	= 02,
-	M_COL	= 04
+	M_NONE	= 000,
+	M_CUT	= 001,
+	M_STAR	= 002,
+	M_REG	= 004,
+	M_COL	= 010,
+	M_ALL	= 077
 } Mflag;
 
 static void	setmarks(char *);
@@ -979,6 +981,8 @@ header(FILE *fp)
 	    fprintf(fp, "_cutmarks\n");
     if (Mflag & M_REG)
 	    fprintf(fp, "_regmarks\n");
+    if (Mflag & M_STAR)
+	    fprintf(fp, "_startargets\n");
     if (Mflag & M_COL)
 	    fprintf(fp, "_colorbars\n");
     fprintf(fp, "} def\n");
@@ -1241,12 +1245,16 @@ setmarks(char *str)
 		for (sp = str; *sp && *sp != ':'; sp++);
 		c = *sp;
 		*sp = 0;
-		if (prefix(str, "cut"))
+		if (prefix(str, "cutmarks"))
 			Mflag |= M_CUT;
-		else if (prefix(str, "registration"))
+		else if (prefix(str, "registrationmarks"))
 			Mflag |= M_REG;
+		else if (prefix(str, "startargets"))
+			Mflag |= M_STAR;
 		else if (prefix(str, "colorbars"))
 			Mflag |= M_COL;
+		else if (prefix(str, "all"))
+			Mflag |= M_ALL;
 		else
 			error(FATAL, "unknown mark: -M %s", str);
 		*sp = c;
