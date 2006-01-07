@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.9 0
+%%BeginResource: procset dpost_cutmarks 1.10 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.9 (gritter) 1/6/06
+% Sccsid @(#)cutmarks.ps	1.10 (gritter) 1/7/06
 %
 
 /_cutmark_a 10 def
@@ -60,28 +60,48 @@
 	stroke
 	newpath
 	_regmark_x _regmark_w add _regmark_y _regmark_w add moveto
-	_regmark_x _regmark_r 2 div add _regmark_y _regmark_w add lineto
 	_regmark_x _regmark_w add _regmark_y _regmark_w add
 		_regmark_r 2 div _regmark_w sub 0 90 arc
 	fill
 	newpath
 	_regmark_x _regmark_w sub _regmark_y _regmark_w add moveto
-	_regmark_x _regmark_w sub _regmark_y _regmark_r 2 div add lineto
 	_regmark_x _regmark_w sub _regmark_y _regmark_w add
 		_regmark_r 2 div _regmark_w sub 90 180 arc
 	fill
 	newpath
 	_regmark_x _regmark_w sub _regmark_y _regmark_w sub moveto
-	_regmark_x _regmark_r 2 div sub _regmark_y _regmark_w sub lineto
 	_regmark_x _regmark_w sub _regmark_y _regmark_w sub
 		_regmark_r 2 div _regmark_w sub 180 270 arc
 	fill
 	newpath
 	_regmark_x _regmark_w add _regmark_y _regmark_w sub moveto
-	_regmark_x _regmark_w add _regmark_y _regmark_r 2 div sub lineto
 	_regmark_x _regmark_w add _regmark_y _regmark_w sub
 		_regmark_r 2 div _regmark_w sub 270 360 arc
 	fill
+} def
+
+/_wedge {
+	newpath
+	/_rosetta_b exch def
+	/_rosetta_a exch def
+	/_rosetta_X _rosetta_x _rosetta_a cos _rosetta_c mul add def
+	/_rosetta_Y _rosetta_y _rosetta_a sin _rosetta_c mul add def
+	_rosetta_X _rosetta_Y moveto
+	_rosetta_X _rosetta_Y _rosetta_r _rosetta_c sub
+		_rosetta_a _rosetta_b sub _rosetta_a _rosetta_b add arc
+	fill
+} def
+/_rosetta {
+	newpath
+	/_rosetta_d exch def
+	/_rosetta_y exch def
+	/_rosetta_x exch def
+	/_rosetta_r _rosetta_d 2 div def
+	/_rosetta_c _rosetta_r 8 div def
+	_rosetta_x _rosetta_r add _rosetta_y moveto
+	_rosetta_x _rosetta_y _rosetta_r 0 360 arc
+	stroke
+	0 10 350 {2.5 _wedge} for
 } def
 
 /setseparationgray where {
@@ -147,6 +167,14 @@
 			3 _cutmark_tby _cutmark_d add
 				_cutmark_a _cutmark_adj add
 			_cutmark_d _regmark
+		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
+			3 _cutmark_tby _cutmark_d add
+				_cutmark_a _cutmark_adj add
+			_cutmark_d 1.5 mul _rosetta
+		2 _cutmark_tbx _cutmark_d add _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d sub
+				_cutmark_a _cutmark_adj sub
+			_cutmark_d 1.5 mul _rosetta
 		grestore
 	} if
 } def
