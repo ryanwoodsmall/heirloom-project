@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.124 (gritter) 1/5/06
+ * Sccsid @(#)dpost.c	1.125 (gritter) 1/7/06
  */
 
 /*
@@ -610,7 +610,8 @@ static struct box {
 static enum {
 	M_NONE	= 00,
 	M_CUT	= 01,
-	M_REG	= 02
+	M_REG	= 02,
+	M_COL	= 04
 } Mflag;
 
 static void	setmarks(char *);
@@ -978,6 +979,8 @@ header(FILE *fp)
 	    fprintf(fp, "_cutmarks\n");
     if (Mflag & M_REG)
 	    fprintf(fp, "_regmarks\n");
+    if (Mflag & M_COL)
+	    fprintf(fp, "_colorbars\n");
     fprintf(fp, "} def\n");
 
     fflush(gf);
@@ -1242,6 +1245,8 @@ setmarks(char *str)
 			Mflag |= M_CUT;
 		else if (prefix(str, "registration"))
 			Mflag |= M_REG;
+		else if (prefix(str, "colorbars"))
+			Mflag |= M_COL;
 		else
 			error(FATAL, "unknown mark: -M %s", str);
 		*sp = c;

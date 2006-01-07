@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.10 0
+%%BeginResource: procset dpost_cutmarks 1.11 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.10 (gritter) 1/7/06
+% Sccsid @(#)cutmarks.ps	1.11 (gritter) 1/7/06
 %
 
 /_cutmark_a 10 def
@@ -175,6 +175,87 @@
 			1 _cutmark_tby _cutmark_d sub
 				_cutmark_a _cutmark_adj sub
 			_cutmark_d 1.5 mul _rosetta
+		grestore
+	} if
+} def
+
+/_block {
+	/_block_bK exch def
+	/_block_bY exch def
+	/_block_bM exch def
+	/_block_bC exch def
+	/_block_K exch def
+	/_block_Y exch def
+	/_block_M exch def
+	/_block_C exch def
+	/_block_y exch def
+	/_block_x exch def
+	/_block_w _cutmarklinewidth _cutmark_adj 2 div def
+	_block_bC _block_bM _block_bY _block_bK setcmykcolor
+	newpath
+	_block_x _block_y moveto
+	_block_x _block_d add _block_y lineto
+	_block_x _block_d add _block_y _block_d add lineto
+	_block_x _block_y _block_d add lineto
+	_block_x _block_y lineto
+	stroke
+	_block_C _block_M _block_Y _block_K setcmykcolor
+	newpath
+	_block_x _block_w add _block_y _block_w add moveto
+	_block_x _block_d add _block_w sub _block_y _block_w add lineto
+	_block_x _block_d add _block_w sub
+		_block_y _block_d add _block_w sub lineto
+	_block_x _block_w add _block_y _block_d add _block_w sub lineto
+	fill
+} def
+
+/_colorbars {
+	/_TrimBox where {
+		pop
+		gsave
+		_cutmark_setup
+		/_block_d _cutmark_b _cutmark_a sub 2 div _cutmark_adj def
+		0 setlinecap
+		2 _cutmark_tbx _cutmark_d 3 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			0 0 0 1 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 4 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			1 1 1 0 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 5 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			1 0 1 0 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 6 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			0 1 1 0 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 7 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			1 1 0 0 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 8 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			0 0 1 0 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 9 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			0 1 0 0 0 0 0 1 _block
+		2 _cutmark_tbx _cutmark_d 10 mul sub _cutmark_a _cutmark_adj add
+			1 _cutmark_tby _cutmark_d 1.5 mul sub
+				_cutmark_a _cutmark_adj sub
+			1 0 0 0 0 0 0 1 _block
+		.1 .1 1.05 {
+			/_bars_z exch def
+			0 _cutmark_tbx _cutmark_d 1 _bars_z sub 10 mul 2 add
+					mul add _cutmark_a _cutmark_adj sub
+				1 _cutmark_tby _cutmark_d 1.5 mul sub
+					_cutmark_a _cutmark_adj sub
+				0 0 0 _bars_z 0 0 0 0 _block
+		} for
 		grestore
 	} if
 } def

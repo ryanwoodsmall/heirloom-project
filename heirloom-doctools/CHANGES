@@ -12,6 +12,7 @@ Release ...
 * troff/dpost/otfdump: TrueType handling has been made more robust against
   an error in Microsoft/Unicode "cmap" subtables.
 * dpost: Error messages now include the number of the current output page.
+* dpost: Color bars can be generated with "-M colorbars".
 
 Release 051227
 * [nt]roff: A new extension level "3" is available. In this level, undefined
