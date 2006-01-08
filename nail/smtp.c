@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.34 (gritter) 7/13/05";
+static char sccsid[] = "@(#)smtp.c	2.35 (gritter) 1/8/06";
 #endif
 #endif /* not lint */
 
@@ -331,12 +331,12 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 		SMTP_OUT(o);
 		SMTP_ANSWER(2);
 	}
-	snprintf(o, sizeof o, "MAIL FROM: <%s>\r\n", skinned);
+	snprintf(o, sizeof o, "MAIL FROM:<%s>\r\n", skinned);
 	SMTP_OUT(o);
 	SMTP_ANSWER(2);
 	for (n = to; n != NULL; n = n->n_flink) {
 		if ((n->n_type & GDEL) == 0) {
-			snprintf(o, sizeof o, "RCPT TO: <%s>\r\n",
+			snprintf(o, sizeof o, "RCPT TO:<%s>\r\n",
 					skin(n->n_name));
 			SMTP_OUT(o);
 			SMTP_ANSWER(2);

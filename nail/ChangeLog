@@ -1,4 +1,7 @@
 [11.26] released ...
+* Nail no longer prints a space before the address in "MAIL FROM:<xxx>" and
+  "RCPT TO:<xxx>" in SMTP. This should make it work with Sendmail X (bugs
+  reported by Stephane Lentz and Claus Assmann).
 * The new "-S variable[=value]" command line option sets the internal option
   "variable", and, in case of a string option, assigns "value" to it (based
   on a request by Dmitry Butskoy).
