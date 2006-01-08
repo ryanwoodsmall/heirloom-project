@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_cutmarks 1.14 0
+%%BeginResource: procset dpost_cutmarks 1.15 0
 %
 % Copyright 2005 Gunnar Ritter, Freiburg i. Br., Germany. All rights reserved.
 % Use is subject to license terms.
@@ -23,7 +23,7 @@
 %
 % CDDL HEADER END
 %
-% Sccsid @(#)cutmarks.ps	1.14 (gritter) 1/7/06
+% Sccsid @(#)cutmarks.ps	1.15 (gritter) 1/8/06
 %
 
 /_cutmark_a 10 def
@@ -93,11 +93,11 @@
 } def
 /_startgt {
 	newpath
-	/_startgt_d exch def
 	/_startgt_y exch def
 	/_startgt_x exch def
+	/_startgt_d 18 _cutmark_adj def
 	/_startgt_r _startgt_d 2 div def
-	/_startgt_c _startgt_r 8 div def
+	/_startgt_c 1 _cutmark_adj def
 	_startgt_x _startgt_r add _startgt_y moveto
 	_startgt_x _startgt_y _startgt_r 0 360 arc
 	stroke
@@ -180,11 +180,11 @@
 		0 _cutmark_tbx _cutmark_d sub _cutmark_a _cutmark_adj sub
 			3 _cutmark_tby _cutmark_d add
 				_cutmark_a _cutmark_adj add
-			_cutmark_d 1.8 mul _startgt
+			_startgt
 		2 _cutmark_tbx _cutmark_d add _cutmark_a _cutmark_adj add
 			1 _cutmark_tby _cutmark_d sub
 				_cutmark_a _cutmark_adj sub
-			_cutmark_d 1.8 mul _startgt
+			_startgt
 		grestore
 	} if
 } def
