@@ -245,12 +245,13 @@ New and extended requests
 .mediasize executive|letter|legal|ledger|tabloid|aN|bN|cN|x y	troff only
 	performs the same actions as the ".papersize" request and generates
 	a device setup command in addition (the PostScript Level 2 operator
-	"setpagedevice" with dpost). The effect of this command can be the
-	selection of a matching paper tray on a printer; on the other hand,
-	the document may not print at all if no such tray is available. In
-	general, it is recommended to use printer-specific options from a
-	PPD file when the file is submitted to the print spooling system
-	instead of this request. However, when generating PostScript as
+	"setpagedevice" as well as the DSC comment "%%DocumentMedia:" with
+	dpost). The effect of this command can be the selection of a
+	matching paper tray on a printer; on the other hand, the document
+	may not print at all if no such tray is available. In general, it
+	is recommended to use printer-specific options from a PPD file
+	when the file is submitted to the print spooling system instead
+	of this request. However, when generating PostScript as
 	intermediate format with the intent of PDF creation, use of this
 	request is recommended.
 
@@ -555,8 +556,9 @@ x X CropAt left-offset top-offset width height
 x X PaperSize x y setmedia
 	results from the ".mediasize" or ".papersize" requests and gives
 	the paper size as "x" and "y" in device units. If "setmedia" is
-	non-zero, PostScript code for "setpagedevice" will also be
-	emitted. This command is not generated otherwise.
+	non-zero, PostScript code for "setpagedevice" and the DSC comment
+	"%%DocumentMedia:" will also be emitted. This command is not
+	generated otherwise.
 
 x X PDFMark attribute value
 	includes information that is used by the distiller utility when
@@ -614,4 +616,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   1/7/06
+Gunnar Ritter                                                   1/10/06

@@ -14,6 +14,9 @@ Release ...
 * dpost: Error messages now include the number of the current output page.
 * dpost: Color bars can now be generated with "-M colorbars", star targets
   with "-M startargets", and all marks are enabled with "-M all".
+* dpost: The ".mediasize" request now also causes a "%%DocumentMedia:" DSC
+  comment to be written. This enables some PostScript previewer programs
+  to determine the document size.
 
 Release 051227
 * [nt]roff: A new extension level "3" is available. In this level, undefined

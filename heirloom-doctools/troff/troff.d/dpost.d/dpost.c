@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.127 (gritter) 1/7/06
+ * Sccsid @(#)dpost.c	1.128 (gritter) 1/10/06
  */
 
 /*
@@ -902,12 +902,16 @@ header(FILE *fp)
     struct Bookmark	*bp;
     time_t	now;
     int		n;
-    double	x, y;
+    double	x = 0, y = 0;
     char	buf[4096];
     char	crdbuf[40];
 
 
     time(&now);
+    if (mediasize.flag) {
+	x = mediasize.val[2] * 72.0 / res;
+	y = mediasize.val[3] * 72.0 / res;
+    }
     fprintf(fp, "%s", CONFORMING);
     fprintf(fp, "%s %s\n", CREATOR, creator);
     fprintf(fp, "%s %s", CREATIONDATE, ctime(&now));
@@ -923,6 +927,8 @@ header(FILE *fp)
 	unlink(temp_file);
     }	/* End if */
     fprintf(fp, "%s %d\n", PAGES, printed);
+    if (mediasize.flag & 2)
+	fprintf(fp, "%%%%DocumentMedia: x%gy%g %g %g 0 () ()\n", x, y, x, y);
 
     if (got_otf)
         fprintf(fp, "%%%%DocumentNeededResources: procset FontSetInit 0 0\n");
@@ -992,8 +998,6 @@ header(FILE *fp)
     while ((n = fread(buf, 1, sizeof buf, gf)) > 0)
 	    fwrite(buf, 1, n, fp);
     if (mediasize.flag) {
-	    x = mediasize.val[2] * 72.0 / res;
-	    y = mediasize.val[3] * 72.0 / res;
 	    fprintf(fp, "/pagebbox [0 0 %g %g] def\n", x, y);
 	    fprintf(fp, "userdict /gotpagebbox true put\n");
 	    if (mediasize.flag & 2)
