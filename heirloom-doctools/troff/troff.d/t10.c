@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.59 (gritter) 1/1/06
+ * Sccsid @(#)t10.c	1.60 (gritter) 1/11/06
  */
 
 /*
@@ -93,6 +93,7 @@ static float	mzoom;
 
 int	c_hyphen;
 int	c_emdash;
+int	c_endash;
 int	c_rule;
 int	c_minus;
 int	c_fi;
@@ -272,6 +273,7 @@ specnames(void)
 	} spnames[] = {
 		&c_hyphen, "hy",
 		&c_emdash, "em",
+		&c_endash, "en",
 		&c_rule, "ru",
 		&c_minus, "\\-",
 		&c_fi, "fi",

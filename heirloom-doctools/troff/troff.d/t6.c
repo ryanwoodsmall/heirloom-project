@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.116 (gritter) 1/6/06
+ * Sccsid @(#)t6.c	1.117 (gritter) 1/11/06
  */
 
 /*
@@ -1320,6 +1320,29 @@ getfontpath(char *file, char *type)
 	return path;
 }
 
+static void
+checkenminus(int f)
+{
+	/*
+	 * A fix for a very special case: If the font supplies punctuation
+	 * characters but is not S1, only one of \- and \(en is present
+	 * since the PostScript character "endash" is mapped to both of
+	 * them.
+	 */
+	enum spec	spec;
+	int	i;
+
+	if (afmtab == NULL || (i = fontbase[f]->afmpos - 1) < 0)
+		return;
+	spec = afmtab[i]->spec;
+	if ((spec&(SPEC_PUNCT|SPEC_S1)) == SPEC_PUNCT) {
+		if (fitab[f][c_endash-32] == 0 && ftrtab[f][c_minus-32])
+			ftrtab[f][c_endash] = c_minus;
+		else if (fitab[f][c_endash-32] && ftrtab[f][c_minus-32] != 0)
+			ftrtab[f][c_minus] = c_endash;
+	}
+}
+
 int
 loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 {
@@ -1432,6 +1455,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 		ptsupplyfont(a->fontname, data);
 		free(data);
 	}
+	checkenminus(nf);
 	if (realpage)
 		ptfpcmd(nf, a->path);
 	return 1;
@@ -1884,6 +1908,7 @@ caseftr(void)
 		ftrtab[f][i] = j;
 	}
 done:
+	checkenminus(f);
 	font = savfont;
 	font1 = savfont1;
 	mchbits();

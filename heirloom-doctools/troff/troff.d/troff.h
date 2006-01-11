@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.19 (gritter) 12/20/05
+ * Sccsid @(#)troff.h	1.20 (gritter) 1/11/06
  */
 
 extern struct tracktab {
@@ -49,6 +49,7 @@ extern	float		*zoomtab;
 extern	int		nchtab;
 extern	char		*chname;
 extern	short		*chtab;
+extern	int		c_endash;
 
 extern	int		kern;
 

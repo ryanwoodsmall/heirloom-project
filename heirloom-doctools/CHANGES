@@ -17,6 +17,8 @@ Release ...
 * dpost: The ".mediasize" request now also causes a "%%DocumentMedia:" DSC
   comment to be written. This enables some PostScript previewer programs
   to determine the document size.
+* troff: On a font mounted with ".fps punct", the "\(en" character is now
+  available as expected.
 
 Release 051227
 * [nt]roff: A new extension level "3" is available. In this level, undefined
