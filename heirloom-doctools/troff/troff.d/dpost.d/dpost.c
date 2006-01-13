@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.128 (gritter) 1/10/06
+ * Sccsid @(#)dpost.c	1.129 (gritter) 1/14/06
  */
 
 /*
@@ -1289,7 +1289,6 @@ setup(void)
     writerequest(0, stdout);		/* global requests eg. manual feed */
     fprintf(stdout, "/resolution %d def\n", res);
     fprintf(stdout, "setup\n");
-    fprintf(stdout, "/Dsetup where { pop Dsetup } if\n");
     fprintf(stdout, "%d setdecoding\n", encoding);
 
     if ( formsperpage > 1 )  {		/* followed by stuff for multiple pages */

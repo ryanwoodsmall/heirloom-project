@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.10 0
+%%BeginResource: procset dpost 4.11 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.10 (gritter) 12/17/05
+% Sccsid @(#)dpost.ps	4.11 (gritter) 1/14/06
 %
 
 /#copies 1 store
@@ -136,6 +136,7 @@
 	currentdict /pagedict known currentdict page known and {
 		page load pagedict exch get cvx exec
 	} if
+	/Dsetup where {pop Dsetup} if
 	_custompagesetup
 } def
 
@@ -152,7 +153,7 @@
 
 /setdecoding {/t decodingdefs 3 -1 roll get bind def} bind def
 
-/T { /track exch def } bind def
+/T {/track exch def} bind def
 
 /w {neg moveto show} bind def
 /m {neg dup /y exch def moveto} bind def
@@ -164,8 +165,8 @@
 	linewidth ptsize mul scaling resolution 72 div mul div setlinewidth
 	/spacewidth ( ) stringwidth pop def
 } bind def
-/F { ptsize exch f } bind def
-/s { font f } bind def
+/F {ptsize exch f} bind def
+/s {font f} bind def
 
 /changefont {
 	/fontheight exch def
@@ -250,11 +251,11 @@ ifelse
 
 % from Adobe's pdfmark Reference Manual for Acrobat 7.0, 11/30/04, p. 10
 /pdfmark where				% Is pdfmark already available?
-	{ pop }				% Yes: do nothing (use that definition)
+	{pop}				% Yes: do nothing (use that definition)
 	{				% No: define pdfmark as follows:
 	/globaldict where		% globaldict is preferred because
-		{ pop globaldict }	% globaldict is always visible; else,
-		{ userdict }		% use userdict otherwise.
+		{pop globaldict}	% globaldict is always visible; else,
+		{userdict}		% use userdict otherwise.
 	ifelse
 	/pdfmark /cleartomark load put
 	}				% Define pdfmark to remove all objects
