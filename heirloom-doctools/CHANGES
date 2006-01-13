@@ -19,6 +19,9 @@ Release ...
   to determine the document size.
 * troff: On a font mounted with ".fps punct", the "\(en" character is now
   available as expected.
+* pic/dpost: The PostScript implementation of the "Dl" (draw line)
+  operation has been fixed to move to the beginning of the line properly
+  even when "inpath" is set. This fixes "box fill 0" in pic.
 
 Release 051227
 * [nt]roff: A new extension level "3" is available. In this level, undefined
