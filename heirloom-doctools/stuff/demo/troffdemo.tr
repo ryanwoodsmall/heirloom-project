@@ -1,8 +1,8 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.33 (gritter) 12/21/05
+.\" Sccsid @(#)troffdemo.tr	1.34 (gritter) 1/16/06
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names and warnings.
-.do xflag 2
+.do xflag 3
 .warn all
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Set the document size.
@@ -171,7 +171,7 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-12/21/05
+1/16/06
 .sp 2v
 .ad b
 .ps 12
