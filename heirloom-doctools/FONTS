@@ -486,7 +486,7 @@ ignores any features that are not mapped to the "DFLT" or "latn" languages
 in an OpenType font.
 
 The default PostScript/Unicode conversion tables currently only contain
-Western character names; other characters are simply ignored when they
+European character names; other characters are simply ignored when they
 occur in input text. The "Adobe Glyph List" cannot be used for this task
 since it lists many characters in positions which are not appropriate for
 the troff input mechanism. For example, small capitals are put in the
@@ -496,4 +496,4 @@ be selected simply with a font change. Contributions of appropriate tables
 for other languages are welcome.
 
 
-Gunnar Ritter                                                 12/21/05
+Gunnar Ritter                                                 1/19/06

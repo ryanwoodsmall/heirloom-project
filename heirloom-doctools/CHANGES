@@ -1,4 +1,8 @@
 Release ...
+* troff: Eastern European characters for Unicode/PostScript conversion
+  have been added (patch by Vladimir B. Machulsky).
+
+Release 060114
 * troff: The internal codes for PostScript characters are now unique across
   all fonts. In effect, requests like ".tr" or ".lc" now handle arbitrary
   characters correctly, including locale-dependent ones.
