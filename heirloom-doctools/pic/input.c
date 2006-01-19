@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)input.c	1.6 (gritter) 12/5/05	*/
+/*	Sccsid @(#)input.c	1.7 (gritter) 1/19/06	*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -263,7 +263,7 @@ int input(void)
 		printf(" <%c>", c);
 	if (ep >= ebuf + sizeof ebuf)
 		ep = ebuf;
-	return *ep++ = c;
+	return (*ep++ = c) & 0377;
 }
 
 int nextchar(void)
