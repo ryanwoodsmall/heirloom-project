@@ -3,6 +3,9 @@ Release ...
   have been added (patch by Vladimir B. Machulsky).
 * pic, grap: Fixed 8-bit input in label texts (bug reported by Vladimir
   B. Machulsky).
+* troff: The ".trimat", ".bleedat", and ".cropat" requests caused some
+  following requests (e.g. ".fp") to fail because of an improper reset
+  of number scaling (bug reported by Sebastian Leusch).
 
 Release 060114
 * troff: The internal codes for PostScript characters are now unique across
