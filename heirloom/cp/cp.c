@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.82 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.83 (gritter) 1/22/06";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.82 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.83 (gritter) 1/22/06";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.82 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)cp.sl	1.83 (gritter) 1/22/06";
 #endif
 
 #include	<sys/types.h>
@@ -533,11 +533,11 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 	}
 #ifdef	O_DIRECT
 	if (haverest) {
-#if !defined (__FreeBSD__) && !defined (__DragonFly__)
+#if !defined (__FreeBSD__) && !defined (__DragonFly__) && !defined (__APPLE__)
 		fdatasync(dfd);
-#else	/* __FreeBSD__, __DragonFly__ */
+#else	/* __FreeBSD__, __DragonFly__, __APPLE__ */
 		fsync(dfd);
-#endif	/* __FreeBSD_, __DragonFly__ */
+#endif	/* __FreeBSD_, __DragonFly__, __APPLE__ */
 	}
 #endif	/* O_DIRECT */
 }

@@ -19,10 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)sigrelse.c	1.7 (gritter) 11/22/05	*/
+/*	Sccsid @(#)sigrelse.c	1.8 (gritter) 1/22/06	*/
 
 #if defined (__FreeBSD__) || defined (__dietlibc__) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 #include <signal.h>
 #include "sigset.h"
 
@@ -38,4 +38,4 @@ sigrelse(int sig)
 	return sigprocmask(SIG_UNBLOCK, &set, &oset);
 }
 #endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __OpenBSD__ ||
-	__DragonFly__ */
+	__DragonFly__ || __APPLE__ */

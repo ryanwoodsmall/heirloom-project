@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tapecntl.sl	1.37 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)tapecntl.sl	1.38 (gritter) 1/22/06";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,7 +45,8 @@ static const char sccsid[] USED = "@(#)tapecntl.sl	1.37 (gritter) 11/22/05";
 #include <errno.h>
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) \
 	|| defined (__hpux) || defined (_AIX) || defined (__NetBSD__) \
-	|| defined (__OpenBSD__) || defined (__DragonFly__)
+	|| defined (__OpenBSD__) || defined (__DragonFly__) \
+	|| defined (__APPLE__)
 #include <sys/ioctl.h>
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
@@ -218,7 +219,7 @@ tape v%s usage:   %s [-<tape>] [-a arg] <command> [device]\n\
         setblk     - set block size (in bytes) for device\n\
         setcomp    - set compression (0 disabled, 1 enabled)\n\
         setdensity - set density code (in hexadecimal)\n",
-        "1.37",
+        "1.38",
         progname);
         exit(1);
 }
@@ -578,7 +579,7 @@ stats(int fd)
 	stats_density = md.default_density;
 }
 #elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-	|| defined (__DragonFly__)
+	|| defined (__DragonFly__) || defined (__APPLE__)
 static int
 process(int fd, enum oper op)
 {

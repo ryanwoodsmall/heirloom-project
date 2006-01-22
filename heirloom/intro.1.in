@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)intro.1.in	1.21 (gritter) 6/18/05
-.TH INTRO 1 "6/18/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)intro.1.in	1.22 (gritter) 1/22/06
+.TH INTRO 1 "1/22/06" "Heirloom Toolchest" "User Commands"
 .SH NAME
 intro \- introduction to commands
 .SH DESCRIPTION
@@ -135,7 +135,8 @@ immediately followed by the toolchest base directory,
 For example, to use the toolchest with a SVID4 personality, execute
 .RS
 .sp
-PATH=/usr/5bin/s42:@.DEFBIN.@:$PATH export PATH
+PATH=/usr/5bin/s42:\
+@.DEFBIN.@:$PATH export PATH
 .RE
 .PP
 You must select exactly one of the personalities above;
@@ -163,7 +164,9 @@ as the ones described above,
 they should be used in addition, as e.\|g.
 .RS
 .sp
-PATH=/usr/ucb:/usr/5bin/s42:@.DEFBIN.@:$PATH export PATH
+PATH=/usr/ucb:\
+/usr/5bin/s42:\
+@.DEFBIN.@:$PATH export PATH
 .sp
 .RE
 does.

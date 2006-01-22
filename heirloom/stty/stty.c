@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifndef	UCB
-static const char sccsid[] USED = "@(#)stty.sl	1.22 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)stty.sl	1.23 (gritter) 1/22/06";
 #else	/* UCB */
-static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.22 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.23 (gritter) 1/22/06";
 #endif	/* UCB */
 
 #include <sys/types.h>
@@ -648,7 +648,7 @@ getattr(int fd)
 		ws.ws_xpixel = 0;
 		ws.ws_ypixel = 0;
 	}
-#if !defined (__FreeBSD__) && !defined (__DragonFly__)
+#if !defined (__FreeBSD__) && !defined (__DragonFly__) && !defined (__APPLE__)
 	vdis = fpathconf(fd, _PC_VDISABLE) & 0377;
 #else
 	vdis = '\377' & 0377;

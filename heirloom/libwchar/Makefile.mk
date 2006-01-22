@@ -3,7 +3,8 @@ all: libwchar.a
 OBJ = mbtowc.o wctomb.o wctype.o mbstowcs.o wcwidth.o wcslen.o wcsncmp.o \
 	mbrtowc.o wctfunc.o mblen.o
 libwchar.a: fake $(OBJ)
-	$(AR) -rv libwchar.a $(OBJ)
+	$(AR) -rv $@ $(OBJ)
+	$(RANLIB) $@
 
 fake:
 	if test "x$(LWCHAR)" = x; \

@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)date_sus.sl	1.25 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)date_sus.sl	1.26 (gritter) 1/22/06";
 #else
-static const char sccsid[] USED = "@(#)date.sl	1.25 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)date.sl	1.26 (gritter) 1/22/06";
 #endif
 
 #include	<unistd.h>
@@ -135,7 +135,7 @@ badtime:
 }
 
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__)
+	defined (__DragonFly__) || defined (__APPLE__)
 static int
 stime(time_t *t)
 {
@@ -146,7 +146,7 @@ stime(time_t *t)
 
 	return settimeofday(&tv, NULL);
 }
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 
 static void
 settime(char *op)
@@ -231,10 +231,11 @@ printtime(const char *cp)
 					goto next;
 				case 'z': {
 						  int hour, min;
-#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__DragonFly__)
+#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__DragonFly__) \
+	|| defined (__APPLE__)
 						  long	timezone;
 						  timezone = -tp->tm_gmtoff;
-#endif	/* __FreeBSD__, __OpenBSD__, __DragonFly__ */
+#endif	/* __FreeBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 
 						  hour = -timezone / 3600;
 						  min = (timezone / 60) % 60;

@@ -6,7 +6,8 @@ all: libuxre.a
 OBJ = onefile.o regfree.o regerror.o
 
 libuxre.a: $(OBJ)
-	$(AR) -rv libuxre.a $(OBJ)
+	$(AR) -rv $@ $(OBJ)
+	$(RANLIB) $@
 
 onefile.o: onefile.c
 	$(CC) $(CFLAGS2) $(CPPFLAGS) $(XO5FL) $(IWCHAR) -I. -c onefile.c

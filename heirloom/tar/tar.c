@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.175 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)tar.sl	1.176 (gritter) 1/22/06";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -84,7 +84,7 @@ static const char sccsid[] USED = "@(#)tar.sl	1.175 (gritter) 11/22/05";
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
 #include <sys/scsi.h>
@@ -116,7 +116,7 @@ static const char sccsid[] USED = "@(#)tar.sl	1.175 (gritter) 11/22/05";
 #endif
 
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__)
+	defined (__DragonFly__) || defined (__APPLE__)
 /*
  * For whatever reason, FreeBSD casts the return values of major() and
  * minor() to signed values so that normal limit comparisons will fail.
@@ -135,7 +135,7 @@ myminor(long dev)
 }
 #undef	minor
 #define	minor(a)	myminor(a)
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 
 #define TBLOCK	512
 #define	MAXBLF	(SSIZE_MAX/TBLOCK)
@@ -2156,7 +2156,7 @@ tseek(int n, int rew)
 	if (tapeblock > 0 && rew) {
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 		struct mtop	mo;
 		mo.mt_op = n > 0 ? MTFSR : MTBSR;
 		mo.mt_count = (n > 0 ? n : -n) / tapeblock;
@@ -2673,7 +2673,7 @@ domtstat(void)
 			tapeblock = md.bsize;
 	}
 #elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__)
+		|| defined (__DragonFly__) || defined (__APPLE__)
 	if ((mtstat.st_mode&S_IFMT) == S_IFCHR) {
 		struct mtget	mg;
 		if (ioctl(mt, MTIOCGET, &mg) == 0)
@@ -2702,7 +2702,8 @@ domtstat(void)
 		if (tapeblock > NBLOCK)
 			NBLOCK = tapeblock;
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__NetBSD__) || defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__NetBSD__) || defined (__OpenBSD__) || \
+	defined (__DragonFly__) || defined (__APPLE__)
 		if (bflag == 0 && cflag && twice == 0) {
 			if (nblock == 1) {
 				if ((nblock = tapeblock) > NBLOCK)
@@ -2712,7 +2713,7 @@ domtstat(void)
 			}
 		}
 #endif	/* __linux__ || __sun || __FreeBSD__ || __NetBSD__ || __OpenBSD__ ||
-	__DragonFly__ */
+	__DragonFly__ || __APPLE__ */
 	}
 	if (twice == 0 && bflag == 0 && tapeblock < 0) {
 		if ((nblock = mtstat.st_blksize >> 9) > NBLOCK)

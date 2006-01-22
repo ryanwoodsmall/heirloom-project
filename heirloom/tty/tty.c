@@ -31,7 +31,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tty.sl	1.13 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)tty.sl	1.14 (gritter) 1/22/06";
 
 #include <unistd.h>
 #include <stdio.h>
@@ -40,10 +40,10 @@ static const char sccsid[] USED = "@(#)tty.sl	1.13 (gritter) 11/22/05";
 #include <stdlib.h>
 #if !defined (__linux) && !defined (__FreeBSD__) && !defined (__hpux) && \
 	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__) && \
-	!defined (__DragonFly__)
+	!defined (__DragonFly__) && !defined (__APPLE__)
 #include <sys/stermio.h>
 #endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__,
-	   !__OpenBSD__, !__DragonFly__ */
+	   !__OpenBSD__, !__DragonFly__, !__APPLE__ */
 
 static int	lflag;
 static int	sflag;

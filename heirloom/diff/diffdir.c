@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffdir.c	1.29 (gritter) 11/22/05>	*/
+/*	Sccsid @(#)diffdir.c	1.30 (gritter) 1/22/06>	*/
 /*	from 4.3BSD diffdir.c	4.9 (Berkeley) 8/28/84	*/
 
 #include "diff.h"
@@ -185,11 +185,11 @@ diffdir(char **argv)
 	snprintf(procself, sizeof procself,
 #if defined (__linux__)
 			"/proc/%d/exe",
-#elif defined (__FreeBSD__) || defined (__DragonFly__)
+#elif defined (__FreeBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 			"/proc/%d/file",
-#else	/* !__linux__, !__FreeBSD__ */
+#else	/* !__linux__, !__FreeBSD__, !__APPLE__ */
 			"/proc/%d/object/a.out",
-#endif	/* !__linux__, !__FreeBSD__ */
+#endif	/* !__linux__, !__FreeBSD__, !__APPLE__ */
 			i);
 	setfile(&file1, &efile1, file1);
 	setfile(&file2, &efile2, file2);

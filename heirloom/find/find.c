@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.43 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.44 (gritter) 1/22/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.43 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.44 (gritter) 1/22/06";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.43 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)find.sl	1.44 (gritter) 1/22/06";
 #endif
 
 #include <stdio.h>
@@ -76,7 +76,7 @@ static const char sccsid[] USED = "@(#)find.sl	1.43 (gritter) 11/22/05";
 #include <mntent.h>
 #endif
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__)
+	defined (__DragonFly__) || defined (__APPLE__)
 #include <sys/param.h>
 #include <sys/mount.h>
 #endif
@@ -733,7 +733,7 @@ static int fstype(register struct anode *p)
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 	return(EQ(fscur->fstype, p->l.fstype));
 #elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__)
+		|| defined (__DragonFly__) || defined (__APPLE__)
 	return(EQ(Statfs, p->l.fstype));
 #else
 	return(EQ(Statb.st_fstype, p->l.fstype));
@@ -744,7 +744,7 @@ static int local(register struct anode *p)
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 	return(strcmp(fscur->fstype, "nfs") && strcmp(fscur->fstype, "smbfs"));
 #elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__)
+		|| defined (__DragonFly__) || defined (__APPLE__)
 	return(strcmp(Statfs, "nfs") != 0);
 #else
 	return(strcmp(Statb.st_fstype, "nfs") != 0);
@@ -1001,7 +1001,7 @@ static int descend(char *fname, struct anode *exlist, int level)
 			goto nof;
 	}
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-		defined (__DragonFly__)
+		defined (__DragonFly__) || defined (__APPLE__)
 	if (Statfs != NULL) {
 		static struct statfs	sf;
 		if (statfs(fname, &sf) < 0) {
@@ -1011,7 +1011,7 @@ static int descend(char *fname, struct anode *exlist, int level)
 		}
 		Statfs = sf.f_fstypename;
 	}
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 	if (Mount) {
 		static dev_t	curdev;
 		if (level == 0)

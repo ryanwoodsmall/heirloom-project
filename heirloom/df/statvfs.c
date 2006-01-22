@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)statvfs.c	1.5 (gritter) 11/21/04	*/
+/*	Sccsid @(#)statvfs.c	1.6 (gritter) 1/22/06	*/
 
 typedef	unsigned long long	fsblkcnt_t;
 typedef	unsigned long long	fsfilcnt_t;
@@ -40,7 +40,8 @@ struct statvfs {
 
 #if defined (__dietlibc__)
 #include <sys/vfs.h>
-#elif defined (__NetBSD__) || defined (__FreeBSD__) || defined (__OpenBSD__)
+#elif defined (__NetBSD__) || defined (__FreeBSD__) || defined (__OpenBSD__) \
+	|| defined (__APPLE__)
 #include <sys/param.h>
 #include <sys/mount.h>
 #endif
@@ -59,10 +60,11 @@ statvfs(const char *path, struct statvfs *buf)
 	buf->f_files = sf.f_files;
 	buf->f_ffree = buf->f_favail = sf.f_ffree;
 	buf->f_fsid = 0;
-#if !defined (__NetBSD__) && !defined (__FreeBSD__) && !defined (__OpenBSD__)
+#if !defined (__NetBSD__) && !defined (__FreeBSD__) && !defined (__OpenBSD__) \
+		&& !defined (__APPLE__)
 	buf->f_namemax = sf.f_namelen;
-#else	/* __NetBSD__, __FreeBSD__, __OpenBSD__ */
+#else	/* __NetBSD__, __FreeBSD__, __OpenBSD__, __APPLE__ */
 	buf->f_namemax = PATH_MAX;
-#endif	/* __NetBSD__, __FreeBSD__, __OpenBSD__ */
+#endif	/* __NetBSD__, __FreeBSD__, __OpenBSD__, __APPLE__ */
 	return 0;
 }

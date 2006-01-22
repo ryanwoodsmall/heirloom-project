@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.109 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.110 (gritter) 1/22/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.109 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.110 (gritter) 1/22/06";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.109 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.110 (gritter) 1/22/06";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.109 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)ps.sl	2.110 (gritter) 1/22/06";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.109 (gritter) 11/22/05";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.110 (gritter) 1/22/06";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
 	&& !defined (__DragonFly__)
@@ -101,7 +101,7 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.109 (gritter) 11/22/05";
 #ifndef	MNTTYPE_IGNORE
 #define	MNTTYPE_IGNORE	""
 #endif
-#elif defined (__NetBSD__) || defined (__OpenBSD__)
+#elif defined (__NetBSD__) || defined (__OpenBSD__) 
 #include	<kvm.h>
 #include	<sys/param.h>
 #include	<sys/sysctl.h>
@@ -129,6 +129,16 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.109 (gritter) 11/22/05";
 #ifndef	SCHED_OTHER
 #define	SCHED_OTHER	1
 #endif
+#elif defined (__APPLE__)
+#include	<sys/proc.h>
+#include        <sys/sysctl.h>
+#include        <sys/mount.h>
+#include	<sys/resource.h>
+#include	<mach/mach_types.h>
+#include	<mach/task_info.h>
+#include	<mach/shared_memory_server.h>
+#define	proc	process
+#undef	p_pgid
 #else	/* SVR4 */
 #include	<sys/mnttab.h>
 #ifdef	__sun
@@ -613,7 +623,7 @@ dlook(dev_type rdev, struct ditem **dt, char *str)
 }
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__)
+	!defined (__OpenBSD__) && !defined (__APPLE__)
 static void
 chdir_to_proc(void)
 {
@@ -628,7 +638,7 @@ chdir_to_proc(void)
 		exit(074);
 	}
 }
-#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__, !__APPLE__ */
 
 static union value *
 getval(char **listp, enum valtype type, int separator, int sep2)
@@ -1199,7 +1209,7 @@ outproc(struct proc *p)
 }
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__)
+	!defined (__OpenBSD__) && !defined (__APPLE__)
 
 #if defined (__linux__) || defined (__FreeBSD__) || defined (__DragonFly__)
 #define	GETVAL_REQ(a)		if ((v = getval(&cp, (a), ' ', 0)) == NULL) \
@@ -2558,7 +2568,7 @@ postproc(struct proc *p)
 		SCHED_RR : SCHED_OTHER;
 #endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
 }
-#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
+#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__, !__APPLE__ */
 
 static enum okay
 selectproc(struct proc *p)
@@ -2656,7 +2666,7 @@ selectproc(struct proc *p)
 }
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__)
+	!defined (__OpenBSD__) && !defined (__APPLE__)
 static void
 do_procs(void)
 {
@@ -3417,6 +3427,407 @@ do_procs(void)
 	kvm_close(kt);
 }
 
+#elif defined (__APPLE__)
+
+typedef struct kinfo_proc kinfo_proc;
+
+static int
+GetBSDProcessList(pid_t thepid, struct kinfo_proc **procList, size_t *procCount)
+    /* derived from http://developer.apple.com/qa/qa2001/qa1123.html */
+    /* Returns a list of all BSD processes on the system.  This routine
+       allocates the list and puts it in *procList and a count of the
+       number of entries in *procCount.  You are responsible for freeing
+       this list (use "free" from System framework).
+       all classic apps run in one process
+       On success, the function returns 0.
+       On error, the function returns a BSD errno value.
+       Preconditions:
+	assert( procList != NULL);
+	assert(*procList == NULL);
+	assert(procCount != NULL);
+       Postconditions:
+	assert( (err == 0) == (*procList != NULL) );
+    */
+{
+	int			err;
+	struct kinfo_proc	*result;
+	int			mib[4];
+	size_t			length;
+
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_PROC;
+	if (thepid == 0) {
+		mib[2] = KERN_PROC_ALL;
+		mib[3] = 0;
+	} else {
+		mib[2] = KERN_PROC_PID;
+		mib[3] = thepid;
+	}
+	/* We start by calling sysctl with result == NULL and length == 0.
+	   That will succeed, and set length to the appropriate length.
+	   We then allocate a buffer of that size and call sysctl again
+	   with that buffer.
+	*/
+	length = 0;
+	err = sysctl(mib, 4, NULL, &length, NULL, 0);
+	if (err == -1)
+		err = errno;
+	if (err == 0) {
+		result = smalloc(length);
+		err = sysctl(mib, 4, result, &length, NULL, 0);
+		if (err == -1)
+			err = errno;
+		if (err == ENOMEM) {
+			free(result); /* clean up */
+			result = NULL;
+		}
+	}
+	*procList = result;
+	*procCount = err == 0 ? length / sizeof **procList : 0;
+	return err;
+}
+
+static time_t
+tv2sec(time_value_t *tv, int mult)
+{
+	return tv->seconds*mult + (tv->microseconds >= 500000/mult);
+}
+
+static unsigned long
+getmem(void)
+{
+	static int	mib[] = {CTL_HW, HW_PHYSMEM, 0};
+	size_t		size;
+	unsigned long	mem;
+
+	size = sizeof mem;
+	if (sysctl(mib, 2, &mem, &size, NULL, 0) == -1) {
+		fprintf(stderr, "error in sysctl(): %s\n", strerror(errno));
+		exit(3);
+	}
+	return mem;
+}
+
+extern kern_return_t task_for_pid(task_port_t task, pid_t pid, task_port_t *target);
+
+static void
+getproc(struct proc *p, struct kinfo_proc *kp)
+{
+	kern_return_t   error;
+	unsigned int	info_count = TASK_BASIC_INFO_COUNT;
+	unsigned int 	thread_info_count = THREAD_BASIC_INFO_COUNT;
+	task_port_t	task;
+	pid_t		pid;
+	struct		task_basic_info	task_binfo;
+	struct		task_thread_times_info task_times;
+	time_value_t	total_time, system_time;
+	struct		task_events_info task_events;
+	struct		policy_timeshare_info tshare;
+	struct		policy_rr_info rr;
+	struct		policy_fifo_info fifo;
+	struct		thread_basic_info th_binfo;
+	thread_port_array_t	thread_list;
+	int		thread_count;
+	int		j, temp, curpri;
+
+	memset(p, 0, sizeof *p);
+
+	p->p_pid = kp->kp_proc.p_pid;
+	strncpy(p->p_fname, kp->kp_proc.p_comm, sizeof p->p_fname);
+	p->p_fname[sizeof p->p_fname - 1] = '\0';
+	p->p_lstate[0] = kp->kp_proc.p_stat; /* contains at least zombie info */
+	p->p_lflag = kp->kp_proc.p_flag;
+	p->p_ppid = kp->kp_eproc.e_ppid;
+	p->p_pgid = kp->kp_eproc.e_pgid;
+	p->p_sid = kp->kp_eproc.e_tpgid;
+	p->p_ttydev = kp->kp_eproc.e_tdev == -1 ? PRNODEV : kp->kp_eproc.e_tdev;
+	p->p_uid = kp->kp_eproc.e_pcred.p_ruid;
+	p->p_euid = kp->kp_eproc.e_ucred.cr_uid;
+	p->p_gid = kp->kp_eproc.e_pcred.p_rgid;
+	p->p_egid = kp->kp_eproc.e_ucred.cr_gid;
+
+	if (p->p_lstate[0] == SZOMB) {
+		p->p_lstate[0] = 7;
+		return; /* do not fetch more data for zombies */
+	}
+
+	pid = kp->kp_proc.p_pid;
+	error = task_for_pid(mach_task_self(), pid, &task);
+	if (error != KERN_SUCCESS) {
+		/* process already left the system */
+		p->p_lstate[0] = 6; /* XXX good choice? */
+		return;
+	}
+	info_count = TASK_BASIC_INFO_COUNT;
+	error = task_info(task, TASK_BASIC_INFO, &task_binfo, &info_count);
+	if (error != KERN_SUCCESS) {
+		fprintf(stderr, "Error calling task_info():%d\n", error);
+		exit(3);
+	}
+	info_count = TASK_THREAD_TIMES_INFO_COUNT;
+	error = task_info(task, TASK_THREAD_TIMES_INFO, &task_times, &info_count);
+	if (error != KERN_SUCCESS) {
+		fprintf(stderr, "Error calling task_info():%d\n", error);
+		exit(3);
+	}
+	info_count = TASK_EVENTS_INFO_COUNT;
+	error = task_info(task, TASK_EVENTS_INFO, &task_events, &info_count);
+	if (error != KERN_SUCCESS) {
+		fprintf(stderr, "Error calling task_info():%d\n", error);
+		exit(3);
+	}
+
+	total_time = task_times.user_time;
+	p->p_utime = tv2sec(&total_time, 1);
+
+	system_time = task_times.system_time;
+	p->p_ktime = tv2sec(&system_time, 1);
+
+	time_value_add(&total_time, &system_time);
+	p->p_time = tv2sec(&total_time, 1);
+
+	time_value_add(&total_time, &task_binfo.user_time);
+	time_value_add(&total_time, &task_binfo.system_time);
+	p->p_accutime = tv2sec(&total_time, 1);
+
+	switch(task_binfo.policy) {
+		case POLICY_TIMESHARE :
+			info_count = POLICY_TIMESHARE_INFO_COUNT;
+			error = task_info(task, TASK_SCHED_TIMESHARE_INFO, &tshare, &info_count);
+			if (error == KERN_SUCCESS) {
+				p->p_intpri = tshare.cur_priority;
+				p->p_rtpri = tshare.base_priority;
+				p->p_clname = "TS";
+				p->p_policy = SCHED_OTHER;
+			}
+			break;
+		case POLICY_RR :
+			info_count = POLICY_RR_INFO_COUNT;
+			error = task_info(task, TASK_SCHED_RR_INFO, &rr, &info_count);
+			if (error == KERN_SUCCESS) {
+				p->p_intpri = rr.base_priority;
+				p->p_rtpri = rr.base_priority;
+				p->p_clname = "RT";
+				p->p_policy = SCHED_RR;
+			}
+		break;
+		case POLICY_FIFO :
+			info_count = POLICY_FIFO_INFO_COUNT;
+			error = task_info(task, TASK_SCHED_FIFO_INFO, &fifo, &info_count);
+			if (error == KERN_SUCCESS) {
+				p->p_intpri = fifo.base_priority;
+				p->p_rtpri = fifo.base_priority;
+				p->p_clname = "FF";
+				p->p_policy = SCHED_FIFO;
+			}
+		break;
+	}
+	p->p_nice = kp->kp_proc.p_nice;
+
+	/* allocates a thread port array */
+	error = task_threads(task, &thread_list, &thread_count);
+	if (error != KERN_SUCCESS) {
+		mach_port_deallocate(mach_task_self(), task);
+		fprintf(stderr, "Error calling task_threads():%d\n", error);
+		exit(3);
+	}
+	p->p_nlwp = thread_count;
+	/* iterate over all threads for: cpu, state, swapped, prio */
+	/* it should also be possible to print all mach threads as LWPs */
+	p->p_lflag |= FL_SWAP; /* assume swapped */
+	curpri = p->p_intpri;
+	for (j = 0; j < thread_count; j++) {
+		info_count = THREAD_BASIC_INFO_COUNT;
+		error = thread_info(thread_list[j], THREAD_BASIC_INFO, &th_binfo, &info_count);
+		if (error != KERN_SUCCESS) {
+			fprintf(stderr, "Error calling thread_info():%d\n", error);
+			exit(3);
+		}
+		p->p_c += th_binfo.cpu_usage;
+		switch (th_binfo.run_state) {
+			case TH_STATE_RUNNING:
+				temp=1;
+				break;
+			case TH_STATE_UNINTERRUPTIBLE:
+				temp=2;
+				break;
+			case TH_STATE_WAITING:
+				temp=(th_binfo.sleep_time <= 20) ? 3 : 4;
+				break;
+			case TH_STATE_STOPPED:
+				temp=5;
+				break;
+			case TH_STATE_HALTED:
+				temp=6;
+				break;
+			default:
+				temp=8;
+		}
+		if (temp < p->p_lstate[0])
+			p->p_lstate[0] = temp;
+		if ((th_binfo.flags & TH_FLAGS_SWAPPED ) == 0)
+			p->p_lflag &= ~FL_SWAP; /* in mem */
+		switch(th_binfo.policy) {
+			case POLICY_TIMESHARE :
+				info_count = POLICY_TIMESHARE_INFO_COUNT;
+				error = thread_info(thread_list[j], THREAD_SCHED_TIMESHARE_INFO, &tshare, &info_count);
+				if (error == KERN_SUCCESS && curpri < tshare.cur_priority)
+					curpri = tshare.cur_priority;
+				break;
+			case POLICY_RR :
+				info_count = POLICY_RR_INFO_COUNT;
+				error = thread_info(thread_list[j], THREAD_SCHED_RR_INFO, &rr, &info_count);
+				if (error == KERN_SUCCESS && curpri < rr.base_priority)
+					curpri = rr.base_priority;
+				break;
+			case POLICY_FIFO :
+				info_count = POLICY_FIFO_INFO_COUNT;
+				error = thread_info(thread_list[j], THREAD_SCHED_FIFO_INFO, &fifo, &info_count);
+				if (error == KERN_SUCCESS && curpri < fifo.base_priority)
+					curpri = fifo.base_priority;
+				break;
+		}
+		mach_port_deallocate(mach_task_self(), thread_list[j]);
+	}
+	p->p_intpri = curpri;
+	/* free the thread port array */
+	error = vm_deallocate(mach_task_self(), (vm_address_t)thread_list, thread_count * sizeof(thread_port_array_t));
+	p->p_c = p->p_c / (TH_USAGE_SCALE/100);
+	p->p_pctcpu = p->p_c;
+
+	p->p_start = kp->kp_proc.p_starttime.tv_sec +
+		(kp->kp_proc.p_starttime.tv_usec >= 500000);
+	p->p_osz = task_binfo.virtual_size / pagesize;
+	p->p_orss = task_binfo.resident_size / pagesize;
+
+	p->p_pflts = task_events.pageins;
+	p->p_bufr = 0;
+	p->p_bufw = 0;
+	p->p_mrcv = task_events.messages_sent; /* Mach messages */
+	p->p_msnd = task_events.messages_received;
+	p->p_addr = (unsigned long)kp->kp_proc.p_addr;
+	p->p_wchan = (unsigned long)kp->kp_proc.p_wchan;
+	
+	mach_port_deallocate(mach_task_self(), task);
+}
+
+static void
+getargv(struct proc *p, struct kinfo_proc *kp)
+{
+	size_t	size, argsz;
+	char	*argbuf;
+	int	mib[3];
+	long	nargs;
+	char	*ap, *pp, *xp;
+
+	/* ignore kernel and zombies */
+	if (kp->kp_proc.p_pid == 0 || p->p_lstate[0] == 7)
+		return;
+
+	/* allocate a procargs space per process */
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_ARGMAX;
+	size = sizeof argsz;
+	if (sysctl(mib, 2, &argsz, &size, NULL, 0) == -1) {
+		fprintf(stderr, "error in sysctl(): %s\n", strerror(errno));
+		exit(3);
+	}
+	argbuf = smalloc(argsz);
+
+	/* fetch the process arguments */
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_PROCARGS2;
+	mib[2] = kp->kp_proc.p_pid;
+	if (sysctl(mib, 3, argbuf, &argsz, NULL, 0) == -1) {
+		/* process already left the system */
+		return;
+	}
+
+	/* the number of args is at offset 0, this works for 32 and 64bit */
+	memcpy(&nargs, argbuf, sizeof nargs);
+	ap = argbuf + sizeof nargs;
+
+	/* skip the exec_path */
+	while (ap < &argbuf[argsz] && *ap != '\0')
+		ap++;
+	if (ap == &argbuf[argsz])
+		goto DONE; /* no args to show */
+	/* skip trailing '\0' chars */
+	while (ap < &argbuf[argsz] && *ap == '\0')
+		ap++;
+	if (ap == &argbuf[argsz])
+		goto DONE; /* no args to show */
+
+	xp = p->p_comm; /* copy the command name also */
+	/* now concat copy the arguments */
+	for (pp = p->p_psargs; pp < &p->p_psargs[sizeof p->p_psargs-1]; pp++) {
+		if (*ap == '\0') {
+			if (xp) {
+				*xp = '\0';
+				xp = NULL;
+			}
+			if (--nargs == 0)
+				break;
+			*pp = ' ';
+			++ap;
+		} else {
+			if (xp)
+				*xp++ = *ap;
+			*pp = *ap++;
+		}
+	}
+	*pp = '\0';
+
+DONE:	free(argbuf);
+	return;
+}
+
+static void
+postproc(struct proc *p)
+{
+	cleanline(p);
+	if (p->p_lstate[0] < 0 || p->p_lstate[0] > 8) /* play safe */
+		p->p_lstate[0] = 8;
+	p->p_state[0] = " RSSITHZ?"[p->p_lstate[0]];
+	p->p_lstate[0] = p->p_state[0];
+	if (p->p_lflag & P_SYSTEM)
+		p->p_flag |= FL_SYS;
+	p->p_pri = p->p_rtpri;
+	p->p_oldpri = p->p_intpri;
+	p->p_size = p->p_osz * kbytes_per_page;
+	p->p_rssize = p->p_orss * kbytes_per_page;
+}
+
+static void
+do_procs(void)
+{
+	struct	proc p;
+	struct	kinfo_proc *kp = NULL;
+	size_t	i, cnt;
+	pid_t	pid0;
+	int	err;
+
+	/* get all processes */
+	pid0 = 0;
+	if ((err = GetBSDProcessList(pid0, &kp, &cnt)) != 0) {
+		fprintf(stderr, "error getting proc list: %s\n", strerror(err));
+		exit(3);
+	}
+	i = cnt;
+	while (--i >= 0) {
+		/* ignore trailing garbage processes with pid 0 */
+		if (kp[i].kp_proc.p_pid == 0 && pid0++ > 0)
+			break;
+		getproc(&p, &kp[i]);
+		getargv(&p, &kp[i]);
+		postproc(&p);
+		if (selectproc(&p) == OKAY)
+			outproc(&p);
+	}
+	/* free the memory allocated by GetBSDProcessList */
+	free(kp);	
+}
+
 #endif	/* all */
 
 /************************************************************************
@@ -3980,7 +4391,7 @@ sysname(int ac, char **av)
 			}
 			endmntent(fp);
 #elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-	|| defined (__DragonFly__)
+	|| defined (__DragonFly__) || defined (__APPLE__)
 			struct statfs	*sp = NULL;
 			int	cnt, i;
 
@@ -4444,7 +4855,7 @@ main(int argc, char **argv)
 	options(argc, argv);
 	devices();
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-		!defined (__OpenBSD__)
+		!defined (__OpenBSD__) && !defined (__APPLE__)
 	chdir_to_proc();
 #endif
 #ifdef	__linux__
@@ -4459,7 +4870,19 @@ main(int argc, char **argv)
 #ifdef	__linux__
 	uptime = sysup();
 #endif	/* __linux__ */
+#ifdef __APPLE__
+	{
+		static int mib[] = {CTL_HW, HW_PAGESIZE, 0};
+		size_t size;
+		size = sizeof pagesize;
+		if (sysctl(mib, 2, &pagesize, &size, NULL, 0) == -1) {
+			fprintf(stderr, "error in sysctl(): %s\n", strerror(errno));
+			exit(3);
+		}
+	}
+#else
 	pagesize = sysconf(_SC_PAGESIZE);
+#endif
 	kbytes_per_page = (pagesize >> 10);
 #ifndef	__sun
 	totalmem = getmem();
@@ -4516,6 +4939,23 @@ main(int argc, char **argv)
 		if (kp != NULL)
 			getproc(&myproc, &kp[0]);
 		kvm_close(kt);
+	}
+#elif defined (__APPLE__)
+	{
+		struct kinfo_proc	*kp;
+		pid_t	mypid = getpid();
+		size_t	cnt;
+		int	err;
+
+		kp = NULL;
+		if ((err = GetBSDProcessList(mypid, &kp, &cnt)) != 0) {
+			fprintf(stderr, "error getting proc list: %s\n", strerror(err));
+			exit(3);
+		}
+		if (kp != NULL) {
+			getproc(&myproc, kp);
+			free(kp);
+		}
 	}
 #else	/* SVR4 */
 	{

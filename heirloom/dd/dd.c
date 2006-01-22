@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)dd.sl	1.29 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)dd.sl	1.30 (gritter) 1/22/06";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -56,7 +56,7 @@ static const char sccsid[] USED = "@(#)dd.sl	1.29 (gritter) 11/22/05";
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 #include	<sys/mtio.h>
 #else	/* SVR4.2MP */
 #include	<sys/scsi.h>
@@ -468,7 +468,7 @@ ontape(void)
 	if (yes == -1) {
 #if defined (__linux__) || defined (__FreeBSD__) || defined (__hpux) || \
 	defined (_AIX) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__)
+	defined (__DragonFly__) || defined (__APPLE__)
 		struct mtget	mg;
 		yes = (istat.st_mode&S_IFMT) == S_IFCHR &&
 			ioctl(iffd, MTIOCGET, &mg) == 0;

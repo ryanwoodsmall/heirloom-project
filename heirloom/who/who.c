@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)who_sus.sl	1.18 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)who_sus.sl	1.19 (gritter) 1/22/06";
 #else
-static const char sccsid[] USED = "@(#)who.sl	1.18 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)who.sl	1.19 (gritter) 1/22/06";
 #endif
 
 #include	<sys/types.h>
@@ -203,13 +203,13 @@ print(const struct utmpx *u)
 #endif	/* __hpux */
 		printf("  id=%4.4s term=%-3d exit=%d",
 				u->ut_id,
-#ifndef	_AIX
+#if !defined (_AIX) || !defined (__APPLE__)
 				u->ut_exit.e_termination,
 				u->ut_exit.e_exit
-#else	/* _AIX */
+#else	/* _AIX, __APPLE__ */
 				0,
 				0
-#endif	/* _AIX */
+#endif	/* _AIX, __APPLE__ */
 				);
 	else if (u->ut_type == INIT_PROCESS && !sflag)
 		printf("  id=%4.4s", u->ut_id);

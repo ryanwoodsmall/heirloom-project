@@ -19,11 +19,17 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)CHECK.c	1.6 (gritter) 11/22/05	*/
+/*	Sccsid @(#)CHECK.c	1.7 (gritter) 1/22/06	*/
 
 #include <stdlib.h>
 
 #ifdef	__FreeBSD__
+#define	NEED_ALLOCA_H	1
+#define	NEED_MALLOC_H	1
+#define	NEED_UTMPX_H	1
+#endif
+
+#ifdef	__APPLE__
 #define	NEED_ALLOCA_H	1
 #define	NEED_MALLOC_H	1
 #define	NEED_UTMPX_H	1

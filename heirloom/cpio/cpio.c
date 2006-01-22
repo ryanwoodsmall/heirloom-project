@@ -26,7 +26,7 @@
  */
 
 /*
- * Sccsid @(#)cpio.c	1.299 (gritter) 11/22/05
+ * Sccsid @(#)cpio.c	1.300 (gritter) 1/22/06
  */
 
 #include <sys/types.h>
@@ -77,7 +77,7 @@
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
 #include <sys/scsi.h>
@@ -148,7 +148,7 @@
 #endif
 
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__)
+	defined (__DragonFly__) || defined (__APPLE__)
 /*
  * For whatever reason, FreeBSD casts the return values of major() and
  * minor() to signed values so that normal limit comparisons will fail.
@@ -167,7 +167,7 @@ myminor(long dev)
 }
 #undef	minor
 #define	minor(a)	myminor(a)
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 
 /*
  * Device and inode counts in cpio formats are too small to store the
@@ -4416,7 +4416,7 @@ tseek(off_t n)
 		int	i = (n - poffs) / tapeblock;
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__)
+	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
 		struct mtop	mo;
 		mo.mt_op = i > 0 ? MTFSR : MTBSR;
 		mo.mt_count = i > 0 ? i : -i;
@@ -4702,7 +4702,7 @@ mstat(void)
 			tapeblock = md.bsize;
 	}
 #elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__)
+		|| defined (__DragonFly__) || defined (__APPLE__)
 	if ((mtst.st_mode&S_IFMT) == S_IFCHR) {
 		struct mtget	mg;
 		if (ioctl(mt, MTIOCGET, &mg) == 0)
