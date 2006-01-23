@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.129 (gritter) 1/14/06
+ * Sccsid @(#)dpost.c	1.130 (gritter) 1/23/06
  */
 
 /*
@@ -2437,6 +2437,7 @@ supplypfb(char *font, char *path, FILE *fp)
 static void
 supplyotf(char *font, char *path, FILE *fp)
 {
+	static int	cffcount;
 	struct stat	st;
 	char	*contents;
 	size_t	size, offset, length;
@@ -2460,7 +2461,8 @@ supplyotf(char *font, char *path, FILE *fp)
 	 * Adobe Distiller 7 complains about it with DSC warnings
 	 * enabled. What follows is an attempt to fix this.
 	 */
-	fprintf(rf, "%%%%IncludeResource: procset FontSetInit 0 0\n");
+	if (cffcount++ == 0)
+		fprintf(rf, "%%%%IncludeResource: procset FontSetInit 0 0\n");
         if (sfcount++ == 0)
         	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
         else
