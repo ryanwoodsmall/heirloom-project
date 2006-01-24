@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.42 (gritter) 1/24/06
+ * Sccsid @(#)afm.c	1.43 (gritter) 1/25/06
  */
 
 #include <stdlib.h>
@@ -1093,6 +1093,13 @@ unhex(int c)
 	return c - '0';
 }
 
+static int
+xdigit(int c)
+{
+	return c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f' ||
+		c >= '0' && c <= '9';
+}
+
 char *
 afmdecodepath(const char *cp)
 {
@@ -1100,7 +1107,7 @@ afmdecodepath(const char *cp)
 
 	dec = dp = malloc(strlen(cp) + 1);
 	while (*cp) {
-		if (*cp == '%') {
+		if (cp[0] == '%' && xdigit(cp[1]&0377) && xdigit(cp[2]&0377)) {
 			*dp++ = unhex(cp[1]) << 4 | unhex(cp[2]);
 			cp += 3;
 		} else
