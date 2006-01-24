@@ -9,7 +9,7 @@
 # font.
 #
 
-# Sccsid @(#)showfont.sh	1.8 (gritter) 10/2/05
+# Sccsid @(#)showfont.sh	1.9 (gritter) 1/24/06
 
 pwd=`pwd`
 
@@ -37,6 +37,7 @@ do (
 		;;
 	esac
 	cat <<-!
+		.mediasize a4
 		.nr PE 10.8i
 		.fp 0 X $i $supply
 		.ps 10
