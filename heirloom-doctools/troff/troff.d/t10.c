@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.60 (gritter) 1/11/06
+ * Sccsid @(#)t10.c	1.61 (gritter) 1/24/06
  */
 
 /*
@@ -723,11 +723,15 @@ newpage(int n)	/* called at end of each output page (we hope) */
 		return;
 	fdprintf(ptid, "p%d\n", n);	/* new page */
 	for (i = 0; i <= nfonts; i++)
-		if (afmtab && fontbase[i]->afmpos)
+		if (afmtab && fontbase[i]->afmpos) {
+			struct afmtab	*a = afmtab[(fontbase[i]->afmpos)-1];
+			if (a->encpath == NULL)
+				a->encpath = afmencodepath(a->path);
 			fdprintf(ptid, "x font %d %s %d\n", i,
-				afmtab[(fontbase[i]->afmpos)-1]->path,
-				afmtab[(fontbase[i]->afmpos)-1]->spec);
-		else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
+				a->encpath, a->spec);
+			if (a->supply)
+				ptsupplyfont(a->fontname, a->supply);
+		} else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
 			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();
 	ptfont();

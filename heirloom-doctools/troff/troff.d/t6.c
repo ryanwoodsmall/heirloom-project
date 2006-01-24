@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.118 (gritter) 1/20/06
+ * Sccsid @(#)t6.c	1.119 (gritter) 1/24/06
  */
 
 /*
@@ -1452,8 +1452,10 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 			data = getfontpath(file, supply);
 		else
 			data = getfontpath(supply, NULL);
-		ptsupplyfont(a->fontname, data);
+		a->supply = afmencodepath(data);
 		free(data);
+		if (realpage)
+			ptsupplyfont(a->fontname, a->supply);
 	}
 	checkenminus(nf);
 	if (realpage)

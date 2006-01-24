@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.41 (gritter) 1/1/06
+ * Sccsid @(#)afm.c	1.42 (gritter) 1/24/06
  */
 
 #include <stdlib.h>
@@ -1063,4 +1063,50 @@ afmgetkern(struct afmtab *a, int ch1, int ch2)
 		return 0;
 }
 #endif	/* !DPOST */
+
+char *
+afmencodepath(const char *cp)
+{
+	const char	hex[] = "0123456789ABCDEF";
+	char	*enc, *ep;
+
+	ep = enc = malloc(3 * strlen(cp) + 1);
+	while (*cp) {
+		if (*cp&0200 || *cp <= 040 || *cp == 0177) {
+			*ep++ = '%';
+			*ep++ = hex[(*cp&0360) >> 4];
+			*ep++ = hex[*cp++&017];
+		} else
+			*ep++ = *cp++;
+	}
+	*ep = 0;
+	return enc;
+}
+
+static int
+unhex(int c)
+{
+	if (c >= 'A' && c <= 'F')
+		return c - 'A';
+	if (c >= 'a' && c <= 'f')
+		return c - 'a';
+	return c - '0';
+}
+
+char *
+afmdecodepath(const char *cp)
+{
+	char	*dec, *dp;
+
+	dec = dp = malloc(strlen(cp) + 1);
+	while (*cp) {
+		if (*cp == '%') {
+			*dp++ = unhex(cp[1]) << 4 | unhex(cp[2]);
+			cp += 3;
+		} else
+			*dp++ = *cp++;
+	}
+	*dp = 0;
+	return dec;
+}
 #endif	/* !DUMP */

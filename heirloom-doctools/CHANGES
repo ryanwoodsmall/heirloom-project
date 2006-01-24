@@ -1,6 +1,10 @@
 Release ...
 * troff: Eastern European characters for Unicode/PostScript conversion
   have been added (patch by Vladimir B. Machulsky).
+* troff, dpost: Font file names can now contain spaces or bytes outside
+  the ASCII range. A "%xx" escape sequence, where "xx" are hexadecimal
+  digits, has been introduced in order to achieve this. The description
+  of ".fp" in the "NEWS" file contains details on this.
 * pic, grap: Fixed 8-bit input in label texts (bug reported by Vladimir
   B. Machulsky).
 * troff: The ".trimat", ".bleedat", and ".cropat" requests caused some

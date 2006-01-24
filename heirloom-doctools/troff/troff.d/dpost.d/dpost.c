@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.130 (gritter) 1/23/06
+ * Sccsid @(#)dpost.c	1.131 (gritter) 1/24/06
  */
 
 /*
@@ -1833,6 +1833,7 @@ loadfont (
     int		fin;			/* for reading *s.afm file */
     int		nw;			/* number of width table entries */
     char	*p;
+    char	*path;
 
 
 /*
@@ -1852,13 +1853,14 @@ loadfont (
     if ( fontbase[n] != NULL && strcmp(s, fontbase[n]->namefont) == 0 )
 	return;
 
+    path = temp;
     if (strchr(s, '/') != NULL)
-	strcpy(temp, s);
+	path = afmdecodepath(s);
     else if (strstr(s, ".afm") != NULL)
 	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s);
     else snprintf(temp, sizeof temp, "%s/dev%s/%s.afm", fontdir, devname, s);
 
-    if ( (fin = open(temp, O_RDONLY)) >= 0 )  {
+    if ( (fin = open(path, O_RDONLY)) >= 0 )  {
 	struct afmtab	*a;
 	struct stat	st;
 	char	*contents;
@@ -1873,7 +1875,7 @@ loadfont (
 		forcespecial = 1;
 	spec = s1 && *s1 ? atoi(s1) : SPEC_NONE;
 	for (i = 0; i < afmcount; i++)
-		if (afmfonts[i] && strcmp(afmfonts[i]->path, temp) == 0 &&
+		if (afmfonts[i] && strcmp(afmfonts[i]->path, path) == 0 &&
 				afmfonts[i]->spec == spec) {
 			a = afmfonts[i];
 			close(fin);
@@ -1888,8 +1890,10 @@ loadfont (
 		goto fail;
 	}
 	close(fin);
-	a->path = malloc(strlen(temp) + 1);
-	strcpy(a->path, temp);
+	a->path = malloc(strlen(path) + 1);
+	strcpy(a->path, path);
+	if (path != temp)
+		free(path);
 	a->file = s;
 	a->spec = spec;
 	if (afmget(a, contents, st.st_size) < 0) {
@@ -1911,6 +1915,8 @@ have:   fontbase[n] = &a->Font;
     	t_fp(n, a->fontname, fontbase[n]->intname, a);
 	goto done;
     }
+    if (strchr(s, '/') != NULL)
+	goto fail;
     if ( s1 == NULL || s1[0] == '\0' )
 	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s);
     else snprintf(temp, sizeof temp, "%s/%s", s1, s);
@@ -2329,7 +2335,7 @@ t_supply(char *font)		/* supply a font */
 			return;
 	sp = calloc(1, sizeof *sp);
 	sp->font = strdup(font);
-	sp->file = strdup(file);
+	sp->file = afmdecodepath(file);
 	sp->type = type && *type ? strdup(type) : NULL;
 	sp->next = supplylist;
 	supplylist = sp;

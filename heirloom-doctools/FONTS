@@ -39,6 +39,13 @@ selected using an extended ".fp" request:
 	"/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
 	"metricsname" above.
+	  The character "%" can be used to escape arbitrary bytes in
+	font file names. In particular, this is necessary to use font
+	files whose names contain spaces, bytes outside the ASCII range,
+	or a "%" itself. "%xx" represents the byte with the hexadecimal
+	code "xx", e.g., "%20" is a space character. In the path names
+	in TROFFONTS, only the "%" and ":" characters have to be masked
+	using this mechanism.
 
 As simple examples,
       
@@ -496,4 +503,4 @@ be selected simply with a font change. Contributions of appropriate tables
 for other languages are welcome.
 
 
-Gunnar Ritter                                                 1/19/06
+Gunnar Ritter                                                 1/24/06

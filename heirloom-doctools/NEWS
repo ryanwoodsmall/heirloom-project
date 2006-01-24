@@ -164,6 +164,13 @@ New and extended requests
 	"/usr/ucblib/doctools/font/devps/supplyname.pfb" (or
 	likewise). "supplyname" may also be the basename of a file like
 	"metricsname" above.
+	  The character "%" can be used to escape arbitrary bytes in
+	font file names. In particular, this is necessary to use font
+	files whose names contain spaces, bytes outside the ASCII range,
+	or a "%" itself. "%xx" represents the byte with the hexadecimal
+	code "xx", e.g., "%20" is a space character. In the path names
+	in TROFFONTS, only the "%" and ":" characters have to be masked
+	using this mechanism.
 
 .fps math,greek,punct,large r yy metricsname [supplyname]	troff only
 	mounts a font with a special character map. By default, special
@@ -616,4 +623,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   1/10/06
+Gunnar Ritter                                                   1/24/06
