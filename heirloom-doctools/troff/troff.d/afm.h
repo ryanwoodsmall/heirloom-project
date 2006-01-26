@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid %W% (gritter) %G%
+ * Sccsid @(#)afm.h	1.23 (gritter) 1/26/06
  */
 
 #ifndef	TROFF_AFM_H

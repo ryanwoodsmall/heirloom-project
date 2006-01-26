@@ -41,7 +41,7 @@ nroff.d/n6.c: * Sccsid @(#)n6.c	1.27 (gritter) 12/23/05
 nroff.d/proto.h: * Sccsid @(#)proto.h	1.28 (gritter) 12/20/05
 nroff.d/tw.h: * Sccsid @(#)tw.h	1.5 (gritter) 9/8/05
 troff.d/afm.c: * Sccsid @(#)afm.c	1.43 (gritter) 1/25/06
-troff.d/afm.h: * Sccsid @(#)version.c	5.79 (gritter) 1/26/06
+troff.d/afm.h: * Sccsid @(#)afm.h	1.23 (gritter) 1/26/06
 troff.d/dev.h: * Sccsid @(#)dev.h	1.9 (gritter) 12/6/05
 troff.d/draw.c: * Sccsid @(#)draw.c	1.3 (gritter) 8/8/05
 troff.d/makedev.c: * Sccsid @(#)makedev.c	1.11 (gritter) 12/6/05
