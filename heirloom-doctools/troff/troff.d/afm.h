@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.22 (gritter) 1/24/06
+ * Sccsid %W% (gritter) %G%
  */
 
 #ifndef	TROFF_AFM_H
@@ -78,6 +78,7 @@ extern struct afmtab {
 	int	*unitab;
 	int	nunitab;
 	void	*unimap;
+	int	*encmap;
 	struct namecache	*namecache;
 	int	nameprime;
 	struct kernpair	*kernpairs;

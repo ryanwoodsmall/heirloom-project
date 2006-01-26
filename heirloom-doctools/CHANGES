@@ -5,6 +5,9 @@ Release ...
   the ASCII range. A "%xx" escape sequence, where "xx" are hexadecimal
   digits, has been introduced in order to achieve this. The description
   of ".fp" in the "NEWS" file contains details on this.
+* dpost: When a font was mounted replacing another font on the same
+  physical position, non-ASCII characters were not printed correctly
+  afterwards (bug reported by Vladimir B. Machulsky).
 * pic, grap: Fixed 8-bit input in label texts (bug reported by Vladimir
   B. Machulsky).
 * troff: The ".trimat", ".bleedat", and ".cropat" requests caused some

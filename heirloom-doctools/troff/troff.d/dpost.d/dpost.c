@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.131 (gritter) 1/24/06
+ * Sccsid @(#)dpost.c	1.132 (gritter) 1/26/06
  */
 
 /*
@@ -461,7 +461,7 @@ int		lastend;		/* where last character on this line was */
  *
  * When font metrics are directly read from AFM files, all characters that
  * are not ASCII are put into the remaining positions in PostScript encoding
- * vectors. Their position in these vectors in recorded in afmmap, and
+ * vectors. Their position in these vectors in recorded in afm->encmap, and
  * characters from troff are translated if necessary.
  *
  */
@@ -470,7 +470,6 @@ int		lastend;		/* where last character on this line was */
 struct  {
 
 	struct afmtab	*afm;		/* AFM data, if any */
-	int	*afmmap;		/* map of non-ASCII characters */
 	char	*name;			/* name of the font loaded here */
 	int	number;			/* its internal number */
 
@@ -2970,7 +2969,7 @@ static int *
 printencvector(struct afmtab *a)
 {
 	int	i, j, k, n, col = 0, s, w;
-	int	*afmmap = NULL;
+	int	*encmap = NULL;
 
 	fprintf(gf, "/Encoding-@%s@0 [\n", a->Font.intname);
 	col = 0;
@@ -2980,7 +2979,7 @@ printencvector(struct afmtab *a)
 	 */
 	s = 128 - 32;
 	w = 128;
-	afmmap = calloc(256 + nchtab + a->nchars, sizeof *afmmap);
+	encmap = calloc(256 + nchtab + a->nchars, sizeof *encmap);
 	col += fprintf(gf, "/.notdef");
 	printencsep(&col);
 	for (j = 1; j < 32; j++) {
@@ -2992,7 +2991,7 @@ printencvector(struct afmtab *a)
 				(k = a->fitab[s]) != 0 &&
 				k < a->nchars &&
 				a->nametab[k] != NULL) {
-			afmmap[s - 128 + 32] = j;
+			encmap[s - 128 + 32] = j;
 			col += fprintf(gf, "/%s", a->nametab[k]);
 			printencsep(&col);
 			s++;
@@ -3017,7 +3016,7 @@ printencvector(struct afmtab *a)
 					(k = a->fitab[s]) != 0 &&
 					k < a->nchars &&
 					a->nametab[k] != NULL) {
-				afmmap[s - 128 + 32] = i + 32;
+				encmap[s - 128 + 32] = i + 32;
 				col += fprintf(gf, "/%s", a->nametab[k]);
 				printencsep(&col);
 				s++;
@@ -3041,7 +3040,7 @@ printencvector(struct afmtab *a)
 					(k = a->fitab[s]) != 0 &&
 					k < a->nchars &&
 					a->nametab[k] != NULL) {
-				afmmap[s - 128 + 32] = i | n << 8;
+				encmap[s - 128 + 32] = i | n << 8;
 				col += fprintf(gf, "/%s", a->nametab[k]);
 				printencsep(&col);
 				s++;
@@ -3052,7 +3051,7 @@ printencvector(struct afmtab *a)
 		}
 		endvec(a, n++);
 	}
-	return afmmap;
+	return encmap;
 }
 /*****************************************************************************/
 
@@ -3066,7 +3065,6 @@ t_sf(int forceflush)
 
     int		fnum;			/* internal font number */
     int		cmd;			/* command to execute */
-    int		i;
 
 
 /*
@@ -3108,20 +3106,11 @@ t_sf(int forceflush)
 	lastfractsize = fractsize;
 	if ( seenfonts[fnum] == 0 ) {
 	    documentfonts();
-	    if (fontname[font].afm) {
+	    if (fontname[font].afm)
 		t_dosupply(fontname[font].afm->fontname);
-		fontname[font].afmmap = printencvector(fontname[font].afm);
-	    }
-	} else if (fontname[font].afm && fontname[font].afmmap == NULL) {
-	    for (i = 0; i <= nfonts; i++)
-		if (fontname[i].afmmap &&
-			fontname[i].afm == fontname[font].afm) {
-		    fontname[font].afmmap = fontname[i].afmmap;
-		    break;
-		}
-	    if (fontname[font].afmmap == NULL)
-		fontname[font].afmmap = printencvector(fontname[font].afm);
 	}
+	if (fontname[font].afm && fontname[font].afm->encmap == NULL)
+	    fontname[font].afm->encmap = printencvector(fontname[font].afm);
 	seenfonts[fnum] = 1;
     }	/* End if */
 
@@ -3954,10 +3943,9 @@ addoctal (
  */
 
 
-    if (fontname[font].afm && fontname[font].afmmap == NULL)
-	    oprep();
-    if (c >= 128 && fontname[font].afmmap) {
-	    c = fontname[font].afmmap[c - 128];
+    oprep();
+    if (c >= 128 && fontname[font].afm->encmap) {
+	    c = fontname[font].afm->encmap[c - 128];
 	    subfont = c >> 8;
 	    c &= 0377;
     } else
