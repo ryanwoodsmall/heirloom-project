@@ -369,6 +369,11 @@ New and extended requests
 	Mark names can be abbreviated and combined by colons, e.g.
 	"-Mcut:reg" will print cut marks and registration marks.
 
+.vpt n
+	enables (n != 0) or disables (n = 0) page ejections and vertical
+	position traps, i.e. those set with ".wh" or ".dt". At end of
+	input, the page is forcefully ejected. The default is "enabled".
+
 .warn [+|-][bits|name] ...
 	controls warning messages, which may be given either numerically
 	as bits or symbolically as names. See below for defined bits and
@@ -474,6 +479,10 @@ New number registers
 
 \n[seconds]
 	prints the seconds portion of the current local time [0,60].
+
+\n[.vpt]
+	prints whether vertical position traps are enabled (1) or
+	disabled (0).
 
 \n[.warn]
 	prints the bits representing the currently activated warning
@@ -623,4 +632,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   1/24/06
+Gunnar Ritter                                                   1/31/06

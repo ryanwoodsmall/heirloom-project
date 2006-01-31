@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.18 (gritter) 12/6/05
+ * Sccsid @(#)ni.c	1.19 (gritter) 1/31/06
  */
 
 /*
@@ -117,6 +117,7 @@ int	ascii = ASCII;
 int	ptid = PTID;
 int	lg = LG;
 int	pnlist[NPN] = { -1 };
+int	vpt = 1;
 
 
 int	*pnp = pnlist;

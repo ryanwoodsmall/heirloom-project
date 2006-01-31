@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.66 (gritter) 12/19/05
+ * Sccsid @(#)tdef.h	1.67 (gritter) 1/31/06
  */
 
 /*
@@ -834,6 +834,7 @@ void casepo(void);
 void casepl(void);
 void casewh(void);
 void casech(void);
+void casevpt(void);
 int findn(int);
 void casepn(void);
 void casebp(void);
