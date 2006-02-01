@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.132 (gritter) 1/26/06
+ * Sccsid @(#)dpost.c	1.133 (gritter) 2/1/06
  */
 
 /*
@@ -2860,7 +2860,7 @@ t_track(char *buf)
 		t = 0;
 	if (t != lasttrack) {
 		tracked = -1;
-	} else if (t)
+	} else if (t && tracked != -1)
 		tracked = 1;
 	track = t;
 }
@@ -2870,8 +2870,10 @@ t_strack(void)
 {
 	endtext();
 	fprintf(tf, "%d T\n", track);
-	tracked = track != 0;
-	lasttrack = track;
+	if (tf == stdout) {
+		tracked = track != 0;
+		lasttrack = track;
+	}
 }
 
 /*****************************************************************************/

@@ -7,6 +7,9 @@ Release ...
   of ".fp" in the "NEWS" file contains details on this.
 * [nt]roff: The ".vpt" request has been added to make it possible to
   disable vertical position traps.
+* dpost: With the ".track" command, the tracking amount was not properly
+  initialized at every page of PostScript output. This could result in
+  incorrect arrangements of characters.
 * dpost: When a font was mounted replacing another font on the same
   physical position, non-ASCII characters were not printed correctly
   afterwards (bug reported by Vladimir B. Machulsky).
