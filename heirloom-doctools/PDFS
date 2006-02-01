@@ -68,7 +68,8 @@ practical to include the command in the chapter/section macros, as e.g.
 
 	.de CH
 	.	bp
-	\\X'PDFMark: Bookmark 0 \\$1'
+	.	sp |0c
+	\v'-1v-4p'\\X'PDFMark: Bookmark 0 \\$1'
 	.	sp |\\n[topmargin]u
 	.	ce
 	.	sp
@@ -81,8 +82,9 @@ practical to include the command in the chapter/section macros, as e.g.
 
 Unless the bookmark command occurs at the top of the page, it refers
 to the baseline of the text; this is why a "\v'-1v'" command occurs
-before it in the section macro. Also do not forget to use "\\X" inside
-a macro.
+before it in the section macro. "\v'-1v-4p'" at the top of the page
+is a special value that causes the upper left corner to be shown.
+Also do not forget to use "\\X" inside a macro.
 
 The level of the first bookmark in a document must be of level 0. The
 levels of following bookmarks must be either
@@ -136,4 +138,4 @@ position, this is usually a sign that the media size of troff/dpost did
 not match that of the distiller (see above).
 
 
-Gunnar Ritter                                                 12/10/05
+Gunnar Ritter                                                 2/1/06

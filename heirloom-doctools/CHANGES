@@ -13,6 +13,9 @@ Release ...
 * dpost: When a font was mounted replacing another font on the same
   physical position, non-ASCII characters were not printed correctly
   afterwards (bug reported by Vladimir B. Machulsky).
+* dpost: The BookMark device command now causes "/XYZ" destination keys
+  to be written to PDF documents. This has the effect that the current
+  zoom factor is retained when a bookmark is selected.
 * pic, grap: Fixed 8-bit input in label texts (bug reported by Vladimir
   B. Machulsky).
 * troff: The ".trimat", ".bleedat", and ".cropat" requests caused some
