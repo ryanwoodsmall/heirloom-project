@@ -21,6 +21,9 @@ Release ...
 * troff: The ".trimat", ".bleedat", and ".cropat" requests caused some
   following requests (e.g. ".fp") to fail because of an improper reset
   of number scaling (bug reported by Sebastian Leusch).
+* troff: If the "\~" character appeared as part of the first word of a
+  line not immediately following a break, the current line and the line
+  before it were not justified correctly.
 
 Release 060114
 * troff: The internal codes for PostScript characters are now unique across

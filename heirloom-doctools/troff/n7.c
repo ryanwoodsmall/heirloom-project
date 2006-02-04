@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.41 (gritter) 1/31/06
+ * Sccsid @(#)n7.c	1.42 (gritter) 2/5/06
  */
 
 /*
@@ -711,8 +711,8 @@ int
 movword(void)
 {
 	register int w;
-	register tchar i, *wp, c, *lp, *lastlp;
-	int	savwch, hys;
+	register tchar i, *wp, c, *lp, *lastlp, lasti = 0;
+	int	savwch, hys, stretches = 0;
 
 	over = 0;
 	wp = wordp;
@@ -767,12 +767,15 @@ movword(void)
 		w += kernadjust(i, *wp ? *wp : ' ' | i&SFMASK);
 		wne -= w;
 		wch--;
+		if (cbits(i) == STRETCH && cbits(lasti) != STRETCH)
+			stretches++;
+		lasti = i;
 		storeline(i, w);
 	}
 	*linep = *wp;
 	lastlp = linep;
 	if (nel >= 0) {
-		nwd++;
+		nwd += stretches + 1;
 		return(0);	/* line didn't fill up */
 	}
 #ifndef NROFF
@@ -854,7 +857,6 @@ int
 getword(int x)
 {
 	register int j, k = 0;
-	int	lastj = 0;
 	register tchar i, *wp, nexti, gotspc = 0;
 	int noword;
 #ifdef EUC
@@ -1053,9 +1055,6 @@ g1:		nexti = GETCH();
 #endif /* EUC */
 	if (j != ' ') {
 		static char *sentchar = ".?!:";	/* sentence terminators */
-		if (j == STRETCH && lastj != j)
-			nwd++;
-		lastj = j;
 		if (j != '\n')
 #ifdef EUC
 #ifdef NROFF
