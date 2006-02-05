@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.61 (gritter) 1/24/06
+ * Sccsid @(#)t10.c	1.62 (gritter) 2/5/06
  */
 
 /*
@@ -81,8 +81,6 @@ int	Unitwidth;
 int	nfonts;
 int	nsizes;
 int	nchtab;
-
-long	realpage;
 
 static float	mzoom;
 

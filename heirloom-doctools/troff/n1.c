@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.58 (gritter) 1/31/06
+ * Sccsid @(#)n1.c	1.59 (gritter) 2/5/06
  */
 
 /*
@@ -514,6 +514,8 @@ verrprint(const char *s, va_list ap)
 	if (numtab[CD].val > 0)
 		fdprintf(stderr, "; line %d, file %s", numtab[CD].val,
 			 cfname[ifi] ? cfname[ifi] : "");
+	if (xflag && realpage)
+		fdprintf(stderr, "; page %ld", realpage);
 	fdprintf(stderr, "\n");
 	stackdump();
 #ifdef	DEBUG

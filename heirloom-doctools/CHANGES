@@ -10,6 +10,8 @@ Release ...
 * dpost: With the ".track" command, the tracking amount was not properly
   initialized at every page of PostScript output. This could result in
   incorrect arrangements of characters.
+* [nt]roff: Diagnostic messages now include the number of the current
+  output page.
 * dpost: When a font was mounted replacing another font on the same
   physical position, non-ASCII characters were not printed correctly
   afterwards (bug reported by Vladimir B. Machulsky).
@@ -21,9 +23,10 @@ Release ...
 * troff: The ".trimat", ".bleedat", and ".cropat" requests caused some
   following requests (e.g. ".fp") to fail because of an improper reset
   of number scaling (bug reported by Sebastian Leusch).
-* troff: If the "\~" character appeared as part of the first word of a
-  line not immediately following a break, the current line and the line
-  before it were not justified correctly.
+* troff: If the "\~" character appeared as part of the first word of
+  a line not immediately following a break, the current line and the
+  line before it were not justified correctly (bug reported by
+  Christian Schaper).
 
 Release 060114
 * troff: The internal codes for PostScript characters are now unique across

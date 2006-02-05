@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.20 (gritter) 1/11/06
+ * Sccsid @(#)troff.h	1.21 (gritter) 2/5/06
  */
 
 extern struct tracktab {
@@ -52,8 +52,6 @@ extern	short		*chtab;
 extern	int		c_endash;
 
 extern	int		kern;
-
-extern	long		realpage;
 
 extern	void		growfonts(int);
 extern	int		loadafm(int, int, char *, char *, int, enum spec);
