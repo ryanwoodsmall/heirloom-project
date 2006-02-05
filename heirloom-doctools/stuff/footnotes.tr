@@ -7,10 +7,12 @@
 .\" If the smaller size of regular numeral is chosen instead, the
 .\" width of the letter parts becomes too small.
 .\"
-.\" Sccsid @(#)footnotes.tr	1.4 (gritter) 1/16/06
+.\" Sccsid @(#)footnotes.tr	1.5 (gritter) 2/5/06
 .\"
 .\" Long request names will be used later.
 .do xflag 3
+.\" Enable all warnings.
+.warn
 .\" This is only to improve the readability of the output.
 .sp 2c
 .ps 14
@@ -58,15 +60,31 @@
 .	if (\\n[FEtmp]>0) \{\
 .		nr FEbuild (\\n[FEtmp]%10)
 .		ie (\\n[FEbuild]=0) .ds * \[zerosuperior]\\**
-.		el .ie (\\n[FEbuild]=1) .ds * \[onesuperior]\\**
-.		el .ie (\\n[FEbuild]=2) .ds * \[twosuperior]\\**
-.		el .ie (\\n[FEbuild]=3) .ds * \[threesuperior]\\**
-.		el .ie (\\n[FEbuild]=4) .ds * \[foursuperior]\\**
-.		el .ie (\\n[FEbuild]=5) .ds * \[fivesuperior]\\**
-.		el .ie (\\n[FEbuild]=6) .ds * \[sixsuperior]\\**
-.		el .ie (\\n[FEbuild]=7) .ds * \[sevensuperior]\\**
-.		el .ie (\\n[FEbuild]=8) .ds * \[eightsuperior]\\**
-.		el .ds * \[ninesuperior]\\**
+.		el \{\
+.		  ie (\\n[FEbuild]=1) .ds * \[onesuperior]\\**
+.		  el \{\
+.		    ie (\\n[FEbuild]=2) .ds * \[twosuperior]\\**
+.		    el \{\
+.		      ie (\\n[FEbuild]=3) .ds * \[threesuperior]\\**
+.		      el \{\
+.			ie (\\n[FEbuild]=4) .ds * \[foursuperior]\\**
+.			el \{\
+.			  ie (\\n[FEbuild]=5) .ds * \[fivesuperior]\\**
+.			  el \{\
+.			    ie (\\n[FEbuild]=6) .ds * \[sixsuperior]\\**
+.			    el \{\
+.			      ie (\\n[FEbuild]=7) .ds * \[sevensuperior]\\**
+.			      el \{\
+.				ie (\\n[FEbuild]=8) .ds * \[eightsuperior]\\**
+.				el .ds * \[ninesuperior]\\**
+.			      \}
+.			    \}
+.			  \}
+.			\}
+.		      \}
+.		    \}
+.		  \}
+.		\}
 .		nr FEtmp (\\n[FEtmp]/10)
 .		FEbuild
 .	\}
