@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.59 (gritter) 2/5/06
+ * Sccsid @(#)n1.c	1.60 (gritter) 2/5/06
  */
 
 /*
@@ -293,7 +293,7 @@ start:
 loop:
 	xflag = _xflag;
 	copyf = lgf = nb = nflush = nlflg = 0;
-	if (ip && rbf0(ip) == 0 && ejf && frame->pframe <= ejl) {
+	if (ip && rbf0(ip) == 0 && dip == d && ejf && frame->pframe <= ejl) {
 		nflush++;
 		trap = 0;
 		eject((struct s *)0);

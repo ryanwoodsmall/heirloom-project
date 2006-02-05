@@ -12,6 +12,7 @@ Release ...
   incorrect arrangements of characters.
 * [nt]roff: Diagnostic messages now include the number of the current
   output page.
+* [nt]roff: Page breaks inside a diversion are now properly ignored.
 * dpost: When a font was mounted replacing another font on the same
   physical position, non-ASCII characters were not printed correctly
   afterwards (bug reported by Vladimir B. Machulsky).
