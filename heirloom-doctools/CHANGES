@@ -27,6 +27,8 @@ Release ...
   a line not immediately following a break, the current line and the
   line before it were not justified correctly (bug reported by
   Christian Schaper).
+* [nt]roff: The ".spreadwarn" request was wrongly called ".spreadlimit"
+  in the NEWS file.
 
 Release 060114
 * troff: The internal codes for PostScript characters are now unique across

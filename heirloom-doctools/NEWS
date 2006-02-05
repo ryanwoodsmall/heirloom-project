@@ -317,7 +317,7 @@ New and extended requests
 	shifts the arguments to the current macro by "n", or 1 if "n"
 	is missing.
 
-.spreadlimit [n]
+.spreadwarn [n]
 	sets or toggles a limit that causes a warning to be printed when
 	it is exceeded by the adjustment that is computed for the current
 	output line in ".ad b" mode. The limit is initially 3m, but the
@@ -632,4 +632,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   1/31/06
+Gunnar Ritter                                                   2/5/06
