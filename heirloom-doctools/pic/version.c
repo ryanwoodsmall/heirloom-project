@@ -5,8 +5,8 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/pic.sl	5.6 (gritter) 1/19/06";
-const char version[] = "version July 5, 1993	5.6 (gritter) 1/19/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/pic.sl	5.7 (gritter) 2/8/06";
+const char version[] = "version July 5, 1993	5.7 (gritter) 2/8/06";
 /* SLIST */
 /*
 arcgen.c:	Sccsid @(#)arcgen.c	1.3 (gritter) 10/18/05	
@@ -26,7 +26,7 @@ picl.l:	Sccsid @(#)picl.l	1.7 (gritter) 11/27/05
 picy.c:	Sccsid @(#)picy.y	1.4 (gritter) 11/28/05	
 picy.c: * Sccsid @(#)yaccpar	1.5 (gritter) 11/26/05
 picy.y:	Sccsid @(#)picy.y	1.4 (gritter) 11/28/05	
-pltroff.c:	Sccsid @(#)pltroff.c	1.2 (gritter) 10/18/05	
+pltroff.c:	Sccsid @(#)pltroff.c	1.3 (gritter) 2/8/06	
 print.c:	Sccsid @(#)print.c	1.3 (gritter) 10/18/05	
 symtab.c:	Sccsid @(#)symtab.c	1.3 (gritter) 10/18/05	
 textgen.c:	Sccsid @(#)textgen.c	1.2 (gritter) 10/18/05	

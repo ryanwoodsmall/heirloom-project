@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)pltroff.c	1.2 (gritter) 10/18/05	*/
+/*	Sccsid @(#)pltroff.c	1.3 (gritter) 2/8/06	*/
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -74,8 +74,8 @@ void openpl(char *s)	/* initialize device; s is residue of .PS invocation line *
 		fprintf(stderr, " %g X %g\n", deltx, delty);
 	}
 	space(xmin, ymin, xmax, ymax);
-	printf("... %g %g %g %g\n", xmin, ymin, xmax, ymax);
-	printf("... %.3fi %.3fi %.3fi %.3fi\n",
+	printf(".\\\" %g %g %g %g\n", xmin, ymin, xmax, ymax);
+	printf(".\\\" %.3fi %.3fi %.3fi %.3fi\n",
 		xconv(xmin), yconv(ymin), xconv(xmax), yconv(ymax));
 	printf(".nr 00 \\n(.u\n");
 	printf(".nf\n");

@@ -1,3 +1,7 @@
+Release ...
+* pic: The comments before ".PS" containing bounding box information are
+  now prefixed by '.\"' instead of '...' for compatibility with ".warn".
+
 Release 060208
 * troff: Eastern European characters for Unicode/PostScript conversion
   have been added (patch by Vladimir B. Machulsky).
