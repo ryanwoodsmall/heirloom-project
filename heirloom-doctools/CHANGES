@@ -1,4 +1,4 @@
-Release ...
+Release 060208
 * troff: Eastern European characters for Unicode/PostScript conversion
   have been added (patch by Vladimir B. Machulsky).
 * troff, dpost: Font file names can now contain spaces or bytes outside
