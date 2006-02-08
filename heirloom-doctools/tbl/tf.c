@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tf.c	1.4 (gritter) 10/15/05
+ * Sccsid @(#)tf.c	1.5 (gritter) 2/8/06
  */
 
  /* tf.c: save and restore fill mode around table */
@@ -67,17 +67,34 @@ fprintf(tabout, ".if \\(ts\\n(.z\\(ts\\(ts .ds #d nl\n");
 void
 saveline(void)
 {
+warnoff();
 fprintf(tabout, ".if \\n+(b.=1 .nr d. \\n(.c-\\n(c.-1\n");
+warnon();
 linstart=iline;
 }
 void
 restline(void)
 {
+warnoff();
 fprintf(tabout,".if \\n-(b.=0 .nr c. \\n(.c-\\n(d.-%d\n", iline-linstart);
+warnon();
 linstart = 0;
 }
 void
 cleanfc(void)
 {
 fprintf(tabout, ".fc\n");
+}
+void
+warnoff(void)
+{
+fprintf(tabout, ".if \\n(.X>0 \\{\\\n");
+fprintf(tabout, ".do nr w. \\n[.warn]\n");
+fprintf(tabout, ".do warn -mac -reg\n");
+fprintf(tabout, ".\\}\n");
+}
+void
+warnon(void)
+{
+fprintf(tabout, ".if \\n(.X>0 .do warn \\n(w.\n");
 }

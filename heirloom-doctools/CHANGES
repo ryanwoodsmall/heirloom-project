@@ -1,4 +1,7 @@
 Release ...
+* tbl: The ".warn" troff request is now used internally to save, disable,
+  and restore warning messages around those portions of tbl output which
+  use potentially undefined requests or registers.
 * pic: The comments before ".PS" containing bounding box information are
   now prefixed by '.\"' instead of '...' for compatibility with ".warn".
 

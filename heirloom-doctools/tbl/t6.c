@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.5 (gritter) 10/15/05
+ * Sccsid @(#)t6.c	1.6 (gritter) 2/8/06
  */
 
  /* t6.c: compute tab stops */
@@ -41,8 +41,11 @@ for(icol=0; icol <ncol; icol++)
 	fprintf(tabout, ".nr %d 0\n", icol+CRIGHT);
    for(text=0; text<2; text++)
 	{
-	if (text)
+	if (text) {
+		warnoff();
 		fprintf(tabout, ".%02d\n.rm %02d\n", icol+80, icol+80);
+		warnon();
+	}
 	for(ilin=0; ilin<nlin; ilin++)
 		{
 		if (instead[ilin]|| fullbot[ilin]) continue;
