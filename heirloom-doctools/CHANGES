@@ -4,6 +4,9 @@ Release ...
   use potentially undefined requests or registers.
 * pic: The comments before ".PS" containing bounding box information are
   now prefixed by '.\"' instead of '...' for compatibility with ".warn".
+* pic/dpost: The PostScript implementation of the "Dl" (draw line)
+  operation now rounds the current point to the troff device resolution
+  when testing for equality. This is another fix for "box fill 0" in pic.
 
 Release 060208
 * troff: Eastern European characters for Unicode/PostScript conversion

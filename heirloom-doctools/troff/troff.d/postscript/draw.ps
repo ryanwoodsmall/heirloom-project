@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_draw 1.4 0
+%%BeginResource: procset dpost_draw 1.5 0
 % from OpenSolaris "lp:filter/postscript/postscript/draw.ps	1.1"
 %
 % CDDL HEADER START
@@ -23,7 +23,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)draw.ps	1.4 (gritter) 1/13/06
+% Sccsid @(#)draw.ps	1.5 (gritter) 2/9/06
 %
 % Drawing procedures for dpost. Automatically pulled in, but only
 % when needed.
@@ -40,8 +40,8 @@
 			/Dlny exch def
 			/Dlnx exch def
 			currentpoint
-			neg /Dlcy exch def
-			/Dlcx exch def
+			neg round /Dlcy exch def
+			round /Dlcx exch def
 			Dlnx Dlcx ne Dlny Dlcy ne or {Dlnx Dlny neg moveto} if
 			neg lineto
 		}
