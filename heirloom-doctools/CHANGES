@@ -7,6 +7,8 @@ Release ...
 * pic/dpost: The PostScript implementation of the "Dl" (draw line)
   operation now rounds the current point to the troff device resolution
   when testing for equality. This is another fix for "box fill 0" in pic.
+* [nt]roff: The "\n[.warn]" number register is now properly changed after
+  a call to ".warn" with no arguments.
 
 Release 060208
 * troff: Eastern European characters for Unicode/PostScript conversion
