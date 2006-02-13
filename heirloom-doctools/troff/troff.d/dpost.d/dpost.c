@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.134 (gritter) 2/1/06
+ * Sccsid @(#)dpost.c	1.135 (gritter) 2/13/06
  */
 
 /*
@@ -668,6 +668,7 @@ static void	t_cutat(const char *, struct box *, char *);
 static void	t_track(char *);
 static void	t_strack(void);
 static void	t_pdfmark(char *);
+static void	t_locale(char *);
 
 static int	mb_cur_max;
 
@@ -1709,6 +1710,8 @@ devcntrl(
 		    t_track(buf);
 		else if ( strcmp(str, "PDFMark") == 0 )
 		    t_pdfmark(buf);
+		else if ( strcmp(str, "LC_CTYPE") == 0 )
+		    t_locale(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -4354,4 +4357,18 @@ orderbookmarks(void)
 		refs[k] = i;
 		lvl = k;
 	}
+}
+
+static void
+t_locale(char *lp)
+{
+	static char	*savlp;
+
+	if (savlp && strcmp(lp, savlp) == 0)
+		return;
+	free(savlp);
+	savlp = malloc(strlen(lp) + 1);
+	sscanf(lp, "%s", savlp);
+	setlocale(LC_CTYPE, savlp);
+	mb_cur_max = MB_CUR_MAX;
 }

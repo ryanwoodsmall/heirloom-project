@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.62 (gritter) 2/5/06
+ * Sccsid @(#)t10.c	1.63 (gritter) 2/13/06
  */
 
 /*
@@ -52,6 +52,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#ifdef	EUC
+#include <locale.h>
+#endif
 #include "ext.h"
 #include "dev.h"
 #include "afm.h"
@@ -260,6 +263,9 @@ ptinit(void)
 		fdprintf(ptid, " %s", &chname[chtab[i]]);
 	fdprintf(ptid, "\nx xxx\n");
   */
+#ifdef	EUC
+	ptlocale(setlocale(LC_CTYPE, NULL));
+#endif	/* EUC */
 }
 
 void
@@ -710,6 +716,21 @@ ptcut(void)
 }
 
 void
+ptlocale(const char *cp)
+{
+	static char	*lp;
+
+	if (cp != NULL) {
+		free(lp);
+		lp = malloc(strlen(cp) + 1);
+		strcpy(lp, cp);
+	}
+	if (ascii || realpage == 0 || lp == NULL)
+		return;
+	fdprintf(ptid, "x X LC_CTYPE %s\n", lp);
+}
+
+void
 newpage(int n)	/* called at end of each output page (we hope) */
 {
 	int i;
@@ -735,6 +756,7 @@ newpage(int n)	/* called at end of each output page (we hope) */
 	ptfont();
 	ptpapersize();
 	ptcut();
+	ptlocale(NULL);
 }
 
 void

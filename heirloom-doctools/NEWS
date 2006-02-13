@@ -569,6 +569,10 @@ x X CropAt left-offset top-offset width height
 	results from the ".cropat" request and passes the given values
 	in device units.
 
+x X LC_CTYPE localename
+	advises the post-processor to set the LC_CTYPE locale category
+	to "localename".
+
 x X PaperSize x y setmedia
 	results from the ".mediasize" or ".papersize" requests and gives
 	the paper size as "x" and "y" in device units. If "setmedia" is
@@ -632,4 +636,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   2/5/06
+Gunnar Ritter                                                   2/13/06

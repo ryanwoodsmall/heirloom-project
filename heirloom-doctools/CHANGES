@@ -4,11 +4,14 @@ Release ...
   use potentially undefined requests or registers.
 * pic: The comments before ".PS" containing bounding box information are
   now prefixed by '.\"' instead of '...' for compatibility with ".warn".
+* [nt]roff: The "\n[.warn]" number register is now properly changed after
+  a call to ".warn" with no arguments.
 * pic/dpost: The PostScript implementation of the "Dl" (draw line)
   operation now rounds the current point to the troff device resolution
   when testing for equality. This is another fix for "box fill 0" in pic.
-* [nt]roff: The "\n[.warn]" number register is now properly changed after
-  a call to ".warn" with no arguments.
+* troff/dpost: A "x X LC_CTYPE localename" device command has been added.
+  This ensures that troff and dpost use the same locale for generating
+  PDF bookmark entries.
 
 Release 060208
 * troff: Eastern European characters for Unicode/PostScript conversion
