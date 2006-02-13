@@ -1,4 +1,9 @@
 Release ...
+* [nt]roff: The input line number is now adjusted at a different place,
+  fixing many glitches which previously caused it to be wrong.
+* tbl: The ".lf" troff request is now used internally to adjust troff's
+  idea of the current input file and line number, making troff warnings
+  more helpful.
 * tbl: The ".warn" troff request is now used internally to save, disable,
   and restore warning messages around those portions of tbl output which
   use potentially undefined requests or registers.

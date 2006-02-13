@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t1.c	1.9 (gritter) 8/13/05
+ * Sccsid @(#)t1.c	1.10 (gritter) 2/13/06
  */
 
  /* t1.c: main control and input switching */
@@ -137,6 +137,7 @@ swapin(void)
 /* file names are all put into f. by the GCOS troff preprocessor */
 	fprintf(tabout, ".ds f. %s\n",ifile);
 # endif
+	fprintf(tabout, ".lf 1 %s\n", ifile);
 	if (tabin==NULL)
 		error("Can't open file");
 	sargc--;

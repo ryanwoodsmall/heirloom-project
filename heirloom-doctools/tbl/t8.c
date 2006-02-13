@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t8.c	1.6 (gritter) 10/15/05
+ * Sccsid @(#)t8.c	1.7 (gritter) 2/13/06
  */
 
  /* t8.c: write out one line of output table */
@@ -103,11 +103,13 @@ for(c=0; c<ncol; c++)
 	if (point((intptr_t)s) ) continue;
 	lf=prev(nl);
 	nreg(space,s,'|');
+	warnoff();
 	if (lf>=0 && vspen(table[lf][c].col))
 		fprintf(tabout, ".if (%s+\\n(^%c-1v)>\\n(#- .nr #- +(%s+\\n(^%c-\\n(#--1v)\n",space,'a'+c,space,'a'+c);
 	else
 		fprintf(tabout, ".if (%s+\\n(#^-1v)>\\n(#- .nr #- +(%s+\\n(#^-\\n(#--1v)\n",space,space);
 	}
+	warnon();
 if (allflg && once>0 )
 	fullwide(i,'-');
 once=1;

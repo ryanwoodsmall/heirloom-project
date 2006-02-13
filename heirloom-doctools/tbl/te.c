@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)te.c	1.10 (gritter) 9/5/05
+ * Sccsid @(#)te.c	1.11 (gritter) 2/13/06
  */
 
  /* te.c: error message control, input line count */
@@ -61,6 +61,7 @@ for (;;)
 				error(errmsg(errno));
 			if (swapin()==0)
 				return(0);
+			iline++;
 			continue;
 			}
 		if (n + MAXCHS >= *zp)
