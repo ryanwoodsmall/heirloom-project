@@ -1,4 +1,10 @@
 Release ...
+* troff: Non-ASCII small characters were erroneously mapped to uppercase
+  input characters. They are now mapped to lowercase input characters as
+  it is done for ASCII characters.
+* troff: When a regular font was chosen as fallback for an expert font,
+  non-ASCII characters were selected from the regular font even if a
+  matching character in the expert font existed.
 * [nt]roff: The input line number is now adjusted at a different place,
   fixing many glitches which previously caused it to be wrong.
 * tbl: The ".lf" troff request is now used internally to adjust troff's

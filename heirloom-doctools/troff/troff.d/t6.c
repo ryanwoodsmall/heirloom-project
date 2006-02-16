@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.119 (gritter) 1/24/06
+ * Sccsid @(#)t6.c	1.120 (gritter) 2/16/06
  */
 
 /*
@@ -2014,7 +2014,7 @@ int
 un2tr(int c, int *fp)
 {
 	extern char	ifilt[];
-	struct unimap	*up;
+	struct unimap	*um, *up;
 	int	i, j;
 
 	switch (c) {
@@ -2055,11 +2055,20 @@ un2tr(int c, int *fp)
 		if ((i = ufmap(c, font, fp)) != 0)
 			return i;
 		if ((c&~0xffff) == 0 && unimap[c>>8] != NULL &&
-				(up = unimap[c>>8][c&0377]) != NULL)
+				(um = unimap[c>>8][c&0377]) != NULL) {
+			up = um;
+			do
+				if ((j = postchar1(up->u.psc, font)) != 0) {
+					*fp = font;
+					return j;
+				}
+			while ((up = up->next) != NULL);
+			up = um;
 			do
 				if ((j = postchar(up->u.psc, fp)) != 0)
 					return j;
 			while ((up = up->next) != NULL);
+		}
 		if (fallbacktab[font])
 			for (j = 0; fallbacktab[font][j] != 0; j++) {
 				if ((i = findft(fallbacktab[font][j])) < 0)
