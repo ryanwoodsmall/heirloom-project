@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.21 (gritter) 12/19/05
+ * Sccsid @(#)n4.c	1.22 (gritter) 2/17/06
  */
 
 /*
@@ -576,6 +576,8 @@ a0:
 		k = 0;
 		if (cbits(ii = getch()) == '=')
 			k++; 
+		else if (xflag && cbits(ii) == '?')
+			goto maximum;
 		else 
 			ch = ii;
 		i = ckph();
@@ -588,10 +590,23 @@ a0:
 		else 
 			acc = 0;
 		goto a0;
+	maximum:
+		i = ckph();
+		if (nonumb) {
+			acc = 0; 
+			break;
+		}
+		if (i > acc)
+			acc = i;
+		goto a0;
 	case '<':
 		k = 0;
 		if (cbits(ii = getch()) == '=')
 			k++; 
+		else if (xflag && cbits(ii) == '?')
+			goto minimum;
+		else if (xflag && cbits(ii) == '>')
+			goto notequal;
 		else 
 			ch = ii;
 		i = ckph();
@@ -601,6 +616,26 @@ a0:
 		}
 		if (acc < (i + k))
 			acc = 1; 
+		else 
+			acc = 0;
+		goto a0;
+	minimum:
+		i = ckph();
+		if (nonumb) {
+			acc = 0; 
+			break;
+		}
+		if (i < acc)
+			acc = i;
+		goto a0;
+	notequal:
+		i = ckph();
+		if (nonumb) {
+			acc = 0; 
+			break;
+		}
+		if (i != acc)
+			acc = 1;
 		else 
 			acc = 0;
 		goto a0;

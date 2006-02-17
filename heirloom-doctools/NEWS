@@ -502,6 +502,16 @@ New number registers
 	prints the current year (2005 etc.).
 
 
+New numeric expressions
+=======================
+
+a<>b	is 1 if the expression "a" is not equal to "b", or 0 otherwise.
+
+a<?b	is the minimum of "a" and "b".
+
+a>?b	is the maximum of "a" and "b".
+
+
 Warning bits and names
 ======================
 

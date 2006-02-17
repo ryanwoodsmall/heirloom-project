@@ -8,6 +8,8 @@ Release ...
 * [nt]roff: Additional conditions are available with ".if": "c" to test
   for a glyph in the current font, "d" to test for the existence of a
   macro, and "r" to test for the existence of a number register.
+* [nt]roff: Three additional operators for numeric expressions are
+  available: "<>" (not equal), "<?" (minimum), and ">?" (maximum).
 * [nt]roff: The input line number is now adjusted at a different place,
   fixing many glitches which previously caused it to be wrong.
 * tbl: The ".lf" troff request is now used internally to adjust troff's
