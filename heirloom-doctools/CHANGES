@@ -1,4 +1,11 @@
 Release ...
+* troff: The ".fspacewidth" request has been introduced to set the width
+  of the space character of a font.
+* troff: For monospaced fonts, the space width is now set to the size of
+  the "space" character in the AFM/TrueType/OpenType font metrics. This
+  matches the traditional behavior of the "post" device with the "Courier"
+  font, but was previously not done for "ps", which led to incorrect
+  formatting.
 * troff: Non-ASCII small characters were erroneously mapped to uppercase
   input characters. They are now mapped to lowercase input characters as
   it is done for ASCII characters.

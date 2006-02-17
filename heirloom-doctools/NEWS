@@ -186,6 +186,22 @@ New and extended requests
 
 	The remaining arguments are handled as described for ".fp".
 
+.fspacewidth ff [width]					troff only
+	sets the width of the space character in font "ff" to "width",
+	which is given in units of 1/72000 of an inch multiplied by the
+	current point size or 1/1000 of an em (as in AFM kerning pair
+	definitions). If only one argument is present, the space width
+	is set to the width of the "space" glyph as obtained from the
+	font metrics file. If the space width for a font is not set
+	explicitly using this request, it defaults to 1/3 em for
+	variable-width fonts, or to the width of the "space" glyph
+	for monospaced fonts.
+	  When the width of spaces in output is actually computed,
+	the space size as set by ".ss" is also taken into account.
+	The space width as defined above is used directly with
+	".ss 12", which is the default. Otherwise, it is multiplied
+	by the ss setting divided by 12.
+
 .ftr ff abcd...						troff only
 	is a font-specific variant of the ".tr" request. If the current
 	character originates from font "ff", character "a" is translated

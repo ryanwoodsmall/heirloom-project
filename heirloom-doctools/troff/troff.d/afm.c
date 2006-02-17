@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.43 (gritter) 1/25/06
+ * Sccsid @(#)afm.c	1.44 (gritter) 2/17/06
  */
 
 #include <stdlib.h>
@@ -686,6 +686,8 @@ afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		np = afmnamelook(a, N);
 		np->afpos = a->nchars;
 		np->gid = gid;
+		if (a->isFixedPitch && strcmp(N, "space") == 0)
+			a->fontab[0] = unitconv(WX);
 	}
 	a->fontab[a->nchars] = unitconv(WX);
 	/*
@@ -902,6 +904,9 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->fontname[tp - th] = 0;
 			if (strcmp(a->fontname, "Symbol") == 0)
 				s |= SPEC_S;
+		} else if (state == FONTMETRICS &&
+				(th = thisword(cp, "IsFixedPitch")) != NULL) {
+			a->isFixedPitch = strncmp(th, "true", 4) == 0;
 		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "XHeight")) != NULL) {
 			a->xheight = strtol(th, NULL, 10);

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.23 (gritter) 1/26/06
+ * Sccsid @(#)afm.h	1.24 (gritter) 2/17/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -92,6 +92,7 @@ extern struct afmtab {
 	int	nchars;
 	int	capheight;
 	int	xheight;
+	int	isFixedPitch;
 	enum spec	spec;
 	enum {
 		TYPE_AFM,

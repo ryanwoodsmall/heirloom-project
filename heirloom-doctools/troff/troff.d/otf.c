@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.38 (gritter) 1/5/06
+ * Sccsid @(#)otf.c	1.39 (gritter) 2/17/06
  */
 
 #include <stdio.h>
@@ -2216,6 +2216,8 @@ get_post(void)
 		return;
 	if (table_directories[pos_post].length >= 16)
 		isFixedPitch = pbe32(&contents[o+12]);
+	if (a)
+		a->isFixedPitch = isFixedPitch;
 	if (table_directories[pos_post].length >= 20)
 		minMemType42 = pbe32(&contents[o+16]);
 	if (table_directories[pos_post].length >= 24)

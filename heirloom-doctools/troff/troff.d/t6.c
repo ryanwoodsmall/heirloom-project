@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.121 (gritter) 2/17/06
+ * Sccsid @(#)t6.c	1.122 (gritter) 2/17/06
  */
 
 /*
@@ -1239,6 +1239,38 @@ casess(void)
 	noscale = 0;
 }
 
+void
+casefspacewidth(void)
+{
+	struct namecache	*np;
+	struct afmtab	*a;
+	int	f, n, i;
+
+	lgf++;
+	if (skip(1))
+		return;
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 2);
+	if ((f = findft(i)) < 0)
+		return;
+	if (skip(0)) {
+		fontab[f][0] = dev.res * dev.unitwidth / 72 / 3;
+		if (afmtab && (i = fontbase[f]->afmpos - 1) >= 0) {
+			a = afmtab[i];
+			np = afmnamelook(a, "space");
+			if (np->afpos != 0)
+				fontab[f][0] = fontab[f][np->afpos];
+		}
+	} else {
+		noscale++;
+		n = atoi();
+		noscale--;
+		unitsPerEm = 1000;
+		fontab[f][0] = unitconv(n);
+	}
+	zapwcache(1);
+}
+
 
 tchar xlss(void)
 {
@@ -1760,6 +1792,7 @@ hang(int **tp)
 		n = atoi();
 		noscale--;
 		if (fbits(k) == j && !ismot(k)) {
+			unitsPerEm = 1000;
 			n = unitconv(n);
 			if (tp[j] == NULL)
 				tp[j] = calloc(NCHARS, sizeof *tp);
@@ -1828,6 +1861,7 @@ casekernpair(void)
 	if (d == UNPAD)
 		d = ' ';
 	setfbits(d, g);
+	unitsPerEm = 1000;
 	n = unitconv(n);
 	kadd(c, d, n);
 done:
@@ -1863,6 +1897,7 @@ kernsingle(int **tp)
 			continue;
 		if (tp[f] == NULL)
 			tp[f] = calloc(NCHARS, sizeof *tp);
+		unitsPerEm = 1000;
 		tp[f][c] = unitconv(n);
 	}
 	font = savfont;
