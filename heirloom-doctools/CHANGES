@@ -5,6 +5,9 @@ Release ...
 * troff: When a regular font was chosen as fallback for an expert font,
   non-ASCII characters were selected from the regular font even if a
   matching character in the expert font existed.
+* [nt]roff: Additional conditions are available with ".if": "c" to test
+  for a glyph in the current font, "d" to test for the existence of a
+  macro, and "r" to test for the existence of a number register.
 * [nt]roff: The input line number is now adjusted at a different place,
   fixing many glitches which previously caused it to be wrong.
 * tbl: The ".lf" troff request is now used internally to adjust troff's

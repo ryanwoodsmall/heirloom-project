@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.35 (gritter) 1/31/06
+ * Sccsid @(#)n5.c	1.36 (gritter) 2/17/06
  */
 
 /*
@@ -965,13 +965,15 @@ caseie(void)
 	ifx++;
 }
 
+int	tryglf;
 
 void
 caseif(int x)
 {
 	extern int falsef;
 	register int notflag, true;
-	tchar i;
+	tchar i, j;
+	enum warn w = warn;
 
 	if (x == 2) {
 		notflag = 0;
@@ -1012,10 +1014,43 @@ caseif(int x)
 		true++;
 	case 'n':
 #endif
+		break;
+	case 'c':
+		if (xflag == 0)
+			goto dfl;
+		warn &= ~WARN_CHAR;
+		tryglf++;
+		if (!skip(1)) {
+			j = getch();
+#if defined (NROFF) && defined (EUC)
+			if (multi_locale && j & MBMASK) {
+				while ((j & MBMASK) != LASTOFMB)
+					j = getch();
+				true++;
+			} else
+#endif	/* NROFF && EUC */
+			true = !ismot(j) && cbits(j) && cbits(j) != ' ';
+		}
+		tryglf--;
+		warn = w;
+		break;
+	case 'r':
+	case 'd':
+		if (xflag == 0)
+			goto dfl;
+		warn &= ~(WARN_MAC|WARN_SPACE|WARN_REG);
+		if (!skip(1)) {
+			j = getrq();
+			if (j >= 256)
+				j = maybemore(j, 2);
+			true = (cbits(i) == 'r' ? usedr(j) : findmn(j)) >= 0;
+		}
+		warn = w;
+		break;
 	case ' ':
 		break;
 	default:
-		true = cmpstr(i);
+	dfl:	true = cmpstr(i);
 	}
 i1:
 	true ^= notflag;

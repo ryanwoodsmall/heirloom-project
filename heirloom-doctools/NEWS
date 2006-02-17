@@ -215,6 +215,16 @@ New and extended requests
 	is used directly, and can be switched on using the ".hy" request,
 	which is what many macro packages do.
 
+.if
+	The following new conditions are available:
+
+	.if c G		true if a glyph "G" exists in the current font,
+			where "G" is either an ASCII or localized input
+			character, a troff special character "\(xx" or
+			"\[xxx]", or a "\U'xxxx'" escape sequence
+	.if d xx	true if there is a request, macro, or string "xx"
+	.if r xx	true if there is a number register "xx"
+
 .kern [0|1]						troff only
 	Disables (0) or enables pairwise kerning. The default is enabled
 	unless the "-x0" option is given.
@@ -636,4 +646,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   2/13/06
+Gunnar Ritter                                                   2/17/06
