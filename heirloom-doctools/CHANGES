@@ -28,6 +28,7 @@ Release ...
 * troff/dpost: A "x X LC_CTYPE localename" device command has been added.
   This ensures that troff and dpost use the same locale for generating
   PDF bookmark entries.
+* dpost: CFF font data is now ASCII hex encoded in PostScript output.
 
 Release 060208
 * troff: Eastern European characters for Unicode/PostScript conversion
