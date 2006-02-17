@@ -536,7 +536,7 @@ currently defined:
 131072	font	Warn when a font cannot be found. This warning is enabled
 		by default.
 	all	All warnings except "di", "mac", and "reg". This may be the
-		best choice when using tbl, eqn, or existing macro packages.
+		best choice when using existing macro packages.
 	w	All warnings.
 
 
