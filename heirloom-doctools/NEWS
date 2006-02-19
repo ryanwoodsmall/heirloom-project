@@ -230,6 +230,9 @@ New and extended requests
 	mechanism. Note that hyphenation is disabled by default if troff
 	is used directly, and can be switched on using the ".hy" request,
 	which is what many macro packages do.
+	  This request also makes parts of words composed by "-" or
+	"\(em" characters subject to hyphenation. Traditionally, the only
+	hyphenation points in such words had been the hyphens/dashes.
 
 .if
 	The following new conditions are available:
@@ -672,4 +675,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   2/17/06
+Gunnar Ritter                                                   2/19/06

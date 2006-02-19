@@ -1,4 +1,6 @@
 Release ...
+* [nt]roff: With the ".hylang" request, the individual parts of words
+  composed by "-" or "\(em" characters are now subject to hyphenation.
 * troff: The ".fspacewidth" request has been introduced to set the width
   of the space character of a font.
 * troff: For monospaced fonts, the space width is now set to the size of

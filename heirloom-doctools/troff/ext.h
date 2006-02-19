@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.36 (gritter) 2/17/06
+ * Sccsid @(#)ext.h	1.37 (gritter) 2/19/06
  */
 
 /*
@@ -103,6 +103,7 @@ extern	int	flss;
 extern	int	*fontlab;
 extern	int	gflag;
 extern	int	hflg;
+extern	int	hyext;
 extern	int	ibf;
 extern	int	ifi;
 extern	int	ifile;

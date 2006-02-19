@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.18 (gritter) 12/19/05
+ * Sccsid @(#)n8.c	1.19 (gritter) 2/19/06
  */
 
 /*
@@ -97,6 +97,7 @@ hyphen(tchar *wp)
 {
 	register int j;
 	register tchar *i;
+	tchar	*_wdstart, *_wdend;
 
 	i = wp;
 	while (punct(*i++))
@@ -104,7 +105,7 @@ hyphen(tchar *wp)
 	if (!alph(*--i))
 		return;
 	wdstart = i++;
-	while (alph(*i++))
+	while (hyext ? *i++ : alph(*i++))
 		;
 	hyend = wdend = --i - 1;
 	while (punct(*i++))
@@ -117,8 +118,34 @@ hyphen(tchar *wp)
 	*hyp = 0;
 	hyoff = 2;
 	if (dicthnj) {
-		if (!exword())
-			hyphenhnj();
+		i = _wdstart = wdstart;
+		_wdend = wdend;
+		do {
+			if (cbits(*i) == '-' || cbits(*i) == EMDASH ||
+					i == _wdend) {
+				while (wdstart <= i && (punct(*wdstart) ||
+						cbits(*wdstart) >= '0' &&
+						cbits(*wdstart) <= '9'))
+					wdstart++;
+				for (wdend = wdstart; wdend <= i; wdend++) {
+					if (!alph(*wdend) ||
+							cbits(*wdend) >= '0' &&
+							cbits(*wdend) <= '9')
+						break;
+				}
+				hyend = --wdend;
+				if (wdstart + 4 <= wdend && !exword())
+					hyphenhnj();
+				wdstart = &i[1];
+				if (i < _wdend) {
+					*hyp++ = &i[1];
+					if (hyp > (hyptr + NHYP - 1))
+						hyp = hyptr + NHYP - 1;
+				}
+			}
+		} while (i++ <= _wdend);
+		wdstart = _wdstart;
+		wdend = _wdend;
 	} else if (!exword() && !suffix())
 		digram();
 	*hyp++ = 0;
@@ -155,11 +182,12 @@ alph(tchar j)
 #ifdef	EUC
 	if (!ismot(j) && i & ~0177) {
 		int	u = tr2un(i, fbits(j));
-		return iswalpha(u);
+		return hyext ? iswalnum(u) : iswalpha(u);
 	} else
 #endif	/* EUC */
 #endif	/* !NROFF */
-	if (!ismot(j) && i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z')
+	if (!ismot(j) && i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z' ||
+			hyext && i >= '0' && i <= '9')
 		return(1);
 	else
 		return(0);
@@ -427,6 +455,7 @@ casehylang(void)
 	if (dicthnj)
 		hnj_hyphen_free(dicthnj);
 	dicthnj = NULL;
+	hyext = 0;
 	skip(0);
 	do {
 		c = getach();
@@ -453,6 +482,7 @@ casehylang(void)
 	}
 	free(file);
 	free(path);
+	hyext = 1;
 }
 
 static void
