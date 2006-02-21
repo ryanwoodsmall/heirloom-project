@@ -1,4 +1,4 @@
-Release ...
+Release 060221
 * [nt]roff: With the ".hylang" request, the individual parts of words
   composed by "-" or "\(em" characters are now subject to hyphenation.
 * troff: The ".fspacewidth" request has been introduced to set the width
