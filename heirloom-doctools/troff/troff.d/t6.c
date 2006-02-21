@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.122 (gritter) 2/17/06
+ * Sccsid @(#)t6.c	1.123 (gritter) 2/21/06
  */
 
 /*
@@ -1723,13 +1723,13 @@ setpapersize(int setmedia)
 void
 casepapersize(void)
 {
-	return setpapersize(0);
+	setpapersize(0);
 }
 
 void
 casemediasize(void)
 {
-	return setpapersize(1);
+	setpapersize(1);
 }
 
 static void
@@ -1756,19 +1756,19 @@ cutat(struct box *bp)
 void
 casetrimat(void)
 {
-	return cutat(&trimat);
+	cutat(&trimat);
 }
 
 void
 casebleedat(void)
 {
-	return cutat(&bleedat);
+	cutat(&bleedat);
 }
 
 void
 casecropat(void)
 {
-	return cutat(&cropat);
+	cutat(&cropat);
 }
 
 static void
