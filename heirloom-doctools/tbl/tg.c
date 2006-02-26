@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tg.c	1.6 (gritter) 10/15/05
+ * Sccsid @(#)tg.c	1.7 (gritter) 2/26/06
  */
 
  /* tg.c: process included text blocks */
@@ -68,7 +68,7 @@ fprintf(tabout,".if \\n(.l<\\n(%d .ll \\n(%du\n", icol+CRIGHT, icol+CRIGHT);
 if (ctype(ilin,icol)=='a')
 	fprintf(tabout, ".ll -2n\n");
 fprintf(tabout, ".in 0\n");
-while (gets1(&line, &linesize))
+while (gets1(&line, &line, &linesize))
 	{
 	if (line[0]=='T' && line[1]=='}' && line[2]== tab) break;
 	if (match("T}", line)) break;

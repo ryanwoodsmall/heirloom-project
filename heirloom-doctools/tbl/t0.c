@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t0.c	1.6 (gritter) 10/15/05
+ * Sccsid @(#)t0.c	1.7 (gritter) 2/26/06
  */
 
  /* t0.c: storage allocation */
@@ -41,7 +41,7 @@ char *leftover = 0;
 int textflg = 0;
 int left1flg = 0;
 int rightl = 0;
-char *cstore, *cspace;
+char *cstore, *cspace, *cbase;
 char *last;
 struct colstr *table[MAXLIN];
 int style[MAXHEAD][MAXCOL];

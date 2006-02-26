@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t1.c	1.10 (gritter) 2/13/06
+ * Sccsid @(#)t1.c	1.11 (gritter) 2/26/06
  */
 
  /* t1.c: main control and input switching */
@@ -73,7 +73,7 @@ size_t linesize = 0;
 /* required by GCOS because "stdout" is set by troff preprocessor */
 tabin=stdin; tabout=stdout;
 setinp(argc,argv);
-while (gets1(&line, &linesize))
+while (gets1(&line, &line, &linesize))
 	{
 	fprintf(tabout, "%s\n",line);
 	if (prefix(".TS", line))

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.12 (gritter) 2/8/06
+ * Sccsid @(#)t..c	1.13 (gritter) 2/26/06
  */
 
 /* t..c : external declarations */
@@ -69,7 +69,7 @@ extern int left1flg;
 extern int rightl;
 struct colstr {char *col, *rcol;};
 extern struct colstr *table[];
-extern char *cspace, *cstore;
+extern char *cspace, *cstore, *cbase;
 extern char *exstore, *exlim;
 extern int sep[];
 extern int used[], lused[], rused[];
@@ -145,7 +145,7 @@ int domore(char *);
 void checkuse(void);
 int real(char *);
 char *chspace(void);
-void updspace(char *, char *);
+void updspace(char *, char *, int);
 int *alocv(int);
 void release(void);
 /* tc.c */
@@ -154,7 +154,7 @@ int point(int);
 /* te.c */
 void error(char *);
 char *errmsg(int);
-char *gets1(char **, size_t *);
+char *gets1(char **, char **, size_t *);
 void un1getc(int);
 int get1char(void);
 /* tf.c */

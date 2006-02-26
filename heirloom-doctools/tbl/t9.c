@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t9.c	1.6 (gritter) 10/15/05
+ * Sccsid @(#)t9.c	1.7 (gritter) 2/26/06
  */
 
  /* t9.c: write lines for tables over MAXLIN lines */
@@ -36,7 +36,7 @@ for(useln=nlin-1; useln>=0 && (fullbot[useln] || instead[useln]); useln--);
 if (useln<0)
 	error("Weird.  No real lines in table.");
 domore(leftover);
-while (gets1(&cspace, &linesize) && (cstore=cspace) && domore(cstore))
+while (gets1(&cbase, &cspace, &linesize) && (cstore=cspace) && domore(cstore))
 	;
 last =cstore;
 return;

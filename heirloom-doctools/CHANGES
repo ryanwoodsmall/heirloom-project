@@ -1,3 +1,7 @@
+Release ...
+* tbl: Storage space expansions because of long lines inside a table are
+  now done properly.
+
 Release 060221
 * [nt]roff: With the ".hylang" request, the individual parts of words
   composed by "-" or "\(em" characters are now subject to hyphenation.

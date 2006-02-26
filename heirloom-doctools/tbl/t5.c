@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t5.c	1.5 (gritter) 8/12/05
+ * Sccsid @(#)t5.c	1.6 (gritter) 2/26/06
  */
 
  /* t5.c: read data for table */
@@ -28,13 +28,13 @@ void
 gettbl(void)
 {
 int icol, ch;
-char *ocstore;
+char *ocbase;
 size_t linesize = MAXSTR;
-cstore=cspace= chspace();
+cbase=cstore=cspace= chspace();
 textflg=0;
-for (nlin=nslin=0; ocstore = cstore, gets1(&cstore, &linesize); nlin++)
+for (nlin=nslin=0; ocbase=cbase, gets1(&cbase, &cstore, &linesize); nlin++)
 	{
-	cspace += cstore - ocstore;
+	cspace += cbase - ocbase;
 	stynum[nlin]=nslin;
 	if (prefix(".TE", cstore))
 		{
@@ -117,7 +117,7 @@ for (nlin=nslin=0; ocstore = cstore, gets1(&cstore, &linesize); nlin++)
 	while (*cstore != '\0')
 		 cstore++;
 	if (cstore-cspace > MAXCHS)
-		cstore = cspace = chspace();
+		cbase = cstore = cspace = chspace();
 	}
 last = cstore;
 permute();

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tb.c	1.5 (gritter) 8/12/05
+ * Sccsid @(#)tb.c	1.6 (gritter) 2/26/06
  */
 
  /* tb.c: check which entries exist, also storage allocation */
@@ -84,12 +84,23 @@ if (pp == 0)
 return(pp);
 }
 void
-updspace(char *old, char *new)
+updspace(char *old, char *new, int area)
 {
-int i;
+int i, j, d = new - old;
 for (i = 0; i < spcount; i++)
 	if (spvecs[i] == old) {
 		spvecs[i] = new;
+		for (i = 0; i < nlin; i++) {
+			if (instead[i] >= old && instead[i] < &old[area])
+				instead[i] += d;
+			if (table[i])
+				for (j = 0; j <= ncol; j++)
+					if (table[i][j].col >= old &&
+					    table[i][j].col < &old[area])
+						table[i][j].col += d;
+		}
+		if (leftover >= old && leftover < &old[area])
+			leftover += d;
 		break;
 	}
 }

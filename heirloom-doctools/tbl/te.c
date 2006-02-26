@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)te.c	1.11 (gritter) 2/13/06
+ * Sccsid @(#)te.c	1.12 (gritter) 2/26/06
  */
 
  /* te.c: error message control, input line count */
@@ -45,7 +45,7 @@ errmsg(int errnum)
 	return (strerror(errnum));
 }
 char *
-gets1(char **sp, size_t *zp)
+gets1(char **bp, char **sp, size_t *zp)
 {
 char *s, *p = 0;
 int c, n = 0;
@@ -66,11 +66,13 @@ for (;;)
 			}
 		if (n + MAXCHS >= *zp)
 			{
+			int oz = *zp;
 			*zp = n + MAXCHS + 128;
-			if ((p = realloc(*sp, *zp))==NULL)
+			if ((p = realloc(*bp, *zp))==NULL)
 				error("Line too long");
-			updspace(*sp, p);
-			*sp = p;
+			updspace(*bp, p, oz);
+			*sp += p - *bp;
+			*bp = p;
 			}
 		if (c=='\n')
 			{
