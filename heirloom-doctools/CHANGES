@@ -3,6 +3,8 @@ Release ...
   now done properly.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
+* [nt]roff: The ".mc" request does not require an argument so no warning
+  is printed if it is given none.
 
 Release 060221
 * [nt]roff: With the ".hylang" request, the individual parts of words
