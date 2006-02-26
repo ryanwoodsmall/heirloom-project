@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.22 (gritter) 2/17/06
+ * Sccsid @(#)n4.c	1.23 (gritter) 2/26/06
  */
 
 /*
@@ -475,9 +475,9 @@ atoi()
 
 	illscale = 0;
 	n = atoi0();
-	if (nonumb && ch && ch != ' ' && ch != '\n' && warn & WARN_NUMBER &&
-			illscale == 0) {
-		c = cbits(ch);
+	c = cbits(ch);
+	if (nonumb && c && c != ' ' && c != '\n' && c != RIGHT &&
+			warn & WARN_NUMBER && illscale == 0) {
 		if ((c & ~0177) == 0 && isprint(c))
 			errprint("illegal number, char %c", c);
 		else
