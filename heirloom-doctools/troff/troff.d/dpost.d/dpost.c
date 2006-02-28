@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.137 (gritter) 2/19/06
+ * Sccsid @(#)dpost.c	1.138 (gritter) 2/28/06
  */
 
 /*
@@ -4322,7 +4322,7 @@ t_pdfmark(char *buf)
 			    "  /View [/XYZ -4 %g 0]\n"
 			    "/DEST pdfmark\n",
 			nBookmarks - 1,
-			pagelength - (lasty >= 0 ? vpos * 72.0 / res : 0));
+			pagelength - (lasty >= 0 ? vpos * 72.0 / res : -4));
 	} else
 		error(NON_FATAL, "unknown PDFMark attribute %s", buf);
 }

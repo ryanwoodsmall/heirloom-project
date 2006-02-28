@@ -5,6 +5,10 @@ Release ...
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
 * [nt]roff: The ".mc" request does not require an argument so no warning
   is printed if it is given none.
+* dpost: When a PDFMark Bookmark command is issued at the beginning of
+  a page of intermediate output before any text has been printed, the
+  value "4" is now substracted automatically to make the PDF viewer
+  show the whole page top including margin.
 
 Release 060221
 * [nt]roff: With the ".hylang" request, the individual parts of words
