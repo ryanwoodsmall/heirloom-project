@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)su.sl	1.24 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)su.sl	1.25 (gritter) 2/21/06";
 
 #include	"config.h"
 #include	<sys/types.h>
@@ -53,7 +53,9 @@ static const char sccsid[] USED = "@(#)su.sl	1.24 (gritter) 5/29/05";
 #include	<termios.h>
 #include	<limits.h>
 #include	<syslog.h>
-#ifdef	PAM
+#ifdef	__APPLE__
+#include	<pam/pam_appl.h>
+#elif	PAM
 #include	<security/pam_appl.h>
 #else	/* !PAM */
 #ifdef SHADOW_PWD

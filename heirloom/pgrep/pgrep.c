@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pgrep.sl	1.22 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)pgrep.sl	1.23 (gritter) 2/21/06";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -1095,15 +1095,11 @@ oneproc(struct proc *p, struct kinfo_proc *kp)
 	p->p_start = kp->kp_proc.p_starttime.tv_sec +
 		(kp->kp_proc.p_starttime.tv_usec >= 500000);
 
-        if (kp->kp_proc.p_stat == SZOMB) {
-                return; /* do not fetch more data for zombies */
-        }
-
 	error = task_for_pid(mach_task_self(), p->p_pid, &task);
 	if (error != KERN_SUCCESS) {
-		fprintf(stderr, "Error calling task_for_pid():%d\n", error);
-		exit(3);
+		return; /* no process, nothing to show/kill */
 	}
+
 	info_count = TASK_BASIC_INFO_COUNT;
 	error = task_info(task, TASK_BASIC_INFO, &task_binfo, &info_count);
 	if (error != KERN_SUCCESS) {
@@ -1123,9 +1119,6 @@ argproc(struct proc *p, struct kinfo_proc *kp)
 	long	nargs;
 	char	*ap, *pp;
 
-	if (kp->kp_proc.p_pid == 0)
-		return;
-
 	/* allocate a procargs space per process */
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_ARGMAX;
@@ -1140,10 +1133,8 @@ argproc(struct proc *p, struct kinfo_proc *kp)
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROCARGS2;
 	mib[2] = kp->kp_proc.p_pid;
-	if (sysctl(mib, 3, argbuf, &argsz, NULL, 0) == -1) {
-		/* process already left the system */
-		return;
-	}
+	if (sysctl(mib, 3, argbuf, &argsz, NULL, 0) == -1)
+		goto DONE; /* process has no args or already left the system */
 
 	/* the number of args is at offset 0, this works for 32 and 64bit */
 	memcpy(&nargs, argbuf, sizeof nargs);

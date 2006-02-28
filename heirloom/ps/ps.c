@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.110 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.111 (gritter) 2/28/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.110 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.111 (gritter) 2/28/06";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.110 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.111 (gritter) 2/28/06";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.110 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)ps.sl	2.111 (gritter) 2/28/06";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.110 (gritter) 1/22/06";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.111 (gritter) 2/28/06";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
 	&& !defined (__DragonFly__)
@@ -3545,6 +3545,10 @@ getproc(struct proc *p, struct kinfo_proc *kp)
 	p->p_euid = kp->kp_eproc.e_ucred.cr_uid;
 	p->p_gid = kp->kp_eproc.e_pcred.p_rgid;
 	p->p_egid = kp->kp_eproc.e_ucred.cr_gid;
+	p->p_start = kp->kp_proc.p_starttime.tv_sec +
+		(kp->kp_proc.p_starttime.tv_usec >= 500000);
+	p->p_addr = (unsigned long)kp->kp_proc.p_addr;
+	p->p_wchan = (unsigned long)kp->kp_proc.p_wchan;
 
 	if (p->p_lstate[0] == SZOMB) {
 		p->p_lstate[0] = 7;
@@ -3555,7 +3559,8 @@ getproc(struct proc *p, struct kinfo_proc *kp)
 	error = task_for_pid(mach_task_self(), pid, &task);
 	if (error != KERN_SUCCESS) {
 		/* process already left the system */
-		p->p_lstate[0] = 6; /* XXX good choice? */
+		p->p_lstate[0] = 7; /* handle exited process/task like zombie */
+		p->p_clname = "??"; /* will be used as nice value */
 		return;
 	}
 	info_count = TASK_BASIC_INFO_COUNT;
@@ -3610,7 +3615,7 @@ getproc(struct proc *p, struct kinfo_proc *kp)
 				p->p_clname = "RT";
 				p->p_policy = SCHED_RR;
 			}
-		break;
+			break;
 		case POLICY_FIFO :
 			info_count = POLICY_FIFO_INFO_COUNT;
 			error = task_info(task, TASK_SCHED_FIFO_INFO, &fifo, &info_count);
@@ -3620,7 +3625,7 @@ getproc(struct proc *p, struct kinfo_proc *kp)
 				p->p_clname = "FF";
 				p->p_policy = SCHED_FIFO;
 			}
-		break;
+			break;
 	}
 	p->p_nice = kp->kp_proc.p_nice;
 
@@ -3695,8 +3700,6 @@ getproc(struct proc *p, struct kinfo_proc *kp)
 	p->p_c = p->p_c / (TH_USAGE_SCALE/100);
 	p->p_pctcpu = p->p_c;
 
-	p->p_start = kp->kp_proc.p_starttime.tv_sec +
-		(kp->kp_proc.p_starttime.tv_usec >= 500000);
 	p->p_osz = task_binfo.virtual_size / pagesize;
 	p->p_orss = task_binfo.resident_size / pagesize;
 
@@ -3705,8 +3708,6 @@ getproc(struct proc *p, struct kinfo_proc *kp)
 	p->p_bufw = 0;
 	p->p_mrcv = task_events.messages_sent; /* Mach messages */
 	p->p_msnd = task_events.messages_received;
-	p->p_addr = (unsigned long)kp->kp_proc.p_addr;
-	p->p_wchan = (unsigned long)kp->kp_proc.p_wchan;
 	
 	mach_port_deallocate(mach_task_self(), task);
 }

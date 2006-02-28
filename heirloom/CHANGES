@@ -1,3 +1,8 @@
+Release ...
+* su: Works with PAM on Mac OS X now (Stefan Tramm).
+* ps: Handles dead processes as on other platforms now (Stefan Tramm).
+* pgrep: Ignores dead processes now (Stefan Tramm).
+
 Release 060122
 * The tools have been ported to Mac OS X 10.4.3 (patches by Stefan Tramm).
 * The tools have been ported to DragonFlyBSD 1.3.7-DEVELOPMENT.
