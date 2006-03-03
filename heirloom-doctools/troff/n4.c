@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.23 (gritter) 2/26/06
+ * Sccsid @(#)n4.c	1.24 (gritter) 3/3/06
  */
 
 /*
@@ -98,6 +98,7 @@ void
 setn(void)
 {
 	extern const char	revision[];
+	const char	*name;
 	register int i, j;
 	register tchar ii;
 	int	f;
@@ -114,7 +115,8 @@ setn(void)
 		f = 0;
 	if ((i = getsn()) == 0)
 		return;
-	if ((i & 0177) == '.')
+	name = macname(i);
+	if (i < 65536 && (i & 0177) == '.')
 		switch (i >> BYTE) {
 		case 's': 
 			i = fl = u2pts(pts);
@@ -233,7 +235,18 @@ setn(void)
 		default:
 			goto s0;
 		}
-	else {
+	else if (name[0] == '.') {
+		if (strcmp(&name[1], "warn") == 0)
+			i = warn;
+		else if (strcmp(&name[1], "vpt") == 0)
+			i = vpt;
+		else if (strcmp(&name[1], "ascender") == 0)
+			i = getascender();
+		else if (strcmp(&name[1], "descender") == 0)
+			i = getdescender();
+		else
+			goto s0;
+	} else {
 s0:
 		if ((j = _findr(i, 1)) == -1)
 			i = 0;

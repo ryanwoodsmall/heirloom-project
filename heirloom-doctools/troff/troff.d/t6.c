@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.123 (gritter) 2/21/06
+ * Sccsid @(#)t6.c	1.124 (gritter) 3/3/06
  */
 
 /*
@@ -295,6 +295,45 @@ abscw(int n)	/* return index of abs char n in fontab[], etc. */
 		if (codetab[xfont][i] == n)
 			return i;
 	return 0;
+}
+
+static int
+fvert2pts(int f, int s, int k)
+{
+	float	z;
+
+	if (k != 0) {
+		k = (k * u2pts(s) + (Unitwidth / 2)) / Unitwidth;
+		if (dev.anysize && xflag && (z = zoomtab[f]) != 0)
+			k *= z;
+	}
+	return k;
+}
+
+int
+getascender(void)
+{
+	struct afmtab	*a;
+	int	n;
+
+	if ((n = fontbase[font]->afmpos - 1) >= 0) {
+		a = afmtab[n];
+		return fvert2pts(font, pts, a->ascender);
+	} else
+		return 0;
+}
+
+int
+getdescender(void)
+{
+	struct afmtab	*a;
+	int	n;
+
+	if ((n = fontbase[font]->afmpos - 1) >= 0) {
+		a = afmtab[n];
+		return fvert2pts(font, pts, a->descender);
+	} else
+		return 0;
 }
 
 int

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.63 (gritter) 2/17/06
+ * Sccsid @(#)n1.c	1.64 (gritter) 3/3/06
  */
 
 /*
@@ -425,8 +425,6 @@ init2(void)
 	cvtime();
 	numtab[PID].val = getpid();
 	spreadlimit = 3*EM;
-	setnr(".warn", warn, 0);
-	setnr(".vpt", vpt, 0);
 	olinep = oline;
 	ioff = 0;
 	numtab[HP].val = init = 0;

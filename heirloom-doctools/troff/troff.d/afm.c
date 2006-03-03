@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.44 (gritter) 2/17/06
+ * Sccsid @(#)afm.c	1.45 (gritter) 3/3/06
  */
 
 #include <stdlib.h>
@@ -913,6 +913,12 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "CapHeight")) != NULL) {
 			a->capheight = strtol(th, NULL, 10);
+		} else if (state == FONTMETRICS &&
+				(th = thisword(cp, "Ascender")) != NULL) {
+			a->ascender = strtol(th, NULL, 10);
+		} else if (state == FONTMETRICS &&
+				(th = thisword(cp, "Descender")) != NULL) {
+			a->descender = strtol(th, NULL, 10);
 		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "StartCharMetrics")) != 0) {
 			n = strtol(th, NULL, 10);

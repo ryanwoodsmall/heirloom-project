@@ -507,6 +507,14 @@ New number registers
 \n[seconds]
 	prints the seconds portion of the current local time [0,60].
 
+\n[.ascender]
+	prints the ascender value of the current font scaled to the
+	current point size.
+
+\n[.descender]
+	prints the descender value of the current font scaled to the
+	current point size.
+
 \n[.vpt]
 	prints whether vertical position traps are enabled (1) or
 	disabled (0).

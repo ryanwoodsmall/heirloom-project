@@ -3,6 +3,9 @@ Release ...
   with most other versions of troff, but differs from Solaris troff.
 * tbl: Storage space expansions because of long lines inside a table are
   now done properly.
+* troff: The "\n[.ascender]" and "\n[.descender]" registers contain the
+  typical extents of the current font above and below the base line,
+  scaled to the current point size.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
 * [nt]roff: The ".mc" request does not require an argument so no warning
