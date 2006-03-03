@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.40 (gritter) 3/3/06
+ * Sccsid @(#)otf.c	1.41 (gritter) 3/3/06
  */
 
 #include <stdio.h>
@@ -2324,14 +2324,16 @@ get_OS_2(void)
 		fsType = -1;
 	if (table_directories[pos_OS_2].length >= 72) {
 		if (a) {
-			a->ascender = (int16_t)pbe16(&contents[o + 68]);
-			a->descender = (int16_t)pbe16(&contents[o + 70]);
+			a->ascender =
+				unitconv((int16_t)pbe16(&contents[o + 68]));
+			a->descender =
+				unitconv((int16_t)pbe16(&contents[o + 70]));
 		}
 	}
 	if (table_directories[pos_OS_2].length >= 92) {
 		if (a) {
-			a->xheight = pbe16(&contents[o + 88]);
-			a->capheight = pbe16(&contents[o + 90]);
+			a->xheight = unitconv(pbe16(&contents[o + 88]));
+			a->capheight = unitconv(pbe16(&contents[o + 90]));
 		}
 	} else {
 	dfl:	if (a) {
