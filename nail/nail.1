@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.314 (gritter) 10/4/05
+.\"     Sccsid: @(#)nail.1	2.315 (gritter) 3/3/06
 .\"
-.TH NAIL 1 "10/4/05" "nail 11.26" "User Commands"
+.TH NAIL 1 "3/3/06" "nail 11.26" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -3414,6 +3414,16 @@ from their beginning on. This mode is configured by assigning
 to the
 .I smtp
 variable.
+.IP
+The SMTP transfer is executed in a child process;
+unless either the
+.I sendwait
+or the
+.I verbose
+variable is set,
+this process runs asynchronously.
+If it receives a TERM signal,
+it will abort and save the message to the `dead.letter' file.
 .TP
 .B smtp-auth
 Sets the SMTP authentication method.
@@ -3658,8 +3668,7 @@ to print `(Interrupt -- one more to kill letter)'.
 Typing a second
 \s-2RUBOUT\s0 causes
 .I nail
-to save your partial letter on the file
-.I dead.letter
+to save your partial letter on the file `dead.letter'
 in your home directory and abort the letter.
 Once you have
 sent mail to someone, there is no way to undo the act, so be

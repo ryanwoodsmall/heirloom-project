@@ -5,6 +5,9 @@
 * The new "-S variable[=value]" command line option sets the internal option
   "variable", and, in case of a string option, assigns "value" to it (based
   on a request by Dmitry Butskoy).
+* When a TERM signal is sent to the SMTP transfer child process, it will
+  abort and save the message to the "dead.letter" file (proposed by
+  Perry Hutchison).
 * Use of the "resend" command with multiple messages at once now works as
   documented (bug reported by Svend Sorensen).
 * When the "next" or newline command is typed as the first command after a
