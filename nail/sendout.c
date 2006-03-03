@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.89 (gritter) 10/18/05";
+static char sccsid[] = "@(#)sendout.c	2.90 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -749,7 +749,10 @@ start_mta(struct name *to, struct name *mailargs, FILE *input,
 	pid_t pid;
 	sigset_t nset;
 	char *cp, *smtp;
+	char	*user = NULL, *password = NULL, *skinned = NULL;
 	enum okay	ok = STOP;
+	struct termios	otio;
+	int	reset_tio;
 
 	if ((smtp = value("smtp")) == NULL) {
 		args = unpack(cat(mailargs, to));
@@ -761,6 +764,13 @@ start_mta(struct name *to, struct name *mailargs, FILE *input,
 			printf("\n");
 			return OKAY;
 		}
+	}
+	if (smtp != NULL) {
+		skinned = skin(myorigin(hp));
+		if ((user = smtp_auth_var("-user", skinned)) != NULL &&
+				(password = smtp_auth_var("-password",
+					skinned)) == NULL)
+			password = getpassword(&otio, &reset_tio, NULL);
 	}
 	/*
 	 * Fork, set up the temporary mail file as standard
@@ -784,7 +794,8 @@ start_mta(struct name *to, struct name *mailargs, FILE *input,
 		freopen("/dev/null", "r", stdin);
 		if (smtp != NULL) {
 			prepare_child(&nset, 0, 1);
-			if (smtp_mta(smtp, to, input, hp) == 0)
+			if (smtp_mta(smtp, to, input, hp,
+					user, password, skinned) == 0)
 				_exit(0);
 		} else {
 			prepare_child(&nset, fileno(input), -1);

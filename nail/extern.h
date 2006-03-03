@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.157 (gritter) 10/18/05
+ *	Sccsid @(#)extern.h	2.158 (gritter) 3/4/06
  */
 
 /* aux.c */
@@ -470,7 +470,9 @@ enum okay resend_msg(struct message *mp, struct name *to, int add_resent);
 char *nodename(int mayoverride);
 char *myaddrs(struct header *hp);
 char *myorigin(struct header *hp);
-int smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp);
+char *smtp_auth_var(const char *type, const char *addr);
+int smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp,
+		const char *user, const char *password, const char *skinned);
 /* ssl.c */
 void ssl_set_vrfy_level(const char *uhp);
 enum okay ssl_vrfy_decide(void);

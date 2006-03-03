@@ -5,6 +5,10 @@
 * The new "-S variable[=value]" command line option sets the internal option
   "variable", and, in case of a string option, assigns "value" to it (based
   on a request by Dmitry Butskoy).
+* If the "smtp-auth-user" variable is set but neither "smtp-auth-password"
+  nor a matching "smtp-auth-password-user@host" can be found, the user is
+  asked for the SMTP AUTH password on the terminal (proposed by
+  Svend Sorensen).
 * When a TERM signal is sent to the SMTP transfer child process, it will
   abort and save the message to the "dead.letter" file (proposed by
   Perry Hutchison).

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.36 (gritter) 3/3/06";
+static char sccsid[] = "@(#)smtp.c	2.37 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -166,13 +166,13 @@ myorigin(struct header *hp)
 
 #ifdef	HAVE_SOCKETS
 
-static char *auth_var(const char *type, const char *addr);
 static int read_smtp(struct sock *sp, int value);
 static int talk_smtp(struct name *to, FILE *fi, struct sock *sp,
-		char *server, char *uhp, struct header *hp);
+		char *server, char *uhp, struct header *hp,
+		const char *user, const char *password, const char *skinned);
 
-static char *
-auth_var(const char *type, const char *addr)
+char *
+smtp_auth_var(const char *type, const char *addr)
 {
 	char	*var, *cp;
 	int	len;
@@ -244,19 +244,17 @@ read_smtp(struct sock *sp, int value)
  */
 static int
 talk_smtp(struct name *to, FILE *fi, struct sock *sp,
-		char *xserver, char *uhp, struct header *hp)
+		char *xserver, char *uhp, struct header *hp,
+		const char *user, const char *password, const char *skinned)
 {
 	struct name *n;
 	char *b = NULL, o[LINESIZE];
 	size_t blen, bsize = 0, count;
-	char	*user, *password, *b64, *skinned, *authstr, *cp;
+	char	*b64, *authstr, *cp;
 	enum	{ AUTH_NONE, AUTH_LOGIN, AUTH_CRAM_MD5 } auth;
 	int	inhdr = 1, inbcc = 0;
 
-	skinned = skin(myorigin(hp));
-	user = auth_var("-user", skinned);
-	password = auth_var("-password", skinned);
-	if ((authstr = auth_var("", skinned)) == NULL)
+	if ((authstr = smtp_auth_var("", skinned)) == NULL)
 		auth = user && password ? AUTH_LOGIN : AUTH_NONE;
 	else if (strcmp(authstr, "login") == 0)
 		auth = AUTH_LOGIN;
@@ -400,7 +398,8 @@ onterm(int signo)
  * Connect to a SMTP server.
  */
 int
-smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp)
+smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp,
+		const char *user, const char *password, const char *skinned)
 {
 	struct sock	so;
 	int	use_ssl, ret;
@@ -432,7 +431,8 @@ smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp)
 		return 1;
 	}
 	so.s_desc = "SMTP";
-	ret = talk_smtp(to, fi, &so, server, server, hp);
+	ret = talk_smtp(to, fi, &so, server, server, hp,
+			user, password, skinned);
 	if (!debug && !_debug)
 		sclose(&so);
 	if (smtpbuf) {
@@ -445,7 +445,8 @@ smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp)
 }
 #else	/* !HAVE_SOCKETS */
 int
-smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp)
+smtp_mta(char *server, struct name *to, FILE *fi, struct header *hp,
+		const char *user, const char *password, const char *skinned)
 {
 	fputs(catgets(catd, CATSET, 194,
 			"No SMTP support compiled in.\n"), stderr);

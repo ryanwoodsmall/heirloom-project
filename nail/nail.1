@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)nail.1	2.315 (gritter) 3/3/06
+.\"     Sccsid: @(#)nail.1	2.316 (gritter) 3/4/06
 .\"
-.TH NAIL 1 "3/3/06" "nail 11.26" "User Commands"
+.TH NAIL 1 "3/4/06" "nail 11.26" "User Commands"
 .SH NAME
 nail \- send and receive Internet mail
 .SH SYNOPSIS
@@ -3428,7 +3428,7 @@ it will abort and save the message to the `dead.letter' file.
 .B smtp-auth
 Sets the SMTP authentication method.
 If set to `login',
-or if unset and both smtp-auth-user and smtp-auth-password are set,
+or if unset and smtp-auth-user is set,
 AUTH LOGIN is used.
 If set to `cram-md5',
 AUTH CRAM-MD5 is used.
@@ -3460,6 +3460,14 @@ variable.
 Sets the global user name for SMTP AUTH.
 Both user and password have to be given
 for AUTH LOGIN and AUTH CRAM-MD5.
+.IP
+If this variable is set but neither
+.I smtp-auth-password
+or a matching
+.I smtp-auth-password-user@host
+can be found,
+.I nail
+will as for a password on the user's terminal.
 .TP
 \fBsmtp-auth-user-\fIuser\fB@\fIhost\fR
 Overrides
