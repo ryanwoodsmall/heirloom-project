@@ -1,4 +1,6 @@
 Release ...
+* [nt]roff: Hyphenation is now enabled by default. This is compatible
+  with most other versions of troff, but differs from Solaris troff.
 * tbl: Storage space expansions because of long lines inside a table are
   now done properly.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is

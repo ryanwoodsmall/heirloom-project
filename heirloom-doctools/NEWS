@@ -227,9 +227,7 @@ New and extended requests
 	files to the directory /usr/ucblib/doctools/hyphen; see the notes
 	in "troff/libhnj/hyphen.d" for details. If no "language" argument
 	is present, the hyphenation is reset to the traditional troff
-	mechanism. Note that hyphenation is disabled by default if troff
-	is used directly, and can be switched on using the ".hy" request,
-	which is what many macro packages do.
+	mechanism.
 	  This request also makes parts of words composed by "-" or
 	"\(em" characters subject to hyphenation. Traditionally, the only
 	hyphenation points in such words had been the hyphens/dashes.
@@ -675,4 +673,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   2/19/06
+Gunnar Ritter                                                   3/3/06
