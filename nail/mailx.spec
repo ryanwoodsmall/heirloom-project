@@ -1,16 +1,16 @@
-# Sccsid @(#)nail.spec	1.33 (gritter) 7/12/05
+# Sccsid @(#)mailx.spec	1.34 (gritter) 3/4/06
 
 %define	use_nss	0
 %define	mozilla_version	1.6
 
 Summary: An enhanced implementation of the mailx command
-Name: nail
+Name: mailx
 Version: 11.5
 Release: 1
 License: BSD
 Group: Applications/Internet
 Source: %{name}-%{version}.tar.bz2
-URL: <http://nail.sourceforge.net>
+URL: <http://heirloom.sourceforge.net/mailx.html>
 Vendor: Gunnar Ritter <gunnarr@acm.org>
 Packager: Didar Hussain <dhs@rediffmail.com>
 BuildRoot: %{_tmppath}/%{name}-root
@@ -24,8 +24,8 @@ BuildRequires: /usr/include/mozilla-%{mozilla_version}/nss/cms.h
 %endif
 
 %description
-Nail is derived from Berkeley Mail and is intended provide the 
-functionality of the POSIX mailx command with additional support
+Heirloom mailx is derived from Berkeley Mail and is intended provide
+the functionality of the POSIX mailx command with additional support
 for MIME messages, IMAP, POP3, and SMTP. It provides enhanced
 features for interactive use, such as caching and disconnected
 operation for IMAP, message threading, scoring, and filtering.
@@ -69,7 +69,7 @@ make %{makeflags}
 
 %install
 make DESTDIR=%{buildroot} %{makeflags} install
-gzip -9 %{buildroot}/%{mandir}/man1/nail.1
+gzip -9 %{buildroot}/%{mandir}/man1/mailx.1
 
 %clean
 cd ..; rm -rf %{_builddir}/%{name}-%{version}
@@ -79,5 +79,5 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc COPYING AUTHORS INSTALL README TODO ChangeLog
 %config(noreplace) /etc/nail.rc
-%{bindir}/nail
-%{mandir}/man1/nail*
+%{bindir}/mailx
+%{mandir}/man1/mailx*
