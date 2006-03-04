@@ -1,6 +1,6 @@
-#define	V	"11.26pre"
+#define	V	"12.0"
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.340 (gritter) 3/4/06";
+static char sccsid[] = "@(#)version.c	2.341 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -48,13 +48,13 @@ static char sccsid[] = "@(#)version.c	2.340 (gritter) 3/4/06";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = "nail " V " 3/4/06";
+const char *version = V " 3/4/06";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)nail " V " 3/4/06";
+= "@(#)mailx " V " (gritter) 3/4/06";
 #endif	/* !lint */
 /* SLIST */
 /*

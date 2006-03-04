@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -69,7 +69,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap_gssapi.c	1.9 (gritter) 10/2/04";
+static char sccsid[] = "@(#)imap_gssapi.c	1.10 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 

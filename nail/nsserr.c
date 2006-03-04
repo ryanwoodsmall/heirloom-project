@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2005 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -27,7 +27,7 @@
  * Contributor(s):
  */
 
-/*	"@(#)nsserr.c	1.2 (gritter) 2/12/05"	*/
+/*	"@(#)nsserr.c	1.3 (gritter) 3/4/06"	*/
 
 #include <sslerr.h>
 #include <secerr.h>

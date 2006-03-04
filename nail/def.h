@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)def.h	2.103 (gritter) 7/29/05
+ *	Sccsid @(#)def.h	2.104 (gritter) 3/4/06
  */
 
 /*
@@ -321,9 +321,9 @@ struct message {
 /*
  * Given a file address, determine the block number it represents.
  */
-#define nail_blockof(off)		((int) ((off) / 4096))
-#define nail_offsetof(off)		((int) ((off) % 4096))
-#define nail_positionof(block, offset)	((off_t)(block) * 4096 + (offset))
+#define mailx_blockof(off)		((int) ((off) / 4096))
+#define mailx_offsetof(off)		((int) ((off) % 4096))
+#define mailx_positionof(block, offset)	((off_t)(block) * 4096 + (offset))
 
 /*
  * Argument types.

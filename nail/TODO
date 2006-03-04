@@ -1,4 +1,4 @@
-Before you start making additions to nail, subscribe to the development
+Before you start making additions to mailx, subscribe to the development
 mailing list at <https://lists.sourceforge.net/lists/listinfo/nail-devel>
 to coordinate your efforts with the maintainer and other people.
 
@@ -48,12 +48,12 @@ personally not going to implement this as X Window Copy-and-Paste
 satisfies me. But if you desparately need it, you're invited to
 contribute code. You can't use libreadline, though, because its
 license is incompatible, and I insist that your implementation
-is done in a way that a) nail can still be compiled without
+is done in a way that a) mailx can still be compiled without
 requiring any further libraries (i. e. your code is optional)
 and b) your code works for all kinds of terminals, not just
 VT100/ANSI ones.
 
-Nail will not support 'Return-Receipt-To' or 'Disposition-Notification-To'
+Mailx will not support 'Return-Receipt-To' or 'Disposition-Notification-To'
 header fields, neither for the sending nor for the receiving part.
 For the sending part it plainly doesn't work because one wants to
 know whether the human recipient has read the mail and not if he
@@ -62,4 +62,4 @@ window. For the receiving part, it is simply annoying. If you want
 a confirmation, ask the recipient to send one in the body of the
 message.
 
-	Gunnar Ritter					11/6/04
+	Gunnar Ritter					3/4/06

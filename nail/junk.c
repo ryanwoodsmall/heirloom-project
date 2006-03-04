@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.72 (gritter) 7/14/05";
+static char sccsid[] = "@(#)junk.c	1.73 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -210,7 +210,7 @@ enum entry {
 };
 
 static const char	README1[] = "\
-This is a junk mail database maintained by nail(1). It does not contain any\n\
+This is a junk mail database maintained by mailx(1). It does not contain any\n\
 of the actual words found in your messages. Instead, parts of MD5 hashes are\n\
 used for lookup. It is thus possible to tell if some given word was likely\n\
 contained in your mail from examining this data, at best.\n";

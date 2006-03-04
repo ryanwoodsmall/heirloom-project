@@ -1,9 +1,10 @@
-# This is the configuration file for nail, a mail user agent.
-# See nail(1) for further options.
+# This is the configuration file for Heirloom mailx (formerly
+# known under the name "nail".
+# See mailx(1) for further options.
 # This file is not overwritten when 'make install' is run in
-# the nail build process again.
+# the mailx build process again.
 
-# Sccsid @(#)nail.rc	2.9 (gritter) 1/15/05
+# Sccsid @(#)nail.rc	2.10 (gritter) 3/4/06
 
 # Do not forward to mbox by default since this is likely to be
 # irritating for most users today.

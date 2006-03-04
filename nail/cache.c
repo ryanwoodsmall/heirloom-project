@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cache.c	1.60 (gritter) 7/24/05";
+static char sccsid[] = "@(#)cache.c	1.61 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -81,7 +81,7 @@ static const char	infofmt[] = "%c %lu %u %lu %lu";
 	((f) & (MSAVED|MDELETED|MREAD|MBOXED|MNEW|MFLAGGED|MANSWERED|MDRAFTED))
 
 static const char	README1[] = "\
-This is a cache directory maintained by nail(1). You should not change any\n\
+This is a cache directory maintained by mailx(1). You should not change any\n\
 files within. Nevertheless, the structure is as follows: Each subdirectory\n\
 of the current directory represents an IMAP account, and each subdirectory\n\
 below that represents a mailbox. Each mailbox directory contains a file\n\
@@ -97,12 +97,13 @@ Files named QUEUE contain data that will be sent do the IMAP server next\n\
 time a connection is made in online mode.\n";
 static const char	README4[] = "\n\
 You can safely delete any file or directory here, unless it contains a QUEUE\n\
-file that is not empty; nail(1) will download the data again and will also\n\
+file that is not empty; mailx(1) will download the data again and will also\n\
 write new cache entries if configured in this way. If you do not wish to use\n\
 the cache anymore, delete the entire directory and unset the 'imap-cache'\n\
-variable in nail(1).\n";
+variable in mailx(1).\n";
 static const char	README5[] = "\n\
-For more information about nail(1), visit <http://nail.sourceforge.net>.\n";
+For more information about mailx(1), visit\n\
+<http://heirloom.sourceforge.net/mailx.html>.\n";
 
 static char *
 encname(struct mailbox *mp, const char *name, int same, const char *box)
@@ -212,8 +213,8 @@ success:
 		goto fail;
 	m->m_size = size;
 	m->m_lines = lines;
-	m->m_block = nail_blockof(offset);
-	m->m_offset = nail_offsetof(offset);
+	m->m_block = mailx_blockof(offset);
+	m->m_offset = mailx_offsetof(offset);
 flags:	if (setflags) {
 		m->m_xsize = xsize;
 		m->m_time = xtime;

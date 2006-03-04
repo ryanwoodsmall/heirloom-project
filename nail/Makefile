@@ -1,5 +1,5 @@
 #
-# Makefile for nail
+# Makefile for mailx
 #
 
 #
@@ -81,10 +81,10 @@ OBJ = aux.o base64.o cache.o cmd1.o cmd2.o cmd3.o cmdtab.o collect.o \
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(FEATURES) $(INCLUDES) $(WARN) \
 		$(LDFLAGS) $< `grep '^[^#]' LIBS` $(LIBS) -o $@
 
-all: nail
+all: mailx
 
-nail: $(OBJ) LIBS
-	$(CC) $(LDFLAGS) $(OBJ) `grep '^[^#]' LIBS` $(LIBS) -o nail
+mailx: $(OBJ) LIBS
+	$(CC) $(LDFLAGS) $(OBJ) `grep '^[^#]' LIBS` $(LIBS) -o mailx
 
 $(OBJ): config.h def.h extern.h glob.h rcv.h
 imap.o: imap_gssapi.c
@@ -96,15 +96,15 @@ config.h LIBS:
 
 install: all
 	test -d $(DESTDIR)$(BINDIR) || mkdir -p $(DESTDIR)$(BINDIR)
-	$(UCBINSTALL) -c -s nail $(DESTDIR)$(BINDIR)/nail
+	$(UCBINSTALL) -c -s mailx $(DESTDIR)$(BINDIR)/mailx
 	test -d $(DESTDIR)$(MANDIR)/man1 || mkdir -p $(DESTDIR)$(MANDIR)/man1
-	$(UCBINSTALL) -c -m 644 nail.1 $(DESTDIR)$(MANDIR)/man1/nail.1
+	$(UCBINSTALL) -c -m 644 mailx.1 $(DESTDIR)$(MANDIR)/man1/mailx.1
 	test -d $(DESTDIR)$(SYSCONFDIR) || mkdir -p $(DESTDIR)$(SYSCONFDIR)
 	test -f $(DESTDIR)$(MAILRC) || \
 		$(UCBINSTALL) -c -m 644 nail.rc $(DESTDIR)$(MAILRC)
 
 clean:
-	rm -f $(OBJ) nail *~ core log
+	rm -f $(OBJ) mailx *~ core log
 
 mrproper: clean
 	rm -f config.h config.log LIBS

@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.216 (gritter) 8/25/05";
+static char sccsid[] = "@(#)imap.c	1.217 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -1360,8 +1360,8 @@ imap_fetchdata(struct mailbox *mp, struct message *m, size_t expected,
 	if (m != NULL) {
 		m->m_size = size + headsize;
 		m->m_lines = lines + headlines;
-		m->m_block = nail_blockof(offset);
-		m->m_offset = nail_offsetof(offset);
+		m->m_block = mailx_blockof(offset);
+		m->m_offset = mailx_offsetof(offset);
 		switch (need) {
 		case NEED_HEADER:
 			m->m_have |= HAVE_HEADER;
@@ -1398,8 +1398,8 @@ imap_putstr(struct mailbox *mp, struct message *m, const char *str,
 	if (m != NULL) {
 		m->m_size = headsize + len;
 		m->m_lines = headlines + 1;
-		m->m_block = nail_blockof(offset);
-		m->m_offset = nail_offsetof(offset);
+		m->m_block = mailx_blockof(offset);
+		m->m_offset = mailx_offsetof(offset);
 		m->m_have |= HAVE_HEADER|HAVE_BODY;
 		m->m_xlines = m->m_lines;
 		m->m_xsize = m->m_size;
@@ -1456,7 +1456,7 @@ imap_get(struct mailbox *mp, struct message *m, enum needspec need)
 		if (m->m_flag & HAVE_HEADER && m->m_size) {
 			char	*hdr = smalloc(m->m_size);
 			fflush(mp->mb_otf);
-			if (fseek(mp->mb_itf, (long)nail_positionof(m->m_block,
+			if (fseek(mp->mb_itf, (long)mailx_positionof(m->m_block,
 						m->m_offset), SEEK_SET) < 0 ||
 					fread(hdr, 1, m->m_size, mp->mb_itf)
 						!= m->m_size) {
@@ -2755,8 +2755,8 @@ imap_appenduid(struct mailbox *mp, FILE *fp, time_t t, long off1,
 	memset(&xm, 0, sizeof xm);
 	xm.m_flag = flag&MREAD | MNEW;
 	xm.m_time = t;
-	xm.m_block = nail_blockof(off1);
-	xm.m_offset = nail_offsetof(off1);
+	xm.m_block = mailx_blockof(off1);
+	xm.m_offset = mailx_offsetof(off1);
 	xm.m_size = size;
 	xm.m_xsize = xsize;
 	xm.m_lines = xm.m_xlines = lines;

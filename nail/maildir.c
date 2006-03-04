@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.18 (gritter) 7/5/05";
+static char sccsid[] = "@(#)maildir.c	1.19 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -187,9 +187,9 @@ maildir_setfile1(const char *name, int newmail, int omsgCount)
 
 /*
  * In combination with the names from mkname(), this comparison function
- * ensures that the order of messages in a maildir folder created by nail
+ * ensures that the order of messages in a maildir folder created by mailx
  * remains always the same. In effect, if a mbox folder is transferred to
- * a maildir folder by 'copy *', the order of the messages in nail will
+ * a maildir folder by 'copy *', the order of the messages in mailx will
  * not change.
  */
 static int 
@@ -365,8 +365,8 @@ readin(const char *name, struct message *m)
 	fflush(mb.mb_otf);
 	m->m_size = m->m_xsize = size;
 	m->m_lines = m->m_xlines = lines;
-	m->m_block = nail_blockof(offset);
-	m->m_offset = nail_offsetof(offset);
+	m->m_block = mailx_blockof(offset);
+	m->m_offset = mailx_offsetof(offset);
 	free(buf);
 	substdate(m);
 }

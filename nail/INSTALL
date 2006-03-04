@@ -1,5 +1,5 @@
-How to configure and install nail
-=================================
+How to configure and install mailx
+==================================
 
 Quick start
 -----------
@@ -19,9 +19,9 @@ Path names are configurable as Makefile variables:
 
 PREFIX          The default Makefile puts BINDIR and MANDIR below this.
 
-BINDIR          The nail binary is installed there.
+BINDIR          The mailx binary is installed there.
 
-MANDIR          The nail manual page is put in $(MANDIR)/man1.
+MANDIR          The mailx manual page is put in $(MANDIR)/man1.
 
 SYSCONFDIR      nail.rc is installed in this directory unless it already
                 exists.
@@ -33,7 +33,7 @@ MAILSPOOL       The directory where the mail files of users are stored
 SENDMAIL        Path to the de-facto standard /usr/lib/sendmail interface
                 normally offered by Unix MTAs. If only SMTP is used to send
                 mail, the value does not matter. Note that if you want to
-                use the '-r' option in nail, the sendmail interface must
+                use the '-r' option in mailx, the sendmail interface must
                 support the '-r' option too.
 
 DESTDIR         Prepended to BINDIR, MANDIR etc. at 'make install'. Mostly
@@ -42,7 +42,7 @@ DESTDIR         Prepended to BINDIR, MANDIR etc. at 'make install'. Mostly
 UCBINSTALL      Path name to a BSD-style install, like /usr/ucb/install on
                 SVR4 or GNU install.
 
-Nail uses a simple shell script named 'makeconfig' to check for header
+Mailx uses a simple shell script named 'makeconfig' to check for header
 files and library functions. It is automatically invoked by 'make all'.
 The script generates three files, 'config.h', 'LIBS', and 'config.log'.
 'config.h' is included as usual, 'LIBS' contains options for the linker,
@@ -103,17 +103,17 @@ Transition remarks concerning the old configure system
 * --prefix and other common configure options: Path names can be specified
   in the Makefile or as assignment arguments to make.
 
-* --with-openssl: No longer available. Nail is always built with OpenSSL
-  support if possible. If you really want to have a nail binary without
+* --with-openssl: No longer available. Mailx is always built with OpenSSL
+  support if possible. If you really want to have a mailx binary without
   OpenSSL support, edit config.h after running 'make config.h'.
 
 * --enable-all-chars: No longer available at compile time. 'print-all-chars'
-  can be set in nail in those cases where use of this option was necessary.
+  can be set in mailx in those cases where use of this option was necessary.
 
 * --with-rcfile, --with-mailspool, --with-sendmail: These path names can
   be set in the Makefile or as arguments to make.
 
-* --with-csh: No longer used. Nail now uses /bin/sh for executing commands
+* --with-csh: No longer used. Mailx now uses /bin/sh for executing commands
   if the SHELL variable is not set.
 
 * --with-more, --with-pg, --with-ed, --with-vi: No longer available. If the
@@ -130,10 +130,10 @@ In short, if you were using
 
 up to now, replace it by
 
-        make PREFIX=/opt/nail SYSCONFDIR=/opt/nail/etc
+        make PREFIX=/opt/mailx SYSCONFDIR=/opt/mailx/etc
 
 The DESTDIR variable for building packages is available as before.
-If you intend to build nail packages, a look at 'nail.spec' might
+If you intend to build mailx packages, a look at 'mailx.spec' might
 be helpful - even if you don't use RPM, the process is likely to
 be similar.
 
@@ -143,7 +143,7 @@ Why autoconf/automake are no longer used
 
 Autoconf and automake are systems of considerable complexity which
 one must know well to make real use of them. The autoconf/automake
-scripts for nail were supplied by a contributor in 2000 and were
+scripts for mailx were supplied by a contributor in 2000 and were
 out of date as of 2004; they wouldn't work with recent versions of
 automake, in particular. But I'm not very interested in learning
 automake myself, and I'm absolutely not interested in keeping such
@@ -162,7 +162,7 @@ it, no special versions of third-party tools are needed. Every serious
 developer should understand the advantage (except perhaps some GNU
 addicts who have learned and installed all versions of automake anyway).
 
-For the user who just wants to build nail, the new system is not more
+For the user who just wants to build mailx, the new system is not more
 complicated than the old one; transition mostly involves passing path
 names to make instead of passing them to configure. (It's not even an
 argument that the user needs to know the names of Makefile variables;
@@ -178,13 +178,13 @@ Building S/MIME and SSL/TLS support using Mozilla NSS
 It is possible to build encryption support using Mozilla NSS instead
 of OpenSSL. Doing so has both advantages and disadvantages:
 
-- With NSS, nail can use the same key and certificate databases as the
+- With NSS, mailx can use the same key and certificate databases as the
   Mozilla applications (Mozilla Suite, Firefox, Thunderbird). This makes
   it possible to install and configure certificates at one central location.
-  Note that running nail and Mozilla at the same time from one certificate
-  directory may result in 'Bad database' errors in nail if Mozilla modifies
-  the configuration files (nail never modifies them). If you encounter such
-  problems, create a copy of the .db files for exclusive use with nail.
+  Note that running mailx and Mozilla at the same time from one certificate
+  directory may result in 'Bad database' errors in mailx if Mozilla modifies
+  the configuration files (mailx never modifies them). If you encounter such
+  problems, create a copy of the .db files for exclusive use with mailx.
 
 - OpenSSL offers more transparent control over certificates. While it is
   possible to modify the NSS databases using command line utilities (see
@@ -196,7 +196,7 @@ of OpenSSL. Doing so has both advantages and disadvantages:
   supports version 2.
 
 - Building OpenSSL is much easier than building NSS for use with non-Mozilla
-  applications like nail.
+  applications like mailx.
 
 To build using NSS, you need both the NSS and the NSPR libraries/include
 files from the Mozilla project. If you are using a Linux distribution,
@@ -214,7 +214,7 @@ updated as often as the Mozilla end-user applications in recent times (but you
 should watch for possible future security fixes regardless, of course.)
 
 If you have these RPMs installed, you can uncomment the marked lines in either
-the Makefile or in nail.spec. Nail should then build cleanly with NSS support
+the Makefile or in mailx.spec. Mailx should then build cleanly with NSS support
 included, and that's all.
 
 On recent Solaris versions, NSS and NSPR are available in the packages
@@ -239,4 +239,4 @@ simply assumes that you want to build NSS if it manages to build the test
 executable.
 
 
-        Gunnar Ritter                                   6/28/05
+        Gunnar Ritter                                   3/4/06

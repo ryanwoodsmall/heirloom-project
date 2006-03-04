@@ -1,5 +1,10 @@
-[11.26] released ...
-* Nail no longer prints a space before the address in "MAIL FROM:<xxx>" and
+[12.0] released 3/4/06
+* The program has been integrated into the Heirloom project as "mailx". The
+  new project homepage is at <http://heirloom.sourceforge.net/mailx.html>.
+  The name "nail" will persist in some places, and the mailing list will
+  remain with the same address for now. If you want to continue to call
+  the program as "nail", create a symbolic link to "mailx".
+* Mailx no longer prints a space before the address in "MAIL FROM:<xxx>" and
   "RCPT TO:<xxx>" in SMTP. This should make it work with Sendmail X (bugs
   reported by Stephane Lentz and Claus Assmann).
 * The new "-S variable[=value]" command line option sets the internal option

@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ssl.c	1.37 (gritter) 7/15/05";
+static char sccsid[] = "@(#)ssl.c	1.38 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -337,8 +337,8 @@ smime_decrypt_assemble(struct message *m, FILE *hp, FILE *bp)
 	}
 	x->m_size = x->m_xsize = octets;
 	x->m_lines = x->m_xlines = lines;
-	x->m_block = nail_blockof(offset);
-	x->m_offset = nail_offsetof(offset);
+	x->m_block = mailx_blockof(offset);
+	x->m_offset = mailx_offsetof(offset);
 	return x;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.82 (gritter) 3/22/05";
+static char sccsid[] = "@(#)send.c	2.83 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -806,8 +806,8 @@ newpart(struct mimepart *ip, struct mimepart **np, off_t offs, int *part)
 	*np = csalloc(1, sizeof **np);
 	(*np)->m_flag = MNOFROM;
 	(*np)->m_have = HAVE_HEADER|HAVE_BODY;
-	(*np)->m_block = nail_blockof(offs);
-	(*np)->m_offset = nail_offsetof(offs);
+	(*np)->m_block = mailx_blockof(offs);
+	(*np)->m_offset = mailx_offsetof(offs);
 	if (part) {
 		(*part)++;
 		sz = ip->m_partstring ? strlen(ip->m_partstring) : 0;
@@ -833,7 +833,7 @@ endpart(struct mimepart **np, off_t xoffs, long lines)
 {
 	off_t	offs;
 
-	offs = nail_positionof((*np)->m_block, (*np)->m_offset);
+	offs = mailx_positionof((*np)->m_block, (*np)->m_offset);
 	(*np)->m_size = (*np)->m_xsize = xoffs - offs;
 	(*np)->m_lines = (*np)->m_xlines = lines;
 	*np = NULL;
@@ -867,8 +867,8 @@ parse822(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 	np = csalloc(1, sizeof *np);
 	np->m_flag = MNOFROM;
 	np->m_have = HAVE_HEADER|HAVE_BODY;
-	np->m_block = nail_blockof(offs);
-	np->m_offset = nail_offsetof(offs);
+	np->m_block = mailx_blockof(offs);
+	np->m_offset = mailx_offsetof(offs);
 	np->m_size = np->m_xsize = count;
 	np->m_lines = np->m_xlines = lines;
 	np->m_partstring = ip->m_partstring;

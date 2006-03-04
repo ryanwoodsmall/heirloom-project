@@ -1,5 +1,5 @@
 /*
- * Nail - a mail user agent derived from Berkeley Mail.
+ * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
  * Copyright (c) 2000-2004 Gunnar Ritter, Freiburg i. Br., Germany.
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.68 (gritter) 11/6/04";
+static char sccsid[] = "@(#)fio.c	2.69 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -142,8 +142,8 @@ setptr(FILE *ibuf, off_t offset)
 			this.m_flag = MUSED|MNEW|MNEWEST;
 			this.m_size = 0;
 			this.m_lines = 0;
-			this.m_block = nail_blockof(offset);
-			this.m_offset = nail_offsetof(offset);
+			this.m_block = mailx_blockof(offset);
+			this.m_offset = mailx_offsetof(offset);
 			inhead = 1;
 		} else if (linebuf[0] == 0) {
 			inhead = 0;
@@ -295,7 +295,7 @@ setinput(struct mailbox *mp, struct message *m, enum needspec need)
 	if (ok != OKAY)
 		return NULL;
 	fflush(mp->mb_otf);
-	if (fseek(mp->mb_itf, (long)nail_positionof(m->m_block,
+	if (fseek(mp->mb_itf, (long)mailx_positionof(m->m_block,
 					m->m_offset), SEEK_SET) < 0) {
 		perror("fseek");
 		panic(catgets(catd, CATSET, 77, "temporary file seek"));

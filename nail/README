@@ -1,7 +1,7 @@
-Welcome to nail, a mail user agent for Unix systems!
-====================================================
+Welcome to Heirloom mailx!
+==========================
 
-Nail is derived from Berkeley Mail and is intended provide the
+Mailx is derived from Berkeley Mail and is intended provide the
 functionality of the POSIX mailx command with additional support
 for MIME, IMAP, POP3, SMTP, and S/MIME. It provides enhanced
 features for interactive use, such as caching and disconnected
@@ -9,18 +9,25 @@ operation for IMAP, message threading, scoring, and filtering.
 It is also usable as a mail batch language, both for sending
 and receiving mail.
 
-New releases of nail are announced on Freshmeat. If you want to get
+Until March 2006, this project has been developed under the
+name "nail"; it is integrated into the Heirloom project now.
+The old name will persist at some places. If you were calling
+the program under the name "nail" and want to continue to do
+so, create a symbolic link to the mailx binary.
+
+New releases of mailx are announced on Freshmeat. If you want to get
 notified by email on each release, use their subscription service at
 <http://freshmeat.net/projects/nail/>.
 
-The project homepage is currently at <http://nail.sourceforge.net>.
+The project homepage is currently at
+<http://heirloom.sourceforge.net/mailx.html>.
 
 
 How to build
 ============
 
-To compile and install nail, look at the file 'INSTALL'. You can also
-build nail RPMs using 'rpmbuild -tb nail-<version>.tar.bz2'.
+To compile and install mailx, look at the file 'INSTALL'. You can also
+build mailx RPMs using 'rpmbuild -tb mailx-<version>.tar.bz2'.
 
 You should always install the template for the system-wide configuration
 file. If this is not possible because you lack the necessary permissions,
@@ -28,7 +35,7 @@ integrate its contents into your ~/.mailrc. This is because some of the
 built-in defaults are not appropriate anymore for the Unix platforms of
 today, but are still being kept for compatibility.
 
-Nail has been built successfully in the following environments using
+Mailx has been built successfully in the following environments using
 the current configuration system:
 
 Linux               Kernel 2.0 and above; libc4, libc5, glibc 2.2 and above,
@@ -53,7 +60,7 @@ If your system does not appear in this list, just try it out. Whether
 it works or not, you should contact the development list and report the
 results.
 
-But note that I strongly discourage from porting nail to Windows
+But note that I strongly discourage from porting mailx to Windows
 and environments that make Windows look Unix-like; I won't accept any
 patches or suggestions that go in this direction. There are two major
 reasons for this: First, any port makes maintaining harder; there are
@@ -65,11 +72,11 @@ otherwise have been used to enhance the software for Unix platforms.
 Windows is just not worth this, and here we are at the second point:
 Porting software to Windows encourages people to use -- that is: to buy
 -- Windows. It supports a company that is known to threaten Open Source
-software like nail. In short, porting nail (or similar free software)
+software like mailx. In short, porting mailx (or similar free software)
 to Windows has an ill effect on that software. Don't do it.
 
 Note that my statement doesn't legally restrict you if you want to port
-nail to any platform. This would not be the way of free software either,
+mailx to any platform. This would not be the way of free software either,
 especially since I might be wrong in the future; as an example, porting
 free software to mainframes of a certain company is considered a good
 thing today. I just wish to express my opinion as a free software
@@ -79,10 +86,10 @@ developer, and to inform you that I don't maintain such a port.
 Mailbox formats
 ===============
 
-Nail supports the mbox and maildir mailbox formats.
+Mailx supports the mbox and maildir mailbox formats.
 
 The mbox format variant based on the 'Content-Length:' header field that
-is used on most SVr4 systems by default is not supported by nail. As this
+is used on most SVr4 systems by default is not supported by mailx. As this
 format generally is a design flaw, you should fix your system by either
 using procmail for local mail delivery, which is a good idea anyway, or
 at least add the -E flag to the Mlocal line in /etc/sendmail.cf if using
@@ -90,7 +97,7 @@ at least add the -E flag to the Mlocal line in /etc/sendmail.cf if using
 
 Although it is not bad, just obsolete, similar considerations apply
 to the MMDF format used on OpenServer systems; unless you switch to
-procmail (or contribute support for this format), nail will not be
+procmail (or contribute support for this format), mailx will not be
 able to read your mailbox there.
 
 
@@ -115,7 +122,7 @@ Also before you send something to the list, make sure that you did the
 following:
 
 1. Check out that you are using a binary made from pristine sources of the
-   latest release. This is particularly important if you received your nail
+   latest release. This is particularly important if you received your mailx
    binaries from a third-party vendor. If you are unwilling to do this for
    whatever reason, use the support channels of your vendor and avoid abusing
    the Open Source development model.
@@ -145,4 +152,4 @@ Enjoy!
 Gunnar Ritter
 Freiburg i. Br.
 Germany
-<gunnarr@acm.org>                                                 11/22/05
+<gunnarr@acm.org>                                                 3/4/06
