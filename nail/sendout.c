@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.91 (gritter) 3/4/06";
+static char sccsid[] = "@(#)sendout.c	2.92 (gritter) 3/4/06";
 #endif
 #endif /* not lint */
 
@@ -1209,7 +1209,8 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		}
 	}
 	if (w & GUA && stealthmua == 0)
-		fprintf(fo, "User-Agent: %s\n", version), gotcha++;
+		fprintf(fo, "User-Agent: Heirloom mailx %s\n",
+				version), gotcha++;
 	if (w & GMIME) {
 		fputs("MIME-Version: 1.0\n", fo), gotcha++;
 		if (hp->h_attach != NULL) {
