@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.83 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.84 (gritter) 3/4/06";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.83 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)cp_s42.sl	1.84 (gritter) 3/4/06";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.83 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)cp.sl	1.84 (gritter) 3/4/06";
 #endif
 
 #include	<sys/types.h>
@@ -424,7 +424,7 @@ writerr(void *vp, int count, int written)
 {
 }
 
-static void
+static long long
 fdcopy(const char *src, const struct stat *ssp, const int sfd,
 		const char *tgt, const struct stat *dsp, const int dfd)
 {
@@ -433,6 +433,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 	static size_t bufsize;
 	ssize_t rsz, wo, wt;
 	size_t	blksize;
+	long long	copied = 0;
 #ifdef	O_DIRECT
 	int	sfl = 0, dfl = 0, haverest = 0, dioen = 0;
 	off_t	remsz = 0;
@@ -444,7 +445,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 
 		if ((sent = sfile(dfd, sfd, ssp->st_mode, ssp->st_size)) ==
 				ssp->st_size)
-			return;
+			return sent;
 		if (sent < 0)
 			goto err;
 	}
@@ -504,9 +505,10 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 				if ((dsp->st_mode&S_IFMT) == S_IFREG)
 					unlink(tgt);
 #endif	/* notdef */
-				return;
+				return copied;
 			}
 			wt += wo;
+			copied += wo;
 		} while (wt < rsz);
 #ifdef	O_DIRECT
 		if (Dflag && ssp->st_size > blksize &&
@@ -540,6 +542,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 #endif	/* __FreeBSD_, __DragonFly__, __APPLE__ */
 	}
 #endif	/* O_DIRECT */
+	return copied;
 }
 
 static void
@@ -552,6 +555,7 @@ filecopy(const char *src, const struct stat *ssp,
 	float	f, s, t;
 	struct timeval	tv1, tv2;
 	struct rusage	ru1, ru2;
+	long long	copied = 0;
 
 	if (sflag) {
 		gettimeofday(&tv1, NULL);
@@ -581,7 +585,7 @@ filecopy(const char *src, const struct stat *ssp,
 		errcnt |= 04;
 		goto end2;
 	}
-	fdcopy(src, ssp, sfd, tgt, &stbuf, dfd);
+	copied = fdcopy(src, ssp, sfd, tgt, &stbuf, dfd);
 end2:
 	if (pflag)
 		permissions(tgt, ssp);
@@ -595,7 +599,7 @@ end2:
 		getrusage(RUSAGE_SELF, &ru2);
 #define	tv2f(tv)	((tv).tv_sec + (float)(tv).tv_usec / 1000000)
 		f = tv2f(tv2) - tv2f(tv1);
-		s = (float)ssp->st_size / (2<<19);
+		s = (float)copied / (2<<19);
 		t = f ? s / f : s;
 		printf("                 ****** %s File Information ******\n"
 		       "        Input file              :       %s\n"
