@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.64 (gritter) 3/4/06";
+static char sccsid[]  = "@(#)mime.c	2.65 (gritter) 3/6/06";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -720,7 +720,7 @@ static enum mimeclean
 mime_isclean(FILE *f)
 {
 	long initial_pos;
-	unsigned curlen = 1, maxlen = 0, limit = -1;
+	unsigned curlen = 1, maxlen = 0, limit = 950;
 	enum mimeclean isclean = 0;
 	char	*cp;
 	int c = EOF, lastc;

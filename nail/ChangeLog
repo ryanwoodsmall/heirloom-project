@@ -1,3 +1,7 @@
+[12.1] released ...
+* A warning about an initalization of an unsigned value to -1 has been
+  eliminated (patch by Matthew Sienkiewicz).
+
 [12.0] released 3/4/06
 * The program has been integrated into the Heirloom project as "mailx". The
   new project homepage is at <http://heirloom.sourceforge.net/mailx.html>.
