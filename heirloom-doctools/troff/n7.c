@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.43 (gritter) 2/19/06
+ * Sccsid @(#)n7.c	1.44 (gritter) 3/6/06
  */
 
 /*
@@ -169,7 +169,7 @@ tbreak(void)
 		if ((c = cbits(j = *i++) & ~MBMASK) == ' ' || c == STRETCH) {
 #endif /* NROFF */
 #endif /* EUC */
-			if (xflag && !fi && dilev)
+			if (xflag && !fi && dilev || iszbit(j))
 				goto std;
 			pad = 0;
 			if (i > line)
@@ -292,6 +292,8 @@ text(void)
 	if (spcnt)
 		goto t2;
 	while ((c = cbits(i = GETCH())) == ' ' || c == STRETCH) {
+		if (iszbit(i))
+			break;
 		spcnt++;
 		numtab[HP].val += sps;
 		widthp = sps;
@@ -726,6 +728,8 @@ movword(void)
 		while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
 #endif /* NROFF */
 #endif /* EUC */
+			if (iszbit(i))
+				break;
 			wch--;
 			wne -= sps;
 		}
@@ -920,7 +924,7 @@ getword(int x)
 			hyoff = 1;	/* 1 => don't hyphenate */
 			continue;
 		}
-		if (j == ' ') {
+		if (j == ' ' && !iszbit(i)) {
 			numtab[HP].val += sps;
 			widthp = sps;
 			storeword(i, sps);
@@ -1054,7 +1058,7 @@ g1:		nexti = GETCH();
 			goto g1;
 #endif /* NROFF */
 #endif /* EUC */
-	if (j != ' ') {
+	if (j != ' ' || iszbit(i)) {
 		static char *sentchar = ".?!:";	/* sentence terminators */
 		if (j != '\n')
 #ifdef EUC
@@ -1101,7 +1105,7 @@ g1:		nexti = GETCH();
 rtn:
 	for (wp = word; *wp; wp++) {
 		j = cbits(*wp);
-		if (j == ' ' || j == STRETCH)
+		if ((j == ' ' || j == STRETCH) && !iszbit(j))
 			continue;
 		if (!ischar(j) || (!isdigit(j) && j != '-'))
 			break;

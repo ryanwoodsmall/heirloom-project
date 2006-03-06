@@ -6,6 +6,9 @@ Release ...
 * troff: The "\n[.ascender]" and "\n[.descender]" registers contain the
   typical extents of the current font above and below the base line,
   scaled to the current point size.
+* troff: Zero-width space characters are no longer considered word space
+  when a line is justified. This fixes "\X" device control functions in
+  diversions.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
 * [nt]roff: The ".mc" request does not require an argument so no warning
