@@ -181,7 +181,8 @@ New and extended requests
 
 	math	mathematical characters like \(<= \(cu \(-> \(if
 	greek	greek characters like \(*a \(*b \(*g \(*A \(*B \(*G
-	punct	the characters \(or \- \` \' " # < > @ \ ^ ~
+	punct	the characters \(or \- \` \' " # < > @ \ ^ ~ (default
+		for -Tps and -Tpsmed)
 	large	parts of large characters like \(rc \(rk \(lb \(lk
 
 	The remaining arguments are handled as described for ".fp".
@@ -681,4 +682,4 @@ x X TrimAt left-offset top-offset width height
 	in device units.
 
 
-Gunnar Ritter                                                   3/3/06
+Gunnar Ritter                                                   3/10/06

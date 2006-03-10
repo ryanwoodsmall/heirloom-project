@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.46 (gritter) 3/10/06
+ * Sccsid @(#)afm.c	1.47 (gritter) 3/10/06
  */
 
 #include <stdlib.h>
@@ -867,8 +867,11 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	} state = NONE;
 	char	*cp, *th, *tp;
 	int	n = 0;
-	enum spec	s = a->spec;
+	enum spec	s;
 
+	if (dev.allpunct)
+		a->spec |= SPEC_PUNCT;
+	s = a->spec;
 	if ((cp = strrchr(a->file, '/')) == NULL)
 		cp = a->file;
 	else

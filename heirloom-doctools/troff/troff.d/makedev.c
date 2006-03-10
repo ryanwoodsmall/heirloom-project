@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.11 (gritter) 12/6/05
+ * Sccsid @(#)makedev.c	1.12 (gritter) 3/10/06
  */
 
 /*
@@ -193,6 +193,8 @@ readdesc(const char *name)
 			dget(mp, &dev.biggestfont);
 		} else if (strcmp(cmd, "spare2") == 0) {
 			dget(mp, &dev.spare2);
+		} else if (strcmp(cmd, "allpunct") == 0) {
+			dev.allpunct = 1;
 		} else if (strcmp(cmd, "anysize") == 0) {
 			dev.anysize = 1;
 		} else if (strcmp(cmd, "afmfonts") == 0) {

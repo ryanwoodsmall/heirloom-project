@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.9 (gritter) 12/6/05
+ * Sccsid @(#)dev.h	1.10 (gritter) 3/10/06
  */
 
 /*
@@ -64,6 +64,7 @@ struct dev {
 	int	nsizes;		/* number of sizes it has */
 	int	sizescale;	/* scaling for fractional point sizes */
 	int	anysize;	/* device can print any size */
+	int	allpunct;	/* all fonts contain punctuation characters */
 	int	afmfonts;	/* device uses AFM fonts by default */
 	int	paperwidth;	/* max line length in units */
 	int	paperlength;	/* max paper length in units */
