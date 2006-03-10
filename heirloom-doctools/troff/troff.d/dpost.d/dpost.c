@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.138 (gritter) 2/28/06
+ * Sccsid @(#)dpost.c	1.139 (gritter) 3/10/06
  */
 
 /*
@@ -2939,20 +2939,30 @@ dup length dict begin\n\
   currentdict\n\
 end\n",
 		a->fontname, a->Font.intname, n);
-	if (strcmp(a->fontname, "Symbol") == 0 && n == 0) {
-		fprintf(gf, "/Symbol-tmp-@%s exch definefont pop\n",
-			a->Font.intname);
-		fprintf(gf, "/Symbol-tmp-@%s /Symbol-@%s Sdefs cf\n",
-			a->Font.intname, a->Font.intname);
-		fprintf(gf, "/Symbol-tmp-@%s undefinefont\n",
-			a->Font.intname);
-	} else if (strcmp(a->fontname, "Times-Roman") == 0 && n == 0) {
-		fprintf(gf, "/Times-Roman-tmp-@%s exch definefont pop\n",
-			a->Font.intname);
-		fprintf(gf, "/Times-Roman-tmp-@%s /Times-Roman-@%s S1defs cf\n",
-			a->Font.intname, a->Font.intname);
-		fprintf(gf, "/Times-Roman-tmp-@%s undefinefont\n",
-			a->Font.intname);
+	if (a->spec & SPEC_S) {
+		fprintf(gf, "/%s-tmp-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " exch definefont pop\n");
+		fprintf(gf, "/%s-tmp-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " /%s-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " Sdefs cf\n");
+		fprintf(gf, "/%s-tmp-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " undefinefont\n");
+	} else if (a->spec & SPEC_S1) {
+		fprintf(gf, "/%s-tmp-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " exch definefont pop\n");
+		fprintf(gf, "/%s-tmp-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " /%s-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " S1defs cf\n");
+		fprintf(gf, "/%s-tmp-@%s", a->fontname, a->Font.intname);
+		if (n) fprintf(gf, "@%d", n);
+		fprintf(gf, " undefinefont\n");
 	} else if (n)
 		fprintf(gf, "/%s-@%s@%d exch definefont pop\n",
 			a->fontname, a->Font.intname, n);

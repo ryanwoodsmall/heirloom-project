@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.45 (gritter) 3/3/06
+ * Sccsid @(#)afm.c	1.46 (gritter) 3/10/06
  */
 
 #include <stdlib.h>
@@ -846,7 +846,7 @@ afmalloc(struct afmtab *a, int n)
 	a->nametab = malloc((n+NCHARLIB+1)*sizeof *a->nametab);
 	a->nametab[0] = 0;
 	a->nchars = 1;
-	addcharlib(a, a->base[0]=='S' && a->base[1]==0);
+	addcharlib(a, a->base[0]=='S' && a->base[1]==0 || a->spec&SPEC_S);
 	a->nameprime = nextprime(n+NCHARLIB+1);
 	a->namecache = calloc(a->nameprime, sizeof *a->namecache);
 	for (i = 0; i < a->nameprime; i++) {
