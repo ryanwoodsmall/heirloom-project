@@ -13,6 +13,8 @@ Release ...
 * troff: Zero-width space characters are no longer considered word space
   when a line is justified. This fixes "\X" device control functions in
   diversions.
+* dpost: The "post" device works again; dpost previously crashed with a
+  null pointer dereference when it was used.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
 * [nt]roff: The ".mc" request does not require an argument so no warning
