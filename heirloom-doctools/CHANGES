@@ -23,6 +23,9 @@ Release ...
   a page of intermediate output before any text has been printed, the
   value "4" is now substracted automatically to make the PDF viewer
   show the whole page top including margin.
+* -mm macros: An error that was introduced when the macros were converted
+  to use spaces between a request name and its arguments has been fixed.
+  It sometimes caused the page offset to be wrong.
 
 Release 060221
 * [nt]roff: With the ".hylang" request, the individual parts of words
