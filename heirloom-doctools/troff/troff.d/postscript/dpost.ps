@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.11 0
+%%BeginResource: procset dpost 4.12 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.11 (gritter) 1/14/06
+% Sccsid @(#)dpost.ps	4.12 (gritter) 3/12/06
 %
 
 /#copies 1 store
@@ -210,6 +210,7 @@
 %
 
 /Sdefs [
+	/underscore		[0 0 502 0]
 	/bracketlefttp		[208 500]
 	/bracketleftbt		[208 500]
 	/bracketrighttp		[-60 380]
@@ -229,6 +230,21 @@
 	/integral		[100 -50 500 0]
 	/infinity		[10 -75 730 0]
 ] def
+
+%
+% This adjusts the y left bearing of the underscore character in the
+% Symbol font to the position expected by troff, depending on the
+% font variant actually in use with the current document.
+%
+/_Sdefsadj {
+	gsave
+	/Symbol findfont 1000 scalefont setfont
+	0 0 moveto
+	(\137) false charpath flattenpath pathbbox pop pop exch pop
+	grestore
+	252 add neg
+	Sdefs 1 [0 5 -1 roll 502 0] put
+} def
 
 /S1defs [
 	/underscore		[0 80 500 0]

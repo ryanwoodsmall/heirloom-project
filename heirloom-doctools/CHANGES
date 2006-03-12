@@ -13,6 +13,11 @@ Release ...
 * troff: Zero-width space characters are no longer considered word space
   when a line is justified. This fixes "\X" device control functions in
   diversions.
+* dpost: The metrics of the underscore character in the PostScript Symbol
+  font (which is mapped to "\(ul" and is used to draw horizontal lines)
+  are now dynamically adjusted in the generated PostScript code. This
+  works around varying metrics of this character in different versions
+  of the Symbol font.
 * dpost: The "post" device works again; dpost previously crashed with a
   null pointer dereference when it was used.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
