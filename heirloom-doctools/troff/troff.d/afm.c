@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.47 (gritter) 3/10/06
+ * Sccsid @(#)afm.c	1.48 (gritter) 3/12/06
  */
 
 #include <stdlib.h>
@@ -818,8 +818,6 @@ addmetrics(struct afmtab *a, char *_line, enum spec s)
 	}
 	if (N == NULL)
 		return;
-	if (a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0)
-		s |= SPEC_S1;
 	tp = afmmapname(N, s);
 	afmaddchar(a, C, tp, 0, WX, B, N, s, 0);
 }
@@ -869,9 +867,6 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	int	n = 0;
 	enum spec	s;
 
-	if (dev.allpunct)
-		a->spec |= SPEC_PUNCT;
-	s = a->spec;
 	if ((cp = strrchr(a->file, '/')) == NULL)
 		cp = a->file;
 	else
@@ -880,6 +875,13 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	strcpy(a->base, cp);
 	if ((cp = strrchr(a->base, '.')) != NULL)
 		*cp = '\0';
+	if (dev.allpunct)
+		a->spec |= SPEC_PUNCT;
+	if (a->base[0]=='S' && a->base[1]==0)
+		a->spec |= SPEC_S;
+	if (a->base[0]=='S' && a->base[1]=='1' && a->base[2]==0)
+		a->spec |= SPEC_S1;
+	s = a->spec;
 	a->xheight = 500;
 	a->capheight = 700;
 	unitsPerEm = 1000;
@@ -905,8 +907,6 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			a->fontname = malloc(tp - th + 1);
 			memcpy(a->fontname, th, tp - th);
 			a->fontname[tp - th] = 0;
-			if (strcmp(a->fontname, "Symbol") == 0)
-				s |= SPEC_S;
 		} else if (state == FONTMETRICS &&
 				(th = thisword(cp, "IsFixedPitch")) != NULL) {
 			a->isFixedPitch = strncmp(th, "true", 4) == 0;
