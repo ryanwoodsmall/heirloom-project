@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.38 (gritter) 3/3/06
+ * Sccsid @(#)n9.c	1.39 (gritter) 3/12/06
  */
 
 /*
@@ -693,11 +693,11 @@ struct fg {
 	int	eof;
 };
 
-#define	getline	xxgetline
 static int
-getline(struct fg *fp, char **linebp, size_t *linesize)
+psgetline(struct fg *fp, char **linebp, size_t *linesize)
 {
 	int	i, n = 0;
+	int	nl = 0;
 
 	if (fp->bp == NULL)
 		fp->bp = fp->buf;
@@ -710,15 +710,19 @@ getline(struct fg *fp, char **linebp, size_t *linesize)
 		for (;;) {
 			if (*linesize < n + 2)
 				*linebp = realloc(*linebp, *linesize += 128);
-			if (fp->bp >= fp->ep || *fp->bp == '\n')
+			if (fp->bp >= fp->ep || *fp->bp == '\n' || nl) {
+				nl = 2;
 				break;
+			}
+			if (*fp->bp == '\r')
+				nl = 1;
 			(*linebp)[n++] = *fp->bp++;
 		}
-		if (*fp->bp == '\n') {
+		if (fp->bp < fp->ep && *fp->bp == '\n') {
 			(*linebp)[n++] = *fp->bp++;
 			break;
 		}
-		if (fp->eof)
+		if (nl == 2 || fp->eof)
 			break;
 		fp->bp = fp->buf;
 	}
@@ -734,7 +738,8 @@ getcom(const char *cp, const char *tp)
 	n = strlen(tp);
 	if (strncmp(cp, tp, n))
 		return NULL;
-	if (cp[n] == ' ' || cp[n] == '\t' || cp[n] == '\n' || cp[n] == 0)
+	if (cp[n] == ' ' || cp[n] == '\t' || cp[n] == '\r' ||
+			cp[n] == '\n' || cp[n] == 0)
 		return (char *)&cp[n];
 	return NULL;
 }
@@ -756,7 +761,7 @@ getpsbb(const char *name, int bb[4])
 	fp = calloc(1, sizeof *fp);
 	fp->fd = fd;
 	for (;;) {
-		n = getline(fp, &buf, &size);
+		n = psgetline(fp, &buf, &size);
 		if (++lineno == 1 && (n == 0 || strncmp(buf, "%!PS-", 5))) {
 			errprint("%s is not a DSC-conforming "
 					"PostScript document", name);

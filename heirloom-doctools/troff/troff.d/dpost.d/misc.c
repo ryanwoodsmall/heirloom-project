@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.10 (gritter) 1/6/06
+ * Sccsid @(#)misc.c	1.11 (gritter) 3/12/06
  */
 
 /*
@@ -330,10 +330,11 @@ tempname(const char *sfx)
 
 #define	LSIZE	512
 
-char *fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
+char *psgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 {
 	int c;
 	size_t n = 0;
+	int nl = 0;
 
 	if (*line == NULL || *linesize < LSIZE + n + 1)
 		*line = realloc(*line, *linesize = LSIZE + n + 1);
@@ -342,10 +343,16 @@ char *fgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 			*line = realloc(*line, *linesize += LSIZE);
 		c = getc(fp);
 		if (c != EOF) {
+			if (nl && c != '\n') {
+				ungetc(c, fp);
+				break;
+			}
 			(*line)[n++] = c;
 			(*line)[n] = '\0';
 			if (c == '\n')
 				break;
+			if (c == '\r')
+				nl = 1;
 		} else {
 			if (n > 0)
 				break;

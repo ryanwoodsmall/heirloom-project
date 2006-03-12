@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ps_include.c	1.8 (gritter) 11/29/05
+ * Sccsid @(#)ps_include.c	1.9 (gritter) 3/12/06
  */
 
 /*
@@ -131,10 +131,11 @@ ps_include(
 	trailer.start = 0;
 	fseek(fin, 0L, SEEK_SET);
 
-	while ( fgetline(&buf, &bufsize, NULL, fin) != NULL ) {
+	while ( psgetline(&buf, &bufsize, NULL, fin) != NULL ) {
 		if (++lineno == 1 && strncmp(buf, "%!PS-", 5) == 0) {
 			for (bp = buf; !spacechar(*bp&0377); bp++);
-			while (*bp && *bp != '\n' && spacechar(*bp&0377))
+			while (*bp && *bp != '\n' && *bp != '\r' &&
+					spacechar(*bp&0377))
 				bp++;
 			if (strncmp(bp, "EPSF-3.0", 8) == 0 &&
 					(bp[8] == 0 || spacechar(bp[8]&0377)))
@@ -208,7 +209,7 @@ fprintf(stderr, "trailer=(%d,%d)\n", trailer.start, trailer.end);
 		size_t	len;
 		rewind(fin);
 		fprintf(fout, "%%%%BeginDocument: %s\n", name);
-		while (fgetline(&buf, &bufsize, &len, fin) != NULL)
+		while (psgetline(&buf, &bufsize, &len, fin) != NULL)
 			fwrite(buf, 1, len, fout);
 		fprintf(fout, "%%%%EndDocument\n");
 	} else {
@@ -234,7 +235,7 @@ copy(FILE *fin, FILE *fout, Section *s)
 		return;
 	fseek(fin, s->start, SEEK_SET);
 	while (ftell(fin) < s->end &&
-			fgetline(&buf, &bufsize, &len, fin) != NULL) {
+			psgetline(&buf, &bufsize, &len, fin) != NULL) {
 		if (buf[0] == '%')
 			putc(' ', fout);
 		fwrite(buf, 1, len, fout);

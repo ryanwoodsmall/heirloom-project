@@ -23,6 +23,9 @@ Release ...
   of "Bold", "Ultra", or "Heavy".
 * dpost: The "post" device works again; dpost previously crashed with a
   null pointer dereference when it was used.
+* troff/dpost: EPS files that contain carriage-return characters as
+  newline indicators are now correctly handled with the ".psbb" request
+  and the picture inclusion mechanism.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
 * [nt]roff: The ".mc" request does not require an argument so no warning
