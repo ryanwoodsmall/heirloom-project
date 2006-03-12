@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost_charsq 1.0 0
+%%BeginResource: procset dpost_charsq 1.1 0
 % from OpenSolaris "lp:filter/postscript/font/devpost/charlib/sq	1.2"
 %
 % CDDL HEADER START
@@ -32,6 +32,11 @@
     side 0 rlineto
     0 side neg rlineto
     closepath
-    font B eq font /Times-Bold-@13 eq or {fill} {stroke} ifelse
+    currentfont dup /FontInfo dup 3 1 roll known {
+        get dup /Weight dup 3 1 roll known {
+            get dup dup (Ultra) eq exch (Bold) eq or exch (Heavy) eq or
+	    	{fill} {stroke} ifelse
+        } {pop pop stroke} ifelse
+    } {pop pop stroke} ifelse
 } def
 %%EndResource

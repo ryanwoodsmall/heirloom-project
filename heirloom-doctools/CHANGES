@@ -19,6 +19,8 @@ Release ...
   works around varying metrics of this character in different versions
   of the Symbol font. Note that this does not work in PDF unless the
   font is embedded at the time the document is distilled.
+* dpost: The "\(sq" glyph is now filled in any font with a "Weight" entry
+  of "Bold", "Ultra", or "Heavy".
 * dpost: The "post" device works again; dpost previously crashed with a
   null pointer dereference when it was used.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is

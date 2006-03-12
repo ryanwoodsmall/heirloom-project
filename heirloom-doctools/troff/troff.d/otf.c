@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.41 (gritter) 3/3/06
+ * Sccsid @(#)otf.c	1.42 (gritter) 3/12/06
  */
 
 #include <stdio.h>
@@ -60,6 +60,7 @@ short	indexToLocFormat;
 static struct afmtab	*a;
 static int	nc;
 static int	fsType;
+static int	WeightClass;
 static int	isFixedPitch;
 static int	minMemType42;
 static int	maxMemType42;
@@ -2318,6 +2319,10 @@ get_OS_2(void)
 	o = table_directories[pos_OS_2].offset;
 	if (pbe16(&contents[o]) > 0x0003)
 		goto dfl;
+	if (table_directories[pos_OS_2].length >= 6)
+		WeightClass = pbe16(&contents[o+4]);
+	else
+		WeightClass = -1;
 	if (table_directories[pos_OS_2].length >= 10)
 		fsType = pbe16(&contents[o+8]);
 	else
@@ -3308,8 +3313,8 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 				yMax * 1000 / unitsPerEm);
 		fprintf(fp, "/PaintType 0 def\n");
 		fprintf(fp, "/Encoding StandardEncoding def\n");
-		if (fsType != -1 || Notice || Copyright) {
-			fprintf(fp, "/FontInfo 3 dict dup begin\n");
+		if (fsType != -1 || Notice || Copyright || WeightClass) {
+			fprintf(fp, "/FontInfo 4 dict dup begin\n");
 			if (fsType != -1)
 				fprintf(fp, "/FSType %d def\n", fsType);
 			if (Notice)
@@ -3318,6 +3323,19 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 			if (Copyright)
 				fprintf(fp, "/Copyright (%s) readonly def\n",
 						Copyright);
+			if (WeightClass) {
+				if (WeightClass <= 350)
+					cp = "Light";
+				else if (WeightClass <= 550)
+					cp = "Medium";
+				else if (WeightClass <= 750)
+					cp = "Bold";
+				else if (WeightClass <= 850)
+					cp = "Ultra";
+				else
+					cp = "Heavy";
+				fprintf(fp, "/Weight (%s) readonly def\n", cp);
+			}
 			fprintf(fp, "end readonly def\n");
 		}
 		fprintf(fp, "/CharStrings %d dict dup begin\n", nc);
