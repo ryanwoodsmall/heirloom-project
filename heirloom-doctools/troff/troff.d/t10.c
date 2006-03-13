@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.63 (gritter) 2/13/06
+ * Sccsid @(#)t10.c	1.64 (gritter) 3/13/06
  */
 
 /*
@@ -294,8 +294,11 @@ specnames(void)
 		&c_dagger, "dg",
 		0, 0
 	};
+	static int	twice;
 	int	i;
 
+	if (twice++)
+		return;
 	for (i = 0; spnames[i].n; i++)
 		*spnames[i].n = findch(spnames[i].v);
 }

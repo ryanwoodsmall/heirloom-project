@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.11 (gritter) 12/20/05
+ * Sccsid @(#)otfdump.c	1.12 (gritter) 3/13/06
  */
 
 static enum show {
@@ -205,6 +205,11 @@ kernpair(int first, int second, int x)
 			print(SHOW_KERNPAIRS, "kernpair %s %s width %d",
 				s1, s2, unitconv(x));
 	}
+}
+
+static void
+kerninit(void)
+{
 }
 
 static void

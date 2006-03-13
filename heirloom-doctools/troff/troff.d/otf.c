@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.42 (gritter) 3/12/06
+ * Sccsid @(#)otf.c	1.44 (gritter) 3/13/06
  */
 
 #include <stdio.h>
@@ -2534,6 +2534,7 @@ get_x_adj(int ValueFormat1, int o)
 }
 
 static void	kernpair(int, int, int);
+static void	kerninit(void);
 static void	kernfinish(void);
 
 static int	nkerntmp;
@@ -2541,6 +2542,28 @@ static int	nkerntmp;
 #ifndef	DUMP
 static struct kernpair	*kerntmp;
 static int	akerntmp;
+
+static struct namecache	**nametable;
+
+static void
+kerninit(void)
+{
+	char	*cp;
+	int	i;
+
+	nametable = calloc(nc, sizeof *nametable);
+	for (i = 0; i < nc; i++)
+		if ((cp = GID2SID(i)) != NULL)
+			nametable[i] = afmnamelook(a, cp);
+}
+
+static struct namecache *
+GID2name(int gid)
+{
+	if (gid < 0 || gid >= nc)
+		return NULL;
+	return nametable[gid];
+}
 
 static void
 kernpair1(int ch1, int ch2, int k)
@@ -2561,16 +2584,13 @@ kernpair1(int ch1, int ch2, int k)
 static void
 kernpair(int first, int second, int x)
 {
-	char	*cp;
 	struct namecache	*np1, *np2;
 	int	i, j;
 
-	if ((cp = GID2SID(first)) == NULL)
+	np1 = GID2name(first);
+	np2 = GID2name(second);
+	if (np1 == NULL || np2 == NULL)
 		return;
-	np1 = afmnamelook(a, cp);
-	if ((cp = GID2SID(second)) == NULL)
-		return;
-	np2 = afmnamelook(a, cp);
 	x = unitconv(x);
 	for (i = 0; i < 2; i++)
 		if (np1->fival[i] >= 0)
@@ -2586,13 +2606,14 @@ kernfinish(void)
 	int	i;
 
 	a->nkernpairs = nkerntmp;
-	a->kernprime = nextprime(a->nkernpairs);
+	a->kernprime = nextprime(2*a->nkernpairs);
 	a->kernpairs = calloc(a->kernprime, sizeof *a->kernpairs);
 	for (i = 0; i < nkerntmp; i++)
 		*afmkernlook(a, kerntmp[i].ch1, kerntmp[i].ch2) = kerntmp[i];
 	nkerntmp = akerntmp = 0;
 	free(kerntmp);
 	kerntmp = NULL;
+	free(nametable);
 }
 #endif	/* !DUMP */
 
@@ -3394,6 +3415,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 			get_ttf();
 		}
 #ifndef	DPOST
+		kerninit();
 		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
 		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern);
 		get_feature(pos_GSUB, NULL, -1, get_substitutions);

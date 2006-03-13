@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.125 (gritter) 3/13/06
+ * Sccsid @(#)t6.c	1.126 (gritter) 3/13/06
  */
 
 /*
@@ -1408,6 +1408,8 @@ checkenminus(int f)
 
 	if (afmtab == NULL || (i = fontbase[f]->afmpos - 1) < 0)
 		return;
+	if (c_endash == 0 || c_minus == 0)
+		specnames();
 	spec = afmtab[i]->spec;
 	if ((spec&(SPEC_PUNCT|SPEC_S1)) == SPEC_PUNCT) {
 		if (fitab[f][c_endash-32] == 0 && ftrtab[f][c_minus-32])
