@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.29 (gritter) 3/3/06
+ * Sccsid @(#)n6.c	1.30 (gritter) 3/13/06
  */
 
 /*
@@ -181,15 +181,18 @@ setabs (void)		/* set absolute char from \C'...' */
 }
 
 int 
-findft(register int i)
+findft(register int i, int required)
 {
 	register int k;
 
 	if ((k = i - '0') >= 0 && k <= nfonts && k < smnt)
 		return(k);
 	for (k = 0; fontlab[k] != i; k++)
-		if (k > nfonts)
+		if (k > nfonts) {
+			if (warn & WARN_FONT)
+				errprint("%s: no such font", macname(i));
 			return(-1);
+		}
 	return(k);
 }
 
@@ -292,7 +295,7 @@ setfont(int a)
 	}
 	if (i == 'S' || i == '0')
 		return;
-	if ((j = findft(i)) == -1)
+	if ((j = findft(i, 0)) == -1)
 		return;
 s0:
 	font1 = font;
@@ -484,7 +487,7 @@ casebd(void)
 
 	k = 0;
 bd0:
-	if (skip(1) || !(i = getrq()) || (j = findft(i)) == -1) {
+	if (skip(1) || !(i = getrq()) || (j = findft(i, 1)) == -1) {
 		if (k)
 			goto bd1;
 		else 

@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.30 (gritter) 3/3/06
+ * Sccsid @(#)proto.h	1.31 (gritter) 3/13/06
  */
 
 /* n10.c */
@@ -25,7 +25,7 @@ int getascender(void);
 int getdescender(void);
 tchar setch(int);
 tchar setabs(void);
-int findft(register int);
+int findft(register int, int);
 void caseps(void);
 void mchbits(void);
 void setps(void);

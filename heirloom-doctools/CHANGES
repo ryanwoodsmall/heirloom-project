@@ -26,6 +26,8 @@ Release ...
 * troff/dpost: EPS files that contain carriage-return characters as
   newline indicators are now correctly handled with the ".psbb" request
   and the picture inclusion mechanism.
+* [nt]roff: Requests like ".bd" or ".kernpair" now warn when an invalid
+  font name is given.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
   found as part of a possibly numeric argument, as in e.g. ".bp \}".
 * [nt]roff: The ".mc" request does not require an argument so no warning

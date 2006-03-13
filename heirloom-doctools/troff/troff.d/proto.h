@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.38 (gritter) 3/3/06
+ * Sccsid @(#)proto.h	1.39 (gritter) 3/13/06
  */
 
 /* t6.c */
@@ -15,7 +15,7 @@ int kernadjust(tchar, tchar);
 void xbits(register tchar, int);
 tchar setch(int);
 tchar setabs(void);
-int findft(register int);
+int findft(register int, int);
 void caseps(void);
 void casps1(register int);
 int findps(register int);
