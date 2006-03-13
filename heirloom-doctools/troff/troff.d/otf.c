@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.44 (gritter) 3/13/06
+ * Sccsid @(#)otf.c	1.45 (gritter) 3/13/06
  */
 
 #include <stdio.h>
@@ -2592,6 +2592,8 @@ kernpair(int first, int second, int x)
 	if (np1 == NULL || np2 == NULL)
 		return;
 	x = unitconv(x);
+	if (x == 0)
+		return;
 	for (i = 0; i < 2; i++)
 		if (np1->fival[i] >= 0)
 			for (j = 0; j < 2; j++)

@@ -5,6 +5,12 @@ Release ...
   taken from the current font instead of the special font by default 
   if possible with the "ps" and "psmed" devices. The new DESC keyword
   "allpunct" controls this.
+* troff: Kerning pairs from font metrics files that include "\[name]"
+  characters now work correctly; they could previously apply to wrong
+  characters.
+* troff: OpenType and TrueType kerning pairs with a position difference
+  of zero are now completely ignored. They could previously overwrite a
+  previous positioning difference for the same pair.
 * tbl: Storage space expansions because of long lines inside a table are
   now done properly.
 * troff: The "\n[.ascender]" and "\n[.descender]" registers contain the
