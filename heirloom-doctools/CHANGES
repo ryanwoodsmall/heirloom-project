@@ -7,7 +7,8 @@ Release ...
   "allpunct" controls this.
 * troff: Kerning pairs from font metrics files that include "\[name]"
   characters now work correctly; they could previously apply to wrong
-  characters.
+  characters with font files containing more than 260 characters, and
+  were ineffective with smaller ones.
 * troff: OpenType and TrueType kerning pairs with a position difference
   of zero are now completely ignored. They could previously overwrite a
   previous positioning difference for the same pair.
