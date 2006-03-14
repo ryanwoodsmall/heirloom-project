@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.46 (gritter) 3/14/06
+ * Sccsid @(#)otf.c	1.47 (gritter) 3/14/06
  */
 
 #include <stdio.h>
@@ -2460,7 +2460,7 @@ open_class(int o)
 	}
 }
 
-static void
+static inline void
 get_class(struct class *cp, int *gp, int *vp)
 {
 	int	Start, End;
