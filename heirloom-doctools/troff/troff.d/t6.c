@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.127 (gritter) 3/13/06
+ * Sccsid @(#)t6.c	1.128 (gritter) 3/14/06
  */
 
 /*
@@ -1314,7 +1314,7 @@ casefspacewidth(void)
 		n = atoi();
 		noscale--;
 		unitsPerEm = 1000;
-		fontab[f][0] = unitconv(n);
+		fontab[f][0] = _unitconv(n);
 	}
 	zapwcache(1);
 }
@@ -1843,7 +1843,7 @@ hang(int **tp)
 		noscale--;
 		if (fbits(k) == j && !ismot(k)) {
 			unitsPerEm = 1000;
-			n = unitconv(n);
+			n = _unitconv(n);
 			if (tp[j] == NULL)
 				tp[j] = calloc(NCHARS, sizeof *tp);
 			tp[j][i] = n;
@@ -1912,7 +1912,7 @@ casekernpair(void)
 		d = ' ';
 	setfbits(d, g);
 	unitsPerEm = 1000;
-	n = unitconv(n);
+	n = _unitconv(n);
 	kadd(c, d, n);
 done:
 	font = savfont;
@@ -1948,7 +1948,7 @@ kernsingle(int **tp)
 		if (tp[f] == NULL)
 			tp[f] = calloc(NCHARS, sizeof *tp);
 		unitsPerEm = 1000;
-		tp[f][c] = unitconv(n);
+		tp[f][c] = _unitconv(n);
 	}
 	font = savfont;
 	font1 = savfont1;

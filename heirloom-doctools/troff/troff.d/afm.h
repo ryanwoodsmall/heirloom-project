@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.25 (gritter) 3/3/06
+ * Sccsid @(#)afm.h	1.26 (gritter) 3/14/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -132,5 +132,9 @@ extern	char	*afmdecodepath(const char *);
 extern	int	otfcff(const char *, char *, size_t, size_t *, size_t *);
 extern	int	otft42(char *, char *, char *, size_t, FILE *);
 #endif
+
+extern struct dev	dev;
+
+#define	_unitconv(i)	(unitsPerEm * 72 == dev.res ? (i) : unitconv(i))
 
 #endif	/* !TROFF_AFM_H */

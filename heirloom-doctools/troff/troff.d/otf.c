@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.45 (gritter) 3/13/06
+ * Sccsid @(#)otf.c	1.46 (gritter) 3/14/06
  */
 
 #include <stdio.h>
@@ -1531,7 +1531,9 @@ error(const char *fmt, ...)
 	longjmp(breakpoint, 1);
 }
 
-static uint16_t
+#define _pbe16(cp) ((uint16_t)((cp)[1]&0377) + ((uint16_t)((cp)[0]&0377) << 8))
+
+static uint32_t
 pbe16(const char *cp)
 {
 	return (uint16_t)(cp[1]&0377) +
@@ -1564,7 +1566,7 @@ pbeXX(const char *cp, int n)
 	case 1:
 		return *cp&0377;
 	case 2:
-		return pbe16(cp);
+		return _pbe16(cp);
 	case 3:
 		return pbe24(cp);
 	case 4:
@@ -2330,15 +2332,15 @@ get_OS_2(void)
 	if (table_directories[pos_OS_2].length >= 72) {
 		if (a) {
 			a->ascender =
-				unitconv((int16_t)pbe16(&contents[o + 68]));
+				_unitconv((int16_t)pbe16(&contents[o + 68]));
 			a->descender =
-				unitconv((int16_t)pbe16(&contents[o + 70]));
+				_unitconv((int16_t)pbe16(&contents[o + 70]));
 		}
 	}
 	if (table_directories[pos_OS_2].length >= 92) {
 		if (a) {
-			a->xheight = unitconv(pbe16(&contents[o + 88]));
-			a->capheight = unitconv(pbe16(&contents[o + 90]));
+			a->xheight = _unitconv(pbe16(&contents[o + 88]));
+			a->capheight = _unitconv(pbe16(&contents[o + 90]));
 		}
 	} else {
 	dfl:	if (a) {
@@ -2467,14 +2469,15 @@ get_class(struct class *cp, int *gp, int *vp)
 	case 1:
 		if (cp->cnt < cp->GlyphCount) {
 			*gp = cp->StartGlyph + cp->cnt;
-			*vp = pbe16(&contents[cp->offset+6+2*cp->cnt++]);
+			*vp = _pbe16(&contents[cp->offset+6+2*cp->cnt]);
+			cp->cnt++;
 			return;
 		}
 		goto dfl;
 	case 2:
 		while (cp->cnt < cp->ClassRangeCount) {
-			Start = pbe16(&contents[cp->offset+4+6*cp->cnt]);
-			End = pbe16(&contents[cp->offset+4+6*cp->cnt+2]);
+			Start = _pbe16(&contents[cp->offset+4+6*cp->cnt]);
+			End = _pbe16(&contents[cp->offset+4+6*cp->cnt+2]);
 			if (cp->gid > End) {
 				cp->gid = -1;
 				cp->cnt++;
@@ -2483,7 +2486,7 @@ get_class(struct class *cp, int *gp, int *vp)
 			if (cp->gid < Start)
 				cp->gid = Start;
 			*gp = cp->gid++;
-			*vp = pbe16(&contents[cp->offset+4+6*cp->cnt+4]);
+			*vp = _pbe16(&contents[cp->offset+4+6*cp->cnt+4]);
 			return;
 		}
 		/*FALLTHRU*/
@@ -2521,25 +2524,26 @@ get_x_adj(int ValueFormat1, int o)
 	int	z = 0;
 
 	if (ValueFormat1 & 0x0001) {
-		x += (int16_t)pbe16(&contents[o+z]);
+		x += (int16_t)_pbe16(&contents[o+z]);
 		z += 2;
 	}
 	if (ValueFormat1 & 0x0002)
 		z += 2;
 	if (ValueFormat1 & 0x0004) {
-		x += (int16_t)pbe16(&contents[o+z]);
+		x += (int16_t)_pbe16(&contents[o+z]);
 		z += 2;
 	}
 	return x;
 }
 
-static void	kernpair(int, int, int);
 static void	kerninit(void);
 static void	kernfinish(void);
 
 static int	nkerntmp;
 
-#ifndef	DUMP
+#ifdef	DUMP
+static void	kernpair(int, int, int);
+#else	/* !DUMP */
 static struct kernpair	*kerntmp;
 static int	akerntmp;
 
@@ -2557,13 +2561,7 @@ kerninit(void)
 			nametable[i] = afmnamelook(a, cp);
 }
 
-static struct namecache *
-GID2name(int gid)
-{
-	if (gid < 0 || gid >= nc)
-		return NULL;
-	return nametable[gid];
-}
+#define	GID2name(gid)	((gid) < 0 || (gid) >= nc ? NULL : nametable[gid])
 
 static void
 kernpair1(int ch1, int ch2, int k)
@@ -2581,8 +2579,11 @@ kernpair1(int ch1, int ch2, int k)
 	nkerntmp++;
 }
 
+#define	kernpair(first, second, x)	\
+		((x) ? _kernpair(first, second, (x)) : NULL)
+
 static void
-kernpair(int first, int second, int x)
+_kernpair(int first, int second, int x)
 {
 	struct namecache	*np1, *np2;
 	int	i, j;
@@ -2591,7 +2592,7 @@ kernpair(int first, int second, int x)
 	np2 = GID2name(second);
 	if (np1 == NULL || np2 == NULL)
 		return;
-	x = unitconv(x);
+	x = _unitconv(x);
 	if (x == 0)
 		return;
 	for (i = 0; i < 2; i++)
@@ -2625,7 +2626,7 @@ get_PairValueRecord(int first, int ValueFormat1, int ValueFormat2, int o)
 	int	second;
 	int	x;
 
-	second = pbe16(&contents[o]);
+	second = _pbe16(&contents[o]);
 	x = get_x_adj(ValueFormat1, o+2);
 	kernpair(first, second, x);
 }
@@ -2637,7 +2638,7 @@ get_PairSet(int first, int ValueFormat1, int ValueFormat2, int o)
 	int	i;
 	int	sz;
 
-	PairValueCount = pbe16(&contents[o]);
+	PairValueCount = _pbe16(&contents[o]);
 	sz = get_value_size(ValueFormat1, ValueFormat2);
 	for (i = 0; i < PairValueCount; i++)
 		get_PairValueRecord(first, ValueFormat1, ValueFormat2,

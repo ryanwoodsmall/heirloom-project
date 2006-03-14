@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.48 (gritter) 3/12/06
+ * Sccsid @(#)afm.c	1.49 (gritter) 3/14/06
  */
 
 #include <stdlib.h>
@@ -31,7 +31,6 @@
 #include "dev.h"
 #include "afm.h"
 
-extern	struct dev	dev;
 extern	char		*chname;
 extern	short		*chtab;
 extern	int		nchtab;
@@ -687,9 +686,9 @@ afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 		np->afpos = a->nchars;
 		np->gid = gid;
 		if (a->isFixedPitch && strcmp(N, "space") == 0)
-			a->fontab[0] = unitconv(WX);
+			a->fontab[0] = _unitconv(WX);
 	}
-	a->fontab[a->nchars] = unitconv(WX);
+	a->fontab[a->nchars] = _unitconv(WX);
 	/*
 	 * Crude heuristics mainly based on observations with the existing
 	 * fonts for -Tpost and on tests with eqn.
@@ -1050,7 +1049,7 @@ addkernpair(struct afmtab *a, char *_line)
 		*lp = 0;
 		np2 = afmnamelook(a, cp);
 		*lp = c;
-		n = unitconv(strtol(&lp[1], NULL, 10));
+		n = _unitconv(strtol(&lp[1], NULL, 10));
 		for (i = 0; i < 2; i++)
 			if (np1->fival[i] >= 0)
 				for (j = 0; j < 2; j++)
