@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.128 (gritter) 3/14/06
+ * Sccsid @(#)t6.c	1.129 (gritter) 3/14/06
  */
 
 /*
@@ -1442,6 +1442,8 @@ loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 		if (access(path, 0) < 0)
 			path = getfontpath(file, "ttf");
 	}
+	if (dev.allpunct)
+		spec |= SPEC_PUNCT;
 	a = calloc(1, sizeof *a);
 	for (i = 0; i < nafm; i++)
 		if (strcmp(afmtab[i]->path, path) == 0 &&
