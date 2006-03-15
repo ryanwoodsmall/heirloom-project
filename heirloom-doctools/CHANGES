@@ -11,7 +11,9 @@ Release ...
   were ineffective with smaller ones.
 * troff: OpenType and TrueType kerning pairs with a position difference
   of zero are now completely ignored. They could previously overwrite a
-  previous positioning difference for the same pair.
+  previous positioning difference for the same pair. Also if a kerning
+  pair occurs more than once in the metrics file, the first definition
+  is now used instead of the last one.
 * tbl: Storage space expansions because of long lines inside a table are
   now done properly.
 * troff: The "\n[.ascender]" and "\n[.descender]" registers contain the

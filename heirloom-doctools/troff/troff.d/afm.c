@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.49 (gritter) 3/14/06
+ * Sccsid @(#)afm.c	1.50 (gritter) 3/15/06
  */
 
 #include <stdlib.h>
@@ -827,12 +827,12 @@ afmalloc(struct afmtab *a, int n)
 	int	i;
 
 #if defined (DPOST) || defined (DUMP)
-	a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab, sizeof *a->fitab);
+	a->fichars = n+NCHARLIB+1 + 128 - 32 + nchtab;
 #else	/* TROFF */
 	extern int	psmaxcode;
-	a->fitab = calloc(n+NCHARLIB+1 + 128 - 32 + nchtab + psmaxcode+1,
-			sizeof *a->fitab);
+	a->fichars = n+NCHARLIB+1 + 128 - 32 + nchtab + psmaxcode+1;
 #endif	/* TROFF */
+	a->fitab = calloc(a->fichars, sizeof *a->fitab);
 	a->fontab = malloc((n+NCHARLIB+1)*sizeof *a->fontab);
 	a->fontab[0] = dev.res * dev.unitwidth / 72 / 3;
 	a->kerntab = calloc(n+NCHARLIB+1, sizeof *a->kerntab);
@@ -939,10 +939,7 @@ afmget(struct afmtab *a, char *contents, size_t size)
 		} else if (state == KERNDATA &&
 				(th = thisword(cp, "StartKernPairs")) != 0) {
 			a->nkernpairs = n = strtol(th, NULL, 10);
-			a->kernprime = nextprime(4 * a->nkernpairs);
 			state = KERNPAIRS;
-			a->kernpairs = calloc(a->kernprime,
-					sizeof *a->kernpairs);
 		} else if (state == KERNPAIRS &&
 				thisword(cp, "EndKernPairs")) {
 			state = KERNDATA;
@@ -993,32 +990,27 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 }
 
 #ifndef	DPOST
-#define	hash(c, prime)	((2654435769U * (c) >> 0) % prime)
-
-struct kernpair *
-afmkernlook(struct afmtab *a, int ch1, int ch2)
+void
+afmaddkernpair(struct afmtab *a, int ch1, int ch2, int k)
 {
-	struct kernpair	*kp;
-	unsigned	h, c, n = 0;
+	struct kernpairs	*kp;
 
-	h = hash((unsigned)ch1<<16 | (unsigned)ch2, a->kernprime);
-	kp = &a->kernpairs[c = h];
-	while (kp->ch1 != 0 || kp->ch2 != 0) {
-		if (kp->ch1 == ch1 && kp->ch2 == ch2)
-			break;
-		c += n&1 ? -((n+1)/2) * ((n+1)/2) : ((n+1)/2) * ((n+1)/2);
-		n++;
-		while (c >= a->kernprime)
-			c -= a->kernprime;
-		kp = &a->kernpairs[c];
+	if (a->kernpairs == NULL)
+		a->kernpairs = calloc(a->fichars, sizeof *a->kernpairs);
+	kp = &a->kernpairs[ch1];
+	while (kp->cnt == NKERNPAIRS) {
+		if (kp->next == NULL)
+			kp->next = calloc(1, sizeof *kp->next);
+		kp = kp->next;
 	}
-	return kp;
+	kp->ch2[kp->cnt] = ch2;
+	kp->k[kp->cnt] = k;
+	kp->cnt++;
 }
 
 static void
 addkernpair(struct afmtab *a, char *_line)
 {
-	struct kernpair	*kp;
 	struct namecache	*np1, *np2;
 	char	*lp = _line, c, *cp;
 	int	n, i, j;
@@ -1053,27 +1045,29 @@ addkernpair(struct afmtab *a, char *_line)
 		for (i = 0; i < 2; i++)
 			if (np1->fival[i] >= 0)
 				for (j = 0; j < 2; j++)
-					if (np2->fival[j] >= 0) {
-						kp = afmkernlook(a,
+					if (np2->fival[j] >= 0)
+						afmaddkernpair(a,
 								np1->fival[i],
-								np2->fival[j]);
-						kp->ch1 = np1->fival[i];
-						kp->ch2 = np2->fival[j];
-						kp->k = n;
-					}
+								np2->fival[j],
+								n);
 	}
 }
 
 int
 afmgetkern(struct afmtab *a, int ch1, int ch2)
 {
-	struct kernpair	*kp;
+	struct kernpairs	*kp;
+	int	i;
 
 	if (a->kernpairs) {
-		kp = afmkernlook(a, ch1, ch2);
-		return kp->k;
-	} else
-		return 0;
+		kp = &a->kernpairs[ch1];
+		do {
+			for (i = 0; i < kp->cnt; i++)
+				if (kp->ch2[i] == ch2)
+					return kp->k[i];
+		} while ((kp = kp->next) != NULL);
+	}
+	return 0;
 }
 #endif	/* !DPOST */
 

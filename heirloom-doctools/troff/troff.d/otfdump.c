@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.13 (gritter) 3/14/06
+ * Sccsid @(#)otfdump.c	1.14 (gritter) 3/15/06
  */
 
 static enum show {
@@ -184,12 +184,9 @@ afmalloc(struct afmtab *a, int n)
 {
 }
 
-struct kernpair *
-afmkernlook(struct afmtab *a, int ch1, int ch2)
+void
+afmaddkernpair(struct afmtab *a, int ch1, int ch2, int k)
 {
-	static struct kernpair	k;
-
-	return &k;
 }
 
 static void

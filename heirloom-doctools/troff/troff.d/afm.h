@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.26 (gritter) 3/14/06
+ * Sccsid @(#)afm.h	1.27 (gritter) 3/15/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -39,10 +39,12 @@ enum spec {
 	SPEC_S		= 02000
 };
 
-struct kernpair {
-	unsigned short	ch1;
-	unsigned short	ch2;
-	short	k;
+#define	NKERNPAIRS	46
+struct kernpairs {
+	struct kernpairs	*next;
+	int	cnt;
+	unsigned short	ch2[NKERNPAIRS];
+	short	k[NKERNPAIRS];
 };
 
 struct namecache {
@@ -81,15 +83,15 @@ extern struct afmtab {
 	int	*encmap;
 	struct namecache	*namecache;
 	int	nameprime;
-	struct kernpair	*kernpairs;
+	struct kernpairs	*kernpairs;
 	struct charpair	*gid2tr;
 	int	nkernpairs;
-	int	kernprime;
 	int	nspace;
 	struct feature	**features;
 	int	rq;
 	int	lineno;
 	int	nchars;
+	int	fichars;
 	int	capheight;
 	int	xheight;
 	int	isFixedPitch;
@@ -122,7 +124,7 @@ extern	void	afmremap(struct afmtab *);
 extern	int	afmmapname(const char *, enum spec);
 extern	void	afmaddchar(struct afmtab *, int, int, int, int, int[],
 			char *, enum spec, int);
-extern	struct kernpair	*afmkernlook(struct afmtab *, int, int);
+extern void	afmaddkernpair(struct afmtab *, int, int, int);
 extern	int	nextprime(int n);
 extern	unsigned	pjw(const char *);
 extern	char	*afmencodepath(const char *);

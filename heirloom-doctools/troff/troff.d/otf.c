@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.47 (gritter) 3/14/06
+ * Sccsid @(#)otf.c	1.48 (gritter) 3/15/06
  */
 
 #include <stdio.h>
@@ -2544,8 +2544,6 @@ static int	nkerntmp;
 #ifdef	DUMP
 static void	kernpair(int, int, int);
 #else	/* !DUMP */
-static struct kernpair	*kerntmp;
-static int	akerntmp;
 
 static struct namecache	**nametable;
 
@@ -2562,22 +2560,6 @@ kerninit(void)
 }
 
 #define	GID2name(gid)	((gid) < 0 || (gid) >= nc ? NULL : nametable[gid])
-
-static void
-kernpair1(int ch1, int ch2, int k)
-{
-	if (nkerntmp >= akerntmp) {
-		if (akerntmp == 0)
-			akerntmp = 4096;
-		else
-			akerntmp *= 2;
-		kerntmp = realloc(kerntmp, akerntmp * sizeof *kerntmp);
-	}
-	kerntmp[nkerntmp].ch1 = ch1;
-	kerntmp[nkerntmp].ch2 = ch2;
-	kerntmp[nkerntmp].k = k;
-	nkerntmp++;
-}
 
 #define	kernpair(first, second, x)	\
 		((x) ? _kernpair(first, second, (x)) : NULL)
@@ -2599,23 +2581,14 @@ _kernpair(int first, int second, int x)
 		if (np1->fival[i] >= 0)
 			for (j = 0; j < 2; j++)
 				if (np2->fival[j] >= 0)
-					kernpair1(np1->fival[i],
+					afmaddkernpair(a, np1->fival[i],
 							np2->fival[j], x);
 }
 
 static void
 kernfinish(void)
 {
-	int	i;
-
 	a->nkernpairs = nkerntmp;
-	a->kernprime = nextprime(2*a->nkernpairs);
-	a->kernpairs = calloc(a->kernprime, sizeof *a->kernpairs);
-	for (i = 0; i < nkerntmp; i++)
-		*afmkernlook(a, kerntmp[i].ch1, kerntmp[i].ch2) = kerntmp[i];
-	nkerntmp = akerntmp = 0;
-	free(kerntmp);
-	kerntmp = NULL;
 	free(nametable);
 }
 #endif	/* !DUMP */
