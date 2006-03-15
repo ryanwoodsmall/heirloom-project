@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.48 (gritter) 3/15/06
+ * Sccsid @(#)otf.c	1.49 (gritter) 3/16/06
  */
 
 #include <stdio.h>
@@ -2681,7 +2681,7 @@ get_PairPosFormat2(int o)
 }
 
 static void
-get_GPOS_kern(int _t, int o, const char *_name)
+get_GPOS_kern1(int _t, int o, const char *_name)
 {
 	int	PosFormat;
 
@@ -2689,6 +2689,15 @@ get_GPOS_kern(int _t, int o, const char *_name)
 	case 1:
 		get_PairPosFormat1(o);
 		break;
+	}
+}
+
+static void
+get_GPOS_kern2(int _t, int o, const char *_name)
+{
+	int	PosFormat;
+
+	switch (PosFormat = pbe16(&contents[o])) {
 	case 2:
 		get_PairPosFormat2(o);
 		break;
@@ -3393,7 +3402,8 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 #ifndef	DPOST
 		kerninit();
 		get_feature(pos_GSUB, "liga", 4, get_LigatureSubstFormat1);
-		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern);
+		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern1);
+		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern2);
 		get_feature(pos_GSUB, NULL, -1, get_substitutions);
 		if (ttf && nkerntmp == 0)
 			get_kern();
