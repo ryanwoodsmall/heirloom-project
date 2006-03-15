@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.50 (gritter) 3/15/06
+ * Sccsid @(#)afm.c	1.51 (gritter) 3/16/06
  */
 
 #include <stdlib.h>
@@ -995,6 +995,8 @@ afmaddkernpair(struct afmtab *a, int ch1, int ch2, int k)
 {
 	struct kernpairs	*kp;
 
+	if (k == 0)
+		return;
 	if (a->kernpairs == NULL)
 		a->kernpairs = calloc(a->fichars, sizeof *a->kernpairs);
 	kp = &a->kernpairs[ch1];
