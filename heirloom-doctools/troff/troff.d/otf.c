@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.49 (gritter) 3/16/06
+ * Sccsid @(#)otf.c	1.50 (gritter) 3/16/06
  */
 
 #include <stdio.h>
@@ -2539,7 +2539,7 @@ get_x_adj(int ValueFormat1, int o)
 static void	kerninit(void);
 static void	kernfinish(void);
 
-static int	nkerntmp;
+static int	got_kern;
 
 #ifdef	DUMP
 static void	kernpair(int, int, int);
@@ -2553,6 +2553,7 @@ kerninit(void)
 	char	*cp;
 	int	i;
 
+	got_kern = 0;
 	nametable = calloc(nc, sizeof *nametable);
 	for (i = 0; i < nc; i++)
 		if ((cp = GID2SID(i)) != NULL)
@@ -2588,7 +2589,6 @@ _kernpair(int first, int second, int x)
 static void
 kernfinish(void)
 {
-	a->nkernpairs = nkerntmp;
 	free(nametable);
 }
 #endif	/* !DUMP */
@@ -2685,6 +2685,7 @@ get_GPOS_kern1(int _t, int o, const char *_name)
 {
 	int	PosFormat;
 
+	got_kern = 1;
 	switch (PosFormat = pbe16(&contents[o])) {
 	case 1:
 		get_PairPosFormat1(o);
@@ -2697,6 +2698,7 @@ get_GPOS_kern2(int _t, int o, const char *_name)
 {
 	int	PosFormat;
 
+	got_kern = 1;
 	switch (PosFormat = pbe16(&contents[o])) {
 	case 2:
 		get_PairPosFormat2(o);
@@ -3019,6 +3021,7 @@ get_kern_subtable(int o)
 			(coverage&4) != 0 ||	/* . . . not perpendicular */
 			((coverage&0xff00) != 0))	/* . . . format 0 */
 		return;
+	got_kern = 1;
 	nPairs = pbe16(&contents[o+6]);
 	for (i = 0; i < nPairs; i++) {
 		if (o + 14 + 3 * (i+1) > o + length)
@@ -3405,7 +3408,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern1);
 		get_feature(pos_GPOS, "kern", 2, get_GPOS_kern2);
 		get_feature(pos_GSUB, NULL, -1, get_substitutions);
-		if (ttf && nkerntmp == 0)
+		if (ttf && got_kern == 0)
 			get_kern();
 		kernfinish();
 		get_cmap(0);

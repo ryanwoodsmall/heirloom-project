@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otfdump.c	1.14 (gritter) 3/15/06
+ * Sccsid @(#)otfdump.c	1.15 (gritter) 3/16/06
  */
 
 static enum show {
@@ -195,7 +195,6 @@ kernpair(int first, int second, int x)
 	char	*s1, *s2;
 
 	if (x) {
-		nkerntmp++;
 		s1 = GID2SID(first);
 		s2 = GID2SID(second);
 		if (s1 && s2)
@@ -212,5 +211,4 @@ kerninit(void)
 static void
 kernfinish(void)
 {
-	nkerntmp = 0;
 }

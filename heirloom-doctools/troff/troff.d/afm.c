@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.51 (gritter) 3/16/06
+ * Sccsid @(#)afm.c	1.52 (gritter) 3/16/06
  */
 
 #include <stdlib.h>
@@ -938,7 +938,6 @@ afmget(struct afmtab *a, char *contents, size_t size)
 			state = KERNDATA;
 		} else if (state == KERNDATA &&
 				(th = thisword(cp, "StartKernPairs")) != 0) {
-			a->nkernpairs = n = strtol(th, NULL, 10);
 			state = KERNPAIRS;
 		} else if (state == KERNPAIRS &&
 				thisword(cp, "EndKernPairs")) {
