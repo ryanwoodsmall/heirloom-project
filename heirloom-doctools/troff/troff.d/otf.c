@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.50 (gritter) 3/16/06
+ * Sccsid @(#)otf.c	1.51 (gritter) 3/17/06
  */
 
 #include <stdio.h>
@@ -2517,7 +2517,7 @@ get_value_size(int ValueFormat1, int ValueFormat2)
 	return sz;
 }
 
-static int
+static inline int
 get_x_adj(int ValueFormat1, int o)
 {
 	int	x = 0;
@@ -2647,9 +2647,10 @@ get_PairPosFormat2(int o)
 	int	ValueFormat1, ValueFormat2;
 	int	ClassDef1, ClassDef2;
 	int	Class1Count, Class2Count;
-	int	g1, g2;
-	int	v1, v2;
+	int	g, *g2 = NULL;
+	int	v, *v2 = NULL;
 	int	sz;
+	int	i, n, a;
 	int	x;
 
 	ValueFormat1 = pbe16(&contents[o+4]);
@@ -2660,24 +2661,37 @@ get_PairPosFormat2(int o)
 	Class2Count = pbe16(&contents[o+14]);
 	sz = get_value_size(ValueFormat1, ValueFormat2);
 	if ((c1 = open_class(ClassDef1)) != NULL) {
-		while (get_class(c1, &g1, &v1), g1 >= 0) {
-			if ((c2 = open_class(ClassDef2)) != NULL) {
-				while (get_class(c2, &g2, &v2), g2 >= 0) {
-					if (v1 >= 0 && v1 < Class1Count &&
-							v2 >= 0 &&
-							v2 < Class2Count) {
-						x = get_x_adj(ValueFormat1,
-							o + 16 +
-							v1*Class2Count*sz +
-							v2*sz);
-						kernpair(g1, g2, x);
-					}
+		if ((c2 = open_class(ClassDef2)) != NULL) {
+			n = a = 0;
+			while (get_class(c2, &g, &v), g >= 0) {
+				if (v < 0 || v >= Class2Count)
+					continue;
+				if (n >= a) {
+					a = a ? 2*a : 128;
+					g2 = realloc(g2, a * sizeof *g2);
+					v2 = realloc(v2, a * sizeof *v2);
 				}
-				free_class(c2);
+				g2[n] = g;
+				v2[n] = v;
+				n++;
 			}
+			while (get_class(c1, &g, &v), g >= 0) {
+				if (v < 0 || v >= Class1Count)
+					continue;
+				for (i = 0; i < n; i++) {
+					x = get_x_adj(ValueFormat1,
+						o + 16 +
+						v*Class2Count*sz +
+						v2[i]*sz);
+					kernpair(g, g2[i], x);
+				}
+			}
+			free_class(c2);
 		}
 		free_class(c1);
 	}
+	free(g2);
+	free(v2);
 }
 
 static void
