@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.51 (gritter) 3/17/06
+ * Sccsid @(#)otf.c	1.52 (gritter) 3/17/06
  */
 
 #include <stdio.h>
@@ -2562,28 +2562,25 @@ kerninit(void)
 
 #define	GID2name(gid)	((gid) < 0 || (gid) >= nc ? NULL : nametable[gid])
 
-#define	kernpair(first, second, x)	\
-		((x) ? _kernpair(first, second, (x)) : NULL)
-
-static void
-_kernpair(int first, int second, int x)
+static inline void
+kernpair(int first, int second, int x)
 {
 	struct namecache	*np1, *np2;
-	int	i, j;
 
+	if (x == 0 || (x = _unitconv(x)) == 0)
+		return;
 	np1 = GID2name(first);
 	np2 = GID2name(second);
 	if (np1 == NULL || np2 == NULL)
 		return;
-	x = _unitconv(x);
-	if (x == 0)
-		return;
-	for (i = 0; i < 2; i++)
-		if (np1->fival[i] >= 0)
-			for (j = 0; j < 2; j++)
-				if (np2->fival[j] >= 0)
-					afmaddkernpair(a, np1->fival[i],
-							np2->fival[j], x);
+	if (np1->fival[0] >= 0 && np2->fival[0] >= 0)
+		afmaddkernpair(a, np1->fival[0], np2->fival[0], x);
+	if (np1->fival[0] >= 0 && np2->fival[1] >= 0)
+		afmaddkernpair(a, np1->fival[0], np2->fival[1], x);
+	if (np1->fival[1] >= 0 && np2->fival[0] >= 0)
+		afmaddkernpair(a, np1->fival[1], np2->fival[0], x);
+	if (np1->fival[1] >= 0 && np2->fival[1] >= 0)
+		afmaddkernpair(a, np1->fival[1], np2->fival[1], x);
 }
 
 static void
