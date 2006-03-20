@@ -2,7 +2,7 @@
 * A warning about an initalization of an unsigned value to -1 has been
   eliminated (patch by Matthew Sienkiewicz).
 * Percent characters in the "prompt" variable are now handled correctly;
-  values of "folder" beginning with an at sign and longer than the
+  values of "folder" beginning with an at character and longer than the
   maximum system path length do not cause a heap overflow anymore (patch
   by Ulf Harnhammar).
 
