@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.84 (gritter) 3/4/06";
+static char sccsid[] = "@(#)lex.c	2.85 (gritter) 3/20/06";
 #endif
 #endif /* not lint */
 
@@ -344,7 +344,7 @@ commands(void)
 			reset_on_stop = 1;
 			if ((prompt = value("prompt")) == NULL)
 				prompt = value("bsdcompat") ? "& " : "? ";
-			printf(prompt);
+			printf("%s", prompt);
 		}
 		fflush(stdout);
 		sreset();

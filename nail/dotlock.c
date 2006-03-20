@@ -34,7 +34,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)dotlock.c	2.8 (gritter) 3/4/06";
+static char sccsid[] = "@(#)dotlock.c	2.9 (gritter) 3/20/06";
 #endif
 #endif
 
@@ -60,16 +60,20 @@ static int create_exclusive(const char *fname);
 static int 
 maildir_access(const char *fname)
 {
-	char path[MAXPATHLEN];
+	char *path;
 	char *p;
+	int i;
 
+	path = ac_alloc(strlen(fname) + 2);
 	strcpy(path, fname);
 	p = strrchr(path, '/');
 	if (p != NULL)
 		*p = '\0';
 	if (p == NULL || *path == '\0')
 		strcpy(path, ".");
-	return access(path, R_OK|W_OK|X_OK);
+	i = access(path, R_OK|W_OK|X_OK);
+	ac_free(path);
+	return i;
 }
 
 /*

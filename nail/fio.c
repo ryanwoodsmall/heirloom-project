@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.69 (gritter) 3/4/06";
+static char sccsid[] = "@(#)fio.c	2.70 (gritter) 3/20/06";
 #endif
 #endif /* not lint */
 
@@ -919,9 +919,9 @@ ssl_retry:	x = SSL_write(sp->s_ssl, data, sz);
 		snprintf(o, sizeof o, "%s write error",
 				sp->s_desc ? sp->s_desc : "socket");
 #if defined (USE_NSS)
-		sp->s_use_ssl ? nss_gen_err(o) : perror(o);
+		sp->s_use_ssl ? nss_gen_err("%s", o) : perror(o);
 #elif defined (USE_OPENSSL)
-		sp->s_use_ssl ? ssl_gen_err(o) : perror(o);
+		sp->s_use_ssl ? ssl_gen_err("%s", o) : perror(o);
 #else	/* !USE_SSL */
 		perror(o);
 #endif	/* !USE_SSL */
@@ -956,11 +956,11 @@ sgetline(char **line, size_t *linesize, size_t *linelen, struct sock *sp)
 						sizeof sp->s_rbuf)) <= 0) {
 					if (sp->s_rsz < 0) {
 						char	o[512];
-						snprintf(o, sizeof o,
+						snprintf(o, sizeof o, "%s",
 							sp->s_desc ?
 								sp->s_desc :
 								"socket");
-						nss_gen_err(o);
+						nss_gen_err("%s", o);
 					}
 					break;
 				}
@@ -978,11 +978,11 @@ sgetline(char **line, size_t *linesize, size_t *linelen, struct sock *sp)
 						case SSL_ERROR_WANT_WRITE:
 							goto ssl_retry;
 						}
-						snprintf(o, sizeof o,
+						snprintf(o, sizeof o, "%s",
 							sp->s_desc ?
 								sp->s_desc :
 								"socket");
-						ssl_gen_err(o);
+						ssl_gen_err("%s", o);
 
 					}
 					break;
@@ -996,7 +996,7 @@ sgetline(char **line, size_t *linesize, size_t *linelen, struct sock *sp)
 						char	o[512];
 						if (errno == EINTR)
 							goto again;
-						snprintf(o, sizeof o,
+						snprintf(o, sizeof o, "%s",
 							sp->s_desc ?
 								sp->s_desc :
 								"socket");

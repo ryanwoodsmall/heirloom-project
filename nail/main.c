@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.47 (gritter) 3/4/06";
+static char sccsid[] = "@(#)main.c	2.48 (gritter) 3/20/06";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -447,7 +447,7 @@ usage:
 		 */
 		if ((cp = value("folder")) != NULL &&
 				which_protocol(cp) == PROTO_IMAP)
-			strcpy(mailname, cp);
+			strncpy(mailname, cp, PATHSIZE)[PATHSIZE-1] = '\0';
 	}
 	i = setfile(ef, 0);
 	if (i < 0)
