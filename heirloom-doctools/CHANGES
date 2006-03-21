@@ -1,4 +1,10 @@
 Release ...
+* An revised version of the "Nroff/Troff User's Manual" is now available
+  in the directory "doc/troff". It replaces the "NEWS" and "PDFS" text
+  files; these have been removed.
+* A typeset version of "Font Handling in Troff With PostScript Devices"
+  is now available in the directory "doc/fonts". It replaces the "FONTS"
+  text file that has been removed.
 * [nt]roff: Hyphenation is now enabled by default. This is compatible
   with most other versions of troff, but differs from Solaris troff.
 * troff/dpost: The characters \(or \- \` \' " # < > @ \ ^ ~ are now

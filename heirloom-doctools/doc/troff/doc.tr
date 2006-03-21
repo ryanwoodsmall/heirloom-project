@@ -1,0 +1,5863 @@
+.\" Derived from (1) /usr/doc/troff/*, Unix 7th edition,
+.\" and (2) /sys/doc/troff.ms, Plan 9 version 4:
+.\"
+.\" (1)
+.\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\"   Redistributions of source code and documentation must retain the
+.\"    above copyright notice, this list of conditions and the following
+.\"    disclaimer.
+.\"   Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"   All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"      This product includes software developed or owned by Caldera
+.\"      International, Inc.
+.\"   Neither the name of Caldera International, Inc. nor the names of
+.\"    other contributors may be used to endorse or promote products
+.\"    derived from this software without specific prior written permission.
+.\"
+.\" USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
+.\" INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+.\" BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+.\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+.\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+.\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.\"
+.\" (2)
+.\" Copyright (C) 2003, Lucent Technologies Inc. and others.
+.\" All Rights Reserved.
+.\"
+.\" Distributed under the terms of the Lucent Public License Version 1.02.
+.\"
+.\"
+.\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
+.\" Sccsid @(#)doc.tr	1.23.1.1 (gritter) 3/13/06
+.\"
+.\" from file m.mac
+.do xflag 3
+.warn
+.mediasize letter
+.fps math,greek 1 R times ttf
+.fp 2 I timesi ttf
+.fp 3 B timesbd ttf
+.fp 4 BI timesbi ttf
+.flig R 6
+.flig I 6
+.flig B 6
+.flig BI 6
+.kernpair B f B l 100
+.kernpair B f B i 50
+.kernpair I T R ) 125
+.kernpair I W R ) 125
+.kernpair I H R ) 125
+.kernpair I N B \' 90
+.ig
+.fps math 1 R tim_____ pfb
+.fp 2 I timi____ pfb
+.fp 3 B timb____ pfb
+.fp 4 BI timbi___ pfb
+.fp 0 RE tiy_____ pfb
+.fp 0 IE tiyi____ pfb
+.fp 0 BE tiyb____ pfb
+.fp 0 BIE tiybi___ pfb
+.fallback R RE
+.flig R 31
+.fallback I IE
+.flig I 31
+.fallback B BE
+.flig B 31
+.fallback BI BIE
+.flig BI 31
+..
+.if \n(mo=1 .ds mo January
+.if \n(mo=2 .ds mo February
+.if \n(mo=3 .ds mo March
+.if \n(mo=4 .ds mo April
+.if \n(mo=5 .ds mo May
+.if \n(mo=6 .ds mo June
+.if \n(mo=7 .ds mo July
+.if \n(mo=8 .ds mo August
+.if \n(mo=9 .ds mo September
+.if \n(mo=10 .ds mo October
+.if \n(mo=11 .ds mo November
+.if \n(mo=12 .ds mo December
+.if \n(dw=1 .ds dw Sunday
+.if \n(dw=2 .ds dw Monday
+.if \n(dw=3 .ds dw Tuesday
+.if \n(dw=4 .ds dw Wednesday
+.if \n(dw=5 .ds dw Thursday
+.if \n(dw=6 .ds dw Friday
+.if \n(dw=7 .ds dw Saturday
+.\"
+.de ii
+.ds NR "\fInroff\fR
+.ds TR "\fItroff\fR
+.ds NR. "\fInroff.\fR
+.ds TR. "\fItroff.\fR
+.ds NR, "\fInroff,\fR
+.ds TR, "\fItroff,\fR
+.ds NR; "\fInroff;\fR
+.ds TR; "\fItroff;\fR
+.ds NR: "\fInroff:\fR
+.ds TR: "\fItroff:\fR
+.ds PS "\fRPostScript\fR
+.ds PDF "\s-1PDF\s+1
+.ds H
+.nr PS 10
+.nr PO 1i
+.hy 14
+.ds u \^\v'-0.3m'\s-2
+.ds d \s0\v'0.3m'
+.nr a .8i
+.nr b 1.6i
+.nr c 2.4i
+.nr d 2.9i
+.nr e 0.25i
+.nr p 0 1
+.nr s 0 1
+.af p 1
+.af s 1
+..
+.nr m -1i
+.nr x 0 1
+.nr y 0+\nmu
+.ii
+.ev 1
+.ps \n(PS-2
+.vs \n(PS
+.ll 6.5i
+'in 0
+.ev
+.tr &.
+.de xx
+.sp 0.4
+..
+.de ht
+.tl `\*(NR/\*(TR \fRUser's Manual``Heirloom Documentation Tools`
+.tl '3/13/06'''\".tl 'Version \n(mo/\n(dy/\n(yr'''
+..
+.de hd
+.\".tl '\(rn'''
+.if \\n%>1 \{'sp |.33i
+.ht
+.ps \\n(S2
+.ps \\n(S1
+.ft
+'sp |1i\}
+.nr x 0 1
+.nr y 0+\\nmu
+.chfo \\nmu
+.if \\n(dn .fz
+.ns
+.if dmx .mx
+.nr cl 0 1
+.mk
+..
+.de fz
+.fn
+.nf
+.fy
+.fi
+.ef
+..
+.de fx
+.if \\nx .di fy
+..
+.nr fopos 0
+.de chfo
+.rr fopos
+.nr fopos \\$1
+.ch fo \\n[fopos]u
+..
+.de dl
+.ie \\n[fopos]>=0 .chfo \\n[fopos]u+1v
+.el .chfo \\n[fopos]u-1v
+..
+.de fo
+.if dcx .cx
+.nr dn 0
+.if \\nx .xf
+.nr x 0 \"disable fx
+.ie \\n(2C&(\\n+(cl<2) \{\
+.po +3.4i
+.rt
+.nr y 0+\\nmu
+.chfo \\nmu
+.if \\n(dn .fz
+.ns \}
+.el \{\
+.po \\n(POu
+.nr S1 \\n(.s
+.ps
+.nr S2 \\n(.s
+.ps 10
+'bp \}
+..
+.nr 2C 0
+.de 2C
+.br
+.mk
+.nr 2C 1
+.ll 3.1i
+.ev 1
+.ll 3.1i
+.ev
+..
+.de 1C
+.br
+.nr 2C 0
+.ll 6.5i
+.ev 1
+.ll 6.5i
+.ev
+..
+.de co
+.de cx
+.br
+\fI(Continued next page.)\fP
+.br
+.rm cx
+\\..
+..
+.de pp
+'ps \\n(PS
+.ft R
+'tl ''- % -''
+'bp
+..
+.wh 0 hd
+.wh 12i fo
+.wh \nmu fx
+.chfo \nmu
+.de fn
+.da FN
+.ev 1
+.if \\n+x=1 .fs
+.fi
+.ti 0
+..
+.de xf
+.ev 1
+.nf
+.FN
+.rm FN
+.di
+.ev
+..
+.de fs
+.ti 0
+\l'1i'
+.br
+..
+.de ef
+.br
+.ev
+.di
+.nr y -\\n(dn
+.if \\nx=1 .nr y -2p
+.chfo \\nyu
+.if \\n(nl+\\n(.v-\\n(.p-\\ny .chfo \\n(nlu+\\n(.vu
+..
+.wh -.6i pp
+.de h1
+.xx
+.ne 5
+.nf
+.ta \\nau \\nbu \\ncu \\ndu +\\neu
+.ft BI
+Request	Initial	If No
+Form	Value\\$2	Argument	Notes\\$1	Explanation
+.ft R
+.ft
+.fi
+.in \\ndu
+..
+.de bt
+.ft R
+.xx
+.ne 1.1
+.ti 0
+..
+.de b1
+.br
+.ti 0
+..
+.de pg
+.ft R
+.fi
+.in 0
+.xx
+.ne 1.1
+..
+.de sc
+.pg
+\fI\\*H\\np.\\n+s.\|\\c
+.ft R
+.ul
+.it 1 sc-end
+.di head
+..
+.de sc-end
+.end 2
+..
+.de mh
+.nr s 0
+.in 0
+.xx
+.ne 2.5
+.ft B
+\\*H\\n+p.
+.it 1 mh-end
+.di head
+..
+.de mh-end
+.end \\n[mh-level]
+..
+.de end
+.br
+.nr eol \\n(.n
+.di
+.head
+.br
+.Bookmark \\$1 \\*[head]
+.sp -2v
+\h'|\\n[eol]u'
+..
+.de x1
+.xx
+.in .5i
+.nf
+..
+.de x2
+.xx
+.in 0
+.fi
+..
+.de EM
+.br
+\&\c
+'bp
+.pl 2i
+..
+.em EM
+.de TS
+.sp
+..
+.de T&
+..
+.de TE
+.sp
+.ce 0
+.ft R
+.ps \n(PS
+.ta \\nau \\nbu \\ncu \\ndu +\\neu
+..
+.de I
+\fI\\$*\fP
+..
+.de B
+\fB\\$*\fP
+..
+.de BI
+\f(BI\\$*\fP
+..
+.de Bookmark
+.	mk Btmp
+.	vpt 0
+.	ev bookmarks
+.		ie \\$1=0 \{\
+\v'|0'
+.			nr bmove 1v+4p
+.		\}
+.		el .nr bmove 2v
+\v'-\\n[bmove]u'\\X'PDFMark: BookmarkClosed \\$1 \\$2'
+.		sp |\\n[Btmp]u
+.	ev
+.	vpt 1
+..
+.\" from file m0
+\X'PDFMark: Author Gunnar Ritter'
+\X,PDFMark: Title Nroff/Troff User's Manual,
+\X'PS: [ {Catalog} << /ViewerPreferences << /DisplayDocTitle true >> >> /PUT pdfmark'
+\X'PS: [ /PageMode /UseOutlines /DOCVIEW pdfmark'
+.br
+.ii
+.Bookmark 0 Title
+.br
+.rs
+.sp |1.50i
+.ce 1000
+.ps 12
+.ft B
+Heirloom Documentation Tools
+.sp 16p-\n(.vu
+Nroff/Troff User's Manual
+.sp .2i
+.ft I
+.ps 10
+Joseph F. Ossanna
+.br
+Brian W. Kernighan
+.br
+Gunnar Ritter
+.ft R
+.ce 0
+.sp 2
+.ps \n(PS
+.fi
+.Bookmark 0 Introduction
+.ft B
+Introduction
+.pg
+\*(NR and \*(TR are text processors under
+the \s-1UNIX\s+1 Time-Sharing System\*u1\*d
+that format text for typewriter-like terminals and
+for a typesetter/raster devices, respectively.
+They accept lines of text interspersed with lines of
+format control information and
+format the text into a printable, paginated document
+having a user-designed style.
+\*(NR and \*(TR offer
+unusual freedom in document styling,
+including:
+arbitrary style headers and footers;
+arbitrary style footnotes;
+multiple automatic sequence numbering for paragraphs, sections, etc;
+multiple column output;
+dynamic font and point-size control;
+arbitrary horizontal and vertical local motions at any point;
+and
+a family of automatic overstriking, bracket construction, and
+line drawing functions.
+.pg
+\*(TR produces its output in a device-independent form,
+although parameterized for a specific device;
+\*(TR output must be processed by a driver for that
+device to produce printed output.
+.pg
+\*(NR and \*(TR are highly compatible with each other and it is almost always
+possible to prepare input acceptable to both.
+Conditional input is provided that enables
+the user to embed input expressly destined for either program.
+\*(NR can prepare output directly for a variety of terminal types and
+is capable of utilizing the full resolution of each terminal.
+.pg
+.ft B
+On the Heirloom Documentation Tools Edition
+.pg
+In Summer 2005, Sun Microsystems, Inc. released
+the source code to the Solaris system,
+including the System\ V Release\ 4 version of \*[TR,]
+a derivative of AT\[ampersand]T
+\fIDocumenter's Workbench\fR \*[TR,] version 2.
+It had undergone few changes since the end of the 1980's,
+so it could serve as a clean starting point
+for a new version of \*(TR
+which is intended to be highly compatible
+with \s-1UNIX\s+1 \*[TR,]
+but which also provides additional features
+desirable for a high-quality typesetting application
+at the beginning of the 21th century.
+.pg
+As with the other components of the \fIHeirloom Project,\fR
+the original code,
+once it had been released under an Open Source license,
+has been made portable such that it compiles and runs
+on the contemporary \s-1UNIX\s+1-style systems, including Linux.
+It continues to be freely available under the same license
+as originally released, including its complete source code.
+.pg
+\*(PS and its close relative \*[PDF]
+are now the only device languages
+which are relevant to high-quality printing;
+actually, \*(PS itself is more and more becoming
+an intermediate language for the generation of \*[PDF] documents.
+The \fIHeirloom\fR version of \*(TR is thus primarily directed
+towards generating \*(PS output
+for further processing by a \*[PDF] creator,
+such as Ghostscript or Adobe Distiller;
+it can generate \*[PDF]-specific instructions
+for prepress usage
+as well as for online navigation in \*[PDF] documents.
+.pg
+The principal output device independence of \*(TR
+has nevertheless been retained,
+and changes to the intermediate language have been minor.
+Many \*(TR post-processors will thus continue to be usable
+with no or little adaptions.
+.pg
+\*(PS Type\ 1, OpenType, and TrueType
+have become device-independent font formats;
+virtually all commercial and free fonts
+are available in one of them.
+There is thus no need for a \*(TR-specific device-independent font format
+anymore;
+instead, \fIHeirloom\fR \*(TR can read font metrics directly
+from Type\ 1, OpenType, and TrueType font files.
+This has greatly relieved the task of installing fonts\(emit
+suffices to copy the original files to a user-selectable font directory\(em,
+and makes it possible to access advanced typographic data,
+such as kerning tables or substitution instructions for old-style numerals.
+.pg
+\*(TR provides convenient access to
+any character in a font file
+either by its \*(PS name,
+by its Unicode position
+as specified in a font-specific or a generic table,
+or by conversion from \s-1POSIX\s+1-style locale-specific characters
+to Unicode positions.
+The last form allows direct input of international language texts
+in almost any character encoding,
+including \s-1UTF\s+1-8.
+.pg
+A variety of international paper formats
+and hyphenation languages are supported by \*[TR.]
+.pg
+Many internal limitations of \*(TR have been removed;
+most notably, \*(TR can now set characters in fractional point sizes.
+.pg
+The \*(TR language has been extended
+similarly as in the \s-1GNU\s+1 version of \*[TR,] \fIgroff\fR\|\*u6\*d;
+for example,
+names of requests, macros, strings, number registers, and fonts
+can consist of more than two characters.
+However, \fIHeirloom\fR \*(TR is not generally compatible with \fIgroff,\fR
+although adaption of \fIgroff\fR documents is often possible.
+.pg
+As even the most basic printing devices
+are now capable of rastering \*(PS documents
+(at least using conversion tools),
+and as \*(PS and \*[PDF] viewer programs allow
+an accurate on-screen display of \*(TR documents,
+there is only one area where \*(NR is still useful:
+the formatting of \s-1UNIX\s+1 manual pages.
+The \fIHeirloom\fR version of \*(NR
+is thus specifically aimed at this task;
+it remains a separate program,
+is much smaller than \*[TR,]
+and is optionally able to run without external device description files.
+This makes it possible to use it to view manual pages
+even on small system distributions
+where the size of programs is an issue.
+.pg
+The Solaris version of \*(NR had already been updated
+to support input characters in arbitrary locales.
+The \fIHeirloom\fR version adds the ability to generate
+\s-1UTF\s+1-8 output.
+This extends the \*(NR character set
+by many mathematical and typographical characters
+on terminals capable of displaying them.
+.pg
+Although \fIHeirloom\fR \*(NR does of course
+not provide the typographical extensions made for \*[TR,]
+it includes the same language extensions.
+It is thus well able to cope with the
+tangle of manual page code
+which has been produced by application writers
+who have unfortunately become increasingly unaware
+of how to write well-styled \*(NR documents.
+.pg
+This manual as well as some of the pre- and post-processor commands
+have been derived from \s-1UNIX\s+1 code re\%leased by Caldera\*u7\*d,
+and from materials released by Lucent as parts
+of the \fIPlan\ 9\fR system\*u8\*d.
+.pg
+.ft B
+Background to the Second Edition
+.pg
+\*(TR
+was originally written by the late Joe Ossanna
+in about 1973, in assembly language for the \s-1PDP\s+1-11,
+to drive the Graphic Systems CAT typesetter.
+It was rewritten in C around 1975,
+and underwent slow but steady evolution until
+Ossanna's death late in 1977.
+.pg
+In 1979, Brian Kernighan
+modified
+\*(TR
+so that it would produce output for a variety of typesetters,
+while retaining its input specifications.
+Over the decade from 1979 to 1989,
+the internals
+have been modestly revised,
+though much of the code remains as it was when Ossanna wrote it.
+.pg
+\*(TR
+reads parameter files
+each time it is invoked, to
+set values for machine resolution,
+legal type sizes and fonts, and character names,
+character widths
+and the like.
+\*(TR
+output is \s-1ASCII\s+1 characters
+in a simple language
+that describes where each character is to be placed
+and in what size and font.
+A post-processor must be written for each device
+to convert this typesetter-independent language
+into specific instructions for that device.
+.pg
+The output language contains information that was not readily
+identifiable in the older output.
+In the newer language, the beginning of each page, line, and word
+is marked,
+so post-processors can do device-specific optimizations
+such as sorting the data vertically or printing it boustrophedonically,
+independent of
+\*[TR.]
+.pg
+Capabilities for graphics have been added:
+\*(TR
+recognizes commands for drawing diagonal lines,
+circles, ellipses, circular arcs,
+and quadratic B-splines.
+There are also ways to pass arbitrary information to the output,
+unprocessed by
+\*[TR.]
+.pg
+A number of limitations have been eased or eliminated.
+A document may have an arbitrary number of fonts on any page
+(if the output device permits it, of course).
+Fonts may be accessed merely by naming them;
+``mounting'' is no longer necessary.
+There are no limits on the number of characters.
+\H'8'Character height\H'10' and \S'-1'sl\S'0'a\S'1'nt\S'0' may be set
+independently of width.
+.pg
+The remainder of this document contains a description of
+usage and command-line options;
+a summary of requests, escape sequences, and pre-defined number registers;
+a reference manual;
+tutorial examples;
+and a list of commonly-available characters.
+.pg
+.ft B
+Acknowledgements (for the Second Edition, by Brian Kernighan)
+.pg
+Joe Ossanna's
+\*(TR
+remains a remarkable accomplishment.
+For more than twenty years, it has proven a robust tool,
+taking unbelievable abuse from a variety of preprocessors
+and being forced into uses that were never conceived of
+in the original design,
+all with considerable grace under fire.
+.pg
+Recent versions of \*(TR have profited from
+significant code improvements by
+Jaap Akkerhuis, Dennis Ritchie, Ken Thompson, and Molly Wagner.
+Andrew Hume, Doug McIlroy, Peter Nelson, and
+Ravi Sethi made valuable suggestions on the manual.
+I fear that the remaining bugs are my fault.
+.pg
+.ft B
+Acknowledgements (for the Heirloom Edition, by Gunnar Ritter)
+.pg
+The \*(TR program as written by Joseph Ossanna and Brian Kernighan
+turned out to be an excellent base
+for a typesetting system containing
+approximately twice as many lines of code.
+As with the second edition,
+the design and the principal parts of \*(TR have remained the same,
+despite of additions and modifications.
+This is particularly remarkable since
+much of it is now more than 30 years old,
+but serves its purpose as well as on day one.
+.pg
+I am grateful to Sun, Caldera, and Lucent
+for releasing the source code
+without which this project would not have been possible.
+.pg
+I wish to thank Brian Kernighan for the permission
+to adapt this manual.
+.pg
+.ft B
+Availability and Contact Information
+.pg
+The source code of the \fIHeirloom Documentation Tools\fR
+and accompanying materials
+are freely available from <http://heirloom.sourceforge.net/\:doctools.html>.
+Comments and bug reports should be sent to Gunnar Ritter,
+<gunnarr@acm.org>.
+.pg
+.sp .4
+.ft B
+References
+.pg
+.ta .3i
+.in .3i
+.ti 0
+[1]	M. D. McIllroy, B. W. Kernighan (Eds.),
+.ul
+Unix Programmer's Manual,
+Vol.\|2,
+AT\[ampersand]T Bell Laboratories,
+Murray Hill,
+\s-1NJ\s+1 07974, 1979;
+<http://plan9.bell-labs.com/7thEdMan/index.html>.
+.sp .4
+.ti 0
+[2]	B. W. Kernighan, L. L. Cherry,
+.ul
+Typesetting Mathematics \(em User's Guide (Second Edition),
+in [1].
+.sp .4
+.ti 0
+[3]	M. E. Lesk,
+.ul
+Tbl \(em A Program to Format Tables,
+in [1].
+.sp .4
+.ti 0
+[4]	B. W. Kernighan, \fIA TROFF Tutorial\fR,
+in [1].
+.sp .4
+.ti 0
+[5]	J. F. Ossanna, ``Nroff/Troff User's Manual'',
+in [1].
+.sp .4
+.ti 0
+[6]	<http://groff.ffii.org>
+.sp .4
+.ti 0
+[7]	<http://www.tuhs.org/Archive/Caldera-license.pdf>
+.sp .4
+.ti 0
+[8]	<http://plan9.bell-labs.com/plan9>
+'in 0
+.pg
+.bp
+.Bookmark 0 Usage
+.ft B
+Usage
+.pg
+The general form of invoking \*(NR (or \*(TR) at \s-1UNIX\s+1 command level is
+.x1
+\fBnroff  \fIoptions  files\fR\
+\h'|2i'(or  \fBtroff  \fIoptions  files\fR)
+.x2
+where \fIoptions\fR represents any of a number of option arguments
+and \fIfiles\fR represents the list of files containing the document
+to be formatted.
+An argument consisting of a single minus (\fB\-\fR) is taken to be
+a file name corresponding to the standard input.
+If no file names are given input is taken from the standard input.
+The options, which may appear in any order so long as they appear
+before the files, are:
+.sp
+.ta .2i 1.0i
+.ft BI
+	Option	Effect
+.br
+.ft R
+.ta .3i 1.0i
+.in 1.0i
+.ll -.3i
+.bt
+	\fB\-o\fIlist\fR	\
+Print only pages whose page numbers appear in \fIlist\fR,
+which consists of comma-separated numbers and number ranges.
+A number range has the form \fIN\-M\fR
+and means pages \fIN\fR through \fIM;\fR
+a initial \fI\-N\fR means
+from the beginning to page \fIN;\fR and a final \fIN\-\fR means
+from \fIN\fR to the end.
+.bt
+	\fB\-n\fIN\fR	Number first generated page \fIN\fR.
+.bt
+	\fB\-s\fIN\fR	Stop every \fIN\fR pages.
+\*(NR will halt prior to every \fIN\fR pages (default \fIN\fR=1)
+to allow paper loading or
+changing, and will resume upon receipt of a newline.
+\*(TR will include a ``pause'' code every \fIN\fR pages;
+its meaning, if any, depends on the output device.
+.bt
+	\fB\-m\fIname\fR	Prepends the macro file
+\fB/usr/ucblib/tmac/\fIname\fR
+to the input \fIfiles\fR.
+.bt
+	\fB\-r\fIaN\fR	Register \fIa\fR (one-character) is set to \fIN\fR.
+.bt
+	\fB\-i\fP	Read standard input after the input files are exhausted.
+.bt
+	\fB\-q\fR	\
+Invoke the simultaneous input-output mode of the \fBrd\fR request.
+.bt
+	\fB\-x\fIN\fR	Sets the extension level to \fIN\fR (cf. \(sc1.1).
+.bt
+	\fB\-z\fR	Check syntax only; do not generate any output except for error messages.
+.sp
+.ne 3
+.ft BI
+		\*(NR Only
+.br
+.ft
+.bt
+	\fB\-e\fR	\
+Produce equally-spaced words in adjusted
+lines, using full terminal resolution.
+.bt
+	\fB\-h\fR	\
+Produce equally-spaced words in adjusted lines,
+using full terminal resolution.
+.bt
+	\fB\-T\fIname\fR	Specifies
+the name of the output terminal type.
+Currently defined names are \fB37\fR for the (default) Model 37 Teletype\(rg,
+\fBlp\fR for any line printer or terminal without half-line capability,
+\fBtn300\fR for the GE TermiNet\ 300,
+\fB300S\fR for the \s-1DASI\s+1-300S,
+\fB300\fR for the \s-1DASI\s+1-300,
+and
+\fB450\fR for the \s-1DASI\s+1-450 (Diablo Hyterm).
+A special names, \fBlocale\fR, is also supported.
+It generates \s-1UTF\s+1-8 output if permitted
+by the current \s-1LC_CTYPE\s+1 locale,
+and has the same effect as \fBlp\fR otherwise.
+.sp
+.ne 3
+.ft BI
+		\*(TR Only
+.br
+.ft
+.bt
+	\fB\-f\fP	Refrain from feeding out paper and stopping
+the output device at the end of the run.
+.bt
+	\fB\-a\fP	Send a printable \s-1(ASCII)\s+1 approximation
+of the results to the standard output.
+.bt
+	\fB\-F\fIpath\fR	Look in directory \fIpath\fP
+for font information;
+the default is \fB/usr/ucblib/doctools/font/devps\fP.
+.bt
+	\fB\-T\fIname\fR	Specifies the output device.
+Currently defined names are
+\fBps\fR for (default) \*(PS output at 72\|000 dpi,
+\fBpsmed\fR for \*(PS output at 3600 dpi,
+\fBpslow\fR for \*(PS output at 432 dpi,
+and
+\fBpost\fR for \*(PS output at 720 dpi with legacy fonts.
+.bt
+	\fB\-u\fIN\fR	Set the emboldening amount,
+i.e. the number of times a character is printed to simulate bold output,
+to \fIN\fR.
+.ll
+.in 0
+.xx
+.pg
+Each option is invoked as a separate argument;
+for example,
+.x1
+\fBnroff  \-o\fI4,8\-10  \fB\-T\fI300S  \fB\-m\fIabc  file1  file2\fR
+.x2
+requests formatting of pages 4, 8, 9, and 10 of a document contained in the files
+named \fIfile1\fR and \fIfile2\fR,
+specifies the output terminal as a \s-1DASI\s+1-300S,
+and invokes the macro package \fIabc\fR.
+.pg
+Various pre- and post-processors are available for use with \*(NR and \*[TR.]
+These include the equation preprocessors \fIneqn\fP and \fIeqn\fP\*u2\*d
+(for \*(NR and \*(TR respectively),
+the table-construction preprocessor \fItbl\fP\*u3\*d,
+and \fIpic\fP and \fIgrap\fP
+for various forms of graphics.
+A reverse-line postprocessor \fIcol\fP
+is available for multiple-column \*(NR output on terminals without reverse-line ability;
+\fIcol\fP expects the Model 37 Teletype
+escape sequences that \*(NR produces by default.
+.pg
+The \fBdpost\fR postprocessor has a special role
+as it translates \*(TR intermediate output to \*(PS,
+which is currently the only relevant target device format.
+.pg
+For example, in
+.x1
+\fBtbl  \fIfiles  \fB|  eqn  |  troff  \fIoptions  \fB|  dpost\fR  >\fIoutput.ps\fR
+.x2
+the first \|\fB|\fR\| indicates the piping of \fItbl's\fP
+output to \fIeqn's\fP input;
+the second the piping of \fIeqn's\fP output to \*(TR's input;
+and the third indicates the piping of \*(TR's output to \fIdpost,\fP
+which then writes \*(PS code to \fIoutput.ps\fR.
+.xx
+The following options are currently supported with \fIdpost:\fR
+.sp
+.ta .3i 1.2i
+.ft BI
+	Option	Effect
+.br
+.ft R
+.ta .3i 1.2i
+.in 1.2i
+.ll -.3i
+.bt
+	\fB\-e\ \fIencoding\fR	\
+Sets the \*(PS encoding scheme.
+Interesting values of \fIencoding\fR are:
+\fB0\fR using the \*(PS \fBashow\fR operator,
+with the same position representation as previous
+versions of \fIdpost\fR;
+\fB2\fR using the \*(PS \fBwidthshow\fR operator,
+usually resulting in compacter output
+unless the \fBtrack\fR request has been used;
+\fB4\fR using \fBashow\fR,
+storing positions as differences;
+\fB5\fR like 4 but using a binary \*(PS Level\~2 representation.
+The default is 4.
+\fB
+.bt
+	\fB\-M\ \fImarks\fR	\
+Print marks (in combination with the \fBtrimat\fR \*(TR request).
+Valid types of \fImarks\fR are:
+\fBcutmarks\fR,
+\fBregistrationmarks\fR,
+\fBstartargets\fR,
+\fBcolorbars\fR,
+and
+\fBall\fR.
+Mark names can be abbreviated and combined by colons,
+e.g. \fB\-Mcut:reg\fR will print cut marks and registration marks.
+.\" from file m0a
+.ii
+.ll 6.5i
+.in 0
+.bp
+.ps \n(PS
+.tr |
+.ce
+.Bookmark 0 "Summary and Index"
+.nr mh-level 2
+.ft B
+Request Summary
+.ft R
+.br
+.Bookmark 1 "Request Summary"
+.pg
+In the following table,
+the notation \(+-\fIN\fP in the
+\fIRequest Form\fR
+column means that the forms \fIN\fR, +\fIN\fR, or \-\fIN\fR are permitted,
+to set the parameter to \fIN\fR,
+increment it by \fIN\fR,
+or decrement it by \fIN\fR,
+respectively.
+Plain \fIN\fP means that the value is used to set the parameter.
+\fIInitial Values\fP separated by \fB;\fP
+are for
+\*(NR
+and
+\*(TR
+respectively.
+In the \fINotes\fP column,
+.ft R
+.TS
+cw(.3i) lw(4i).
+B	T{
+Request normally causes a break.
+The use of \fB\'\fR as control character (instead of \fB.\fR)
+suppresses the break function.
+T}
+D	Mode or relevant parameters associated with current diversion level.
+E	Relevant parameters are a part of the current environment.
+O	Must stay in effect until logical output.
+P	Mode must be still or again in effect at the time of physical output.
+T	\*(TR only; no effect in \*[NR.]
+\fBv\fR,\fBp\fR,\fBm\fR,\fBu\fR	Default scale indicator; if not specified, scale indicators are \fIignored\fR.
+.TE
+.de mx
+.ev 2
+.nf
+.h1
+.in
+.sp
+.fi
+.ev
+.ns
+..
+.xx
+.h1
+.mh
+General Explanation
+.bt
+\fB&do\fI|name\fR		ignored	\(en	Executes \fIname\fR in extension level 3.
+.b1
+.lg 0
+\fB&xflag\fI|N\fR	1	ignored	\(en	Sets the extension level permanently to \fIN\fP.
+.lg
+.mh
+Font and Character Size Control
+.bt
+\fB&lc_ctype\fI|name\fR	ignored	\(en	Sets the \s-1LC_CTYPE\s+1 locale.
+.b1
+\fB&ps\fI\|\(+-N\fR	10\|point	previous	E,T	Point size; also \fB\es\fI\(+-N\fR.
+.b1
+\fB&fzoom\fI|F|Z\fR	1	ignored	O,T	Zooms font \fIF\fR by factor \fIZ\fR.
+.b1
+\fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size
+set to \fIN\fR/36\|em.
+.b1
+\fB&cs\fI\|F\|N\|M\fR	off	\(en	P,T	Constant character
+space (width)
+mode (font \fIF\^\fR\^).
+.b1
+\fB&bd\fI|F|N\fR	off	\(en	P,T	Embolden font \fIF\fR by \fIN\fR\(mi1 units.
+.b1
+\fB&bd|S|\fIF|N\fR	off	\(en	P,T	Embolden Special Font when current font is \fIF\fR.
+.b1
+\fB&ft\fI|F\fR	Roman	previous	E	Change to font
+\fIF\fR|= \fIx\fR, \fIxx\fR, or 1-4.
+Also \fB\ef\fIx\fR,\|\fB\ef(\fIxx\fR,\|\fB\ef\fIN\fR.
+.b1
+\fB&fp\fI|N|F\fR	R,I,B,...,S	ignored	\(en	Font named \fIF\fR mounted on physical position 1\(<=\fIN\fR\(<=4.
+.b1
+\fB&fps\fI|map|...\fR		ignored	T	Mounts a font with a special character map.
+.b1
+\fB&feature\fI|F|\(+-name|...\fR	ignored	O,T	Controls OpenType features.
+.b1
+\fB&fallback\fI|F|A|B|...\fR	ignored	O,T	Selects the fallback sequence for font \fIF\fR.
+.b1
+\fB&hidechar\fI|F|c|d|...\fR	ignored	O,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
+.b1
+.lg 0
+\fB&flig\fI|F|N\fR	font-speci\(fic	ignored	T	De\(fines the ligatures in font \fIF\fR.
+.lg
+.b1
+\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
+of the space character in font \fIF\fR to \fIN\fR.
+.mh
+Page Control
+.bt
+\fB&pl\fI\|\(+-N\fR	11\|i	11\|i	\fBv\fR	Page length.
+.b1
+\fB&papersize\fI|media\fR	ignored	T	Sets the paper size.
+.b1
+\fB&mediasize\fI|media\fR	ignored	T	Sets the device media size.
+.b1
+\fB&cropat\fI|L|T|W|H\fR	ignored	T	Sets the ``CropBox'' page parameter for \*[PDF] generation.
+.b1
+\fB&trimat\fI|L|T|W|H\fR	ignored	T	Sets the ``TrimBox'' page parameter for \*[PDF] generation.
+.b1
+\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Sets the ``BleedBox'' page parameter for \*[PDF] generation.
+.b1
+\fB&bp|\fI\(+-N\fR	\fIN\(eq\fR1	\(en	B,\fBv\fR	\
+Eject current page; next page number \fIN\fR.
+.b1
+\fB&pn\fI|\(+-N	N\(eq\fR1	ignored	\(en	Next page number \fIN\fR.
+.b1
+\fB&po\fI|\(+-N\fR	0;1\|i	previous	\fBv\fR	Page offset.
+.b1
+\fB&ne\fI|N\fR	\(en	\fIN\(eq\fR1\|v	D,\fBv\fR	Need \fIN\fR vertical space (\fIV\fR = vertical spacing).
+.b1
+\fB&mk|\fIR\fR	none	internal	D	Mark current vertical place in register \fIR\fR.
+.b1
+\fB&rt\fI|\(+-N\fR	none	internal	D,\fBv\fR	Return \fI(upward only)\fR to marked vertical place.
+.mh
+Text Filling, Adjusting, and Centering
+.bt
+\fB&br\fR	\(en	\(en	B	Break.
+.b1
+.lg 0
+\fB&fi\fR	\(fill	\(en	B,E	Fill output lines.
+.lg
+.b1
+\fB&nf\fR	fill	\(en	B,E	No filling or adjusting of output lines.
+.b1
+\fB&ad\fI|c\fR	adj,both	adjust	E	Adjust output lines with mode \fIc\fR; \fIc\fP\^=\^l,\^r,\^c,\^b,\^\fInone\fP
+.b1
+\fB&na\fR	adjust	\(en	E	No output line adjusting.
+.b1
+\fB&ce\fI|N\fR	off	\fIN\(eq\fR1	B,E	Center following \fIN\fR input text lines.
+.b1
+\fB&track\fI|F|S|N|T|M\fR	ignored	O,T	Specifies letter space tracking.
+.b1
+\fB&kern\fI|N\fR	1	1	O,T	Controls pairwise kerning.
+.b1
+\fB&kernpair\fI|F|c|G|d|N\fR	ignored	O,T	Defines a kerning pair.
+.b1
+\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space after a character.
+.b1
+\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space before a character.
+.b1
+\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at left margin.
+.b1
+\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at right margin.
+.mh
+Vertical Spacing
+.bt
+\fB&vs\fI|N\fR	1/6in;12pts	previous	E,\fBp\fR	Vertical base line spacing (\fIV\fR\^).
+.b1
+\fB&ls\fI|N	N\(eq\fR1	previous	E	Output \fIN\(mi\fR1 \fIV\^\fRs after each text output line.
+.b1
+\fB&sp\fI|N\fR	\(en	\fIN\(eq\fR1\fIV\fR	B,\fBv\fR	Space \
+vertical distance \fIN\fR \fIin either direction\fR.
+.b1
+\fB&sv\fI|N\fR	\(en	\fIN\(eq\fR1\fIV\fR	\fBv\fR	Save vertical distance \fIN\fR.
+.b1
+\fB&os\fR	\(en	\(en	\(en	Output saved vertical distance.
+.b1
+\fB&ns\fR	space	\(en	D	Turn no-space mode on.
+.b1
+\fB&rs\fR	\(en	\(en	D	Restore spacing; turn no-space mode off.
+.mh
+Line Length and Indenting
+.bt
+\fB&ll\fI|\(+-N\fR	6.5\|i	previous	E,\fBm\fR	Line length.
+.b1
+\fB&in\fI|\(+-N\fR	\fIN\(eq\fR\^0	previous	B,E,\fBm\fR	Indent.
+.b1
+\fB&ti\fI|\(+-N\fR	\(en	ignored	B,E,\fBm\fR	Temporary indent.
+.mh
+Macros, Strings, Diversion, and Position Traps
+.bt
+\fB&de\fI|xx|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Define or redefine macro \fIxx;\fR end at call of \fIyy\fR.
+.b1
+\fB&am\fI|xx|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Append to a macro.
+.b1
+\fB&ds\fI|xx|string\fR	\(en	ignored	\(en	Define a string \fIxx\fR containing \fIstring\fR.
+.b1
+\fB&as\fI|xx|string\fR	\(en	ignored	\(en	Append \fIstring\fR to string \fIxx\fR.
+.b1
+\fB&chop\fI|xx\fR	\(en	ignored	\(en	Removes the last character of \fIxx\fR.
+.b1
+\fB&rm\fI|xx\fR	\(en	ignored	\(en	Remove request, macro, or string.
+.b1
+\fB&rn\fI|xx|yy\fR	\(en	ignored	\(en	Rename request, macro, or string \fIxx\fR to \fIyy\fR.
+.b1
+\fB&di\fI|xx\fR	\(en	end	D	Divert output to macro \fIxx\fR.
+.b1
+\fB&da\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR.
+.b1
+\fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Set location trap; negative is w.r.t. page bottom.
+.b1
+\fB&ch\fI|xx|N\fR	\(en	\(en	\fBv\fR	Change trap location.
+.b1
+\fB&dt\fI|N|xx\fR	\(en	off	D,\fBv\fR	Set a diversion trap.
+.b1
+\fB&vpt\fI|N\fR	1	ignored	\(en	Enables or disables vertical position traps.
+.b1
+\fB&it\fI|N|xx\fR	\(en	off	E	Set an input-line count trap.
+.b1
+\fB&return\fR	\(en	\(en	\(en	Returns from the current macro.
+.b1
+\fB&shift\fI|N\fR	\(en	1	\(en	Shifts the arguments to the current macro.
+.b1
+\fB&em\fI|xx\fR	none	none	\(en	End macro is \fIxx\fI.
+.mh
+Number Registers
+.bt
+\fB&nr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	Define and set number register \fIR\fR; auto-increment by \fIM\fR.
+.b1
+\fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format to register \fIR\fR (\fIc=\fB1\fR, \fBi\fR, \fBI\fR, \fBa\fR, \fBA\fR).
+.b1
+\fB&rr\fI|R\fR	\(en	\(en	\(en	Remove register \fIR\fR.
+.mh
+Tabs, Leaders, and Fields
+.bt
+\fB&ta\fI|Nt|...\fR	0.8\|n;|0.5\|i	none	E,\fBm\fR	Tab settings; \fIleft\fR type, unless \fIt=\fBR\fR(right), \fBC\fR(centered).
+.b1
+\fB&tc\fI|c\fR	none	none	E	Tab repetition character.
+.b1
+\fB&lc\fI|c\fR	\fB.\fR	none	E	Leader repetition character.
+.b1
+\fB&fc\fI|a|b\fR	off	off	\(en	Set field delimiter \fIa\fR and pad character \fIb\fR.
+.mh
+Input and Output Conventions and Character Translations
+.bt
+\fB&ec\fI|c\fR	\e	\e	\(en	Set escape character.
+.b1
+\fB&eo\fR	on	\(en	\(en	Turn off escape character mechanism.
+.b1
+\fB&lg\fI|N\fR	\(en;\|on	on	T	Ligature mode
+on if \fIN\fR>0.
+.b1
+\fB&ul\fI|N\fR	off	\fIN\(eq\fR1	E	Underline (italicize in \*(TR) \fIN\fR input lines.
+.b1
+\fB&cu\fI|N\fR	off	\fIN\(eq\fR1	E	Continuous underline in \*[NR;] like \fBul\fR in \*[TR.]
+.b1
+\fB&uf\fI|F\fR	Italic	Italic	\(en	Underline font set to \fIF\fR (to be switched to by \fBul\fR).
+.b1
+\fB&cc\fI|c\fR	\fB.	.\fR	E	Set control character to \fIc\fR.
+.b1
+\fB&c2\fI|c\fR	\fB\'	\'\fR	E	Set nobreak control character to \fIc\fR.
+.b1
+\fB&tr\fI|abcd....\fR	none	\(en	O	Translate \fIa\fR to \fIb\fR, etc. on output.
+.b1
+\fB&ftr\fI|F|abcd....\fR	none	\(en	O,T	Font-specific \fBtr\fR.
+.mh
+Local Horizontal and Vertical Motions, and the Width Function
+.mh
+Overstrike, Bracket, Line-drawing, Graphics, and Zero-width Functions
+.mh
+Hyphenation.
+.bt
+\fB&nh\fR	hyphenate	\(en	E	No hyphenation.
+.b1
+\fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.
+.b1
+\fB&hylang\fI|name\fR	off	off	\(en	Sets the hyphenation language.
+.b1
+\fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.
+.b1
+\fB&hw\fI|word|...\fR	\(en	ignored	\(en	Add words to hyphenation dictionary.
+.mh
+Three-Part Titles.
+.bt
+\fB&tl\fI|\'left\'center\'right\'\fR	\(en	\(en	Three part title; delimiter may be any character.
+.b1
+\fB&pc\fI|c\fR	\fB%\fR	off	\(en	Page number character.
+.b1
+\fB&lt\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Length of title.
+.mh
+Output Line Numbering.
+.bt
+\fB&nm\fI|\(+-N|M|S|I\fR	off	E	Number mode on or off, set parameters.
+.b1
+\fB&nn\fI|N\fR	\(en	\fIN\(eq\fR1	E	Do not number next \fIN\fR lines.
+.mh
+Conditional Acceptance of Input
+.bt
+\fB&if\fI|c|anything\fR		\(en	\(en	If condition \fIc\fR true, accept \fIanything\fR as input,
+.b1
+				for multi-line use \fI\e{anything\|\e}\fR.
+.b1
+\fB&if|!\fIc|anything\fR	\(en	\(en	If condition \fIc\fR false, accept \fIanything\fR.
+.b1
+\fB&if\fI|N|anything\fR		\(en	\fBu\fR	If expression \fIN\fR > 0, accept \fIanything\fR.
+.b1
+\fB&if|!\fIN|anything\fR	\(en	\fBu\fR	If expression \fIN\fR \(<= 0 [sic], accept \fIanything\fR.
+.b1
+\fB&if\fI|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR identical to \fIstring2\fR,
+accept \fIanything\fR.
+.b1
+\fB&if|!\fI\|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR not identical to \fIstring2\fR,
+accept \fIanything\fR.
+.b1
+\fB&ie\fI|c|anything\fR		\(en	\fBu\fR	If portion of if-else; all above forms (like \fBif\fR).
+.b1
+\fB&el\fI|anything\fR		\(en	\(en	Else portion of if-else.
+.mh
+Environment Switching.
+.bt
+\fB&ev\fI|name\fR	\fIname\(eq\fR0	previous	\(en	Environment switched (\fIpush down\fR).
+.b1
+\fB&evc\fI|name\fR		\(en	\(en	Copies environment \fIname\fR to the current environment.
+.mh
+Insertions from the Standard Input
+.bt
+\fB&rd\fI|prompt\fR\fR	\(en	\fIprompt=\s-1\fRBEL\s+1	\(en	Read insertion.
+.b1
+\fB&ex\fR	\(en	\(en	\(en	\
+Exit from \*(NR/\*[TR.]
+.mh
+Input/Output File Switching
+.bt
+\fB&so\fI|filename\fR		\(en	\(en	Switch source file \fI(push down)\fR.
+.b1
+\fB&pso\fI|string\fR		\(en	\(en	Executes \fIstring\fR and reads its output.
+.b1
+\fB&nx\fI|filename\fR		end-of-file	\(en	Next file.
+.br
+\fB&sy\fI|string\fR		\(en	\(en	Execute program \fIstring\fP. Output not interpolated.
+.b1
+\fB&pi\fI|string\fR		\(en	\(en	Pipe output to program \fIstring\fP.
+.b1
+\fB&cf\fI|filename\fR		\(en	\(en	Copy file contents to \*(TR output.
+.b1
+\fB&open\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR as \fIstream\fR, truncating.
+.b1
+\fB&opena\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR as \fIstream\fR, appending.
+.b1
+\fB&write\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR to file \fIstream\fR.
+.b1
+\fB&writec\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR without terminating newline.
+.b1
+\fB&close\fI|stream\fR		\(en	\(en	Closes the file \fIstream\fR.
+.mh
+Miscellaneous
+.bt
+\fB&mc\fI|c|N\fR	\(en	off	E,\fBm\fR	Set margin character \fIc\fR and separation \fIN\fR.
+.b1
+\fB&tm\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR on terminal (standard error).
+.b1
+\fB&tmc\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR without newline on terminal.
+.b1
+\fB&ab\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR on standard error, exit program.
+.b1
+\fB&ig\fI|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Ignore till call of \fIyy\fR.
+.b1
+\fB&lf\fI|N|f\fR		\(en	\(en	Set input line number to \fIN\fP and filename to \fIf\fP.
+.b1
+\fB&pm\fI|t\fR	\(en	all	\(en	Print macro names and sizes;
+.b1
+				if \fIt\fR present, print only total of sizes.
+.b1
+\fB&recursionlimit\fI|N\fR	\(en	\(en	Sets the maximum stack depth to \fIN\fR.
+.b1
+.lg 0
+\fB&fl\fR	\(en	\(en	B	Flush output buffer.
+.lg
+.mh
+Output and Error Messages
+.bt
+\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Controls warning messages.
+.b1
+\fB&spreadwarn\fI|N\fR	toggle	\(en	Spread limit warning.
+.mh
+Color Support
+.mh
+Picture Inclusion
+.bt
+\fB&psbb\fI|filename\fR	\(en	\(en	Reads the \*(PS bounding box from \fIfilename\fR.
+.mh
+Special Features for \*[PDF] Documents
+.mh
+Output Language
+.mh
+Device and Font Description Files
+.xx
+.nf
+.rm mx
+.ft R
+.nr zz 3
+.de cl
+.ie \\n+(cl<\n(zz \{\
+.	po +\\n(.lu/\n(zzu
+.	rt\}
+.el \{.po \\n(POu\}
+..
+.nr cl 0 1
+.di zz
+.ta 12nR
+.nf
+.ps 8
+.vs 10
+.tc .
+ab	20
+ad	4
+af	8
+am	7
+as	7
+bd	2
+bleedat	3
+bp	3
+br	4
+c2	10
+cc	10
+ce	4
+cf	19
+ch	7
+chop	7
+close	19
+cropat	3
+cs	2
+cu	10
+da	7
+de	7
+di	7
+do	1
+ds	7
+dt	7
+ec	10
+el	16
+em	7
+eo	10
+ev	17
+evc	17
+ex	18
+fallback	2
+fc	9
+feature	2
+fi	4
+fl	20
+flig	2
+fp	2
+fps	2
+fspacewidth	2
+ft	2
+fzoom	2
+hc	13
+hidechar	2
+hw	13
+hy	13
+hylang	13
+ie	16
+if	16
+ig	20
+in	6
+it	7
+kern	4
+kernafter	4
+kernbefore	4
+kernpair	4
+lc	9
+lc_ctype	2
+lf	20
+lg	10
+lhang	4
+li	10
+ll	6
+ls	5
+lt	14
+mc	20
+mediasize	3
+mk	3
+na	4
+ne	3
+nf	4
+nh	13
+nm	15
+nn	15
+nr	8
+ns	5
+nx	19
+open	19
+opena	19
+os	5
+papersize	3
+pc	14
+pi	19
+pl	3
+pm	20
+pn	3
+po	3
+ps	2
+psbb	23
+pso	19
+rd	18
+recursionlimit	20
+return	7
+rhang	4
+rm	7
+rn	7
+rr	8
+rs	5
+rt	3
+shift	7
+so	19
+sp	5
+spreadwarn	21
+ss	2
+sv	5
+sy	19
+ta	9
+tc	9
+ti	6
+tl	14
+tm	20
+tr	10
+track	4
+trimat	3
+uf	10
+ul	10
+vs	5
+warn	21
+wh	7
+write	19
+writec	19
+xflag	1
+.tc
+.di
+.nr aa \n(dn/\n(zz
+.ne \n(aau+10p
+.sp
+.ft B
+Alphabetical Request and Section Number Cross Reference
+.ft
+.br
+.Bookmark 1 "Alphabetical Request and Section Number Cross Reference"
+.sp .3
+.wh \n(nlu+\n(aau cl
+.nr qq \n(nlu+\n(aau
+.ps
+.vs
+.mk
+.zz
+.rt
+.sp \n(.tu
+.ch cl 12i
+.sp
+.bp
+.nf
+.ft B
+Escape Sequences for Characters, Indicators, and Functions
+.ft R
+.br
+.Bookmark 1 "Escape Sequences for Characters, Indicators, and Functions"
+.xx
+.TS
+c2l
+c2l2l
+n2l2l.
+.ft BI
+Section	Escape
+Reference	Sequence	Meaning
+.ft R
+.xx
+10.1	\fB\e\e\fR	\e (to prevent or delay the interpretation of \e\|)
+2.1	\fB\e\'\fR	\' (acute accent); equivalent to \fB\e(aa\fR
+2.1	\fB\e\`\fR	\` (grave accent); equivalent to \fB\e(ga\fR
+2.1	\fB\e\-\fR	\- Minus sign in the \fIcurrent\fR font
+7	\fB\e\^.\fR	Period (dot) (see \fBde\fR)
+11.1	\fB\e\fR(space)	Unpaddable space-size space character
+11.1	\fB\e\(ap\fR	Paddable no-break space character
+11.1	\fB\e0\fR	Digit width space
+.tr ||
+11.1	\fB\e\||\fR	1/6\|em narrow space character (zero width in \*(NR)
+.tr |
+11.1	\fB\e^\fR	1/12\|em half-narrow space character (zero width in \*(NR)
+.tr &&
+4.1	\fB\e&\fR	Non-printing, zero width character
+.tr &.
+10.6	\fB\e!\fR	Transparent line indicator
+10.8	\fB\e"\fR	Beginning of comment
+7.3	\fB\e$\fIn\fR,\fB\e$(\fInn\fR,\fB\e$[\fInnn\fB]\fR	Interpolate argument \fIn\fR, \fInn\fR, or \fInnn\fR
+7.3	\fB\e$\(**\fR	Interpolate all arguments separated by spaces
+7.3	\fB\e$@\fR	Interpolate all arguments in double quotes
+13	\fB\e%\fR	Default optional hyphenation character
+2.1	\fB\e(\fIxx\fR	Character named \fIxx\fR
+2.1	\fB\e[\fIxxx\fR]	Character named \fIxxx\fP
+7.1	\fB\e\(**\fIx\fR,\fB\e\(**(\fIxx\fR,\fB\e\(**[\fIxxx\fB]\fR	Interpolate string \fIx\fR, \fIxx\fR, or \fIxxx\fR
+13	\fB\e:\fR	Optional line-break character
+9.1	\fB\ea\fR	Non-interpreted leader character
+12.3	\fB\eb\fI\'abc...\'\fR	Bracket building function
+4.2	\fB\ec\fR	Interrupt text processing
+11.1	\fB\ed\fR	Forward (down) 1/2\|em vertical motion (1/2 line in \*(NR)
+12.5	\fB\eD\fI\'c...\'\fR	Draw graphics function \fIc\fP with parameters ...; \fIc\fP\^=\^\fBl\fR,\^\fBc\fR,\^\fBe\fR,\^\fBa\fP,\^\fB\(ap\fP
+10.1	\fB\ee\fR	Printable version of the \fIcurrent\fR escape character.
+10.1	\fB\eE\fR	Printable escape character, not interpreted in \fIcopy mode\fR.
+2.2	\fB\ef\fIx\fR,\fB\ef(\fIxx\fR,\fB\ef[\fIxxx\fB]\fR,\fB\ef\fIN\fR	Change to font named \fIx\fR, \fIxx\fR, or \fIxxx\fR, or position \fIN\fR
+8.	\fB\eg\fIx\fR,\fB\eg(\fIxx\fR,\fB\eg[\fIxxx\fB]\fR	Format of number register \fIx\fP, \fIxx\fR, or \fIxxx\fR
+11.1	\fB\eh\fI\'N\'\fR	Local horizontal motion; move right \fIN\fR \fI(negative left)\fR
+2.3	\fB\eH\fI\'N\'\fR	Height of current font is \fIN\fR
+11.3	\fB\ek\fIx\fR	Mark horizontal \fIinput\fR place in register \fIx\fR
+12.4	\fB\el\fI\^\'Nc\'\fR	Horizontal line drawing function (optionally with \fIc\fR\|)
+12.4	\fB\eL\fI\'Nc\'\fR	Vertical line drawing function (optionally with \fIc\fR\|)
+8	\fB\en\fIx\fR,\fB\en(\fIxx\fR,\fB\en[\fIxxx\fB]\fR	Interpolate number register \fIx\fR, \fIxx\fR, or \fIxxx\fR
+2.	\fB\eN\fI\'N\'\fR	Character number \fIN\fR on current font
+12.1	\fB\eo\fI\'abc...\'\fR	Overstrike characters \fIa, b, c, ...\fR
+4.1	\fB\ep\fR	Break and spread output line
+11.1	\fB\er\fR	Reverse 1\|em vertical motion (reverse line in \*(NR)
+2.3	\fB\es\fIN\fR,\fB\es\fI\(+-N\fR,\fB\es\'\fI\(+-N\fB\'\fR	Point-size change function
+2.2	\fB\eS\fI\'N\'\fR	Slant output \fIN\fP degrees
+9.1	\fB\et\fR	Non-interpreted horizontal tab
+11.1	\fB\eu\fR	Reverse (up) 1/2\|em vertical motion (1/2 line in \*(NR)
+2.1	\fB\eU\fI\'X\'\fR	Character at Unicode position U+\fIX\fR
+11.1	\fB\ev\fI\'N\'\fR	Local vertical motion; move down \fIN\fR \fI(negative up)\fR
+11.2	\fB\ew\fI\'string\'\fR	Interpolate width of \fIstring\fR
+5.2	\fB\ex\fI\'N\'\fR	Extra line-space function \fI(negative before, positive after)\fR
+10.7	\fB\eX\fI\'string\'\fR	Output \fIstring\fP as device control function
+12.2	\fB\ez\fIc\fR	Print \fIc\fR with zero width (without spacing)
+16	\fB\e{\fR	Begin conditional input
+16	\fB\e}\fR	End conditional input
+10.7	\fB\e\fR(newline)	Concealed (ignored) newline
+\(en	\fB\e\fIZ\fR	\fIZ\fR, any character \fInot\fR listed above
+.TE
+.fi
+.sp
+The escape sequences
+\fB\e\e\fR,
+\fB\e\^.\fR,
+\fB\e"\fR,
+\fB\e$\fR,
+\fB\e\(**\fR,
+\fB\ea\fR,
+\fB\ee\fR,
+\fB\eg\fR,
+\fB\en\fR,
+\fB\et\fR,
+and
+\fB\e\fR(newline) are interpreted in \fIcopy mode\fR (\(sc7.2).
+.sp
+.ft B
+Predefined General Number Registers
+.br
+.Bookmark 1 "Predefined General Number Registers"
+.nf
+.ft
+.TS
+c2l
+c2l2l
+n2l2l.
+.ft BI
+Section	Register
+Reference	Name	Description
+.ft R
+.xx
+3	\fB%\fR	Current page number.
+11.2	\fBct\fR	Character type (set by \fIwidth\fR function).
+7.4	\fBdl\fR	Width (maximum) of last completed diversion.
+7.4	\fBdn\fR	Height (vertical size) of last completed diversion.
+\(en	\fBdw\fR	Current day of the week (1\(en7).
+\(en	\fBdy\fR	Current day of the month (1\(en31).
+\(en	\fBhours\fR	Hours portion of current local time (0\(en23).
+11.3	\fBhp\fR	Current horizontal place on \fIinput\fR line.
+15	\fBln\fR	Output line number.
+\(en	\fBminutes\fR	Minutes portion of current local time (0\(en59).
+\(en	\fBmo\fR	Current month (1\(en12).
+4.1	\fBnl\fR	Vertical position of last printed text base-line.
+11.2	\fBsb\fR	Depth of string below base line (generated by \fIwidth\fR function).
+\(en	\fBseconds\fR	Seconds portion of current local time (0\(en60).
+11.2	\fBst\fR	Height of string above base line (generated by \fIwidth\fR function).
+\(en	\fByear\fR	Current year.
+\(en	\fByr\fR	Current year minus 1900.
+.TE
+.sp
+.ft B
+Predefined Read-Only Number Registers
+.ft R
+.br
+.Bookmark 1 "Predefined Read-Only Number Registers"
+.TS
+c2l
+c2l2l
+n2l2l.
+.ft BI
+Section	Register
+Reference	Name	Description
+.ft R
+.xx
+19	\fB$$\fR	Process id of \*(NR or \*[TR.]
+7.3	\fB&$\fR	Number of arguments available at the current macro level.
+\(en	\fB&A\fR	Set to 1 in \*[TR,] if \fB\-a\fR option used; always 1 in \*[NR.]
+5.2	\fB&a\fR	Post-line extra line-space most recently utilized \
+using \fB\ex\fI\'N\'\fR.
+5.4	\fB&ascender\fR	Ascender of current font and point size.
+2.3	\fB&b\fR	Emboldening level.
+\(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
+7.4	\fB&d\fR	Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.
+5.4	\fB&descender\fR	Descender of current font and point size.
+2.2	\fB&f\fR	Current font as physical quadrant (1-4).
+20.	\fB&F\fR	Current input file name [sic].
+4	\fB&h\fR	Text base-line high-water mark on current page or diversion.
+11.1	\fB&H\fR	Available horizontal resolution in basic units.
+6	\fB&i\fR	Current indent.
+4.2	\fB&j\fR	Current \fBad\fP mode.
+4.1	\fB&k\fR	Current output horizontal position.
+6	\fB&l\fR	Current line length.
+5.1	\fB&L\fR	Current \fBls\fP value.
+4	\fB&n\fR	Length of text portion on previous output line.
+3	\fB&o\fR	Current page offset.
+3	\fB&p\fR	Current page length.
+2.3	\fB&s\fR	Current point size (may be a decimal fraction).
+7.5	\fB&t\fR	Distance to the next trap.
+\(en	\fB&T\fR	Set to 1 in \*[NR,] if \fB\-T\fR option used; always 0 in \*[TR.]
+4.1	\fB&u\fR	Equal to 1 in fill mode and 0 in nofill mode.
+5.1	\fB&v\fR	Current vertical line spacing.
+7.5	\fB&vpt\fR	Vertical position traps enabled (1) or disabled (0).
+11.1	\fB&V\fR	Available vertical resolution in basic units.
+11.2	\fB&w\fR	Width of previous character.
+21	\fB&warn\fR	Currently activated warning categories.
+\(en	\fB&x\fR	Reserved version-dependent register.
+1.1	\fB&X\fR	Current extension level.
+\(en	\fB&y\fR	Reserved version-dependent register.
+7.4	\fB&z\fR	Name [sic] of current diversion.
+.TE
+.in 0
+.fi
+.rm EM
+.\" from file m1
+.bp
+.Bookmark 0 "Reference Manual"
+.nr mh-level 1
+.ii
+.ds H
+.tr |
+.tr ~|
+.rm mx
+.br
+.ce
+.ps \n(PS
+.ft B
+.ps +2
+.rs
+.sp 1.0i
+REFERENCE MANUAL
+.ft R
+.ps -2
+.sp
+.mh
+General Explanation
+.sc
+Form of input.
+Input consists of \fItext lines\fR, which are destined to be printed,
+interspersed with \fIcontrol lines\fR,
+which set parameters or otherwise control subsequent processing.
+Control lines begin with a \fIcontrol character\fR\(em\
+normally \fB.\fR (period) or \fB\'\fR (acute accent)\(em\
+followed by a name that specifies
+a basic \fIrequest\fR or the substitution of
+a user-defined \fImacro\fR in place of the control line.
+The control character \fB\'\fR suppresses the \fIbreak\fR function\(em\
+the forced output of a partially filled line\(em\
+caused by certain requests.
+The control character may be separated from the request/macro name by
+white space (spaces and/or tabs) for esthetic reasons.
+Names must be followed by either
+space or newline.
+Control lines with unrecognized names are ignored.
+.pg
+Various special functions may be introduced anywhere in the input by
+means of an \fIescape\fR character, normally \fB\e\fR.
+For example, the function
+\fB\en\fIR\fR
+causes the interpolation of the contents of the
+\fInumber register R\fR
+in place of the function;
+here \fIR\fR is either a single character name
+as in \fB\en\fIx\fR,
+a left-parenthesis-introduced, two-character name as in \fB\en(\fIxx\fR,
+or a left-bracket-introduced, multiple character name as in
+\fB\en[\fIxxx\fR].
+.pg
+In traditional \*[TR,]
+only one and two character names were permitted
+for request, macro, string, number register, and font names.
+Heirloom \*(TR can accept names containing a (nearly) arbitrary
+number of \s-1ASCII\s+1 characters.
+By default, request and macro names are still required
+to contain at most two characters for compatibility reasons.
+The \fB\-x\fR command line option,
+the \fBdo\fR request,
+.lg 0
+or the \fBxflag\fR request
+.lg
+make the longer names available.
+The current extension level is available in the \fB&x\fR register.
+.pg
+Four levels of extension availability are currently defined:
+.de lv
+.xx
+.in \w'0\ 'u
+.ti 0
+..
+.lv
+0\ disables all extensions except for locale-dependent input and
+Type\ 1/OpenType/TrueType font selection using \fBfp\fR.
+.lv
+1\ enables extensions except for direct access to long names on
+request lines, i.e., \fB&abcde\fR will be interpreted as request
+\fBab\fR with argument \fBcde\fR. Long names can be accessed using
+the \fBdo\fR request, e.g. \fB&do papersize a4\fR. Long names in
+escape sequences are recognized, though, e.g. \fB\e*[xyz]\fR
+refers to the string named \fBxyz\fR and not to the string named
+\fB[\fR. It is normally the only relevant difference, so input
+written for traditional \*(TR can almost always be used
+without change in this mode. This level is the default.
+.lv
+2\ also enables direct access to long names on request lines.
+If an undefined long name is read, its first two characters
+are interpreted as a short request using the remaining
+characters as argument. So if a macro \fBabcde\fR is defined,
+\fB&abcde\fR will execute it, but otherwise, \fB&abcde\fR continues
+to execute \fBab\fR. String and number register references are
+only interpreted if they start in the first two characters
+of a name, i.e. no string interpretation is performed on
+input \fB&ab\e*(xy\fR.
+.lv
+3\ ignores undefined long requests even if they form a prefix
+of a short request, and interprets string and number register
+references in any position of a name.
+.in 0
+.pg
+.lg 0
+It is recommended to execute \fB&do xflag 3\fR in the first line of new
+.lg
+\*(TR programs that need not rely on any existing code.
+.sc
+Formatter and device resolution.
+\*(TR internally stores and processes dimensions in units
+that correspond to the particular device
+for which output is being prepared;
+values from 300 to 72\|000/inch are typical.
+See \(sc24.
+\*(NR internally uses 240 units/inch,
+corresponding to the least common multiple of the
+horizontal and vertical resolutions of various
+typewriter-like output devices.
+\*(TR rounds horizontal/vertical numerical parameter input to the actual
+horizontal/vertical resolution
+of the output device indicated by the \fB\-T\fR option (default \fBps\fP).
+\*(NR similarly rounds numerical input to the actual resolution
+of the output device indicated by the \fB\(miT\fR option
+(default Model 37 Teletype).
+.sc
+Numerical parameter input.
+Both \*(NR and \*(TR
+accept numerical input with the appended scale
+indicators
+shown in the following table,
+where
+\fIS\fR is the current type size in points,
+\fIV\fR is the current vertical line spacing in
+basic units,
+and
+\fIC\fR is a \fInominal character width\fR in basic units.
+.TS
+center box;
+c|c|ls
+c|c|ll
+c|l|l|l.
+Scale		Number of basic units
+Indicator	Meaning	\*(TR \fI\-Tps\fP	\*(NR
+_
+\fBi\fR	Inch	72000	240
+\fBc\fR	Centimeter	72000\(mu50/127	240\(mu50/127
+\fBP\fR	Pica = 1/6 inch	12000	240/6
+\fBm\fR	Em = \fIS\fR points	6\(mu\fIS\fR	\fIC\fR
+\fBn\fR	En = Em/2	3\(mu\fIS\fR	\fIC, same as Em\fR
+\fBp\fR	Point = 1/72 inch	1000	240/72
+\fBu\fR	Basic unit	1	1
+\fBv\fR	Vertical line space	\fIV\fR	\fIV\fR
+none	Default, see below
+.TE
+In \*[NR,] \fIboth\fR the em and the en are taken to be equal to the \fIC\fR,
+which is output-device dependent;
+common values are 1/10 and 1/12 inch.
+Actual character widths in \*(NR need not be all the same and constructed characters
+such as \(mi> (\(->) are often extra wide.
+The default scaling is \fBm\fP for the horizontally-oriented requests
+and functions
+\fBll\fR,
+\fBin\fR,
+\fBti\fR,
+\fBta\fR,
+\fBlt\fR,
+\fBpo\fR,
+\fBmc\fR,
+\fB\eh\fR,
+\fB\el\fR,
+and horizontal coordinates of \fB\eD\fR;
+\fBv\fR
+for the vertically-oriented requests and functions
+\fBpl\fR,
+\fBwh\fR,
+\fBch\fR,
+\fBdt\fR,
+\fBsp\fR,
+\fBsv\fR,
+\fBne\fR,
+\fBrt\fR,
+\fB\ev\fR,
+\fB\ex\fR,
+\fB\eL\fR,
+and vertical coordinates of \fB\eD\fR;
+\fBp\fR for the \fBvs\fR request;
+and \fBu\fR for the requests
+\fBnr\fR,
+\fBif\fR,
+and
+\fBie\fR.
+\fIAll\fR other requests ignore any scale indicators.
+When a number register containing an already appropriately scaled number
+is interpolated to provide numerical input,
+the unit scale indicator
+\fBu\fR may need to be appended to prevent
+an additional inappropriate default scaling.
+The number, \fIN\fR, may be specified in decimal-fraction form
+but the parameter finally stored is rounded to an integer number of basic units.
+.pg
+The \fIabsolute position\fR indicator \fB~\fR may be prepended
+to a number \fIN\fR
+to generate the distance to the vertical or horizontal place \fIN\fR.
+For vertically-oriented requests and functions, \fB~\|\fIN\fR
+becomes the distance in basic units from the current vertical place on the page or in a \fIdiversion\fR (\(sc7.4)
+to the the vertical place \fIN\fR.
+For \fIall\fR other requests and functions,
+\fB~\|\fIN\fR
+becomes the distance from
+the current horizontal place on the \fIinput\fR line to the horizontal place \fIN\fR.
+For example,
+.x1
+\&\fB.sp  ~\|3.2c\fR
+.x2
+will space \fIin the required direction\fR to 3.2\|centimeters from the top of the page.
+.sc
+.tr &&
+Numerical expressions.
+Wherever numerical input is expected an expression involving parentheses,
+the arithmetic operators \fB\(pl\fR, \fB\(mi\fR, \fB/\fR, \fB\(**\fR, \fB%\fR (mod),
+the logical operators
+\fB<\fR,
+\fB>\fR,
+\fB<=\fR,
+\fB>=\fR,
+\fB=\fR (or \fB==\fR),
+\fB<>\fR (not equal),
+\fB&\fR\ (and),
+\fB:\fR\ (or),
+and the functions
+\fIa\fB<?\fIb\fR (minimum of \fIa\fR and \fIb\fR)
+and
+\fIa\fB>?\fIb\fR (maximum of \fIa\fR and \fIb\fR)
+may be used.
+Except where controlled by parentheses, evaluation of expressions is left-to-right;
+there is no operator precedence.
+In the case of certain requests, an initial \fB\(pl\fR or \fB\(mi\fR is stripped
+and interpreted as an increment or decrement indicator respectively.
+In the presence of default scaling, the desired scale indicator must be
+attached to \fIevery\fR number in an expression
+for which the desired and default scaling differ.
+For example,
+if the number register \fBx\fR contains 2
+and the current point size is 10,
+then
+.br
+.tr &.
+.x1
+.ft B
+\&.ll  (4.25i\(pl\enxP\(pl3)/2u
+.ft R
+.x2
+will set the line length to 1/2 the sum of 4.25 inches \(pl 2 picas \(pl 30 points.
+.sc
+Notation.
+Numerical parameters are indicated in this manual in two ways.
+\(+-\fIN\fR means that the argument may take the forms \fIN\fR, \(pl\fIN\fR, or \(mi\fIN\fR and
+that the corresponding effect is to set the affected parameter
+to \fIN\fR, to increment it by \fIN\fR, or to decrement it by \fIN\fR respectively.
+Plain \fIN\fR means that an initial algebraic sign is \fInot\fR
+an increment indicator,
+but merely the sign of \fIN\fR.
+Generally, unreasonable numerical input is either ignored
+or truncated to a reasonable value.
+For example,
+most requests expect to set parameters to non-negative
+values;
+exceptions are
+\fBsp\fR,
+\fBwh\fR,
+\fBch\fR,
+\fBnr\fR,
+and
+\fBif\fR.
+The requests
+\fBps\fR,
+\fBft\fR,
+\fBpo\fR,
+\fBvs\fR,
+\fBls\fR,
+\fBll\fR,
+\fBin\fR,
+and
+\fBlt\fR
+restore the \fIprevious\fR parameter value in the \fIabsence\fR
+of an argument.
+.pg
+Single character arguments are indicated by single lower case letters
+and
+one/two character arguments are indicated by a pair of lower case letters.
+Character string arguments are indicated by multi-character mnemonics.
+.h1
+.bt
+\fB&do\fI|name\fR		ignored	\(en	\
+Executes the request or macro \fIname\fR in extension level 3
+and restore the previous level afterwards.
+.bt
+.lg 0
+\fB&xflag\fI|N\fR	1	ignored	\(en	\
+Sets the extension level permanently to \fIN\fP.
+.lg
+.mh
+Font and Character Size Control
+.sc
+Character set.
+The basic \*(TR character set
+is defined by a description file
+specific to each output device (\(sc24).
+There are normally several regular fonts
+and one or more special fonts.
+The basic character set is shown in the attached Table|I.
+All \s-1ASCII\s+1 characters are included,
+with some on the Special Font.
+With three exceptions, the \s-1ASCII\s+1 characters are input as themselves,
+and non-\s-1ASCII\s+1 characters are input in the form \fB\e(\fIxx\fR where
+\fIxx\fR is a two-character name given in the attached Table|II.
+The three \s-1ASCII\s+1 exceptions are mapped as follows:
+.TS
+center box;
+cs|cs
+cc|cc
+cl|cl.
+\s-1ASCII\s+1 Input	Printed by \*(TR
+Character	Name	Character	Name
+_
+\'	acute accent	'	close quote
+\`	grave accent	`	open quote
+\(mi	minus	\(en	hyphen
+.TE
+.tr ~~
+The characters
+\fB\'\fR,
+\fB\`\fR,
+and
+\fB\-\fR
+may be input
+by \fB\e\'\fR, \fB\e\`\fR, and \fB\e\-\fR respectively or by their names (Table II).
+In traditional \*[TR,],
+the \s-1ASCII\s+1 characters \fB@\fR, \fB#\fR, \fB"\fR, \fB\(aa\fR, \fB\(ga\fR, \fB<\fR, \fB>\fR, \fB\e\fR, \fB{\fR, \fB}\fR, \fB~\fR, \fB^\fR, and \fB\(ul\fR existed
+only on the Special Font and were printed as a 1-em space if that Font
+was not mounted.
+With the \fBpslow\fR device,
+these characters print in the \fITimes\fR font by default
+regardless of the current font
+(but see the \fBfps\fR request below).
+With other devices,
+these characters are taken from the current font.
+.pg
+With Type\ 1, OpenType, and TrueType fonts,
+\*(TR allows to access all named \*(PS
+characters of the current font and
+of those in the \fBfallback\fR sequence
+in the form \fB\e[\fIname\fB]\fR.
+.pg
+\*(TR internally converts non-\s-1ASCII\s+1 characters
+of the current \s-1LC_CTYPE\s+1 locale
+to named \*(PS characters
+once they are read in regular (not \fIcopy\fR) mode.
+If the current font is an OpenType or a TrueType font and contains
+a custom Unicode mapping table, the input character is looked up in that
+table first.
+Otherwise, a default table is used. A character that is not
+present in the current font is searched using the \fBfallback\fR sequence
+first, then in the special fonts.
+If the character cannot be found, it is discarded.
+Characters for which no name is known are replaced by spaces.
+.pg
+The \fB\eN\fI\'n\'\fR escape sequence
+has historically been available to refer
+to character \fIn\fR of the current font.
+It is still accepted,
+but its use is discouraged with 
+Type\ 1, OpenType, and TrueType fonts
+since the arrangement of character in font tables
+is performed at run-time
+and may change with future versions of \*[TR.]
+.pg
+.tr ~|
+\*(NR has an analogous, but different, mechanism for defining legal characters
+and how to print them.
+By default all characters are valid.
+There are such
+additional characters as may be available on
+the output device,
+such characters as may be able to be constructed
+by overstriking or other combination,
+and those that can reasonably be mapped
+into other printable characters.
+The exact behavior is determined by a driving
+table prepared for each device.
+The characters
+\fB\'\fR,
+\fB\`\fR,
+and
+\fB\(ul\fR
+print
+as themselves.
+.pg
+Both \*(NR and \*(TR allow references to specific
+Unicode characters with the \fB\eU\fI\'X\'\fR escape sequence;
+it causes the character at position U+\fIX\fR to be printed
+(\fIX\fR is a hexadecimal number).
+For \*[TR,] it is required that this character
+is available in one of the fonts mounted at this point.
+As an example, \eU\'20AC\' prints the Euro character \U'20AC'.
+.sc
+Fonts.
+\*(TR
+begins execution by reading information for a set of defaults fonts,
+said to be
+.I mounted;
+conventionally, the first four are
+Times Roman (\&\fBR\fR),
+Times Italic
+(\&\fBI\fR),
+Times Bold
+(\&\fBB\fR),
+and
+Times Bold Italic
+(\&\fBBI\fR),
+and the last is a Special font (\fBS\fR)
+containing miscellaneous characters.
+The set of fonts and positions is determined by the device description file,
+described in §26.
+.pg
+The \fIcurrent\fR font, initially Roman, may be changed
+(among the mounted fonts)
+by use of the \fBft\fR request,
+or by imbedding at any desired point
+either \fB\ef\fIx\fR, \fB\ef(\fIxx\fR, \fB\ef[\fIxxx\fB]\fR, or \fB\ef\fIN\fR
+where
+\fIx\fR, \fIxx\fR, and \fIxxx\fR are the name of a mounted font
+and \fIN\fR is a numerical font position.
+.pg
+It is \fInot\fR necessary to change to the Special font;
+characters on that font are automatically handled
+as if they were physically part of the current font.
+The Special font may actually be several fonts;
+the name \fBS\fP
+is reserved and is generally used for one of these.
+The \fBfallback\fR request sets a font-specific sequence
+of additional fonts that are searched for missing characters.
+.pg
+\*(TR can be informed that any particular font is mounted
+by use of the \fBfp\fR request.
+The list of known fonts is installation dependent.
+In the subsequent discussion of font-related requests,
+\fIF\fR represents either a one/two-character
+font name or the numerical font position.
+The current font is available (as numerical position) in the read-only number register \fB.f\fR.
+.pg
+A request for a named but not-mounted font is honored
+if the font description information exists.
+In this way, there is no limit on the number of fonts that may be printed
+in any part of a document.
+Mounted fonts may be handled more efficiently,
+and they may be referred to by their mount positions,
+but there is no other difference.
+Mention of an unmounted font loads it temporarily at font position
+zero, which serves as a one-font cache.
+.pg
+\*(NR understands font control
+and normally underlines Italic characters (see \(sc10.5).
+.sc
+Character size.
+Character point sizes available depend on the specific output device;
+a typical (historical) set of values is
+6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, and 36.
+This is a range of 1/12 inch to 1/2 inch.
+Modern output devices such as the default \fBdevps\fR
+usually allow the point size to be set to arbitrary values,
+including fractional points.
+The \fBps\fR request is used to change or restore the point size.
+Alternatively the point size may be changed between any two characters
+by imbedding a \fB\es\fIN\fR
+at the desired point
+to set the size to \fIN\fR,
+or a \fB\es\fI\(+-N\fR (1\(<=\fIN\fR\(<=9)
+to increment/decrement the size by \fIN\fR;
+\fB\es0\fR restores the \fIprevious\fR size.
+On historical output devices,
+requested point size values that are between two valid
+sizes yielded the larger of the two.
+.pg
+Note that through an accident of history, a construction like
+.B \es39
+is parsed as size 39, and thus converted to size 36 (given the sizes above),
+while
+.B \es40
+is parsed as size 4 followed by 
+\fB0\fR.
+The forms
+\fB\es(\fInn\fR, \fB\es\(+-(\fInn\fR,
+and \fB\es\'\(+-\fInn\fB\'\fR
+permit specification of sizes that would otherwise be ambiguous.
+.pg
+The current size is available in the \fB.s\fR register.
+Note that this may be a decimal fraction
+if the current point size is not an integer.
+Since standard number registers cannot hold decimal
+fractions, point sizes should be saved and restored as follows:
+\fB&nr \fIos\fB \en(.sp\fR ... \fB&ps \en(\fIos\fBu\fR.
+\*(NR ignores type size control.
+.pg
+The function \fB\eH\fI\'\(+-N'\fR
+sets \H'+2'the height of the current font\H'0' to
+\fIN\fP, or increments it by +\fIN\fR, or decrements it by \-\fIN\fP;
+if \fIN\fR=0, the height is restored to the current point size.
+In each case, the width is unchanged.
+Not all devices support independent height and width for characters.
+.h1
+.bt
+\fB&lc_ctype\fI|name\fR	ignored	\(en	Sets the \s-1LC_CTYPE\s+1 locale
+to \fIname\fR.
+The default is the value
+of the \s-1LC_CTYPE\s+1 environment variable.
+This request is
+useful to specify an input character set regardless of environment
+influences.
+.bt
+\fB&ps\fI|\(+-N\fR	10\|point	previous	E	Point size
+set to \(+-\fIN\fR.
+Alternatively imbed \fB\es\fIN\fR, \fB\es\fI\(+-N\fR,
+or \fB\es\'\fIN\fB\'\fR.
+Any positive size value may be requested on modern devices.
+If invalid, the next larger valid size will result on traditional devices,
+with a maximum of 36.
+A paired sequence
+\(pl\fIN\fR,\|\(mi\fIN\fR
+will work because the previous requested value is also remembered.
+Ignored in \*[NR.]
+.bt
+\fB&fzoom\fI|F|Z\fR	1	ignored	O,T	Zooms font \fIF\fR by factor \fIZ\fR,
+which is a positive floating point number.
+This request is useful for adjusting fonts with different
+visual sizes but identical nominal points; the zoom is thus not
+applied to characters from another font that have been found by
+the \fBfallback\fR sequence or by the special font mechanism.
+.bt
+\fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size
+is set to \fIN\fR/36\|ems.
+This size is the minimum word spacing in adjusted text.
+The optional second argument \fIM\fR determines whether additional white
+space is added between sentences. If \fIM\fR is zero, no additional
+white space is added.
+Otherwise, a space of size \fIN\fR is added as usual.
+Ignored in \*[NR.]
+.bt
+\fB&cs\|\fIF\|N\|M\fR	off	\(en	P	Constant character space
+(width) mode is
+set on for font \fIF\fR (if mounted); the width of every character will be
+taken to be \fIN\fR/36 ems.
+If \fIM\fR is absent,
+the em is that of the character's point size;
+if \fIM\fR is given,
+the em is \fIM\fR-points.
+All affected characters
+are centered in this space, including those with an actual width
+larger than this space.
+Special Font characters occurring while the current font
+is \fIF\fR are also so treated.
+If \fIN\fR is absent, the mode is turned off.
+The mode must be still or again in effect when the characters are physically printed.
+Ignored in \*[NR.]
+.bt
+\fB&bd\fI|F|N\fR	off	\(en	P	The characters in font \fIF\fR will be artificially
+emboldened by printing each one twice, separated by \fIN\fR\^\(mi1 basic units.
+A reasonable value for \fIN\fR is 3 when the character size is in the vicinity
+of 10 points.
+If \fIN\fR is missing the embolden mode is turned off.
+The emboldening value \fIN\fP is in the \fB.b\fR register.
+.xx
+.bd R 3
+This paragraph is printed with \fI.bd R 3\fR.
+The mode must be still or again in effect when the characters are physically printed.
+Ignored in \*[NR.]
+.br
+.bd R
+.bt
+\fB&bd|S|\fIF|N\fR	off	\(en	P	The characters in the Special Font
+will be emboldened whenever the current font is \fIF\fR.
+The mode must be still or again in effect when the characters are physically printed.
+.bt
+\fB&ft|\fIF\fR	Roman	previous	E	Font changed to
+\fIF\fR.
+Alternatively, imbed \fB\ef\fIF\fR.
+The font name \fBP\fR is reserved to mean the previous font,
+and the name \fBS\fR for the special font.
+.bt
+\fB&fp|\fIN|F|\fR[\fIfile|\fR[\fIsupply\fR]]	ignored	\(en	Font position.
+This is a statement
+that a font named \fIF\fR is mounted on position \fIN\fR.
+With two arguments,
+it is a fatal error if \fIF\fR is not known
+as a \*(TR font file (\(sc24.2).
+.xx
+With three or more arguments,
+font metrics are read from the given \fIfile\fR,
+which must be in Type\ 1, OpenType,
+or TrueType format. If the \fB\s-1TROFFONTS\s+1\fR environment variable is set,
+each of the colon-separated directories in it is tried for the files
+\fIfile.afm\fR, \fIfile.otf\fR, \fIfile.ttf\fR,
+or, if the \fIfile\fR argument
+has an \fB.afm\fR, \fB.otf\fR, or \fB.ttf\fR extension itself,
+for \fIfile\fR. Otherwise, the font is loaded from the file
+\fB/usr/ucblib/doctools/font/devps/\fIfile\fB.afm\fR.
+.xx
+The font is then available with \fB&ft F\fR, \fB\efF\fR, etc. \fBF\fR may
+be freely chosen. The \fIN\fR argument specifies a register on which
+the font is to be mounted. If it is zero, the font is mounted on
+a free position (not on position zero). The \fIN\fR argument may
+consist of more than a single digit.
+.xx
+\fIF\fR may be the name of a previously mounted font, such
+as \fBR\fR. In this case, the same register must be reused. For best
+compatibility with conventional \*(TR usage, it is recommended
+that the base fonts of a document are mounted as ``1 R'', ``2 I''.
+The initial fonts on positions 9 (\fBS1\fR) and 10 (\fBS\fR) should not be
+changed, as these contain special metrics for drawing commands.
+.xx
+\fIF\fR may also consist of more than two characters.
+.xx
+If the optional \fIsupply\fR argument is present, glyph data
+is included in the generated \*(PS file. If \fIsupply\fR
+is one of \fBotf\fR, \fBpfb\fR, \fBpfa\fR, \fBttf\fR, or \fBt42\fR, the file
+\fIsupply.pfb\fR (or likewise) is searched in the directories
+in \fB\s-1TROFFONTS\s+1\fR first as described
+for the \s-1AFM\s+1 file above, and if it is not found there, in
+\fB/usr/ucblib/doctools/font/devps/\fIsupply\fB.pfb\fR (or
+likewise). \fIsupply\fR may also be the basename of a file like
+\fIfile\fR above.
+.xx
+The character \fB%\fR can be used to escape arbitrary bytes in
+font file names. In particular, this is necessary to use font
+files whose names contain spaces, bytes outside the ASCII range,
+or a \fB%\fR itself. \fB%\fIxx\fR represents the byte with the hexadecimal
+code \fIxx\fR, e.g., \fB%20\fR is a space character. In the path names
+in TROFFONTS, only the \fB%\fR and \fB:\fR characters have to be masked
+using this mechanism.
+.bt
+\fB&fps\fI|map|...\fR		ignored	T	\
+Mounts a font with a special character map.
+By default, special characters like \fB\e(\(**a\fR
+are not assigned when a font is mounted
+even if a matching named \*(PS character (like \fB\e[alpha]\fR)
+would have been available. The following special character maps
+exist:
+.xx
+\fBmath\fR	mathematical characters like \(<= \(cu \(-> \(if
+.br
+\fBgreek\fR	greek characters like \(*a \(*b \(*g \(*A \(*B \(*G
+.br
+\fBpunct\fR	the characters \e(or \- \e\` \e\' " # < > @ \e ^ ~
+.br
+\fBlarge\fR	parts of large characters like \(rc \(rk \(lb \(lk
+.xx
+The \fBpunct\fR map is used by default
+for the \fBps\fR and \fBpsmed\fR devices.
+.xx
+The remaining arguments are handled as described for \fBfp\fR.
+.bt
+\fB&feature\fI|F|\(+-name|...\fR	ignored	O,T	\
+Enables (+) or disables (\-) the OpenType feature \fIname\fR in font \fIF\fR.
+Only OpenType features that result in context-insensitive
+single-character substitutions are supported. Typical features
+are \fBonum\fR to enable old-style numerals, or \fBsmcp\fR to enable
+small capitals.
+.bt
+\fB&fallback\fI|F|A|B|...\fR	ignored	O,T	\
+Selects the fallback sequence for font \fIF\fR.
+If the current font is \fIF\fR and a character is not found,
+font \fIA\fR is searched first, then font \fIB\fR, etc.
+If the character still has not been found,
+it is searched for in the Special Font,
+then in the fonts mounted at positions 0, 1, and so forth.
+.bt
+\fB&hidechar\fI|F|c|d|...\fR	ignored	O,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
+If the characters appear in input afterwards,
+they are searched in other fonts using the fallback sequence.
+This is useful e.g. for combining characters from a regular
+and a Type\ 1 expert font.
+.bt
+.lg 0
+\fB&flig\fI|F|N\fR	font-speci\(fic	ignored	T	De\(fines the set of
+ligatures to be used with font \fIF\fR.
+.lg
+\fIN\fR is the sum of the values 1 for ff, 2 for
+fi, 4 for fl, 8 for ffi, and 16 for ffl.
+.lg 0
+Thus \fB&flig R 31\fR
+.lg
+enables all these ligatures in font \fBR\fR. The default is specific
+to a font and is determined from its metrics file. Enabling
+the ff, ffi, and ffl ligatures with \*(PS Type\ 1 fonts
+usually requires an expert font that has been selected for
+character substitution using the \fBfallback\fR request.
+.bt
+\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
+of the space character in font \fIF\fR to \fIN\fR,
+which is given in units of 1/72000 of an inch multiplied by the
+current point size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair
+definitions). If only one argument is present, the space width
+is set to the width of the \fBspace\fR character as obtained from the
+font metrics file. If the space width for a font is not set
+explicitly using this request, it defaults to 1/3 em for
+variable-width fonts, or to the width of the \fBspace\fR character
+for monospaced fonts.
+.xx
+When the width of spaces in output is actually computed,
+the space size as set by \fBss\fR is also taken into account.
+The space width as defined above is used directly with
+\fB&ss 12\fR, which is the default. Otherwise, it is multiplied
+by the \fBss\fR setting divided by 12.
+.mh
+Page control
+.pg
+Top and bottom margins are \fInot\fR automatically provided;
+it is conventional to define two \fImacros\fR and to set \fItraps\fR
+for them at vertical positions 0 (top) and \fI\(miN\fR (\fIN\fR from the bottom).
+See \(sc7 and Tutorial Examples \(scT2.
+A pseudo-page transition onto the \fIfirst\fR page occurs
+either when the first \fIbreak\fR occurs or
+when the first \fInon-diverted\fR text processing occurs.
+Arrangements
+for a trap to occur at the top of the first page
+must be completed before this transition.
+In the following, references to the \fIcurrent diversion\fR (\(sc7.4)
+mean that the mechanism being described works during both
+ordinary and diverted output (the former considered as the top diversion level).
+.pg
+The physical limitations on \*(TR and \*(NR output
+are device dependent.
+.h1
+.bt
+\fB&pl\fI|\(+-N\fR	11\|in	11\|in	\fBv\fR	Page length set to \fI\(+-N\fR.
+The current page length is available in the \fB.p\fR register.
+.bt
+\fB&papersize\fI|media\fR	ignored	T	Sets the paper size.
+\fImedia\fR can be one of
+\fBexecutive\fR,
+\fBletter\fR,
+\fBlegal\fR,
+\fBledger\fR,
+\fBtabloid\fR,
+\fBa\fIN\fR,
+\fBb\fIN\fR,
+\fBc\fIN\fR,
+or two numbers giving the width and height directly.
+The page length is set from these
+parameters, the page offset and line length are adjusted as needed,
+and the post-processor is informed about the page metrics for its
+internal calculations.
+The last action is the real reason why this
+request exists; without it, \*(PS printers may displace the
+pages of the document. The default are \fBletter\fR measurements. This
+request should be used early in a document; if it is given multiple
+times, the last one will setup the device.
+.bt
+\fB&mediasize\fI|media\fR	ignored	T	Sets the device media size.
+\fImedia\fR can be one of
+\fBexecutive\fR,
+\fBletter\fR,
+\fBlegal\fR,
+\fBledger\fR,
+\fBtabloid\fR,
+\fBa\fIN\fR,
+\fBb\fIN\fR,
+\fBc\fIN\fR,
+or two numbers giving the width and height directly.
+This request performs the same actions as
+\fBpapersize\fR and generates
+a device setup command in addition (the \*(PS Level 2 operator
+\fBsetpagedevice\fR as well as the DSC comment
+\fB%%DocumentMedia:\fR with \fIdpost\fR).
+The effect of this command can be the selection of a
+matching paper tray on a printer; on the other hand, the document
+may not print at all if no such tray is available.
+In general, it is recommended to use printer-specific
+options from a \s-1PPD\s+1 file
+when the file is submitted to the print spooling system instead
+of this request.
+However, when generating \*(PS as
+intermediate format with the intent of \*[PDF] creation, use of this
+request is recommended.
+.bt
+\fB&cropat\fI|L|T|W|H\fR	ignored	T	Sets the ``CropBox'' page parameter for \*[PDF] generation.
+The four arguments give the offset from the left (\fIL\fR)
+and top (\fIT\fR) margins of the document
+(as set by \fBmediasize\fR),
+and width (\fIW\fR) and height (\fIH\fR) of the box.
+The default units are points.
+The CropBox restricts the
+area of the page that is shown by a \*[PDF] viewer program. It is
+useful to hide cut marks and other printing instructions when
+the same \*[PDF] document is intended to be displayed on screen.
+.bt
+\fB&trimat\fI|L|T|W|H\fR	ignored	T	Sets the ``TrimBox'' page parameter for \*[PDF] generation
+and enables printing of marks when combined with \fIdpost\ \-M\fR.
+The four arguments give the offset from the left (\fIL\fR)
+and top (\fIT\fR) margins of the document
+(as set by \fBmediasize\fR),
+and width (\fIW\fR) and height (\fIH\fR) of the box.
+The default units are points.
+The TrimBox specifies how
+the page is to be cut after it has been printed; it is sort of
+an electronic equivalent for cut marks (which should continue to
+be printed in addition).
+.bt
+\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Sets the ``BleedBox'' page parameter for \*[PDF] generation.
+The four arguments give the offset from the left (\fIL\fR)
+and top (\fIT\fR) margins of the document
+(as set by \fBmediasize\fR),
+and width (\fIW\fR) and height (\fIH\fR) of the box.
+The default units are points.
+The BleedBox should be defined
+as a a frame around the objects of the actual document including
+any bleed areas (i.e. content that should extend to the end of the
+trimmed final page but is extended a bit such to work around
+possible cutting inaccuracies). Cut marks, color bars, and other
+information for the printing office should be positioned outside
+the BleedBox.
+.bt
+\fB&bp\fI|\(+-N\fR	\fIN\(eq\fR1	\(en	B,\fBv\fR	Begin page.
+The current page is ejected and a new page is begun.
+If \fI\(+-N\fR is given, the new page number will be \fI\(+-N\fR.
+Also see request \fBns\fR.
+.bt
+\fB&pn\fI|\(+-N\fR	\fIN\fR\(eq1	ignored	\(en	Page number.
+The next page (when it occurs) will have the page number \fI\(+-N\fR.
+A \fBpn\fR must occur before the initial pseudo-page transition
+to effect the page number of the first page.
+The current page number is in the \fB%\fR register.
+.bt
+\fB&po\fI|\(+-N\fR	0;|1\|in	previous	\fBv\fR	Page offset.
+The current \fIleft margin\fR is set to \fI\(+-N\fR.
+The \*(TR initial value provides about 1|inch of paper margin
+on a typical device.
+The current page offset is available in the \fB.o\fR register.
+.bt
+\fB&ne\fI|N\fR	\(en	\fIN\(eq\fR1\|\fIV\fR	D,\fBv\fR	Need \fIN\fR vertical space.
+If the distance, \fID\fR, to the next trap position (see \(sc7.5) is less than \fIN\fR,
+a forward vertical space of size \fID\fR occurs,
+which will spring the trap.
+If there are no remaining
+traps on the page,
+\fID\fR is the distance to the bottom of the page.
+If \fID\|<\|V\fR, another line could still be output
+and spring the trap.
+In a diversion, \fID\fR is the distance to the \fIdiversion trap\fR, if any,
+or is very large.
+.bt
+\fB&mk\fI|R\fR	none	internal	D	Mark the \fIcurrent\fR vertical place
+in an internal register (both associated with the current diversion level),
+or in register \fIR\fR, if given.
+See \fBrt\fR request.
+.bt
+\fB&rt\fI|\(+-N\fR	none	internal	D,\fBv\fR	Return \fIupward only\fR to a marked vertical place
+in the current diversion.
+If \fI\(+-N\fR (w.r.t. current place) is given,
+the place is \fI\(+-N\fR from the top of the page or diversion
+or, if \fIN\fR is absent, to a
+place marked by a previous \fBmk\fR.
+Note that the \fBsp\fR request (\(sc5.3) may be used
+in all cases instead of \fBrt\fR
+by spacing to the absolute place stored in a explicit register;
+e.|g. using the sequence \fB.mk|\fIR\fR ... \fB.sp|~\|\en\fIR\fBu\fR;
+this also works when the motion is downwards.
+.mh
+Text Filling, Adjusting, and Centering
+.sc
+Filling and adjusting.
+Normally,
+words are collected from input text lines
+and assembled into a output text line
+until some word does not fit.
+An attempt is then made
+the hyphenate the word in effort to assemble a part
+of it into the output line.
+The spaces between the words on the output line
+are then increased to spread out the line
+to the current \fIline length\fR
+minus any current \fIindent\fR.
+A \fIword\fR is any string of characters delimited by
+the \fIspace\fR character or the beginning/end of the input line.
+Any adjacent pair of words that must be kept together
+(neither split across output lines nor spread apart
+in the adjustment process)
+can be tied together by separating them with the
+\fIunpaddable space\fR character
+"\fB\e\ \ \fR" (backslash-space).
+The adjusted word spacings are uniform in \*(TR
+and the minimum interword spacing can be controlled
+with the \fBss\fR request (\(sc2).
+In \*[NR,] they are normally nonuniform because of
+quantization to character-size spaces;
+however,
+the command line option \fB\-e\fR causes uniform
+spacing with full output device resolution.
+Filling, adjustment, and hyphenation (\(sc13) can all be
+prevented or controlled.
+The \fItext length\fR on the last line output is available in the \fB.n\fR register,
+and text base-line position on the page for this line is in the \fBnl\fR register.
+The text base-line high-water mark (lowest place) on the current page is in
+the \fB.h\fR register.
+The current horizontal output position
+is in the \fB.k\fR register.
+.pg
+.tr &&
+An input text line ending with \fB.\fR\^, \fB?\fR, or \fB!\fR,
+optionally followed by any number of \fB"\fR, \fB\'\fR,
+\fB)\fR, \fB]\fR, \fB*\fR, or \fB\(dg\fR,
+is taken
+to be the end of a \fIsentence\fR, and an additional space character is
+automatically provided during filling.
+To prevent this at individual locations,
+add \fB\e&\fR to the end of the input line;
+the \fBss\fR request (\(sc2) can be used to disable it globally.
+Multiple inter-word space characters found in the input are retained,
+except for trailing spaces;
+initial spaces also cause a \fIbreak\fR.
+.pg
+When filling is in effect, a \fB\ep\fR may be imbedded or attached to a word to
+cause a \fIbreak\fR at the \fIend\fR of the word and have the resulting output
+line \fIspread out\fR to fill the current line length.
+.pg
+A text input line that happens to begin
+with a control character can
+be made to not look like a control line
+by prefacing it with
+the non-printing, zero-width filler character \fB\e&\fR.
+Still another way is to specify output translation of some
+convenient character into the control character
+using \fBtr\fR (\(sc10.5).
+.pg
+\*(TR reads kerning tables from Type\ 1,
+OpenType, and TrueType font files.
+These tables contain small horizontal spacing adjustments
+for pairs of individual characters,
+e.g., the pair ``Vo'' would print as ``V\&o''
+without kerning applied.
+Placing \fB\e&\fR between two characters
+disables kerning at that location;
+the \fBkern\fR request can disable it globally.
+The \fBkernpair\fR request adds a kerning pair;
+in contrast to predefined pairs,
+it allows the characters to originate from different fonts.
+.pg
+.kernafter R \[guillemotleft] 66
+.kernbefore R \[guillemotright] 66
+It is sometimes useful to add or substact a constant amount of spacing
+whenever a specific character appears;
+for example, \[guillemotleft]french\[guillemotright]
+quotation marks usually require some additional distance
+to the words contained in them.
+The \fBkernafter\fR and \fBkernbefore\fR requests allow
+to define such adjustments.
+Again, a \fB\e&\fR disables them at individual points;
+they are generally not applied if the other character is a space.
+.tr &.
+.pg
+Characters can hang beyond the left or right margins of adjusted text;
+the \fBlhang\fR and \fBrhang\fR requests specify this.
+Left margin adjustments are evaluated before the letters that fit on the
+current line are computed, and can thus principally be of any length.
+In contrast, right margin adjustments are evaluated after this computation
+is finished, and the adjustment is simply added to the word space of the
+output line.
+Thus a positive right adjustment that is large in relation
+to the line length will cause visible holes, and a negative adjustment
+will ultimately cause the words on the line to be printed over each
+other.
+This is not a problem for the typical application of hanging
+punctuation for visual alignment, though;
+if e.g. a line with eight word
+spaces is shifted by .08 em,
+each word space is enlarged by only .01 em.
+.sc
+Interrupted text.
+The copying of a input line in \fInofill\f (non-fill) mode can be \fIinterrupted\fR
+by terminating
+the partial line with a \fB\ec\fR.
+The \fInext\fR encountered input text line will be considered to be a continuation
+of the same line of input text.
+Similarly,
+a word within \fIfilled\fR text may be interrupted by terminating the
+word (and line) with \fB\ec\fR;
+the next encountered text will be taken as a continuation of the
+interrupted word.
+If the intervening control lines cause a break,
+any partial line will be forced out along with any partial word.
+.h1
+.bt
+\fB&br\fR	\(en	\(en	B	Break.
+The filling of the line currently
+being collected is stopped and
+the line is output without adjustment.
+Text lines beginning with space characters
+and empty text lines (blank lines) also cause a break.
+.bt
+.lg 0
+\fB&fi\fR	\(fill|on	\(en	B,E	Fill subsequent output lines.
+.lg
+The register \fB.u\fR is 1 in fill mode and 0 in nofill mode.
+.bt
+\fB&nf\fR	fill|on	\(en	B,E	Nofill.
+Subsequent output lines are \fIneither\fR filled \fInor\fR adjusted.
+Input text lines are copied directly to output lines
+\fIwithout regard\fR for the current line length.
+.bt
+\fB&ad\fI|c\fR	adj,both	adjust	E	\
+Line adjustment is begun.
+If fill mode is not on, adjustment will be deferred until
+fill mode is back on.
+If the type indicator \fIc\fR is present,
+the adjustment type is changed as shown in the following table.
+.TS
+center box;
+c|c
+c|l.
+Indicator	Adjust Type
+_
+\fBl\fR	adjust left margin only
+\fBr\fR	adjust right margin only
+\fBc\fR	center
+\fBb\fR or \fBn\fR	adjust both margins
+absent	unchanged
+.TE
+The number register \fB.j\fR contains the current value
+of the \fBad\fR setting;
+its value can be recorded and used subsequently
+to set adjustment.
+.bt
+\fB&na\fR	adjust	\(en	E	Noadjust.
+Adjustment is turned off;
+the right margin will be ragged.
+The adjustment type for \fBad\fR is not changed.
+Output line filling still occurs if fill mode is on.
+.bt
+\fB&ce\fI|N\fR	off	\fIN\fR\(eq1	B,E	Center the next \fIN\fR input text lines
+within the current (line-length minus indent).
+If \fIN\fR\(eq\^0, any residual count is cleared.
+A break occurs after each of the \fIN\fR input lines.
+If the input line is too long,
+it will be left adjusted.
+.bt
+\fB&track\fI|F|S|N|T|M\fR	ignored	O,T	Specifies letter space tracking
+for font \fIF\fR.
+If the current font is \fIF\fR
+and the point size is below or equal to \fIS\fR,
+white space of width \fIN\fR is added to each character.
+If the point size is above or equal to \fIT\fR,
+white space of width \fIM\fR is added.
+If the point size is between \fIS\fR and \fIT\fR,
+the amount of white space added is computed
+as a value between \fIN\fR and \fIM\fR using the current point size \fIs\fR:
+(\fIs\^M\fR\-\fIs\^N\fR+\fIT\^N\fR\-\fIS\^M\fR)\|/\|(\fIT\fR\-\fIS\fR).
+The default unit for all numeric arguments is points.
+Negative numbers are accepted and
+cause a decrease of letter space.
+No adjustment is performed on the last character of an output line.
+Tracking also applies to characters
+from another font that have been selected by the \fBfallback\fP sequence.
+.bt
+\fB&kern\fI|N\fR	1	1	O,T	Controls pairwise kerning;
+disabled if \fIN\fR=0, otherwise enabled.
+.bt
+.dl
+\fB&kernpair\fI|F|c|G|d|N\fR	ignored	O,T	Adds a kerning pair
+to the kerning table for character \fIc\fR
+from font \fIF\fR and character \fId\fR from font \fIG\fR.
+The \fIN\fR argument is 1/72\|000 of an inch multiplied by the current point
+size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair definitions).
+To add a kerning pair that includes the space character, use ``\e ''.
+.bt
+\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space after a character
+if the current font is \fIF\fR and \fIc\fR
+is the first character of a pair of characters subject to kerning.
+The \fIN\fR argument is
+1/72\|000 of an inch multiplied by the current point size or 1/1000
+of an em (as in \s-1AFM\s+1 kerning pair definitions).
+Same for \fId/M\fR etc.
+.bt
+\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space before a character
+if the current font is \fIF\fR and \fIc\fR
+is the second character of a pair of characters subject to kerning.
+The \fIN\fR argument is
+1/72\|000 of an inch multiplied by the current point size or 1/1000
+of an em (as in \s-1AFM\s+1 kerning pair definitions).
+Same for \fId/M\fR etc.
+.bt
+\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at left margin.
+When the current font is \fIF\fR and \fIc\fR appears at the left margin
+of an output line in left-adjusted, both-adjusted, or nofill mode,
+the margin is relocated to the right by \fIN\fR, which is
+1/72\|000 of an inch multiplied by the current point size or 1/1000
+of an em (as in \s-1AFM\s+1 character width definitions).
+Same for \fId/M\fR etc.
+.bt
+\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at right margin.
+When the current font is \fIF\fR and \fIc\fR appears at the right margin
+of an output line in right-adjusted, both-adjusted, or nofill mode,
+the margin is relocated to the right by \fIN\fR, which is
+1/72\|000 of an inch multiplied by the current point size or 1/1000
+of an em (as in \s-1AFM\s+1 character width definitions).
+Same for \fId/M\fR etc.
+.mh
+Vertical Spacing
+.sc
+Base-line spacing.
+The vertical spacing \fI(V)\fR between the base-lines of successive
+output lines can be set
+using the \fBvs\fR request.
+\fIV\fR should be large enough to accommodate the character sizes
+on the affected output lines.
+For the common type sizes (9-12 points),
+usual typesetting practice is to set \fIV\fR to 2\ points greater than the
+point size;
+\*(TR default is 10-point type on a 12-point spacing
+(as in this document).
+The current \fIV\fR is available in the \fB.v\fR register.
+Multiple-\fIV\|\fR line separation (e.\|g. double spacing) may be requested
+with \fBls\fR,
+but it is better to use a large \fBvs\fR instead;
+certain preprocessors assume single spacing.
+The current line spacing is available in the \fB.L\fR register.
+.sc
+Extra line-space.
+If a word contains a vertically tall construct requiring
+the output line containing it to have extra vertical space
+before and/or after it,
+the \fIextra-line-space\fR function \fB\ex\fI\'N\'\fR
+can be imbedded in or attached to that word.
+If \fIN\fR is negative,
+the output line containing the word will
+be preceded by \fIN\fR extra vertical space;
+if \fIN\fR is positive,
+the output line containing the word
+will be followed by \fIN\fR extra vertical space.
+If successive requests for extra space apply to the same line,
+the maximum values are used.
+The most recently utilized post-line extra line-space is available in the \fB.a\fR register.
+.pg
+In \fB\ex\fI\'...\'\fR and other functions having a pair of delimiters around
+their parameter (here \fB\'\fR\|),
+the delimiter choice is arbitrary,
+except that it can not look like the continuation of a number expression for \fIN\fR.
+.sc
+Blocks of vertical space.
+A block of vertical space is ordinarily requested using \fBsp\fR,
+which honors the \fIno-space\fR mode and which does
+not space \fIpast\fR a trap.
+A contiguous block of vertical space may be reserved using \fBsv\fR.
+.sc
+Ascenders and descenders.
+Type\ 1, OpenType, and TrueType metrics
+supply information about the typical extents
+of characters above the base-line (ascender) and below it (descender).
+Usually, these correspond to the top of the lowercase ``d''
+and the bottom of the lowercase ``p'', respectively.
+The \fB&ascender\fR and \fB&descender\fR number registers
+contain these values in units
+with correct scaling for the current point size applied.
+If no values are available,
+these registers are set to zero.
+.h1
+.bt
+\fB&vs\fI\|N\fR	1/6in;12pts	previous	E,\fBp\fR	Set vertical base-line spacing size \fIV\fR.
+Transient \fIextra\fR vertical space available with \fB\ex\fI\'N\'\fR (see above).
+.bt
+\fB&ls\fI\|N\fR	\fIN\(eq\^\fR1	previous	E	\fILine\fR spacing
+set to \fI\(+-N\fR.
+\fIN\(mi\fR1 \fIV\fR\^s \fI(blank lines)\fR are
+appended to each output text line.
+Appended blank lines are omitted, if the text or previous appended blank line reached a trap position.
+.bt
+\fB&sp\fI|N\fR	\(en	\fIN\fR\(eq1\fIV\fR	B,\fBv\fR	Space vertically in \fIeither\fR direction.
+If \fIN\fR is negative, the motion is \fIbackward\fR (upward)
+and is limited to the distance to the top of the page.
+Forward (downward) motion is truncated to the distance to the
+nearest trap.
+(Recall the use of \fB.sp\ ~\|\fIN\fR from \(sc1.3.)
+If the no-space mode is on,
+no spacing occurs (see \fBns\fR, and \fBrs\fR below).
+.bt
+\fB&sv\fI|N\fR	\(en	\fIN\(eq\fR1\fIV\fR	\fBv\fR	Save a contiguous vertical block of size \fIN\fR.
+If the distance to the next trap is greater
+than \fIN\fR, \fIN\fR vertical space is output.
+No-space mode has \fIno\fR effect.
+If this distance is less than \fIN\fR,
+no vertical space is immediately output,
+but \fIN\fR is remembered for later output (see \fBos\fR).
+Subsequent \fBsv\fR requests will overwrite any still remembered \fIN\fR.
+.bt
+\fB&os\fR	\(en	\(en	\(en	Output saved vertical space.
+No-space mode has \fIno\fR effect.
+Used to finally output a block of vertical space requested
+by an earlier \fBsv\fR request.
+.bt
+\fB&ns\fR	space	\(en	D	No-space mode turned on.
+When on, the no-space mode inhibits \fBsp\fR requests and
+\fBbp\fR requests \fIwithout\fR a next page number.
+The no-space mode is turned off when a line of
+output occurs, or with \fBrs\fR.
+.bt
+\fB&rs\fR	space	\(en	D	Restore spacing.
+The no-space mode is turned off.
+.bt
+Blank|text|line.	\(en	B	Causes a break and
+output of a blank line exactly like \fBsp|1\fR.
+.\" from file m2
+.tr |
+.rm mx
+.br
+.mh
+Line Length and Indenting
+.pg
+The maximum line length for fill mode may be set with \fBll\fR.
+The indent may be set with \fBin\fR;
+an indent applicable to \fIonly\fR the \fInext\fR output line may be set with \fBti\fR.
+The line length includes indent space but \fInot\fR
+page offset space.
+The line-length minus the indent is the basis for centering with \fBce\fR.
+The effect of \fBll\fR, \fBin\fR, or \fBti\fR
+is delayed, if a partially collected line exists,
+until after that line is output.
+In fill mode the length of text on an output line is less than or equal to
+the line length minus the indent.
+The current line length and indent are available in registers \fB.l\fR and \fB.i\fR respectively.
+The length of \fIthree-part titles\fR produced by \fBtl\fR
+(see \(sc14) is \fIindependently\fR set by \fBlt\fR.
+.h1
+.bt
+\fB&ll\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Line length is set to \(+-\fIN\fR.
+.bt
+\fB&in\fI|\(+-N\fR	\fIN\(eq\^\fR0	previous	B,E,\fBm\fR	Indent is set to \fI\(+-N\fR.
+The indent is prepended to each output line.
+.bt
+\fB&ti\fI|\(+-N\fR	\(en	ignored	B,E,\fBm\fR	Temporary indent.
+The \fInext\fR output text line will be indented a distance \fI\(+-N\fR
+with respect to the current indent.
+The resulting total indent may not be negative.
+The current indent is not changed.
+.mh
+Macros, Strings, Diversion, and Position Traps
+.sc
+Macros and strings.
+A \fImacro\fR is a named set of arbitrary \fIlines\fR that may be invoked by name or
+with a \fItrap\fR.
+A \fIstring\fR is a named string of \fIcharacters\fR,
+\fInot\fR including a newline character,
+that may be interpolated by name at any point.
+Request, macro, and string names share the \fIsame\fR name list.
+Macro and string names
+may consist of an arbitrary number of \s-1ASCII\s+1 characters (\(sc1.1)
+and may usurp previously defined
+request, macro, or string names;
+this implies that build-in operators may be (irrevocably) redefined.
+Any of these entities may be renamed with \fBrn\fR
+or removed with \fBrm\fR.
+Macros are created by \fBde\fR and \fBdi\fR, and appended to by \fBam\fR and \fBda\fR;
+\fBdi\fR and \fBda\fR cause normal output to be stored in a macro.
+Strings are created by \fBds\fR and appended to by \fBas\fR.
+A macro is invoked in the same way as a request;
+a control line beginning \fB.\fIxx\fR will interpolate the contents of macro \fIxx\fR.
+The remainder of the line may contain up to nine \fIarguments\fR.
+The strings \fIx\fR, \fIxx\fR, and \fIxxx\fR
+are interpolated at any desired point with
+\fB\e\(**\fIx\fR, \fB\e\(**(\fIxx\fR,
+and \fB\e\(**[\fIxxx\fB]\fR respectively.
+String references and macro invocations may be nested.
+.sc
+Copy mode input interpretation.
+During the definition and extension
+of strings and macros (not by diversion)
+the input is read in \fIcopy mode\fR.
+The input is copied without interpretation
+\fIexcept\fR that:
+.x1
+.ds + \v'-.1m'\s-4\(bu\s+4\v'+.1m'
+\*+ The contents of number registers indicated by \fB\en\fR are interpolated.
+\*+ Strings indicated by \fB\e\(**\fR are interpolated.
+\*+ Arguments indicated by \fB\e$\fR are interpolated.
+\*+ Concealed newlines indicated by \fB\e\fR(newline) are eliminated.
+\*+ Comments indicated by \fB\e"\fR are eliminated.
+\*+ \fB\et\fR and \fB\ea\fR are interpreted as \s-1ASCII\s+1 horizontal tab and \s-1SOH\s+1 respectively (\(sc9).
+\*+ \fB\e\e\fR is interpreted as \fB\e\fR.
+\*+ \fB\e.\fR is interpreted as "\fB.\fR".
+.x2
+These interpretations can be suppressed by
+prepending
+a \fB\e\fR.
+For example, since \fB\e\e\fR maps into a \fB\e\fR, \fB\e\en\fR will copy as \fB\en\fR which
+will be interpreted as a number register indicator when the
+macro or string is reread.
+.sc
+Arguments.
+When a macro is invoked by name, the remainder of the line is
+taken to contain arguments.
+The argument separator is the space character, and arguments
+may be surrounded by double-quotes to permit imbedded space characters.
+Pairs of double-quotes may be imbedded in double-quoted arguments to
+represent a single double-quote character.
+The argument \fB"\^"\fR is explicitly null.
+If the desired arguments won't fit on a line,
+a concealed newline may be used to continue on the next line.
+A trailing double quote may be omitted.
+.pg
+When a macro is invoked the \fIinput level\fR is \fIpushed down\fR and
+any arguments available at the previous level become unavailable
+until the macro is completely read and the previous level is restored.
+A macro's own arguments can be interpolated at \fIany\fR point
+within the macro with \fB\e$\fIn\fR, \fB\e$(\fInn\fR, or \fB\e$[\fInnn\fB]\fR,
+which interpolates the \fIn\fRth, \fInn\fRth,
+or \fInnn\fRth argument, respectively.
+If an invoked argument doesn't exist,
+a null string results.
+For example, the macro \fIxx\fR may be defined by
+.x1
+.ft B
+.ta .75i
+&de xx	\e"begin definition
+Today is \e\e$1 the \e\e$2.
+&.	\e"end definition
+.ft R
+.x2
+and called by
+.x1
+.ft B
+&xx Monday 14th
+.ft R
+.x2
+to produce the text
+.x1
+.ft B
+Today is Monday the 14th.
+.ft R
+.x2
+Note that the \fB\e$\fR
+was concealed in the definition with a prepended \fB\e\fR.
+.pg
+The escape sequence \fB\e$\(**\fR interpolates all arguments to a macro,
+separated by spaces;
+\fB\e$@\fR interpolates all arguments,
+each one surrounded by double quotes, separated by spaces.
+The number of currently available
+arguments is in the \fB.$\fR register.
+.pg
+No arguments are available at the top (non-macro) level,
+within a string, or within a trap-invoked macro.
+.pg
+Arguments are copied in \fIcopy mode\fR onto a stack
+where they are available for reference.
+It is advisable to conceal string references (with an extra \fB\e\fR\|)
+to delay interpolation until argument reference time.
+.sc
+Diversions.
+Processed output may be diverted into a macro for purposes
+such as footnote processing (see Tutorial \(scT5)
+or determining the horizontal and vertical size of some text for
+conditional changing of pages or columns.
+A single diversion trap may be set at a specified vertical position.
+The number registers \fBdn\fR and \fBdl\fR respectively contain the
+vertical and horizontal size of the most
+recently ended diversion.
+Processed text that is diverted into a macro
+retains the vertical size of each of its lines when reread
+in \fInofill\fR mode
+regardless of the current \fIV\fR.
+Constant-spaced (\fBcs\fR) or emboldened (\fBbd\fR) text that is diverted
+can be reread correctly only if these modes are again or still in effect
+at reread time.
+One way to do this is to imbed in the diversion the appropriate
+\fBcs\fR or \fBbd\fR requests with the \fItransparent\fR
+mechanism described in \(sc10.6.
+.pg
+Diversions may be nested
+and certain parameters and registers
+are associated
+with the current diversion level
+(the top non-diversion level may be thought of as the
+0th diversion level).
+These are the diversion trap and associated macro,
+no-space mode,
+the internally-saved marked place (see \fBmk\fR and \fBrt\fR),
+the current vertical place (\fB.d\fR register),
+the current high-water text base-line (\fB.h\fR register),
+and the current diversion name (\fB.z\fR register).
+.sc
+Traps.
+Three types of trap mechanisms are available\(empage traps, a diversion trap, and
+an input-line-count trap.
+Macro-invocation traps may be planted using \fBwh\fR at any page position including the top.
+This trap position may be changed using \fBch\fR.
+Trap positions at or below the bottom of the page
+have no effect unless or until
+moved to within the page or rendered effective by an increase in page length.
+Two traps may be planted at the \fIsame\fR position only by first planting them at different
+positions and then moving one of the traps;
+the first planted trap will conceal the second unless and until the first one is moved
+(see Tutorial Examples \(scT5).
+If the first one is moved back, it again conceals the second trap.
+The macro associated with a page trap is automatically
+invoked when a line of text is output whose vertical size \fIreaches\fR
+or \fIsweeps past\fR the trap position.
+Reaching the bottom of a page springs the top-of-page trap, if any,
+provided there is a next page.
+The distance to the next trap position is available in the \fB.t\fR register;
+if there are no traps between the current position and the bottom of the page,
+the distance returned is the distance to the page bottom.
+.pg
+A macro-invocation trap effective in the current diversion may be planted using \fBdt\fR.
+The \fB.t\fR register works in a diversion; if there is no subsequent trap a \fIlarge\fR
+distance is returned.
+For a description of input-line-count traps, see \fBit\fR below.
+.h1
+.bt
+\fB&de\fI|xx|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Define or redefine the macro \fIxx\fR.
+The contents of the macro begin on the next input line.
+Input lines are copied in \fIcopy mode\fR until the definition is terminated by a
+line beginning with \fB.\fIyy\fR,
+whereupon the macro \fIyy\fR is called.
+In the absence of \fIyy\fR, the definition
+is terminated by a
+line beginning with "\fB..\fR".
+A macro may contain \fBde\fR requests
+provided the terminating macros differ
+or the contained definition terminator is concealed.
+\&"\fB..\fR" can be concealed as
+\fB\e\e..\fR which will copy as \fB\e..\fR and be reread as "\fB..\fR".
+.bt
+\fB&am\fI|xx|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Append to macro (append version of \fBde\fR).
+.bt
+\fB&ds\fI|xx|string\fR	\(en	ignored	\(en	Define a string
+\fIxx\fR containing \fIstring\fR.
+Any initial double-quote in \fIstring\fR is stripped off to permit
+initial blanks.
+.bt
+\fB&as\fI|xx|string\fR	\(en	ignored	\(en	Append
+\fIstring\fR to string \fIxx\fR
+(append version of \fBds\fR).
+.bt
+\fB&chop\fI|xx\fR	\(en	ignored	\(en	Removes the last character of the macro, string, or diversion \fIxx\fR.
+.bt
+\fB&rm\fI|xx\fR	\(en	ignored	\(en	Remove
+request, macro, or string.
+The name \fIxx\fR is removed from the name list and
+any related storage space is freed.
+Subsequent references will have no effect.
+If many macros and strings are being created dynamically, it
+may become necessary to remove unused ones
+to recapture internal storage space for newer registers.
+.bt
+\fB&rn\fI|xx|yy\fR	\(en	ignored	\(en	Rename request, macro, or string
+\fIxx\fR to \fIyy\fR.
+If \fIyy\fR exists, it is first removed.
+.bt
+\fB&di|\fIxx\fR	\(en	end	D	Divert output to macro \fIxx\fR.
+Normal text processing occurs during diversion
+except that page offsetting is not done.
+The diversion ends when the request \fBdi\fR or \fBda\fR is encountered without an argument;
+extraneous
+requests of this type should not appear when nested diversions are being used.
+.bt
+\fB&da|\fIxx\fR	\(en	end	D	Divert, appending to \fIxx\fR
+(append version of \fBdi\fR).
+.bt
+\fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Install
+a trap to invoke \fIxx\fR at page position \fIN;\fR
+a \fInegative N\fR will be interpreted with respect to the
+page \fIbottom\fR.
+Any macro previously planted at \fIN\fR is replaced by \fIxx\fR.
+A zero \fIN\fR refers to the \fItop\fR of a page.
+In the absence of \fIxx\fR, the first found trap at \fIN\fR, if any, is removed.
+.bt
+\fB&ch\fI|xx|N\fR	\(en	\(en	\fBv\fR	Change
+the trap position for macro \fIxx\fR to be \fIN\fR.
+In the absence of \fIN\fR, the trap, if any, is removed.
+.bt
+\fB&dt\fI|N|xx\fR	\(en	off	D,\fBv\fR	Install a diversion trap
+at position \fIN\fR in the \fIcurrent\fR diversion to invoke
+macro \fIxx\fR.
+Another \fBdt\fR will redefine the diversion trap.
+If no arguments are given, the diversion trap is removed.
+.bt
+\fB&vpt\fI|N\fR	1	ignored	\(en	Enables (\fIN\fR\(!=0) or disables (\fIN\fR\(eq0)
+page ejections and vertical position traps,
+i.e. those set with \fBwh\fR or \fBdt\fR.
+At end of input, the page is forcefully ejected.
+The number register \fB&vpt\fR
+holds the current setting.
+.bt
+\fB&it\fI|N|xx\fR	\(en	off	E	Set an input-line-count trap
+to invoke the macro \fIxx\fR after \fIN\fR lines of \fItext\fR input
+have been read
+(control or request lines don't count).
+The text may be in-line text or
+text interpolated by inline or trap-invoked macros.
+.bt
+\fB&return\fR	\(en	\(en	\(en	Immediately returns from the current macro to the level above.
+.bt
+\fB&shift\fI|N\fR	\(en	1	\(en	Shifts the arguments to the current macro
+by \fIN\fR.
+.bt
+\fB&em\fI|xx\fR	none	none	\(en	The
+macro \fIxx\fR will be invoked
+when all input has ended.
+The effect is the same as if the contents of \fIxx\fR had been at the end
+of the last file processed,
+but all processing ceases at the next page eject.
+.mh
+Number Registers
+.pg
+A variety of parameters are available to the user as
+predefined, named \fInumber registers\fR (see Summary and Index, page 7).
+In addition, the user may define his own named registers.
+Register names are one or two characters long and \fIdo not\fR conflict
+with request, macro, or string names.
+Except for certain predefined read-only registers,
+a number register can be read, written, automatically
+incremented or decremented, and interpolated
+into the input in a variety of formats.
+One common use of user-defined registers is to
+automatically number sections, paragraphs, lines, etc.
+A number register may be used any time numerical input is expected or desired
+and may be used in numerical \fIexpressions\fR (\(sc1.4).
+.pg
+Number registers are created and modified using \fBnr\fR, which
+specifies the name, numerical value, and the auto-increment size.
+Registers are also modified, if accessed
+with an auto-incrementing sequence.
+If the registers \fIx\fR and \fIxx\fR both contain
+\fIN\fR and have the auto-increment size \fIM\fR,
+the following access sequences have the effect shown:
+.TS
+center box;
+c2|c2|c
+c2|c2|c2
+l2|c2|c2
+l2|c2|c2
+l2|l2|c2.
+	Effect on	Value
+Sequence	Register	Interpolated
+_
+\fB\en\fIx\fR	none	\fIN\fR
+\fB\en(\fIxx\fR	none	\fIN\fR
+\fB\en[\fIxxx\fB]\fR	none	\fIN\fR
+\fB\en+\fIx\fR	\fIx\fR incremented by \fIM\fR	\fIN+M\fR
+\fB\en\-\fIx\fR	\fIx\fR decremented by \fIM\fR	\fIN\-M\fR
+\fB\en+(\fIxx\fR	\fIxx\fR incremented by \fIM\fR	\fIN+M\fR
+\fB\en\-(\fIxx\fR	\fIxx\fR decremented by \fIM\fR	\fIN\-M\fR
+\fB\en+[\fIxxx\fB]\fR	\fIxxx\fR incremented by \fIM\fR	\fIN+M\fR
+\fB\en\-[\fIxxx\fB]\fR	\fIxxx\fR decremented by \fIM\fR	\fIN\-M\fR
+.TE
+When interpolated, a number register is converted to
+decimal (default),
+decimal with leading zeros,
+lower-case Roman,
+upper-case Roman,
+lower-case sequential alphabetic,
+or
+upper-case sequential alphabetic
+according to the format specified by \fBaf\fR.
+.h1
+.bt
+\fB&nr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	\
+The number register \fIR\fR is assigned the value \fI\(+-N\fR
+with respect to the previous value, if any.
+The increment for auto-incrementing is set to \fIM\fR.
+.bt
+\fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format \fIc\fR to register \fIR\fR.
+The available formats are:
+.TS
+center box;
+c2|c
+c2|c
+c2|l.
+	Numbering
+Format	Sequence
+_
+\fB1\fR	0,1,2,3,4,5,...
+\fB001\fR	000,001,002,003,004,005,...
+\fBi\fR	0,i,ii,iii,iv,v,...
+\fBI\fR	0,I,II,III,IV,V,...
+\fBa\fR	0,a,b,c,...,z,aa,ab,...,zz,aaa,...
+\fBA\fR	0,A,B,C,...,Z,AA,AB,...,ZZ,AAA,...
+.TE
+An arabic format having \fIN\fR digits
+specifies a field width of \fIN\fR digits (example 2 above).
+The read-only registers and the \fIwidth\fR function (\(sc11.2)
+are always arabic.
+Warning: the value of a number register in a non-Arabic format
+is not numeric, and will not produce the expected results in expressions.
+.xx
+The function \fB\eg\fIx\fR, \fB\eg(\fIxx\fR, or \fB\eg[\fIxxx\fB]\fR
+returns the format of a number register in a form suitable for \fBaf\fR;
+it returns nothing if the register has not been used.
+.bt
+\fB&rr\fI|R\fR	\(en	ignored	\(en	Remove register \fIR\fR.
+If many registers are being created dynamically, it
+may become necessary to remove no longer used registers
+to recapture internal storage space for newer registers.
+The register \fB.R\fR contains the number
+of number registers still available.
+.\" from file m3
+.tr |
+.rm mx
+.mh
+Tabs, Leaders, and Fields
+.sc
+Tabs and leaders.
+The \s-1ASCII\s+1 horizontal tab character and the \s-1ASCII\s+1
+\s-1SOH\s+1 (hereafter known as the \fIleader\fR character)
+can both be used to generate either horizontal motion or
+a string of repeated characters.
+The length of the generated entity is governed
+by internal \fItab stops\fR specifiable
+with \fBta\fR.
+The default difference is that tabs generate motion and leaders generate
+a string of periods;
+\fBtc\fR and \fBlc\fR
+offer the choice of repeated character or motion.
+There are three types of internal tab stops\(em\
+\fIleft\fR adjusting, \fIright\fR adjusting,
+and \fIcentering\fR.
+In the following table,
+\fID\fR is the distance from the current position on the \fIinput\fR line
+(where a tab or leader was found)
+to the next tab stop,
+\fInext-string\fR consists
+of the input characters following the tab (or leader) up to the next tab (or leader) or end of line,
+and
+\fIW\fR is the width of \fInext-string\fR.
+.TS
+center box;
+c2|c2|c
+c2|c2|c
+c2|c2|l.
+Tab	Length of motion or	Location of
+type	repeated characters	\fInext-string\fR
+_
+Left	\fID\fR	Following \fID\fR
+Right	\fID\-W\fR	Right adjusted within \fID\fR
+Centered	\fID\-W/\fR2	Centered on right end of \fID\fR
+.TE
+The length of generated motion is allowed to be negative, but
+that of a repeated character string cannot be.
+Repeated character strings contain an integer number of characters, and
+any residual distance is prepended as motion.
+Tabs or leaders found after the last tab stop are ignored, but may be used
+as \fInext-string\fR terminators.
+.pg
+Tabs and leaders are not interpreted in \fIcopy mode\fR.
+\fB\et\fR and \fB\ea\fR always generate a non-interpreted
+tab and leader respectively, and
+are equivalent to actual tabs and leaders in \fIcopy mode\fR.
+.sc
+Fields.
+A \fIfield\fR is contained between
+a \fIpair\fR of \fIfield delimiter\fR characters,
+and consists of sub-strings
+separated by \fIpadding\fR indicator characters.
+The field length is the distance on the
+\fIinput\fR line from the position where the field begins to the next tab stop.
+The difference between the total length of all the sub-strings
+and the field length is incorporated as horizontal
+padding space that is divided among the indicated
+padding places.
+The incorporated padding is allowed to be negative.
+For example,
+if the field delimiter is \fB#\fR and the padding indicator is \fB^\fR,
+\fB#^\fIxxx\fB^\fIright\|\fB#\fR
+specifies a right-adjusted string with the string \fIxxx\fR centered
+in the remaining space.
+.h1
+.bt
+\fB&ta\fI|Nt|...\fR	0.8;|0.5in	none	E,\fBm\fR	\
+Set tab stops and types.
+\fIt=\fBR\fR, right adjusting;
+\fIt=\fBC\fR, centering;
+\fIt\fR absent, left adjusting.
+\*(TR tab stops are preset every 0.5in.;
+\*(NR every 0.8in.
+The stop values are separated by spaces, and
+a value preceded by \fB+\fR
+is treated as an increment to the previous stop value.
+.bt
+\fB&tc\fI|c\fR	none	none	E	\
+The tab repetition character becomes \fIc\fR,
+or is removed specifying motion.
+.bt
+\fB&lc\fI|c\fR	\fB.\fR	none	E	\
+The leader repetition character becomes \fIc\fR,
+or is removed specifying motion.
+.bt
+\fB&fc\fI|a|b\fR	off	off	\(en	\
+The field delimiter is set to \fIa\fR;
+the padding indicator is set to the \fIspace\fR character or to
+\fIb\fR, if given.
+In the absence of arguments the field mechanism is turned off.
+.mh
+Input and Output Conventions and Character Translations
+.sc
+Input character translations.
+Ways of inputting the graphic character set were
+discussed in \(sc2.1.
+The \s-1ASCII\s+1 control characters horizontal tab (\(sc9.1),
+\s-1SOH\s+1 (\(sc9.1), and backspace (\(sc10.3) are discussed elsewhere.
+The newline delimits input lines.
+In addition,
+\s-1STX\s+1, \s-1ETX\s+1, \s-1ENQ\s+1, \s-1ACK\s+1, and \s-1BEL\s+1
+are accepted,
+and may be used as delimiters or translated into a graphic with \fBtr\fR (\(sc10.5).
+\fIAll\fR others are ignored.
+.pg
+The \fIescape\fR character \fB\e\fR
+introduces \fIescape sequences\fR\(em\
+causes the following character to mean
+another character, or to indicate
+some function.
+A complete list of such sequences is given in the Summary.
+\fB\e\fR
+should not be confused with the \s-1ASCII\s+1 control character \s-1ESC\s+1 of the
+same name.
+The escape character \fB\e\fR can be input with the sequence \fB\e\e\fR.
+The escape character can be changed with \fBec\fR,
+and all that has been said about the default \fB\e\fR becomes true
+for the new escape character.
+\fB\ee\fR can be used to print whatever the current escape character is;
+this escape sequence is interpreted in \fIcopy mode\fR.
+\fB\eE\fR prints the current escape character
+but is not interpreted in \fIcopy mode\fR.
+If necessary or convenient, the escape mechanism may be turned off with \fBeo\fR,
+and restored with \fBec\fR.
+.h1
+.bt
+\fB&ec\fI|c\fR	\fB\e\fR	\fB\e\fR	\(en	\
+Set escape character to \fB\e\fR, or to \fIc\fR, if given.
+.bt
+\fB&eo\fR	on	\(en	\(en	Turn escape mechanism off.
+.sc
+Ligatures.
+.lg 0
+The set of available ligatures is device and font dependent,
+but is often a subset of
+\fB\(fi\fR, \fB\(fl\fR, \fB\(ff\fR, \fB\(Fi\fR, and \fB\(Fl\fR.
+They may be input (even in \*(NR) by
+\fB\e(fi\fR, \fB\e(fl\fR, \fB\e(ff\fR, \fB\e(Fi\fR, and \fB\e(Fl\fR respectively.
+In \*[TR,] the \fBflig\fR request (\(sc2) specifies the set of ligatures
+available with an individual font.
+.lg
+The ligature mode is normally on in \*[TR,] and \fIautomatically\fR invokes 
+ligatures during input.
+.h1
+.bt
+\fB&lg\fI|N\fR	off;|on	on	\(en	Ligature mode
+is turned on if \fIN\fR is absent or non-zero,
+and turned off if \fIN\(eq\^\fR0.
+If \fIN\fR\(eq\^2, only the two-character ligatures are automatically invoked.
+Ligature mode is inhibited for
+request, macro, string, register, or file names,
+and in \fIcopy mode\fR.
+No effect in \*[NR.]
+.sc
+Backspacing, underlining, overstriking, etc.
+Unless in \fIcopy mode\fR, the \s-1ASCII\s+1 backspace character is replaced
+by a backward horizontal motion having the width of the
+space character.
+Underlining as a form of line-drawing is discussed in \(sc12.4.
+A generalized overstriking function is described in \(sc12.1.
+.pg
+\*(NR automatically underlines
+characters in the \fIunderline\fR font,
+specifiable with \fBuf\fR,
+normally that on font position 2 (normally Times Italic, see \(sc2.2).
+In addition to \fBft\fR and \fB\ef\fIF\fR,
+the underline font may be selected by \fBul\fR and \fBcu\fR.
+Underlining is restricted to an output-device-dependent
+subset of \fIreasonable\fR characters.
+.h1
+.bt
+\fB&ul\fI|N\fR	off	\fIN\(eq\fR1	E	\
+Underline in \*(NR (italicize in \*(TR) the next \fIN\fR
+input text lines.
+Actually, switch to \fIunderline\fR font, saving the
+current font for later restoration;
+\fIother\fR font changes within the span of a \fBul\fR
+will take effect,
+but the restoration will undo the last change.
+Output generated by \fBtl\fR (\(sc14) \fIis\fR affected by the
+font change, but does \fInot\fR decrement \fIN\fR.
+If \fIN\fR\^>\^1, there is the risk that
+a trap interpolated macro may provide text
+lines within the span;
+environment switching can prevent this.
+.bt
+\fB&cu\fI|N\fR	off	\fIN\(eq\fR1	E	\
+Continuous underline.
+A variant of \fBul\fR that causes \fIevery\fR character to be underlined in \*[NR.]
+Identical to \fBul\fR in \*[TR.]
+.bt
+\fB&uf\fI|F\fR	Italic	Italic	\(en	\
+Underline font set to \fIF\fR.
+In \*[NR,]
+\fIF\fR may \fInot\fR be on position 1.
+.sc
+Control characters.
+Both the control character \fB.\fR and the \fIno-break\fR
+control character \fB\'\fR may be changed, if desired.
+Such a change must be compatible with the design
+of any macros used in the span of the change,
+and
+particularly of any trap-invoked macros.
+.h1
+.bt
+\fB&cc\fI|c\fR	\fB.\fR	\fB.\fR	E	\
+The basic control character is set to \fIc\fR,
+or reset to "\fB.\fR".
+.bt
+\fB&c2\fI|c\fR	\fB\'	\'\fR	E	The \fInobreak\fR control character is set
+to \fIc\fR, or reset to "\fB\'\fR".
+.sc
+Output translation.
+One character can be made a stand-in for another character using \fBtr\fR.
+All text processing (e. g. character comparisons) takes place
+with the input (stand-in) character which appears to have the width of the final
+character.
+The graphic translation occurs at the moment of output
+(including diversion).
+.h1
+.bt
+\fB&tr\fI|abcd....\fR	none	\(en	O	Translate \
+\fIa\fR into \fIb\fR, \fIc\fR into \fId\fR, etc.
+If an odd number of characters is given,
+the last one will be mapped into the space character.
+To be consistent, a particular translation
+must stay in effect from \fIinput\fR to \fIoutput\fR time.
+.bt
+\fB&ftr\fI|F|abcd....\fR	none	\(en	O,T	Font-specific \fBtr\fR.
+If the current character originates from font \fIF\fR,
+character \fIa\fR into \fIb\fR, \fIc\fR into \fId\fR, etc.
+.sc
+Transparent throughput.
+An input line beginning with a \fB\e!\fR is read in \fIcopy mode\fR and \fItransparently\fR output
+(without the initial \fB\e!\fR);
+the text processor is otherwise unaware of the line's presence.
+This mechanism may be used to pass control information to a post-processor
+or to imbed control lines in a macro created by a diversion.
+.sc
+Transparent output.
+The sequence \fB\eX\fI\'anything\'\fR copies \fIanything\fR
+to the output,
+as a device control function in the form \fBx\ X\ \fIanything\fR (\(sc23).
+Escape sequences in \fIanything\fR are processed.
+.sc
+Comments and concealed newlines.
+An uncomfortably long input line that must stay
+one line (e. g. a string definition, or nofilled text)
+can be split into many physical lines by ending all but
+the last one with the escape \fB\e\fR.
+The sequence \fB\e\fR(newline) is \fIalways\fR ignored\(em\
+except in a comment.
+Comments may be imbedded at the \fIend\fR of any line by
+prefacing them with \fB\e"\fR.
+The newline at the end of a comment cannot be concealed.
+A line beginning with \fB\e"\fR will appear as a blank line and
+behave like \fB.sp|1\fR;
+a comment can be on a line by itself by beginning the line with \fB.\e"\fR.
+.mh
+Local Horizontal and Vertical Motions, and the Width Function
+.sc
+Local Motions.
+The functions \fB\ev\'\fIN\fB\'\fR and
+\fB\eh\'\fIN\fB\'\fR
+can be used for \fIlocal\fR vertical and horizontal motion respectively.
+The distance \fIN\fR may be negative; the \fIpositive\fR directions
+are \fIrightward\fR and \fIdownward\fR.
+A \fIlocal\fR motion is one contained \fIwithin\fR a line.
+To avoid unexpected vertical dislocations, it is necessary that
+the \fInet\fR vertical local motion within a word in filled text
+and otherwise within a line balance to zero.
+The above and certain other escape sequences providing local motion are
+summarized in the following table.
+.tr ||
+.ds X \0\0\0
+.br
+.ne 12
+.TS
+center box;
+c2|cs2||c2|cs2
+c1|c2c2||c2|c2c2.
+Vertical	Effect in	Horizontal	Effect in
+Local Motion	\*(TR	\*(NR	Local Motion	\*(TR	\*(NR
+_
+.sp .4
+.T&
+l2|ls2||l2|ls2.
+\fB\*X\ev\'\fIN\fB\'\fR	Move distance \fIN\fR	\
+\fB\*X\eh\'\fIN\fB\'\fR	Move distance \fIN\fR
+.T&
+_2|_2_2||l2|ls2.
+			\fB\*X\e\fR(space)	Unpaddable space-size space
+.T&
+l2|l2|l2||l2|ls2.
+			\fB\*X\e\(ap\fR	Paddable no-break space
+\fB\*X\eu\fR	\(12 em up	\(12 line up	\fB\*X\e0\fR	Digit-size space
+.T&
+l2|l2|l2||_2|_2_2.
+\fB\*X\ed\fR	\(12 em down	\(12 line down
+.T&
+l2|l2|l2||l2|l2|l2.
+\fB\*X\er\fR	1 em up	1 line up	\fB\*X\e\||\fR	1/6 em space	ignored
+			\fB\*X\e^\fR	1/12 em space	ignored
+.sp .4
+.TE
+.rm X
+.tr |
+As an example,
+\fBE\s-2\v'-.4m'2\v'.4m'\s+2\fR
+could be generated by the sequence
+\fBE\es\-2\ev\'\-0.4m\'2\ev\'0.4m\'\es+2\fR;
+note that the 0.4|em vertical motions are at the smaller size.
+.sc
+Width Function.
+The \fIwidth\fR function \fB\ew\'\fIstring\fB\|\'\fR
+generates the numerical width of \fIstring\fR (in basic units).
+Size and font changes may be safely imbedded in \fIstring\fR,
+and will not affect the current environment.
+For example,
+\&\fB.ti|\-\\w\'\efB1.|\'u\fR could be used to
+temporarily indent leftward a distance equal to the
+size of the string "\fB1.|\fR" in font \fBB\fR.
+.pg
+The width function also sets three number registers.
+The registers \fBst\fR and \fBsb\fR are set respectively to the highest and
+lowest extent of \fIstring\fR relative to the baseline;
+then, for example,
+the total \fIheight\fR of the string is \fB\en(stu\-\en(sbu\fR.
+In \*(TR the number register \fBct\fR is set to a value
+between 0|and|3:
+0 means that all of the characters in \fIstring\fR were short lower
+case characters without descenders (like \fBe\fR);
+1 means that at least one character has a descender (like \fBy\fR);
+2 means that at least one character is tall (like \fBH\fR);
+and 3 means that both tall characters and characters with
+descenders are present.
+.sc
+Mark horizontal place.
+The escape sequence \fB\ek\fIx\fR will cause the \fIcurrent\fR horizontal
+position in the \fIinput line\fR to be stored in register \fIx\fR.
+As an example,
+the construction \fB\ekx\fIword\|\fB\eh\'\|~\|\enxu+3u\'\fIword\fB\fR
+will embolden \fIword\fR by backing up to almost its beginning and overprinting it,
+resulting in \kz\fIword\fR\h'|\nzu+2u'\fIword\fR.
+.mh
+Overstrike, Bracket, Line-drawing, Graphics, and Zero-width Functions
+.sc
+Overstriking.
+Automatically centered overstriking of up to nine characters
+is provided by the \fIoverstrike\fR function
+\fB\eo\'\fIstring\fB\|\'\fR.
+The characters in \fIstring\fR overprinted with centers aligned; the total width
+is that of the widest character.
+\fIstring\fR may \fInot\fR contain local vertical motion.
+As examples,
+\fB\eo\'e\e\'\'\fR produces \fB\o'e\''\fR, and
+\fB\eo\'\e(mo\e(sl\'\fR produces \fB\o'\(mo\(sl'\fR.
+.sc
+Zero-width characters.
+The function \fB\ez\fIc\fR will output \fIc\fR without spacing over
+it, and can be used to produce left-aligned overstruck
+combinations.
+As examples,
+\fB\ez\e(ci\e(pl\fR will produce \fB\z\(ci\(pl\fR, and
+\fB\e(br\ez\e(rn\e(ul\e(br\fR will produce the smallest possible
+constructed box \fB\(br\z\(rn\(ul\(br\fR\|.
+.sc
+Large Brackets.
+The Special Font contains a number of bracket construction pieces
+(\|\|\(lt\|\|\(lb\|\|\(rt\|\|\(rb\|\|\(lk\|\|\(rk\|\|\(bv\|\|\(lf\|\|\(rf\|\|\(lc\|\|\(rc\|\|)
+that can be combined into various bracket styles.
+The function \fB\eb\'\fIstring\fB\|\'\fR may be used to pile
+up vertically the characters in \fIstring\fR
+(the first character on top and the last at the bottom);
+the characters are vertically separated by 1|em and the total
+pile is centered 1/2\|em above the current baseline
+(\(12 line in \*(NR).
+For example,
+\fB\eb\'\|\e(lc\e(lf\|\'E\e\|~\|\eb\'\|\e(rc\e(rf\|\'\|\ex\'\|\-0.5m\'\|\ex\'0.5m\'\|\fR
+produces
+\x'-.5m'\x'.5m'\fB\b'\(lc\(lf'E\|\b'\(rc\(rf'\fR.
+.sc
+Line drawing.
+.tr &&
+The function \fB\e\|l\^\'\fINc\fB\'\fR (backslash-ell)
+will draw a string of repeated \fIc\fR\|'s towards the right for a distance \fIN\fR.
+If \fIc\fR looks like a continuation of
+an expression for \fIN\fR, it may insulated from \fIN\fR with a \fB\e&\fR.
+If \fIc\fR is not specified, the \fB\(ru\fR (baseline rule) is used
+(underline character in \*(NR).
+If \fIN\fR is negative, a backward horizontal motion
+of size \fIN\fR is made \fIbefore\fR drawing the string.
+Any space resulting from \fIN\fR\|/(size of \fIc\fR) having a remainder is put at the beginning (left end)
+of the string.
+If \fIN\fR is less than the width of \fIc\fR,
+a single \fIc\fR is centered on a distance \fIN\fR.
+In the case of characters
+that are designed to be connected such as
+baseline-rule\ \fB\(ru\fR\|,
+underrule\ \fB\(ul\fR\|,
+and
+root-en\ \fB\(rn\fR\|,
+the remainder space is covered by over-lapping.
+If \fIN\fR is \fIless\fR than the width of \fIc\fR,
+a single \fIc\fR is centered on a distance \fIN\fR.
+As an example, a macro to underscore a string can be written
+.br
+.tr &.
+.x1
+.ft B
+.ne 2.1
+&de us
+\e\e$1\e\|l\|\'\|~\|0\e(ul\'
+&&
+.ft R
+.x2
+.ne 2.1
+.de xu
+\\$1\l'|0\(ul'
+..
+or one to draw a box around a string
+.x1
+.ft B
+&de bx
+\e(br\e\|~\|\e\e$1\e\|~\|\e(br\e\|l\|\'\|~\|0\e(rn\'\e\|l\|\'\|~\|0\e(ul\'
+&&
+.ft R
+.x2
+.de bx
+\(br\|\\$1\|\(br\l'|0\(rn'\l'|0\(ul'
+..
+such that
+.x1
+.ft B
+&ul "underlined words"
+.ft R
+.x2
+and
+.x1
+.ft B
+&bx "words in a box"
+.ft R
+.x2
+yield
+.xu "underlined words"
+and
+.bx "words in a box"
+\h'-\w'.'u'.
+.pg
+The function \fB\eL\'\fINc\fB\'\fR draws a vertical line consisting
+of the (optional) character \fIc\fR stacked vertically apart 1\|em
+(1 line in \*(NR),
+with the first two characters overlapped,
+if necessary, to form a continuous line.
+The default character is the \fIbox rule\fR |\(br| (\fB\|\e(br\fR);
+the other suitable character is the \fIbold vertical\fR \|\(bv\| (\fB\|\e(bv\fR).
+The line is begun without any initial motion relative to the
+current base line.
+A positive \fIN\fR specifies a line drawn downward and
+a negative \fIN\fR specifies a line drawn upward.
+After the line is drawn \fIno\fR compensating
+motions are made;
+the instantaneous baseline is at the \fIend\fR of the line.
+.pg
+.de eb
+.sp -1
+.nf
+\h'-.5n'\L'|\\nzu-1'\l'\\n(.lu+1n\(ul'\L'-|\\nzu+1'\l'|0u-.5n\(ul'
+.fi
+..
+.ne 2i
+.mk z
+The horizontal and vertical line drawing functions may be used
+in combination to produce large boxes.
+The zero-width \fIbox-rule\fR and the \(12-em wide \fIunderrule\fR
+were \fIdesigned\fR to form corners when using 1-em vertical
+spacings.
+For example the macro
+.x1
+.ft B
+\&.de eb
+\&.sp \-1	\e"compensate for next automatic base-line spacing
+\&.nf	\e"avoid possibly overflowing word buffer
+.tr ||
+\&\eh\'\-.5n\'\eL\'\||\|\e\enau\-1\'\el\'\e\en(.lu+1n\e(ul\'\eL\'\-\||\|\e\enau+1\'\el\'\||\|0u\-.5n\e(ul\'    \e"draw box
+.tr |
+.lg 0
+\&.fi
+.lg
+\&..
+.ft R
+.x2
+will draw a box around some text whose beginning vertical place was
+saved in number register \fIa\fR
+(e. g. using \fB.mk|a\fR)
+as done for this paragraph.
+.eb
+.sc
+Graphics
+.pg
+The function \fB\eD\fI\'c...\'\fR
+draws a graphic object of type \fIc\fR
+according to a sequence of parameters,
+which are generally pairs of numbers.
+.nf
+.ta 1.2i
+\fB\eD\'l \fIdh dv\'	\fRdraw line from current position by \fIdh,\|dv\fR
+\fB\eD\'c \fId\'	\fRdraw circle of diameter \fId\fR with left side at current position
+\fB\eD\'e \fIu v\'	\fRdraw ellipse of diameters \fIu\fP and \fIv\fP
+\fB\eD\'a \fIa b c d\'\fB	\fRdraw arc from current position to \fIa\fR+\fIc\fR,\|\fIb\fR+\fId\fR, \fRwith center at \fIa\fR,\|\fIb\fR from current position
+\fB\eD\'\(ap \fIa b c d...\'\fB	\fRdraw B-spline from current position by \fIa\fR,\|\fIb\fR, \fRthen by \fIc\fR,\|\fId\fR, then by \fIc\fR,\|\fId\fR, then ...
+.pg
+For example,\fB\eD\'e0.2i 0.1i\'\fR
+draws the ellipse
+\D'e.2i .1i'\|,
+and \fB\eD\'l.2i \-.1i\'\eD\'l.1i .1i\'\fR
+the line
+\D'l.2i -.1i'\D'l.1i .1i'\|.
+A \fB\eD\fR
+with an unknown \fIc\fR is processed and copied through to the output
+for unspecified interpretation;
+coordinates are interpreted alternately as horizontal and vertical
+values.
+.pg
+Numbers taken as horizontal (first, third, etc.)
+have default scaling of \fBm\fR;
+vertical numbers (second, fourth, etc.)
+have default scaling of \fBv\fR (\(sc1.3).
+The position after a graphical object has been drawn is
+at its end; for circles and ellipses, the ``end''
+is at the right side.
+.\" from file m4
+.tr |
+.mh
+Hyphenation.
+.pg
+Automatic hyphenation may be switched off and on.
+When switched on with \fBhy\fR,
+several variants may be set.
+A \fIhyphenation indicator\fR character,
+by default \fB\e%\fR,
+may be imbedded in a word to
+specify desired hyphenation points,
+or may be prefixed to suppress hyphenation.
+The character \fB\e:\fR indicates that a line break may
+optionally occur at a point,
+but that no hyphen is to be generated.
+In addition,
+the user may specify a small list of exception words.
+.pg
+Only words that consist of a central alphabetic string
+surrounded by (usually null) non-alphabetic strings
+are considered candidates for automatic hyphenation.
+Words that contain hyphens
+(minus),
+em-dashes (\fB\e(em\fR),
+or hyphenation indicator characters
+are \fIalways\fR subject to splitting after those characters,
+whether automatic hyphenation is on or off.
+.h1
+.bt
+\fB&nh\fR	hyphenate	\(en	E	\
+Automatic hyphenation is turned off.
+.bt
+\fB&hy\fIN\fR	on,\fIN=\fR1	on,\fIN=\fR1	E	\
+Automatic hyphenation is turned on
+for \fIN\fR\|\(>=1, or off for \fIN=\fR\|0.
+If \fIN=\fR\|2, \fIlast\fR lines (ones that will cause a trap)
+are not hyphenated.
+For \fIN=\fR\|4 and 8, the last and first two characters
+respectively of a word are not split off.
+These values are additive;
+i.|e. \fIN=\fR\|14 will invoke all three restrictions.
+.bt
+\fB&hylang\fI|name\fR	off	off	\(en	Sets the hyphenation language
+to \fIname\fR, which is one of
+\fBde_DE\fR,
+\fBde_DE@traditional\fR,
+\fBen_US\fR,
+\fBfr_FR\fR,
+\fBit_IT\fR,
+or
+\fBla_VA\fR.
+Other languages can be made available by adding hyphenation
+files to the directory
+\fB/usr/ucblib/doctools/hyphen\fR. If no \fIname\fR argument
+is present, the hyphenation is reset to the traditional \*(TR
+mechanism.
+.xx
+This request also makes parts of words composed by \fB-\fR or
+\fB\e(em\fR characters subject to hyphenation. Traditionally, the only
+hyphenation points in such words had been the hyphens/dashes.
+.bt
+\fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character is set
+to \fIc\fR or to the default \fB\e%\fR.
+The indicator does not appear in the output.
+.bt
+\fB&hw\fI|word1|...\fR		ignored	\(en	Specify hyphenation points in words
+with imbedded minus signs.
+Versions of a word with terminal \fIs\fR are implied;
+i.|e. \fIdig\-it\fR implies \fIdig\-its\fR.
+This list is examined initially \fIand\fR after
+each suffix stripping.
+.mh
+Three-Part Titles.
+.pg
+The titling function \fBtl\fR provides for automatic placement
+of three fields at the left, center, and right of a line
+with a title-length
+specifiable with \fBlt\fR.
+\fBtl\fR may be used anywhere, and is independent of the
+normal text collecting process.
+A common use is in header and footer macros.
+.h1
+.bt
+\fB&tl\fI|\'left\'center\'right\'\fR	\(en	\(en	\
+The strings \fIleft\fR, \fIcenter\fR, and \fIright\fR are
+respectively left-adjusted, centered, and right-adjusted
+in the current title-length.
+Any of the strings may be empty,
+and overlapping is permitted.
+If the page-number character (initially \fB%\fR) is found within any of the fields it is replaced
+by the current page number having the format assigned to register \fB%\fR.
+Any character may be used as the string delimiter.
+.bt
+\fB&pc\fI|c\fR	\fB%\fR	off	\(en	The page number character is set to \fIc\fR,
+or removed.
+The page-number register remains \fB%\fR.
+.bt
+\fB&lt\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Length of title set to \fI\(+-N\fR.
+The line-length and the title-length are \fIindependent\fR.
+Indents do not apply to titles; page-offsets do.
+.mh
+Output Line Numbering.
+.pg
+.ll -\w'0000'u
+.nm 1 3
+Automatic sequence numbering of output lines may be
+requested with \fBnm\fR.
+When in effect,
+a three-digit, arabic number plus a digit-space
+is prepended to output text lines.
+The text lines are thus offset by four digit-spaces,
+and otherwise retain their line length;
+a reduction in line length may be desired to keep the right margin
+aligned with an earlier margin.
+Blank lines, other vertical spaces, and lines generated by \fBtl\fR
+are \fInot\fR numbered.
+Numbering can be temporarily suspended with \fBnn\fR,
+or with an \fB.nm\fR followed by a later \fB.nm|+0\fR.
+In addition,
+a line number indent \fII\fR, and the number-text separation \fIS\fR
+may be specified in digit-spaces.
+Further, it can be specified that only those line numbers that are
+multiples of some number \fIM\fR are to be printed (the others will appear
+as blank number fields).
+.br
+.nm
+.ll
+.h1
+.bt
+\fB&nm\fI|\(+-N|M|S|I\fR	off	E	\
+Line number mode.
+If \fI\(+-N\fR is given,
+line numbering is turned on,
+and the next output line numbered is numbered \fI\(+-N\fR.
+Default values are \fIM=\fR\|1, \fIS=\fR\|1, and \fII=\fR\|0.
+Parameters corresponding to missing arguments are unaffected;
+a non-numeric argument is considered missing.
+In the absence of all arguments, numbering is turned off;
+the next line number is preserved for possible further use
+in number register \fBln\fR.
+.bt
+\fB&nn\fI|N\fR	\(en	\fIN=\fR1	E	The next \fIN\fR text output lines are not
+numbered.
+.pg
+.ll -\w'0000'u
+.nm +0
+As an example, the paragraph portions of this section
+are numbered with \fIM=\fR\|3:
+\&\fB.nm|1|3\fR was placed at the beginning;
+\&\fB.nm\fR was placed at the end of the first paragraph;
+and \fB.nm|+0\fR was placed in front of this paragraph;
+and \fB.nm\fR finally placed at the end.
+Line lengths were also changed (by \fB\ew\'0000\'u\fR) to keep the right side aligned.
+Another example is
+\&\fB.nm|+5|5|x|3\fR which turns on numbering with the line number of the next
+line to be 5 greater than the last numbered line,
+with \fIM=\fR\|5, with spacing \fIS\fR untouched, and with the indent \fII\fR set to 3.
+.br
+.ll
+.nm
+.mh
+Conditional Acceptance of Input
+.pg
+In the following,
+\fIc\fR is a one-character, built-in \fIcondition\fR name,
+\fB!\fR signifies \fInot\fR,
+\fIN\fR is a numerical expression,
+\fIstring1\fR and \fIstring2\fR are strings delimited by any non-blank, non-numeric character \fInot\fR in the strings,
+and
+\fIanything\fR represents what is conditionally accepted.
+.h1
+.bt
+\fB&if\fI|c|anything\fR		\(en	\(en	If condition \fIc\fR true, accept \fIanything\fR as input;
+in multi-line case use \fI\e{anything\|\e}\fR.
+.bt
+\fB&if|!\fIc|anything\fR	\(en	\(en	If condition \fIc\fR false, accept \fIanything\fR.
+.bt
+\fB&if\fI|N|anything\fR		\(en	\fBu\fR	If expression \fIN\fR > 0, accept \fIanything\fR.
+.bt
+\fB&if|!\fIN|anything\fR	\(en	\fBu\fR	If expression \fIN\fR \(<= 0 [sic], accept \fIanything\fR.
+.bt
+\fB&if\fI|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR identical to \fIstring2\fR,
+accept \fIanything\fR.
+.bt
+\fB&if|!\fI\|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR not identical to \fIstring2\fR,
+accept \fIanything\fR.
+.bt
+\fB&ie\fI|c|anything\fR		\(en	\fBu\fR	If portion of if-else; all of the forms for \fBif\fR above are valid.
+.bt
+\fB&el\fI|anything\fR		\(en	\(en	Else portion of if-else.
+.pg
+.ne 16
+The built-in condition names are:
+.TS
+center box;
+c2|c2
+c2|c2
+c2|l2.
+Condition
+Name	True If
+_
+\fBc\fI G\fR	T{
+character \fIG\fR exists in the current font,
+where \fIG\fR is either an \s-1ASCII\s+1 or localized input
+character, a \*(TR special character \fB\e(\fIxx\fR or
+\fB\e[\fIxxx\fB]\fR, or a \fB\eU\fI\'X\'\fR escape sequence
+T}
+\fBd\fI xx\fR	there is a request, macro, or string \fIxx\fR
+\fBr\fI xx\fR	number register \fIxx\fR has been accessed
+\fBo\fR	Current page number is odd
+\fBe\fR	Current page number is even
+\fBt\fR	Formatter is \*(TR
+\fBn\fR	Formatter is \*(NR
+.TE
+If the condition \fIc\fR is \fItrue\fR, or if the number \fIN\fR is greater than zero,
+or if the strings compare identically (including motions and character size and font),
+\fIanything\fR is accepted as input.
+If a \fB!\fR precedes the condition, number, or string comparison,
+the sense of the acceptance is reversed.
+.pg
+Any spaces between the condition and the beginning of \fIanything\fR are skipped over.
+The \fIanything\fR can be either a single input line (text, macro, or whatever)
+or a number of input lines.
+In the multi-line case,
+the first line must begin with a left delimiter \fB\e{\fR and
+the last line must end with a right delimiter \fB\e}\fR.
+.pg
+The request \fBie\fR (if-else) is identical to \fBif\fR
+except that the acceptance state is remembered.
+A subsequent and matching \fBel\fR (else) request then uses the reverse sense of that state.
+\fBie\fR|-|\fBel\fR pairs may be nested.
+.pg
+Some examples are:
+.x1
+.ft B
+.ne 1
+&if e .tl \'Even Page %\'\'\'
+.ft R
+.x2
+which outputs a title if the page number is even; and
+.x1
+.ft B
+.ne 3.1
+&ie \en%>1 \e{\e
+\&\'sp 0.5i
+&tl \'Page %\'\'\'
+\&\'sp ~\|1.2i|\e}
+&el .sp ~\|2.5i
+.ft R
+.x2
+which treats page 1 differently from other pages.
+.mh
+Environment Switching.
+.pg
+A number of the parameters that
+control the text processing are gathered together into an
+\fIenvironment\fR, which can be switched by the user.
+The environment parameters are those associated
+with requests noting E in their \fINotes\fR column;
+in addition, partially collected lines and words are in the environment.
+Everything else is global; examples are page-oriented parameters,
+diversion-oriented parameters, number registers, and macro and string definitions.
+All environments are initialized with default parameter values.
+The number of possible environments is only limited by available memory.
+.h1
+.bt
+\fB&ev\fI|name\fR	\fIname\(eq\fR0	previous	\(en	Environment switched to
+environment \fIname\fR.
+Switching is done in push-down fashion so that
+restoring a previous environment \fImust\fR be done with \fB.ev\fR
+rather than specific reference.
+Note that what is pushed down and restored
+is the environment \fIname,\fR
+not its contents.
+.bt
+.dl
+\fB&evc\fI|name\fR		\(en	\(en	Copies the environment \fIname\fR to the current environment.
+The temporary state of the current environment is reset, and
+incompletely filled lines are discarded.
+.mh
+Insertions from the Standard Input
+.pg
+The input can be temporarily switched to the system \fIstandard input\fR
+with \fBrd\fR,
+which will switch back when \fItwo\fR newlines
+in a row are found (the \fIextra\fR blank line is not used).
+This mechanism is intended for insertions in form-letter-like documentation.
+The \fIstandard input\fR can be the user's keyboard,
+a \fIpipe\fR, or a \fIfile\fR.
+.h1
+.bt
+\fB&rd\fI|prompt\fR	\(en	\fIprompt=\fR\s-1BEL\s+1	\(en	\
+Read insertion from the standard input until two newlines in a row are found.
+If the standard input is the user's keyboard, \fIprompt\fR (or a \s-1BEL\s+1)
+is written onto the user's terminal.
+\fBrd\fR behaves like a macro,
+and arguments may be placed after \fIprompt\fR.
+.bt
+\fB&ex\fR	\(en	\(en	\(en	Exit from \*(NR/\*[TR.]
+Text processing is terminated exactly as if all input had ended.
+.pg
+If insertions are to be
+taken from the terminal keyboard \fIwhile\fR output is being printed
+on the terminal, the command line option \fB\-q\fR will turn off the echoing
+of keyboard input and prompt only with \s-1BEL\s+1.
+The regular input and insertion input \fIcannot\fR
+simultaneously come from the standard input.
+.pg
+As an example,
+multiple copies of a form letter may be prepared by entering the insertions
+for all the copies in one file to be used as the standard input,
+and causing the file containing the letter to reinvoke itself using \fBnx\fR (\(sc19);
+the process would ultimately be ended by an \fBex\fR in the insertion file.
+.mh
+Input/Output File Switching
+.h1
+.bt
+\fB&so\fI|filename\fR		\(en	\(en	Switch source file.
+The top input (file reading) level is switched to \fIfilename\fR.
+When the new file ends,
+input is again taken from the original file.
+\fBso\fR's may be nested.
+.bt
+\fB&pso\fI|string\fR		\(en	\(en	Executes \fIstring\fR
+and reads its standard output as text input.
+.bt
+\fB&nx\fI|filename\fR		end-of-file	\(en	Next file is \fIfilename\fR.
+The current file is considered ended, and the input is immediately switched
+to \fIfilename\fR.
+.bt
+\fB&sy\fI|string\fR		\(en	\(en	Execute program from \fIstring\fR, which is the rest of the input line.
+The output is not collected automatically.
+The number register \fB$$\fP,
+which contains the process id of the \*(TR process,
+may be useful in generating unique filenames for output.
+.bt
+\fB&pi\fI|string\fR		\(en	\(en	Pipe output to \fIstring\fR, which is the rest of the input line.
+This request must occur \fIbefore\fR any printing occurs;
+typically it is the first line of input.
+.bt
+\fB&cf\fI|filename\fR		\(en	\(en	Copy contents of file \fIfilename\fR to output, completely unprocessed.
+The file is assumed to contain something meaningful to subsequent processes.
+.bt
+\fB&open\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR for writing while truncating existing contents
+and associates \fIstream\fR with it for latter use with \fBwrite\fR etc.
+.bt
+\fB&opena\fI|stream|filename\fR	ignored	\(en	Works like \fBopen\fR but appends to \fIfilename\fR instead of truncating
+an existing file.
+.bt
+\fB&write\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR to file \fIstream\fR,
+which must have been obtained by a previous \fBopen\fR request.
+\fItext\fR is interpreted in \fIcopy mode.\fR
+.bt
+\fB&writec\fI|stream|text\fR	ignored	\(en	Like \fBwrite\fR but does not write a terminating newline.
+.bt
+\fB&close\fI|stream\fR		\(en	\(en	Closes the file \fIstream\fR,
+which must have been obtained by a previous \fBopen\fR request.
+.mh
+Miscellaneous
+.pg
+.h1
+.bt
+.mc \s12\(br\s0
+\fB&mc\fI|c|N\fR	\(en	off	E,\fBm\fR	\
+Specifies that a \fImargin\fR character \fIc\fR appear a distance
+\fIN\fR to the right of the right margin
+after each non-empty text line (except those produced by \fBtl\fR).
+If the output line is too-long (as can happen in nofill mode)
+the character will be appended to the line.
+If \fIN\fR is not given, the previous \fIN\fR is used; the initial \fIN\fR is
+0.2|inches in \*(NR and 1\|em in \*[TR.]
+The margin character used with this paragraph was a 12-point box-rule.
+.br
+.mc
+.bt
+\fB&tm\fI|string\fR	\(en	newline	\(en	\
+After skipping initial blanks, \fIstring\fR (rest of the line) is read in \fIcopy mode\fR
+and written on the standard error.
+.bt
+\fB&tmc\fI|string\fR	\(en	newline	\(en	Works like \fBtm\fR
+but does not write a terminating newline.
+.bt
+\fB&ab\fI|string\fR	\(en	newline	\(en	\
+After skipping initial blanks, \fIstring\fR (rest of the line) is read in \fIcopy mode\fR
+and written on the standard error.
+\*(TR or \*(NR then exit.
+.bt
+\fB&ig\fI|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Ignore \
+input lines.
+\fBig\fR behaves exactly like \fBde\fR (\(sc7) except that the
+input is discarded.
+The input is read in \fIcopy mode\fR, and any auto-incremented
+registers will be affected.
+.bt
+\fB&lf\fI|N|filename\fR		\(en	\(en	\
+Set line number to \fIN\fR and filename to \fIfilename\fR
+for purposes of subsequent error messages, etc.
+The number register [sic] \fB.F\fR contains
+the name of the current input file,
+as set by command line arguments,
+\fBso\fR, \fBnx\fR, or \fBlf\fR.
+The number register \fB.c\fR contains the number of input lines
+read from the current file, again perhaps as modified by \fBlf\fR.
+.bt
+\fB&pm\fI|t\fR	\(en	all	\(en	\
+Print macros.
+The names and sizes of all of the defined macros and strings are printed
+on the standard error;
+if \fIt\fR is given, only the total of the sizes is printed.
+The sizes is given in \fIblocks\fR
+of 128 characters.
+.bt
+\fB&recursionlimit\fI|N\fR	\(en	\(en	Sets
+the maximum stack depth for recursive invocations of macros to \fIN\fR.
+If \fIN\fR is zero, the stack depth is unlimited.
+The default limit is 512.
+.bt
+.lg 0
+\fB&fl\fR	\(en	\(en	B	\c
+.lg
+Flush output buffer.
+Force output,
+including any pending position information.
+.mh
+Output and Error Messages.
+.pg
+The output from \fBtm\fR, \fBpm\fR, and the prompt from \fBrd\fR,
+as well as various \fIerror\fR messages are written onto
+the standard error.
+The latter is different from the \fIstandard output\fR,
+where formatted text goes.
+By default, both are written onto the user's terminal,
+but they can be independently redirected.
+.pg
+\*(NR and \*(TR provide a mechanism
+to enable or disable warnings for several categories.
+When one of the selected conditions occurs,
+a \fIwarning\fR message is written onto the standard error,
+but processing continues.
+.sp
+.ne 32
+.TS
+box center;
+rfB | lfB | lfB
+n | lfB | lw(3.5i).
+Bit	Name	Description
+_
+0	none	No warnings at all.
+1	char	T{
+Warn when unknown character names like \fB\e(xx\fR or \fB\e[xxx]\fR
+are found.
+T}
+2	number	Warn when illegal numeric expressions occur.
+4	break	Warn when a line in \fB&ad b\fR mode cannot be adjusted.
+8	delim	Warn when a delimiter to an escape sequence is missing.
+16	el	T{
+Warn when a \fBel\fR request is found without a matching \fBie\fR.
+T}
+32	scale	T{
+Warn when an undefined scale indicator is used in a
+numeric expression.
+T}
+256	di	T{
+Warn when a \fBdi\fR request is executed but no diversion is
+currently active.
+T}
+512	mac	T{
+Warn when an undefined request, macro or string is called.
+T}
+1024	reg	T{
+Warn when an undefined number register is accessed.
+The number register will be set to zero immediately after
+the first access so this warning can be printed only
+once per register name.
+T}
+8192	missing	Warn when a required argument to a request is missing.
+16384	input	T{
+Warn when illegal byte sequences or characters that have
+no known \*(PS equivalent are read.
+T}
+32768	escape	Warn when an undefined escape sequence is used.
+65536	space	T{
+Warn when an unknown long request name is used, but its
+first two characters form a known regular request.
+The regular request is then executed in extension level 2, or
+ignored in extension level 3.
+T}
+131072	font	T{
+Warn when a font cannot be found. This warning is enabled
+by default.
+T}
+	all	T{
+All warnings except \fBdi\fR, \fBmac\fR, and \fBreg\fR.
+This may be the best choice when using existing macro packages.
+T}
+	w	All warnings.
+.TE
+.pg
+Various \fIerror\fR conditions may occur during
+the operation of \*(NR and \*[TR.]
+Certain less serious errors having only local impact do not
+cause processing to terminate.
+Two examples are \fIword overflow\fR, caused by a word that is too large
+to fit into the word buffer (in fill mode), and
+\fIline overflow\fR, caused by an output line that grew too large
+to fit in the line buffer;
+in both cases, a message is printed, the offending excess
+is discarded,
+and the affected word or line is marked at the point of truncation
+with a \(** in \*(NR and a \(lh in \*[TR.]
+Processing continues if possible,
+on the grounds that output useful for debugging may be produced.
+If a serious error occurs, processing terminates,
+and an appropriate message is printed,
+along with a list of the macro names currently active.
+Examples are the inability to create, read, or write files,
+and the exceeding of certain internal limits that
+make future output unlikely to be useful.
+.h1
+.bt
+\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Controls warning messages,
+which may be given either numerically
+as bits or symbolically as names.
+With a \fB+\fR sign, the respective bit or name is enabled in
+addition to the currently enabled categories;
+with a \fB\-\fR sign, it is disabled.
+Omitting the sign sets the categories exactly to
+the given bit or name.
+\fB&warn 0\fR disables all warnings.
+The \fB&warn\fR register represents
+the currently activated warning categories
+as bits.
+.bt
+\fB&spreadwarn\fI|N\fR	toggle	\(en	Sets or toggles a limit that causes a warning to be printed when
+it is exceeded by the adjustment that is computed for the current
+output line in \fBad\ b\fR mode. The limit is initially 3\|m, but the
+warning message is disabled. Calling this request without an
+argument toggles the warning message; calling it with an argument
+enables the warning and sets the limit to \fIN\fR (default scale m).
+.pg
+.mh
+Color Support
+.\" This chapter partially derived from
+.\" Plan 9 v4 /sys/src/cmd/postscript/mcolor/mcolor.5
+.\" Copyright (C) 2003, Lucent Technologies Inc. and others.
+.\" All Rights Reserved.
+.pg
+While \*(TR does not support colors directly,
+\fIdpost\fR is able to embed arbitrary \*(PS color instructions
+using the \fB\eX\'SetColor: \fIcolor\fB\'\fR escape sequence.
+Possible values for \fIcolor\fR include:
+.xx
+.nr w \w'\(en\ '
+.in +\nwu
+.ti -\nwu
+\(en\ ``\fInamed-color\fR'',
+e.g. ``red''.
+Named colors (\s-1RGB\s+1 only) must be listed in the
+``colordict''
+dictionary in file
+\fB/usr/ucblib/doctools/font/devps/postscript/color.ps\fR.
+Every \fIcolor\fR argument that begins with a letter
+is treated as a named color.
+.xx
+.ti -\nwu
+\(en\ ``\fIred green blue \fBrgb\fR'',
+e.g. ``.2 .3 .4 rgb''
+(\fBrgb\fR is an abbreviation for the \*(PS \fBsetrgbcolor\fR operator)
+.xx
+.ti -\nwu
+\(en\ ``\fIhue saturation brightness \fBhsb\fR'',
+e.g. ``.5 .6 .7 hsb''
+(\fBhsb\fR is an abbreviation for the \*(PS \fBsethsbcolor\fR operator)
+.xx
+.ti -\nwu
+\(en\ ``\fIcyan magenta yellow black \fBcmyk\fR'',
+e.g. ``.1 .2 .3 .4 cmyk''
+(\fBcmyk\fR is an abbreviation for the \*(PS \fBsetcmykcolor\fR operator)
+.xx
+.ti -\nwu
+\(en\ ``\fIgray \fBsetgray\fR'',
+e.g. ``.5 setgray''
+.xx
+.ti -\nwu
+\(en\ ``[\fB$\fIsetcolorspace\fR] \fIcomp1 comp2 .\|.\|. compn \fBsetcolor\fR'',
+where \fB$\fIsetcolorspace\fR may be a \*(PS procedure
+defined in the setup section using a 
+`\eX\'PSSetup: $setcolorspace {.\|.\|.} bind def\''
+escape sequence.
+This parameter is required if the color space changes
+in the document.
+Otherwise, it may be sufficient
+to install the color space once in the setup section.
+.pg
+Each parameter must be a number in the range between 0.0 and 1.0.
+In the most general case, the value of the
+.I color
+argument is passed to the \*(PS output without interpretation.
+.pg
+Both the text and background color can be selected.
+A
+.I color
+argument of ``\fIcolor1\fR'' \fBon\fR ``\fIcolor2\fR''
+prints text in
+.I color1
+on a background in
+.I color2.
+.pg
+The initial color is black in the \fIDeviceGray\fR color space,
+i.e. the same as ``0 setgray''.
+Once a color is in effect,
+it is re-installed at the top of each output page.
+.pg
+The \fB\-mcolor\fR macro package
+adds another access method to
+the capabilities of color selection
+and reverse video printing.
+It includes the following macro:
+.h1
+.bt
+\fB&CL\fI|color|text\fR	\s-1RGB\s+1|black		Prints \fItext\fR in \fIcolor\fR.
+No arguments restores a default color
+(black in \s-1RGB\s+1 color space;
+note that this is different from the initial color).
+If
+.I text
+is omitted the selected
+.I color
+remains in effect until another
+.I color
+is selected.
+If two arguments are given the
+.I text
+is printed in
+.I color
+and then the default color is restored.
+.pg
+.mh
+Picture Inclusion
+.\" This chapter partially derived from
+.\" Plan 9 v4 /sys/man/6/mpictures
+.\" Copyright (C) 2003, Lucent Technologies Inc. and others.
+.\" All Rights Reserved.
+.pg
+\fIdpost\fR can be advised to include
+other \*(PS documents into the output it generates.
+In general, these documents should be \s-1EPS\s+1
+(Encapsulated \*(PS) files;
+inclusion of more general \*(PS documents,
+especially if they consist of multiple pages,
+will usually not lead to acceptable results.
+.pg
+If a \*(PS file lacks page-delimiting comments,
+the entire file is included.
+If no
+.B %%BoundingBox
+comment is present, the picture is
+assumed to fill an 8.5\(mu11-inch page.
+Nothing prevents the picture from being placed off the page.
+.pg
+An example how to combine the following requests and macros is:
+.x1
+&psbb picture.eps
+&nr scale 4
+&nr y (\en[ury]p\-\en[lly]p)/\en[scale]
+&nr x (\en[urx]p\-\en[llx]p)/\en[scale]
+&PI picture.eps "\enyu,\enxu"
+&sp \enyu
+picture description
+.x2
+.pg
+\*(TR includes a request to assist the inclusion of \s-1EPS\s+1 files:
+.h1
+.bt
+\fB&psbb\fI|filename\fR	\(en	\(en	\
+Reads the \fB%%BoundingBox\fR \s-1DSC\s+1 comment
+from the \*(PS document \fIfilename\fR
+and assigns
+the lower left \fIx\fR coordinate to the register \fBllx\fR,
+the lower left \fIy\fR coordinate to \fBlly\fR,
+the upper right \fIx\fR coordinate to \fBurx\fR,
+and the upper right \fIy\fR coordinate to \fBury\fR.
+All values are in points.
+If an error occurs, the registers are set to zero.
+.pg
+The \fB\-mpictures\fR macros insert the necessary
+advices to \fIdpost\fR
+to include \*(PS pictures into \*(TR documents.
+The macros are:
+.h1
+.bt
+\fB&BP\fI|source|height|width|position|offset|flags|label\fR	Define a frame and place a picture in it.
+The arguments are:
+.nr Ind \n(.i
+.de Arg
+.xx
+.ie \\n(.$=0 .nr Argx 1
+.el .nr Argx \\$1
+.nr Argy \\n[Argx]-1
+.in \\n[Ind]u+\\n[Argx]m
+.ti \\n[Ind]u+\\n[Argy]m
+..
+.Arg
+.I source
+Name of a \*(PS picture file, optionally
+suffixed with (\fIn\fR)
+to select page number
+.I n
+from the file (first page by default).
+.Arg
+.I height
+Vertical size of the frame, default \fB3.0i\fR.
+This argument is interpreted as a value in inches
+unless it ends with a \fBu\fR scale indicator.
+.Arg
+.I width
+Horizontal size of the frame, current line length by default.
+This argument is interpreted as a value in inches
+unless it ends with a \fBu\fR scale indicator.
+.Arg
+.I position
+\fBl\fR (default), \fBc\fR, or \fBr\fR
+to left-justify, center, or right-justify the frame.
+.Arg
+.I offset
+Move the frame horizontally from the original
+.I position
+by this amount, default \fB0i\fR.
+.Arg
+.I flags
+One or more of:
+.Arg 2
+\fBa \fId\fR
+Rotate the picture clockwise
+.I d
+degrees, default \fId\fR =90.
+.Arg 2
+.B o
+Outline the picture with a box.
+.Arg 2
+.B s
+Freely scale both picture dimensions. 
+.Arg 2
+.B w
+White out the area to be occupied by the picture.
+.Arg 2
+\fBl\fR, \fBr\fR, \fBt\fR, \fBb\fR
+Attach the picture to the left right, top, or bottom of the frame.
+.Arg
+.I label
+Place
+.I label
+at distance
+.B 1.5v
+below the frame.
+.in \n[Ind]u
+.xx
+If there is room,
+.B &BP
+fills text around the frame.
+Everything destined for either side of the frame
+goes into a diversion to be retrieved when the accumulated
+text sweeps past the trap set by
+.B &BP
+or when the diversion is explicitly closed
+by \fB&EP\fR.
+.bt
+\fB&EP\fR				End a picture started by \fB&BP\fR;
+\fB&EP\fR is usually called implicitly by a trap
+at frame bottom.
+A picture and associated text silently disappear if
+a diversion trap set by
+.B &BP
+is not reached.
+Call
+.B &EP
+at the end of the document to retrieve it.
+.bt
+\fB&PI\fI|source|height\fB,\fIwidth\fB,\fIyoffset\fB,\fIxoffset|flags\fR	This low-level macro, used by \fB&BP\fR,
+can help do more complex things.
+The two arguments not already described are:
+.Arg
+.I xoffset
+Offset the frame from the left margin by this amount, default
+\fB0i\fR.
+This argument is interpreted as a value in inches
+unless it ends with a \fBu\fR scale indicator.
+.Arg
+.I yoffset
+Offset the frame from the current baseline,
+measuring positive downward, default \fB0i\fR.
+This argument is interpreted as a value in inches
+unless it ends with a \fBu\fR scale indicator.
+.in \n[Ind]u
+.mh
+Special Features for \*[PDF] Documents
+.pg
+.sc
+The basics.
+\*(TR does not directly generate \*[PDF] documents;
+the \fIdpost\fR postprocessor generates \*(PS output
+which can be converted to \*[PDF] by
+utilities like Ghostscript's \fIps2pdf\fR or Adobe Distiller.
+But it is possible to include special advices
+to this conversion program in \*(PS
+using the \fBpdfmark\fR operator.
+Such advices are generated automatically by some \*(TR requests,
+e.g. by \fBcropat\fR (\(sc3).
+Other advices can be given explicitly using the
+\fB\eX\'PS:\fR...\fB\'\fR
+or
+\fB\eX\'PDFMark:\fR...\fB\'\fR
+escape sequences.
+.pg
+.sc
+Preparations.
+When generating PDF files,
+it is especially important to set the paper format
+using the \fBmediasize\fR request (\(sc3).
+This is because calculations in \*[PDF] documents
+are generally performed in relation regard to the page bottom,
+while \*(TR performs its calculations in relation to the page top.
+Failing to set the paper format correctly
+will thus usually result in vertical displacements
+of \*[PDF]-specific elements.
+.pg
+.sc
+Specifying document description items.
+PDF documents can include meta-data about author, title etc.
+To generate such data,
+use the \fBPDFMark\fR device command of \fIdpost\fR
+with the \*(TR \fB\eX\fR escape sequence, e.g.\&
+.x1
+\fB\eX\'PDFMark: Author \fIMy Name\fB\'
+\fB\eX\'PDFMark: Keywords \fITypesetting, PDF documents\fB\'
+\fB\eX\'PDFMark: Subject \fItroff, dpost, and pdfmark\fB\'
+\fB\eX\'PDFMark: Title \fISpecial features for PDF documents\fB\'
+\fB&br\fR
+.x2
+.xx
+Unicode characters are accepted in these text strings.
+Note that whitespace and newlines surrounding \fB\eX\fR escape sequences
+are considered to be input text by \*[TR,]
+and need a \fIbreak\fR before they are output.
+To avoid inserting superfluous spaces or line breaks,
+specify this information before an initial
+\fB&sp \(or\en[topmargin]u\fR request or the like in the document.
+.pg
+.sc
+Direct use of the pdfmark operator.
+In cases where \*(TR or \fIdpost\fR do not
+include an explicit mechanism for \*[PDF] features,
+it is possible to call the \fBpdfmark\fR operator directly.
+Examples are:
+.xx
+.in +2m
+.ti -2m
+\fB\eX\'PS: [ {Catalog} << /ViewerPreferences << /DisplayDocTitle true >> >> /PUT pdfmark\e'\fR
+.br
+This causes the \*[PDF] viewer to print the document title
+(as in \(sc22.3) in the application title bar
+instead of the \*[PDF] file name.
+.xx
+.ti -2m
+\fB\eX\'PS: [ /PageMode /UseOutlines /DOCVIEW pdfmark\'\fR
+.br
+This causes the \*[PDF] viewer to display the bookmarks toolbar
+when the document is opened.
+Other interesting values are
+\fB/UseNone\fR (the default),
+\fB/UseThumbs\fR (display page thumbnails),
+and \fB/FullScreen\fR (open the document in full-screen mode).
+.xx
+.ti -2m
+\fB\eX\'PS: [ /PageMode /Page \fIN\fB /View [/XYZ null null null] /DOCVIEW pdfmark\'\fR
+.br
+Page \fIN\fR is displayed instead of the first page
+when the document is opened.
+.xx
+.ti -2m
+\fB\eX\'PS: [ {Catalog} << /PageLayout /TwoPageRight >> /PUT pdfmark\'\fR
+.br
+With this command,
+the \*[PDF] viewer displays two pages at once.
+Other interesting values are
+\fB/SinglePage\fR (display one page at once),
+\fB/OneColumn\fR (display one page in continuous mode),
+and
+\fB/TwoColumnRight\fR (display two pages in continuous mode).
+.xx
+.ti -2m
+\fB\eX\'PS: [ /Label (\fItext\fB) /PAGELABEL pdfmark\'\fR
+.br
+The given \s-1ASCII\s+1 \fItext\fR is shown next to the page number
+of the current page
+in the \*[PDF] viewer toolbar.
+This is particularly useful to implement roman page numbers
+in \*[PDF] documents
+in combination with the \fBaf\fR request.
+.in -2m
+.pg
+.sc
+Creating bookmarks.
+Bookmarks are usually shown by the \*[PDF] viewer at the left of the
+window.
+When you create \*[PDF] files longer than a few pages for viewing
+on the screen, you should include bookmarks for each chapter or section
+because they enable the reader to navigate much more conveniently.
+.pg
+Start with a bookmark for the title page.
+``0'' is the level of the bookmark in the tree structure,
+and the following arguments form the name of the bookmark:
+\fB\eX\'PDFMark: Bookmark \fI0 Title\fB\'\fR.
+Similar to the description specifications above, this bookmark should
+appear before the top margin of the title page.
+.pg
+When generating bookmarks for chapters and sections, it is usually most
+practical to include the command in the chapter/section macros:
+.x1
+&de CH
+&	bp
+\ev\'\(or\-1v\-4p\'\e\eX\'PDFMark: Bookmark 0 \e\e$1\'
+&	sp \(or\e\en[topmargin]u
+&	ce
+&	sp
+&.
+&de SH
+&	ce
+\e\e$1\ev\'\-1v\'\e\eX\'PDFMark: Bookmark 1 \e\e$1\'
+&	sp
+&.
+.x2
+Unless the bookmark command occurs at the top of the page,
+it refers to the baseline of the text;
+this is why a \fB\ev\'\-1v\'\fR command occurs
+before it in the section macro.
+\fB\ev\'\-1v\-4p\'\fR at the top of the page
+is a special value that causes the upper left corner to be shown.
+.pg
+The level of the first bookmark in a document must be of level 0.
+The levels of following bookmarks must be either
+.xx
+.nr w \w'\(en\ '
+.in +\nwu
+.ti -\nwu
+\(en\ one higher than the level of the previous bookmark.
+The new bookmark then becomes a child of the previous bookmark.
+.xx
+.ti -\nwu
+\(en\ equal to the level of the previous bookmark.
+In this case, both bookmarks are grouped
+below the first previous bookmark of the first higher level,
+or at the top level for level 0.
+.xx
+.ti -\nwu
+\(en\ lower than the level of the previous bookmark.
+This terminates the list of children of the higher levels.
+.in -\nwu
+.pg
+As an example, the following level structure is legal, and causes the
+PDF viewer to group the bookmarks as shown:
+.xx
+.nf
+.lc \-
+.ta 1i 1i+3m 1i+6m 1i+9m
+	 0			title page
+	 0			Chapter 1
+	 \(bu1		Section 1.1
+	 \(bu1		Section 1.2
+	 \(or	\(bu2	Subsection 1.2.1
+	 \(or	\(bu2	Subsection 1.2.2
+	 \(or	\(bu2	Subsection 1.2.3
+	 \(bu1		Section 1.3
+	 	\(bu2	Subsection 1.3.1
+	 	\(bu2	Subsection 1.3.2
+	 0			Chapter 2
+	 \(bu1		Section 2.1
+	 0			Index
+.fi
+.pg
+In case of an illegal structure in which the level of a bookmark is
+raised by more than one above its predecessor,
+\fIdpost\fR emits a warning and assigns the highest legal level.
+However, a garbled document structure may result:
+.xx
+.nf
+	 0
+	 \(bu2		\(lh the first level 2 is corrected to 1 by \fIdpost\fR
+	 	\(bu2	so the second bookmark becomes a child of the first
+.fi
+.xx
+.lc
+Thus such dpost warnings should usually be taken seriously, and the
+document should be corrected.
+.pg
+An alternate form of bookmarks,
+\fB\eX\'PDFMark: BookmarkClosed \fR...\fB\'\fR,
+is available.
+The syntax is the same,
+but the initial view in the tree structure is collapsed,
+i.e. no children are shown by default.
+It the bookmark has no children,
+there is no difference to a regular bookmark.
+.\"""
+.pg
+.mh
+Output Language.
+.pg
+\*(TR
+produces its output in a language that is independent of any
+specific output device,
+except that the numbers in it have been computed on the basis
+of the resolution of the device,
+and the sizes, fonts, and characters that that device can print.
+Nevertheless it is quite possible to interpret that output
+on a different device, within the latter's capabilities.
+.de tb
+.xx
+.nf
+.in .5i
+..
+.tb
+.ta .8i
+\fBs\^\fIn\fR	set point size to \fIn\fR, fractional parts (if any) ignored
+\fBs\-23\^\fId.d\fR	set point size to \fId.d\fR
+\fBf\^\fIn\fR	set font to \fIn\fR
+\fBc\^\fIc\fR	print character \fIc\fR
+\fBC\^\fIname\fR	print the character called \fIname\fR; terminate \fIname\fR by white space
+\fBCPS\^\fIname\fR	print the character with the given \*(PS \fIname\fR
+\fBN\^\fIn\fR	print character \fIn\fR on current font
+\fBH\^\fIn\fR	go to absolute horizontal position \fIn\fP (\fIn\fR\(>=0)
+\fBV\^\fIn\fR	go to absolute vertical position \fIn\fP (\fIn\fR\(>=0, down is positive)
+\fBh\^\fIn\fR	go \fIn\fP units horizontally; \fIn\fR<0 is to the left
+\fBv\^\fIn\fR	go \fIn\fP units vertically; \fIn\fR<0 is up
+\fInnc\fR	move right \fInn\fP, then print \s-1ASCII\s0 character \fIc\fP;  \fInn\fP must be exactly 2 digits
+\fBp\^\fIn\fR	new page \fIn\fP begins\(emset vertical position to 0
+\fBn\^\fIb a\fR	end of line (information only\(emno action);  \fIb\fP = space before line, \fIa\fP = after
+\fBw\fR	paddable word space (information only\(emno action)
+\fBD\^\fIc ...\en\fR	graphics function \fIc\fR; see below
+\fBx ...\en\fR	device control functions; see below
+\fB# ...\en\fR	comment
+.pg
+All position values are in units.
+Sequences that end in digits must be followed by a non-digit.
+Blanks, tabs and newlines may occur as separators
+in the input, and are mandatory to separate constructions
+that would otherwise be confused.
+Graphics functions, device control functions, and comments extend to the
+end of the line they occur on.
+.pg
+The device control and graphics commands are intended as open-ended
+families, to be expanded as needed.
+The graphics functions coincide directly with the \fB\eD\fR
+sequences:
+.tb
+.ta 1.2i
+\fBD\^l \fIdh dv	\fRdraw line from current position by \fIdh,\|dv\fR
+\fBD\^c \fId	\fRdraw circle of diameter \fId\fR with left side at current position
+\fBD\^e \fIu v	\fRdraw ellipse of diameters \fIu\fP and \fIv\fP
+\fBD\^a \fIa b c d\fB	\fRdraw arc from current position to \fIa\fR+\fIc\fR,\|\fIb\fR+\fId\fR, \fRwith center at \fIa\fR,\|\fIb\fR from current position
+\fBD\^\(ap \fIa b c d...\fB	\fRdraw B-spline from current position by \fIa\fR,\|\fIb\fR, \fRthen by \fIc\fR,\|\fId\fR, then by \fIc\fR,\|\fId\fR, then ...
+\fBD\^z \fIa b c d...\fB	\fRfor any other \fIz\fR is uninterpreted
+.pg
+In all of these, \fIx,\|y\fR is an increment on the current horizontal and
+vertical position,
+with down and right positive.
+All distances and dimensions are in units.
+.pg
+The device control functions begin with \fBx\fP,
+then a command, then other parameters.
+.tb
+.ta 1.5i 1.5i+1m
+\fBx T \fIs\fP	\fRname of typesetter is \fIs\fR
+.dl
+\fBx r \fIn h v\fP	\fRresolution is \fIn\fR units/inch;
+		\fIh\fR = minimum horizontal motion, \fIv\fR = minimum vertical
+\fBx i	\fRinitialize\fP
+\fBx f \fIn s\fP	\fRmount font \fIs\fR on font position \fIn\fR
+\fBx f \fIn filename\fR	\fIfilename\fR contains metrics for font on position \fIn\fR
+\fBx p	\fRpause\(emcan restart
+\fBx s	\fRstop\(emdone forever
+\fBx t	\fRgenerate trailer information, if any
+\fBx H \fIn\fP	\fRset character height to \fIn\fR, fractional parts (if any) ignored
+\fBx H \-23 \fId.d\fR	set character height to \fId.d\fR
+\fBx S \fIn\fP	\fRset slant to \fIn\fR
+\fBx X \fIany\fP	\fRgenerated by the \fB\eX\fR function
+\fBx X BleedAt \fIL T W H\fR	generated by the \fBbleedat\fR request
+\fBx X CropAt \fIL T W H\fR	generated by the \fBcropat\fR request
+\fBx X LC_CTYPE \fIname\fR	sets the \s-1LC_CTYPE\s+1 locale to \fIname\fR
+\fBx X PaperSize \fIW H n\fR	generated by the \fBmediasize\fR and \fBpapersize\fR requests
+		\fIn\fR is non-zero for \fBmediasize\fR
+\fBx X PS \fIcommand\fR	embed \*(PS \fIcommand\fR
+\fBx X PSSetup \fIcommand\fR	embed \*(PS \fIcommand\fR in global setup section
+\fBx X SetColor \fIcolor\fR	change printing \fIcolor\fR
+\fBx X SupplyFont \fIfont file\fR	supply data from \fIfile\fR for \*(PS \fIfont\fR
+\fBx X Sync\fR	instructs to flush position and font information immediately
+\fBx X Track \fIn\fR	gives a hint that following characters are tracked by \fIn\fR units
+		interpretation is optional; following positions are not changed
+\fBx X TrimAt \fIL T W H\fR	generated by the \fBtrimat\fR request
+\fBx \fIany\fP	\fRto be ignored if not recognized
+.pg
+Subcommands like ``i''
+may be spelled out like ``init''.
+.pg
+The commands \fBx\ T\fR, \fBx\ r\fR\ ...\fR, and \fBx\ i\fR
+fonts must be mounted before they can be used;
+\fBx\ s\fR comes last.
+There are no other order requirements.
+.pg
+The following is the output from ``hello, world''
+for a typical printer,
+as described in §25:
+.tb
+x T post
+x res 720 1 1
+x init
+V0
+p1
+.sp
+x font 1 R
+x font 2 I
+x font 3 B
+x font 4 BI
+x font 5 CW
+x font 6 H
+x font 7 HB
+x font 8 HX
+x font 9 S1
+x font 10 S
+.sp
+s10
+f1
+H0
+s10
+f1
+V0
+H720
+V120
+ch
+50e44l28l28o50,w58w72o50r33l28dn120 0
+x trailer
+V7920
+x stop
+.pg
+\*(TR output is normally not redundant;
+size and font changes and position information are not included
+unless needed.
+Nevertheless, each page is self-contained, for the benefit of postprocessors
+that re-order pages or process only a subset.
+.pg
+.mh
+Device and Font Description Files
+.pg
+The parameters that describe a output device \fIname\fR
+are read from the directory
+\fB/usr/ucblib/doctools/font/dev\fIname\fR,
+each time
+\*(TR
+is invoked.
+The device name is provided by default,
+by the environment variable \fB\s-1TYPESETTER\s+1\fR,
+or by a command-line argument \fB\-T\fIname\fR.
+The default device name is \fBps\fR,
+for \*(PS output at a resolution of 72\|000\ dpi.
+The pre-defined string \fB.T\fR
+contains the name of the device.
+The \fB\-F\fR
+command-line option may be used to change the default directory.
+.sc
+Device description file.
+.pg
+General parameters of the device are stored, one per line, in
+the file \fB/usr/ucblib/doctools/font/dev\fIname\^\fB/DESC\fR,
+as a sequence of names and values.
+\*(TR recognizes these parameters, and ignores any
+others that may be present for specific drivers:
+.tb
+.ta 1i
+\fBfonts \fIn F G H ... Z
+\fBsizes \fIs t ... \fB0
+\fBres \fIn\fR
+\fBhor \fIn\fR
+\fBvert \fIn\fR
+\fBunitwidth \fIn\fR
+\fBcharset\fR
+\fIlist of multi-character character names (optional)\fP
+.pg
+The F, G, ... are font names
+to be initially mounted.
+The list of sizes is a set of integers representing
+some or all of the legal sizes the device can produce,
+terminated by a zero.
+The  \fBres\fR
+parameter gives the resolution of the machine in units per inch;
+\fBhor\fR and \fBver\fR
+give the minimum number of units that can be moved
+horizontally and vertically.
+.pg
+Character widths for each font are assumed to be given in machine units
+at point size \fBunitwidth\fR.
+(In other words, a character with a width of
+\fIn\fR is \fIn\fR units wide at size \fBunitwidth\fR.)
+All widths are integers at all sizes.
+.pg
+A list of valid character names may be introduced by \fBcharset\fR;
+the list of names is optional.
+.pg
+A line whose first non-blank character is \fB#\fR is a comment.
+Except that \fBcharset\fR
+must occur last, parameters may appear in any order.
+.pg
+Here is a subset of the \fB\s-1DESC\s+1\fR
+file for a typical Postscript printer:
+.tb
+# Description file for Postscript printers.
+
+fonts 10 R I B BI CW H HB HX S1 S
+sizes 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+   24 25 26 27 28 29 30 31 32 33 34 35 36 38 40 44 48 54 60 72 0
+res 720
+hor 1
+vert 1
+unitwidth 10
+charset
+hy ct fi fl ff Fi Fl dg em 14 34 12 en aa
+ga ru sc dd -> br Sl ps cs cy as os =. ld
+rd le ge pp -+ ob vr
+sq bx ci fa te ** pl mi eq ~= *A *B *X *D
+*E *F *G *Y *I *K *L *M *N *O *P *R *H *S *T *U *W
+*C *Q *Z ul rn *a *b *x *d *e *f *g *y *i *k
+*l *m *n *o *p *h *r *s *t *u *w *c *q *z
+.sc
+Font description files.
+.pg
+Note: This description applies to the old
+\*(TR device-independent font format.
+The current version of \*(TR usually reads font metrics
+directly from Type\ 1, OpenType, or TrueType font files,
+as described for the \fBfp\fR request (\(sc2)
+and in the separate fonts manual available from the project home page.
+.pg
+Each font is described by an analogous description file,
+which begins with parameters of the font, one per line, followed by a
+list of characters and widths.
+The file for font \fIF\fR
+is \fB/usr/ucblib/doctools/font/dev\fIname\^\fB/\fIF\fR.
+.ta 1.7i
+.tb
+\fBname \fIstr\fR	name of font is \fIstr\fR
+\fBligatures ... 0\fR	list of ligatures
+\fBspacewidth \fIn\fR	width of a space on this font
+\fBspecial\fR	this is a special font
+\fBcharset\fR
+\fIlist of character name, width, ascender/descender, code\fP, tab separated
+.pg
+The \fBname\fR and \fBcharset\fR
+fields are mandatory;
+\fBcharset\fR must be last.
+Comments are permitted,
+as are other unrecognized parameters.
+.pg
+Each line following \fRcharset\fR
+describes one character: its name, its width in units as described above,
+ascender/descender information, and a decimal, octal or hexadecimal value
+by which the output device knows it
+(the \fB\eN\fR
+``number'' of the character).
+The character name is arbitrary, except that \fB\-\-\-\fR
+signifies an unnamed character.
+If the width field contains \fB"\fR,
+the name is a synonym for the previous character.
+The ascender/descender field is 1 if
+the character has a descender (hangs below the baseline, like \fBy\fR),
+is 2 if it has an ascender (is tall, like \fBY\fR),
+is 3 if both,
+and is 0 if neither.
+The value is returned
+in the \fBct\fR
+register, as computed by the \fB\ew\fR
+function (§11.2).
+.pg
+Here are excerpts from a typical font description file
+for the same Postscript printer.
+.tb
+.ta .5i 1i 1.5i 2.5i
+hy	33	0	45	hyphen \e(hy
+-	"			- is a synonym for \e(hy
+.sp
+Q	72	3	81
+.sp
+a	44	0	97
+b	50	2	98
+c	44	0	99
+d	50	2	100
+y	50	1	121
+.sp
+em	100	0	208
+\-\-\-	44	2	220	English pound currency symbol \eN'220'
+\-\-\-	36	0	221	centered dot \eN'221'
+.pg
+This says, for example, that the width of the letter \fBa\fR
+is 44 units at point size 10,
+the value of \fBunitwidth\fR.
+Point sizes are scaled linearly and rounded, so the width of \fBa\fR
+will be 44 at size 10, 40 at size 9, 35 at size 8,
+and so on.
+.rm EM
+.bp
+.\" from file m5
+.Bookmark 0 "Tutorial Examples"
+.ii
+.ds H T
+.tr |
+.tr ~|
+.de x1
+.xx
+.ft B
+.in .2i
+.nf
+.ne 2.1
+.ta 1i
+..
+.de x2
+.fi
+.in 0
+.ft R
+.xx
+..
+.br
+.ps \n(PS
+.ce
+.ft B
+.rs
+.sp 0.5i
+TUTORIAL EXAMPLES
+.ft R
+.sp 2
+.nr p 0
+.2C
+.ns
+.mh
+.mk
+Introduction
+.pg
+Although \*(NR and \*(TR
+have by design a syntax reminiscent
+of earlier text processors*
+.fn
+.xx
+*For example:
+P.|A.|Crisman, Ed.,
+.ul
+The Compatible Time-Sharing System,
+MIT Press, 1965, Section|AH9.01
+(Description of RUNOFF program on MIT's CTSS system).
+.ef
+with the intent of easing their use,
+it is almost always necessary to
+prepare at least a small set of macro definitions
+to describe most documents.
+Such common formatting needs
+as page margins and footnotes
+are deliberately not built into \*(NR and \*[TR.]
+Instead,
+the macro and string definition, number register, diversion,
+environment switching, page-position trap, and conditional input mechanisms
+provide the basis for user-defined implementations.
+.pg
+The examples to be discussed are intended to be useful and somewhat realistic,
+but won't necessarily cover all relevant contingencies.
+Explicit numerical parameters are used
+in the examples
+to make them easier to read and to
+illustrate typical values.
+In many cases, number registers would really be used
+to reduce the number of places where numerical
+information is kept,
+and to concentrate conditional parameter initialization
+like that which depends on whether \*(TR or \*(NR is being used.
+.mh
+Page Margins
+.pg
+As discussed in \(sc3,
+\fIheader\fR and \fIfooter\fR macros are usually defined
+to describe the top and bottom page margin areas respectively.
+A trap is planted at page position 0 for the header, and at
+\fI\-N\fR (\fIN\fR from the page bottom) for the footer.
+The simplest such definitions might be
+.x1
+&de hd	\e"define header
+\'sp 1i
+&&	\e"end definition
+&de fo	\e"define footer
+\'bp
+&&	\e"end definition
+&wh 0 hd
+&wh \-1i fo
+.x2
+which provide blank 1|inch top and bottom margins.
+The header will occur on the \fIfirst\fR page,
+only if the definition and trap exist prior to
+the initial pseudo-page transition (\(sc3).
+In fill mode, the output line that springs the footer trap
+was typically forced out because some part or whole word didn't fit on it.
+If anything in the footer and header that follows causes a \fIbreak\fR,
+that word or part word will be forced out.
+In this and other examples,
+requests like \fBbp\fR and \fBsp\fR that normally cause breaks are invoked using
+the \fIno-break\fR control character \fB\'\fR
+to avoid this.
+When the header/footer design contains material
+requiring independent text processing, the
+environment may be switched, avoiding
+most interaction with the running text.
+.pg
+A more realistic example would be
+.x1
+&de hd	\e"header
+&if t .tl \'\e(rn\'\'\e(rn\'  \e"troff cut mark
+&if \e\en%>1 \e{\e
+\'sp ~\|0.5i\-1	\e"tl base at 0.5i
+&tl \'\'\- % \-\'\'	\e"centered page number
+&ps	\e"restore size
+&ft	\e"restore font
+&vs  \e}	\e"restore vs
+\'sp ~\|1.0i  	\e"space to 1.0i
+&ns	\e"turn on no-space mode
+&&
+&de fo	\e"footer
+&ps 10	\e"set footer/header size
+&ft R	\e"set font
+&vs 12p	\e"set base-line spacing
+&if \e\en%=1 \e{\e
+\'sp ~\|\e\en(.pu\-0.5i\-1  \e"tl base 0.5i up
+&tl \'\'\- % \-\'\' \e}  \e"first page number
+\'bp
+&&
+&wh 0 hd
+&wh \-1i fo
+.x2
+which sets the size, font, and base-line spacing for the
+header/footer material, and ultimately restores them.
+The material in this case is a page number at the bottom of the
+first page and at the top of the remaining pages.
+If \*(TR is used, a \fIcut mark\fR is drawn in the form
+of \fIroot-en\fR's at each margin.
+The \fBsp\fR's refer to absolute positions to avoid
+dependence on the base-line spacing.
+Another reason for this in the footer
+is that the footer is invoked by printing a line whose
+vertical spacing swept past the trap position by possibly
+as much as the base-line spacing.
+The \fIno-space\fR mode is turned on at the end of \fBhd\fR
+to render ineffective
+accidental occurrences of \fBsp\fR at the top of the running text.
+.pg
+The above method of restoring size, font, etc. presupposes
+that such requests (that set \fIprevious\fR value) are \fInot\fR
+used in the running text.
+A better scheme is save and restore both the current \fIand\fR
+previous values as shown for size in the following:
+.x1
+&de fo
+&nr s1 \e\en(.s	\e"current size
+&ps
+&nr s2 \e\en(.s	\e"previous size
+&  ---	\e"rest of footer
+&&
+&de hd
+&  ---	\e"header stuff
+&ps \e\en(s2	\e"restore previous size
+&ps \e\en(s1	\e"restore current size
+&&
+.x2
+Page numbers may be printed in the bottom margin
+by a separate macro triggered during the footer's
+page ejection:
+.x1
+&de bn	\e"bottom number
+&tl \'\'\- % \-\'\'	\e"centered page number
+&&
+&wh \-0.5i\-1v bn	 \e"tl base 0.5i up
+.x2
+.mh
+Paragraphs and Headings
+.pg
+The housekeeping
+associated with starting a new paragraph should be collected
+in a paragraph macro
+that, for example,
+does the desired preparagraph spacing,
+forces the correct font, size, base-line spacing, and indent,
+checks that enough space remains for \fImore than one\fR line,
+and
+requests a temporary indent.
+.x1
+&de pg	\e"paragraph
+&br	\e"break
+&ft R	\e"force font,
+&ps 10	\e"size,
+&vs 12p	\e"spacing,
+&in 0	\e"and indent
+&sp 0.4	\e"prespace
+&ne 1+\e\en(.Vu	\e"want more than 1 line
+&ti 0.2i	\e"temp indent
+&&
+.x2
+The first break in \fBpg\fR
+will force out any previous partial lines,
+and must occur before the \fBvs\fR.
+The forcing of font, etc. is
+partly a defense against prior error and
+partly to permit
+things like section heading macros to
+set parameters only once.
+The prespacing parameter is suitable for \*[TR;]
+a larger space, at least as big as the output device vertical resolution, would be
+more suitable in \*[NR.]
+The choice of remaining space to test for in the \fBne\fR
+is the smallest amount greater than one line
+(the \fB.V\fR is the available vertical resolution).
+.pg
+A macro to automatically number section headings
+might look like:
+.x1
+&de sc	\e"section
+&  ---	\e"force font, etc.
+&sp 0.4	\e"prespace
+&ne 2.4+\e\en(.Vu \e"want 2.4+ lines
+.lg 0
+&fi
+.lg
+\e\en+S.
+&&
+&nr S 0 1	\e"init S
+.x2
+The usage is \fB.sc\fR,
+followed by the section heading text,
+followed by \fB.pg\fR.
+The \fBne\fR test value includes one line of heading,
+0.4 line in the following \fBpg\fR, and
+one line of the paragraph text.
+A word consisting of the next section number and a period is
+produced to begin the heading line.
+The format of the number may be set by \fBaf\fR (\(sc8).
+.pg
+Another common form is the labeled, indented paragraph,
+where the label protrudes left into the indent space.
+.x1
+&de lp	\e"labeled paragraph
+&pg
+&in 0.5i	\e"paragraph indent
+&ta 0.2i 0.5i	\e"label, paragraph
+&ti 0
+\et\e\e$1\et\ec	\e"flow into paragraph
+&&
+.x2
+The intended usage is "\fB.lp\fR \fIlabel\fR\|";
+\fIlabel\fR will begin at 0.2\|inch, and
+cannot exceed a length of 0.3\|inch without intruding into
+the paragraph.
+The label could be right adjusted against 0.4\|inch by
+setting the tabs instead with \fB.ta|0.4iR|0.5i\fR.
+The last line of \fBlp\fR ends with \fB\ec\fR so that
+it will become a part of the first line of the text
+that follows.
+.mh
+Multiple Column Output
+.pg
+The production of multiple column pages requires
+the footer macro to decide whether it was
+invoked by other than the last column,
+so that it will begin a new column rather than
+produce the bottom margin.
+The header can initialize a column register that
+the footer will increment and test.
+The following is arranged for two columns, but
+is easily modified for more.
+.x1
+&de hd	\e"header
+&  ---
+&nr cl 0 1	\e"init column count
+&mk	\e"mark top of text
+&&
+&de fo	\e"footer
+&ie \e\en+(cl<2 \e{\e
+&po +3.4i	\e"next column; 3.1+0.3
+&rt	\e"back to mark
+&ns \e}	\e"no-space mode
+&el \e{\e
+&po \e\enMu	\e"restore left margin
+&  ---
+\'bp \e}
+&&
+&ll 3.1i	\e"column width
+&nr M \e\en(.o	\e"save left margin
+.x2
+Typically a portion of the top of the first page
+contains full width text;
+the request for the narrower line length,
+as well as another \fB.mk\fR would
+be made where the two column output was to begin.
+.mh
+Footnote Processing
+.pg
+The footnote mechanism to be described is used by
+imbedding the footnotes in the input text at the
+point of reference,
+demarcated by an initial \fB.fn\fR and a terminal \fB.ef\fR:
+.x1
+&fn
+\fIFootnote text and control lines...\fP
+&ef
+.x2
+In the following,
+footnotes are processed in a separate environment and diverted
+for later printing in the space immediately prior to the bottom
+margin.
+There is provision for the case where the last collected
+footnote doesn't completely fit in the available space.
+.x1
+&de hd	\e"header
+&  ---
+&nr x 0 1	\e"init footnote count
+&nr y 0\-\e\enb	\e"current footer place
+&ch fo \-\e\enbu	\e"reset footer trap
+&if \e\en(dn .fz	\e"leftover footnote
+&&
+&de fo	\e"footer
+&nr dn 0	\e"zero last diversion size
+&if \e\enx \e{\e
+&ev 1	\e"expand footnotes in ev1
+&nf	\e"retain vertical size
+&FN	\e"footnotes
+&rm FN	\e"delete it
+&if "\e\en(.z"fy" .di	 \e"end overflow diversion
+&nr x 0	\e"disable fx
+&ev  \e}	\e"pop environment
+&  ---
+\'bp
+&&
+&de fx	\e"process footnote overflow
+&if \e\enx .di fy	\e"divert overflow
+&&
+&de fn	\e"start footnote
+&da FN	\e"divert (append) footnote
+&ev 1	\e"in environment 1
+&if \e\en+x=1 .fs	 \e"if first, include separator
+.lg 0
+&fi	\e"fill mode
+.lg
+&&
+&de ef	\e"end footnote
+&br	\e"finish output
+&nr z \e\en(.v	\e"save spacing
+&ev	\e"pop ev
+&di	\e"end diversion
+&nr y \-\e\en(dn	\e"new footer position,
+&if \e\enx=1 .nr y \-(\e\en(.v\-\e\enz) \e
+	\e"uncertainty correction
+&ch fo \e\enyu	\e"y is negative
+&if (\|\e\en(nl+1v)>(\|\e\en(.p+\e\eny) \e
+&ch fo \e\en(nlu+1v	 \e"it didn't fit
+&&
+&de fs	\e"separator
+\el\'1i\'	\e"1 inch rule
+&br
+&&
+&de fz	\e"get leftover footnote
+&fn
+&nf	\e"retain vertical size
+&fy	\e"where fx put it
+&ef
+&&
+&nr b 1.0i	\e"bottom margin size
+&wh 0 hd	\e"header trap
+&wh 12i fo	\e"footer trap, temp position
+&wh \-\e\enbu fx	\e"fx at footer position
+&ch fo \-\e\enbu	\e"conceal fx with fo
+.x2
+The header \fBhd\fR initializes a footnote count register \fBx\fR,
+and sets both the current footer trap position register \fBy\fR and
+the footer trap itself to a nominal position specified in
+register \fBb\fR.
+In addition, if the register \fBdn\fR indicates a leftover footnote,
+\fBfz\fR is invoked to reprocess it.
+The footnote start macro \fBfn\fR begins a diversion (append) in environment 1,
+and increments the count \fBx\fR; if the count is one, the footnote separator \fBfs\fR
+is interpolated.
+The separator is kept in a separate macro to permit user redefinition.
+The footnote end macro \fBef\fR restores
+the previous environment and ends the diversion after saving the spacing size in register \fBz\fR.
+\fBy\fR is then decremented by the size of the footnote, available in \fBdn\fR;
+then on the first footnote, \fBy\fR is further decremented by the difference
+in vertical base-line spacings of the two environments, to
+prevent the late triggering the footer trap from causing the last
+line of the combined footnotes to overflow.
+The footer trap is then set to the lower (on the page) of \fBy\fR or the current page position (\fBnl\fR)
+plus one line, to allow for printing the reference line.
+If indicated by \fBx\fR, the footer \fBfo\fR rereads the footnotes from \fBFN\fR in nofill mode
+in environment 1,
+and deletes \fBFN\fR.
+If the footnotes were too large to fit, the macro \fBfx\fR will be trap-invoked to redivert
+the overflow into \fBfy\fR,
+and the register \fBdn\fR will later indicate to the header whether \fBfy\fR is empty.
+Both \fBfo\fR and \fBfx\fR are planted in the nominal footer trap position in an order
+that causes \fBfx\fR to be concealed unless the \fBfo\fR trap is moved.
+The footer then terminates the overflow diversion, if necessary, and
+zeros \fBx\fR to disable \fBfx\fR,
+because the uncertainty correction
+together with a not-too-late triggering of the footer can result
+in the footnote rereading finishing before reaching the \fBfx\fR trap.
+.pg
+A good exercise for the student is to combine the multiple-column and footnote mechanisms.
+.mh
+The Last Page
+.pg
+After the last input file has ended, \*(NR and \*(TR
+invoke the \fIend macro\fR (\(sc7), if any,
+and when it finishes, eject the remainder of the page.
+During the eject, any traps encountered are processed normally.
+At the \fIend\fR of this last page, processing terminates
+\fIunless\fR a partial line, word, or partial word remains.
+If it is desired that another page be started, the end-macro
+.x1
+&de en	\e"end-macro
+\ec
+\'bp
+&&
+&em en
+.x2
+will deposit a null partial word,
+and effect another last page.
+.rm EM
+.\" from file table1
+.ii
+.bp
+.Bookmark 0 "Font Style Examples"
+.1C
+.rm mx
+.br
+.tr &&
+.tr ||
+.tr ~~
+.de aa
+.nf
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+1234567890
+.ss 9
+! $ % & ( ) ` ' * + \- . , / : ; = ? [ ] |
+.fi
+\(bu \(sq \(em \(hy \(ru \(14 \(12 \(34 \(fi \(fl \(ff
+\(Fi \(Fl
+\(de \(dg \(fm
+\(ct \(rg \(co
+.ss 12
+..
+.de bb
+.ss 9
+.fi
+.ll 5i
+" \' \e ^ \_ \` ~ \(sl < > { } # @ \(pl \(mi \(eq \(**
+.br
+\(*a \(*b \(*g \(*d \(*e \(*z \(*y \(*h \(*i \(*k \(*l \(*m
+\(*n \(*c \(*o \(*p \(*r \(*s \(ts \(*t \(*u \(*f \(*x \(*q \(*w
+.br
+\(*G \(*D \(*H \(*L \(*C \(*P \(*S \(*U \(*F \(*Q \(*W
+.br
+\(sr \(rn \(>= \(<= \(== \(ap \(~= \(!=
+\(-> \(<- \(ua \(da \(mu
+\(di \(+- \(cu \(ca \(sb \(sp \(ib \(ip \(if \(pd
+.br
+\(sc \(gr \(no \(is \(pt \(es \(mo
+\(dd \(rh \(lh \(or \(ci
+\(lt \(lb \(rt \(rb \(lk \(rk \(bv \(lf \(rf \(lc \(rc
+\(br
+.br
+.ss 12
+.nf
+..
+.nf
+.ps 12
+.vs 14p
+.ft B
+.ce
+.sp 3
+Table I
+.sp
+.ce
+Font Style Examples
+.sp .5i
+.ft R
+.ps 10
+.fi
+.vs 12p
+The following fonts are printed in 12-point, with a vertical spacing of 14-point,
+and with
+non-alphanumeric characters separated by \(14\|em space.
+Note that this table only includes
+the historical \s-1CAT\s+1 \*(TR character set;
+\*(PS devices can usually print a much larger,
+although font-dependent set of characters.
+.sp .5i
+.na
+.ps 12
+.vs 14p
+.ft R
+Times Roman
+.sp .5
+.aa
+.sp
+.ft I
+Times Italic
+.sp .5
+.aa
+.sp
+.ft B
+Times Bold
+.sp .5
+.aa
+.sp
+.ft R
+Special Font
+.sp .5
+.fi
+.ll 5i
+.bb
+.ad
+.rm EM
+.\" from file table2
+.ii
+.bp
+.Bookmark 0 "Input Naming Conventions"
+.1C
+.de mx
+.nf
+.ft I
+.ta .25iC .5i +.45i 3.25iC +.25i +.45i
+		Input	Character		Input	Character
+	Char	Name	Name	Char	Name	Name
+.ft R
+.sp .2
+.nr cl 0
+.mk
+..
+.br
+.tr ~~
+.nf
+.ps 12
+.vs 14p
+.ft B
+.ce
+Table II
+.sp
+.ce 2
+Input Naming Conventions for \', \`,and  \-
+and for Non-ASCII Special Characters
+.sp .5i
+.ft R
+.ps 10
+.vs 12p
+.ft B
+Non-\s-1ASCII\s+1 characters and \f(BIminus\fP on the standard fonts.
+.sp
+.ft R
+.de cl
+.ie \\n+(cl<2 \{.po +3.0i
+.rt \}
+.el .sc
+..
+.de sc
+.po \\n(POu
+.nr cl 0
+..
+.nr cl 0 1
+.de qq
+	\&'	\'	close quote
+	`	\`	open quote
+	\(em	\e(em	3/4 Em dash
+	-	\-	hyphen or
+	\(hy	\e(hy	hyphen
+	\-	\e\-	current font minus
+	\(bu	\e(bu	bullet
+	\(sq	\e(sq	square
+	\(ru	\e(ru	rule
+	\(14	\e(14	1/4
+	\(12	\e(12	1/2
+	\(34	\e(34	3/4
+	\(fi	\e(fi	fi
+	\(fl	\e(fl	fl
+	\(ff	\e(ff	ff
+	\(Fi	\e(Fi	ffi
+	\(Fl	\e(Fl	ffl
+	\(de	\e(de	degree
+	\(dg	\e(dg	dagger
+	\(fm	\e(fm	foot mark
+	\(ct	\e(ct	cent sign
+	\(rg	\e(rg	registered
+	\(co	\e(co	copyright
+..
+.di zz
+.lg 0
+.qq
+.di
+.lg
+.mx
+.nr aa \n(dn/2
+.ne \n(aau+1
+.nr bb \n(nl+\n(aa
+.ch cl
+.wh \n(bbu cl
+.qq
+.sp |\n(bbu
+.ch cl 12i
+.fi
+.sp 2
+.ft B
+Non-\s-1ASCII\s+1 characters and \', \`, \_\|, \(pl, \(mi, \(eq, and \(** on the special font.
+.sp .4
+.ft R
+.fi
+.ps 10
+In traditional \*[TR,]
+the ASCII characters @, #, ", \', \`, <, >, \\, {, }, ~, ^, and \(ul existed
+\fIonly\fR on the special font and were printed as a 1-em space if that font
+was not mounted.
+The following characters exist only on the special font.
+The special math plus, minus, and equals are provided to
+insulate the appearance of equations from the choice of standard fonts.
+.nf
+.ps 10
+.sp
+.de sc
+.po \\n(POu
+.nr cl 0
+'bp
+..
+.ch cl \nmu-\n(.vu-1u
+.mx
+.lg 0
+	\(pl	\e(pl	math plus
+	\(mi	\e(mi	math minus
+	\(eq	\e(eq	math equals
+	\(**	\e(**	math star
+	\(sc	\e(sc	section
+	\(aa	\\(aa	acute accent
+	\(ga	\\(ga	grave accent
+	\(ul	\\(ul	underrule
+	\(sl	\\(sl	slash (matching backslash)
+	\(*a	\\(*a	alpha
+	\(*b	\\(*b	beta
+	\(*g	\\(*g	gamma
+	\(*d	\\(*d	delta
+	\(*e	\\(*e	epsilon
+	\(*z	\\(*z	zeta
+	\(*y	\\(*y	eta
+	\(*h	\\(*h	theta
+	\(*i	\\(*i	iota
+	\(*k	\\(*k	kappa
+	\(*l	\\(*l	lambda
+	\(*m	\\(*m	mu
+	\(*n	\\(*n	nu
+	\(*c	\\(*c	xi
+	\(*o	\\(*o	omicron
+	\(*p	\\(*p	pi
+	\(*r	\\(*r	rho
+	\(*s	\\(*s	sigma
+	\(ts	\\(ts	terminal sigma
+	\(*t	\\(*t	tau
+	\(*u	\\(*u	upsilon
+	\(*f	\\(*f	phi
+	\(*x	\\(*x	chi
+	\(*q	\\(*q	psi
+	\(*w	\\(*w	omega
+	\(*A	\\(*A	Alpha
+	\(*B	\\(*B	Beta
+	\(*G	\\(*G	Gamma
+	\(*D	\\(*D	Delta
+	\(*E	\\(*E	Epsilon
+	\(*Z	\\(*Z	Zeta
+	\(*Y	\\(*Y	Eta
+	\(*H	\\(*H	Theta
+	\(*I	\\(*I	Iota
+	\(*K	\\(*K	Kappa
+	\(*L	\\(*L	Lambda
+	\(*M	\\(*M	Mu
+	\(*N	\\(*N	Nu
+	\(*C	\\(*C	Xi
+	\(*O	\\(*O	Omicron
+	\(*P	\\(*P	Pi
+	\(*R	\\(*R	Rho
+	\(*S	\\(*S	Sigma
+	\(*T	\\(*T	Tau
+	\(*U	\\(*U	Upsilon
+	\(*F	\\(*F	Phi
+	\(*X	\\(*X	Chi
+	\(*Q	\\(*Q	Psi
+	\(*W	\\(*W	Omega
+	\(sr	\\(sr	square root
+	\(rn	\\(rn	root en extender
+	\(>=	\\(>=	>=
+	\(<=	\\(<=	<=
+	\(==	\\(==	identically equal
+	\(~=	\\(~=	approx =
+	\(ap	\\(ap	approximates
+	\(!=	\\(!=	not equal
+	\(->	\\(\(mi>	right arrow
+	\(<-	\\(<\(mi	left arrow
+	\(ua	\\(ua	up arrow
+	\(da	\\(da	down arrow
+	\(mu	\\(mu	multiply
+	\(di	\\(di	divide
+	\(+-	\\(+\(mi	plus-minus
+	\(cu	\\(cu	cup (union)
+	\(ca	\\(ca	cap (intersection)
+	\(sb	\\(sb	subset of
+	\(sp	\\(sp	superset of
+	\(ib	\\(ib	improper subset
+	\(ip	\\(ip	improper superset
+	\(if	\\(if	infinity
+	\(pd	\\(pd	partial derivative
+	\(gr	\\(gr	gradient
+	\(no	\\(no	not
+	\(is	\\(is	integral sign
+	\(pt	\\(pt	proportional to
+	\(es	\\(es	empty set
+	\(mo	\\(mo	member of
+	\(br	\\(br	box vertical rule
+	\(dd	\\(dd	double dagger
+	\(rh	\\(rh	right hand
+	\(lh	\\(lh	left hand
+.\"	\(bs	\\(bs	Bell System logo
+	\(or	\\(or	or
+	\(ci	\\(ci	circle
+	\(lt	\\(lt	left top of big curly bracket
+	\(lb	\\(lb	left bottom
+	\(rt	\\(rt	right top
+	\(rb	\\(rb	right bot
+	\(lk	\\(lk	left center of big curly bracket
+	\(rk	\\(rk	right center of big curly bracket
+	\(bv	\\(bv	bold vertical
+	\(lf	\\(lf	left floor (left bottom of big
+			square bracket)
+	\(rf	\\(rf	right floor (right bottom)
+	\(lc	\\(lc	left ceiling (left top)
+	\(rc	\\(rc	right ceiling (right top)
+.rm EM
+.ds EM
