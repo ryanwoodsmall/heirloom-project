@@ -15,8 +15,11 @@ been enhanced to generate UTF-8 output.
 troff generates typesetter output from the same document source code as
 nroff. Thus a special use of it is to prepare manual pages for printing.
 troff is a general-purpose typesetting processor, though. Significant
-features have been added in this implementation; see the files "NEWS",
-"FONTS", and "PDFS" for details.
+features have been added in this implementation; see the "Nroff/Troff
+User's Manual" and "Font Handling in Troff with PostScript Devices"
+for details. Both documents are included in the "doc" subdirectory
+of the source code distribution; compiled PDF files can be downloaded
+from the project home page.
 
 Currently, troff is almost exclusively targeted at generating output
 for PostScript interpreters. Its principal device independence has
@@ -152,4 +155,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						12/31/05
+<gunnarr@acm.org>						3/21/06
