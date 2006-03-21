@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.24 (gritter) 3/3/06
+ * Sccsid @(#)n4.c	1.25 (gritter) 3/21/06
  */
 
 /*
@@ -209,9 +209,7 @@ setn(void)
 			i = NN - regcnt;	
 			break;
 		case 'z': 
-			i = dip->curd;
-			pbbuf[pbp++] = (i >> BYTE) & BYTEMASK;
-			pbbuf[pbp++] = i & BYTEMASK;
+			cpushback(macname(dip->curd));
 			return;
 		case 'b': 
 			i = bdtab[font];

@@ -39,6 +39,8 @@ Release ...
 * troff/dpost: EPS files that contain carriage-return characters as
   newline indicators are now correctly handled with the ".psbb" request
   and the picture inclusion mechanism.
+* [nt]roff: The "\(.z" number register handles diversion names longer
+  than two characters properly now.
 * [nt]roff: Requests like ".bd" or ".kernpair" now warn when an invalid
   font name is given.
 * [nt]roff: No "illegal number" warning is printed anymore when a "\}" is
