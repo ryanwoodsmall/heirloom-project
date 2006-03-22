@@ -1,7 +1,7 @@
 Release ...
-* troff: No longer prints a warning when a font selected with ".fp" is
+* troff: No longer prints a warning when a font selected with ".ft" is
   not currently mounted but can be mounted in position 0.
-* nroff: No longer prints a warning when a font is selected with ".fp".
+* nroff: No longer prints a warning when a font is selected with ".ft".
 
 Release 060321
 * An revised version of the "Nroff/Troff User's Manual" is now available
