@@ -2,6 +2,10 @@ Release ...
 * troff: No longer prints a warning when a font selected with ".ft" is
   not currently mounted but can be mounted in position 0.
 * nroff: No longer prints a warning when a font is selected with ".ft".
+* nroff: Multibyte characters are now emboldened correctly. Previously,
+  the number of backspace characters output corresponded to the length
+  of the multibyte sequence instead of the column width of the character
+  (bug reported by Alexander E. Patrakov).
 
 Release 060321
 * An revised version of the "Nroff/Troff User's Manual" is now available

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.22 (gritter) 2/5/06
+ * Sccsid @(#)n10.c	1.23 (gritter) 3/22/06
  */
 
 /*
@@ -889,7 +889,7 @@ ptout1(void)
 			for (qq = q - cnt; qq <= q;)
 				oput(cbits(*qq++));
 			while (--j > 0) {
-				for (jj = cnt + 1; jj > 0; jj--)
+				for (jj = w / t.Char; jj > 0; jj--)
 					oput('\b');
 				for (qq = q - cnt; qq <= q;)
 					oput(cbits(*qq++));
