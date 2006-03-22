@@ -6,6 +6,8 @@ Release ...
   the number of backspace characters output corresponded to the length
   of the multibyte sequence instead of the column width of the character
   (bug reported by Alexander E. Patrakov).
+* dpost: The line width for drawing has been fixed; previously, lines
+  were 100 times too slim with the "ps" device.
 
 Release 060321
 * An revised version of the "Nroff/Troff User's Manual" is now available
