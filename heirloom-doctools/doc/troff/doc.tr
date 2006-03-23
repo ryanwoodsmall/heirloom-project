@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.23.1.1 (gritter) 3/13/06
+.\" Sccsid @(#)doc.tr	1.24 (gritter) 3/23/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -146,7 +146,7 @@
 ..
 .de ht
 .tl `\*(NR/\*(TR \fRUser's Manual``Heirloom Documentation Tools`
-.tl '3/13/06'''\".tl 'Version \n(mo/\n(dy/\n(yr'''
+.tl '3/23/06'''\".tl 'Version \n(mo/\n(dy/\n(yr'''
 ..
 .de hd
 .\".tl '\(rn'''
@@ -1132,7 +1132,11 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \fB&as\fI|xx|string\fR	\(en	ignored	\(en	Append \fIstring\fR to string \fIxx\fR.
 .b1
-\fB&chop\fI|xx\fR	\(en	ignored	\(en	Removes the last character of \fIxx\fR.
+\fB&substring\fI|xx|N|\fR[\fIM\fR]	ignored	\(en	Replace string \fIxx\fR by its substring between \fIN\fR and \fIM\fR.
+.b1
+\fB&length\fI|R|string\fR	\fIR\fR|set|to|0	\(en	Store the length of \fIstring\fR in register \fIR\fR.
+.b1
+\fB&chop\fI|xx\fR	\(en	ignored	\(en	Remove the last character of \fIxx\fR.
 .b1
 \fB&rm\fI|xx\fR	\(en	ignored	\(en	Remove request, macro, or string.
 .b1
@@ -1406,6 +1410,7 @@ kernbefore	4
 kernpair	4
 lc	9
 lc_ctype	2
+length	7
 lf	20
 lg	10
 lhang	4
@@ -1452,6 +1457,7 @@ so	19
 sp	5
 spreadwarn	21
 ss	2
+substring	7
 sv	5
 sy	19
 ta	9
@@ -2737,7 +2743,6 @@ from another font that have been selected by the \fBfallback\fP sequence.
 \fB&kern\fI|N\fR	1	1	O,T	Controls pairwise kerning;
 disabled if \fIN\fR=0, otherwise enabled.
 .bt
-.dl
 \fB&kernpair\fI|F|c|G|d|N\fR	ignored	O,T	Adds a kerning pair
 to the kerning table for character \fIc\fR
 from font \fIF\fR and character \fId\fR from font \fIG\fR.
@@ -3112,7 +3117,16 @@ initial blanks.
 \fIstring\fR to string \fIxx\fR
 (append version of \fBds\fR).
 .bt
-\fB&chop\fI|xx\fR	\(en	ignored	\(en	Removes the last character of the macro, string, or diversion \fIxx\fR.
+\fB&substring\fI|xx|N|\fR[\fIM\fR]	ignored	\(en	Replace string \fIxx\fR by its substring between indices \fIN\fR and \fIM\fR.
+\fIN\fR and \fIM\fR start at 0.
+Negative values are interpreted relative to the end
+of the string;
+\(mi1 implies the last character of the string.
+.bt
+\fB&length\fI|R|string\fR	\fIR\fR|set|to|0	\(en	Store the length of \fIstring\fR in register \fIR\fR.
+\fIstring\fR is read in \fIcopy mode.\fR
+.bt
+\fB&chop\fI|xx\fR	\(en	ignored	\(en	Remove the last character of the macro, string, or diversion \fIxx\fR.
 .bt
 \fB&rm\fI|xx\fR	\(en	ignored	\(en	Remove
 request, macro, or string.
@@ -4087,7 +4101,6 @@ Note that what is pushed down and restored
 is the environment \fIname,\fR
 not its contents.
 .bt
-.dl
 \fB&evc\fI|name\fR		\(en	\(en	Copies the environment \fIname\fR to the current environment.
 The temporary state of the current environment is reset, and
 incompletely filled lines are discarded.
@@ -4885,7 +4898,6 @@ then a command, then other parameters.
 .tb
 .ta 1.5i 1.5i+1m
 \fBx T \fIs\fP	\fRname of typesetter is \fIs\fR
-.dl
 \fBx r \fIn h v\fP	\fRresolution is \fIn\fR units/inch;
 		\fIh\fR = minimum horizontal motion, \fIv\fR = minimum vertical
 \fBx i	\fRinitialize\fP

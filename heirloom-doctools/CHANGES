@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: The ".substring" and ".length" requests have been added to
+  replace a string by a substring of it and to determine the length of
+  a string, respectively.
 * troff: No longer prints a warning when a font selected with ".ft" is
   not currently mounted but can be mounted in position 0.
 * nroff: No longer prints a warning when a font is selected with ".ft".
