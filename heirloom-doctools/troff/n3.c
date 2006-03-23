@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.74 (gritter) 3/23/06
+ * Sccsid @(#)n3.c	1.75 (gritter) 3/23/06
  */
 
 /*
@@ -1162,9 +1162,8 @@ casepc(void)
 void
 casechop(void)
 {
-	int	a = app;
 	int	i, j;
-	filep	savip, savoffset;
+	filep	savip;
 
 	if (dip != d)
 		wbfl();
@@ -1181,22 +1180,20 @@ casechop(void)
 	savip = ip;
 	ip = (filep)contab[j].mx;
 	app = 1;
-	while ((i = rbf()) != 0)
-		i = 1;
-	app = a;
-	savoffset = offset;
+	while (rbf() != 0);
+	app = 0;
 	if (ip > (filep)contab[j].mx) {
 		offset = ip - 1;
-		wbf(0);
+		wbt(0);
 	}
 	ip = savip;
-	offset = savoffset;
+	offset = dip->op;
 }
 
 void
 casesubstring(void)
 {
-	int	i, j, k, a = 0, st;
+	int	i, j, k, sz = 0, st;
 	int	n1, n2 = -1;
 	tchar	*tp = NULL, c;
 	filep	savip;
@@ -1221,16 +1218,15 @@ casesubstring(void)
 	savip = ip;
 	ip = (filep)contab[j].mx;
 	k = 0;
-	do {
-		c = rbf();
-		k++;
-		if (k >= a) {
-			a += 512;
-			tp = realloc(tp, a * sizeof *tp);
+	app = 1;
+	while ((c = rbf()) != 0) {
+		if (k >= sz) {
+			sz += 512;
+			tp = realloc(tp, sz * sizeof *tp);
 		}
-		tp[k-1] = c;
-	} while (c != 0);
-	k--;
+		tp[k++] = c;
+	}
+	app = 0;
 	ip = savip;
 	if ((offset = finds(i)) != 0) {
 		st = 0;
@@ -1256,8 +1252,7 @@ casesubstring(void)
 				}
 			}
 		}
-		wbf(0);
-		wbfl();
+		wbt(0);
 		clrmn(oldmn);
 		if (newmn) {
 			if (contab[newmn].rq)
@@ -1268,6 +1263,7 @@ casesubstring(void)
 	}
 	free(tp);
 	offset = dip->op;
+	ip = savip;
 }
 
 void

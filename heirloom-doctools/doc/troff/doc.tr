@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.24 (gritter) 3/23/06
+.\" Sccsid @(#)doc.tr	1.25 (gritter) 3/23/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1132,7 +1132,7 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \fB&as\fI|xx|string\fR	\(en	ignored	\(en	Append \fIstring\fR to string \fIxx\fR.
 .b1
-\fB&substring\fI|xx|N|\fR[\fIM\fR]	ignored	\(en	Replace string \fIxx\fR by its substring between \fIN\fR and \fIM\fR.
+\fB&substring\fI|xx|N|\fR[\fIM\fR]	\fIM\fR\(eq\|\(mi1	\(en	Replace string \fIxx\fR by its substring between \fIN\fR and \fIM\fR.
 .b1
 \fB&length\fI|R|string\fR	\fIR\fR|set|to|0	\(en	Store the length of \fIstring\fR in register \fIR\fR.
 .b1
@@ -3117,7 +3117,7 @@ initial blanks.
 \fIstring\fR to string \fIxx\fR
 (append version of \fBds\fR).
 .bt
-\fB&substring\fI|xx|N|\fR[\fIM\fR]	ignored	\(en	Replace string \fIxx\fR by its substring between indices \fIN\fR and \fIM\fR.
+\fB&substring\fI|xx|N|\fR[\fIM\fR]	\fIM\fR\(eq\|\(mi1	\(en	Replace string \fIxx\fR by its substring between indices \fIN\fR and \fIM\fR.
 \fIN\fR and \fIM\fR start at 0.
 Negative values are interpreted relative to the end
 of the string;
