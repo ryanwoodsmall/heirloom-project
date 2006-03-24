@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.12 (gritter) 3/17/06
+.\" Sccsid @(#)doc.tr	2.13 (gritter) 3/24/06
 .do xflag 3
 .warn
 .spreadwarn .5c
@@ -197,7 +197,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-3/17/06
+3/24/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -563,8 +563,8 @@ request:
 \fR0/1/2\fP
 .EE
 .P
-In this example, old-style numerals from Fournier Expert are mixed
-with the slash character from Fournier Regular, and are adjusted to
+In this example, old-style numerals from Adobe Garamond Expert are mixed
+with the slash character from Adobe Garamond Regular, and are adjusted to
 achieve matching visual letter spacing.
 .P
 It is sometimes useful to add a certain amount of space whenever a
