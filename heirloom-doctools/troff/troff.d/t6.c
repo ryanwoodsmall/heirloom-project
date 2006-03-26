@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.130 (gritter) 3/22/06
+ * Sccsid @(#)t6.c	1.131 (gritter) 3/26/06
  */
 
 /*
@@ -578,10 +578,12 @@ tchar setch(int delim)
 {
 	register int j;
 	char	temp[NC];
-	tchar	c;
+	tchar	c, d[2] = {0, 0};
 	int	f, n;
 
 	n = 0;
+	if (delim == 'C')
+		d[0] = getach();
 	do {
 		c = getach();
 		if (c == 0 && n < 2)
@@ -590,12 +592,12 @@ tchar setch(int delim)
 			temp[n-1] = 0;
 			break;
 		}
-		if (delim == '[' && c == ']') {
+		if (delim == '[' && c == ']' || delim == 'C' && c == d[0]) {
 			temp[n] = 0;
 			break;
 		}
 		temp[n++] = c;
-		if (delim != '[' && n == 2) {
+		if (delim == '(' && n == 2) {
 			temp[n] = 0;
 			break;
 		}
@@ -604,8 +606,12 @@ tchar setch(int delim)
 		nodelim(']');
 		return ' ';
 	}
+	if (delim == 'C' && c != d[0]) {
+		nodelim(d[0]);
+		return ' ';
+	}
 	c = 0;
-	if (delim == '[') {
+	if (delim == '[' || delim == 'C') {
 		if ((c = postchar(temp, &f)) != 0) {
 			c |= chbits & ~FMASK;
 			setfbits(c, f);
@@ -618,7 +624,7 @@ tchar setch(int delim)
 				break;
 			}
 	if (c == 0 && warn & WARN_CHAR)
-		errprint("missing glyph \\%c%s%s", delim, temp,
+		errprint("missing glyph \\%c%s%s%s%s", delim, d, temp, d,
 				delim == '[' ? "]" : "");
 	if (c == 0 && !tryglf)
 		c = ' ';

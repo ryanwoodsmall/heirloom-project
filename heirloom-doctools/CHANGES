@@ -11,6 +11,8 @@ Release ...
   (bug reported by Alexander E. Patrakov).
 * dpost: The line width for drawing has been fixed; previously, lines
   were 100 times too slim with the "ps" device.
+* troff: The "\C'xxx'" escape sequence is now available; it selects a
+  named character with the same effect as "\[xxx]".
 
 Release 060321
 * An revised version of the "Nroff/Troff User's Manual" is now available

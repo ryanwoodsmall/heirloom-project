@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.26 (gritter) 3/25/06
+.\" Sccsid @(#)doc.tr	1.27 (gritter) 3/26/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -81,7 +81,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 3/25/06
+.ds Sccsdate 3/26/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1566,6 +1566,7 @@ Reference	Sequence	Meaning
 9.1	\fB\ea\fR	Non-interpreted leader character
 12.3	\fB\eb\fI\'abc...\'\fR	Bracket building function
 4.2	\fB\ec\fR	Interrupt text processing
+2.1	\fB\eC\fI\'xxx\'\fR	Character named \fIxxx\fP
 11.1	\fB\ed\fR	Forward (down) 1/2\|em vertical motion (1/2 line in \*(NR)
 12.5	\fB\eD\fI\'c...\'\fR	Draw graphics function \fIc\fP with parameters ...; \fIc\fP\^=\^\fBl\fR,\^\fBc\fR,\^\fBe\fR,\^\fBa\fP,\^\fB\(ap\fP
 10.1	\fB\ee\fR	Printable version of the \fIcurrent\fR escape character.
@@ -2053,7 +2054,7 @@ With Type\ 1, OpenType, and TrueType fonts,
 \*(TR allows to access all named \*(PS
 characters of the current font and
 of those in the \fBfallback\fR sequence
-in the form \fB\e[\fIname\fB]\fR.
+in the forms \fB\e[\fIname\fB]\fR or \fB\eC\fI\'name\'\fR.
 .pg
 \*(TR internally converts non-\s-1ASCII\s+1 characters
 of the current \s-1LC_CTYPE\s+1 locale
