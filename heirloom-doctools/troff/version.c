@@ -24,7 +24,7 @@ ext.h: * Sccsid @(#)ext.h	1.37 (gritter) 2/19/06
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
 mallint.h: * Sccsid @(#)mallint.h	1.4 (gritter) 8/27/05
 malloc.c: * Sccsid @(#)malloc.c	1.3 (gritter) 8/26/05
-n1.c: * Sccsid @(#)version.c	6.34 (gritter) 3/26/06
+n1.c: * Sccsid @(#)n1.c	1.65 (gritter) 3/26/06
 n2.c: * Sccsid @(#)n2.c	1.14 (gritter) 12/19/05
 n3.c: * Sccsid @(#)n3.c	1.75 (gritter) 3/23/06
 n4.c: * Sccsid @(#)n4.c	1.25 (gritter) 3/21/06
