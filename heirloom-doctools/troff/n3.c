@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.75 (gritter) 3/23/06
+ * Sccsid @(#)n3.c	1.76 (gritter) 4/3/06
  */
 
 /*
@@ -1053,6 +1053,7 @@ casedi(void)
 	dip->curd = i;
 	clrmn(oldmn);
 	k = (int *) & dip->dnl;
+	dip->flss = 0;
 	for (j = 0; j < 10; j++)
 		k[j] = 0;	/*not op and curd*/
 rtn:

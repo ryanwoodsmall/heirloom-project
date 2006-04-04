@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.37 (gritter) 2/19/06
+ * Sccsid @(#)ext.h	1.39 (gritter) 4/3/06
  */
 
 /*
@@ -103,7 +103,6 @@ extern	int	flss;
 extern	int	*fontlab;
 extern	int	gflag;
 extern	int	hflg;
-extern	int	hyext;
 extern	int	ibf;
 extern	int	ifi;
 extern	int	ifile;
@@ -197,7 +196,7 @@ extern	struct widcache {	/* width cache, indexed by character */
 	int	fontpts;
 	int	width;
 } *widcache;
-extern	char gchtab[];
+extern	char *gchtab;
 extern	struct	d	*d;
 extern	struct	d	*dip;
 
@@ -216,6 +215,9 @@ extern	int	**rhangtab;
 extern	int	**kernafter;
 extern	int	**kernbefore;
 extern	int	**ftrtab;
+extern	char	*lgmark;
+extern	struct lgtab	**lgtab;
+extern	int	***lgrevtab;
 extern	int	spreadwarn;
 extern	int	spreadlimit;
 extern	int	lastrq;

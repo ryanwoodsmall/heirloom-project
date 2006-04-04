@@ -1,4 +1,16 @@
 Release ...
+* dpost: An error that could lead to invalid PostScript output when the
+  last character of a long output string sequence was a backslash has
+  been fixed.
+* troff: The ".flig" request has been enhanced to enable the definition
+  of arbitrary font-specific ligatures, e.g. ".flig R Th \[T_h]" could
+  be used for a "Th" ligature. The previous syntax is still accepted.
+* troff: If a hyphentation point occurs within an automatically created
+  ligature, the ligature is now split into its parts.
+* troff: The "\;" escape sequence has been introduced as a ligature
+  suppressor without other side-effects.
+* [nt]roff: The hyphenation language as set by the ".hylang" request is
+  now specific to the current environment.
 * [nt]roff: The ".substring" and ".length" requests have been added to
   replace a string by a substring of it and to determine the length of
   a string, respectively.

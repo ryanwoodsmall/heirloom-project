@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.27 (gritter) 3/26/06
+.\" Sccsid @(#)doc.tr	1.31 (gritter) 4/3/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -53,10 +53,10 @@
 .fp 2 I timesi ttf
 .fp 3 B timesbd ttf
 .fp 4 BI timesbi ttf
-.flig R 6
-.flig I 6
-.flig B 6
-.flig BI 6
+.flig R fi \[fi] fl \[fl]
+.flig I fi \[fi] fl \[fl]
+.flig B fi \[fi] fl \[fl]
+.flig BI fi \[fi] fl \[fl]
 .kernpair B f B l 100
 .kernpair B f B i 50
 .kernpair I T R ) 125
@@ -81,7 +81,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 3/26/06
+.ds Sccsdate 4/3/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1057,10 +1057,6 @@ Also \fB\ef\fIx\fR,\|\fB\ef(\fIxx\fR,\|\fB\ef\fIN\fR.
 .b1
 \fB&hidechar\fI|F|c|d|...\fR	ignored	O,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
 .b1
-.lg 0
-\fB&flig\fI|F|N\fR	font-speci\(fic	ignored	T	De\(fines the ligatures in font \fIF\fR.
-.lg
-.b1
 \fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
 of the space character in font \fIF\fR to \fIN\fR.
 .mh
@@ -1213,6 +1209,10 @@ Input and Output Conventions and Character Translations
 \fB&lg\fI|N\fR	\(en;\|on	on	T	Ligature mode
 on if \fIN\fR>0.
 .b1
+.lg 0
+\fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fines the ligatures in font \fIF\fR.
+.lg
+.b1
 \fB&ul\fI|N\fR	off	\fIN\(eq\fR1	E	Underline (italicize in \*(TR) \fIN\fR input lines.
 .b1
 \fB&cu\fI|N\fR	off	\fIN\(eq\fR1	E	Continuous underline in \*[NR;] like \fBul\fR in \*[TR.]
@@ -1237,7 +1237,7 @@ Hyphenation.
 .b1
 \fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.
 .b1
-\fB&hylang\fI|name\fR	off	off	\(en	Sets the hyphenation language.
+\fB&hylang\fI|name\fR	off	off	E	Sets the hyphenation language.
 .b1
 \fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.
 .b1
@@ -1412,7 +1412,7 @@ fc	9
 feature	2
 fi	4
 fl	20
-flig	2
+flig	10.2
 fp	2
 fps	2
 fspacewidth	2
@@ -1563,6 +1563,7 @@ Reference	Sequence	Meaning
 2.1	\fB\e[\fIxxx\fR]	Character named \fIxxx\fP
 7.1	\fB\e\(**\fIx\fR,\fB\e\(**(\fIxx\fR,\fB\e\(**[\fIxxx\fB]\fR	Interpolate string \fIx\fR, \fIxx\fR, or \fIxxx\fR
 13	\fB\e:\fR	Optional line-break character
+10.2	\fB\e;\fR	Ligature suppressor
 9.1	\fB\ea\fR	Non-interpreted leader character
 12.3	\fB\eb\fI\'abc...\'\fR	Bracket building function
 4.2	\fB\ec\fR	Interrupt text processing
@@ -2383,21 +2384,6 @@ If the characters appear in input afterwards,
 they are searched in other fonts using the fallback sequence.
 This is useful e.g. for combining characters from a regular
 and a Type\ 1 expert font.
-.bt
-.lg 0
-\fB&flig\fI|F|N\fR	font-speci\(fic	ignored	T	De\(fines the set of
-ligatures to be used with font \fIF\fR.
-.lg
-\fIN\fR is the sum of the values 1 for ff, 2 for
-fi, 4 for fl, 8 for ffi, and 16 for ffl.
-.lg 0
-Thus \fB&flig R 31\fR
-.lg
-enables all these ligatures in font \fBR\fR. The default is specific
-to a font and is determined from its metrics file. Enabling
-the ff, ffi, and ffl ligatures with \*(PS Type\ 1 fonts
-usually requires an expert font that has been selected for
-character substitution using the \fBfallback\fR request.
 .bt
 \fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
 of the space character in font \fIF\fR to \fIN\fR,
@@ -3457,12 +3443,22 @@ but is often a subset of
 \fB\(fi\fR, \fB\(fl\fR, \fB\(ff\fR, \fB\(Fi\fR, and \fB\(Fl\fR.
 They may be input (even in \*(NR) by
 \fB\e(fi\fR, \fB\e(fl\fR, \fB\e(ff\fR, \fB\e(Fi\fR, and \fB\e(Fl\fR respectively.
-In \*[TR,] the \fBflig\fR request (\(sc2) specifies the set of ligatures
+In \*[TR,] the \fBflig\fR request specifies the set of ligatures
 available with an individual font.
 .lg
 The ligature mode is normally on in \*[TR,] and \fIautomatically\fR invokes 
 ligatures during input.
+At most the five named ligatures are enabled by default.
+.pg
+The ligature suppressor \fB\e;\fR
+disables automatic ligature building
+if it is placed between two characters,
+but has no other effects.
+Many other escape sequences,
+.tr &&
+e.g. \fB\e&\fR, \fB\e%\fR, also disable automatic ligature building.
 .h1
+.tr &.
 .bt
 \fB&lg\fI|N\fR	off;|on	on	\(en	Ligature mode
 is turned on if \fIN\fR is absent or non-zero,
@@ -3472,6 +3468,36 @@ Ligature mode is inhibited for
 request, macro, string, register, or file names,
 and in \fIcopy mode\fR.
 No effect in \*[NR.]
+.bt
+.lg 0
+\fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fines the set of
+ligatures to be used with font \fIF\fR.
+.lg
+\fIstring\fR may consist of up to four characters;
+its exact occurences are substituted by the character \fIc\fR
+whenever the current font is \fIF\fR.
+If \fIstring\fR starts with a minus sign,
+ligature subtitution for it is disabled;
+the \fIc\fR argument must not be present in this case.
+It is required that any substring of \fIstring\fR
+that consists of two or more characters
+is also defined as a ligature.
+Multiple \fIstring/c\fR pairs may be given.
+.lg 0
+As a special case,
+\fB&flig \fIF\fB 0\fR disables all ligatures for font \fIF\fR.
+.lg
+The default set of ligatures is specific
+to a font and is determined from its metrics file.
+.xx
+.lg 0
+As examples,
+\fB&flig R Th \e[T_h]\fR
+.lg
+enables a ligature for ``Th'' in font \fBR\fR,
+and
+\fB&flig R \-Th\fR
+disables it.
 .sc
 Backspacing, underlining, overstriking, etc.
 Unless in \fIcopy mode\fR, the \s-1ASCII\s+1 backspace character is replaced
@@ -3893,7 +3919,7 @@ respectively of a word are not split off.
 These values are additive;
 i.|e. \fIN=\fR\|14 will invoke all three restrictions.
 .bt
-\fB&hylang\fI|name\fR	off	off	\(en	Sets the hyphenation language
+\fB&hylang\fI|name\fR	off	off	E	Sets the hyphenation language
 to \fIname\fR, which is one of
 \fBde_DE\fR,
 \fBde_DE@traditional\fR,

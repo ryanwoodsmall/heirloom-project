@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.141 (gritter) 3/12/06
+ * Sccsid @(#)dpost.c	1.142 (gritter) 4/4/06
  */
 
 /*
@@ -3539,9 +3539,9 @@ put1 (
 
 
 static void
-oprep(void)
+oprep(int maysplit)
 {
-    if ( textcount > MAXSTACK )		/* don't put too much on the stack? */
+    if ( maysplit && textcount > MAXSTACK )		/* don't put too much on the stack? */
 	endtext();
 
     if ( font != lastfont || size != lastsize || subfont != lastsubfont ||
@@ -3903,9 +3903,11 @@ addchar (
  *
  */
 
+    static int	lastc;
 
     subfont = 0;
-    oprep();
+    oprep(lastc != '\\');
+    lastc = c;
     switch ( encoding )  {
 	case 0:
 	case 1:
@@ -3969,14 +3971,14 @@ addoctal (
  */
 
 
-    oprep();
+    oprep(1);
     if (c >= 128 && fontname[font].afm && fontname[font].afm->encmap) {
 	    c = fontname[font].afm->encmap[c - 128];
 	    subfont = c >> 8;
 	    c &= 0377;
     } else
 	    subfont = 0;
-    oprep();
+    oprep(1);
     switch ( encoding )  {
 	case 0:
 	case 1:
@@ -4055,7 +4057,7 @@ charlib (
 
 
     subfont = 0;
-    oprep();
+    oprep(1);
     endtext();
 
     if ( lastc < 128 )  {		/* just a simple ASCII character */

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.64 (gritter) 3/13/06
+ * Sccsid @(#)t10.c	1.65 (gritter) 4/2/06
  */
 
 /*
@@ -158,6 +158,10 @@ growfonts(int n)
 		for (j = 0; j < NCHARS; j++)
 			ftrtab[i][j] = j;
 	}
+	lgtab = realloc(lgtab, n * sizeof *lgtab);
+	memset(&lgtab[Nfont], 0, (n - Nfont) * sizeof *lgtab);
+	lgrevtab = realloc(lgrevtab, n * sizeof *lgrevtab);
+	memset(&lgrevtab[Nfont], 0, (n - Nfont) * sizeof *lgrevtab);
 	Nfont = n;
 }
 
@@ -216,8 +220,9 @@ ptinit(void)
 				fontlab[i] &= BYTEMASK;
 			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL,
 					1, SPEC_NONE);
-		} else
+		} else {
 			makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
+		}
 		p += 3 * nw + dev.nchtab + 128 - 32;
 	}
 	fontbase[0] = (struct Font *) p;	/* the last shall be first */
@@ -243,6 +248,8 @@ ptinit(void)
 	pts1 = pts2u(pts1);
 	ics = ICS;
 	specnames();	/* install names like "hyphen", etc. */
+	for (i = 0; i <= nfonts; i++)
+		setlig(i, fontbase[i]->ligfont);
 	kern = xflag;
 	if (ascii)
 		return;

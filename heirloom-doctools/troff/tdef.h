@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.68 (gritter) 2/19/06
+ * Sccsid @(#)tdef.h	1.72 (gritter) 4/3/06
  */
 
 /*
@@ -246,6 +246,10 @@ endif NROFF
 #define	isblbit(n)	((n) & BLBIT)
 #define	COPYBIT		(01ULL << 30)	/* wide character in copy mode */
 #define	iscopy(n)	((n) & COPYBIT)
+#define	AUTOLIG		(01ULL << 29)	/* ligature substituted automatically */
+#define	islig(n)	((n) & AUTOLIG)
+#define	DIBIT		(01ULL << 28)	/* written in a diversion */
+#define	isdi(n)		((n) & DIBIT)
 
 #define	SMASK		(037777777LL << 40)
 #define	FMASK		(0377LL << 32)
@@ -281,6 +285,10 @@ endif NROFF
 #define	COPYBIT	0x20000000	 /* wide character in copy mode */
 #define	iscopy(n)	((n) & COPYBIT)
 #define	ABSCHAR		0400	/* absolute char number in this font */
+#define	AUTOLIG	0		/* ligature substituted automatically */
+#define	islig(n)	((n) ? 0 : 0)
+#define	DIBIT	0		/* written in a diversion */
+#define	isdi(n)		((n) ? 0 : 0)
 
 #define	SMASK		(0037L << 24)
 #define	FMASK		(0377L << 16)
@@ -328,6 +336,7 @@ endif NROFF
 #define	TABBIT	02		/* bits in gchtab */
 #define	LDRBIT	04
 #define	FCBIT	010
+#define	LGBIT	020
 
 #define	PAIR(A,B)	(A|(B<<BYTE))
 
@@ -431,6 +440,13 @@ extern int	c_boxrule;
 extern int	c_lefthand;
 extern int	c_dagger;
 
+struct lgtab {
+	struct lgtab	*next;
+	struct lgtab	*link;
+	int	from;
+	int	to;
+};
+
 /*
  * <widec.h> includes <stdio.h> which defines
  * stderr. So undef it if it is already defined.
@@ -482,6 +498,7 @@ struct	d {	/* diversion */
 	int	maxl;
 	int	hnl;
 	int	curd;
+	int	flss;
 };
 
 struct	s {	/* stack frame */
@@ -600,6 +617,8 @@ extern const struct numtab initnumtab[];
 #define	it	env._it
 #define	itmac	env._itmac
 #define	lnsize	env._lnsize
+#define	dicthnj	env._dicthnj
+#define	hyext	env._hyext
 #define	hyptr	env._hyptr
 #define	tabtab	env._tabtab
 #define	line	env._line
@@ -674,6 +693,8 @@ extern struct env {
 	int	_it;
 	int	_itmac;
 	int	_lnsize;
+	void	*_dicthnj;
+	int	_hyext;
 	tchar	*_hyptr[NHYP];
 	int	_tabtab[NTAB];
 	tchar	_line[LNSIZE];

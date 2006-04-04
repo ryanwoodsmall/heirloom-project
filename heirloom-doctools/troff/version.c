@@ -7,35 +7,35 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	6.34 (gritter) 3/26/06";
+	"@(#)/usr/ucb/otfdump.sl	6.40 (gritter) 4/4/06";
 #elif defined (DPOST)
-static const char sccsid[] USED = "@(#)dpost.sl  6.34 (gritter) 3/26/06";
-const char creator[] = "Heirloom Documentation Tools - dpost 6.34 (gritter) 3/26/06";
+static const char sccsid[] USED = "@(#)dpost.sl  6.40 (gritter) 4/4/06";
+const char creator[] = "Heirloom Documentation Tools - dpost 6.40 (gritter) 4/4/06";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	6.34 (gritter) 3/26/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	6.40 (gritter) 4/4/06";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	6.34 (gritter) 3/26/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	6.40 (gritter) 4/4/06";
 #endif	/* !DUMP, !NROFF */
-const char revision[] = "6.34";
+const char revision[] = "6.40";
 /* SLIST */
 /*
 calloc.c: * Sccsid @(#)calloc.c	1.3 (gritter) 8/26/05
-ext.h: * Sccsid @(#)ext.h	1.37 (gritter) 2/19/06
+ext.h: * Sccsid @(#)ext.h	1.39 (gritter) 4/3/06
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
 mallint.h: * Sccsid @(#)mallint.h	1.4 (gritter) 8/27/05
 malloc.c: * Sccsid @(#)malloc.c	1.3 (gritter) 8/26/05
-n1.c: * Sccsid @(#)n1.c	1.65 (gritter) 3/26/06
-n2.c: * Sccsid @(#)n2.c	1.14 (gritter) 12/19/05
-n3.c: * Sccsid @(#)n3.c	1.75 (gritter) 3/23/06
+n1.c: * Sccsid @(#)n1.c	1.67 (gritter) 4/3/06
+n2.c: * Sccsid @(#)n2.c	1.17 (gritter) 4/3/06
+n3.c: * Sccsid @(#)n3.c	1.76 (gritter) 4/3/06
 n4.c: * Sccsid @(#)n4.c	1.25 (gritter) 3/21/06
 n5.c: * Sccsid @(#)n5.c	1.39 (gritter) 3/13/06
-n7.c: * Sccsid @(#)n7.c	1.44 (gritter) 3/6/06
-n8.c: * Sccsid @(#)n8.c	1.19 (gritter) 2/19/06
-n9.c: * Sccsid @(#)n9.c	1.39 (gritter) 3/12/06
+n7.c: * Sccsid @(#)n7.c	1.45 (gritter) 4/2/06
+n8.c: * Sccsid @(#)n8.c	1.22 (gritter) 4/3/06
+n9.c: * Sccsid @(#)n9.c	1.40 (gritter) 4/2/06
 ni.c: * Sccsid @(#)ni.c	1.20 (gritter) 3/3/06
-nii.c: * Sccsid @(#)nii.c	1.24 (gritter) 2/19/06
+nii.c: * Sccsid @(#)nii.c	1.26 (gritter) 4/3/06
 suftab.c: * Sccsid @(#)suftab.c	1.4 (gritter) 8/16/05
-tdef.h: * Sccsid @(#)tdef.h	1.68 (gritter) 2/19/06
+tdef.h: * Sccsid @(#)tdef.h	1.72 (gritter) 4/3/06
 nroff.d/n10.c: * Sccsid @(#)n10.c	1.23 (gritter) 3/22/06
 nroff.d/n6.c: * Sccsid @(#)n6.c	1.32 (gritter) 3/26/06
 nroff.d/proto.h: * Sccsid @(#)proto.h	1.31 (gritter) 3/13/06
@@ -47,10 +47,10 @@ troff.d/draw.c: * Sccsid @(#)draw.c	1.3 (gritter) 8/8/05
 troff.d/makedev.c: * Sccsid @(#)makedev.c	1.12 (gritter) 3/10/06
 troff.d/otf.c: * Sccsid @(#)otf.c	1.52 (gritter) 3/17/06
 troff.d/otfdump.c: * Sccsid @(#)otfdump.c	1.15 (gritter) 3/16/06
-troff.d/proto.h: * Sccsid @(#)proto.h	1.39 (gritter) 3/13/06
-troff.d/t10.c: * Sccsid @(#)t10.c	1.64 (gritter) 3/13/06
-troff.d/t6.c: * Sccsid @(#)t6.c	1.131 (gritter) 3/26/06
-troff.d/troff.h: * Sccsid @(#)troff.h	1.21 (gritter) 2/5/06
+troff.d/proto.h: * Sccsid @(#)proto.h	1.40 (gritter) 4/2/06
+troff.d/t10.c: * Sccsid @(#)t10.c	1.65 (gritter) 4/2/06
+troff.d/t6.c: * Sccsid @(#)t6.c	1.134 (gritter) 4/4/06
+troff.d/troff.h: * Sccsid @(#)troff.h	1.22 (gritter) 4/2/06
 troff.d/unimap.c: * Sccsid @(#)unimap.c	1.13 (gritter) 2/16/06
 troff.d/unimap.h: * Sccsid @(#)unimap.h	1.2 (gritter) 12/22/05
 libhnj/hnjalloc.c: * Sccsid @(#)hnjalloc.c	1.3 (gritter) 8/26/05
@@ -61,7 +61,7 @@ troff.d/dpost.d/asciitype.c:	Sccsid @(#)asciitype.c	1.4 (gritter) 4/17/03
 troff.d/dpost.d/asciitype.h:	Sccsid @(#)asciitype.h	1.6 (gritter) 9/9/05	
 troff.d/dpost.d/color.c: * Sccsid @(#)color.c	1.5 (gritter) 11/29/05
 troff.d/dpost.d/comments.h: * Sccsid @(#)comments.h	1.5 (gritter) 8/23/05
-troff.d/dpost.d/dpost.c: * Sccsid @(#)dpost.c	1.141 (gritter) 3/12/06
+troff.d/dpost.d/dpost.c: * Sccsid @(#)dpost.c	1.142 (gritter) 4/4/06
 troff.d/dpost.d/dpost.h: * Sccsid @(#)dpost.h	1.6 (gritter) 10/1/05
 troff.d/dpost.d/dpost_afm.c: * Sccsid @(#)dpost_afm.c	1.2 (gritter) 9/29/05
 troff.d/dpost.d/dpost_draw.c: * Sccsid @(#)dpost_draw.c	1.5 (gritter) 11/28/05

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.65 (gritter) 3/26/06
+ * Sccsid @(#)n1.c	1.67 (gritter) 4/3/06
  */
 
 /*
@@ -102,6 +102,7 @@ char	*mbbuf1p = mbbuf1;
 wchar_t	twc = 0;
 #endif	/* EUC */
 
+static void initg(void);
 static void printlong(long, int);
 static void printn(long, long);
 static char *sprintlong(char *s, long, int);
@@ -134,6 +135,7 @@ main(int argc, char **argv)
 	grownumtab();
 	growpbbuf();
 	morechars(1);
+	initg();
 	for (j = 0; j <= NSO; j++)
 		cfpid[j] = -1;
 	if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
@@ -869,8 +871,8 @@ rtn:
  * in getchar, viz FLSS, RPT, f, \b, \n, fc, tabch, ldrch
  */
 
-char
-gchtab[] = {
+static char
+_gchtab[] = {
 	000,004,000,000,010,000,000,000, /* fc, ldr */
 	001,002,001,000,001,000,000,000, /* \b, tab, nl, RPT */
 	000,000,000,000,000,000,000,000,
@@ -888,6 +890,12 @@ gchtab[] = {
 	000,000,000,000,000,000,000,000,
 	000,000,000,000,000,000,000,000,
 };
+
+static void
+initg(void)
+{
+	memcpy(gchtab, _gchtab, sizeof _gchtab);
+}
 
 tchar
 getch(void)
@@ -925,12 +933,7 @@ g0:
 		return(i);
 	k = cbits(i);
 	if (k != ESC) {
-		/*
-		 * gchtab[] has only 128 entries
-		 * if k is out of the range, it should be
-		 * handled as gchtab[k] == 0
-		 */
-		if (!isascii(k) || gchtab[k]==0)
+		if (gchtab[k]==0)
 			return(i);
 		if (k == '\n') {
 			if (cbits(i) == '\n')
@@ -952,7 +955,7 @@ g0:
 			goto g0;
 		}
 		if (!copyf) {
-			if (k == 'f' && lg && !lgf) {
+			if (gchtab[k]&LGBIT && !isdi(i) && lg && !lgf) {
 				i = getlg(i);
 				return(i);
 			}
@@ -1159,6 +1162,10 @@ gx:
 	case 'r':	/* full em up */
 	case 'd':	/* half em down */
 		return(sethl(k));
+	case ';':	/* ligature suppressor (only) */
+		if (xflag)
+			goto g0;
+		/*FALLTHRU*/
 	default:
 		if (warn & WARN_ESCAPE)
 			errprint("undefined escape sequence \\%c", k);

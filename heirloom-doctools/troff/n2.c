@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.14 (gritter) 12/19/05
+ * Sccsid @(#)n2.c	1.17 (gritter) 4/3/06
  */
 
 /*
@@ -154,6 +154,12 @@ pchar1(register tchar i)
 
 	j = cbits(i);
 	if (dip != &d[0]) {
+		if (i == FLSS)
+			dip->flss++;
+		else if (dip->flss > 0)
+			dip->flss--;
+		else if (!ismot(i) && cbits(i) > 32)
+			i |= DIBIT;
 		wbf(i);
 		dip->op = offset;
 		return;
@@ -178,12 +184,44 @@ pchar1(register tchar i)
 }
 
 #ifndef	NROFF
+static void
+outmb(tchar i)
+{
+	extern int nchtab;
+	int j = cbits(i);
+#ifdef	EUC
+	wchar_t	wc;
+	char	mb[MB_LEN_MAX+1];
+	int	n;
+#endif	/* EUC */
+
+	if (j < 0177) {
+		oput(j);
+		return;
+	}
+#ifdef	EUC
+	wc = tr2un(j, fbits(i));
+	if (wc != -1 && (n = wctomb(mb, wc)) > 0) {
+		mb[n] = 0;
+		oputs(mb);
+	} else
+#endif	/* EUC */
+	if (j < 128 + nchtab) {
+		oput('\\');
+		oput('(');
+		oput(chname[chtab[j-128]]);
+		oput(chname[chtab[j-128]+1]);
+	}
+}
+
 void
 outascii (	/* print i in best-guess ascii */
     tchar i
 )
 {
 	int j = cbits(i);
+	int f = fbits(i);
+	int k;
 
 	if (j == FILLER)
 		return;
@@ -201,37 +239,13 @@ outascii (	/* print i in best-guess ascii */
 		oput('-');
 	else if (j == XON)
 		oputs("\\X");
-	else if (j == LIG_FI)
-		oputs("fi");
-	else if (j == LIG_FL)
-		oputs("fl");
-	else if (j == LIG_FF)
-		oputs("ff");
-	else if (j == LIG_FFI)
-		oputs("ffi");
-	else if (j == LIG_FFL)
-		oputs("ffl");
-	else if (j == WORDSP)
+	else if (islig(i) && lgrevtab && lgrevtab[f] && lgrevtab[f][j]) {
+		for (k = 0; lgrevtab[f][j][k]; k++)
+			outmb(i & SFMASK | lgrevtab[f][j][k]);
+	} else if (j == WORDSP)
 		;	/* nothing at all */
-	else if (j > 0177) {
-		extern int nchtab;
-#ifdef	EUC
-		wchar_t	wc;
-		char	mb[MB_LEN_MAX+1];
-		int	n;
-		wc = tr2un(j, fbits(i));
-		if (wc != -1 && (n = wctomb(mb, wc)) > 0) {
-			mb[n] = 0;
-			oputs(mb);
-		} else
-#endif	/* EUC */
-		if (j < 128 + nchtab) {
-			oput('\\');
-			oput('(');
-			oput(chname[chtab[j-128]]);
-			oput(chname[chtab[j-128]+1]);
-		}
-	}
+	else if (j > 0177)
+		outmb(i);
 }
 #endif
 

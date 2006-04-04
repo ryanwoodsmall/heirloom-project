@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.13 (gritter) 3/24/06
+.\" Sccsid @(#)doc.tr	2.15 (gritter) 4/5/06
 .do xflag 3
 .warn
 .spreadwarn .5c
@@ -29,6 +29,7 @@
 .	fp 0 T GaramondPremrPro-Subh otf
 .	kernpair T F T F 25
 .	kernpair SC R SC \[i.sc] 40
+.	flig R ft \[f_t.alt]
 .	ds Ornament \v'-.25m'\s9\[orn.01]\s0
 .\}
 .feature R +pnum +onum
@@ -197,7 +198,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-3/24/06
+4/5/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -361,7 +362,7 @@ Features such as ``aalt'' or ``ornm'' which only map sets of very special
 characters to different positions are normally not useful with \*(TR since
 these characters can be accessed directly
 using ``\[backslash][name]'' escape sequences
-anyway. To make an individual alternate character the default, the ``.ftr''
+anyway. To make an individual alternate character the default, the ``.f\;tr''
 request can be used:
 .EX
 &do xflag 3
@@ -372,9 +373,9 @@ request can be used:
 .EE
 .P
 Feature mappings result in changes to the same internal data structures as
-the ``.ftr'' request. It is thus possible to make adjustments to mappings by
-using ``.ftr'' after ``.feature'', or to create personalized variants by using
-``.ftr'' based on the data obtained from ``otfdump \[minus]s''.
+the ``.f\;tr'' request. It is thus possible to make adjustments to mappings by
+using ``.f\;tr'' after ``.feature'', or to create personalized variants by using
+``.f\;tr'' based on the data obtained from ``otfdump \[minus]s''.
 .P
 The ``.feature'' request must still be active for a font
 when a character is printed;
@@ -486,12 +487,13 @@ request in combination with the fallback sequence:
 &fp 1 \fCR\fN gdrg____ pfb
 &fp 0 \fCE\fN gerg____ pfb
 &fallback \fCR E\fN
-&flig \fCR\fN 31
+&flig \fCR\fN ff \e(ff ffi \e(Fi ffl \e(Fl
 e\(ffective o\(Fice o\(Fline
 .EE
 .P
 OpenType fonts usually do contain all ligatures that \*(TR substitutes
-automatically, so no special procedure needs to be applied.
+by default, so no special procedure needs to be applied
+unless other ligatures are to be activated in addition.
 .S "Combining different fonts"
 .P
 Different fonts often have different visual sizes even if they are set
@@ -569,7 +571,7 @@ achieve matching visual letter spacing.
 .P
 It is sometimes useful to add a certain amount of space whenever a
 character appears, for example before ``;'' or ``?'', or on the inner
-sides of guillemots in French/Swiss style. The ``.kernafter'' and
+sides of guillemots in French/Swiss style. The ``.kernaf\;ter'' and
 ``.kernbefore'' requests are useful for this:
 .EX
 &do xflag 3

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.19 (gritter) 2/19/06
+ * Sccsid @(#)n8.c	1.22 (gritter) 4/3/06
  */
 
 /*
@@ -72,8 +72,6 @@ int	*nexth;
 tchar	*hyend;
 #define THRESH 160 /*digram goodness threshold*/
 int	thresh = THRESH;
-
-static	HyphenDict	*dicthnj;
 
 static	void		hyphenhnj(void);
 
@@ -180,8 +178,15 @@ alph(tchar j)
 	int i = cbits(j);
 #ifndef	NROFF
 #ifdef	EUC
+	int f = fbits(j);
 	if (!ismot(j) && i & ~0177) {
-		int	u = tr2un(i, fbits(j));
+		int	u;
+		if (islig(j) && hyext &&
+				lgrevtab && lgrevtab[f] && lgrevtab[f][i])
+			return 1;
+		u = tr2un(i, f);
+		if (u == 0x017F)	/* longs */
+			u = 's';
 		return hyext ? iswalnum(u) : iswalpha(u);
 	} else
 #endif	/* EUC */
@@ -353,6 +358,8 @@ maplow(register int i, int f)
 #ifdef	EUC
 	if (!ismot(i) && i & ~0177) {
 		i = tr2un(i, f);
+		if (i == 0x017F)	/* longs */
+			i = 's';
 		if (iswupper(i))
 			i = towlower(i);
 	} else
@@ -452,8 +459,6 @@ casehylang(void)
 	int	c, i = 0, sz = 0;
 	char	*file = NULL, *path = NULL;
 
-	if (dicthnj)
-		hnj_hyphen_free(dicthnj);
 	dicthnj = NULL;
 	hyext = 0;
 	skip(0);
@@ -485,84 +490,89 @@ casehylang(void)
 	hyext = 1;
 }
 
+static int
+addc(int m, char **cp, tchar **wp, int **wpp, int distance)
+{
+#ifdef	NROFF
+	if (m & ~0177)
+		return 0;
+	m = maplow(m, fbits(*(*wp)));
+	*(*cp)++ = m;
+	*(*wpp)++ = distance;
+#else
+	m = maplow(m, fbits(*(*wp)));
+	if (m > 0 && m <= 0x7f) {
+		*(*cp)++ = m;
+		*(*wpp)++ = distance;
+	} else if (m >= 0x80 && m <= 0x7ff) {
+		*(*cp)++ = m >> 6 & 037 | 0300;
+		*(*wpp)++ = distance;
+		*(*cp)++ = m & 077 | 0200;
+		*(*wpp)++ = -1000;
+	} else if (m >= 0x800 && m <= 0xffff) {
+		*(*cp)++ = m >> 12 & 017 | 0340;
+		*(*wpp)++ = distance;
+		*(*cp)++ = m >> 6 & 077 | 0200;
+		*(*wp)++ = -1000;
+		*(*cp)++ = m & 077 | 0200;
+		*(*wpp)++ = -1000;
+	} else
+		return 0;
+#endif
+	return 1;
+}
+
 static void
 hyphenhnj(void)
 {
 	tchar	*wp;
-	char	cb[3*WDSIZE+1], *cp, hb[3*WDSIZE+1];
-	int	wpos[3*WDSIZE+1], *wpp;
-	int	i, j, m;
+	char	*cb, *cp, *hb;
+	int	*wpos, *wpp;
+	int	f, i, j, k, m;
 
+	i = 12 * (wdend - wdstart) + 1;
+	cb = malloc(i * sizeof *cb);
+	hb = malloc(i * sizeof *hb);
+	wpos = malloc(i * sizeof *wpos);
 	cp = cb;
 	wpp = wpos;
-	for (wp = wdstart; wp <= wdend; wp++)
-		if (cp < &cb[sizeof cb - 1]) {
-			m = cbits(*wp);
-			if (m == LIG_FI) {
-				*cp++ = 'f';
-				*wpp++ = wp - wdstart;
-				*cp++ = 'i';
-				*wpp++ = -1;
-			} else if (m == LIG_FL) {
-				*cp++ = 'f';
-				*wpp++ = wp - wdstart;
-				*cp++ = 'l';
-				*wpp++ = -1;
-			} else if (m == LIG_FF) {
-				*cp++ = 'f';
-				*wpp++ = wp - wdstart;
-				*cp++ = 'f';
-				*wpp++ = -1;
-			} else if (m == LIG_FFI) {
-				*cp++ = 'f';
-				*wpp++ = wp - wdstart;
-				*cp++ = 'f';
-				*wpp++ = -1;
-				*cp++ = 'i';
-				*wpp++ = -1;
-			} else if (m == LIG_FFL) {
-				*cp++ = 'f';
-				*wpp++ = wp - wdstart;
-				*cp++ = 'f';
-				*wpp++ = -1;
-				*cp++ = 'l';
-				*wpp++ = -1;
-			} else {
-#ifdef	NROFF
-				if (m & ~0177)
-					return;
-				m = maplow(m, fbits(*wp));
-				*cp++ = m;
-				*wpp++ = wp - wdstart;
-#else
-				m = maplow(m, fbits(*wp));
-				if (m > 0 && m <= 0x7f) {
-					*cp++ = m;
-					*wpp++ = wp - wdstart;
-				} else if (m >= 0x80 && m <= 0x7ff) {
-					*cp++ = m >> 6 & 037 | 0300;
-					*wpp++ = wp - wdstart;
-					*cp++ = m & 077 | 0200;
-					*wpp++ = -1;
-				} else if (m >= 0x800 && m <= 0xffff) {
-					*cp++ = m >> 12 & 017 | 0340;
-					*wpp++ = wp - wdstart;
-					*cp++ = m >> 6 & 077 | 0200;
-					*wp++ = -1;
-					*cp++ = m & 077 | 0200;
-					*wpp++ = -1;
-				} else
-					return;
-#endif
+	for (wp = wdstart; wp <= wdend; wp++) {
+		m = cbits(*wp);
+		f = fbits(*wp);
+#ifndef	NROFF
+		if (islig(*wp) && lgrevtab && lgrevtab[f] && lgrevtab[f][m]) {
+			for (i = 0; lgrevtab[f][m][i]; i++) {
+				if (addc(lgrevtab[f][m][i], &cp, &wp, &wpp,
+						i ? -i : wp-wdstart) == 0)
+					goto retn;
 			}
+		} else
+#endif
+		{
+			if (addc(m, &cp, &wp, &wpp, wp - wdstart) == 0)
+				goto retn;
 		}
+	}
 	*cp = '\0';
 	j = cp - cb;
 	hnj_hyphen_hyphenate(dicthnj, cb, j, hb);
-	for (i = 0; i < j; i++)
-		if (hb[i] - '0' & 1 && wpos[i+1] >= 0) {
-			*hyp++ = &wdstart[wpos[i+1]];
-			if (hyp > (hyptr + NHYP - 1))
+	k = 0;
+	for (i = 0; i < j; i++) {
+		if (wpos[i+1] >= 0)
+			k = wpos[i+1];
+		if (hb[i] - '0' & 1 && wpos[i+1] >= -3) {
+			if (wpos[i+1] >= 0)
+				*hyp = &wdstart[wpos[i+1]];
+			else {
+				*hyp = &wdstart[wpos[k]];
+				*hyp = (void *)((intptr_t)*hyp | -wpos[i+1]);
+			}
+			if (++hyp > (hyptr + NHYP - 1))
 				hyp = hyptr + NHYP - 1;
 		}
+	}
+retn:
+	free(cb);
+	free(hb);
+	free(wpos);
 }

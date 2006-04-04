@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.44 (gritter) 3/6/06
+ * Sccsid @(#)n7.c	1.45 (gritter) 4/2/06
  */
 
 /*
@@ -713,8 +713,12 @@ int
 movword(void)
 {
 	register int w;
-	register tchar i, *wp, c, *lp, *lastlp, lasti = 0;
+	register tchar i, *wp, c, *lp, *lastlp, lasti = 0, *tp;
 	int	savwch, hys, stretches = 0;
+#ifndef	NROFF
+	tchar	lgs, lge;
+	int	*ip, s, lgw;
+#endif
 
 	over = 0;
 	wp = wordp;
@@ -757,14 +761,17 @@ movword(void)
 	while (*hyp && *hyp <= wp)
 		hyp++;
 	while (wch) {
-		if (hyoff != 1 && *hyp == wp) {
-			hyp++;
+		tp = (tchar *)((intptr_t)*hyp & ~(intptr_t)03);
+		if (hyoff != 1 && tp == wp) {
 			if (!wdstart || (wp > wdstart + 1 && wp < wdend &&
 			   (!(hyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
 			   (!(hyf & 010) || wp > wdstart + 2))) {	/* 010 => 1st 2 */
 				nhyp++;
-				storeline((tchar)IMP, 0);
+				i = IMP;
+				setsbits(i, (intptr_t)*hyp & 03);
+				storeline(i, 0);
 			}
+			hyp++;
 		}
 		i = *wp++;
 		w = width(i);
@@ -793,8 +800,28 @@ m1:
 		if (wch == savwch)
 			goto m4;
 	}
-	if (*--linep != IMP)
+	if (cbits(*--linep) != IMP)
 		goto m5;
+#ifndef	NROFF
+	if ((s = sbits(*linep)) != 0) {
+		i = *(linep + 1);
+		if ((ip = lgrevtab[fbits(i)][cbits(i)]) == NULL)
+			goto m5;
+		lgs = strlg(fbits(i), ip, s) | i & SFMASK | AUTOLIG;
+		for (w = 0; ip[s+w]; w++);
+		lge = strlg(fbits(i), &ip[s], w) | i & SFMASK | AUTOLIG;
+		lgw = width(lgs);
+		if (linep - 1 >= wordp) {
+			lgw += kernadjust(i, *(linep - 1));
+			lgw -= kernadjust(*(linep + 1), *(linep - 1));
+		}
+		hys += lgw;
+	} else {
+		lgs = 0;
+		lge = 0;
+		lgw = 0;
+	}
+#endif	/* !NROFF */
 	if (!(--nhyp))
 		if (!nwd)
 			goto m2;
@@ -803,6 +830,12 @@ m1:
 		goto m1;
 	}
 m2:
+#ifndef	NROFF
+	if (lgs != 0) {
+		*wp = lge;
+		storeline(lgs, lgw);
+	}
+#endif	/* !NROFF */
 	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH &&
 			(*(linep - 1) & BLBIT) == 0) {
 		*linep = (*(linep - 1) & SFMASK) | HYPHEN;
@@ -821,7 +854,7 @@ m4:
 	return(1);	/* line filled up */
 m5:
 	nc--;
-	for (lp = &linep[1]; lp < lastlp && *lp == IMP; lp++);
+	for (lp = &linep[1]; lp < lastlp && cbits(*lp) == IMP; lp++);
 	w = width(*linep);
 	w += kernadjust(*linep, *lp ? *lp : ' ' | *linep&SFMASK);
 	ne -= w;

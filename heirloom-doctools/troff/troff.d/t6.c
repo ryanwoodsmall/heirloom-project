@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.131 (gritter) 3/26/06
+ * Sccsid @(#)t6.c	1.134 (gritter) 4/4/06
  */
 
 /*
@@ -84,6 +84,8 @@ int	**rhangtab;
 int	**kernafter;
 int	**kernbefore;
 int	**ftrtab;
+struct lgtab	**lgtab;
+int	***lgrevtab;
 struct tracktab	*tracktab;
 int	sbold = 0;
 int	kern = 0;
@@ -95,7 +97,6 @@ width(register tchar j)
 {
 	register int i, k;
 
-	lasttrack = 0;
 	if (j & (ZBIT|MOT)) {
 		if (iszbit(j))
 			return(0);
@@ -121,6 +122,7 @@ width(register tchar j)
 	i = ftrans(fbits(j), i);
 	if (i < 32)
 		return(0);
+	lasttrack = 0;
 	if (sfbits(j) == oldbits) {
 		xfont = pfont;
 		xpts = ppts;
@@ -984,35 +986,57 @@ tchar makem(register int i)
 tchar getlg(tchar i)
 {
 	tchar j, k;
-	register int lf;
-	int f;
+	struct lgtab *lp;
+	int c, f, n, lgn;
 
 	f = fbits(i);
-	if ((lf = fontbase[f]->ligfont) == 0) /* font lacks ligatures */
+	if (lgtab[f] == NULL)	/* font lacks ligatures */
 		return(i);
-	j = getch0();
-	if (cbits(j) == 'i' && (lf & LFI))
-		j = LIG_FI;
-	else if (cbits(j) == 'l' && (lf & LFL))
-		j = LIG_FL;
-	else if (cbits(j) == 'f' && (lf & LFF)) {
-		if ((lf & (LFFI|LFFL)) && lg != 2) {
-			k = getch0();
-			if (cbits(k)=='i' && (lf&LFFI))
-				j = LIG_FFI;
-			else if (cbits(k)=='l' && (lf&LFFL))
-				j = LIG_FFL;
-			else {
-				pbbuf[pbp++] = k;
-				j = LIG_FF;
-			}
-		} else 
-			j = LIG_FF;
-	} else {
-		pbbuf[pbp++] = j;
-		j = i;
+	c = cbits(i);
+	lp = &lgtab[f][c];
+	if (lp->from != c || (lp = lp->link) == NULL)
+		return(i);
+	k = i;
+	n = 1;
+	lgn = lg == 2 ? 2 : 1000;
+	for (;;) {
+		j = getch0();
+		c = cbits(j);
+		while (lp != NULL && lp->from != c)
+			lp = lp->next;
+		if (lp == NULL || lp->to == 0) {
+			pbbuf[pbp++] = j;
+			return(k);
+		}
+		k = i & SFMASK | lp->to | AUTOLIG;
+		if (lp->link == NULL || ++n > lgn)
+			return(k);
+		lp = lp->link;
 	}
-	return(i & SFMASK | j);
+}
+
+int
+strlg(int f, int *tp, int n)
+{
+	struct lgtab	*lp;
+	int	i;
+
+	if (n == 1)
+		return tp[0];
+	if (lgtab[f] == NULL)
+		return 0;
+	lp = &lgtab[f][tp[0]];
+	if (lp->from != tp[0])
+		return 0;
+	for (i = 1; i < n; i++) {
+		if ((lp = lp->link) == NULL)
+			return 0;
+		while (lp != NULL && lp->from != tp[i])
+			lp = lp->next;
+		if (lp == NULL || lp->to == 0)
+			return 0;
+	}
+	return lp->to;
 }
 
 void
@@ -1025,32 +1049,227 @@ caselg(void)
 	lg = atoi();
 }
 
-void
-caseflig(void)
+static void
+addlig(int f, tchar *from, tchar to)
 {
 	int	i, j;
+	struct lgtab	*lp;
 
-	if (skip(1))
+	if (from[0] == 0 || from[1] == 0) {
+		if (warn & WARN_FONT)
+			errprint("short ligature has no effect");
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
-	if ((j = findft(i, 1)) < 0 || skip(1))
-		return;
-	fontbase[j]->ligfont = atoi() & 037;
+	}
+	if (lgtab[f] == NULL)
+		lgtab[f] = calloc(NCHARS, sizeof **lgtab);
+	i = cbits(from[0]);
+	gchtab[i] |= LGBIT;
+	lp = &lgtab[f][i];
+	lp->from = i;
+	j = 1;
+	for (;;) {
+		i = cbits(from[j]);
+		if (lp->link == NULL) {
+			if (from[j+1] != 0) {
+				if (warn & WARN_FONT)
+					errprint("ligature step missing");
+				return;
+			}
+			lp->link = calloc(1, sizeof *lp->link);
+			lp = lp->link;
+			lp->from = i;
+			lp->to = cbits(to);
+			break;
+		}
+		lp = lp->link;
+		if (++j >= 4) {
+			if (warn & WARN_FONT)
+				errprint("ignoring ligature of length >4");
+			return;
+		}
+		while (lp->from != i && lp->next)
+			lp = lp->next;
+		if (lp->from != i) {
+			if (from[j] != 0) {
+				if (warn & WARN_FONT)
+					errprint("ligature step missing");
+				return;
+			}
+			lp->next = calloc(1, sizeof *lp->next);
+			lp = lp->next;
+			lp->from = i;
+		}
+		if (from[j] == 0) {
+			lp->to = cbits(to);
+			break;
+		}
+	}
+	if (lgrevtab[f] == NULL)
+		lgrevtab[f] = calloc(NCHARS, sizeof **lgrevtab);
+	lgrevtab[f][to] = malloc((j+2) * sizeof ***lgrevtab);
+	j = 0;
+	while (lgrevtab[f][to][j] = cbits(from[j]))
+		j++;
 	/*
 	 * If the font still contains the charlib substitutes for ff,
 	 * Fi, and Fl, hide them. The ".flig" request is intended for
 	 * use in combination with expert fonts only.
 	 */
-	if (fontbase[j]->ligfont & LFF)
-		if (codetab[j][fitab[j][LIG_FF-32]] < 32)
-			fitab[j][LIG_FF-32] = 0;
-	if (fontbase[j]->ligfont & LFFI)
-		if (codetab[j][fitab[j][LIG_FFI-32]] < 32)
-			fitab[j][LIG_FFI-32] = 0;
-	if (fontbase[j]->ligfont & LFFL)
-		if (codetab[j][fitab[j][LIG_FFL-32]] < 32)
-			fitab[j][LIG_FFL-32] = 0;
+	if (to == LIG_FF)
+		if (codetab[f][fitab[f][LIG_FF-32]] < 32)
+			fitab[f][LIG_FF-32] = 0;
+	if (to == LIG_FFI)
+		if (codetab[f][fitab[f][LIG_FFI-32]] < 32)
+			fitab[f][LIG_FFI-32] = 0;
+	if (to == LIG_FFL)
+		if (codetab[f][fitab[f][LIG_FFL-32]] < 32)
+			fitab[f][LIG_FFL-32] = 0;
+}
+
+static void
+dellig(int f, tchar *from)
+{
+	struct lgtab	*lp, *lq;
+	int	i, j;
+
+	if (from[0] == 0 || from[1] == 0)
+		return;
+	if (lgtab[f] == NULL)
+		return;
+	i = cbits(from[0]);
+	lp = lq = &lgtab[f][i];
+	j = 1;
+	for (;;) {
+		i = cbits(from[j]);
+		if (lp->link == NULL)
+			break;
+		lq = lp;
+		lp = lp->link;
+		while (lp->from != i && lp->next) {
+			lq = lp;
+			lp = lp->next;
+		}
+		if (lp->from != i)
+			break;
+		if (from[++j] == 0) {
+			if (lq->link == lp)
+				lq->link = lp->next;
+			else if (lq->next == lp)
+				lq->next = lp->next;
+			if (lp->link)
+				if (warn & WARN_FONT)
+					errprint("deleted ligature cuts chain");
+			free(lgrevtab[f][lp->to]);
+			lgrevtab[f][lp->to] = NULL;
+			free(lp);
+		}
+	}
+}
+
+void
+setlig(int f, int j)
+{
+	tchar	from[4], to;
+
+	free(lgrevtab[f]);
+	lgrevtab[f] = NULL;
+	free(lgtab[f]);
+	lgtab[f] = NULL;
+	from[0] = 'f';
+	from[2] = from[3] = 0;
+	from[1] = 'f';
+	to = LIG_FF;
+	if (j & LFF)
+		addlig(f, from, to);
+	from[1] = 'i';
+	to = LIG_FI;
+	if (j & LFI)
+		addlig(f, from, to);
+	from[1] = 'l';
+	to = LIG_FL;
+	if (j & LFL)
+		addlig(f, from, to);
+	from[1] = 'f';
+	from[2] = 'i';
+	to = LIG_FFI;
+	if (j & LFFI)
+		addlig(f, from, to);
+	from[2] = 'l';
+	to = LIG_FFL;
+	if (j & LFFL)
+		addlig(f, from, to);
+}
+
+static int
+getflig(int f, int cnt)
+{
+	int	delete, allnum;
+	tchar	from[NC], to;
+	int	c, i, j;
+	char	number[NC];
+
+	if (skip(0))
+		return 0;
+	switch (cbits(c = getch())) {
+	case '-':
+		c = getch();
+		delete = 1;
+		break;
+	case '+':
+		c = getch();
+		/*FALLTHRU*/
+	default:
+		delete = 0;
+		break;
+	case 0:
+		return 0;
+	}
+	allnum = 1;
+	for (i = 0; i < sizeof from - 2; i++) {
+		from[i] = c;
+		j = cbits(c);
+		if (c == 0 || ismot(c) || j == ' ' || j == '\n') {
+			from[i] = 0;
+			ch = j;
+			break;
+		}
+		if (j < '0' || j > '9')
+			allnum = 0;
+		c = getch();
+	}
+	if (cnt == 0 && allnum == 1) {	/* backwards compatibility */
+		if (skip(0) == 0)
+			goto new;
+		for (j = 0; j <= i+1; j++)
+			number[j] = cbits(from[j]);
+		j = strtol(number, NULL, 10);
+		setlig(f, j);
+		return 0;
+	}
+	if (delete == 0) {
+		if (skip(1))
+			return 0;
+	new:	to = getch();
+		addlig(f, from, to);
+	} else
+		dellig(f, from);
+	return 1;
+}
+
+void
+caseflig(void)
+{
+	int	i, j;
+
+	lgf++;
+	if (skip(1))
+		return;
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 2);
+	if ((j = findft(i, 1)) < 0)
+		return;
+	i = 0;
+	while (getflig(j, i++) != 0);
 }
 
 void
@@ -1138,7 +1357,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 {
 	char longname[4096], *shortname, *ap;
 	char *fpout;
-	int nw;
+	int i, nw;
 
 	zapwcache(0);
 	if (truename)
@@ -1163,6 +1382,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 			&((char *)fontbase[pos])[sizeof(struct Font) + 2*nw],
 			&((char *)fontbase[pos])[sizeof(struct Font) + 3*nw],
 			nw);
+		setlig(pos, fontbase[pos]->ligfont);
 	}
 	if (pos == smnt) {
 		smnt = 0; 
@@ -1178,6 +1398,8 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	free(rhangtab[pos]);
 	rhangtab[pos] = NULL;
 	memset(&tracktab[pos], 0, sizeof tracktab[pos]);
+	for (i = 0; i < NCHARS; i++)
+		ftrtab[pos][i] = i;
 	kzap(pos);
 		/* if there is a directory, no place to store its name. */
 		/* if position isn't zero, no place to store its value. */
@@ -1529,6 +1751,9 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	free(rhangtab[nf]);
 	rhangtab[nf] = NULL;
 	memset(&tracktab[nf], 0, sizeof tracktab[nf]);
+	setlig(nf, a->Font.ligfont);
+	for (i = 0; i < NCHARS; i++)
+		ftrtab[nf][i] = i;
 	kzap(nf);
 	nafm++;
 	if (nf > nfonts)
