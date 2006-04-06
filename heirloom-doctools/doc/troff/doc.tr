@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.31 (gritter) 4/3/06
+.\" Sccsid @(#)doc.tr	1.32 (gritter) 4/6/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -81,7 +81,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/3/06
+.ds Sccsdate 4/6/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -168,9 +168,14 @@
 .de xx
 .sp 0.4
 ..
+.ev ht
+.evc 0
+.ev
 .de ht
+.ev ht
 .tl `\*(NR/\*(TR \fRUser's Manual``Heirloom Documentation Tools`
 .tl '\*[Date]'''\".tl 'Version \n(mo/\n(dy/\n(yr'''
+.ev
 ..
 .de hd
 .\".tl '\(rn'''
@@ -188,6 +193,11 @@
 .if dmx .mx
 .nr cl 0 1
 .mk
+..
+.rn bp barebp
+.de bp
+.nr nosave 1
+.barebp
 ..
 .de fz
 .fn
@@ -209,7 +219,35 @@
 .ie \\n[fopos]>=0 .chfo \\n[fopos]u+1v
 .el .chfo \\n[fopos]u-1v
 ..
+.nr savedline 0
 .de fo
+.ie (\\n[nosave]=0)&(\\n(2C=0) \{\
+.nr savedline 1
+.di savedline
+.dt 1v barefo
+.\}
+.el .barefo
+..
+.nr nosave 0
+.de restore
+.if \\n[savedline] \{\
+.mk curpos
+.ev restore
+.sp |\\n[curpos]u
+.nf
+.cc 
+savedline
+cc .
+.fi
+.ev
+.nr savedline 0
+.\}
+..
+.de barefo
+.if \\n[savedline] \{\
+.di
+.if (\\n(dl<(\\n(.l))&(\\n[nosave]=0) .restore \" orphan detected
+.\}
 .if dcx .cx
 .nr dn 0
 .if \\nx .xf
@@ -227,7 +265,8 @@
 .ps
 .nr S2 \\n(.s
 .ps 10
-'bp \}
+'barebp \}
+.restore
 ..
 .nr 2C 0
 .de 2C
@@ -259,7 +298,7 @@
 'ps \\n(PS
 .ft R
 'tl ''- % -''
-'bp
+'barebp
 ..
 .wh 0 hd
 .wh 12i fo
@@ -298,6 +337,7 @@
 .de h1
 .xx
 .ne 5
+.nr nosave 1
 .nf
 .ta \\nau \\nbu \\ncu \\ndu +\\neu
 .ft BI
@@ -313,10 +353,13 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .xx
 .ne 1.1
 .ti 0
+.nr nosave 0
 ..
 .de b1
 .br
 .ti 0
+.ie '\\$1'' .nr nosave 1
+.el .nr nosave \\$1
 ..
 .de pg
 .ft R
@@ -324,9 +367,12 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .in 0
 .xx
 .ne 1.1
+.nr nosave 0
 ..
 .de sc
+.ne 1
 .pg
+.nr nosave 1
 \fI\\*H\\np.\\n+s.\|\\c
 .ft R
 .ul
@@ -335,6 +381,11 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 ..
 .de sc-end
 .end 2
+.wh \\n(nlu+2v sc-post
+..
+.de sc-post
+.nr nosave 0
+.ch sc-post
 ..
 .de mh
 .nr s 0
@@ -343,6 +394,7 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .ne 2.5
 .ft B
 \\*H\\n+p.
+.nr nosave 1
 .it 1 mh-end
 .di head
 ..
@@ -372,11 +424,12 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .de EM
 .br
 \&\c
-'bp
+'barebp
 .pl 2i
 ..
 .em EM
 .de TS
+.nr nosave 1
 .sp
 ..
 .de T&
@@ -669,6 +722,7 @@ a reference manual;
 tutorial examples;
 and a list of commonly-available characters.
 .pg
+.nr nosave 1
 .ft B
 Acknowledgements (for the Second Edition, by Brian Kernighan)
 .pg
@@ -764,6 +818,7 @@ in [1].
 [8]	<http://plan9.bell-labs.com/plan9>
 'in 0
 .pg
+.nr nosave 1
 .bp
 .Bookmark 0 Usage
 .ft B
@@ -961,6 +1016,7 @@ e.g. \fB\-Mcut:reg\fR will print cut marks and registration marks.
 .ll 6.5i
 .in 0
 .bp
+.nr nosave 1
 .ps \n(PS
 .tr |
 .ce
@@ -1054,9 +1110,9 @@ Also \fB\ef\fIx\fR,\|\fB\ef(\fIxx\fR,\|\fB\ef\fIN\fR.
 \fB&feature\fI|F|\(+-name|...\fR	ignored	O,T	Controls OpenType features.
 .b1
 \fB&fallback\fI|F|A|B|...\fR	ignored	O,T	Selects the fallback sequence for font \fIF\fR.
-.b1
+.b1 0
 \fB&hidechar\fI|F|c|d|...\fR	ignored	O,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
-.b1
+.b1 0
 \fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
 of the space character in font \fIF\fR to \fIN\fR.
 .mh
@@ -1082,9 +1138,9 @@ Eject current page; next page number \fIN\fR.
 \fB&po\fI|\(+-N\fR	0;1\|i	previous	\fBv\fR	Page offset.
 .b1
 \fB&ne\fI|N\fR	\(en	\fIN\(eq\fR1\|v	D,\fBv\fR	Need \fIN\fR vertical space (\fIV\fR = vertical spacing).
-.b1
+.b1 0
 \fB&mk|\fIR\fR	none	internal	D	Mark current vertical place in register \fIR\fR.
-.b1
+.b1 0
 \fB&rt\fI|\(+-N\fR	none	internal	D,\fBv\fR	Return \fI(upward only)\fR to marked vertical place.
 .mh
 Text Filling, Adjusting, and Centering
@@ -1112,9 +1168,9 @@ Text Filling, Adjusting, and Centering
 \fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space after a character.
 .b1
 \fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space before a character.
-.b1
+.b1 0
 \fB&lhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at left margin.
-.b1
+.b1 0
 \fB&rhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at right margin.
 .mh
 Vertical Spacing
@@ -1129,17 +1185,17 @@ vertical distance \fIN\fR \fIin either direction\fR.
 \fB&sv\fI|N\fR	\(en	\fIN\(eq\fR1\fIV\fR	\fBv\fR	Save vertical distance \fIN\fR.
 .b1
 \fB&os\fR	\(en	\(en	\(en	Output saved vertical distance.
-.b1
+.b1 0
 \fB&ns\fR	space	\(en	D	Turn no-space mode on.
-.b1
+.b1 0
 \fB&rs\fR	\(en	\(en	D	Restore spacing; turn no-space mode off.
 .mh
 Line Length and Indenting
 .bt
 \fB&ll\fI|\(+-N\fR	6.5\|i	previous	E,\fBm\fR	Line length.
-.b1
+.b1 0
 \fB&in\fI|\(+-N\fR	\fIN\(eq\fR\^0	previous	B,E,\fBm\fR	Indent.
-.b1
+.b1 0
 \fB&ti\fI|\(+-N\fR	\(en	ignored	B,E,\fBm\fR	Temporary indent.
 .mh
 Macros, Strings, Diversion, and Position Traps
@@ -1177,17 +1233,17 @@ Macros, Strings, Diversion, and Position Traps
 \fB&it\fI|N|xx\fR	\(en	off	E	Set an input-line count trap.
 .b1
 \fB&return\fR	\(en	\(en	\(en	Returns from the current macro.
-.b1
+.b1 0
 \fB&shift\fI|N\fR	\(en	1	\(en	Shifts the arguments to the current macro.
-.b1
+.b1 0
 \fB&em\fI|xx\fR	none	none	\(en	End macro is \fIxx\fI.
 .mh
 Number Registers
 .bt
 \fB&nr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	Define and set number register \fIR\fR; auto-increment by \fIM\fR.
-.b1
+.b1 0
 \fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format to register \fIR\fR (\fIc=\fB1\fR, \fBi\fR, \fBI\fR, \fBa\fR, \fBA\fR).
-.b1
+.b1 0
 \fB&rr\fI|R\fR	\(en	\(en	\(en	Remove register \fIR\fR.
 .mh
 Tabs, Leaders, and Fields
@@ -1195,9 +1251,9 @@ Tabs, Leaders, and Fields
 \fB&ta\fI|Nt|...\fR	0.8\|n;|0.5\|i	none	E,\fBm\fR	Tab settings; \fIleft\fR type, unless \fIt=\fBR\fR(right), \fBC\fR(centered).
 .b1
 \fB&tc\fI|c\fR	none	none	E	Tab repetition character.
-.b1
+.b1 0
 \fB&lc\fI|c\fR	\fB.\fR	none	E	Leader repetition character.
-.b1
+.b1 0
 \fB&fc\fI|a|b\fR	off	off	\(en	Set field delimiter \fIa\fR and pad character \fIb\fR.
 .mh
 Input and Output Conventions and Character Translations
@@ -1222,9 +1278,9 @@ on if \fIN\fR>0.
 \fB&cc\fI|c\fR	\fB.	.\fR	E	Set control character to \fIc\fR.
 .b1
 \fB&c2\fI|c\fR	\fB\'	\'\fR	E	Set nobreak control character to \fIc\fR.
-.b1
+.b1 0
 \fB&tr\fI|abcd....\fR	none	\(en	O	Translate \fIa\fR to \fIb\fR, etc. on output.
-.b1
+.b1 0
 \fB&ftr\fI|F|abcd....\fR	none	\(en	O,T	Font-specific \fBtr\fR.
 .mh
 Local Horizontal and Vertical Motions, and the Width Function
@@ -1238,23 +1294,23 @@ Hyphenation.
 \fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.
 .b1
 \fB&hylang\fI|name\fR	off	off	E	Sets the hyphenation language.
-.b1
+.b1 0
 \fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.
-.b1
+.b1 0
 \fB&hw\fI|word|...\fR	\(en	ignored	\(en	Add words to hyphenation dictionary.
 .mh
 Three-Part Titles.
 .bt
 \fB&tl\fI|\'left\'center\'right\'\fR	\(en	\(en	Three part title; delimiter may be any character.
-.b1
+.b1 0
 \fB&pc\fI|c\fR	\fB%\fR	off	\(en	Page number character.
-.b1
+.b1 0
 \fB&lt\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Length of title.
 .mh
 Output Line Numbering.
 .bt
 \fB&nm\fI|\(+-N|M|S|I\fR	off	E	Number mode on or off, set parameters.
-.b1
+.b1 0
 \fB&nn\fI|N\fR	\(en	\fIN\(eq\fR1	E	Do not number next \fIN\fR lines.
 .mh
 Conditional Acceptance of Input
@@ -1274,21 +1330,21 @@ accept \fIanything\fR.
 .b1
 \fB&if|!\fI\|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR not identical to \fIstring2\fR,
 accept \fIanything\fR.
-.b1
+.b1 0
 \fB&ie\fI|c|anything\fR		\(en	\fBu\fR	If portion of if-else; all above forms (like \fBif\fR).
-.b1
+.b1 0
 \fB&el\fI|anything\fR		\(en	\(en	Else portion of if-else.
 .mh
 Environment Switching.
 .bt
 \fB&ev\fI|name\fR	\fIname\(eq\fR0	previous	\(en	Environment switched (\fIpush down\fR).
-.b1
+.b1 0
 \fB&evc\fI|name\fR		\(en	\(en	Copies environment \fIname\fR to the current environment.
 .mh
 Insertions from the Standard Input
 .bt
 \fB&rd\fI|prompt\fR\fR	\(en	\fIprompt=\s-1\fRBEL\s+1	\(en	Read insertion.
-.b1
+.b1 0
 \fB&ex\fR	\(en	\(en	\(en	\
 Exit from \*(NR/\*[TR.]
 .mh
@@ -1311,9 +1367,9 @@ Input/Output File Switching
 \fB&opena\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR as \fIstream\fR, appending.
 .b1
 \fB&write\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR to file \fIstream\fR.
-.b1
+.b1 0
 \fB&writec\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR without terminating newline.
-.b1
+.b1 0
 \fB&close\fI|stream\fR		\(en	\(en	Closes the file \fIstream\fR.
 .mh
 Miscellaneous
@@ -1333,9 +1389,9 @@ Miscellaneous
 \fB&pm\fI|t\fR	\(en	all	\(en	Print macro names and sizes;
 .b1
 				if \fIt\fR present, print only total of sizes.
-.b1
+.b1 0
 \fB&recursionlimit\fI|N\fR	\(en	\(en	Sets the maximum stack depth to \fIN\fR.
-.b1
+.b1 0
 .lg 0
 \fB&fl\fR	\(en	\(en	B	Flush output buffer.
 .lg
@@ -1343,7 +1399,7 @@ Miscellaneous
 Output and Error Messages
 .bt
 \fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Controls warning messages.
-.b1
+.b1 0
 \fB&spreadwarn\fI|N\fR	toggle	\(en	Spread limit warning.
 .mh
 Color Support
@@ -2965,6 +3021,7 @@ the input is read in \fIcopy mode\fR.
 The input is copied without interpretation
 \fIexcept\fR that:
 .x1
+.nr nosave 0
 .ds + \v'-.1m'\s-4\(bu\s+4\v'+.1m'
 \*+ The contents of number registers indicated by \fB\en\fR are interpolated.
 \*+ Strings indicated by \fB\e\(**\fR are interpolated.
@@ -3843,13 +3900,13 @@ saved in number register \fIa\fR
 as done for this paragraph.
 .eb
 .sc
-Graphics
-.pg
+Graphics.
 The function \fB\eD\fI\'c...\'\fR
 draws a graphic object of type \fIc\fR
 according to a sequence of parameters,
 which are generally pairs of numbers.
 .nf
+.nr nosave 1
 .ta 1.2i
 \fB\eD\'l \fIdh dv\'	\fRdraw line from current position by \fIdh,\|dv\fR
 \fB\eD\'c \fId\'	\fRdraw circle of diameter \fId\fR with left side at current position
@@ -4733,15 +4790,19 @@ Examples are:
 .xx
 .in +2m
 .ti -2m
+.nr nosave 1
 \fB\eX\'PS: [ {Catalog} << /ViewerPreferences << /DisplayDocTitle true >> >> /PUT pdfmark\e'\fR
 .br
+.nr nosave 0
 This causes the \*[PDF] viewer to print the document title
 (as in \(sc22.3) in the application title bar
 instead of the \*[PDF] file name.
 .xx
 .ti -2m
+.nr nosave 1
 \fB\eX\'PS: [ /PageMode /UseOutlines /DOCVIEW pdfmark\'\fR
 .br
+.nr nosave 0
 This causes the \*[PDF] viewer to display the bookmarks toolbar
 when the document is opened.
 Other interesting values are
@@ -4750,14 +4811,18 @@ Other interesting values are
 and \fB/FullScreen\fR (open the document in full-screen mode).
 .xx
 .ti -2m
+.nr nosave 1
 \fB\eX\'PS: [ /PageMode /Page \fIN\fB /View [/XYZ null null null] /DOCVIEW pdfmark\'\fR
 .br
+.nr nosave 0
 Page \fIN\fR is displayed instead of the first page
 when the document is opened.
 .xx
 .ti -2m
+.nr nosave 1
 \fB\eX\'PS: [ {Catalog} << /PageLayout /TwoPageRight >> /PUT pdfmark\'\fR
 .br
+.nr nosave 0
 With this command,
 the \*[PDF] viewer displays two pages at once.
 Other interesting values are
@@ -4767,8 +4832,10 @@ and
 \fB/TwoColumnRight\fR (display two pages in continuous mode).
 .xx
 .ti -2m
+.nr nosave 1
 \fB\eX\'PS: [ /Label (\fItext\fB) /PAGELABEL pdfmark\'\fR
 .br
+.nr nosave 0
 The given \s-1ASCII\s+1 \fItext\fR is shown next to the page number
 of the current page
 in the \*[PDF] viewer toolbar.
@@ -4899,6 +4966,7 @@ on a different device, within the latter's capabilities.
 ..
 .tb
 .ta .8i
+.nr nosave 1
 \fBs\^\fIn\fR	set point size to \fIn\fR, fractional parts (if any) ignored
 \fBs\-23\^\fId.d\fR	set point size to \fId.d\fR
 \fBf\^\fIn\fR	set font to \fIn\fR
@@ -4915,6 +4983,7 @@ on a different device, within the latter's capabilities.
 \fBn\^\fIb a\fR	end of line (information only\(emno action);  \fIb\fP = space before line, \fIa\fP = after
 \fBw\fR	paddable word space (information only\(emno action)
 \fBD\^\fIc ...\en\fR	graphics function \fIc\fR; see below
+.nr nosave 0
 \fBx ...\en\fR	device control functions; see below
 \fB# ...\en\fR	comment
 .pg
@@ -4932,10 +5001,12 @@ The graphics functions coincide directly with the \fB\eD\fR
 sequences:
 .tb
 .ta 1.2i
+.nr nosave 1
 \fBD\^l \fIdh dv	\fRdraw line from current position by \fIdh,\|dv\fR
 \fBD\^c \fId	\fRdraw circle of diameter \fId\fR with left side at current position
 \fBD\^e \fIu v	\fRdraw ellipse of diameters \fIu\fP and \fIv\fP
 \fBD\^a \fIa b c d\fB	\fRdraw arc from current position to \fIa\fR+\fIc\fR,\|\fIb\fR+\fId\fR, \fRwith center at \fIa\fR,\|\fIb\fR from current position
+.nr nosave 0
 \fBD\^\(ap \fIa b c d...\fB	\fRdraw B-spline from current position by \fIa\fR,\|\fIb\fR, \fRthen by \fIc\fR,\|\fId\fR, then by \fIc\fR,\|\fId\fR, then ...
 \fBD\^z \fIa b c d...\fB	\fRfor any other \fIz\fR is uninterpreted
 .pg
@@ -4948,9 +5019,12 @@ The device control functions begin with \fBx\fP,
 then a command, then other parameters.
 .tb
 .ta 1.5i 1.5i+1m
+.nr nosave 1
 \fBx T \fIs\fP	\fRname of typesetter is \fIs\fR
+.nr nosave 0
 \fBx r \fIn h v\fP	\fRresolution is \fIn\fR units/inch;
 		\fIh\fR = minimum horizontal motion, \fIv\fR = minimum vertical
+.nr nosave 1
 \fBx i	\fRinitialize\fP
 \fBx f \fIn s\fP	\fRmount font \fIs\fR on font position \fIn\fR
 \fBx f \fIn filename\fR	\fIfilename\fR contains metrics for font on position \fIn\fR
@@ -4973,6 +5047,7 @@ then a command, then other parameters.
 \fBx X Sync\fR	instructs to flush position and font information immediately
 \fBx X Track \fIn\fR	gives a hint that following characters are tracked by \fIn\fR units
 		interpretation is optional; following positions are not changed
+.nr nosave 0
 \fBx X TrimAt \fIL T W H\fR	generated by the \fBtrimat\fR request
 \fBx \fIany\fP	\fRto be ignored if not recognized
 .pg
@@ -4988,6 +5063,7 @@ The following is the output from ``hello, world''
 for a typical printer,
 as described in §25:
 .tb
+.nr nosave 1
 x T post
 x res 720 1 1
 x init
@@ -5016,6 +5092,7 @@ V120
 ch
 50e44l28l28o50,w58w72o50r33l28dn120 0
 x trailer
+.nr nosave 0
 V7920
 x stop
 .pg
@@ -5053,12 +5130,14 @@ as a sequence of names and values.
 others that may be present for specific drivers:
 .tb
 .ta 1i
+.nr nosave 1
 \fBfonts \fIn F G H ... Z
 \fBsizes \fIs t ... \fB0
 \fBres \fIn\fR
 \fBhor \fIn\fR
 \fBvert \fIn\fR
 \fBunitwidth \fIn\fR
+.nr nosave 0
 \fBcharset\fR
 \fIlist of multi-character character names (optional)\fP
 .pg
@@ -5089,6 +5168,7 @@ must occur last, parameters may appear in any order.
 Here is a subset of the \fB\s-1DESC\s+1\fR
 file for a typical Postscript printer:
 .tb
+.nr nosave 1
 # Description file for Postscript printers.
 
 fonts 10 R I B BI CW H HB HX S1 S
@@ -5104,6 +5184,7 @@ ga ru sc dd -> br Sl ps cs cy as os =. ld
 rd le ge pp -+ ob vr
 sq bx ci fa te ** pl mi eq ~= *A *B *X *D
 *E *F *G *Y *I *K *L *M *N *O *P *R *H *S *T *U *W
+.nr nosave 0
 *C *Q *Z ul rn *a *b *x *d *e *f *g *y *i *k
 *l *m *n *o *p *h *r *s *t *u *w *c *q *z
 .sc
@@ -5123,10 +5204,12 @@ The file for font \fIF\fR
 is \fB/usr/ucblib/doctools/font/dev\fIname\^\fB/\fIF\fR.
 .ta 1.7i
 .tb
+.nr nosave 1
 \fBname \fIstr\fR	name of font is \fIstr\fR
 \fBligatures ... 0\fR	list of ligatures
 \fBspacewidth \fIn\fR	width of a space on this font
 \fBspecial\fR	this is a special font
+.nr nosave 0
 \fBcharset\fR
 \fIlist of character name, width, ascender/descender, code\fP, tab separated
 .pg
@@ -5159,6 +5242,7 @@ function (§11.2).
 Here are excerpts from a typical font description file
 for the same Postscript printer.
 .tb
+.nr nosave 1
 .ta .5i 1i 1.5i 2.5i
 hy	33	0	45	hyphen \e(hy
 -	"			- is a synonym for \e(hy
@@ -5172,6 +5256,7 @@ d	50	2	100
 y	50	1	121
 .sp
 em	100	0	208
+.nr nosave 0
 \-\-\-	44	2	220	English pound currency symbol \eN'220'
 \-\-\-	36	0	221	centered dot \eN'221'
 .pg
@@ -5708,6 +5793,7 @@ Special Font
 .\" from file table2
 .ii
 .bp
+.nr nosave 1
 .Bookmark 0 "Input Naming Conventions"
 .1C
 .de mx
