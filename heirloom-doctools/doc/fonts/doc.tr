@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.15 (gritter) 4/5/06
+.\" Sccsid @(#)doc.tr	2.16 (gritter) 4/6/06
 .do xflag 3
 .warn
 .spreadwarn .5c
@@ -6,32 +6,16 @@
 .mediasize a5
 .hylang en_US
 .hw Post-Script
-.nr Premier 1
-.ie \n[Premier]=0 \{\
-.	fp 1 R AGaramondPro-Regular otf
-.	fp 2 I AGaramondPro-Italic otf
-.	fp 0 N AGaramondPro-Regular otf
-.	fp 0 C AGaramondPro-Regular otf
-.	fp 0 SC AGaramondPro-Regular otf
-.	fp 0 T AGaramondPro-Regular otf
-.	feature T +titl
-.	kernpair T \[F.titling] T \[F.titling] 25
-.	kernbefore N › 40
-.	kernafter N ‹ 40
-.	ds Ornament \s(12\[orn.001]\s0
-.\}
-.el \{\
-.	fp 1 R GaramondPremrPro-Med otf
-.	fp 2 I GaramondPremrPro-MedIt otf
-.	fp 0 N GaramondPremrPro-Med otf
-.	fp 0 C GaramondPremrPro-Med otf
-.	fp 0 SC GaramondPremrPro-Med otf
-.	fp 0 T GaramondPremrPro-Subh otf
-.	kernpair T F T F 25
-.	kernpair SC R SC \[i.sc] 40
-.	flig R ft \[f_t.alt]
-.	ds Ornament \v'-.25m'\s9\[orn.01]\s0
-.\}
+.fp 1 R GaramondPremrPro-Med otf
+.fp 2 I GaramondPremrPro-MedIt otf
+.fp 0 N GaramondPremrPro-Med otf
+.fp 0 C GaramondPremrPro-Med otf
+.fp 0 SC GaramondPremrPro-Med otf
+.fp 0 T GaramondPremrPro-Subh otf
+.kernpair T F T F 25
+.kernpair SC R SC \[i.sc] 40
+.flig R ft \[f_t.alt]
+.ds Ornament \v'-.25m'\s9\[orn.01]\s0
 .feature R +pnum +onum
 .feature I +pnum +onum
 .feature SC +smcp +pnum +onum
@@ -70,6 +54,8 @@
 .kernpair N f N P 100
 .kernpair N g N _ 60
 .kernpair N f N 8 20
+.kernpair N ſ N ſ 40
+.kernpair N ſ N i 85
 .kernpair I ' I ' 0
 .kernpair I ` I ` 0
 .kernpair C F C F 45
@@ -198,7 +184,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-4/5/06
+4/6/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -412,7 +398,7 @@ to use the Adobe Garamond small capital font, write something like
 \f(SCThis text prints in Small Capitals.\fP
 .EE
 .P
-With an OpenType font, the ``.feature'' request comes handy again:
+With an OpenType font, the ``.feature'' request is useful again:
 .EX
 &do xflag 3
 &fp 0 \fCSC\fN AGaramondPro-Regular otf
@@ -491,14 +477,47 @@ request in combination with the fallback sequence:
 e\(ffective o\(Fice o\(Fline
 .EE
 .P
-OpenType fonts usually do contain all ligatures that \*(TR substitutes
-by default, so no special procedure needs to be applied
-unless other ligatures are to be activated in addition.
+OpenType fonts contain all available ligatures in the base font,
+so no special procedure needs to be applied with them.
+.S "Defining additional ligatures"
+.P
+Fonts may provide ligatures beyond the five standard \*(TR ones.
+They are not activated by default
+regardless of any definitions in the font metrics files,
+but can be enabled individually as desired;
+\*(TR will then replace sequences of characters automatically
+with them as with the standard ligatures.
+For example, Adobe Garamond Premier Pro
+contains ligatures for use with the historic ``ſ'' letter variant:
+.EX
+&do xflag 3
+&fp 1 \fCR\fN GaramondPremrPro otf
+&flig R ſſ \e[longs_longs] ſi \e[longs_i] ſſi \e[longs_longs_i]
+Uſe theſe ligatures for cla\[longs_longs_i]c typography.
+.EE
+.P
+\*(TR splits ligatures in two parts
+when hyphenating words.
+It is thus necessary that any part of a ligature
+that is not a single character is also defined as a ligature,
+so ``\[longs_longs]'' and ``\[longs_i]''
+are prerequisites for ``\[longs_longs_i]''.
+.P
+It is normally not advisable
+to enable ligatures with \[s_p]ecial display forms
+using the ``.f\;lig'' mechanism;
+they should be set manually as special characters
+(``\e[s_p]'' in this case)
+at precise locations.
 .S "Combining different fonts"
 .P
 Different fonts often have different visual sizes even if they are set
-in the same nominal point size. To adjust this, the ``.fzoom'' request
-is available. It only applies to characters that are actually in the
+in the same nominal point size.
+Also fonts from different vendors are often based on
+different standards for character heights.
+To adjust this, the ``.fzoom'' request is available.
+As implied by this purpose,
+it only applies to characters that are actually in the
 current font, not to characters from another font that have been
 selected using the fallback sequence.
 .fp 0 GI GillSansStd otf
@@ -514,10 +533,13 @@ selected using the fallback sequence.
 The ``.fzoom'' request affects all characters set in the respective font on
 the current output line. To create single zoomed words, mount a font twice
 under different names, but zoom it only once.
-.S "Tracking individual words"
+.S "Spacing out individual words"
 .P
-Tracking of individual words is used for highlighting text e.g. with German
-blackletter faces. Like the ``.fzoom'' request, the ``.track'' request applies
+Spacing out the characters of individual words is commonly done
+for highlighting text e.g. with German
+blackletter faces;
+the ``.track'' request can be used for this as well.
+Like ``.fzoom'', ``.track'' applies
 to all characters in the respective font on an entire output line. Thus it
 is also necessary to mount a font twice but to track it only once when it
 is used for tracking individual words.
