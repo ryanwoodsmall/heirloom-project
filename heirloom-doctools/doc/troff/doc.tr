@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.32 (gritter) 4/6/06
+.\" Sccsid @(#)doc.tr	1.33 (gritter) 4/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -81,7 +81,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/6/06
+.ds Sccsdate 4/7/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -4935,7 +4935,7 @@ However, a garbled document structure may result:
 .fi
 .xx
 .lc
-Thus such dpost warnings should usually be taken seriously, and the
+Thus such \fIdpost\fR warnings should usually be taken seriously, and the
 document should be corrected.
 .pg
 An alternate form of bookmarks,
@@ -5696,9 +5696,9 @@ and effect another last page.
 .rm EM
 .\" from file table1
 .ii
+.1C
 .bp
 .Bookmark 0 "Font Style Examples"
-.1C
 .rm mx
 .br
 .tr &&
