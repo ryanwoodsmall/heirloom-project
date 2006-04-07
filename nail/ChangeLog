@@ -1,4 +1,7 @@
 [12.1] released ...
+* The conversion of messages in state-dependent encodings has been fixed;
+  garbage characters could be inserted because the state was not properly
+  reset when a buffer was enlarged (patch by Matthew Fischer).
 * A warning about an initalization of an unsigned value to -1 has been
   eliminated (patch by Matthew Sienkiewicz).
 * Percent characters in the "prompt" variable are now handled correctly;
