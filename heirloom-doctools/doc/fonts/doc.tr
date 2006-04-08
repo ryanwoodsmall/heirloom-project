@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.16 (gritter) 4/6/06
+.\" Sccsid @(#)doc.tr	2.17 (gritter) 4/8/06
 .do xflag 3
 .warn
 .spreadwarn .5c
@@ -184,7 +184,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-4/6/06
+4/8/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -509,6 +509,25 @@ using the ``.f\;lig'' mechanism;
 they should be set manually as special characters
 (``\e[s_p]'' in this case)
 at precise locations.
+.S "Choosing between multiple possible ligatures"
+.P
+If a font contains only two-character ligatures,
+there are two possibilities for automatic ligature building
+with an input sequence that would form a three-character ligature,
+e.g., ``f\^f\^i'' could be constructed
+as ``\(ffi'' or ``f\(fi''.
+\*(TR normally selects the first ligature available,
+so ``\(ffi'' would be the default.
+In many cases, the other choice
+would be aesthetically preferable;
+this is the application for the ``.fdeferlig'' request:
+.EX
+&do xflag 3
+&fp 1 \fCR\fN GaramondPremrPro otf
+&flig R ſſ \e[longs_longs] ſi \e[longs_i]
+&fdeferlig R ſſi
+Choo\[longs_i]ng the ſecond ligature looks poſ\[longs_i]bly better.
+.EE
 .S "Combining different fonts"
 .P
 Different fonts often have different visual sizes even if they are set
@@ -590,6 +609,7 @@ request:
 In this example, old-style numerals from Adobe Garamond Expert are mixed
 with the slash character from Adobe Garamond Regular, and are adjusted to
 achieve matching visual letter spacing.
+.S "Kerning of a character in any combination"
 .P
 It is sometimes useful to add a certain amount of space whenever a
 character appears, for example before ``;'' or ``?'', or on the inner
