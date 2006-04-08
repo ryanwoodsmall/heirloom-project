@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.33 (gritter) 4/7/06
+.\" Sccsid @(#)doc.tr	1.35 (gritter) 4/8/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -57,6 +57,7 @@
 .flig I fi \[fi] fl \[fl]
 .flig B fi \[fi] fl \[fl]
 .flig BI fi \[fi] fl \[fl]
+.kernpair R f R i 55
 .kernpair B f B l 100
 .kernpair B f B i 50
 .kernpair I T R ) 125
@@ -81,7 +82,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/7/06
+.ds Sccsdate 4/8/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1269,6 +1270,8 @@ on if \fIN\fR>0.
 \fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fines the ligatures in font \fIF\fR.
 .lg
 .b1
+\fB&fdeferlig\fI|F|string|...\fR	ignored	T	Defers ligature building for the first character of \fIstring\fR.
+.b1
 \fB&ul\fI|N\fR	off	\fIN\(eq\fR1	E	Underline (italicize in \*(TR) \fIN\fR input lines.
 .b1
 \fB&cu\fI|N\fR	off	\fIN\(eq\fR1	E	Continuous underline in \*[NR;] like \fBul\fR in \*[TR.]
@@ -1465,6 +1468,7 @@ evc	17
 ex	18
 fallback	2
 fc	9
+fdeferlig	10.2
 feature	2
 fi	4
 fl	20
@@ -3555,6 +3559,19 @@ enables a ligature for ``Th'' in font \fBR\fR,
 and
 \fB&flig R \-Th\fR
 disables it.
+.bt
+\fB&fdeferlig\fI|F|string|...\fR	ignored	T	Defers ligature building for the first character of \fIstring\fR.
+Normally when a sequence of three characters appears
+for which both the first and the last two characters
+are defined as a ligature,
+the ligature is built using the first two characters.
+For example, if ``f\;f\;i'' appears in input
+and both ``f\;f'' and ``f\;i'' are defined as ligatures,
+the ``f\;f'' ligature is built, followed by a single ``i'' character.
+Use of this request causes the ligature to be built
+using the second two characters,
+so in the example, \fB&fdeferlig R f\;f\;i\fR would result
+in a single ``f'' character followed by a ``f\;i'' ligature.
 .sc
 Backspacing, underlining, overstriking, etc.
 Unless in \fIcopy mode\fR, the \s-1ASCII\s+1 backspace character is replaced
@@ -3866,6 +3883,7 @@ After the line is drawn \fIno\fR compensating
 motions are made;
 the instantaneous baseline is at the \fIend\fR of the line.
 .pg
+.nr nosave 1
 .de eb
 .sp -1
 .nf

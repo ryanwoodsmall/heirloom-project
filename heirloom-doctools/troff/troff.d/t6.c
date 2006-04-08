@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.134 (gritter) 4/4/06
+ * Sccsid @(#)t6.c	1.135 (gritter) 4/8/06
  */
 
 /*
@@ -985,7 +985,7 @@ tchar makem(register int i)
 
 tchar getlg(tchar i)
 {
-	tchar j, k;
+	tchar j, k, pb[NC];
 	struct lgtab *lp;
 	int c, f, n, lgn;
 
@@ -1001,12 +1001,19 @@ tchar getlg(tchar i)
 	lgn = lg == 2 ? 2 : 1000;
 	for (;;) {
 		j = getch0();
+		if (n < sizeof pb)
+			pb[n-1] = j;
 		c = cbits(j);
 		while (lp != NULL && lp->from != c)
 			lp = lp->next;
 		if (lp == NULL || lp->to == 0) {
 			pbbuf[pbp++] = j;
 			return(k);
+		}
+		if (lp->to == -1) {	/* fdeferlig request */
+			pb[n < sizeof pb ? n : sizeof pb - 1] = 0;
+			pushback(pb);
+			return(i);
 		}
 		k = i & SFMASK | lp->to | AUTOLIG;
 		if (lp->link == NULL || ++n > lgn)
@@ -1036,7 +1043,7 @@ strlg(int f, int *tp, int n)
 		if (lp == NULL || lp->to == 0)
 			return 0;
 	}
-	return lp->to;
+	return lp->to > 0 ? lp->to : 0;
 }
 
 void
@@ -1050,7 +1057,7 @@ caselg(void)
 }
 
 static void
-addlig(int f, tchar *from, tchar to)
+addlig(int f, tchar *from, int to)
 {
 	int	i, j;
 	struct lgtab	*lp;
@@ -1078,7 +1085,7 @@ addlig(int f, tchar *from, tchar to)
 			lp->link = calloc(1, sizeof *lp->link);
 			lp = lp->link;
 			lp->from = i;
-			lp->to = cbits(to);
+			lp->to = to;
 			break;
 		}
 		lp = lp->link;
@@ -1100,16 +1107,18 @@ addlig(int f, tchar *from, tchar to)
 			lp->from = i;
 		}
 		if (from[j] == 0) {
-			lp->to = cbits(to);
+			lp->to = to;
 			break;
 		}
 	}
-	if (lgrevtab[f] == NULL)
-		lgrevtab[f] = calloc(NCHARS, sizeof **lgrevtab);
-	lgrevtab[f][to] = malloc((j+2) * sizeof ***lgrevtab);
-	j = 0;
-	while (lgrevtab[f][to][j] = cbits(from[j]))
-		j++;
+	if (to >= 0) {
+		if (lgrevtab[f] == NULL)
+			lgrevtab[f] = calloc(NCHARS, sizeof **lgrevtab);
+		lgrevtab[f][to] = malloc((j+2) * sizeof ***lgrevtab);
+		j = 0;
+		while (lgrevtab[f][to][j] = cbits(from[j]))
+			j++;
+	}
 	/*
 	 * If the font still contains the charlib substitutes for ff,
 	 * Fi, and Fl, hide them. The ".flig" request is intended for
@@ -1201,7 +1210,7 @@ setlig(int f, int j)
 }
 
 static int
-getflig(int f, int cnt)
+getflig(int f, int mode)
 {
 	int	delete, allnum;
 	tchar	from[NC], to;
@@ -1237,7 +1246,7 @@ getflig(int f, int cnt)
 			allnum = 0;
 		c = getch();
 	}
-	if (cnt == 0 && allnum == 1) {	/* backwards compatibility */
+	if (mode == 0 && allnum == 1) {	/* backwards compatibility */
 		if (skip(0) == 0)
 			goto new;
 		for (j = 0; j <= i+1; j++)
@@ -1247,9 +1256,12 @@ getflig(int f, int cnt)
 		return 0;
 	}
 	if (delete == 0) {
-		if (skip(1))
-			return 0;
-	new:	to = getch();
+		if (mode >= 0) {
+			if (skip(1))
+				return 0;
+		new:	to = cbits(getch());
+		} else
+			to = -1;
 		addlig(f, from, to);
 	} else
 		dellig(f, from);
@@ -1257,7 +1269,7 @@ getflig(int f, int cnt)
 }
 
 void
-caseflig(void)
+caseflig(int defer)
 {
 	int	i, j;
 
@@ -1269,7 +1281,13 @@ caseflig(void)
 	if ((j = findft(i, 1)) < 0)
 		return;
 	i = 0;
-	while (getflig(j, i++) != 0);
+	while (getflig(j, defer ? -1 : i++) != 0);
+}
+
+void
+casefdeferlig(void)
+{
+	caseflig(1);
 }
 
 void

@@ -9,6 +9,11 @@ Release ...
   ligature, the ligature is now split into its parts.
 * troff: The "\;" escape sequence has been introduced as a ligature
   suppressor without other side-effects.
+* troff: The ".fdeferlig" request has been introduced. It defers building
+  of a ligature by one character, e.g. if both "ff" and "fi" are defined
+  as ligatures and "ffi" appears in input, a single "f" followed by the
+  "fi" ligature can be constructed instead of a "ff" ligature followed by
+  a single "i".
 * [nt]roff: The hyphenation language as set by the ".hylang" request is
   now specific to the current environment.
 * [nt]roff: The ".substring" and ".length" requests have been added to
