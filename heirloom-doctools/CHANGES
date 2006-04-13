@@ -1,3 +1,7 @@
+Release ...
+* troff: The ".fkern" request has been introduced to disable the use of
+  the kerning tables of specific fonts.
+
 Release 060409
 * dpost: An error that could lead to invalid PostScript output when the
   last character of a long output string sequence was a backslash has

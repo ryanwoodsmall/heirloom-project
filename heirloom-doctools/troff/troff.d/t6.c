@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.135 (gritter) 4/8/06
+ * Sccsid @(#)t6.c	1.136 (gritter) 4/14/06
  */
 
 /*
@@ -471,8 +471,8 @@ getkw(tchar c, tchar d)
 		if (ktable != NULL && (kp = klook(c, d)) != NULL)
 			k = kp->n;
 		else if ((n = (fontbase[f]->afmpos)-1) >= 0 &&
-				n == (fontbase[g]->afmpos)-1) {
-			a = afmtab[n];
+				n == (fontbase[g]->afmpos)-1 &&
+				(a = afmtab[n])->nokern == 0) {
 			I = i - 32;
 			J = j - 32;
 			if (I >= nchtab + 128)
@@ -1923,6 +1923,23 @@ void
 casekern(void)
 {
 	kern = skip(0) || atoi() ? 1 : 0;
+}
+
+void
+casefkern(void)
+{
+	struct afmtab	*a;
+	int	f, i;
+
+	lgf++;
+	if (skip(1))
+		return;
+	if ((i = getrq()) >= 256)
+		i = maybemore(i, 2);
+	if ((f = findft(i, 1)) < 0 || (i = fontbase[f]->afmpos - 1) < 0)
+		return;
+	a = afmtab[i];
+	a->nokern = skip(0) || atoi() ? 0 : 1;
 }
 
 static void

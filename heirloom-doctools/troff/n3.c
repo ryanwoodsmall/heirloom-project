@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.77 (gritter) 4/8/06
+ * Sccsid @(#)n3.c	1.78 (gritter) 4/14/06
  */
 
 /*
@@ -86,10 +86,60 @@ static void	caselength(void);
 static int	getls(int);
 static void	addcon(int, char *, void(*)(int));
 
+static const struct {
+	char	*n;
+	void	(*f)(int);
+} longrequests[] = {
+	{ "bleedat",		(void(*)(int))casebleedat },
+	{ "chop",		(void(*)(int))casechop },
+	{ "close",		(void(*)(int))caseclose },
+	{ "cropat",		(void(*)(int))casecropat },
+	{ "evc",		(void(*)(int))caseevc },
+	{ "fallback",		(void(*)(int))casefallback },
+	{ "fdeferlig",		(void(*)(int))casefdeferlig },
+	{ "feature",		(void(*)(int))casefeature },
+	{ "fkern",		(void(*)(int))casefkern },
+	{ "flig",		(void(*)(int))caseflig },
+	{ "fps",		(void(*)(int))casefps },
+	{ "fspacewidth",	(void(*)(int))casefspacewidth },
+	{ "ftr",		(void(*)(int))caseftr },
+	{ "fzoom",		(void(*)(int))casefzoom },
+	{ "hidechar",		(void(*)(int))casehidechar },
+	{ "hylang",		(void(*)(int))casehylang },
+	{ "kern",		(void(*)(int))casekern },
+	{ "kernafter",		(void(*)(int))casekernafter },
+	{ "kernbefore",		(void(*)(int))casekernbefore },
+	{ "kernpair",		(void(*)(int))casekernpair },
+	{ "lc_ctype",		(void(*)(int))caselc_ctype },
+	{ "length",		(void(*)(int))caselength },
+	{ "lhang",		(void(*)(int))caselhang },
+	{ "mediasize",		(void(*)(int))casemediasize },
+	{ "open",		(void(*)(int))caseopen },
+	{ "opena",		(void(*)(int))caseopena },
+	{ "papersize",		(void(*)(int))casepapersize },
+	{ "psbb",		(void(*)(int))casepsbb },
+	{ "pso",		(void(*)(int))casepso },
+	{ "recursionlimit",	(void(*)(int))caserecursionlimit },
+	{ "return",		(void(*)(int))casereturn },
+	{ "rhang",		(void(*)(int))caserhang },
+	{ "shift",		(void(*)(int))caseshift },
+	{ "spreadwarn",		(void(*)(int))casespreadwarn },
+	{ "substring",		(void(*)(int))casesubstring },
+	{ "tmc",		(void(*)(int))casetmc },
+	{ "track",		(void(*)(int))casetrack },
+	{ "trimat",		(void(*)(int))casetrimat },
+	{ "vpt",		(void(*)(int))casevpt },
+	{ "warn",		(void(*)(int))casewarn },
+	{ "write",		(void(*)(int))casewrite },
+	{ "writec",		(void(*)(int))casewritec },
+	{ "xflag",		(void(*)(int))casexflag },
+	{ NULL,			NULL }
+};
+
 void *
 growcontab(void)
 {
-	int	i, inc = 256;
+	int	i, j, inc = 256;
 	struct contab	*onc;
 
 	onc = contab;
@@ -99,48 +149,8 @@ growcontab(void)
 	if (NM == 0) {
 		for (i = 0; initcontab[i].f; i++)
 			contab[i] = initcontab[i];
-		addcon(i++, "track", (void(*)(int))casetrack);
-		addcon(i++, "lc_ctype", (void(*)(int))caselc_ctype);
-		addcon(i++, "fallback", (void(*)(int))casefallback);
-		addcon(i++, "hidechar", (void(*)(int))casehidechar);
-		addcon(i++, "evc", (void(*)(int))caseevc);
-		addcon(i++, "return", (void(*)(int))casereturn);
-		addcon(i++, "chop", (void(*)(int))casechop);
-		addcon(i++, "fzoom", (void(*)(int))casefzoom);
-		addcon(i++, "kern", (void(*)(int))casekern);
-		addcon(i++, "hylang", (void(*)(int))casehylang);
-		addcon(i++, "flig", (void(*)(int))caseflig);
-		addcon(i++, "papersize", (void(*)(int))casepapersize);
-		addcon(i++, "mediasize", (void(*)(int))casemediasize);
-		addcon(i++, "shift", (void(*)(int))caseshift);
-		addcon(i++, "xflag", (void(*)(int))casexflag);
-		addcon(i++, "lhang", (void(*)(int))caselhang);
-		addcon(i++, "rhang", (void(*)(int))caserhang);
-		addcon(i++, "kernpair", (void(*)(int))casekernpair);
-		addcon(i++, "kernbefore", (void(*)(int))casekernbefore);
-		addcon(i++, "kernafter", (void(*)(int))casekernafter);
-		addcon(i++, "ftr", (void(*)(int))caseftr);
-		addcon(i++, "feature", (void(*)(int))casefeature);
-		addcon(i++, "recursionlimit", (void(*)(int))caserecursionlimit);
-		addcon(i++, "psbb", (void(*)(int))casepsbb);
-		addcon(i++, "pso", (void(*)(int))casepso);
-		addcon(i++, "tmc", (void(*)(int))casetmc);
-		addcon(i++, "open", (void(*)(int))caseopen);
-		addcon(i++, "opena", (void(*)(int))caseopena);
-		addcon(i++, "write", (void(*)(int))casewrite);
-		addcon(i++, "writec", (void(*)(int))casewritec);
-		addcon(i++, "close", (void(*)(int))caseclose);
-		addcon(i++, "spreadwarn", (void(*)(int))casespreadwarn);
-		addcon(i++, "warn", (void(*)(int))casewarn);
-		addcon(i++, "trimat", (void(*)(int))casetrimat);
-		addcon(i++, "bleedat", (void(*)(int))casebleedat);
-		addcon(i++, "cropat", (void(*)(int))casecropat);
-		addcon(i++, "fps", (void(*)(int))casefps);
-		addcon(i++, "vpt", (void(*)(int))casevpt);
-		addcon(i++, "fspacewidth", (void(*)(int))casefspacewidth);
-		addcon(i++, "length", (void(*)(int))caselength);
-		addcon(i++, "substring", (void(*)(int))casesubstring);
-		addcon(i++, "fdeferlig", (void(*)(int))casefdeferlig);
+		for (j = 0; longrequests[j].f; j++)
+			addcon(i++, longrequests[j].n, longrequests[j].f);
 	} else {
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])

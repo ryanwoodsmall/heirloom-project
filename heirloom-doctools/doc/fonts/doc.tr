@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.17 (gritter) 4/8/06
+.\" Sccsid @(#)doc.tr	2.18 (gritter) 4/14/06
 .do xflag 3
 .warn
 .spreadwarn .5c
@@ -41,6 +41,7 @@
 .kernpair R f R i 25
 .kernpair R f R l 100
 .kernpair R f R b 110
+.kernpair R f R k 110
 .kernpair R ' R ' 0
 .kernpair R ` R ` 0
 .kernpair R f R R 100
@@ -184,7 +185,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-4/8/06
+4/14/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -582,8 +583,12 @@ Pairwise kerning is enabled unless the
 \fN\[minus]x0\fR option is given. The ``.kern''
 request disables it. Kerning tables are initially read from the \fCAFM\fR,
 OpenType, or TrueType files; this default kerning only applies if two
-adjacent characters are from the same font. There are two methods to
-adjust the kerning tables: In many cases, it is most convenient to
+adjacent characters are from the same font.
+A font-specific kerning table
+can be disabled using the ``.fkern'' request.
+.P
+There are two methods to
+adjust the kerning tables: In some cases, it is most convenient to
 create a private copy
 of the \fCAFM\fR file and to adjust the ``\fCKPX\fR'' entries
 in it. This has the advantage that the modified kerning pairs are
