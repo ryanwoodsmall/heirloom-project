@@ -47,9 +47,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)file_sus.sl	1.32 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)file_sus.sl	1.33 (gritter) 4/14/06";
 #else	/* !SUS */
-static const char sccsid[] USED = "@(#)file.sl	1.32 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)file.sl	1.33 (gritter) 4/14/06";
 #endif	/* !SUS */
 
 #ifdef	__GLIBC__
@@ -159,7 +159,7 @@ static void	pritem(struct match *, int);
 static void	fmterr(const char *, int);
 static int	tar(void);
 static int	sccs(void);
-static int	utf8(void);
+static int	utf8(const char *);
 static int	endianess(void);
 static int	redirect(const char *, const char *);
 
@@ -343,7 +343,7 @@ rd:	in = read(ifile, buf, sizeof buf);
 		j = i;
 		while(buf[i++] != '\n'){
 			if(i - j > 255){
-				if (!utf8())
+				if (!utf8(NULL))
 					printf("data\n"); 
 				goto out;
 			}
@@ -433,7 +433,7 @@ notas:
 			printf("troff output\n");
 			goto out;
 		}
-		if (!utf8())
+		if (!utf8(NULL))
 			printf("data\n"); 
 		goto out; 
 	}
@@ -447,7 +447,8 @@ notas:
 outa:
 	while(i < in)
 		if((buf[i++]&0377) > 127){
-			printf(" with garbage\n");
+			if (!utf8(" with utf-8 characters\n"))
+				printf(" with garbage\n");
 			goto out;
 		}
 	/* if next few lines in then read whole file looking for nulls ...
@@ -1015,7 +1016,7 @@ sccs(void)
 }
 
 static int
-utf8(void)
+utf8(const char *msg)
 {
 	int	c, d, i, j, n;
 	int	found = 0;
@@ -1046,7 +1047,7 @@ utf8(void)
 		}
 	}
 	if (found) {
-		printf("utf-8 text\n");
+		printf("%s", msg ? msg : "utf-8 text\n");
 		return 1;
 	}
 	return 0;
