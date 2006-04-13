@@ -1,6 +1,9 @@
 Release ...
 * troff: The ".fkern" request has been introduced to disable the use of
   the kerning tables of specific fonts.
+* [nt]roff: A warning is now issued when a non-ASCII byte is found in
+  a name (of a request, number register, etc.) with the "input" warning
+  category.
 
 Release 060409
 * dpost: An error that could lead to invalid PostScript output when the

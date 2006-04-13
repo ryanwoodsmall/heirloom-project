@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.67 (gritter) 4/3/06
+ * Sccsid @(#)n1.c	1.68 (gritter) 4/14/06
  */
 
 /*
@@ -1530,13 +1530,17 @@ getach(void)
 	j = cbits(i = getch());
 #ifndef	EUC
 	if (ismot(i) || j == ' ' || j == '\n' || j & 0200) {
+		if (j >= 0200)
 #else
 #ifndef	NROFF
 	if (ismot(i) || j == ' ' || j == '\n' || j & 0200) {
+		if (j >= 0200)
 #else
 	if (ismot(i) || j == ' ' || j == '\n' || j > 0200) {
+		if (j > 0200)
 #endif	/* NROFF */
 #endif	/* EUC */
+			illseq(j, NULL, -3);
 
 		ch = i;
 		j = 0;
