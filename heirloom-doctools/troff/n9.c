@@ -932,7 +932,7 @@ illseq(int wc, const char *mb, int n)
 	if ((warn & WARN_INPUT) == 0)
 		return;
 	if (n == -3)
-		errprint("non-ASCII input byte '\\%o' terminates name", wc);
+		errprint("non-ASCII input byte terminates name");
 	else if (n == 0) {
 		if (wc & ~0177)
 			errprint("ignoring '%U' in input", wc);
