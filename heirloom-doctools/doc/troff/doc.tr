@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.36 (gritter) 4/14/06
+.\" Sccsid @(#)doc.tr	1.37 (gritter) 4/14/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1087,7 +1087,7 @@ Font and Character Size Control
 .b1
 \fB&ps\fI\|\(+-N\fR	10\|point	previous	E,T	Point size; also \fB\es\fI\(+-N\fR.
 .b1
-\fB&fzoom\fI|F|Z\fR	1	ignored	O,T	Zooms font \fIF\fR by factor \fIZ\fR.
+\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zooms font \fIF\fR by factor \fIZ\fR.
 .b1
 \fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size
 set to \fIN\fR/36\|em.
@@ -1108,13 +1108,13 @@ Also \fB\ef\fIx\fR,\|\fB\ef(\fIxx\fR,\|\fB\ef\fIN\fR.
 .b1
 \fB&fps\fI|map|...\fR		ignored	T	Mounts a font with a special character map.
 .b1
-\fB&feature\fI|F|\(+-name|...\fR	ignored	O,T	Controls OpenType features.
+\fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	Controls OpenType features.
 .b1
-\fB&fallback\fI|F|A|B|...\fR	ignored	O,T	Selects the fallback sequence for font \fIF\fR.
+\fB&fallback\fI|F|A|B|...\fR	ignored	P,T	Selects the fallback sequence for font \fIF\fR.
 .b1 0
-\fB&hidechar\fI|F|c|d|...\fR	ignored	O,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
+\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
 .b1 0
-\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
+\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Sets the width
 of the space character in font \fIF\fR to \fIN\fR.
 .mh
 Page Control
@@ -1160,21 +1160,21 @@ Text Filling, Adjusting, and Centering
 .b1
 \fB&ce\fI|N\fR	off	\fIN\(eq\fR1	B,E	Center following \fIN\fR input text lines.
 .b1
-\fB&track\fI|F|S|N|T|M\fR	ignored	O,T	Specifies letter space tracking.
+\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Specifies letter space tracking.
 .b1
-\fB&kern\fI|N\fR	1	1	O,T	Controls pairwise kerning.
+\fB&kern\fI|N\fR	1	1	P,T	Controls pairwise kerning.
 .b1
-\fB&fkern\fI|F|N\fR	1	1	O,T	Controls the use of kerning tables from font \fIF\fR.
+\fB&fkern\fI|F|N\fR	1	1	P,T	Controls the use of kerning tables from font \fIF\fR.
 .b1
-\fB&kernpair\fI|F|c|G|d|N\fR	ignored	O,T	Defines a kerning pair.
+\fB&kernpair\fI|F|c|G|d|N\fR	ignored	P,T	Defines a kerning pair.
 .b1
-\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space after a character.
+\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space after a character.
 .b1
-\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space before a character.
+\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space before a character.
 .b1 0
-\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at left margin.
+\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at left margin.
 .b1 0
-\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at right margin.
+\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at right margin.
 .mh
 Vertical Spacing
 .bt
@@ -1286,7 +1286,7 @@ on if \fIN\fR>0.
 .b1 0
 \fB&tr\fI|abcd....\fR	none	\(en	O	Translate \fIa\fR to \fIb\fR, etc. on output.
 .b1 0
-\fB&ftr\fI|F|abcd....\fR	none	\(en	O,T	Font-specific \fBtr\fR.
+\fB&ftr\fI|F|abcd....\fR	none	\(en	P,T	Font-specific \fBtr\fR.
 .mh
 Local Horizontal and Vertical Motions, and the Width Function
 .mh
@@ -2298,7 +2298,7 @@ A paired sequence
 will work because the previous requested value is also remembered.
 Ignored in \*[NR.]
 .bt
-\fB&fzoom\fI|F|Z\fR	1	ignored	O,T	Zooms font \fIF\fR by factor \fIZ\fR,
+\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zooms font \fIF\fR by factor \fIZ\fR,
 which is a positive floating point number.
 This request is useful for adjusting fonts with different
 visual sizes but identical nominal points; the zoom is thus not
@@ -2427,14 +2427,14 @@ for the \fBps\fR and \fBpsmed\fR devices.
 .xx
 The remaining arguments are handled as described for \fBfp\fR.
 .bt
-\fB&feature\fI|F|\(+-name|...\fR	ignored	O,T	\
+\fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	\
 Enables (+) or disables (\-) the OpenType feature \fIname\fR in font \fIF\fR.
 Only OpenType features that result in context-insensitive
 single-character substitutions are supported. Typical features
 are \fBonum\fR to enable old-style numerals, or \fBsmcp\fR to enable
 small capitals.
 .bt
-\fB&fallback\fI|F|A|B|...\fR	ignored	O,T	\
+\fB&fallback\fI|F|A|B|...\fR	ignored	P,T	\
 Selects the fallback sequence for font \fIF\fR.
 If the current font is \fIF\fR and a character is not found,
 font \fIA\fR is searched first, then font \fIB\fR, etc.
@@ -2442,13 +2442,13 @@ If the character still has not been found,
 it is searched for in the Special Font,
 then in the fonts mounted at positions 0, 1, and so forth.
 .bt
-\fB&hidechar\fI|F|c|d|...\fR	ignored	O,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
+\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
 If the characters appear in input afterwards,
 they are searched in other fonts using the fallback sequence.
 This is useful e.g. for combining characters from a regular
 and a Type\ 1 expert font.
 .bt
-\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Sets the width
+\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Sets the width
 of the space character in font \fIF\fR to \fIN\fR,
 which is given in units of 1/72000 of an inch multiplied by the
 current point size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair
@@ -2796,7 +2796,7 @@ A break occurs after each of the \fIN\fR input lines.
 If the input line is too long,
 it will be left adjusted.
 .bt
-\fB&track\fI|F|S|N|T|M\fR	ignored	O,T	Specifies letter space tracking
+\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Specifies letter space tracking
 for font \fIF\fR.
 If the current font is \fIF\fR
 and the point size is below or equal to \fIS\fR,
@@ -2814,22 +2814,22 @@ No adjustment is performed on the last character of an output line.
 Tracking also applies to characters
 from another font that have been selected by the \fBfallback\fP sequence.
 .bt
-\fB&kern\fI|N\fR	1	1	O,T	Controls pairwise kerning;
+\fB&kern\fI|N\fR	1	1	P,T	Controls pairwise kerning;
 disabled if \fIN\fR=0, otherwise enabled.
 .bt
-\fB&fkern\fI|F|N\fR	1	1	O,T	Controls the use of kerning tables from font \fIF\fR;
+\fB&fkern\fI|F|N\fR	1	1	P,T	Controls the use of kerning tables from font \fIF\fR;
 disabled if \fIN\fR=0, otherwise enabled.
 \*(TR kerning adjustments as defined by the following requests
 are not affected.
 .bt
-\fB&kernpair\fI|F|c|G|d|N\fR	ignored	O,T	Adds a kerning pair
+\fB&kernpair\fI|F|c|G|d|N\fR	ignored	P,T	Adds a kerning pair
 to the kerning table for character \fIc\fR
 from font \fIF\fR and character \fId\fR from font \fIG\fR.
 The \fIN\fR argument is 1/72\|000 of an inch multiplied by the current point
 size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair definitions).
 To add a kerning pair that includes the space character, use ``\e ''.
 .bt
-\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space after a character
+\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space after a character
 if the current font is \fIF\fR and \fIc\fR
 is the first character of a pair of characters subject to kerning.
 The \fIN\fR argument is
@@ -2837,7 +2837,7 @@ The \fIN\fR argument is
 of an em (as in \s-1AFM\s+1 kerning pair definitions).
 Same for \fId/M\fR etc.
 .bt
-\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	O,T	Adds a constant amount of space before a character
+\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space before a character
 if the current font is \fIF\fR and \fIc\fR
 is the second character of a pair of characters subject to kerning.
 The \fIN\fR argument is
@@ -2845,7 +2845,7 @@ The \fIN\fR argument is
 of an em (as in \s-1AFM\s+1 kerning pair definitions).
 Same for \fId/M\fR etc.
 .bt
-\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at left margin.
+\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at left margin.
 When the current font is \fIF\fR and \fIc\fR appears at the left margin
 of an output line in left-adjusted, both-adjusted, or nofill mode,
 the margin is relocated to the right by \fIN\fR, which is
@@ -2853,7 +2853,7 @@ the margin is relocated to the right by \fIN\fR, which is
 of an em (as in \s-1AFM\s+1 character width definitions).
 Same for \fId/M\fR etc.
 .bt
-\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	O,T	Hanging characters at right margin.
+\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at right margin.
 When the current font is \fIF\fR and \fIc\fR appears at the right margin
 of an output line in right-adjusted, both-adjusted, or nofill mode,
 the margin is relocated to the right by \fIN\fR, which is
@@ -3655,7 +3655,7 @@ the last one will be mapped into the space character.
 To be consistent, a particular translation
 must stay in effect from \fIinput\fR to \fIoutput\fR time.
 .bt
-\fB&ftr\fI|F|abcd....\fR	none	\(en	O,T	Font-specific \fBtr\fR.
+\fB&ftr\fI|F|abcd....\fR	none	\(en	P,T	Font-specific \fBtr\fR.
 If the current character originates from font \fIF\fR,
 character \fIa\fR into \fIb\fR, \fIc\fR into \fId\fR, etc.
 .sc
