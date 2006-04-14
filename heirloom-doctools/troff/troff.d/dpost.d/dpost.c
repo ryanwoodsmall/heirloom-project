@@ -4464,18 +4464,15 @@ t_link(char *lp)
 				if ((lp = strchr(lp, ' ')) != NULL) {
 					lp++;
 					endtext();
-					fprintf(gf, "[ /Dest /Anchor$");
-					pref(lp, gf);
-					fprintf(gf, "\n"
-						"/Rect [%g %g %g %g]\n"
+					fprintf(tf, "[ /Dest /Anchor$");
+					pref(lp, tf);
+					fprintf(tf, "\n"
+						"/Rect [%d %d %d %d]\n"
 						"/Color [%s]\n"
 						"/Border [%s]\n"
 						"/Subtype /Link\n"
 						"/ANN pdfmark\n",
-						llx * 72.0 / res,
-						pagelength - lly * 72.0 / res,
-						urx * 72.0 / res,
-						pagelength - ury * 72.0 / res,
+						llx, -lly, urx, -ury,
 						linkcolor, linkborder);
 				}
 			}
