@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.66 (gritter) 4/14/06
+ * Sccsid @(#)t10.c	1.67 (gritter) 4/14/06
  */
 
 /*
@@ -774,7 +774,7 @@ ptanchor(int n)
 	for (rp = anchors; rp; rp = rp->next)
 		if (rp->cnt == n) {
 			fdprintf(ptid, "x X Anchor %d,%d %s\n",
-				vpos - lss, hpos + esc, rp->name);
+				vpos + lead - lss, hpos + esc, rp->name);
 			break;
 		}
 }
