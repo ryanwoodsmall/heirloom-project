@@ -1,4 +1,6 @@
 Release ...
+* troff/dpost: Links and anchors in PDF documents can now be defined;
+  "\A" and "\T" escape sequences have been introduced for this.
 * troff: The ".fkern" request has been introduced to disable the use of
   the kerning tables of specific fonts.
 * [nt]roff: A warning is now issued when a non-ASCII byte is found in

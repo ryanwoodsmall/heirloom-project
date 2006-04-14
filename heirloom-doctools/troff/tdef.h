@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.72 (gritter) 4/3/06
+ * Sccsid @(#)tdef.h	1.73 (gritter) 4/14/06
  */
 
 /*
@@ -138,6 +138,11 @@
 #define	iscontrol(n)	(n==035 || n==036)	/* used to test the next two */
 #define	HX	035	/* next character is value of \x'...' */
 #define	FONTPOS	036	/* position of font \f(XX encoded in top */
+
+#define	XFUNC	013	/* extended function codes, type in fbits: */
+#define	ANCHOR	0001	/* anchor definition */
+#define	LINKON	0002	/* link start */
+#define	LINKOFF	0003	/* link end */
 
 #define	HYPHEN	c_hyphen
 #define	EMDASH	c_emdash	/* \(em */
@@ -617,6 +622,9 @@ extern const struct numtab initnumtab[];
 #define	it	env._it
 #define	itmac	env._itmac
 #define	lnsize	env._lnsize
+#define	linkin	env._linkin
+#define	linkout	env._linkout
+#define	linkhp	env._linkhp
 #define	dicthnj	env._dicthnj
 #define	hyext	env._hyext
 #define	hyptr	env._hyptr
@@ -693,6 +701,9 @@ extern struct env {
 	int	_it;
 	int	_itmac;
 	int	_lnsize;
+	int	_linkin;
+	int	_linkout;
+	int	_linkhp;
 	void	*_dicthnj;
 	int	_hyext;
 	tchar	*_hyptr[NHYP];

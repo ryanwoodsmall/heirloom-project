@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.37 (gritter) 4/14/06
+.\" Sccsid @(#)doc.tr	1.38 (gritter) 4/14/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1628,6 +1628,7 @@ Reference	Sequence	Meaning
 13	\fB\e:\fR	Optional line-break character
 10.2	\fB\e;\fR	Ligature suppressor
 9.1	\fB\ea\fR	Non-interpreted leader character
+24.6	\fB\eA\fI\'string\'\fR	Anchor definition
 12.3	\fB\eb\fI\'abc...\'\fR	Bracket building function
 4.2	\fB\ec\fR	Interrupt text processing
 2.1	\fB\eC\fI\'xxx\'\fR	Character named \fIxxx\fP
@@ -1650,6 +1651,7 @@ Reference	Sequence	Meaning
 2.3	\fB\es\fIN\fR,\fB\es\fI\(+-N\fR,\fB\es\'\fI\(+-N\fB\'\fR	Point-size change function
 2.2	\fB\eS\fI\'N\'\fR	Slant output \fIN\fP degrees
 9.1	\fB\et\fR	Non-interpreted horizontal tab
+24.6	\fB\eT\fI\'string\'\fR	Link definition
 11.1	\fB\eu\fR	Reverse (up) 1/2\|em vertical motion (1/2 line in \*(NR)
 2.1	\fB\eU\fI\'X\'\fR	Character at Unicode position U+\fIX\fR
 11.1	\fB\ev\fI\'N\'\fR	Local vertical motion; move down \fIN\fR \fI(negative up)\fR
@@ -4972,6 +4974,34 @@ but the initial view in the tree structure is collapsed,
 i.e. no children are shown by default.
 It the bookmark has no children,
 there is no difference to a regular bookmark.
+.sc
+Links.
+\*[PDF] documents can contain links
+that cause the viewer to jump to a certain location
+when the user clicks on an area of the page.
+In \*[TR,] such links can be built as follows:
+.pg
+The \fB\eA\fI\'string\'\fR escape sequence defines an anchor,
+i.e. a location to jump to,
+with the name \fIstring\fR
+(consisting of \s-1ASCII\s0 characters).
+.pg
+The actual link is built using two \fB\eT\fR escape
+sequences surrounding the text that forms the area to click on,
+e.g.: \fB\eT\fI\'string\'text of link\fB\eT\fR.
+\fIstring\fR must correspond to an anchor
+anywhere in the document.
+.pg
+The appearance of links can be changed;
+links are normally surrounded by an 1 point wide blue border.
+The color can be set using
+\fB\eX'SetLinkColor: \fIred green blue\fB'\fR,
+where \fIred, green, and blue\fR are values between 0 and 1.
+The border can be set using
+\fB\eX'SetLinkBorder: \fIbx by width\fB'\fR,
+where \fIbx\fR and \fIby\fR define the horizontal
+and vertical corner radius, respectively,
+and \fIwidth\fR defines the width.
 .\"""
 .pg
 .mh

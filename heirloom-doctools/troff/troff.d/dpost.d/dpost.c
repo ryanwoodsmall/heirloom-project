@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.142 (gritter) 4/4/06
+ * Sccsid @(#)dpost.c	1.143 (gritter) 4/14/06
  */
 
 /*
@@ -669,6 +669,10 @@ static void	t_track(char *);
 static void	t_strack(void);
 static void	t_pdfmark(char *);
 static void	t_locale(char *);
+static void	t_anchor(char *);
+static void	t_link(char *);
+static void	t_linkcolor(char *);
+static void	t_linkborder(char *);
 
 static int	mb_cur_max;
 
@@ -1712,6 +1716,14 @@ devcntrl(
 		    t_pdfmark(buf);
 		else if ( strcmp(str, "LC_CTYPE") == 0 )
 		    t_locale(buf);
+		else if ( strcmp(str, "Anchor") == 0 )
+		    t_anchor(buf);
+		else if ( strcmp(str, "Link") == 0 )
+		    t_link(buf);
+		else if ( strcmp(str, "SetLinkColor") == 0 )
+		    t_linkcolor(buf);
+		else if ( strcmp(str, "SetLinkBorder") == 0 )
+		    t_linkborder(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -4394,4 +4406,101 @@ t_locale(char *lp)
 	sscanf(lp, "%s", savlp);
 	setlocale(LC_CTYPE, savlp);
 	mb_cur_max = MB_CUR_MAX;
+}
+
+static void
+pref(const char *lp, FILE *fp)
+{
+	int	c;
+
+	while ((c = *lp++ & 0377) != 0 && c != '\n') {
+		if (c >= '0' && c <= '9' || c >= 'a' && c <= 'z' ||
+				c >= 'A' && c <= 'Z')
+			putc(c, fp);
+		else
+			fprintf(fp, "$%2x", c);
+	}
+}
+
+static void
+t_anchor(char *lp)
+{
+	int	v;
+
+	v = strtol(lp, &lp, 10);
+	if ((lp = strchr(lp, ' ')) != NULL) {
+		lp++;
+		endtext();
+		fprintf(tf, "[ /Dest /Anchor$");
+		pref(lp, tf);
+		fprintf(tf, "\n"
+			    "  /View [/XYZ -4 %g 0]\n"
+			    "/DEST pdfmark\n",
+			pagelength - (v >= 0 ? v * 72.0 / res : -4));
+	}
+}
+
+static char linkcolor[60] = "0 0 1";
+static char linkborder[60] = "0 0 1";
+
+static void
+t_link(char *lp)
+{
+	int	llx, lly, urx, ury;
+
+	llx = strtol(lp, &lp, 10);
+	if (*lp) {
+		while (*lp == ',')
+			lp++;
+		lly = strtol(lp, &lp, 10);
+		if (*lp) {
+			while (*lp == ',')
+				lp++;
+			urx = strtol(lp, &lp, 10);
+			if (*lp) {
+				while (*lp == ',')
+					lp++;
+				ury = strtol(lp, &lp, 10);
+				if ((lp = strchr(lp, ' ')) != NULL) {
+					lp++;
+					endtext();
+					fprintf(gf, "[ /Dest /Anchor$");
+					pref(lp, gf);
+					fprintf(gf, "\n"
+						"/Rect [%g %g %g %g]\n"
+						"/Color [%s]\n"
+						"/Border [%s]\n"
+						"/Subtype /Link\n"
+						"/ANN pdfmark\n",
+						llx * 72.0 / res,
+						pagelength - lly * 72.0 / res,
+						urx * 72.0 / res,
+						pagelength - ury * 72.0 / res,
+						linkcolor, linkborder);
+				}
+			}
+		}
+	}
+}
+
+static void
+t_linkcolor(char *lp)
+{
+	int	r, g, b;
+
+	r = strtol(lp, &lp, 10);
+	g = strtol(lp, &lp, 10);
+	b = strtol(lp, &lp, 10);
+	snprintf(linkcolor, sizeof linkcolor, "%d %d %d", r, g, b);
+}
+
+static void
+t_linkborder(char *lp)
+{
+	int	bx, by, c;
+
+	bx = strtol(lp, &lp, 10);
+	by = strtol(lp, &lp, 10);
+	c = strtol(lp, &lp, 10);
+	snprintf(linkborder, sizeof linkborder, "%d %d %d", bx, by, c);
 }

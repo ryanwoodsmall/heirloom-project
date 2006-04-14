@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.136 (gritter) 4/14/06
+ * Sccsid @(#)t6.c	1.137 (gritter) 4/14/06
  */
 
 /*
@@ -91,6 +91,7 @@ int	sbold = 0;
 int	kern = 0;
 struct box	mediasize, bleedat, trimat, cropat;
 int	psmaxcode;
+struct ref	*anchors, *links;
 
 int
 width(register tchar j)
@@ -2483,6 +2484,87 @@ setuc0(int n)
 		setfbits(c, f);
 	}
 	return c;
+}
+
+static char *
+getref(void)
+{
+	int	a = 0, i, c, delim;
+	char	*np = NULL;
+
+	if ((delim = getach()) != 0) {
+		for (i = 0; ; i++) {
+			if (i + 1 >= a)
+				np = realloc(np, a += 32);
+			if ((c = getach()) == 0) {
+				if (cbits(ch) == ' ') {
+					ch = 0;
+					c = ' ';
+				} else {
+					nodelim(delim);
+					break;
+				}
+			}
+			if (c == delim)
+				break;
+			np[i] = c;
+		}
+		np[i] = 0;
+	}
+	return np;
+}
+
+static tchar
+mkxfunc(int f, int s)
+{
+	tchar	t = XFUNC;
+	setfbits(t, f);
+	setsbits(t, s);
+	return t;
+}
+
+tchar
+setanchor(void)
+{
+	static int	cnt;
+	struct ref	*rp;
+	char	*np;
+
+	if ((np = getref()) != NULL) {
+		rp = calloc(1, sizeof *rp);
+		rp->cnt = ++cnt;
+		rp->name = np;
+		rp->next = anchors;
+		anchors = rp;
+		return mkxfunc(ANCHOR, cnt);
+	} else
+		return mkxfunc(ANCHOR, 0);
+}
+
+tchar
+setlink(void)
+{
+	static int	cnt;
+	struct ref	*rp;
+	char	*np;
+	int	sv;
+
+	sv = linkin;
+	if (linkin = !linkin) {
+		if ((np = getref()) != NULL) {
+			rp = calloc(1, sizeof *rp);
+			rp->cnt = ++cnt;
+			rp->name = np;
+			rp->next = links;
+			links = rp;
+			linkin = cnt;
+			return mkxfunc(LINKON, cnt);
+		} else {
+			linkin = -1;
+			return mkxfunc(LINKON, 0);
+		}
+	} else
+		return mkxfunc(LINKOFF, sv > 0 ? sv : 0);
 }
 
 int

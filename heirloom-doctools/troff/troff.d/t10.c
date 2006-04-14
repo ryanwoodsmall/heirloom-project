@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.65 (gritter) 4/2/06
+ * Sccsid @(#)t10.c	1.66 (gritter) 4/14/06
  */
 
 /*
@@ -114,6 +114,9 @@ struct dev dev;
 struct Font **fontbase;
 
 int Nfont;
+
+static void	ptanchor(int);
+static void	ptlink(int);
 
 void
 growfonts(int n)
@@ -358,12 +361,16 @@ ptout(register tchar i)
 	b = dip->blss + lss;
 	lead += dip->blss + lss;
 	dip->blss = 0;
+	if (linkout)
+		linkhp = hpos;
 	for (k = oline; k < olinep; )
 		k = ptout0(k, olinep);	/* now passing a pointer! */
 	olinep = oline;
 	lead += dip->alss;
 	a = dip->alss;
 	dip->alss = 0;
+	if (linkout)
+		ptlink(linkout);
 	/*
 	fdprintf(ptid, "x xxx end of line: hpos=%d, vpos=%d\n", hpos, vpos);
 */
@@ -444,6 +451,23 @@ ptout0(tchar *pi, tchar *pend)
 		temp[2] = 0;
 		ptfpcmd(0, temp);
 		return(pi+outsize);
+	}
+	if (k == XFUNC) {
+		switch (fbits(i)) {
+		case ANCHOR:
+			ptanchor(sbits(i));
+			return(pi+outsize);
+		case LINKON:
+			linkout = sbits(i);
+			linkhp = hpos + esc;
+			return(pi+outsize);
+		case LINKOFF:
+			ptlink(sbits(i));
+			linkout = 0;
+			return(pi+outsize);
+		default:
+			return(pi+outsize);
+		}
 	}
 	if (sfbits(i) == oldbits) {
 		xfont = pfont;
@@ -738,6 +762,37 @@ ptlocale(const char *cp)
 	if (ascii || realpage == 0 || lp == NULL)
 		return;
 	fdprintf(ptid, "x X LC_CTYPE %s\n", lp);
+}
+
+static void
+ptanchor(int n)
+{
+	struct ref	*rp;
+
+	if (ascii)
+		return;
+	for (rp = anchors; rp; rp = rp->next)
+		if (rp->cnt == n) {
+			fdprintf(ptid, "x X Anchor %d,%d %s\n",
+				vpos - lss, hpos + esc, rp->name);
+			break;
+		}
+}
+
+static void
+ptlink(int n)
+{
+	struct ref	*rp;
+
+	if (ascii)
+		return;
+	for (rp = links; rp; rp = rp->next)
+		if (rp->cnt == n) {
+			fdprintf(ptid, "x X Link %d,%d,%d,%d %s\n",
+				linkhp, vpos + pts2u(1),
+				hpos + esc, vpos - pts * 8 / 10,
+				rp->name);
+		}
 }
 
 void
