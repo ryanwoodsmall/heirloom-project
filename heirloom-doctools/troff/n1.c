@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.69 (gritter) 4/14/06
+ * Sccsid @(#)n1.c	1.70 (gritter) 4/15/06
  */
 
 /*
@@ -109,6 +109,7 @@ static char *sprintlong(char *s, long, int);
 static char *sprintn(char *s, long n, int b);
 #define	vfdprintf	xxvfdprintf
 static void vfdprintf(int fd, const char *fmt, va_list ap);
+static void _setenv(void);
 
 #ifdef	DEBUG
 int	debug = 0;	/*debug flag*/
@@ -1057,6 +1058,11 @@ g0:
 	case 'N':	/* absolute character number */
 		i = setabs();
 		goto gx;
+	case 'V':	/* environment variable */
+		if (xflag == 0)
+			break;
+		_setenv();
+		goto g0;
 	case '.':	/* . */
 		i = '.';
 gx:
@@ -1627,6 +1633,46 @@ setuc(void)
 	if (n == 0 || *bp != '\0')
 		return 0;
 	return setuc0(n);
+}
+
+
+static void
+_setenv(void)
+{
+	int	a = 0, i = 0, c, delim;
+	char	*np = NULL, *vp;
+
+	if ((delim = getach()) == 0)
+		return;
+	switch (delim) {
+	case '[':
+		for (;;) {
+			if (i + 1 >= a)
+				np = realloc(np, a += 32);
+			if ((c = getach()) == 0) {
+				nodelim(']');
+				break;
+			}
+			if (c == ']')
+				break;
+			np[i++] = c;
+		}
+		np[i] = 0;
+		break;
+	case '(':
+		np = malloc(a = 3);
+		np[0] = delim;
+		np[1] = getach();
+		np[2] = 0;
+		break;
+	default:
+		np = malloc(a = 2);
+		np[0] = delim;
+		np[1] = 0;
+	}
+	if ((vp = getenv(np)) != NULL)
+		cpushback(vp);
+	free(np);
 }
 
 

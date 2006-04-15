@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.38 (gritter) 4/14/06
+.\" Sccsid @(#)doc.tr	1.39 (gritter) 4/15/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -82,7 +82,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/14/06
+.ds Sccsdate 4/15/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1655,6 +1655,7 @@ Reference	Sequence	Meaning
 11.1	\fB\eu\fR	Reverse (up) 1/2\|em vertical motion (1/2 line in \*(NR)
 2.1	\fB\eU\fI\'X\'\fR	Character at Unicode position U+\fIX\fR
 11.1	\fB\ev\fI\'N\'\fR	Local vertical motion; move down \fIN\fR \fI(negative up)\fR
+20	\fB\eV\fIx\fR,\fB\eV(\fIxx\fR,\fB\eV[\fIxxx\fB]\fR	Environment variable \fIx\fP, \fIxx\fR, or \fIxxx\fR
 11.2	\fB\ew\fI\'string\'\fR	Interpolate width of \fIstring\fR
 5.2	\fB\ex\fI\'N\'\fR	Extra line-space function \fI(negative before, positive after)\fR
 10.7	\fB\eX\fI\'string\'\fR	Output \fIstring\fP as device control function
@@ -1677,6 +1678,8 @@ The escape sequences
 \fB\eg\fR,
 \fB\en\fR,
 \fB\et\fR,
+\fB\eV\fR,
+\fB\eX\fR,
 and
 \fB\e\fR(newline) are interpreted in \fIcopy mode\fR (\(sc7.2).
 .sp
@@ -3040,6 +3043,8 @@ The input is copied without interpretation
 \*+ The contents of number registers indicated by \fB\en\fR are interpolated.
 \*+ Strings indicated by \fB\e\(**\fR are interpolated.
 \*+ Arguments indicated by \fB\e$\fR are interpolated.
+\*+ Environment variables indicated by \fB\eV\fR are interpolated.
+\*+ Device control functions indicated by \fB\eX\fR are executed.
 \*+ Concealed newlines indicated by \fB\e\fR(newline) are eliminated.
 \*+ Comments indicated by \fB\e"\fR are eliminated.
 \*+ \fB\et\fR and \fB\ea\fR are interpreted as \s-1ASCII\s+1 horizontal tab and \s-1SOH\s+1 respectively (\(sc9).
@@ -4320,6 +4325,12 @@ which must have been obtained by a previous \fBopen\fR request.
 which must have been obtained by a previous \fBopen\fR request.
 .mh
 Miscellaneous
+.pg
+The \fB\eV\fIx\fR, \fB\eV(\fIxx\fR, or \fB\eV[\fIxxx\fB]\fR
+escape sequence causes the value of the
+\fIx\fP, \fIxx\fR, or \fIxxx\fR environment variable, respectively,
+to be printed.
+It is interpreted in \fIcopy mode.\fR
 .pg
 .h1
 .bt

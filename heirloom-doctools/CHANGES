@@ -3,6 +3,8 @@ Release ...
   "\A" and "\T" escape sequences have been introduced for this.
 * troff: The ".fkern" request has been introduced to disable the use of
   the kerning tables of specific fonts.
+* [nt]roff: The "\V" escape sequence has been introduced; it prints the
+  value of an environment variable.
 * [nt]roff: A warning is now issued when a non-ASCII byte is found in
   a name (of a request, number register, etc.) with the "input" warning
   category.
