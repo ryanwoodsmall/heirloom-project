@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.143 (gritter) 4/14/06
+ * Sccsid @(#)dpost.c	1.144 (gritter) 4/15/06
  */
 
 /*
@@ -4483,21 +4483,21 @@ t_link(char *lp)
 static void
 t_linkcolor(char *lp)
 {
-	int	r, g, b;
+	float	r, g, b;
 
-	r = strtol(lp, &lp, 10);
-	g = strtol(lp, &lp, 10);
-	b = strtol(lp, &lp, 10);
-	snprintf(linkcolor, sizeof linkcolor, "%d %d %d", r, g, b);
+	r = strtof(lp, &lp);
+	g = strtof(lp, &lp);
+	b = strtof(lp, &lp);
+	snprintf(linkcolor, sizeof linkcolor, "%g %g %g", r, g, b);
 }
 
 static void
 t_linkborder(char *lp)
 {
-	int	bx, by, c;
+	float	bx, by, c;
 
-	bx = strtol(lp, &lp, 10);
-	by = strtol(lp, &lp, 10);
-	c = strtol(lp, &lp, 10);
-	snprintf(linkborder, sizeof linkborder, "%d %d %d", bx, by, c);
+	bx = strtof(lp, &lp);
+	by = strtof(lp, &lp);
+	c = strtof(lp, &lp);
+	snprintf(linkborder, sizeof linkborder, "%g %g %g", bx, by, c);
 }
