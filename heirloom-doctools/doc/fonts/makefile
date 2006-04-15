@@ -1,7 +1,7 @@
 DISTFLAGS = -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite \
 	-sProcessColorModel=DeviceGray -dPDFSETTINGS=/prepress
 CRYPT = -sOwnerPassword="`dd if=/dev/random bs=12 count=1 2>/dev/null | \
-	md5sum | awk '{ print $1 }'` " -dEncryptionR=3 \
+	md5sum | awk '{ print $$1 }'` " -dEncryptionR=3 \
 	-dKeyLength=128 -dPermissions=-300
 
 .SUFFIXES: .tr .ps .pdf
