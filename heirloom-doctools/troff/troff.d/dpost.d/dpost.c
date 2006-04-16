@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.145 (gritter) 4/16/06
+ * Sccsid @(#)dpost.c	1.146 (gritter) 4/17/06
  */
 
 /*
@@ -2491,20 +2491,28 @@ supplyotf(char *font, char *path, FILE *fp)
         	fprintf(sf, "%%%%+ font %s\n", font);
 	fprintf(rf, "%%%%BeginResource: font %s\n", font);
 	fprintf(rf, "/FontSetInit /ProcSet findresource begin\n");
-	fprintf(rf, "/%s %d ", font, length);
-	fprintf(rf, "currentfile /ASCIIHexDecode filter cvx exec\n");
-	for (i = 0; StartData[i]; i++) {
-		putc(hex[(StartData[i]&0360)>>4], rf);
-		putc(hex[StartData[i]&017], rf);
+	if (encoding == 5) {
+		fprintf(rf, "%%%%BeginData: %ld Binary Bytes\n",
+				(long)(length + 13 + strlen(font) + 12));
+		fprintf(rf, "/%s %12d StartData ", font, length);
+		fwrite(&contents[offset], 1, length, rf);
+		fprintf(rf, "\n%%%%EndData\n");
+	} else {
+		fprintf(rf, "/%s %d ", font, length);
+		fprintf(rf, "currentfile /ASCIIHexDecode filter cvx exec\n");
+		for (i = 0; StartData[i]; i++) {
+			putc(hex[(StartData[i]&0360)>>4], rf);
+			putc(hex[StartData[i]&017], rf);
+		}
+		putc('\n', rf);
+		for (i = offset; i < offset+length; i++) {
+			putc(hex[(contents[i]&0360)>>4], rf);
+			putc(hex[contents[i]&017], rf);
+			if (i > offset && (i - offset + 1) % 34 == 0)
+				putc('\n', rf);
+		}
+		fprintf(rf, ">\n");
 	}
-	putc('\n', rf);
-	for (i = offset; i < offset+length; i++) {
-		putc(hex[(contents[i]&0360)>>4], rf);
-		putc(hex[contents[i]&017], rf);
-		if (i > offset && (i - offset + 1) % 34 == 0)
-			putc('\n', rf);
-	}
-	fprintf(rf, ">\n");
 	fprintf(rf, "%%%%EndResource\n");
 	free(contents);
 	got_otf = 1;
