@@ -5,6 +5,8 @@ Release ...
 * su: Works with PAM on Mac OS X now (Stefan Tramm).
 * ps: Handles dead processes as on other platforms now (Stefan Tramm).
 * pgrep: Ignores dead processes now (Stefan Tramm).
+* spell: A value of the wrong type that was passed to scanf() could lead
+  to build errors on 64-bit platforms (Jeffrey H. Johnson).
 
 Release 060122
 * The tools have been ported to Mac OS X 10.4.3 (patches by Stefan Tramm).

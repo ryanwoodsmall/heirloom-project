@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)spellin.c	2.3 (gritter) 6/22/05
+ * Sccsid @(#)spellin.c	2.4 (gritter) 4/16/06
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -77,6 +77,7 @@ int
 main(int argc, char **argv)
 {
 	int32_t h, k, d;
+	unsigned hu;
 	int32_t  i;
 	int32_t count;
 	int32_t w1;
@@ -103,7 +104,8 @@ main(int argc, char **argv)
 	z = huff((1L<<HASHWIDTH)/atof(argv[1]));
 	fprintf(stderr, "%s: expected code widths = %f\n",
 	    argv[0], z);
-	for (count = 0; scanf("%lo", (long *)&h) == 1; ++count) {
+	for (count = 0; scanf("%o", &hu) == 1; ++count) {
+		h = hu;
 		if ((t = h >> (HASHWIDTH - INDEXWIDTH)) != u) {
 			if (bp != B)
 				wp++;
