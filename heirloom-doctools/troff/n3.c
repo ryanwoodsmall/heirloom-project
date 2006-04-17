@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.80 (gritter) 4/17/06
+ * Sccsid @(#)n3.c	1.82 (gritter) 4/17/06
  */
 
 /*
@@ -400,16 +400,23 @@ finds(register int mn)
 {
 	register int i;
 	register filep savip;
+	filep	savoffset;
 
 	oldmn = findmn(mn);
 	newmn = 0;
 	apptr = (filep)0;
 	if (app && oldmn >= 0 && contab[oldmn].mx) {
 		savip = ip;
+		savoffset = offset;
 		ip = (filep)contab[oldmn].mx;
 		oldmn = -1;
-		while ((i = rbf()) != 0)
-			;
+		while ((i = rbf()) != 0) {
+			if (istail(i)) {
+				offset = ip - 1;
+				wbt(i & ~(tchar)TAILBIT);
+			}
+		}
+		offset = savoffset;
 		apptr = ip;
 		if (!diflg)
 			ip = incoff(ip);
@@ -463,7 +470,8 @@ copyb(void)
 	register int i, j, state;
 	register tchar ii;
 	int	req;
-	filep savoff = 0;
+	filep savoff = 0, tailoff = 0;
+	tchar	tailc = 0;
 	char	*cp, *mn;
 
 	if (skip(0) || !(j = getrq()))
@@ -498,6 +506,9 @@ copyb(void)
 		if (i == '\n') {
 			state = 1;
 			nlflg = 0;
+			tailoff = offset;
+			tailc = ii;
+			ii &= ~(tchar)TAILBIT;
 			goto c0;
 		}
 		if (state == 1 && i == '.') {
@@ -519,6 +530,10 @@ c0:
 		wbfl();
 		offset = savoff;
 		wbt((tchar)0);
+		if (tailoff) {
+			offset = tailoff;
+			wbt(tailc | TAILBIT);
+		}
 	}
 	copyf--;
 	free(mn);
@@ -782,6 +797,7 @@ pushi(filep newip, int mname)
 	p->lastpbp = lastpbp;
 	p->mname = mname;
 	p->frame_cnt = frame->frame_cnt + 1;
+	p->tail_cnt = frame->tail_cnt + 1;
 	lastpbp = pbp;
 	pendt = ch = 0;
 	frame = nxf;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.39 (gritter) 4/3/06
+ * Sccsid @(#)ext.h	1.40 (gritter) 4/17/06
  */
 
 /*
@@ -165,6 +165,7 @@ extern	int	stdi;
 extern	int	stop;
 extern	int	sv;
 extern	int	tabch,	ldrch;
+extern	int	tailflg;
 extern	int	tflg;
 extern	int	totout;
 extern	int	trap;

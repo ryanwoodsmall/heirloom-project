@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.39 (gritter) 3/13/06
+ * Sccsid @(#)n5.c	1.40 (gritter) 4/17/06
  */
 
 /*
@@ -1084,14 +1084,15 @@ casereturn(void)
 void
 eatblk(int inblk)
 {	register int cnt, i;
+	tchar	ii;
 
 	cnt = 0;
 	do {
 		if (ch)	{
-			i = cbits(ch);
+			i = cbits(ii = ch);
 			ch = 0;
 		} else
-			i = cbits(getch0());
+			i = cbits(ii = getch0());
 		if (i == ESC)
 			cnt++;
 		else {
@@ -1105,8 +1106,10 @@ eatblk(int inblk)
 		}
 		if (i == LEFT) eatblk(1);
 	} while ((!inblk && (i != '\n')) || (inblk && (i != RIGHT)));
-	if (i == '\n')
+	if (i == '\n') {
 		nlflg++;
+		tailflg = istail(ii);
+	}
 }
 
 

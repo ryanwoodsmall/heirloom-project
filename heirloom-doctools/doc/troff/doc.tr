@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.48 (gritter) 4/17/06
+.\" Sccsid @(#)doc.tr	1.49 (gritter) 4/17/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1265,6 +1265,8 @@ Macros, Strings, Diversion, and Position Traps
 \T'shift'\fB&shift\fI|N\fR	\(en	1	\(en	Shifts the arguments to the current macro.\T
 .b1 0
 \T'em'\fB&em\fI|xx\fR	none	none	\(en	End macro is \fIxx\fI.\T
+.b1 0
+\T'recursionlimit'\fB&recursionlimit\fI|N|M\fR	\(en	\(en	Sets the maximum stack depth.\T
 .mht s_reg
 Number Registers
 .bt
@@ -1420,8 +1422,6 @@ Miscellaneous
 .b1
 				if \fIt\fR present, print only total of sizes.\T
 .b1 0
-\T'recursionlimit'\fB&recursionlimit\fI|N\fR	\(en	\(en	Sets the maximum stack depth to \fIN\fR.\T
-.b1 0
 .lg 0
 \T'fl'\fB&fl\fR	\(en	\(en	B	Flush output buffer.\T
 .lg
@@ -1556,7 +1556,7 @@ Device and Font Description Files
 \T'psbb'psbb	23\T
 \T'pso'pso	19\T
 \T'rd'rd	18\T
-\T'recursionlimit'recursionlimit	20\T
+\T'recursionlimit'recursionlimit	7\T
 \T'return'return	7\T
 \T'rhang'rhang	4\T
 \T'rm'rm	7\T
@@ -3242,6 +3242,31 @@ A macro-invocation trap effective in the current diversion may be planted using 
 The \fB.t\fR register works in a diversion; if there is no subsequent trap a \fIlarge\fR
 distance is returned.
 For a description of input-line-count traps, see \T'it'\fBit\fR below.\T
+.sc
+Recursion.
+\*(TR macros can be invoked recursively.
+In general, arguments and other information for macro calls
+is stored on a stack.
+Since the size of the stack is limited by available memory,
+recursive calls cannot descend to arbitrary depths.
+To avoid consumption of large amounts of memory,
+the depth is deliberately restricted further;
+the \T'recursionlimit'\fBrecursionlimit\fR\T request
+allows to adjust that restriction.
+.pg
+A macro call can be \fItail-recursive\fR,
+that is, the re-invocation of the current macro
+can occur in its last statement.
+\*(TR can then replace the stack frame
+of the current macro instance
+with that of the following one,
+and the stack size remains constant.
+The depth of tail-recursive macro calls is thus principally unlimited,
+and is not artificially restricted by default.
+Since \*(TR cannot determine the control character
+at the time the macro is invoked in advance,
+a macro invocation must actually occur in the last line
+for tail-recursion elimination to become effective.
 .h1
 .bta de
 \A'e_.'\fB&de\fI|xx|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Define or redefine the macro \fIxx\fR.
@@ -3347,6 +3372,14 @@ when all input has ended.
 The effect is the same as if the contents of \fIxx\fR had been at the end
 of the last file processed,
 but all processing ceases at the next page eject.
+.bta recursionlimit
+\fB&recursionlimit\fI|N|M\fR	\(en	\(en	Sets
+the maximum stack depth for generally recursive invocations
+of macros to \fIN\fR,
+and for invocations of tail-recursive macros to \fIM\fR.
+If \fIN\fR or \fIM\fR are zero, the respective depth is unlimited.
+The default is 512 for the general case,
+and no limit for tail-recursion.
 .mha s_reg
 Number Registers
 .pg
@@ -4476,11 +4509,6 @@ on the standard error;
 if \fIt\fR is given, only the total of the sizes is printed.
 The sizes is given in \fIblocks\fR
 of 128 characters.
-.bta recursionlimit
-\fB&recursionlimit\fI|N\fR	\(en	\(en	Sets
-the maximum stack depth for recursive invocations of macros to \fIN\fR.
-If \fIN\fR is zero, the stack depth is unlimited.
-The default limit is 512.
 .bta fl
 .lg 0
 \fB&fl\fR	\(en	\(en	B	\c

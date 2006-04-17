@@ -1,6 +1,9 @@
 Release ...
 * troff/dpost: Links and anchors in PDF documents can now be defined;
   "\A" and "\T" escape sequences have been introduced for this.
+* [nt]roff: Tail-recursion elimination for macro calls has been added.
+  This allows recursive macro calls of arbitrary depths when the call
+  to itself occurs in the last line of the macro.
 * troff: The ".fkern" request has been introduced to disable the use of
   the kerning tables of specific fonts.
 * [nt]roff: The "\V" escape sequence has been introduced; it prints the

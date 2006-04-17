@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.70 (gritter) 4/15/06
+ * Sccsid @(#)n1.c	1.71 (gritter) 4/17/06
  */
 
 /*
@@ -86,6 +86,7 @@ char *xxxvers = "@(#)roff:n1.c	2.13";
 
 #define	MAX_RECURSION_DEPTH	512
 static int	max_recursion_depth = MAX_RECURSION_DEPTH;
+static int	max_tail_depth;
 
 jmp_buf sjbuf;
 filep	ipl[NSO];
@@ -813,6 +814,9 @@ int
 control(register int a, register int b)
 {
 	register int	j;
+	int	newip;
+	int	n, i;
+	struct s	*p;
 
 	if (a == 0 || (j = findmn(a)) == -1) {
 		nosuch(a);
@@ -824,6 +828,9 @@ control(register int a, register int b)
 	 * recursion limit of MAX_RECURSION_DEPTH was chosen as
 	 * it is extremely unlikely that a correct nroff/troff
 	 * invocation would exceed this value.
+	 *
+	 * The depth of tail-recursive macro calls is not limited
+	 * by default.
 	 */
 
 	if (max_recursion_depth > 0 && frame->frame_cnt > max_recursion_depth) {
@@ -831,6 +838,13 @@ control(register int a, register int b)
 		    "Exceeded maximum stack size (%d) when "
 		    "executing macro %s. Stack dump follows",
 		    max_recursion_depth, macname(frame->mname));
+		edone(02);
+	}
+	if (max_tail_depth > 0 && frame->tail_cnt > max_tail_depth) {
+		errprint(
+		    "Exceeded maximum recursion depth (%d) when "
+		    "executing macro %s. Stack dump follows",
+		    max_tail_depth, macname(frame->mname));
 		edone(02);
 	}
 
@@ -843,10 +857,29 @@ control(register int a, register int b)
 #endif	/* DEBUG */
 	if (contab[j].f == 0) {
 		nxf->nargs = 0;
+		tailflg = 0;
 		if (b)
 			collect();
 		flushi();
-		return pushi((filep)contab[j].mx, a);
+		newip = pushi((filep)contab[j].mx, a);
+		p = frame->pframe;
+		if (tailflg && b && p != stk &&
+				p->ppendt == 0 &&
+				p->pch == 0 &&
+				p->pip == frame->pip &&
+				p->lastpbp == frame->lastpbp) {
+			frame->pframe = p->pframe;
+			frame->frame_cnt--;
+			n = (char *)nxf - (char *)frame;
+			memmove(p, frame, n);
+			for (i = p->nargs; i >= 1; i--)
+				*(char **)(((tchar **)(p + 1)) + i - 1) -=
+					(char *)frame - (char *)p;
+			nxf = (struct s *)&((char *)p)[n];
+			frame = p;
+		}
+		tailflg = 0;
+		return newip;
 	} else if (b) {
 		(*contab[j].f)(0);
 		return 0;
@@ -911,8 +944,10 @@ g0:
 			fdprintf(stderr, "getch: ch is %x (%c)\n",
 				ch, (ch&0177) < 040 ? 0177 : ch&0177);
 #endif	/* DEBUG */
-		if (cbits(i) == '\n')
+		if (cbits(i) == '\n') {
 			nlflg++;
+			tailflg = istail(i);
+		}
 		ch = 0;
 		return(i);
 	}
@@ -937,8 +972,10 @@ g0:
 		if (gchtab[k]==0)
 			return(i);
 		if (k == '\n') {
-			if (cbits(i) == '\n')
+			if (cbits(i) == '\n') {
 				nlflg++;
+				tailflg = istail(i);
+			}
 			return(k);
 		}
 		if (k == FLSS) {
@@ -1002,6 +1039,7 @@ g0:
 		while (cbits(i = getch0()) != '\n')
 			;
 		nlflg++;
+		tailflg = istail(i);
 		return(i);
 	case ESC:	/* double backslash */
 		i = eschar;
@@ -1578,6 +1616,7 @@ casenx(void)
 	strcpy(mfiles[nmfi], nextf);
 	nextfile();
 	nlflg++;
+	tailflg = 0;
 	ip = 0;
 	pendt = 0;
 	frame = stk;
@@ -1925,4 +1964,6 @@ caserecursionlimit(void)
 {
 	skip(1);
 	max_recursion_depth = atoi();
+	skip(0);
+	max_tail_depth = atoi();
 }
