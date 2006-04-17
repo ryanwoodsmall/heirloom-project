@@ -8,6 +8,8 @@ Release ...
 * [nt]roff: A warning is now issued when a non-ASCII byte is found in
   a name (of a request, number register, etc.) with the "input" warning
   category.
+* [nt]roff: Long request names as second arguments to macro definitions
+  (as in ".de xx longname") are now handled correctly.
 
 Release 060409
 * dpost: An error that could lead to invalid PostScript output when the

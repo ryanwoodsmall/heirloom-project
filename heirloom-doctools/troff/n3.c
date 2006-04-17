@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.79 (gritter) 4/14/06
+ * Sccsid @(#)n3.c	1.80 (gritter) 4/17/06
  */
 
 /*
@@ -462,16 +462,18 @@ copyb(void)
 {
 	register int i, j, state;
 	register tchar ii;
-	int	req, k;
+	int	req;
 	filep savoff = 0;
+	char	*cp, *mn;
 
 	if (skip(0) || !(j = getrq()))
 		j = '.';
 	if (j >= 256)
-		maybemore(j, 1);
+		j = maybemore(j, 1);
 	req = j;
-	k = j >> BYTE;
-	j &= BYTEMASK;
+	cp = macname(req);
+	mn = malloc(strlen(cp) + 1);
+	strcpy(mn, cp);
 	copyf++;
 	flushi();
 	nlflg = 0;
@@ -479,22 +481,17 @@ copyb(void)
 
 /* state 0	eat up
  * state 1	look for .
- * state 2	look for first char of end macro
- * state 3	look for second char of end macro
+ * state 2	look for chars of end macro
  */
 
 	while (1) {
 		i = cbits(ii = getch());
-		if (state == 3) {
-			if (i == k)
+		if (state == 2 && mn[j] == 0) {
+			ch = ii;
+			i = getach();
+			ch = ii;
+			if (!i)
 				break;
-			if (!k) {
-				ch = ii;
-				i = getach();
-				ch = ii;
-				if (!i)
-					break;
-			}
 			state = 0;
 			goto c0;
 		}
@@ -506,10 +503,11 @@ copyb(void)
 		if (state == 1 && i == '.') {
 			state++;
 			savoff = offset;
+			j = 0;
 			goto c0;
 		}
-		if ((state == 2) && (i == j)) {
-			state++;
+		if ((state == 2) && (i == mn[j])) {
+			j++;
 			goto c0;
 		}
 		state = 0;
@@ -523,6 +521,7 @@ c0:
 		wbt((tchar)0);
 	}
 	copyf--;
+	free(mn);
 	return(req);
 }
 
