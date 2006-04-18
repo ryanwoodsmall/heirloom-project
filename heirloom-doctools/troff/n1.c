@@ -861,7 +861,6 @@ control(register int a, register int b)
 			}
 			*p = *frame;
 			free(frame);
-			nxf = calloc(1, sizeof *nxf);
 			frame = p;
 		}
 		tailflg = 0;
