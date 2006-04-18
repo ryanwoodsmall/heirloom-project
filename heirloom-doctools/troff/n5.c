@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.40 (gritter) 4/17/06
+ * Sccsid @(#)n5.c	1.41 (gritter) 4/18/06
  */
 
 /*
@@ -793,12 +793,8 @@ findev(int *number, char *name)
 		*number = -1 - i;
 		return NULL;
 	} else {
-#ifdef	INCORE
 		extern tchar *corebuf;
 		return &((struct env *)corebuf)[*number];
-#else
-		return (struct env *)-1;
-#endif
 	}
 }
 
@@ -883,21 +879,8 @@ e1:
 	if ((np = findev(&nxev, name)) == NULL ||
 			(op = findev(&ev, NULL)) == NULL)
 		goto cannot;
-#ifdef INCORE
 	*op = env;
 	env = *np;
-#else
-	if (ev >= 0 && ev < NEV) {
-		lseek(ibf, ev * sizeof(env), SEEK_SET);
-		write(ibf, (char *) & env, sizeof(env));
-	} else
-		*op = env;
-	if (nxev >= 0 && nxev < NEV) {
-		lseek(ibf, nxev * sizeof(env), SEEK_SET);
-		read(ibf, (char *) & env, sizeof(env));
-	} else
-		env = *np;
-#endif
 	ev = nxev;
 }
 
@@ -911,12 +894,6 @@ caseevc(void)
 	if (getev(&nxev, &name) == 0 || (ep = findev(&nxev, name)) == NULL)
 		return;
 	tmpenv = env;
-#ifndef	INCORE
-	if (nxev >= 0 && nxev < NEV) {
-		lseek(ibuf, nxev * sizeof(env), SEEK_SET);
-		read(ibf, (char *) & env, sizeof(env));
-	} else
-#endif
 	env = *ep;
 	env._pendnf = 0;
 	env._pendw = 0;

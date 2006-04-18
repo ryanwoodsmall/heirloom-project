@@ -13,6 +13,8 @@ Release ...
   category.
 * [nt]roff: Long request names as second arguments to macro definitions
   (as in ".de xx longname") are now handled correctly.
+* [nt]roff: The need for the sbrk() system call has been eliminated; the
+  regular system malloc() is now used.
 
 Release 060409
 * dpost: An error that could lead to invalid PostScript output when the

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.137 (gritter) 4/14/06
+ * Sccsid @(#)t6.c	1.138 (gritter) 4/18/06
  */
 
 /*
@@ -1125,13 +1125,13 @@ addlig(int f, tchar *from, int to)
 	 * Fi, and Fl, hide them. The ".flig" request is intended for
 	 * use in combination with expert fonts only.
 	 */
-	if (to == LIG_FF)
+	if (to == LIG_FF && fitab[f][LIG_FF-32] >= 0)
 		if (codetab[f][fitab[f][LIG_FF-32]] < 32)
 			fitab[f][LIG_FF-32] = 0;
-	if (to == LIG_FFI)
+	if (to == LIG_FFI && fitab[f][LIG_FFI-32] >= 0)
 		if (codetab[f][fitab[f][LIG_FFI-32]] < 32)
 			fitab[f][LIG_FFI-32] = 0;
-	if (to == LIG_FFL)
+	if (to == LIG_FFL && fitab[f][LIG_FFL-32] >= 0)
 		if (codetab[f][fitab[f][LIG_FFL-32]] < 32)
 			fitab[f][LIG_FFL-32] = 0;
 }

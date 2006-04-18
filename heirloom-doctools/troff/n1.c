@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.71 (gritter) 4/17/06
+ * Sccsid @(#)n1.c	1.73 (gritter) 4/18/06
  */
 
 /*
@@ -392,17 +392,8 @@ init0(void)
 void
 init1(char a)
 {
-	register char	*p;
 	register int i;
 
-	p = tmp_name;
-	if (a == 'a')
-		p = &p[9];
-	if ((ibf = mkstemp(p)) == -1) {
-		errprint("cannot create temp file.");
-		exit(-1);
-	}
-	unlkp = p;
 	for (i = NTRTAB; --i; )
 		trtab[i] = i;
 	trtab[UNPAD] = ' ';
@@ -441,20 +432,15 @@ init2(void)
 	cpushback(ibuf);
 	ibufp = ibuf;
 	nx = mflg;
-	frame = stk = (struct s *)setbrk(DELTA);
+	frame = stk = calloc(1, sizeof *stk);
 	stk->frame_cnt = 0;
 	dip = &d[0];
-	nxf = frame + 1;
+	nxf = calloc(1, sizeof *nxf);
 	initenv = env;
-#ifdef INCORE
 	for (i = 0; i < NEV; i++) {
 		extern tchar *corebuf;
 		((struct env *)corebuf)[i] = env;
 	}
-#else
-	for (i = NEV; i--; )
-		write(ibf, (char *) & env, sizeof(env));
-#endif
 }
 
 
@@ -815,7 +801,6 @@ control(register int a, register int b)
 {
 	register int	j;
 	int	newip;
-	int	n, i;
 	struct s	*p;
 
 	if (a == 0 || (j = findmn(a)) == -1) {
@@ -870,12 +855,13 @@ control(register int a, register int b)
 				p->lastpbp == frame->lastpbp) {
 			frame->pframe = p->pframe;
 			frame->frame_cnt--;
-			n = (char *)nxf - (char *)frame;
-			memmove(p, frame, n);
-			for (i = p->nargs; i >= 1; i--)
-				*(char **)(((tchar **)(p + 1)) + i - 1) -=
-					(char *)frame - (char *)p;
-			nxf = (struct s *)&((char *)p)[n];
+			if (p->nargs > 0) {
+				free(p->argt);
+				free(p->argsp);
+			}
+			*p = *frame;
+			free(frame);
+			nxf = calloc(1, sizeof *nxf);
 			frame = p;
 		}
 		tailflg = 0;
@@ -1268,7 +1254,6 @@ again:
 	if (pbp > lastpbp)
 		i = pbbuf[--pbp];
 	else if (ip) {
-#ifdef INCORE
 		extern tchar *corebuf;
 		i = corebuf[ip];
 		if (i == 0)
@@ -1279,9 +1264,6 @@ again:
 				(void)rbf();
 			}
 		}
-#else
-		i = rbf();
-#endif
 	} else {
 		if (donef || ndone)
 			done(0);
@@ -1605,6 +1587,7 @@ getach(void)
 void
 casenx(void)
 {
+	struct s *pp;
 	lgf++;
 	skip(0);
 	getname();
@@ -1619,8 +1602,16 @@ casenx(void)
 	tailflg = 0;
 	ip = 0;
 	pendt = 0;
-	frame = stk;
-	nxf = frame + 1;
+	while (frame != stk) {
+		pp = frame;
+		frame = frame->pframe;
+		if (pp->nargs > 0) {
+			free(pp->argt);
+			free(pp->argsp);
+		}
+		free(pp);
+	}
+	nxf = calloc(1, sizeof *nxf);
 }
 
 

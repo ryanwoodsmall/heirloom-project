@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.17 (gritter) 4/3/06
+ * Sccsid @(#)n2.c	1.19 (gritter) 4/18/06
  */
 
 /*
@@ -321,7 +321,7 @@ done(int x)
 	donef = 1;
 	ip = 0;
 	frame = stk;
-	nxf = frame + 1;
+	nxf = calloc(1, sizeof *nxf);
 	if (!ejf)
 		tbreak();
 	nflush++;
@@ -369,7 +369,6 @@ done3(int x)
 	error |= x;
 	signal(SIGINT, SIG_IGN);
 	signal(SIGTERM, SIG_IGN);
-	unlink(unlkp);
 #ifdef NROFF
 	twdone();
 #endif
@@ -383,7 +382,7 @@ void
 edone(int x)
 {
 	frame = stk;
-	nxf = frame + 1;
+	nxf = calloc(1, sizeof *nxf);
 	ip = 0;
 	done(x);
 }

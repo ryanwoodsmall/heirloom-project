@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.20 (gritter) 3/3/06
+ * Sccsid @(#)ni.c	1.21 (gritter) 4/18/06
  */
 
 /*
@@ -63,7 +63,6 @@ char	*fontfile = FNTDIR;             /* rest added in casefp() */
 char	devname[20]	 = "ps";	/* default typesetter */
 
 #endif
-char	tmp_name[] = "/var/tmp/trtmpXXXXXX";
 char	obuf[OBUFSZ];	/* characters collected here for typesetter output */
 char	*obufp = obuf;
 int	NN;

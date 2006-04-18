@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.27 (gritter) 4/17/06
+ * Sccsid @(#)nii.c	1.29 (gritter) 4/18/06
  */
 
 /*
@@ -88,10 +88,8 @@ int	lastpbp;	/* pbp in previous stack frame */
 int	nx;
 int	mflg;
 tchar	ch = 0;
-int	ibf;
 int	ttyod;
 int	iflg;
-char	*enda;
 int	rargc;
 char	**argp;
 int	*trtab;
@@ -151,7 +149,6 @@ int	nhyp;
 tchar	**hyp;
 tchar	*olinep;
 int	dotT;
-char	*unlkp;
 int	no_out;
 struct	widcache *widcache;
 struct	d *d;

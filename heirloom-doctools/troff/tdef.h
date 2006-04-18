@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.74 (gritter) 4/17/06
+ * Sccsid @(#)tdef.h	1.76 (gritter) 4/18/06
  */
 
 /*
@@ -175,7 +175,6 @@ extern	int	NS;	/* name buffer */
 #define	DSIZE	512	/* disk sector size in chars */
 
 extern	int	NM;	/* requests + macros */
-#define	DELTA	1024	/* delta core bytes */
 #define	NHYP	40	/* max hyphens per word */
 #define	NTAB	40	/* tab stops */
 #define	NSO	5	/* "so" depth */
@@ -254,7 +253,7 @@ endif NROFF
 #define	AUTOLIG		(01ULL << 29)	/* ligature substituted automatically */
 #define	islig(n)	((n) & AUTOLIG)
 #define	TAILBIT		(01ULL << 29)	/* tail recursion */
-#define	istail(n)	(((n) & (AUTOLIG|'\n')) == (AUTOLIG|'\n'))
+#define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (TAILBIT|'\n'))
 #define	DIBIT		(01ULL << 28)	/* written in a diversion */
 #define	isdi(n)		((n) & DIBIT)
 
@@ -292,7 +291,7 @@ endif NROFF
 #define	COPYBIT	0x20000000	 /* wide character in copy mode */
 #define	iscopy(n)	((n) & COPYBIT)
 #define	TAILBIT	0x10000000	/* tail recursion */
-#define	istail(n)	(((n) & (AUTOLIG|'\n')) == (AUTOLIG|'\n'))
+#define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (AUTOLIG|'\n'))
 #define	ABSCHAR		0400	/* absolute char number in this font */
 #define	AUTOLIG	0		/* ligature substituted automatically */
 #define	islig(n)	((n) ? 0 : 0)
@@ -370,8 +369,7 @@ endif NROFF
  * "temp file" parameters.  macros and strings
  * are stored in an array of linked blocks,
  * which may be in memory and an array called
- * corebuf[], if INCORE is set during
- * compilation, or otherwise in a file called trtmp$$.
+ * corebuf[].
 
  * The numerology is delicate if filep is 16 bits:
 	#define BLK 128
@@ -514,8 +512,8 @@ struct	s {	/* stack frame */
 	int	nargs;
 	struct s *pframe;
 	filep	pip;
-	int	pnchar;
-	tchar	prchar;
+	int	*argt;
+	tchar	*argsp;
 	int	ppendt;
 	tchar	pch;
 	int	lastpbp;
