@@ -13,6 +13,8 @@ Release ...
   category.
 * [nt]roff: Long request names as second arguments to macro definitions
   (as in ".de xx longname") are now handled correctly.
+* [nt]roff: The ".close" request has been fixed; repeated calls to it
+  could previously result in lost file stream descriptors.
 * [nt]roff: The need for the sbrk() system call has been eliminated; the
   regular system malloc() is now used.
 

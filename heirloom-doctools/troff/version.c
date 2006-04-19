@@ -7,16 +7,16 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	6.54 (gritter) 4/19/06";
+	"@(#)/usr/ucb/otfdump.sl	6.55 (gritter) 4/19/06";
 #elif defined (DPOST)
-static const char sccsid[] USED = "@(#)dpost.sl  6.54 (gritter) 4/19/06";
-const char creator[] = "Heirloom Documentation Tools - dpost 6.54 (gritter) 4/19/06";
+static const char sccsid[] USED = "@(#)dpost.sl  6.55 (gritter) 4/19/06";
+const char creator[] = "Heirloom Documentation Tools - dpost 6.55 (gritter) 4/19/06";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	6.54 (gritter) 4/19/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	6.55 (gritter) 4/19/06";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	6.54 (gritter) 4/19/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	6.55 (gritter) 4/19/06";
 #endif	/* !DUMP, !NROFF */
-const char revision[] = "6.54";
+const char revision[] = "6.55";
 /* SLIST */
 /*
 ext.h: * Sccsid @(#)ext.h	1.42 (gritter) 4/18/06
@@ -25,7 +25,7 @@ n1.c: * Sccsid @(#)n1.c	1.73 (gritter) 4/18/06
 n2.c: * Sccsid @(#)n2.c	1.19 (gritter) 4/18/06
 n3.c: * Sccsid @(#)n3.c	1.84 (gritter) 4/18/06
 n4.c: * Sccsid @(#)n4.c	1.25 (gritter) 3/21/06
-n5.c: * Sccsid @(#)n5.c	1.41 (gritter) 4/18/06
+n5.c: * Sccsid @(#)n5.c	1.42 (gritter) 4/19/06
 n7.c: * Sccsid @(#)n7.c	1.45 (gritter) 4/2/06
 n8.c: * Sccsid @(#)n8.c	1.23 (gritter) 4/19/06
 n9.c: * Sccsid @(#)n9.c	1.41 (gritter) 4/14/06

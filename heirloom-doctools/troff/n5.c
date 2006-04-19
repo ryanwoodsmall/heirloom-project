@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.41 (gritter) 4/18/06
+ * Sccsid @(#)n5.c	1.42 (gritter) 4/19/06
  */
 
 /*
@@ -682,7 +682,7 @@ caseclose(void)
 	if ((i = getstream(nextf)) < 0)
 		return;
 	free(streams[i].name);
-	memmove(&streams[i], &streams[i+1], sizeof *streams);
+	memmove(&streams[i], &streams[i+1], (nstreams-i-1) * sizeof *streams);
 	nstreams--;
 }
 
