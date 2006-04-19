@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.67 (gritter) 4/14/06
+ * Sccsid @(#)t10.c	1.68 (gritter) 4/19/06
  */
 
 /*
@@ -643,6 +643,19 @@ ptout0(tchar *pi, tchar *pend)
 	return(pi+outsize);
 }
 
+static void
+pttrack(int always)
+{
+	static int	mtrack;
+
+	if (xflag && lasttrack) {
+		if (always || mtrack != lasttrack)
+			fdprintf(ptid, "x X Track %d\n", lasttrack);
+		mtrack = lasttrack;
+	} else
+		mtrack = 0;
+}
+
 void
 ptps(void)
 {
@@ -668,6 +681,7 @@ ptps(void)
 		fdprintf(ptid, "s%d\n", (int)s);	/* really should put out string rep of size */
 	mpts = i;
 	mzoom = z;
+	pttrack(0);
 }
 
 void
@@ -675,8 +689,7 @@ ptfont(void)
 {
 	mfont = xfont;
 	fdprintf(ptid, "f%d\n", xfont);
-	if (xflag && lasttrack)
-		fdprintf(ptid, "x X Track %d\n", lasttrack);
+	pttrack(0);
 }
 
 void
