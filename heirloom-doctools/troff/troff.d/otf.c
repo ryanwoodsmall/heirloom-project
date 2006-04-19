@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.53 (gritter) 4/19/06
+ * Sccsid @(#)otf.c	1.54 (gritter) 4/19/06
  */
 
 #include <stdio.h>
@@ -1622,6 +1622,8 @@ cffoper(long *op)
 				buf[i++] = '-';
 			else if (c == 0xf) {
 				buf[i++] = 0;
+				if (s == 0)
+					n++;
 				break;
 			}
 			if ((s = !s) == 0)

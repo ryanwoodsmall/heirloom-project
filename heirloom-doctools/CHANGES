@@ -15,6 +15,9 @@ Release ...
   (as in ".de xx longname") are now handled correctly.
 * [nt]roff: The ".close" request has been fixed; repeated calls to it
   could previously result in lost file stream descriptors.
+* troff, otfdump, dpost: The end of floating point values in CFF data is
+  now properly recognized; the previous failure to do so could result in
+  errors like "invalid operand b0 range 255" with valid OpenType fonts.
 * [nt]roff: The need for the sbrk() system call has been eliminated; the
   regular system malloc() is now used.
 
