@@ -18,6 +18,8 @@ Release ...
 * troff, otfdump, dpost: The end of floating point values in CFF data is
   now properly recognized; the previous failure to do so could result in
   errors like "invalid operand b0 range 255" with valid OpenType fonts.
+* troff: In TrueType fonts with version 3.0 "post" tables, characters that
+  lack a Unicode mapping can now be accessed as "\[index0xN]".
 * [nt]roff: The need for the sbrk() system call has been eliminated; the
   regular system malloc() is now used.
 
