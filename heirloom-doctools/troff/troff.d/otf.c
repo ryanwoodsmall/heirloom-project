@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.52 (gritter) 3/17/06
+ * Sccsid @(#)otf.c	1.53 (gritter) 4/19/06
  */
 
 #include <stdio.h>
@@ -2880,7 +2880,7 @@ get_SingleSubstitutionFormat1(int o, const char *name)
 {
 	struct feature	*fp;
 	struct cov	*cp;
-	int	c;
+	int	c, d;
 	int	Coverage;
 	int	DeltaGlyphID;
 
@@ -2892,7 +2892,8 @@ get_SingleSubstitutionFormat1(int o, const char *name)
 	DeltaGlyphID = pbe16(&contents[o+4]);
 	fp = add_feature(name);
 	while ((c = get_cov(cp)) >= 0)
-		add_substitution_pair(fp, c, c + DeltaGlyphID);
+		if ((d = c + DeltaGlyphID) < nc)
+			add_substitution_pair(fp, c, d);
 	free_cov(cp);
 }
 

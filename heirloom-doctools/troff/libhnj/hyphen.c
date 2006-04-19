@@ -39,7 +39,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, August 2005.
  *
- * Sccsid @(#)hyphen.c	1.4 (gritter) 9/15/05
+ * Sccsid @(#)hyphen.c	1.5 (gritter) 4/19/06
  */
 
 #include <stdlib.h> /* for NULL, malloc */
@@ -339,14 +339,15 @@ hnj_hyphen_load (const char *fn)
   for (i = 0; i < HASH_SIZE; i++)
     for (e = hashtab->entries[i]; e; e = e->next)
       {
-	for (j = 1; 1; j++)
+	state_num = -1;
+	for (j = 1; e->key[j-1]; j++)
 	  {
 	    state_num = hnj_hash_lookup (hashtab, e->key + j);
 	    if (state_num >= 0)
 	      break;
 	  }
         /* KBH: FIXME state 0 fallback_state should always be -1? */
-	if (e->val) 
+	if (e->val && state_num >= 0) 
 	  dict->states[e->val].fallback_state = state_num;
       }
 #ifdef VERBOSE
