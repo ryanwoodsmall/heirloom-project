@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.76 (gritter) 4/18/06
+ * Sccsid @(#)tdef.h	1.77 (gritter) 4/20/06
  */
 
 /*
@@ -291,7 +291,7 @@ endif NROFF
 #define	COPYBIT	0x20000000	 /* wide character in copy mode */
 #define	iscopy(n)	((n) & COPYBIT)
 #define	TAILBIT	0x10000000	/* tail recursion */
-#define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (AUTOLIG|'\n'))
+#define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (TAILBIT|'\n'))
 #define	ABSCHAR		0400	/* absolute char number in this font */
 #define	AUTOLIG	0		/* ligature substituted automatically */
 #define	islig(n)	((n) ? 0 : 0)
