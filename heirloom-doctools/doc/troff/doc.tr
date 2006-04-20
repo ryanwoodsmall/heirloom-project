@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.49 (gritter) 4/17/06
+.\" Sccsid @(#)doc.tr	1.50 (gritter) 4/20/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -82,7 +82,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/17/06
+.ds Sccsdate 4/20/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -459,6 +459,7 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .de T&
 ..
 .de TE
+.nr nosave 0
 .sp
 .ce 0
 .ft R
