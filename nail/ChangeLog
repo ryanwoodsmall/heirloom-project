@@ -1,4 +1,9 @@
 [12.1] released ...
+* The base64 encoder also used an invalid encoding for the last unit of
+  data if (bytes_of_input % 3 == 1). As with the previous similar bug,
+  most base64 decoders, including mailx's own, ignore such bits since
+  base64 data is always a multiple of 8-bit bytes. (Patch by
+  Lukasz Stelmach.)
 * The conversion of messages in state-dependent encodings has been fixed;
   garbage characters could be inserted because the state was not properly
   reset when a buffer was enlarged (patch by Matthew Fischer).
