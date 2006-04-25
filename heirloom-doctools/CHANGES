@@ -8,6 +8,10 @@ Release ...
   the kerning tables of specific fonts.
 * [nt]roff: The "\V" escape sequence has been introduced; it prints the
   value of an environment variable.
+* troff: An explicit "N" font register argument to the ".fp" request may
+  now be an arbitrary number between 1 and 255.
+* troff: The "\n[.fp]" number register has been introduced to make it
+  possible to determine the next unused font register.
 * [nt]roff: A warning is now issued when a non-ASCII byte is found in
   a name (of a request, number register, etc.) with the "input" warning
   category.

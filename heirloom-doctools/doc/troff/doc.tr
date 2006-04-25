@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.51 (gritter) 4/22/06
+.\" Sccsid @(#)doc.tr	1.52 (gritter) 4/25/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -84,7 +84,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/22/06
+.ds Sccsdate 4/25/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1770,7 +1770,8 @@ using \fB\ex\fI\'N\'\fR.\T
 \(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
-\T'n_.f'2.2\T	\T'n_.f'\fB&f\fR\T	\T'n_.f'Current font as physical quadrant (1-4).\T
+\T'n_.f'2.2\T	\T'n_.f'\fB&f\fR\T	\T'n_.f'Current font as physical quadrant (1-255).\T
+\T'n_.fp'2.2\T	\T'n_.fp'\fB&fp\fR\T	\T'n_.fp'Next unused physical font quadrant.\T
 \T'n_.F'20.\T	\T'n_.F'\fB&F\fR\T	\T'n_.F'Current input file name [sic].\T
 \T'n_.h'4\T	\T'n_.h'\fB&h\fR\T	\T'n_.h'Text base-line high-water mark on current page or diversion.\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
@@ -2262,7 +2263,9 @@ The list of known fonts is installation dependent.
 In the subsequent discussion of font-related requests,
 \fIF\fR represents either a one/two-character
 font name or the numerical font position.
-The current font is available (as numerical position) in the read-only number register \A'n_.f'\fB.f\fR.
+The current font is available (as numerical position)
+in the read-only number register \A'n_.f'\fB.f\fR;
+the \A'n_.fp'\fB.fp\fR register holds the next unused position.
 .pg
 A request for a named but not-mounted font is honored
 if the font description information exists.
@@ -2427,10 +2430,12 @@ Otherwise, the font is loaded from the file
 \fB/usr/ucblib/doctools/font/devps/\fIfile\fB.afm\fR.
 .xx
 The \fIN\fR argument specifies a register on which
-the font is to be mounted (1\(<=\fIN\fR\(<=8).
+the font is to be mounted (1\(<=\fIN\fR\(<=255).
 If it is zero, the font is mounted on the next
 free position (not on position zero).
-At most 255 fonts may be mounted simultaneously.
+At most 255 fonts may be mounted simultaneously;
+it is possible to use more than 255 fonts in a document
+by reusing font registers.
 .xx
 The font is then available with \fB&ft F\fR, \fB\efF\fR, etc.
 \fBF\fR may be freely chosen,

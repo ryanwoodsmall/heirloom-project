@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.139 (gritter) 4/19/06
+ * Sccsid @(#)t6.c	1.140 (gritter) 4/25/06
  */
 
 /*
@@ -206,6 +206,8 @@ getcw(register int i)
 		}
 		if (smnt) {
 			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
+				if (fontbase[ii] == NULL)
+					continue;
 				t = ftrans(ii, i + 32) - 32;
 				j = fitab[ii][t];
 				if (j != 0) {
@@ -415,6 +417,8 @@ findchar(tchar c)
 		}
 		if (smnt) {
 			for (ii=smnt, jj=0; jj < nfonts; jj++, ii=ii % nfonts + 1) {
+				if (fontbase[ii] == NULL)
+					continue;
 				if (fitab[ii][i] != 0) {
 					f = ii;
 					goto found;
@@ -568,6 +572,8 @@ postchar(const char *temp, int *fp)
 	}
 	if (smnt) {
 		for (i=smnt, j=0; j < nfonts; j++, i=i % nfonts + 1) {
+			if (fontbase[i] == NULL)
+				continue;
 			if ((c = postchar1(temp, i)) != 0) {
 				*fp = i;
 				return c;
@@ -653,13 +659,18 @@ int
 findft(register int i, int required)
 {
 	register int k;
+	char	*mn, *mp;
 
-	if ((k = i - '0') >= 0 && k <= nfonts && k < smnt)
+	if ((k = i - '0') >= 0 && k <= nfonts && k < smnt && fontbase[k])
 		return(k);
 	for (k = 0; fontlab[k] != i; k++)
 		if (k > nfonts) {
+			mn = macname(i);
+			if ((k = strtol(mn, &mp, 10)) >= 0 && k <= nfonts &&
+					fontbase[k])
+				break;
 			if (required && warn & WARN_FONT)
-				errprint("%s: no such font", macname(i));
+				errprint("%s: no such font", mn);
 			return(-1);
 		}
 	return(k);
@@ -1300,7 +1311,7 @@ casefp(int spec)
 
 	lgf++;
 	skip(0);
-	if ((i = xflag ? atoi() : cbits(getch()) - '0') < 0 || i > nfonts)
+	if ((i = xflag ? atoi() : cbits(getch()) - '0') < 0 || i > 255)
 	bad:	errprint("fp: bad font position %d", i);
 	else if (skip(0) || !(j = getrq()))
 		errprint("fp: no font name");
@@ -1308,7 +1319,7 @@ casefp(int spec)
 		if (j >= 256)
 			j = maybemore(j, 3);
 		if (skip(0) || !getname()) {
-			if (i == 0)
+			if (i == 0 || i > nfonts)
 				goto bad;
 			setfp(i, j, 0);
 		} else {		/* 3rd argument = filename */
@@ -1435,6 +1446,19 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 	if (pos == 0)
 		ch = (tchar) FONTPOS | (tchar) f << 22;
 	return(pos);
+}
+
+int
+nextfp(void)
+{
+	int	i;
+
+	for (i = 1; i <= nfonts; i++)
+		if (fontbase[i] == NULL)
+			return i;
+	if (i <= 255)
+		return i;
+	return 0;
 }
 
 void
@@ -1682,8 +1706,8 @@ loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 	struct afmtab	*a;
 	int	i, have = 0;
 
-	if (nf < 0 || nf > nfonts)
-		nf = nfonts + 1;
+	if (nf < 0)
+		nf = nextfp();
 	path = getfontpath(file, "afm");
 	if (access(path, 0) < 0) {
 		path = getfontpath(file, "otf");
@@ -2432,9 +2456,12 @@ un2tr(int c, int *fp)
 					return i;
 			}
 		if (smnt)
-			for (i = smnt, j=0; j < nfonts; j++, i = i % nfonts + 1)
+			for (i = smnt, j=0; j < nfonts; j++, i = i % nfonts + 1) {
+				if (fontbase[i] == NULL)
+					continue;
 				if ((i = ufmap(c, i, fp)) != 0)
 					return i;
+			}
 		*fp = font;
 		if (c < 040 && c == ifilt[c] || c >= 040 && c < 0177)
 			return c;

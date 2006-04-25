@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tw.h	1.5 (gritter) 9/8/05
+ * Sccsid @(#)tw.h	1.6 (gritter) 4/25/06
  */
 
 /*
@@ -40,6 +40,8 @@
  * software developed by the University of California, Berkeley, and its
  * contributors.
  */
+
+#define	nextfp()	0
 
 /* typewriter driving table structure */
 

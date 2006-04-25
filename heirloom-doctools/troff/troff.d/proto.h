@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.43 (gritter) 4/14/06
+ * Sccsid @(#)proto.h	1.44 (gritter) 4/25/06
  */
 
 /* t6.c */
@@ -39,6 +39,7 @@ void casefdeferlig(void);
 void casefp(int);
 void casefps(void);
 int setfp(int, int, char *);
+int nextfp(void);
 void casecs(void);
 void casebd(void);
 void casevs(void);
