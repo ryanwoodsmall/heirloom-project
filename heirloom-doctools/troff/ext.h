@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.42 (gritter) 4/18/06
+ * Sccsid @(#)ext.h	1.43 (gritter) 4/26/06
  */
 
 /*
@@ -178,7 +178,7 @@ extern	int	xflag;
 extern	int	xfont;
 extern	int	xpts;
 extern	int	no_out;
-extern	struct	s	*ejl;
+extern	int	ejl;
 extern	struct	s	*frame,	*stk,	*nxf;
 extern	tchar	**hyp;
 extern	tchar	*olinep;

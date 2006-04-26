@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.45 (gritter) 4/2/06
+ * Sccsid @(#)n7.c	1.46 (gritter) 4/26/06
  */
 
 /*
@@ -550,7 +550,7 @@ newline(int a)
 		goto nl2;
 nl1:
 	ejf = dip->hnl = numtab[NL].val = 0;
-	ejl = frame;
+	ejl = frame->tail_cnt;
 	if (donef) {
 		if ((!nc && !wch) || ndone)
 			done1(0);
@@ -694,9 +694,9 @@ eject(struct s *a)
 	}
 	ejf++;
 	if (a)
-		ejl = a;
+		ejl = a->tail_cnt;
 	else 
-		ejl = frame;
+		ejl = frame->tail_cnt;
 	if (trap)
 		return;
 e1:

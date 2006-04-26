@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.29 (gritter) 4/18/06
+ * Sccsid @(#)nii.c	1.30 (gritter) 4/26/06
  */
 
 /*
@@ -53,7 +53,8 @@
 #include "proto.h"
 #include "ext.h"
 
-struct 	s *frame, *stk, *ejl;
+struct 	s *frame, *stk;
+int	ejl;
 struct	s *nxf;
 
 pid_t	pipeflg = -1;
