@@ -301,7 +301,8 @@ start:
 loop:
 	xflag = _xflag;
 	copyf = lgf = nb = nflush = nlflg = 0;
-	if (ip && rbf0(ip) == 0 && dip == d && ejf && frame->tail_cnt <= ejl) {
+	if (ip && rbf0(ip) == 0 && dip == d && ejf &&
+			frame->pframe->tail_cnt <= ejl) {
 		nflush++;
 		trap = 0;
 		eject((struct s *)0);
