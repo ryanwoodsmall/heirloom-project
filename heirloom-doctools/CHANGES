@@ -12,6 +12,8 @@ Release ...
   now be an arbitrary number between 1 and 255.
 * troff: The "\n[.fp]" number register has been introduced to make it
   possible to determine the next unused font register.
+* [nt]roff: The "-daS" command line option has been added to define the
+  string "a" to "S".
 * [nt]roff: A warning is now issued when a non-ASCII byte is found in
   a name (of a request, number register, etc.) with the "input" warning
   category.

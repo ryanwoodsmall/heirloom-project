@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.73 (gritter) 4/18/06
+ * Sccsid @(#)n1.c	1.74 (gritter) 4/26/06
  */
 
 /*
@@ -205,9 +205,13 @@ main(int argc, char **argv)
 			ptid = 1;
 			continue;
 		case 'r':
+		case 'd':
 			if (&argv[0][2] != '\0' && strlen(&argv[0][2]) >= 2 && &argv[0][3] != '\0')
-			eibuf = roff_sprintf(ibuf+strlen(ibuf), ".nr %c %s\n",
-				argv[0][2], &argv[0][3]); 
+			eibuf = roff_sprintf(ibuf+strlen(ibuf), ".%s %c %s%s\n",
+				argv[0][1] == 'd' ? "ds" : "nr",
+				argv[0][2],
+				argv[0][1] == 'd' ? "\"" : "",
+				&argv[0][3]); 
 			else 
 				errprint("wrong options");
 			continue;

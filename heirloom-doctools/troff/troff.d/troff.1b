@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.20 (gritter) 12/18/05
+.\" Sccsid @(#)troff.1b	1.21 (gritter) 4/26/06
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "12/18/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "4/26/06" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -41,6 +41,7 @@ troff \- (BSD) typeset or format documents
 .nh
 \fB/usr/ucb/troff\fR
 [\fB\-af\&iz\fR]
+[\fB\-d\fIaS\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
@@ -130,6 +131,12 @@ Set register
 .I a
 (one-character) to
 .IR N .
+.TP
+.BI \-d aN
+Define string
+.I a
+(one-character) to
+.IR S .
 .TP
 .B \-i
 Read standard input after the input files are exhausted.
