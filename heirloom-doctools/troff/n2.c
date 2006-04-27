@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.19 (gritter) 4/18/06
+ * Sccsid @(#)n2.c	1.20 (gritter) 4/27/06
  */
 
 /*
@@ -83,6 +83,8 @@ int	nmb1 = 0;
 extern	jmp_buf	sjbuf;
 int	toolate;
 int	error;
+
+static void	outtp(tchar);
 
 int
 pchar(register tchar i)
@@ -172,7 +174,7 @@ pchar1(register tchar i)
 	if (no_out)
 		return;
 	if (tflg) {	/* transparent mode, undiverted */
-		fdprintf(ptid, "%c", j);
+		outtp(i);
 		return;
 	}
 #ifndef NROFF
@@ -181,6 +183,19 @@ pchar1(register tchar i)
 	else
 #endif
 		ptout(i);
+}
+
+static void
+outtp(tchar i)
+{
+	int	j = cbits(i);
+
+#if !defined (NROFF) && defined (EUC)
+	if (iscopy(i))
+		fdprintf(ptid, "%lc", j);
+	else
+#endif	/* !NROFF && EUC */
+		fdprintf(ptid, "%c", j);
 }
 
 #ifndef	NROFF
@@ -291,6 +306,25 @@ flusho(void)
 		toolate += write(ptid, obuf, obufp - obuf);
 	}
 	obufp = obuf;
+}
+
+void
+caseoutput(void)
+{
+	tchar	i;
+
+	copyf++;
+	if (!skip(0)) {
+		if (cbits(i = getch()) == '"')
+			i = getch();
+		while (i != 0) {
+			outtp(i);
+			if (cbits(i) == '\n')
+				break;
+			i = getch();
+		}
+	}
+	copyf--;
 }
 
 

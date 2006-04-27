@@ -14,6 +14,9 @@ Release ...
   possible to determine the next unused font register.
 * [nt]roff: The "-daS" command line option has been added to define the
   string "a" to "S".
+* [nt]roff: The ".output" request has been added to write a command to
+  intermediate output regardless of whether there is a current diversion
+  or not (unlike "\!").
 * [nt]roff: A warning is now issued when a non-ASCII byte is found in
   a name (of a request, number register, etc.) with the "input" warning
   category.

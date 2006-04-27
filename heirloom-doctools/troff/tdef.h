@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.77 (gritter) 4/20/06
+ * Sccsid @(#)tdef.h	1.78 (gritter) 4/27/06
  */
 
 /*
@@ -759,6 +759,7 @@ void pchar1(register tchar);
 void outascii(tchar);
 void oputs(register char *);
 void flusho(void);
+void caseoutput(void);
 void done(int);
 void done1(int);
 void done2(int);

@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.52 (gritter) 4/25/06
+.\" Sccsid @(#)doc.tr	1.53 (gritter) 4/27/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -84,7 +84,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/25/06
+.ds Sccsdate 4/27/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1081,7 +1081,7 @@ Request normally causes a break.
 The use of \fB\'\fR as control character (instead of \fB.\fR)
 suppresses the break function.
 T}
-D	Mode or relevant parameters associated with current diversion level.
+D	Mode or relevant parameters associated with current \T'c_diversion'diversion\T level.
 E	Relevant parameters are a part of the current environment.
 O	Must stay in effect until logical output.
 P	Mode must be still or again in effect at the time of physical output.
@@ -1317,6 +1317,8 @@ on if \fIN\fR>0.
 \T'tr'\fB&tr\fI|abcd....\fR	none	\(en	O	Translate \fIa\fR to \fIb\fR, etc. on output.\T
 .b1 0
 \T'ftr'\fB&ftr\fI|F|abcd....\fR	none	\(en	P,T	Font-specific \fBtr\fR.\T
+.b1 0
+\T'output'\fB&output\fI|string\fR		ignored	\(en	Write \fIstring\fR directly to intermediate output.\T
 .mht s_mot
 Local Horizontal and Vertical Motions, and the Width Function
 .mht s_draw
@@ -1548,6 +1550,7 @@ Device and Font Description Files
 \T'open'open	19\T
 \T'opena'opena	19\T
 \T'os'os	5\T
+\T'output'output	10.6\T
 \T'papersize'papersize	3\T
 \T'pc'pc	14\T
 \T'pi'pi	19\T
@@ -2013,7 +2016,7 @@ The \fIabsolute position\fR indicator \fB~\fR may be prepended
 to a number \fIN\fR
 to generate the distance to the vertical or horizontal place \fIN\fR.
 For vertically-oriented requests and functions, \fB~\|\fIN\fR
-becomes the distance in basic units from the current vertical place on the page or in a \fIdiversion\fR \T'c_diversion'(\(sc7.4)\T
+becomes the distance in basic units from the current vertical place on the page or in a \T'c_diversion'\fIdiversion\fR (\(sc7.4)\T
 to the the vertical place \fIN\fR.
 For \fIall\fR other requests and functions,
 \fB~\|\fIN\fR
@@ -2538,7 +2541,7 @@ when the first \fInon-diverted\fR text processing occurs.
 Arrangements
 for a trap to occur at the top of the first page
 must be completed before this transition.
-In the following, references to the \fIcurrent diversion\fR \T'c_diversion'(\(sc7.4)\T
+In the following, references to the \T'c_diversion'\fIcurrent diversion\fR (\(sc7.4)\T
 mean that the mechanism being described works during both
 ordinary and diverted output (the former considered as the top diversion level).
 .pg
@@ -2661,18 +2664,20 @@ traps on the page,
 \fID\fR is the distance to the bottom of the page.
 If \fID\|<\|V\fR, another line could still be output
 and spring the trap.
-In a diversion, \fID\fR is the distance to the \fIdiversion trap\fR, if any,
+In a \T'c_diversion'diversion\T,
+\fID\fR is the distance to the \fIdiversion trap\fR, if any,
 or is very large.
 .bta mk
 \fB&mk\fI|R\fR	none	internal	D	Mark the \fIcurrent\fR vertical place
-in an internal register (both associated with the current diversion level),
+in an internal register (both associated with the current
+\T'c_diversion'diversion\T level),
 or in register \fIR\fR, if given.
 See \fBrt\fR request.
 .bta rt
 \fB&rt\fI|\(+-N\fR	none	internal	D,\fBv\fR	Return \fIupward only\fR to a marked vertical place
-in the current diversion.
+in the current \T'c_diversion'diversion\T.
 If \fI\(+-N\fR (w.r.t. current place) is given,
-the place is \fI\(+-N\fR from the top of the page or diversion
+the place is \fI\(+-N\fR from the top of the page or \T'c_diversion'diversion\T
 or, if \fIN\fR is absent, to a
 place marked by a previous \fBmk\fR.
 Note that the \T'sp'\fBsp\fR request (\(sc5.3)\T may be used
@@ -3105,7 +3110,7 @@ String references and macro invocations may be nested.
 .sc
 \A'copy mode'Copy mode input interpretation.
 During the definition and extension
-of strings and macros (not by diversion)
+of strings and macros (not by \T'c_diversion'diversion\T)
 the input is read in \fIcopy mode\fR.
 The input is copied without interpretation
 \fIexcept\fR that:
@@ -3780,7 +3785,7 @@ All text processing (e. g. character comparisons) takes place
 with the input (stand-in) character which appears to have the width of the final
 character.
 The graphic translation occurs at the moment of output
-(including diversion).
+(including \T'c_diversion'diversion\T).
 .h1
 .bta tr
 \fB&tr\fI|abcd....\fR	none	\(en	O	Translate \
@@ -3800,7 +3805,13 @@ is read in \T'copy mode'\fIcopy mode\fR\T and \fItransparently\fR output
 (without the initial \fB\e!\fR);
 the text processor is otherwise unaware of the line's presence.
 This mechanism may be used to pass control information to a post-processor
-or to imbed control lines in a macro created by a diversion.
+or to imbed control lines in a macro created by a \T'c_diversion'diversion\T.
+.h1
+.bta output
+\fB&output\fI|string\fR		ignored	\(en	Write \fIstring\fR directly to intermediate output,
+regardless of whether there is a \T'c_diversion'current diversion\T or not.
+\fIstring\fR is read in copy mode,
+and an initial double-quote is discarded.
 .sc
 Transparent output.
 The sequence \A'e_X'\fB\eX\fI\'anything\'\fR copies \fIanything\fR
@@ -4079,9 +4090,10 @@ draws a graphic object of type \fIc\fR
 according to a sequence of parameters,
 which are generally pairs of numbers.
 .nf
-.nr nosave 1
 .ta 1.2i
+.nr nosave 1
 \fB\eD\'l \fIdh dv\'	\fRdraw line from current position by \fIdh,\|dv\fR
+.nr nosave 0
 \fB\eD\'c \fId\'	\fRdraw circle of diameter \fId\fR with left side at current position
 \fB\eD\'e \fIu v\'	\fRdraw ellipse of diameters \fIu\fP and \fIv\fP
 \fB\eD\'a \fIa b c d\'\fB	\fRdraw arc from current position to \fIa\fR+\fIc\fR,\|\fIb\fR+\fId\fR, \fRwith center at \fIa\fR,\|\fIb\fR from current position
@@ -4369,7 +4381,8 @@ The environment parameters are those associated
 with requests noting E in their \fINotes\fR column;
 in addition, partially collected lines and words are in the environment.
 Everything else is global; examples are page-oriented parameters,
-diversion-oriented parameters, number registers, and macro and string definitions.
+\T'c_diversion'diversion\T-oriented parameters,
+number registers, and macro and string definitions.
 All environments are initialized with default parameter values.
 The number of possible environments is only limited by available memory.
 .h1
@@ -4577,8 +4590,8 @@ Warn when an undefined scale indicator is used in a
 \T'c_expr'numerical expression\T.
 T}
 256	di	T{
-Warn when a \T'di'\fBdi\fR\T request is executed but no diversion is
-currently active.
+Warn when a \T'di'\fBdi\fR\T request is executed but no
+\T'c_diversion'diversion\T is currently active.
 T}
 512	mac	T{
 Warn when an undefined request, macro or string is called.
@@ -4875,10 +4888,10 @@ If there is room,
 .B &BP
 fills text around the frame.
 Everything destined for either side of the frame
-goes into a diversion to be retrieved when the accumulated
+goes into a \T'c_diversion'diversion\T to be retrieved when the accumulated
 text sweeps past the trap set by
 .B &BP
-or when the diversion is explicitly closed
+or when the \T'c_diversion'diversion\T is explicitly closed
 by \fB&EP\fR.
 .bta EP
 \fB&EP\fR				End a picture started by \fB&BP\fR;
@@ -5170,12 +5183,13 @@ Nevertheless it is quite possible to interpret that output
 on a different device, within the latter's capabilities.
 .de tb
 .xx
+.nr nosave 1
+.ne 3v
 .nf
 .in .5i
 ..
 .tb
 .ta .8i
-.nr nosave 1
 \fBs\^\fIn\fR	set point size to \fIn\fR, fractional parts (if any) ignored
 \fBs\-23\^\fId.d\fR	set point size to \fId.d\fR
 \fBf\^\fIn\fR	set font to \fIn\fR
@@ -5210,7 +5224,6 @@ The graphics functions coincide directly with the \T'e_D'\fB\eD\fR\T
 sequences:
 .tb
 .ta 1.2i
-.nr nosave 1
 \fBD\^l \fIdh dv	\fRdraw line from current position by \fIdh,\|dv\fR
 \fBD\^c \fId	\fRdraw circle of diameter \fId\fR with left side at current position
 \fBD\^e \fIu v	\fRdraw ellipse of diameters \fIu\fP and \fIv\fP
@@ -5228,7 +5241,6 @@ The device control functions begin with \fBx\fP,
 then a command, then other parameters.
 .tb
 .ta 1.5i 1.5i+1m
-.nr nosave 1
 \fBx T \fIs\fP	\fRname of typesetter is \fIs\fR
 .nr nosave 0
 \fBx r \fIn h v\fP	\fRresolution is \fIn\fR units/inch;
@@ -5272,7 +5284,6 @@ The following is the output from ``hello, world''
 for a typical printer,
 as described in \T's_output'\(sc25\T:
 .tb
-.nr nosave 1
 x T post
 x res 720 1 1
 x init
@@ -5339,7 +5350,6 @@ as a sequence of names and values.
 others that may be present for specific drivers:
 .tb
 .ta 1i
-.nr nosave 1
 \fBfonts \fIn F G H ... Z
 \fBsizes \fIs t ... \fB0
 \fBres \fIn\fR
@@ -5377,7 +5387,6 @@ must occur last, parameters may appear in any order.
 Here is a subset of the \fB\s-1DESC\s+1\fR
 file for a typical Postscript printer:
 .tb
-.nr nosave 1
 # Description file for Postscript printers.
 
 fonts 10 R I B BI CW H HB HX S1 S
@@ -5413,7 +5422,6 @@ The file for font \fIF\fR
 is \fB/usr/ucblib/doctools/font/dev\fIname\^\fB/\fIF\fR.
 .ta 1.7i
 .tb
-.nr nosave 1
 \fBname \fIstr\fR	name of font is \fIstr\fR
 \fBligatures ... 0\fR	list of ligatures
 \fBspacewidth \fIn\fR	width of a space on this font
@@ -5451,7 +5459,6 @@ function\T \T'c_width'(\(sc11.2).\T
 Here are excerpts from a typical font description file
 for the same Postscript printer.
 .tb
-.nr nosave 1
 .ta .5i 1i 1.5i 2.5i
 hy	33	0	45	hyphen \e(hy
 -	"			- is a synonym for \e(hy
@@ -5533,7 +5540,7 @@ Such common formatting needs
 as page margins and footnotes
 are deliberately not built into \*(NR and \*[TR.]
 Instead,
-the macro and string definition, number register, diversion,
+the macro and string definition, number register, \T'c_diversion'diversion\T,
 environment switching, page-position trap, and conditional input mechanisms
 provide the basis for user-defined implementations.
 .pg
@@ -5799,13 +5806,13 @@ footnote doesn't completely fit in the available space.
 &if \e\en(dn .fz	\e"leftover footnote
 &&
 &de fo	\e"footer
-&nr dn 0	\e"zero last diversion size
+&nr dn 0	\e"zero last \T'c_diversion'diversion\T size
 &if \e\enx \e{\e
 &ev 1	\e"expand footnotes in ev1
 &nf	\e"retain vertical size
 &FN	\e"footnotes
 &rm FN	\e"delete it
-&if "\e\en(.z"fy" .di	 \e"end overflow diversion
+&if "\e\en(.z"fy" .di	 \e"end overflow \T'c_diversion'diversion\T
 &nr x 0	\e"disable fx
 &ev  \e}	\e"pop environment
 &  ---
@@ -5826,7 +5833,7 @@ footnote doesn't completely fit in the available space.
 &br	\e"finish output
 &nr z \e\en(.v	\e"save spacing
 &ev	\e"pop ev
-&di	\e"end diversion
+&di	\e"end \T'c_diversion'diversion\T
 &nr y \-\e\en(dn	\e"new footer position,
 &if \e\enx=1 .nr y \-(\e\en(.v\-\e\enz) \e
 	\e"uncertainty correction
@@ -5856,12 +5863,14 @@ the footer trap itself to a nominal position specified in
 register \fBb\fR.
 In addition, if the register \T'n_dn'\fBdn\fR\T indicates a leftover footnote,
 \fBfz\fR is invoked to reprocess it.
-The footnote start macro \fBfn\fR begins a diversion (append) in environment 1,
+The footnote start macro \fBfn\fR begins a
+\T'c_diversion'diversion\T (append) in environment 1,
 and increments the count \fBx\fR; if the count is one, the footnote separator \fBfs\fR
 is interpolated.
 The separator is kept in a separate macro to permit user redefinition.
 The footnote end macro \fBef\fR restores
-the previous environment and ends the diversion after saving the spacing size in register \fBz\fR.
+the previous environment and ends the \T'c_diversion'diversion\T
+after saving the spacing size in register \fBz\fR.
 \fBy\fR is then decremented by the size of the footnote,
 available in \T'n_dn'\fBdn\fR\T;
 then on the first footnote, \fBy\fR is further decremented by the difference
@@ -5879,7 +5888,8 @@ and the register \T'n_dn'\fBdn\fR\T will later indicate
 to the header whether \fBfy\fR is empty.
 Both \fBfo\fR and \fBfx\fR are planted in the nominal footer trap position in an order
 that causes \fBfx\fR to be concealed unless the \fBfo\fR trap is moved.
-The footer then terminates the overflow diversion, if necessary, and
+The footer then terminates the overflow \T'c_diversion'diversion\T,
+if necessary, and
 zeros \fBx\fR to disable \fBfx\fR,
 because the uncertainty correction
 together with a not-too-late triggering of the footer can result
