@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.53 (gritter) 4/27/06
+.\" Sccsid @(#)doc.tr	1.54 (gritter) 4/28/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -60,9 +60,13 @@
 .kernpair R f R i 55
 .kernpair B f B l 100
 .kernpair B f B i 50
+.kernpair B f R ) 60
+.kernpair I f R ) 190
 .kernpair I T R ) 125
 .kernpair I W R ) 125
 .kernpair I H R ) 125
+.kernpair I M R ) 110
+.kernpair I S R ) 70
 .kernpair I N B \' 90
 .kernpair R [ I f 200
 .kernpair R [ I \[fi] 200
@@ -84,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/27/06
+.ds Sccsdate 4/28/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
