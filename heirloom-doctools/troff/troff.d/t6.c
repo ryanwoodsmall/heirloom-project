@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.141 (gritter) 4/30/06
+ * Sccsid @(#)t6.c	1.142 (gritter) 5/1/06
  */
 
 /*
@@ -1782,7 +1782,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	fontab[nf] = malloc(a->nchars * sizeof *fontab[nf]);
 	kerntab[nf] = malloc(a->nchars * sizeof *kerntab[nf]);
 	codetab[nf] = malloc(a->nchars * sizeof *codetab[nf]);
-	fitab[nf] = malloc((128-32+nchtab+psmaxcode+1) * sizeof *fitab[nf]);
+	fitab[nf] = calloc(NCHARS, sizeof *fitab[nf]);
 	memcpy(fontab[nf], a->fontab, a->nchars * sizeof *fontab[nf]);
 	memcpy(kerntab[nf], a->kerntab, a->nchars * sizeof *kerntab[nf]);
 	memcpy(codetab[nf], a->codetab, a->nchars * sizeof *codetab[nf]);

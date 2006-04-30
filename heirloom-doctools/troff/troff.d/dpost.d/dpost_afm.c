@@ -23,8 +23,10 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost_afm.c	1.2 (gritter) 9/29/05
+ * Sccsid @(#)dpost_afm.c	1.3 (gritter) 5/1/06
  */
 
 #define	DPOST
 #include "../afm.c"
+
+int	NCHARS;

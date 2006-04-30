@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.53 (gritter) 3/20/06
+ * Sccsid @(#)afm.c	1.54 (gritter) 5/1/06
  */
 
 #include <stdlib.h>
@@ -978,7 +978,7 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 	fontab[nf] = calloc(nw, sizeof *fontab);
 	kerntab[nf] = calloc(nw, sizeof *kerntab);
 	codetab[nf] = calloc(nw, sizeof *codetab);
-	fitab[nf] = calloc(128 - 32 + nchtab, sizeof *fitab);
+	fitab[nf] = calloc(NCHARS ? NCHARS : 128 - 32 + nchtab, sizeof *fitab);
 	if (devfontab) for (i = 0; i < nw; i++)
 		fontab[nf][i] = devfontab[i]&0377;
 	if (devkerntab) for (i = 0; i < nw; i++)
