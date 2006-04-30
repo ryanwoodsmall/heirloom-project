@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.54 (gritter) 4/28/06
+.\" Sccsid @(#)doc.tr	1.55 (gritter) 4/30/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/28/06
+.ds Sccsdate 4/30/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -904,6 +904,8 @@ to the input \fIfiles\fR.
 .bt
 	\fB\-r\fIaN\fR	Register \fIa\fR (one-character) is set to \fIN\fR.
 .bt
+	\fB\-d\fIaS\fR	String \fIa\fR (one-character) is set to \fIS\fR.
+.bt
 	\fB\-i\fP	Read standard input after the input files are exhausted.
 .bt
 	\fB\-q\fR	\
@@ -971,6 +973,7 @@ to \fIN\fR.
 .ll
 .in 0
 .xx
+.ne 3
 .pg
 Each option is invoked as a separate argument;
 for example,
