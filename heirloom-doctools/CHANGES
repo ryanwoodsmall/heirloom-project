@@ -1,4 +1,4 @@
-Release ...
+Release 060430
 * troff/dpost: Links and anchors in PDF documents can now be defined;
   "\A" and "\T" escape sequences have been introduced for this.
 * [nt]roff: Tail-recursion elimination for macro calls has been added.
