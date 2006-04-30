@@ -1,3 +1,8 @@
+Release ...
+* troff: The ".fkern" request now properly refers to a single mounted
+  instance of a font; it previously affected all mounted instances of
+  one font metrics file.
+
 Release 060430
 * troff/dpost: Links and anchors in PDF documents can now be defined;
   "\A" and "\T" escape sequences have been introduced for this.

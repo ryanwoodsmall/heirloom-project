@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.10 (gritter) 3/10/06
+ * Sccsid @(#)dev.h	1.11 (gritter) 4/30/06
  */
 
 /*
@@ -78,7 +78,7 @@ struct Font {		/* characteristics of a font */
 	char	nwfont;		/* number of width entries for this font */
 	char	specfont;	/* 1 == special font */
 	char	ligfont;	/* 1 == ligatures exist on this font */
-	char	spare1;		/* unused for now */
+	char	flgfont;	/* font flags */
 	char	namefont[10];	/* name of this font (e.g., "R" */
 	char	intname[10];	/* internal name (=number) on device, in ascii */
 	int	afmpos;		/* afmpos-1 = position in afmtab */
@@ -91,6 +91,10 @@ struct Font {		/* characteristics of a font */
 #define	LFL	04
 #define	LFFI	010
 #define	LFFL	020
+
+/* flags for ffont */
+
+#define	FNOKERN	01
 
 extern	void		*readdesc(const char *);
 extern	void		*readfont(const char *, struct dev *, int);

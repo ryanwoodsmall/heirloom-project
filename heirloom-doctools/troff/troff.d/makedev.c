@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.12 (gritter) 3/10/06
+ * Sccsid @(#)makedev.c	1.13 (gritter) 4/30/06
  */
 
 /*
@@ -305,7 +305,7 @@ _readfont(const char *name, size_t *szp, int warn)	/* create fitab and width tab
 		} else if (strcmp(cmd, "special") == 0)
 			font.specfont = 1;
 		else if (strcmp(cmd, "spare1") == 0)
-			font.spare1 = cget(mp);
+			cget(mp);
 		else if (strcmp(cmd, "ligatures") == 0) {
 			font.ligfont = getlig(mp, warn);
 		} else if (strcmp(cmd, "spacewidth") == 0) {
