@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.142 (gritter) 5/1/06
+ * Sccsid @(#)t6.c	1.143 (gritter) 5/1/06
  */
 
 /*
@@ -92,6 +92,8 @@ int	kern = 0;
 struct box	mediasize, bleedat, trimat, cropat;
 int	psmaxcode;
 struct ref	*anchors, *links;
+
+static void	kernsingle(int **);
 
 int
 width(register tchar j)
@@ -2117,57 +2119,25 @@ casecropat(void)
 	cutat(&cropat);
 }
 
-static void
-hang(int **tp)
-{
-	int	i, j, n;
-	int	savfont = font, savfont1 = font1;
-	tchar	k;
-
-	lgf++;
-	if (skip(1))
-		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
-	if ((j = findft(i, 1)) < 0)
-		return;
-	font = font1 = j;
-	mchbits();
-	while (!skip(0) && (i = cbits(k = getch())) != '\n' && !skip(1)) {
-		noscale++;
-		n = atoi();
-		noscale--;
-		if (fbits(k) == j && !ismot(k)) {
-			unitsPerEm = 1000;
-			n = _unitconv(n);
-			if (tp[j] == NULL)
-				tp[j] = calloc(NCHARS, sizeof *tp);
-			tp[j][i] = n;
-		}
-	}
-	font = savfont;
-	font1 = savfont1;
-	mchbits();
-}
-
 void
 caselhang(void)
 {
-	hang(lhangtab);
+	kernsingle(lhangtab);
 }
 
 void
 caserhang(void)
 {
-	hang(rhangtab);
+	kernsingle(rhangtab);
 }
 
 void
 casekernpair(void)
 {
 	int	savfont = font, savfont1 = font1;
-	int	f, g, i, n;
-	tchar	c, d;
+	int	f, g, i, j, n;
+	tchar	c, d, *cp = NULL, *dp = NULL;
+	int	a = 0, b = 0;
 
 	lgf++;
 	if (skip(1))
@@ -2180,8 +2150,17 @@ casekernpair(void)
 	mchbits();
 	if (skip(1))
 		goto done;
-	c = getch();
-	if (fbits(c) != f || skip(1))
+	while ((j = cbits(c = getch())) > ' ' || j == UNPAD) {
+		if (fbits(c) != f) {
+			if (warn & WARN_CHAR)
+				errprint("glyph %C not in font %s",
+					c, macname(i));
+			continue;
+		}
+		cp = realloc(cp, ++a * sizeof *cp);
+		cp[a-1] = c;
+	}
+	if (a == 0 || skip(1))
 		goto done;
 	if ((i = getrq()) >= 256)
 		i = maybemore(i, 2);
@@ -2191,26 +2170,40 @@ casekernpair(void)
 	mchbits();
 	if (skip(1))
 		goto done;
-	d = getch();
-	if (fbits(d) != g || skip(1))
+	while ((j = cbits(c = getch())) > ' ' || j == UNPAD) {
+		if (fbits(c) != g) {
+			if (warn & WARN_CHAR)
+				errprint("glyph %C not in font %s",
+					c, macname(i));
+			continue;
+		}
+		dp = realloc(dp, ++b * sizeof *dp);
+		dp[b-1] = c;
+	}
+	if (b == 0 || skip(1))
 		goto done;
 	noscale++;
 	n = atoi();
 	noscale--;
-	if ((c = cbits(c)) == 0)
-		goto done;
-	if (c == UNPAD)
-		c = ' ';
-	setfbits(c, f);
-	if ((d = cbits(d)) == 0)
-		goto done;
-	if (d == UNPAD)
-		d = ' ';
-	setfbits(d, g);
 	unitsPerEm = 1000;
 	n = _unitconv(n);
-	kadd(c, d, n);
+	for (i = 0; i < a; i++)
+		for (j = 0; j < b; j++) {
+			if ((c = cbits(cp[i])) == 0)
+				continue;
+			if (c == UNPAD)
+				c = ' ';
+			setfbits(c, f);
+			if ((d = cbits(dp[j])) == 0)
+				continue;
+			if (d == UNPAD)
+				d = ' ';
+			setfbits(d, g);
+			kadd(c, d, n);
+		}
 done:
+	free(cp);
+	free(dp);
 	font = savfont;
 	font1 = savfont1;
 	mchbits();
@@ -2220,8 +2213,10 @@ static void
 kernsingle(int **tp)
 {
 	int     savfont = font, savfont1 = font1;
-	int	f, i, n;
-	tchar	c;
+	int	f, i, j, n;
+	int	twice = 0;
+	tchar	c, *cp = NULL;
+	int	a;
 
 	lgf++;
 	if (skip(1))
@@ -2232,20 +2227,31 @@ kernsingle(int **tp)
 		return;
 	font = font1 = f;
 	mchbits();
-	while (!skip(0)) {
-		c = getch();
+	while (!skip(twice++ == 0)) {
+		a = 0;
+		while ((j = cbits(c = getch())) > ' ') {
+			if (fbits(c) != f) {
+				if (warn & WARN_CHAR)
+					errprint("glyph %C not in font %s",
+						c, macname(i));
+				continue;
+			}
+			cp = realloc(cp, ++a * sizeof *cp);
+			cp[a-1] = c;
+		}
 		if (skip(1))
 			break;
 		noscale++;
 		n = atoi();
 		noscale--;
-		if (fbits(c) != f || (c = cbits(c)) <= 32)
-			continue;
 		if (tp[f] == NULL)
 			tp[f] = calloc(NCHARS, sizeof *tp);
 		unitsPerEm = 1000;
-		tp[f][c] = _unitconv(n);
+		n = _unitconv(n);
+		for (j = 0; j < a; j++)
+			tp[f][cbits(cp[j])] = n;
 	}
+	free(cp);
 	font = savfont;
 	font1 = savfont1;
 	mchbits();

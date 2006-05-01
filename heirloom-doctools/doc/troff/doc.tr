@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.55 (gritter) 4/30/06
+.\" Sccsid @(#)doc.tr	1.56 (gritter) 5/1/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/30/06
+.ds Sccsdate 5/1/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1201,15 +1201,15 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'fkern'\fB&fkern\fI|F|N\fR	1	1	P,T	Controls the use of kerning tables from font \fIF\fR.\T
 .b1
-\T'kernpair'\fB&kernpair\fI|F|c|G|d|N\fR	ignored	P,T	Defines a kerning pair.\T
+\T'kernpair'\fB&kernpair\fI|F|c...|G|d...|N\fR	ignored	P,T	Defines a kerning pair.\T
 .b1
-\T'kernafter'\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space after a character.\T
+\T'kernafter'\fB&kernafter\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space after a character.\T
 .b1
-\T'kernbefore'\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space before a character.\T
+\T'kernbefore'\fB&kernbefore\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space before a character.\T
 .b1 0
-\T'lhang'\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at left margin.\T
+\T'lhang'\fB&lhang\fI|F|c...|N|d...|M|...\fR	ignored	T	Hanging characters at left margin.\T
 .b1 0
-\T'rhang'\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at right margin.\T
+\T'rhang'\fB&rhang\fI|F|c...|N|d...|M|...\fR	ignored	T	Hanging characters at right margin.\T
 .mht s_vert
 Vertical Spacing
 .bt
@@ -1507,12 +1507,12 @@ Device and Font Description Files
 \T'ex'ex	18\T
 \T'fallback'fallback	2\T
 \T'fc'fc	9\T
-\T'fdeferlig'fdeferlig	10.2\T
+\T'fdeferlig'fdeferlig	10\T
 \T'feature'feature	2\T
 \T'fi'fi	4\T
 \T'fkern'fkern	4\T
 \T'fl'fl	20\T
-\T'flig'flig	10.2\T
+\T'flig'flig	10\T
 \T'fp'fp	2\T
 \T'fps'fps	2\T
 \T'fspacewidth'fspacewidth	2\T
@@ -1557,7 +1557,7 @@ Device and Font Description Files
 \T'open'open	19\T
 \T'opena'opena	19\T
 \T'os'os	5\T
-\T'output'output	10.6\T
+\T'output'output	10\T
 \T'papersize'papersize	3\T
 \T'pc'pc	14\T
 \T'pi'pi	19\T
@@ -2761,7 +2761,22 @@ the non-printing, zero-width filler character \fB\e&\fR.
 Still another way is to specify output translation of some
 convenient character into the control character
 using \T'tr'\fBtr\fR\T \T'c_trans'(\(sc10.5).\T
-.pg
+.sc
+Interrupted text.
+The copying of a input line in \fInofill\f (non-fill) mode can be \fIinterrupted\fR
+by terminating
+the partial line with a \A'e_c'\fB\ec\fR.
+The \fInext\fR encountered input text line will be considered to be a continuation
+of the same line of input text.
+Similarly,
+a word within \fIfilled\fR text may be interrupted by terminating the
+word (and line) with \fB\ec\fR;
+the next encountered text will be taken as a continuation of the
+interrupted word.
+If the intervening control lines cause a break,
+any partial line will be forced out along with any partial word.
+.sc
+Kerning.
 \*(TR reads kerning tables from Type\ 1,
 OpenType, and TrueType font files.
 These tables contain small horizontal spacing adjustments
@@ -2788,7 +2803,8 @@ to define such adjustments.
 Again, a \fB\e&\fR disables them at individual points;
 they are generally not applied if the other character is a space.
 .tr &.
-.pg
+.sc
+Hanging characters.
 Characters can hang beyond the left or right margins of adjusted text;
 the \T'lhang'\fBlhang\fR\T and
 \T'rhang'\fBrhang\fR\T requests specify this.
@@ -2806,20 +2822,6 @@ punctuation for visual alignment, though;
 if e.g. a line with eight word
 spaces is shifted by .08 em,
 each word space is enlarged by only .01 em.
-.sc
-Interrupted text.
-The copying of a input line in \fInofill\f (non-fill) mode can be \fIinterrupted\fR
-by terminating
-the partial line with a \A'e_c'\fB\ec\fR.
-The \fInext\fR encountered input text line will be considered to be a continuation
-of the same line of input text.
-Similarly,
-a word within \fIfilled\fR text may be interrupted by terminating the
-word (and line) with \fB\ec\fR;
-the next encountered text will be taken as a continuation of the
-interrupted word.
-If the intervening control lines cause a break,
-any partial line will be forced out along with any partial word.
 .h1
 .bta br
 \fB&br\fR	\(en	\(en	B	Break.
@@ -2902,43 +2904,63 @@ disabled if \fIN\fR=0, otherwise enabled.
 \*(TR kerning adjustments as defined by the following requests
 are not affected.
 .bta kernpair
-\fB&kernpair\fI|F|c|G|d|N\fR	ignored	P,T	Adds a kerning pair
+\fB&kernpair\fI|F|c...|G|d...|N\fR	ignored	P,T	Adds a kerning pair
 to the kerning table for character \fIc\fR
 from font \fIF\fR and character \fId\fR from font \fIG\fR.
+\fIc\fR and \fId\fR may consist of multiple characters;
+in this case, table entries are added
+for any pair combination of characters from \fIc\fR and \fId\fR.
 The \fIN\fR argument is 1/72\|000 of an inch multiplied by the current point
-size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair definitions).
-To add a kerning pair that includes the space character, use \T'e_ '``\e ''.\T
+size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair definitions);
+it may be negative.
+To add a kerning pair that includes the space character, use \T'e_ '``\e\ ''.\T
 .bta kernafter
-\fB&kernafter\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space after a character
+\fB&kernafter\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space after a character
 if the current font is \fIF\fR and \fIc\fR
 is the first character of a pair of characters subject to kerning.
+\fIc\fR may consist of multiple characters;
+in this case, the same amount is added
+whenever one of the given characters appears.
 The \fIN\fR argument is
 1/72\|000 of an inch multiplied by the current point size or 1/1000
-of an em (as in \s-1AFM\s+1 kerning pair definitions).
+of an em (as in \s-1AFM\s+1 kerning pair definitions);
+it may be negative.
 Same for \fId/M\fR etc.
 .bta kernbefore
-\fB&kernbefore\fI|F|c|N|d|M|...\fR	ignored	P,T	Adds a constant amount of space before a character
+\fB&kernbefore\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space before a character
 if the current font is \fIF\fR and \fIc\fR
 is the second character of a pair of characters subject to kerning.
+\fIc\fR may consist of multiple characters;
+in this case, the same amount is added
+whenever one of the given characters appears.
 The \fIN\fR argument is
 1/72\|000 of an inch multiplied by the current point size or 1/1000
-of an em (as in \s-1AFM\s+1 kerning pair definitions).
+of an em (as in \s-1AFM\s+1 kerning pair definitions);
+it may be negative.
 Same for \fId/M\fR etc.
 .bta lhang
-\fB&lhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at left margin.
+\fB&lhang\fI|F|c...|N|d...|M|...\fR	ignored	T	Hanging characters at left margin.
 When the current font is \fIF\fR and \fIc\fR appears at the left margin
 of an output line in left-adjusted, both-adjusted, or nofill mode,
 the margin is relocated to the right by \fIN\fR, which is
 1/72\|000 of an inch multiplied by the current point size or 1/1000
-of an em (as in \s-1AFM\s+1 character width definitions).
+of an em (as in \s-1AFM\s+1 character width definitions);
+it may be negative.
+\fIc\fR may consist of multiple characters;
+in this case, the margin is relocated
+whenever one of the given characters appears.
 Same for \fId/M\fR etc.
 .bta rhang
-\fB&rhang\fI|F|c|N|d|M|...\fR	ignored	T	Hanging characters at right margin.
+\fB&rhang\fI|F|c...|N|d...|M|...\fR	ignored	T	Hanging characters at right margin.
 When the current font is \fIF\fR and \fIc\fR appears at the right margin
 of an output line in right-adjusted, both-adjusted, or nofill mode,
 the margin is relocated to the right by \fIN\fR, which is
 1/72\|000 of an inch multiplied by the current point size or 1/1000
-of an em (as in \s-1AFM\s+1 character width definitions).
+of an em (as in \s-1AFM\s+1 character width definitions);
+it may be negative.
+\fIc\fR may consist of multiple characters;
+in this case, the margin is relocated
+whenever one of the given characters appears.
 Same for \fId/M\fR etc.
 .mha s_vert
 Vertical Spacing

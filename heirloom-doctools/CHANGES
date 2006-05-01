@@ -1,4 +1,7 @@
 Release ...
+* troff: The ".kernpair", ".kernafter", ".kernbefore", ".lhang", and
+  ".rhang" requests now also accept groups of characters to which the
+  same kerning/hanging value is applied.
 * troff: The ".fkern" request now properly refers to a single mounted
   instance of a font; it previously affected all mounted instances of
   one font metrics file.
