@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.143 (gritter) 5/1/06
+ * Sccsid @(#)t6.c	1.144 (gritter) 5/2/06
  */
 
 /*
@@ -669,8 +669,8 @@ findft(register int i, int required)
 	for (k = 0; fontlab[k] != i; k++)
 		if (k > nfonts) {
 			mn = macname(i);
-			if ((k = strtol(mn, &mp, 10)) >= 0 && k <= nfonts &&
-					fontbase[k])
+			if ((k = strtol(mn, &mp, 10)) >= 0 && *mp == 0 &&
+					k <= nfonts && fontbase[k])
 				break;
 			if (required && warn & WARN_FONT)
 				errprint("%s: no such font", mn);

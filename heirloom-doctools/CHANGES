@@ -9,6 +9,8 @@ Release ...
   does not originate from the current font but is found in the fallback
   sequence are now performed correctly. Previously, an invalid heap
   access could occur, resulting in the choice of random characters.
+* troff: Selecting one of the base fonts with ".ft" without a previous
+  ".fp" works again; it was broken in the last release.
 
 Release 060430
 * troff/dpost: Links and anchors in PDF documents can now be defined;
