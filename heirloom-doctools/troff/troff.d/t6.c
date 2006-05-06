@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.144 (gritter) 5/2/06
+ * Sccsid @(#)t6.c	1.145 (gritter) 5/6/06
  */
 
 /*
@@ -670,7 +670,7 @@ findft(register int i, int required)
 		if (k > nfonts) {
 			mn = macname(i);
 			if ((k = strtol(mn, &mp, 10)) >= 0 && *mp == 0 &&
-					k <= nfonts && fontbase[k])
+					mp > mn && k <= nfonts && fontbase[k])
 				break;
 			if (required && warn & WARN_FONT)
 				errprint("%s: no such font", mn);
@@ -854,10 +854,9 @@ setfont(int a)
 {
 	register int i, j;
 
-	if (a) {
-		if ((i = getrq()) >= 256)
-			i = maybemore(i, 3);
-	} else 
+	if (a)
+		i = getrq(3);
+	else 
 		i = getsn();
 	if (!i || i == 'P') {
 		j = font1;
@@ -1292,8 +1291,7 @@ caseflig(int defer)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((j = findft(i, 1)) < 0)
 		return;
 	i = 0;
@@ -1316,11 +1314,9 @@ casefp(int spec)
 	skip(0);
 	if ((i = xflag ? atoi() : cbits(getch()) - '0') < 0 || i > 255)
 	bad:	errprint("fp: bad font position %d", i);
-	else if (skip(0) || !(j = getrq()))
+	else if (skip(0) || !(j = getrq(3)))
 		errprint("fp: no font name");
 	else {
-		if (j >= 256)
-			j = maybemore(j, 3);
 		if (skip(0) || !getname()) {
 			if (i == 0 || i > nfonts)
 				goto bad;
@@ -1472,10 +1468,8 @@ casecs(void)
 	noscale++;
 	if (skip(1))
 		goto rtn;
-	if (!(i = getrq()))
+	if (!(i = getrq(2)))
 		goto rtn;
-	if (i >= 256)
-		i = maybemore(i, 2);
 	if ((i = findft(i, 1)) < 0)
 		goto rtn;
 	skip(1);
@@ -1499,9 +1493,7 @@ casebd(void)
 	zapwcache(0);
 	k = 0;
 bd0:
-	if (skip(1) || !(i = getrq()) ||
-			(i = i >= 256 ? maybemore(i, 2) : i,
-			(j = findft(i, 1)) == -1)) {
+	if (skip(1) || !(i = getrq(2)) || (j = findft(i, 1)) == -1) {
 		if (k)
 			goto bd1;
 		else 
@@ -1572,8 +1564,7 @@ casefspacewidth(void)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
 	if (skip(0)) {
@@ -1842,8 +1833,7 @@ casetrack(void)
 
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((j = findft(i, 1)) < 0)
 		return;
 	s1 = tracknum();
@@ -1873,14 +1863,12 @@ casefallback(void)
 
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((j = findft(i, 1)) < 0)
 		return;
 	do {
 		skip(0);
-		if ((i = getrq()) >= 256)
-			i = maybemore(i, 2);
+		i = getrq(2);
 		fb = realloc(fb, (n+2) * sizeof *fb);
 		fb[n++] = i;
 	} while (i);
@@ -1896,8 +1884,7 @@ casehidechar(void)
 
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((j = findft(i, 1)) < 0)
 		return;
 	font = font1 = j;
@@ -1927,8 +1914,7 @@ casefzoom(void)
 
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((j = findft(i, 1)) < 0)
 		return;
 	skip(1);
@@ -1962,8 +1948,7 @@ casefkern(void)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
 	if (skip(0) || atoi())
@@ -2142,8 +2127,7 @@ casekernpair(void)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
 	font = font1 = f;
@@ -2162,8 +2146,7 @@ casekernpair(void)
 	}
 	if (a == 0 || skip(1))
 		goto done;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((g = findft(i, 1)) < 0)
 		goto done;
 	font = font1 = g;
@@ -2221,8 +2204,7 @@ kernsingle(int **tp)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
 	font = font1 = f;
@@ -2279,8 +2261,7 @@ caseftr(void)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
 	font = font1 = f;
@@ -2360,8 +2341,7 @@ casefeature(void)
 	lgf++;
 	if (skip(1))
 		return;
-	if ((i = getrq()) >= 256)
-		i = maybemore(i, 2);
+	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
 	if ((j = (fontbase[f]->afmpos) - 1) < 0 ||

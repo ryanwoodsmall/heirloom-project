@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.87 (gritter) 5/2/06
+ * Sccsid @(#)n3.c	1.88 (gritter) 5/6/06
  */
 
 /*
@@ -205,18 +205,14 @@ casern(void)
 
 	lgf++;
 	skip(1);
-	if ((i = getrq()) == 0)
+	if ((i = getrq(0)) == 0)
 		return;
-	if (i >= 256)
-		i = maybemore(i, 0);
 	if ((oldmn = findmn(i)) < 0) {
 		nosuch(i);
 		return;
 	}
 	skip(1);
-	j = getrq();
-	if (j >= 256)
-		j = maybemore(j, 1);
+	j = getrq(1);
 	clrmn(findmn(j));
 	if (j) {
 		munhash(&contab[oldmn]);
@@ -283,11 +279,8 @@ caserm(void)
 	int j, cnt = 0;
 
 	lgf++;
-	while (!skip(!cnt++) && (j = getrq()) != 0) {
-		if (j >= 256)
-			j = maybemore(j, 0);
+	while (!skip(!cnt++) && (j = getrq(0)) != 0)
 		clrmn(findmn(j));
-	}
 	lgf--;
 }
 
@@ -327,10 +320,8 @@ casede(void)
 	req = '.';
 	lgf++;
 	skip(1);
-	if ((i = getrq()) == 0)
+	if ((i = getrq(1)) == 0)
 		goto de1;
-	if (i >= 256)
-		i = maybemore(i, 1);
 	if ((offset = finds(i)) == 0)
 		goto de1;
 	if (ds)
@@ -460,10 +451,8 @@ copyb(void)
 	tchar	tailc = 0;
 	char	*cp, *mn;
 
-	if (skip(0) || !(j = getrq()))
+	if (skip(0) || !(j = getrq(1)))
 		j = '.';
-	if (j >= 256)
-		j = maybemore(j, 1);
 	req = j;
 	cp = macname(req);
 	mn = malloc(strlen(cp) + 1);
@@ -776,7 +765,7 @@ getsn(void)
 	if ((i = getach()) == 0)
 		return(0);
 	if (i == '(')
-		return(getrq());
+		return(getrq2());
 	else if (i == '[' && xflag != 0)
 		return(getls(']'));
 	else 
@@ -937,7 +926,7 @@ casedi(void)
 	register int *k;
 
 	lgf++;
-	if (skip(0) || (i = getrq()) == 0) {
+	if (skip(0) || (i = getrq(1)) == 0) {
 		if (dip != d)
 			wbt((tchar)0);
 		if (dilev > 0) {
@@ -965,8 +954,6 @@ casedi(void)
 		wbt((tchar)0);
 	diflg++;
 	dip = &d[dilev];
-	if (i >= 256)
-		i = maybemore(i, 1);
 	dip->op = finds(i);
 	dip->curd = i;
 	clrmn(oldmn);
@@ -990,9 +977,7 @@ casedt(void)
 	if (nonumb)
 		return;
 	skip(1);
-	dip->dimac = getrq();
-	if (dip->dimac >= 256)
-		dip->dimac = maybemore(dip->dimac, 1);
+	dip->dimac = getrq(1);
 }
 
 
@@ -1088,10 +1073,8 @@ casechop(void)
 		wbfl();
 	lgf++;
 	skip(1);
-	if ((i = getrq()) == 0)
+	if ((i = getrq(0)) == 0)
 		return;
-	if (i >= 256)
-		i = maybemore(i, 0);
 	if ((j = findmn(i)) < 0) {
 		nosuch(i);
 		return;
@@ -1121,10 +1104,8 @@ casesubstring(void)
 		wbfl();
 	lgf++;
 	skip(1);
-	if ((i = getrq()) == 0)
+	if ((i = getrq(0)) == 0)
 		return;
-	if (i >= 256)
-		i = maybemore(i, 0);
 	if ((j = findmn(i)) < 0) {
 		nosuch(i);
 		return;
@@ -1192,10 +1173,8 @@ caselength(void)
 
 	lgf++;
 	skip(1);
-	if ((i = getrq()) == 0)
+	if ((i = getrq(1)) == 0)
 		return;
-	if (i >= 256)
-		i = maybemore(i, 1);
 	j = 0;
 	lgf--;
 	copyf++;

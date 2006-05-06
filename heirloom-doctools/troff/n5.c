@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.42 (gritter) 4/19/06
+ * Sccsid @(#)n5.c	1.43 (gritter) 5/6/06
  */
 
 /*
@@ -411,9 +411,7 @@ casewh(void)
 	if (nonumb)
 		return;
 	skip(0);
-	j = getrq();
-	if (j >= 256)
-		j = maybemore(j, 1);
+	j = getrq(1);
 	if ((k = findn(i)) != NTRAP) {
 		mlist[k] = j;
 		return;
@@ -438,11 +436,9 @@ casech(void)
 
 	lgf++;
 	skip(1);
-	if (!(j = getrq()))
+	if (!(j = getrq(0)))
 		return;
 	else  {
-		if (j >= 256)
-			j = maybemore(j, 0);
 		for (k = 0; k < NTRAP; k++)
 			if (mlist[k] == j)
 				break;
@@ -745,9 +741,7 @@ caseem(void)
 {
 	lgf++;
 	skip(1);
-	em = getrq();
-	if (em >= 256)
-		em = maybemore(em, 1);
+	em = getrq(1);
 }
 
 
@@ -1016,9 +1010,7 @@ caseif(int x)
 			goto dfl;
 		warn &= ~(WARN_MAC|WARN_SPACE|WARN_REG);
 		if (!skip(1)) {
-			j = getrq();
-			if (j >= 256)
-				j = maybemore(j, 2);
+			j = getrq(2);
 			true = (cbits(i) == 'r' ? usedr(j) : findmn(j)) >= 0;
 		}
 		warn = w;
@@ -1380,7 +1372,7 @@ caseuf(void)
 	register int i, j;
 	extern int findft(int, int);
 
-	if (skip(0) || !(i = getrq()) || i == 'S' ||  (j = findft(i, 1))  == -1)
+	if (skip(0) || !(i = getrq(2)) || i == 'S' || (j = findft(i, 1))  == -1)
 		ulfont = ULFONT; /*default underline position*/
 	else 
 		ulfont = j;
@@ -1402,11 +1394,8 @@ caseit(void)
 	skip(1);
 	i = atoi();
 	skip(1);
-	if (!nonumb && (itmac = getrq())) {
-		if (itmac >= 256)
-			itmac = maybemore(itmac, 1);
+	if (!nonumb && (itmac = getrq(1)))
 		it = i;
-	}
 	noscale = 0;
 }
 
@@ -1443,10 +1432,8 @@ casemk(void)
 		dip->mkline = j;
 		return;
 	}
-	if ((i = getrq()) == 0)
+	if ((i = getrq(1)) == 0)
 		return;
-	if (i >= 256)
-		i = maybemore(i, 1);
 	numtab[findr(i)].val = j;
 }
 

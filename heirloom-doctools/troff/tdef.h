@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.80 (gritter) 5/2/06
+ * Sccsid @(#)tdef.h	1.81 (gritter) 5/6/06
  */
 
 /*
@@ -730,7 +730,8 @@ void errprint(const char *, ...);
 void fdprintf(int, char *, ...);
 char *roff_sprintf(char *, char *, ...);
 int control(register int, register int);
-int getrq(void);
+int getrq2(void);
+int getrq(int);
 tchar getch(void);
 void setxon(void);
 tchar getch0(void);

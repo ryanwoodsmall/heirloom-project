@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.33 (gritter) 4/14/06
+ * Sccsid @(#)n6.c	1.34 (gritter) 5/6/06
  */
 
 /*
@@ -300,7 +300,7 @@ setfont(int a)
 	register int i, j;
 
 	if (a)
-		i = getrq();
+		i = getrq(3);
 	else 
 		i = getsn();
 	if (!i || i == 'P') {
@@ -472,10 +472,8 @@ casefp(void)
 	skip(1);
 	if ((i = cbits(getch()) - '0') < 0 || i > nfonts)
 		return;
-	if (skip(1) || !(j = getrq()))
+	if (skip(1) || !(j = getrq(3)))
 		return;
-	if (j >= 256)
-		j = maybemore(j, 3);
 	fontlab[i] = j;
 }
 
@@ -501,7 +499,7 @@ casebd(void)
 
 	k = 0;
 bd0:
-	if (skip(1) || !(i = getrq()) || (j = findft(i, 1)) == -1) {
+	if (skip(1) || !(i = getrq(0)) || (j = findft(i, 1)) == -1) {
 		if (k)
 			goto bd1;
 		else 
