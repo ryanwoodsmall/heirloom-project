@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.111 (gritter) 2/28/06";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.112 (gritter) 5/8/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.111 (gritter) 2/28/06";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.112 (gritter) 5/8/06";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.111 (gritter) 2/28/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.112 (gritter) 5/8/06";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.111 (gritter) 2/28/06";
+static const char sccsid[] USED = "@(#)ps.sl	2.112 (gritter) 5/8/06";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.111 (gritter) 2/28/06";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.112 (gritter) 5/8/06";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
 	&& !defined (__DragonFly__)
@@ -154,6 +154,11 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.111 (gritter) 2/28/06";
 #include	<wctype.h>
 #ifndef	TIOCGWINSZ
 #include	<sys/ioctl.h>
+#endif
+
+#if __NetBSD_Version__ >= 300000000
+#include	<sys/statvfs.h>
+#define	statfs	statvfs
 #endif
 
 #include	<mbtowi.h>

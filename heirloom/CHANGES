@@ -7,6 +7,7 @@ Release ...
 * pgrep: Ignores dead processes now (Stefan Tramm).
 * spell: A value of the wrong type that was passed to scanf() could lead
   to build errors on 64-bit platforms (Jeffrey H. Johnson).
+* df, find, ps: Changes have been made to build on NetBSD 3 (Aleksey Cheusov).
 
 Release 060122
 * The tools have been ported to Mac OS X 10.4.3 (patches by Stefan Tramm).

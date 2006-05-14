@@ -45,11 +45,11 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.44 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)find_su3.sl	1.45 (gritter) 5/8/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.44 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.45 (gritter) 5/8/06";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.44 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)find.sl	1.45 (gritter) 5/8/06";
 #endif
 
 #include <stdio.h>
@@ -85,6 +85,10 @@ static const char sccsid[] USED = "@(#)find.sl	1.44 (gritter) 1/22/06";
 #endif
 #ifndef	major
 #include <sys/mkdev.h>
+#endif
+#if __NetBSD_Version__>= 300000000
+#include <sys/statvfs.h>
+#define statfs statvfs
 #endif
 #include "getdir.h"
 #include "atoll.h"
