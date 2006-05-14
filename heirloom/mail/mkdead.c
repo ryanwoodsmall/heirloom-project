@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mkdead.c	1.6 (gritter) 6/22/05
+ * Sccsid @(#)mkdead.c	1.7 (gritter) 5/14/06
  */
 
 #include "mail.h"
@@ -65,8 +65,11 @@ mkdead(void)
 			try to create in $HOME
 		*/
 		cat(&hmdead, &hmdeadsize, home, dead);
-		if ((aret=legal(hmdead)) && !(stat(hmdead, &st) < 0 &&
-			errno == EOVERFLOW))
+		if ((aret=legal(hmdead)) && !(stat(hmdead, &st) < 0
+#ifdef EOVERFLOW
+			&& errno == EOVERFLOW
+#endif
+			))
 			malf = fopen(hmdead, "a");
 		if ((malf == NULL) || (aret == 0)) {
 			fprintf(stderr,

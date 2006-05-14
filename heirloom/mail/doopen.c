@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)doopen.c	1.4 (gritter) 6/18/05
+ * Sccsid @(#)doopen.c	1.5 (gritter) 5/14/06
  */
 #include "mail.h"
 /*
@@ -46,7 +46,11 @@ doopen(char *file, char *type, int errnum)
 	FILE *fptr = NULL;
 	struct stat st;
 
-	if ((stat(file, &st) < 0 && errno == EOVERFLOW) ||
+	if ((stat(file, &st) < 0
+#ifdef EOVERFLOW
+		&& errno == EOVERFLOW
+#endif
+		) ||
 		(fptr = fopen(file, type)) == NULL) {
 		fprintf(stderr,
 			"%s: Can't open '%s' type: %s\n",program,file,type);

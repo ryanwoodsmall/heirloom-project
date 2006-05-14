@@ -19,7 +19,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)getdir.c	1.19 (gritter) 1/22/06	*/
+/*	Sccsid @(#)getdir.c	1.20 (gritter) 5/14/06	*/
 
 #ifndef	__linux__
 /*
@@ -143,8 +143,11 @@ getdir(struct getdb *db, int *err)
 		&& !defined (__DragonFly__) && !defined (__APPLE__)
 				db->g_dirp->d_ino == 0
 #else	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
-				(db->g_dirp->d_fileno == 0 ||
-				  db->g_dirp->d_type == DT_WHT)
+				(db->g_dirp->d_fileno == 0
+#ifdef DT_WHT
+				  || db->g_dirp->d_type == DT_WHT
+#endif
+				  )
 #endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 		      )
 		{
@@ -169,8 +172,14 @@ getdir(struct getdb *db, int *err)
 		goto next;
 	db->g_dic.d_ino = db->g_dirp->d_ino;
 #else	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
-	if (db->g_dirp->d_fileno == 0 || db->g_dirp->d_type == DT_WHT)
+	if (db->g_dirp->d_fileno == 0
+#ifdef DT_WHT
+	    || db->g_dirp->d_type == DT_WHT
+#endif
+	    )
+	{
 		goto next;
+	}
 	db->g_dic.d_ino = db->g_dirp->d_fileno;
 #endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 	db->g_dic.d_name = db->g_dirp->d_name;

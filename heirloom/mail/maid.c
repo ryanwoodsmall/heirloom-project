@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)maid.c	1.29 (gritter) 7/3/05
+ * Sccsid @(#)maid.c	1.30 (gritter) 5/14/06
  */
 /*
 ma_id() {
@@ -42,7 +42,7 @@ static char mawhat[]="@(#) ma.sl	2.116"; }
 #else
 #define	USED
 #endif
-static const char id[] = "@(#)ma.sl 1.29 (gritter) 7/3/05";
+static const char id[] = "@(#)ma.sl 1.30 (gritter) 5/14/06";
 /* SLIST */
 /*
 Dout.c: * Sccsid @(#)Dout.c	1.4 (gritter) 6/18/05
@@ -62,7 +62,7 @@ del_recipl.c: * Sccsid @(#)del_recipl.c	1.3 (gritter) 6/18/05
 delempty.c: * Sccsid @(#)delempty.c	1.4 (gritter) 6/22/05
 delete.c: * Sccsid @(#)delete.c	1.4 (gritter) 6/18/05
 done.c: * Sccsid @(#)done.c	1.5 (gritter) 6/22/05
-doopen.c: * Sccsid @(#)doopen.c	1.4 (gritter) 6/18/05
+doopen.c: * Sccsid @(#)doopen.c	1.5 (gritter) 5/14/06
 dumpaff.c: * Sccsid @(#)dumpaff.c	1.3 (gritter) 6/18/05
 dumprcv.c: * Sccsid @(#)dumprcv.c	1.3 (gritter) 6/18/05
 errmsg.c: * Sccsid @(#)errmsg.c	1.3 (gritter) 6/18/05
@@ -85,7 +85,7 @@ mail.h: * Sccsid @(#)mail.h	1.11 (gritter) 7/3/05
 maillock.c: * Sccsid @(#)maillock.c	1.5 (gritter) 6/22/05
 maillock.h: * Sccsid @(#)maillock.h	1.3 (gritter) 6/18/05
 main.c: * Sccsid @(#)main.c	1.11 (gritter) 7/3/05
-mkdead.c: * Sccsid @(#)mkdead.c	1.6 (gritter) 6/22/05
+mkdead.c: * Sccsid @(#)mkdead.c	1.7 (gritter) 5/14/06
 mta_ercode.c: * Sccsid @(#)mta_ercode.c	1.3 (gritter) 6/18/05
 new_recipl.c: * Sccsid @(#)new_recipl.c	1.3 (gritter) 6/18/05
 parse.c: * Sccsid @(#)parse.c	1.5 (gritter) 6/22/05
@@ -102,7 +102,7 @@ s_string.h: * Sccsid @(#)s_string.h	1.3 (gritter) 6/18/05
 savehdrs.c: * Sccsid @(#)savehdrs.c	1.4 (gritter) 6/22/05
 sel_disp.c: * Sccsid @(#)sel_disp.c	1.3 (gritter) 6/18/05
 sendlist.c: * Sccsid @(#)sendlist.c	1.9 (gritter) 6/22/05
-sendmail.c: * Sccsid @(#)sendmail.c	1.9 (gritter) 7/3/05
+sendmail.c: * Sccsid @(#)sendmail.c	1.10 (gritter) 5/14/06
 setsig.c: * Sccsid @(#)setsig.c	1.5 (gritter) 6/18/05
 skipspace.c: * Sccsid @(#)skipspace.c	1.4 (gritter) 7/3/05
 stamp.c: * Sccsid @(#)stamp.c	1.3 (gritter) 6/18/05

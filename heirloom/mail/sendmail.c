@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sendmail.c	1.9 (gritter) 7/3/05
+ * Sccsid @(#)sendmail.c	1.10 (gritter) 5/14/06
  */
 
 #include "mail.h"
@@ -150,10 +150,12 @@ sendmail(int argc, char **argv)
 	cpy(&fromS, &fromSsize, "");
 	input = stdin;
 	if (fstat(fileno(input), &sbuf) < 0) {
+#ifdef EOVERFLOW
 		if (errno == EOVERFLOW) {
 			perror("stdin");
 			exit(1);
 		}
+#endif
 	}
 
 	while ((n = getline (&line, &linesize, stdin)) > 0) {

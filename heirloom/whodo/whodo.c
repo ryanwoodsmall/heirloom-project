@@ -34,7 +34,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)whodo.sl	1.40 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)whodo.sl	1.41 (gritter) 5/14/06";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -60,7 +60,7 @@ static const char sccsid[] USED = "@(#)whodo.sl	1.40 (gritter) 1/22/06";
 #include	<sys/sysctl.h>
 #endif
 
-#if defined (__NetBSD__) || defined (__NetBSD__) || defined (__APPLE__)
+#if defined (__NetBSD__) || defined (__OpenBSD__) || defined (__APPLE__)
 #if defined (__APPLE__)
 #include	<mach/mach_types.h>
 #include	<mach/task_info.h>

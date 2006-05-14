@@ -1,17 +1,17 @@
 #include "awk.h"
 #if defined (SU3)
-const char version[] = "@(#)awk_su3.sl  1.49 (gritter) 11/22/05";
+const char version[] = "@(#)awk_su3.sl  1.50 (gritter) 5/14/06";
 int	posix = 1;
 #elif defined (SUS)
-const char version[] = "@(#)awk_sus.sl  1.49 (gritter) 11/22/05";
+const char version[] = "@(#)awk_sus.sl  1.50 (gritter) 5/14/06";
 int	posix = 1;
 #else
-const char version[] = "@(#)nawk.sl  1.49 (gritter) 11/22/05";
+const char version[] = "@(#)nawk.sl  1.50 (gritter) 5/14/06";
 int	posix = 0;
 #endif
 /* SLIST */
 /*
-awk.g.y:   Sccsid @(#)awk.g.y	1.8 (gritter) 12/4/04>
+awk.g.y:   Sccsid @(#)awk.g.y	1.9 (gritter) 5/14/06>
 awk.h:   Sccsid @(#)awk.h	1.23 (gritter) 12/25/04>
 awk.lx.l:   Sccsid @(#)awk.lx.l	1.13 (gritter) 11/22/05>
 b.c:   Sccsid @(#)b.c	1.6 (gritter) 5/15/04>
