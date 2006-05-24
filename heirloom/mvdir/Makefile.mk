@@ -1,10 +1,7 @@
 all: mvdir
 
 mvdir: mvdir.sh
-	echo '#!$(SHELL)' | cat - mvdir.sh | sed ' \
-		s,@DEFBIN@,$(DEFBIN),g; \
-		s,@SV3BIN@,$(SV3BIN),g; \
-		s,@DEFLIB@,$(DEFLIB),g' >mvdir
+	echo '#!$(SHELL)' | cat - mvdir.sh | sed ' s,@DEFBIN@,$(DEFBIN),g; s,@SV3BIN@,$(SV3BIN),g; s,@DEFLIB@,$(DEFLIB),g' >mvdir
 	chmod 755 mvdir
 
 install: all

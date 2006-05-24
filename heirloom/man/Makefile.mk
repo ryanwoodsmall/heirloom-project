@@ -39,10 +39,7 @@ man.dfl: man.dfl.in
 	*) \
 		mac=an ;; \
 	esac ; \
-	<man.dfl.in >man.dfl sed " \
-		s,@MANDIR@,$(MANDIR),g; \
-		s,@DEFLIB@,$(DEFLIB),g; \
-		s,-mandoc,-m$$mac,"
+	<man.dfl.in >man.dfl sed " s,@MANDIR@,$(MANDIR),g; s,@DEFLIB@,$(DEFLIB),g; s,-mandoc,-m$$mac,"
 
 install: all
 	$(UCBINST) -c man $(ROOT)$(DEFBIN)/man

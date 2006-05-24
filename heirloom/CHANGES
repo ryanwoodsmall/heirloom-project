@@ -9,6 +9,7 @@ Release ...
   to build errors on 64-bit platforms (Jeffrey H. Johnson).
 * df, find, ps: Changes have been made to build on NetBSD 3 (Aleksey Cheusov).
 * Changes have been made to build on OpenBSD 3.8 (Aleksey Cheusov).
+* Changes have been made to build with GNU make 3.81.
 
 Release 060122
 * The tools have been ported to Mac OS X 10.4.3 (patches by Stefan Tramm).
