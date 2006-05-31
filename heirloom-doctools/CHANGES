@@ -2,6 +2,11 @@ Release ...
 * troff: The ".kernpair", ".kernafter", ".kernbefore", ".lhang", and
   ".rhang" requests now also accept groups of characters to which the
   same kerning/hanging value is applied.
+* [nt]roff: It is now possible to use strings inside macros names (e.g.
+  ".xx\*(yy" as documented.
+* [nt]roff: The ".if d", ".if n", and ".rr" requests erroneously applied
+  to a shorter two-character name if an undefined longer name was given
+  as an argument; this has been fixed.
 * troff: The ".fkern" request now properly refers to a single mounted
   instance of a font; it previously affected all mounted instances of
   one font metrics file.

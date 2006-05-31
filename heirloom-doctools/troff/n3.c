@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.88 (gritter) 5/6/06
+ * Sccsid @(#)n3.c	1.89 (gritter) 5/31/06
  */
 
 /*
@@ -1296,7 +1296,8 @@ maybemore(int sofar, int flags)
 
 	if (xflag < 2)
 		return sofar;
-	raw = 1;
+	if (xflag == 2)
+		raw = 1;
 	buf[0] = sofar&BYTEMASK;
 	buf[1] = (sofar>>BYTE)&BYTEMASK;
 	do {
@@ -1316,13 +1317,15 @@ maybemore(int sofar, int flags)
 			break;
 	if (n == hadn) {
 		if ((flags & 1) == 0) {
+			strcpy(laststr, buf);
 		retn:	buf[i-1] = c;
 			if (xflag < 3)
 				cpushback(&buf[2]);
 			raw = r;
-			if (flags & 2)
-				/*EMPTY*/;
-			else if (warn & WARN_MAC && i > 3 && xflag >= 3) {
+			if (flags & 2) {
+				if (i > 3 && xflag >= 3)
+					sofar = -2;
+			} else if (warn & WARN_MAC && i > 3 && xflag >= 3) {
 				buf[i-1] = 0;
 				errprint("%s: no such request", buf);
 				sofar = 0;
@@ -1349,28 +1352,30 @@ maybemore(int sofar, int flags)
 static int
 getls(int termc)
 {
-	char	c;
+	char	c, buf[NC+1];
 	int	i = 0, j = -1, n = -1;
 
 	do {
 		c = xflag < 3 ? getach() : mgetach();
-		if (i >= sizeof laststr)
+		if (i >= sizeof buf)
 			return -1;
-		laststr[i++] = c;
+		buf[i++] = c;
 	} while (c && c != termc);
 	if (c != termc)
 		nodelim(termc);
-	laststr[--i] = 0;
+	buf[--i] = 0;
 	if (i == 0 || c != termc)
 		j = 0;
 	else if (i <= 2) {
-		j = PAIR(laststr[0], laststr[1]);
+		j = PAIR(buf[0], buf[1]);
 	} else {
 		for (n = 0; n < hadn; n++)
-			if (strcmp(had[n], laststr) == 0)
+			if (strcmp(had[n], buf) == 0)
 				break;
-		if (n == hadn)
+		if (n == hadn) {
 			n = -1;
+			strcpy(laststr, buf);
+		}
 	}
 	return n >= 0 ? MAXRQ2 + n : j;
 }

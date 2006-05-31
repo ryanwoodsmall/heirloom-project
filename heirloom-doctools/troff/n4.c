@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.27 (gritter) 5/6/06
+ * Sccsid @(#)n4.c	1.28 (gritter) 5/31/06
  */
 
 /*
@@ -337,7 +337,7 @@ _findr(register int i, int rd)
 	register struct numtab *p;
 	register int h = NHASH(i);
 
-	if (i == 0)
+	if (i == 0 || i == -2)
 		return(-1);
 	for (p = nhash[h]; p; p = p->link)
 		if (i == p->r)
@@ -368,7 +368,7 @@ usedr (	/* returns -1 if nr i has never been used */
 {
 	register struct numtab *p;
 
-	if (i == 0)
+	if (i == 0 || i == -2)
 		return(-1);
 	for (p = nhash[NHASH(i)]; p; p = p->link)
 		if (i == p->r)
