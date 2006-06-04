@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.81 (gritter) 5/6/06
+ * Sccsid @(#)tdef.h	1.82 (gritter) 6/4/06
  */
 
 /*
@@ -618,6 +618,7 @@ extern const struct numtab initnumtab[];
 #define	in1	env._in1
 #define	un	env._un
 #define	wch	env._wch
+#define	rhang	env._rhang
 #define	pendt	env._pendt
 #define	pendw	env._pendw
 #define	pendnf	env._pendnf
@@ -697,6 +698,7 @@ extern struct env {
 	int	_in1;
 	int	_un;
 	int	_wch;
+	int	_rhang;
 	int	_pendt;
 	tchar	*_pendw;
 	int	_pendnf;

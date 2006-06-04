@@ -14,6 +14,8 @@ Release ...
   does not originate from the current font but is found in the fallback
   sequence are now performed correctly. Previously, an invalid heap
   access could occur, resulting in the choice of random characters.
+* troff: Margin characters set with ".mc" are now correctly placed in
+  combination with hanging characters set with ".rhang".
 * troff: Selecting one of the base fonts with ".ft" without a previous
   ".fp" works again; it was broken in the last release.
 
