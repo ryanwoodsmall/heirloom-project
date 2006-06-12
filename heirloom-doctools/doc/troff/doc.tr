@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.56 (gritter) 5/1/06
+.\" Sccsid @(#)doc.tr	1.57 (gritter) 6/12/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 5/1/06
+.ds Sccsdate 6/12/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -579,7 +579,7 @@ which is intended to be highly compatible
 with \s-1UNIX\s+1 \*[TR,]
 but which also provides additional features
 desirable for a high-quality typesetting application
-at the beginning of the 21th century.
+at the beginning of the 21st century.
 .pg
 As with the other components of the \fIHeirloom Project,\fR
 the original code,
