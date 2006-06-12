@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ssl.c	1.38 (gritter) 3/4/06";
+static char sccsid[] = "@(#)ssl.c	1.39 (gritter) 6/12/06";
 #endif
 #endif /* not lint */
 
@@ -203,7 +203,7 @@ smime_sign_assemble(FILE *hp, FILE *bp, FILE *sp)
 		lastc = c;
 	}
 	fprintf(op, "Content-Type: multipart/signed;\n"
-		" protocol=application/x-pkcs7-signature; micalg=sha1;\n"
+		" protocol=\"application/x-pkcs7-signature\"; micalg=sha1;\n"
 		" boundary=\"%s\"\n\n", boundary);
 	fprintf(op, "This is an S/MIME signed message.\n\n--%s\n",
 			boundary);

@@ -4,6 +4,8 @@
   most base64 decoders, including mailx's own, ignore such bits since
   base64 data is always a multiple of 8-bit bytes. (Patch by
   Lukasz Stelmach.)
+* Quotes are now placed around the "protocol" parameter in S/MIME headers
+  in accordance to RFC 2045 (Marco Arioli, Jeffrey Stedfast).
 * The conversion of messages in state-dependent encodings has been fixed;
   garbage characters could be inserted because the state was not properly
   reset when a buffer was enlarged (patch by Matthew Fischer).
