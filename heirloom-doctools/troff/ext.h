@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.43 (gritter) 4/26/06
+ * Sccsid @(#)ext.h	1.44 (gritter) 6/13/06
  */
 
 /*
@@ -114,6 +114,7 @@ extern	int	macerr;
 extern	int	mb_cur_max;
 extern	int	mflg;
 extern	int	mfont;
+extern	int	minflg;
 extern	int	mlist[NTRAP];
 extern	int	mpts;
 extern	int	ndone;

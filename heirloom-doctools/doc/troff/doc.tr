@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.57 (gritter) 6/12/06
+.\" Sccsid @(#)doc.tr	1.58 (gritter) 6/13/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 6/12/06
+.ds Sccsdate 6/13/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1195,6 +1195,8 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'ce'\fB&ce\fI|N\fR	off	\fIN\(eq\fR1	B,E	Center following \fIN\fR input text lines.\T
 .b1
+\T'minss'\fB&minss\fI|N\fR	off	ignored	E,T	Minimum word space when adjusting lines.\T
+.b1
 \T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Specifies letter space tracking.\T
 .b1
 \T'kern'\fB&kern\fI|N\fR	1	1	P,T	Controls pairwise kerning.\T
@@ -1544,6 +1546,7 @@ Device and Font Description Files
 \T'lt'lt	14\T
 \T'mc'mc	20\T
 \T'mediasize'mediasize	3\T
+\T'minss'minss	4\T
 \T'mk'mk	3\T
 \T'na'na	4\T
 \T'ne'ne	3\T
@@ -2876,6 +2879,11 @@ If \fIN\fR\(eq\^0, any residual count is cleared.
 A break occurs after each of the \fIN\fR input lines.
 If the input line is too long,
 it will be left adjusted.
+.bta minss
+\fB&minss\fI|N\fR	off	ignored	E,T	Minimum word space.
+When adjusting both margins,
+\*(TR may decrease the size of the word space
+up to this limit (rather than to the value set by \T'ss'\fBss\fR\T).
 .bta track
 \fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Specifies letter space tracking
 for font \fIF\fR.

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.22 (gritter) 6/4/06
+ * Sccsid @(#)ni.c	1.23 (gritter) 6/13/06
  */
 
 /*
@@ -238,8 +238,10 @@ tchar oline[LNSIZE+1];
 struct	env env = {
 /* int	ics	 */	0,
 /* int	sps	 */	0,
+/* int	minsps	 */	0,
 /* int	ses	 */	0,
 /* int	spacesz	 */	0,
+/* int	minspsz  */	0,
 /* int	lss	 */	0,
 /* int	lss1	 */	0,
 /* int	ll	 */	0,
@@ -277,6 +279,8 @@ struct	env env = {
 /* int	lastl	 */	0,
 /* int	nel	 */	0,
 /* int	admod	 */	0,
+/* int	adflg	 */	0,
+/* int	adspc	 */	0,
 /* tchar	*wordp	 */	0,
 /* int	spflg	 */	0,	/* probably to indicate space after punctuation needed */
 /* tchar	*linep	 */	0,

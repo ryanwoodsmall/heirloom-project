@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.145 (gritter) 5/6/06
+ * Sccsid @(#)t6.c	1.146 (gritter) 6/13/06
  */
 
 /*
@@ -92,6 +92,7 @@ int	kern = 0;
 struct box	mediasize, bleedat, trimat, cropat;
 int	psmaxcode;
 struct ref	*anchors, *links;
+static int	_minflg;
 
 static void	kernsingle(int **);
 
@@ -100,6 +101,8 @@ width(register tchar j)
 {
 	register int i, k;
 
+	_minflg = minflg;
+	minflg = 0;
 	if (j & (ZBIT|MOT)) {
 		if (iszbit(j))
 			return(0);
@@ -131,7 +134,7 @@ width(register tchar j)
 		xpts = ppts;
 	} else 
 		xbits(j, 0);
-	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf)
+	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf && !_minflg)
 		k = widcache[i-32].width;
 	else {
 		k = getcw(i-32);
@@ -181,7 +184,13 @@ getcw(register int i)
 		}
 	}
 	if (i == 0) {	/* a blank */
-		k = (fontab[xfont][0] * spacesz + 6) / 12;
+		if (_minflg) {
+			j = minspsz;
+			_minflg = 0;
+			nocache = 1;
+		} else
+			j = spacesz;
+		k = (fontab[xfont][0] * j + 6) / 12;
 		/* this nonsense because .ss cmd uses 1/36 em as its units */
 		/* and default is 12 */
 		goto g1;
@@ -752,6 +761,12 @@ mchbits(void)
 	chbits = 0;
 	setsbits(chbits, ++j);
 	setfbits(chbits, font);
+	if (minspsz) {
+		k = spacesz;
+		spacesz = minspsz;
+		minsps = width(' ' | chbits);
+		spacesz = k;
+	}
 	sps = width(' ' | chbits);
 	zapwcache(1);
 }
@@ -1534,24 +1549,43 @@ casevs(void)
 }
 
 void
-casess(void)
+casess(int flg)
 {
 	register int i, j;
+	int _spacesz, _sps;
 
 	noscale++;
 	skip(1);
 	if (i = atoi()) {
+		_spacesz = spacesz;
 		spacesz = i & 0177;
 		zapwcache(0);
-		sps = width(' ' | chbits);
-		if (xflag) {
+		_sps = width(' ' | chbits);
+		if (xflag && flg == 0) {
 			skip(0);
 			j = atoi();
 			if (!nonumb)
 				ses = j;
 		}
+		if (flg) {
+			minsps = _sps;
+			minspsz = spacesz;
+			spacesz = _spacesz;
+			zapwcache(0);
+			sps = width(' ' | chbits);
+		} else {
+			sps = _sps;
+			if (minspsz > spacesz)
+				minsps = minspsz = 0;
+		}
 	}
 	noscale = 0;
+}
+
+void
+caseminss(void)
+{
+	casess(1);
 }
 
 void

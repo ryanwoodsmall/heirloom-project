@@ -1,4 +1,7 @@
 Release ...
+* troff: The ".minss" request has been added. It allows troff to decrease
+  the size of the word space below the value set by ".ss" when adjusting
+  lines at both margins.
 * troff: The ".kernpair", ".kernafter", ".kernbefore", ".lhang", and
   ".rhang" requests now also accept groups of characters to which the
   same kerning/hanging value is applied.

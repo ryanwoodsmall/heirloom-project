@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.34 (gritter) 4/14/06
+ * Sccsid @(#)proto.h	1.35 (gritter) 6/13/06
  */
 
 /* n10.c */
@@ -73,6 +73,7 @@ void casedummy(void);
 #define	casefspacewidth	casedummy
 #define	casefdeferlig	casedummy
 #define	casefkern	casedummy
+#define	caseminss	casedummy
 
 #define	kernadjust(a, b)	0
 #define	u2pts(i)		(i)
