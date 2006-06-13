@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.50 (gritter) 6/13/06
+ * Sccsid @(#)n7.c	1.51 (gritter) 6/14/06
  */
 
 /*
@@ -732,12 +732,16 @@ movword(void)
 {
 	register int w;
 	register tchar i, *wp, c, *lp, *lastlp, lasti = 0, *tp;
-	int	savwch, hys, stretches = 0;
+	int	savwch, hys, stretches = 0, wholewd = 0;
 #ifndef	NROFF
-	tchar	lgs, lge;
-	int	*ip, s, lgw;
+	tchar	lgs = 0, lge = 0, optlgs = 0, optlge = 0;
+	int	*ip, s, lgw = 0, optlgw = 0;
+	tchar	*optlinep = NULL, *optwp = NULL;
+	int	optnc = 0, optnel = 0, optne = 0, optadspc = 0, optwne = 0,
+		optwch = 0, optwholewd = 0;
 #else	/* NROFF */
 #define	lgw	0
+#define	optlinep	0
 #endif	/* NROFF */
 
 	over = 0;
@@ -773,8 +777,8 @@ movword(void)
 		}
 #endif	/* !NROFF */
 	}
-	if (wne > nel && !hyoff && hyf &&
-	   (!nwd || nel > 3 * (minsps ? minsps : sps)) &&
+	if (wne > nel - adspc && !hyoff && hyf &&
+	   (!nwd || nel - adspc > 3 * (minsps ? minsps : sps)) &&
 	   (!(hyf & 02) || (findt1() > lss)))
 		hyphen(wp);
 	savwch = wch;
@@ -815,24 +819,31 @@ movword(void)
 	*linep = *wp;
 	lastlp = linep;
 	if (nel >= 0) {
-		if (minspsz && nwd && nel - adspc < 0 &&
-				nel / nwd < sps * 8 / 9)
-			goto m3;
+		if (minspsz && nwd && nel - adspc < 0 && nel / nwd < sps) {
+			wholewd = 1;
+			goto m0;
+		}
 		nwd += stretches + 1;
 		if (nel - adspc < 0 && nwd > 1)
 			adflg |= 5;
 		return(0);	/* line didn't fill up */
 	}
+m0:
 #ifndef NROFF
 	xbits((tchar)HYPHEN, 1);
 #endif
 	hys = width((tchar)HYPHEN);
+	if (wholewd)
+		goto m1a;
 m1:
 	if (!nhyp) {
 		if (!nwd)
 			goto m3;
-		if (wch == savwch)
+		if (wch == savwch) {
+			if (optlinep)
+				goto m2;
 			goto m4;
+		}
 	}
 	if (cbits(*--linep) != IMP)
 		goto m5;
@@ -862,7 +873,28 @@ m1:
 		nc--;
 		goto m1;
 	}
+	wholewd = 0;
+m1a:
+#ifndef	NROFF
+	if (minspsz && wch < savwch && nwd && nel / nwd < sps) {
+		optlgs = lgs, optlge = lge, optlgw = lgw;
+		optlinep = linep, optwp = wp, optnc = nc, optnel = nel,
+		optne = ne, optadspc = adspc, optwne = wne, optwch = wch;
+		optwholewd = wholewd;
+		nc -= !wholewd;
+		goto m1;
+	}
+#endif
 m2:
+#ifndef	NROFF
+	if (optlinep) {
+		lgs = optlgs, lge = optlge, lgw = optlgw;
+		linep = optlinep, wp = optwp, nc = optnc, nel = optnel,
+		ne = optne, adspc = optadspc, wne = optwne, wch = optwch;
+		if (wholewd = optwholewd)
+			goto m3;
+	}
+#endif
 #ifndef	NROFF
 	if (lgs != 0) {
 		*wp = lge;
