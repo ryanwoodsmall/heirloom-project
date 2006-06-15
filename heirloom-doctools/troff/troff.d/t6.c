@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.146 (gritter) 6/13/06
+ * Sccsid @(#)t6.c	1.147 (gritter) 6/15/06
  */
 
 /*
@@ -102,7 +102,7 @@ width(register tchar j)
 	register int i, k;
 
 	_minflg = minflg;
-	minflg = 0;
+	minflg = minspc = 0;
 	if (j & (ZBIT|MOT)) {
 		if (iszbit(j))
 			return(0);
@@ -137,7 +137,14 @@ width(register tchar j)
 	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf && !_minflg)
 		k = widcache[i-32].width;
 	else {
+		if (_minflg && i == 32 && cbits(j) != 32)
+			_minflg = 0;
 		k = getcw(i-32);
+		if (i == 32 && _minflg && !cs) {
+			_minflg = 0;
+			minspc = getcw(0) - k;
+		}
+		_minflg = 0;
 		if (bd)
 			k += (bd - 1) * HOR;
 		if (cs)
@@ -186,7 +193,6 @@ getcw(register int i)
 	if (i == 0) {	/* a blank */
 		if (_minflg) {
 			j = minspsz;
-			_minflg = 0;
 			nocache = 1;
 		} else
 			j = spacesz;
