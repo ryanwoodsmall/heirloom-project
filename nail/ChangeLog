@@ -1,4 +1,4 @@
-[12.1] released ...
+[12.1] released 6/15/06
 * The base64 encoder also used an invalid encoding for the last unit of
   data if (bytes_of_input % 3 == 1). As with the previous similar bug,
   most base64 decoders, including mailx's own, ignore such bits since
