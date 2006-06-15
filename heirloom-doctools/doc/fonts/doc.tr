@@ -1,7 +1,7 @@
-.\" Sccsid @(#)doc.tr	2.18 (gritter) 4/14/06
+.\" Sccsid @(#)doc.tr	2.19 (gritter) 6/15/06
 .do xflag 3
 .warn
-.spreadwarn .5c
+.spreadwarn 5p
 .lc_ctype de_DE.utf8
 .mediasize a5
 .hylang en_US
@@ -70,6 +70,7 @@
 .nr VS 12p
 .ll \n(LLu
 .ss 12 0
+.minss 9
 .de Breakpage
 .	ch Breakpage
 '	bp
@@ -185,7 +186,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-4/14/06
+6/15/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -296,8 +297,10 @@ variable to this directory; if you have multiple font directories, you
 can separate them in \fCTROFFONTS\fR by colons, just as in the \fCPATH\fR variable
 for the shell, e.g.
 ``\fCTROFFONTS\fR=\:/\&usr/\:\&local/\:\&share/\:\&fonts\&:\:/\&usr/\:\&share/\:\&fonts
-export \fCTROFFONTS\fR''. Write the definition in your .profile to make it
-permanent. You can now use the fonts with \*[TR.] If you want to install
+export \fCTROFFONTS\fR''.
+Write the definition in your ``.profile'' or a similar startup file
+to make it permanent.
+You can now use the fonts with \*[TR.] If you want to install
 more fonts later, it is sufficient to put them into the font directory.
 .S "Installing OpenType or TrueType fonts"
 .P
