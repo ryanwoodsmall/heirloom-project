@@ -19,6 +19,8 @@ Release ...
   access could occur, resulting in the choice of random characters.
 * troff: Margin characters set with ".mc" are now correctly placed in
   combination with hanging characters set with ".rhang".
+* [nt]roff: It is legal to call ".it" or ".dt" without arguments, thus
+  a warning is no longer issued in this case.
 * troff: Selecting one of the base fonts with ".ft" without a previous
   ".fp" works again; it was broken in the last release.
 
