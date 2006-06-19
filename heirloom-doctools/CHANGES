@@ -1,4 +1,4 @@
-Release ...
+Release 060619
 * troff: The ".minss" request has been added. It allows troff to decrease
   the size of the word space below the value set by ".ss" when adjusting
   lines at both margins.
