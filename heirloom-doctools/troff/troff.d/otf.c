@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.55 (gritter) 4/20/06
+ * Sccsid @(#)otf.c	1.56 (gritter) 6/24/06
  */
 
 #include <stdio.h>
@@ -1778,6 +1778,8 @@ get_CFF_Top_DICT_Entry(int e)
 			d = cffoper(&o);
 		else {
 			d = 0;
+			if (contents[o] == 12)
+				o++;
 			o++;
 		}
 	}

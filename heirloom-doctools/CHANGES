@@ -1,3 +1,8 @@
+Release ...
+* troff, dpost, otfdump: The operator 12 in CFF Top DICT entries was not
+  handled correctly, resulting in misleading error messages with some
+  OpenType fonts. This has been fixed (bug reported by D. Jeff Dionne).
+
 Release 060619
 * troff: The ".minss" request has been added. It allows troff to decrease
   the size of the word space below the value set by ".ss" when adjusting
