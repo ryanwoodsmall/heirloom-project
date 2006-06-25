@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.58 (gritter) 6/13/06
+.\" Sccsid @(#)doc.tr	1.59 (gritter) 6/25/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 6/13/06
+.ds Sccsdate 6/25/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1681,7 +1681,7 @@ Reference	Sequence	Meaning
 \T'e_g'8.\T	\T'e_g'\fB\eg\fIx\fR,\fB\eg(\fIxx\fR,\fB\eg[\fIxxx\fB]\fR\T	\T'e_g'Format of number register \fIx\fP, \fIxx\fR, or \fIxxx\fR\T
 \T'e_h'11.1\T	\T'e_h'\fB\eh\fI\'N\'\fR\T	\T'e_h'Local horizontal motion; move right \fIN\fR \fI(negative left)\fR\T
 \T'e_H'2.3\T	\T'e_H'\fB\eH\fI\'N\'\fR\T	\T'e_H'Height of current font is \fIN\fR\T
-\T'e_k'11.3\T	\T'e_k'\fB\ek\fIx\fR\T	\T'e_k'Mark horizontal \fIinput\fR place in register \fIx\fR\T
+\T'e_k'11.3\T	\T'e_k'\fB\ek\fIx\fR,\fB\ek(\fIxx\fR,\fB\ek[\fIxxx\fB]\fR\T	\T'e_k'Mark horizontal \fIinput\fR place in register \fIx,\fR \fIxx\fR, or \fIxxx\fR\T
 \T'e_l'12.4\T	\T'e_l'\fB\el\fI\^\'Nc\'\fR\T	\T'e_l'Horizontal line drawing function (optionally with \fIc\fR\|)\T
 \T'e_L'12.4\T	\T'e_L'\fB\eL\fI\'Nc\'\fR\T	\T'e_L'Vertical line drawing function (optionally with \fIc\fR\|)\T
 \T'e_n'8\T	\T'e_n'\fB\en\fIx\fR,\fB\en(\fIxx\fR,\fB\en[\fIxxx\fB]\fR\T	\T'e_n'Interpolate number register \fIx\fR, \fIxx\fR, or \fIxxx\fR\T
@@ -3963,6 +3963,9 @@ As an example,
 the construction \fB\ekx\fIword\|\fB\eh\'\|~\|\enxu+3u\'\fIword\fB\fR
 will embolden \fIword\fR by backing up to almost its beginning and overprinting it,
 resulting in \kz\fIword\fR\h'|\nzu+2u'\fIword\fR.
+Likewise, \fB\ek(\fIxx\fR and \fB\ek[\fIxxx\fB]\fR
+will store the horizontal position in register \fIxx\fR or \fIxxx\fR,
+respectively.
 The \A'n_hp'\fBhp\fR number register also holds
 the current horizontal position in the input line.
 .mha s_draw
@@ -4473,6 +4476,8 @@ to reinvoke itself using \T'nx'\fBnx\fR\T
 \T's_io'(\(sc19);\T
 the process would ultimately be ended
 by an \T'ex'\fBex\fR\T in the insertion file.
+.br
+.ne 6
 .mha s_io
 Input/Output File Switching
 .h1
