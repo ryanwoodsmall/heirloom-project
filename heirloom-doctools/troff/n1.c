@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.77 (gritter) 5/6/06
+ * Sccsid @(#)n1.c	1.78 (gritter) 6/28/06
  */
 
 /*
@@ -1624,6 +1624,8 @@ casenx(void)
 	nx++;
 	if (nmfi > 0)
 		nmfi--;
+	if (mfiles == NULL)
+		mfiles = calloc(1, sizeof *mfiles);
 	free(mfiles[nmfi]);
 	mfiles[nmfi] = malloc(NS);
 	strcpy(mfiles[nmfi], nextf);
