@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)proto.h	1.45 (gritter) 6/13/06
+ * Sccsid @(#)proto.h	1.47 (gritter) 7/2/06
  */
 
 /* t6.c */
@@ -45,6 +45,7 @@ void casebd(void);
 void casevs(void);
 void casess(int);
 void caseminss(void);
+void caselspadj(void);
 void casefspacewidth(void);
 tchar xlss(void);
 void casetrack(void);

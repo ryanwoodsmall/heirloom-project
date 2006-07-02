@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.70 (gritter) 4/25/06
+ * Sccsid @(#)t10.c	1.72 (gritter) 7/2/06
  */
 
 /*
@@ -84,6 +84,7 @@ int	Unitwidth;
 int	nfonts;
 int	nsizes;
 int	nchtab;
+int	lettrack;
 
 static float	mzoom;
 
@@ -115,6 +116,7 @@ struct Font **fontbase;
 
 int Nfont;
 
+static void	pttrack(int);
 static void	ptanchor(int);
 static void	ptlink(int);
 
@@ -465,6 +467,12 @@ ptout0(tchar *pi, tchar *pend)
 			ptlink(sbits(i));
 			linkout = 0;
 			return(pi+outsize);
+		case LETSP:
+			lettrack = sbits(i);
+			return(pi+outsize);
+		case NLETSP:
+			lettrack = -sbits(i);
+			return(pi+outsize);
 		default:
 			return(pi+outsize);
 		}
@@ -495,8 +503,14 @@ ptout0(tchar *pi, tchar *pend)
 		ptps();
 	if (lead)
 		ptlead();
-	if (&pi[outsize] < pend)
-		w += getkw(pi[0], pi[outsize]);
+	if (lettrack)
+		pttrack(0);
+	for (j = outsize; &pi[j] < pend; j++)
+		if (cbits(pi[j]) != XFUNC || fbits(pi[j]) != LETSP &&
+				fbits(pi[j]) != NLETSP)
+			break;
+	if (&pi[j] < pend)
+		w += getkw(pi[0], pi[j]);
 	if (afmtab && (j = (fontbase[xfont]->afmpos) - 1) >= 0)
 		a = afmtab[j];
 	else
@@ -640,6 +654,7 @@ ptout0(tchar *pi, tchar *pend)
 			esc -= bd;
 	}
 	esc += w;
+	lettrack = 0;
 	return(pi+outsize);
 }
 
@@ -648,10 +663,10 @@ pttrack(int always)
 {
 	static int	mtrack;
 
-	if (xflag && lasttrack) {
-		if (always || mtrack != lasttrack)
-			fdprintf(ptid, "x X Track %d\n", lasttrack);
-		mtrack = lasttrack;
+	if (xflag && (lasttrack || lettrack || mtrack)) {
+		if (always || mtrack != (lasttrack + lettrack))
+			fdprintf(ptid, "x X Track %d\n", lasttrack + lettrack);
+		mtrack = lasttrack + lettrack;
 	} else
 		mtrack = 0;
 }

@@ -1,4 +1,6 @@
 Release ...
+* troff: The ".lspadj" request has been added to enable dynamic letter
+  spacing when justifying lines.
 * [nt]roff: The ".nx" request now works again, it previously caused
   a segmentation fault because of a null pointer dereference (bug
   reported by Michael Hobgood).

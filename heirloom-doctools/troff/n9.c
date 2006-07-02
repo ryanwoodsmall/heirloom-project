@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.44 (gritter) 5/2/06
+ * Sccsid @(#)n9.c	1.45 (gritter) 7/2/06
  */
 
 /*
@@ -454,6 +454,7 @@ setfield(int x)
 	fp = fbuf;
 	pp = padptr;
 	if (x == savfc) {
+		*fp++ = mkxfunc(FLDMARK, 0);
 		nexti = getch();
 		while (1) {
 			j = cbits(ii = nexti);
@@ -513,6 +514,9 @@ s1:
 		jj = 0;
 	} else if (type == 0) {
 		/*plain tab or leader*/
+		if (pbp >= pbsize-4)
+			growpbbuf();
+		pbbuf[pbp++] = mkxfunc(FLDMARK, 0);
 		if ((j = width(rchar)) > 0) {
 			int nchar;
 			k = kernadjust(rchar, rchar);
@@ -524,11 +528,9 @@ s1:
 				nchar += length / (k+j);
 				length %= k+j;
 			}
-			if (pbp >= pbsize-3)
-				growpbbuf();
 			pbbuf[pbp++] = FILLER;
 			while (nchar-->0) {
-				if (pbp >= pbsize-4)
+				if (pbp >= pbsize-5)
 					if (growpbbuf() == NULL)
 						break;
 				numtab[HP].val += j;
@@ -548,6 +550,7 @@ s1:
 	} else {
 		/*center tab*/
 		/*right tab*/
+		*fp++ = mkxfunc(FLDMARK, 0);
 		nexti = getch();
 		while (((j = cbits(ii = nexti)) != savtc) &&  (j != '\n') && (j != savlc)) {
 			jj = width(ii);
@@ -610,6 +613,15 @@ rtn:
 	return(jj);
 }
 
+
+tchar
+mkxfunc(int f, int s)
+{
+	tchar	t = XFUNC;
+	setfbits(t, f);
+	setsbits(t, s);
+	return t;
+}
 
 #ifdef EUC
 /* locale specific initialization */

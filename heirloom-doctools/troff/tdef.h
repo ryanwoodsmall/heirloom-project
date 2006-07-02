@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.83 (gritter) 6/13/06
+ * Sccsid @(#)tdef.h	1.86 (gritter) 7/2/06
  */
 
 /*
@@ -143,6 +143,9 @@
 #define	ANCHOR	0001	/* anchor definition */
 #define	LINKON	0002	/* link start */
 #define	LINKOFF	0003	/* link end */
+#define	LETSP	0004	/* positive letter spacing */
+#define	NLETSP	0005	/* negative letter spacing */
+#define	FLDMARK	0006	/* field marker */
 
 #define	HYPHEN	c_hyphen
 #define	EMDASH	c_emdash	/* \(em */
@@ -187,7 +190,7 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 #define	NWIDCACHE NCHARS	/* number of items in widcache */
 #define	NTRAP	20	/* number of traps */
 #define	NPN	20	/* numbers in "-o" */
-#define	FBUFSZ	256	/* field buf size words */
+#define	FBUFSZ	512	/* field buf size words */
 #define	OBUFSZ	4096	/* bytes */
 #define	IBUFSZ	4096	/* bytes */
 #define	NC	1024	/* cbuf size words */
@@ -563,6 +566,16 @@ extern const struct numtab initnumtab[];
 #define	ses	env._ses
 #define	spacesz	env._spacesz
 #define	minspsz	env._minspsz
+#define	lspspsz	env._lspspsz
+#define	lspsps	env._lspsps
+#define	lspmin	env._lspmin
+#define	lspmax	env._lspmax
+#define	lspnc	env._lspnc
+#define	lsplow	env._lsplow
+#define	lsphigh	env._lsphigh
+#define	lspcur	env._lspcur
+#define	lsplast	env._lsplast
+#define	fldcnt	env._fldcnt
 #define	lss	env._lss
 #define	lss1	env._lss1
 #define	ll	env._ll
@@ -647,6 +660,16 @@ extern struct env {
 	int	_ses;
 	int	_spacesz;
 	int	_minspsz;
+	int	_lspspsz;
+	int	_lspsps;
+	int	_lspmin;
+	int	_lspmax;
+	int	_lspnc;
+	int	_lsplow;
+	int	_lsphigh;
+	int	_lspcur;
+	int	_lsplast;
+	int	_fldcnt;
 	int	_lss;
 	int	_lss1;
 	int	_ll;
@@ -971,6 +994,7 @@ void setvline(void);
 void setdraw(void);
 void casefc(void);
 tchar setfield(int);
+tchar mkxfunc(int, int);
 void localize(void);
 void caselc_ctype(void);
 void casepsbb(void);

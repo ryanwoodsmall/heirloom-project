@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.59 (gritter) 6/25/06
+.\" Sccsid @(#)doc.tr	1.60 (gritter) 7/2/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 6/25/06
+.ds Sccsdate 7/2/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1197,7 +1197,9 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'minss'\fB&minss\fI|N\fR	off	ignored	E,T	Minimum word space when adjusting lines.\T
 .b1
-\T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Specifies letter space tracking.\T
+\T'lspadj'\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing for justification.\T
+.b1
+\T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.\T
 .b1
 \T'kern'\fB&kern\fI|N\fR	1	1	P,T	Controls pairwise kerning.\T
 .b1
@@ -1543,6 +1545,7 @@ Device and Font Description Files
 \T'li'li	10\T
 \T'll'll	6\T
 \T'ls'ls	5\T
+\T'lspadj'lspadj	4\T
 \T'lt'lt	14\T
 \T'mc'mc	20\T
 \T'mediasize'mediasize	3\T
@@ -2721,7 +2724,10 @@ can be tied together by separating them with the
 The adjusted word spacings are uniform in \*(TR
 and the minimum interword spacing can be controlled
 with the \T'ss'\fBss\fR request\T \T's_font'(\(sc2).\T
-In \*[NR,] they are normally nonuniform because of
+\*(TR can optionally decrease word spacings
+and change the letter spacing
+when justifying lines.
+In \*[NR,] word spacings are normally nonuniform because of
 quantization to character-size spaces;
 however,
 the command line option \fB\-e\fR causes uniform
@@ -2883,10 +2889,24 @@ it will be left adjusted.
 \fB&minss\fI|N\fR	off	ignored	E,T	Minimum word space.
 When adjusting both margins,
 \*(TR may decrease the size of the word space
-up to this limit (rather than to the value set by \T'ss'\fBss\fR\T).
+down to \fIN\fR/36\|ems
+(rather than to the value set by \T'ss'\fBss\fR\T).
+.bta lspadj
+\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing for justification.
+The space between letters can be automatically expanded or condensed
+(in addition to the space between words)
+in \fBad\ b\fR mode.
+The \fIN\fR argument gives the minimum percentage
+of the current point size by which
+adjacent characters may be tightened.
+When the computed size of the word space
+needs to be larger than \fIS\fR,
+additional space will be increased up to a limit
+of \fIM\fR percent of the current point size
+until the word space does not extend beyond \fIS\fR anymore.
+\fIS\fR is given in units of 1/36\|ems as with \fBss\fR.
 .bta track
-\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Specifies letter space tracking
-for font \fIF\fR.
+\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.
 If the current font is \fIF\fR
 and the point size is below or equal to \fIS\fR,
 white space of width \fIN\fR is added to each character.

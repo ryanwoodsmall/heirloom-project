@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.23 (gritter) 6/13/06
+ * Sccsid @(#)ni.c	1.25 (gritter) 7/2/06
  */
 
 /*
@@ -229,7 +229,7 @@ const struct contab initcontab[] = {
 };
 
 
-tchar oline[LNSIZE+1];
+tchar oline[2*LNSIZE+1];
 
 /*
  * troff environment block
@@ -242,6 +242,16 @@ struct	env env = {
 /* int	ses	 */	0,
 /* int	spacesz	 */	0,
 /* int	minspsz  */	0,
+/* int	lspspsz	 */	0,
+/* int	lspsps	 */	0,
+/* int	lspmin	 */	0,
+/* int	lspmax	 */	0,
+/* int	lspnc	 */	0,
+/* int	lsplow	 */	0,
+/* int	lsphigh	 */	0,
+/* int	lspcur	 */	0,
+/* int	lsplast	 */	0,
+/* int	fldcnt	 */	0,
 /* int	lss	 */	0,
 /* int	lss1	 */	0,
 /* int	ll	 */	0,

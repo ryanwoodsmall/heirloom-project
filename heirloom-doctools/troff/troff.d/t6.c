@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.147 (gritter) 6/15/06
+ * Sccsid @(#)t6.c	1.149 (gritter) 7/2/06
  */
 
 /*
@@ -290,8 +290,8 @@ getcw(register int i)
 			lasttrack = r;
 		}
 	}
-	k += lasttrack;
-	if (nocache|bd)
+	k += lasttrack + lettrack;
+	if (nocache|bd|lettrack)
 		widcache[i].fontpts = 0;
 	else {
 		widcache[i].fontpts = xfont + (xpts<<8);
@@ -771,6 +771,12 @@ mchbits(void)
 		k = spacesz;
 		spacesz = minspsz;
 		minsps = width(' ' | chbits);
+		spacesz = k;
+	}
+	if (lspspsz) {
+		k = spacesz;
+		spacesz = lspspsz;
+		lspsps = width(' ' | chbits);
 		spacesz = k;
 	}
 	sps = width(' ' | chbits);
@@ -1592,6 +1598,39 @@ void
 caseminss(void)
 {
 	casess(1);
+}
+
+void
+caselspadj(void)
+{
+	int	s, n, x;
+
+	dfact = 10;
+	if (skip(0) || (n = atoi()) == 0) {
+		lspspsz = 0;
+		lspsps = 0;
+		return;
+	}
+	if (skip(1))
+		return;
+	noscale++;
+	s = atoi();
+	noscale--;
+	if (skip(1))
+		return;
+	dfact = 10;
+	x = atoi();
+	lspspsz = s;
+	lspmin = 1000 - n;
+	lspmax = x - 1000;
+	s = spacesz;
+	spacesz = lspspsz;
+	zapwcache(1);
+	lspsps = width(' ' | chbits);
+	spacesz = s;
+	zapwcache(1);
+	sps = width(' ' | chbits);
+	zapwcache(1);
 }
 
 void
@@ -2568,15 +2607,6 @@ getref(void)
 		np[i] = 0;
 	}
 	return np;
-}
-
-static tchar
-mkxfunc(int f, int s)
-{
-	tchar	t = XFUNC;
-	setfbits(t, f);
-	setsbits(t, s);
-	return t;
 }
 
 tchar
