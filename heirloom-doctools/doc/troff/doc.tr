@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.60 (gritter) 7/2/06
+.\" Sccsid @(#)doc.tr	1.61 (gritter) 7/3/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/2/06
+.ds Sccsdate 7/3/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -2897,12 +2897,12 @@ The space between letters can be automatically expanded or condensed
 (in addition to the space between words)
 in \fBad\ b\fR mode.
 The \fIN\fR argument gives the minimum percentage
-of the current point size by which
+of an en of the current point size by which
 adjacent characters may be tightened.
 When the computed size of the word space
 needs to be larger than \fIS\fR,
 additional space will be increased up to a limit
-of \fIM\fR percent of the current point size
+of \fIM\fR percent of an en of the current point size
 until the word space does not extend beyond \fIS\fR anymore.
 \fIS\fR is given in units of 1/36\|ems as with \fBss\fR.
 .bta track

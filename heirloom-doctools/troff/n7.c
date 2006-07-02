@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.56 (gritter) 7/2/06
+ * Sccsid @(#)n7.c	1.57 (gritter) 7/3/06
  */
 
 /*
@@ -224,7 +224,7 @@ tbreak(void)
 				fldcnt--;
 			else if (fldcnt == 0 && lspcur && nc && !ismot(j) &&
 					!iszbit(j) && cbits(j) > ' ') {
-				k = (int)sbits(j) * lspcur / 1000;
+				k = (int)sbits(j) / 2 * lspcur / 1000;
 				if (k >= 0)
 					c = mkxfunc(LETSP, k);
 				else
@@ -559,7 +559,7 @@ storelsp(tchar c, int neg)
 	}
 	if (iszbit(c) || (i = cbits(c)) <= ' ')
 		return;
-	s = sbits(c);
+	s = sbits(c) / 2;
 	if (neg)
 		s = -s;
 	lsplow += s * lspmin / 1000;
@@ -1429,7 +1429,7 @@ lspcomp(void)
 			if (cbits(c) == XFUNC && fbits(c) == FLDMARK)
 				diff = lsplast = 0;
 			else if (cbits(c) > ' ') {
-				lsplast = (int)sbits(c) * lspcur / 1000;
+				lsplast = (int)sbits(c) / 2 * lspcur / 1000;
 				diff += lsplast;
 			}
 		}
