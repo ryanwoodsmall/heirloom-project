@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.59 (gritter) 7/3/06
+ * Sccsid @(#)n7.c	1.60 (gritter) 7/3/06
  */
 
 /*
@@ -923,7 +923,9 @@ m1:
 m1a:
 #ifndef	NROFF
 	if (minspsz && wch < savwch && nwd && nel / nwd > 0 &&
-			(nel - lsplow) / nwd < sps - minsps) {
+			(nel - lsplow) / nwd < sps - minsps ||
+			nel + lsplow >= hys + lgw &&
+			nel < hys + lgw) {
 		optlgs = lgs, optlge = lge, optlgw = lgw;
 		optlinep = linep, optwp = wp, optnc = nc, optnel = nel,
 		optne = ne, optadspc = adspc, optwne = wne, optwch = wch;
