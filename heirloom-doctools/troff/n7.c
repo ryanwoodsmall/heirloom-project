@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.61 (gritter) 7/3/06
+ * Sccsid @(#)n7.c	1.63 (gritter) 7/3/06
  */
 
 /*
@@ -47,21 +47,19 @@
  */
 
 #include <stdlib.h>
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 #ifdef	__sun
 #include <widec.h>
 #else
 #include <wchar.h>
 #endif
 #include <limits.h>
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "proto.h"
+#include "pt.h"
 #ifdef NROFF
 #define GETCH gettch
 tchar	gettch();
@@ -77,30 +75,42 @@ tchar	gettch();
  */
 
 #include <ctype.h>
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 #include <wctype.h>
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 #include "ext.h"
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 char	mbbuf2[MB_LEN_MAX + 1];
 char	*mbbuf2p = mbbuf2;
 tchar	mtbuf[MB_LEN_MAX + 1];
 tchar	*mtbufp;
 int	pendmb = 0;
 wchar_t	cwc, owc, wceoll;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 int	brflg;
 
 #undef	iswascii
 #define	iswascii(c)	(((c) & ~(wchar_t)0177) == 0)
 
+#ifndef	NROFF
+#define	nroff		0
 static void	lspshrink(void);
 static int	lspgrow(void);
 static int	lspcomp(void);
+#else	/* NROFF */
+#define	nroff		1
+#define	minsps		0
+#define	minspsz		0
+#define	storelsp(a, b)
+#define	lspshrink()
+#define	lspgrow()	0
+#define	lspcomp()	0
+#define	lspsps		0
+#define	lsplow		0
+#define	lspnc		0
+#define	lsplast		0
+#define	lspcur		0
+#endif	/* NROFF */
 
 void
 tbreak(void)
@@ -172,15 +182,7 @@ tbreak(void)
 #endif
 	adrem = (adrem / resol) * resol;
 	for (i = line; nc > 0; ) {
-#ifndef EUC
-		if ((c = cbits(j = *i++)) == ' ' || c == STRETCH) {
-#else
-#ifndef NROFF
-		if ((c = cbits(j = *i++)) == ' ' || c == STRETCH) {
-#else
 		if ((c = cbits(j = *i++) & ~MBMASK) == ' ' || c == STRETCH) {
-#endif /* NROFF */
-#endif /* EUC */
 			if (xflag && !fi && dilev || iszbit(j))
 				goto std;
 			pad = 0;
@@ -190,18 +192,8 @@ tbreak(void)
 				minflg = _minflg;
 				pad += width(j);
 				nc--;
-#ifndef EUC
-			} while ((c = cbits(j = *i++)) == ' ' ||
-					c == STRETCH);
-#else
-#ifndef NROFF
-			} while ((c = cbits(j = *i++)) == ' ' ||
-					c == STRETCH);
-#else
 			} while ((c = cbits(j = *i++) & ~MBMASK) == ' ' ||
 					c == STRETCH);
-#endif /* NROFF */
-#endif /* EUC */
 			pad += kernadjust(i[-2], i[-1]);
 			i--;
 			pad += adsp;
@@ -372,8 +364,7 @@ t5:
 adj:
 	adsp = adrem = 0;
 	if (ad) {
-#ifndef	NROFF
-		if (nc > 0) {
+		if (!nroff && nc > 0) {
 			int	j;
 			c = line[nc-1];
 			width(c);
@@ -389,7 +380,6 @@ adj:
 			ne -= j;
 			nel += j;
 		}
-#endif	/* !NROFF */
 		if (admod == 0 && lspcur == 0 && nel < 0 && lspnc)
 			lspshrink();
 	jst:	if (nwd == 1)
@@ -442,15 +432,14 @@ nofill(void)
 		nwd = 10000;
 	}
 	nexti = GETCH();
-#ifndef	NROFF
-	if (!ce && !pendnf && lhangtab != NULL && cbits(nexti) != SLANT &&
+	if (!nroff && !ce && !pendnf && lhangtab != NULL &&
+			cbits(nexti) != SLANT &&
 			!ismot(nexti) && lhangtab[fbits(nexti)] != NULL &&
 			(k = lhangtab[fbits(nexti)][cbits(nexti)]) != 0) {
 		width(nexti);	/* set xpts */
 		k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
 		storeline(makem(k), 0);
 	}
-#endif	/* !NROFF */
 	while ((j = (cbits(i = nexti))) != '\n') {
 		if (j == ohc) {
 			nexti = GETCH();
@@ -544,6 +533,7 @@ s1:
 }
 
 
+#ifndef	NROFF
 static void
 storelsp(tchar c, int neg)
 {
@@ -566,6 +556,7 @@ storelsp(tchar c, int neg)
 	lsphigh += s * lspmax / 1000;
 	lspnc += neg ? -1 : 1;
 }
+#endif	/* !NROFF */
 
 void
 newline(int a)
@@ -797,15 +788,7 @@ movword(void)
 	over = 0;
 	wp = wordp;
 	if (!nwd) {
-#ifndef EUC
-		while ((c = cbits(i = *wp++)) == ' ') {
-#else
-#ifndef NROFF
-		while ((c = cbits(i = *wp++)) == ' ') {
-#else
 		while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
-#endif /* NROFF */
-#endif /* EUC */
 			if (iszbit(i))
 				break;
 			wch--;
@@ -814,8 +797,7 @@ movword(void)
 		wp--;
 		if (wp > wordp)
 			wne -= kernadjust(wp[-1], wp[0]);
-#ifndef	NROFF
-		if (admod != 1 && admod != 2 && lhangtab != NULL &&
+		if (!nroff && admod != 1 && admod != 2 && lhangtab != NULL &&
 				cbits(*wp) != SLANT && !ismot(*wp) &&
 				lhangtab[fbits(*wp)] != NULL &&
 				(w = lhangtab[fbits(*wp)][cbits(*wp)]) != 0) {
@@ -824,7 +806,6 @@ movword(void)
 			nel -= w;
 			storeline(makem(w), 0);
 		}
-#endif	/* !NROFF */
 	}
 	if (wne > nel - adspc && !hyoff && hyf &&
 	   (!nwd || nel + lsplow - adspc > 3 * (minsps ? minsps : sps)) &&
@@ -950,8 +931,6 @@ m2:
 		if (wholewd = optwholewd)
 			goto m3;
 	}
-#endif
-#ifndef	NROFF
 	if (lgs != 0) {
 		*wp = lge;
 		storeline(lgs, lgw);
@@ -1017,7 +996,9 @@ setnel(void)
 		}
 		nel = ll - un;
 		rhang = ne = adsp = adrem = adspc = 0;
+#ifndef	NROFF
 		lsplow = lsphigh = lspcur = lsplast = lspnc = fldcnt = 0;
+#endif	/* !NROFF */
 	}
 }
 
@@ -1028,15 +1009,13 @@ getword(int x)
 	register int j, k = 0;
 	register tchar i, *wp, nexti, gotspc = 0;
 	int noword;
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
 	char *mbbuf3p;
 	int wbf, n;
 	tchar m;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 
 	noword = 0;
 	if (x)
@@ -1050,8 +1029,7 @@ getword(int x)
 	wordp = word;
 	over = wne = wch = 0;
 	hyoff = 0;
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	mtbufp = mtbuf;
 	if (pendmb) {
 		while(*mtbufp) {
@@ -1069,17 +1047,14 @@ getword(int x)
 		pendmb = 0;
 		goto g1;
 	}
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	while (1) {	/* picks up 1st char of word */
 		j = cbits(i = GETCH());
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 		if (multi_locale)
 			if (collectmb(i))
 				continue;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 		if (j == '\n') {
 			wne = wch = 0;
 			noword = 1;
@@ -1104,8 +1079,7 @@ getword(int x)
 		}
 		break;
 	}
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	if (!multi_locale)
 		goto a0;
 	if (wddlm && iswprint(wceoll) && iswprint(cwc) &&
@@ -1143,8 +1117,7 @@ getword(int x)
 		}
 	}
 a0:
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	storeword(' ' | chbits, sps + k);
 	if (spflg) {
 		if (xflag == 0 || ses != 0)
@@ -1179,12 +1152,9 @@ g0:
 	}
 	j = width(i);
 	numtab[HP].val += j;
-#ifndef EUC
+#if !defined (EUC) || !defined (NROFF)
 	storeword(i, j);
-#else
-#ifndef NROFF
-	storeword(i, j);
-#else
+#else	/* EUC && NROFF */
 	if (multi_locale) {
 		mtbufp = mtbuf;
 		while(*mtbufp) {
@@ -1202,8 +1172,7 @@ g0:
 	} else {
 		storeword(i, j);
 	}
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	if (1) {
 		int	oev = ev;
 		nexti = GETCH();
@@ -1216,24 +1185,19 @@ g0:
 	} else
 g1:		nexti = GETCH();
 	j = cbits(i = nexti);
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	if (multi_locale)
 		if (collectmb(i))
 			goto g1;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	if (j != ' ' || iszbit(i)) {
 		static char *sentchar = ".?!:";	/* sentence terminators */
 		if (j != '\n')
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 			if (!multi_locale)
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 			goto g0;
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 			else {
 				if (!wdbdg || (iswascii(cwc) && iswascii(owc)))
 					goto g0;
@@ -1245,8 +1209,7 @@ g1:		nexti = GETCH();
 					goto rtn;
 				} else goto g0;
 			}
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 		wp = wordp-1;	/* handle extra space at end of sentence */
 		while (wp >= word) {
 			j = cbits(*wp--);
@@ -1260,11 +1223,9 @@ g1:		nexti = GETCH();
 			break;
 		}
 	}
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	wceoll = owc;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	*wordp = 0;
 	numtab[HP].val += sps;
 rtn:
@@ -1344,8 +1305,7 @@ tchar gettch(void)
 
 
 #endif
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 int
 collectmb(tchar i)
 {
@@ -1391,9 +1351,9 @@ gotmb:
 }
 
 
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 
+#ifndef	NROFF
 static void
 lspshrink(void)
 {
@@ -1442,3 +1402,4 @@ lspcomp(void)
 	ne += lsplast;
 	return diff;
 }
+#endif	/* !NROFF */

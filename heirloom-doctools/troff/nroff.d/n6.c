@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.34 (gritter) 5/6/06
+ * Sccsid @(#)n6.c	1.35 (gritter) 7/3/06
  */
 
 /*
@@ -54,7 +54,7 @@
 #include <ctype.h>
 #include "tdef.h"
 #include "tw.h"
-#include "proto.h"
+#include "pt.h"
 #include "ext.h"
 
 /*

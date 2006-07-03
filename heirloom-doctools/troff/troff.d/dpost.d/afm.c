@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost_afm.c	1.3 (gritter) 5/1/06
+ * Sccsid @(#)afm.c	1.3 (gritter) 5/1/06
  */
 
 #define	DPOST

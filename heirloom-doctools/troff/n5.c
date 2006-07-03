@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.44 (gritter) 6/16/06
+ * Sccsid @(#)n5.c	1.46 (gritter) 7/3/06
  */
 
 /*
@@ -51,16 +51,14 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef 	EUC
-#ifdef	NROFF
+#if defined (EUC) && defined (NROFF)
 #include <stddef.h>
 #ifdef	__sun
 #include <widec.h>
 #else
 #include <wchar.h>
 #endif
-#endif	/* NROFF */
-#endif	/* EUC */
+#endif	/* EUC && NROFF */
 #include <string.h>
 #include <unistd.h>
 #include "tdef.h"
@@ -68,7 +66,7 @@
 #ifdef	NROFF
 #include "tw.h"
 #endif
-#include "proto.h"
+#include "pt.h"
 
 extern void mchbits(void);
 
@@ -1180,11 +1178,9 @@ int
 rdtty(void)
 {
 	char	onechar;
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	int	i, n, col_index;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 
 	onechar = 0;
 	if (read(0, &onechar, 1) == 1) {
@@ -1192,14 +1188,10 @@ rdtty(void)
 			tty++;
 		else 
 			tty = 1;
-#ifndef EUC
+#if !defined (EUC) || !defined (NROFF)
 		if (tty != 3)
 			return(onechar);
-#else
-#ifndef NROFF
-		if (tty != 3)
-			return(onechar);
-#else
+#else	/* EUC && NROFF */
 		if (tty != 3) {
 			if (!multi_locale)
 				return(onechar);
@@ -1239,8 +1231,7 @@ rdtty(void)
 			}
 			return(i);
 		}
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	}
 	popi();
 	tty = 0;

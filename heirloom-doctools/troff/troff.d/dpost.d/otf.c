@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost_otf.c	1.3 (gritter) 10/13/05
+ * Sccsid @(#)otf.c	1.3 (gritter) 10/13/05
  */
 
 #include <stdio.h>

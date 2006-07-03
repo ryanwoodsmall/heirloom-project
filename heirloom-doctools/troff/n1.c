@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.78 (gritter) 6/28/06
+ * Sccsid @(#)n1.c	1.80 (gritter) 7/3/06
  */
 
 /*
@@ -82,7 +82,7 @@ char *xxxvers = "@(#)roff:n1.c	2.13";
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "proto.h"
+#include "pt.h"
 
 #define	MAX_RECURSION_DEPTH	512
 static int	max_recursion_depth = MAX_RECURSION_DEPTH;
@@ -1320,7 +1320,7 @@ g2:
 		i = *ibufp++ & 0177;
 		ioff++;
 		if (i >= 040 && i < 0177)
-#else
+#else	/* EUC */
 #ifndef	NROFF
 		i = *ibufp++ & 0377;
 		ioff++;
@@ -1351,7 +1351,7 @@ g2:
 				i &= 0177;
 		}
 		if (i >= 040 && i < 0177)
-#else
+#else	/* NROFF */
 		i = *ibufp++ & 0377;
 		*mbbuf1p++ = i;
 		*mbbuf1p = 0;
@@ -1411,23 +1411,17 @@ g2:
 g4:
 	if (!copyf && iscopy(i))
 		i = setuc0(cbits(i));
-#ifndef EUC
+#if !defined (EUC) || !defined (NROFF)
 	if (copyf == 0 && (i & ~BYTEMASK) == 0)
-#else
-#ifndef NROFF
-	if (copyf == 0 && (i & ~BYTEMASK) == 0)
-#else
+#else	/* EUC && NROFF */
 	if (copyf == 0 && (i & ~CHMASK) == 0)
-#endif /* NROFF */
-#endif /* EUC */
+#endif	/* EUC && NROFF */
 		i |= chbits;
-#ifdef EUC
-#ifdef NROFF
+#if defined (EUC) && defined (NROFF)
 	if (multi_locale)
 		if (i & MBMASK1)
 			i |= ZBIT;
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 	if (cbits(i) == eschar && !raw)
 		setcbits(i, ESC);
 	return(i);
@@ -1592,18 +1586,13 @@ getach(void)
 
 	lgf++;
 	j = cbits(i = getch());
-#ifndef	EUC
+#if !defined (EUC) || !defined (NROFF)
 	if (ismot(i) || j == ' ' || j == '\n' || j & 0200) {
 		if (j >= 0200)
-#else
-#ifndef	NROFF
-	if (ismot(i) || j == ' ' || j == '\n' || j & 0200) {
-		if (j >= 0200)
-#else
+#else	/* EUC && NROFF */
 	if (ismot(i) || j == ' ' || j == '\n' || j > 0200) {
 		if (j > 0200)
-#endif	/* NROFF */
-#endif	/* EUC */
+#endif	/* EUC && NROFF */
 			illseq(j, NULL, -3);
 
 		ch = i;
@@ -1655,15 +1644,11 @@ getname(void)
 
 	lgf++;
 	for (k = 0; ; k++) {
-#ifndef EUC
+#if !defined (EUC) || !defined (NROFF)
 		if (((j = cbits(i = getch())) <= ' ') || (j > 0176))
-#else
-#ifndef NROFF
-		if (((j = cbits(i = getch())) <= ' ') || (j > 0176))
-#else
+#else	/* EUC && NROFF */
 		if (((j = cbits(i = getch())) <= ' ') || (j == 0177))
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 			break;
 		if (k + 1 >= NS)
 			nextf = realloc(nextf, NS += 14);

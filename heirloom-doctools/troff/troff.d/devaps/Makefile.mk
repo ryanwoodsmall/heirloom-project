@@ -1,6 +1,4 @@
-VPATH = ..
-
-OBJ = daps.o build.o draw.o getopt.o daps_version.o
+OBJ = daps.o build.o draw.o getopt.o version.o
 
 FONTS = B I R S CT CW CX GB GI GR GS HI HK HX PO PX S1 SC SM TX DESC \
 	C G H BI CE CI HB HL MB MI MR MX PA PB PI TB
@@ -45,3 +43,4 @@ mrproper: clean
 build.o: build.c daps.h
 daps.o: daps.c aps.h dev.h daps.h daps.g
 makedev.o: makedev.c dev.h
+draw.o: draw.c ../draw.c

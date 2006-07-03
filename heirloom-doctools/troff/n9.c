@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.45 (gritter) 7/2/06
+ * Sccsid @(#)n9.c	1.46 (gritter) 7/3/06
  */
 
 /*
@@ -57,7 +57,7 @@
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "proto.h"
+#include "pt.h"
 #include "ext.h"
 #ifdef EUC
 #include <locale.h>

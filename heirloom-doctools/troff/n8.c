@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.24 (gritter) 6/26/06
+ * Sccsid @(#)n8.c	1.26 (gritter) 7/3/06
  */
 
 /*
@@ -55,7 +55,7 @@
 #include	<string.h>
 #include	"tdef.h"
 #include "ext.h"
-#include "proto.h"
+#include "pt.h"
 #include "libhnj/hyphen.h"
 #define	HY_BIT	0200	/* generic stuff in here only works for ascii */
 #define	HY_BIT2	0x80000000
@@ -176,8 +176,7 @@ int
 alph(tchar j)
 {
 	int i = cbits(j);
-#ifndef	NROFF
-#ifdef	EUC
+#if !defined (NROFF) && defined (EUC)
 	int f = fbits(j);
 	if (!ismot(j) && i & ~0177) {
 		int	u;
@@ -189,8 +188,7 @@ alph(tchar j)
 			u = 's';
 		return hyext ? iswalnum(u) : iswalpha(u);
 	} else
-#endif	/* EUC */
-#endif	/* !NROFF */
+#endif	/* !NROFF && EUC */
 	if (!ismot(j) && i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z' ||
 			hyext && i >= '0' && i <= '9')
 		return(1);
@@ -354,8 +352,7 @@ mark:
 int 
 maplow(register int i, int f)
 {
-#ifndef	NROFF
-#ifdef	EUC
+#if !defined (NROFF) && defined (EUC)
 	if (!ismot(i) && i & ~0177) {
 		i = tr2un(i, f);
 		if (i == 0x017F)	/* longs */
@@ -363,8 +360,7 @@ maplow(register int i, int f)
 		if (iswupper(i))
 			i = towlower(i);
 	} else
-#endif	/* EUC */
-#endif	/* !NROFF */
+#endif	/* !NROFF && EUC */
 	if (ischar(i) && isupper(i)) 
 		i = tolower(i);
 	return(i);

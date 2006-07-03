@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.20 (gritter) 4/27/06
+ * Sccsid @(#)n2.c	1.22 (gritter) 7/3/06
  */
 
 /*
@@ -59,7 +59,7 @@
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "proto.h"
+#include "pt.h"
 #include <setjmp.h>
 #include "ext.h"
 #ifdef EUC
@@ -130,16 +130,12 @@ pchar(register tchar i)
 			j = eschar;	/* fall through */
 	default:
 	dfl:
-#ifndef EUC
+#if !defined (EUC) || !defined (NROFF)
 		setcbits(i, trtab[j]);
-#else
-#ifndef NROFF
-		setcbits(i, trtab[j]);
-#else
+#else	/* EUC && NROFF */
 		if (!multi_locale || (!(j & CSMASK) && !(j & MBMASK1)))
 			setcbits(i, trtab[j]);
-#endif /* NROFF */
-#endif /* EUC */
+#endif /* EUC && NROFF */
 		if (xon == 0)
 			setcbits(i, ftrans(fbits(i), cbits(i)));
 	}

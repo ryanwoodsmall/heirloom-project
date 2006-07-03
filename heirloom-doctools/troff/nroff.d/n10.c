@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n10.c	1.23 (gritter) 3/22/06
+ * Sccsid @(#)n10.c	1.24 (gritter) 7/3/06
  */
 
 /*
@@ -66,7 +66,7 @@ Device interfaces
 #include "tdef.h"
 #include "ext.h"
 #include "tw.h"
-#include "proto.h"
+#include "pt.h"
 
 struct t t;	/* terminal characteristics */
 

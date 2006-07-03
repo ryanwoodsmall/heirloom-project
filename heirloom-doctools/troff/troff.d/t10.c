@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.73 (gritter) 7/3/06
+ * Sccsid @(#)t10.c	1.74 (gritter) 7/3/06
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "ext.h"
 #include "dev.h"
 #include "afm.h"
-#include "proto.h"
+#include "pt.h"
 #include "troff.h"
 #include "unimap.h"
 /*

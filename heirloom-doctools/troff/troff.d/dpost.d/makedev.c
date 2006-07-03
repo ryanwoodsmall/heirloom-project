@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost_makedev.c	1.1 (gritter) 9/4/05
+ * Sccsid @(#)makedev.c	1.1 (gritter) 9/4/05
  */
 
 #include "../makedev.c"

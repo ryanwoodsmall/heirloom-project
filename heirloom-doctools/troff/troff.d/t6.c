@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.149 (gritter) 7/2/06
+ * Sccsid @(#)t6.c	1.150 (gritter) 7/3/06
  */
 
 /*
@@ -65,7 +65,7 @@
 #include <unistd.h>
 #include "ext.h"
 #include "afm.h"
-#include "proto.h"
+#include "pt.h"
 #include "troff.h"
 
 /* fitab[f][c] is 0 if c is not on font f */

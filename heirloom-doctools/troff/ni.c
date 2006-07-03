@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.25 (gritter) 7/2/06
+ * Sccsid @(#)ni.c	1.27 (gritter) 7/3/06
  */
 
 /*
@@ -47,6 +47,7 @@
  */
 
 #include "tdef.h"
+#include "ext.h"
 
 /* You may want to change these names */
 
@@ -238,9 +239,10 @@ tchar oline[2*LNSIZE+1];
 struct	env env = {
 /* int	ics	 */	0,
 /* int	sps	 */	0,
-/* int	minsps	 */	0,
 /* int	ses	 */	0,
 /* int	spacesz	 */	0,
+#ifndef	NROFF
+/* int	minsps	 */	0,
 /* int	minspsz  */	0,
 /* int	lspspsz	 */	0,
 /* int	lspsps	 */	0,
@@ -251,6 +253,7 @@ struct	env env = {
 /* int	lsphigh	 */	0,
 /* int	lspcur	 */	0,
 /* int	lsplast	 */	0,
+#endif	/* !NROFF */
 /* int	fldcnt	 */	0,
 /* int	lss	 */	0,
 /* int	lss1	 */	0,
