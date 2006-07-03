@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.72 (gritter) 7/2/06
+ * Sccsid @(#)t10.c	1.73 (gritter) 7/3/06
  */
 
 /*
@@ -87,6 +87,7 @@ int	nchtab;
 int	lettrack;
 
 static float	mzoom;
+static int	mtrack;
 
 /* these characters are used as various signals or values
  * in miscellaneous places.
@@ -503,7 +504,7 @@ ptout0(tchar *pi, tchar *pend)
 		ptps();
 	if (lead)
 		ptlead();
-	if (lettrack)
+	if (lettrack || mtrack)
 		pttrack(0);
 	for (j = outsize; &pi[j] < pend; j++)
 		if (cbits(pi[j]) != XFUNC || fbits(pi[j]) != LETSP &&
@@ -661,8 +662,6 @@ ptout0(tchar *pi, tchar *pend)
 static void
 pttrack(int always)
 {
-	static int	mtrack;
-
 	if (xflag && (lasttrack || lettrack || mtrack)) {
 		if (always || mtrack != (lasttrack + lettrack))
 			fdprintf(ptid, "x X Track %d\n", lasttrack + lettrack);
@@ -704,6 +703,7 @@ ptfont(void)
 {
 	mfont = xfont;
 	fdprintf(ptid, "f%d\n", xfont);
+	mtrack = 0;
 	pttrack(1);
 }
 
