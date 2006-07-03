@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.63 (gritter) 7/3/06
+ * Sccsid @(#)n7.c	1.64 (gritter) 7/3/06
  */
 
 /*
@@ -821,7 +821,9 @@ movword(void)
 		if (hyoff != 1 && tp == wp) {
 			if (!wdstart || (wp > wdstart + 1 && wp < wdend &&
 			   (!(hyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
-			   (!(hyf & 010) || wp > wdstart + 2))) {	/* 010 => 1st 2 */
+			   (!(hyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
+			   (hyf & 020 && wp == wdend) ||		/* 020 = allow last */
+			   (hyf & 040 && wp == wdstart + 1)) {		/* 040 = allow first */
 				nhyp++;
 				i = IMP;
 				setsbits(i, (intptr_t)*hyp & 03);

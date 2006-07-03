@@ -7,6 +7,9 @@ Release ...
 * [nt]roff: With the ".hylang" request, words that consist of four
   characters are now subject to hyphenation (with the traditional
   hyphenation, five characters are the minimum length).
+* [nt]roff: The ".hy" request accepts the additional flags 16 and 32 that
+  allow the last or first character of a word, respectively, to be split
+  off.
 * troff, dpost, otfdump: The operator 12 in CFF Top DICT entries was not
   handled correctly, resulting in misleading error messages with some
   OpenType fonts. This has been fixed (bug reported by D. Jeff Dionne).

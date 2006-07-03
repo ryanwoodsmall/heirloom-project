@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.61 (gritter) 7/3/06
+.\" Sccsid @(#)doc.tr	1.62 (gritter) 7/3/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -4211,15 +4211,19 @@ whether automatic hyphenation is on or off.
 \fB&nh\fR	hyphenate	\(en	E	\
 Automatic hyphenation is turned off.
 .bta hy
-\fB&hy\fIN\fR	on,\fIN=\fR1	on,\fIN=\fR1	E	\
+\fB&hy\fI|N\fR	on,\fIN=\fR1	on,\fIN=\fR1	E	\
 Automatic hyphenation is turned on
 for \fIN\fR\|\(>=1, or off for \fIN=\fR\|0.
 If \fIN=\fR\|2, \fIlast\fR lines (ones that will cause a trap)
 are not hyphenated.
 For \fIN=\fR\|4 and 8, the last and first two characters
 respectively of a word are not split off.
+For \fIN=\fR\|16 and 32, the last and first characters
+respectively of a word are allowed to be split off;
+this is only effective for explicit hyphenation points
+specified with \fB\e%\fR, \fB\e:\fR, or \fBhw\fR.
 These values are additive;
-i.|e. \fIN=\fR\|14 will invoke all three restrictions.
+i.|e. \fIN=\fR\|14 will invoke the three restrictions.
 .bta hylang
 \fB&hylang\fI|name\fR	off	off	E	Sets the hyphenation language
 to \fIname\fR, which is one of
