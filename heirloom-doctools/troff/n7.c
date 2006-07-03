@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.60 (gritter) 7/3/06
+ * Sccsid @(#)n7.c	1.61 (gritter) 7/3/06
  */
 
 /*
@@ -788,7 +788,7 @@ movword(void)
 	tchar	*optlinep = NULL, *optwp = NULL;
 	int	optnc = 0, optnel = 0, optne = 0, optadspc = 0, optwne = 0,
 		optwch = 0, optwholewd = 0,
-		optlsplow = 0, optlsphigh = 0, optlspnc = 0;
+		optlsplow = 0, optlsphigh = 0, optlspnc = 0, optfldcnt = 0;
 #else	/* NROFF */
 #define	lgw	0
 #define	optlinep	0
@@ -930,6 +930,7 @@ m1a:
 		optlinep = linep, optwp = wp, optnc = nc, optnel = nel,
 		optne = ne, optadspc = adspc, optwne = wne, optwch = wch;
 		optlsplow = lsplow, optlsphigh = lsphigh, optlspnc = lspnc;
+		optfldcnt = fldcnt;
 		optwholewd = wholewd;
 		nc -= !wholewd;
 		goto m1;
@@ -945,6 +946,7 @@ m2:
 		linep = optlinep, wp = optwp, nc = optnc, nel = optnel,
 		ne = optne, adspc = optadspc, wne = optwne, wch = optwch;
 		lsplow = optlsplow, lsphigh = optlsphigh, lspnc = optlspnc;
+		fldcnt = optfldcnt;
 		if (wholewd = optwholewd)
 			goto m3;
 	}
