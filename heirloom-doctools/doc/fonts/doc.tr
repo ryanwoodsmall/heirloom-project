@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.19 (gritter) 6/15/06
+.\" Sccsid @(#)doc.tr	2.20 (gritter) 7/4/06
 .do xflag 3
 .warn
 .spreadwarn 5p
@@ -186,7 +186,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-6/15/06
+7/4/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -706,14 +706,18 @@ supported with the font.
 .P
 The shell script ``stuff\&/\&showfont.sh'' in the source code distribution
 uses \*(TR and possibly \fIotfdump\fR to print a map of all characters in an
-\fCAFM\fR, OpenType, or TrueType font.
+\fCAFM\fR, OpenType, or TrueType font along with their \*(PS names.
 .S "Limitations"
 .P
 \fIdpost\fR uses a method to embed \fCCFF\fR-based (\*(PS-style) OpenType
 fonts in \*(PS documents that is only available with \*(PS\ 3
 interpreters; older printing equipment that uses \*(PS Level\ 2 or below cannot
-handle such documents directly. The Ghostscript ``\fNps2ps\fR'' utility can be
-used to create Level\ 2 documents from \fIdpost\fR output. Also you may have
+handle such documents directly.
+The recommended workaround is to convert the \*(PS output
+to a \fCPDF\fR document
+and to print it using a \fCPDF\fR viewer
+or reverse conversion program.
+Also you may have
 to update your copy of Ghostscript in order to create \fCPDF\fR files with
 proper font embedding from such output.
 .P
