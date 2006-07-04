@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.35 (gritter) 2/12/06
+.\" Sccsid @(#)troffdemo.tr	1.36 (gritter) 7/4/06
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names and warnings.
 .do xflag 3
@@ -54,6 +54,7 @@
 .	ds m9 E 9
 .	kernpair R B E r -15
 .	kernpair E \(ff R e -5
+.	kernpair IE \(ff R \  83
 .\}
 .el \{\
 .	fp 1 R ACaslonPro-Regular otf
@@ -79,6 +80,7 @@
 .	ds m7 R \[sevenoldstyle]
 .	ds m8 R \[eightoldstyle]
 .	ds m9 R \[nineoldstyle]
+.	kernpair I \(ff R \  83
 .\}
 .\" The expert font needs letter space tracking for use as small caps.
 .track E 1 .3 24 3
@@ -172,12 +174,12 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-2/12/06
+7/4/06
 .sp 2v
 .ad b
 .ps 12
 .\" Begin of text
-The \fItroff\fP\^ text processor
+The \fItroff\fP text processor
 from the Heirloom Documentation Tools project
 is a variant of the Unix application
 originally written by \fEJoseph F. Ossanna\fR
@@ -185,20 +187,20 @@ and \fEBrian W. Kernighan.\fR
 It has been derived from source code provided by
 the OpenSolaris project.
 Amongst many enhancements,
-Heirloom \fItroff\fP\^ provides extended
+Heirloom \fItroff\fP provides extended
 capabilities to work with PostScript fonts:
 .F
 PostScript Type 1 and OpenType fonts can be used
 as supplied by their vendor
 without any need for conversion;
-\fItroff\fP\^ can access font metrics directly
+\fItroff\fP can access font metrics directly
 in the \fVAFM\fP or OpenType files,
 and the \fIdpost\fR post-processor
 can embed glyph data from \fVPFB\fP or OpenType files
 into the PostScript output it generates.
 .F
 With both Type 1 ``expert'' and OpenType fonts,
-\fItroff\fR\^ can be configured
+\fItroff\fR can be configured
 such that it sets extra characters transparently
 in alternation with base characters
 to produce extra ligatures, as in the words
@@ -216,7 +218,7 @@ Hanging characters can be used to achieve better visual alignment
 of commas, hyphens, &c. to the page margins.
 .sp
 .in 0
-Heirloom \fItroff\fP\^ is free software;
-its \fIC\fP\^ source code can be obtained at no charge from
+Heirloom \fItroff\fP is free software;
+its \fIC\fP source code can be obtained at no charge from
 \[less]http\&://heirloom.sourceforge.net/doctools.html\[greater].
 It runs on a wide variety of Unix systems.
