@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.64 (gritter) 7/4/06
+.\" Sccsid @(#)doc.tr	1.65 (gritter) 7/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -911,7 +911,7 @@ to the input \fIfiles\fR.
 	\fB\-q\fR	\
 Invoke the simultaneous input-output mode of the \T'rd'\fBrd\fR\T request.
 .bt
-	\fB\-x\fIN\fR	Sets the extension level to \fIN\fR \T'c_extension'(cf. \(sc1.1).\T
+	\fB\-x\fIN\fR	Set the extension level to \fIN\fR \T'c_extension'(cf. \(sc1.1).\T
 .bt
 	\fB\-z\fR	Check syntax only; do not generate any output except for error messages.
 .sp
@@ -1022,7 +1022,7 @@ The following options are currently supported with \fIdpost:\fR
 .ll -.3i
 .bt
 	\fB\-e\ \fIencoding\fR	\
-Sets the \*(PS encoding scheme.
+Set the \*(PS encoding scheme.
 Interesting values of \fIencoding\fR are:
 \fB0\fR using the \*(PS \fBashow\fR operator,
 with the same position representation as previous
@@ -1110,19 +1110,19 @@ T	\*(TR only; no effect in \*[NR.]
 .mht s_general
 General Explanation
 .bt
-\T'do'\fB&do\fI|name\fR		ignored	\(en	Executes \fIname\fR in extension level 3.\T
+\T'do'\fB&do\fI|name\fR		ignored	\(en	Execute \fIname\fR in extension level 3.\T
 .b1
 .lg 0
-\T'xflag'\fB&xflag\fI|N\fR	1	ignored	\(en	Sets the extension level permanently to \fIN\fP.\T
+\T'xflag'\fB&xflag\fI|N\fR	1	ignored	\(en	Set the extension level permanently to \fIN\fP.\T
 .lg
 .mht s_font
 Font and Character Size Control
 .bt
-\T'lc_ctype'\fB&lc_ctype\fI|name\fR	ignored	\(en	Sets the \s-1LC_CTYPE\s+1 locale.\T
+\T'lc_ctype'\fB&lc_ctype\fI|name\fR	ignored	\(en	Set the \s-1LC_CTYPE\s+1 locale.\T
 .b1
 \T'ps'\fB&ps\fI\|\(+-N\fR	10\|point	previous	E,T	Point size; also\T \T'e_s'\fB\es\fI\(+-N\fR.\T
 .b1
-\T'fzoom'\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zooms font \fIF\fR by factor \fIZ\fR.\T
+\T'fzoom'\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zoom font \fIF\fR by factor \fIZ\fR.\T
 .b1
 \T'ss'\fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size\T
 set to \fIN\fR/36\|em.
@@ -1141,30 +1141,30 @@ mode (font \fIF\^\fR\^).
 .b1
 \T'fp'\fB&fp|\fIN|F|\fR[\fIfile|\fR[\fIsupply\fR]]	ignored	\(en	Font position; mounts the font \fIfile\fR.\T
 .b1
-\T'fps'\fB&fps\fI|map|...\fR		ignored	T	Mounts a font with a special character map.\T
+\T'fps'\fB&fps\fI|map|...\fR		ignored	T	Mount a font with a special character map.\T
 .b1
-\T'feature'\fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	Controls OpenType features.\T
+\T'feature'\fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	Control OpenType features.\T
 .b1
-\T'fallback'\fB&fallback\fI|F|A|B|...\fR	ignored	P,T	Selects the fallback sequence for font \fIF\fR.\T
+\T'fallback'\fB&fallback\fI|F|A|B|...\fR	ignored	P,T	Select the fallback sequence for font \fIF\fR.\T
 .b1 0
-\T'hidechar'\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.\T
+\T'hidechar'\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hide the characters \fIc\fR, \fId\fR, etc. from font F.\T
 .b1 0
-\T'fspacewidth'\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Sets the width
+\T'fspacewidth'\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Set the width
 of the space character in font \fIF\fR to \fIN\fR.\T
 .mht s_page
 Page Control
 .bt
 \T'pl'\fB&pl\fI\|\(+-N\fR	11\|i	11\|i	\fBv\fR	Page length.\T
 .b1
-\T'papersize'\fB&papersize\fI|media\fR	ignored	T	Sets the paper size.\T
+\T'papersize'\fB&papersize\fI|media\fR	ignored	T	Set the paper size.\T
 .b1
-\T'mediasize'\fB&mediasize\fI|media\fR	ignored	T	Sets the device media size.\T
+\T'mediasize'\fB&mediasize\fI|media\fR	ignored	T	Set the device media size.\T
 .b1
-\T'cropat'\fB&cropat\fI|L|T|W|H\fR	ignored	T	Sets the ``CropBox'' page parameter for \*[PDF] generation.\T
+\T'cropat'\fB&cropat\fI|L|T|W|H\fR	ignored	T	Set the ``CropBox'' page parameter for \*[PDF] generation.\T
 .b1
-\T'trimat'\fB&trimat\fI|L|T|W|H\fR	ignored	T	Sets the ``TrimBox'' page parameter for \*[PDF] generation.\T
+\T'trimat'\fB&trimat\fI|L|T|W|H\fR	ignored	T	Set the ``TrimBox'' page parameter for \*[PDF] generation.\T
 .b1
-\T'bleedat'\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Sets the ``BleedBox'' page parameter for \*[PDF] generation.\T
+\T'bleedat'\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Set the ``BleedBox'' page parameter for \*[PDF] generation.\T
 .b1
 \T'bp'\fB&bp|\fI\(+-N\fR	\fIN\(eq\fR1	\(en	B,\fBv\fR	\
 Eject current page; next page number \fIN\fR.\T
@@ -1201,15 +1201,15 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.\T
 .b1
-\T'kern'\fB&kern\fI|N\fR	1	1	P,T	Controls pairwise kerning.\T
+\T'kern'\fB&kern\fI|N\fR	1	1	P,T	Control pairwise kerning.\T
 .b1
-\T'fkern'\fB&fkern\fI|F|N\fR	1	1	P,T	Controls the use of kerning tables from font \fIF\fR.\T
+\T'fkern'\fB&fkern\fI|F|N\fR	1	1	P,T	Control the use of kerning tables from font \fIF\fR.\T
 .b1
-\T'kernpair'\fB&kernpair\fI|F|c...|G|d...|N\fR	ignored	P,T	Defines a kerning pair.\T
+\T'kernpair'\fB&kernpair\fI|F|c...|G|d...|N\fR	ignored	P,T	Define a kerning pair.\T
 .b1
-\T'kernafter'\fB&kernafter\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space after a character.\T
+\T'kernafter'\fB&kernafter\fI|F|c...|N|d...|M|...\fR	P,T	Add a constant amount of space after a character.\T
 .b1
-\T'kernbefore'\fB&kernbefore\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space before a character.\T
+\T'kernbefore'\fB&kernbefore\fI|F|c...|N|d...|M|...\fR	P,T	Add a constant amount of space before a character.\T
 .b1 0
 \T'lhang'\fB&lhang\fI|F|c...|N|d...|M|...\fR	ignored	T	Hanging characters at left margin.\T
 .b1 0
@@ -1270,17 +1270,17 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'dt'\fB&dt\fI|N|xx\fR	\(en	off	D,\fBv\fR	Set a diversion trap.\T
 .b1
-\T'vpt'\fB&vpt\fI|N\fR	1	ignored	\(en	Enables or disables vertical position traps.\T
+\T'vpt'\fB&vpt\fI|N\fR	1	ignored	\(en	Enable or disable vertical position traps.\T
 .b1
 \T'it'\fB&it\fI|N|xx\fR	\(en	off	E	Set an input-line count trap.\T
 .b1
-\T'return'\fB&return\fR	\(en	\(en	\(en	Returns from the current macro.\T
+\T'return'\fB&return\fR	\(en	\(en	\(en	Return from the current macro.\T
 .b1 0
-\T'shift'\fB&shift\fI|N\fR	\(en	1	\(en	Shifts the arguments to the current macro.\T
+\T'shift'\fB&shift\fI|N\fR	\(en	1	\(en	Shift the arguments to the current macro.\T
 .b1 0
 \T'em'\fB&em\fI|xx\fR	none	none	\(en	End macro is \fIxx\fI.\T
 .b1 0
-\T'recursionlimit'\fB&recursionlimit\fI|N|M\fR	\(en	\(en	Sets the maximum stack depth.\T
+\T'recursionlimit'\fB&recursionlimit\fI|N|M\fR	\(en	\(en	Set the maximum stack depth.\T
 .mht s_reg
 Number Registers
 .bt
@@ -1310,10 +1310,10 @@ Input and Output Conventions and Character Translations
 on if \fIN\fR>0.
 .b1
 .lg 0
-\T'flig'\fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fines the ligatures in font \fIF\fR.\T
+\T'flig'\fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fine the ligatures in font \fIF\fR.\T
 .lg
 .b1
-\T'fdeferlig'\fB&fdeferlig\fI|F|string|...\fR	ignored	T	Defers ligature building for the first character of \fIstring\fR.\T
+\T'fdeferlig'\fB&fdeferlig\fI|F|string|...\fR	ignored	T	Defer ligature building for the first character of \fIstring\fR.\T
 .b1
 \T'ul'\fB&ul\fI|N\fR	off	\fIN\(eq\fR1	E	Underline (italicize in \*(TR) \fIN\fR input lines.\T
 .b1
@@ -1341,7 +1341,7 @@ Hyphenation.
 .b1
 \T'hy'\fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.\T
 .b1
-\T'hylang'\fB&hylang\fI|name\fR	off	off	E	Sets the hyphenation language.\T
+\T'hylang'\fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language.\T
 .b1 0
 \T'hc'\fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.\T
 .b1 0
@@ -1387,7 +1387,7 @@ Environment Switching.
 .bt
 \T'ev'\fB&ev\fI|name\fR	\fIname\(eq\fR0	previous	\(en	Environment switched (\fIpush down\fR).\T
 .b1 0
-\T'evc'\fB&evc\fI|name\fR		\(en	\(en	Copies environment \fIname\fR to the current environment.\T
+\T'evc'\fB&evc\fI|name\fR		\(en	\(en	Copy environment \fIname\fR to the current environment.\T
 .mht s_stdin
 Insertions from the Standard Input
 .bt
@@ -1400,7 +1400,7 @@ Input/Output File Switching
 .bt
 \T'so'\fB&so\fI|filename\fR		\(en	\(en	Switch source file \fI(push down)\fR.\T
 .b1
-\T'pso'\fB&pso\fI|string\fR		\(en	\(en	Executes \fIstring\fR and reads its output.\T
+\T'pso'\fB&pso\fI|string\fR		\(en	\(en	Execute \fIstring\fR and read its output.\T
 .b1
 \T'nx'\fB&nx\fI|filename\fR		end-of-file	\(en	Next file.\T
 .br
@@ -1410,15 +1410,15 @@ Input/Output File Switching
 .b1
 \T'cf'\fB&cf\fI|filename\fR		\(en	\(en	Copy file contents to \*(TR output.\T
 .b1
-\T'open'\fB&open\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR as \fIstream\fR, truncating.\T
+\T'open'\fB&open\fI|stream|filename\fR	ignored	\(en	Open \fIfilename\fR as \fIstream\fR, truncating.\T
 .b1
-\T'opena'\fB&opena\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR as \fIstream\fR, appending.\T
+\T'opena'\fB&opena\fI|stream|filename\fR	ignored	\(en	Open \fIfilename\fR as \fIstream\fR, appending.\T
 .b1
-\T'write'\fB&write\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR to file \fIstream\fR.\T
+\T'write'\fB&write\fI|stream|text\fR	ignored	\(en	Write \fItext\fR to file \fIstream\fR.\T
 .b1 0
-\T'writec'\fB&writec\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR without terminating newline.\T
+\T'writec'\fB&writec\fI|stream|text\fR	ignored	\(en	Write \fItext\fR without terminating newline.\T
 .b1 0
-\T'close'\fB&close\fI|stream\fR		\(en	\(en	Closes the file \fIstream\fR.\T
+\T'close'\fB&close\fI|stream\fR		\(en	\(en	Close the file \fIstream\fR.\T
 .mht s_misc
 Miscellaneous
 .bt
@@ -1444,7 +1444,7 @@ Miscellaneous
 .mht s_err
 Output and Error Messages
 .bt
-\T'warn'\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Controls warning messages.\T
+\T'warn'\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Control warning messages.\T
 .b1 0
 \T'spreadwarn'\fB&spreadwarn\fI|N\fR	toggle	\(en	Spread limit warning.\T
 .mht s_color
@@ -1452,7 +1452,7 @@ Color Support
 .mht s_pics
 Picture Inclusion
 .bt
-\T'psbb'\fB&psbb\fI|filename\fR	\(en	\(en	Reads the \*(PS bounding box from \fIfilename\fR.\T
+\T'psbb'\fB&psbb\fI|filename\fR	\(en	\(en	Read the \*(PS bounding box from \fIfilename\fR.\T
 .mht s_pdf
 Special Features for \*[PDF] Documents
 .mht s_output
@@ -2128,12 +2128,12 @@ Character string arguments are indicated by multi-character mnemonics.
 .h1
 .bta do
 \fB&do\fI|name\fR		ignored	\(en	\
-Executes the request or macro \fIname\fR in extension level 3
+Execute the request or macro \fIname\fR in extension level 3
 and restore the previous level afterwards.
 .bta xflag
 .lg 0
 \fB&xflag\fI|N\fR	1	ignored	\(en	\
-Sets the extension level permanently to \fIN\fP.
+Set the extension level permanently to \fIN\fP.
 .lg
 .mha s_font
 Font and Character Size Control
@@ -2357,7 +2357,7 @@ In each case, the width is unchanged.
 Not all devices support independent height and width for characters.
 .h1
 .bta lc_ctype
-\fB&lc_ctype\fI|name\fR	ignored	\(en	Sets the \s-1LC_CTYPE\s+1 locale
+\fB&lc_ctype\fI|name\fR	ignored	\(en	Set the \s-1LC_CTYPE\s+1 locale
 to \fIname\fR.
 The default is the value
 of the \s-1LC_CTYPE\s+1 environment variable.
@@ -2379,7 +2379,7 @@ A paired sequence
 will work because the previous requested value is also remembered.
 Ignored in \*[NR.]
 .bta fzoom
-\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zooms font \fIF\fR by factor \fIZ\fR,
+\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zoom font \fIF\fR by factor \fIZ\fR,
 which is a positive floating point number.
 This request is useful for adjusting fonts with different
 visual sizes but identical nominal points; the zoom is thus not
@@ -2499,7 +2499,7 @@ in TROFFONTS, only the \fB%\fR and \fB:\fR characters have to be masked
 using this mechanism.
 .bta fps
 \fB&fps\fI|map|...\fR		ignored	T	\
-Mounts a font with a special character map.
+Mount a font with a special character map.
 By default, special characters like \fB\e(\(**a\fR
 are not assigned when a font is mounted
 even if a matching named \*(PS character (like \fB\e[alpha]\fR)
@@ -2520,27 +2520,27 @@ for the \fBps\fR and \fBpsmed\fR devices.
 The remaining arguments are handled as described for \T'fp'\fBfp\fR.\T
 .bta feature
 \fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	\
-Enables (+) or disables (\-) the OpenType feature \fIname\fR in font \fIF\fR.
+Enable (+) or disable (\-) the OpenType feature \fIname\fR in font \fIF\fR.
 Only OpenType features that result in context-insensitive
 single-character substitutions are supported. Typical features
 are \fBonum\fR to enable old-style numerals, or \fBsmcp\fR to enable
 small capitals.
 .bta fallback
 \fB&fallback\fI|F|A|B|...\fR	ignored	P,T	\
-Selects the fallback sequence for font \fIF\fR.
+Select the fallback sequence for font \fIF\fR.
 If the current font is \fIF\fR and a character is not found,
 font \fIA\fR is searched first, then font \fIB\fR, etc.
 If the character still has not been found,
 it is searched for in the Special Font,
 then in the fonts mounted at positions 0, 1, and so forth.
 .bta hidechar
-\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hides the characters \fIc\fR, \fId\fR, etc. from font F.
+\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hide the characters \fIc\fR, \fId\fR, etc. from font F.
 If the characters appear in input afterwards,
 they are searched in other fonts using the fallback sequence.
 This is useful e.g. for combining characters from a regular
 and a Type\ 1 expert font.
 .bta fspacewidth
-\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Sets the width
+\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Set the width
 of the space character in font \fIF\fR to \fIN\fR,
 which is given in units of 1/72000 of an inch multiplied by the
 current point size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair
@@ -2580,7 +2580,7 @@ are device dependent.
 \fB&pl\fI|\(+-N\fR	11\|in	11\|in	\fBv\fR	Page length set to \fI\(+-N\fR.
 The current page length is available in the \A'n_.p'\fB.p\fR register.
 .bta papersize
-\fB&papersize\fI|media\fR	ignored	T	Sets the paper size.
+\fB&papersize\fI|media\fR	ignored	T	Set the paper size.
 \fImedia\fR can be one of
 \fBexecutive\fR,
 \fBletter\fR,
@@ -2601,7 +2601,7 @@ pages of the document. The default are \fBletter\fR measurements. This
 request should be used early in a document; if it is given multiple
 times, the last one will setup the device.
 .bta mediasize
-\fB&mediasize\fI|media\fR	ignored	T	Sets the device media size.
+\fB&mediasize\fI|media\fR	ignored	T	Set the device media size.
 \fImedia\fR can be one of
 \fBexecutive\fR,
 \fBletter\fR,
@@ -2628,7 +2628,7 @@ However, when generating \*(PS as
 intermediate format with the intent of \*[PDF] creation, use of this
 request is recommended.
 .bta cropat
-\fB&cropat\fI|L|T|W|H\fR	ignored	T	Sets the ``CropBox'' page parameter for \*[PDF] generation.
+\fB&cropat\fI|L|T|W|H\fR	ignored	T	Set the ``CropBox'' page parameter for \*[PDF] generation.
 The four arguments give the offset from the left (\fIL\fR)
 and top (\fIT\fR) margins of the document
 (as set by \T'mediasize'\fBmediasize\fR\T),
@@ -2639,7 +2639,7 @@ area of the page that is shown by a \*[PDF] viewer program. It is
 useful to hide cut marks and other printing instructions when
 the same \*[PDF] document is intended to be displayed on screen.
 .bta trimat
-\fB&trimat\fI|L|T|W|H\fR	ignored	T	Sets the ``TrimBox'' page parameter for \*[PDF] generation
+\fB&trimat\fI|L|T|W|H\fR	ignored	T	Set the ``TrimBox'' page parameter for \*[PDF] generation
 and enables printing of marks when combined with \fIdpost\ \-M\fR.
 The four arguments give the offset from the left (\fIL\fR)
 and top (\fIT\fR) margins of the document
@@ -2651,7 +2651,7 @@ the page is to be cut after it has been printed; it is sort of
 an electronic equivalent for cut marks (which should continue to
 be printed in addition).
 .bta bleedat
-\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Sets the ``BleedBox'' page parameter for \*[PDF] generation.
+\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Set the ``BleedBox'' page parameter for \*[PDF] generation.
 The four arguments give the offset from the left (\fIL\fR)
 and top (\fIT\fR) margins of the document
 (as set by \T'mediasize'\fBmediasize\fR\T),
@@ -2943,15 +2943,15 @@ Tracking also applies to characters
 from another font that have been selected
 by the \T'fallback'\fBfallback\fP\T sequence.
 .bta kern
-\fB&kern\fI|N\fR	1	1	P,T	Controls pairwise kerning;
+\fB&kern\fI|N\fR	1	1	P,T	Control pairwise kerning;
 disabled if \fIN\fR=0, otherwise enabled.
 .bta fkern
-\fB&fkern\fI|F|N\fR	1	1	P,T	Controls the use of kerning tables from font \fIF\fR;
+\fB&fkern\fI|F|N\fR	1	1	P,T	Control the use of kerning tables from font \fIF\fR;
 disabled if \fIN\fR=0, otherwise enabled.
 \*(TR kerning adjustments as defined by the following requests
 are not affected.
 .bta kernpair
-\fB&kernpair\fI|F|c...|G|d...|N\fR	ignored	P,T	Adds a kerning pair
+\fB&kernpair\fI|F|c...|G|d...|N\fR	ignored	P,T	Add a kerning pair
 to the kerning table for character \fIc\fR
 from font \fIF\fR and character \fId\fR from font \fIG\fR.
 \fIc\fR and \fId\fR may consist of multiple characters;
@@ -2962,7 +2962,7 @@ size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair definitions);
 it may be negative.
 To add a kerning pair that includes the space character, use \T'e_ '``\e\ ''.\T
 .bta kernafter
-\fB&kernafter\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space after a character
+\fB&kernafter\fI|F|c...|N|d...|M|...\fR	P,T	Add a constant amount of space after a character
 if the current font is \fIF\fR and \fIc\fR
 is the first character of a pair of characters subject to kerning.
 \fIc\fR may consist of multiple characters;
@@ -2974,7 +2974,7 @@ of an em (as in \s-1AFM\s+1 kerning pair definitions);
 it may be negative.
 Same for \fId/M\fR etc.
 .bta kernbefore
-\fB&kernbefore\fI|F|c...|N|d...|M|...\fR	P,T	Adds a constant amount of space before a character
+\fB&kernbefore\fI|F|c...|N|d...|M|...\fR	P,T	Add a constant amount of space before a character
 if the current font is \fIF\fR and \fIc\fR
 is the second character of a pair of characters subject to kerning.
 \fIc\fR may consist of multiple characters;
@@ -3445,7 +3445,7 @@ macro \fIxx\fR.
 Another \fBdt\fR will redefine the diversion trap.
 If no arguments are given, the diversion trap is removed.
 .bta vpt
-\fB&vpt\fI|N\fR	1	ignored	\(en	Enables (\fIN\fR\(!=0) or disables (\fIN\fR\(eq0)
+\fB&vpt\fI|N\fR	1	ignored	\(en	Enable (\fIN\fR\(!=0) or disable (\fIN\fR\(eq0)
 page ejections and vertical position traps,
 i.e. those set with \fBwh\fR or \fBdt\fR.
 At end of input, the page is forcefully ejected.
@@ -3459,9 +3459,9 @@ have been read
 The text may be in-line text or
 text interpolated by inline or trap-invoked macros.
 .bta return
-\fB&return\fR	\(en	\(en	\(en	Immediately returns from the current macro to the level above.
+\fB&return\fR	\(en	\(en	\(en	Immediately return from the current macro to the level above.
 .bta shift
-\fB&shift\fI|N\fR	\(en	1	\(en	Shifts the arguments to the current macro
+\fB&shift\fI|N\fR	\(en	1	\(en	Shift the arguments to the current macro
 by \fIN\fR.
 .bta em
 \fB&em\fI|xx\fR	none	none	\(en	The
@@ -3471,7 +3471,7 @@ The effect is the same as if the contents of \fIxx\fR had been at the end
 of the last file processed,
 but all processing ceases at the next page eject.
 .bta recursionlimit
-\fB&recursionlimit\fI|N|M\fR	\(en	\(en	Sets
+\fB&recursionlimit\fI|N|M\fR	\(en	\(en	Set
 the maximum stack depth for generally recursive invocations
 of macros to \fIN\fR,
 and for invocations of tail-recursive macros to \fIM\fR.
@@ -3750,7 +3750,7 @@ and in \T'copy mode'\fIcopy mode\fR.\T
 No effect in \*[NR.]
 .bta flig
 .lg 0
-\fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fines the set of
+\fB&flig\fI|F|string|c|...\fR	ignored	T	De\(fine the set of
 ligatures to be used with font \fIF\fR.
 .lg
 \fIstring\fR may consist of up to four characters;
@@ -3779,7 +3779,7 @@ and
 \fB&flig R \-Th\fR
 disables it.
 .bta fdeferlig
-\fB&fdeferlig\fI|F|string|...\fR	ignored	T	Defers ligature building for the first character of \fIstring\fR.
+\fB&fdeferlig\fI|F|string|...\fR	ignored	T	Defer ligature building for the first character of \fIstring\fR.
 Normally when a sequence of three characters appears
 for which both the first and the last two characters
 are defined as a ligature,
@@ -4244,7 +4244,7 @@ specified with \fB\e%\fR, \fB\e:\fR, or \fBhw\fR.
 These values are additive;
 i.|e. \fIN=\fR\|14 will invoke the three restrictions.
 .bta hylang
-\fB&hylang\fI|name\fR	off	off	E	Sets the hyphenation language
+\fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language
 to \fIname\fR, which is one of
 \fBde_DE\fR,
 \fBde_DE@traditional\fR,
@@ -4481,7 +4481,7 @@ Note that what is pushed down and restored
 is the environment \fIname,\fR
 not its contents.
 .bta evc
-\fB&evc\fI|name\fR		\(en	\(en	Copies the environment \fIname\fR to the current environment.
+\fB&evc\fI|name\fR		\(en	\(en	Copy the environment \fIname\fR to the current environment.
 The temporary state of the current environment is reset, and
 incompletely filled lines are discarded.
 .mha s_stdin
@@ -4533,8 +4533,8 @@ When the new file ends,
 input is again taken from the original file.
 \fBso\fR's may be nested.
 .bta pso
-\fB&pso\fI|string\fR		\(en	\(en	Executes \fIstring\fR
-and reads its standard output as text input.
+\fB&pso\fI|string\fR		\(en	\(en	Execute \fIstring\fR
+and read its standard output as text input.
 .bta nx
 \fB&nx\fI|filename\fR		end-of-file	\(en	Next file is \fIfilename\fR.
 The current file is considered ended, and the input is immediately switched
@@ -4553,19 +4553,19 @@ typically it is the first line of input.
 \fB&cf\fI|filename\fR		\(en	\(en	Copy contents of file \fIfilename\fR to output, completely unprocessed.
 The file is assumed to contain something meaningful to subsequent processes.
 .bta open
-\fB&open\fI|stream|filename\fR	ignored	\(en	Opens \fIfilename\fR for writing while truncating existing contents
+\fB&open\fI|stream|filename\fR	ignored	\(en	Open \fIfilename\fR for writing while truncating existing contents
 and associates \fIstream\fR with it for latter use with \fBwrite\fR etc.
 .bta opena
-\fB&opena\fI|stream|filename\fR	ignored	\(en	Works like \fBopen\fR but appends to \fIfilename\fR instead of truncating
+\fB&opena\fI|stream|filename\fR	ignored	\(en	Like \fBopen\fR but appends to \fIfilename\fR instead of truncating
 an existing file.
 .bta write
-\fB&write\fI|stream|text\fR	ignored	\(en	Writes \fItext\fR to file \fIstream\fR,
+\fB&write\fI|stream|text\fR	ignored	\(en	Write \fItext\fR to file \fIstream\fR,
 which must have been obtained by a previous \fBopen\fR request.
 \fItext\fR is interpreted in \T'copy mode'\fIcopy mode.\fR\T
 .bta writec
 \fB&writec\fI|stream|text\fR	ignored	\(en	Like \fBwrite\fR but does not write a terminating newline.
 .bta close
-\fB&close\fI|stream\fR		\(en	\(en	Closes the file \fIstream\fR,
+\fB&close\fI|stream\fR		\(en	\(en	Close the file \fIstream\fR,
 which must have been obtained by a previous \fBopen\fR request.
 .mha s_misc
 Miscellaneous
@@ -4595,7 +4595,7 @@ The margin character used with this paragraph was a 12-point box-rule.
 After skipping initial blanks, \fIstring\fR (rest of the line) is read in \T'copy mode'\fIcopy mode\fR\T
 and written on the standard error.
 .bta tmc
-\fB&tmc\fI|string\fR	\(en	newline	\(en	Works like \fBtm\fR
+\fB&tmc\fI|string\fR	\(en	newline	\(en	Like \fBtm\fR
 but does not write a terminating newline.
 .bta ab
 \fB&ab\fI|string\fR	\(en	newline	\(en	\
@@ -4734,7 +4734,7 @@ and the exceeding of certain internal limits that
 make future output unlikely to be useful.
 .h1
 .bta warn
-\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Controls warning messages,
+\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Control warning messages,
 which may be given either numerically
 as bits or symbolically as names.
 With a \fB+\fR sign, the respective bit or name is enabled in
@@ -4747,7 +4747,7 @@ The \A'n_.warn'\fB.warn\fR register represents
 the currently activated warning categories
 as bits.
 .bta spreadwarn
-\fB&spreadwarn\fI|N\fR	toggle	\(en	Sets or toggles a limit that causes a warning to be printed when
+\fB&spreadwarn\fI|N\fR	toggle	\(en	Set or toggle a limit that causes a warning to be printed when
 it is exceeded by the adjustment that is computed for the current
 output line in \fBad\ b\fR mode. The limit is initially 3\|m, but the
 warning message is disabled. Calling this request without an
@@ -4834,7 +4834,7 @@ and reverse video printing.
 It includes the following macro:
 .h1
 .bta CL
-\fB&CL\fI|color|text\fR	\s-1RGB\s+1|black		Prints \fItext\fR in \fIcolor\fR.
+\fB&CL\fI|color|text\fR	\s-1RGB\s+1|black		Print \fItext\fR in \fIcolor\fR.
 No arguments restores a default color
 (black in \s-1RGB\s+1 color space;
 note that this is different from the initial color).
@@ -4889,7 +4889,7 @@ picture description
 .h1
 .bta psbb
 \fB&psbb\fI|filename\fR	\(en	\(en	\
-Reads the \fB%%BoundingBox\fR \s-1DSC\s+1 comment
+Read the \fB%%BoundingBox\fR \s-1DSC\s+1 comment
 from the \*(PS document \fIfilename\fR
 and assigns
 the lower left \fIx\fR coordinate to the register \fBllx\fR,
