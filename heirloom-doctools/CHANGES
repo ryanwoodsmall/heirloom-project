@@ -1,6 +1,13 @@
 Release ...
 * troff: The ".lspadj" request has been added to enable dynamic letter
   spacing when justifying lines.
+* troff: Font and size attributes of space (and newline) characters in
+  input are now honored for computing widths and kerning pairs. Previously,
+  font and size of space characters were always that of the last previous
+  printable character; this is retained with the -x0 option. This means
+  that e.g. in "\fIabc\fR def", the size of the space is now computed
+  from the italic font instead of the roman font, and a kerning pair for
+  "I c R \ " is now effective.
 * [nt]roff: The ".nx" request now works again, it previously caused
   a segmentation fault because of a null pointer dereference (bug
   reported by Michael Hobgood).

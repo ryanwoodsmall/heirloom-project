@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.64 (gritter) 7/3/06
+ * Sccsid @(#)n7.c	1.65 (gritter) 7/4/06
  */
 
 /*
@@ -187,7 +187,7 @@ tbreak(void)
 				goto std;
 			pad = 0;
 			if (i > line)
-				pad += kernadjust(i[-2], ' '| i[-2]&SFMASK);
+				pad += kernadjust(i[-2], i[-1]);
 			do {
 				minflg = _minflg;
 				pad += width(j);
@@ -250,6 +250,7 @@ tbreak(void)
 	for (k = ls - 1; k > 0 && !trap; k--)
 		newline(0);
 	spread = 0;
+	spbits = 0;
 }
 
 void
@@ -320,8 +321,8 @@ text(void)
 		if (iszbit(i))
 			break;
 		spcnt++;
-		numtab[HP].val += sps;
-		widthp = sps;
+		widthp = xflag ? width(i) : sps;
+		numtab[HP].val += widthp;
 		lasti = i;
 	}
 	if (lasti) {
@@ -792,7 +793,7 @@ movword(void)
 			if (iszbit(i))
 				break;
 			wch--;
-			wne -= minsps ? minsps : sps;
+			wne -= xflag ? width(i) : sps;
 		}
 		wp--;
 		if (wp > wordp)
@@ -835,7 +836,7 @@ movword(void)
 		minflg = minspsz;
 		w = width(i);
 		adspc += minspc;
-		w += kernadjust(i, *wp ? *wp : ' ' | i&SFMASK);
+		w += kernadjust(i, *wp ? *wp : ' ' | (spbits?spbits:i&SFMASK));
 		wne -= w;
 		wch--;
 		if (cbits(i) == STRETCH && cbits(lasti) != STRETCH)
@@ -1008,8 +1009,8 @@ setnel(void)
 int
 getword(int x)
 {
-	register int j, k = 0;
-	register tchar i, *wp, nexti, gotspc = 0;
+	register int j, k = 0, w;
+	register tchar i = 0, *wp, nexti, gotspc = 0, t;
 	int noword;
 #if defined (EUC) && defined (NROFF)
 	wchar_t *wddelim;
@@ -1067,10 +1068,16 @@ getword(int x)
 			continue;
 		}
 		if (j == ' ' && !iszbit(i)) {
-			numtab[HP].val += sps;
-			widthp = sps;
-			storeword(i, sps);
+			if (spbits && xflag) {
+				i = ' ' | spbits;
+				w = width(i);
+			} else
+				w = sps;
+			storeword(i, w);
+			numtab[HP].val += w;
+			widthp = w;
 			gotspc = i;
+			spbits = i & SFMASK;
 			continue;
 		}
 		if (gotspc) {
@@ -1120,10 +1127,17 @@ getword(int x)
 	}
 a0:
 #endif /* EUC && NROFF */
-	storeword(' ' | chbits, sps + k);
+	if (spbits && xflag) {
+		t = ' ' | spbits;
+		w = width(t);
+	} else {
+		t = ' ' | chbits;
+		w = sps;
+	}
+	storeword(t, w + k);
 	if (spflg) {
 		if (xflag == 0 || ses != 0)
-			storeword(' ' | chbits, sps);
+			storeword(t, w);
 		spflg = 0;
 	}
 g0:
@@ -1179,7 +1193,11 @@ g0:
 		int	oev = ev;
 		nexti = GETCH();
 		if (ev == oev) {
-			k = kernadjust(i, nexti);
+			if (cbits(nexti) == '\n')
+				t = ' ' | chbits;
+			else
+				t = nexti;
+			k = kernadjust(i, t);
 			wne += k;
 			widthp += k;
 			numtab[HP].val += k;
@@ -1229,8 +1247,12 @@ g1:		nexti = GETCH();
 	wceoll = owc;
 #endif /* EUC && NROFF */
 	*wordp = 0;
-	numtab[HP].val += sps;
+	numtab[HP].val += xflag ? width(i) : sps;
 rtn:
+	if (i & SFMASK)
+		spbits = i & SFMASK;
+	else if (i == '\n')
+		spbits = chbits;
 	for (wp = word; *wp; wp++) {
 		j = cbits(*wp);
 		if ((j == ' ' || j == STRETCH) && !iszbit(j))
