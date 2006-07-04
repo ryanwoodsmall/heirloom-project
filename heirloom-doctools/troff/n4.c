@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.29 (gritter) 7/3/06
+ * Sccsid @(#)n4.c	1.30 (gritter) 7/4/06
  */
 
 /*
@@ -49,6 +49,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<locale.h>
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
@@ -98,6 +99,7 @@ void
 setn(void)
 {
 	extern const char	revision[];
+	char	tb[20], *cp;
 	const char	*name;
 	register int i, j;
 	register tchar ii;
@@ -120,12 +122,8 @@ setn(void)
 		switch (i >> BYTE) {
 		case 's': 
 			i = fl = u2pts(pts);
-			if (i != fl) {
-				char	tb[20];
-				roff_sprintf(tb, "%f", fl);
-				cpushback(tb);
-				return;
-			}
+			if (i != fl)
+				goto flt;
 			break;
 		case 'v': 
 			i = lss;		
@@ -244,7 +242,36 @@ setn(void)
 			i = getdescender();
 		else if (strcmp(&name[1], "fp") == 0)
 			i = nextfp();
-		else
+		else if (strcmp(&name[1], "ss") == 0)
+			i = spacesz;
+		else if (strcmp(&name[1], "sss") == 0)
+			i = ses ? spacesz : 0;
+		else if (strcmp(&name[1], "minss") == 0)
+			i = minspsz ? minspsz : spacesz;
+		else if (strcmp(&name[1], "lspmin") == 0) {
+			i = fl = 100 - lspmin / 10.0;
+			if (i != fl)
+				goto flt;
+		} else if (strcmp(&name[1], "lspmax") == 0) {
+			i = fl = 100 + lspmax / 10.0;
+			if (i != fl)
+				goto flt;
+		} else if (strcmp(&name[1], "lspss") == 0)
+			i = lspspsz;
+		else if (strcmp(&name[1], "lc_ctype") == 0) {
+			if ((cp = setlocale(LC_CTYPE, NULL)) == NULL)
+				cp = "C";
+			cpushback(cp);
+			return;
+		} else if (strcmp(&name[1], "hylang") == 0) {
+			if (hylang)
+				cpushback(hylang);
+			return;
+		} else if (strcmp(&name[1], "fzoom") == 0) {
+			i = fl = getfzoom();
+			if (i != fl)
+				goto flt;
+		} else
 			goto s0;
 	} else {
 s0:
@@ -256,6 +283,10 @@ s0:
 		}
 	}
 	setn1(i, nform, (tchar) 0);
+	return;
+flt:
+	roff_sprintf(tb, "%f", fl);
+	cpushback(tb);
 }
 
 tchar	numbuf[17];

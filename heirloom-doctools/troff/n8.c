@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.27 (gritter) 7/3/06
+ * Sccsid @(#)n8.c	1.28 (gritter) 7/4/06
  */
 
 /*
@@ -454,35 +454,38 @@ void
 casehylang(void)
 {
 	int	c, i = 0, sz = 0;
-	char	*file = NULL, *path = NULL;
+	char	*path = NULL;
 
 	dicthnj = NULL;
+	free(hylang);
+	hylang = NULL;
 	hyext = 0;
 	skip(0);
 	do {
 		c = getach();
 		if (i >= sz)
-			file = realloc(file, (sz += 8) * sizeof *file);
-		file[i++] = c;
+			hylang = realloc(hylang, (sz += 8) * sizeof *hylang);
+		hylang[i++] = c;
 	} while (c);
 	if (i == 1) {
-		free(file);
+		free(hylang);
+		hylang = NULL;
 		return;
 	}
-	if (strchr(file, '/') == NULL) {
-		path = malloc(strlen(file) + strlen(HYPDIR) + 12);
-		sprintf(path, "%s/hyph_%s.dic", HYPDIR, file);
+	if (strchr(hylang, '/') == NULL) {
+		path = malloc(strlen(hylang) + strlen(HYPDIR) + 12);
+		sprintf(path, "%s/hyph_%s.dic", HYPDIR, hylang);
 	} else {
-		path = malloc(strlen(file) + 1);
-		strcpy(path, file);
+		path = malloc(strlen(hylang) + 1);
+		strcpy(path, hylang);
 	}
 	if ((dicthnj = hnj_hyphen_load(path)) == NULL) {
 		errprint("Can't load %s", path);
-		free(file);
+		free(hylang);
+		hylang = NULL;
 		free(path);
 		return;
 	}
-	free(file);
 	free(path);
 	hyext = 1;
 }

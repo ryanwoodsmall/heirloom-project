@@ -1,7 +1,7 @@
 /*
  *	Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- *	Sccsid @(#)pt.h	1.37 (gritter) 7/3/06
+ *	Sccsid @(#)pt.h	1.38 (gritter) 7/4/06
  */
 
 /* n10.c */
@@ -21,8 +21,6 @@ extern void	newpage();
 extern void	pttrailer();
 /* n6.c */
 extern int	width(register tchar);
-extern int	getascender(void);
-extern int	getdescender(void);
 extern tchar	setch(int);
 extern tchar	setabs(void);
 extern int	findft(register int, int);
@@ -78,3 +76,7 @@ extern void	casedummy(void);
 
 #define	kernadjust(a, b)	0
 #define	u2pts(i)		(i)
+
+#define	getascender()		0
+#define	getdescender()		0
+#define	getfzoom()		0

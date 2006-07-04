@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.150 (gritter) 7/3/06
+ * Sccsid @(#)t6.c	1.152 (gritter) 7/4/06
  */
 
 /*
@@ -1567,8 +1567,9 @@ casess(int flg)
 	int _spacesz, _sps;
 
 	noscale++;
-	skip(1);
-	if (i = atoi()) {
+	if (skip(flg == 0))
+		minsps = minspsz = 0;
+	else if (i = atoi()) {
 		_spacesz = spacesz;
 		spacesz = i & 0177;
 		zapwcache(0);
@@ -2011,6 +2012,12 @@ casefzoom(void)
 			ptps();
 	}
 	free(buf);
+}
+
+double
+getfzoom(void)
+{
+	return zoomtab[font];
 }
 
 void

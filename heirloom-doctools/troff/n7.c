@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.65 (gritter) 7/4/06
+ * Sccsid @(#)n7.c	1.66 (gritter) 7/4/06
  */
 
 /*
@@ -99,17 +99,10 @@ static int	lspgrow(void);
 static int	lspcomp(void);
 #else	/* NROFF */
 #define	nroff		1
-#define	minsps		0
-#define	minspsz		0
 #define	storelsp(a, b)
 #define	lspshrink()
 #define	lspgrow()	0
 #define	lspcomp()	0
-#define	lspsps		0
-#define	lsplow		0
-#define	lspnc		0
-#define	lsplast		0
-#define	lspcur		0
 #endif	/* NROFF */
 
 void

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.88 (gritter) 7/3/06
+ * Sccsid @(#)tdef.h	1.89 (gritter) 7/4/06
  */
 
 /*
@@ -576,7 +576,19 @@ extern const struct numtab initnumtab[];
 #define	lsphigh	env._lsphigh
 #define	lspcur	env._lspcur
 #define	lsplast	env._lsplast
-#endif	/* !NROFF */
+#else	/* NROFF */
+#define	minsps	0
+#define	minspsz	0
+#define	lspspsz	0
+#define	lspsps	0
+#define	lspmin	0
+#define	lspmax	0
+#define	lspnc	0
+#define	lsplow	0
+#define	lsphigh	0
+#define	lspcur	0
+#define	lsplast	0
+#endif	/* NROFF */
 #define	fldcnt	env._fldcnt
 #define	lss	env._lss
 #define	lss1	env._lss1
@@ -648,6 +660,7 @@ extern const struct numtab initnumtab[];
 #define	linkin	env._linkin
 #define	linkout	env._linkout
 #define	linkhp	env._linkhp
+#define	hylang	env._hylang
 #define	dicthnj	env._dicthnj
 #define	hyext	env._hyext
 #define	hyptr	env._hyptr
@@ -744,6 +757,7 @@ extern struct env {
 	int	_linkin;
 	int	_linkout;
 	int	_linkhp;
+	char	*_hylang;
 	void	*_dicthnj;
 	int	_hyext;
 	tchar	*_hyptr[NHYP];

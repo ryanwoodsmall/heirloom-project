@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.62 (gritter) 7/3/06
+.\" Sccsid @(#)doc.tr	1.64 (gritter) 7/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/3/06
+.ds Sccsdate 7/4/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1195,7 +1195,7 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'ce'\fB&ce\fI|N\fR	off	\fIN\(eq\fR1	B,E	Center following \fIN\fR input text lines.\T
 .b1
-\T'minss'\fB&minss\fI|N\fR	off	ignored	E,T	Minimum word space when adjusting lines.\T
+\T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
 \T'lspadj'\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing for justification.\T
 .b1
@@ -1788,18 +1788,27 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
 \T'n_.f'2.2\T	\T'n_.f'\fB&f\fR\T	\T'n_.f'Current font as physical quadrant (1-255).\T
 \T'n_.fp'2.2\T	\T'n_.fp'\fB&fp\fR\T	\T'n_.fp'Next unused physical font quadrant.\T
+\T'n_.fzoom'2.3\T	\T'n_.fzoom'\fB&fzoom\fR\T	\T'n_.fzoom'Current font zoom factor (may be a decimal fraction).\T
 \T'n_.F'20.\T	\T'n_.F'\fB&F\fR\T	\T'n_.F'Current input file name [sic].\T
 \T'n_.h'4\T	\T'n_.h'\fB&h\fR\T	\T'n_.h'Text base-line high-water mark on current page or diversion.\T
+\T'n_.hylang'13\T	\T'n_.hylang'\fB&hylang\fR\T	\T'n_.hylang'Current hyphenation language [sic].\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
 \T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent.\T
 \T'n_.j'4.2\T	\T'n_.j'\fB&j\fR\T	\T'n_.j'Current \fBad\fP mode.\T
 \T'n_.k'4.1\T	\T'n_.k'\fB&k\fR\T	\T'n_.k'Current output horizontal position.\T
 \T'n_.l'6\T	\T'n_.l'\fB&l\fR\T	\T'n_.l'Current line length.\T
+\T'n_.lc_ctype'2.1\T	\T'n_.lc_ctype'\fB&lc_ctype\fR\T	\T'n_.lc_ctype'Current \s-1LC_CTYPE\s0 locale [sic].\T
+\T'n_.lspmin'4\T	\T'n_.lspmin'\fB&lspmin\fR\T	\T'n_.lspmin'Current minimum dynamic letter space (may be a decimal fraction).\T
+\T'n_.lspss'4\T	\T'n_.lspss'\fB&lspss\fR\T	\T'n_.lspss'Current dynamic letter space threshold.\T
+\T'n_.lspmax'4\T	\T'n_.lspmax'\fB&lspmax\fR\T	\T'n_.lspmax'Current maximum dynamic letter space (may be a decimal fraction).\T
 \T'n_.L'5.1\T	\T'n_.L'\fB&L\fR\T	\T'n_.L'Current \fBls\fP value.\T
+\T'n_.minss'4\T	\T'n_.minss'\fB&minss\fR\T	\T'n_.minss'Current minimum space size.\T
 \T'n_.n'4\T	\T'n_.n'\fB&n\fR\T	\T'n_.n'Length of text portion on previous output line.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
+\T'n_.ss'2\T	\T'n_.ss'\fB&ss\fR\T	\T'n_.ss'Current space size.\T
+\T'n_.sss'2\T	\T'n_.sss'\fB&sss\fR\T	\T'n_.sss'Current sentence space size.\T
 \T'n_.t'7.5\T	\T'n_.t'\fB&t\fR\T	\T'n_.t'Distance to the next trap.\T
 \(en	\fB&T\fR	Set to 1 in \*[NR,] if \fB\-T\fR option used; always 0 in \*[TR.]
 \T'n_.u'4.1\T	\T'n_.u'\fB&u\fR\T	\T'n_.u'Equal to 1 in fill mode and 0 in nofill mode.\T
@@ -2355,6 +2364,8 @@ of the \s-1LC_CTYPE\s+1 environment variable.
 This request is
 useful to specify an input character set regardless of environment
 influences.
+The current value is available in the \A'n_.lc_ctype'\fB&lc_ctype\fR
+number register.
 .bta ps
 \fB&ps\fI|\(+-N\fR	10\|point	previous	E	Point size
 set to \(+-\fIN\fR.
@@ -2374,6 +2385,8 @@ This request is useful for adjusting fonts with different
 visual sizes but identical nominal points; the zoom is thus not
 applied to characters from another font that have been found by
 the \T'fallback'\fBfallback\fR\T sequence or by the special font mechanism.
+The current value of the current font is available
+in the \A'n_.fzoom'\fB&fzoom\fR number register.
 .bta ss
 \fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size
 is set to \fIN\fR/36\|ems.
@@ -2383,6 +2396,8 @@ space is added between sentences. If \fIM\fR is zero, no additional
 white space is added.
 Otherwise, a space of size \fIN\fR is added as usual.
 Ignored in \*[NR.]
+The number registers \A'n_.ss'\fB&ss\fR and \A'n_.sss'\fB&sss\fR
+contain the current values of \fIN\fR and \fIM\fR, respectively.
 .bta cs
 \fB&cs\|\fIF\|N\|M\fR	off	\(en	P	Constant character space
 (width) mode is
@@ -2886,11 +2901,12 @@ A break occurs after each of the \fIN\fR input lines.
 If the input line is too long,
 it will be left adjusted.
 .bta minss
-\fB&minss\fI|N\fR	off	ignored	E,T	Minimum word space.
+\fB&minss\fI|N\fR	off	off	E,T	Minimum word space.
 When adjusting both margins,
 \*(TR may decrease the size of the word space
 down to \fIN\fR/36\|ems
 (rather than to the value set by \T'ss'\fBss\fR\T).
+The current value is available in the \A'n_.minss'\fB&minss\fR register.
 .bta lspadj
 \fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing for justification.
 The space between letters can be automatically expanded or condensed
@@ -2905,6 +2921,9 @@ additional space will be increased up to a limit
 of \fIM\fR percent of an en of the current point size
 until the word space does not extend beyond \fIS\fR anymore.
 \fIS\fR is given in units of 1/36\|ems as with \fBss\fR.
+The number registers \A'n_.lspmin'\fB&lspmin\fR,
+\A'n_.lspss'\fB&lspss\fR, and \A'n_.lspmax'\fB&lspmax\fR
+contain the current values of \fIN\fR, \fIS\fR, and \fI\fR, respectively.
 .bta track
 \fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.
 If the current font is \fIF\fR
@@ -4239,6 +4258,8 @@ files to the directory
 \fB/usr/ucblib/doctools/hyphen\fR. If no \fIname\fR argument
 is present, the hyphenation is reset to the traditional \*(TR
 mechanism.
+The current value is available in the \A'n_.hylang'\fB&hylang\fR
+number register.
 .xx
 This request also makes parts of words composed by \fB-\fR or
 \fB\e(em\fR characters subject to hyphenation. Traditionally, the only
