@@ -3,10 +3,10 @@ Release ...
   spacing when justifying lines.
 * troff: Font and size attributes of space (and newline) characters in
   input are now honored for computing widths and kerning pairs. Previously,
-  font and size of space characters were always that of the next previous
-  printable character; this is retained with the -x0 option. This means
-  that e.g. in "\f(CWabc \fRdef", the size of the space is now computed
-  from the constant width font instead of the roman font.
+  font and size of space characters were always that of the next printable
+  character; this is retained with the -x0 option. This means that e.g. in
+  "\f(CWabc \fRdef", the size of the space is now computed from the
+  constant width font instead of the roman font.
 * [nt]roff: The ".nx" request now works again, it previously caused
   a segmentation fault because of a null pointer dereference (bug
   reported by Michael Hobgood).
