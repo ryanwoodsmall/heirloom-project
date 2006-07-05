@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.66 (gritter) 7/4/06
+ * Sccsid @(#)n7.c	1.67 (gritter) 7/6/06
  */
 
 /*
@@ -766,7 +766,7 @@ movword(void)
 {
 	register int w;
 	register tchar i, *wp, c, *lp, *lastlp, lasti = 0, *tp;
-	int	savwch, hys, stretches = 0, wholewd = 0;
+	int	savwch, hys, stretches = 0, wholewd = 0, mnel;
 #ifndef	NROFF
 	tchar	lgs = 0, lge = 0, optlgs = 0, optlge = 0;
 	int	*ip, s, lgw = 0, optlgw = 0;
@@ -841,8 +841,10 @@ movword(void)
 	}
 	*linep = *wp;
 	lastlp = linep;
+	mnel = (sps - minsps) * nwd;
 	if (nel >= 0 || nel + lsplow >= 0 && lspnc - (nwd ? nwd : 1) > 0) {
-		if (nel >= 0 && nwd && nel - adspc < 0 && nel / nwd < sps) {
+		if (nel >= 0 && nwd && nel - adspc < 0 && nel / nwd < sps ||
+				nel < 0 && nel + lsplow >= 0) {
 			wholewd = 1;
 			goto m0;
 		}
@@ -896,13 +898,14 @@ m1:
 		nc--;
 		goto m1;
 	}
+	if (nel >= mnel + hys + lgw)
+		goto m2;
 	wholewd = 0;
 m1a:
 #ifndef	NROFF
-	if (minspsz && wch < savwch && nwd && nel / nwd > 0 &&
-			(nel - lsplow) / nwd < sps - minsps ||
-			nel + lsplow >= hys + lgw &&
-			nel < hys + lgw) {
+	if (minspsz && wch < savwch && nwd && nel / nwd > 0 && nel < mnel ||
+			nel + lsplow >= (wholewd ? 0 : hys + lgw) &&
+			nel < (wholewd ? 0 : hys + lgw)) {
 		optlgs = lgs, optlge = lge, optlgw = lgw;
 		optlinep = linep, optwp = wp, optnc = nc, optnel = nel,
 		optne = ne, optadspc = adspc, optwne = wne, optwch = wch;
@@ -918,7 +921,7 @@ m1a:
 #endif
 m2:
 #ifndef	NROFF
-	if (optlinep) {
+	if (optlinep && 3*abs(optnel - mnel) < 5*abs(nel - mnel)) {
 		lgs = optlgs, lge = optlge, lgw = optlgw;
 		linep = optlinep, wp = optwp, nc = optnc, nel = optnel,
 		ne = optne, adspc = optadspc, wne = optwne, wch = optwch;
@@ -926,7 +929,8 @@ m2:
 		fldcnt = optfldcnt;
 		if (wholewd = optwholewd)
 			goto m3;
-	}
+	} else if (optlinep && wch == savwch && !nhyp)
+		goto m4;
 	if (lgs != 0) {
 		*wp = lge;
 		storeline(lgs, lgw);
