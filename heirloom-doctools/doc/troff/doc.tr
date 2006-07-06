@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.65 (gritter) 7/4/06
+.\" Sccsid @(#)doc.tr	1.66 (gritter) 7/6/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/4/06
+.ds Sccsdate 7/6/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1197,7 +1197,7 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
-\T'lspadj'\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing for justification.\T
+\T'lspadj'\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing when adjusting lines.\T
 .b1
 \T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.\T
 .b1
@@ -2739,9 +2739,6 @@ can be tied together by separating them with the
 The adjusted word spacings are uniform in \*(TR
 and the minimum interword spacing can be controlled
 with the \T'ss'\fBss\fR request\T \T's_font'(\(sc2).\T
-\*(TR can optionally decrease word spacings
-and change the letter spacing
-when justifying lines.
 In \*[NR,] word spacings are normally nonuniform because of
 quantization to character-size spaces;
 however,
@@ -2757,6 +2754,30 @@ The text base-line high-water mark (lowest place) on the current page is in
 the \A'n_.h'\fB.h\fR register.
 The current horizontal output position
 is in the \A'n_.k'\fB.k\fR register.
+.pg
+\*(TR can optionally decrease word spacings
+and change the letter spacing
+when adjusting lines to fit on both margins.
+The interword spacing controlled with the \T'ss'\fBss\fR request\T request
+is then understood as the optimum setting.
+Words are collected from input until the first word
+that would require to condense spacing is encountered.
+Between the end of the previous word and the end of this word,
+hyphenation points are additionally examined
+until the two possibilities to end the line
+surrounding the optimum are found.
+The point closest to the optimum is then chosen.
+If the word spacing so determined would fall below
+the minimum allowed, letter spacings are condensed.
+If it would exceed the threshold for expanded letter spacing,
+it is attempted to compensate until the threshold is reached,
+up to the maximum allowed letter spacing.
+Remaining space is distributed among the word spacings.
+Lines that terminate with a \fIbreak\fR
+are normally set using the optimum word and line spacings
+unless the last word collected is the first word
+that falls below the optimum spacing,
+which may result in condensed spacing.
 .pg
 .tr &&
 An input text line ending with \fB.\fR\^, \fB?\fR, or \fB!\fR,
@@ -2908,7 +2929,7 @@ down to \fIN\fR/36\|ems
 (rather than to the value set by \T'ss'\fBss\fR\T).
 The current value is available in the \A'n_.minss'\fB&minss\fR register.
 .bta lspadj
-\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing for justification.
+\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing when adjusting lines.
 The space between letters can be automatically expanded or condensed
 (in addition to the space between words)
 in \fBad\ b\fR mode.
