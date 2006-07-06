@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.66 (gritter) 7/6/06
+.\" Sccsid @(#)doc.tr	1.67 (gritter) 7/6/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -2758,7 +2758,7 @@ is in the \A'n_.k'\fB.k\fR register.
 \*(TR can optionally decrease word spacings
 and change the letter spacing
 when adjusting lines to fit on both margins.
-The interword spacing controlled with the \T'ss'\fBss\fR request\T request
+The interword spacing controlled with the \T'ss'\fBss\fR request\T
 is then understood as the optimum setting.
 Words are collected from input until the first word
 that would require to condense spacing is encountered.
