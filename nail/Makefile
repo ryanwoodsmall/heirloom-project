@@ -52,6 +52,11 @@ SHELL		= /bin/sh
 # them here.
 #IPv6		= -DHAVE_IPv6_FUNCS
 
+#
+# Binaries are stripped with this command after installation.
+#
+STRIP = strip
+
 ###########################################################################
 ###########################################################################
 # You should really know what you do if you change anything below this line
@@ -96,7 +101,8 @@ config.h LIBS:
 
 install: all
 	test -d $(DESTDIR)$(BINDIR) || mkdir -p $(DESTDIR)$(BINDIR)
-	$(UCBINSTALL) -c -s mailx $(DESTDIR)$(BINDIR)/mailx
+	$(UCBINSTALL) -c mailx $(DESTDIR)$(BINDIR)/mailx
+	$(STRIP) $(DESTDIR)$(BINDIR)/mailx
 	test -d $(DESTDIR)$(MANDIR)/man1 || mkdir -p $(DESTDIR)$(MANDIR)/man1
 	$(UCBINSTALL) -c -m 644 mailx.1 $(DESTDIR)$(MANDIR)/man1/mailx.1
 	test -d $(DESTDIR)$(SYSCONFDIR) || mkdir -p $(DESTDIR)$(SYSCONFDIR)

@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.48 (gritter) 3/20/06";
+static char sccsid[] = "@(#)main.c	2.49 (gritter) 7/7/06";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -193,7 +193,8 @@ main(int argc, char *argv[])
 			sendflag++;
 			break;
 		case 'S': {
-				char *args[] = { optarg, NULL };
+				char *args[] = { NULL, NULL };
+				args[0] = optarg;
 				set(args);
 			}
 			break;

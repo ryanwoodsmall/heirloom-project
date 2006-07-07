@@ -42,6 +42,9 @@ DESTDIR         Prepended to BINDIR, MANDIR etc. at 'make install'. Mostly
 UCBINSTALL      Path name to a BSD-style install, like /usr/ucb/install on
                 SVR4 or GNU install.
 
+STRIP		A command to strip the binary at 'make install'. Use the
+		do-nothing command ':' to avoid stripping.
+
 Mailx uses a simple shell script named 'makeconfig' to check for header
 files and library functions. It is automatically invoked by 'make all'.
 The script generates three files, 'config.h', 'LIBS', and 'config.log'.
@@ -239,4 +242,4 @@ simply assumes that you want to build NSS if it manages to build the test
 executable.
 
 
-        Gunnar Ritter                                   3/4/06
+        Gunnar Ritter                                   7/7/06

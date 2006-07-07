@@ -1,4 +1,4 @@
-#define	V	"12.1"
+#define	V	"12.2pre"
 /*
  * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.350 (gritter) 6/15/06";
+static char sccsid[] = "@(#)version.c	2.352 (gritter) 7/7/06";
 #endif
 #endif /* not lint */
 
@@ -48,13 +48,13 @@ static char sccsid[] = "@(#)version.c	2.350 (gritter) 6/15/06";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = V " 6/15/06";
+const char *version = V " 7/7/06";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)mailx " V " (gritter) 6/15/06";
+= "@(#)mailx " V " (gritter) 7/7/06";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -85,7 +85,7 @@ list.c:static char sccsid[] = "@(#)list.c	2.60 (gritter) 3/4/06";
 lzw.c: * Sccsid @(#)lzw.c	1.11 (gritter) 3/4/06
 macro.c:static char sccsid[] = "@(#)macro.c	1.13 (gritter) 3/4/06";
 maildir.c:static char sccsid[] = "@(#)maildir.c	1.19 (gritter) 3/4/06";
-main.c:static char sccsid[] = "@(#)main.c	2.48 (gritter) 3/20/06";
+main.c:static char sccsid[] = "@(#)main.c	2.49 (gritter) 7/7/06";
 md5.c:	Sccsid @(#)md5.c	1.8 (gritter) 3/4/06	
 md5.h:	Sccsid @(#)md5.h	1.8 (gritter) 3/4/06	
 mime.c:static char sccsid[]  = "@(#)mime.c	2.66 (gritter) 4/7/06";

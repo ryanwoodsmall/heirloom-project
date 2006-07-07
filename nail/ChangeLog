@@ -1,3 +1,8 @@
+[12.2] released ...
+* A "STRIP" makefile variable has been introduced to control the strip
+  command at "make install".
+* Made it compile on UnixWare again (patch by Joe Julian).
+
 [12.1] released 6/15/06
 * The base64 encoder also used an invalid encoding for the last unit of
   data if (bytes_of_input % 3 == 1). As with the previous similar bug,
