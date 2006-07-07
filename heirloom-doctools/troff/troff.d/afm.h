@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.31 (gritter) 5/1/06
+ * Sccsid @(#)afm.h	1.32 (gritter) 7/7/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -39,9 +39,10 @@ enum spec {
 	SPEC_S		= 02000
 };
 
-#define	NKERNPAIRS	46
+#define	NKERNPAIRS	45
 struct kernpairs {
 	struct kernpairs	*next;
+	int	sorted;
 	int	cnt;
 	unsigned short	ch2[NKERNPAIRS];
 	short	k[NKERNPAIRS];

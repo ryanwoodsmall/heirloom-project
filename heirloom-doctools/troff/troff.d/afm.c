@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.54 (gritter) 5/1/06
+ * Sccsid @(#)afm.c	1.55 (gritter) 7/7/06
  */
 
 #include <stdlib.h>
@@ -990,6 +990,14 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 }
 
 #ifndef	DPOST
+/*
+ * For short to medium-sized documents, the run time is dominated by
+ * the time required to read kerning pairs for fonts with many pairs.
+ * Kerning pairs are thus simply dumped in the order they occur at
+ * this point. Later when a kerning pair is actually looked up, the
+ * structures accessed are sorted (eliding duplicates), leading to
+ * better performance with large documents.
+ */
 void
 afmaddkernpair(struct afmtab *a, int ch1, int ch2, int k)
 {
@@ -1055,18 +1063,59 @@ addkernpair(struct afmtab *a, char *_line)
 	}
 }
 
+static void
+sortkernpairs(struct kernpairs *kp)
+{
+	int	i, j, s, t;
+	do {
+		s = 0;
+		for (i = 0; i < kp->cnt-1; i++)
+			if (kp->ch2[i] > kp->ch2[i+1]) {
+				t = kp->ch2[i];
+				kp->ch2[i] = kp->ch2[i+1];
+				kp->ch2[i+1] = t;
+				t = kp->k[i];
+				kp->k[i] = kp->k[i+1];
+				kp->k[i+1] = t;
+				s = 1;
+			}
+	} while (s);
+	for (j = 0; j < kp->cnt-1; j++)
+		if (kp->ch2[j] == kp->ch2[j+1]) {
+			for (i = j+1; i < kp->cnt-1; i++) {
+				kp->ch2[i] = kp->ch2[i+1];
+				kp->k[i] = kp->k[i+1];
+			}
+			kp->cnt--;
+			j--;
+		}
+	kp->sorted = 1;
+}
+
 int
 afmgetkern(struct afmtab *a, int ch1, int ch2)
 {
 	struct kernpairs	*kp;
-	int	i;
+	int	l, m, r;
 
 	if (a->kernpairs) {
 		kp = &a->kernpairs[ch1];
 		do {
-			for (i = 0; i < kp->cnt; i++)
-				if (kp->ch2[i] == ch2)
-					return kp->k[i];
+			if (kp->sorted == 0)
+				sortkernpairs(kp);
+			if (ch2 >= kp->ch2[0] && ch2 <= kp->ch2[kp->cnt-1]) {
+				l = 0;
+				r = kp->cnt-1;
+				do {
+					m = (l+r) / 2;
+					if (ch2 < kp->ch2[m])
+						r = m-1;
+					else
+						l = m+1;
+				} while (ch2 != kp->ch2[m] && l <= r);
+				if (kp->ch2[m] == ch2)
+					return kp->k[m];
+			}
 		} while ((kp = kp->next) != NULL);
 	}
 	return 0;
