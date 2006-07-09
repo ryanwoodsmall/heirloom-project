@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.94 (gritter) 7/3/06
+ * Sccsid @(#)n3.c	1.95 (gritter) 7/9/06
  */
 
 /*
@@ -1330,9 +1330,10 @@ maybemore(int sofar, int flags)
 			if (flags & 2) {
 				if (i > 3 && xflag >= 3)
 					sofar = -2;
-			} else if (warn & WARN_MAC && i > 3 && xflag >= 3) {
+			} else if (i > 3 && xflag >= 3) {
 				buf[i-1] = 0;
-				errprint("%s: no such request", buf);
+				if (warn & WARN_MAC)
+					errprint("%s: no such request", buf);
 				sofar = 0;
 			} else if (warn & WARN_SPACE && i > 3 &&
 					findmn(sofar) >= 0) {

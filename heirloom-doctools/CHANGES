@@ -23,6 +23,8 @@ Release ...
 * [nt]roff: The ".ss", ".sss", ".minss", ".lspmin", ".lspss", ".lspmax",
   ".lc_ctype", ".hylang", and ".fzoom" number registers have been added
   to retrieve the current values set with the respective requests.
+* [nt]roff: With xflag 3 and warning "mac" deactivated, if ".xx" was a
+  defined request and ".xxx" was not, ".xx" was executed for ".xxx".
 * troff, dpost, otfdump: The operator 12 in CFF Top DICT entries was not
   handled correctly, resulting in misleading error messages with some
   OpenType fonts. This has been fixed (bug reported by D. Jeff Dionne).
