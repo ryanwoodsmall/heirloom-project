@@ -37,6 +37,8 @@ Release ...
 * [nt]roff: The ".hlm" request and the ".hln" and ".hlc" number registers
   have been added to control the maximum number of consecutive hyphenated
   lines.
+* [nt]roff: The "\#" escape sequence (comment including newline) has been
+  added.
 * [nt]roff: With xflag 3 and warning "mac" deactivated, if ".xx" was a
   defined request and ".xxx" was not, ".xx" was executed for ".xxx".
 * troff, dpost, otfdump: The operator 12 in CFF Top DICT entries was not

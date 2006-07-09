@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.75 (gritter) 7/9/06
+.\" Sccsid @(#)doc.tr	1.76 (gritter) 7/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/9/06
+.ds Sccsdate 7/10/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1679,6 +1679,7 @@ Reference	Sequence	Meaning
 .tr &.
 \T'e_!'10.6\T	\T'e_!'\fB\e!\fR\T	\T'e_!'Transparent line indicator\T
 \T'e_"'10.8\T	\T'e_"'\fB\e"\fR\T	\T'e_"'Beginning of comment\T
+\T'e_#'10.8\T	\T'e_#'\fB\e#\fR\T	\T'e_#'Comment including newline\T
 \T'e_$'7.3\T	\T'e_$'\fB\e$\fIn\fR,\fB\e$(\fInn\fR,\fB\e$[\fInnn\fB]\fR\T	\T'e_$'Interpolate argument \fIn\fR, \fInn\fR, or \fInnn\fR\T
 \T'e_$*'7.3\T	\T'e_$*'\fB\e$\(**\fR\T	\T'e_$*'Interpolate all arguments separated by spaces\T
 \T'e_$@'7.3\T	\T'e_$@'\fB\e$@\fR\T	\T'e_$@'Interpolate all arguments in double quotes\T
@@ -1739,6 +1740,7 @@ The escape sequences
 \fB\T'e_esc'\e\e\T\fR,
 \fB\T'e_.'\e\^.\T\fR,
 \fB\T'e_"'\e"\T\fR,
+\fB\T'e_#'\e#\T\fR,
 \fB\T'e_$'\e$\T\fR,
 \fB\T'e_*'\e\(**\T\fR,
 \fB\T'e_a'\ea\T\fR,
@@ -3254,7 +3256,7 @@ The input is copied without interpretation
 \*+ Environment variables indicated by \T'e_V'\fB\eV\fR\T are interpolated.
 \*+ Device control functions indicated by \T'e_X'\fB\eX\fR\T are executed.
 \*+ Concealed newlines indicated by \T'e_newline'\fB\e\fR\T(newline) are eliminated.
-\*+ Comments indicated by \T'e_"'\fB\e"\fR\T are eliminated.
+\*+ Comments indicated by \T'e_"'\fB\e"\fR\T or \T'e_#'\fB\e#\fR\T are eliminated.
 \*+ \T'e_t'\fB\et\fR\T and \T'e_a'\fB\ea\fR\T are interpreted as \s-1ASCII\s+1 horizontal tab and \s-1SOH\s+1 respectively \T's_tabs'(\(sc9).\T
 \*+ \T'e_e'\fB\e\e\fR\T is interpreted as \fB\e\fR.
 \*+ \T'e_.'\fB\e.\fR\T is interpreted as "\fB.\fR".
@@ -3976,10 +3978,14 @@ The sequence \A'e_newline'\fB\e\fR(newline) is \fIalways\fR ignored\(em\
 except in a comment.
 Comments may be imbedded at the \fIend\fR of any line by
 prefacing them with \A'e_"'\fB\e"\fR.
-The newline at the end of a comment cannot be concealed.
+This form does not conceal the newline at the end of the comment.
 A line beginning with \fB\e"\fR will appear as a blank line and
 behave like \fB.sp|1\fR;
 a comment can be on a line by itself by beginning the line with \fB.\e"\fR.
+The form \A'e_#'\fB\e#\fR includes the newline
+as part of the comment.
+It thus effectively acts like a concealed newline
+in concatenating the following line immediately to the current line.
 .mha s_mot
 Local Horizontal and Vertical Motions, and the Width Function
 .sc
