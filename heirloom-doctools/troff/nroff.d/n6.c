@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.36 (gritter) 7/4/06
+ * Sccsid @(#)n6.c	1.37 (gritter) 7/9/06
  */
 
 /*
@@ -136,24 +136,36 @@ setch(int delim)
 			if (s < &temp[sizeof temp - 1])
 				*s++ = j;
 		} while (j != 0 && (s == &temp[1] || j != temp[0]));
-		*s = 0;
-		if (j != temp[0])
-			nodelim(temp[0]);
-		else if (warn & WARN_CHAR) {
-			errprint("missing glyph \\C%s", temp);
+		if (s - temp == 3)
+			return temp[1];
+		else if (s - temp == 4) {
+			temp[0] = temp[1];
+			temp[1] = temp[2];
+			s = &temp[2];
+		} else {
+			*s = 0;
+			if (j != temp[0])
+				nodelim(temp[0]);
+			else if (warn & WARN_CHAR) {
+				errprint("missing glyph \\C%s", temp);
+			}
+			return 0;
 		}
-		return 0;
 	} else if (delim == '[' && (j = getach()) != ']') {
 		*s++ = j;
 		while ((j = getach()) != ']' && j != 0)
 			if (s < &temp[sizeof temp - 1])
 				*s++ = j;
-		*s = '\0';
-		if (j != ']')
-			nodelim(']');
-		else if (warn & WARN_CHAR)
-			errprint("missing glyph [%s]", temp);
-		return 0;
+		if (s - temp == 1)
+			return temp[0];
+		else if (s - temp != 2) {
+			*s = '\0';
+			if (j != ']')
+				nodelim(']');
+			else if (warn & WARN_CHAR)
+				errprint("missing glyph [%s]", temp);
+			return 0;
+		}
 	} else {
 		if ((*s++ = getach()) == 0 || (*s++ = getach()) == 0)
 			return(0);

@@ -7,6 +7,9 @@ Release ...
   character; this is retained with the -x0 option. This means that e.g. in
   "\f(CWabc \fRdef", the size of the space is now computed from the
   constant width font instead of the roman font.
+* [nt]roff, dpost, daps: The character name "\(rs" for backslash has been
+  introduced.
+* nroff: "\[xx]" and "\C'xx'" result in the same character as "\(xx" now.
 * [nt]roff: The ".nx" request now works again, it previously caused
   a segmentation fault because of a null pointer dereference (bug
   reported by Michael Hobgood).

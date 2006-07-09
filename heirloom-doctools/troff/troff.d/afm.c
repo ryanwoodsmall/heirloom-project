@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.55 (gritter) 7/7/06
+ * Sccsid @(#)afm.c	1.56 (gritter) 7/9/06
  */
 
 #include <stdlib.h>
@@ -205,6 +205,7 @@ const struct names punctnames[] = {
 	{ "\\-","endash" },
 	{ "aa","acute" },
 	{ "ga","grave" },
+	{ "rs","backslash" },
 	{ 0,	0 }
 };
 

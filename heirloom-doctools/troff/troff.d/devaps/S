@@ -41,6 +41,7 @@ charset
 \'	27	2	2
 aa	"
 \	37	0	3
+rs	37	0	3
 ^	40	0	4
 ul	45	1	5	max_range 2
 _	"
