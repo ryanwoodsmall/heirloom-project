@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.67 (gritter) 7/6/06
+.\" Sccsid @(#)doc.tr	1.75 (gritter) 7/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/6/06
+.ds Sccsdate 7/9/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1183,6 +1183,8 @@ Text Filling, Adjusting, and Centering
 .bt
 \T'br'\fB&br\fR	\(en	\(en	B	Break.\T
 .b1
+\T'brp'\fB&brp\fR	\(en	\(en	B	Break and spread.\T
+.b1
 .lg 0
 \T'fi'\fB&fi\fR	\(fill	\(en	B,E	Fill output lines.\T
 .lg
@@ -1274,9 +1276,13 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'it'\fB&it\fI|N|xx\fR	\(en	off	E	Set an input-line count trap.\T
 .b1
+\T'itc'\fB&itc\fI|N|xx\fR	\(en	off	E	Input-line count trap ignoring \fB\ec\fR.\T
+.b1
 \T'return'\fB&return\fR	\(en	\(en	\(en	Return from the current macro.\T
-.b1 0
+.b1
 \T'shift'\fB&shift\fI|N\fR	\(en	1	\(en	Shift the arguments to the current macro.\T
+.b1
+\T'blm'\fB&blm\fI|xx\fR	none	none	\(en	Blank line macro is \fIxx\fR.\T
 .b1 0
 \T'em'\fB&em\fI|xx\fR	none	none	\(en	End macro is \fIxx\fI.\T
 .b1 0
@@ -1342,6 +1348,8 @@ Hyphenation.
 \T'hy'\fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.\T
 .b1
 \T'hylang'\fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language.\T
+.b1
+\T'hlm'\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.\T
 .b1 0
 \T'hc'\fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.\T
 .b1 0
@@ -1428,6 +1436,8 @@ Miscellaneous
 .b1
 \T'tmc'\fB&tmc\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR without newline on terminal.\T
 .b1
+\T'nop'\fB&nop\fI|remainder of line\fR	\(en	\(en	Use \fIremainder of line\fR as input.\T
+.b1
 \T'ab'\fB&ab\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR on standard error, exit program.\T
 .b1
 \T'ig'\fB&ig\fI|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Ignore till call of \fIyy\fR.\T
@@ -1453,6 +1463,9 @@ Color Support
 Picture Inclusion
 .bt
 \T'psbb'\fB&psbb\fI|filename\fR	\(en	\(en	Read the \*(PS bounding box from \fIfilename\fR.\T
+.br
+.rm mx
+.ne 8
 .mht s_pdf
 Special Features for \*[PDF] Documents
 .mht s_output
@@ -1461,7 +1474,6 @@ Output Language
 Device and Font Description Files
 .xx
 .nf
-.rm mx
 .ft R
 .nr zz 3
 .de cl
@@ -1484,8 +1496,10 @@ Device and Font Description Files
 \T'as'as	7\T
 \T'bd'bd	2\T
 \T'bleedat'bleedat	3\T
+\T'blm'blm	7\T
 \T'bp'bp	3\T
 \T'br'br	4\T
+\T'brp'brp	4\T
 \T'c2'c2	10\T
 \T'cc'cc	10\T
 \T'ce'ce	4\T
@@ -1524,6 +1538,7 @@ Device and Font Description Files
 \T'fzoom'fzoom	2\T
 \T'hc'hc	13\T
 \T'hidechar'hidechar	2\T
+\T'hlm'hlm	13\T
 \T'hw'hw	13\T
 \T'hy'hy	13\T
 \T'hylang'hylang	13\T
@@ -1532,6 +1547,7 @@ Device and Font Description Files
 \T'ig'ig	20\T
 \T'in'in	6\T
 \T'it'it	7\T
+\T'itc'itc	7\T
 \T'kern'kern	4\T
 \T'kernafter'kernafter	4\T
 \T'kernbefore'kernbefore	4\T
@@ -1557,6 +1573,7 @@ Device and Font Description Files
 \T'nh'nh	13\T
 \T'nm'nm	15\T
 \T'nn'nn	15\T
+\T'nop'nop	20\T
 \T'nr'nr	8\T
 \T'ns'ns	5\T
 \T'nx'nx	19\T
@@ -1669,6 +1686,7 @@ Reference	Sequence	Meaning
 \T'e_('2.1\T	\T'e_('\fB\e(\fIxx\fR\T	\T'e_('Character named \fIxx\fR\T
 \T'e_['2.1\T	\T'e_['\fB\e[\fIxxx\fR]\T	\T'e_['Character named \fIxxx\fP\T
 \T'e_*'7.1\T	\T'e_*'\fB\e\(**\fIx\fR,\fB\e\(**(\fIxx\fR,\fB\e\(**[\fIxxx\fB]\fR\T	\T'e_*'Interpolate string \fIx\fR, \fIxx\fR, or \fIxxx\fR\T
+\T'e_*'7.1\T	\T'e_*'\fB\e\(**[\fIxxx\ arg\ \fR...\fB]\fR\T	\T'e_*'Interpolate string \fIxxx\fR with arguments \fIarg\ \fR...\T
 \T'e_:'13\T	\T'e_:'\fB\e:\fR\T	\T'e_:'Optional line-break character\T
 \T'e_;'10.2\T	\T'e_;'\fB\e;\fR\T	\T'e_;'Ligature suppressor\T
 \T'e_a'9.1\T	\T'e_a'\fB\ea\fR\T	\T'e_a'Non-interpreted leader character\T
@@ -1681,7 +1699,7 @@ Reference	Sequence	Meaning
 \T'e_e'10.1\T	\T'e_e'\fB\ee\fR\T	\T'e_e'Printable version of the \fIcurrent\fR escape character.\T
 \T'e_E'10.1\T	\T'e_E'\fB\eE\fR\T	\T'e_E'Printable escape character, not interpreted in \fIcopy mode\fR.\T
 \T'e_f'2.2\T	\T'e_f'\fB\ef\fIx\fR,\fB\ef(\fIxx\fR,\fB\ef[\fIxxx\fB]\fR,\fB\ef\fIN\fR\T	\T'e_f'Change to font named \fIx\fR, \fIxx\fR, or \fIxxx\fR, or position \fIN\fR\T
-\T'e_g'8.\T	\T'e_g'\fB\eg\fIx\fR,\fB\eg(\fIxx\fR,\fB\eg[\fIxxx\fB]\fR\T	\T'e_g'Format of number register \fIx\fP, \fIxx\fR, or \fIxxx\fR\T
+\T'e_g'8\T	\T'e_g'\fB\eg\fIx\fR,\fB\eg(\fIxx\fR,\fB\eg[\fIxxx\fB]\fR\T	\T'e_g'Format of number register \fIx\fP, \fIxx\fR, or \fIxxx\fR\T
 \T'e_h'11.1\T	\T'e_h'\fB\eh\fI\'N\'\fR\T	\T'e_h'Local horizontal motion; move right \fIN\fR \fI(negative left)\fR\T
 \T'e_H'2.3\T	\T'e_H'\fB\eH\fI\'N\'\fR\T	\T'e_H'Height of current font is \fIN\fR\T
 \T'e_k'11.3\T	\T'e_k'\fB\ek\fIx\fR,\fB\ek(\fIxx\fR,\fB\ek[\fIxxx\fB]\fR\T	\T'e_k'Mark horizontal \fIinput\fR place in register \fIx,\fR \fIxx\fR, or \fIxxx\fR\T
@@ -1692,7 +1710,13 @@ Reference	Sequence	Meaning
 \T'e_o'12.1\T	\T'e_o'\fB\eo\fI\'abc...\'\fR\T	\T'e_o'Overstrike characters \fIa, b, c, ...\fR\T
 \T'e_p'4.1\T	\T'e_p'\fB\ep\fR\T	\T'e_p'Break and spread output line\T
 \T'e_r'11.1\T	\T'e_r'\fB\er\fR\T	\T'e_r'Reverse 1\|em vertical motion (reverse line in \*(NR)\T
-\T'e_s'2.3\T	\T'e_s'\fB\es\fIN\fR,\fB\es\fI\(+-N\fR,\fB\es\'\fI\(+-N\fB\'\fR\T	\T'e_s'Point-size change function\T
+\T'e_R'8\T	\T'e_R'\fB\eR\fI\'R\ \(+-N\'\fR\T	\T'e_R'Set number register \fIR\fR to \fI\(+-N\fR\T
+.ne 3
+\T'e_s'2.3\T	T{
+\T'e_s'\fB\es\fIN\fR,\fB\es\fI\(+-N\fR,
+\fB\es\'\fI\(+-N\fB\'\fR,\fB\es\fI\(+-\fB\'\fIN\fB\'\fR,
+\fB\es[\fI\(+-N\fB]\fR,\fB\es\fI\(+-\fB[\fIN\fB]\fR\T
+T}	\T'e_s'Point-size change function\T
 \T'e_S'2.2\T	\T'e_S'\fB\eS\fI\'N\'\fR\T	\T'e_S'Slant output \fIN\fP degrees\T
 \T'e_t'9.1\T	\T'e_t'\fB\et\fR\T	\T'e_t'Non-interpreted horizontal tab\T
 \T'e_T'24.6\T	\T'e_T'\fB\eT\fI\'string\'\fR\T	\T'e_T'Link definition\T
@@ -1791,6 +1815,8 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.fzoom'2.3\T	\T'n_.fzoom'\fB&fzoom\fR\T	\T'n_.fzoom'Current font zoom factor (may be a decimal fraction).\T
 \T'n_.F'20.\T	\T'n_.F'\fB&F\fR\T	\T'n_.F'Current input file name [sic].\T
 \T'n_.h'4\T	\T'n_.h'\fB&h\fR\T	\T'n_.h'Text base-line high-water mark on current page or diversion.\T
+\T'n_.hlc'13\T	\T'n_.hlc'\fB&hlc\fR\T	\T'n_.hlc'Current number of consecutive hyphenated lines.\T
+\T'n_.hlm'13\T	\T'n_.hlm'\fB&hlm\fR\T	\T'n_.hlm'Maximum number of consecutive hyphenated lines.\T
 \T'n_.hylang'13\T	\T'n_.hylang'\fB&hylang\fR\T	\T'n_.hylang'Current hyphenation language [sic].\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
 \T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent.\T
@@ -2338,7 +2364,8 @@ is parsed as size 4 followed by
 \fB0\fR.
 The forms
 \fB\es(\fInn\fR, \fB\es\(+-(\fInn\fR,
-and \fB\es\'\(+-\fInn\fB\'\fR
+\fB\es\'\fI\(+-nn\fB\'\fR, \fB\es\fI\(+-\fB\'\fInn\fB\'\fR,
+\fB\es[\fI\(+-nn\fB]\fR, and \fB\es\fI\(+-\fB[\fInn\fB]\fR
 permit specification of sizes that would otherwise be ambiguous.
 .pg
 The current size is available in the \A'n_.s'\fB.s\fR register.
@@ -2875,6 +2902,9 @@ being collected is stopped and
 the line is output without adjustment.
 Text lines beginning with space characters
 and empty text lines (blank lines) also cause a break.
+.bta brp
+\fB&brp\fR	\(en	\(en	B	Break and spread;
+same effect as the \T'e_p'\fB\ep\fR\T escape sequence.
 .bta fi
 .lg 0
 \fB&fi\fR	\(fill|on	\(en	B,E	Fill subsequent output lines.
@@ -3136,7 +3166,9 @@ output occurs, or with \fBrs\fR.
 The no-space mode is turned off.
 .bta blank
 Blank|text|line.	\(en	B	Causes a break and
-output of a blank line exactly like \fBsp|1\fR.
+output of a blank line exactly like \fBsp|1\fR
+unless a different action has been specified
+with the \T'blm'\fBblm\fR request.\T
 .\" from file m2
 .tr |
 .rm mx
@@ -3198,11 +3230,13 @@ to be stored in a macro.
 Strings are created by \T'ds'\fBds\fR\T and appended to by \T'as'\fBas\fR.\T
 A macro is invoked in the same way as a request;
 a control line beginning \fB.\fIxx\fR will interpolate the contents of macro \fIxx\fR.
-The remainder of the line may contain up to nine \fIarguments\fR.
+The remainder of the line may contain arbitrarily many \fIarguments\fR.
 The strings \fIx\fR, \fIxx\fR, and \fIxxx\fR
 are interpolated at any desired point with
 \A'e_*'\fB\e\(**\fIx\fR, \fB\e\(**(\fIxx\fR,
-and \fB\e\(**[\fIxxx\fB]\fR respectively.
+and \fB\e\(**[\fIxxx\fB]\fR respectively;
+the form \fB\e\(**[\fIxxx\ arg\ \fR...\fB]\fR
+allows to specify arguments to a string.
 String references and macro invocations may be nested.
 .sc
 \A'copy mode'Copy mode input interpretation.
@@ -3245,6 +3279,12 @@ If the desired arguments won't fit on a line,
 a concealed newline may be used to continue on the next line.
 A trailing double quote may be omitted.
 .pg
+Similarly, arguments may be passed to strings
+with the \fB\e\(**[\fR syntax,
+separated by spaces,
+until the argument list ends with the \fB]\fR character.
+String arguments are otherwise handled exactly like macro arguments.
+.pg
 When a macro is invoked the \fIinput level\fR is \fIpushed down\fR and
 any arguments available at the previous level become unavailable
 until the macro is completely read and the previous level is restored.
@@ -3286,8 +3326,8 @@ each one surrounded by double quotes, separated by spaces.
 The number of currently available
 arguments is in the \A'n_.$'\fB.$\fR register.
 .pg
-No arguments are available at the top (non-macro) level,
-within a string, or within a trap-invoked macro.
+No arguments are available at the top (non-macro) level
+or within a trap-invoked macro.
 .pg
 Arguments are copied in \T'copy mode'\fIcopy mode\fR\T onto a stack
 where they are available for reference.
@@ -3479,11 +3519,19 @@ have been read
 (control or request lines don't count).
 The text may be in-line text or
 text interpolated by inline or trap-invoked macros.
+.bta itc
+\fB&itc\fI|N|xx\fR	\(en	off	E	Set an input-line-count trap
+like \fBit\fR, but ignore line interruptions with \T'e_c'\fB\ec\fR\T
+when counting lines.
 .bta return
 \fB&return\fR	\(en	\(en	\(en	Immediately return from the current macro to the level above.
 .bta shift
 \fB&shift\fI|N\fR	\(en	1	\(en	Shift the arguments to the current macro
 by \fIN\fR.
+.bta blm
+\fB&blm\fI|xx\fR	none	none	\(en	Whenever a blank line is encountered,
+the macro \fIxx\fR is invoked
+instead of the \T'blank'default behavior to output a blank line.\T
 .bta em
 \fB&em\fI|xx\fR	none	none	\(en	The
 macro \fIxx\fR will be invoked
@@ -3558,6 +3606,8 @@ according to the format specified by \T'af'\fBaf\fR\T.
 The number register \fIR\fR is assigned the value \fI\(+-N\fR
 with respect to the previous value, if any.
 The increment for auto-incrementing is set to \fIM\fR.
+An alternate syntax is available
+with the \A'e_R'\fB\eR\fI\'R\ \(+-N\'\fR escape sequence.
 .bta af
 \fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format \fIc\fR to register \fIR\fR.
 The available formats are:
@@ -4285,6 +4335,20 @@ number register.
 This request also makes parts of words composed by \fB-\fR or
 \fB\e(em\fR characters subject to hyphenation. Traditionally, the only
 hyphenation points in such words had been the hyphens/dashes.
+.bta hlm
+\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.
+Each time a line is hyphenated automatically,
+the count of consecutive hyphenated lines
+(accessible in the \A'n_.hlc'\fB&hlc\fR number register)
+is incremented;
+whenever a line is not automatically hyphenated,
+it is reset to zero.
+This request allows to set a limit on the maximum number
+of consecutive hyphenated lines;
+when the count of consecutive lines has reached the maximum,
+the current line is not hyphenated.
+The default is no limit.
+The current value is accessible in the \A'n_.hlm'\fB&hlm\fR number register.
 .bta hc
 \fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character is set
 to \fIc\fR or to the default \fB\e%\fR.
@@ -4618,6 +4682,8 @@ and written on the standard error.
 .bta tmc
 \fB&tmc\fI|string\fR	\(en	newline	\(en	Like \fBtm\fR
 but does not write a terminating newline.
+.bta nop
+\fB&nop\fI|remainder of line\fR	\(en	\(en	Use \fIremainder of line\fR as input.
 .bta ab
 \fB&ab\fI|string\fR	\(en	newline	\(en	\
 After skipping initial blanks, \fIstring\fR (rest of the line) is read in \T'copy mode'\fIcopy mode\fR\T
@@ -5092,6 +5158,7 @@ Examples are:
 .xx
 .in +2m
 .ti -2m
+.ne 2
 .nr nosave 1
 \fB\eX\'PS: [ {Catalog} << /ViewerPreferences << /DisplayDocTitle true >> >> /PUT pdfmark\e'\fR
 .br
@@ -5102,6 +5169,7 @@ instead of the \*[PDF] file name.
 .xx
 .ti -2m
 .nr nosave 1
+.ne 2
 \fB\eX\'PS: [ /PageMode /UseOutlines /DOCVIEW pdfmark\'\fR
 .br
 .nr nosave 0
@@ -5114,6 +5182,7 @@ and \fB/FullScreen\fR (open the document in full-screen mode).
 .xx
 .ti -2m
 .nr nosave 1
+.ne 2
 \fB\eX\'PS: [ /PageMode /Page \fIN\fB /View [/XYZ null null null] /DOCVIEW pdfmark\'\fR
 .br
 .nr nosave 0
@@ -5122,6 +5191,7 @@ when the document is opened.
 .xx
 .ti -2m
 .nr nosave 1
+.ne 2
 \fB\eX\'PS: [ {Catalog} << /PageLayout /TwoPageRight >> /PUT pdfmark\'\fR
 .br
 .nr nosave 0

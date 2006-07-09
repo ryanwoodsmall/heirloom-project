@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.46 (gritter) 7/3/06
+ * Sccsid @(#)ext.h	1.52 (gritter) 7/9/06
  */
 
 /*
@@ -76,6 +76,7 @@ extern	int	app;
 extern	int	ascii;
 extern	int	bd;
 extern	int	*bdtab;
+extern	int	blmac;
 extern	int	ccs;
 extern	int	copyf;
 extern	int	cs;
@@ -342,6 +343,7 @@ extern long	long atoi1(register tchar);
 extern void	setnr(const char *, int, int);
 extern void	caserr(void);
 extern void	casenr(void);
+extern void	setr(void);
 extern void	caseaf(void);
 extern void	setaf(void);
 extern int	vnumb(int *);
@@ -365,6 +367,7 @@ extern void	casetc(void);
 extern void	caselc(void);
 extern void	casehy(void);
 extern void	casenh(void);
+extern void	casehlm(void);
 extern int	max(int, int);
 extern int	min(int, int);
 extern void	casece(void);
@@ -389,6 +392,8 @@ extern void	casewrite(void);
 extern void	casewritec(void);
 extern void	caseclose(void);
 extern void	casesp(int);
+extern void	casebrp(void);
+extern void	caseblm(void);
 extern void	casert(void);
 extern void	caseem(void);
 extern void	casefl(void);
@@ -397,6 +402,7 @@ extern void	caseevc(void);
 extern void	caseel(void);
 extern void	caseie(void);
 extern void	caseif(int);
+extern void	casenop(void);
 extern void	casereturn(void);
 extern void	eatblk(int);
 extern int	cmpstr(tchar);
@@ -410,7 +416,8 @@ extern void	casetr(void);
 extern void	casecu(void);
 extern void	caseul(void);
 extern void	caseuf(void);
-extern void	caseit(void);
+extern void	caseit(int);
+extern void	caseitc(void);
 extern void	casemc(void);
 extern void	casemk(void);
 extern void	casesv(void);

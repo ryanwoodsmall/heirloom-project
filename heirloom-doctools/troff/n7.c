@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.67 (gritter) 7/6/06
+ * Sccsid @(#)n7.c	1.70 (gritter) 7/9/06
  */
 
 /*
@@ -484,7 +484,10 @@ callsp(void)
 	else 
 		i = lss;
 	flss = 0;
-	casesp(i);
+	if (blmac)
+		control(blmac, 0);
+	else
+		casesp(i);
 }
 
 
@@ -496,7 +499,7 @@ ckul(void)
 		font = sfont;
 		mchbits();
 	}
-	if (it && (--it == 0) && itmac)
+	if (it && (!itc || !pendw && !pendnf) && (--it == 0) && itmac)
 		control(itmac, 0);
 }
 
@@ -766,7 +769,7 @@ movword(void)
 {
 	register int w;
 	register tchar i, *wp, c, *lp, *lastlp, lasti = 0, *tp;
-	int	savwch, hys, stretches = 0, wholewd = 0, mnel;
+	int	savwch, hys, stretches = 0, wholewd = 0, mnel, hyphenated = 0;
 #ifndef	NROFF
 	tchar	lgs = 0, lge = 0, optlgs = 0, optlge = 0;
 	int	*ip, s, lgw = 0, optlgw = 0;
@@ -801,7 +804,7 @@ movword(void)
 			storeline(makem(w), 0);
 		}
 	}
-	if (wne > nel - adspc && !hyoff && hyf &&
+	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
 	   (!nwd || nel + lsplow - adspc > 3 * (minsps ? minsps : sps)) &&
 	   (!(hyf & 02) || (findt1() > lss)))
 		hyphen(wp);
@@ -948,6 +951,7 @@ m2:
 		if (lspsps)
 			storelsp(*linep, 0);
 		linep++;
+		hyphenated++;
 	}
 m3:
 	nwd++;
@@ -957,6 +961,10 @@ m4:
 	adflg &= ~1;
 	adflg |= 4;
 	wordp = wp;
+	if (hyphenated)
+		hlc++;
+	else
+		hlc = 0;
 	return(1);	/* line filled up */
 m5:
 	nc--;

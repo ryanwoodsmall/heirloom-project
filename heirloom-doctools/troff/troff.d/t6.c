@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.152 (gritter) 7/4/06
+ * Sccsid @(#)t6.c	1.153 (gritter) 7/9/06
  */
 
 /*
@@ -786,7 +786,7 @@ mchbits(void)
 void
 setps(void)
 {
-	register int i, j = 0;
+	register int i, j = 0, k;
 
 	i = cbits(getch());
 	if (ischar(i) && isdigit(i)) {		/* \sd or \sdd */
@@ -814,12 +814,23 @@ setps(void)
 		} else if (j == '(') {		/* \s+(dd, \s-(dd */
 			j = cbits(getch()) - '0';
 			j = 10 * j + cbits(getch()) - '0';
+		} else if ((j == '[' || j == '\'') && xflag) {	/* \s+[dd], */
+			k = j == '[' ? ']' : j;			/* \s-'dd' */
+			noscale++;
+			j = atoi();
+			noscale--;
+			if (nonumb)
+				return;
+			if (cbits(getch()) != k)
+				nodelim(k);
 		}
 		if (i == '-')
 			j = -j;
 		j = pts2u(j);
 		j += apts;
-	} else if (i == '\'' && xflag) {
+	} else if ((i == '[' || i == '\'') && xflag) {	/* \s'+dd', \s[dd] */
+		if (i == '[')
+			i = ']';
 		dfact = INCH;
 		dfactd = 72;
 		res = VERT;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.30 (gritter) 7/4/06
+ * Sccsid @(#)n4.c	1.32 (gritter) 7/9/06
  */
 
 /*
@@ -258,6 +258,10 @@ setn(void)
 				goto flt;
 		} else if (strcmp(&name[1], "lspss") == 0)
 			i = lspspsz;
+		else if (strcmp(&name[1], "hlm") == 0)
+			i = hlm;
+		else if (strcmp(&name[1], "hlc") == 0)
+			i = hlc;
 		else if (strcmp(&name[1], "lc_ctype") == 0) {
 			if ((cp = setlocale(LC_CTYPE, NULL)) == NULL)
 				cp = "C";
@@ -866,6 +870,26 @@ caserr(void)
 	}
 }
 
+
+void
+setr(void)
+{
+	int	termc, i, j;
+
+	lgf++;
+	termc = getach();
+	j = getrq(3);
+	if ((i = findr(j)) == -1 || skip(1))
+		return;
+	j = inumb(&numtab[i].val);
+	if (nonumb)
+		return;
+	if (getach() != termc) {
+		nodelim(termc);
+		return;
+	}
+	numtab[i].val = j;
+}
 
 void
 casenr(void)

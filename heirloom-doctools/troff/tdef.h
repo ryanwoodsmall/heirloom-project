@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.89 (gritter) 7/4/06
+ * Sccsid @(#)tdef.h	1.91 (gritter) 7/9/06
  */
 
 /*
@@ -619,6 +619,8 @@ extern const struct numtab initnumtab[];
 #define	tdelim	env._tdelim
 #define	hyf	env._hyf
 #define	hyoff	env._hyoff
+#define	hlm	env._hlm
+#define	hlc	env._hlc
 #define	un1	env._un1
 #define	tabc	env._tabc
 #define	dotc	env._dotc
@@ -655,6 +657,7 @@ extern const struct numtab initnumtab[];
 #define	pendnf	env._pendnf
 #define	spread	env._spread
 #define	it	env._it
+#define	itc	env._itc
 #define	itmac	env._itmac
 #define	lnsize	env._lnsize
 #define	linkin	env._linkin
@@ -716,6 +719,8 @@ extern struct env {
 	int	_tdelim;
 	int	_hyf;
 	int	_hyoff;
+	int	_hlm;
+	int	_hlc;
 	int	_un1;
 	int	_tabc;
 	int	_dotc;
@@ -752,6 +757,7 @@ extern struct env {
 	int	_pendnf;
 	int	_spread;
 	int	_it;
+	int	_itc;
 	int	_itmac;
 	int	_lnsize;
 	int	_linkin;

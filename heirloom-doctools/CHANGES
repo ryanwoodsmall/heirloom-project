@@ -23,6 +23,20 @@ Release ...
 * [nt]roff: The ".ss", ".sss", ".minss", ".lspmin", ".lspss", ".lspmax",
   ".lc_ctype", ".hylang", and ".fzoom" number registers have been added
   to retrieve the current values set with the respective requests.
+* [nt]roff: The forms "\s+-'dd'", "\s+-[dd]", and "\s[+-dd]" of the size
+  change escape sequence are now understood.
+* [nt]roff: The ".nop text" request (use text as input) has been added.
+* [nt]roff: The escape sequence "\R'R +-N'" to set the value of a number
+  register has been added.
+* [nt]roff: String references now accept arguments with the \*[xx arg ...]
+  escape sequence.
+* [nt]roff: The ".blm xx" request has been added, it causes ".xx" to be
+  called whenever a blank line is encountered.
+* [nt]roff: The ".itc" request (input trap not counting "\c") has been
+  added.
+* [nt]roff: The ".hlm" request and the ".hln" and ".hlc" number registers
+  have been added to control the maximum number of consecutive hyphenated
+  lines.
 * [nt]roff: With xflag 3 and warning "mac" deactivated, if ".xx" was a
   defined request and ".xxx" was not, ".xx" was executed for ".xxx".
 * troff, dpost, otfdump: The operator 12 in CFF Top DICT entries was not
