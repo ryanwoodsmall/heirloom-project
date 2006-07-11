@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.32 (gritter) 7/9/06
+ * Sccsid @(#)n4.c	1.33 (gritter) 7/11/06
  */
 
 /*
@@ -248,16 +248,24 @@ setn(void)
 			i = ses ? spacesz : 0;
 		else if (strcmp(&name[1], "minss") == 0)
 			i = minspsz ? minspsz : spacesz;
-		else if (strcmp(&name[1], "lspmin") == 0) {
-			i = fl = 100 - lspmin / 10.0;
+		else if (strcmp(&name[1], "lshmin") == 0) {
+			i = fl = 100 - lshmin / (LAFACT/100.0);
+			if (i != fl)
+				goto flt;
+		} else if (strcmp(&name[1], "lshmax") == 0) {
+			i = fl = 100 + lshmax / (LAFACT/100.0);
+			if (i != fl)
+				goto flt;
+		} else if (strcmp(&name[1], "lspmin") == 0) {
+			i = fl = 100 - lspmin / (LAFACT/100.0);
 			if (i != fl)
 				goto flt;
 		} else if (strcmp(&name[1], "lspmax") == 0) {
-			i = fl = 100 + lspmax / 10.0;
+			i = fl = 100 + lspmax / (LAFACT/100.0);
 			if (i != fl)
 				goto flt;
-		} else if (strcmp(&name[1], "lspss") == 0)
-			i = lspspsz;
+		} else if (strcmp(&name[1], "letss") == 0)
+			i = letspsz;
 		else if (strcmp(&name[1], "hlm") == 0)
 			i = hlm;
 		else if (strcmp(&name[1], "hlc") == 0)

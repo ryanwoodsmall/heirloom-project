@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.148 (gritter) 7/3/06
+ * Sccsid @(#)dpost.c	1.149 (gritter) 7/11/06
  */
 
 /*
@@ -434,6 +434,8 @@ int		fontslant = 0;		/* angle from x S ... */
 
 int		res;			/* resolution assumed in input file */
 float		widthfac = 1.0;		/* for emulation = res/dev.res */
+float		horscale = 1.0;		/* horizontal font scaling */
+float		lasthorscale = 1.0;	/* last horizontal font scaling */
 
 
 /*
@@ -663,6 +665,7 @@ char		temp[4096];
 
 /*****************************************************************************/
 
+static void	sethorscale(char *);
 static void	t_papersize(char *);
 static void	t_cutat(const char *, struct box *, char *);
 static void	t_track(char *);
@@ -1464,7 +1467,8 @@ conv(
 		    endtext();
 		    getdraw();
 		    if ( size != lastsize || size == FRACTSIZE &&
-				    fractsize != lastfractsize) {
+				    fractsize != lastfractsize ||
+				    horscale != lasthorscale) {
 			subfont = 0;
 			t_sf(0);
 		    }
@@ -1724,6 +1728,8 @@ devcntrl(
 		    t_linkcolor(buf);
 		else if ( strcmp(str, "SetLinkBorder") == 0 )
 		    t_linkborder(buf);
+		else if ( strcmp(str, "HorScale") == 0 )
+		    sethorscale(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
 		    beginpath(buf, FALSE);
 		else if ( strcmp(str, "DrawPath") == 0 )
@@ -2782,6 +2788,7 @@ setsize (
 
     size = n;
     fractsize = f;
+    lasthorscale = horscale = 1.0;
 
 }   /* End of setsize */
 
@@ -2869,6 +2876,12 @@ t_font (
 
 }   /* End of t_font */
 
+/*****************************************************************************/
+static void
+sethorscale(char *buf)
+{
+	horscale = atof(buf);
+}
 
 /*****************************************************************************/
 static void
@@ -2942,6 +2955,7 @@ setfont (
 
     font = n;
     subfont = 0;
+    lasthorscale = horscale = 1.0;
 
 }   /* End of setfont */
 
@@ -3145,11 +3159,14 @@ t_sf(int forceflush)
 	else if (size == lastsize && fractsize == lastfractsize)
 	    cmd = 'F';
     }
+    if (horscale != 1.0)
+	    cmd = 'h';
     if ( tf == stdout )  {
 	lastfont = font;
 	lastsubfont = subfont;
 	lastsize = size;
 	lastfractsize = fractsize;
+	lasthorscale = horscale;
 	if ( seenfonts[fnum] == 0 ) {
 	    documentfonts();
 	    if (fontname[font].afm)
@@ -3160,13 +3177,13 @@ t_sf(int forceflush)
 	seenfonts[fnum] = 1;
     }	/* End if */
 
-    if (cmd == 'f' || cmd == 's') {
+    if (cmd == 'f' || cmd == 's' || cmd == 'h') {
         if (size != FRACTSIZE)
             fprintf(tf, "%d ", pstab[size-1]);
         else
 	    fprintf(tf, "%g ", (double)fractsize);
     }
-    if (cmd == 'f' || cmd == 'F') {
+    if (cmd == 'f' || cmd == 'F' || cmd == 'h') {
         if (fontname[font].afm && subfont)
     	    fprintf(tf, "@%s@%d ", fontname[font].afm->Font.intname, subfont);
         else if (fontname[font].afm)
@@ -3174,6 +3191,8 @@ t_sf(int forceflush)
         else
     	    fprintf(tf, "%s ", fontname[font].name);
     }
+    if (cmd == 'h')
+	    fprintf(tf, "%g ", horscale);
     fprintf(tf, "%c\n", cmd);
 
     if ( fontheight != 0 || fontslant != 0 ) {
@@ -3539,9 +3558,11 @@ put1 (
     lastw = 0;
     if ( i != 0 && (code = p[i]) != 0 )  {
 	if (size != FRACTSIZE)
-	    lastw = widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
+	    lastw = horscale * widthfac * ((pw[i] * pstab[size-1] + unitwidth/2) / unitwidth);
 	else
-	    lastw = widthfac * (int)((pw[i] * fractsize + unitwidth/2) / unitwidth);
+	    lastw = horscale * widthfac * (int)((pw[i] * fractsize + unitwidth/2) / unitwidth);
+	if (widthfac == 1)	/* ignore fractional parts since troff */
+		lastw = (int)lastw;	/* does the same */
 	if (track && (encoding == 0 || encoding == 4 || encoding == 5))
 		lastw += track;
 	if (code == -1 && fontname[k].afm)
@@ -3565,7 +3586,8 @@ oprep(int maysplit, int stext)
 	endtext();
 
     if ( font != lastfont || size != lastsize || subfont != lastsubfont ||
-		    size == FRACTSIZE && fractsize != lastfractsize) {
+		    size == FRACTSIZE && fractsize != lastfractsize ||
+		    horscale != lasthorscale) {
 	t_sf(0);
     }
     if (tracked < 0)

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.74 (gritter) 7/3/06
+ * Sccsid @(#)t10.c	1.75 (gritter) 7/11/06
  */
 
 /*
@@ -85,9 +85,11 @@ int	nfonts;
 int	nsizes;
 int	nchtab;
 int	lettrack;
+float	horscale;
 
 static float	mzoom;
 static int	mtrack;
+static float	mhorscale;
 
 /* these characters are used as various signals or values
  * in miscellaneous places.
@@ -117,6 +119,7 @@ struct Font **fontbase;
 
 int Nfont;
 
+static void	pthorscale(int);
 static void	pttrack(int);
 static void	ptanchor(int);
 static void	ptlink(int);
@@ -474,6 +477,12 @@ ptout0(tchar *pi, tchar *pend)
 		case NLETSP:
 			lettrack = -sbits(i);
 			return(pi+outsize);
+		case LETSH:
+			horscale = 1 + (double)sbits(i) / LAFACT;
+			return(pi+outsize);
+		case NLETSH:
+			horscale = 1 - (double)sbits(i) / LAFACT;
+			return(pi+outsize);
 		default:
 			return(pi+outsize);
 		}
@@ -487,7 +496,7 @@ ptout0(tchar *pi, tchar *pend)
 		return(pi+outsize);
 	if (k >= 32) {
 		if (widcache[k-32].fontpts == xfont + (xpts<<8)  && !setwdf &&
-				kern == 0) {
+				kern == 0 && horscale == 0) {
 			w = widcache[k-32].width;
 			bd = 0;
 			cs = 0;
@@ -506,9 +515,13 @@ ptout0(tchar *pi, tchar *pend)
 		ptlead();
 	if (lettrack || mtrack)
 		pttrack(0);
+	if (horscale || mhorscale)
+		pthorscale(0);
 	for (j = outsize; &pi[j] < pend; j++)
 		if (cbits(pi[j]) != XFUNC || fbits(pi[j]) != LETSP &&
-				fbits(pi[j]) != NLETSP)
+				fbits(pi[j]) != NLETSP &&
+				fbits(pi[j]) != LETSH &&
+				fbits(pi[j]) != NLETSH)
 			break;
 	if (&pi[j] < pend)
 		w += getkw(pi[0], pi[j]);
@@ -656,7 +669,20 @@ ptout0(tchar *pi, tchar *pend)
 	}
 	esc += w;
 	lettrack = 0;
+	horscale = 0;
 	return(pi+outsize);
+}
+
+static void
+pthorscale(int always)
+{
+	if (horscale || mhorscale) {
+		if (always || mhorscale != horscale)
+			fdprintf(ptid, "x X HorScale %g\n",
+				horscale ? horscale : 1.0);
+		mhorscale = horscale;
+	} else
+		mhorscale = 0;
 }
 
 static void
@@ -696,6 +722,7 @@ ptps(void)
 	mpts = i;
 	mzoom = z;
 	pttrack(0);
+	pthorscale(0);
 }
 
 void
@@ -705,6 +732,7 @@ ptfont(void)
 	fdprintf(ptid, "f%d\n", xfont);
 	mtrack = 0;
 	pttrack(1);
+	pthorscale(1);
 }
 
 void

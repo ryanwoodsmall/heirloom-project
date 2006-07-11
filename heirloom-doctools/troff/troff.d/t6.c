@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.153 (gritter) 7/9/06
+ * Sccsid @(#)t6.c	1.154 (gritter) 7/11/06
  */
 
 /*
@@ -103,6 +103,7 @@ width(register tchar j)
 
 	_minflg = minflg;
 	minflg = minspc = 0;
+	rawwidth = 0;
 	if (j & (ZBIT|MOT)) {
 		if (iszbit(j))
 			return(0);
@@ -134,8 +135,9 @@ width(register tchar j)
 		xpts = ppts;
 	} else 
 		xbits(j, 0);
-	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf && !_minflg)
-		k = widcache[i-32].width;
+	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf &&
+			!_minflg && !horscale)
+		k = rawwidth = widcache[i-32].width;
 	else {
 		if (_minflg && i == 32 && cbits(j) != 32)
 			_minflg = 0;
@@ -259,6 +261,10 @@ getcw(register int i)
 	k = *(p + j);
 	if (dev.anysize == 0 || xflag == 0 || (z = zoomtab[xfont]) == 0)
 		z = 1;
+	if (horscale) {
+		z *= horscale;
+		nocache = 1;
+	}
  g1:
 	if (!bd)
 		bd = bdtab[ofont];
@@ -271,6 +277,7 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = (k * z * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+	rawwidth = k;
 	s = xpts;
 	lasttrack = 0;
 	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1) {
@@ -773,10 +780,10 @@ mchbits(void)
 		minsps = width(' ' | chbits);
 		spacesz = k;
 	}
-	if (lspspsz) {
+	if (letspsz) {
 		k = spacesz;
-		spacesz = lspspsz;
-		lspsps = width(' ' | chbits);
+		spacesz = letspsz;
+		letsps = width(' ' | chbits);
 		spacesz = k;
 	}
 	sps = width(' ' | chbits);
@@ -1613,16 +1620,20 @@ caseminss(void)
 }
 
 void
-caselspadj(void)
+caseletadj(void)
 {
-	int	s, n, x;
+	int	s, n, x, l, h;
 
-	dfact = 10;
+	dfact = LAFACT / 100;
 	if (skip(0) || (n = atoi()) == 0) {
-		lspspsz = 0;
-		lspsps = 0;
+		letspsz = 0;
+		letsps = 0;
 		return;
 	}
+	if (skip(1))
+		return;
+	dfact = LAFACT / 100;
+	l = atoi();
 	if (skip(1))
 		return;
 	noscale++;
@@ -1630,15 +1641,21 @@ caselspadj(void)
 	noscale--;
 	if (skip(1))
 		return;
-	dfact = 10;
+	dfact = LAFACT / 100;
 	x = atoi();
-	lspspsz = s;
-	lspmin = 1000 - n;
-	lspmax = x - 1000;
+	if (skip(1))
+		return;
+	dfact = LAFACT / 100;
+	h = atoi();
+	letspsz = s;
+	lspmin = LAFACT - n;
+	lspmax = x - LAFACT;
+	lshmin = LAFACT - l;
+	lshmax = h - LAFACT;
 	s = spacesz;
-	spacesz = lspspsz;
+	spacesz = letspsz;
 	zapwcache(1);
-	lspsps = width(' ' | chbits);
+	letsps = width(' ' | chbits);
 	spacesz = s;
 	zapwcache(1);
 	sps = width(' ' | chbits);

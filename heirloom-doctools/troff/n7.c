@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.70 (gritter) 7/9/06
+ * Sccsid @(#)n7.c	1.71 (gritter) 7/11/06
  */
 
 /*
@@ -94,15 +94,16 @@ int	brflg;
 
 #ifndef	NROFF
 #define	nroff		0
-static void	lspshrink(void);
-static int	lspgrow(void);
-static int	lspcomp(void);
+static void	letshrink(void);
+static int	letgrow(void);
+static int	lspcomp(int);
 #else	/* NROFF */
 #define	nroff		1
 #define	storelsp(a, b)
-#define	lspshrink()
-#define	lspgrow()	0
-#define	lspcomp()	0
+#define	storelsh(a, b)
+#define	letshrink()
+#define	letgrow()	0
+#define	lspcomp(a)	0
 #endif	/* NROFF */
 
 void
@@ -207,14 +208,24 @@ tbreak(void)
 			if (!ismot(j) && cbits(j) == XFUNC &&
 					fbits(j) == FLDMARK)
 				fldcnt--;
-			else if (fldcnt == 0 && lspcur && nc && !ismot(j) &&
+			else if (fldcnt == 0 && nc && !ismot(j) &&
 					!iszbit(j) && cbits(j) > ' ') {
-				k = (int)sbits(j) / 2 * lspcur / 1000;
-				if (k >= 0)
-					c = mkxfunc(LETSP, k);
-				else
-					c = mkxfunc(NLETSP, -k);
-				pchar(c);
+				if (lspcur) {
+					k = (int)sbits(j) / 2 * lspcur / LAFACT;
+					if (k >= 0)
+						c = mkxfunc(LETSP, k);
+					else
+						c = mkxfunc(NLETSP, -k);
+					pchar(c);
+				}
+				if (lshcur) {
+					k = lshcur;
+					if (k >= 0)
+						c = mkxfunc(LETSH, k);
+					else
+						c = mkxfunc(NLETSH, -k);
+					pchar(c);
+				}
 			}
 			pchar(j);
 			nc--;
@@ -374,15 +385,17 @@ adj:
 			ne -= j;
 			nel += j;
 		}
-		if (admod == 0 && lspcur == 0 && nel < 0 && lspnc)
-			lspshrink();
+		if (admod == 0 && lspcur == 0 && lshcur == 0 &&
+				nel < 0 && lspnc)
+			letshrink();
 	jst:	if (nwd == 1)
 			adsp = nel; 
 		else 
 			adsp = nel / (nwd - 1);
 		adsp = (adsp / HOR) * HOR;
-		if (admod == 0 && lspcur == 0 && adsp > lspsps - sps)
-			if (lspgrow())
+		if (admod == 0 && lspcur == 0 && lshcur == 0 &&
+				adsp > letsps - sps)
+			if (letgrow())
 				goto jst;
 		adrem = nel - adsp*(nwd-1);
 		if (admod == 0 && nwd == 1 && warn & WARN_BREAK)
@@ -535,7 +548,6 @@ static void
 storelsp(tchar c, int neg)
 {
 	int	s;
-	int	i;
 
 	if (ismot(c))
 		return;
@@ -544,14 +556,30 @@ storelsp(tchar c, int neg)
 		fldcnt += neg ? -1 : 1;
 		return;
 	}
-	if (iszbit(c) || (i = cbits(c)) <= ' ')
+	if (iszbit(c) || cbits(c) <= ' ')
 		return;
 	s = sbits(c) / 2;
 	if (neg)
 		s = -s;
-	lsplow += s * lspmin / 1000;
-	lsphigh += s * lspmax / 1000;
+	lsplow += s * lspmin / LAFACT;
+	lsphigh += s * lspmax / LAFACT;
 	lspnc += neg ? -1 : 1;
+}
+
+static void
+storelsh(tchar c, int w)
+{
+	if (ismot(c))
+		return;
+	if (cbits(c) == XFUNC && fbits(c) == FLDMARK) {
+		lshlow = lshhigh = lshwid = 0;
+		return;
+	}
+	if (iszbit(c) || cbits(c) <= ' ')
+		return;
+	lshwid += w;
+	lshlow = lshwid * lshmin / LAFACT;
+	lshhigh = lshwid * lshmax / LAFACT;
 }
 #endif	/* !NROFF */
 
@@ -772,11 +800,12 @@ movword(void)
 	int	savwch, hys, stretches = 0, wholewd = 0, mnel, hyphenated = 0;
 #ifndef	NROFF
 	tchar	lgs = 0, lge = 0, optlgs = 0, optlge = 0;
-	int	*ip, s, lgw = 0, optlgw = 0;
+	int	*ip, s, lgw = 0, optlgw = 0, lgr = 0, optlgr = 0;
 	tchar	*optlinep = NULL, *optwp = NULL;
 	int	optnc = 0, optnel = 0, optne = 0, optadspc = 0, optwne = 0,
 		optwch = 0, optwholewd = 0,
-		optlsplow = 0, optlsphigh = 0, optlspnc = 0, optfldcnt = 0;
+		optlsplow = 0, optlsphigh = 0, optlspnc = 0, optfldcnt = 0,
+		optlshwid = 0, optlshlow = 0, optlshhigh = 0;
 #else	/* NROFF */
 #define	lgw	0
 #define	optlinep	0
@@ -805,7 +834,7 @@ movword(void)
 		}
 	}
 	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
-	   (!nwd || nel + lsplow - adspc > 3 * (minsps ? minsps : sps)) &&
+	   (!nwd || nel + lsplow + lshlow - adspc > 3 * (minsps?minsps:sps)) &&
 	   (!(hyf & 02) || (findt1() > lss)))
 		hyphen(wp);
 	savwch = wch;
@@ -831,6 +860,7 @@ movword(void)
 		i = *wp++;
 		minflg = minspsz;
 		w = width(i);
+		storelsh(i, rawwidth);
 		adspc += minspc;
 		w += kernadjust(i, *wp ? *wp : ' ' | (spbits?spbits:i&SFMASK));
 		wne -= w;
@@ -839,15 +869,16 @@ movword(void)
 			stretches++;
 		lasti = i;
 		storeline(i, w);
-		if (lspsps)
+		if (letsps)
 			storelsp(i, 0);
 	}
 	*linep = *wp;
 	lastlp = linep;
 	mnel = (sps - minsps) * nwd;
-	if (nel >= 0 || nel + lsplow >= 0 && lspnc - (nwd ? nwd : 1) > 0) {
+	if (nel >= 0 || nel + lsplow + lshlow >= 0 &&
+			lspnc - (nwd ? nwd : 1) > 0) {
 		if (nel >= 0 && nwd && nel - adspc < 0 && nel / nwd < sps ||
-				nel < 0 && nel + lsplow >= 0) {
+				nel < 0 && nel + lsplow + lshlow >= 0) {
 			wholewd = 1;
 			goto m0;
 		}
@@ -884,6 +915,7 @@ m1:
 		for (w = 0; ip[s+w]; w++);
 		lge = strlg(fbits(i), &ip[s], w) | i & SFMASK | AUTOLIG;
 		lgw = width(lgs);
+		lgr = rawwidth;
 		if (linep - 1 >= wordp) {
 			lgw += kernadjust(i, *(linep - 1));
 			lgw -= kernadjust(*(linep + 1), *(linep - 1));
@@ -897,7 +929,7 @@ m1:
 	if (!(--nhyp))
 		if (!nwd)
 			goto m2;
-	if (nel + lsplow < hys + lgw) {
+	if (nel + lsplow + lshlow < hys + lgw) {
 		nc--;
 		goto m1;
 	}
@@ -907,13 +939,14 @@ m1:
 m1a:
 #ifndef	NROFF
 	if (minspsz && wch < savwch && nwd && nel / nwd > 0 && nel < mnel ||
-			nel + lsplow >= (wholewd ? 0 : hys + lgw) &&
+			nel + lsplow + lshlow >= (wholewd ? 0 : hys + lgw) &&
 			nel < (wholewd ? 0 : hys + lgw)) {
-		optlgs = lgs, optlge = lge, optlgw = lgw;
+		optlgs = lgs, optlge = lge, optlgw = lgw, optlgr = lgr;
 		optlinep = linep, optwp = wp, optnc = nc, optnel = nel,
 		optne = ne, optadspc = adspc, optwne = wne, optwch = wch;
 		optlsplow = lsplow, optlsphigh = lsphigh, optlspnc = lspnc;
 		optfldcnt = fldcnt;
+		optlshwid = lshwid, optlshlow = lshlow, optlshhigh = lshhigh;
 		optwholewd = wholewd;
 		nc -= !wholewd;
 		goto m1;
@@ -925,11 +958,12 @@ m1a:
 m2:
 #ifndef	NROFF
 	if (optlinep && 3*abs(optnel - mnel) < 5*abs(nel - mnel)) {
-		lgs = optlgs, lge = optlge, lgw = optlgw;
+		lgs = optlgs, lge = optlge, lgw = optlgw, lgr = optlgr;
 		linep = optlinep, wp = optwp, nc = optnc, nel = optnel,
 		ne = optne, adspc = optadspc, wne = optwne, wch = optwch;
 		lsplow = optlsplow, lsphigh = optlsphigh, lspnc = optlspnc;
 		fldcnt = optfldcnt;
+		lshwid = optlshwid, lshlow = optlshlow, lshhigh = optlshhigh;
 		if (wholewd = optwholewd)
 			goto m3;
 	} else if (optlinep && wch == savwch && !nhyp)
@@ -937,6 +971,7 @@ m2:
 	if (lgs != 0) {
 		*wp = lge;
 		storeline(lgs, lgw);
+		storelsh(lgs, lgr);
 	}
 #endif	/* !NROFF */
 	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH &&
@@ -945,10 +980,11 @@ m2:
 		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
 		w += width(*linep);
+		storelsh(*linep, rawwidth);
 		w += kernadjust(*linep, ' ' | *linep & SFMASK);
 		nel -= w;
 		ne += w;
-		if (lspsps)
+		if (letsps)
 			storelsp(*linep, 0);
 		linep++;
 		hyphenated++;
@@ -956,7 +992,7 @@ m2:
 m3:
 	nwd++;
 m4:
-	if (lspsps && linep > line)
+	if (letsps && linep > line)
 		storelsp(linep[-1], 1);
 	adflg &= ~1;
 	adflg |= 4;
@@ -970,6 +1006,7 @@ m5:
 	nc--;
 	minflg = minspsz;
 	w = width(*linep);
+	storelsh(*linep, -rawwidth);
 	adspc -= minspc;
 	for (lp = &linep[1]; lp < lastlp && cbits(*lp) == IMP; lp++);
 	w += kernadjust(*linep, *lp ? *lp : ' ' | *linep&SFMASK);
@@ -978,7 +1015,7 @@ m5:
 	wne += w;
 	wch++;
 	wp--;
-	if (lspsps)
+	if (letsps)
 		storelsp(*linep, 1);
 	goto m1;
 }
@@ -1006,6 +1043,7 @@ setnel(void)
 		rhang = ne = adsp = adrem = adspc = 0;
 #ifndef	NROFF
 		lsplow = lsphigh = lspcur = lsplast = lspnc = fldcnt = 0;
+		lshwid = lshhigh = lshlow = lshcur = 0;
 #endif	/* !NROFF */
 	}
 }
@@ -1384,34 +1422,70 @@ gotmb:
 
 #ifndef	NROFF
 static void
-lspshrink(void)
+letshrink(void)
 {
-	int	diff, nsp;
+	int	diff, nsp, lshdiff;
 
 	nsp = nwd == 1 ? nwd : nwd - 1;
-	diff = nel + nel * nsp / lspnc;
-	lspcur = lspmin * diff / lsplow;
-	ne += lspcomp();
+	diff = nel;
+	if (lspnc)
+		diff += nel * nsp / lspnc;
+	if (lshwid) {
+		if (lshlow < -diff / 2)
+			lshcur = -lshmin;
+		else if (lsplow < -diff / 2)
+			lshcur = (double)(diff - lsplow) / lshwid * LAFACT;
+		else
+			lshcur = (double)diff / 2 / lshwid * LAFACT;
+		lshdiff = (double)lshcur / LAFACT * lshwid;
+		nel -= lshdiff;
+		ne += lshdiff;
+	} else
+		lshdiff = 0;
+	diff -= lshdiff;
+	if (lsplow)
+		lspcur = lspmin * diff / lsplow;
+	else
+		lspcur = 0;
+	ne += lspcomp(lshdiff);
 }
 
 static int
-lspgrow(void)
+letgrow(void)
 {
-	int	diff, n, nsp;
+	int	diff, n, nsp, lshdiff;
 
 	nsp = nwd == 1 ? nwd : nwd - 1;
-	if (lspnc - nsp <= 0 || lsphigh <= 0)
+	if ((lspnc - nsp <= 0 || lsphigh <= 0) && lshhigh <= 0)
 		return 0;
-	n = (lspsps - (minsps ? minsps : sps)) * nsp;
-	diff = nel + nel * nsp / lspnc - n;
+	n = (letsps - (minsps ? minsps : sps)) * nsp;
+	diff = nel;
+	if (lspnc)
+		diff += nel * nsp / lspnc - n;
+	if (lshwid) {
+		if (lshhigh < diff / 2)
+			lshcur = lshmax;
+		else if (lsphigh < diff / 2)
+			lshcur = (double)(diff - lsphigh) / lshwid * LAFACT;
+		else
+			lshcur = (double)diff / 2 / lshwid * LAFACT;
+		lshdiff = (double)lshcur / LAFACT * lshwid;
+		nel -= lshdiff;
+		ne += lshdiff;
+	} else
+		lshdiff = 0;
+	diff -= lshdiff;
 	if (diff > lsphigh)
 		diff = lsphigh;
-	lspcur = lspmax * diff / lsphigh;
-	return lspcomp();
+	if (lsphigh)
+		lspcur = lspmax * diff / lsphigh;
+	else
+		lspcur = 0;
+	return lspcomp(lshdiff);
 }
 
 static int
-lspcomp(void)
+lspcomp(int idiff)
 {
 	int	diff = 0, i;
 	tchar	c;
@@ -1422,13 +1496,13 @@ lspcomp(void)
 			if (cbits(c) == XFUNC && fbits(c) == FLDMARK)
 				diff = lsplast = 0;
 			else if (cbits(c) > ' ') {
-				lsplast = (int)sbits(c) / 2 * lspcur / 1000;
+				lsplast = (int)sbits(c) / 2 * lspcur / LAFACT;
 				diff += lsplast;
 			}
 		}
 	diff -= lsplast;
 	nel -= diff;
 	ne += lsplast;
-	return diff;
+	return idiff + diff;
 }
 #endif	/* !NROFF */

@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.76 (gritter) 7/10/06
+.\" Sccsid @(#)doc.tr	1.77 (gritter) 7/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/10/06
+.ds Sccsdate 7/11/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1199,7 +1199,7 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
-\T'lspadj'\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing when adjusting lines.\T
+\T'letadj'\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.\T
 .b1
 \T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.\T
 .b1
@@ -1555,13 +1555,13 @@ Device and Font Description Files
 \T'lc'lc	9\T
 \T'lc_ctype'lc_ctype	2\T
 \T'length'length	7\T
+\T'letadj'letadj	4\T
 \T'lf'lf	20\T
 \T'lg'lg	10\T
 \T'lhang'lhang	4\T
 \T'li'li	10\T
 \T'll'll	6\T
 \T'ls'ls	5\T
-\T'lspadj'lspadj	4\T
 \T'lt'lt	14\T
 \T'mc'mc	20\T
 \T'mediasize'mediasize	3\T
@@ -1826,8 +1826,10 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.k'4.1\T	\T'n_.k'\fB&k\fR\T	\T'n_.k'Current output horizontal position.\T
 \T'n_.l'6\T	\T'n_.l'\fB&l\fR\T	\T'n_.l'Current line length.\T
 \T'n_.lc_ctype'2.1\T	\T'n_.lc_ctype'\fB&lc_ctype\fR\T	\T'n_.lc_ctype'Current \s-1LC_CTYPE\s0 locale [sic].\T
+\T'n_.letss'4\T	\T'n_.letss'\fB&letss\fR\T	\T'n_.letss'Current dynamic letter space threshold.\T
+\T'n_.lshmin'4\T	\T'n_.lshmin'\fB&lshmin\fR\T	\T'n_.lshmin'Current minimum dynamic letter shape (may be a decimal fraction).\T
+\T'n_.lshmax'4\T	\T'n_.lshmax'\fB&lshmax\fR\T	\T'n_.lshmax'Current maximum dynamic letter shape (may be a decimal fraction).\T
 \T'n_.lspmin'4\T	\T'n_.lspmin'\fB&lspmin\fR\T	\T'n_.lspmin'Current minimum dynamic letter space (may be a decimal fraction).\T
-\T'n_.lspss'4\T	\T'n_.lspss'\fB&lspss\fR\T	\T'n_.lspss'Current dynamic letter space threshold.\T
 \T'n_.lspmax'4\T	\T'n_.lspmax'\fB&lspmax\fR\T	\T'n_.lspmax'Current maximum dynamic letter space (may be a decimal fraction).\T
 \T'n_.L'5.1\T	\T'n_.L'\fB&L\fR\T	\T'n_.L'Current \fBls\fP value.\T
 \T'n_.minss'4\T	\T'n_.minss'\fB&minss\fR\T	\T'n_.minss'Current minimum space size.\T
@@ -2784,29 +2786,33 @@ the \A'n_.h'\fB.h\fR register.
 The current horizontal output position
 is in the \A'n_.k'\fB.k\fR register.
 .pg
-\*(TR can optionally decrease word spacings
-and change the letter spacing
+\*(TR can optionally decrease word spacings,
+change the letter spacing,
+and reshape letters
 when adjusting lines to fit on both margins.
 The interword spacing controlled with the \T'ss'\fBss\fR request\T
 is then understood as the optimum setting.
 Words are collected from input until the first word
-that would require to condense spacing is encountered.
+that would require to condense spacing or letter shapings is encountered.
 Between the end of the previous word and the end of this word,
 hyphenation points are additionally examined
 until the two possibilities to end the line
 surrounding the optimum are found.
 The point closest to the optimum is then chosen.
 If the word spacing so determined would fall below
-the minimum allowed, letter spacings are condensed.
-If it would exceed the threshold for expanded letter spacing,
+the minimum allowed, letter spacings and shapings are condensed.
+If it would exceed the threshold for expanded letter spacing and letter shaping,
 it is attempted to compensate until the threshold is reached,
-up to the maximum allowed letter spacing.
+up to the maximum allowed letter spacing
+and letter shaping.
 Remaining space is distributed among the word spacings.
+Distribution among letter spacings and shaping is equal
+until one of the respective limits is reached.
 Lines that terminate with a \fIbreak\fR
 are normally set using the optimum word and line spacings
 unless the last word collected is the first word
 that falls below the optimum spacing,
-which may result in condensed spacing.
+which may result in condensed spacing and shaping.
 .pg
 .tr &&
 An input text line ending with \fB.\fR\^, \fB?\fR, or \fB!\fR,
@@ -2960,23 +2966,33 @@ When adjusting both margins,
 down to \fIN\fR/36\|ems
 (rather than to the value set by \T'ss'\fBss\fR\T).
 The current value is available in the \A'n_.minss'\fB&minss\fR register.
-.bta lspadj
-\fB&lspadj\fI|N|S|M\fR	off	E,T	Dynamic letter spacing when adjusting lines.
+.bta letadj
+\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.
 The space between letters can be automatically expanded or condensed
-(in addition to the space between words)
+(in addition to the space between words),
+and the width of letters can be automatically changed
 in \fBad\ b\fR mode.
-The \fIN\fR argument gives the minimum percentage
+The \fIX\fR argument gives the minimum percentage
 of an en of the current point size by which
-adjacent characters may be tightened.
+adjacent characters may be tightened;
+the \fIU\fR argument gives the minimum percentage
+of the letter width by which letters may be condensed.
 When the computed size of the word space
-needs to be larger than \fIS\fR,
-additional space will be increased up to a limit
-of \fIM\fR percent of an en of the current point size
+would have to be larger than \fIS\fR,
+additional space will be inserted between letters up to a limit
+of \fIY\fR percent of an en of the current point size,
+and letters will be expanded by up to \fIV\fR percent of their width
 until the word space does not extend beyond \fIS\fR anymore.
 \fIS\fR is given in units of 1/36\|ems as with \fBss\fR.
-The number registers \A'n_.lspmin'\fB&lspmin\fR,
-\A'n_.lspss'\fB&lspss\fR, and \A'n_.lspmax'\fB&lspmax\fR
-contain the current values of \fIN\fR, \fIS\fR, and \fI\fR, respectively.
+The number registers
+\A'n_.lspmin'\fB&lspmin\fR,
+\A'n_.lshmin'\fB&lshmin\fR,
+\A'n_.letss'\fB&letss\fR,
+\A'n_.lspmax'\fB&lspmax\fR,
+and \A'n_.lshmax'\fB&lshmax\fR
+contain the current values of
+\fIX\fR, \fIU\fR, \fIS\fR, \fIY\fR, and \fIV\fR,
+respectively.
 .bta track
 \fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.
 If the current font is \fIF\fR
@@ -5442,6 +5458,7 @@ then a command, then other parameters.
 \fBx X \fIany\fP	\fRgenerated by the \T'e_X'\fB\eX\fR function\T
 \fBx X BleedAt \fIL T W H\fR	generated by the \T'bleedat'\fBbleedat\fR request\T
 \fBx X CropAt \fIL T W H\fR	generated by the \T'cropat'\fBcropat\fR request\T
+\fBx X HorScale \fIpercent\fR	scale letters horizontally by \fIpercent\fR (with the \T'letadj'\fBletadj\fR\T request)
 \fBx X LC_CTYPE \fIname\fR	sets the \s-1LC_CTYPE\s+1 locale to \fIname\fR
 \fBx X PaperSize \fIW H n\fR	generated by the \T'mediasize'\fBmediasize\fR\T and \T'papersize'\fBpapersize\fR\T requests
 		\fIn\fR is non-zero for \T'mediasize'\fBmediasize\fR\T

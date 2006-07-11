@@ -1,6 +1,6 @@
 Release ...
-* troff: The ".lspadj" request has been added to enable dynamic letter
-  spacing when justifying lines.
+* troff: The ".letadj" request has been added to enable dynamic letter
+  spacing and letter reshaping when justifying lines.
 * troff: Font and size attributes of space (and newline) characters in
   input are now honored for computing widths and kerning pairs. Previously,
   font and size of space characters were always that of the next printable
@@ -20,9 +20,10 @@ Release ...
   allow the last or first character of a word, respectively, to be split
   off.
 * troff: Giving no arguments to ".minss" now deactivates this mechanism.
-* [nt]roff: The ".ss", ".sss", ".minss", ".lspmin", ".lspss", ".lspmax",
-  ".lc_ctype", ".hylang", and ".fzoom" number registers have been added
-  to retrieve the current values set with the respective requests.
+* [nt]roff: The ".ss", ".sss", ".minss", ".lspmin", ".letss", ".lspmax",
+  ".lshmin", ".lshmax", ".lc_ctype", ".hylang", and ".fzoom" number
+  registers have been added to retrieve the current values set with the
+  respective requests.
 * [nt]roff: The forms "\s+-'dd'", "\s+-[dd]", and "\s[+-dd]" of the size
   change escape sequence are now understood.
 * [nt]roff: The ".nop text" request (use text as input) has been added.

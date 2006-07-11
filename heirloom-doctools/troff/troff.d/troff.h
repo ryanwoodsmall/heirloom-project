@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.24 (gritter) 7/2/06
+ * Sccsid @(#)troff.h	1.25 (gritter) 7/11/06
  */
 
 extern struct tracktab {
@@ -59,6 +59,7 @@ extern	int		c_endash;
 
 extern	int		kern;
 extern	int		lettrack;
+extern	float		horscale;
 
 extern	void		growfonts(int);
 extern	void		setlig(int, int);

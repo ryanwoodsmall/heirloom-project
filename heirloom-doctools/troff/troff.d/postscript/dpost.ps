@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.13 0
+%%BeginResource: procset dpost 4.14 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.13 (gritter) 3/22/06
+% Sccsid @(#)dpost.ps	4.14 (gritter) 7/11/06
 %
 
 /#copies 1 store
@@ -93,6 +93,7 @@
 /min {2 copy gt {exch} if pop} bind def
 
 /track 0 def
+/horscale 1.0 def
 
 /setup {
 	counttomark 2 idiv {def} repeat pop
@@ -161,12 +162,15 @@
 
 /f {
 	dup /font exch def exch
-	dup /ptsize exch def scaling div dup /size exch def SF
+	dup /ptsize exch def scaling div dup /size exch def
+	horscale 1.0 ne {horscale mul [exch 0 0 size 0 0]} if SF
 	linewidth ptsize mul scaling 10 mul div setlinewidth
 	/spacewidth ( ) stringwidth pop def
+	/horscale 1.0 def
 } bind def
 /F {ptsize exch f} bind def
 /s {font f} bind def
+/h {/horscale exch def f} bind def
 
 /changefont {
 	/fontheight exch def

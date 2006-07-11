@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.91 (gritter) 7/9/06
+ * Sccsid @(#)tdef.h	1.92 (gritter) 7/11/06
  */
 
 /*
@@ -146,6 +146,10 @@
 #define	LETSP	0004	/* positive letter spacing */
 #define	NLETSP	0005	/* negative letter spacing */
 #define	FLDMARK	0006	/* field marker */
+#define	LETSH	0007	/* expanded letter shapes */
+#define	NLETSH	0010	/* condensed letter shapes */
+
+#define	LAFACT	1000	/* letter adjustment float-to-int conversion factor */
 
 #define	HYPHEN	c_hyphen
 #define	EMDASH	c_emdash	/* \(em */
@@ -567,8 +571,8 @@ extern const struct numtab initnumtab[];
 #ifndef	NROFF
 #define	minsps	env._minsps
 #define	minspsz	env._minspsz
-#define	lspspsz	env._lspspsz
-#define	lspsps	env._lspsps
+#define	letspsz	env._letspsz
+#define	letsps	env._letsps
 #define	lspmin	env._lspmin
 #define	lspmax	env._lspmax
 #define	lspnc	env._lspnc
@@ -576,11 +580,17 @@ extern const struct numtab initnumtab[];
 #define	lsphigh	env._lsphigh
 #define	lspcur	env._lspcur
 #define	lsplast	env._lsplast
+#define	lshmin	env._lshmin
+#define	lshmax	env._lshmax
+#define	lshwid	env._lshwid
+#define	lshlow	env._lshlow
+#define	lshhigh	env._lshhigh
+#define	lshcur	env._lshcur
 #else	/* NROFF */
 #define	minsps	0
 #define	minspsz	0
-#define	lspspsz	0
-#define	lspsps	0
+#define	letspsz	0
+#define	letsps	0
 #define	lspmin	0
 #define	lspmax	0
 #define	lspnc	0
@@ -588,6 +598,12 @@ extern const struct numtab initnumtab[];
 #define	lsphigh	0
 #define	lspcur	0
 #define	lsplast	0
+#define	lshmin	0
+#define	lshmax	0
+#define	lshwid	0
+#define	lshlow	0
+#define	lshhigh	0
+#define	lshcur	0
 #endif	/* NROFF */
 #define	fldcnt	env._fldcnt
 #define	lss	env._lss
@@ -679,8 +695,8 @@ extern struct env {
 #ifndef	NROFF
 	int	_minsps;
 	int	_minspsz;
-	int	_lspspsz;
-	int	_lspsps;
+	int	_letspsz;
+	int	_letsps;
 	int	_lspmin;
 	int	_lspmax;
 	int	_lspnc;
@@ -688,6 +704,12 @@ extern struct env {
 	int	_lsphigh;
 	int	_lspcur;
 	int	_lsplast;
+	int	_lshmin;
+	int	_lshmax;
+	int	_lshwid;
+	int	_lshlow;
+	int	_lshhigh;
+	int	_lshcur;
 #endif	/* !NROFF */
 	int	_fldcnt;
 	int	_lss;

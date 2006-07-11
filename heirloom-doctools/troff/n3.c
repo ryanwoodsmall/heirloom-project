@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.101 (gritter) 7/9/06
+ * Sccsid @(#)n3.c	1.102 (gritter) 7/11/06
  */
 
 /*
@@ -111,8 +111,8 @@ static const struct {
 	{ "kernpair",		(void(*)(int))casekernpair },
 	{ "lc_ctype",		(void(*)(int))caselc_ctype },
 	{ "length",		(void(*)(int))caselength },
+	{ "letadj",		(void(*)(int))caseletadj },
 	{ "lhang",		(void(*)(int))caselhang },
-	{ "lspadj",		(void(*)(int))caselspadj },
 	{ "mediasize",		(void(*)(int))casemediasize },
 	{ "minss",		(void(*)(int))caseminss },
 	{ "nop",		(void(*)(int))casenop },
