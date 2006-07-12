@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.71 (gritter) 7/11/06
+ * Sccsid @(#)n7.c	1.72 (gritter) 7/13/06
  */
 
 /*
@@ -533,7 +533,7 @@ storeline(register tchar c, int w)
 	}
 s1:
 	if (w == -1) {
-		minflg = minspsz;
+		minflg = minspsz && ad && !admod;
 		w = width(c);
 	}
 	ne += w;
@@ -549,7 +549,7 @@ storelsp(tchar c, int neg)
 {
 	int	s;
 
-	if (ismot(c))
+	if (!ad || admod || ismot(c))
 		return;
 	if (cbits(c) == XFUNC && fbits(c) == FLDMARK) {
 		lsplow = lsphigh = lspnc = 0;
@@ -569,7 +569,7 @@ storelsp(tchar c, int neg)
 static void
 storelsh(tchar c, int w)
 {
-	if (ismot(c))
+	if (!ad || admod || ismot(c))
 		return;
 	if (cbits(c) == XFUNC && fbits(c) == FLDMARK) {
 		lshlow = lshhigh = lshwid = 0;
@@ -834,7 +834,8 @@ movword(void)
 		}
 	}
 	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
-	   (!nwd || nel + lsplow + lshlow - adspc > 3 * (minsps?minsps:sps)) &&
+	   (!nwd || nel + lsplow + lshlow - adspc >
+	    3 * (minsps && ad && !admod ? minsps : sps)) &&
 	   (!(hyf & 02) || (findt1() > lss)))
 		hyphen(wp);
 	savwch = wch;
@@ -858,7 +859,7 @@ movword(void)
 			hyp++;
 		}
 		i = *wp++;
-		minflg = minspsz;
+		minflg = minspsz && ad && !admod;
 		w = width(i);
 		storelsh(i, rawwidth);
 		adspc += minspc;
@@ -874,7 +875,7 @@ movword(void)
 	}
 	*linep = *wp;
 	lastlp = linep;
-	mnel = (sps - minsps) * nwd;
+	mnel = ad && !admod ? (sps - minsps) * nwd : 0;
 	if (nel >= 0 || nel + lsplow + lshlow >= 0 &&
 			lspnc - (nwd ? nwd : 1) > 0) {
 		if (nel >= 0 && nwd && nel - adspc < 0 && nel / nwd < sps ||
@@ -938,7 +939,8 @@ m1:
 	wholewd = 0;
 m1a:
 #ifndef	NROFF
-	if (minspsz && wch < savwch && nwd && nel / nwd > 0 && nel < mnel ||
+	if (minspsz && ad && !admod &&
+			wch < savwch && nwd && nel / nwd > 0 && nel < mnel ||
 			nel + lsplow + lshlow >= (wholewd ? 0 : hys + lgw) &&
 			nel < (wholewd ? 0 : hys + lgw)) {
 		optlgs = lgs, optlge = lge, optlgw = lgw, optlgr = lgr;
@@ -1004,7 +1006,7 @@ m4:
 	return(1);	/* line filled up */
 m5:
 	nc--;
-	minflg = minspsz;
+	minflg = minspsz && ad && !admod;
 	w = width(*linep);
 	storelsh(*linep, -rawwidth);
 	adspc -= minspc;
@@ -1458,7 +1460,7 @@ letgrow(void)
 	nsp = nwd == 1 ? nwd : nwd - 1;
 	if ((lspnc - nsp <= 0 || lsphigh <= 0) && lshhigh <= 0)
 		return 0;
-	n = (letsps - (minsps ? minsps : sps)) * nsp;
+	n = (letsps - (minsps && ad && !admod ? minsps : sps)) * nsp;
 	diff = nel;
 	if (lspnc)
 		diff += nel * nsp / lspnc - n;

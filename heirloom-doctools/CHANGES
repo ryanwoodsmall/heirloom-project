@@ -20,6 +20,7 @@ Release ...
   allow the last or first character of a word, respectively, to be split
   off.
 * troff: Giving no arguments to ".minss" now deactivates this mechanism.
+* troff: ".minss" now has no effect unless in ".ad b" mode as documented.
 * [nt]roff: The ".ss", ".sss", ".minss", ".lspmin", ".letss", ".lspmax",
   ".lshmin", ".lshmax", ".lc_ctype", ".hylang", and ".fzoom" number
   registers have been added to retrieve the current values set with the
