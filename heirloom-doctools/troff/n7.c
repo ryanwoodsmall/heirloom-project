@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.72 (gritter) 7/13/06
+ * Sccsid @(#)n7.c	1.73 (gritter) 7/16/06
  */
 
 /*
@@ -517,7 +517,7 @@ ckul(void)
 }
 
 
-void
+int
 storeline(register tchar c, int w)
 {
 	if (linep >= line + lnsize - 1) {
@@ -529,7 +529,7 @@ storeline(register tchar c, int w)
 			w = -1;
 			goto s1;
 		}
-		return;
+		return 0;
 	}
 s1:
 	if (w == -1) {
@@ -540,6 +540,7 @@ s1:
 	nel -= w;
 	*linep++ = c;
 	nc++;
+	return 1;
 }
 
 
@@ -851,10 +852,10 @@ movword(void)
 			   (!(hyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
 			   (hyf & 020 && wp == wdend) ||		/* 020 = allow last */
 			   (hyf & 040 && wp == wdstart + 1)) {		/* 040 = allow first */
-				nhyp++;
 				i = IMP;
 				setsbits(i, (intptr_t)*hyp & 03);
-				storeline(i, 0);
+				if (storeline(i, 0))
+					nhyp++;
 			}
 			hyp++;
 		}
@@ -905,7 +906,7 @@ m1:
 			goto m4;
 		}
 	}
-	if (cbits(*--linep) != IMP)
+	if ((*--linep & ~SMASK) != IMP)
 		goto m5;
 #ifndef	NROFF
 	if ((s = sbits(*linep)) != 0) {

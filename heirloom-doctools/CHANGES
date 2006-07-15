@@ -43,6 +43,8 @@ Release ...
   added.
 * [nt]roff: With xflag 3 and warning "mac" deactivated, if ".xx" was a
   defined request and ".xxx" was not, ".xx" was executed for ".xxx".
+* [nt]roff: Several segmentation violations that occurred with arbitrary
+  binary data as input have been fixed.
 * troff, dpost, otfdump: The operator 12 in CFF Top DICT entries was not
   handled correctly, resulting in misleading error messages with some
   OpenType fonts. This has been fixed (bug reported by D. Jeff Dionne).

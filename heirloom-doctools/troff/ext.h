@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.53 (gritter) 7/11/06
+ * Sccsid @(#)ext.h	1.54 (gritter) 7/16/06
  */
 
 /*
@@ -439,7 +439,7 @@ extern void	text(void);
 extern void	nofill(void);
 extern void	callsp(void);
 extern void	ckul(void);
-extern void	storeline(register tchar, int);
+extern int	storeline(register tchar, int);
 extern void	newline(int);
 extern int	findn1(int);
 extern void	chkpn(void);
