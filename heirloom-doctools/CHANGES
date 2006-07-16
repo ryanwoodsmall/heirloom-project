@@ -1,4 +1,4 @@
-Release ...
+Release 060716
 * troff: The ".letadj" request has been added to enable dynamic letter
   spacing and letter reshaping when justifying lines.
 * troff: Font and size attributes of space (and newline) characters in
