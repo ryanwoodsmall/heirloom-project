@@ -1,0 +1,174 @@
+.\" Sccsid @(#)doc.tr	1.3 (gritter) 7/16/06
+.do xflag 3
+.mediasize a4
+.warn
+.hylang en_US
+.lc_ctype de_DE.utf8
+.fp 1 R gdrg____ pfb
+.fp 0 E gerg____ pfb
+.fallback R E
+.flig R ff \(ff ffi \(Fi ffl \(Fl
+.kernbefore R %:;!? 60
+.kernbefore R ., 20
+.rhang R f -80
+.fp 2 I gdio____ pfb
+.fp 0 IE gei_____ pfb
+.fallback I IE
+.flig I ff \(ff ffi \(Fi ffl \(Fl
+.kernbefore I %:;!? 60
+.kernbefore I ., 20
+.fp 0 T gdttl___ pfb
+.flig T 0
+.track T 18 3 18 3
+.ds - \(en
+.sp |2c
+.ps 18
+.vs 36
+.ad c
+.ft T
+Justification in Heirloom troff
+.ps 11
+.vs 12
+.sp |4c
+.nr O1 1.5c
+.nr O2 5.1c
+.nr LC \n(O2u-\n(O1u-1.5P
+.nr O3 \n(O2u+14P
+.nr O4 \n(O3u+11.5P+1.5P
+.po \n(O2u
+.ss 12 0
+.de co
+.sp
+.ft I
+.ll \\n(LCu
+..
+.de xx
+.ft R
+.ad b
+.minss \\$1
+.letadj \\$2 \\$3 \\$4 \\$5 \\$6
+.wh \\n(nlu+12v yy
+.ll 11.5P
+Harmony, liberal intercourse with all nations,
+are recommended by policy, humanity, and interest.
+But even our commercial policy
+should hold an equal and impartial hand;
+neither seeking nor granting exclusive favors or preferences;
+consulting the natural course of things;
+diffusing and diversifying by gentle means
+the streams of commerce, but forcing nothing;
+establishing with powers so disposed, in order
+.zz
+..
+.de yy
+.ch yy
+.di waste
+..
+.de zz
+.br
+.di
+..
+.mk T
+.po \n(O1u
+.ad r
+.co
+In traditional troff,
+increased word spaces
+were the only justification mechanism.
+.sp |\nTu
+.po \n(O2u
+.xx 12 100 100 12 100 100
+.sp |\nTu
+.po \n(O4u
+.ad l
+.co
+Word spacing 75% to 150%,
+letter spacing 95% to 105%,
+glyph reshaping 98% to 102%.
+.sp |\nTu
+.po \n(O3u
+.xx 9 95 98 18 105 102
+.sp 2
+.po \n(O1u
+.mk T
+.po \n(O1u
+.ad r
+.co
+Allow the word spaces to be
+decreased to 75%,
+but do not perform letter spacing
+or glyph reshaping.
+.sp |\nTu
+.po \n(O2u
+.xx 9 100 100 19 100 100
+.sp |\nTu
+.po \n(O4u
+.ad l
+.co
+Word spacing 75% to 150%,
+letter spacing 95% to 105%,
+no glyph reshaping.
+.sp |\nTu
+.po \n(O3u
+.xx 9 95 100 18 105 100
+.sp 2
+.po \n(O1u
+.mk T
+.ad r
+.co
+An insane extreme:
+Justification by letter spacing only.
+.sp |\nTu
+.po \n(O2u
+.xx 12 95 100 12 1000 100
+.sp |\nTu
+.po \n(O4u
+.ad l
+.co
+The other insane extreme:
+Justification by glyph reshaping only.
+.sp |\nTu
+.po \n(O3u
+.xx 12 100 95 12 100 1000
+.sp 3
+.mk T
+.wh \n(nlu+9v nc
+.de nc
+.ch nc
+'sp |\nTu
+.po \n(O3u
+..
+.po \n(O1u
+.ft I
+.ad b
+.ss 11 0
+.minss 9
+.letadj 97 98 18 102 101
+.ll \n(LCu+13P
+The text is an excerpt of George Washington's
+1796 Farewell address.
+Its choice for this purpose is due to
+examples in James Felici's
+“The Complete Manual of Typography,”
+Berkeley, \s-1CA\s0, 2003, p.\|147.
+In comparison to the typesetting program
+used by Felici,
+Heirloom troff has a stricter preference for the
+spacing settings configured as optimal.
+Setting the minimum or maximum to more extreme values
+will thus not result in much differences
+in its output\(emunless
+there is a line where the extremes
+are actually the only option for automatic justification,
+in which case manual intervention would certainly be preferable.
+For layouts with longer lines than in this example,
+best results are normally achieved
+with even smaller ranges for letter spacing and glyph reshaping.
+¶ As can be seen, letter spacing and glyph reshaping
+partially compensate for the distortions caused by the other.
+It is thus recommended that they are used in combination.
+.br
+.ad r
+Gunnar Ritter, 7/16/06
+.br
+<http\&://heirloom.sourceforge.net/doctools.html>
