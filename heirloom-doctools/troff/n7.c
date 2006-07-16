@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.73 (gritter) 7/16/06
+ * Sccsid @(#)n7.c	1.74 (gritter) 7/16/06
  */
 
 /*
@@ -1431,7 +1431,7 @@ letshrink(void)
 
 	nsp = nwd == 1 ? nwd : nwd - 1;
 	diff = nel;
-	if (lspnc)
+	if (lspnc && lsplow)
 		diff += nel * nsp / lspnc;
 	if (lshwid) {
 		if (lshlow < -diff / 2)
@@ -1463,7 +1463,7 @@ letgrow(void)
 		return 0;
 	n = (letsps - (minsps && ad && !admod ? minsps : sps)) * nsp;
 	diff = nel;
-	if (lspnc)
+	if (lspnc && lsphigh)
 		diff += nel * nsp / lspnc - n;
 	if (lshwid) {
 		if (lshhigh < diff / 2)
