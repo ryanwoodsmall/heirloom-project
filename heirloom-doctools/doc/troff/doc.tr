@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.80 (gritter) 7/17/06
+.\" Sccsid @(#)doc.tr	1.81 (gritter) 7/18/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -70,6 +70,7 @@
 .kernpair I N B \' 90
 .kernpair R [ I f 200
 .kernpair R [ I \[fi] 200
+.kernpair R , B p 80
 .ig
 .fps math 1 R tim_____ pfb
 .fp 2 I timi____ pfb
@@ -88,7 +89,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/17/06
+.ds Sccsdate 7/18/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1120,7 +1121,7 @@ Font and Character Size Control
 .bt
 \T'lc_ctype'\fB&lc_ctype\fI|name\fR	ignored	\(en	Set the \s-1LC_CTYPE\s+1 locale.\T
 .b1
-\T'ps'\fB&ps\fI\|\(+-N\fR	10\|point	previous	E,T	Point size; also\T \T'e_s'\fB\es\fI\(+-N\fR.\T
+\T'ps'\fB&ps\fI\|\(+-N\fR	10\|point	previous	E,T,\fBp\fR	Point size; also\T \T'e_s'\fB\es\fI\(+-N\fR.\T
 .b1
 \T'fzoom'\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zoom font \fIF\fR by factor \fIZ\fR.\T
 .b1
@@ -1157,15 +1158,15 @@ Page Control
 .bt
 \T'pl'\fB&pl\fI\|\(+-N\fR	11\|i	11\|i	\fBv\fR	Page length.\T
 .b1
-\T'papersize'\fB&papersize\fI|media\fR	ignored	T	Set the paper size.\T
+\T'papersize'\fB&papersize\fI|media\fR	ignored	T,\fBu\fR	Set the paper size.\T
 .b1
-\T'mediasize'\fB&mediasize\fI|media\fR	ignored	T	Set the device media size.\T
+\T'mediasize'\fB&mediasize\fI|media\fR	ignored	T,\fBu\fR	Set the device media size.\T
 .b1
-\T'cropat'\fB&cropat\fI|L|T|W|H\fR	ignored	T	Set the ``CropBox'' page parameter for \*[PDF] generation.\T
+\T'cropat'\fB&cropat\fI|L|T|W|H\fR	ignored	T,\fBp\fR	Set the ``CropBox'' page parameter for \*[PDF] generation.\T
 .b1
-\T'trimat'\fB&trimat\fI|L|T|W|H\fR	ignored	T	Set the ``TrimBox'' page parameter for \*[PDF] generation.\T
+\T'trimat'\fB&trimat\fI|L|T|W|H\fR	ignored	T,\fBp\fR	Set the ``TrimBox'' page parameter for \*[PDF] generation.\T
 .b1
-\T'bleedat'\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Set the ``BleedBox'' page parameter for \*[PDF] generation.\T
+\T'bleedat'\fB&bleedat\fI|L|T|W|H\fR	ignored	T,\fBp\fR	Set the ``BleedBox'' page parameter for \*[PDF] generation.\T
 .b1
 \T'bp'\fB&bp|\fI\(+-N\fR	\fIN\(eq\fR1	\(en	B,\fBv\fR	\
 Eject current page; next page number \fIN\fR.\T
@@ -1206,7 +1207,7 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'transchar'\fB&transchar\fI|c..\fR	\fB"')]*\(dg\fR	off	E	Transparent characters for sentence-ending.\T
 .b1
-\T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.\T
+\T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T,\fBp\fR	Static letter space tracking.\T
 .b1
 \T'kern'\fB&kern\fI|N\fR	1	1	P,T	Control pairwise kerning.\T
 .b1
@@ -1467,7 +1468,7 @@ Output and Error Messages
 .bt
 \T'warn'\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Control warning messages.\T
 .b1 0
-\T'spreadwarn'\fB&spreadwarn\fI|N\fR	toggle	\(en	Spread limit warning.\T
+\T'spreadwarn'\fB&spreadwarn\fI|N\fR	toggle	\fBm\fR	Spread limit warning.\T
 .mht s_color
 Color Support
 .mht s_pics
@@ -2418,7 +2419,7 @@ influences.
 The current value is available in the \A'n_.lc_ctype'\fB&lc_ctype\fR
 number register.
 .bta ps
-\fB&ps\fI|\(+-N\fR	10\|point	previous	E	Point size
+\fB&ps\fI|\(+-N\fR	10\|point	previous	E,\fBp\fR	Point size
 set to \(+-\fIN\fR.
 Alternatively imbed \fB\es\fIN\fR, \fB\es\fI\(+-N\fR,
 or \fB\es\'\fIN\fB\'\fR.
@@ -2630,7 +2631,7 @@ are device dependent.
 \fB&pl\fI|\(+-N\fR	11\|in	11\|in	\fBv\fR	Page length set to \fI\(+-N\fR.
 The current page length is available in the \A'n_.p'\fB.p\fR register.
 .bta papersize
-\fB&papersize\fI|media\fR	ignored	T	Set the paper size.
+\fB&papersize\fI|media\fR	ignored	T,\fBu\fR	Set the paper size.
 \fImedia\fR can be one of
 \fBexecutive\fR,
 \fBletter\fR,
@@ -2651,7 +2652,7 @@ pages of the document. The default are \fBletter\fR measurements. This
 request should be used early in a document; if it is given multiple
 times, the last one will setup the device.
 .bta mediasize
-\fB&mediasize\fI|media\fR	ignored	T	Set the device media size.
+\fB&mediasize\fI|media\fR	ignored	T,\fBu\fR	Set the device media size.
 \fImedia\fR can be one of
 \fBexecutive\fR,
 \fBletter\fR,
@@ -2678,7 +2679,7 @@ However, when generating \*(PS as
 intermediate format with the intent of \*[PDF] creation, use of this
 request is recommended.
 .bta cropat
-\fB&cropat\fI|L|T|W|H\fR	ignored	T	Set the ``CropBox'' page parameter for \*[PDF] generation.
+\fB&cropat\fI|L|T|W|H\fR	ignored	T,\fBp\fR	Set the ``CropBox'' page parameter for \*[PDF] generation.
 The four arguments give the offset from the left (\fIL\fR)
 and top (\fIT\fR) margins of the document
 (as set by \T'mediasize'\fBmediasize\fR\T),
@@ -2689,7 +2690,7 @@ area of the page that is shown by a \*[PDF] viewer program. It is
 useful to hide cut marks and other printing instructions when
 the same \*[PDF] document is intended to be displayed on screen.
 .bta trimat
-\fB&trimat\fI|L|T|W|H\fR	ignored	T	Set the ``TrimBox'' page parameter for \*[PDF] generation
+\fB&trimat\fI|L|T|W|H\fR	ignored	T,\fBp\fR	Set the ``TrimBox'' page parameter for \*[PDF] generation
 and enables printing of marks when combined with \fIdpost\ \-M\fR.
 The four arguments give the offset from the left (\fIL\fR)
 and top (\fIT\fR) margins of the document
@@ -2701,7 +2702,7 @@ the page is to be cut after it has been printed; it is sort of
 an electronic equivalent for cut marks (which should continue to
 be printed in addition).
 .bta bleedat
-\fB&bleedat\fI|L|T|W|H\fR	ignored	T	Set the ``BleedBox'' page parameter for \*[PDF] generation.
+\fB&bleedat\fI|L|T|W|H\fR	ignored	T,\fBp\fR	Set the ``BleedBox'' page parameter for \*[PDF] generation.
 The four arguments give the offset from the left (\fIL\fR)
 and top (\fIT\fR) margins of the document
 (as set by \T'mediasize'\fBmediasize\fR\T),
@@ -3030,7 +3031,7 @@ before the end of an input text line.
 The current set of transparent characters for sentence ending is available
 in the \A'n_.transchar'\fB&transchar\fR number register.
 .bta track
-\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.
+\fB&track\fI|F|S|N|T|M\fR	ignored	P,T,\fBp\fR	Static letter space tracking.
 If the current font is \fIF\fR
 and the point size is below or equal to \fIS\fR,
 white space of width \fIN\fR is added to each character.
@@ -4914,7 +4915,7 @@ The \A'n_.warn'\fB.warn\fR register represents
 the currently activated warning categories
 as bits.
 .bta spreadwarn
-\fB&spreadwarn\fI|N\fR	toggle	\(en	Set or toggle a limit that causes a warning to be printed when
+\fB&spreadwarn\fI|N\fR	toggle	\fBm\fR	Set or toggle a limit that causes a warning to be printed when
 it is exceeded by the adjustment that is computed for the current
 output line in \fBad\ b\fR mode. The limit is initially 3\|m, but the
 warning message is disabled. Calling this request without an
