@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.93 (gritter) 7/17/06
+ * Sccsid @(#)tdef.h	1.94 (gritter) 7/17/06
  */
 
 /*
@@ -697,6 +697,7 @@ extern const struct numtab initnumtab[];
 #define	sentch	env._sentch
 #define	transch	env._transch
 #define	breakch	env._breakch
+#define	nhych	env._nhych
 
 extern struct env {
 	int	_ics;
@@ -805,6 +806,7 @@ extern struct env {
 	int	_sentch[NSENT];
 	int	_transch[NSENT];
 	int	_breakch[NSENT];
+	int	_nhych[NSENT];
 	tchar	_line[LNSIZE];
 	tchar	_word[WDSIZE];
 } env, initenv;

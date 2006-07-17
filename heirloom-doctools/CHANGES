@@ -3,6 +3,9 @@ Release ...
   now configurable with the ".sentchar" and ".transchar" requests.
 * [nt]roff: The set of optional line break characters (normally hyphen
   and em dash) is now configurable with the ".breakchar" request.
+* [nt]roff: The ".nhychar" request defines a set of hyphenation-
+  inhibiting characters (as hyphen and em dash with traditional troff
+  hyphenation).
 * troff: The second argument to the ".ss" request now actually sets the
   size of the sentence-end space instead of just switching it on or off.
 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.75 (gritter) 7/17/06
+ * Sccsid @(#)n7.c	1.76 (gritter) 7/17/06
  */
 
 /*
@@ -813,6 +813,26 @@ maybreak(tchar c)
 	}
 }
 
+static int
+nhychar(tchar c)
+{
+	int	i, k = cbits(c);
+
+	switch (nhych[0]) {
+	case IMP:
+		return 0;
+	case 0:
+		if (hyext)
+			return 0;
+		return k == '-' || k == EMDASH;
+	default:
+		for (i = 0; nhych[i] && i < NSENT; i++)
+			if (nhych[i] == k)
+				return 1;
+		return 0;
+	}
+}
+
 
 int
 movword(void)
@@ -1225,12 +1245,14 @@ g0:
 		}
 		if (maybreak(j))
 			if (wordp > word + 1) {
-				if (!hyext)
+				if (!xflag)
 					hyoff = 2;
 				*hyp++ = wordp + 1;
 				if (hyp > (hyptr + NHYP - 1))
 					hyp = hyptr + NHYP - 1;
 			}
+		if (xflag && nhychar(j))
+			hyoff = 2;
 	}
 	j = width(i);
 	numtab[HP].val += j;

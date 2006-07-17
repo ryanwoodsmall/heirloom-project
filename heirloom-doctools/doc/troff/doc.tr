@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.78 (gritter) 7/17/06
+.\" Sccsid @(#)doc.tr	1.79 (gritter) 7/17/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1356,6 +1356,8 @@ Hyphenation.
 .b1
 \T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
+\T'nhychar'\fB&nhychar\fI|c...\fR	\fB\(hy\(em\fR	off	E	Hyphenation-inhibiting characters.\T
+.b1
 \T'hlm'\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.\T
 .b1 0
 \T'hc'\fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.\T
@@ -1479,7 +1481,7 @@ Special Features for \*[PDF] Documents
 Output Language
 .mht s_device
 Device and Font Description Files
-.xx
+.bp
 .nf
 .ft R
 .nr zz 3
@@ -1579,6 +1581,7 @@ Device and Font Description Files
 \T'ne'ne	3\T
 \T'nf'nf	4\T
 \T'nh'nh	13\T
+\T'nhychar'nhychar	13\T
 \T'nm'nm	15\T
 \T'nn'nn	15\T
 \T'nop'nop	20\T
@@ -1845,6 +1848,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.L'5.1\T	\T'n_.L'\fB&L\fR\T	\T'n_.L'Current \fBls\fP value.\T
 \T'n_.minss'4\T	\T'n_.minss'\fB&minss\fR\T	\T'n_.minss'Current minimum space size.\T
 \T'n_.n'4\T	\T'n_.n'\fB&n\fR\T	\T'n_.n'Length of text portion on previous output line.\T
+\T'n_.nhychar'13\T	\T'n_.nhychar'\fB&nhychar\fR\T	\T'n_.nhychar'Current hyphenation-inhibiting characters.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
@@ -4385,13 +4389,23 @@ The current value is available in the \A'n_.hylang'\fB&hylang\fR
 number register.
 .xx
 This request also makes parts of words composed by \fB-\fR or
-\fB\e(em\fR characters subject to hyphenation. Traditionally, the only
+\fB\e(em\fR characters subject to hyphenation,
+unless otherwise defined explicitly with the \fB&nhychar\fR request.
+Traditionally, the only
 hyphenation points in such words had been the hyphens/dashes.
 .bta breakchar
 \fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.
 A line may always be split after one of these characters.
 The current set of optional line break characters is available
 in the \A'n_.breakchar'\fB&breakchar\fR number register.
+.bta nhychar
+\fB&nhychar\fI|c...\fR	\fB\(hy\(em\fR	off	E	Hyphenation-inhibiting characters.
+A word that contains one of the characters \fIc...\fR
+is not hyphenated,
+except that it may be split across lines
+if one of these characters is also an optional line break character.
+The current set of hyphenation-inhibiting characters is available
+in the \A'n_.nhychar'\fB&nhychar\fR number register.
 .bta hlm
 \fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.
 Each time a line is hyphenated automatically,
