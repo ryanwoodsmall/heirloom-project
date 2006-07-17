@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.83 (gritter) 7/16/06
+ * Sccsid @(#)n1.c	1.84 (gritter) 7/18/06
  */
 
 /*
@@ -1981,7 +1981,9 @@ void
 caserecursionlimit(void)
 {
 	skip(1);
+	noscale++;
 	max_recursion_depth = atoi();
 	skip(0);
 	max_tail_depth = atoi();
+	noscale--;
 }
