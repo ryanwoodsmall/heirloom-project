@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.52 (gritter) 7/9/06
+ * Sccsid @(#)n5.c	1.53 (gritter) 7/17/06
  */
 
 /*
@@ -1461,6 +1461,43 @@ casemc(void)
 		ics = i;
 }
 
+
+static void
+setchar(int *tp)
+{
+	int	c, *tpp;
+	tchar	i;
+
+	if (skip(0)) {
+		*tp = IMP;
+		return;
+	}
+	tpp = tp;
+	do {
+		while (!ismot(c = cbits(i = getch())) &&
+				c != ' ' && c != '\n')
+			if (tpp < &tp[NSENT])
+				*tpp++ = c;
+	} while (!skip(0));
+}
+
+void
+casesentchar(void)
+{
+	setchar(sentch);
+}
+
+void
+casetranschar(void)
+{
+	setchar(transch);
+}
+
+void
+casebreakchar(void)
+{
+	setchar(breakch);
+}
 
 void
 casemk(void)

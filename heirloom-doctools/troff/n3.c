@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.102 (gritter) 7/11/06
+ * Sccsid @(#)n3.c	1.103 (gritter) 7/17/06
  */
 
 /*
@@ -87,6 +87,7 @@ static const struct {
 } longrequests[] = {
 	{ "bleedat",		(void(*)(int))casebleedat },
 	{ "blm",		(void(*)(int))caseblm },
+	{ "breakchar",		(void(*)(int))casebreakchar },
 	{ "brp",		(void(*)(int))casebrp },
 	{ "chop",		(void(*)(int))casechop },
 	{ "close",		(void(*)(int))caseclose },
@@ -125,11 +126,13 @@ static const struct {
 	{ "recursionlimit",	(void(*)(int))caserecursionlimit },
 	{ "return",		(void(*)(int))casereturn },
 	{ "rhang",		(void(*)(int))caserhang },
+	{ "sentchar",		(void(*)(int))casesentchar },
 	{ "shift",		(void(*)(int))caseshift },
 	{ "spreadwarn",		(void(*)(int))casespreadwarn },
 	{ "substring",		(void(*)(int))casesubstring },
 	{ "tmc",		(void(*)(int))casetmc },
 	{ "track",		(void(*)(int))casetrack },
+	{ "transchar",		(void(*)(int))casetranschar },
 	{ "trimat",		(void(*)(int))casetrimat },
 	{ "vpt",		(void(*)(int))casevpt },
 	{ "warn",		(void(*)(int))casewarn },

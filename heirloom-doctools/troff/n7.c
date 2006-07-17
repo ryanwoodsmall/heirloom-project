@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.74 (gritter) 7/16/06
+ * Sccsid @(#)n7.c	1.75 (gritter) 7/17/06
  */
 
 /*
@@ -793,6 +793,27 @@ e1:
 }
 
 
+static int
+maybreak(tchar c)
+{
+	int	i, k = cbits(c);
+
+	if (c & BLBIT)
+		return 1;
+	switch (breakch[0]) {
+	case IMP:
+		return 0;
+	case 0:
+		return k == '-' || k == EMDASH;
+	default:
+		for (i = 0; breakch[i] && i < NSENT; i++)
+			if (breakch[i] == k)
+				return 1;
+		return 0;
+	}
+}
+
+
 int
 movword(void)
 {
@@ -977,8 +998,7 @@ m2:
 		storelsh(lgs, lgr);
 	}
 #endif	/* !NROFF */
-	if ((i = cbits(*(linep - 1))) != '-' && i != EMDASH &&
-			(*(linep - 1) & BLBIT) == 0) {
+	if (!maybreak(*(linep - 1))) {
 		*linep = (*(linep - 1) & SFMASK) | HYPHEN;
 		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
@@ -1183,7 +1203,7 @@ a0:
 	storeword(t, w + k);
 	if (spflg) {
 		if (xflag == 0 || ses != 0)
-			storeword(t, w);
+			storeword(t | SENTSP, ses);
 		spflg = 0;
 	}
 g0:
@@ -1203,7 +1223,7 @@ g0:
 				wordp[-1] |= BLBIT;
 			goto g1;
 		}
-		if (j == '-' || j == EMDASH)
+		if (maybreak(j))
 			if (wordp > word + 1) {
 				if (!hyext)
 					hyoff = 2;
@@ -1257,7 +1277,12 @@ g1:		nexti = GETCH();
 			goto g1;
 #endif /* EUC && NROFF */
 	if (j != ' ' || iszbit(i)) {
-		static char *sentchar = ".?!:";	/* sentence terminators */
+		static int sentchar[] =
+			{ '.', '?', '!', ':', 0 }; /* sentence terminators */
+		int	*sp, *tp;
+		static int transchar[] =
+			{ '"', '\'', ')', ']', '*', 0, 0 };
+		transchar[5] = DAGGER;
 		if (j != '\n')
 #if defined (EUC) && defined (NROFF)
 			if (!multi_locale)
@@ -1277,16 +1302,20 @@ g1:		nexti = GETCH();
 			}
 #endif /* EUC && NROFF */
 		wp = wordp-1;	/* handle extra space at end of sentence */
-		while (wp >= word) {
+		sp = *sentch ? sentch : sentchar;
+		tp = *transch ? transch : transchar;
+		while (sp[0] != IMP && wp >= word) {
 			j = cbits(*wp--);
-			if (j=='"' || j=='\'' || j==')' || j==']' || j=='*' || j==DAGGER)
-				continue;
-			for (k = 0; sentchar[k]; k++)
-				if (j == sentchar[k]) {
+			for (i = 0; tp[0] != IMP && tp[k] && k < NSENT; k++)
+				if (j == tp[k])
+					goto cont;
+			for (k = 0; sp[k] && k < NSENT; k++)
+				if (j == sp[k]) {
 					spflg++;
 					break;
 				}
 			break;
+		cont:;
 		}
 	}
 #if defined (EUC) && defined (NROFF)

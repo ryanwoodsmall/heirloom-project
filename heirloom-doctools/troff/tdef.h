@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.92 (gritter) 7/11/06
+ * Sccsid @(#)tdef.h	1.93 (gritter) 7/17/06
  */
 
 /*
@@ -62,8 +62,9 @@
 #	define	VERT	t.Vert
 #	define	INCH	240	/* increments per inch */
 #	define	SPS	INCH/10	/* space size */
-#	define	SES	SPS	/* sentence space size */
 #	define	SS	INCH/10	/* " */
+#	define	SES	SPS	/* sentence space size */
+#	define	SSS	SS	/* " */
 #	define	TRAILER	0
 #	define	PO	0 /* page offset */
 #	define	ASCII	1
@@ -83,6 +84,7 @@
 #	define	SPS	(EM/3)	/* space size  */
 #	define	SES	SPS	/* sentence space size */
 #	define	SS	12	/* space size in 36ths of an em */
+#	define	SSS	SS	/* sentence space size in 36ths of an em */
 #	define	PO	(INCH)	/* page offset 1 inch */
 /* #	define	EM	(POINT * pts) */
 #define	EM	(((long) INCH * u2pts(pts) + 36) / 72)	/* don't lose significance */
@@ -200,6 +202,7 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 #define	NC	1024	/* cbuf size words */
 #define	NOV	10	/* number of overstrike chars */
 #define	NPP	10	/* pads per field */
+#define	NSENT	40	/* number of sentence end characters */
 
 /*
 	Internal character representation:
@@ -261,6 +264,8 @@ endif NROFF
 #define	islig(n)	((n) & AUTOLIG)
 #define	TAILBIT		(01ULL << 29)	/* tail recursion */
 #define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (TAILBIT|'\n'))
+#define	SENTSP		(01ULL << 29)	/* sentence space */
+#define	issentsp(n)	((n) & SENTSP)
 #define	DIBIT		(01ULL << 28)	/* written in a diversion */
 #define	isdi(n)		((n) & DIBIT)
 
@@ -302,6 +307,8 @@ endif NROFF
 #define	ABSCHAR		0400	/* absolute char number in this font */
 #define	AUTOLIG	0		/* ligature substituted automatically */
 #define	islig(n)	((n) ? 0 : 0)
+#define	SENTSP		0	/* sentence space */
+#define	issentsp(n)	((n) ? 0 : 0)
 #define	DIBIT	0		/* written in a diversion */
 #define	isdi(n)		((n) ? 0 : 0)
 
@@ -568,6 +575,7 @@ extern const struct numtab initnumtab[];
 #define	sps	env._sps
 #define	ses	env._ses
 #define	spacesz	env._spacesz
+#define	sesspsz	env._sesspsz
 #ifndef	NROFF
 #define	minsps	env._minsps
 #define	minspsz	env._minspsz
@@ -686,12 +694,16 @@ extern const struct numtab initnumtab[];
 #define	tabtab	env._tabtab
 #define	line	env._line
 #define	word	env._word
+#define	sentch	env._sentch
+#define	transch	env._transch
+#define	breakch	env._breakch
 
 extern struct env {
 	int	_ics;
 	int	_sps;
 	int	_ses;
 	int	_spacesz;
+	int	_sesspsz;
 #ifndef	NROFF
 	int	_minsps;
 	int	_minspsz;
@@ -790,6 +802,9 @@ extern struct env {
 	int	_hyext;
 	tchar	*_hyptr[NHYP];
 	int	_tabtab[NTAB];
+	int	_sentch[NSENT];
+	int	_transch[NSENT];
+	int	_breakch[NSENT];
 	tchar	_line[LNSIZE];
 	tchar	_word[WDSIZE];
 } env, initenv;

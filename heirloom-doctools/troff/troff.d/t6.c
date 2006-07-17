@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.155 (gritter) 7/12/06
+ * Sccsid @(#)t6.c	1.156 (gritter) 7/17/06
  */
 
 /*
@@ -122,7 +122,8 @@ width(register tchar j)
 			i = eschar;
 		else if (iscontrol(i))
 			return(0);
-	}
+	} else if (i == ' ' && issentsp(j))
+		return(ses);
 	if (i==ohc)
 		return(0);
 	i = trtab[i];
@@ -774,18 +775,26 @@ mchbits(void)
 	chbits = 0;
 	setsbits(chbits, ++j);
 	setfbits(chbits, font);
+	zapwcache(1);
 	if (minspsz) {
 		k = spacesz;
 		spacesz = minspsz;
 		minsps = width(' ' | chbits);
 		spacesz = k;
+		zapwcache(1);
 	}
 	if (letspsz) {
 		k = spacesz;
 		spacesz = letspsz;
 		letsps = width(' ' | chbits);
 		spacesz = k;
+		zapwcache(1);
 	}
+	k = spacesz;
+	spacesz = sesspsz;
+	ses = width(' ' | chbits);
+	spacesz = k;
+	zapwcache(1);
 	sps = width(' ' | chbits);
 	zapwcache(1);
 }
@@ -1582,30 +1591,33 @@ void
 casess(int flg)
 {
 	register int i, j;
-	int _spacesz, _sps;
 
 	noscale++;
 	if (skip(flg == 0))
 		minsps = minspsz = 0;
-	else if (i = atoi()) {
-		_spacesz = spacesz;
-		spacesz = i & 0177;
-		zapwcache(0);
-		_sps = width(' ' | chbits);
-		if (xflag && flg == 0) {
-			skip(0);
+	else if ((i = atoi()) != 0 && !nonumb) {
+		if (xflag && flg == 0 && !skip(0)) {
 			j = atoi();
-			if (!nonumb)
-				ses = j;
+			if (!nonumb) {
+				sesspsz = j & 0177;
+				spacesz = sesspsz;
+				zapwcache(1);
+				ses = width(' ' | chbits);
+			}
 		}
 		if (flg) {
-			minsps = _sps;
-			minspsz = spacesz;
-			spacesz = _spacesz;
+			j = spacesz;
+			minspsz = i & 0177;
+			spacesz = minspsz;
+			zapwcache(1);
+			minsps = width(' ' | chbits);
+			spacesz = j;
 			zapwcache(0);
 			sps = width(' ' | chbits);
 		} else {
-			sps = _sps;
+			spacesz = i & 0177;
+			zapwcache(0);
+			sps = width(' ' | chbits);
 			if (minspsz > spacesz)
 				minsps = minspsz = 0;
 		}

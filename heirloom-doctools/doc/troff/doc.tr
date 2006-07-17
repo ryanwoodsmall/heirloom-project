@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.77 (gritter) 7/11/06
+.\" Sccsid @(#)doc.tr	1.78 (gritter) 7/17/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -88,7 +88,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/11/06
+.ds Sccsdate 7/17/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1124,12 +1124,13 @@ Font and Character Size Control
 .b1
 \T'fzoom'\fB&fzoom\fI|F|Z\fR	1	ignored	P,T	Zoom font \fIF\fR by factor \fIZ\fR.\T
 .b1
-\T'ss'\fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size\T
-set to \fIN\fR/36\|em.
+\T'ss'\fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size
+set to \fIN\fR/36\|em;
+sentence space \fIM\fR/36\|em.\T
 .b1
-\T'cs'\fB&cs\fI\|F\|N\|M\fR	off	\(en	P,T	Constant character\T
+\T'cs'\fB&cs\fI\|F\|N\|M\fR	off	\(en	P,T	Constant character
 space (width)
-mode (font \fIF\^\fR\^).
+mode (font \fIF\^\fR\^).\T
 .b1
 \T'bd'\fB&bd\fI|F|N\fR	off	\(en	P,T	Embolden font \fIF\fR by \fIN\fR\(mi1 units.\T
 .b1
@@ -1200,6 +1201,10 @@ Text Filling, Adjusting, and Centering
 \T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
 \T'letadj'\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.\T
+.b1
+\T'sentchar'\fB&sentchar\fI|c...\fR	\fB.?!:\fR	off	E	Sentence-ending characters.\T
+.b1
+\T'transchar'\fB&transchar\fI|c..\fR	\fB"')]*\(dg\fR	off	E	Transparent characters for sentence-ending.\T
 .b1
 \T'track'\fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.\T
 .b1
@@ -1348,6 +1353,8 @@ Hyphenation.
 \T'hy'\fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.\T
 .b1
 \T'hylang'\fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language.\T
+.b1
+\T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
 \T'hlm'\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.\T
 .b1 0
@@ -1499,6 +1506,7 @@ Device and Font Description Files
 \T'blm'blm	7\T
 \T'bp'bp	3\T
 \T'br'br	4\T
+\T'breakchar'breakchar	13\T
 \T'brp'brp	4\T
 \T'c2'c2	10\T
 \T'cc'cc	10\T
@@ -1600,6 +1608,7 @@ Device and Font Description Files
 \T'rr'rr	8\T
 \T'rs'rs	5\T
 \T'rt'rt	3\T
+\T'sentchar'sentchar	4\T
 \T'shift'shift	7\T
 \T'so'so	19\T
 \T'sp'sp	5\T
@@ -1615,6 +1624,7 @@ Device and Font Description Files
 \T'tm'tm	20\T
 \T'tr'tr	10\T
 \T'track'track	4\T
+\T'transchar'transchar	4\T
 \T'trimat'trimat	3\T
 \T'uf'uf	10\T
 \T'ul'ul	10\T
@@ -1809,6 +1819,7 @@ Reference	Name	Description
 using \fB\ex\fI\'N\'\fR.\T
 \T'n_.ascender'5.4\T	\T'n_.ascender'\fB&ascender\fR\T	\T'n_.ascender'Ascender of current font and point size.\T
 \T'n_.b'2.3\T	\T'n_.b'\fB&b\fR\T	\T'n_.b'Emboldening level.\T
+\T'n_.breakchar'13\T	\T'n_.breakchar'\fB&breakchar\fR\T	\T'n_.breakchar'Current optional line break characters.\T
 \(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
@@ -1837,9 +1848,11 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
+\T'n_.sentchar'4.1\T	\T'n_.sentchar'\fB&sentchar\fR\T	\T'n_.sentchar'Current sentence-ending characters [sic].\T
 \T'n_.ss'2\T	\T'n_.ss'\fB&ss\fR\T	\T'n_.ss'Current space size.\T
 \T'n_.sss'2\T	\T'n_.sss'\fB&sss\fR\T	\T'n_.sss'Current sentence space size.\T
 \T'n_.t'7.5\T	\T'n_.t'\fB&t\fR\T	\T'n_.t'Distance to the next trap.\T
+\T'n_.transchar'4.1\T	\T'n_.transchar'\fB&transchar\fR\T	\T'n_.transchar'Current characters transparent for sentence-ending [sic].\T
 \(en	\fB&T\fR	Set to 1 in \*[NR,] if \fB\-T\fR option used; always 0 in \*[TR.]
 \T'n_.u'4.1\T	\T'n_.u'\fB&u\fR\T	\T'n_.u'Equal to 1 in fill mode and 0 in nofill mode.\T
 \T'n_.v'5.1\T	\T'n_.v'\fB&v\fR\T	\T'n_.v'Current vertical line spacing.\T
@@ -2422,10 +2435,9 @@ in the \A'n_.fzoom'\fB&fzoom\fR number register.
 \fB&ss\fI|N\fR|[\fIM\fR]	12/36\|m	ignored	E,T	Space-character size
 is set to \fIN\fR/36\|ems.
 This size is the minimum word spacing in adjusted text.
-The optional second argument \fIM\fR determines whether additional white
-space is added between sentences. If \fIM\fR is zero, no additional
-white space is added.
-Otherwise, a space of size \fIN\fR is added as usual.
+The optional second argument
+sets the space that is added between sentences
+to \fIM\fR/36\|ems.
 Ignored in \*[NR.]
 The number registers \A'n_.ss'\fB&ss\fR and \A'n_.sss'\fB&sss\fR
 contain the current values of \fIN\fR and \fIM\fR, respectively.
@@ -2815,7 +2827,7 @@ that falls below the optimum spacing,
 which may result in condensed spacing and shaping.
 .pg
 .tr &&
-An input text line ending with \fB.\fR\^, \fB?\fR, or \fB!\fR,
+An input text line ending with \fB.\fR\^, \fB?\fR, \fB!\fR, or \fB:\fR,
 optionally followed by any number of \fB"\fR, \fB\'\fR,
 \fB)\fR, \fB]\fR, \fB*\fR, or \fB\(dg\fR,
 is taken
@@ -2824,7 +2836,8 @@ automatically provided during filling.
 To prevent this at individual locations,
 add \A'e_&'\fB\e&\fR to the end of the input line;
 the \T'ss'\fBss\fR request\T \T's_font'(\(sc2)\T
-can be used to disable it globally.
+changes the size of this space character and can also disable it globally.
+Both the sentence-ending and the transparent characters are configurable.
 Multiple inter-word space characters found in the input are retained,
 except for trailing spaces;
 initial spaces also cause a \fIbreak\fR.
@@ -2993,6 +3006,22 @@ and \A'n_.lshmax'\fB&lshmax\fR
 contain the current values of
 \fIX\fR, \fIU\fR, \fIS\fR, \fIY\fR, and \fIV\fR,
 respectively.
+.bta sentchar
+\fB&sentchar\fI|c...\fR	\fB.?!:\fR	off	E	Sentence-ending characters.
+When one of the characters \fIc...\fR appears at the end
+of an input text line,
+an additional space character
+of the size defined with the \T'ss'\fBss\fR\T request
+is inserted.
+The current set of sentence-ending characters is available
+in the \A'n_.sentchar'\fB&sentchar\fR number register.
+.bta transchar
+\fB&transchar\fI|c..\fR	\fB"')]*\(dg\fR	off	E	Transparent characters for sentence-ending.
+A sentence-ending character is recognized as such
+even if followed by one or more of the characters \fIc...\fR
+before the end of an input text line.
+The current set of transparent characters for sentence ending is available
+in the \A'n_.transchar'\fB&transchar\fR number register.
 .bta track
 \fB&track\fI|F|S|N|T|M\fR	ignored	P,T	Static letter space tracking.
 If the current font is \fIF\fR
@@ -4312,7 +4341,8 @@ the user may specify a small list of exception words.
 Only words that consist of a central alphabetic string
 surrounded by (usually null) non-alphabetic strings
 are considered candidates for automatic hyphenation.
-Words that contain hyphens
+Unless the set of optional line break characters is otherwise configured,
+words that contain hyphens
 (minus),
 em-dashes (\fB\e(em\fR),
 or hyphenation indicator characters
@@ -4357,6 +4387,11 @@ number register.
 This request also makes parts of words composed by \fB-\fR or
 \fB\e(em\fR characters subject to hyphenation. Traditionally, the only
 hyphenation points in such words had been the hyphens/dashes.
+.bta breakchar
+\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.
+A line may always be split after one of these characters.
+The current set of optional line break characters is available
+in the \A'n_.breakchar'\fB&breakchar\fR number register.
 .bta hlm
 \fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.
 Each time a line is hyphenated automatically,

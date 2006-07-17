@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.33 (gritter) 7/11/06
+ * Sccsid @(#)n4.c	1.34 (gritter) 7/17/06
  */
 
 /*
@@ -245,7 +245,7 @@ setn(void)
 		else if (strcmp(&name[1], "ss") == 0)
 			i = spacesz;
 		else if (strcmp(&name[1], "sss") == 0)
-			i = ses ? spacesz : 0;
+			i = sesspsz;
 		else if (strcmp(&name[1], "minss") == 0)
 			i = minspsz ? minspsz : spacesz;
 		else if (strcmp(&name[1], "lshmin") == 0) {
@@ -283,6 +283,51 @@ setn(void)
 			i = fl = getfzoom();
 			if (i != fl)
 				goto flt;
+		} else if (strcmp(&name[1], "sentchar") == 0) {
+			if (sentch[0] == IMP)
+				/*EMPTY*/;
+			else if (sentch[0] == 0)
+				cpushback(".?!:");
+			else {
+				tchar	tc[NSENT+1];
+				for (i = 0; sentch[i] && i < NSENT; i++)
+					tc[i] = sentch[i];
+				tc[i] = 0;
+				pushback(tc);
+			}
+			return;
+		} else if (strcmp(&name[1], "transchar") == 0) {
+			tchar	tc[NSENT+1];
+			if (transch[0] == IMP)
+				/*EMPTY*/;
+			else if (transch[0] == 0) {
+				cpushback("\"')]*");
+				tc[0] = DAGGER;
+				tc[1] = 0;
+				pushback(tc);
+			} else {
+				for (i = 0; transch[i] && i < NSENT; i++)
+					tc[i] = transch[i];
+				tc[i] = 0;
+				pushback(tc);
+			}
+			return;
+		} else if (strcmp(&name[1], "breakchar") == 0) {
+			tchar	tc[NSENT+1];
+			if (breakch[0] == IMP)
+				/*EMPTY*/;
+			else if (breakch[0] == 0) {
+				tc[0] = EMDASH;
+				tc[1] = '-';
+				tc[2] = 0;
+				pushback(tc);
+			} else {
+				for (i = 0; breakch[i] && i < NSENT; i++)
+					tc[i] = breakch[i];
+				tc[i] = 0;
+				pushback(tc);
+			}
+			return;
 		} else
 			goto s0;
 	} else {

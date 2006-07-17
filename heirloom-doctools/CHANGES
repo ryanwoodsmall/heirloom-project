@@ -1,3 +1,11 @@
+Release ...
+* [nt]roff: The sets of sentence-ending and transparent characters are
+  now configurable with the ".sentchar" and ".transchar" requests.
+* [nt]roff: The set of optional line break characters (normally hyphen
+  and em dash) is now configurable with the ".breakchar" request.
+* troff: The second argument to the ".ss" request now actually sets the
+  size of the sentence-end space instead of just switching it on or off.
+
 Release 060716
 * troff: The ".letadj" request has been added to enable dynamic letter
   spacing and letter reshaping when justifying lines.
