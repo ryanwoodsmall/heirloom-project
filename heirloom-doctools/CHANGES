@@ -1,4 +1,6 @@
 Release ...
+* [nt]roff: The ".index" request has been added to determine the position
+  of a string within a string or macro.
 * [nt]roff: The sets of sentence-ending and transparent characters are
   now configurable with the ".sentchar" and ".transchar" requests.
 * [nt]roff: The set of optional line break characters (normally hyphen
@@ -8,6 +10,8 @@ Release ...
   hyphenation).
 * troff: The second argument to the ".ss" request now actually sets the
   size of the sentence-end space instead of just switching it on or off.
+* nroff: The ".psbb" request has been made a no-op since nroff cannot
+  otherwise handle EPS documents anyway.
 
 Release 060716
 * troff: The ".letadj" request has been added to enable dynamic letter

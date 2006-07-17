@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.79 (gritter) 7/17/06
+.\" Sccsid @(#)doc.tr	1.80 (gritter) 7/17/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1261,6 +1261,8 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'length'\fB&length\fI|R|string\fR	\fIR\fR|set|to|0	\(en	Store the length of \fIstring\fR in register \fIR\fR.\T
 .b1
+\T'index'\fB&index\fI|R|xx|string\fR	ignored	\(en	Store position where \fIstring\fR occurs in \fIxx\fR in register \fIR\fR.\T
+.b1
 \T'chop'\fB&chop\fI|xx\fR	\(en	ignored	\(en	Remove the last character of \fIxx\fR.\T
 .b1
 \T'rm'\fB&rm\fI|xx\fR	\(en	ignored	\(en	Remove request, macro, or string.\T
@@ -1556,6 +1558,7 @@ Device and Font Description Files
 \T'if'if	16\T
 \T'ig'ig	20\T
 \T'in'in	6\T
+\T'index'index	7\T
 \T'it'it	7\T
 \T'itc'itc	7\T
 \T'kern'kern	4\T
@@ -3512,6 +3515,12 @@ of the string;
 \(mi1 implies the last character of the string.
 .bta length
 \fB&length\fI|R|string\fR	\fIR\fR|set|to|0	\(en	Store the length of \fIstring\fR in register \fIR\fR.
+\fIstring\fR is read in \T'copy mode'\fIcopy mode.\fR\T
+.bta index
+\fB&index\fI|R|xx|string\fR	ignored	\(en	Store the position of the first
+occurence of \fIstring\fR in \fIxx\fR in register \fIR\fR.
+Positions are counted from 0.
+If no occurence is found, \fIR\fR is set to \-1.
 \fIstring\fR is read in \T'copy mode'\fIcopy mode.\fR\T
 .bta chop
 \fB&chop\fI|xx\fR	\(en	ignored	\(en	Remove the last character of the macro, string, or diversion \fIxx\fR.

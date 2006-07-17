@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.104 (gritter) 7/17/06
+ * Sccsid @(#)n3.c	1.105 (gritter) 7/17/06
  */
 
 /*
@@ -78,6 +78,7 @@ static void	_collect(int);
 static void	caseshift(void);
 static void	casesubstring(void);
 static void	caselength(void);
+static void	caseindex(void);
 static int	getls(int, int *);
 static void	addcon(int, char *, void(*)(int));
 
@@ -105,6 +106,7 @@ static const struct {
 	{ "hidechar",		(void(*)(int))casehidechar },
 	{ "hlm",		(void(*)(int))casehlm },
 	{ "hylang",		(void(*)(int))casehylang },
+	{ "index",		(void(*)(int))caseindex },
 	{ "itc",		(void(*)(int))caseitc },
 	{ "kern",		(void(*)(int))casekern },
 	{ "kernafter",		(void(*)(int))casekernafter },
@@ -1110,7 +1112,7 @@ casechop(void)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
-	if ((j = findmn(i)) < 0) {
+	if ((j = findmn(i)) < 0 || !contab[j].mx) {
 		nosuch(i);
 		return;
 	}
@@ -1141,7 +1143,7 @@ casesubstring(void)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
-	if ((j = findmn(i)) < 0) {
+	if ((j = findmn(i)) < 0 || !contab[j].mx) {
 		nosuch(i);
 		return;
 	}
@@ -1219,6 +1221,65 @@ caselength(void)
 	}
 	copyf--;
 	numtab[findr(i)].val = j;
+}
+
+void
+caseindex(void)
+{
+	int	i, j, n, N, M;
+	int	*sp = NULL, as = 0, ns = 0, *np;
+	tchar	c;
+	filep	savip;
+
+	lgf++;
+	skip(1);
+	if ((N = getrq(1)) == 0)
+		return;
+	skip(1);
+	if ((i = getrq(1)) == 0)
+		return;
+	if ((M = findmn(i)) < 0 || !contab[M].mx) {
+		nosuch(i);
+		return;
+	}
+	copyf++;
+	if (!skip(0)) {
+		while ((c = getch()) != 0 && !ismot(c) &&
+				(i = cbits(c)) != '\n') {
+			if (ns >= as)
+				sp = realloc(sp, (as += 10) * sizeof *sp);
+			sp[ns++] = i;
+		}
+		np = malloc((ns + 1) * sizeof *np);
+		i = 0;
+		j = -1;
+		for (;;) {
+			np[i++] = j++;
+			if (i >= ns)
+				break;
+			while (j >= 0 && sp[i] != sp[j])
+				j = np[j];
+		}
+		savip = ip;
+		ip = (filep)contab[M].mx;
+		app = 1;
+		j = 0;
+		n = 0;
+		while ((c = rbf()) != 0 && j < ns) {
+			while (j >= 0 && cbits(c) != sp[j])
+				j = np[j];
+			j++;
+			n++;
+		}
+		n = j == ns ? n - ns : -1;
+		app = 0;
+		ip = savip;
+		free(sp);
+		free(np);
+	} else
+		n = -1;
+	copyf--;
+	numtab[findr(N)].val = n;
 }
 
 

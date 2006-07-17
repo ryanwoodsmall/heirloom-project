@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.46 (gritter) 7/3/06
+ * Sccsid @(#)n9.c	1.47 (gritter) 7/17/06
  */
 
 /*
@@ -697,6 +697,7 @@ caselc_ctype(void)
 #endif
 }
 
+#ifndef	NROFF
 struct fg {
 	char	buf[512];
 	char	*bp;
@@ -801,10 +802,12 @@ getpsbb(const char *name, int bb[4])
 	free(buf);
 	close(fd);
 }
+#endif	/* !NROFF */
 
 void
 casepsbb(void)
 {
+#ifndef	NROFF
 	char	*buf = NULL;
 	int	c;
 	int	n = 0, sz = 0;
@@ -824,6 +827,7 @@ casepsbb(void)
 	setnr("lly", bb[1], 0);
 	setnr("urx", bb[2], 0);
 	setnr("ury", bb[3], 0);
+#endif	/* !NROFF */
 }
 
 static const struct {
