@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.76 (gritter) 7/17/06
+ * Sccsid @(#)n7.c	1.77 (gritter) 7/19/06
  */
 
 /*
@@ -92,6 +92,7 @@ int	brflg;
 #undef	iswascii
 #define	iswascii(c)	(((c) & ~(wchar_t)0177) == 0)
 
+static tchar	adjbit(tchar);
 #ifndef	NROFF
 #define	nroff		0
 static void	letshrink(void);
@@ -148,6 +149,7 @@ tbreak(void)
 	lastl = ne;
 	if (brflg != 1) {
 		totout = 0;
+		hlc = 0;
 	} else if (ad) {
 		if ((lastl = ll - un + rhang + lsplast) < ne)
 			lastl = ne;
@@ -177,12 +179,14 @@ tbreak(void)
 	adrem = (adrem / resol) * resol;
 	for (i = line; nc > 0; ) {
 		if ((c = cbits(j = *i++) & ~MBMASK) == ' ' || c == STRETCH) {
-			if (xflag && !fi && dilev || iszbit(j))
+			if (xflag && !fi && dilev || iszbit(j) || isadjspc(j))
 				goto std;
 			pad = 0;
-			if (i > line)
+			if (i > &line[1])
 				pad += kernadjust(i[-2], i[-1]);
 			do {
+				if (xflag)
+					pchar(adjbit(j));
 				minflg = _minflg;
 				pad += width(j);
 				nc--;
@@ -231,6 +235,8 @@ tbreak(void)
 			nc--;
 		}
 	}
+	if (hlc)
+		pchar(mkxfunc(HYPHED, 0));
 	if (ic) {
 		if ((k = ll - un - lastl + ics) > 0)
 			horiz(k);
@@ -324,6 +330,8 @@ text(void)
 	while ((c = cbits(i = GETCH())) == ' ' || c == STRETCH) {
 		if (iszbit(i))
 			break;
+		if (isadjspc(i))
+			continue;
 		spcnt++;
 		widthp = xflag ? width(i) : sps;
 		numtab[HP].val += widthp;
@@ -861,6 +869,8 @@ movword(void)
 				break;
 			wch--;
 			wne -= xflag ? width(i) : sps;
+			if (xflag && linep > line)
+				storeline(adjbit(i), 0);
 		}
 		wp--;
 		if (wp > wordp)
@@ -1154,16 +1164,20 @@ getword(int x)
 			continue;
 		}
 		if (j == ' ' && !iszbit(i)) {
-			if (spbits && xflag) {
+			if (isadjspc(i))
+				w = 0;
+			else if (spbits && xflag) {
 				i = ' ' | spbits;
 				w = width(i);
 			} else
 				w = sps;
 			storeword(i, w);
 			numtab[HP].val += w;
-			widthp = w;
-			gotspc = i;
-			spbits = i & SFMASK;
+			if (!isadjspc(j)) {
+				widthp = w;
+				gotspc = i;
+				spbits = i & SFMASK;
+			}
 			continue;
 		}
 		if (gotspc) {
@@ -1298,7 +1312,7 @@ g1:		nexti = GETCH();
 		if (collectmb(i))
 			goto g1;
 #endif /* EUC && NROFF */
-	if (j != ' ' || iszbit(i)) {
+	if (j != ' ' || iszbit(i) || isadjspc(i)) {
 		static int sentchar[] =
 			{ '.', '?', '!', ':', 0 }; /* sentence terminators */
 		int	*sp, *tp;
@@ -1352,7 +1366,7 @@ rtn:
 		spbits = chbits;
 	for (wp = word; *wp; wp++) {
 		j = cbits(*wp);
-		if ((j == ' ' || j == STRETCH) && !iszbit(j))
+		if ((j == ' ' || j == STRETCH) && !iszbit(j) && !isadjspc(j))
 			continue;
 		if (!ischar(j) || (!isdigit(j) && j != '-'))
 			break;
@@ -1473,6 +1487,14 @@ gotmb:
 
 
 #endif /* EUC && NROFF */
+
+static tchar
+adjbit(tchar c)
+{
+	if (cbits(c) == ' ')
+		setcbits(c, WORDSP);
+	return(c | ADJBIT);
+}
 
 #ifndef	NROFF
 static void

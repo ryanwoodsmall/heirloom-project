@@ -10,6 +10,9 @@ Release ...
   hyphenation).
 * troff: The second argument to the ".ss" request now actually sets the
   size of the sentence-end space instead of just switching it on or off.
+* [nt]roff: The ".unformat" and ".asciify" requests have been added to
+  remove the effects of adjustment, and font and point size information,
+  respectively, from a diversion.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
 

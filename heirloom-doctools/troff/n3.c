@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.106 (gritter) 7/18/06
+ * Sccsid @(#)n3.c	1.107 (gritter) 7/19/06
  */
 
 /*
@@ -79,6 +79,8 @@ static void	caseshift(void);
 static void	casesubstring(void);
 static void	caselength(void);
 static void	caseindex(void);
+static void	caseasciify(void);
+static void	caseunformat(int);
 static int	getls(int, int *);
 static void	addcon(int, char *, void(*)(int));
 
@@ -86,6 +88,7 @@ static const struct {
 	char	*n;
 	void	(*f)(int);
 } longrequests[] = {
+	{ "asciify",		(void(*)(int))caseasciify },
 	{ "bleedat",		(void(*)(int))casebleedat },
 	{ "blm",		(void(*)(int))caseblm },
 	{ "breakchar",		(void(*)(int))casebreakchar },
@@ -137,6 +140,7 @@ static const struct {
 	{ "track",		(void(*)(int))casetrack },
 	{ "transchar",		(void(*)(int))casetranschar },
 	{ "trimat",		(void(*)(int))casetrimat },
+	{ "unformat",		(void(*)(int))caseunformat },
 	{ "vpt",		(void(*)(int))casevpt },
 	{ "warn",		(void(*)(int))casewarn },
 	{ "write",		(void(*)(int))casewrite },
@@ -1285,6 +1289,97 @@ caseindex(void)
 		n = -1;
 	copyf--;
 	numtab[findr(N)].val = n;
+}
+
+static void
+caseasciify(void)
+{
+	caseunformat(1);
+}
+
+static void
+caseunformat(int flag)
+{
+	int	i, j;
+	int	ns = 0, as = 0;
+	tchar	*tp = NULL, c;
+	filep	savip;
+	int	noout = 0;
+
+	if (dip != d)
+		wbfl();
+	lgf++;
+	skip(1);
+	if ((i = getrq(0)) == 0)
+		return;
+	if ((j = findmn(i)) < 0 || !contab[j].mx) {
+		nosuch(i);
+		return;
+	}
+	savip = ip;
+	ip = (filep)contab[j].mx;
+	ns = 0;
+	app = 1;
+	while ((c = rbf()) != 0) {
+		if (ns >= as) {
+			as += 512;
+			tp = realloc(tp, as * sizeof *tp);
+		}
+		tp[ns++] = c;
+	}
+	app = 0;
+	ip = savip;
+	if ((offset = finds(i)) != 0) {
+		for (j = 0; j < ns; j++) {
+			if (!ismot(c) && cbits(c) == '\n')
+				noout = 0;
+			else if (j+1 < ns && cbits(tp[j+1]) == XFUNC &&
+					fbits(tp[j+1]) == HYPHED)
+				noout = 1;
+			if (isadjspc(c = tp[j])) {
+				if (cbits(c) == WORDSP)
+					setcbits(c, ' ');
+				c &= ~ADJBIT;
+			} else if (c == WORDSP) {
+				j++;
+				continue;
+			} else if (c == FLSS) {
+				j++;
+				continue;
+			} else if (cbits(c) == XFUNC && fbits(c) == FLDMARK) {
+				if ((c = sbits(c)) == 0)
+					continue;
+			} else if (isadjmot(c))
+				continue;
+			if (flag & 1 && !ismot(c) && cbits(c) != SLANT) {
+#ifndef	NROFF
+				int	m = cbits(c);
+				int	f = fbits(c);
+				int	k;
+				if (islig(c) && lgrevtab && lgrevtab[f] &&
+						lgrevtab[f][m]) {
+					for (k = 0; lgrevtab[f][m][k]; k++)
+						if (!noout)
+							wbf(lgrevtab[f][m][k]);
+					continue;
+				} else
+#endif
+					c = cbits(c);
+			}
+			if (!noout)
+				wbf(c);
+		}
+		wbt(0);
+		clrmn(oldmn);
+		if (newmn) {
+			if (contab[newmn].rq)
+				munhash(&contab[newmn]);
+			contab[newmn].rq = i;
+			maddhash(&contab[newmn]);
+		}
+	}
+	free(tp);
+	offset = dip->op;
 }
 
 

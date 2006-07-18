@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.81 (gritter) 7/18/06
+.\" Sccsid @(#)doc.tr	1.82 (gritter) 7/19/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -89,7 +89,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/18/06
+.ds Sccsdate 7/19/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1274,6 +1274,10 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'da'\fB&da\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR.\T
 .b1
+\T'unformat'\fB&unformat\fI|xx\fR	\(en	\(en	\(en	Strip line break information from diversion \fIxx\fR.\T
+.b1
+\T'asciify'\fB&asciify\fI|xx\fR	\(en	\(en	\(en	All characters in diversion \fIxx\fR changed to plain text.\T
+.b1
 \T'wh'\fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Set location trap; negative is w.r.t. page bottom.\T
 .b1
 \T'ch'\fB&ch\fI|xx|N\fR	\(en	\(en	\fBv\fR	Change trap location.\T
@@ -1506,6 +1510,7 @@ Device and Font Description Files
 \T'af'af	8\T
 \T'am'am	7\T
 \T'as'as	7\T
+\T'asciify'asciify	7\T
 \T'bd'bd	2\T
 \T'bleedat'bleedat	3\T
 \T'blm'blm	7\T
@@ -1635,6 +1640,7 @@ Device and Font Description Files
 \T'trimat'trimat	3\T
 \T'uf'uf	10\T
 \T'ul'ul	10\T
+\T'unformat'unformat	7\T
 \T'vs'vs	5\T
 \T'warn'warn	21\T
 \T'wh'wh	7\T
@@ -3548,6 +3554,20 @@ requests of this type should not appear when nested diversions are being used.
 .bta da
 \fB&da|\fIxx\fR	\(en	end	D	Divert, appending to \fIxx\fR
 (append version of \fBdi\fR).
+.bta unformat
+\fB&unformat\fI|xx\fR	\(en	\(en	\(en	Strip line break information from diversion \fIxx\fR.
+All breaks that do not result
+in explicit vertical movement are discarded,
+interword spaces that had been converted
+to horizontal movements during adjustment
+become space characters again,
+the effects of tabulators and field characters are reverted,
+and hyphenated word parts are combined again.
+.bta asciify
+\fB&asciify\fI|xx\fR	\(en	\(en	\(en	All characters in diversion \fIxx\fR changed to plain text.
+Has all effects described for \fBunformat\fR
+and additionally discards font and point size information
+and splits substituted ligatures to their individual characters.
 .bta wh
 \fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Install
 a trap to invoke \fIxx\fR at page position \fIN;\fR

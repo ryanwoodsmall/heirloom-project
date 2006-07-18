@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.76 (gritter) 7/17/06
+ * Sccsid @(#)t10.c	1.77 (gritter) 7/19/06
  */
 
 /*
@@ -338,6 +338,8 @@ ptout(register tchar i)
 	register tchar	*k;
 	int temp, a, b;
 
+	if (isadjspc(i))
+		return;
 	if (cbits(i) != '\n') {
 		*olinep++ = i;
 		return;

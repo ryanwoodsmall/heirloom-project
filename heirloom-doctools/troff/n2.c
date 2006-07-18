@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.22 (gritter) 7/3/06
+ * Sccsid @(#)n2.c	1.23 (gritter) 7/19/06
  */
 
 /*
@@ -235,6 +235,8 @@ outascii (	/* print i in best-guess ascii */
 	int k;
 
 	if (j == FILLER)
+		return;
+	if (isadjspc(i))
 		return;
 	if (ismot(i)) {
 		oput(' ');

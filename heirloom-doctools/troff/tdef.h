@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.94 (gritter) 7/17/06
+ * Sccsid @(#)tdef.h	1.95 (gritter) 7/19/06
  */
 
 /*
@@ -150,6 +150,7 @@
 #define	FLDMARK	0006	/* field marker */
 #define	LETSH	0007	/* expanded letter shapes */
 #define	NLETSH	0010	/* condensed letter shapes */
+#define	HYPHED	0011	/* previous character is an automatic hyphen */
 
 #define	LAFACT	1000	/* letter adjustment float-to-int conversion factor */
 
@@ -189,7 +190,7 @@ extern	int	NM;	/* requests + macros */
 #define	NSO	5	/* "so" depth */
 extern	int	NMF;	/* size of space for -m flags */
 #define	WDSIZE	540	/* word buffer size */
-#define	LNSIZE	680	/* line buffer size */
+#define	LNSIZE	1080	/* line buffer size */
 extern	int	NDI;	/* number of diversions */
 extern	int	NCHARS;	/* maximum size of troff character set */
 #define	NTRTAB	NCHARS	/* number of items in trtab[] */
@@ -259,7 +260,10 @@ endif NROFF
 #define	BLBIT		(01ULL << 31)	/* optional break-line char */
 #define	isblbit(n)	((n) & BLBIT)
 #define	COPYBIT		(01ULL << 30)	/* wide character in copy mode */
-#define	iscopy(n)	((n) & COPYBIT)
+#define	iscopy(n)	((n) & COPYBIT && !ismot(n) && cbits(n) & ~0177)
+#define	ADJBIT		(01ULL << 30)	/* adjusted space */
+#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0)
+#define	isadjmot(n)	((n) & ADJBIT && ismot(n))
 #define	AUTOLIG		(01ULL << 29)	/* ligature substituted automatically */
 #define	islig(n)	((n) & AUTOLIG)
 #define	TAILBIT		(01ULL << 29)	/* tail recursion */
@@ -301,7 +305,10 @@ endif NROFF
 #define	BLBIT	0x40000000	/* optional break-line char */
 #define	isblbit(n)	((n) & BLBIT)
 #define	COPYBIT	0x20000000	 /* wide character in copy mode */
-#define	iscopy(n)	((n) & COPYBIT)
+#define	iscopy(n)	((n) & COPYBIT && !ismot(n) && cbits(n) & ~0177)
+#define	ADJBIT	0x20000000	/* adjusted space */
+#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0)
+#define	isadjmot(n)	((n) & ADJBIT && ismot(n))
 #define	TAILBIT	0x10000000	/* tail recursion */
 #define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (TAILBIT|'\n'))
 #define	ABSCHAR		0400	/* absolute char number in this font */
