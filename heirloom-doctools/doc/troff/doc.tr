@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.82 (gritter) 7/19/06
+.\" Sccsid @(#)doc.tr	1.83 (gritter) 7/23/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -89,7 +89,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/19/06
+.ds Sccsdate 7/23/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1706,6 +1706,7 @@ Reference	Sequence	Meaning
 \T'e_$'7.3\T	\T'e_$'\fB\e$\fIn\fR,\fB\e$(\fInn\fR,\fB\e$[\fInnn\fB]\fR\T	\T'e_$'Interpolate argument \fIn\fR, \fInn\fR, or \fInnn\fR\T
 \T'e_$*'7.3\T	\T'e_$*'\fB\e$\(**\fR\T	\T'e_$*'Interpolate all arguments separated by spaces\T
 \T'e_$@'7.3\T	\T'e_$@'\fB\e$@\fR\T	\T'e_$@'Interpolate all arguments in double quotes\T
+\T'e_$0'7.3\T	\T'e_$0'\fB\e$0\fR\T	\T'e_$0'Interpolate name of current macro or string\T
 \T'e_%'13\T	\T'e_%'\fB\e%\fR\T	\T'e_%'Default optional hyphenation character\T
 \T'e_('2.1\T	\T'e_('\fB\e(\fIxx\fR\T	\T'e_('Character named \fIxx\fR\T
 \T'e_['2.1\T	\T'e_['\fB\e[\fIxxx\fR]\T	\T'e_['Character named \fIxxx\fP\T
@@ -1733,6 +1734,7 @@ Reference	Sequence	Meaning
 \T'e_N'2.\T	\T'e_N'\fB\eN\fI\'N\'\fR\T	\T'e_N'Character number \fIN\fR on current font\T
 \T'e_o'12.1\T	\T'e_o'\fB\eo\fI\'abc...\'\fR\T	\T'e_o'Overstrike characters \fIa, b, c, ...\fR\T
 \T'e_p'4.1\T	\T'e_p'\fB\ep\fR\T	\T'e_p'Break and spread output line\T
+\T'e_P'7.5\T	\T'e_P'\fB\eP\fIx\fR,\fB\eP(\fIxx\fR,\fB\eP[\fIxxx\fB]\fR\T	\T'e_P'Output-line trap \fIx\fR, \fIxx\fR, or \fIxxx\fR\T
 \T'e_r'11.1\T	\T'e_r'\fB\er\fR\T	\T'e_r'Reverse 1\|em vertical motion (reverse line in \*(NR)\T
 \T'e_R'8\T	\T'e_R'\fB\eR\fI\'R\ \(+-N\'\fR\T	\T'e_R'Set number register \fIR\fR to \fI\(+-N\fR\T
 .ne 3
@@ -3384,6 +3386,8 @@ The escape sequence \A'e_$*'\fB\e$\(**\fR interpolates all arguments to a macro,
 separated by spaces;
 \A'e_$@'\fB\e$@\fR interpolates all arguments,
 each one surrounded by double quotes, separated by spaces.
+The name of the current macro or string
+is available with the \A'e_$0'\fB\e$0\fR escape sequence.
 The number of currently available
 arguments is in the \A'n_.$'\fB.$\fR register.
 .pg
@@ -3432,7 +3436,8 @@ the current high-water text base-line \T'n_.h'(\fB.h\fR register)\T,
 and the current diversion name (\A'n_.z'\fB.z\fR register).
 .sc
 \A'c_trap'Traps.
-Three types of trap mechanisms are available\(empage traps, a diversion trap, and
+Four types of trap mechanisms are available\(empage traps,
+output-line traps, a diversion trap, and
 an input-line-count trap.
 Macro-invocation traps may be planted using
 \T'wh'\fBwh\fR\T at any page position including the top.
@@ -3454,6 +3459,23 @@ The distance to the next trap position is available
 in the \A'n_.t'\fB.t\fR register;
 if there are no traps between the current position and the bottom of the page,
 the distance returned is the distance to the page bottom.
+.pg
+An output-line trap is planted using
+the escape sequence \A'e_P'\fB\eP\fIx\fR,
+\fB\eP(\fIxx\fR, or \fB\eP[\fIxxx\fB]\fR.
+It is converted to an internal character code
+that becomes part of the current text.
+When the line containing it has been physically output,
+the macro \fIx\fR, \fIxx\fR, or \fIxxx\fR, respectively, is invoked.
+A line may contain more than one output-line trap;
+they are invoked in the order they appear.
+If a page trap becomes effective at the same point,
+it is invoked immediately after all output-line traps.
+Output-line traps are not invoked
+at the time they become part of a diversion.
+They can thus be used to determine e.g. the effective page number
+of the surrounding text,
+even when it had originally been diverted on another page.
 .pg
 A macro-invocation trap effective in the current diversion may be planted using \T'dt'\fBdt\fR.\T
 The \fB.t\fR register works in a diversion; if there is no subsequent trap a \fIlarge\fR

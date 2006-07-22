@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: A new type of traps is available: output-line traps. They are
+  set with the new "\P" escape sequence and are invoked when the line that
+  contains the corresponding sequence has been output.
 * [nt]roff: The ".index" request has been added to determine the position
   of a string within a string or macro.
 * [nt]roff: The sets of sentence-ending and transparent characters are
@@ -13,6 +16,8 @@ Release ...
 * [nt]roff: The ".unformat" and ".asciify" requests have been added to
   remove the effects of adjustment, and font and point size information,
   respectively, from a diversion.
+* [nt]roff: The "\$0" escape sequence has been added to refer to the name
+  of the current macro or string.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
 

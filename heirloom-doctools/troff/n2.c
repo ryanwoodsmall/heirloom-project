@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.23 (gritter) 7/19/06
+ * Sccsid @(#)n2.c	1.24 (gritter) 7/23/06
  */
 
 /*
@@ -172,6 +172,10 @@ pchar1(register tchar i)
 	if (tflg) {	/* transparent mode, undiverted */
 		outtp(i);
 		return;
+	}
+	if (cbits(i) == XFUNC && fbits(i) == OLT) {
+		olt = realloc(olt, (nolt + 1) * sizeof *olt);
+		olt[nolt++] = sbits(i);
 	}
 #ifndef NROFF
 	if (ascii)

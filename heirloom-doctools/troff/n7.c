@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.77 (gritter) 7/19/06
+ * Sccsid @(#)n7.c	1.78 (gritter) 7/23/06
  */
 
 /*
@@ -448,7 +448,7 @@ nofill(void)
 	}
 	nexti = GETCH();
 	if (!nroff && !ce && !pendnf && lhangtab != NULL &&
-			cbits(nexti) != SLANT &&
+			cbits(nexti) != SLANT && cbits(nexti) != XFUNC &&
 			!ismot(nexti) && lhangtab[fbits(nexti)] != NULL &&
 			(k = lhangtab[fbits(nexti)][cbits(nexti)]) != 0) {
 		width(nexti);	/* set xpts */
@@ -678,18 +678,24 @@ nlpn:
 	}
 nl2:
 	trap = 0;
+	if (nolt && dip == d) {
+		for (i = 0; i < nolt; i++)
+			trap |= control(olt[i], 0);
+		nolt = 0;
+		free(olt);
+	}
 	if (vpt <= 0)
 		/*EMPTY*/;
 	else if (numtab[NL].val == 0) {
 		if ((j = findn(0)) != NTRAP)
-			trap = control(mlist[j], 0);
+			trap |= control(mlist[j], 0);
 	} else if ((i = findt(numtab[NL].val - nlss)) <= nlss) {
 		if ((j = findn1(numtab[NL].val - nlss + i)) == NTRAP) {
 			flusho();
 			errprint("Trap botch.");
 			done2(-5);
 		}
-		trap = control(mlist[j], 0);
+		trap |= control(mlist[j], 0);
 	}
 }
 
@@ -876,6 +882,7 @@ movword(void)
 		if (wp > wordp)
 			wne -= kernadjust(wp[-1], wp[0]);
 		if (!nroff && admod != 1 && admod != 2 && lhangtab != NULL &&
+				cbits(*wp) != XFUNC &&
 				cbits(*wp) != SLANT && !ismot(*wp) &&
 				lhangtab[fbits(*wp)] != NULL &&
 				(w = lhangtab[fbits(*wp)][cbits(*wp)]) != 0) {

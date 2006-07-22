@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.56 (gritter) 7/17/06
+ * Sccsid @(#)ext.h	1.57 (gritter) 7/23/06
  */
 
 /*
@@ -131,6 +131,7 @@ extern	int	nlist[NTRAP];
 extern	int	nmfi;
 extern	int	no_out;
 extern	int	nofeed;
+extern	int	nolt;
 extern	int	nonumb;
 extern	int	noscale;
 extern	int	npn;
@@ -138,6 +139,7 @@ extern	int	npnflg;
 extern	int	nx;
 extern	int	oldbits;
 extern	int	oldmn;
+extern	int	*olt;
 extern	int	over;
 extern	int	padc;
 extern	int	pfont;
@@ -382,6 +384,7 @@ extern void	casepl(void);
 extern void	casewh(void);
 extern void	casech(void);
 extern void	casevpt(void);
+extern tchar	setolt(void);
 extern int	findn(int);
 extern void	casepn(void);
 extern void	casebp(void);
