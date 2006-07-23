@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.112 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.113 (gritter) 7/23/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.112 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.113 (gritter) 7/23/06";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.112 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.113 (gritter) 7/23/06";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.112 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)ps.sl	2.113 (gritter) 7/23/06";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.112 (gritter) 5/8/06";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.113 (gritter) 7/23/06";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
 	&& !defined (__DragonFly__)
@@ -1372,16 +1372,17 @@ compute_priority_old(struct proc *p)
 	if (p->p_lstate[0] != 'R' && p->p_c <= 2)
 		p->p_c = 0;
 	/*
-	 * The value for C still depends on the nice value. Make 60
+	 * The value for C still depends on the nice value. Make 80
 	 * the highest possible C value for all nice values.
 	 */
-	p->p_c *= 60 / full_counter;
+	p->p_c *= 80 / full_counter;
 }
 
 /*
  * Priority calculation for Linux 2.5 and (hopefully) above, based
- * on 2.5.31. This supplies a sensible priority value, but nothing
- * we could use to compute "CPU usage for scheduling".
+ * on 2.5.31. This supplies a sensible priority value, but originally
+ * nothing we could use to compute "CPU usage for scheduling". More
+ * recent 2.6 versions have a SleepAVG field in the "status" file.
  */
 static void
 compute_priority_new(struct proc *p)
@@ -1761,6 +1762,15 @@ getproc_status(struct proc *p)
 				return STOP;
 			}
 			p->p_lwp = v->v_int;
+		} else if (strncmp(line, "SleepAVG:", 9) == 0) {
+			cp = &line[9];
+			while (isspace(*cp))
+				cp++;
+			if ((v = getval(&cp, VT_INT, '%', 0)) == NULL) {
+				fclose(fp);
+				return STOP;
+			}
+			p->p_c = (100 - v->v_int) * 80 / 100;
 		}
 	}
 	fclose(fp);

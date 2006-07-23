@@ -34,9 +34,9 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)priocntl_s42.sl	1.18 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)priocntl_s42.sl	1.19 (gritter) 7/23/06";
 #else
-static const char sccsid[] USED = "@(#)priocntl.sl	1.18 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)priocntl.sl	1.19 (gritter) 7/23/06";
 #endif
 
 #include	<sys/time.h>
@@ -842,11 +842,17 @@ selclass(const char *s)
 {
 	if (eq(s, "TS"))
 		cflag = SCHED_OTHER;
-	else if (eq(s, "BA"))
+	else if (eq(s, "B"))
 		cflag = SCHED_BATCH;
-	else if (eq(s, "IS"))
+	else if (eq(s, "BA"))	/* old */
+		cflag = SCHED_BATCH;
+	else if (eq(s, "ISO"))
 		cflag = SCHED_ISO;
-	else if (eq(s, "FI"))
+	else if (eq(s, "IS"))	/* old */
+		cflag = SCHED_ISO;
+	else if (eq(s, "FF"))
+		cflag = SCHED_FIFO;
+	else if (eq(s, "FI"))	/* old */
 		cflag = SCHED_FIFO;
 	else if (eq(s, "RT") || eq(s, "FP"))
 		cflag = SCHED_RR;

@@ -1,4 +1,8 @@
 Release ...
+* ps: Use the Linux 2.6 /proc/status "SleepAVG" field to compute the value
+  for the "C" column (cpu usage for scheduling).
+* priocntl: The "FF", "B", and "ISO" class names are now accepted with
+  the "-e" option too.
 * file: UTF-8 characters in troff input files are now recognized.
 * cp: The "-s" option now displays correct sizes and related statistics
   for special files with st_size == 0.
