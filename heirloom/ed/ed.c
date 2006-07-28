@@ -48,13 +48,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.98 (gritter) 7/23/05";
+static const char sccsid[] USED = "@(#)ed_su3.sl	1.99 (gritter) 7/27/06";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.98 (gritter) 7/23/05";
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.99 (gritter) 7/27/06";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.98 (gritter) 7/23/05";
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.99 (gritter) 7/27/06";
 #else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.98 (gritter) 7/23/05";
+static const char sccsid[] USED = "@(#)ed.sl	1.99 (gritter) 7/27/06";
 #endif	/* !SU3, !SUS, !S42 */
 
 #include <sys/types.h>
@@ -1759,6 +1759,8 @@ dosub(int really)
 	register int i, j, k;
 	int c;
 
+	if (!really)
+		goto copy;
 	i = 0;
 	j = 0;
 	k = 0;
@@ -1798,7 +1800,7 @@ dosub(int really)
 		lp = linebuf;
 		sp = genbuf;
 	} else {
-		sp = linebuf;
+	copy:	sp = linebuf;
 		lp = genbuf;
 	}
 	while (*lp++ = *sp++)

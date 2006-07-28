@@ -1,4 +1,7 @@
 Release ...
+* ed: Substituting only a specific occurence of the pattern, as in the
+  command "s/x/y/3", now works correctly if the substitution "y" is not
+  equal in length to the pattern match "x" (Derek Thomas).
 * ps: Use the Linux 2.6 /proc/status "SleepAVG" field to compute the value
   for the "C" column (cpu usage for scheduling).
 * priocntl: The "FF", "B", and "ISO" class names are now accepted with
