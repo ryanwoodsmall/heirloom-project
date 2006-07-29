@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.101 (gritter) 7/29/06
+ * Sccsid @(#)tdef.h	1.102 (gritter) 7/30/06
  */
 
 /*
@@ -371,6 +371,7 @@ endif NROFF
 #define	LGBIT	020
 
 #define	PAIR(A,B)	(A|(B<<BYTE))
+#define	LOOP		(-4)
 
 #ifndef EUC
 #define	oput(c)	if ((*obufp++ = (c)), obufp >= &obuf[OBUFSZ]) flusho(); else
@@ -546,7 +547,11 @@ struct	s {	/* stack frame */
 	int	mname;
 	int	frame_cnt;
 	int	tail_cnt;
-	int	loopf;	/* 1: allocated, 2: continue loop, 4: in evaluation */
+	enum {
+		LOOP_FREE = 01,
+		LOOP_NEXT = 02,
+		LOOP_EVAL = 04
+	} loopf;
 };
 
 extern struct contab {

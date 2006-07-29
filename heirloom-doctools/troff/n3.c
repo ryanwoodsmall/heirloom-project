@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.114 (gritter) 7/29/06
+ * Sccsid @(#)n3.c	1.115 (gritter) 7/30/06
  */
 
 /*
@@ -748,14 +748,14 @@ popi(void)
 	pendt = p->ppendt;
 	lastpbp = p->lastpbp;
 	c = p->pch;
-	if (p->loopf & 2) {
+	if (p->loopf & LOOP_NEXT) {
 		d = ch;
 		ch = c;
 		pushi(p->newip, p->mname);
 		c = 0;
 		ch = d;
 	} else
-		if (p->loopf & 1)
+		if (p->loopf & LOOP_FREE)
 			ffree(p->newip);
 	free(p);
 	return(c);
@@ -774,13 +774,13 @@ pushi(filep newip, int mname)
 	p->pch = ch;
 	p->lastpbp = lastpbp;
 	p->mname = mname;
-	if (mname != -4) {
+	if (mname != LOOP) {
 		p->frame_cnt = frame->frame_cnt + 1;
 		p->tail_cnt = frame->tail_cnt + 1;
 	} else {
 		p->frame_cnt = frame->frame_cnt;
 		p->tail_cnt = frame->tail_cnt;
-		p->loopf = 5;
+		p->loopf = LOOP_EVAL;
 	}
 	p->newip = newip;
 	lastpbp = pbp;
@@ -1461,7 +1461,7 @@ stackdump (void)	/* dumps stack of macros in process */
 
 	if (frame != stk) {
 		for (p = frame; p != stk; p = p->pframe)
-			if (p->mname != -4)
+			if (p->mname != LOOP)
 				fdprintf(stderr, "%s ", macname(p->mname));
 		fdprintf(stderr, "\n");
 	}

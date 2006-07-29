@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.62 (gritter) 7/29/06
+ * Sccsid @(#)n5.c	1.63 (gritter) 7/30/06
  */
 
 /*
@@ -1104,9 +1104,9 @@ i1:
 		iflist[ifx] = !true;
 	}
 	if (true) {
-		if (frame->loopf & 4) {
-			frame->loopf &= ~4;
-			frame->loopf |= 2;
+		if (frame->loopf & LOOP_EVAL) {
+			frame->loopf &= ~LOOP_EVAL;
+			frame->loopf |= LOOP_NEXT;
 		}
 i2:
 		while ((cbits(i = getch())) == ' ')
@@ -1116,8 +1116,8 @@ i2:
 		ch = i;
 		nflush++;
 	} else {
-		if (frame->loopf & 4)
-			frame->loopf = 1;
+		if (frame->loopf & LOOP_EVAL)
+			frame->loopf = LOOP_FREE;
 		copyf++;
 		falsef++;
 		eatblk(0);
@@ -1136,7 +1136,7 @@ void
 casereturn(void)
 {
 	while (frame->loopf) {
-		frame->loopf = 1;
+		frame->loopf = LOOP_FREE;
 		popi();
 	}
 	popi();
@@ -1180,7 +1180,8 @@ casewhile(void)
 		errprint("%d excess delimiter(s)", -level);
 	wbt(0);
 	copyf--, clonef--;
-	pushi(newip, -4);
+	pushi(newip, LOOP);
+	offset = dip->op;
 }
 
 void
@@ -1214,7 +1215,7 @@ casecontinue(int _break)
 	}
 	while (i > 1 || _break && i > 0) {
 		if (frame->loopf) {
-			frame->loopf = 1;
+			frame->loopf = LOOP_FREE;
 			i--;
 		}
 		popi();
