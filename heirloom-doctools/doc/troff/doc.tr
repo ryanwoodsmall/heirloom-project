@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.86 (gritter) 7/29/06
+.\" Sccsid @(#)doc.tr	1.87 (gritter) 7/29/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1888,6 +1888,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
+\T'n_.shc'13\T	\T'n_.shc'\fB&shc\fR\T	\T'n_.shc'Current soft hyphenation character [sic].\T
 \T'n_.sentchar'4.1\T	\T'n_.sentchar'\fB&sentchar\fR\T	\T'n_.sentchar'Current sentence-ending characters [sic].\T
 \T'n_.ss'2\T	\T'n_.ss'\fB&ss\fR\T	\T'n_.ss'Current space size.\T
 \T'n_.sss'2\T	\T'n_.sss'\fB&sss\fR\T	\T'n_.sss'Current sentence space size.\T
@@ -4488,6 +4489,8 @@ hyphenation points in such words had been the hyphens/dashes.
 \fB&shc\fI|c\fR	\(hy	\(hy	E	Set the soft hyphenation character,
 i.e. the character that is inserted at the end of
 a hyphenated word.
+The current soft hyphenation character is available
+in the \A'n_.shc'\fB&shc\fR number register.
 .bta hcode
 \fB&hcode\fI|abcd...\fR	\(en	E	Hyphenation code.
 When determining the hyphenation points for an input word,
