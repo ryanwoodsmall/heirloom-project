@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.96 (gritter) 7/23/06
+ * Sccsid @(#)tdef.h	1.97 (gritter) 7/29/06
  */
 
 /*
@@ -152,6 +152,7 @@
 #define	NLETSH	0010	/* condensed letter shapes */
 #define	HYPHED	0011	/* previous character is an automatic hyphen */
 #define	OLT	0012	/* output line trap */
+#define	YON	0013	/* indirect copy through */
 
 #define	LAFACT	1000	/* letter adjustment float-to-int conversion factor */
 

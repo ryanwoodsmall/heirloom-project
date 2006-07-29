@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.77 (gritter) 7/19/06
+ * Sccsid @(#)t10.c	1.78 (gritter) 7/29/06
  */
 
 /*
@@ -123,6 +123,7 @@ static void	pthorscale(int);
 static void	pttrack(int);
 static void	ptanchor(int);
 static void	ptlink(int);
+static void	ptyon(int);
 
 void
 growfonts(int n)
@@ -485,6 +486,9 @@ ptout0(tchar *pi, tchar *pend)
 			return(pi+outsize);
 		case NLETSH:
 			horscale = 1 - (double)sbits(i) / LAFACT;
+			return(pi+outsize);
+		case YON:
+			ptyon(sbits(i));
 			return(pi+outsize);
 		default:
 			return(pi+outsize);
@@ -852,6 +856,45 @@ ptlink(int n)
 				hpos + esc, vpos - pts * 8 / 10,
 				rp->name);
 		}
+}
+
+static void
+ptyon(int i)
+{
+	tchar	c;
+	int	j, k, nl;
+	filep	savip;
+
+	if ((j = findmn(i)) < 0 || !contab[j].mx) {
+		nosuch(i);
+		return;
+	}
+	if (xfont != mfont)
+		ptfont();
+	if (xpts != mpts || zoomtab[xfont] != mzoom)
+		ptps();
+	if (lead)
+		ptlead();
+	fdprintf(ptid, "x X ");
+	savip = ip;
+	ip = (filep)contab[j].mx;
+	app = 1;
+	k = -1;
+	nl = 0;
+	while ((c = rbf()) != 0) {
+		if ((k = cbits(c)) != '\n') {
+			while (nl--)
+				oputs("\n+");
+			nl = 0;
+			outascii(c);
+		} else
+			nl++;
+	}
+	while (nl-- > 1)
+		oputs("\n+");
+	oput('\n');
+	app = 0;
+	ip = savip;
 }
 
 void

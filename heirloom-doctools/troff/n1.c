@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.85 (gritter) 7/23/06
+ * Sccsid @(#)n1.c	1.86 (gritter) 7/29/06
  */
 
 /*
@@ -110,6 +110,7 @@ static char *sprintlong(char *s, long, int);
 static char *sprintn(char *s, long n, int b);
 #define	vfdprintf	xxvfdprintf
 static void vfdprintf(int fd, const char *fmt, va_list ap);
+static tchar setyon(void);
 static void _setenv(void);
 
 #ifdef	DEBUG
@@ -1034,6 +1035,11 @@ g0:
 	case 'X':	/* \X'...' for copy through */
 		setxon();
 		goto g0;
+	case 'Y':	/* \Y(xx for indirect copy through */
+		if (xflag == 0)
+			break;
+		i = setyon();
+		return(i);
 	case '\n':	/* concealed newline */
 		goto g0;
 	case 'n':	/* number register */
@@ -1278,6 +1284,12 @@ setxon(void)	/* \X'...' for copy through */
 	*i++ = XOFF;
 	*i = 0;
 	pushback(xbuf);
+}
+
+static tchar
+setyon(void)	/* \Y(xx for indirect copy through */
+{
+	return mkxfunc(YON, getsn());
 }
 
 

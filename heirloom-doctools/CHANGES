@@ -16,6 +16,9 @@ Release ...
 * [nt]roff: The ".unformat" and ".asciify" requests have been added to
   remove the effects of adjustment, and font and point size information,
   respectively, from a diversion.
+* troff: The "\Yx", "\Y(xx", or "\Y[xxx]" escape sequence has been added
+  to output the contents of the string or macro x, xx, or xxx, respectively,
+  as a device control function.
 * [nt]roff: The "\$0" escape sequence has been added to refer to the name
   of the current macro or string.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot

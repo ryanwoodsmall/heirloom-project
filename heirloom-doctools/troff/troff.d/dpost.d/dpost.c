@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.149 (gritter) 7/11/06
+ * Sccsid @(#)dpost.c	1.150 (gritter) 7/29/06
  */
 
 /*
@@ -1604,8 +1604,8 @@ devcntrl(
 {
 
 
-    char	str[4096], buf[4096], str1[4096];
-    int		c, n;
+    char	str[4096], *buf, str1[4096];
+    int		c, n, size;
 
 
 /*
@@ -1619,6 +1619,7 @@ devcntrl(
  */
 
 
+    buf = malloc(size = 4096);
     sget(str, sizeof str, fp);		/* get the control function name */
 
     switch ( str[0] )  {		/* only the first character counts */
@@ -1661,7 +1662,7 @@ devcntrl(
 	case 'f':			/* load font in a position */
 		fscanf(fp, "%d", &n);
 		sget(str, sizeof str, fp);
-		fgets(buf, sizeof buf, fp);	/* in case there's a filename */
+		fgets(buf, size, fp);	/* in case there's a filename */
 		ungetc('\n', fp);	/* fgets() goes too far */
 		str1[0] = '\0';		/* in case there's nothing to come in */
 		sscanf(buf, "%s", str1);
@@ -1698,8 +1699,19 @@ devcntrl(
 		str[n] = 0;
 		if (c != ':')
 			ungetc(c, fp);
-		fgets(buf, sizeof(buf), fp);
-		ungetc('\n', fp);
+		n = 0;
+		for (;;) {
+			fgets(&buf[n], size - n, fp);
+			if ((c = getc(fp)) != '+') {
+				ungetc(c, fp);
+				break;
+			}
+			while (buf[n])
+				n++;
+			if (size - n < 4096)
+				buf = realloc(buf, size += 4096);
+			lineno++;
+		}
 		if ( strcmp(str, "PI") == 0 || strcmp(str, "PictureInclusion") == 0 )
 		    picture(buf);
 		else if ( strcmp(str, "InlinePicture") == 0 )
@@ -1760,10 +1772,12 @@ devcntrl(
 		    /* xymove(hpos, vpos); ul90-22006 */
 		    fprintf(tf, "%s", buf);
 		}   /* End else */
-		break;
+		goto done;
     }	/* End switch */
 
     while ( (c = getc(fp)) != '\n'  &&  c != EOF ) ;
+done:
+    free(buf);
 
 }   /* End of devcntrl */
 

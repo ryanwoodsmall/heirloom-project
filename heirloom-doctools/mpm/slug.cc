@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)slug.cc	1.6 (gritter) 10/31/05	*/
+/*	Sccsid @(#)slug.cc	1.7 (gritter) 7/29/06	*/
 #include	"misc.h"
 #include	"slug.h"
 #include	<math.h>
@@ -490,6 +490,15 @@ slug getslug(FILE *fp)
 				if (firstV > 0)
 					WARNING("weird x X %s in mid-VBOX\n",
 						str);
+				for (;;) {
+					c = getc(fp);
+					ungetc(c, fp);
+					if (c != '+')
+						break;
+					fgets(buf, (int) sizeof(buf), fp);
+					linenum++;
+					adds(buf);
+				}
 				return ret;
 			}
 			break;
