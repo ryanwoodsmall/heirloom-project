@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.97 (gritter) 7/29/06
+ * Sccsid @(#)tdef.h	1.98 (gritter) 7/29/06
  */
 
 /*
@@ -503,6 +503,7 @@ extern enum warn {
 	WARN_DELIM	= 8,
 	WARN_EL		= 16,
 	WARN_SCALE	= 32,
+	WARN_RANGE	= 64,
 	WARN_DI		= 256,
 	WARN_MAC	= 512,
 	WARN_REG	= 1024,
@@ -511,7 +512,7 @@ extern enum warn {
 	WARN_ESCAPE	= 32768,
 	WARN_SPACE	= 65536,
 	WARN_FONT	= 131072,
-	WARN_ALL	= 2147481855,	/* all except di, mac, reg */
+	WARN_ALL	= 2147481919,	/* all except di, mac, reg */
 	WARN_W		= 2147483647
 } warn;
 
@@ -535,6 +536,7 @@ struct	s {	/* stack frame */
 	int	nargs;
 	struct s *pframe;
 	filep	pip;
+	filep	newip;
 	int	*argt;
 	tchar	*argsp;
 	int	ppendt;
@@ -543,6 +545,7 @@ struct	s {	/* stack frame */
 	int	mname;
 	int	frame_cnt;
 	int	tail_cnt;
+	int	loopf;	/* 1: allocated, 2: continue loop, 4: in evaluation */
 };
 
 extern struct contab {

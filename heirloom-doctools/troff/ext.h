@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.57 (gritter) 7/23/06
+ * Sccsid @(#)ext.h	1.58 (gritter) 7/29/06
  */
 
 /*
@@ -78,6 +78,7 @@ extern	int	bd;
 extern	int	*bdtab;
 extern	int	blmac;
 extern	int	ccs;
+extern	int	clonef;
 extern	int	copyf;
 extern	int	cs;
 extern	int	defaultpl;
@@ -408,6 +409,9 @@ extern void	caseie(void);
 extern void	caseif(int);
 extern void	casenop(void);
 extern void	casereturn(void);
+extern void	casewhile(void);
+extern void	casebreak(void);
+extern void	casecontinue(int);
 extern void	eatblk(int);
 extern int	cmpstr(tchar);
 extern void	caserd(void);

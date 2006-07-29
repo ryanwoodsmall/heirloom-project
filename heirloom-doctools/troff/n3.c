@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.109 (gritter) 7/23/06
+ * Sccsid @(#)n3.c	1.110 (gritter) 7/29/06
  */
 
 /*
@@ -91,10 +91,12 @@ static const struct {
 	{ "asciify",		(void(*)(int))caseasciify },
 	{ "bleedat",		(void(*)(int))casebleedat },
 	{ "blm",		(void(*)(int))caseblm },
+	{ "break",		(void(*)(int))casebreak},
 	{ "breakchar",		(void(*)(int))casebreakchar },
 	{ "brp",		(void(*)(int))casebrp },
 	{ "chop",		(void(*)(int))casechop },
 	{ "close",		(void(*)(int))caseclose },
+	{ "continue",		(void(*)(int))casecontinue },
 	{ "cropat",		(void(*)(int))casecropat },
 	{ "evc",		(void(*)(int))caseevc },
 	{ "fallback",		(void(*)(int))casefallback },
@@ -143,6 +145,7 @@ static const struct {
 	{ "unformat",		(void(*)(int))caseunformat },
 	{ "vpt",		(void(*)(int))casevpt },
 	{ "warn",		(void(*)(int))casewarn },
+	{ "while",		(void(*)(int))casewhile },
 	{ "write",		(void(*)(int))casewrite },
 	{ "writec",		(void(*)(int))casewritec },
 	{ "xflag",		(void(*)(int))casexflag },
@@ -725,7 +728,7 @@ tchar
 popi(void)
 {
 	register struct s *p;
-	tchar	c;
+	tchar	c, d;
 
 	if (frame == stk)
 		return(0);
@@ -741,6 +744,15 @@ popi(void)
 	pendt = p->ppendt;
 	lastpbp = p->lastpbp;
 	c = p->pch;
+	if (p->loopf & 2) {
+		d = ch;
+		ch = c;
+		pushi(p->newip, p->mname);
+		c = 0;
+		ch = d;
+	} else
+		if (p->loopf & 1)
+			ffree(p->newip);
 	free(p);
 	return(c);
 }
@@ -758,8 +770,15 @@ pushi(filep newip, int mname)
 	p->pch = ch;
 	p->lastpbp = lastpbp;
 	p->mname = mname;
-	p->frame_cnt = frame->frame_cnt + 1;
-	p->tail_cnt = frame->tail_cnt + 1;
+	if (mname != -4) {
+		p->frame_cnt = frame->frame_cnt + 1;
+		p->tail_cnt = frame->tail_cnt + 1;
+	} else {
+		p->frame_cnt = frame->frame_cnt;
+		p->tail_cnt = frame->tail_cnt;
+		p->loopf = 5;
+	}
+	p->newip = newip;
 	lastpbp = pbp;
 	pendt = ch = 0;
 	frame = nxf;
@@ -1438,7 +1457,8 @@ stackdump (void)	/* dumps stack of macros in process */
 
 	if (frame != stk) {
 		for (p = frame; p != stk; p = p->pframe)
-			fdprintf(stderr, "%s ", macname(p->mname));
+			if (p->mname != -4)
+				fdprintf(stderr, "%s ", macname(p->mname));
 		fdprintf(stderr, "\n");
 	}
 }

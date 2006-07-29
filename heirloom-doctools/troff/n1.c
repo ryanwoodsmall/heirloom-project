@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.86 (gritter) 7/29/06
+ * Sccsid @(#)n1.c	1.87 (gritter) 7/29/06
  */
 
 /*
@@ -1032,24 +1032,7 @@ g0:
 		return(j);
 	switch (k) {
 
-	case 'X':	/* \X'...' for copy through */
-		setxon();
-		goto g0;
-	case 'Y':	/* \Y(xx for indirect copy through */
-		if (xflag == 0)
-			break;
-		i = setyon();
-		return(i);
 	case '\n':	/* concealed newline */
-		goto g0;
-	case 'n':	/* number register */
-		setn();
-		goto g0;
-	case '*':	/* string indicator */
-		setstr();
-		goto g0;
-	case '$':	/* argument indicator */
-		seta();
 		goto g0;
 	case '{':	/* LEFT */
 		i = LEFT;
@@ -1069,9 +1052,6 @@ g0:
 		nlflg++;
 		tailflg = istail(i);
 		return(i);
-	case ESC:	/* double backslash */
-		i = eschar;
-		goto gx;
 	case 'e':	/* printable version of current eschar */
 		i = PRESC;
 		goto gx;
@@ -1118,6 +1098,33 @@ g0:
 			break;
 		i = OHC | BLBIT;
 		return(i);
+	}
+	if (clonef) {
+		pbbuf[pbp++] = j;
+		return(eschar);
+	}
+	switch (k) {
+
+	case 'X':	/* \X'...' for copy through */
+		setxon();
+		goto g0;
+	case 'Y':	/* \Y(xx for indirect copy through */
+		if (xflag == 0)
+			break;
+		i = setyon();
+		return(i);
+	case 'n':	/* number register */
+		setn();
+		goto g0;
+	case '*':	/* string indicator */
+		setstr();
+		goto g0;
+	case '$':	/* argument indicator */
+		seta();
+		goto g0;
+	case ESC:	/* double backslash */
+		i = eschar;
+		goto gx;
 	case 'g':	/* return format of a number register */
 		setaf();
 		goto g0;

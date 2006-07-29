@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.84 (gritter) 7/29/06
+.\" Sccsid @(#)doc.tr	1.85 (gritter) 7/29/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1402,10 +1402,16 @@ accept \fIanything\fR.\T
 .b1
 \T'if'\fB&if|!\fI\|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR not identical to \fIstring2\fR,
 accept \fIanything\fR.\T
-.b1 0
+.b1
 \T'ie'\fB&ie\fI|c|anything\fR		\(en	\fBu\fR	If portion of if-else; all above forms (like \fBif\fR).\T
-.b1 0
+.b1
 \T'el'\fB&el\fI|anything\fR		\(en	\(en	Else portion of if-else.\T
+.b1
+\T'while'\fB&while\fI|c|anything\fR	\(en	\(en	Execute \fIanything\fR while \fIc\fR (like \fBif\fR) is true.\T
+.b1 0
+\T'break'\fB&break\fI|n\fR		\(en	1	Break out of \fIn\fR nested \fBwhile\fR loops.\T
+.b1 0
+\T'continue'\fB&continue\fI|n\fR		\(en	1	Continue at the \fIn\fR-th nested \fBwhile\fR loop.\T
 .mht s_env
 Environment Switching.
 .bt
@@ -1516,6 +1522,7 @@ Device and Font Description Files
 \T'blm'blm	7\T
 \T'bp'bp	3\T
 \T'br'br	4\T
+\T'break'break	16\T
 \T'breakchar'breakchar	13\T
 \T'brp'brp	4\T
 \T'c2'c2	10\T
@@ -1525,6 +1532,7 @@ Device and Font Description Files
 \T'ch'ch	7\T
 \T'chop'chop	7\T
 \T'close'close	19\T
+\T'continue'continue	16\T
 \T'cropat'cropat	3\T
 \T'cs'cs	2\T
 \T'cu'cu	10\T
@@ -1644,6 +1652,7 @@ Device and Font Description Files
 \T'vs'vs	5\T
 \T'warn'warn	21\T
 \T'wh'wh	7\T
+\T'while'while	16\T
 \T'write'write	19\T
 \T'writec'writec	19\T
 \T'xflag'xflag	1\T
@@ -3484,7 +3493,7 @@ The \fB.t\fR register works in a diversion; if there is no subsequent trap a \fI
 distance is returned.
 For a description of input-line-count traps, see \T'it'\fBit\fR below.\T
 .sc
-Recursion.
+\A'c_recursion'Recursion.
 \*(TR macros can be invoked recursively.
 In general, return information and arguments for macro calls
 are stored as \fIframes\fR on a \fIstack\fR.
@@ -4613,6 +4622,22 @@ accept \fIanything\fR.
 \fB&ie\fI|c|anything\fR		\(en	\fBu\fR	If portion of if-else; all of the forms for \fBif\fR above are valid.
 .bta el
 \fB&el\fI|anything\fR		\(en	\(en	Else portion of if-else.
+.bta while
+\fB&while\fI|c|anything\fR	\(en	\(en	Execute \fIanything\fR while \fIc\fR is true;
+all of the forms for \fBif\fR above are valid.
+\fIanything\fR is stored in an unnamed temporary macro
+each time a \fBwhile\fR loop is prepared for execution.
+Long or nested loops will thus cause many macro definitions
+and may slow down execution;
+\T'c_recursion'recursive macros (\(sc10.6)\T do not suffer from this problem.
+In the multi-line case,
+the \fB\e}\fR terminating the loop must be placed at the end of a line.
+.bta break
+\fB&break\fI|n\fR		\(en	1	Break out of \fIn\fR nested \fBwhile\fR loops,
+or terminate the current loop if no argument is given.
+.bta continue
+\fB&continue\fI|n\fR		\(en	1	Continue at the \fIn\fR-th nested \fBwhile\fR loop,
+or continue the current loop if no argument is given.
 .pg
 .ne 16
 The built-in condition names are:
@@ -4895,6 +4920,13 @@ T}
 32	scale	T{
 Warn when an undefined scale indicator is used in a
 \T'c_expr'numerical expression\T.
+T}
+64	range	T{
+Warn when an argument to
+\T'break'\fB&break\fR\T
+or
+\T'continue'\fB&continue\fR\T
+is out of range.
 T}
 256	di	T{
 Warn when a \T'di'\fBdi\fR\T request is executed but no

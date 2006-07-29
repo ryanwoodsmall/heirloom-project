@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.36 (gritter) 7/23/06
+ * Sccsid @(#)nii.c	1.37 (gritter) 7/29/06
  */
 
 /*
@@ -175,3 +175,4 @@ int	blmac;
 int	rawwidth;
 int	*olt;
 int	nolt;
+int	clonef;

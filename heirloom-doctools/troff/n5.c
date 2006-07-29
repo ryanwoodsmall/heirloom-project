@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.55 (gritter) 7/23/06
+ * Sccsid @(#)n5.c	1.56 (gritter) 7/29/06
  */
 
 /*
@@ -1070,6 +1070,10 @@ i1:
 		iflist[ifx] = !true;
 	}
 	if (true) {
+		if (frame->loopf & 4) {
+			frame->loopf &= ~4;
+			frame->loopf |= 2;
+		}
 i2:
 		while ((cbits(i = getch())) == ' ')
 			;
@@ -1078,6 +1082,8 @@ i2:
 		ch = i;
 		nflush++;
 	} else {
+		if (frame->loopf & 4)
+			frame->loopf = 1;
 		copyf++;
 		falsef++;
 		eatblk(0);
@@ -1095,7 +1101,95 @@ casenop(void)
 void
 casereturn(void)
 {
+	while (frame->loopf) {
+		frame->loopf = 1;
+		popi();
+	}
 	popi();
+}
+
+void
+casewhile(void)
+{
+	tchar	c;
+	int	k, level, nl;
+	filep	newip;
+
+	if (dip != d)
+		wbfl();
+	if ((nextb = alloc()) == 0) {
+		errprint("out of space");
+		edone(04);
+		return;
+	}
+	newip = offset = nextb;
+	wbf('.');
+	wbf('i');
+	wbf('f');
+	wbf(' ');
+	copyf++, clonef++;
+	nl = level = 0;
+	do {
+		nlflg = 0;
+		k = cbits(c = getch());
+		switch (k) {
+		case LEFT:
+			level++;
+			break;
+		case RIGHT:
+			level--;
+			break;
+		}
+		wbf(c);
+	} while (!nlflg || level > 0);
+	if (level < 0 && warn & WARN_DELIM)
+		errprint("%d excess delimiter(s)", -level);
+	wbt(0);
+	copyf--, clonef--;
+	pushi(newip, -4);
+}
+
+void
+casebreak(void)
+{
+	casecontinue(1);
+}
+
+void
+casecontinue(int _break)
+{
+	int	i, j;
+	struct s	*s;
+
+	if (skip(0))
+		i = 1;
+	else {
+		noscale++;
+		i = atoi();
+		noscale--;
+	}
+	j = 0;
+	for (s = frame; s != stk; s = s->pframe)
+		if (s->loopf && ++j >= i)
+			break;
+	if (j != i) {
+		if (warn & WARN_RANGE)
+			errprint("%d loop levels requested but only %d current",
+					i, j);
+		return;
+	}
+	while (i > 1 || _break && i > 0) {
+		if (frame->loopf) {
+			frame->loopf = 1;
+			i--;
+		}
+		popi();
+	}
+	if (i == 1) {
+		while (frame->loopf == 0)
+			popi();
+		popi();
+	}
 }
 
 void

@@ -4,6 +4,8 @@ Release ...
   contains the corresponding sequence has been output.
 * [nt]roff: The ".index" request has been added to determine the position
   of a string within a string or macro.
+* [nt]roff: The ".while", ".break", and ".continue" requests have been
+  added as another method to process input repeatedly.
 * [nt]roff: The sets of sentence-ending and transparent characters are
   now configurable with the ".sentchar" and ".transchar" requests.
 * [nt]roff: The set of optional line break characters (normally hyphen

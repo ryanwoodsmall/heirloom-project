@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.48 (gritter) 7/19/06
+ * Sccsid @(#)n9.c	1.49 (gritter) 7/29/06
  */
 
 /*
@@ -843,6 +843,7 @@ static const struct {
 	{ WARN_DELIM,	"delim" },
 	{ WARN_EL,	"el" },
 	{ WARN_SCALE,	"scale" },
+	{ WARN_RANGE,	"range" },
 	{ WARN_DI,	"di" },
 	{ WARN_MAC,	"mac" },
 	{ WARN_REG,	"reg" },
@@ -922,7 +923,7 @@ casewarn(void)
 void
 nosuch(int rq)
 {
-	if (rq && rq != RIGHT && warn & WARN_MAC)
+	if (rq && rq != RIGHT && rq != PAIR(RIGHT, RIGHT) && warn & WARN_MAC)
 		errprint("%s: no such request", macname(rq));
 }
 
