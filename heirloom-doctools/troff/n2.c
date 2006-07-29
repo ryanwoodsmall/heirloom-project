@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.24 (gritter) 7/23/06
+ * Sccsid @(#)n2.c	1.25 (gritter) 7/30/06
  */
 
 /*
@@ -208,6 +208,7 @@ outmb(tchar i)
 	wchar_t	wc;
 	char	mb[MB_LEN_MAX+1];
 	int	n;
+	int	f;
 #endif	/* EUC */
 
 	if (j < 0177) {
@@ -215,7 +216,13 @@ outmb(tchar i)
 		return;
 	}
 #ifdef	EUC
-	wc = tr2un(j, fbits(i));
+	if (iscopy(i))
+		wc = cbits(i);
+	else {
+		if ((f = fbits(i)) == 0)
+			f = font;
+		wc = tr2un(j, f);
+	}
 	if (wc != -1 && (n = wctomb(mb, wc)) > 0) {
 		mb[n] = 0;
 		oputs(mb);
@@ -250,6 +257,8 @@ outascii (	/* print i in best-guess ascii */
 		oput(j);
 		return;
 	}
+	if (f == 0)
+		f = xfont;
 	if (j == DRAWFCN)
 		oputs("\\D");
 	else if (j == HYPHEN || j == MINUS)
