@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.110 (gritter) 7/29/06
+ * Sccsid @(#)n3.c	1.114 (gritter) 7/29/06
  */
 
 /*
@@ -98,6 +98,8 @@ static const struct {
 	{ "close",		(void(*)(int))caseclose },
 	{ "continue",		(void(*)(int))casecontinue },
 	{ "cropat",		(void(*)(int))casecropat },
+	{ "ecs",		(void(*)(int))caseecs },
+	{ "ecr",		(void(*)(int))caseecr },
 	{ "evc",		(void(*)(int))caseevc },
 	{ "fallback",		(void(*)(int))casefallback },
 	{ "fdeferlig",		(void(*)(int))casefdeferlig },
@@ -108,6 +110,7 @@ static const struct {
 	{ "fspacewidth",	(void(*)(int))casefspacewidth },
 	{ "ftr",		(void(*)(int))caseftr },
 	{ "fzoom",		(void(*)(int))casefzoom },
+	{ "hcode",		(void(*)(int))casehcode },
 	{ "hidechar",		(void(*)(int))casehidechar },
 	{ "hlm",		(void(*)(int))casehlm },
 	{ "hylang",		(void(*)(int))casehylang },
@@ -135,6 +138,7 @@ static const struct {
 	{ "return",		(void(*)(int))casereturn },
 	{ "rhang",		(void(*)(int))caserhang },
 	{ "sentchar",		(void(*)(int))casesentchar },
+	{ "shc",		(void(*)(int))caseshc },
 	{ "shift",		(void(*)(int))caseshift },
 	{ "spreadwarn",		(void(*)(int))casespreadwarn },
 	{ "substring",		(void(*)(int))casesubstring },

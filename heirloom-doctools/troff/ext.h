@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.58 (gritter) 7/29/06
+ * Sccsid @(#)ext.h	1.62 (gritter) 7/29/06
  */
 
 /*
@@ -90,6 +90,7 @@ extern	int	donef;
 extern	int	dotT;
 extern	int	dpn;
 extern	int	ds;
+extern	int	ecs;
 extern	int	ejf;
 extern	int	em;
 extern	int	eqflg;
@@ -372,6 +373,8 @@ extern void	caselc(void);
 extern void	casehy(void);
 extern void	casenh(void);
 extern void	casehlm(void);
+extern void	casehcode(void);
+extern void	caseshc(void);
 extern int	max(int, int);
 extern int	min(int, int);
 extern void	casece(void);
@@ -418,6 +421,8 @@ extern void	caserd(void);
 extern int	rdtty(void);
 extern void	caseec(void);
 extern void	caseeo(void);
+extern void	caseecs(void);
+extern void	caseecr(void);
 extern void	caseta(void);
 extern void	casene(void);
 extern void	casetr(void);

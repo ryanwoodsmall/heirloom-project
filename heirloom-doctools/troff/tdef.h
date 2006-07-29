@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.98 (gritter) 7/29/06
+ * Sccsid @(#)tdef.h	1.100 (gritter) 7/29/06
  */
 
 /*
@@ -702,6 +702,9 @@ extern const struct numtab initnumtab[];
 #define	hylang	env._hylang
 #define	dicthnj	env._dicthnj
 #define	hyext	env._hyext
+#define	hcode	env._hcode
+#define	nhcode	env._nhcode
+#define	shc	env._shc
 #define	hyptr	env._hyptr
 #define	tabtab	env._tabtab
 #define	line	env._line
@@ -813,6 +816,9 @@ extern struct env {
 	char	*_hylang;
 	void	*_dicthnj;
 	int	_hyext;
+	int	*_hcode;
+	int	_nhcode;
+	int	_shc;
 	tchar	*_hyptr[NHYP];
 	int	_tabtab[NTAB];
 	int	_sentch[NSENT];

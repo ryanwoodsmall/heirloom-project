@@ -6,6 +6,12 @@ Release ...
   of a string within a string or macro.
 * [nt]roff: The ".while", ".break", and ".continue" requests have been
   added as another method to process input repeatedly.
+* [nt]roff: The ".ecs" and ".ecr" requests have been added to save and
+  restore the escape character.
+* [nt]roff: The ".shc" request has been added to set the soft hyphen
+  character.
+* [nt]roff: The ".hcode" request has been added to specify character
+  mappings for hyphenation purposes.
 * [nt]roff: The sets of sentence-ending and transparent characters are
   now configurable with the ".sentchar" and ".transchar" requests.
 * [nt]roff: The set of optional line break characters (normally hyphen
@@ -23,6 +29,8 @@ Release ...
   as a device control function.
 * [nt]roff: The "\$0" escape sequence has been added to refer to the name
   of the current macro or string.
+* [nt]roff: The "M" (Em/100), "s" (= "u"), and "z" (= "p") scale indicators
+  have been added.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
 

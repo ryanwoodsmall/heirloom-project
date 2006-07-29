@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.35 (gritter) 7/17/06
+ * Sccsid @(#)n4.c	1.36 (gritter) 7/29/06
  */
 
 /*
@@ -833,6 +833,7 @@ a1:
 	}
 	switch (i) {
 	case 'u':
+	case 's':
 		i = j = 1;	/* should this be related to HOR?? */
 		break;
 	case 'v':	/*VSs - vert spacing*/
@@ -853,6 +854,7 @@ a1:
 #endif
 		break;
 	case 'p':	/*Points*/
+	case 'z':
 		j = INCH;
 		i = 72;
 		break;
@@ -868,6 +870,10 @@ a1:
 	case 'P':	/*Picas*/
 		j = INCH;
 		i = 6;
+		break;
+	case 'M':	/*Ems/100*/
+		j = EM;
+		i = 100;
 		break;
 	default:
 		if ((i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') &&

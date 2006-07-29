@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.85 (gritter) 7/29/06
+.\" Sccsid @(#)doc.tr	1.86 (gritter) 7/29/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -71,6 +71,7 @@
 .kernpair R [ I f 200
 .kernpair R [ I \[fi] 200
 .kernpair R , B p 80
+.kernpair R \[longs] R ' 110
 .ig
 .fps math 1 R tim_____ pfb
 .fp 2 I timi____ pfb
@@ -1324,6 +1325,10 @@ Input and Output Conventions and Character Translations
 .b1
 \T'eo'\fB&eo\fR	on	\(en	\(en	Turn off escape character mechanism.\T
 .b1
+\T'ecs'\fB&ecs\fR	\e	\(en	\(en	Save escape character.\T
+.b1
+\T'ecr'\fB&ecr\fR	\e	\(en	\(en	Restore saved escape character.\T
+.b1
 \T'lg'\fB&lg\fI|N\fR	\(en;\|on	on	T	Ligature mode\T
 on if \fIN\fR>0.
 .b1
@@ -1360,6 +1365,10 @@ Hyphenation.
 \T'hy'\fB&hy\fI|N\fR	hyphenate	hyphenate	E	Hyphenate; \fIN =\fR mode.\T
 .b1
 \T'hylang'\fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language.\T
+.b1
+\T'shc'\fB&shc\fI|c\fR	\(hy	\(hy	E	Set the soft hyphenation character.\T
+.b1
+\T'hcode'\fB&hcode\fI|abcd...\fR	\(en	E	Hyphenation code of \fIa\fR is \fIb\fR, etc.\T
 .b1
 \T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
@@ -1543,6 +1552,8 @@ Device and Font Description Files
 \T'ds'ds	7\T
 \T'dt'dt	7\T
 \T'ec'ec	10\T
+\T'ecs'ecs	10\T
+\T'ecr'ecr	10\T
 \T'el'el	16\T
 \T'em'em	7\T
 \T'eo'eo	10\T
@@ -1563,6 +1574,7 @@ Device and Font Description Files
 \T'ft'ft	2\T
 \T'fzoom'fzoom	2\T
 \T'hc'hc	13\T
+\T'hcode'hcode	13\T
 \T'hidechar'hidechar	2\T
 \T'hlm'hlm	13\T
 \T'hw'hw	13\T
@@ -1629,6 +1641,7 @@ Device and Font Description Files
 \T'rs'rs	5\T
 \T'rt'rt	3\T
 \T'sentchar'sentchar	4\T
+\T'shc'shc	13\T
 \T'shift'shift	7\T
 \T'so'so	19\T
 \T'sp'sp	5\T
@@ -2043,10 +2056,11 @@ _
 \fBi\fR	Inch	72000	240
 \fBc\fR	Centimeter	72000\(mu50/127	240\(mu50/127
 \fBP\fR	Pica = 1/6 inch	12000	240/6
-\fBm\fR	Em = \fIS\fR points	6\(mu\fIS\fR	\fIC\fR
-\fBn\fR	En = Em/2	3\(mu\fIS\fR	\fIC, same as Em\fR
-\fBp\fR	Point = 1/72 inch	1000	240/72
-\fBu\fR	Basic unit	1	1
+\fBm\fR	Em = \fIS\fR points	\fIS\fR	\fIC\fR
+\fBn\fR	En = Em/2	\fIS\fR/2	\fIC, same as Em\fR
+\fBM\fR	1/100 Em	\fIS\fR/100	\fIC\fR/100
+\fBp\fR,\fBz\fR	Point = 1/72 inch	1000	240/72
+\fBu\fR,\fBs\fR	Basic unit	1	1
 \fBv\fR	Vertical line space	\fIV\fR	\fIV\fR
 none	Default, see below
 .TE
@@ -3890,6 +3904,8 @@ for the new escape character.
 this escape sequence is interpreted in \T'copy mode'\fIcopy mode\fR.\T
 \A'e_E'\fB\eE\fR prints the current escape character
 but is not interpreted in \T'copy mode'\fIcopy mode\fR.\T
+\T'ecs'\fBecs\fR\T and \T'ecr'\fBecr\fR\T
+save and restore the escape character.
 If necessary or convenient, the escape mechanism
 may be turned off with \T'eo'\fBeo\fR\T,
 and restored with \T'ec'\fBec\fR\T.
@@ -3899,6 +3915,10 @@ and restored with \T'ec'\fBec\fR\T.
 Set escape character to \fB\e\fR, or to \fIc\fR, if given.
 .bta eo
 \fB&eo\fR	on	\(en	\(en	Turn escape mechanism off.
+.bta ecs
+\fB&ecs\fR	\e	\(en	\(en	Save escape character.
+.bta ecr
+\fB&ecr\fR	\e	\(en	\(en	Restore saved escape character.
 .sc
 Ligatures.
 .lg 0
@@ -4464,6 +4484,17 @@ This request also makes parts of words composed by \fB-\fR or
 unless otherwise defined explicitly with the \fB&nhychar\fR request.
 Traditionally, the only
 hyphenation points in such words had been the hyphens/dashes.
+.bta shc
+\fB&shc\fI|c\fR	\(hy	\(hy	E	Set the soft hyphenation character,
+i.e. the character that is inserted at the end of
+a hyphenated word.
+.bta hcode
+\fB&hcode\fI|abcd...\fR	\(en	E	Hyphenation code.
+When determining the hyphenation points for an input word,
+\fIa\fR is mapped to \fIb\fR, etc.
+When no hyphenation code is specified for a character,
+it is mapped to its lower-case variant if necessary,
+and the ``long \[longs]'' character is mapped to a ``round s''.
 .bta breakchar
 \fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.
 A line may always be split after one of these characters.

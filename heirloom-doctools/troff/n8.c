@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.28 (gritter) 7/4/06
+ * Sccsid @(#)n8.c	1.31 (gritter) 7/29/06
  */
 
 /*
@@ -177,8 +177,14 @@ int
 alph(tchar j)
 {
 	int i = cbits(j);
-#if !defined (NROFF) && defined (EUC)
 	int f = fbits(j);
+	int	h;
+
+	if (!ismot(j) && i < nhcode && (h = hcode[i]) != 0) {
+		h = tr2un(h, f);
+		return hyext ? iswalnum(h) : iswalpha(h);
+	} else
+#if !defined (NROFF) && defined (EUC)
 	if (!ismot(j) && i & ~0177) {
 		int	u;
 		if (islig(j) && hyext &&
@@ -353,6 +359,12 @@ mark:
 int 
 maplow(register int i, int f)
 {
+	int	h;
+
+	if (!ismot(i) && i < nhcode && (h = hcode[i]) != 0) {
+		h = tr2un(h, f);
+		return(h);
+	} else
 #if !defined (NROFF) && defined (EUC)
 	if (!ismot(i) && i & ~0177) {
 		i = tr2un(i, f);

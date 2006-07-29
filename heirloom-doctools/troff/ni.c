@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.31 (gritter) 7/17/06
+ * Sccsid @(#)ni.c	1.32 (gritter) 7/29/06
  */
 
 /*
@@ -102,6 +102,7 @@ int	oldbits = -1;
 int	init = 1;
 int	fc = IMP;	/* field character */
 int	eschar = '\\';
+int	ecs = '\\';
 #ifdef	NROFF
 int	pl = 11*INCH;
 int	po = PO;

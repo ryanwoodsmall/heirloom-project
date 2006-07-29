@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.40 (gritter) 7/19/06
+ * Sccsid @(#)n6.c	1.41 (gritter) 7/29/06
  */
 
 /*
@@ -194,6 +194,12 @@ setabs (void)		/* set absolute char from \C'...' */
 	if (nonumb)
 		return 0;
 	return n + nchtab + _SPECCHAR_ST;
+}
+
+int
+tr2un(tchar c, int f)
+{
+	return(cbits(c));
 }
 
 int 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.78 (gritter) 7/23/06
+ * Sccsid @(#)n7.c	1.79 (gritter) 7/29/06
  */
 
 /*
@@ -854,6 +854,7 @@ movword(void)
 	register int w;
 	register tchar i, *wp, c, *lp, *lastlp, lasti = 0, *tp;
 	int	savwch, hys, stretches = 0, wholewd = 0, mnel, hyphenated = 0;
+	int	hc;
 #ifndef	NROFF
 	tchar	lgs = 0, lge = 0, optlgs = 0, optlge = 0;
 	int	*ip, s, lgw = 0, optlgw = 0, lgr = 0, optlgr = 0;
@@ -948,10 +949,11 @@ movword(void)
 		return(0);	/* line didn't fill up */
 	}
 m0:
+	hc = shc ? shc : HYPHEN;
 #ifndef NROFF
-	xbits((tchar)HYPHEN, 1);
+	xbits((tchar)hc, 1);
 #endif
-	hys = width((tchar)HYPHEN);
+	hys = width((tchar)hc);
 	if (wholewd)
 		goto m1a;
 m1:
@@ -1036,7 +1038,7 @@ m2:
 	}
 #endif	/* !NROFF */
 	if (!maybreak(*(linep - 1))) {
-		*linep = (*(linep - 1) & SFMASK) | HYPHEN;
+		*linep = (*(linep - 1) & SFMASK) | hc;
 		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
 		w += width(*linep);

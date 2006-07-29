@@ -1,7 +1,7 @@
 /*
  *	Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- *	Sccsid @(#)pt.h	1.39 (gritter) 7/11/06
+ *	Sccsid @(#)pt.h	1.40 (gritter) 7/29/06
  */
 
 /* n10.c */
@@ -23,6 +23,7 @@ extern void	pttrailer();
 extern int	width(register tchar);
 extern tchar	setch(int);
 extern tchar	setabs(void);
+extern int	tr2un(tchar, int);
 extern int	findft(register int, int);
 extern void	caseps(void);
 extern void	mchbits(void);

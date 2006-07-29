@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.56 (gritter) 7/29/06
+ * Sccsid @(#)n5.c	1.61 (gritter) 7/29/06
  */
 
 /*
@@ -265,6 +265,37 @@ casehlm(void)
 			hlm = i;
 	} else
 		hlm = -1;
+}
+
+void
+casehcode(void)
+{
+	tchar	c, d;
+	int	k;
+
+	if (skip(1))
+		return;
+	do {
+		c = getch();
+		if (skip(1))
+			break;
+		d = getch();
+		if (c && d && !ismot(c) && !ismot(d)) {
+			if ((k = cbits(c)) >= nhcode) {
+				hcode = realloc(hcode, (k+1) * sizeof *hcode);
+				memset(&hcode[nhcode], 0,
+					(k+1-nhcode) * sizeof *hcode);
+				nhcode = k+1;
+			}
+			hcode[k] = cbits(d);
+		}
+	} while (!skip(0));
+}
+
+void
+caseshc(void)
+{
+	shc = skip(0) ? 0 : getch();
 }
 
 int 
@@ -928,7 +959,10 @@ caseevc(void)
 	if (getev(&nxev, &name) == 0 || (ep = findev(&nxev, name)) == NULL)
 		return;
 	tmpenv = env;
+	free(env._hcode);
 	env = *ep;
+	env._hcode = malloc(env._nhcode * sizeof *env._hcode);
+	memcpy(env._hcode, ep->_hcode, env._nhcode * sizeof *env._hcode);
 	env._pendnf = 0;
 	env._pendw = 0;
 	env._pendt = 0;
@@ -1398,6 +1432,20 @@ void
 caseeo(void)
 {
 	eschar = 0;
+}
+
+
+void
+caseecs(void)
+{
+	ecs = eschar;
+}
+
+
+void
+caseecr(void)
+{
+	eschar = ecs;
 }
 
 
