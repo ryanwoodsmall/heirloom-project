@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.102 (gritter) 7/30/06
+ * Sccsid @(#)tdef.h	1.103 (gritter) 7/30/06
  */
 
 /*
@@ -559,6 +559,8 @@ extern struct contab {
 	struct	contab *link;
 	void	(*f)(int);
 	unsigned mx;
+	unsigned int	als;
+	int	nlink;
 } *contab;
 extern const struct contab initcontab[];
 
@@ -568,6 +570,8 @@ extern struct numtab {
 	int	inc;
 	int	val;
 	struct	numtab *link;
+	int	aln;
+	int	nlink;
 } *numtab;
 extern const struct numtab initnumtab[];
 

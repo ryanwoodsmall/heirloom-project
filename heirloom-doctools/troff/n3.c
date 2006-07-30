@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.115 (gritter) 7/30/06
+ * Sccsid @(#)n3.c	1.116 (gritter) 7/30/06
  */
 
 /*
@@ -75,6 +75,7 @@ tchar *wbuf;
 tchar *corebuf;
 
 static void	_collect(int);
+static int	_findmn(int, int);
 static void	caseshift(void);
 static void	casesubstring(void);
 static void	caselength(void);
@@ -88,6 +89,8 @@ static const struct {
 	char	*n;
 	void	(*f)(int);
 } longrequests[] = {
+	{ "aln",		(void(*)(int))casealn },
+	{ "als",		(void(*)(int))caseals },
 	{ "asciify",		(void(*)(int))caseasciify },
 	{ "bleedat",		(void(*)(int))casebleedat },
 	{ "blm",		(void(*)(int))caseblm },
@@ -137,6 +140,7 @@ static const struct {
 	{ "recursionlimit",	(void(*)(int))caserecursionlimit },
 	{ "return",		(void(*)(int))casereturn },
 	{ "rhang",		(void(*)(int))caserhang },
+	{ "rnn",		(void(*)(int))casernn },
 	{ "sentchar",		(void(*)(int))casesentchar },
 	{ "shc",		(void(*)(int))caseshc },
 	{ "shift",		(void(*)(int))caseshift },
@@ -232,13 +236,13 @@ casern(void)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
-	if ((oldmn = findmn(i)) < 0) {
+	if ((oldmn = _findmn(i, 0)) < 0) {
 		nosuch(i);
 		return;
 	}
 	skip(1);
 	j = getrq(1);
-	clrmn(findmn(j));
+	clrmn(_findmn(j, 0));
 	if (j) {
 		munhash(&contab[oldmn]);
 		contab[oldmn].rq = j;
@@ -301,11 +305,20 @@ mrehash(void)
 void
 caserm(void)
 {
-	int j, cnt = 0;
+	int i, j, k, cnt = 0;
 
 	lgf++;
-	while (!skip(!cnt++) && (j = getrq(0)) != 0)
-		clrmn(findmn(j));
+	while (!skip(!cnt++) && (j = getrq(0)) != 0) {
+		k = _findmn(j, 0);
+		if (contab[k].als) {
+			i = _findmn(j, 1);
+			if (--contab[i].nlink <= 0)
+				clrmn(i);
+		}
+		if (contab[k].nlink > 0)
+			contab[k].nlink--;
+		clrmn(k);
+	}
 	lgf--;
 }
 
@@ -339,6 +352,7 @@ casede(void)
 {
 	register int i, req;
 	register filep savoff;
+	int	k, nlink;
 
 	if (dip != d)
 		wbfl();
@@ -354,11 +368,18 @@ casede(void)
 	else 
 		req = copyb();
 	wbfl();
+	if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0)
+		k = contab[oldmn].rq;
+	else {
+		k = i;
+		nlink = 0;
+	}
 	clrmn(oldmn);
 	if (newmn) {
 		if (contab[newmn].rq)
 			munhash(&contab[newmn]);
-		contab[newmn].rq = i;
+		contab[newmn].rq = k;
+		contab[newmn].nlink = nlink;
 		maddhash(&contab[newmn]);
 	}
 	if (apptr) {
@@ -376,15 +397,25 @@ de1:
 }
 
 
-int 
-findmn(register int i)
+static int 
+_findmn(register int i, int als)
 {
 	register struct contab *p;
 
 	for (p = mhash[MHASH(i)]; p; p = p->link)
-		if (i == p->rq)
+		if (i == p->rq) {
+			if (als && p->als)
+				return(_findmn(p->als, als));
 			return(p - contab);
+		}
 	return(-1);
+}
+
+
+int
+findmn(int i)
+{
+	return _findmn(i, 1);
 }
 
 
@@ -398,17 +429,19 @@ clrmn(register int i)
 		contab[i].rq = 0;
 		contab[i].mx = 0;
 		contab[i].f = 0;
+		contab[i].als = 0;
+		contab[i].nlink = 0;
 	}
 }
 
 
-filep 
-finds(register int mn)
+static filep 
+_finds(register int mn, int als)
 {
 	register tchar i;
 	register filep savip;
 
-	oldmn = findmn(mn);
+	oldmn = _findmn(mn, als);
 	newmn = 0;
 	apptr = (filep)0;
 	if (app && oldmn >= 0 && contab[oldmn].mx) {
@@ -429,17 +462,19 @@ finds(register int mn)
 			if (contab[i].rq == 0)
 				break;
 		}
-		if (i == NM && growcontab() == NULL || (nextb = alloc()) == 0) {
+		nextb = 0;
+		if (i == NM && growcontab() == NULL ||
+				als && (nextb = alloc()) == 0) {
 			app = 0;
 			if (macerr++ > 1)
 				done2(02);
 			errprint("Too many (%d) string/macro names", NM);
 			edone(04);
-			return(offset = 0);
+			return(als ? offset = 0 : 0);
 		}
 		contab[i].mx = (unsigned) nextb;
+		newmn = i;
 		if (!diflg) {
-			newmn = i;
 			if (oldmn == -1)
 				contab[i].rq = -1;
 		} else {
@@ -448,7 +483,14 @@ finds(register int mn)
 		}
 	}
 	app = 0;
-	return(offset = nextb);
+	return(als ? offset = nextb : 1);
+}
+
+
+filep
+finds(int mn)
+{
+	return _finds(mn, 1);
 }
 
 
@@ -993,6 +1035,7 @@ casedi(void)
 {
 	register int i, j;
 	register int *k;
+	int	nlink;
 
 	lgf++;
 	if (skip(0) || (i = getrq(1)) == 0) {
@@ -1025,7 +1068,18 @@ casedi(void)
 	dip = &d[dilev];
 	dip->op = finds(i);
 	dip->curd = i;
+	if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0) {
+		munhash(&contab[newmn]);
+		j = contab[oldmn].rq;
+	} else {
+		j = i;
+		nlink = 0;
+	}
 	clrmn(oldmn);
+	contab[newmn].rq = j;
+	contab[newmn].nlink = nlink;
+	if (i != j)
+		maddhash(&contab[newmn]);
 	k = (int *) & dip->dnl;
 	dip->flss = 0;
 	for (j = 0; j < 10; j++)
@@ -1047,6 +1101,48 @@ casedt(void)
 		return;
 	skip(0);
 	dip->dimac = getrq(1);
+}
+
+
+void
+caseals(void)
+{
+	int	i, j, k, t;
+
+	if (skip(1))
+		return;
+	i = getrq(1);
+	if (skip(1))
+		return;
+	j = getrq(1);
+	if ((k = findmn(j)) < 0) {
+		nosuch(j);
+		return;
+	}
+	if (contab[k].nlink == 0) {
+		munhash(&contab[k]);
+		t = makerq(NULL);
+		contab[k].rq = t;
+		maddhash(&contab[k]);
+		if (_finds(j, 0) != 0 && newmn) {
+			contab[newmn].als = t;
+			contab[newmn].rq = j;
+			maddhash(&contab[newmn]);
+			contab[k].nlink = 1;
+		}
+	} else
+		t = j;
+	if (_finds(i, 0) != 0) {
+		clrmn(oldmn);
+		if (newmn) {
+			if (contab[newmn].rq)
+				munhash(&contab[newmn]);
+			contab[newmn].als = t;
+			contab[newmn].rq = i;
+			maddhash(&contab[newmn]);
+			contab[k].nlink++;
+		}
+	}
 }
 
 
@@ -1165,7 +1261,7 @@ void
 casesubstring(void)
 {
 	int	i, j, k, sz = 0, st;
-	int	n1, n2 = -1;
+	int	n1, n2 = -1, nlink;
 	tchar	*tp = NULL, c;
 	filep	savip;
 
@@ -1224,11 +1320,18 @@ casesubstring(void)
 			}
 		}
 		wbt(0);
+		if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0)
+			k = contab[oldmn].rq;
+		else {
+			k = i;
+			nlink = 0;
+		}
 		clrmn(oldmn);
 		if (newmn) {
 			if (contab[newmn].rq)
 				munhash(&contab[newmn]);
-			contab[newmn].rq = i;
+			contab[newmn].rq = k;
+			contab[newmn].nlink = nlink;
 			maddhash(&contab[newmn]);
 		}
 	}
@@ -1325,7 +1428,7 @@ caseasciify(void)
 static void
 caseunformat(int flag)
 {
-	int	i, j;
+	int	i, j, k, nlink;
 	int	ns = 0, as = 0;
 	tchar	*tp = NULL, c;
 	filep	savip;
@@ -1404,11 +1507,18 @@ caseunformat(int flag)
 				wbf(c);
 		}
 		wbt(0);
+		if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0)
+			k = contab[oldmn].rq;
+		else {
+			k = i;
+			nlink = 0;
+		}
 		clrmn(oldmn);
 		if (newmn) {
 			if (contab[newmn].rq)
 				munhash(&contab[newmn]);
-			contab[newmn].rq = i;
+			contab[newmn].rq = k;
+			contab[newmn].nlink = nlink;
 			maddhash(&contab[newmn]);
 		}
 	}
@@ -1565,7 +1675,7 @@ maybemore(int sofar, int flags)
 					errprint("%s: no such request", buf);
 				sofar = 0;
 			} else if (warn & WARN_SPACE && i > 3 &&
-					findmn(sofar) >= 0) {
+					_findmn(sofar, 0) >= 0) {
 				buf[i-1] = 0;
 				errprint("%s: missing space", macname(sofar));
 			}
@@ -1625,8 +1735,14 @@ getls(int termc, int *strp)
 int
 makerq(const char *name)
 {
+	static int	t;
+	char	_name[20];
 	int	n;
 
+	if (name == NULL) {
+		roff_sprintf(_name, "%d", ++t);
+		name = _name;
+	}
 	if (name[0] == 0 || name[1] == 0 || name[2] == 0)
 		return PAIR(name[0], name[1]);
 	for (n = 0; n < hadn; n++)

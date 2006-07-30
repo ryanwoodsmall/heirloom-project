@@ -24,6 +24,11 @@ Release ...
 * [nt]roff: The ".unformat" and ".asciify" requests have been added to
   remove the effects of adjustment, and font and point size information,
   respectively, from a diversion.
+* [nt]roff: The ".als" request has been added to create an alias name
+  for a request, macro, or string.
+* [nt]roff: The ".aln" request has been added to create an alias name
+  for a number register.
+* [nt]roff: The ".rnn" request has been added to rename a number register.
 * troff: The "\Yx", "\Y(xx", or "\Y[xxx]" escape sequence has been added
   to output the contents of the string or macro x, xx, or xxx, respectively,
   as a device control function.

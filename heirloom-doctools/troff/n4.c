@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.37 (gritter) 7/29/06
+ * Sccsid @(#)n4.c	1.38 (gritter) 7/30/06
  */
 
 /*
@@ -68,7 +68,7 @@ int	falsef	= 0;	/* on if inside false branch of if */
 #define	NHASH(i)	((i>>6)^i)&0177
 struct	numtab	*nhash[128];	/* 128 == the 0177 on line above */
 
-static int	_findr(register int i, int);
+static int	_findr(register int i, int, int);
 
 void *
 grownumtab(void)
@@ -356,7 +356,7 @@ setn(void)
 			goto s0;
 	} else {
 s0:
-		if ((j = _findr(i, 1)) == -1)
+		if ((j = _findr(i, 1, 1)) == -1)
 			i = 0;
 		else {
 			i = numtab[j].val = (numtab[j].val+numtab[j].inc*f);
@@ -440,11 +440,11 @@ nunhash(register struct numtab *rp)
 int
 findr(int i)
 {
-	return _findr(i, 0);
+	return _findr(i, 0, 1);
 }
 
 static int 
-_findr(register int i, int rd)
+_findr(register int i, int rd, int aln)
 {
 	register struct numtab *p;
 	register int h = NHASH(i);
@@ -452,8 +452,11 @@ _findr(register int i, int rd)
 	if (i == 0 || i == -2)
 		return(-1);
 	for (p = nhash[h]; p; p = p->link)
-		if (i == p->r)
+		if (i == p->r) {
+			if (aln && p->aln)
+				return(p->aln - 1);
 			return(p - numtab);
+		}
 	if (rd && warn & WARN_REG)
 		errprint("no such register %s", macname(i));
 	do {
@@ -473,9 +476,9 @@ _findr(register int i, int rd)
 	return 0;
 }
 
-int 
-usedr (	/* returns -1 if nr i has never been used */
-    register int i
+static int 
+_usedr (	/* returns -1 if nr i has never been used */
+    register int i, int aln
 )
 {
 	register struct numtab *p;
@@ -483,9 +486,19 @@ usedr (	/* returns -1 if nr i has never been used */
 	if (i == 0 || i == -2)
 		return(-1);
 	for (p = nhash[NHASH(i)]; p; p = p->link)
-		if (i == p->r)
+		if (i == p->r) {
+			if (aln && p->aln)
+				return(p->aln - 1);
 			return(p - numtab);
+		}
 	return -1;
+}
+
+
+int
+usedr(int i)
+{
+	return _usedr(i, 1);
 }
 
 
@@ -931,16 +944,29 @@ setnr(const char *name, int val, int inc)
 }
 
 
+static void
+clrnr(int k)
+{
+	struct numtab	*p;
+
+	if (k >= 0) {
+		p = &numtab[k];
+		p->r = p->val = p->inc = p->fmt = 0;
+		p->aln = p->nlink = 0;
+		regcnt--;
+	}
+}
+
 void
 caserr(void)
 {
-	register int i, j;
+	register int i, j, k;
 	register struct numtab *p;
 	int cnt = 0;
 
 	lgf++;
 	while (!skip(!cnt++) && (i = getrq(2)) ) {
-		j = usedr(i);
+		j = _usedr(i, 0);
 		if (j < 0) {
 			if (warn & WARN_REG)
 				errprint("no such register %s", macname(i));
@@ -948,9 +974,49 @@ caserr(void)
 		}
 		p = &numtab[j];
 		nunhash(p);
-		p->r = p->val = p->inc = p->fmt = 0;
-		regcnt--;
+		if (p->aln && (k = _usedr(i, 1)) >= 0) {
+			if (--numtab[k].nlink <= 0)
+				clrnr(k);
+		}
+		if (p->nlink > 0)
+			p->nlink--;
+		if (p->nlink == 0)
+			clrnr(j);
+		else
+			p->r = -1;
 	}
+}
+
+
+void
+casernn(void)
+{
+	int	i, j, k, n;
+
+	lgf++;
+	skip(1);
+	if ((i = getrq(0)) == 0)
+		return;
+	if ((k = _usedr(i, 0)) < 0) {
+		if (warn & WARN_REG)
+			errprint("no such register %s", macname(i));
+		return;
+	}
+	skip(1);
+	j = getrq(1);
+	n = _findr(j, 0, 0);
+	if (n >= 0) {
+		if (numtab[n].nlink) {
+			numtab[n].nlink--;
+			numtab[n].r = -1;
+		}
+		n = _findr(j, 0, 0);
+	}
+	if (n >= 0) {
+		numtab[n] = numtab[k];
+		numtab[n].r = j;
+	}
+	clrnr(k);
 }
 
 
@@ -1052,6 +1118,26 @@ setaf (void)	/* return format of number register */
 			pbbuf[pbp++] = '0';
 		}
 	}
+}
+
+
+void
+casealn(void)
+{
+	int	i, j, r, o;
+
+	if (skip(1))
+		return;
+	i = getrq(1);
+	if (skip(1))
+		return;
+	j = getrq(1);
+	if ((r = findr(i)) < 0 || (o = findr(j)) < 0)
+		return;
+	numtab[r].aln = o + 1;
+	if (numtab[o].nlink == 0)
+		numtab[o].nlink = 1;
+	numtab[o].nlink++;
 }
 
 

@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.87 (gritter) 7/29/06
+.\" Sccsid @(#)doc.tr	1.88 (gritter) 7/30/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -90,7 +90,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/29/06
+.ds Sccsdate 7/30/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1295,6 +1295,8 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'shift'\fB&shift\fI|N\fR	\(en	1	\(en	Shift the arguments to the current macro.\T
 .b1
+\T'als'\fB&als\fI|yy|xx\fR	\(en	\(en	\(en	\fIyy\fR is created as an alias for \fIxx\fR.\T
+.b1
 \T'blm'\fB&blm\fI|xx\fR	none	none	\(en	Blank line macro is \fIxx\fR.\T
 .b1 0
 \T'em'\fB&em\fI|xx\fR	none	none	\(en	End macro is \fIxx\fI.\T
@@ -1304,10 +1306,14 @@ Macros, Strings, Diversion, and Position Traps
 Number Registers
 .bt
 \T'nr'\fB&nr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	Define and set number register \fIR\fR; auto-increment by \fIM\fR.\T
-.b1 0
+.b1
 \T'af'\fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format to register \fIR\fR (\fIc=\fB1\fR, \fBi\fR, \fBI\fR, \fBa\fR, \fBA\fR).\T
-.b1 0
+.b1
 \T'rr'\fB&rr\fI|R\fR	\(en	\(en	\(en	Remove register \fIR\fR.\T
+.b1 0
+\T'rnn'\fB&rnn\fI|R|S\fR	\(en	\(en	\(en	Rename register \fIR\fR to \fIS\fR.\T
+.b1 0
+\T'aln'\fB&aln\fI|S|R\fR	\(en	\(en	\(en	Register \fIS\fR is created as an alias for \fIR\fR.\T
 .mht s_tabs
 Tabs, Leaders, and Fields
 .bt
@@ -1523,6 +1529,8 @@ Device and Font Description Files
 \T'ab'ab	20\T
 \T'ad'ad	4\T
 \T'af'af	8\T
+\T'aln'aln	8\T
+\T'als'als	7\T
 \T'am'am	7\T
 \T'as'as	7\T
 \T'asciify'asciify	7\T
@@ -1637,6 +1645,7 @@ Device and Font Description Files
 \T'rhang'rhang	4\T
 \T'rm'rm	7\T
 \T'rn'rn	7\T
+\T'rnn'rnn	8\T
 \T'rr'rr	8\T
 \T'rs'rs	5\T
 \T'rt'rt	3\T
@@ -3657,6 +3666,16 @@ when counting lines.
 .bta shift
 \fB&shift\fI|N\fR	\(en	1	\(en	Shift the arguments to the current macro
 by \fIN\fR.
+.bta als
+\fB&als\fI|yy|xx\fR	\(en	\(en	\(en	\fIyy\fR is created as an alias for
+the request, macro, or string \fIxx\fR.
+The alias name is in every respect identical to the original name.
+If \fIxx\fR is removed or renamed,
+\fIyy\fR continues to refer to the object
+at the time the alias had been created
+(and vice-versa).
+If either \fIxx\fR or \fIyy\fR are redefined,
+both refer to the new definition.
 .bta blm
 \fB&blm\fI|xx\fR	none	none	\(en	Whenever a blank line is encountered,
 the macro \fIxx\fR is invoked
@@ -3773,6 +3792,18 @@ may become necessary to remove no longer used registers
 to recapture internal storage space for newer registers.
 The register \fB.R\fR contains the number
 of number registers still available.
+.bta rnn
+\fB&rnn\fI|R|S\fR	\(en	\(en	\(en	Rename register \fIR\fR to \fIS\fR.
+If \fIS\fR exists, it is first removed.
+.bta aln
+\fB&aln\fI|S|R\fR	\(en	\(en	\(en	Register \fIS\fR is created as an alias for \fIR\fR.
+The alias name is in every respect identical to the original name.
+If \fIR\fR is removed or renamed,
+\fIS\fR continues to refer to the register
+at the time the alias had been created
+(and vice-versa).
+A change in value or format in \fIR\fR
+affects \fIS\fR and vice-versa.
 .\" from file m3
 .tr |
 .rm mx
