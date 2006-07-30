@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.88 (gritter) 7/30/06
+.\" Sccsid @(#)doc.tr	1.90 (gritter) 7/30/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -2158,9 +2158,11 @@ the logical operators
 \fB&\fR\ (and),
 \fB:\fR\ (or),
 and the functions
-\fIa\fB<?\fIb\fR (minimum of \fIa\fR and \fIb\fR)
-and
-\fIa\fB>?\fIb\fR (maximum of \fIa\fR and \fIb\fR)
+\fIa\fB<?\fIb\fR (minimum of \fIa\fR and \fIb\fR),
+\fIa\fB>?\fIb\fR (maximum of \fIa\fR and \fIb\fR),
+and \fB(\fIc\fB;\fIe\fB)\fR (evaluate the expression \fIe\fR using
+\fIc\fR as default scale indicator,
+or ignoring scaling indicators if \fIc\fR is omitted)
 may be used.
 Except where controlled by parentheses, evaluation of expressions is left-to-right;
 there is no operator precedence.
@@ -4987,11 +4989,10 @@ Warn when an undefined scale indicator is used in a
 \T'c_expr'numerical expression\T.
 T}
 64	range	T{
-Warn when an argument to
-\T'break'\fB&break\fR\T
-or
-\T'continue'\fB&continue\fR\T
-is out of range.
+Warn when an argument is out of range.
+T}
+128	syntax	T{
+Warn about questionable syntax in numerical expressions.
 T}
 256	di	T{
 Warn when a \T'di'\fBdi\fR\T request is executed but no

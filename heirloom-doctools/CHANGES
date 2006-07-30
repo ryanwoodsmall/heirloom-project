@@ -34,6 +34,8 @@ Release ...
   as a device control function.
 * [nt]roff: The "\$0" escape sequence has been added to refer to the name
   of the current macro or string.
+* [nt]roff: The "(c;e)" numerical expression function has been added to
+  evaluate "e" using "c" as default scale indicator.
 * [nt]roff: The "M" (Em/100), "s" (= "u"), and "z" (= "p") scale indicators
   have been added.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.103 (gritter) 7/30/06
+ * Sccsid @(#)tdef.h	1.105 (gritter) 7/30/06
  */
 
 /*
@@ -256,7 +256,7 @@ endif NROFF
 #define	isvmot(n)	((n) & VMOT)	/* must have tested MOT previously */
 #define	isnmot(n)	((n) & NMOT)	/* ditto */
 #define	absmot(n)	(unsigned long)(BMBITS&(n) | ((n)&XMBITS)>>XMSHIFT)
-#define	sabsmot(n)	((n)&BMBITS | ((n)&~BMBITS)<<XMSHIFT)
+#define	sabsmot(n)	(!xflag || (n) <= MAXMOT ? (n)&BMBITS | ((n)&~BMBITS)<<XMSHIFT : moflo(n))
 
 #define	ZBIT		(01ULL << 63) 	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
@@ -301,7 +301,7 @@ endif NROFF
 #define	isvmot(n)	((n) & VMOT)	/* must have tested MOT previously */
 #define	isnmot(n)	((n) & NMOT)	/* ditto */
 #define	absmot(n)	(unsigned)(0177777 & (n) & ~MOT)	/* (short) is cheap mask */
-#define	sabsmot(n)	((n)&0177777)
+#define	sabsmot(n)	(!xflag || (n) <= MAXMOT ? (n)&0177777 : moflo(n))
 
 #define	ZBIT	0x80000000 	/*  (01L << 31) */	/* zero width char */
 #define	iszbit(n)	((n) & ZBIT)
@@ -506,6 +506,7 @@ extern enum warn {
 	WARN_EL		= 16,
 	WARN_SCALE	= 32,
 	WARN_RANGE	= 64,
+	WARN_SYNTAX	= 128,
 	WARN_DI		= 256,
 	WARN_MAC	= 512,
 	WARN_REG	= 1024,
@@ -514,7 +515,7 @@ extern enum warn {
 	WARN_ESCAPE	= 32768,
 	WARN_SPACE	= 65536,
 	WARN_FONT	= 131072,
-	WARN_ALL	= 2147481919,	/* all except di, mac, reg */
+	WARN_ALL	= 2147481855,	/* all except di, mac, reg */
 	WARN_W		= 2147483647
 } warn;
 

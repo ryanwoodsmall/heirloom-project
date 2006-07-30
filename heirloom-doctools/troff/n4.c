@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.38 (gritter) 7/30/06
+ * Sccsid @(#)n4.c	1.39 (gritter) 7/30/06
  */
 
 /*
@@ -50,6 +50,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<locale.h>
+#include	<limits.h>
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
@@ -609,7 +610,8 @@ static int	illscale;
 int
 atoi()
 {
-	int	n, c;
+	long long	n;
+	int	c;
 
 	illscale = 0;
 	n = atoi0();
@@ -620,6 +622,11 @@ atoi()
 			errprint("illegal number, char %c", c);
 		else
 			errprint("illegal number");
+	} else if (n < INT_MIN || n > INT_MAX) {
+		if (warn & WARN_NUMBER)
+			errprint("arithmetic overflow");
+		if (xflag)
+			nonumb = 1;
 	}
 	return n;
 }
@@ -808,6 +815,7 @@ atoi1(register tchar ii)
 	register int i, j, digits;
 	register long long	acc;
 	int	neg, abs, field;
+	int	_noscale = 0, scale;
 
 	neg = abs = field = digits = 0;
 	acc = 0;
@@ -846,13 +854,16 @@ a1:
 		i = cbits(ii);
 		goto a1;
 	}
-	if (!field) {
+	if (!xflag && !field) {
 		ch = ii;
 		goto a2;
 	}
-	switch (i) {
-	case 'u':
+	switch (scale = i) {
 	case 's':
+		if (!xflag)
+			goto dfl;
+		/*FALLTHRU*/
+	case 'u':
 		i = j = 1;	/* should this be related to HOR?? */
 		break;
 	case 'v':	/*VSs - vert spacing*/
@@ -872,8 +883,11 @@ a1:
 		i = 1;	/*Same as Ems in NROFF*/
 #endif
 		break;
-	case 'p':	/*Points*/
 	case 'z':
+		if (!xflag)
+			goto dfl;
+		/*FALLTHRU*/
+	case 'p':	/*Points*/
 		j = INCH;
 		i = 72;
 		break;
@@ -891,19 +905,58 @@ a1:
 		i = 6;
 		break;
 	case 'M':	/*Ems/100*/
+		if (!xflag)
+			goto dfl;
 		j = EM;
 		i = 100;
 		break;
+	case ';':
+		if (!xflag)
+			goto dfl;
+		i = j = 1;
+		_noscale = 1;
+		goto newscale;
 	default:
+	dfl:	if (!field) {
+			ch = ii;
+			goto a2;
+		}
 		if ((i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') &&
 				warn & WARN_SCALE) {
 			errprint("undefined scale indicator %c", i);
 			illscale = 1;
-		}
+		} else
+			scale = 0;
 		j = dfact;
 		ch = ii;
 		i = dfactd;
 	}
+	if (!field) {
+		tchar	t = getch(), tp[2];
+		int	f, d, n;
+		if (cbits(t) != ';') {
+			tp[0] = ii;
+			tp[1] = 0;
+			pushback(tp);
+			ch = ii;
+			goto a2;
+		}
+	newscale:
+		/* (c;e) */
+		f = dfact;
+		d = dfactd;
+		n = noscale;
+		dfact = j;
+		dfactd = i;
+		noscale = _noscale;
+		acc = atoi0();
+		dfact = f;
+		dfactd = d;
+		noscale = n;
+		return(acc);
+	}
+	if (noscale && scale && warn & WARN_SYNTAX)
+		errprint("ignoring scale indicator %c", scale);
 	if (neg) 
 		acc = -acc;
 	if (!noscale) {
@@ -1208,3 +1261,10 @@ quant(int n, int m)
 }
 
 
+tchar
+moflo(int n)
+{
+	if (warn & WARN_RANGE)
+		errprint("value too large for motion");
+	return sabsmot(MAXMOT);
+}

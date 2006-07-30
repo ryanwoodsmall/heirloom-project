@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.51 (gritter) 7/29/06
+ * Sccsid @(#)n9.c	1.52 (gritter) 7/30/06
  */
 
 /*
@@ -844,6 +844,7 @@ static const struct {
 	{ WARN_EL,	"el" },
 	{ WARN_SCALE,	"scale" },
 	{ WARN_RANGE,	"range" },
+	{ WARN_SYNTAX,	"syntax" },
 	{ WARN_DI,	"di" },
 	{ WARN_MAC,	"mac" },
 	{ WARN_REG,	"reg" },
