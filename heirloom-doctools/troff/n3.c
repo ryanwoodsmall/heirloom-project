@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.116 (gritter) 7/30/06
+ * Sccsid @(#)n3.c	1.117 (gritter) 7/30/06
  */
 
 /*
@@ -1548,17 +1548,24 @@ casepm(void)
 	kk = cnt = tcnt = 0;
 	tot = !skip(0);
 	for (i = 0; i < NM; i++) {
-		if ((xx = contab[i].rq) == 0 || contab[i].mx == 0)
-			continue;
-		tcnt++;
-		j = (filep) contab[i].mx;
-		k = 1;
-		while ((j = blist[blisti(j)]) != (unsigned) ~0) {
-			k++; 
+		if ((xx = contab[i].rq) == 0 || contab[i].mx == 0) {
+			if (contab[i].als && (k = findmn(xx)) >= 0) {
+				if (contab[k].rq == 0 || contab[k].mx == 0)
+					continue;
+			} else
+				continue;
 		}
-		cnt++;
+		tcnt++;
+		if (contab[i].als == 0 && (j = (filep) contab[i].mx) != 0) {
+			k = 1;
+			while ((j = blist[blisti(j)]) != (unsigned) ~0) {
+				k++; 
+			}
+			cnt++;
+		} else
+			k = 0;
 		kk += k;
-		if (!tot)
+		if (!tot && contab[i].nlink == 0)
 			fdprintf(stderr, "%s %d\n", macname(xx), k);
 	}
 	fdprintf(stderr, "pm: total %d, macros %d, space %d\n", tcnt, cnt, kk);
