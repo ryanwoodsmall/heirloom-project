@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.117 (gritter) 7/30/06
+ * Sccsid @(#)n3.c	1.118 (gritter) 7/30/06
  */
 
 /*
@@ -310,12 +310,12 @@ caserm(void)
 	lgf++;
 	while (!skip(!cnt++) && (j = getrq(0)) != 0) {
 		k = _findmn(j, 0);
-		if (contab[k].als) {
+		if (k >= 0 && contab[k].als) {
 			i = _findmn(j, 1);
 			if (--contab[i].nlink <= 0)
 				clrmn(i);
 		}
-		if (contab[k].nlink > 0)
+		if (k >= 0 && contab[k].nlink > 0)
 			contab[k].nlink--;
 		clrmn(k);
 	}
@@ -1068,7 +1068,7 @@ casedi(void)
 	dip = &d[dilev];
 	dip->op = finds(i);
 	dip->curd = i;
-	if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0) {
+	if (newmn && oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0) {
 		munhash(&contab[newmn]);
 		j = contab[oldmn].rq;
 	} else {
@@ -1076,10 +1076,12 @@ casedi(void)
 		nlink = 0;
 	}
 	clrmn(oldmn);
-	contab[newmn].rq = j;
-	contab[newmn].nlink = nlink;
-	if (i != j)
-		maddhash(&contab[newmn]);
+	if (newmn) {
+		contab[newmn].rq = j;
+		contab[newmn].nlink = nlink;
+		if (i != j)
+			maddhash(&contab[newmn]);
+	}
 	k = (int *) & dip->dnl;
 	dip->flss = 0;
 	for (j = 0; j < 10; j++)
