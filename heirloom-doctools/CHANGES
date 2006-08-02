@@ -10,6 +10,8 @@ Release ...
   created and modified with the ".nrf" request and are otherwise like
   standard integer number registers, with which they share a common name
   space.
+* [nt]roff: The ".if f expr" condition has been introduced to evaluate
+  an expression with floating-point computation.
 * [nt]roff: The ".ecs" and ".ecr" requests have been added to save and
   restore the escape character.
 * [nt]roff: The ".shc" request has been added to set the soft hyphen

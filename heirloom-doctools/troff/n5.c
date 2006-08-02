@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.64 (gritter) 7/30/06
+ * Sccsid @(#)n5.c	1.65 (gritter) 8/3/06
  */
 
 /*
@@ -1019,6 +1019,7 @@ caseif(int x)
 	register int notflag, true;
 	tchar i, j;
 	enum warn w = warn;
+	int	flt = 0;
 
 	if (x == 3)
 		goto i2;
@@ -1031,11 +1032,21 @@ caseif(int x)
 	skip(1);
 	if ((cbits(i = getch())) == '!') {
 		notflag = 1;
+		if (xflag && (cbits(i = getch())) == 'f')
+			flt = 1;
+		else
+			ch = i;
+	} else if (xflag && cbits(i) == 'f') {
+		flt = 1;
+		notflag = 0;
 	} else {
 		notflag = 0;
 		ch = i;
 	}
-	i = (int)atoi0();
+	if (flt)
+		i = atof0() > 0;
+	else
+		i = (int)atoi0();
 	if (!nonumb) {
 		if (i > 0)
 			true++;
@@ -1106,6 +1117,8 @@ i1:
 	}
 	if (true) {
 		if (frame->loopf & LOOP_EVAL) {
+			if (nonumb)
+				goto i3;
 			frame->loopf &= ~LOOP_EVAL;
 			frame->loopf |= LOOP_NEXT;
 		}
@@ -1117,6 +1130,7 @@ i2:
 		ch = i;
 		nflush++;
 	} else {
+i3:
 		if (frame->loopf & LOOP_EVAL)
 			frame->loopf = LOOP_FREE;
 		copyf++;

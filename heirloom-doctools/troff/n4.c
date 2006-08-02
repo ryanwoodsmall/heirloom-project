@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.41 (gritter) 8/2/06
+ * Sccsid @(#)n4.c	1.42 (gritter) 8/3/06
  */
 
 /*
@@ -634,12 +634,6 @@ atoi()
 	struct acc	a;
 
 	a = _atoi(0);
-	if (!nonumb && (a.n < INT_MIN || a.n > INT_MAX)) {
-		if (warn & WARN_NUMBER)
-			errprint("arithmetic overflow");
-		if (xflag)
-			nonumb = 1;
-	}
 	return a.n;
 }
 
@@ -649,12 +643,6 @@ atof()
 	struct acc	a;
 
 	a = _atoi(1);
-	if (!nonumb && (a.f < FLT_MIN || a.f > FLT_MAX)) {
-		if (warn & WARN_NUMBER)
-			errprint("floating-point arithmetic overflow");
-		if (xflag)
-			nonumb = 1;
-	}
 	return a.f;
 }
 
@@ -674,6 +662,21 @@ _atoi(int flt)
 		else
 			errprint("illegal number");
 	}
+	if (flt) {
+		if (!nonumb && (n.f<0 && n.f<FLT_MIN || n.f>0 && n.f>FLT_MAX)) {
+			if (warn & WARN_NUMBER)
+				errprint("floating-point arithmetic overflow");
+			if (xflag)
+				nonumb = 1;
+		}
+	} else {
+		if (!nonumb && (n.n<0 && n.n <INT_MIN || n.n>0 && n.n>INT_MAX)) {
+			if (warn & WARN_NUMBER)
+				errprint("arithmetic overflow");
+			if (xflag)
+				nonumb = 1;
+		}
+	}
 	return n;
 }
 
@@ -684,6 +687,15 @@ atoi0(void)
 
 	a = _atoi0(0);
 	return a.n;
+}
+
+double
+atof0(void)
+{
+	struct acc	a;
+
+	a = _atoi0(0);
+	return a.f;
 }
 
 static struct acc

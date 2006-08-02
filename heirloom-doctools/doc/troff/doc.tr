@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.91 (gritter) 8/2/06
+.\" Sccsid @(#)doc.tr	1.92 (gritter) 8/3/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -72,6 +72,7 @@
 .kernpair R [ I \[fi] 200
 .kernpair R , B p 80
 .kernpair R \[longs] R ' 110
+.kernpair B f I F 50
 .ig
 .fps math 1 R tim_____ pfb
 .fp 2 I timi____ pfb
@@ -90,7 +91,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/2/06
+.ds Sccsdate 8/3/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1414,6 +1415,10 @@ Conditional Acceptance of Input
 .b1
 \T'if'\fB&if|!\fIN|anything\fR	\(en	\fBu\fR	If expression \fIN\fR \(<= 0 [sic], accept \fIanything\fR.\T
 .b1
+\T'if'\fB&if|f\fIF|anything\fR	\(en	\fBu\fR	If floating-point expression \fIF\fR > 0, accept \fIanything\fR.\T
+.b1
+\T'if'\fB&if|!f\fIF|anything\fR	\(en	\fBu\fR	If floating-point expression \fIF\fR \(<= 0 [sic], accept \fIanything\fR.\T
+.b1
 \T'if'\fB&if\fI|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR identical to \fIstring2\fR,
 accept \fIanything\fR.\T
 .b1
@@ -2119,6 +2124,7 @@ and
 requests;
 and \fBu\fR for the requests
 \fB\T'nr'nr\T\fR,
+\fB\T'nrf'nrf\T\fR,
 \fB\T'if'if\T\fR,
 and
 \fB\T'ie'ie\T\fR.
@@ -2129,7 +2135,9 @@ the unit scale indicator
 \fBu\fR may need to be appended to prevent
 an additional inappropriate default scaling.
 The number, \fIN\fR, may be specified in decimal-fraction form
-but the parameter finally stored is rounded to an integer number of basic units.
+but the parameter finally stored is rounded to an integer number of basic units,
+except for floating-point computations with
+\T'nrf'\fBnrf\fR\T and \T'if'\fBif\ f\fR\T.
 .pg
 The \fIabsolute position\fR indicator \fB~\fR may be prepended
 to a number \fIN\fR
@@ -2169,8 +2177,6 @@ or ignoring scaling indicators if \fIc\fR is omitted)
 may be used.
 Except where controlled by parentheses, evaluation of expressions is left-to-right;
 there is no operator precedence.
-Comparison computations are executed on integer values (in basic units)
-except with the arguments to the \T'nrf'\fBnrf\fR\T request.
 In the case of certain requests, an initial \fB\(pl\fR or \fB\(mi\fR is stripped
 and interpreted as an increment or decrement indicator respectively.
 In the presence of default scaling, the desired scale indicator must be
@@ -3776,7 +3782,7 @@ with respect to the previous value, if any.
 Comparison computations in the expression \fIF\fR
 are performed using floating-point values.
 The increment for auto-incrementing,
-which may also be a floating-point value,
+which also is a floating-point value,
 is set to \fIG\fR.
 .bta af
 \fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format \fIc\fR to register \fIR\fR.
@@ -4687,8 +4693,8 @@ Conditional Acceptance of Input
 In the following,
 \fIc\fR is a one-character, built-in \fIcondition\fR name,
 \fB!\fR signifies \fInot\fR,
-\fIN\fR is a \T'c_expr'numerical expression\T
-(with comparison computations based on integer values),
+\fIN\fR is an integer \T'c_expr'numerical expression\T,
+\fIF\fR is a floating-point expression,
 \fIstring1\fR and \fIstring2\fR are strings delimited by any non-blank, non-numeric character \fInot\fR in the strings,
 and
 \fIanything\fR represents what is conditionally accepted.
@@ -4702,6 +4708,10 @@ in multi-line case use \fI\e{anything\|\e}\fR.
 \fB&if\fI|N|anything\fR		\(en	\fBu\fR	If \T'c_expr'expression\T \fIN\fR > 0, accept \fIanything\fR.
 .bt
 \fB&if|!\fIN|anything\fR	\(en	\fBu\fR	If \T'c_expr'expression\T \fIN\fR \(<= 0 [sic], accept \fIanything\fR.
+.bt
+\fB&if|f\fIF|anything\fR	\(en	\fBu\fR	If floating-point expression \fIF\fR > 0, accept \fIanything\fR.
+.bt
+\fB&if|!f\fIF|anything\fR	\(en	\fBu\fR	If floating-point expression \fIF\fR \(<= 0 [sic], accept \fIanything\fR.
 .bt
 \fB&if\fI|\'string1\'string2\'|anything\fR	\(en	If \fIstring1\fR identical to \fIstring2\fR,
 accept \fIanything\fR.
