@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.119 (gritter) 8/2/06
+ * Sccsid @(#)n3.c	1.120 (gritter) 8/2/06
  */
 
 /*
@@ -1537,9 +1537,55 @@ caseunformat(int flag)
  */
 #define	MAXRQ2	0200000
 
+static struct map {
+	struct map	*link;
+	int	n;
+} *map[128];
 static char	**had;
 static int	hadn;
 static int	alcd;
+
+#define	maphash(cp)	(_pjw(cp) & 0177)
+
+static unsigned
+_pjw(const char *cp)
+{
+	unsigned	h = 0, g;
+
+	cp--;
+	while (*++cp) {
+		h = (h << 4 & 0xffffffff) + (*cp&0377);
+		if ((g = h & 0xf0000000) != 0) {
+			h = h ^ g >> 24;
+			h = h ^ g;
+		}
+	}
+	return h;
+}
+
+static int
+mapget(const char *cp)
+{
+	int	h = maphash(cp);
+	struct map	*mp;
+
+	for (mp = map[h]; mp; mp = mp->link)
+		if (strcmp(had[mp->n], cp) == 0)
+			return mp->n;
+	return hadn;
+}
+
+static void
+mapadd(const char *cp, int n)
+{
+	int	h = maphash(cp);
+	struct map	*mp;
+
+	mp = calloc(1, sizeof *mp);
+	mp->n = n;
+	mp->link = map[h];
+	map[h] = mp;
+}
 
 void
 casepm(void)
@@ -1665,10 +1711,7 @@ maybemore(int sofar, int flags)
 	buf[i] = 0;
 	if (i == 3)
 		goto retn;
-	for (n = 0; n < hadn; n++)
-		if (strcmp(had[n], buf) == 0)
-			break;
-	if (n == hadn) {
+	if ((n = mapget(buf)) >= hadn) {
 		if ((flags & 1) == 0) {
 			strcpy(laststr, buf);
 		retn:	buf[i-1] = c;
@@ -1696,6 +1739,7 @@ maybemore(int sofar, int flags)
 		had[n] = malloc(strlen(buf) + 1);
 		strcpy(had[n], buf);
 		hadn = n+1;
+		mapadd(buf, n);
 	}
 	pb[0] = c;
 	if (xflag < 3)
@@ -1731,10 +1775,7 @@ getls(int termc, int *strp)
 	else if (i <= 2) {
 		j = PAIR(buf[0], buf[1]);
 	} else {
-		for (n = 0; n < hadn; n++)
-			if (strcmp(had[n], buf) == 0)
-				break;
-		if (n == hadn) {
+		if ((n = mapget(buf)) >= hadn) {
 			n = -1;
 			strcpy(laststr, buf);
 		}
@@ -1755,14 +1796,14 @@ makerq(const char *name)
 	}
 	if (name[0] == 0 || name[1] == 0 || name[2] == 0)
 		return PAIR(name[0], name[1]);
-	for (n = 0; n < hadn; n++)
-		if (strcmp(had[n], name) == 0)
-			return MAXRQ2 + n;
+	if ((n = mapget(name)) < hadn)
+		return MAXRQ2 + n;
 	if (hadn++ >= alcd)
 		had = realloc(had, (alcd += 20) * sizeof *had);
 	had[n] = malloc(strlen(name) + 1);
 	strcpy(had[n], name);
 	hadn = n + 1;
+	mapadd(name, n);
 	return MAXRQ2 + n;
 }
 
@@ -1776,4 +1817,5 @@ addcon(int t, char *rs, void(*f)(int))
 	had[n] = rs;
 	contab[t].rq = MAXRQ2 + n;
 	contab[t].f = f;
+	mapadd(rs, n);
 }
