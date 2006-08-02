@@ -6,6 +6,10 @@ Release ...
   of a string within a string or macro.
 * [nt]roff: The ".while", ".break", and ".continue" requests have been
   added as another method to process input repeatedly.
+* [nt]roff: Floating-point registers have been introduced; they can be
+  created and modified with the ".nrf" request and are otherwise like
+  standard integer number registers, with which they share a common name
+  space.
 * [nt]roff: The ".ecs" and ".ecr" requests have been added to save and
   restore the escape character.
 * [nt]roff: The ".shc" request has been added to set the soft hyphen
@@ -38,6 +42,9 @@ Release ...
   evaluate "e" using "c" as default scale indicator.
 * [nt]roff: The "M" (Em/100), "s" (= "u"), and "z" (= "p") scale indicators
   have been added.
+* troff: The ".psbb" request now reads a "%%HiResBoundingBox" DSC comment
+  in preference to "%%BoundingBox"; the registers it assigns to are now
+  floating-point registers.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
 

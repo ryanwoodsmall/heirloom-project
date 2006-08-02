@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.64 (gritter) 7/30/06
+ * Sccsid @(#)ext.h	1.65 (gritter) 8/2/06
  */
 
 /*
@@ -343,13 +343,15 @@ extern int	abc(int, int (*)(tchar));
 extern int	abc0(int, int (*)(tchar));
 #define	atoi()	xxatoi()
 extern int	atoi();
-extern long	long atoi0(void);
-extern long	long ckph(void);
-extern long	long atoi1(register tchar);
+#define	atof()	xxatof()
+extern float	atof();
+extern long long	atoi0(void);
 extern void	setnr(const char *, int, int);
+extern void	setnrf(const char *, float, float);
 extern void	caserr(void);
 extern void	casernn(void);
-extern void	casenr(void);
+extern void	casenr(int);
+extern void	casenrf(void);
 extern void	setr(void);
 extern void	caseaf(void);
 extern void	setaf(void);

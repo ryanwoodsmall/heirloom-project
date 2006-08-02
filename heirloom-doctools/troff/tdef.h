@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.105 (gritter) 7/30/06
+ * Sccsid @(#)tdef.h	1.106 (gritter) 8/2/06
  */
 
 /*
@@ -573,6 +573,8 @@ extern struct numtab {
 	struct	numtab *link;
 	int	aln;
 	int	nlink;
+	float	fval;
+	float	finc;
 } *numtab;
 extern const struct numtab initnumtab[];
 
@@ -591,6 +593,11 @@ extern const struct numtab initnumtab[];
 #define	SB	12
 #define	CD	13
 #define	PID	14
+
+struct acc {
+	long long	n;
+	double	f;
+};
 
 /* the infamous environment block */
 

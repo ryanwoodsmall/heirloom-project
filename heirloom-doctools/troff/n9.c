@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.52 (gritter) 7/30/06
+ * Sccsid @(#)n9.c	1.53 (gritter) 8/2/06
  */
 
 /*
@@ -760,7 +760,7 @@ getcom(const char *cp, const char *tp)
 }
 
 static void
-getpsbb(const char *name, int bb[4])
+getpsbb(const char *name, double bb[4])
 {
 	struct fg	*fp;
 	char	*buf = NULL;
@@ -790,6 +790,15 @@ getpsbb(const char *name, int bb[4])
 				bb[2] = strtol(cp, &cp, 10);
 			if (*cp)
 				bb[3] = strtol(cp, &cp, 10);
+		}
+		if (n > 0 && (cp =getcom(buf, "%%HiResBoundingBox:")) != NULL) {
+			bb[0] = strtod(cp, &cp);
+			if (*cp)
+				bb[1] = strtod(cp, &cp);
+			if (*cp)
+				bb[2] = strtod(cp, &cp);
+			if (*cp)
+				bb[3] = strtod(cp, &cp);
 			break;
 		}
 		if (n == 0 || getcom(buf, "%%EndComments") != NULL ||
@@ -813,7 +822,7 @@ casepsbb(void)
 	char	*buf = NULL;
 	int	c;
 	int	n = 0, sz = 0;
-	int	bb[4] = { 0, 0, 0, 0 };
+	double	bb[4] = { 0, 0, 0, 0 };
 
 	lgf++;
 	skip(1);
@@ -825,10 +834,10 @@ casepsbb(void)
 	} while (c);
 	getpsbb(buf, bb);
 	free(buf);
-	setnr("llx", bb[0], 0);
-	setnr("lly", bb[1], 0);
-	setnr("urx", bb[2], 0);
-	setnr("ury", bb[3], 0);
+	setnrf("llx", bb[0], 0);
+	setnrf("lly", bb[1], 0);
+	setnrf("urx", bb[2], 0);
+	setnrf("ury", bb[3], 0);
 #endif	/* !NROFF */
 }
 
