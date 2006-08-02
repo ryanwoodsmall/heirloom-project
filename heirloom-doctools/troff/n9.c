@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.53 (gritter) 8/2/06
+ * Sccsid @(#)n9.c	1.54 (gritter) 8/2/06
  */
 
 /*
@@ -768,6 +768,7 @@ getpsbb(const char *name, double bb[4])
 	size_t	size = 0;
 	int	fd, n;
 	int	lineno = 0;
+	int	found = 0;
 
 	if ((fd = open(name, O_RDONLY)) < 0) {
 		errprint("can't open %s", name);
@@ -790,6 +791,7 @@ getpsbb(const char *name, double bb[4])
 				bb[2] = strtol(cp, &cp, 10);
 			if (*cp)
 				bb[3] = strtol(cp, &cp, 10);
+			found = 1;
 		}
 		if (n > 0 && (cp =getcom(buf, "%%HiResBoundingBox:")) != NULL) {
 			bb[0] = strtod(cp, &cp);
@@ -805,7 +807,9 @@ getpsbb(const char *name, double bb[4])
 				buf[0] != '%' || buf[1] == ' ' ||
 				buf[1] == '\t' || buf[1] == '\r' ||
 				buf[1] == '\n') {
-			errprint("%s lacks a %%BoundingBox: DSC comment", name);
+			if (found == 0)
+				errprint("%s lacks a %%BoundingBox: DSC "
+					"comment", name);
 			break;
 		}
 	}
