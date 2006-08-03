@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.42 (gritter) 8/3/06
+ * Sccsid @(#)n4.c	1.43 (gritter) 8/3/06
  */
 
 /*
@@ -109,6 +109,7 @@ setn(void)
 	extern const char	revision[];
 	char	tb[20], *cp;
 	const char	*name;
+	struct s	*s;
 	register int i, j;
 	register tchar ii;
 	int	f;
@@ -155,7 +156,8 @@ setn(void)
 			i = in;		
 			break;
 		case '$': 
-			i = frame->nargs;		
+			for (s = frame; s->loopf && s != stk; s = s->pframe);
+			i = s->nargs;
 			break;
 		case 'A': 
 			i = ascii;		

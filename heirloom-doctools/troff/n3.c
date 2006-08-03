@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.120 (gritter) 8/2/06
+ * Sccsid @(#)n3.c	1.121 (gritter) 8/3/06
  */
 
 /*
@@ -960,7 +960,9 @@ seta(void)
 {
 	register int c, i;
 	char q[] = { 0, 0 };
+	struct s	*s;
 
+	for (s = frame; s->loopf && s != stk; s = s->pframe);
 	switch (c = cbits(getch())) {
 	case '@':
 		q[0] = '"';
@@ -968,10 +970,10 @@ seta(void)
 	case '*':
 		if (xflag == 0)
 			goto dfl;
-		for (i = frame->nargs; i >= 1; i--) {
+		for (i = s->nargs; i >= 1; i--) {
 			if (q[0])
 				cpushback(q);
-			pushback(&frame->argsp[frame->argt[i - 1]]);
+			pushback(&s->argsp[s->argt[i - 1]]);
 			if (q[0])
 				cpushback(q);
 			if (i > 1)
@@ -995,10 +997,10 @@ seta(void)
 		goto assign;
 	default:
 	dfl:	i = c - '0';
-	assign:	if (i > 0 && i <= frame->nargs)
-			pushback(&frame->argsp[frame->argt[i - 1]]);
+	assign:	if (i > 0 && i <= s->nargs)
+			pushback(&s->argsp[s->argt[i - 1]]);
 		else if (i == 0)
-			cpushback(macname(frame->mname));
+			cpushback(macname(s->mname));
 	}
 }
 
@@ -1006,7 +1008,9 @@ static void
 caseshift(void)
 {
 	int	i, j;
+	struct s	*s;
 
+	for (s = frame; s->loopf && s != stk; s = s->pframe);
 	if (skip(0))
 		i = 1;
 	else {
@@ -1016,10 +1020,10 @@ caseshift(void)
 	}
 	if (nonumb)
 		return;
-	if (i > 0 && i <= frame->nargs) {
-		frame->nargs -= i;
-		for (j = 1; j <= frame->nargs; j++)
-			frame->argt[j - 1] = frame->argt[j + i - 1];
+	if (i > 0 && i <= s->nargs) {
+		s->nargs -= i;
+		for (j = 1; j <= s->nargs; j++)
+			s->argt[j - 1] = s->argt[j + i - 1];
 	}
 }
 
