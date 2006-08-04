@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.43 (gritter) 8/3/06
+ * Sccsid @(#)n4.c	1.44 (gritter) 8/4/06
  */
 
 /*
@@ -48,7 +48,6 @@
 
 #include	<stdlib.h>
 #include	<string.h>
-#include	<stdio.h>
 #include	<ctype.h>
 #include	<locale.h>
 #include	<limits.h>
@@ -379,17 +378,7 @@ s0:
 	setn1(i, nform, (tchar) 0);
 	return;
 flt:
-	snprintf(tb, sizeof tb, "%.6f", fl);
-	i = 0;
-	for (cp = tb; *cp; cp++)
-		if (*cp == '.')
-			i = 1;
-	if (i) {
-		while (*--cp == '0')
-			*cp = 0;
-		if (*cp == '.')
-			*cp = 0;
-	}
+	roff_sprintf(tb, "%g", fl);
 	cpushback(tb);
 }
 
@@ -899,7 +888,7 @@ atoi1(register tchar ii, int flt)
 	struct acc	acc;
 	int	neg, abs, field;
 	int	_noscale = 0, scale;
-	double	f;
+	double	e, f;
 
 	neg = abs = field = digits = 0;
 	acc.f = acc.n = 0;
@@ -945,6 +934,28 @@ a1:
 		ii = getch();
 		i = cbits(ii);
 		goto a1;
+	}
+	e = 1;
+	if (xflag && (i == 'e' || i == 'E')) {
+		if ((i = cbits(ii = getch())) == '+')
+			j = 1;
+		else if (i == '-')
+			j = -1;
+		else if (i >= '0' && i <= '9') {
+			j = 1;
+			ch = ii;
+		} else {
+			ch = ii;
+			field = 0;
+			goto a2;
+		}
+		f = 0;
+		while ((i = cbits(ii = getch())) >= '0' && i <= '9')
+			f = f * 10 + i - '0';
+		while (f-- > 0)
+			e *= 10;
+		if (j < 0)
+			e = 1/e;
 	}
 	if (!xflag && !field) {
 		ch = ii;
@@ -1060,6 +1071,10 @@ a1:
 	if ((field != digits) && (digits > 0))
 		while (digits--)
 			acc.n /= 10;
+	if (e != 1) {
+		acc.n = (int)(e * acc.n);
+		acc.f *= e;
+	}
 	if (abs) {
 		if (dip != d)
 			j = dip->dnl; 

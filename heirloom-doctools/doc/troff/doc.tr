@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.92 (gritter) 8/3/06
+.\" Sccsid @(#)doc.tr	1.93 (gritter) 8/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -91,7 +91,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/3/06
+.ds Sccsdate 8/4/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -2138,6 +2138,8 @@ The number, \fIN\fR, may be specified in decimal-fraction form
 but the parameter finally stored is rounded to an integer number of basic units,
 except for floating-point computations with
 \T'nrf'\fBnrf\fR\T and \T'if'\fBif\ f\fR\T.
+Exponential notation as in `1\fBe+\fR9' or `1\fBe\-\fR10'
+is supported.
 .pg
 The \fIabsolute position\fR indicator \fB~\fR may be prepended
 to a number \fIN\fR

@@ -12,6 +12,8 @@ Release ...
   space.
 * [nt]roff: The ".if f expr" condition has been introduced to evaluate
   an expression with floating-point computation.
+* [nt]roff: Exponential notation, as in "1e+10", is now supported in
+  numerical expressions.
 * [nt]roff: The ".ecs" and ".ecr" requests have been added to save and
   restore the escape character.
 * [nt]roff: The ".shc" request has been added to set the soft hyphen
