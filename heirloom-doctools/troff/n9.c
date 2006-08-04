@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.54 (gritter) 8/2/06
+ * Sccsid @(#)n9.c	1.55 (gritter) 8/5/06
  */
 
 /*
@@ -709,6 +709,27 @@ struct fg {
 };
 
 static int
+psskip(struct fg *fp, size_t n)
+{
+	size_t	i;
+
+	if (fp->eof)
+		return -1;
+	if (fp->bp < fp->ep) {
+		i = fp->ep - fp->bp;
+		if (i > n) {
+			fp->bp += n;
+			return 0;
+		}
+		fp->bp = fp->buf;
+		n -= i;
+	}
+	if (lseek(fp->fd, n, SEEK_CUR) == (off_t)-1)
+		return -1;
+	return 0;
+}
+
+static int
 psgetline(struct fg *fp, char **linebp, size_t *linesize)
 {
 	int	i, n = 0;
@@ -725,7 +746,9 @@ psgetline(struct fg *fp, char **linebp, size_t *linesize)
 		for (;;) {
 			if (*linesize < n + 2)
 				*linebp = realloc(*linebp, *linesize += 128);
-			if (fp->bp >= fp->ep || *fp->bp == '\n' || nl) {
+			if (fp->bp >= fp->ep)
+				break;
+			if (*fp->bp == '\n' || nl) {
 				nl = 2;
 				break;
 			}
@@ -766,9 +789,12 @@ getpsbb(const char *name, double bb[4])
 	char	*buf = NULL;
 	char	*cp;
 	size_t	size = 0;
-	int	fd, n;
+	int	fd, n, k;
 	int	lineno = 0;
 	int	found = 0;
+	int	atend = 0;
+	int	state = 0;
+	int	indoc = 0;
 
 	if ((fd = open(name, O_RDONLY)) < 0) {
 		errprint("can't open %s", name);
@@ -783,34 +809,109 @@ getpsbb(const char *name, double bb[4])
 					"PostScript document", name);
 			break;
 		}
-		if (n > 0 && (cp = getcom(buf, "%%BoundingBox:")) != NULL) {
+		if (n > 0 && state != 1 &&
+				(cp = getcom(buf, "%%BoundingBox:")) != NULL) {
+			while (*cp == ' ' || *cp == '\t')
+				cp++;
+			if (strncmp(cp, "(atend)", 7) == 0) {
+				atend++;
+				continue;
+			}
 			bb[0] = strtol(cp, &cp, 10);
 			if (*cp)
 				bb[1] = strtol(cp, &cp, 10);
 			if (*cp)
 				bb[2] = strtol(cp, &cp, 10);
-			if (*cp)
+			if (*cp) {
 				bb[3] = strtol(cp, &cp, 10);
-			found = 1;
+				found = 1;
+			} else
+				errprint("missing arguments to "
+					"%%%%BoundingBox: in %s, line %d\n",
+					name, lineno);
+			continue;
 		}
-		if (n > 0 && (cp =getcom(buf, "%%HiResBoundingBox:")) != NULL) {
+		if (n > 0 && state != 1 &&
+				(cp = getcom(buf, "%%HiResBoundingBox:"))
+				!= NULL) {
+			while (*cp == ' ' || *cp == '\t')
+				cp++;
+			if (strncmp(cp, "(atend)", 7) == 0) {
+				atend++;
+				continue;
+			}
 			bb[0] = strtod(cp, &cp);
 			if (*cp)
 				bb[1] = strtod(cp, &cp);
 			if (*cp)
 				bb[2] = strtod(cp, &cp);
-			if (*cp)
+			if (*cp) {
 				bb[3] = strtod(cp, &cp);
-			break;
+				break;
+			} else {
+				errprint("missing arguments to "
+					"%%%%HiResBoundingBox: in %s, "
+					"line %d\n",
+					name, lineno);
+				continue;
+			}
 		}
-		if (n == 0 || getcom(buf, "%%EndComments") != NULL ||
-				buf[0] != '%' || buf[1] == ' ' ||
-				buf[1] == '\t' || buf[1] == '\r' ||
-				buf[1] == '\n') {
-			if (found == 0)
-				errprint("%s lacks a %%BoundingBox: DSC "
+		if (n == 0 || state == 0 &&
+				(getcom(buf, "%%EndComments") != NULL ||
+				 buf[0] != '%' || buf[1] == ' ' ||
+				 buf[1] == '\t' || buf[1] == '\r' ||
+				 buf[1] == '\n')) {
+		eof:	if (found == 0 && (atend == 0 || n == 0))
+				errprint("%s lacks a %%%%BoundingBox: DSC "
 					"comment", name);
-			break;
+			if (atend == 0 || n == 0)
+				break;
+			state = 1;
+			continue;
+		}
+		if (indoc == 0 && getcom(buf, "%%EOF") != NULL) {
+			n = 0;
+			goto eof;
+		}
+		if (state == 1 && indoc == 0 &&
+				getcom(buf, "%%Trailer") != NULL) {
+			state = 2;
+			continue;
+		}
+		if (state == 1 && getcom(buf, "%%BeginDocument:") != NULL) {
+			indoc++;
+			continue;
+		}
+		if (state == 1 && indoc > 0 &&
+				getcom(buf, "%%EndDocument") != NULL) {
+			indoc--;
+			continue;
+		}
+		if (state == 1 &&
+				(cp = getcom(buf, "%%BeginBinary:")) != NULL) {
+			if ((k = strtol(cp, &cp, 10)) > 0)
+				psskip(fp, k);
+			continue;
+		}
+		if (state == 1 && (cp = getcom(buf, "%%BeginData:")) != NULL) {
+			if ((k = strtol(cp, &cp, 10)) > 0) {
+				while (*cp == ' ' || *cp == '\t')
+					cp++;
+				while (*cp && *cp != ' ' && *cp != '\t')
+					cp++;
+				while (*cp == ' ' || *cp == '\t')
+					cp++;
+				if (strncmp(cp, "Bytes", 5) == 0)
+					psskip(fp, k);
+				else if (strncmp(cp, "Lines", 5) == 0) {
+					while (k--) {
+						n = psgetline(fp, &buf, &size);
+						if (n == 0)
+							goto eof;
+					}
+				}
+			}
+			continue;
 		}
 	}
 	free(fp);

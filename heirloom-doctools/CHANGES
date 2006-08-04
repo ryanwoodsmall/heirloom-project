@@ -49,6 +49,8 @@ Release ...
 * troff: The ".psbb" request now reads a "%%HiResBoundingBox" DSC comment
   in preference to "%%BoundingBox"; the registers it assigns to are now
   floating-point registers.
+* troff: The ".psbb" request now properly supports the "(atend)" syntax in
+  PostScript DSC input files.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
 
