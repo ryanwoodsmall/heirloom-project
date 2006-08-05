@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.65 (gritter) 8/3/06
+ * Sccsid @(#)n5.c	1.67 (gritter) 8/5/06
  */
 
 /*
@@ -141,7 +141,6 @@ casefi(void)
 	tbreak();
 	fi++;
 	pendnf = 0;
-	lnsize = LNSIZE;
 }
 
 
@@ -510,7 +509,8 @@ casevpt(void)
 tchar
 setolt(void)
 {
-	return mkxfunc(OLT, getsn());
+	storerq(getsn());
+	return mkxfunc(OLT, 0);
 }
 
 
@@ -961,6 +961,8 @@ caseevc(void)
 		return;
 	tmpenv = env;
 	free(env._hcode);
+	free(env._line);
+	free(env._word);
 	env = *ep;
 	env._hcode = malloc(env._nhcode * sizeof *env._hcode);
 	memcpy(env._hcode, ep->_hcode, env._nhcode * sizeof *env._hcode);
@@ -971,7 +973,11 @@ caseevc(void)
 	env._wne = 0;
 	env._wdstart = 0;
 	env._wdend = 0;
-	env._linep = line;
+	env._lnsize = 0;
+	env._line = NULL;
+	env._linep = NULL;
+	env._wdsize = 0;
+	env._word = 0;
 	env._wordp = 0;
 	env._spflg = 0;
 	env._ce = 0;

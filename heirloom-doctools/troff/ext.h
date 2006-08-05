@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.66 (gritter) 8/3/06
+ * Sccsid @(#)ext.h	1.68 (gritter) 8/5/06
  */
 
 /*
@@ -196,7 +196,8 @@ extern	int	pbp;
 extern	int	lastpbp;
 extern	tchar	ch;
 extern	tchar	nrbits;
-extern	tchar	oline[];
+extern	tchar	*oline;
+extern	size_t	olinesz;
 extern	struct widcache {	/* width cache, indexed by character */
 	int	fontpts;
 	int	width;
@@ -507,4 +508,6 @@ extern void	nosuch(int);
 extern void	illseq(int, const char *, int);
 extern void	missing(void);
 extern void	nodelim(int);
+extern void	storerq(int);
+extern int	fetchrq(tchar *);
 extern void	morechars(int);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.78 (gritter) 7/29/06
+ * Sccsid @(#)t10.c	1.80 (gritter) 8/5/06
  */
 
 /*
@@ -341,6 +341,12 @@ ptout(register tchar i)
 
 	if (isadjspc(i))
 		return;
+	if (olinep >= &oline[olinesz]) {
+		olinesz += 100;
+		k = realloc(oline, olinesz * sizeof *oline);
+		olinep += k - oline;
+		oline = k;
+	}
 	if (cbits(i) != '\n') {
 		*olinep++ = i;
 		return;
@@ -488,8 +494,10 @@ ptout0(tchar *pi, tchar *pend)
 			horscale = 1 - (double)sbits(i) / LAFACT;
 			return(pi+outsize);
 		case YON:
-			ptyon(sbits(i));
-			return(pi+outsize);
+			if (&pi[outsize+NSRQ-1] >= pend)
+				return(pi+outsize);
+			ptyon(fetchrq(&pi[outsize]));
+			return(pi+outsize+NSRQ-1);
 		default:
 			return(pi+outsize);
 		}

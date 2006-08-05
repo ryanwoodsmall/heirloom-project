@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.121 (gritter) 8/3/06
+ * Sccsid @(#)n3.c	1.123 (gritter) 8/5/06
  */
 
 /*
@@ -1158,7 +1158,8 @@ casetl(void)
 {
 	register int j;
 	int w[3];
-	tchar buf[LNSIZE];
+	tchar *buf = NULL;
+	int	bufsz = 0;
 	register tchar *tp;
 	tchar i, delim, nexti;
 	int oev;
@@ -1170,6 +1171,8 @@ casetl(void)
 		delim = '\'';
 	} else 
 		delim = cbits(delim);
+	bufsz = LNSIZE;
+	buf = malloc(bufsz * sizeof *buf);
 	tp = buf;
 	numtab[HP].val = 0;
 	w[0] = w[1] = w[2] = 0;
@@ -1195,8 +1198,14 @@ casetl(void)
 			nexti = getch();
 			if (ev == oev)
 				numtab[HP].val += kernadjust(i, nexti);
-			if (tp < &buf[LNSIZE-10])
-				*tp++ = i;
+			if (tp >= &buf[bufsz-10]) {
+				tchar	*k;
+				bufsz += 100;
+				k = realloc(buf, bufsz * sizeof *buf);
+				tp += k - buf;
+				buf = k;
+			}
+			*tp++ = i;
 		}
 	}
 	if (j<3)
@@ -1227,6 +1236,7 @@ casetl(void)
 		if (numtab[NL].val > dip->hnl)
 			dip->hnl = numtab[NL].val;
 	}
+	free(buf);
 }
 
 void

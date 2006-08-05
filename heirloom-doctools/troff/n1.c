@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.88 (gritter) 7/29/06
+ * Sccsid @(#)n1.c	1.90 (gritter) 8/5/06
  */
 
 /*
@@ -424,6 +424,8 @@ init2(void)
 	cvtime();
 	numtab[PID].val = getpid();
 	spreadlimit = 3*EM;
+	olinesz = LNSIZE;
+	oline = malloc(olinesz * sizeof *oline);
 	olinep = oline;
 	ioff = 0;
 	numtab[HP].val = init = 0;
@@ -1296,7 +1298,8 @@ setxon(void)	/* \X'...' for copy through */
 static tchar
 setyon(void)	/* \Y(xx for indirect copy through */
 {
-	return mkxfunc(YON, getsn());
+	storerq(getsn());
+	return mkxfunc(YON, 0);
 }
 
 

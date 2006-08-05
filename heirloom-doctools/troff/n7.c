@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.80 (gritter) 7/30/06
+ * Sccsid @(#)n7.c	1.82 (gritter) 8/5/06
  */
 
 /*
@@ -528,8 +528,12 @@ ckul(void)
 int
 storeline(register tchar c, int w)
 {
-	if (linep >= line + lnsize - 1) {
-		if (!over) {
+	if (linep == NULL || linep >= line + lnsize - 4) {
+		tchar	*k;
+		if (over)
+			return 0;
+		lnsize += lnsize ? 100 : LNSIZE;
+		if ((k = realloc(line, lnsize * sizeof *line)) == NULL) {
 			flusho();
 			errprint("Line overflow.");
 			over++;
@@ -537,7 +541,8 @@ storeline(register tchar c, int w)
 			w = -1;
 			goto s1;
 		}
-		return 0;
+		linep += k - line;
+		line = k;
 	}
 s1:
 	if (w == -1) {
@@ -1395,8 +1400,12 @@ void
 storeword(register tchar c, register int w)
 {
 
-	if (wordp >= &word[WDSIZE - 3]) {
-		if (!over) {
+	if (wordp == NULL || wordp >= &word[wdsize - 3]) {
+		tchar	*k, **h;
+		if (over)
+			return;
+		wdsize += wdsize ? 100 : WDSIZE;
+		if ((k = realloc(word, wdsize * sizeof *word)) == NULL) {
 			flusho();
 			errprint("Word overflow.");
 			over++;
@@ -1404,7 +1413,11 @@ storeword(register tchar c, register int w)
 			w = -1;
 			goto s1;
 		}
-		return;
+		wordp += k - word;
+		for (h = hyptr; h < hyp; h++)
+			if (*h)
+				*h += k - word;
+		word = k;
 	}
 s1:
 	if (w == -1)

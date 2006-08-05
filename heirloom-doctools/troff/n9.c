@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.55 (gritter) 8/5/06
+ * Sccsid @(#)n9.c	1.56 (gritter) 8/5/06
  */
 
 /*
@@ -1074,6 +1074,44 @@ illseq(int wc, const char *mb, int n)
 			errprint("ignoring '\\%o' in input", wc);
 	} else
 		errprint("illegal byte sequence at '\\%o' in input", *mb&0377);
+}
+
+void
+storerq(int i)
+{
+	tchar	tp[6];
+
+	tp[0] = mkxfunc(RQ1, i & 037);
+	tp[1] = mkxfunc(RQ2, i >> 5 & 037);
+	tp[2] = mkxfunc(RQ3, i >> 10 & 037);
+	tp[3] = mkxfunc(RQ4, i >> 15 & 037);
+	tp[4] = mkxfunc(RQ5, i >> 20 & 037);
+	tp[5] = 0;
+	pushback(tp);
+}
+
+int
+fetchrq(tchar *tp)
+{
+	int	i;
+
+	i = 0;
+	if (ismot(tp[0]) || cbits(tp[0]) != XFUNC || fbits(tp[0]) != RQ1)
+		return 0;
+	i |= sbits(tp[0]) & 037;
+	if (ismot(tp[1]) || cbits(tp[1]) != XFUNC || fbits(tp[1]) != RQ2)
+		return 0;
+	i |= (sbits(tp[1]) & 037) << 5;
+	if (ismot(tp[2]) || cbits(tp[2]) != XFUNC || fbits(tp[2]) != RQ3)
+		return 0;
+	i |= (sbits(tp[2]) & 037) << 10;
+	if (ismot(tp[3]) || cbits(tp[3]) != XFUNC || fbits(tp[3]) != RQ4)
+		return 0;
+	i |= (sbits(tp[3]) & 037) << 15;
+	if (ismot(tp[4]) || cbits(tp[4]) != XFUNC || fbits(tp[4]) != RQ5)
+		return 0;
+	i |= (sbits(tp[4]) & 037) << 20;
+	return i;
 }
 
 void

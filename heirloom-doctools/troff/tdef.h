@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.106 (gritter) 8/2/06
+ * Sccsid @(#)tdef.h	1.108 (gritter) 8/5/06
  */
 
 /*
@@ -154,6 +154,12 @@
 #define	OLT	0012	/* output line trap */
 #define	YON	0013	/* indirect copy through */
 #define	CC	0014	/* unchangeable control character */
+#define	RQ1	0015	/* first five bits of request number */
+#define	RQ2	0016	/* second five bits of request number */
+#define	RQ3	0017	/* third five bits of request number */
+#define	RQ4	0020	/* fourth five bits of request number */
+#define	RQ5	0021	/* fifth five bits of request number */
+#define	NSRQ	5	/* number of tchars to store a request */
 
 #define	LAFACT	1000	/* letter adjustment float-to-int conversion factor */
 
@@ -192,8 +198,8 @@ extern	int	NM;	/* requests + macros */
 #define	NTAB	40	/* tab stops */
 #define	NSO	5	/* "so" depth */
 extern	int	NMF;	/* size of space for -m flags */
-#define	WDSIZE	540	/* word buffer size */
-#define	LNSIZE	1080	/* line buffer size */
+#define	WDSIZE	540	/* default word buffer size */
+#define	LNSIZE	680	/* default line buffer size */
 extern	int	NDI;	/* number of diversions */
 extern	int	NCHARS;	/* maximum size of troff character set */
 #define	NTRTAB	NCHARS	/* number of items in trtab[] */
@@ -714,6 +720,7 @@ struct acc {
 #define	itc	env._itc
 #define	itmac	env._itmac
 #define	lnsize	env._lnsize
+#define	wdsize	env._wdsize
 #define	linkin	env._linkin
 #define	linkout	env._linkout
 #define	linkhp	env._linkhp
@@ -828,6 +835,7 @@ extern struct env {
 	int	_itc;
 	int	_itmac;
 	int	_lnsize;
+	int	_wdsize;
 	int	_linkin;
 	int	_linkout;
 	int	_linkhp;
@@ -843,6 +851,6 @@ extern struct env {
 	int	_transch[NSENT];
 	int	_breakch[NSENT];
 	int	_nhych[NSENT];
-	tchar	_line[LNSIZE];
-	tchar	_word[WDSIZE];
+	tchar	*_line;
+	tchar	*_word;
 } env, initenv;

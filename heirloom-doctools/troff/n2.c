@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.25 (gritter) 7/30/06
+ * Sccsid @(#)n2.c	1.26 (gritter) 8/5/06
  */
 
 /*
@@ -147,6 +147,8 @@ pchar(register tchar i)
 void
 pchar1(register tchar i)
 {
+	static int	_olt;
+	static tchar	_olp[5];
 	register int j;
 	extern void ptout(tchar);
 
@@ -175,7 +177,15 @@ pchar1(register tchar i)
 	}
 	if (cbits(i) == XFUNC && fbits(i) == OLT) {
 		olt = realloc(olt, (nolt + 1) * sizeof *olt);
-		olt[nolt++] = sbits(i);
+		_olt = 1;
+		return;
+	}
+	if (_olt) {
+		_olp[_olt - 1] = i;
+		if (_olt++ < NSRQ)
+			return;
+		olt[nolt++] = fetchrq(_olp);
+		_olt = 0;
 	}
 #ifndef NROFF
 	if (ascii)
