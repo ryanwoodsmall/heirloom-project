@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.123 (gritter) 8/5/06
+ * Sccsid @(#)n3.c	1.124 (gritter) 8/5/06
  */
 
 /*
@@ -1805,7 +1805,7 @@ makerq(const char *name)
 	int	n;
 
 	if (name == NULL) {
-		roff_sprintf(_name, "%d", ++t);
+		roff_sprintf(_name, "\13%d", ++t);
 		name = _name;
 	}
 	if (name[0] == 0 || name[1] == 0 || name[2] == 0)

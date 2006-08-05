@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.33 (gritter) 8/5/06
+ * Sccsid @(#)ni.c	1.34 (gritter) 8/5/06
  */
 
 /*
@@ -227,6 +227,7 @@ const struct contab initcontab[] = {
 	C(PAIR('l', 'f'), caself),
 	C(PAIR('d', 'b'), casedb),
 /*	C(PAIR('!', 0), casesy), */	/* synonym for .sy */
+	C(PAIR(XFUNC, 0), caseif),	/* while loop execution */
 	C(0,              0)
 };
 
