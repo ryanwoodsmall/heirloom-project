@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.96 (gritter) 8/7/06
+.\" Sccsid @(#)doc.tr	1.97 (gritter) 8/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -2294,6 +2294,10 @@ and
 may be input
 by \fB\e\'\fR, \fB\e\`\fR, and \fB\e\-\fR respectively or by their names
 \T'Table II'(Table II)\T.
+The characters \fB\e\fR and \fB"\fR can also be referred to
+as \fB\e(rs\fR and \fB\e(dq\fR, respectively;
+this form allows to completely avoid their interpretation
+as argument delimiter or escape character.
 In traditional \*[TR,],
 the \s-1ASCII\s+1 characters \fB@\fR, \fB#\fR, \fB"\fR, \fB\(aa\fR, \fB\(ga\fR, \fB<\fR, \fB>\fR, \fB\e\fR, \fB{\fR, \fB}\fR, \fB~\fR, \fB^\fR, and \fB\(ul\fR existed
 only on the Special Font and were printed as a 1-em space if that Font
