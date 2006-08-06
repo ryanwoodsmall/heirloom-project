@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.94 (gritter) 8/6/06
+ * Sccsid @(#)n1.c	1.95 (gritter) 8/6/06
  */
 
 /*
@@ -514,7 +514,7 @@ verrprint(const char *s, va_list ap)
 	fdprintf(stderr, "\n");
 	stackdump();
 #ifdef	DEBUG
-	if (debug)
+	if (debug & DB_ABRT)
 		abort();
 #endif	/* DEBUG */
 }
@@ -861,8 +861,8 @@ control(register int a, register int b)
 
 #ifdef	DEBUG
 	if (debug & DB_MAC)
-		fdprintf(stderr, "control: macro %c%c, contab[%d]\n",
-			a&0177, (a>>BYTE)&0177 ? (a>>BYTE)&0177 : ' ', j);
+		fdprintf(stderr, "control: macro %s, contab[%d]\n",
+			macname(a), j);
 #endif	/* DEBUG */
 	if (contab[j].f == 0) {
 		nxf->nargs = 0;
@@ -961,7 +961,7 @@ g0:
 #ifdef	DEBUG
 		if (debug & DB_GETC)
 			fdprintf(stderr, "getch: ch is %x (%c)\n",
-				ch, (ch&0177) < 040 ? 0177 : ch&0177);
+				(int)ch, (ch&0177) < 040 ? 0177 : ch&0177);
 #endif	/* DEBUG */
 		if (cbits(i) == '\n') {
 			nlflg++;
@@ -982,7 +982,7 @@ g0:
 #ifdef	DEBUG
 	if (debug & DB_GETC)
 		fdprintf(stderr, "getch: getch0 returns %x (%c)\n",
-			i, (i&0177) < 040 ? 0177 : i&0177);
+			(int)i, (i&0177) < 040 ? 0177 : i&0177);
 #endif	/* DEBUG */
 	if (ismot(i))
 		return(i);

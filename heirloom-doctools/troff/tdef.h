@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.110 (gritter) 8/6/06
+ * Sccsid @(#)tdef.h	1.111 (gritter) 8/6/06
  */
 
 /*
@@ -505,6 +505,7 @@ extern	int	debug;	/*debug flag*/
 #define	DB_ALLC	02	/*print out message from alloc()*/
 #define	DB_GETC	04	/*print out message from getch()*/
 #define	DB_LOOP	010	/*print out message before "Eileen's loop" fix*/
+#define	DB_ABRT	020	/*abort on errprint()*/
 #endif	/* DEBUG */
 
 extern enum warn {

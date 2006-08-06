@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.126 (gritter) 8/6/06
+ * Sccsid @(#)n3.c	1.127 (gritter) 8/6/06
  */
 
 /*
@@ -1050,6 +1050,11 @@ casedi(void)
 		if (dip != d)
 			wbt((tchar)0);
 		if (dilev > 0) {
+#ifdef	DEBUG
+			if (debug & DB_MAC)
+				fdprintf(stderr, "ending diversion %s\n",
+						macname(dip->curd));
+#endif	/* DEBUG */
 			numtab[DN].val = dip->dnl;
 			numtab[DL].val = dip->maxl;
 			dip = &d[--dilev];
@@ -1058,6 +1063,10 @@ casedi(void)
 			errprint(".di outside active diversion");
 		goto rtn;
 	}
+#ifdef	DEBUG
+	if (debug & DB_MAC)
+		fdprintf(stderr, "starting diversion %s\n", macname(i));
+#endif	/* DEBUG */
 	if (++dilev == NDI) {
 		struct d	*nd;
 		const int	inc = 5;
