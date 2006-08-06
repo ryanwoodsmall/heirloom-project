@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.80 (gritter) 8/5/06
+ * Sccsid @(#)t10.c	1.82 (gritter) 8/6/06
  */
 
 /*
@@ -119,11 +119,13 @@ struct Font **fontbase;
 
 int Nfont;
 
+static int	okern(tchar *, tchar *, int);
 static void	pthorscale(int);
 static void	pttrack(int);
 static void	ptanchor(int);
 static void	ptlink(int);
 static void	ptyon(int);
+static void	ptchar(int, int);
 
 void
 growfonts(int n)
@@ -498,6 +500,11 @@ ptout0(tchar *pi, tchar *pend)
 				return(pi+outsize);
 			ptyon(fetchrq(&pi[outsize]));
 			return(pi+outsize+NSRQ-1);
+		case CHAR:
+			ptchar(sbits(i), iszbit(i) != 0);
+			if (!iszbit(i))
+				esc += okern(pi, pend, outsize);
+			return(pi+outsize);
 		default:
 			return(pi+outsize);
 		}
@@ -532,21 +539,14 @@ ptout0(tchar *pi, tchar *pend)
 		pttrack(0);
 	if (horscale || mhorscale)
 		pthorscale(0);
-	for (j = outsize; &pi[j] < pend; j++)
-		if (cbits(pi[j]) != XFUNC || fbits(pi[j]) != LETSP &&
-				fbits(pi[j]) != NLETSP &&
-				fbits(pi[j]) != LETSH &&
-				fbits(pi[j]) != NLETSH)
-			break;
-	if (&pi[j] < pend)
-		w += getkw(pi[0], pi[j]);
+	w += okern(pi, pend, outsize);
 	if (afmtab && (j = (fontbase[xfont]->afmpos) - 1) >= 0)
 		a = afmtab[j];
 	else
 		a = NULL;
 	j = z = 0;
 	if (k != DRAWFCN) {
-		if (cs) {
+		if (cs && !fmtchar) {
 			if (bd)
 				w += (bd - 1) * HOR;
 			j = (cs - w) / 2;
@@ -555,7 +555,7 @@ ptout0(tchar *pi, tchar *pend)
 				w -= (bd - 1) * HOR;
 		}
 		if (iszbit(i)) {
-			if (cs)
+			if (cs && !fmtchar)
 				w = -j; 
 			else 
 				w = 0;
@@ -665,7 +665,7 @@ ptout0(tchar *pi, tchar *pend)
 		} else
 			fdprintf(ptid, "C%s\n", &chname[chtab[k - 128]]);
 	}
-	if (bd) {
+	if (bd && !fmtchar) {
 		bd -= HOR;
 		if (esc += bd)
 			ptesc();
@@ -686,6 +686,23 @@ ptout0(tchar *pi, tchar *pend)
 	lettrack = 0;
 	horscale = 0;
 	return(pi+outsize);
+}
+
+static int
+okern(tchar *pi, tchar *pend, int outsize)
+{
+	int	j;
+
+	for (j = outsize; &pi[j] < pend; j++)
+		if (cbits(pi[j]) != XFUNC || fbits(pi[j]) != LETSP &&
+				fbits(pi[j]) != NLETSP &&
+				fbits(pi[j]) != LETSH &&
+				fbits(pi[j]) != NLETSH)
+			break;
+	if (&pi[j] < pend)
+		return getkw(pi[0], pi[j]);
+	else
+		return 0;
 }
 
 static void
@@ -903,6 +920,62 @@ ptyon(int i)
 	oput('\n');
 	app = 0;
 	ip = savip;
+}
+
+static void
+ptchar1(struct charout *cp, int z)
+{
+	filep	savip;
+	tchar	i, *k, *savoline, *savolinep;
+	size_t	savolinesz;
+	int	savhpos, savvpos;
+
+	savoline = oline;
+	savolinep = olinep;
+	savolinesz = olinesz;
+	olinep = oline = NULL;
+	olinesz = 0;
+	savhpos = hpos + esc;
+	savvpos = vpos + lead;
+	savip = ip;
+	ip = cp->op;
+	app++;
+	fmtchar++;
+	while ((i = rbf()) != 0 && cbits(i) != '\n' && cbits(i) != FLSS)
+		pchar(i);
+	for (k = oline; k < olinep; )
+		k = ptout0(k, olinep);
+	fmtchar--;
+	app--;
+	ip = savip;
+	free(oline);
+	oline = savoline;
+	olinep = savolinep;
+	olinesz = savolinesz;
+	esc = savhpos - hpos;
+	if (!z)
+		esc += cs ? cs : cp->width;
+	lead = savvpos - vpos;
+}
+
+static void
+ptchar(int n, int z)
+{
+	struct charout	*cp = &charout[n];
+	int	savbd;
+
+	ptchar1(cp, z);
+	if (bd) {
+		bd -= HOR;
+		if (esc += bd)
+			ptesc();
+		savbd = bd;
+		bd = 0;
+		ptchar1(cp, z);
+		bd = savbd;
+		if (iszbit(cp->ch))
+			esc -= bd;
+	}
 }
 
 void

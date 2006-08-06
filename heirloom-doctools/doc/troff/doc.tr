@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.93 (gritter) 8/4/06
+.\" Sccsid @(#)doc.tr	1.94 (gritter) 8/6/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -91,7 +91,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/4/06
+.ds Sccsdate 8/6/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1358,8 +1358,14 @@ on if \fIN\fR>0.
 \T'c2'\fB&c2\fI|c\fR	\fB\'	\'\fR	E	Set nobreak control character to \fIc\fR.\T
 .b1 0
 \T'tr'\fB&tr\fI|abcd....\fR	none	\(en	O	Translate \fIa\fR to \fIb\fR, etc. on output.\T
-.b1 0
+.b1
 \T'ftr'\fB&ftr\fI|F|abcd....\fR	none	\(en	P,T	Font-specific \fBtr\fR.\T
+.b1
+\T'char'\fB&char\fI|c|string\fR		ignored	\(en	Define character \fIc\fR to \fIstring\fR.\T
+.b1
+\T'fchar'\fB&fchar\fI|c|string\fR	ignored	T	Define fallback for character \fIc\fR to \fIstring\fR.\T
+.b1 0
+\T'rchar'\fB&rchar\fI|c...\fR		ignored	\(en	Remove character definitions for \fIc...\fR.\T
 .b1 0
 \T'output'\fB&output\fI|string\fR		ignored	\(en	Write \fIstring\fR directly to intermediate output.\T
 .mht s_mot
@@ -1554,6 +1560,7 @@ Device and Font Description Files
 \T'ce'ce	4\T
 \T'cf'cf	19\T
 \T'ch'ch	7\T
+\T'char'char	10\T
 \T'chop'chop	7\T
 \T'close'close	19\T
 \T'continue'continue	16\T
@@ -1577,6 +1584,7 @@ Device and Font Description Files
 \T'ex'ex	18\T
 \T'fallback'fallback	2\T
 \T'fc'fc	9\T
+\T'fchar'fchar	10\T
 \T'fdeferlig'fdeferlig	10\T
 \T'feature'feature	2\T
 \T'fi'fi	4\T
@@ -1647,6 +1655,7 @@ Device and Font Description Files
 \T'ps'ps	2\T
 \T'psbb'psbb	23\T
 \T'pso'pso	19\T
+\T'rchar'rchar	10\T
 \T'rd'rd	18\T
 \T'recursionlimit'recursionlimit	7\T
 \T'return'return	7\T
@@ -2935,7 +2944,7 @@ interrupted word.
 If the intervening control lines cause a break,
 any partial line will be forced out along with any partial word.
 .sc
-Kerning.
+\A'c_kerning'Kerning.
 \*(TR reads kerning tables from Type\ 1,
 OpenType, and TrueType font files.
 These tables contain small horizontal spacing adjustments
@@ -4131,6 +4140,11 @@ with the input (stand-in) character which appears to have the width of the final
 character.
 The graphic translation occurs at the moment of output
 (including \T'c_diversion'diversion\T).
+.xx
+A character can be substituted
+by an arbitrary sequence of characters,
+motions, drawing commands, etc. by
+means of the \T'char'\fBchar\fR\T request.
 .h1
 .bta tr
 \fB&tr\fI|abcd....\fR	none	\(en	O	Translate \
@@ -4143,6 +4157,41 @@ must stay in effect from \fIinput\fR to \fIoutput\fR time.
 \fB&ftr\fI|F|abcd....\fR	none	\(en	P,T	Font-specific \fBtr\fR.
 If the current character originates from font \fIF\fR,
 character \fIa\fR into \fIb\fR, \fIc\fR into \fId\fR, etc.
+.bta char
+\fB&char\fI|c|string\fR		ignored	\(en	Define character \fIc\fR to \fIstring\fR.
+\fIstring\fR is read in \T'copy mode'\fIcopy mode\fR\T
+when the request is processed.
+.xx
+Whenever \fIc\fR occurs in regular (not copy mode) later,
+a temporary copy of the current environment is created,
+the escape character is temporarily set to \e,
+and \fIstring\fR is output to an unnamed diversion.
+If \fIc\fR itself occurs in \fIstring\fR,
+no recursive substitution takes place,
+but the plain character \fIc\fR is selected instead.
+The resulting object continues to behave like the single character \fIc\fR
+in the data stream.
+It can thus be part of a \T'c_kerning'kerning definition\T,
+can be hyphenated (possibly requiring an explicit
+hyphenation code to be assigned using the \T'hcode'\fBhcode\fR\T request),
+can become the \T's_tabs'tab or leader character\T,
+and can be used for \T'c_line'line drawing\T.
+.xx
+If both \fBtr\fR and \fBchar\fR are defined for a character \fIc\fR,
+\fBtr\fR is applied,
+but if \fIc\fR is the result of \fBtr\fR
+and \fBchar\fR is defined for it,
+\fBchar\fR is also applied.
+.xx
+At the time \fIc\fR would have been output,
+the contents of the diversion are printed instead of it.
+.bta fchar
+\fB&fchar\fI|c|string\fR	ignored	T	Define character \fIc\fR to \fIstring\fR as a fallback only:
+If \fIc\fR is present in the current font, output \fIc\fR,
+otherwise, output \fIstring\fR as with \fBchar\fR.
+.bta rchar
+\fB&rchar\fI|c...\fR		ignored	\(en	Remove character definitions for \fIc...\fR;
+applies to both \fBchar\fR and \fBfchar\fR.
 .sc
 \A'c_transparent'Transparent throughput.
 An input line beginning with a \A'e_!'\fB\e!\fR

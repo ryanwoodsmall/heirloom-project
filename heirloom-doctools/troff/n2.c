@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.26 (gritter) 8/5/06
+ * Sccsid @(#)n2.c	1.27 (gritter) 8/6/06
  */
 
 /*
@@ -150,6 +150,7 @@ pchar1(register tchar i)
 	static int	_olt;
 	static tchar	_olp[5];
 	register int j;
+	filep	savip;
 	extern void ptout(tchar);
 
 	j = cbits(i);
@@ -175,11 +176,32 @@ pchar1(register tchar i)
 		outtp(i);
 		return;
 	}
-	if (cbits(i) == XFUNC && fbits(i) == OLT) {
-		olt = realloc(olt, (nolt + 1) * sizeof *olt);
-		_olt = 1;
-		return;
+	if (cbits(i) == XFUNC) {
+		switch (fbits(i)) {
+		case OLT:
+			olt = realloc(olt, (nolt + 1) * sizeof *olt);
+			_olt = 1;
+			return;
+		case CHAR:
+#ifndef	NROFF
+			if (!ascii)
+				break;
+#endif	/* !NROFF */
+			savip = ip;
+			ip = charout[sbits(i)].op;
+			app++;
+			fmtchar++;
+			while ((i = rbf()) != 0 && cbits(i) != '\n' &&
+					cbits(i) != FLSS)
+				pchar(i);
+			fmtchar--;
+			app--;
+			ip = savip;
+			return;
+		}
 	}
+	if (cbits(i) == 'x')
+		fmtchar = fmtchar;
 	if (_olt) {
 		_olp[_olt - 1] = i;
 		if (_olt++ < NSRQ)
@@ -277,7 +299,7 @@ outascii (	/* print i in best-guess ascii */
 		oputs("\\X");
 	else if (islig(i) && lgrevtab && lgrevtab[f] && lgrevtab[f][j]) {
 		for (k = 0; lgrevtab[f][j][k]; k++)
-			outmb(i & SFMASK | lgrevtab[f][j][k]);
+			outmb(sfmask(i) | lgrevtab[f][j][k]);
 	} else if (j == WORDSP)
 		;	/* nothing at all */
 	else if (j > 0177)

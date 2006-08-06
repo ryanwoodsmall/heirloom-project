@@ -14,6 +14,8 @@ Release ...
   an expression with floating-point computation.
 * [nt]roff: Exponential notation, as in "1e+10", is now supported in
   numerical expressions.
+* [nt]roff: The ".char", ".fchar", and ".rchar" requests have been added
+  to transform a single input character to multiple output characters.
 * [nt]roff: The ".ecs" and ".ecr" requests have been added to save and
   restore the escape character.
 * [nt]roff: The ".shc" request has been added to set the soft hyphen

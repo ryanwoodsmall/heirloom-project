@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.108 (gritter) 8/5/06
+ * Sccsid @(#)tdef.h	1.109 (gritter) 8/6/06
  */
 
 /*
@@ -160,6 +160,7 @@
 #define	RQ4	0020	/* fourth five bits of request number */
 #define	RQ5	0021	/* fifth five bits of request number */
 #define	NSRQ	5	/* number of tchars to store a request */
+#define	CHAR	0022	/* formatted result of a .char execution */
 
 #define	LAFACT	1000	/* letter adjustment float-to-int conversion factor */
 
@@ -375,6 +376,7 @@ endif NROFF
 #define	LDRBIT	04
 #define	FCBIT	010
 #define	LGBIT	020
+#define	CHBIT	040
 
 #define	PAIR(A,B)	(A|(B<<BYTE))
 #define	LOOP		(-4)
@@ -539,6 +541,12 @@ struct	d {	/* diversion */
 	int	hnl;
 	int	curd;
 	int	flss;
+};
+
+struct	charout {	/* formatted result of .char */
+	filep	op;
+	int	width;
+	tchar	ch;
 };
 
 struct	s {	/* stack frame */

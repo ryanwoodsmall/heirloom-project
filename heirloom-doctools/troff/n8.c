@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.31 (gritter) 7/29/06
+ * Sccsid @(#)n8.c	1.32 (gritter) 8/6/06
  */
 
 /*
@@ -176,10 +176,14 @@ punct(tchar i)
 int 
 alph(tchar j)
 {
-	int i = cbits(j);
-	int f = fbits(j);
+	int i;
+	int f;
 	int	h;
 
+	while (cbits(j) == XFUNC && fbits(j) == CHAR)
+		j = charout[sbits(j)].ch;
+	i = cbits(j);
+	f = fbits(j);
 	if (!ismot(j) && i < nhcode && (h = hcode[i]) != 0) {
 		h = tr2un(h, f);
 		return hyext ? iswalnum(h) : iswalpha(h);
@@ -247,7 +251,7 @@ casehw(void)
 				k = HY_BIT2;
 				continue;
 			}
-			*j++ = maplow(i, xfont) | k;
+			*j++ = maplow(t) | k;
 			k = 0;
 			if (j >= (hbuf + NHEX - 2) && growhbuf(&j) == NULL)
 				goto full;
@@ -273,15 +277,12 @@ exword(void)
 		if (e == NULL || *e == 0)
 			return(0);
 		w = wdstart;
-		while (*e && w <= hyend &&
-				(*e&~HY_BIT2) == maplow(cbits(*w), fbits(*w))) {
+		while (*e && w <= hyend && (*e&~HY_BIT2) == maplow(*w)) {
 			e++; 
 			w++;
 		};
 		if (!*e) {
-			if (w-1 == hyend || (w == wdend &&
-						maplow(cbits(*w), fbits(*w))
-						== 's')) {
+			if (w-1 == hyend || (w == wdend && maplow(*w) == 's')) {
 				w = wdstart;
 				for (e = save; *e; e++) {
 					if (*e & HY_BIT2)
@@ -323,8 +324,7 @@ again:
 			return(0);
 		s = s0 + i - 1;
 		w = hyend - 1;
-		while (s > s0 && w >= wdstart &&
-				(*s & 0177) == maplow(cbits(*w), fbits(*w))) {
+		while (s > s0 && w >= wdstart && (*s & 0177) == maplow(*w)) {
 			s--;
 			w--;
 		}
@@ -357,10 +357,14 @@ mark:
 
 
 int 
-maplow(register int i, int f)
+maplow(tchar t)
 {
-	int	h;
+	int	h, i, f;
 
+	while (cbits(t) == XFUNC && fbits(t) == CHAR)
+		t = charout[sbits(t)].ch;
+	i = cbits(t);
+	f = fbits(t);
 	if (!ismot(i) && i < nhcode && (h = hcode[i]) != 0) {
 		h = tr2un(h, f);
 		return(h);
@@ -381,9 +385,9 @@ maplow(register int i, int f)
 
 
 int 
-vowel(int i)
+vowel(tchar i)
 {
-	switch (maplow(i, xfont)) {
+	switch (maplow(i)) {
 	case 'a':
 	case 'e':
 	case 'i':
@@ -401,7 +405,7 @@ tchar *
 chkvow(tchar *w)
 {
 	while (--w >= wdstart)
-		if (vowel(cbits(*w)))
+		if (vowel(*w))
 			return(w);
 	return(0);
 }
@@ -432,13 +436,13 @@ again:
 	while ((++w < hyend) && (w < (wdend - 1))) {
 		val = 1;
 		if (w == wdstart)
-			val *= dilook('a', cbits(*w), bxh);
+			val *= dilook('a', *w, bxh);
 		else if (w == wdstart + 1)
-			val *= dilook(cbits(*(w-1)), cbits(*w), bxxh);
+			val *= dilook(*(w-1), *w, bxxh);
 		else 
-			val *= dilook(cbits(*(w-1)), cbits(*w), xxh);
-		val *= dilook(cbits(*w), cbits(*(w+1)), xhx);
-		val *= dilook(cbits(*(w+1)), cbits(*(w+2)), hxx);
+			val *= dilook(*(w-1), *w, xxh);
+		val *= dilook(*w, *(w+1), xhx);
+		val *= dilook(*(w+1), *(w+2), hxx);
 		if (val > maxval) {
 			maxval = val;
 			maxw = w + 1;
@@ -452,11 +456,11 @@ again:
 
 
 int 
-dilook(int a, int b, const char t[26][13])
+dilook(tchar a, tchar b, const char t[26][13])
 {
 	register int i, j;
 
-	i = t[maplow(a, xfont)-'a'][(j = maplow(b, xfont)-'a')/2];
+	i = t[maplow(a)-'a'][(j = maplow(b)-'a')/2];
 	if (!(j & 01))
 		i >>= 4;
 	return(i & 017);
@@ -505,14 +509,17 @@ casehylang(void)
 static int
 addc(int m, char **cp, tchar **wp, int **wpp, int distance)
 {
+	tchar	t;
+
+	t = m ? m | sfmask(**wp) : **wp;
 #ifdef	NROFF
 	if (m & ~0177)
 		return 0;
-	m = maplow(m, fbits(*(*wp)));
+	m = maplow(t);
 	*(*cp)++ = m;
 	*(*wpp)++ = distance;
 #else
-	m = maplow(m, fbits(*(*wp)));
+	m = maplow(t);
 	if (m > 0 && m <= 0x7f) {
 		*(*cp)++ = m;
 		*(*wpp)++ = distance;
@@ -561,7 +568,7 @@ hyphenhnj(void)
 		} else
 #endif
 		{
-			if (addc(m, &cp, &wp, &wpp, wp - wdstart) == 0)
+			if (addc(0, &cp, &wp, &wpp, wp - wdstart) == 0)
 				goto retn;
 		}
 	}

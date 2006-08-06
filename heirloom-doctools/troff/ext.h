@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.68 (gritter) 8/5/06
+ * Sccsid @(#)ext.h	1.69 (gritter) 8/6/06
  */
 
 /*
@@ -78,6 +78,10 @@ extern	int	bd;
 extern	int	*bdtab;
 extern	int	blmac;
 extern	int	ccs;
+extern	int	charf;
+extern	tchar	**chartab;
+extern	struct charout	*charout;
+extern	int	charoutsz;
 extern	int	clonef;
 extern	int	copyf;
 extern	int	cs;
@@ -99,7 +103,9 @@ extern	int	esc;
 extern	int	eschar;
 extern	int	ev;
 extern	int	fc;
+extern	char	*fchartab;
 extern	int	flss;
+extern	int	fmtchar;
 extern	int	*fontlab;
 extern	int	gflag;
 extern	int	hflg;
@@ -267,6 +273,11 @@ extern void	setrpt(void);
 extern void	casedb(void);
 extern void	casexflag(void);
 extern void	caserecursionlimit(void);
+extern void	casechar(int);
+extern void	casefchar(void);
+extern void	caserchar(void);
+extern tchar	setchar(tchar);
+extern tchar	sfmask(tchar);
 /* n2.c */
 extern int	pchar(register tchar);
 extern void	pchar1(register tchar);
@@ -415,6 +426,7 @@ extern void	caseem(void);
 extern void	casefl(void);
 extern void	caseev(void);
 extern void	caseevc(void);
+extern void	evc(struct env *, struct env *);
 extern void	caseel(void);
 extern void	caseie(void);
 extern void	caseif(int);
@@ -483,11 +495,11 @@ extern void	caseht(void);
 extern void	casehw(void);
 extern int	exword(void);
 extern int	suffix(void);
-extern int	maplow(register int, int);
-extern int	vowel(int);
+extern int	maplow(tchar);
+extern int	vowel(tchar);
 extern tchar	*chkvow(tchar *);
 extern void	digram(void);
-extern int	dilook(int, int, const char [26][13]);
+extern int	dilook(tchar, tchar, const char [26][13]);
 extern void	casehylang(void);
 /* n9.c */
 extern tchar	setz(void);

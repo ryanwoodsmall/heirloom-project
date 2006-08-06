@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.82 (gritter) 8/5/06
+ * Sccsid @(#)n7.c	1.84 (gritter) 8/6/06
  */
 
 /*
@@ -379,10 +379,13 @@ adj:
 	if (ad) {
 		if (!nroff && nc > 0) {
 			int	j;
-			c = line[nc-1];
+			c = 0;
+			for (j = nc - 1; j >= 0; j--)
+				if ((c = line[j-1]) != IMP)
+					break;
 			width(c);
 			j = lasttrack;
-			j += kernadjust(c, ' ' | c&SFMASK);
+			j += kernadjust(c, ' ' | sfmask(c));
 			if (admod != 1 && rhangtab != NULL && !ismot(c) &&
 					rhangtab[xfont] != NULL &&
 					(k = rhangtab[xfont][cbits(c)]) != 0) {
@@ -928,7 +931,7 @@ movword(void)
 		w = width(i);
 		storelsh(i, rawwidth);
 		adspc += minspc;
-		w += kernadjust(i, *wp ? *wp : ' ' | (spbits?spbits:i&SFMASK));
+		w += kernadjust(i, *wp ? *wp : ' ' | (spbits?spbits:sfmask(i)));
 		wne -= w;
 		wch--;
 		if (cbits(i) == STRETCH && cbits(lasti) != STRETCH)
@@ -978,9 +981,9 @@ m1:
 		i = *(linep + 1);
 		if ((ip = lgrevtab[fbits(i)][cbits(i)]) == NULL)
 			goto m5;
-		lgs = strlg(fbits(i), ip, s) | i & SFMASK | AUTOLIG;
+		lgs = strlg(fbits(i), ip, s) | sfmask(i) | AUTOLIG;
 		for (w = 0; ip[s+w]; w++);
-		lge = strlg(fbits(i), &ip[s], w) | i & SFMASK | AUTOLIG;
+		lge = strlg(fbits(i), &ip[s], w) | sfmask(i) | AUTOLIG;
 		lgw = width(lgs);
 		lgr = rawwidth;
 		if (linep - 1 >= wordp) {
@@ -1043,12 +1046,12 @@ m2:
 	}
 #endif	/* !NROFF */
 	if (!maybreak(*(linep - 1))) {
-		*linep = (*(linep - 1) & SFMASK) | hc;
+		*linep = sfmask(*(linep - 1)) | hc;
 		w = -kernadjust(*(linep - 1), *(linep + 1));
 		w += kernadjust(*(linep - 1), *linep);
 		w += width(*linep);
 		storelsh(*linep, rawwidth);
-		w += kernadjust(*linep, ' ' | *linep & SFMASK);
+		w += kernadjust(*linep, ' ' | sfmask(*linep));
 		nel -= w;
 		ne += w;
 		if (letsps)
@@ -1076,7 +1079,7 @@ m5:
 	storelsh(*linep, -rawwidth);
 	adspc -= minspc;
 	for (lp = &linep[1]; lp < lastlp && cbits(*lp) == IMP; lp++);
-	w += kernadjust(*linep, *lp ? *lp : ' ' | *linep&SFMASK);
+	w += kernadjust(*linep, *lp ? *lp : ' ' | sfmask(*linep));
 	ne -= w;
 	nel += w;
 	wne += w;
@@ -1190,7 +1193,7 @@ getword(int x)
 			if (!isadjspc(j)) {
 				widthp = w;
 				gotspc = i;
-				spbits = i & SFMASK;
+				spbits = sfmask(i);
 			}
 			continue;
 		}
@@ -1375,7 +1378,7 @@ g1:		nexti = GETCH();
 	numtab[HP].val += xflag ? width(i) : sps;
 rtn:
 	if (i & SFMASK)
-		spbits = i & SFMASK;
+		spbits = sfmask(i);
 	else if (i == '\n')
 		spbits = chbits;
 	for (wp = word; *wp; wp++) {

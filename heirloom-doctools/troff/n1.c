@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.90 (gritter) 8/5/06
+ * Sccsid @(#)n1.c	1.93 (gritter) 8/6/06
  */
 
 /*
@@ -103,15 +103,15 @@ char	*mbbuf1p = mbbuf1;
 wchar_t	twc = 0;
 #endif	/* EUC */
 
-static void initg(void);
-static void printlong(long, int);
-static void printn(long, long);
-static char *sprintlong(char *s, long, int);
-static char *sprintn(char *s, long n, int b);
+static void	initg(void);
+static void	printlong(long, int);
+static void	printn(long, long);
+static char	*sprintlong(char *s, long, int);
+static char	*sprintn(char *s, long n, int b);
 #define	vfdprintf	xxvfdprintf
-static void vfdprintf(int fd, const char *fmt, va_list ap);
-static tchar setyon(void);
-static void _setenv(void);
+static void	vfdprintf(int fd, const char *fmt, va_list ap);
+static tchar	setyon(void);
+static void	_setenv(void);
 
 #ifdef	DEBUG
 int	debug = 0;	/*debug flag*/
@@ -301,7 +301,7 @@ start:
 	eileenct = 0;		/*reset count for "Eileen's loop"*/
 loop:
 	xflag = _xflag;
-	copyf = lgf = nb = nflush = nlflg = 0;
+	charf = clonef = copyf = lgf = nb = nflush = nlflg = 0;
 	if (ip && rbf0(ip) == 0 && dip == d && ejf &&
 			frame->pframe->tail_cnt <= ejl) {
 		nflush++;
@@ -988,7 +988,7 @@ g0:
 		return(i);
 	k = cbits(i);
 	if (k != ESC) {
-		if (i & MBMASK || gchtab[k]==0)
+		if (i & MBMASK || k >= NCHARS || gchtab[k]==0)
 			return(i);
 		if (k == '\n') {
 			if (cbits(i) == '\n') {
@@ -1013,8 +1013,8 @@ g0:
 		}
 		if (!copyf) {
 			if (gchtab[k]&LGBIT && !isdi(i) && lg && !lgf) {
-				i = getlg(i);
-				return(i);
+				k = cbits(i = getlg(i));
+				goto chartest;
 			}
 			if (k == fc || k == tabch || k == ldrch) {
 				if ((i = setfield(k)) == 0)
@@ -1026,6 +1026,10 @@ g0:
 				i = makem(-width(' ' | chbits));
 				return(i);
 			}
+		chartest:
+			if (!lgf && !charf && chartab[trtab[k]] != NULL)
+				i = setchar(i);
+			return(i);
 		}
 		return(i);
 	}
@@ -1163,7 +1167,8 @@ gx:
 	case '(':	/* special char name */
 		if ((i = setch(k)) == 0 && !tryglf)
 			goto g0;
-		return(i);
+		k = cbits(i);
+		goto chartest;
 	case 'U':	/* Unicode character */
 		if (xflag == 0)
 			goto dfl;
@@ -1285,11 +1290,13 @@ setxon(void)	/* \X'...' for copy through */
 	delim = cbits(c);
 	i = xbuf;
 	*i++ = XON;
+	charf++;
 	while ((k = cbits(c = getch())) != delim && k != '\n' && i < xbuf+NC-1) {
 		if (k == ' ')
 			setcbits(c, UNPAD);
 		*i++ = c | ZBIT;
 	}
+	charf--;
 	*i++ = XOFF;
 	*i = 0;
 	pushback(xbuf);
@@ -2013,4 +2020,191 @@ caserecursionlimit(void)
 	skip(0);
 	max_tail_depth = atoi();
 	noscale--;
+}
+
+void
+casechar(int flag)
+{
+	extern int	ps2cc(const char *);
+	extern int	nchtab;
+	char	name[NC];
+	int	i, k, size = 0;
+	tchar	c, *tp = NULL;
+
+	copyf++, clonef++;
+	if (skip(1))
+		return;
+	if ((k = cbits((c = getch()))) == eschar) {
+		switch (cbits(c = getch())) {
+		case '(':
+			name[0] = getch();
+			name[1] = getch();
+			name[2] = 0;
+			break;
+		case '[':
+			for (i = 0; cbits(c = getch()) != ']'; i++)
+				if (i < sizeof name - 1)
+					name[i] = c;
+			name[i] = 0;
+			break;
+		default:
+			errprint("mapping of escape sequences not permitted");
+			return;
+		}
+#ifndef	NROFF
+		k = ps2cc(name) + nchtab + 128 + 32 + 128 - 32 + nchtab;
+#else
+		if ((k = findch(name)) <= 0) {
+			errprint("invalid character name \\[%s]", name);
+			return;
+		}
+#endif
+	} else if (iscopy(c))
+		k = cbits(c = setuc0(k));
+	if (k <= ' ') {
+		errprint("mapping of special characters not permitted");
+		return;
+	}
+	clonef--;
+	if (skip(1))
+		return;
+	if (cbits(c = getch()) != '"')
+		ch = c;
+	size = 10;
+	tp = malloc(size * sizeof *tp);
+	i = 0;
+	while (c = getch(), !nlflg) {
+		if (i + 3 >= size) {
+			size += 10;
+			tp = realloc(tp, size * sizeof *tp);
+		}
+		tp[i++] = c;
+	}
+	tp[i++] = XFUNC;	/* escape a possible \ at the end */
+	tp[i++] = '\n';
+	tp[i] = 0;
+	free(chartab[k]);
+	chartab[k] = tp;
+	gchtab[k] |= CHBIT;
+	copyf--;
+#ifndef	NROFF
+	if (flag)
+		fchartab[k] = 1;
+	else
+		fchartab[k] = 0;
+#endif
+}
+
+void
+casefchar(void)
+{
+#ifndef	NROFF
+	casechar(1);
+#endif
+}
+
+void
+caserchar(void)
+{
+	tchar	c;
+	int	k;
+
+	lgf++;
+	if (skip(1))
+		return;
+	do {
+		c = getch();
+		k = cbits(c);
+		free(chartab[k]);
+		chartab[k] = NULL;
+		gchtab[k] &= ~CHBIT;
+	} while (!skip(0));
+}
+
+tchar
+setchar(tchar c)
+{
+	static int	charcount;
+	struct env	saveev;
+	struct d	newd, *savedip;
+	int	savxflag;
+	int	saveschar;
+	int	savvflag;
+	filep	startb;
+	tchar	*csp, t;
+	int	k = cbits(c);
+
+#ifndef	NROFF
+	if (fchartab[k] && onfont(c))
+		return c;
+#endif
+	if (iszbit(c))
+		return c;
+	if ((startb = alloc()) == 0) {
+		errprint("out of space");
+		return ' ';
+	}
+	fmtchar++;
+	savxflag = xflag;
+	xflag = 3;
+	savvflag = vflag;
+	vflag = 0;
+	saveschar = eschar;
+	eschar = '\\';
+	t = 0;
+	setsbits(t, charcount);
+	charcount = sbits(t);
+	csp = chartab[k];
+	chartab[k] = NULL;
+	saveev = env;
+	evc(&env, &env);
+	in = in1 = 0;
+	fi = 0;
+	if (dip != d)
+		wbt(0);
+	if (charcount >= charoutsz) {
+		charoutsz += 32;
+		charout = realloc(charout, charoutsz * sizeof *charout);
+	}
+	memset(&charout[charcount], 0, sizeof *charout);
+	savedip = dip;
+	memset(&newd, 0, sizeof newd);
+	dip = &newd;
+	offset = dip->op = startb;
+	pushback(csp);
+	text();
+	tbreak();
+	nlflg = 0;
+	wbt(0);
+	charout[charcount].op = startb;
+	charout[charcount].ch = c;
+	if (iszbit(c))
+		charout[charcount].width = 0;
+	else {
+		charout[charcount].width = dip->maxl - lasttrack;
+		width(' ' | sfmask(c));
+		charout[charcount].width += lasttrack;
+	}
+	dip = savedip;
+	offset = dip->op;
+	free(env._line);
+	free(env._word);
+	free(env._hcode);
+	env = saveev;
+	chartab[k] = csp;
+	eschar = saveschar;
+	xflag = savxflag;
+	vflag = savvflag;
+	fmtchar--;
+	return mkxfunc(CHAR, charcount++);
+}
+
+tchar
+sfmask(tchar t)
+{
+	while (cbits(t) == XFUNC && fbits(t) == CHAR)
+		t = charout[sbits(t)].ch;
+	if (t == XFUNC || t == SLANT || (t & SFMASK) == 0)
+		return chbits;
+	return t & SFMASK;
 }

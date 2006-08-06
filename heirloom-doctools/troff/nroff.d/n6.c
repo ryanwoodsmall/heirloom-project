@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.41 (gritter) 7/29/06
+ * Sccsid @(#)n6.c	1.42 (gritter) 8/6/06
  */
 
 /*
@@ -85,6 +85,8 @@ width(register tchar j)
 		return(k);
 	}
 	i = cbits(j);
+	if (i == XFUNC && fbits(j) == CHAR)
+		return(charout[sbits(j)].width);
 	if (i < ' ') {
 		if (i == '\b')
 			return(-widthp);
@@ -165,7 +167,7 @@ setch(int delim)
 			if (j != ']')
 				nodelim(']');
 			else if (warn & WARN_CHAR)
-				errprint("missing glyph [%s]", temp);
+				errprint("missing glyph \\[%s]", temp);
 			return 0;
 		}
 	} else {
@@ -191,7 +193,7 @@ setabs (void)		/* set absolute char from \C'...' */
 	n = 0;
 	n = inumb(&n);
 	getch();
-	if (nonumb)
+	if (nonumb || n + nchtab + _SPECCHAR_ST >= NCHARS)
 		return 0;
 	return n + nchtab + _SPECCHAR_ST;
 }

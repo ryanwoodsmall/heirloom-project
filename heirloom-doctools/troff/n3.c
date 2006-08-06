@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.124 (gritter) 8/5/06
+ * Sccsid @(#)n3.c	1.125 (gritter) 8/6/06
  */
 
 /*
@@ -97,6 +97,7 @@ static const struct {
 	{ "break",		(void(*)(int))casebreak},
 	{ "breakchar",		(void(*)(int))casebreakchar },
 	{ "brp",		(void(*)(int))casebrp },
+	{ "char",		(void(*)(int))casechar },
 	{ "chop",		(void(*)(int))casechop },
 	{ "close",		(void(*)(int))caseclose },
 	{ "continue",		(void(*)(int))casecontinue },
@@ -105,6 +106,7 @@ static const struct {
 	{ "ecr",		(void(*)(int))caseecr },
 	{ "evc",		(void(*)(int))caseevc },
 	{ "fallback",		(void(*)(int))casefallback },
+	{ "fchar",		(void(*)(int))casefchar },
 	{ "fdeferlig",		(void(*)(int))casefdeferlig },
 	{ "feature",		(void(*)(int))casefeature },
 	{ "fkern",		(void(*)(int))casefkern },
@@ -138,6 +140,7 @@ static const struct {
 	{ "papersize",		(void(*)(int))casepapersize },
 	{ "psbb",		(void(*)(int))casepsbb },
 	{ "pso",		(void(*)(int))casepso },
+	{ "rchar",		(void(*)(int))caserchar },
 	{ "recursionlimit",	(void(*)(int))caserecursionlimit },
 	{ "return",		(void(*)(int))casereturn },
 	{ "rhang",		(void(*)(int))caserhang },
@@ -1189,7 +1192,7 @@ casetl(void)
 		} else {
 			if (cbits(i) == pagech) {
 				setn1(numtab[PN].val, numtab[findr('%')].fmt,
-				      i&SFMASK);
+				      sfmask(i));
 				nexti = getch();
 				continue;
 			}

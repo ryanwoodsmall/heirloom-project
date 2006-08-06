@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.68 (gritter) 8/5/06
+ * Sccsid @(#)n5.c	1.69 (gritter) 8/6/06
  */
 
 /*
@@ -184,6 +184,7 @@ chget(int c)
 {
 	tchar i = 0;
 
+	charf++;
 	if (skip(0) || ismot(i = getch()) || cbits(i) == ' ' || cbits(i) == '\n') {
 		ch = i;
 		return(c);
@@ -955,41 +956,51 @@ caseevc(void)
 {
 	char	*name;
 	int	nxev;
-	struct env	tmpenv, *ep;
+	struct env	*ep;
 
 	if (getev(&nxev, &name) == 0 || (ep = findev(&nxev, name)) == NULL)
 		return;
-	tmpenv = env;
 	free(env._hcode);
 	free(env._line);
 	free(env._word);
-	env = *ep;
-	env._hcode = malloc(env._nhcode * sizeof *env._hcode);
-	memcpy(env._hcode, ep->_hcode, env._nhcode * sizeof *env._hcode);
-	env._pendnf = 0;
-	env._pendw = 0;
-	env._pendt = 0;
-	env._wch = 0;
-	env._wne = 0;
-	env._wdstart = 0;
-	env._wdend = 0;
-	env._lnsize = 0;
-	env._line = NULL;
-	env._linep = NULL;
-	env._wdsize = 0;
-	env._word = 0;
-	env._wordp = 0;
-	env._spflg = 0;
-	env._ce = 0;
-	env._nn = 0;
-	env._ndf = 0;
-	env._nms = 0;
-	env._ni = 0;
-	env._ul = 0;
-	env._cu = 0;
-	env._it = 0;
-	env._itmac = 0;
-	env._pendnf = 0;
+	evc(&env, ep);
+}
+
+void
+evc(struct env *dp, struct env *sp)
+{
+	memmove(dp, sp, sizeof *dp);
+	dp->_hcode = malloc(dp->_nhcode * sizeof *dp->_hcode);
+	memmove(dp->_hcode, sp->_hcode, dp->_nhcode * sizeof *dp->_hcode);
+	dp->_pendnf = 0;
+	dp->_pendw = 0;
+	dp->_pendt = 0;
+	dp->_wch = 0;
+	dp->_wne = 0;
+	dp->_wdstart = 0;
+	dp->_wdend = 0;
+	dp->_lnsize = 0;
+	dp->_line = NULL;
+	dp->_linep = NULL;
+	dp->_wdsize = 0;
+	dp->_word = 0;
+	dp->_wordp = 0;
+	dp->_spflg = 0;
+	dp->_ce = 0;
+	dp->_nn = 0;
+	dp->_ndf = 0;
+	dp->_nms = 0;
+	dp->_ni = 0;
+	dp->_ul = 0;
+	dp->_cu = 0;
+	dp->_it = 0;
+	dp->_itmac = 0;
+	dp->_pendnf = 0;
+	dp->_nc = 0;
+	dp->_un = 0;
+	dp->_un1 = -1;
+	dp->_nwd = 0;
+	setnel();
 }
 
 void
@@ -1633,7 +1644,7 @@ casemc(void)
 
 
 static void
-setchar(int *tp)
+propchar(int *tp)
 {
 	int	c, *tpp;
 	tchar	i;
@@ -1654,25 +1665,25 @@ setchar(int *tp)
 void
 casesentchar(void)
 {
-	setchar(sentch);
+	propchar(sentch);
 }
 
 void
 casetranschar(void)
 {
-	setchar(transch);
+	propchar(transch);
 }
 
 void
 casebreakchar(void)
 {
-	setchar(breakch);
+	propchar(breakch);
 }
 
 void
 casenhychar(void)
 {
-	setchar(nhych);
+	propchar(nhych);
 }
 
 void

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.157 (gritter) 7/19/06
+ * Sccsid @(#)t6.c	1.158 (gritter) 8/6/06
  */
 
 /*
@@ -95,6 +95,7 @@ struct ref	*anchors, *links;
 static int	_minflg;
 
 static void	kernsingle(int **);
+static int	_ps2cc(const char *name, int create);
 
 int
 width(register tchar j)
@@ -103,6 +104,7 @@ width(register tchar j)
 
 	_minflg = minflg;
 	minflg = minspc = 0;
+	lasttrack = 0;
 	rawwidth = 0;
 	if (isadjspc(j))
 		return(0);
@@ -124,6 +126,10 @@ width(register tchar j)
 			i = eschar;
 		else if (iscontrol(i))
 			return(0);
+		else if (i == XFUNC && fbits(j) == CHAR) {
+			k = charout[sbits(j)].width;
+			goto set;
+		}
 	} else if (i == ' ' && issentsp(j))
 		return(ses);
 	if (i==ohc)
@@ -150,9 +156,9 @@ width(register tchar j)
 			minspc = getcw(0) - k;
 		}
 		_minflg = 0;
-		if (bd)
+	set:	if (bd && !fmtchar)
 			k += (bd - 1) * HOR;
-		if (cs)
+		if (cs && !fmtchar)
 			k = cs;
 	}
 	widthp = k;
@@ -329,6 +335,24 @@ abscw(int n)	/* return index of abs char n in fontab[], etc. */
 	return 0;
 }
 
+int
+onfont(tchar c)
+{
+	int	k = cbits(c);
+	int	f = fbits(c);
+
+	if (k <= ' ')
+		return 1;
+	k -= 32;
+	if (k >= nchtab + 128-32) {
+		if (afmtab && fontbase[f]->afmpos - 1 >= 0)
+			k -= nchtab + 128;
+		else
+			return abscw(k + 32 - (nchtab+128)) != 0;
+	}
+	return fitab[f][k] != 0;
+}
+
 static int
 fvert2pts(int f, int s, int k)
 {
@@ -482,6 +506,10 @@ getkw(tchar c, tchar d)
 	int	f, g, i, j, k, n, s, I, J;
 	float	z;
 
+	if (cbits(c) == XFUNC && fbits(c) == CHAR)
+		c = charout[sbits(c)].ch;
+	if (cbits(d) == XFUNC && fbits(d) == CHAR)
+		d = charout[sbits(d)].ch;
 	lastkern = 0;
 	if (!kern || iszbit(c) || iszbit(d) || ismot(c) || ismot(d))
 		return 0;
@@ -568,9 +596,11 @@ postchar1(const char *temp, int f)
 		a = afmtab[i];
 		np = afmnamelook(a, temp);
 		if (np->afpos != 0) {
-			if (np->fival[0] >= 0)
+			if (np->fival[0] >= 0 &&
+					fitab[f][np->fival[0]])
 				return np->fival[0] + 32 + nchtab + 128;
-			else if (np->fival[1] >= 0)
+			else if (np->fival[1] >= 0 &&
+					fitab[f][np->fival[1]])
 				return np->fival[1] + 32 + nchtab + 128;
 			else
 				return 0;
@@ -592,7 +622,7 @@ postchar(const char *temp, int *fp)
 		for (j = 0; fallbacktab[font][j] != 0; j++) {
 			if ((i = findft(fallbacktab[font][j], 0)) < 0)
 				continue;
-			if ((c = postchar1(temp, i)) != 0) {
+			if ((c = postchar1(temp, i)) != 0 && fchartab[c] == 0) {
 				*fp = i;
 				return c;
 			}
@@ -602,7 +632,7 @@ postchar(const char *temp, int *fp)
 		for (i=smnt, j=0; j < nfonts; j++, i=i % nfonts + 1) {
 			if (fontbase[i] == NULL)
 				continue;
-			if ((c = postchar1(temp, i)) != 0) {
+			if ((c = postchar1(temp, i)) != 0 && fchartab[c] == 0) {
 				*fp = i;
 				return c;
 			}
@@ -660,6 +690,16 @@ tchar setch(int delim)
 				c = j + 128 | chbits;
 				break;
 			}
+	if (c == 0 && delim == '(')
+		if ((c = postchar(temp, &f)) != 0) {
+			c |= chbits & ~FMASK;
+			setfbits(c, f);
+		}
+	if (c == 0 && (c = _ps2cc(temp, 0)) != 0) {
+		c += nchtab + 128 + 32 + 128 - 32 + nchtab;
+		if (chartab[c] == NULL)
+			c = 0;
+	}
 	if (c == 0 && warn & WARN_CHAR)
 		errprint("missing glyph \\%c%s%s%s%s", delim, d, temp, d,
 				delim == '[' ? "]" : "");
@@ -676,7 +716,7 @@ tchar setabs(void)		/* set absolute char from \C'...' */
 	n = 0;
 	n = inumb(&n);
 	getch();
-	if (nonumb)
+	if (nonumb || n + nchtab + 128 >= NCHARS)
 		return 0;
 	return n + nchtab + 128;
 }
@@ -2003,7 +2043,7 @@ void
 casehidechar(void)
 {
 	int	savfont = font, savfont1 = font1;
-	int	i, j, n, m;
+	int	i, j;
 	tchar	k;
 
 	if (skip(1))
@@ -2016,11 +2056,10 @@ casehidechar(void)
 	while ((i = cbits(k = getch())) != '\n') {
 		if (fbits(k) != j || ismot(k) || i == ' ')
 			continue;
-		n = 128 - 32 + nchtab;
-		if (afmtab && (m=(fontbase[j]->afmpos)-1) >= 0)
-			n += afmtab[m]->nchars;
-		if (i < n)
-			fitab[j][i - 32] = 0;
+		if (i >= nchtab + 128-32 && afmtab &&
+				fontbase[j]->afmpos - 1 >= 0)
+			i -= nchtab + 128;
+		fitab[j][i - 32] = 0;
 	}
 	font = savfont;
 	font1 = savfont1;
@@ -2565,6 +2604,15 @@ un2tr(int c, int *fp)
 				if ((j = postchar(up->u.psc, fp)) != 0)
 					return j;
 			while ((up = up->next) != NULL);
+			up = um;
+			do
+				if ((j = _ps2cc(up->u.psc, 0)) != 0) {
+					j += nchtab + 128 + 32 +
+						128 - 32 + nchtab;
+					if (chartab[j] != NULL)
+						return j;
+				}
+			while ((up = up->next) != NULL);
 		}
 		if (fallbacktab[font])
 			for (j = 0; fallbacktab[font][j] != 0; j++) {
@@ -2724,8 +2772,8 @@ static struct psnnode {
 	int	code;
 } **psntable;
 
-int
-ps2cc(const char *name)
+static int
+_ps2cc(const char *name, int create)
 {
 	struct psnnode	*pp;
 	unsigned	h;
@@ -2736,9 +2784,17 @@ ps2cc(const char *name)
 	for (pp = psntable[h]; pp; pp = pp->next)
 		if (strcmp(name, pp->name) == 0)
 			return pp->code;
+	if (create == 0)
+		return 0;
 	pp = calloc(1, sizeof *pp);
 	pp->name = strdup(name);
 	pp->next = psntable[h];
 	psntable[h] = pp;
 	return pp->code = ++psmaxcode;
+}
+
+int
+ps2cc(const char *name)
+{
+	return _ps2cc(name, 1);
 }

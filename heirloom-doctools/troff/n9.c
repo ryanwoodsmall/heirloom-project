@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.56 (gritter) 8/5/06
+ * Sccsid @(#)n9.c	1.57 (gritter) 8/6/06
  */
 
 /*
@@ -430,6 +430,8 @@ setfield(int x)
 		rchar = tabc | chbits;
 	else if (x ==  ldrch) 
 		rchar = dotc | chbits;
+	if (chartab[trtab[cbits(rchar)]] != 0)
+		rchar = setchar(rchar);
 	temp = npad = ws = 0;
 	savfc = fc;
 	savtc = tabch;
@@ -1129,7 +1131,11 @@ morechars(int n)
 		trtab[i] = i;
 	gchtab = realloc(gchtab, nnc * sizeof *gchtab);
 	memset(&gchtab[NCHARS], 0, (nnc-NCHARS) * sizeof *gchtab);
+	chartab = realloc(chartab, nnc * sizeof *chartab);
+	memset(&chartab[NCHARS], 0, (nnc-NCHARS) * sizeof *chartab);
 #ifndef	NROFF
+	fchartab = realloc(fchartab, nnc * sizeof *fchartab);
+	memset(&fchartab[NCHARS], 0, (nnc-NCHARS) * sizeof *fchartab);
 	for (i = 0; i <= nfonts; i++) {
 		extern short	**fitab;
 		if (fitab != NULL && fitab[i] != NULL) {
