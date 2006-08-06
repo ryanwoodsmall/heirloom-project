@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.111 (gritter) 8/6/06
+ * Sccsid @(#)tdef.h	1.112 (gritter) 8/7/06
  */
 
 /*
@@ -749,6 +749,7 @@ struct acc {
 #define	transch	env._transch
 #define	breakch	env._breakch
 #define	nhych	env._nhych
+#define	evname	env._evname
 
 extern struct env {
 	int	_ics;
@@ -864,4 +865,5 @@ extern struct env {
 	int	_nhych[NSENT];
 	tchar	*_line;
 	tchar	*_word;
+	char	*_evname;
 } env, initenv;

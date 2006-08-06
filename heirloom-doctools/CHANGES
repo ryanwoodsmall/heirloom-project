@@ -48,6 +48,8 @@ Release ...
   evaluate "e" using "c" as default scale indicator.
 * [nt]roff: The "M" (Em/100), "s" (= "u"), and "z" (= "p") scale indicators
   have been added.
+* [nt]roff: The "\n[.ev]" number register has been added as a method to
+  determine the name of the current environment.
 * [nt]roff: Static limits on word and line size have been eliminated.
 * troff: The ".psbb" request now reads a "%%HiResBoundingBox" DSC comment
   in preference to "%%BoundingBox"; the registers it assigns to are now

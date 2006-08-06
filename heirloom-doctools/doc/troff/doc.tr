@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.95 (gritter) 8/6/06
+.\" Sccsid @(#)doc.tr	1.96 (gritter) 8/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -91,7 +91,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/6/06
+.ds Sccsdate 8/7/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1888,6 +1888,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
+\T'n_.ev'17\T	\T'n_.ev'\fB&ev\fR\T	\T'n_.ev'Name of current environment [sic].\T
 \T'n_.f'2.2\T	\T'n_.f'\fB&f\fR\T	\T'n_.f'Current font as physical quadrant (1-255).\T
 \T'n_.fp'2.2\T	\T'n_.fp'\fB&fp\fR\T	\T'n_.fp'Next unused physical font quadrant.\T
 \T'n_.fzoom'2.3\T	\T'n_.fzoom'\fB&fzoom\fR\T	\T'n_.fzoom'Current font zoom factor (may be a decimal fraction).\T
@@ -4895,6 +4896,8 @@ rather than specific reference.
 Note that what is pushed down and restored
 is the environment \fIname,\fR
 not its contents.
+The name of the current environment is available
+in the \A'n_.ev'\fB&ev\fR number register.
 .bta evc
 \fB&evc\fI|name\fR		\(en	\(en	Copy the environment \fIname\fR to the current environment.
 The temporary state of the current environment is reset, and

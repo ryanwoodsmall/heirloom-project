@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.70 (gritter) 8/7/06
+ * Sccsid @(#)n5.c	1.71 (gritter) 8/7/06
  */
 
 /*
@@ -957,6 +957,13 @@ e1:
 	*op = env;
 	env = *np;
 	ev = nxev;
+	if (evname == NULL)
+		if (name)
+			evname = name;
+		else {
+			evname = malloc(20);
+			roff_sprintf(evname, "%d", ev);
+		}
 }
 
 void
@@ -977,9 +984,13 @@ caseevc(void)
 void
 evc(struct env *dp, struct env *sp)
 {
+	char	*name;
+
+	name = dp->_evname;
 	memmove(dp, sp, sizeof *dp);
 	dp->_hcode = malloc(dp->_nhcode * sizeof *dp->_hcode);
 	memmove(dp->_hcode, sp->_hcode, dp->_nhcode * sizeof *dp->_hcode);
+	dp->_evname = name;
 	dp->_pendnf = 0;
 	dp->_pendw = 0;
 	dp->_pendt = 0;
