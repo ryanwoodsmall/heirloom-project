@@ -59,6 +59,8 @@ Release ...
 * tbl: When ending macros in generated code, ".00" is now used instead
   of "..". This allows the use of ".ig" and similar requests within "T{"
   etc. without interference.
+* pic: Accept "{lower|upper} {left|right} of" as aliases for ".nw", ".sw",
+  ".ne", and ".se".
 
 Release 060716
 * troff: The ".letadj" request has been added to enable dynamic letter

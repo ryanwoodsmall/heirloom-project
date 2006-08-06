@@ -10,7 +10,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picl.l	1.7 (gritter) 11/27/05	*/
+/*	Sccsid @(#)picl.l	1.8 (gritter) 8/6/06	*/
 %}
 %Start A str def xsc br thru sh
 %e 1700
@@ -146,6 +146,10 @@ WS	[ \t]
 <A>center" "+of		{ yylval.i = CENTER; return(CORNER); }
 <A>start" "+of		{ yylval.i = START; return(CORNER); }
 <A>end" "+of		{ yylval.i = END; return(CORNER); }
+<A>upper" "right" "+of	{ yylval.i = NE; return(CORNER); }
+<A>lower" "right" "+of	{ yylval.i = SE; return(CORNER); }
+<A>upper" "left" "+of	{ yylval.i = NW; return(CORNER); }
+<A>lower" "left" "+of	{ yylval.i = SW; return(CORNER); }
 
 <A>height|ht	{ yylval.i = HEIGHT; return(ATTR); }
 <A>width|wid	{ yylval.i = WIDTH; return(ATTR); }
