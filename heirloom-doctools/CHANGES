@@ -61,6 +61,8 @@ Release ...
   etc. without interference.
 * pic: Accept "{lower|upper} {left|right} of" as aliases for ".nw", ".sw",
   ".ne", and ".se".
+* pic: Continued newlines in expressions like "center \<newline>of" are
+  now accepted.
 
 Release 060716
 * troff: The ".letadj" request has been added to enable dynamic letter

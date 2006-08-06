@@ -10,13 +10,13 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)picl.l	1.8 (gritter) 8/6/06	*/
+/*	Sccsid @(#)picl.l	1.9 (gritter) 8/6/06	*/
 %}
 %Start A str def xsc br thru sh
 %e 1700
-%k 120
+%k 150
 %a 1800
-%o 1500
+%o 1600
 %p 5000
 %n 700
 
@@ -68,6 +68,7 @@ A	[a-zA-Z_]
 B	[a-zA-Z0-9_]
 D	[0-9]
 WS	[ \t]
+FWS	([ \t]|\\\n)
 
 %%
 	switch (witchcraft) {
@@ -135,21 +136,21 @@ WS	[ \t]
 <A>".nw"		{ yylval.i = NW; return(CORNER); }
 <A>".sw"		{ yylval.i = SW; return(CORNER); }
 
-<A>top" "+of		{ yylval.i = NORTH; return(CORNER); }
-<A>north" "+of		{ yylval.i = NORTH; return(CORNER); }
-<A>bottom" "+of		{ yylval.i = SOUTH; return(CORNER); }
-<A>south" "+of		{ yylval.i = SOUTH; return(CORNER); }
-<A>left" "+of		{ yylval.i = WEST; return(CORNER); }
-<A>west" "+of		{ yylval.i = WEST; return(CORNER); }
-<A>right" "+of		{ yylval.i = EAST; return(CORNER); }
-<A>east" "+of		{ yylval.i = EAST; return(CORNER); }
-<A>center" "+of		{ yylval.i = CENTER; return(CORNER); }
-<A>start" "+of		{ yylval.i = START; return(CORNER); }
-<A>end" "+of		{ yylval.i = END; return(CORNER); }
-<A>upper" "right" "+of	{ yylval.i = NE; return(CORNER); }
-<A>lower" "right" "+of	{ yylval.i = SE; return(CORNER); }
-<A>upper" "left" "+of	{ yylval.i = NW; return(CORNER); }
-<A>lower" "left" "+of	{ yylval.i = SW; return(CORNER); }
+<A>top{FWS}+of		{ yylval.i = NORTH; return(CORNER); }
+<A>north{FWS}+of	{ yylval.i = NORTH; return(CORNER); }
+<A>bottom{FWS}+of	{ yylval.i = SOUTH; return(CORNER); }
+<A>south{FWS}+of	{ yylval.i = SOUTH; return(CORNER); }
+<A>left{FWS}+of		{ yylval.i = WEST; return(CORNER); }
+<A>west{FWS}+of		{ yylval.i = WEST; return(CORNER); }
+<A>right{FWS}+of	{ yylval.i = EAST; return(CORNER); }
+<A>east{FWS}+of		{ yylval.i = EAST; return(CORNER); }
+<A>center{FWS}+of	{ yylval.i = CENTER; return(CORNER); }
+<A>start{FWS}+of	{ yylval.i = START; return(CORNER); }
+<A>end{FWS}+of		{ yylval.i = END; return(CORNER); }
+<A>upper{FWS}right{FWS}+of	{ yylval.i = NE; return(CORNER); }
+<A>lower{FWS}right{FWS}+of	{ yylval.i = SE; return(CORNER); }
+<A>upper{FWS}left{FWS}+of	{ yylval.i = NW; return(CORNER); }
+<A>lower{FWS}left{FWS}+of	{ yylval.i = SW; return(CORNER); }
 
 <A>height|ht	{ yylval.i = HEIGHT; return(ATTR); }
 <A>width|wid	{ yylval.i = WIDTH; return(ATTR); }
