@@ -56,6 +56,9 @@ Release ...
   PostScript DSC input files.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
+* tbl: When ending macros in generated code, ".00" is now used instead
+  of "..". This allows the use of ".ig" and similar requests within "T{"
+  etc. without interference.
 
 Release 060716
 * troff: The ".letadj" request has been added to enable dynamic letter

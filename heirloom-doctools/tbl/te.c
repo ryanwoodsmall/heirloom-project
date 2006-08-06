@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)te.c	1.12 (gritter) 2/26/06
+ * Sccsid @(#)te.c	1.13 (gritter) 8/6/06
  */
 
  /* te.c: error message control, input line count */
@@ -55,15 +55,6 @@ for (;;)
 	iline++;
 	for (;;)
 		{
-		if ((c = getc(tabin))==EOF)
-			{
-			if (ferror(tabin))
-				error(errmsg(errno));
-			if (swapin()==0)
-				return(0);
-			iline++;
-			continue;
-			}
 		if (n + MAXCHS >= *zp)
 			{
 			int oz = *zp;
@@ -73,6 +64,15 @@ for (;;)
 			updspace(*bp, p, oz);
 			*sp += p - *bp;
 			*bp = p;
+			}
+		if ((c = getc(tabin))==EOF)
+			{
+			if (ferror(tabin))
+				error(errmsg(errno));
+			if (swapin()==0)
+				return(0);
+			iline++;
+			continue;
 			}
 		if (c=='\n')
 			{

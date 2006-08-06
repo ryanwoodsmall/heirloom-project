@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tf.c	1.7 (gritter) 2/13/06
+ * Sccsid @(#)tf.c	1.8 (gritter) 8/6/06
  */
 
  /* tf.c: save and restore fill mode around table */
@@ -27,14 +27,14 @@ void
 savefill(void)
 {
 /* remembers various things: fill mode, vs, ps in mac 35 (SF) */
-fprintf(tabout, ".de %d\n",SF);
+fprintf(tabout, ".de %d 00\n",SF);
 fprintf(tabout, ".ps \\n(.s\n");
 fprintf(tabout, ".vs \\n(.vu\n");
 fprintf(tabout, ".in \\n(.iu\n");
 fprintf(tabout, ".if \\n(.u .fi\n");
 fprintf(tabout, ".if \\n(.j .ad\n");
 fprintf(tabout, ".if \\n(.j=0 .na\n");
-fprintf(tabout, "..\n");
+fprintf(tabout, ".00\n");
 fprintf(tabout, ".nf\n");
 /* set obx offset if useful */
 fprintf(tabout, ".nr #~ 0\n");
@@ -71,6 +71,7 @@ void
 saveline(void)
 {
 fprintf(tabout,".lf 2 table-at-line-%d-of-%s\n", iline-1, ifile);
+fprintf(tabout, ".de 00\n..\n");
 fprintf(tabout, ".do nr w. \\n[.warn]\n");
 warnoff();
 fprintf(tabout, ".if \\n+(b.=1 .nr d. \\n(.c-\\n(c.-1\n");
