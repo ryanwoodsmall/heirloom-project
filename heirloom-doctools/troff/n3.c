@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.127 (gritter) 8/6/06
+ * Sccsid @(#)n3.c	1.128 (gritter) 8/7/06
  */
 
 /*
@@ -1694,7 +1694,7 @@ mgetach(void)
 	j = cbits(i = getch());
 	if (ismot(i) || j == ' ' || j == '\n' || j >= 0200 ||
 			j < sizeof nmctab && nmctab[j]) {
-		if (j >= 0200)
+		if (!ismot(i) && j >= 0200)
 			illseq(j, NULL, -3);
 		ch = i;
 		j = 0;
