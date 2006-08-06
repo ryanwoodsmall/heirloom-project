@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.158 (gritter) 8/6/06
+ * Sccsid @(#)t6.c	1.159 (gritter) 8/6/06
  */
 
 /*
@@ -126,8 +126,8 @@ width(register tchar j)
 			i = eschar;
 		else if (iscontrol(i))
 			return(0);
-		else if (i == XFUNC && fbits(j) == CHAR) {
-			k = charout[sbits(j)].width;
+		else if (isxfunc(j, CHAR)) {
+			k = charout[sbits(j)].width + lettrack;
 			goto set;
 		}
 	} else if (i == ' ' && issentsp(j))
@@ -506,9 +506,9 @@ getkw(tchar c, tchar d)
 	int	f, g, i, j, k, n, s, I, J;
 	float	z;
 
-	if (cbits(c) == XFUNC && fbits(c) == CHAR)
+	if (isxfunc(c, CHAR))
 		c = charout[sbits(c)].ch;
-	if (cbits(d) == XFUNC && fbits(d) == CHAR)
+	if (isxfunc(d, CHAR))
 		d = charout[sbits(d)].ch;
 	lastkern = 0;
 	if (!kern || iszbit(c) || iszbit(d) || ismot(c) || ismot(d))

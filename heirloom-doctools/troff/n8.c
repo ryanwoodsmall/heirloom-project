@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.32 (gritter) 8/6/06
+ * Sccsid @(#)n8.c	1.33 (gritter) 8/6/06
  */
 
 /*
@@ -180,7 +180,7 @@ alph(tchar j)
 	int f;
 	int	h;
 
-	while (cbits(j) == XFUNC && fbits(j) == CHAR)
+	while (isxfunc(j, CHAR))
 		j = charout[sbits(j)].ch;
 	i = cbits(j);
 	f = fbits(j);
@@ -361,7 +361,7 @@ maplow(tchar t)
 {
 	int	h, i, f;
 
-	while (cbits(t) == XFUNC && fbits(t) == CHAR)
+	while (isxfunc(t, CHAR))
 		t = charout[sbits(t)].ch;
 	i = cbits(t);
 	f = fbits(t);

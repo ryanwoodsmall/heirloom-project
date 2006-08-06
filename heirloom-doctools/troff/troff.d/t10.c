@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.82 (gritter) 8/6/06
+ * Sccsid @(#)t10.c	1.83 (gritter) 8/6/06
  */
 
 /*
@@ -928,13 +928,15 @@ ptchar1(struct charout *cp, int z)
 	filep	savip;
 	tchar	i, *k, *savoline, *savolinep;
 	size_t	savolinesz;
-	int	savhpos, savvpos;
+	int	savhpos, savvpos, savlettrack;
 
 	savoline = oline;
 	savolinep = olinep;
 	savolinesz = olinesz;
 	olinep = oline = NULL;
 	olinesz = 0;
+	savlettrack = lettrack;
+	lettrack = 0;
 	savhpos = hpos + esc;
 	savvpos = vpos + lead;
 	savip = ip;
@@ -952,9 +954,10 @@ ptchar1(struct charout *cp, int z)
 	oline = savoline;
 	olinep = savolinep;
 	olinesz = savolinesz;
+	lettrack = savlettrack;
 	esc = savhpos - hpos;
 	if (!z)
-		esc += cs ? cs : cp->width;
+		esc += cs ? cs : cp->width + lettrack;
 	lead = savvpos - vpos;
 }
 
@@ -976,6 +979,7 @@ ptchar(int n, int z)
 		if (iszbit(cp->ch))
 			esc -= bd;
 	}
+	lettrack = 0;
 }
 
 void

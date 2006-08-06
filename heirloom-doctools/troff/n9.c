@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.57 (gritter) 8/6/06
+ * Sccsid @(#)n9.c	1.58 (gritter) 8/6/06
  */
 
 /*
@@ -1098,19 +1098,19 @@ fetchrq(tchar *tp)
 	int	i;
 
 	i = 0;
-	if (ismot(tp[0]) || cbits(tp[0]) != XFUNC || fbits(tp[0]) != RQ1)
+	if (ismot(tp[0]) || !isxfunc(tp[0], RQ1))
 		return 0;
 	i |= sbits(tp[0]) & 037;
-	if (ismot(tp[1]) || cbits(tp[1]) != XFUNC || fbits(tp[1]) != RQ2)
+	if (ismot(tp[1]) || !isxfunc(tp[1], RQ2))
 		return 0;
 	i |= (sbits(tp[1]) & 037) << 5;
-	if (ismot(tp[2]) || cbits(tp[2]) != XFUNC || fbits(tp[2]) != RQ3)
+	if (ismot(tp[2]) || !isxfunc(tp[2], RQ3))
 		return 0;
 	i |= (sbits(tp[2]) & 037) << 10;
-	if (ismot(tp[3]) || cbits(tp[3]) != XFUNC || fbits(tp[3]) != RQ4)
+	if (ismot(tp[3]) || !isxfunc(tp[3], RQ4))
 		return 0;
 	i |= (sbits(tp[3]) & 037) << 15;
-	if (ismot(tp[4]) || cbits(tp[4]) != XFUNC || fbits(tp[4]) != RQ5)
+	if (ismot(tp[4]) || !isxfunc(tp[4], RQ5))
 		return 0;
 	i |= (sbits(tp[4]) & 037) << 20;
 	return i;

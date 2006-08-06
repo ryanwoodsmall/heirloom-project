@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.94 (gritter) 8/6/06
+.\" Sccsid @(#)doc.tr	1.95 (gritter) 8/6/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -4170,18 +4170,33 @@ If \fIc\fR itself occurs in \fIstring\fR,
 no recursive substitution takes place,
 but the plain character \fIc\fR is selected instead.
 The resulting object continues to behave like the single character \fIc\fR
-in the data stream.
+in the data stream,
+notionally retaining its font and character size properties.
 It can thus be part of a \T'c_kerning'kerning definition\T,
 can be hyphenated (possibly requiring an explicit
 hyphenation code to be assigned using the \T'hcode'\fBhcode\fR\T request),
 can become the \T's_tabs'tab or leader character\T,
 and can be used for \T'c_line'line drawing\T.
 .xx
+Static letter space adjustments defined with
+the \T'track'\fBtrack\fR\T request
+are applied to each but the last character inside the diversion,
+and to the object as a whole.
+Dynamic letter space adjustments defined with
+the \T'letadj'\fBletadj\fR\T request
+are only applied to the object as a whole.
+No letter reshaping is performed on either the object
+or the contents of the diversion.
+.xx
 If both \fBtr\fR and \fBchar\fR are defined for a character \fIc\fR,
-\fBtr\fR is applied,
+\fBtr\fR becomes effective first and
+changes \fIc\fR to the translation defined,
 but if \fIc\fR is the result of \fBtr\fR
 and \fBchar\fR is defined for it,
-\fBchar\fR is also applied.
+\fBchar\fR is applied.
+\fBftr\fR has no effect on characters for which \fBchar\fR is defined.
+Both \fBtr\fR and \fBftr\fR are applied to characters
+inside the \fBchar\fR diversion as usual.
 .xx
 At the time \fIc\fR would have been output,
 the contents of the diversion are printed instead of it.
@@ -4783,11 +4798,17 @@ and may slow down execution;
 \T'c_recursion'recursive macros (\(sc10.6)\T do not suffer from this problem.
 In the multi-line case,
 the \fB\e}\fR terminating the loop must be placed at the end of a line.
+When \fIanything\fR is copied to the macro,
+neither \T'copy mode'copy mode\T nor regular
+escape interpretation apply.
+References to number registers, strings, etc. must
+thus be written using a single escape character
+unless the \fBwhile\fR request is contained in a macro definition.
 .bta break
-\fB&break\fI|n\fR		\(en	1	Break out of \fIn\fR nested \fBwhile\fR loops,
+\fB&break\fI|n\fR	\(en	1	\(en	Break out of \fIn\fR nested \fBwhile\fR loops,
 or terminate the current loop if no argument is given.
 .bta continue
-\fB&continue\fI|n\fR		\(en	1	Continue at the \fIn\fR-th nested \fBwhile\fR loop,
+\fB&continue\fI|n\fR	\(en	1	\(en	Continue at the \fIn\fR-th nested \fBwhile\fR loop,
 or continue the current loop if no argument is given.
 .pg
 .ne 16

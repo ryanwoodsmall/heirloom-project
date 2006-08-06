@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.109 (gritter) 8/6/06
+ * Sccsid @(#)tdef.h	1.110 (gritter) 8/6/06
  */
 
 /*
@@ -161,6 +161,8 @@
 #define	RQ5	0021	/* fifth five bits of request number */
 #define	NSRQ	5	/* number of tchars to store a request */
 #define	CHAR	0022	/* formatted result of a .char execution */
+
+#define	isxfunc(c, x)	(cbits(c) == XFUNC && fbits(c) == (x))
 
 #define	LAFACT	1000	/* letter adjustment float-to-int conversion factor */
 

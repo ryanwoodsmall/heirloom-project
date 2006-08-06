@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.84 (gritter) 8/6/06
+ * Sccsid @(#)n7.c	1.85 (gritter) 8/6/06
  */
 
 /*
@@ -209,20 +209,22 @@ tbreak(void)
 			horiz(pad);
 		} else {
 		std:
-			if (!ismot(j) && cbits(j) == XFUNC &&
-					fbits(j) == FLDMARK)
+			if (!ismot(j) && isxfunc(j, FLDMARK))
 				fldcnt--;
 			else if (fldcnt == 0 && nc && !ismot(j) &&
-					!iszbit(j) && cbits(j) > ' ') {
-				if (lspcur) {
-					k = (int)sbits(j) / 2 * lspcur / LAFACT;
+					!iszbit(j)) {
+				if (lspcur && (cbits(j) > ' ' ||
+							isxfunc(j, CHAR))) {
+					for (c = j; isxfunc(c, CHAR);
+						c = charout[sbits(c)].ch);
+					k = (int)sbits(c) / 2 * lspcur / LAFACT;
 					if (k >= 0)
 						c = mkxfunc(LETSP, k);
 					else
 						c = mkxfunc(NLETSP, -k);
 					pchar(c);
 				}
-				if (lshcur) {
+				if (lshcur && cbits(j) > ' ') {
 					k = lshcur;
 					if (k >= 0)
 						c = mkxfunc(LETSH, k);
@@ -568,13 +570,15 @@ storelsp(tchar c, int neg)
 
 	if (!ad || admod || ismot(c))
 		return;
-	if (cbits(c) == XFUNC && fbits(c) == FLDMARK) {
+	if (isxfunc(c, FLDMARK)) {
 		lsplow = lsphigh = lspnc = 0;
 		fldcnt += neg ? -1 : 1;
 		return;
 	}
-	if (iszbit(c) || cbits(c) <= ' ')
+	if (iszbit(c) || cbits(c) <= ' ' && !isxfunc(c, CHAR))
 		return;
+	while (isxfunc(c, CHAR))
+		c = charout[sbits(c)].ch;
 	s = sbits(c) / 2;
 	if (neg)
 		s = -s;
@@ -588,7 +592,7 @@ storelsh(tchar c, int w)
 {
 	if (!ad || admod || ismot(c))
 		return;
-	if (cbits(c) == XFUNC && fbits(c) == FLDMARK) {
+	if (isxfunc(c, FLDMARK)) {
 		lshlow = lshhigh = lshwid = 0;
 		return;
 	}
@@ -1594,9 +1598,11 @@ lspcomp(int idiff)
 	diff = 0;
 	for (i = 0; i < nc; i++)
 		if (!ismot(c = line[i])) {
-			if (cbits(c) == XFUNC && fbits(c) == FLDMARK)
+			if (isxfunc(c, FLDMARK))
 				diff = lsplast = 0;
-			else if (cbits(c) > ' ') {
+			else if (cbits(c) > ' ' || isxfunc(c, CHAR)) {
+				while (isxfunc(c, CHAR))
+					c = charout[sbits(c)].ch;
 				lsplast = (int)sbits(c) / 2 * lspcur / LAFACT;
 				diff += lsplast;
 			}

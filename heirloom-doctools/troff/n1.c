@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.93 (gritter) 8/6/06
+ * Sccsid @(#)n1.c	1.94 (gritter) 8/6/06
  */
 
 /*
@@ -333,7 +333,7 @@ loop:
 		copyf--;
 		goto loop;
 	}
-	if (j == cc || j == c2 || j == XFUNC && fbits(i) == CC) {
+	if (j == cc || j == c2 || isxfunc(i, CC)) {
 		if (j == c2)
 			nb++;
 		copyf++;
@@ -2202,7 +2202,7 @@ setchar(tchar c)
 tchar
 sfmask(tchar t)
 {
-	while (cbits(t) == XFUNC && fbits(t) == CHAR)
+	while (isxfunc(t, CHAR))
 		t = charout[sbits(t)].ch;
 	if (t == XFUNC || t == SLANT || (t & SFMASK) == 0)
 		return chbits;
