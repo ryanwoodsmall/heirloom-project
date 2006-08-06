@@ -18,12 +18,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tg.c	1.7 (gritter) 2/26/06
+ * Sccsid @(#)tg.c	1.8 (gritter) 8/6/06
  */
 
  /* tg.c: process included text blocks */
 # include "t..c"
 # include <stdlib.h>
+static void checkig(const char *);
 /* get_text was originally gettext and was renamed */
 int 
 get_text(char *sp, int ilin, int icol, char *fn, char *sz)
@@ -72,6 +73,7 @@ while (gets1(&line, &line, &linesize))
 	{
 	if (line[0]=='T' && line[1]=='}' && line[2]== tab) break;
 	if (match("T}", line)) break;
+	checkig(line);
 	fprintf(tabout, "%s\n", line);
 	}
 if (fn && *fn) fprintf(tabout, ".ft \\n(%d\n", S1);
@@ -119,4 +121,15 @@ if (n < 128)
 else
 	sprintf(space, "\\n[%d%c]", n, c);
 return(space);
+}
+static void
+checkig(const char *lp)
+{
+	if (*lp != '.' && *lp != '\'')
+		return;
+	lp++;
+	while (*lp == ' ' || *lp == '\t')
+		lp++;
+	if (lp[0] == 'i' && lp[1] == 'g' && lp[2] == 0)
+		fprintf(stderr, "%s: line %d: Warning: .ig may cause endless loop\n", ifile, iline-1);
 }

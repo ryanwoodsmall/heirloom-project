@@ -5,7 +5,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/tbl.sl	5.7 (gritter) 2/26/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/tbl.sl	5.8 (gritter) 8/6/06";
 /* SLIST */
 /*
 t..c: * Sccsid @(#)t..c	1.13 (gritter) 2/26/06
@@ -23,7 +23,7 @@ tb.c: * Sccsid @(#)tb.c	1.6 (gritter) 2/26/06
 tc.c: * Sccsid @(#)tc.c	1.5 (gritter) 10/15/05
 te.c: * Sccsid @(#)te.c	1.12 (gritter) 2/26/06
 tf.c: * Sccsid @(#)tf.c	1.7 (gritter) 2/13/06
-tg.c: * Sccsid @(#)tg.c	1.7 (gritter) 2/26/06
+tg.c: * Sccsid @(#)tg.c	1.8 (gritter) 8/6/06
 ti.c: * Sccsid @(#)ti.c	1.3 (gritter) 7/23/05
 tm.c: * Sccsid @(#)tm.c	1.5 (gritter) 9/15/05
 ts.c: * Sccsid @(#)ts.c	1.3 (gritter) 7/23/05
