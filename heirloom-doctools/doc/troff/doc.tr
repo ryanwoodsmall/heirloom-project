@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.98 (gritter) 8/7/06
+.\" Sccsid @(#)doc.tr	1.99 (gritter) 8/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -2033,9 +2033,11 @@ i.e., \fB&abcde\fR will be interpreted as macro \fBabcde\fR,
 and \fB\e*[xyz]\fR refers to the string named \fBxyz\fR.
 If an undefined long name is read, its first two characters
 are interpreted as a short request using the remaining
-characters as argument. So if a macro \fBabcde\fR is defined,
+characters as argument.
+So if a macro \fBabcde\fR is defined,
 \fB&abcde\fR will execute it, but otherwise, \fB&abcde\fR continues
-to execute \fBab\fR. String and number register references are
+to execute \fBab\fR.
+String and number register references are
 only interpreted if they start in the first two characters
 of a name, i.e. no string interpretation is performed on
 input \fB&ab\e*(xy\fR.
@@ -2327,7 +2329,8 @@ once they are read in regular (not \T'copy mode'\fIcopy\fR\T) mode.
 If the current font is an OpenType or a TrueType font and contains
 a custom Unicode mapping table, the input character is looked up in that
 table first.
-Otherwise, a default table is used. A character that is not
+Otherwise, a default table is used.
+A character that is not
 present in the current font is searched
 using the \T'fallback'\fBfallback\fR\T sequence
 first, then in the special fonts.
@@ -2601,7 +2604,9 @@ The font is then available with \fB&ft F\fR, \fB\efF\fR, etc.
 and may consist of more than two characters.
 .xx
 \fIF\fR may be the name of a previously mounted font, such
-as \fBR\fR. In this case, the same \fIN\fR register must be reused. For best
+as \fBR\fR.
+In this case, the same \fIN\fR register must be reused.
+For best
 compatibility with conventional \*(TR usage, it is recommended
 that the base fonts of a document are mounted as ``1\ R'', ``2\ I'',
 ``3\ B'', ``4\ BI''.
@@ -2609,20 +2614,25 @@ The initial fonts on positions 9 (\fBS1\fR) and 10 (\fBS\fR) should not be
 changed, as they contain special metrics for drawing commands.
 .xx
 If the optional \fIsupply\fR argument is present, glyph data
-is included in the generated \*(PS file. If \fIsupply\fR
+is included in the generated \*(PS file.
+If \fIsupply\fR
 is one of \fBotf\fR, \fBpfb\fR, \fBpfa\fR, \fBttf\fR, or \fBt42\fR, the file
 \fIsupply.pfb\fR (or likewise) is searched in the directories
 in \fB\s-1TROFFONTS\s+1\fR first as described
 for the \s-1AFM\s+1 file above, and if it is not found there, in
 \fB/usr/ucblib/doctools/font/devps/\fIsupply\fB.pfb\fR (or
-likewise). \fIsupply\fR may also be the basename of a file like
+likewise).
+\fIsupply\fR may also be the basename of a file like
 \fIfile\fR above.
 .xx
 The character \fB%\fR can be used to escape arbitrary bytes in
-font file names. In particular, this is necessary to use font
+font file names.
+In particular, this is necessary to use font
 files whose names contain spaces, bytes outside the ASCII range,
-or a \fB%\fR itself. \fB%\fIxx\fR represents the byte with the hexadecimal
-code \fIxx\fR, e.g., \fB%20\fR is a space character. In the path names
+or a \fB%\fR itself.
+\fB%\fIxx\fR represents the byte with the hexadecimal
+code \fIxx\fR, e.g., \fB%20\fR is a space character.
+In the path names
 in TROFFONTS, only the \fB%\fR and \fB:\fR characters have to be masked
 using this mechanism.
 .bta fps
@@ -2631,7 +2641,8 @@ Mount a font with a special character map.
 By default, special characters like \fB\e(\(**a\fR
 are not assigned when a font is mounted
 even if a matching named \*(PS character (like \fB\e[alpha]\fR)
-would have been available. The following special character maps
+would have been available.
+The following special character maps
 exist:
 .xx
 \fBmath\fR	mathematical characters like \(<= \(cu \(-> \(if
@@ -2650,7 +2661,8 @@ The remaining arguments are handled as described for \T'fp'\fBfp\fR.\T
 \fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	\
 Enable (+) or disable (\-) the OpenType feature \fIname\fR in font \fIF\fR.
 Only OpenType features that result in context-insensitive
-single-character substitutions are supported. Typical features
+single-character substitutions are supported.
+Typical features
 are \fBonum\fR to enable old-style numerals, or \fBsmcp\fR to enable
 small capitals.
 .bta fallback
@@ -2672,9 +2684,11 @@ and a Type\ 1 expert font.
 of the space character in font \fIF\fR to \fIN\fR,
 which is given in units of 1/72000 of an inch multiplied by the
 current point size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair
-definitions). If only one argument is present, the space width
+definitions).
+If only one argument is present, the space width
 is set to the width of the \fBspace\fR character as obtained from the
-font metrics file. If the space width for a font is not set
+font metrics file.
+If the space width for a font is not set
 explicitly using this request, it defaults to 1/3 em for
 variable-width fonts, or to the width of the \fBspace\fR character
 for monospaced fonts.
@@ -2682,7 +2696,8 @@ for monospaced fonts.
 When the width of spaces in output is actually computed,
 the space size as set by \T'ss'\fBss\fR\T is also taken into account.
 The space width as defined above is used directly with
-\fB&ss 12\fR, which is the default. Otherwise, it is multiplied
+\fB&ss 12\fR, which is the default.
+Otherwise, it is multiplied
 by the \fBss\fR setting divided by 12.
 .mha s_page
 Page control
@@ -2725,7 +2740,9 @@ and the post-processor is informed about the page metrics for its
 internal calculations.
 The last action is the real reason why this
 request exists; without it, \*(PS printers may displace the
-pages of the document. The default are \fBletter\fR measurements. This
+pages of the document.
+The default are \fBletter\fR measurements.
+This
 request should be used early in a document; if it is given multiple
 times, the last one will setup the device.
 .bta mediasize
@@ -2763,7 +2780,8 @@ and top (\fIT\fR) margins of the document
 and width (\fIW\fR) and height (\fIH\fR) of the box.
 The default units are points.
 The CropBox restricts the
-area of the page that is shown by a \*[PDF] viewer program. It is
+area of the page that is shown by a \*[PDF] viewer program.
+It is
 useful to hide cut marks and other printing instructions when
 the same \*[PDF] document is intended to be displayed on screen.
 .bta trimat
@@ -2789,7 +2807,8 @@ The BleedBox should be defined
 as a a frame around the objects of the actual document including
 any bleed areas (i.e. content that should extend to the end of the
 trimmed final page but is extended a bit such to work around
-possible cutting inaccuracies). Cut marks, color bars, and other
+possible cutting inaccuracies).
+Cut marks, color bars, and other
 information for the printing office should be positioned outside
 the BleedBox.
 .bta bp
@@ -2839,7 +2858,7 @@ place marked by a previous \fBmk\fR.
 Note that the \T'sp'\fBsp\fR request (\(sc5.3)\T may be used
 in all cases instead of \fBrt\fR
 by spacing to the absolute place stored in a explicit register;
-e.|g. using the sequence \fB.mk|\fIR\fR ... \fB.sp|~\|\en\fIR\fBu\fR;
+e.g. using the sequence \fB.mk|\fIR\fR ... \fB.sp|~\|\en\fIR\fBu\fR;
 this also works when the motion is downwards.
 .mha s_fill
 Text Filling, Adjusting, and Centering
@@ -3207,7 +3226,7 @@ point size;
 \*(TR default is 10-point type on a 12-point spacing
 (as in this document).
 The current \fIV\fR is available in the \A'n_.v'\fB.v\fR register.
-Multiple-\fIV\|\fR line separation (e.\|g. double spacing) may be requested
+Multiple-\fIV\|\fR line separation (e.g. double spacing) may be requested
 with \T'ls'\fBls\fR,\T
 but it is better to use a large \T'vs'\fBvs\fR\T instead;
 certain preprocessors assume single spacing.
@@ -4145,7 +4164,7 @@ to \fIc\fR, or reset to "\fB\'\fR".
 .sc
 \A'c_trans'Output translation.
 One character can be made a stand-in for another character using \T'tr'\fBtr\fR.\T
-All text processing (e. g. character comparisons) takes place
+All text processing (e.g. character comparisons) takes place
 with the input (stand-in) character which appears to have the width of the final
 character.
 The graphic translation occurs at the moment of output
@@ -4249,7 +4268,7 @@ Newlines in the macro are embedded in the output.
 .sc
 Comments and concealed newlines.
 An uncomfortably long input line that must stay
-one line (e. g. a string definition, or nofilled text)
+one line (e.g. a string definition, or nofilled text)
 can be split into many physical lines by ending all but
 the last one with the escape \fB\e\fR.
 The sequence \A'e_newline'\fB\e\fR(newline) is \fIalways\fR ignored\(em\
@@ -4514,7 +4533,7 @@ For example the macro
 .x2
 will draw a box around some text whose beginning vertical place was
 saved in number register \fIa\fR
-(e. g. using \fB.mk|a\fR)
+(e.g. using \fB.mk|a\fR)
 as done for this paragraph.
 .eb
 .sc
@@ -4598,7 +4617,7 @@ respectively of a word are allowed to be split off;
 this is only effective for explicit hyphenation points
 specified with \fB\e%\fR, \fB\e:\fR, or \fBhw\fR.
 These values are additive;
-i.|e. \fIN=\fR\|14 will invoke the three restrictions.
+i.e. \fIN=\fR\|14 will invoke the three restrictions.
 .bta hylang
 \fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language
 to \fIname\fR, which is one of
@@ -4611,7 +4630,8 @@ or
 \fBla_VA\fR.
 Other languages can be made available by adding hyphenation
 files to the directory
-\fB/usr/ucblib/doctools/hyphen\fR. If no \fIname\fR argument
+\fB/usr/ucblib/doctools/hyphen\fR.
+If no \fIname\fR argument
 is present, the hyphenation is reset to the traditional \*(TR
 mechanism.
 The current value is available in the \A'n_.hylang'\fB&hylang\fR
@@ -4670,7 +4690,7 @@ The indicator does not appear in the output.
 \fB&hw\fI|word1|...\fR		ignored	\(en	Specify hyphenation points in words
 with imbedded minus signs.
 Versions of a word with terminal \fIs\fR are implied;
-i.|e. \fIdig\-it\fR implies \fIdig\-its\fR.
+i.e. \fIdig\-it\fR implies \fIdig\-its\fR.
 This list is examined initially \fIand\fR after
 each suffix stripping.
 .mha s_titles
@@ -5137,7 +5157,8 @@ The regular request is then executed in extension level 2, or
 ignored in extension level 3.
 T}
 131072	font	T{
-Warn when a font cannot be found. This warning is enabled
+Warn when a font cannot be found.
+This warning is enabled
 by default.
 T}
 	all	T{
@@ -5184,8 +5205,10 @@ as bits.
 .bta spreadwarn
 \fB&spreadwarn\fI|N\fR	toggle	\fBm\fR	Set or toggle a limit that causes a warning to be printed when
 it is exceeded by the adjustment that is computed for the current
-output line in \fBad\ b\fR mode. The limit is initially 3\|m, but the
-warning message is disabled. Calling this request without an
+output line in \fBad\ b\fR mode.
+The limit is initially 3\|m, but the
+warning message is disabled.
+Calling this request without an
 argument toggles the warning message; calling it with an argument
 enables the warning and sets the limit to \fIN\fR (default scale m).
 .pg
