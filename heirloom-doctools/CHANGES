@@ -67,6 +67,8 @@ Release ...
 * troff: The "\/" and "\," escape sequences have been added in very basic
   implementations for groff compatibility only; it is recommended that the
   ".kernpair" request is used instead.
+* [nt]roff: The "-mg" macro package has been added for improved support of
+  groff documents, preprocessors, and macro sets.
 * [nt]roff: Static limits on word and line size have been eliminated.
 * [nt]roff: The ".tm" and ".write" commands now discard formatted motion
   sequences.

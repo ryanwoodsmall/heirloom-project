@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.103 (gritter) 8/8/06
+.\" Sccsid @(#)doc.tr	1.104 (gritter) 8/8/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -147,6 +147,11 @@
 .ds TR; "\fItroff;\fR
 .ds NR: "\fInroff:\fR
 .ds TR: "\fItroff:\fR
+.ds GR "\fIgroff\fR
+.ds GR. "\fIgroff.\fR
+.ds GR, "\fIgroff,\fR
+.ds GR; "\fIgroff;\fR
+.ds GR: "\fIgroff:\fR
 .ds PS "\fRPostScript\fR
 .ds PDF "\s-1PDF\s+1
 .ds H
@@ -643,12 +648,12 @@ Many internal limitations of \*(TR have been removed;
 most notably, \*(TR can now set characters in fractional point sizes.
 .pg
 The \*(TR language has been extended
-similarly as in the \s-1GNU\s+1 version of \*[TR,] \fIgroff\fR\|\*u6\*d;
+similarly as in the \s-1GNU\s+1 version of \*[TR,] \*(GR\|\*u6\*d;
 for example,
 names of requests, macros, strings, number registers, and fonts
 can consist of more than two characters.
-However, \fIHeirloom\fR \*(TR is not generally compatible with \fIgroff,\fR
-although adaption of \fIgroff\fR documents is often possible.
+However, \fIHeirloom\fR \*(TR is not generally compatible with \*[GR,]
+although adaption of \*(GR documents is often possible.
 .pg
 As even the most basic printing devices
 are now capable of rastering \*(PS documents
@@ -1523,6 +1528,10 @@ Special Features for \*[PDF] Documents
 Output Language
 .mht s_device
 Device and Font Description Files
+.ds H A
+.nr p 0 1
+.mht A1
+\f(BIgroff\fP Compatibility
 .bp
 .nf
 .ft R
@@ -4369,7 +4378,7 @@ always a zero motion,
 that should be sufficient
 to separate a roman character
 from an immediately following italic character.
-Both exist for basic \fIgroff\fR\ [6] compatibility only.
+Both exist for basic \*(GR\|\*u6\*d compatibility only.
 It is recommended that the \T'kernpair'\fBkernpair\fR\T request
 is used for these purposes instead;
 it allows a more exact optical separation
@@ -6074,6 +6083,84 @@ the value of \fBunitwidth\fR.
 Point sizes are scaled linearly and rounded, so the width of \fBa\fR
 will be 44 at size 10, 40 at size 9, 35 at size 8,
 and so on.
+.ds H A
+.nr p 0 1
+.mha A1
+\f(BIgroff\fP Compatibility
+.pg
+Heirloom \*(TR provides most of the extensions
+to the \*(TR language introduced in \*(GR\|\*u6\*d.
+Consequently, it is often possible
+to create documents and macro sets that can be used with both
+Heirloom \*(TR and \*[GR.]
+It must be noted, though,
+that many of the requests concerning font handling are different;
+moreover, even when using the same \*(PS fonts and spacing settings,
+Heirloom \*(TR and \*(GR will break lines at different points.
+Thus it is to be expected that the formatted output will be different
+even with identical input
+that uses only functions available in both implementations.
+.pg
+As an aid in formatting documents
+that had originally been written with \*(GR in mind,
+Heirloom \*(TR provides the \fB\-mg\fR compatibility macro package.
+Specifically:
+.de ip
+.in \w'\(en\ 'u
+.ti 0
+.xx
+\(en\ \c
+..
+.ip
+\*(TR is operated in \T'c_extension'extension level\T 3.
+.ip
+The number register \fB&g\fR is set to 1
+to claim \*(GR compatibility for macros and preprocessors.
+.ip
+The locale is set to \fBen_US\fR;
+this assumes that input to \*(GR is conventionally
+in the \s-1ISO-8859-1\s0 encoding.
+(If necessary, the locale can be changed later again.)
+.ip
+There is no point in providing \*(GR\fI's\fR compatibility mode
+to traditional \*[TR,]
+thus no attempt has been made to support it.
+.ip
+The macro package uses the \T'tm'\fBtm\fR\T function
+to print a message when an unsupported \*(GR request is encountered.
+.ip
+A basic emulation of the \*(GR \fBfam\fR request is provided,
+but the \fB\eF\fR escape sequence is not supported.
+The concept of a ``font family'' in \*(GR does not match
+the concept of direct font support in Heirloom \*[TR;]
+serious use of custom fonts requires custom macros.
+.ip
+\T'fallback'\fBfallback\fR\T is used to emulate \fBfspecial\fR,
+and \T'track'\fBtrack\fR\T is used to emulate \fBtkf\fR.
+While these requests are not completely compatible,
+the replacements should suffice for most applications.
+.ip
+\*(GR two-character names are mapped to \*(PS character names
+using the \T'char'\fBchar\fR\T request.
+.in 0
+.xx
+Notable remaining differences to \*(GR are:
+.ip
+The concept of an \fIinput level\fR
+regarding delimiters in escape sequences
+and macro arguments is not supported.
+.ip
+The control characters are recognized
+at the beginning of a line
+even if preceded by escape sequences
+that do not result in input characters,
+such as \T'e_f'\fB\ef\fR\T, \T'e_s'\fB\es\fR\T, or \T'e_;'\fB\e;\fR\T.
+.ip
+Diverted characters can be interpreted
+as control or escape characters.
+.ip
+The \T'c_width'\fIwidth\fR function (\(sc11.2)\T
+provides no information about glyph shapes.
 .rm EM
 .bp
 .\" from file m5

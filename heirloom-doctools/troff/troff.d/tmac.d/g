@@ -1,0 +1,233 @@
+.\"
+.\" Heirloom troff: groff compatibility macros
+.\"
+.\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
+.\"
+.\" Sccsid @(#)g	1.1 (gritter) 8/8/06
+.\"
+.do xflag 3
+.nr .g 1
+.warn +escape
+.lc_ctype en_US
+.de cp
+..
+.de not_available
+.	tm request ".\\$0" not available in Heirloom troff; line \\n(.c
+..
+.als backtrace not_available
+.als box not_available
+.als boxa not_available
+.als cflags not_available
+.als color not_available
+.als defcolor not_available
+.als hla not_available
+.als hpf not_available
+.als hpfa not_available
+.als hpfcode not_available
+.als hym not_available
+.als hys not_available
+.als linetabs not_available
+.als mso not_available
+.als nroff not_available
+.als pnr not_available
+.als ptr not_available
+.als pvs not_available
+.als rj not_available
+.als sizes not_available
+.als special not_available
+.als sty not_available
+.als trf not_available
+.als trin not_available
+.als trnt not_available
+.als troff not_available
+.als warnscale not_available
+.als writem not_available
+.de dei
+.de \*[\\$1] \*[\\$2]
+..
+.de ami
+.am \*[\\$1] \*[\\$2]
+..
+.als am1 am
+.als de1 de
+.als as1 as
+.als ds1 ds
+.de fam
+.	if '\\$1'T' \{\
+.		fp 1 R T
+.		fp 2 I I
+.		fp 3 B B
+.		fp 4 BI BI
+.		return
+.	\}
+.	if '\\$1'H' \{\
+.		fp 1 R H
+.		fp 2 I HI
+.		fp 3 B HB
+.		fp 4 BI HX
+.		return
+.	\}
+.	if '\\$1'C' \{\
+.		fp 1 R C
+.		fp 2 I CI
+.		fp 3 B CB
+.		fp 4 BI CX
+.		return
+.	\}
+.	tm font family \\$1 not available; line \\n(.c
+..
+.als fallback fspecial
+.als tkf track
+.if t \{\
+.	char \(%0 \[perthousand]
+.	char \('A \[Aacute]
+.	char \('E \[Eacute]
+.	char \('I \[Iacute]
+.	char \('O \[Oacute]
+.	char \('U \[Uacute]
+.	char \('Y \[Yacute]
+.	char \('a \[aacute]
+.	char \('e \[eacute]
+.	char \('i \[iacute]
+.	char \('o \[oacute]
+.	char \('u \[uacute]
+.	char \('y \[yacute]
+.	char \(+f \[phi1]
+.	char \(+p \[omega1]
+.	char \(,C \[Ccedilla]
+.	char \(,c \[ccedilla]
+.	char \(.i \[dotlessi]
+.	char \(/L \[Lslash]
+.	char \(/O \[Oslash]
+.	char \(/_ \[angle]
+.	char \(/l \[lslash]
+.	char \(/o \[oslash]
+.	char \(3d \[therefore]
+.	char \(:A \[Adieresis]
+.	char \(:E \[Edieresis]
+.	char \(:I \[Idieresis]
+.	char \(:O \[Odieresis]
+.	char \(:U \[Udieresis]
+.	char \(:Y \[Ydieresis]
+.	char \(:a \[adieresis]
+.	char \(:e \[edieresis]
+.	char \(:i \[idieresis]
+.	char \(:o \[odieresis]
+.	char \(:u \[udieresis]
+.	char \(:y \[ydieresis]
+.	char \(AE \[AE]
+.	char \(AN \[logicaland]
+.	char \(Ah \[aleph]
+.	char \(Bq \[quotedblbase]
+.	char \(CL \[club]
+.	char \(Cs \[currency]
+.	char \(DI \[diamond]
+.	char \(Do \[dollar]
+.	char \(Eu \[Euro]
+.	char \(Fc \[guillemotright]
+.	char \(Fn \[florin]
+.	char \(Fo \[guillemotleft]
+.	char \(HE \[heart]
+.	char \(Im \[Ifraktur]
+.	char \(OE \[OE]
+.	char \(OR \[logicalor]
+.	char \(Of \[ordfeminine]
+.	char \(Om \[ordmasculine]
+.	char \(Po \[sterling]
+.	char \(Re \[Rfraktur]
+.	char \(S2 \[twosuperior]
+.	char \(S3 \[threesuperior]
+.	char \(SP \[spade]
+.	char \(Sd \[eth]
+.	char \(TP \[Thorn]
+.	char \(Tp \[thorn]
+.	char \(Ye \[yen]
+.	char \(^A \[Acircumflex]
+.	char \(^E \[Ecircumflex]
+.	char \(^I \[Icircumflex]
+.	char \(^O \[Ocircumflex]
+.	char \(^U \[Ucircumflex]
+.	char \(^a \[acircumflex]
+.	char \(^e \[ecircumflex]
+.	char \(^i \[icircumflex]
+.	char \(^o \[ocircumflex]
+.	char \(^u \[ucircumflex]
+.	char \(`A \[Agrave]
+.	char \(`E \[Egrave]
+.	char \(`I \[Igrave]
+.	char \(`O \[Ograve]
+.	char \(`U \[Ugrave]
+.	char \(`a \[agrave]
+.	char \(`e \[egrave]
+.	char \(`i \[igrave]
+.	char \(`o \[ograve]
+.	char \(`u \[ugrave]
+.	char \(a" \[hungarumlaut]
+.	char \(a. \[dotaccent]
+.	char \(a^ \[circumflex]
+.	char \(ab \[breve]
+.	char \(ac \[cedilla]
+.	char \(ad \[dieresis]
+.	char \(ae \[ae]
+.	char \(ah \[caron]
+.	char \(an \[arrowhorizex]
+.	char \(ao \[ring]
+.	char \(aq \[quotesingle]
+.	char \(at \[at]
+.	char \(a~ \[tilde]
+.	char \(a‐ \[macron]
+.	char \(bq \[quotesinglbase]
+.	char \(c* \[circlemultiply]
+.	char \(c+ \[circleplus]
+.	char \(cq \[quoteright]
+.	char \(dA \[arrowdbldown]
+.	char \(eu \[official]
+.	char \(f/ \[fraction]
+.	char \(fc \[guilsinglright]
+.	char \(fo \[guilsinglleft]
+.	char \(hA \[arrowdblboth]
+.	char \(ha \[asciicircum]
+.	char \(ho \[ogonek]
+.	char \(lA \[arrowdblleft]
+.	char \(lB \[bracketleft]
+.	char \(lC \[braceleft]
+.	char \(la \[angleleft]
+.	char \(lq \[quotedblleft]
+.	char \(lz \[lozenge]
+.	char \(mc \[mu]
+.	char \(md \[dotmath]
+.	char \(oA \[Aring]
+.	char \(oa \[aring]
+.	char \(oe \[oe]
+.	char \(oq \[quoteleft]
+.	char \(pc \[periodcentered]
+.	char \(r! \[exclamdown]
+.	char \(r? \[questiondown]
+.	char \(rA \[arrowdblright]
+.	char \(rB \[bracketright]
+.	char \(rC \[braceright]
+.	char \(ra \[angleright]
+.	char \(rq \[quotedblright]
+.	char \(sd \[second]
+.	char \(sh \[numbersign]
+.	char \(ss \[germandbls]
+.	char \(st \[suchthat]
+.	char \[t+-] \[plusminus]
+.	char \[tdi] \[divide]
+.	char \(tf \[therefore]
+.	char \(ti \[asciitilde]
+.	char \[tmu] \[multiply]
+.	char \(uA \[arrowdblup]
+.	char \(vS \[Scaron]
+.	char \(vZ \[Zcaron]
+.	char \(vs \[scaron]
+.	char \(vz \[zcaron]
+.	char \(wp \[weierstrass]
+.	char \(~A \[Atilde]
+.	char \(~N \[Ntilde]
+.	char \(~O \[Otilde]
+.	char \(~a \[atilde]
+.	char \(~n \[ntilde]
+.	char \(~o \[otilde]
+.	char \(‐D \[Eth]
+.\}
