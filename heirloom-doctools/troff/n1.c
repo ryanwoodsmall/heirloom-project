@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.98 (gritter) 8/7/06
+ * Sccsid @(#)n1.c	1.99 (gritter) 8/8/06
  */
 
 /*
@@ -97,6 +97,8 @@ char	*cfname[NSO+1];		/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
 static int	cfpid[NSO+1];	/* .pso process IDs */
 char	*progname;	/* program name (troff) */
+static tchar	stopchar;
+static jmp_buf	Zjmp;
 #ifdef	EUC
 char	mbbuf1[MB_LEN_MAX + 1];
 char	*mbbuf1p = mbbuf1;
@@ -112,6 +114,7 @@ static char	*sprintn(char *s, long n, int b);
 static void	vfdprintf(int fd, const char *fmt, va_list ap);
 static tchar	setyon(void);
 static void	_setenv(void);
+static tchar	setZ(void);
 
 #ifdef	DEBUG
 int	debug = 0;	/*debug flag*/
@@ -950,8 +953,8 @@ initg(void)
 	memcpy(gchtab, _gchtab, sizeof _gchtab);
 }
 
-tchar
-getch(void)
+static tchar
+_getch(void)
 {
 	register int	k;
 	register tchar i, j;
@@ -1019,7 +1022,7 @@ g0:
 			if (k == fc || k == tabch || k == ldrch) {
 				if ((i = setfield(k)) == 0)
 					goto g0; 
-				else 
+				else
 					return(i);
 			}
 			if (k == '\b') {
@@ -1283,6 +1286,10 @@ gx:
 		if (xflag)
 			setr();
 		goto g0;
+	case 'Z':
+		if (xflag && (j = setZ()) != 0)
+			return(j);
+		goto g0;
 	case ';':	/* ligature suppressor (only) */
 		if (xflag)
 			goto g0;
@@ -1293,6 +1300,17 @@ gx:
 	dfl:	return(j);
 	}
 	/* NOTREACHED */
+}
+
+tchar
+getch(void)
+{
+	tchar	c;
+
+	c = _getch();
+	if (stopchar && !fmtchar && (nlflg || cbits(c) == cbits(stopchar)))
+		longjmp(Zjmp, cbits(c));
+	return(c);
 }
 
 void
@@ -2084,21 +2102,23 @@ casechar(int flag)
 		return;
 	}
 	clonef--;
-	if (skip(1))
-		return;
-	if (cbits(c = getch()) != '"')
-		ch = c;
 	size = 10;
 	tp = malloc(size * sizeof *tp);
 	i = 0;
-	while (c = getch(), !nlflg) {
-		if (i + 3 >= size) {
-			size += 10;
-			tp = realloc(tp, size * sizeof *tp);
+	if (skip(0))
+		tp[i++] = FILLER;
+	else {
+		if (cbits(c = getch()) != '"')
+			ch = c;
+		while (c = getch(), !nlflg) {
+			if (i + 3 >= size) {
+				size += 10;
+				tp = realloc(tp, size * sizeof *tp);
+			}
+			tp[i++] = c;
 		}
-		tp[i++] = c;
+		tp[i++] = XFUNC;	/* escape a possible \ at the end */
 	}
-	tp[i++] = XFUNC;	/* escape a possible \ at the end */
 	tp[i++] = '\n';
 	tp[i] = 0;
 	free(chartab[k]);
@@ -2139,45 +2159,29 @@ caserchar(void)
 	} while (!skip(0));
 }
 
-tchar
-setchar(tchar c)
+struct fmtchar {
+	struct d	newd, *savedip;
+	struct env	saveev;
+	int	savvflag;
+	int	savvpt;
+	tchar	*csp;
+	int	charcount;
+};
+
+static int
+prepchar(struct fmtchar *fp)
 {
 	static int	charcount;
-	struct env	saveev;
-	struct d	newd, *savedip;
-	int	savxflag;
-	int	saveschar;
-	int	savvflag;
 	filep	startb;
-	tchar	*csp, t;
-	int	k = cbits(c);
+	tchar	t;
 
-#ifndef	NROFF
-	if (fchartab[k] && onfont(c))
-		return c;
-#endif
-	if (iszbit(c))
-		return c;
 	if ((startb = alloc()) == 0) {
 		errprint("out of space");
-		return ' ';
+		return -1;
 	}
-	fmtchar++;
-	savxflag = xflag;
-	xflag = 3;
-	savvflag = vflag;
-	vflag = 0;
-	saveschar = eschar;
-	eschar = '\\';
 	t = 0;
 	setsbits(t, charcount);
 	charcount = sbits(t);
-	csp = chartab[k];
-	chartab[k] = NULL;
-	saveev = env;
-	evc(&env, &env);
-	in = in1 = 0;
-	fi = 0;
 	if (dip != d)
 		wbt(0);
 	if (charcount >= charoutsz) {
@@ -2185,16 +2189,75 @@ setchar(tchar c)
 		charout = realloc(charout, charoutsz * sizeof *charout);
 	}
 	memset(&charout[charcount], 0, sizeof *charout);
-	savedip = dip;
-	memset(&newd, 0, sizeof newd);
-	dip = &newd;
+	fp->savedip = dip;
+	memset(&fp->newd, 0, sizeof fp->newd);
+	dip = &fp->newd;
 	offset = dip->op = startb;
+	charout[charcount].op = startb;
+	fp->savvflag = vflag;
+	vflag = 0;
+	fp->savvpt = vpt;
+	vpt = 0;
+	fp->saveev = env;
+	evc(&env, &env);
+	in = in1 = 0;
+	fi = 0;
+	return charcount++;
+}
+
+static void
+restchar(struct fmtchar *fp, int keepf)
+{
+	wbt(0);
+	dip = fp->savedip;
+	offset = dip->op;
+	free(env._line);
+	free(env._word);
+	free(env._hcode);
+	if (keepf) {
+		fp->saveev._apts = apts;
+		fp->saveev._apts1 = apts1;
+		fp->saveev._pts = pts;
+		fp->saveev._pts1 = pts1;
+		fp->saveev._font = font;
+		fp->saveev._font1 = font1;
+		fp->saveev._chbits = chbits;
+		fp->saveev._spbits = spbits;
+	}
+	env = fp->saveev;
+	vflag = fp->savvflag;
+	vpt = fp->savvpt;
+}
+
+tchar
+setchar(tchar c)
+{
+	struct fmtchar	f;
+	int	k = cbits(c);
+	tchar	*csp;
+	int	charcount;
+	int	savxflag;
+	int	saveschar;
+
+#ifndef	NROFF
+	if (fchartab[k] && onfont(c))
+		return c;
+#endif
+	if (iszbit(c))
+		return c;
+	if ((charcount = prepchar(&f)) < 0)
+		return ' ';
+	fmtchar++;
+	savxflag = xflag;
+	xflag = 3;
+	saveschar = eschar;
+	eschar = '\\';
+	csp = chartab[k];
+	chartab[k] = NULL;
 	pushback(csp);
 	text();
 	tbreak();
 	nlflg = 0;
-	wbt(0);
-	charout[charcount].op = startb;
 	charout[charcount].ch = c;
 	if (iszbit(c))
 		charout[charcount].width = 0;
@@ -2203,18 +2266,38 @@ setchar(tchar c)
 		width(' ' | sfmask(c));
 		charout[charcount].width += lasttrack;
 	}
-	dip = savedip;
-	offset = dip->op;
-	free(env._line);
-	free(env._word);
-	free(env._hcode);
-	env = saveev;
+	restchar(&f, 0);
 	chartab[k] = csp;
 	eschar = saveschar;
 	xflag = savxflag;
-	vflag = savvflag;
 	fmtchar--;
-	return mkxfunc(CHAR, charcount++);
+	return mkxfunc(CHAR, charcount);
+}
+
+static tchar
+setZ(void)
+{
+	struct fmtchar	f;
+	int	charcount;
+	int	c;
+
+	if (stopchar) {
+		errprint("nested \\Z sequences not allowed");
+		return 0;
+	}
+	if ((charcount = prepchar(&f)) < 0)
+		return 0;
+	stopchar = getch();
+	charout[charcount].ch = FILLER | sfmask(stopchar);
+	if ((c = setjmp(Zjmp)) == 0)
+		text();
+	if (c != cbits(stopchar))
+		nodelim(stopchar);
+	tbreak();
+	charout[charcount].ch = 0;
+	restchar(&f, 1);
+	stopchar = 0;
+	return mkxfunc(CHAR, charcount);
 }
 
 tchar

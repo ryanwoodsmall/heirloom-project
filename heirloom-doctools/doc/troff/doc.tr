@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.102 (gritter) 8/7/06
+.\" Sccsid @(#)doc.tr	1.103 (gritter) 8/8/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -92,7 +92,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/7/06
+.ds Sccsdate 8/8/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1807,10 +1807,11 @@ T}	\T'e_s'Point-size change function\T
 \T'e_X'10.7\T	\T'e_X'\fB\eX\fI\'string\'\fR\T	\T'e_X'Output \fIstring\fP as device control function\T
 \T'e_Y'10.7\T	\T'e_Y'\fB\eY\fIx\fR,\fB\eY(\fIxx\fR,\fB\eY[\fIxxx\fB]\fR\T	\T'e_Y'Output contents of macro \fIx\fP, \fIxx\fR, or \fIxxx\fR\T as device control function
 \T'e_z'12.2\T	\T'e_z'\fB\ez\fIc\fR\T	\T'e_z'Print \fIc\fR with zero width (without spacing)\T
+\T'e_Z'12.2\T	\T'e_Z'\fB\eZ\fI\'string\'\fR\T	\T'e_Z'Print \fIstring\fR with zero width and height\T
 \T'e_{'16\T	\T'e_{'\fB\e{\fR\T	\T'e_{'Begin conditional input\T
 \T'e_}'16\T	\T'e_}'\fB\e}\fR\T	\T'e_}'End conditional input\T
 \T'e_newline'10.7\T	\T'e_newline'\fB\e\fR(newline)\T	\T'e_newline'Concealed (ignored) newline\T
-\(en	\fB\e\fIZ\fR	\fIZ\fR, any character \fInot\fR listed above
+\(en	\fB\e\fIc\fR	\fIc\fR, any character \fInot\fR listed above
 .TE
 .fi
 .sp
@@ -1833,6 +1834,8 @@ and
 \fB\T'e_newline'\e\fR(newline)\T are interpreted
 in \T'copy mode'\fIcopy mode\fR (\(sc7.2).\T
 .sp
+.nr nosave 1
+.ne 6
 .ft B
 Predefined General Number Registers
 .br
@@ -1867,6 +1870,8 @@ Reference	Name	Description
 \(en	\fByr\fR	Current year minus 1900.
 .TE
 .sp
+.nr nosave 1
+.ne 6
 .ft B
 Predefined Read-Only Number Registers
 .ft R
@@ -4209,7 +4214,7 @@ when the request is processed.
 Whenever \fIc\fR occurs in regular (not copy mode) later,
 a temporary copy of the current environment is created,
 the escape character is temporarily set to \e,
-and \fIstring\fR is output to an unnamed diversion.
+and \fIstring\fR is output in nofill mode to an unnamed diversion.
 If \fIc\fR itself occurs in \fIstring\fR,
 no recursive substitution takes place,
 but the plain character \fIc\fR is selected instead.
@@ -4427,7 +4432,7 @@ As examples,
 \fB\eo\'e\e\'\'\fR produces \fB\o'e\''\fR, and
 \fB\eo\'\e(mo\e(sl\'\fR produces \fB\o'\(mo\(sl'\fR.
 .sc
-Zero-width characters.
+Zero-width characters and strings.
 The function \A'e_z'\fB\ez\fIc\fR will output \fIc\fR without spacing over
 it, and can be used to produce left-aligned overstruck
 combinations.
@@ -4435,6 +4440,10 @@ As examples,
 \fB\ez\e(ci\e(pl\fR will produce \fB\z\(ci\(pl\fR, and
 \fB\e(br\ez\e(rn\e(ul\e(br\fR will produce the smallest possible
 constructed box \fB\(br\z\(rn\(ul\(br\fR\|.
+.pg
+The function \A'e_Z'\fB\eZ\fI'string'\fR
+prints \fIstring\fR in nofill mode
+and restores the horizontal and vertical position afterwards.
 .sc
 Large Brackets.
 The Special Font contains a number of bracket construction pieces
