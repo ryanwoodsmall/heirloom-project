@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.100 (gritter) 8/7/06
+.\" Sccsid @(#)doc.tr	1.101 (gritter) 8/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -2021,6 +2021,8 @@ Type\ 1/OpenType/TrueType font selection using \T'fp'\fBfp\fR\T.
 Since the \T'do'\fBdo\fR\T request
 is not available at this level,
 it is not possible to change to another extension level again.
+It is most useful to print unmaintained documents
+for which any adaption would be too tedious.
 .lv
 1\ enables extensions except for direct access to long names,
 i.e., \fB&abcde\fR will be interpreted
@@ -2200,6 +2202,8 @@ or ignoring scaling indicators if \fIc\fR is omitted)
 may be used.
 Except where controlled by parentheses, evaluation of expressions is left-to-right;
 there is no operator precedence.
+Spaces are ignored if they occur within parentheses;
+any other non-numeric character terminates the expression.
 In the case of certain requests, an initial \fB\(pl\fR or \fB\(mi\fR is stripped
 and interpreted as an increment or decrement indicator respectively.
 In the presence of default scaling, the desired scale indicator must be

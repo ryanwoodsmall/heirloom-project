@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t8.c	1.7 (gritter) 2/13/06
+ * Sccsid @(#)t8.c	1.8 (gritter) 8/7/06
  */
 
  /* t8.c: write out one line of output table */
@@ -166,7 +166,7 @@ for(c=0; c<ncol; c++)
 						if (cmidx)
 							fprintf(tabout, "-((\\n(#-u-\\n(^%cu)/2u)", c+'a');
 						vct++;
-						fprintf(tabout, "'");
+						fprintf(tabout, ")'");
 						exvspen=1;
 						}
 					}
@@ -217,7 +217,7 @@ for(c=0; c<ncol; c++)
 				if (cmidx)
 					fprintf(tabout, "-((\\n(#-u-\\n(^%cu)/2u)", c+'a');
 				vct++;
-				fprintf(tabout, "'");
+				fprintf(tabout, ")'");
 				}
 			}
 		fprintf(tabout, "%c", F1);
@@ -243,7 +243,7 @@ for(c=0; c<ncol; c++)
 			if (cmidx)
 				fprintf(tabout, "-((\\n(#-u-\\n(^%cu)/2u)", c+'a');
 			vct++;
-			fprintf(tabout, "'");
+			fprintf(tabout, ")'");
 			}
 		}
 	else

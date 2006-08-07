@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.45 (gritter) 8/7/06
+ * Sccsid @(#)n4.c	1.48 (gritter) 8/7/06
  */
 
 /*
@@ -620,6 +620,35 @@ abc0(int i, int (*f)(tchar))
 }
 
 static int	illscale;
+static int	parlevel;
+static int	whitexpr;
+
+static tchar
+agetch(void)
+{
+	tchar	c;
+
+	for (;;) {
+		c = getch();
+		if (xflag == 0 || parlevel == 0 || cbits(c) != ' ')
+			break;
+		whitexpr++;
+	}
+	return c;
+}
+
+static void
+ckpl(void)
+{
+	if (xflag && warn & WARN_SYNTAX) {
+		if (parlevel > 0)
+			errprint("missing ')'");
+		if (parlevel < 0)
+			errprint("excess ')'");
+		if (whitexpr && parlevel)
+			nonumb = 1;
+	}
+}
 
 
 int
@@ -647,6 +676,7 @@ _atoi(int flt)
 	int	c;
 
 	illscale = 0;
+	whitexpr = parlevel = 0;
 	n = _atoi0(flt);
 	c = cbits(ch);
 	if (nonumb && c && c != ' ' && c != '\n' && c != RIGHT &&
@@ -655,7 +685,8 @@ _atoi(int flt)
 			errprint("illegal number, char %c", c);
 		else
 			errprint("illegal number");
-	}
+	} else
+		ckpl();
 	if (flt) {
 		if (!nonumb && (n.f<0 && n.f<FLT_MIN || n.f>0 && n.f>FLT_MAX)) {
 			if (warn & WARN_NUMBER)
@@ -679,7 +710,9 @@ atoi0(void)
 {
 	struct acc	a;
 
+	whitexpr = parlevel = 0;
 	a = _atoi0(0);
+	ckpl();
 	return a.n;
 }
 
@@ -688,7 +721,9 @@ atof0(void)
 {
 	struct acc	a;
 
+	whitexpr = parlevel = 0;
 	a = _atoi0(0);
+	ckpl();
 	return a.f;
 }
 
@@ -705,7 +740,7 @@ _atoi0(int flt)
 	cnt = -1;
 a0:
 	cnt++;
-	ii = getch();
+	ii = agetch();
 	c = cbits(ii);
 	switch (c) {
 	default:
@@ -860,8 +895,10 @@ a0:
 		acc.f = acc.n = flt ? i.f != acc.f : i.n != acc.n;
 		goto a0;
 	case ')': 
+		parlevel--;
 		break;
 	case '(':
+		parlevel++;
 		acc = _atoi0(flt);
 		goto a0;
 	}
@@ -875,9 +912,10 @@ ckph(int flt)
 	register tchar i;
 	struct acc	j;
 
-	if (cbits(i = getch()) == '(')
+	if (cbits(i = agetch()) == '(') {
+		parlevel++;
 		j = _atoi0(flt);
-	else {
+	} else {
 		j = atoi1(i, flt);
 	}
 	return(j);
@@ -901,16 +939,16 @@ atoi1(register tchar ii, int flt)
 		default:
 			break;
 		case '+':
-			ii = getch();
+			ii = agetch();
 			continue;
 		case '-':
 			neg = 1;
-			ii = getch();
+			ii = agetch();
 			continue;
 		case '|':
 			abs = 1 + neg;
 			neg = 0;
-			ii = getch();
+			ii = agetch();
 			continue;
 		}
 		break;
@@ -939,7 +977,7 @@ a1:
 		goto a1;
 	}
 	e = 1;
-	if (xflag && (i == 'e' || i == 'E')) {
+	if (xflag && digits && (i == 'e' || i == 'E')) {
 		if ((i = cbits(ii = getch())) == '+')
 			j = 1;
 		else if (i == '-')
@@ -960,7 +998,7 @@ a1:
 		if (j < 0)
 			e = 1/e;
 	}
-	if (!xflag && !field) {
+	if ((!xflag || !parlevel) && !field) {
 		ch = ii;
 		goto a2;
 	}
