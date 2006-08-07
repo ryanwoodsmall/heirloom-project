@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.97 (gritter) 8/7/06
+ * Sccsid @(#)n1.c	1.98 (gritter) 8/7/06
  */
 
 /*
@@ -1033,6 +1033,7 @@ g0:
 		}
 		return(i);
 	}
+ge:
 	k = cbits(j = getch0());
 	if (ismot(j))
 		return(j);
@@ -1180,11 +1181,10 @@ gx:
 		if ((i = setuc()) == 0 && !tryglf)
 			goto g0;
 		return(i);
-	case 'E':	/* printable version of current eschar */
+	case 'E':	/* eschar out of copy mode */
 		if (xflag == 0)
 			goto dfl;
-		i = PRESC;
-		goto gx;
+		goto ge;
 	}
 	if (tryglf) {
 		pbbuf[pbp++] = j;

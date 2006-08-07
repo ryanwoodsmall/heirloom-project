@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.101 (gritter) 8/7/06
+.\" Sccsid @(#)doc.tr	1.102 (gritter) 8/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1774,7 +1774,7 @@ Reference	Sequence	Meaning
 \T'e_d'11.1\T	\T'e_d'\fB\ed\fR\T	\T'e_d'Forward (down) 1/2\|em vertical motion (1/2 line in \*(NR)\T
 \T'e_D'12.5\T	\T'e_D'\fB\eD\fI\'c...\'\fR\T	\T'e_D'Draw graphics function \fIc\fP with parameters ...; \fIc\fP\^=\^\fBl\fR,\^\fBc\fR,\^\fBe\fR,\^\fBa\fP,\^\fB\(ap\fP\T
 \T'e_e'10.1\T	\T'e_e'\fB\ee\fR\T	\T'e_e'Printable version of the \fIcurrent\fR escape character.\T
-\T'e_E'10.1\T	\T'e_E'\fB\eE\fR\T	\T'e_E'Printable escape character, not interpreted in \fIcopy mode\fR.\T
+\T'e_E'10.1\T	\T'e_E'\fB\eE\fR\T	\T'e_E'Escape character, not interpreted in \fIcopy mode\fR.\T
 \T'e_f'2.2\T	\T'e_f'\fB\ef\fIx\fR,\fB\ef(\fIxx\fR,\fB\ef[\fIxxx\fB]\fR,\fB\ef\fIN\fR\T	\T'e_f'Change to font named \fIx\fR, \fIxx\fR, or \fIxxx\fR, or position \fIN\fR\T
 \T'e_g'8\T	\T'e_g'\fB\eg\fIx\fR,\fB\eg(\fIxx\fR,\fB\eg[\fIxxx\fB]\fR\T	\T'e_g'Format of number register \fIx\fP, \fIxx\fR, or \fIxxx\fR\T
 \T'e_h'11.1\T	\T'e_h'\fB\eh\fI\'N\'\fR\T	\T'e_h'Local horizontal motion; move right \fIN\fR \fI(negative left)\fR\T
@@ -1918,6 +1918,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.nhychar'13\T	\T'n_.nhychar'\fB&nhychar\fR\T	\T'n_.nhychar'Current hyphenation-inhibiting characters.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
+\T'n_.ps'2.3\T	\T'n_.ps'\fB&ps\fR\T	\T'n_.ps'Current point size in units.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
 \T'n_.shc'13\T	\T'n_.shc'\fB&shc\fR\T	\T'n_.shc'Current soft hyphenation character [sic].\T
 \T'n_.sentchar'4.1\T	\T'n_.sentchar'\fB&sentchar\fR\T	\T'n_.sentchar'Current sentence-ending characters [sic].\T
@@ -2481,12 +2482,11 @@ The forms
 \fB\es[\fI\(+-nn\fB]\fR, and \fB\es\fI\(+-\fB[\fInn\fB]\fR
 permit specification of sizes that would otherwise be ambiguous.
 .pg
-The current size is available in the \A'n_.s'\fB.s\fR register.
+The current size (in points) is available in the \A'n_.s'\fB&s\fR register.
 Note that this may be a decimal fraction
 if the current point size is not an integer.
-Since standard number registers cannot hold decimal
-fractions, point sizes should be saved and restored as follows:
-\fB&nr \fIos\fB \en(.sp\fR ... \fB&ps \en(\fIos\fBu\fR.
+The \A'n_.ps'\fB&ps\fR register
+stores the current size in units.
 \*(NR ignores type size control.
 .pg
 The function \A'e_H'\fB\eH\fI\'\(+-N'\fR
@@ -4016,8 +4016,11 @@ and all that has been said about the default \fB\e\fR becomes true
 for the new escape character.
 \A'e_e'\fB\ee\fR can be used to print whatever the current escape character is;
 this escape sequence is interpreted in \T'copy mode'\fIcopy mode\fR.\T
-\A'e_E'\fB\eE\fR prints the current escape character
-but is not interpreted in \T'copy mode'\fIcopy mode\fR.\T
+\A'e_E'\fB\eE\fR evaluates to the current escape character
+but is not interpreted in \T'copy mode'\fIcopy mode\fR;\T
+if it is put into a string or macro,
+it will introduce an escape sequence
+once the string is printed or the macro is executed, respectively.
 \T'ecs'\fBecs\fR\T and \T'ecr'\fBecr\fR\T
 save and restore the escape character.
 If necessary or convenient, the escape mechanism
