@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.85 (gritter) 8/6/06
+ * Sccsid @(#)n7.c	1.86 (gritter) 8/7/06
  */
 
 /*
@@ -1363,6 +1363,8 @@ g1:		nexti = GETCH();
 		tp = *transch ? transch : transchar;
 		while (sp[0] != IMP && wp >= word) {
 			j = cbits(*wp--);
+			if (istrans(wp[1]))
+				goto cont;
 			for (k = 0; tp[0] != IMP && tp[k] && k < NSENT; k++)
 				if (j == tp[k])
 					goto cont;

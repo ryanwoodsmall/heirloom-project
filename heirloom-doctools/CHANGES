@@ -53,6 +53,11 @@ Release ...
 * [nt]roff: In extension level 1, long string "\*[xxx]", register "\n[xxx]",
   and font "\f[xxx]" names are no longer recognized unless they are on a
   line beginning with the ".do" request.
+* [nt]roff: The "\)" escape sequence (like "\&" but transparent for
+  sentence ending) has been added.
+* troff: The "\/" and "\," escape sequences have been added in very basic
+  implementations for groff compatibility only; it is recommended that the
+  ".kernpair" request is used instead.
 * [nt]roff: Static limits on word and line size have been eliminated.
 * [nt]roff: The ".tm" and ".write" commands now discard formatted motion
   sequences.

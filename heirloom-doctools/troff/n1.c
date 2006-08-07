@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.96 (gritter) 8/7/06
+ * Sccsid @(#)n1.c	1.97 (gritter) 8/7/06
  */
 
 /*
@@ -1084,6 +1084,11 @@ g0:
 	case '&':	/* filler */
 		i = FILLER;
 		goto gx;
+	case ')':	/* transparent filler */
+		if (xflag == 0)
+			break;
+		i = FILLER|TRANBIT;
+		goto gx;
 	case 'c':	/* to be continued */
 		i = CONT;
 		goto gx;
@@ -1236,10 +1241,23 @@ gx:
 	case '0':	/* number space */
 		return(makem(width('0' | chbits)));
 #ifdef NROFF
+	case '/':
+	case ',':
+		if (xflag == 0)
+			goto dfl;
+		goto g0;
 	case '|':
 	case '^':
 		goto g0;
 #else
+	case '/':	/* italic correction */
+		if (xflag == 0)
+			goto dfl;
+		return(makem((int)(EM)/12));	/* approximation */
+	case ',':	/* left italic correction */
+		if (xflag == 0)
+			goto dfl;
+		return(makem(0));	/* approximation */
 	case '|':	/* narrow space */
 		return(makem((int)(EM)/6));
 	case '^':	/* half narrow space */

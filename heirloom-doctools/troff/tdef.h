@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.112 (gritter) 8/7/06
+ * Sccsid @(#)tdef.h	1.113 (gritter) 8/7/06
  */
 
 /*
@@ -274,8 +274,11 @@ endif NROFF
 #define	COPYBIT		(01ULL << 30)	/* wide character in copy mode */
 #define	iscopy(n)	((n) & COPYBIT && !ismot(n) && cbits(n) & ~0177)
 #define	ADJBIT		(01ULL << 30)	/* adjusted space */
-#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0)
+#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0 \
+				&& cbits(n) != FILLER)
 #define	isadjmot(n)	((n) & ADJBIT && ismot(n))
+#define	TRANBIT		(01ULL << 30)	/* transparent filler */
+#define	istrans(n)	((n) & TRANBIT && cbits(n) == FILLER)
 #define	AUTOLIG		(01ULL << 29)	/* ligature substituted automatically */
 #define	islig(n)	((n) & AUTOLIG)
 #define	TAILBIT		(01ULL << 29)	/* tail recursion */
@@ -319,8 +322,11 @@ endif NROFF
 #define	COPYBIT	0x20000000	 /* wide character in copy mode */
 #define	iscopy(n)	((n) & COPYBIT && !ismot(n) && cbits(n) & ~0177)
 #define	ADJBIT	0x20000000	/* adjusted space */
-#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0)
+#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0 \
+				&& cbits(n) != FILLER)
 #define	isadjmot(n)	((n) & ADJBIT && ismot(n))
+#define	TRANBIT	0x20000000	/* transparent filler */
+#define	istrans(n)	((n) & TRANBIT && cbits(n) == FILLER)
 #define	TAILBIT	0x10000000	/* tail recursion */
 #define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (TAILBIT|'\n'))
 #define	ABSCHAR		0400	/* absolute char number in this font */
