@@ -54,6 +54,8 @@ Release ...
   and font "\f[xxx]" names are no longer recognized unless they are on a
   line beginning with the ".do" request.
 * [nt]roff: Static limits on word and line size have been eliminated.
+* [nt]roff: The ".tm" and ".write" commands now discard formatted motion
+  sequences.
 * troff: The ".psbb" request now reads a "%%HiResBoundingBox" DSC comment
   in preference to "%%BoundingBox"; the registers it assigns to are now
   floating-point registers.
