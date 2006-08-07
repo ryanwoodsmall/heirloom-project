@@ -50,6 +50,9 @@ Release ...
   have been added.
 * [nt]roff: The "\n[.ev]" number register has been added as a method to
   determine the name of the current environment.
+* [nt]roff: In extension level 1, long string "\*[xxx]", register "\n[xxx]",
+  and font "\f[xxx]" names are no longer recognized unless they are on a
+  line beginning with the ".do" request.
 * [nt]roff: Static limits on word and line size have been eliminated.
 * troff: The ".psbb" request now reads a "%%HiResBoundingBox" DSC comment
   in preference to "%%BoundingBox"; the registers it assigns to are now

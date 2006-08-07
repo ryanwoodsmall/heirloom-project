@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.97 (gritter) 8/7/06
+.\" Sccsid @(#)doc.tr	1.98 (gritter) 8/7/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -2014,18 +2014,23 @@ Four levels of extension availability are currently defined:
 .lv
 0\ disables all extensions except for locale-dependent input and
 Type\ 1/OpenType/TrueType font selection using \T'fp'\fBfp\fR\T.
+Since the \T'do'\fBdo\fR\T request
+is not available at this level,
+it is not possible to change to another extension level again.
 .lv
-1\ enables extensions except for direct access to long names on
-request lines, i.e., \fB&abcde\fR will be interpreted as request
-\T'ab'\fBab\fR\T with argument \fBcde\fR. Long names can be accessed using
-the \T'do'\fBdo\fR request\T, e.g. \fB&do papersize a4\fR. Long names in
-escape sequences are recognized, though, e.g. \fB\e*[xyz]\fR
-refers to the string named \fBxyz\fR and not to the string named
-\fB[\fR. It is normally the only relevant difference, so input
-written for traditional \*(TR can almost always be used
-without change in this mode. This level is the default.
+1\ enables extensions except for direct access to long names,
+i.e., \fB&abcde\fR will be interpreted
+as request \T'ab'\fBab\fR\T with argument \fBcde\fR,
+and \fB\e*[xyz]\fR refers to the string named \fB[\fR
+followed by the text \fBxyz]\fR.
+Long names can be accessed using the \T'do'\fBdo\fR request\T,
+e.g. \fB&do de abcde\fR, \fB&do if 1 \e*[xyz]\fR.
+This level is the default.
 .lv
-2\ also enables direct access to long names on request lines.
+2\ enables direct access to long names
+on request lines and escape sequences,
+i.e., \fB&abcde\fR will be interpreted as macro \fBabcde\fR,
+and \fB\e*[xyz]\fR refers to the string named \fBxyz\fR.
 If an undefined long name is read, its first two characters
 are interpreted as a short request using the remaining
 characters as argument. So if a macro \fBabcde\fR is defined,
@@ -2041,7 +2046,7 @@ references in any position of a name.
 .in 0
 .pg
 .lg 0
-It is recommended to execute \fB&do xflag 3\fR in the first line of new
+It is recommended to execute \fB&do xflag 3\fR at the beginning of new
 .lg
 \*(TR programs that need not rely on any existing code.
 .sc
