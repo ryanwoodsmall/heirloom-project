@@ -3,12 +3,13 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g	1.1 (gritter) 8/8/06
+.\" Sccsid @(#)g	1.2 (gritter) 8/8/06
 .\"
 .do xflag 3
 .nr .g 1
 .warn +escape
 .lc_ctype en_US
+.hylang en_US
 .de cp
 ..
 .de not_available
