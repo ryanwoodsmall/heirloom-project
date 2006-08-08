@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.99 (gritter) 8/8/06
+ * Sccsid @(#)n1.c	1.101 (gritter) 8/8/06
  */
 
 /*
@@ -97,8 +97,6 @@ char	*cfname[NSO+1];		/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
 static int	cfpid[NSO+1];	/* .pso process IDs */
 char	*progname;	/* program name (troff) */
-static tchar	stopchar;
-static jmp_buf	Zjmp;
 #ifdef	EUC
 char	mbbuf1[MB_LEN_MAX + 1];
 char	*mbbuf1p = mbbuf1;
@@ -953,8 +951,8 @@ initg(void)
 	memcpy(gchtab, _gchtab, sizeof _gchtab);
 }
 
-static tchar
-_getch(void)
+tchar
+getch(void)
 {
 	register int	k;
 	register tchar i, j;
@@ -1300,17 +1298,6 @@ gx:
 	dfl:	return(j);
 	}
 	/* NOTREACHED */
-}
-
-tchar
-getch(void)
-{
-	tchar	c;
-
-	c = _getch();
-	if (stopchar && !fmtchar && (nlflg || cbits(c) == cbits(stopchar)))
-		longjmp(Zjmp, cbits(c));
-	return(c);
 }
 
 void
@@ -2279,24 +2266,19 @@ setZ(void)
 {
 	struct fmtchar	f;
 	int	charcount;
-	int	c;
+	tchar	i;
 
-	if (stopchar) {
-		errprint("nested \\Z sequences not allowed");
+	if (ismot(i = getch()))
 		return 0;
-	}
 	if ((charcount = prepchar(&f)) < 0)
 		return 0;
-	stopchar = getch();
-	charout[charcount].ch = FILLER | sfmask(stopchar);
-	if ((c = setjmp(Zjmp)) == 0)
-		text();
-	if (c != cbits(stopchar))
-		nodelim(stopchar);
-	tbreak();
+	stopch = i;
+	charout[charcount].ch = FILLER | sfmask(stopch);
+	text();
+	if (nlflg)
+		nodelim(stopch);
 	charout[charcount].ch = 0;
 	restchar(&f, 1);
-	stopchar = 0;
 	return mkxfunc(CHAR, charcount);
 }
 
