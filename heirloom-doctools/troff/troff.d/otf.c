@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.56 (gritter) 6/24/06
+ * Sccsid @(#)otf.c	1.57 (gritter) 8/8/06
  */
 
 #include <stdio.h>
@@ -1728,6 +1728,23 @@ get_INDEX(long *op)
 }
 
 static void
+get_bb(int gid, int B[4])
+{
+	int	k, o;
+
+	if (pos_loca < 0 || pos_glyf < 0)
+		return;
+	o = table_directories[pos_loca].offset;
+	k = indexToLocFormat ? pbe32(&contents[o+4*gid]) :
+		pbe16(&contents[o+2*gid]) * 2;
+	o = table_directories[pos_glyf].offset;
+	B[0] = (int16_t)pbe16(&contents[o+k+2]);
+	B[1] = (int16_t)pbe16(&contents[o+k+4]);
+	B[2] = (int16_t)pbe16(&contents[o+k+6]);
+	B[3] = (int16_t)pbe16(&contents[o+k+8]);
+}
+
+static void
 onechar(int gid, int sid)
 {
 	long	o;
@@ -1759,6 +1776,8 @@ onechar(int gid, int sid)
 			tp = afmmapname(N, a->spec);
 		} else
 			tp = 0;
+		if (ttf)
+			get_bb(gid, B);
 		afmaddchar(a, gid, tp, 0, w, B, N, a->spec, gid);
 	}
 	gid2sid[gid] = sid;

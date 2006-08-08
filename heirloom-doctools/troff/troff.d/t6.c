@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.160 (gritter) 8/7/06
+ * Sccsid @(#)t6.c	1.161 (gritter) 8/8/06
  */
 
 /*
@@ -93,6 +93,8 @@ struct box	mediasize, bleedat, trimat, cropat;
 int	psmaxcode;
 struct ref	*anchors, *links;
 static int	_minflg;
+static int	_rst;
+static int	_rsb;
 
 static void	kernsingle(int **);
 static int	_ps2cc(const char *name, int create);
@@ -106,6 +108,8 @@ width(register tchar j)
 	minflg = minspc = 0;
 	lasttrack = 0;
 	rawwidth = 0;
+	if (setwdf)
+		_rst = _rsb = 0;
 	if (isadjspc(j))
 		return(0);
 	if (j & (ZBIT|MOT)) {
@@ -189,8 +193,9 @@ getcw(register int i)
 	register int	x, j;
 	int nocache = 0;
 	int	ofont = xfont;
-	int	s;
-	float	z = 1;
+	int	s, t;
+	float	z = 1, zv;
+	struct afmtab	*a;
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
@@ -208,6 +213,7 @@ getcw(register int i)
 		} else
 			j = spacesz;
 		k = (fontab[xfont][0] * j + 6) / 12;
+		_rst = _rsb = 0;
 		/* this nonsense because .ss cmd uses 1/36 em as its units */
 		/* and default is 12 */
 		goto g1;
@@ -254,27 +260,46 @@ getcw(register int i)
 					k = *(p + j);
 					if (xfont == sbold)
 						bd = bdtab[ii];
-					if (setwdf)
+					if (setwdf) {
 						numtab[CT].val |= kerntab[ii][j];
+						if (afmtab &&
+						    (t=fontbase[ii]->afmpos-1)>=0) {
+							a = afmtab[t];
+							if (a->bbtab[j]) {
+								_rst = a->bbtab[j][3];
+								_rsb = a->bbtab[j][1];
+							}
+						}
+					}
 					goto g1;
 				}
 			}
 		}
 		k = fontab[xfont][0];	/* leave a space-size space */
+		_rst = _rsb = 0;
 		goto g1;
 	}
  g0:
 	p = fontab[xfont];
-	if (setwdf)
-		numtab[CT].val |= kerntab[ofont][j];
+	if (setwdf) {
+		numtab[CT].val |= kerntab[xfont][j];
+		if (afmtab && (t = fontbase[xfont]->afmpos-1) >= 0) {
+			a = afmtab[t];
+			if (a->bbtab[j]) {
+				_rst = a->bbtab[j][3];
+				_rsb = a->bbtab[j][1];
+			}
+		}
+	}
 	k = *(p + j);
 	if (dev.anysize == 0 || xflag == 0 || (z = zoomtab[xfont]) == 0)
 		z = 1;
+ g1:
+	zv = z;
 	if (horscale) {
 		z *= horscale;
 		nocache = 1;
 	}
- g1:
 	if (!bd)
 		bd = bdtab[ofont];
 	if (cs = cstab[ofont]) {
@@ -286,6 +311,10 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = (k * z * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+	if (setwdf) {
+		_rst = (_rst * zv * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+		_rsb = (_rsb * zv * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+	}
 	rawwidth = k;
 	s = xpts;
 	lasttrack = 0;
@@ -976,6 +1005,7 @@ setwd(void)
 	register tchar i;
 	int	delim, emsz, k;
 	int	savhp, savapts, savapts1, savfont, savfont1, savpts, savpts1;
+	int	rst = 0, rsb = 0;
 
 	base = numtab[ST].val = numtab[ST].val = wid = numtab[CT].val = 0;
 	if (ismot(i = getch()))
@@ -1008,10 +1038,16 @@ setwd(void)
 			numtab[SB].val = base;
 		if ((k = base + emsz) > numtab[ST].val)
 			numtab[ST].val = k;
+		if (_rst > rst)
+			rst = _rst;
+		if (_rsb < rsb)
+			rsb = _rsb;
 	}
 	if (cbits(i) != delim)
 		nodelim(delim);
 	setn1(wid, 0, (tchar) 0);
+	setnr("rst", rst, 0);
+	setnr("rsb", rsb, 0);
 	numtab[HP].val = savhp;
 	apts = savapts;
 	apts1 = savapts1;
@@ -2070,9 +2106,7 @@ casehidechar(void)
 void
 casefzoom(void)
 {
-	char	*buf = NULL, *bp;
-	int	c, i, j;
-	int	n = 0, sz = 0;
+	int	i, j;
 	float	f;
 
 	if (skip(1))
@@ -2081,20 +2115,13 @@ casefzoom(void)
 	if ((j = findft(i, 1)) < 0)
 		return;
 	skip(1);
-	do {
-		c = getach();
-		if (n >= sz)
-			buf = realloc(buf, (sz += 8) * sizeof *buf);
-		buf[n++] = c;
-	} while (c);
-	f = strtod(buf, &bp);
-	if (*bp == '\0' && f >= 0) {
+	f = atof();
+	if (!nonumb && f >= 0) {
 		zoomtab[j] = f;
 		zapwcache(0);
-		if (realpage && j == xfont)
+		if (realpage && j == xfont && !ascii)
 			ptps();
 	}
-	free(buf);
 }
 
 double

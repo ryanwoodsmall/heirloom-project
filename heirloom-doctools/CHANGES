@@ -55,6 +55,9 @@ Release ...
   have been added.
 * [nt]roff: The "\n[.ev]" number register has been added as a method to
   determine the name of the current environment.
+* troff: The "\n[rst]" and "\n[rsb]" registers are set by the width function
+  to the highest and lowest extent of the bounding box of any character.
+  This currently only works for Type 1 and TrueType fonts.
 * [nt]roff: In extension level 1, long string "\*[xxx]", register "\n[xxx]",
   and font "\f[xxx]" names are no longer recognized unless they are on a
   line beginning with the ".do" request.
