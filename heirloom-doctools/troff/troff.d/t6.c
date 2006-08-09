@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.161 (gritter) 8/8/06
+ * Sccsid @(#)t6.c	1.162 (gritter) 8/9/06
  */
 
 /*
@@ -1979,8 +1979,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	memcpy(fontab[nf], a->fontab, a->nchars * sizeof *fontab[nf]);
 	memcpy(kerntab[nf], a->kerntab, a->nchars * sizeof *kerntab[nf]);
 	memcpy(codetab[nf], a->codetab, a->nchars * sizeof *codetab[nf]);
-	memcpy(fitab[nf], a->fitab, (128-32+nchtab+psmaxcode+1) *
-			sizeof *fitab[nf]);
+	memcpy(fitab[nf], a->fitab, a->fichars * sizeof *fitab[nf]);
 	bdtab[nf] = cstab[nf] = ccstab[nf] = 0;
 	zoomtab[nf] = 0;
 	fallbacktab[nf] = NULL;
