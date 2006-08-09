@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.52 (gritter) 8/9/06
+ * Sccsid @(#)n4.c	1.53 (gritter) 8/9/06
  */
 
 /*
@@ -102,8 +102,11 @@ grownumtab(void)
 	return numtab;
 }
 
-void
-setn(void)
+#define	TMYES	if (tm) return(1)
+#define	TMNO	if (tm) return(0)
+
+static int
+_setn(int tm)	/* tm: test for presence of readonly register */
 {
 	extern const char	revision[];
 	char	tb[20], *cp;
@@ -115,6 +118,10 @@ setn(void)
 	float	fl;
 
 	f = nform = 0;
+	if (tm) {
+		i = tm;
+		goto sl;
+	}
 	if ((i = cbits(ii = getach())) == '+')
 		f = 1;
 	else if (i == '-')
@@ -124,7 +131,8 @@ setn(void)
 	if (falsef)
 		f = 0;
 	if ((i = getsn()) == 0)
-		return;
+		return(0);
+sl:
 	name = macname(i);
 	if (i < 65536 && (i & 0177) == '.')
 		switch (i >> BYTE) {
@@ -216,14 +224,16 @@ setn(void)
 			i = NN - regcnt;	
 			break;
 		case 'z': 
+			TMYES;
 			cpushback(macname(dip->curd));
-			return;
+			return(0);
 		case 'b': 
 			i = bdtab[font];
 			break;
 		case 'F':
+			TMYES;
 			cpushback(cfname[ifi] ? cfname[ifi] : "");
-			return;
+			return(0);
 		case 'X':
 			if (xflag) {
 				i = xflag;
@@ -232,8 +242,9 @@ setn(void)
 			/*FALLTHRU*/
 		case 'Y':
 			if (xflag) {
+				TMYES;
 				cpushback((char *)revision);
-				return;
+				return(0);
 			}
 			/*FALLTHRU*/
 
@@ -282,17 +293,20 @@ setn(void)
 		else if (strcmp(&name[1], "lc_ctype") == 0) {
 			if ((cp = setlocale(LC_CTYPE, NULL)) == NULL)
 				cp = "C";
+			TMYES;
 			cpushback(cp);
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "hylang") == 0) {
+			TMYES;
 			if (hylang)
 				cpushback(hylang);
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "fzoom") == 0) {
 			i = fl = getfzoom();
 			if (i != fl)
 				goto flt;
 		} else if (strcmp(&name[1], "sentchar") == 0) {
+			TMYES;
 			if (sentch[0] == IMP)
 				/*EMPTY*/;
 			else if (sentch[0] == 0)
@@ -304,9 +318,10 @@ setn(void)
 				tc[i] = 0;
 				pushback(tc);
 			}
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "transchar") == 0) {
 			tchar	tc[NSENT+1];
+			TMYES;
 			if (transch[0] == IMP)
 				/*EMPTY*/;
 			else if (transch[0] == 0) {
@@ -320,9 +335,10 @@ setn(void)
 				tc[i] = 0;
 				pushback(tc);
 			}
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "breakchar") == 0) {
 			tchar	tc[NSENT+1];
+			TMYES;
 			if (breakch[0] == IMP)
 				/*EMPTY*/;
 			else if (breakch[0] == 0) {
@@ -336,9 +352,10 @@ setn(void)
 				tc[i] = 0;
 				pushback(tc);
 			}
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "nhychar") == 0) {
 			tchar	tc[NSENT+1];
+			TMYES;
 			if (nhych[0] == IMP)
 				/*EMPTY*/;
 			else if (nhych[0] == 0) {
@@ -354,19 +371,24 @@ setn(void)
 				tc[i] = 0;
 				pushback(tc);
 			}
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "shc") == 0) {
 			tchar	tc[2];
+			TMYES;
 			tc[0] = shc ? shc : HYPHEN;
 			tc[1] = 0;
 			pushback(tc);
-			return;
+			return(0);
 		} else if (strcmp(&name[1], "ev") == 0) {
+			TMYES;
 			cpushback(evname ? evname : "0");
-			return;
-		} else if (strcmp(&name[1], "ps") == 0)
+			return(0);
+		} else if (strcmp(&name[1], "ps") == 0) {
 			i = pts;
-		else if (strcmp(&name[1], "ce") == 0)
+#ifdef	NROFF
+			i *= INCH / 72;
+#endif	/* NROFF */
+		} else if (strcmp(&name[1], "ce") == 0)
 			i = ce;
 		else if (strcmp(&name[1], "rj") == 0)
 			i = rj;
@@ -374,9 +396,13 @@ setn(void)
 			goto s0;
 	} else {
 s0:
-		if ((j = _findr(i, 1, 1)) == -1)
+		TMNO;
+		if ((j = _findr(i, 1, 2)) == -1)
 			i = 0;
-		else if (numtab[j].fmt == -1) {
+		else if (j < 0) {
+			i = -j;
+			goto sl;
+		} else if (numtab[j].fmt == -1) {
 			fl = numtab[j].fval = (numtab[j].fval+numtab[j].finc*f);
 			goto flt;
 		} else {
@@ -384,11 +410,20 @@ s0:
 			nform = numtab[j].fmt;
 		}
 	}
+	TMYES;
 	setn1(i, nform, (tchar) 0);
-	return;
+	return(0);
 flt:
+	TMYES;
 	roff_sprintf(tb, "%g", fl);
 	cpushback(tb);
+	return(0);
+}
+
+void
+setn(void)
+{
+	_setn(0);
 }
 
 tchar	numbuf[17];
@@ -474,7 +509,13 @@ _findr(register int i, int rd, int aln)
 		return(-1);
 	for (p = nhash[h]; p; p = p->link)
 		if (i == p->r) {
-			if (aln && p->aln)
+			if (p->aln < 0) {
+				if (aln > 1)
+					return(p->aln);
+				else if (aln)
+					continue;
+			}
+			if (aln && p->aln > 0)
 				return(p->aln - 1);
 			return(p - numtab);
 		}
@@ -508,7 +549,13 @@ _usedr (	/* returns -1 if nr i has never been used */
 		return(-1);
 	for (p = nhash[NHASH(i)]; p; p = p->link)
 		if (i == p->r) {
-			if (aln && p->aln)
+			if (p->aln < 0) {
+				if (aln > 1)
+					return(p->aln);
+				else if (aln)
+					continue;
+			}
+			if (aln && p->aln > 0)
 				return(p->aln - 1);
 			return(p - numtab);
 		}
@@ -1389,12 +1436,26 @@ casealn(void)
 	if (skip(1))
 		return;
 	j = getrq(1);
-	if ((r = findr(i)) < 0 || (o = findr(j)) < 0)
+	if (((o = _usedr(j, 2)) < 0)) {
+		if (o < -1)
+			/*EMPTY*/;
+		else if (_setn(j))
+			o = -j;
+		else {
+			if (warn & WARN_REG)
+				errprint("no such register %s", macname(j));
+			return;
+		}
+	}
+	if ((r = findr(i)) < 0)
 		return;
-	numtab[r].aln = o + 1;
-	if (numtab[o].nlink == 0)
-		numtab[o].nlink = 1;
-	numtab[o].nlink++;
+	if (o >= 0) {
+		numtab[r].aln = o + 1;
+		if (numtab[o].nlink == 0)
+			numtab[o].nlink = 1;
+		numtab[o].nlink++;
+	} else
+		numtab[r].aln = o;
 }
 
 
