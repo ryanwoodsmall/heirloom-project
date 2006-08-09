@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.54 (gritter) 8/9/06
+ * Sccsid @(#)n4.c	1.55 (gritter) 8/9/06
  */
 
 /*
@@ -700,7 +700,9 @@ atoi()
 {
 	struct acc	a;
 
+	lgf++;
 	a = _atoi(0);
+	lgf--;
 	return a.n;
 }
 
@@ -709,7 +711,9 @@ atof()
 {
 	struct acc	a;
 
+	lgf++;
 	a = _atoi(1);
+	lgf--;
 	return a.f;
 }
 
@@ -765,7 +769,9 @@ atoi0(void)
 	struct acc	a;
 
 	whitexpr = parlevel = 0;
+	lgf++;
 	a = _atoi0(0);
+	lgf--;
 	return a.n;
 }
 
@@ -775,7 +781,9 @@ atof0(void)
 	struct acc	a;
 
 	whitexpr = parlevel = 0;
+	lgf++;
 	a = _atoi0(0);
+	lgf--;
 	return a.f;
 }
 
@@ -1312,6 +1320,7 @@ setr(void)
 	lgf++;
 	termc = getach();
 	j = getrq(3);
+	lgf--;
 	if ((i = findr(j)) == -1 || skip(1))
 		return;
 	j = inumb(&numtab[i].val);
@@ -1499,6 +1508,7 @@ _inumb(int *n, float *fp, int flt)
 	register tchar ii;
 
 	f = 0;
+	lgf++;
 	if (n) {
 		if ((j = cbits(ii = getch())) == '+')
 			f = 1;
@@ -1508,6 +1518,7 @@ _inumb(int *n, float *fp, int flt)
 			ch = ii;
 	}
 	i = _atoi(flt);
+	lgf--;
 	if (n && f)
 		i.n = *n + f * i.n;
 	if (fp && f && flt)
