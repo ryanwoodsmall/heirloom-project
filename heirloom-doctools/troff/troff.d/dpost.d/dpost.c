@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.150 (gritter) 7/29/06
+ * Sccsid @(#)dpost.c	1.151 (gritter) 8/9/06
  */
 
 /*
@@ -1474,6 +1474,7 @@ conv(
 		    }
 		    switch ((c=getc(fp))) {
 			case 'p':	/* draw a path */
+			case 'P':	/* should be solid */
 			    while (fscanf(fp, "%d %d", &n, &m) == 2)
 				drawline(n, m);
 			    lineno++;
@@ -1486,11 +1487,13 @@ conv(
 			    break;
 
 			case 'c':	/* circle */
+			case 'C':	/* should be filled */
 			    fscanf(fp, "%d", &n);
 			    drawcirc(n);
 			    break;
 
 			case 'e':	/* ellipse */
+			case 'E':	/* should be filled */
 			    fscanf(fp, "%d %d", &m, &n);
 			    drawellip(m, n);
 			    break;
@@ -1508,6 +1511,18 @@ conv(
 
 			case '~':	/* wiggly line */
 			    drawspline(fp, 2);
+			    lineno++;
+			    break;
+
+			case 't':	/* set line width, ignore */
+			    fscanf(fp, "%d %d", &m, &n);
+			    hgoto(hpos + m);
+			    lineno++;
+			    break;
+
+			case 'F':	/* color scheme, ignore */
+			case 'f':	/* filling color, ignore */
+			    fgets(str, sizeof str, fp);
 			    lineno++;
 			    break;
 

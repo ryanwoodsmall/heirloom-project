@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.88 (gritter) 8/9/06
+ * Sccsid @(#)n7.c	1.89 (gritter) 8/9/06
  */
 
 /*
@@ -95,6 +95,8 @@ int	brflg;
 static tchar	adjbit(tchar);
 #ifndef	NROFF
 #define	nroff		0
+extern int	lastrst;
+extern int	lastrsb;
 static void	setlhang(tchar);
 static void	setrhang(void);
 static void	letshrink(void);
@@ -102,6 +104,8 @@ static int	letgrow(void);
 static int	lspcomp(int);
 #else	/* NROFF */
 #define	nroff		1
+#define	lastrst		0
+#define	lastrsb		0
 #define	setlhang(a)
 #define	setrhang()
 #define	storelsp(a, b)
@@ -340,6 +344,8 @@ text(void)
 			continue;
 		spcnt++;
 		widthp = xflag ? width(i) : sps;
+		cht = lastrst;
+		cdp = -lastrsb;
 		numtab[HP].val += widthp;
 		lasti = i;
 	}
@@ -456,6 +462,8 @@ nofill(void)
 		}
 		j = width(i);
 		widthp = j;
+		cht = lastrst;
+		cdp = -lastrsb;
 		numtab[HP].val += j;
 		storeline(i, j);
 		oev = ev;
@@ -1172,6 +1180,7 @@ getword(int x)
 				w = width(i);
 			} else
 				w = sps;
+			cht = cdp = 0;
 			storeword(i, w);
 			numtab[HP].val += w;
 			if (!isadjspc(j)) {
@@ -1235,6 +1244,7 @@ a0:
 		t = ' ' | chbits;
 		w = sps;
 	}
+	cdp = cht = 0;
 	storeword(t, w + k);
 	if (spflg) {
 		if (xflag == 0 || ses != 0)
@@ -1412,6 +1422,8 @@ s1:
 	if (w == -1)
 		w = width(c);
 	widthp = w;
+	cht = lastrst;
+	cdp = -lastrsb;
 	wne += w;
 	*wordp++ = c;
 	wch++;

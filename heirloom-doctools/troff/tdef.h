@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.116 (gritter) 8/9/06
+ * Sccsid @(#)tdef.h	1.117 (gritter) 8/9/06
  */
 
 /*
@@ -750,6 +750,8 @@ struct acc {
 #define	nhcode	env._nhcode
 #define	shc	env._shc
 #define	stopch	env._stopch
+#define	cht	env._cht
+#define	cdp	env._cdp
 #define	hyptr	env._hyptr
 #define	tabtab	env._tabtab
 #define	line	env._line
@@ -868,6 +870,8 @@ extern struct env {
 	int	_nhcode;
 	int	_shc;
 	tchar	_stopch;
+	int	_cht;
+	int	_cdp;
 	tchar	*_hyptr[NHYP];
 	int	_tabtab[NTAB];
 	int	_sentch[NSENT];

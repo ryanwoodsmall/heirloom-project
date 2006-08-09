@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.130 (gritter) 8/9/06
+ * Sccsid @(#)n3.c	1.131 (gritter) 8/9/06
  */
 
 /*
@@ -928,8 +928,13 @@ _collect(int termc)
 			ch = i;
 		while (1) {
 			i = getch();
-			if (termc && i == termc)
+			if (termc && i == termc) {
+				if (nsp >= asp)
+					savnxf->argsp = realloc(savnxf->argsp,
+						++asp * sizeof *savnxf->argsp);
+				savnxf->argsp[nsp++] = 0;
 				goto rtn;
+			}
 			if (nlflg || (!quote && cbits(i) == ' '))
 				break;
 			if (   quote

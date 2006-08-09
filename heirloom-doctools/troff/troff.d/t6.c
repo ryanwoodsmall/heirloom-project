@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.163 (gritter) 8/9/06
+ * Sccsid @(#)t6.c	1.164 (gritter) 8/9/06
  */
 
 /*
@@ -93,8 +93,8 @@ struct box	mediasize, bleedat, trimat, cropat;
 int	psmaxcode;
 struct ref	*anchors, *links;
 static int	_minflg;
-static int	_rst;
-static int	_rsb;
+int	lastrst;
+int	lastrsb;
 
 static void	kernsingle(int **);
 static int	_ps2cc(const char *name, int create);
@@ -108,8 +108,7 @@ width(register tchar j)
 	minflg = minspc = 0;
 	lasttrack = 0;
 	rawwidth = 0;
-	if (setwdf)
-		_rst = _rsb = 0;
+	lastrst = lastrsb = 0;
 	if (isadjspc(j))
 		return(0);
 	if (j & (ZBIT|MOT)) {
@@ -213,7 +212,7 @@ getcw(register int i)
 		} else
 			j = spacesz;
 		k = (fontab[xfont][0] * j + 6) / 12;
-		_rst = _rsb = 0;
+		lastrst = lastrsb = 0;
 		/* this nonsense because .ss cmd uses 1/36 em as its units */
 		/* and default is 12 */
 		goto g1;
@@ -266,8 +265,8 @@ getcw(register int i)
 						    (t=fontbase[ii]->afmpos-1)>=0) {
 							a = afmtab[t];
 							if (a->bbtab[j]) {
-								_rst = a->bbtab[j][3];
-								_rsb = a->bbtab[j][1];
+								lastrst = a->bbtab[j][3];
+								lastrsb = a->bbtab[j][1];
 							}
 						}
 					}
@@ -276,7 +275,7 @@ getcw(register int i)
 			}
 		}
 		k = fontab[xfont][0];	/* leave a space-size space */
-		_rst = _rsb = 0;
+		lastrst = lastrsb = 0;
 		goto g1;
 	}
  g0:
@@ -286,8 +285,8 @@ getcw(register int i)
 		if (afmtab && (t = fontbase[xfont]->afmpos-1) >= 0) {
 			a = afmtab[t];
 			if (a->bbtab[j]) {
-				_rst = a->bbtab[j][3];
-				_rsb = a->bbtab[j][1];
+				lastrst = a->bbtab[j][3];
+				lastrsb = a->bbtab[j][1];
 			}
 		}
 	}
@@ -311,10 +310,8 @@ getcw(register int i)
 		cs = (cs * EMPTS(x)) / 36;
 	}
 	k = (k * z * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
-	if (setwdf) {
-		_rst = (_rst * zv * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
-		_rsb = (_rsb * zv * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
-	}
+	lastrst = (lastrst * zv * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+	lastrsb = (lastrsb * zv * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
 	rawwidth = k;
 	s = xpts;
 	lasttrack = 0;
@@ -760,7 +757,7 @@ findft(register int i, int required)
 
 	if ((k = i - '0') >= 0 && k <= nfonts && k < smnt && fontbase[k])
 		return(k);
-	for (k = 0; fontlab[k] != i; k++)
+	for (k = 0; k > nfonts || fontlab[k] != i; k++)
 		if (k > nfonts) {
 			mn = macname(i);
 			if ((k = strtol(mn, &mp, 10)) >= 0 && *mp == 0 &&
@@ -1038,10 +1035,10 @@ setwd(void)
 			numtab[SB].val = base;
 		if ((k = base + emsz) > numtab[ST].val)
 			numtab[ST].val = k;
-		if (_rst > rst)
-			rst = _rst;
-		if (_rsb < rsb)
-			rsb = _rsb;
+		if (lastrst > rst)
+			rst = lastrst;
+		if (lastrsb < rsb)
+			rsb = lastrsb;
 	}
 	if (cbits(i) != delim)
 		nodelim(delim);
