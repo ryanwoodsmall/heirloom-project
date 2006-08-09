@@ -3,7 +3,7 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g	1.4 (gritter) 8/9/06
+.\" Sccsid @(#)g	1.5 (gritter) 8/9/06
 .\"
 .do xflag 3
 .nr .g 1
@@ -33,7 +33,6 @@
 .als pnr not_available
 .als ptr not_available
 .als pvs not_available
-.als rj not_available
 .als sizes not_available
 .als special not_available
 .als sty not_available
