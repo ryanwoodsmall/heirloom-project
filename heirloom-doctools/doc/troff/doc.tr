@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.105 (gritter) 8/8/06
+.\" Sccsid @(#)doc.tr	1.106 (gritter) 8/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -92,7 +92,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/8/06
+.ds Sccsdate 8/9/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1207,6 +1207,8 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'ce'\fB&ce\fI|N\fR	off	\fIN\(eq\fR1	B,E	Center following \fIN\fR input text lines.\T
 .b1
+\T'rj'\fB&rj\fI|N\fR	off	\fIN\(eq\fR1	B,E	Right-align following \fIN\fR input text lines.\T
+.b1
 \T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
 \T'letadj'\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.\T
@@ -1670,6 +1672,7 @@ Device and Font Description Files
 \T'recursionlimit'recursionlimit	7\T
 \T'return'return	7\T
 \T'rhang'rhang	4\T
+\T'rj'rj	4\T
 \T'rm'rm	7\T
 \T'rn'rn	7\T
 \T'rnn'rnn	8\T
@@ -1907,6 +1910,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.breakchar'13\T	\T'n_.breakchar'\fB&breakchar\fR\T	\T'n_.breakchar'Current optional line break characters.\T
 \(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
+\T'n_.ce'4\T	\T'n_.ce'\fB&ce\fR\T	\T'n_.ce'Remaining number of lines to be centered.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
 \T'n_.ev'17\T	\T'n_.ev'\fB&ev\fR\T	\T'n_.ev'Name of current environment [sic].\T
 \T'n_.f'2.2\T	\T'n_.f'\fB&f\fR\T	\T'n_.f'Current font as physical quadrant (1-255).\T
@@ -1935,6 +1939,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
 \T'n_.ps'2.3\T	\T'n_.ps'\fB&ps\fR\T	\T'n_.ps'Current point size in units.\T
+\T'n_.rj'4\T	\T'n_.rj'\fB&rj\fR\T	\T'n_.rj'Remaining number of lines to be right-aligned.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
 \T'n_.shc'13\T	\T'n_.shc'\fB&shc\fR\T	\T'n_.shc'Current soft hyphenation character [sic].\T
 \T'n_.sentchar'4.1\T	\T'n_.sentchar'\fB&sentchar\fR\T	\T'n_.sentchar'Current sentence-ending characters [sic].\T
@@ -3104,6 +3109,18 @@ If \fIN\fR\(eq\^0, any residual count is cleared.
 A break occurs after each of the \fIN\fR input lines.
 If the input line is too long,
 it will be left adjusted.
+The number of lines to be right-aligned, if any,
+is set to zero.
+The remaining number of lines to be centered
+is available in the \A'n_.ce'\fB&ce\fR register.
+.bta rj
+\fB&rj\fI|N\fR	off	\fIN\fR\(eq1	B,E	Right-align the next \fIN\fR input text lines
+within the current (line-length minus indent);
+otherwise like \fBce\fR.
+The number of lines to be centered, if any,
+is set to zero.
+The remaining number of lines to be centered
+is available in the \A'n_.rj'\fB&rj\fR register.
 .bta minss
 \fB&minss\fI|N\fR	off	off	E,T	Minimum word space.
 When adjusting both margins,

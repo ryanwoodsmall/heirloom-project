@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.69 (gritter) 8/6/06
+ * Sccsid @(#)ext.h	1.70 (gritter) 8/9/06
  */
 
 /*
@@ -397,6 +397,7 @@ extern void	caseshc(void);
 extern int	max(int, int);
 extern int	min(int, int);
 extern void	casece(void);
+extern void	caserj(void);
 extern void	casein(void);
 extern void	casell(void);
 extern void	caselt(void);

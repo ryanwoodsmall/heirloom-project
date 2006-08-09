@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.72 (gritter) 8/7/06
+ * Sccsid @(#)n5.c	1.73 (gritter) 8/9/06
  */
 
 /*
@@ -318,8 +318,8 @@ min(int aa, int bb)
 }
 
 
-void
-casece(void)
+static void
+cerj(int dorj)
 {
 	register int i;
 
@@ -329,8 +329,28 @@ casece(void)
 	if (nonumb)
 		i = 1;
 	tbreak();
-	ce = i;
+	if (dorj) {
+		rj = i;
+		ce = 0;
+	} else {
+		ce = i;
+		rj = 0;
+	}
 	noscale = 0;
+}
+
+
+void
+casece(void)
+{
+	cerj(0);
+}
+
+
+void
+caserj(void)
+{
+	cerj(1);
 }
 
 

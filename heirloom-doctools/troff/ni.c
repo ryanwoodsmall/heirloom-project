@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.34 (gritter) 8/5/06
+ * Sccsid @(#)ni.c	1.35 (gritter) 8/9/06
  */
 
 /*
@@ -160,6 +160,7 @@ const struct contab initcontab[] = {
 	C(PAIR('n', 'e'), casene),
 	C(PAIR('n', 'f'), casenf),
 	C(PAIR('c', 'e'), casece),
+	C(PAIR('r', 'j'), caserj),
 	C(PAIR('f', 'i'), casefi),
 	C(PAIR('i', 'n'), casein),
 	C(PAIR('l', 'l'), casell),
@@ -321,6 +322,7 @@ struct	env env = {
 /* int	ul	 */	0,
 /* int	cu	 */	0,
 /* int	ce	 */	0,
+/* int	rj	 */	0,
 /* int	in	 */	0,
 /* int	in1	 */	0,
 /* int	un	 */	0,

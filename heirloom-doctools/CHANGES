@@ -44,6 +44,11 @@ Release ...
 * [nt]roff: The ".aln" request has been added to create an alias name
   for a number register.
 * [nt]roff: The ".rnn" request has been added to rename a number register.
+* [nt]roff: The ".rj" request (right-align next input lines) has been
+  added. The ".rj" number register that holds the number of remaining
+  lines to be right-adjusted has been added.
+* [nt]roff: The ".ce" number register that holds the number of remaining
+  lines to be centered with the ".ce" request has been added.
 * troff: The "\Yx", "\Y(xx", or "\Y[xxx]" escape sequence has been added
   to output the contents of the string or macro x, xx, or xxx, respectively,
   as a device control function.

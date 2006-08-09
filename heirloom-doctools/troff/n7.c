@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.87 (gritter) 8/8/06
+ * Sccsid @(#)n7.c	1.88 (gritter) 8/9/06
  */
 
 /*
@@ -95,11 +95,15 @@ int	brflg;
 static tchar	adjbit(tchar);
 #ifndef	NROFF
 #define	nroff		0
+static void	setlhang(tchar);
+static void	setrhang(void);
 static void	letshrink(void);
 static int	letgrow(void);
 static int	lspcomp(int);
 #else	/* NROFF */
 #define	nroff		1
+#define	setlhang(a)
+#define	setrhang()
 #define	storelsp(a, b)
 #define	storelsh(a, b)
 #define	letshrink()
@@ -315,7 +319,7 @@ text(void)
 		return;
 	}
 	setnel();
-	if (ce || !fi) {
+	if (ce || rj || !fi) {
 		nofill();
 		return;
 	}
@@ -379,25 +383,7 @@ t5:
 adj:
 	adsp = adrem = 0;
 	if (ad) {
-		if (!nroff && nc > 0) {
-			int	j;
-			c = 0;
-			for (j = nc - 1; j >= 0; j--)
-				if ((c = line[j-1]) != IMP)
-					break;
-			width(c);
-			j = lasttrack;
-			j += kernadjust(c, ' ' | sfmask(c));
-			if (admod != 1 && rhangtab != NULL && !ismot(c) &&
-					rhangtab[xfont] != NULL &&
-					(k = rhangtab[xfont][cbits(c)]) != 0) {
-				rhang = (k * u2pts(xpts) + (Unitwidth / 2))
-					/ Unitwidth;
-				j += rhang;
-			}
-			ne -= j;
-			nel += j;
-		}
+		setrhang();
 		if (admod == 0 && lspcur == 0 && lshcur == 0 &&
 				nel < 0 && lspnc)
 			letshrink();
@@ -452,14 +438,8 @@ nofill(void)
 		nwd = 10000;
 	}
 	nexti = GETCH();
-	if (!nroff && !ce && !pendnf && lhangtab != NULL &&
-			cbits(nexti) != SLANT && cbits(nexti) != XFUNC &&
-			!ismot(nexti) && lhangtab[fbits(nexti)] != NULL &&
-			(k = lhangtab[fbits(nexti)][cbits(nexti)]) != 0) {
-		width(nexti);	/* set xpts */
-		k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
-		storeline(makem(k), 0);
-	}
+	if (!ce && !rj && !pendnf)
+		setlhang(nexti);
 	while ((j = (cbits(i = nexti))) != '\n') {
 		if (stopch && j == cbits(stopch))
 			break;
@@ -491,6 +471,12 @@ nofill(void)
 		ce--;
 		if ((i = quant(nel / 2, HOR)) > 0)
 			un += i;
+	}
+	if (rj) {
+		rj--;
+		setrhang();
+		if (nel > 0)
+			un += nel;
 	}
 	if (!nc)
 		storeline((tchar)FILLER, 0);
@@ -896,16 +882,8 @@ movword(void)
 		wp--;
 		if (wp > wordp)
 			wne -= kernadjust(wp[-1], wp[0]);
-		if (!nroff && admod != 1 && admod != 2 && lhangtab != NULL &&
-				cbits(*wp) != XFUNC &&
-				cbits(*wp) != SLANT && !ismot(*wp) &&
-				lhangtab[fbits(*wp)] != NULL &&
-				(w = lhangtab[fbits(*wp)][cbits(*wp)]) != 0) {
-			width(*wp);	/* set xpts */
-			w = (w * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
-			nel -= w;
-			storeline(makem(w), 0);
-		}
+		if (admod != 1 && admod != 2)
+			setlhang(*wp);
 	}
 	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
 	   (!nwd || nel + lsplow + lshlow - adspc >
@@ -1530,6 +1508,47 @@ adjbit(tchar c)
 }
 
 #ifndef	NROFF
+static void
+setlhang(tchar c)
+{
+	int	k;
+
+	if (lhangtab != NULL && !ismot(c) && cbits(c) != SLANT &&
+			cbits(c) != XFUNC &&
+			lhangtab[fbits(c)] != NULL &&
+			(k = lhangtab[fbits(c)][cbits(c)]) != 0) {
+		width(c);	/* set xpts */
+		k = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+		nel -= k;
+		storeline(makem(k), 0);
+	}
+}
+
+static void
+setrhang(void)
+{
+	int	j, k;
+	tchar	c;
+
+	if (nc > 0) {
+		c = 0;
+		for (j = nc - 1; j >= 0; j--)
+			if ((c = line[j]) != IMP)
+				break;
+		width(c);
+		j = lasttrack;
+		j += kernadjust(c, ' ' | sfmask(c));
+		if (admod != 1 && rhangtab != NULL && !ismot(c) &&
+				rhangtab[xfont] != NULL &&
+				(k = rhangtab[xfont][cbits(c)]) != 0) {
+			rhang = (k * u2pts(xpts) + (Unitwidth / 2)) / Unitwidth;
+			j += rhang;
+		}
+		ne -= j;
+		nel += j;
+	}
+}
+
 static void
 letshrink(void)
 {
