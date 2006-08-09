@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.51 (gritter) 8/9/06
+ * Sccsid @(#)n4.c	1.52 (gritter) 8/9/06
  */
 
 /*
@@ -628,6 +628,7 @@ abc0(int i, int (*f)(tchar))
 static int	illscale;
 static int	parlevel;
 static int	whitexpr;
+static int	empty;
 
 static tchar
 agetch(void)
@@ -642,20 +643,6 @@ agetch(void)
 	}
 	return c;
 }
-
-static void
-ckpl(void)
-{
-	if (xflag && warn & WARN_SYNTAX) {
-		if (parlevel > 0)
-			errprint("missing ')'");
-		if (parlevel < 0)
-			errprint("excess ')'");
-		if (whitexpr && parlevel)
-			nonumb = 1;
-	}
-}
-
 
 int
 atoi()
@@ -683,16 +670,26 @@ _atoi(int flt)
 
 	illscale = 0;
 	whitexpr = parlevel = 0;
+	empty = 1;
 	n = _atoi0(flt);
 	c = cbits(ch);
-	if (nonumb && c && c != ' ' && c != '\n' && c != RIGHT &&
+	if (c == RIGHT) {
+		if (!empty && (nonumb || parlevel) && warn & WARN_RIGHT_BRACE)
+			errprint("\\} terminates numerical expression");
+	} else if (nonumb && c && c != ' ' && c != '\n' &&
 			warn & WARN_NUMBER && illscale == 0) {
 		if ((c & ~0177) == 0 && isprint(c))
 			errprint("illegal number, char %c", c);
 		else
 			errprint("illegal number");
-	} else
-		ckpl();
+	} else if (warn & WARN_SYNTAX) {
+		if (parlevel > 0)
+			errprint("missing ')'");
+		if (parlevel < 0)
+			errprint("excess ')'");
+		if (xflag && whitexpr && parlevel)
+			nonumb = 1;
+	}
 	if (flt) {
 		if (!nonumb && (n.f<0 && n.f<FLT_MIN || n.f>0 && n.f>FLT_MAX)) {
 			if (warn & WARN_NUMBER)
@@ -718,7 +715,6 @@ atoi0(void)
 
 	whitexpr = parlevel = 0;
 	a = _atoi0(0);
-	ckpl();
 	return a.n;
 }
 
@@ -729,7 +725,6 @@ atof0(void)
 
 	whitexpr = parlevel = 0;
 	a = _atoi0(0);
-	ckpl();
 	return a.f;
 }
 
@@ -1146,6 +1141,8 @@ aa:
 	}
 a2:
 	nonumb = !field;
+	if (empty)
+		empty = !field;
 	return(acc);
 }
 

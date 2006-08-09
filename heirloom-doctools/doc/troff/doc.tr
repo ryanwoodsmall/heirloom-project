@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.106 (gritter) 8/9/06
+.\" Sccsid @(#)doc.tr	1.107 (gritter) 8/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -5218,6 +5218,9 @@ Warn when an undefined number register is accessed.
 The number register will be set to zero immediately after
 the first access so this warning can be printed only
 once per register name.
+T}
+4096	right-brace	T{
+Warn when a \fB\e}\fR terminates a numerical expression.
 T}
 8192	missing	Warn when a required argument to a request is missing.
 16384	input	T{

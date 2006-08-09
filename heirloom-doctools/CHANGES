@@ -89,6 +89,9 @@ Release ...
   PostScript DSC input files.
 * nroff: The ".psbb" request has been made a no-op since nroff cannot
   otherwise handle EPS documents anyway.
+* [nt]roff: The "right-brace" warning category has been added.
+* [nt]roff: Calls of ".vs" that result in negative numbers are now
+  ignored.
 * [nt]roff: The "\(dq" character has been introduced as an alternate name
   for the ASCII double quote character.
 * tbl: When ending macros in generated code, ".00" is now used instead

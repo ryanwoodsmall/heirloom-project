@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.162 (gritter) 8/9/06
+ * Sccsid @(#)t6.c	1.163 (gritter) 8/9/06
  */
 
 /*
@@ -1659,6 +1659,11 @@ casevs(void)
 	i = inumb(&lss);
 	if (nonumb)
 		i = lss1;
+	if (xflag && i < 0) {
+		if (warn & WARN_RANGE)
+			errprint("negative vertical spacing ignored");
+		i = lss1;
+	}
 	if (i < VERT) 
 		i = VERT;
 	lss1 = lss;
