@@ -3,45 +3,11 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g	1.5 (gritter) 8/9/06
+.\" Sccsid @(#)g	1.6 (gritter) 8/9/06
 .\"
-.do xflag 3
-.nr .g 1
-.warn +escape
+.cp 0
 .lc_ctype en_US
 .hylang en_US
-.de cp
-..
-.de not_available
-.	tm request ".\\$0" not available in Heirloom troff; line \\n(.c
-..
-.als backtrace not_available
-.als box not_available
-.als boxa not_available
-.als cflags not_available
-.als color not_available
-.als defcolor not_available
-.als hla not_available
-.als hpf not_available
-.als hpfa not_available
-.als hpfcode not_available
-.als hym not_available
-.als hys not_available
-.als linetabs not_available
-.als mso not_available
-.als nroff not_available
-.als pnr not_available
-.als ptr not_available
-.als pvs not_available
-.als sizes not_available
-.als special not_available
-.als sty not_available
-.als trf not_available
-.als trin not_available
-.als trnt not_available
-.als troff not_available
-.als warnscale not_available
-.als writem not_available
 .de dei
 .de \*[\\$1] \*[\\$2]
 ..
@@ -52,32 +18,9 @@
 .als de1 de
 .als as1 as
 .als ds1 ds
-.de fam
-.	if '\\$1'T' \{\
-.		fp 1 R R
-.		fp 2 I I
-.		fp 3 B B
-.		fp 4 BI BI
-.		return
-.	\}
-.	if '\\$1'H' \{\
-.		fp 1 R H
-.		fp 2 I HI
-.		fp 3 B HB
-.		fp 4 BI HX
-.		return
-.	\}
-.	if '\\$1'C' \{\
-.		fp 1 R C
-.		fp 2 I CI
-.		fp 3 B CB
-.		fp 4 BI CX
-.		return
-.	\}
-.	tm font family \\$1 not available; line \\n(.c
-..
 .als fallback fspecial
 .als tkf track
+.rm ftr
 .if t \{\
 .	char \(%0 \[perthousand]
 .	char \('A \[Aacute]

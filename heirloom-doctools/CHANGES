@@ -4,8 +4,6 @@ Release ...
   contains the corresponding sequence has been output.
 * [nt]roff: The ".index" request has been added to determine the position
   of a string within a string or macro.
-* [nt]roff: The ".while", ".break", and ".continue" requests have been
-  added as another method to process input repeatedly.
 * [nt]roff: Floating-point registers have been introduced; they can be
   created and modified with the ".nrf" request and are otherwise like
   standard integer number registers, with which they share a common name
@@ -14,6 +12,12 @@ Release ...
   an expression with floating-point computation.
 * [nt]roff: Exponential notation, as in "1e+10", is now supported in
   numerical expressions.
+* [nt]roff: The ".cp" request has been added to control compatibility with
+  groff.
+* [nt]roff: The "-mg" macro package has been added for improved support of
+  groff documents, preprocessors, and macro sets.
+* [nt]roff: The ".while", ".break", and ".continue" requests have been
+  added as another method to process input repeatedly.
 * [nt]roff: Space characters inside parentheses in numerical expressions
   are now permissible, i.e. they are discarded and do not terminate the
   expression.
@@ -72,11 +76,6 @@ Release ...
   to a printable but to an effective escape character now.
 * [nt]roff: The "\)" escape sequence (like "\&" but transparent for
   sentence ending) has been added.
-* troff: The "\/" and "\," escape sequences have been added in very basic
-  implementations for groff compatibility only; it is recommended that the
-  ".kernpair" request is used instead.
-* [nt]roff: The "-mg" macro package has been added for improved support of
-  groff documents, preprocessors, and macro sets.
 * [nt]roff: Static limits on word and line size have been eliminated.
 * [nt]roff: The "\{", "\}", "\&", "\%", "\c", and "\(space)" escape
   sequences terminate two-character request names now.

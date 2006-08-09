@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.103 (gritter) 8/9/06
+ * Sccsid @(#)n1.c	1.104 (gritter) 8/9/06
  */
 
 /*
@@ -113,6 +113,8 @@ static void	vfdprintf(int fd, const char *fmt, va_list ap);
 static tchar	setyon(void);
 static void	_setenv(void);
 static tchar	setZ(void);
+static int	setgA(void);
+static int	setgB(void);
 
 #ifdef	DEBUG
 int	debug = 0;	/*debug flag*/
@@ -423,6 +425,7 @@ init2(void)
 	ptinit();
 	mchbits();
 	cvtime();
+	setnr(".g", gflag, 0);
 	numtab[PID].val = getpid();
 	spreadlimit = 3*EM;
 	olinesz = LNSIZE;
@@ -1255,21 +1258,21 @@ gx:
 #ifdef NROFF
 	case '/':
 	case ',':
-		if (xflag == 0)
+		if (gflag == 0)
 			goto dfl;
 		goto g0;
 	case '|':
 	case '^':
 		goto g0;
 #else
-	case '/':	/* italic correction */
-		if (xflag == 0)
+	case '/':
+		if (gflag == 0)
 			goto dfl;
-		return(makem((int)(EM)/12));	/* approximation */
-	case ',':	/* left italic correction */
-		if (xflag == 0)
+		return(makem((int)(EM)/12));	/* italic correction */
+	case ',':
+		if (gflag == 0)
 			goto dfl;
-		return(makem(0));	/* approximation */
+		return(makem(0));	/* left italic correction */
 	case '|':	/* narrow space */
 		return(makem((int)(EM)/6));
 	case '^':	/* half narrow space */
@@ -1284,9 +1287,31 @@ gx:
 	case 'd':	/* half em down */
 		return(sethl(k));
 	case 'A':	/* set anchor */
-		if (xflag == 0 || (j = setanchor()) == 0)
+		if (gflag) {	/* acceptable as name: fake as true */
+			i = setgA() + '0';
+			goto gx;
+		}
+		if (xflag == 0)
+			goto dfl;
+		if ((j = setanchor()) == 0)
 			goto g0;
 		return(j);
+	case 'B':
+		if (gflag) {	/* acceptable as expression */
+			i = setgB() + '0';
+			goto gx;
+		}
+		goto dfl;
+	case 'F':
+	case 'm':
+	case 'M':
+		if (gflag) {	/* font family, color */
+			if ((i = getsn()) > 0 && warn & WARN_ESCAPE)
+				errprint("\\%c[%s] unimplemented",
+						k, macname(i));
+			goto g0;
+		}
+		goto dfl;
 	case 'T':
 		if (xflag == 0 || (j = setlink()) == 0)
 			goto g0;
@@ -1304,9 +1329,9 @@ gx:
 			goto g0;
 		/*FALLTHRU*/
 	default:
-		if (warn & WARN_ESCAPE)
+	dfl:	if (warn & WARN_ESCAPE)
 			errprint("undefined escape sequence \\%c", k);
-	dfl:	return(j);
+		return(j);
 	}
 	/* NOTREACHED */
 }
@@ -2039,10 +2064,33 @@ casexflag(void)
 {
 	int	i;
 
+	gflag = 0;
+	setnr(".g", gflag, 0);
 	skip(1);
+	noscale++;
 	i = atoi();
+	noscale--;
 	if (!nonumb)
 		_xflag = xflag = i & 3;
+}
+
+void
+casecp(void)
+{
+	if (xflag) {
+		gflag = 1;
+		noscale++;
+		if (skip(1) || atoi() && !nonumb)
+			xflag = 1;
+		else
+			xflag = 3;
+		noscale--;
+		_xflag = xflag;
+		setnr(".g", gflag, 0);
+		setnr(".C", xflag == 1, 0);
+		setnr(".x", 1, 0);
+		setnr(".y", 19, 0);
+	}
 }
 
 void
@@ -2301,4 +2349,51 @@ sfmask(tchar t)
 	if (t == XFUNC || t == SLANT || (t & SFMASK) == 0)
 		return chbits;
 	return t & SFMASK;
+}
+
+static int
+setgA(void)
+{
+	extern const char	nmctab[];
+	tchar	c, delim;
+	int	k, y = 1;
+
+	lgf++;
+	delim = getch();
+	if (ismot(delim)) {
+		lgf--;
+		return 0;
+	}
+	while ((k = cbits(c = getch())) != cbits(delim) && !nlflg)
+		if (ismot(c) || k < ' ' && nmctab[k] || k == ' ' || k >= 0200)
+			y = 0;
+	if (nlflg)
+		y = 0;
+	lgf--;
+	return y;
+}
+
+static int
+setgB(void)
+{
+	tchar	c, delim;
+	int	y = 1;
+
+	lgf++;
+	delim = getch();
+	if (ismot(delim)) {
+		lgf--;
+		return 0;
+	}
+	atoi0();
+	if (nonumb)
+		y = 0;
+	do {
+		c = getch();
+		if (!ismot(c) && cbits(c) == cbits(delim))
+			break;
+		y = 0;
+	} while (!nlflg);
+	lgf--;
+	return y;
 }
