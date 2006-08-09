@@ -3,7 +3,7 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g	1.3 (gritter) 8/8/06
+.\" Sccsid @(#)g	1.4 (gritter) 8/9/06
 .\"
 .do xflag 3
 .nr .g 1
@@ -55,7 +55,7 @@
 .als ds1 ds
 .de fam
 .	if '\\$1'T' \{\
-.		fp 1 R T
+.		fp 1 R R
 .		fp 2 I I
 .		fp 3 B B
 .		fp 4 BI BI
