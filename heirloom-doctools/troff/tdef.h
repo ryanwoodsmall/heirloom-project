@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.114 (gritter) 8/8/06
+ * Sccsid @(#)tdef.h	1.115 (gritter) 8/9/06
  */
 
 /*
@@ -527,6 +527,7 @@ extern enum warn {
 	WARN_DI		= 256,
 	WARN_MAC	= 512,
 	WARN_REG	= 1024,
+	WARN_RIGHT_BRACE= 4096,
 	WARN_MISSING	= 8192,
 	WARN_INPUT	= 16384,
 	WARN_ESCAPE	= 32768,
