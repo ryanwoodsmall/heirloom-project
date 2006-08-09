@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.102 (gritter) 8/9/06
+ * Sccsid @(#)n1.c	1.103 (gritter) 8/9/06
  */
 
 /*
@@ -898,12 +898,23 @@ control(register int a, register int b)
 }
 
 
+static int
+rgetach(void)
+{
+	extern const char	nmctab[];
+	int	i;
+
+	if ((i = getach()) == 0 || xflag && i < ' ' && nmctab[i])
+		return(0);
+	return(i);
+}
+
 int
 getrq2(void)
 {
 	register int i, j;
 
-	if (((i = getach()) == 0) || ((j = getach()) == 0))
+	if (((i = rgetach()) == 0) || ((j = rgetach()) == 0))
 		goto rtn;
 	i = PAIR(i, j);
 rtn:
@@ -915,11 +926,7 @@ getrq(int flags)
 {
 	int	i;
 
-	i = getrq2();
-	if ((i&~0377) == RIGHT<<8 || (i&~(0377<<8)) == RIGHT) {
-		if ((flags & 4) == 0 && warn & WARN_RIGHT_BRACE)
-			errprint("\\} in request name");
-	} else if (i >= 256)
+	if ((i = getrq2()) >= 256)
 		i = maybemore(i, flags);
 	return(i);
 }

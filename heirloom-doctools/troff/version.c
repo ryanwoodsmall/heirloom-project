@@ -21,18 +21,18 @@ const char revision[] = "7.48";
 /*
 ext.h: * Sccsid @(#)ext.h	1.69 (gritter) 8/6/06
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
-n1.c: * Sccsid @(#)n1.c	1.102 (gritter) 8/9/06
+n1.c: * Sccsid @(#)n1.c	1.103 (gritter) 8/9/06
 n2.c: * Sccsid @(#)n2.c	1.27 (gritter) 8/6/06
-n3.c: * Sccsid @(#)n3.c	1.129 (gritter) 8/7/06
+n3.c: * Sccsid @(#)n3.c	1.130 (gritter) 8/9/06
 n4.c: * Sccsid @(#)n4.c	1.50 (gritter) 8/8/06
 n5.c: * Sccsid @(#)n5.c	1.72 (gritter) 8/7/06
 n7.c: * Sccsid @(#)n7.c	1.87 (gritter) 8/8/06
 n8.c: * Sccsid @(#)n8.c	1.33 (gritter) 8/6/06
-n9.c: * Sccsid @(#)n9.c	1.59 (gritter) 8/9/06
+n9.c: * Sccsid @(#)n9.c	1.58 (gritter) 8/6/06
 ni.c: * Sccsid @(#)ni.c	1.34 (gritter) 8/5/06
 nii.c: * Sccsid @(#)nii.c	1.41 (gritter) 8/6/06
 suftab.c: * Sccsid @(#)suftab.c	1.4 (gritter) 8/16/05
-tdef.h: * Sccsid @(#)tdef.h	1.115 (gritter) 8/9/06
+tdef.h: * Sccsid @(#)tdef.h	1.114 (gritter) 8/8/06
 nroff.d/n10.c: * Sccsid @(#)n10.c	1.29 (gritter) 8/7/06
 nroff.d/n6.c: * Sccsid @(#)n6.c	1.44 (gritter) 8/8/06
 nroff.d/pt.h: *	Sccsid @(#)pt.h	1.40 (gritter) 7/29/06

@@ -73,6 +73,8 @@ Release ...
 * [nt]roff: The "-mg" macro package has been added for improved support of
   groff documents, preprocessors, and macro sets.
 * [nt]roff: Static limits on word and line size have been eliminated.
+* [nt]roff: The "\{", "\}", "\&", "\%", "\c", and "\(space)" escape
+  sequences terminate two-character request names now.
 * [nt]roff: The ".tm" and ".write" commands now discard formatted motion
   sequences.
 * troff: The ".psbb" request now reads a "%%HiResBoundingBox" DSC comment

@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.106 (gritter) 8/9/06
+.\" Sccsid @(#)doc.tr	1.105 (gritter) 8/8/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -92,7 +92,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/9/06
+.ds Sccsdate 8/8/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -5201,10 +5201,6 @@ Warn when an undefined number register is accessed.
 The number register will be set to zero immediately after
 the first access so this warning can be printed only
 once per register name.
-T}
-4096	right-brace	T{
-Warn when a right brace occurs in a position
-where it might have side-effects.
 T}
 8192	missing	Warn when a required argument to a request is missing.
 16384	input	T{
