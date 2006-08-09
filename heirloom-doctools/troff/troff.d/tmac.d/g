@@ -3,7 +3,7 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g	1.6 (gritter) 8/9/06
+.\" Sccsid @(#)g	1.7 (gritter) 8/9/06
 .\"
 .cp 0
 .lc_ctype en_US
@@ -118,7 +118,7 @@
 .	char \(aq \[quotesingle]
 .	char \(at \[at]
 .	char \(a~ \[tilde]
-.	char \(a‐ \[macron]
+.	char \(a- \[macron]
 .	char \(bq \[quotesinglbase]
 .	char \(c* \[circlemultiply]
 .	char \(c+ \[circleplus]
@@ -172,7 +172,7 @@
 .	char \(~a \[atilde]
 .	char \(~n \[ntilde]
 .	char \(~o \[otilde]
-.	char \(‐D \[Eth]
+.	char \(-D \[Eth]
 \#	for GNU tbl
 .	char \[tbl]
 .\}
