@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.113 (gritter) 8/11/06
+.\" Sccsid @(#)doc.tr	1.114 (gritter) 8/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -5343,12 +5343,12 @@ When \fIN\fR is zero or small,
 printing of macro and string contents is disabled.
 .bta watchn
 \fB&watchn\fI|R\fR	off	ignore	\(en	Notify on change of register \fIR\fR.
+If \fIR\fR does not exist,
+it is created in order to watch future changes.
 No effect on read-only registers
 and some of the predefined general registers.
 .bta unwatchn
 \fB&unwatchn\fI|R\fR	off	ignore	\(en	Disable notification for register \fIR\fR.
-If \fIR\fR does not exist,
-it is created in order to watch future changes.
 .pg
 .mha s_color
 Color Support
@@ -5472,6 +5472,8 @@ Nothing prevents the picture from being placed off the page.
 .pg
 An example how to combine the following requests and macros is:
 .x1
+.nr nosave 1
+.ne 7
 &psbb picture.eps
 &nr scale 4
 &nr y (\en[ury]p\-\en[lly]p)/\en[scale]
@@ -5480,6 +5482,7 @@ An example how to combine the following requests and macros is:
 &sp \enyu
 picture description
 .x2
+.nr nosave 0
 .pg
 \*(TR includes a request to assist the inclusion of \s-1EPS\s+1 files:
 .h1
