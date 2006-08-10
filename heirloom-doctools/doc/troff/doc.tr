@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.112 (gritter) 8/10/06
+.\" Sccsid @(#)doc.tr	1.113 (gritter) 8/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -92,7 +92,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/10/06
+.ds Sccsdate 8/11/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -6229,7 +6229,7 @@ to the \fB&C\fR and \fB&g\fR registers.
 The \fB&x\fR and \fB&y\fR registers
 are read-write in \*(GR compatibility mode;
 they correspond to the emulated \*(GR version number.
-The \fBcp\fR request sets them to 1 and 19, respectively.
+The \fBcp\fR request sets them to 1 and 18, respectively.
 .pg
 Any call to the \fBcp\fR request
 activates the \*(GR compatibility escape sequences described below;
