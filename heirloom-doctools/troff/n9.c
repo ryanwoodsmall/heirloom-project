@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.59 (gritter) 8/9/06
+ * Sccsid @(#)n9.c	1.60 (gritter) 8/10/06
  */
 
 /*
@@ -353,7 +353,7 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 		if (cbits(c) != ' ')
 			ch = c;
 		vflag = 0;
-		dfact = EM;
+		dfact = type == DRAWTHICKNESS ? 1 : EM;
 		dx[i] = quant(atoi(), HOR);
 		if (dx[i] > MAXMOT)
 			dx[i] = MAXMOT;
@@ -366,7 +366,9 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 		vflag = 1;
 		dfact = lss;
 		dy[i] = quant(atoi(), VERT);
-		if (dy[i] > MAXMOT)
+		if (type == DRAWTHICKNESS)
+			dy[i] = 0;
+		else if (dy[i] > MAXMOT)
 			dy[i] = MAXMOT;
 		else if (dy[i] < -MAXMOT)
 			dy[i] = -MAXMOT;
@@ -383,7 +385,7 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 		drawbuf[j++] = MOT | VMOT | ((dy[k] >= 0) ?
 				sabsmot(dy[k]) : (NMOT | sabsmot(-dy[k])));
 	}
-	if (type == DRAWELLIPSE) {
+	if (type == DRAWELLIPSE || type == DRAWELLIPSEFI) {
 		drawbuf[5] = drawbuf[4] | NMOT;	/* so the net vertical is zero */
 		j = 6;
 	}

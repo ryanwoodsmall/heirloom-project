@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.165 (gritter) 8/10/06
+ * Sccsid @(#)t6.c	1.166 (gritter) 8/11/06
  */
 
 /*
@@ -148,9 +148,11 @@ width(register tchar j)
 	} else 
 		xbits(j, 0);
 	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf &&
-			!_minflg && !horscale)
+			!_minflg && !horscale) {
 		k = rawwidth = widcache[i-32].width;
-	else {
+		lastrst = widcache[i-32].rst;
+		lastrsb = widcache[i-32].rsb;
+	} else {
 		if (_minflg && i == 32 && cbits(j) != 32)
 			_minflg = 0;
 		k = getcw(i-32);
@@ -257,19 +259,18 @@ getcw(register int i)
 						xfont = ii;
 				found:	p = fontab[ii];
 					k = *(p + j);
-					if (xfont == sbold)
-						bd = bdtab[ii];
-					if (setwdf) {
-						numtab[CT].val |= kerntab[ii][j];
-						if (afmtab &&
-						    (t=fontbase[ii]->afmpos-1)>=0) {
-							a = afmtab[t];
-							if (a->bbtab[j]) {
-								lastrst = a->bbtab[j][3];
-								lastrsb = a->bbtab[j][1];
-							}
+					if (afmtab &&
+					    (t=fontbase[ii]->afmpos-1)>=0) {
+						a = afmtab[t];
+						if (a->bbtab[j]) {
+							lastrst = a->bbtab[j][3];
+							lastrsb = a->bbtab[j][1];
 						}
 					}
+					if (xfont == sbold)
+						bd = bdtab[ii];
+					if (setwdf)
+						numtab[CT].val |= kerntab[ii][j];
 					goto g1;
 				}
 			}
@@ -280,14 +281,13 @@ getcw(register int i)
 	}
  g0:
 	p = fontab[xfont];
-	if (setwdf) {
+	if (setwdf)
 		numtab[CT].val |= kerntab[xfont][j];
-		if (afmtab && (t = fontbase[xfont]->afmpos-1) >= 0) {
-			a = afmtab[t];
-			if (a->bbtab[j]) {
-				lastrst = a->bbtab[j][3];
-				lastrsb = a->bbtab[j][1];
-			}
+	if (afmtab && (t = fontbase[xfont]->afmpos-1) >= 0) {
+		a = afmtab[t];
+		if (a->bbtab[j]) {
+			lastrst = a->bbtab[j][3];
+			lastrsb = a->bbtab[j][1];
 		}
 	}
 	k = *(p + j);
@@ -338,6 +338,8 @@ getcw(register int i)
 	else {
 		widcache[i].fontpts = xfont + (xpts<<8);
 		widcache[i].width = k;
+		widcache[i].rst = lastrst;
+		widcache[i].rsb = lastrsb;
 	}
 	return(k);
 	/* Unitwidth is Units/Point, where

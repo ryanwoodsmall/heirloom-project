@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.106 (gritter) 8/10/06
+ * Sccsid @(#)n1.c	1.107 (gritter) 8/11/06
  */
 
 /*
@@ -97,6 +97,7 @@ char	*cfname[NSO+1];		/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
 static int	cfpid[NSO+1];	/* .pso process IDs */
 char	*progname;	/* program name (troff) */
+static int	defcf;
 #ifdef	EUC
 char	mbbuf1[MB_LEN_MAX + 1];
 char	*mbbuf1p = mbbuf1;
@@ -304,7 +305,7 @@ start:
 	eileenct = 0;		/*reset count for "Eileen's loop"*/
 loop:
 	xflag = _xflag;
-	charf = clonef = copyf = lgf = nb = nflush = nlflg = 0;
+	defcf = charf = clonef = copyf = lgf = nb = nflush = nlflg = 0;
 	if (ip && rbf0(ip) == 0 && dip == d && ejf &&
 			frame->pframe->tail_cnt <= ejl) {
 		nflush++;
@@ -1175,17 +1176,22 @@ gx:
 		return(i);
 	}
 	if (copyf) {
+copy:
 		pbbuf[pbp++] = j;
 		return(eschar);
 	}
 	switch (k) {
 
 	case '[':
+		if (defcf)
+			goto copy;
 		if (xflag == 0)
 			goto dfl;
 		/*FALLTHRU*/
 	case 'C':
 	case '(':	/* special char name */
+		if (defcf)
+			goto copy;
 		if ((i = setch(k)) == 0 && !tryglf)
 			goto g0;
 		k = cbits(i);
@@ -1330,7 +1336,9 @@ gx:
 			goto g0;
 		/*FALLTHRU*/
 	default:
-	dfl:	if (warn & WARN_ESCAPE)
+	dfl:	if (defcf)
+			goto copy;
+		if (warn & WARN_ESCAPE)
 			errprint("undefined escape sequence \\%c", k);
 		return(j);
 	}
@@ -2090,7 +2098,7 @@ casecp(void)
 		setnr(".g", gflag, 0);
 		setnr(".C", xflag == 1, 0);
 		setnr(".x", 1, 0);
-		setnr(".y", 19, 0);
+		setnr(".y", 18, 0);
 	}
 }
 
@@ -2114,10 +2122,13 @@ casechar(int flag)
 	int	i, k, size = 0;
 	tchar	c, *tp = NULL;
 
-	copyf++, clonef++;
+	defcf++;
 	if (skip(1))
 		return;
-	if ((k = cbits((c = getch()))) == eschar) {
+	c = getch();
+	while (isxfunc(c, CHAR))
+		c = charout[sbits(c)].ch;
+	if ((k = cbits(c)) == eschar) {
 		switch (cbits(c = getch())) {
 		case '(':
 			name[0] = getch();
@@ -2148,7 +2159,8 @@ casechar(int flag)
 		errprint("mapping of special characters not permitted");
 		return;
 	}
-	clonef--;
+	defcf--;
+	copyf++;
 	size = 10;
 	tp = malloc(size * sizeof *tp);
 	i = 0;

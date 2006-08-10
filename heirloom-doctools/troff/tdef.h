@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.118 (gritter) 8/10/06
+ * Sccsid @(#)tdef.h	1.119 (gritter) 8/10/06
  */
 
 /*
@@ -118,9 +118,12 @@
 			/* wiggly line '~' x y x y ... */
 #define	DRAWLINE	'l'
 #define	DRAWCIRCLE	'c'	/* circle */
+#define	DRAWCIRCLEFI	'C'	/* filled circle */
 #define	DRAWELLIPSE	'e'
+#define	DRAWELLIPSEFI	'E'	/* filled ellipse */
 #define	DRAWARC		'a'	/* arbitrary arc */
 #define	DRAWSPLINE	'~'	/* quadratic B spline */
+#define	DRAWTHICKNESS	't'	/* line thickness */
 
 #define	LEFT	020	/* \{ */
 #define	RIGHT	021	/* \} */

@@ -102,6 +102,8 @@ Release ...
   line of input when followed by text on the same line.
 * [nt]roff: The "\(dq" character has been introduced as an alternate name
   for the ASCII double quote character.
+* dpost: Character height and slant changes now only apply to the current
+  font as documented.
 * tbl: When ending macros in generated code, ".00" is now used instead
   of "..". This allows the use of ".ig" and similar requests within "T{"
   etc. without interference.

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.83 (gritter) 8/6/06
+ * Sccsid @(#)t10.c	1.84 (gritter) 8/10/06
  */
 
 /*
@@ -575,11 +575,13 @@ ptout0(tchar *pi, tchar *pend)
 			dy = -dy;
 		switch (cbits(pi[1])) {
 		case DRAWCIRCLE:	/* circle */
+		case DRAWCIRCLEFI:
 			fdprintf(ptid, "D%c %d\n", DRAWCIRCLE, dx);	/* dx is diameter */
 			w = 0;
 			hpos += dx;
 			break;
 		case DRAWELLIPSE:
+		case DRAWELLIPSEFI:
 			fdprintf(ptid, "D%c %d %d\n", DRAWELLIPSE, dx, dy);
 			w = 0;
 			hpos += dx;

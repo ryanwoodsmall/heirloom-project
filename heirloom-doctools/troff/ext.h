@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.73 (gritter) 8/10/06
+ * Sccsid @(#)ext.h	1.74 (gritter) 8/11/06
  */
 
 /*
@@ -206,6 +206,8 @@ extern	tchar	*oline;
 extern	size_t	olinesz;
 extern	struct widcache {	/* width cache, indexed by character */
 	int	fontpts;
+	int	rst;
+	int	rsb;
 	int	width;
 } *widcache;
 extern	char *gchtab;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.151 (gritter) 8/9/06
+ * Sccsid @(#)dpost.c	1.152 (gritter) 8/11/06
  */
 
 /*
@@ -429,9 +429,6 @@ int		lasttrack = 0;		/* previous tracking hint */
 int		tracked;		/* records need to flush track */
 int		lastc = 0;		/* and its name (or index) */
 
-float		fontheight = 0;		/* points from x H ... */
-int		fontslant = 0;		/* angle from x S ... */
-
 int		res;			/* resolution assumed in input file */
 float		widthfac = 1.0;		/* for emulation = res/dev.res */
 float		horscale = 1.0;		/* horizontal font scaling */
@@ -474,6 +471,9 @@ struct  {
 	struct afmtab	*afm;		/* AFM data, if any */
 	char	*name;			/* name of the font loaded here */
 	int	number;			/* its internal number */
+	float	fontheight;		/* points from x H ... */
+	int	fontslant;		/* angle from x S ... */
+
 
 } fontname[NFONT+1] = {NULL, 0};
 
@@ -3224,11 +3224,11 @@ t_sf(int forceflush)
 	    fprintf(tf, "%g ", horscale);
     fprintf(tf, "%c\n", cmd);
 
-    if ( fontheight != 0 || fontslant != 0 ) {
+    if ( fontname[font].fontheight != 0 || fontname[font].fontslant != 0 ) {
 	if (size != FRACTSIZE)
-	    fprintf(tf, "%d %g changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : pstab[size-1]);
+	    fprintf(tf, "%d %g changefont\n", fontname[font].fontslant, (fontname[font].fontheight != 0) ? (double)fontname[font].fontheight : pstab[size-1]);
 	else
-	    fprintf(tf, "%d %g changefont\n", fontslant, (fontheight != 0) ? (double)fontheight : (double)fractsize);
+	    fprintf(tf, "%d %g changefont\n", fontname[font].fontslant, (fontname[font].fontheight != 0) ? (double)fontname[font].fontheight : (double)fractsize);
     }
 
     if (tracked < 0)
@@ -3257,9 +3257,9 @@ t_charht (
  */
 
     if (n == FRACTSIZE)
-        fontheight = f;
+        fontname[font].fontheight = f;
     else
-    	fontheight = (n == pstab[size-1]) ? 0 : n;
+    	fontname[font].fontheight = (n == pstab[size-1]) ? 0 : n;
     lastfont = lastsubfont = -1;
 
 }   /* End of t_charht */
@@ -3284,7 +3284,7 @@ t_slant (
  *
  */
 
-    fontslant = n;
+    fontname[font].fontslant = n;
     lastfont = lastsubfont = -1;
 
 }   /* End of t_slant */
