@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.76 (gritter) 8/10/06
+ * Sccsid @(#)n5.c	1.77 (gritter) 8/10/06
  */
 
 /*
@@ -590,7 +590,7 @@ casebp(void)
 
 
 static void
-tmtmcwr(int ab, int tmc, int wr)
+tmtmcwr(int ab, int tmc, int wr, int ep)
 {
 	const char tmtab[] = {
 		'a',000,000,000,000,000,000,000,
@@ -660,7 +660,10 @@ tmtmcwr(int ab, int tmc, int wr)
 	tmbuf[i] = 0;
 	if (ab)	/* truncate output */
 		obufp = obuf;	/* should be a function in n2.c */
-	if (wr < 0) {
+	if (ep) {
+		flusho();
+		errprint("%s", tmbuf);
+	} else if (wr < 0) {
 		flusho();
 		fdprintf(stderr, "%s", tmbuf);
 	} else if (i)
@@ -672,13 +675,19 @@ tmtmcwr(int ab, int tmc, int wr)
 void
 casetm(int ab)
 {
-	tmtmcwr(ab, 0, -1);
+	tmtmcwr(ab, 0, -1, 0);
 }
 
 void
 casetmc(void)
 {
-	tmtmcwr(0, 1, -1);
+	tmtmcwr(0, 1, -1, 0);
+}
+
+void
+caseerrprint(void)
+{
+	tmtmcwr(0, 1, -1, 1);
 }
 
 static struct stream {
@@ -739,7 +748,7 @@ write1(int writec)
 		return;
 	if ((i = getstream(nextf)) < 0)
 		return;
-	tmtmcwr(0, writec, streams[i].fd);
+	tmtmcwr(0, writec, streams[i].fd, 0);
 }
 
 void

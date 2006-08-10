@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.111 (gritter) 8/10/06
+.\" Sccsid @(#)doc.tr	1.112 (gritter) 8/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1516,6 +1516,8 @@ Output and Error Messages, Debugging
 .b1
 \T'spreadwarn'\fB&spreadwarn\fI|N\fR	toggle	\fBm\fR	Spread limit warning.\T
 .b1
+\T'errprint'\fB&errprint\fI|string\fR	newline	\(en	Print \fIstring\fR like an error message.\T
+.b1
 \T'watch'\fB&watch\fI|xx\fR	off	ignore	\(en	Notify on change of string or macro \fIxx\fR.\T
 .b1
 \T'unwatch'\fB&unwatch\fI|xx\fR	off	ignore	\(en	Disable notification for string or macro \fIxx\fR.\T
@@ -1605,6 +1607,7 @@ Device and Font Description Files
 \T'el'el	16\T
 \T'em'em	7\T
 \T'eo'eo	10\T
+\T'errprint'errprint	21\T
 \T'ev'ev	17\T
 \T'evc'evc	17\T
 \T'ex'ex	18\T
@@ -5177,12 +5180,21 @@ The latter is different from the \fIstandard output\fR,
 where formatted text goes.
 By default, both are written onto the user's terminal,
 but they can be independently redirected.
+An error message additionally includes
+the line number where the error occurred,
+the current input file name,
+the current physical output page number (if any),
+and the names of the macros
+in the frames of the current execution stack.
+The \%\fBerrprint\fR request allows
+to write custom messages in the same format.
 .sc
 Warnings.
 \A's_warning'\*(NR and \*(TR provide a mechanism
 to enable or disable warnings for several categories.
 When one of the selected conditions occurs,
-a \fIwarning\fR message is written onto the standard error,
+a \fIwarning\fR message is written
+in the same format as an error message,
 but processing continues.
 .sp
 .TS
@@ -5281,9 +5293,8 @@ can be \fIwatched\fR.
 Whenever a change of a watched object occurs,
 or when the object is renamed, removed, or aliased,
 a notification message is printed.
-It includes the current line number,
-the current macro stack,
-the name of the current (or last previous) request,
+It is formatted like an error message
+and includes the name of the current (or last previous) request,
 the name of the objects affected,
 and, in case of a change,
 the new contents of the object.
@@ -5316,6 +5327,8 @@ warning message is disabled.
 Calling this request without an
 argument toggles the warning message; calling it with an argument
 enables the warning and sets the limit to \fIN\fR (default scale m).
+.bta errprint
+\fB&errprint\fI|string\fR	newline	\(en	Print \fIstring\fR like an error message.
 .bta watch
 \fB&watch\fI|xx\fR	off	ignore	\(en	Notify on change of string or macro \fIxx\fR.
 If \fIxx\fR does not exist,
@@ -5330,6 +5343,8 @@ When \fIN\fR is zero or small,
 printing of macro and string contents is disabled.
 .bta watchn
 \fB&watchn\fI|R\fR	off	ignore	\(en	Notify on change of register \fIR\fR.
+No effect on read-only registers
+and some of the predefined general registers.
 .bta unwatchn
 \fB&unwatchn\fI|R\fR	off	ignore	\(en	Disable notification for register \fIR\fR.
 If \fIR\fR does not exist,
