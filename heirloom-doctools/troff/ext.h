@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.71 (gritter) 8/9/06
+ * Sccsid @(#)ext.h	1.72 (gritter) 8/10/06
  */
 
 /*
@@ -330,6 +330,9 @@ extern void	caseda(void);
 extern void	casedi(void);
 extern void	casedt(void);
 extern void	caseals(void);
+extern void	casewatch(int);
+extern void	caseunwatch(void);
+extern void	prwatch(int);
 extern void	casetl(void);
 extern void	casepc(void);
 extern void	casechop(void);
@@ -370,6 +373,9 @@ extern void	setr(void);
 extern void	caseaf(void);
 extern void	setaf(void);
 extern void	casealn(void);
+extern void	casewatchn(int);
+extern void	caseunwatchn(void);
+extern void	prwatchn(int);
 extern int	vnumb(int *);
 extern int	hnumb(int *);
 extern int	inumb(int *);

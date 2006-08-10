@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.56 (gritter) 8/9/06
+ * Sccsid @(#)n4.c	1.57 (gritter) 8/10/06
  */
 
 /*
@@ -412,9 +412,13 @@ s0:
 			goto sl;
 		} else if (numtab[j].fmt == -1) {
 			fl = numtab[j].fval = (numtab[j].fval+numtab[j].finc*f);
+			if (numtab[j].finc)
+				prwatchn(j);
 			goto flt;
 		} else {
 			i = numtab[j].val = (numtab[j].val+numtab[j].inc*f);
+			if (numtab[j].inc)
+				prwatchn(j);
 			nform = numtab[j].fmt;
 		}
 	}
@@ -750,7 +754,7 @@ _atoi(int flt)
 			nonumb = 1;
 	}
 	if (flt) {
-		if (!nonumb && (n.f<0 && n.f<FLT_MIN || n.f>0 && n.f>FLT_MAX)) {
+		if (!nonumb && (n.f<0 && n.f<-FLT_MAX || n.f>0 && n.f>FLT_MAX)) {
 			if (warn & WARN_NUMBER)
 				errprint("floating-point arithmetic overflow");
 			if (xflag)
@@ -1223,6 +1227,7 @@ setnr(const char *name, int val, int inc)
 	numtab[i].inc = inc;
 	if (numtab[i].fmt == -1)
 		numtab[i].fmt = 0;
+	prwatchn(i);
 }
 
 void
@@ -1237,6 +1242,7 @@ setnrf(const char *name, float val, float inc)
 	numtab[i].val = numtab[i].fval = val;
 	numtab[i].inc = numtab[i].finc = inc;
 	numtab[i].fmt = -1;
+	prwatchn(i);
 }
 
 
@@ -1274,6 +1280,9 @@ caserr(void)
 			if (--numtab[k].nlink <= 0)
 				clrnr(k);
 		}
+		if (p->flags & FLAG_WATCH)
+			errprint("%s: removing register %s", macname(lastrq),
+					macname(i));
 		if (p->nlink > 0)
 			p->nlink--;
 		if (p->nlink == 0)
@@ -1313,6 +1322,9 @@ casernn(void)
 		numtab[n].r = j;
 	}
 	clrnr(k);
+	if (numtab[n].flags & FLAG_WATCH)
+		errprint("%s: renaming register %s to %s", macname(lastrq),
+				macname(i), macname(j));
 }
 
 
@@ -1337,6 +1349,7 @@ setr(void)
 	numtab[i].val = j;
 	if (numtab[i].fmt == -1)
 		numtab[i].fmt = 0;
+	prwatchn(i);
 }
 
 void
@@ -1369,14 +1382,16 @@ casenr(int flt)
 	j = cbits(ch);
 	if ((j >= 'a' && j <= 'z' || j >= 'A' && j <= 'Z') &&
 			warn & WARN_SCALE)
-		goto rtn;
+		goto rtns;
 	skip(0);
 	a = _atoi(flt);
 	if (nonumb)
-		goto rtn;
+		goto rtns;
 	numtab[i].inc = a.n;
 	if (flt)
 		numtab[i].finc = a.f;
+rtns:
+	prwatchn(i);
 rtn:
 	return;
 }
@@ -1415,6 +1430,20 @@ caseaf(void)
 		return;
 	}
 	numtab[n].fmt = k & BYTEMASK;
+	if (numtab[n].flags & FLAG_WATCH) {
+		char	b[40];
+		int	x;
+		if (k & BYTEMASK > ' ') {
+			b[0] = k & BYTEMASK;
+			b[1] = 0;
+		} else {
+			for (x = 0; x < k; x++)
+				b[x] = '0';
+			b[x] = 0;
+		}
+		errprint("%s: format of register %s set to %s", macname(lastrq),
+				macname(i), b);
+	}
 }
 
 void
@@ -1446,6 +1475,7 @@ void
 casealn(void)
 {
 	int	i, j, r, o;
+	int	flags;
 
 	if (skip(1))
 		return;
@@ -1473,6 +1503,56 @@ casealn(void)
 		numtab[o].nlink++;
 	} else
 		numtab[r].aln = o;
+	flags = numtab[r].flags;
+	if (o >= 0)
+		flags |= numtab[o].flags;
+	if (flags & FLAG_WATCH)
+		errprint("%s: creating alias %s to register %s",
+				macname(lastrq), macname(i), macname(j));
+}
+
+
+void
+casewatchn(int unwatch)
+{
+	int	i, j;
+
+	lgf++;
+	if (skip(1))
+		return;
+	do {
+		if (!(j = getrq(1)) || (i = findr(j)) == -1)
+			break;
+		if (unwatch)
+			numtab[i].flags &= ~FLAG_WATCH;
+		else
+			numtab[i].flags |= FLAG_WATCH;
+	} while (!skip(0));
+}
+
+
+void
+caseunwatchn(void)
+{
+	casewatchn(1);
+}
+
+
+void
+prwatchn(int i)
+{
+	if (i < 0 || i >= NN)
+		return;
+	if (numtab[i].flags & FLAG_WATCH) {
+		if (numtab[i].fmt == -1)
+			errprint("%s: floating-point register %s set to %g, increment %g",
+					macname(lastrq), macname(numtab[i].r),
+					numtab[i].fval, numtab[i].finc);
+		else
+			errprint("%s: register %s set to %d, increment %d",
+					macname(lastrq), macname(numtab[i].r),
+					numtab[i].val, numtab[i].inc);
+	}
 }
 
 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.164 (gritter) 8/9/06
+ * Sccsid %W% (gritter) %G%
  */
 
 /*
@@ -1004,7 +1004,7 @@ setwd(void)
 	int	savhp, savapts, savapts1, savfont, savfont1, savpts, savpts1;
 	int	rst = 0, rsb = 0;
 
-	base = numtab[ST].val = numtab[ST].val = wid = numtab[CT].val = 0;
+	base = numtab[SB].val = numtab[ST].val = wid = numtab[CT].val = 0;
 	if (ismot(i = getch()))
 		return;
 	delim = cbits(i);
@@ -1043,6 +1043,9 @@ setwd(void)
 	if (cbits(i) != delim)
 		nodelim(delim);
 	setn1(wid, 0, (tchar) 0);
+	prwatchn(CT);
+	prwatchn(SB);
+	prwatchn(ST);
 	setnr("rst", rst, 0);
 	setnr("rsb", rsb, 0);
 	numtab[HP].val = savhp;
@@ -2236,8 +2239,10 @@ setpapersize(int setmedia)
 		}
 	}
 	pl = defaultpl = y;
-	if (numtab[NL].val > pl)
+	if (numtab[NL].val > pl) {
 		numtab[NL].val = pl;
+		prwatchn(NL);
+	}
 	po = x > 6 * PO ? PO : x / 8;
 	ll = ll1 = lt = lt1 = x - 2 * po;
 	setnel();

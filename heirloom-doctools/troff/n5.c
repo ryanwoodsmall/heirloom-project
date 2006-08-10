@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.74 (gritter) 8/9/06
+ * Sccsid @(#)n5.c	1.76 (gritter) 8/10/06
  */
 
 /*
@@ -461,8 +461,10 @@ casepl(void)
 		pl = defaultpl ? defaultpl : 11 * INCH; /*11in*/
 	else 
 		pl = i;
-	if (numtab[NL].val > pl)
+	if (numtab[NL].val > pl) {
 		numtab[NL].val = pl;
+		prwatchn(NL);
+	}
 }
 
 
@@ -556,6 +558,7 @@ casepn(void)
 	skip(1);
 	noscale++;
 	i = max(inumb(&numtab[PN].val), 0);
+	prwatchn(PN);
 	noscale = 0;
 	if (!nonumb) {
 		npn = i;
@@ -803,10 +806,13 @@ casesp(int a)
 void
 casebrp(void)
 {
-	spread++;
-	flushi();
-	pendt++;
-	text();
+	if (nc) {
+		spread++;
+		flushi();
+		pendt++;
+		text();
+	} else
+		tbreak();
 }
 
 
@@ -1029,6 +1035,7 @@ evc(struct env *dp, struct env *sp)
 	dp->_wordp = 0;
 	dp->_spflg = 0;
 	dp->_ce = 0;
+	dp->_rj = 0;
 	dp->_nn = 0;
 	dp->_ndf = 0;
 	dp->_nms = 0;
@@ -1036,12 +1043,18 @@ evc(struct env *dp, struct env *sp)
 	dp->_ul = 0;
 	dp->_cu = 0;
 	dp->_it = 0;
+	dp->_itc = 0;
 	dp->_itmac = 0;
 	dp->_pendnf = 0;
 	dp->_nc = 0;
 	dp->_un = 0;
 	dp->_un1 = -1;
 	dp->_nwd = 0;
+	dp->_hyoff = 0;
+	dp->_nb = 0;
+	dp->_spread = 0;
+	dp->_lnmod = 0;
+	dp->_hlc = 0;
 	setnel();
 }
 
@@ -1731,7 +1744,7 @@ casenhychar(void)
 void
 casemk(void)
 {
-	register int i, j;
+	register int i, j, k;
 
 	if (dip != d)
 		j = dip->dnl; 
@@ -1743,7 +1756,8 @@ casemk(void)
 	}
 	if ((i = getrq(1)) == 0)
 		return;
-	numtab[findr(i)].val = j;
+	numtab[k = findr(i)].val = j;
+	prwatchn(k);
 }
 
 
@@ -1790,6 +1804,7 @@ casenm(void)
 	i = inumb(&numtab[LN].val);
 	if (!nonumb)
 		numtab[LN].val = max(i, 0);
+	prwatchn(LN);
 	getnm(&ndf, 1);
 	getnm(&nms, 0);
 	getnm(&ni, 0);

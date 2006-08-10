@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.131 (gritter) 8/9/06
+ * Sccsid @(#)n3.c	1.132 (gritter) 8/10/06
  */
 
 /*
@@ -54,6 +54,7 @@
 
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include "tdef.h"
 #ifdef NROFF
@@ -76,6 +77,7 @@ tchar *corebuf;
 
 static void	_collect(int);
 static int	_findmn(int, int);
+static void	casewatchlength(void);
 static void	caseshift(void);
 static void	casesubstring(void);
 static void	caselength(void);
@@ -155,8 +157,13 @@ static const struct {
 	{ "transchar",		(void(*)(int))casetranschar },
 	{ "trimat",		(void(*)(int))casetrimat },
 	{ "unformat",		(void(*)(int))caseunformat },
+	{ "unwatch",		(void(*)(int))caseunwatch },
+	{ "unwatchn",		(void(*)(int))caseunwatchn },
 	{ "vpt",		(void(*)(int))casevpt },
 	{ "warn",		(void(*)(int))casewarn },
+	{ "watch",		(void(*)(int))casewatch },
+	{ "watchlength",	(void(*)(int))casewatchlength },
+	{ "watchn",		(void(*)(int))casewatchn },
 	{ "while",		(void(*)(int))casewhile },
 	{ "write",		(void(*)(int))casewrite },
 	{ "writec",		(void(*)(int))casewritec },
@@ -251,6 +258,9 @@ casern(void)
 		munhash(&contab[oldmn]);
 		contab[oldmn].rq = j;
 		maddhash(&contab[oldmn]);
+		if (contab[oldmn].flags & FLAG_WATCH)
+			errprint("%s: %s renamed to %s", macname(lastrq),
+					macname(i), macname(j));
 	}
 }
 
@@ -321,7 +331,11 @@ caserm(void)
 		}
 		if (k >= 0 && contab[k].nlink > 0)
 			contab[k].nlink--;
-		clrmn(k);
+		if (k >= 0 && contab[k].flags & FLAG_WATCH)
+			errprint("%s: %s removed", macname(lastrq),
+					macname(j));
+		if (contab[k].nlink <= 0)
+			clrmn(k);
 	}
 	lgf--;
 }
@@ -384,8 +398,14 @@ casede(void)
 			munhash(&contab[newmn]);
 		contab[newmn].rq = k;
 		contab[newmn].nlink = nlink;
+		if (ds)
+			contab[newmn].flags |= FLAG_STRING;
+		else
+			contab[newmn].flags &= ~FLAG_STRING;
 		maddhash(&contab[newmn]);
-	}
+		prwatch(newmn);
+	} else if (apptr)
+		prwatch(findmn(i));
 	if (apptr) {
 		savoff = offset;
 		offset = apptr;
@@ -444,10 +464,13 @@ _finds(register int mn, int als)
 {
 	register tchar i;
 	register filep savip;
+	enum flags	flags = 0;
 
 	oldmn = _findmn(mn, als);
 	newmn = 0;
 	apptr = (filep)0;
+	if (oldmn >= 0)
+		flags = contab[oldmn].flags;
 	if (app && oldmn >= 0 && contab[oldmn].mx) {
 		savip = ip;
 		ip = (filep)contab[oldmn].mx;
@@ -485,6 +508,7 @@ _finds(register int mn, int als)
 			contab[i].rq = mn;
 			maddhash(&contab[i]);
 		}
+		contab[i].flags = flags;
 	}
 	app = 0;
 	return(als ? offset = nextb : 1);
@@ -1062,6 +1086,8 @@ casedi(void)
 #endif	/* DEBUG */
 			numtab[DN].val = dip->dnl;
 			numtab[DL].val = dip->maxl;
+			prwatchn(DN);
+			prwatchn(DL);
 			dip = &d[--dilev];
 			offset = dip->op;
 		} else if (warn & WARN_DI)
@@ -1101,8 +1127,10 @@ casedi(void)
 	if (newmn) {
 		contab[newmn].rq = j;
 		contab[newmn].nlink = nlink;
+		contab[newmn].flags &= ~FLAG_STRING;
 		if (i != j)
 			maddhash(&contab[newmn]);
+		prwatch(newmn);
 	}
 	k = (int *) & dip->dnl;
 	dip->flss = 0;
@@ -1132,6 +1160,7 @@ void
 caseals(void)
 {
 	int	i, j, k, t;
+	int	flags = 0;
 
 	if (skip(1))
 		return;
@@ -1157,6 +1186,8 @@ caseals(void)
 	} else
 		t = j;
 	if (_finds(i, 0) != 0) {
+		if (oldmn > 0 && newmn)
+			flags = contab[oldmn].flags | contab[newmn].flags;
 		clrmn(oldmn);
 		if (newmn) {
 			if (contab[newmn].rq)
@@ -1165,7 +1196,146 @@ caseals(void)
 			contab[newmn].rq = i;
 			maddhash(&contab[newmn]);
 			contab[k].nlink++;
+			if (flags & FLAG_WATCH)
+				errprint("%s: creating alias %s to %s",
+						macname(lastrq),
+						macname(i), macname(j));
 		}
+	}
+}
+
+
+void
+casewatch(int unwatch)
+{
+	int	i, j;
+
+	lgf++;
+	if (skip(1))
+		return;
+	do {
+		if (!(j = getrq(1)))
+			break;
+		if ((i = findmn(j)) < 0) {
+			if (_finds(j, 0) == 0 || !newmn)
+				continue;
+			if (contab[newmn].rq)
+				munhash(&contab[newmn]);
+			contab[newmn].rq = j;
+			maddhash(&contab[newmn]);
+			i = newmn;
+		}
+		if (unwatch)
+			contab[i].flags &= ~FLAG_WATCH;
+		else
+			contab[i].flags |= FLAG_WATCH;
+	} while (!skip(0));
+}
+
+
+void
+caseunwatch(void)
+{
+	casewatch(1);
+}
+
+
+static int	watchlength = 30;
+
+
+static void
+casewatchlength(void)
+{
+	int	i;
+
+	if (!skip(1)) {
+		noscale++;
+		i = atoi();
+		noscale--;
+		if (!nonumb)
+			watchlength = i;
+		if (watchlength < 0)
+			watchlength = 0;
+	}
+}
+
+
+void
+prwatch(int i)
+{
+	const char prtab[] = {
+		'a',000,000,000,000,000,000,000,
+		'b','t','n',000,000,000,000,000,
+		'{','}','&',000,'%','c','e',' ',
+		'!',000,000,000,000,000,000,'~',
+		000
+	};
+	char	*buf = NULL;
+	filep	savip;
+	tchar	c;
+	int	j, k;
+
+	if (i < 0 || i >= NM)
+		return;
+	if (contab[i].flags & FLAG_WATCH) {
+		if (watchlength <= 10) {
+			errprint("%s: %s %s redefined", macname(lastrq),
+				contab[i].flags & FLAG_STRING ? "string" :
+					"macro",
+				macname(contab[i].rq));
+			return;
+		}
+		savip = ip;
+		ip = (filep)contab[i].mx;
+		app++;
+		j = 0;
+		buf = malloc(watchlength);
+		while ((c = rbf()) != 0) {
+			while (isxfunc(c, CHAR))
+				c = charout[sbits(c)].ch;
+#if !defined (NROFF) && defined (EUC)
+			if (iscopy(c) && (k = wctomb(&buf[j], cbits(c))) > 0)
+				j += k;
+			else
+#endif	/* !NROFF && EUC */
+			if (ismot(c))
+				buf[j++] = '?';
+			else if ((k = cbits(c)) < 0177) {
+				if (isprint(k))
+					buf[j++] = k;
+				else if (k < ' ' && prtab[k]) {
+					buf[j++] = '\\';
+					buf[j++] = prtab[k];
+				} else if (k < ' ') {
+					buf[j++] = '^';
+					buf[j++] = k + 0100;
+				} else
+					buf[j++] = '?';
+			} else if (k == ACUTE)
+				buf[j++] = '\'';
+			else if (k == GRAVE)
+				buf[j++] = '`';
+			else if (j == UNDERLINE)
+				buf[j++] = '_';
+			else if (j == MINUS)
+				buf[j++] = '-';
+			else
+				buf[j++] = '?';
+			if (j >= watchlength - 5 - mb_cur_max) {
+				buf[j++] = '.';
+				buf[j++] = '.';
+				buf[j++] = '.';
+				break;
+			}
+		}
+		buf[j] = 0;
+		ip = savip;
+		app--;
+		errprint("%s: %s %s redefined to \"%s\"", macname(lastrq),
+				contab[i].flags & FLAG_STRING ? "string" :
+					"macro",
+				macname(contab[i].rq), buf);
+		free(buf);
 	}
 }
 
@@ -1289,6 +1459,7 @@ casechop(void)
 	}
 	ip = savip;
 	offset = dip->op;
+	prwatch(j);
 }
 
 void
@@ -1367,6 +1538,7 @@ casesubstring(void)
 			contab[newmn].rq = k;
 			contab[newmn].nlink = nlink;
 			maddhash(&contab[newmn]);
+			prwatch(newmn);
 		}
 	}
 	free(tp);
@@ -1377,7 +1549,7 @@ casesubstring(void)
 void
 caselength(void)
 {
-	int	i, j;
+	int	i, j, k;
 
 	lgf++;
 	skip(1);
@@ -1391,13 +1563,14 @@ caselength(void)
 			j++;
 	}
 	copyf--;
-	numtab[findr(i)].val = j;
+	numtab[k = findr(i)].val = j;
+	prwatchn(k);
 }
 
 void
 caseindex(void)
 {
-	int	i, j, n, N, M;
+	int	i, j, k, n, N, M;
 	int	*sp = NULL, as = 0, ns = 0, *np;
 	tchar	c;
 	filep	savip;
@@ -1450,7 +1623,8 @@ caseindex(void)
 	} else
 		n = -1;
 	copyf--;
-	numtab[findr(N)].val = n;
+	numtab[k = findr(N)].val = n;
+	prwatchn(k);
 }
 
 static void
@@ -1553,6 +1727,7 @@ caseunformat(int flag)
 			contab[newmn].rq = k;
 			contab[newmn].nlink = nlink;
 			maddhash(&contab[newmn]);
+			prwatch(newmn);
 		}
 	}
 	free(tp);
@@ -1668,14 +1843,16 @@ static char	laststr[NC+1];
 char *
 macname(int rq)
 {
-	static char	buf[3];
+	static char	buf[4][3];
+	static int	i;
 	if (rq < 0) {
 		return laststr;
 	} else if (rq < MAXRQ2) {
-		buf[0] = rq&0177;
-		buf[1] = (rq>>BYTE)&0177;
-		buf[2] = 0;
-		return buf;
+		i &= 3;
+		buf[i][0] = rq&0177;
+		buf[i][1] = (rq>>BYTE)&0177;
+		buf[i][2] = 0;
+		return buf[i++];
 	} else if (rq - MAXRQ2 < hadn)
 		return had[rq - MAXRQ2];
 	else

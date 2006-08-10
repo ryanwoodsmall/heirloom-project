@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.117 (gritter) 8/9/06
+ * Sccsid @(#)tdef.h	1.118 (gritter) 8/10/06
  */
 
 /*
@@ -537,6 +537,11 @@ extern enum warn {
 	WARN_W		= 2147483647
 } warn;
 
+enum flags {
+	FLAG_WATCH	= 01,
+	FLAG_STRING	= 02
+};
+
 struct	d {	/* diversion */
 	filep	op;
 	int	dnl;
@@ -586,6 +591,7 @@ extern struct contab {
 	unsigned mx;
 	unsigned int	als;
 	int	nlink;
+	enum flags	flags;
 } *contab;
 extern const struct contab initcontab[];
 
@@ -599,6 +605,7 @@ extern struct numtab {
 	int	nlink;
 	float	fval;
 	float	finc;
+	enum flags	flags;
 } *numtab;
 extern const struct numtab initnumtab[];
 

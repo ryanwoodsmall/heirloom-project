@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.110 (gritter) 8/10/06
+.\" Sccsid @(#)doc.tr	1.111 (gritter) 8/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1510,11 +1510,21 @@ Miscellaneous
 \T'fl'\fB&fl\fR	\(en	\(en	B	Flush output buffer.\T
 .lg
 .mht s_err
-Output and Error Messages
+Output and Error Messages, Debugging
 .bt
 \T'warn'\fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Control warning messages.\T
-.b1 0
+.b1
 \T'spreadwarn'\fB&spreadwarn\fI|N\fR	toggle	\fBm\fR	Spread limit warning.\T
+.b1
+\T'watch'\fB&watch\fI|xx\fR	off	ignore	\(en	Notify on change of string or macro \fIxx\fR.\T
+.b1
+\T'unwatch'\fB&unwatch\fI|xx\fR	off	ignore	\(en	Disable notification for string or macro \fIxx\fR.\T
+.b1
+\T'watchlength'\fB&watchlength\fI|N\fR	ignore	\(en	On change, report contents up to length \fIN\fR.\T
+.b1 0
+\T'watchn'\fB&watchn\fI|R\fR	off	ignore	\(en	Notify on change of register \fIR\fR.\T
+.b1 0
+\T'unwatchn'\fB&unwatchn\fI|R\fR	off	ignore	\(en	Disable notification for register \fIR\fR.\T
 .mht s_color
 Color Support
 .mht s_pics
@@ -1705,8 +1715,13 @@ Device and Font Description Files
 \T'uf'uf	10\T
 \T'ul'ul	10\T
 \T'unformat'unformat	7\T
+\T'unwatch'unwatch	21\T
+\T'unwatchn'unwatchn	21\T
 \T'vs'vs	5\T
 \T'warn'warn	21\T
+\T'watch'watch	21\T
+\T'watchlength'watchlength	21\T
+\T'watchn'watchn	21\T
 \T'wh'wh	7\T
 \T'while'while	16\T
 \T'write'write	19\T
@@ -5151,8 +5166,9 @@ Flush output buffer.
 Force output,
 including any pending position information.
 .mha s_err
-Output and Error Messages.
-.pg
+Output and Error Messages, Debugging.
+.sc
+Output Messages.
 The output from \T'tm'\fBtm\fR\T,
 \T'pm'\fBpm\fR\T, and the prompt from \T'rd'\fBrd\fR\T,
 as well as various \fIerror\fR messages are written onto
@@ -5161,18 +5177,18 @@ The latter is different from the \fIstandard output\fR,
 where formatted text goes.
 By default, both are written onto the user's terminal,
 but they can be independently redirected.
-.pg
+.sc
+Warnings.
 \A's_warning'\*(NR and \*(TR provide a mechanism
 to enable or disable warnings for several categories.
 When one of the selected conditions occurs,
 a \fIwarning\fR message is written onto the standard error,
 but processing continues.
 .sp
-.ne 32
 .TS
-box center;
-rfB | lfB | lfB
-n | lfB | lw(4.0i).
+center;
+rfB lfB lfB
+n lfB lw(4.0i).
 Bit	Name	Description
 _
 0	none	No warnings at all.
@@ -5236,7 +5252,8 @@ This may be the best choice when using existing macro packages.
 T}
 	w	All warnings.
 .TE
-.pg
+.sc
+Errors.
 Various \fIerror\fR conditions may occur during
 the operation of \*(NR and \*[TR.]
 Certain less serious errors having only local impact do not
@@ -5257,6 +5274,25 @@ along with a list of the macro names currently active.
 Examples are the inability to create, read, or write files,
 and the exceeding of certain internal limits that
 make future output unlikely to be useful.
+.sc
+Debugging.
+Strings, macros, and number registers
+can be \fIwatched\fR.
+Whenever a change of a watched object occurs,
+or when the object is renamed, removed, or aliased,
+a notification message is printed.
+It includes the current line number,
+the current macro stack,
+the name of the current (or last previous) request,
+the name of the objects affected,
+and, in case of a change,
+the new contents of the object.
+.pg
+When an object is removed,
+watching is disabled.
+If an object of the same name is created later,
+it is not watched
+unless watching is explicitly enabled for it again.
 .h1
 .bta warn
 \fB&warn\fI|\(+-bits\(or\^name\fR	\fIw\fR	\(en	Control warning messages,
@@ -5280,6 +5316,24 @@ warning message is disabled.
 Calling this request without an
 argument toggles the warning message; calling it with an argument
 enables the warning and sets the limit to \fIN\fR (default scale m).
+.bta watch
+\fB&watch\fI|xx\fR	off	ignore	\(en	Notify on change of string or macro \fIxx\fR.
+If \fIxx\fR does not exist,
+it is created as an empty macro
+in order to watch future changes.
+.bta unwatch
+\fB&unwatch\fI|xx\fR	off	ignore	\(en	Disable notification for string or macro \fIxx\fR.
+.bta watchlength
+\fB&watchlength\fI|N\fR	ignore	\(en	On change, report
+the contents of macros and strings up to length \fIN\fR.
+When \fIN\fR is zero or small,
+printing of macro and string contents is disabled.
+.bta watchn
+\fB&watchn\fI|R\fR	off	ignore	\(en	Notify on change of register \fIR\fR.
+.bta unwatchn
+\fB&unwatchn\fI|R\fR	off	ignore	\(en	Disable notification for register \fIR\fR.
+If \fIR\fR does not exist,
+it is created in order to watch future changes.
 .pg
 .mha s_color
 Color Support

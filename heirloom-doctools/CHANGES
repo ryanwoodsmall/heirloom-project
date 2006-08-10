@@ -12,6 +12,8 @@ Release ...
   an expression with floating-point computation.
 * [nt]roff: Exponential notation, as in "1e+10", is now supported in
   numerical expressions.
+* [nt]roff: Debugging requests for watching macros, strings, and number
+  registers have been added.
 * [nt]roff: The ".cp" request has been added to control compatibility with
   groff.
 * [nt]roff: The "-mg" macro package has been added for improved support of
