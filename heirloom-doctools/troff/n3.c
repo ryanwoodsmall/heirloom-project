@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.134 (gritter) 8/11/06
+ * Sccsid @(#)n3.c	1.135 (gritter) 8/11/06
  */
 
 /*
@@ -324,15 +324,16 @@ caserm(void)
 
 	lgf++;
 	while (!skip(!cnt++) && (j = getrq(0)) != 0) {
-		k = _findmn(j, 0);
-		if (k >= 0 && contab[k].als) {
+		if ((k = _findmn(j, 0)) < 0)
+			continue;
+		if (contab[k].als) {
 			i = _findmn(j, 1);
 			if (--contab[i].nlink <= 0)
 				clrmn(i);
 		}
-		if (k >= 0 && contab[k].nlink > 0)
+		if (contab[k].nlink > 0)
 			contab[k].nlink--;
-		if (k >= 0 && contab[k].flags & FLAG_WATCH)
+		if (contab[k].flags & FLAG_WATCH)
 			errprint("%s: %s removed", macname(lastrq),
 					macname(j));
 		if (contab[k].nlink <= 0)
