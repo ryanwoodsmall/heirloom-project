@@ -46,7 +46,7 @@ troff.d/otf.c: * Sccsid @(#)otf.c	1.57 (gritter) 8/8/06
 troff.d/otfdump.c: * Sccsid @(#)otfdump.c	1.15 (gritter) 3/16/06
 troff.d/pt.h: * Sccsid @(#)pt.h	1.51 (gritter) 8/6/06
 troff.d/t10.c: * Sccsid @(#)t10.c	1.83 (gritter) 8/6/06
-troff.d/t6.c: * Sccsid @(#)version.c	7.56 (gritter) 8/10/06
+troff.d/t6.c: * Sccsid @(#)t6.c	1.165 (gritter) 8/10/06
 troff.d/troff.h: * Sccsid @(#)troff.h	1.25 (gritter) 7/11/06
 troff.d/unimap.c: * Sccsid @(#)unimap.c	1.13 (gritter) 2/16/06
 troff.d/unimap.h: * Sccsid @(#)unimap.h	1.2 (gritter) 12/22/05
