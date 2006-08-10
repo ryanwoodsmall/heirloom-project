@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.77 (gritter) 8/10/06
+ * Sccsid @(#)n5.c	1.78 (gritter) 8/10/06
  */
 
 /*
@@ -1231,6 +1231,8 @@ casenop(void)
 void
 casereturn(void)
 {
+	flushi();
+	nflush++;
 	while (frame->loopf) {
 		frame->loopf = LOOP_FREE;
 		popi();
@@ -1308,6 +1310,8 @@ casecontinue(int _break)
 					i, j);
 		return;
 	}
+	flushi();
+	nflush++;
 	while (i > 1 || _break && i > 0) {
 		if (frame->loopf) {
 			frame->loopf = LOOP_FREE;
