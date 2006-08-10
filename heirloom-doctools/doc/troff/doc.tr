@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.109 (gritter) 8/9/06
+.\" Sccsid @(#)doc.tr	1.110 (gritter) 8/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -92,7 +92,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/9/06
+.ds Sccsdate 8/10/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1445,9 +1445,9 @@ accept \fIanything\fR.\T
 .b1
 \T'while'\fB&while\fI|c|anything\fR	\(en	\(en	Execute \fIanything\fR while \fIc\fR (like \fBif\fR) is true.\T
 .b1 0
-\T'break'\fB&break\fI|n\fR		\(en	1	Break out of \fIn\fR nested \fBwhile\fR loops.\T
+\T'break'\fB&break\fI|n\fR	\(en	1	\(en	Break out of \fIn\fR nested \fBwhile\fR loops.\T
 .b1 0
-\T'continue'\fB&continue\fI|n\fR		\(en	1	Continue at the \fIn\fR-th nested \fBwhile\fR loop.\T
+\T'continue'\fB&continue\fI|n\fR	\(en	1	\(en	Continue at the \fIn\fR-th nested \fBwhile\fR loop.\T
 .mht s_env
 Environment Switching.
 .bt
