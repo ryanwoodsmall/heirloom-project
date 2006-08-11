@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.115 (gritter) 8/11/06
+.\" Sccsid @(#)doc.tr	1.116 (gritter) 8/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -3736,6 +3736,9 @@ Subsequent references will have no effect.
 If many macros and strings are being created dynamically, it
 may become necessary to remove unused ones
 to recapture internal storage space for newer registers.
+If a macro is removed while it is in use,
+associated storage is not released,
+and a \T's_warning'warning of the \fBmac\fR category\T is emitted.
 .bta rn
 \fB&rn\fI|xx|yy\fR	\(en	ignored	\(en	Rename request, macro, or string
 \fIxx\fR to \fIyy\fR.

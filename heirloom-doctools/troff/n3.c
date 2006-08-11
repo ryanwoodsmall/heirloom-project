@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.138 (gritter) 8/11/06
+ * Sccsid @(#)n3.c	1.139 (gritter) 8/11/06
  */
 
 /*
@@ -450,8 +450,17 @@ findmn(int i)
 void
 clrmn(register int i)
 {
+	struct s	*s;
+
 	if (i >= 0) {
-		if (contab[i].mx)
+		if (contab[i].flags & FLAG_USED) {
+			if (warn & WARN_MAC)
+				errprint("Macro %s removed while in use",
+						macname(contab[i].rq));
+			for (s = frame; s != stk; s = s->pframe)
+				if (s->contp == i)
+					s->contp = 0;
+		} else if (contab[i].mx)
 			ffree((filep)contab[i].mx);
 		munhash(&contab[i]);
 		memset(&contab[i], 0, sizeof contab[i]);
@@ -513,7 +522,7 @@ _finds(register int mn, int als)
 			contab[i].rq = mn;
 			maddhash(&contab[i]);
 		}
-		contab[i].flags = flags;
+		contab[i].flags = flags & (FLAG_WATCH|FLAG_STRING);
 	}
 	app = 0;
 	return(als ? offset = nextb : 1);
@@ -818,6 +827,8 @@ popi(void)
 		free(p->argt);
 		free(p->argsp);
 	}
+	if (p->contp > 0)
+		contab[p->contp].flags &= ~FLAG_USED;
 	frame = p->pframe;
 	ip = p->pip;
 	pendt = p->ppendt;
@@ -898,7 +909,7 @@ getsn(int create)
 int 
 setstr(void)
 {
-	register int i, j;
+	register int i, j, k;
 	int	space = 0;
 	tchar	c;
 
@@ -923,7 +934,10 @@ setstr(void)
 			nxf->nargs = 0;
 		strflg++;
 		lgf--;
-		return pushi((filep)contab[j].mx, i);
+		contab[j].flags |= FLAG_USED;
+		k = pushi((filep)contab[j].mx, i);
+		frame->contp = j;
+		return(k);
 	}
 }
 
@@ -1229,6 +1243,7 @@ caseals(void)
 	if (_finds(i, 0) != 0) {
 		if (oldmn > 0 && newmn)
 			flags = contab[oldmn].flags | contab[newmn].flags;
+		flags &= FLAG_WATCH|FLAG_STRING;
 		clrmn(oldmn);
 		if (newmn) {
 			if (contab[newmn].rq)
