@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.108 (gritter) 8/11/06
+ * Sccsid @(#)n1.c	1.109 (gritter) 8/11/06
  */
 
 /*
@@ -2123,6 +2123,7 @@ casechar(int flag)
 	tchar	c, *tp = NULL;
 
 	defcf++;
+	charf++;
 	if (skip(1))
 		return;
 	c = getch();
@@ -2160,6 +2161,7 @@ casechar(int flag)
 		return;
 	}
 	defcf--;
+	charf--;
 	copyf++;
 	size = 10;
 	tp = malloc(size * sizeof *tp);
@@ -2223,6 +2225,7 @@ struct fmtchar {
 	struct env	saveev;
 	int	savvflag;
 	int	savvpt;
+	int	savhp;
 	tchar	*csp;
 	int	charcount;
 };
@@ -2257,6 +2260,7 @@ prepchar(struct fmtchar *fp)
 	vflag = 0;
 	fp->savvpt = vpt;
 	vpt = 0;
+	fp->savhp = numtab[HP].val;
 	fp->saveev = env;
 	evc(&env, &env);
 	in = in1 = 0;
@@ -2286,6 +2290,7 @@ restchar(struct fmtchar *fp, int keepf)
 	env = fp->saveev;
 	vflag = fp->savvflag;
 	vpt = fp->savvpt;
+	numtab[HP].val = fp->savhp;
 }
 
 tchar
