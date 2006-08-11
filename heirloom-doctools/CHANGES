@@ -52,6 +52,8 @@ Release ...
 * [nt]roff: The ".aln" request has been added to create an alias name
   for a number register.
 * [nt]roff: The ".rnn" request has been added to rename a number register.
+* [nt]roff: The ".box" request has been added; it is like ".di" but saves
+  and restores a previous partially filled line.
 * [nt]roff: The ".rj" request (right-align next input lines) has been
   added. The ".rj" number register that holds the number of remaining
   lines to be right-adjusted has been added.

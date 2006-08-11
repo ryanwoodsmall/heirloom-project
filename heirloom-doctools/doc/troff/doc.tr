@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.114 (gritter) 8/11/06
+.\" Sccsid @(#)doc.tr	1.115 (gritter) 8/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1284,6 +1284,10 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'da'\fB&da\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR.\T
 .b1
+\T'box'\fB&box\fI|xx\fR	\(en	end	D	Divert output to macro \fIxx\fR, excluding a partially filled line.\T
+.b1
+\T'boxa'\fB&boxa\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR, excluding a partially filled line.\T
+.b1
 \T'unformat'\fB&unformat\fI|xx\fR	\(en	\(en	\(en	Strip line break information from diversion \fIxx\fR.\T
 .b1
 \T'asciify'\fB&asciify\fI|xx\fR	\(en	\(en	\(en	All characters in diversion \fIxx\fR changed to plain text.\T
@@ -1577,6 +1581,8 @@ Device and Font Description Files
 \T'bd'bd	2\T
 \T'bleedat'bleedat	3\T
 \T'blm'blm	7\T
+\T'box'box	7\T
+\T'boxa'boxa	7\T
 \T'bp'bp	3\T
 \T'br'br	4\T
 \T'break'break	16\T
@@ -3590,6 +3596,18 @@ the internally-saved marked place (see \T'mk'\fBmk\fR\T and \T'rt'\fBrt\fR\T),
 the current vertical place (\A'n_.d'\fB.d\fR register),
 the current high-water text base-line \T'n_.h'(\fB.h\fR register)\T,
 and the current diversion name (\A'n_.z'\fB.z\fR register).
+.pg
+A previous partially filled line is included when a diversion begins.
+A partially filled line at the end of a diversion
+is not included but becomes part of the surrounding diversion level.
+With the \T'box'\fBbox\fR\T request,
+a previous partially filled line is not included.
+At the end of the diversion,
+this partially filled line is restored
+at the surrounding level,
+discarding any partially filled line
+from within the diversion.
+The behavior is otherwise the same as with a standard diversion.
 .sc
 \A'c_trap'Traps.
 Four types of trap mechanisms are available\(empage traps,
@@ -3732,6 +3750,10 @@ requests of this type should not appear when nested diversions are being used.
 .bta da
 \fB&da|\fIxx\fR	\(en	end	D	Divert, appending to \fIxx\fR
 (append version of \fBdi\fR).
+.bta box
+\fB&box\fI|xx\fR	\(en	end	D	Divert output to macro \fIxx\fR, excluding a partially filled line.
+.bta boxa
+\fB&boxa\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR, excluding a partially filled line.
 .bta unformat
 \fB&unformat\fI|xx\fR	\(en	\(en	\(en	Strip line break information from diversion \fIxx\fR.
 All breaks that do not result
@@ -4965,6 +4987,7 @@ except that the acceptance state is remembered.
 A subsequent and matching \T'el'\fBel\fR\T (else) request then uses the reverse sense of that state.
 \fBie\fR|-|\fBel\fR pairs may be nested.
 .pg
+.ne 3
 Some examples are:
 .x1
 .ft B
@@ -5470,10 +5493,10 @@ comment is present, the picture is
 assumed to fill an 8.5\(mu11-inch page.
 Nothing prevents the picture from being placed off the page.
 .pg
+.nr nosave 1
+.ne 9
 An example how to combine the following requests and macros is:
 .x1
-.nr nosave 1
-.ne 7
 &psbb picture.eps
 &nr scale 4
 &nr y (\en[ury]p\-\en[lly]p)/\en[scale]

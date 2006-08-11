@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.119 (gritter) 8/10/06
+ * Sccsid @(#)tdef.h	1.120 (gritter) 8/11/06
  */
 
 /*
@@ -559,6 +559,7 @@ struct	d {	/* diversion */
 	int	hnl;
 	int	curd;
 	int	flss;
+	struct env	*boxenv;
 };
 
 struct	charout {	/* formatted result of .char */

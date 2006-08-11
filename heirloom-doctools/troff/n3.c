@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.137 (gritter) 8/11/06
+ * Sccsid @(#)n3.c	1.138 (gritter) 8/11/06
  */
 
 /*
@@ -96,6 +96,8 @@ static const struct {
 	{ "asciify",		(void(*)(int))caseasciify },
 	{ "bleedat",		(void(*)(int))casebleedat },
 	{ "blm",		(void(*)(int))caseblm },
+	{ "box",		(void(*)(int))casebox},
+	{ "boxa",		(void(*)(int))caseboxa},
 	{ "break",		(void(*)(int))casebreak},
 	{ "breakchar",		(void(*)(int))casebreakchar },
 	{ "brp",		(void(*)(int))casebrp },
@@ -1069,16 +1071,29 @@ caseshift(void)
 	}
 }
 
+
 void
-caseda(void)
+casebox(void)
+{
+	casedi(1);
+}
+
+void
+caseboxa(void)
+{
+	caseda(1);
+}
+
+void
+caseda(int box)
 {
 	app++;
-	casedi();
+	casedi(box);
 }
 
 
 void
-casedi(void)
+casedi(int box)
 {
 	register int i, j;
 	register int *k;
@@ -1098,6 +1113,16 @@ casedi(void)
 			numtab[DL].val = dip->maxl;
 			prwatchn(DN);
 			prwatchn(DL);
+			if (dip->boxenv) {
+				free(line);
+				free(word);
+				free(hcode);
+				evcline(&env, dip->boxenv);
+				free(dip->boxenv->_line);
+				free(dip->boxenv->_word);
+				free(dip->boxenv->_hcode);
+				free(dip->boxenv);
+			}
 			dip = &d[--dilev];
 			offset = dip->op;
 		} else if (warn & WARN_DI)
@@ -1146,6 +1171,12 @@ casedi(void)
 	dip->flss = 0;
 	for (j = 0; j < 10; j++)
 		k[j] = 0;	/*not op and curd*/
+	if (box) {
+		dip->boxenv = malloc(sizeof *dip->boxenv);
+		*dip->boxenv = env;
+		evc(&env, &env);
+	} else
+		dip->boxenv = 0;
 rtn:
 	app = 0;
 	diflg = 0;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.79 (gritter) 8/11/06
+ * Sccsid @(#)n5.c	1.80 (gritter) 8/11/06
  */
 
 /*
@@ -1024,11 +1024,13 @@ evc(struct env *dp, struct env *sp)
 {
 	char	*name;
 
-	name = dp->_evname;
-	memmove(dp, sp, sizeof *dp);
-	dp->_hcode = malloc(dp->_nhcode * sizeof *dp->_hcode);
-	memmove(dp->_hcode, sp->_hcode, dp->_nhcode * sizeof *dp->_hcode);
-	dp->_evname = name;
+	if (dp != sp) {
+		name = dp->_evname;
+		memcpy(dp, sp, sizeof *dp);
+		dp->_hcode = malloc(dp->_nhcode * sizeof *dp->_hcode);
+		memcpy(dp->_hcode, sp->_hcode, dp->_nhcode * sizeof *dp->_hcode);
+		dp->_evname = name;
+	}
 	dp->_pendnf = 0;
 	dp->_pendw = 0;
 	dp->_pendt = 0;
@@ -1065,6 +1067,49 @@ evc(struct env *dp, struct env *sp)
 	dp->_lnmod = 0;
 	dp->_hlc = 0;
 	setnel();
+}
+
+void
+evcline(struct env *dp, struct env *sp)
+{
+	if (dp == sp)
+		return;
+#ifndef	NROFF
+	dp->_lspnc = sp->_lspnc;
+	dp->_lsplow = sp->_lsplow;
+	dp->_lsphigh = sp->_lsphigh;
+	dp->_lspcur = sp->_lspcur;
+	dp->_lsplast = sp->_lsplast;
+	dp->_lshwid = sp->_lshwid;
+	dp->_lshlow = sp->_lshlow;
+	dp->_lshhigh = sp->_lshhigh;
+	dp->_lshcur = sp->_lshcur;
+#endif
+	dp->_fldcnt = sp->_fldcnt;
+	dp->_hyoff = sp->_hyoff;
+	dp->_hlc = sp->_hlc;
+	dp->_adflg = sp->_adflg;
+	dp->_adspc = sp->_adspc;
+	dp->_wne = sp->_wne;
+	dp->_ne = sp->_ne;
+	dp->_nc = sp->_nc;
+	dp->_nwd = sp->_nwd;
+	dp->_un = sp->_un;
+	dp->_wch = sp->_wch;
+	dp->_rhang = sp->_rhang;
+	dp->_cht = sp->_cht;
+	dp->_cdp = sp->_cdp;
+	if (icf == 0)
+		dp->_ic = sp->_ic;
+	memcpy(dp->_hyptr, sp->_hyptr, NHYP * sizeof *sp->_hyptr);
+	dp->_line = malloc((dp->_lnsize = sp->_lnsize) * sizeof *dp->_line);
+	memcpy(dp->_line, sp->_line, sp->_lnsize * sizeof *sp->_line);
+	dp->_word = malloc((dp->_wdsize = sp->_wdsize) * sizeof *dp->_word);
+	memcpy(dp->_word, sp->_word, sp->_wdsize * sizeof *sp->_word);
+	dp->_linep = sp->_linep + (dp->_line - sp->_line);
+	dp->_wordp = sp->_wordp + (dp->_word - sp->_word);
+	dp->_wdend = sp->_wdend + (dp->_word - sp->_word);
+	dp->_wdstart = sp->_wdstart + (dp->_word - sp->_word);
 }
 
 void

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.75 (gritter) 8/11/06
+ * Sccsid @(#)ext.h	1.76 (gritter) 8/11/06
  */
 
 /*
@@ -328,8 +328,10 @@ extern int	getsn(int);
 extern int	setstr(void);
 extern void	collect(void);
 extern void	seta(void);
-extern void	caseda(void);
-extern void	casedi(void);
+extern void	casebox(void);
+extern void	caseboxa(void);
+extern void	caseda(int);
+extern void	casedi(int);
 extern void	casedt(void);
 extern void	caseals(void);
 extern void	casewatch(int);
@@ -438,6 +440,7 @@ extern void	casefl(void);
 extern void	caseev(void);
 extern void	caseevc(void);
 extern void	evc(struct env *, struct env *);
+extern void	evcline(struct env *, struct env *);
 extern void	caseel(void);
 extern void	caseie(void);
 extern void	caseif(int);
