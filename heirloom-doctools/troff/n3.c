@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.136 (gritter) 8/11/06
+ * Sccsid @(#)n3.c	1.137 (gritter) 8/11/06
  */
 
 /*
@@ -84,7 +84,7 @@ static void	caselength(void);
 static void	caseindex(void);
 static void	caseasciify(void);
 static void	caseunformat(int);
-static int	getls(int, int *);
+static int	getls(int, int *, int);
 static void	addcon(int, char *, void(*)(int));
 
 static const struct {
@@ -872,7 +872,7 @@ setbrk(int x)
 
 
 static int
-_getsn(int *strp)
+_getsn(int *strp, int create)
 {
 	register int i;
 
@@ -881,15 +881,15 @@ _getsn(int *strp)
 	if (i == '(')
 		return(getrq2());
 	else if (i == '[' && xflag > 1)
-		return(getls(']', strp));
+		return(getls(']', strp, create));
 	else 
 		return(i);
 }
 
 int
-getsn(void)
+getsn(int create)
 {
-	return _getsn(0);
+	return _getsn(0, create);
 }
 
 
@@ -901,7 +901,7 @@ setstr(void)
 	tchar	c;
 
 	lgf++;
-	if ((i = _getsn(&space)) == 0 || (j = findmn(i)) == -1 ||
+	if ((i = _getsn(&space, 0)) == 0 || (j = findmn(i)) == -1 ||
 			!contab[j].mx) {
 		if (space) {
 			do {
@@ -1968,7 +1968,7 @@ maybemore(int sofar, int flags)
 }
 
 static int
-getls(int termc, int *strp)
+getls(int termc, int *strp, int create)
 {
 	char	c, buf[NC+1];
 	int	i = 0, j = -1, n = -1;
@@ -1994,8 +1994,18 @@ getls(int termc, int *strp)
 		j = PAIR(buf[0], buf[1]);
 	} else {
 		if ((n = mapget(buf)) >= hadn) {
-			n = -1;
-			strcpy(laststr, buf);
+			if (create) {
+				if (hadn++ >= alcd)
+					had = realloc(had, (alcd += 20) *
+							sizeof *had);
+				had[n] = malloc(strlen(buf) + 1);
+				strcpy(had[n], buf);
+				hadn = n + 1;
+				mapadd(buf, n);
+			} else {
+				n = -1;
+				strcpy(laststr, buf);
+			}
 		}
 	}
 	return n >= 0 ? MAXRQ2 + n : j;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.74 (gritter) 8/11/06
+ * Sccsid @(#)ext.h	1.75 (gritter) 8/11/06
  */
 
 /*
@@ -324,7 +324,7 @@ extern filep	incoff(register filep);
 extern tchar	popi(void);
 extern int	pushi(filep, int);
 extern char	*setbrk(int);
-extern int	getsn(void);
+extern int	getsn(int);
 extern int	setstr(void);
 extern void	collect(void);
 extern void	seta(void);

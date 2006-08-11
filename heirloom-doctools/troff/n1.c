@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.107 (gritter) 8/11/06
+ * Sccsid @(#)n1.c	1.108 (gritter) 8/11/06
  */
 
 /*
@@ -1255,7 +1255,7 @@ copy:
 		setov();
 		goto g0;
 	case 'k':	/* mark hor place */
-		if ((k = findr(getsn())) != -1) {
+		if ((k = findr(getsn(1))) != -1) {
 			numtab[k].val = numtab[HP].val;
 			prwatchn(k);
 		}
@@ -1313,7 +1313,7 @@ copy:
 	case 'm':
 	case 'M':
 		if (gflag) {	/* font family, color */
-			if ((i = getsn()) > 0 && warn & WARN_ESCAPE)
+			if ((i = getsn(0)) > 0 && warn & WARN_ESCAPE)
 				errprint("\\%c[%s] unimplemented",
 						k, macname(i));
 			goto g0;
@@ -1373,7 +1373,7 @@ setxon(void)	/* \X'...' for copy through */
 static tchar
 setyon(void)	/* \Y(xx for indirect copy through */
 {
-	storerq(getsn());
+	storerq(getsn(0));
 	return mkxfunc(YON, 0);
 }
 

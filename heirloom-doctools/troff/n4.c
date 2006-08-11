@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.58 (gritter) 8/11/06
+ * Sccsid @(#)n4.c	1.59 (gritter) 8/11/06
  */
 
 /*
@@ -130,7 +130,7 @@ _setn(int tm)	/* tm: test for presence of readonly register */
 		ch = ii;
 	if (falsef)
 		f = 0;
-	if ((i = getsn()) == 0)
+	if ((i = getsn(1)) == 0)
 		return(0);
 sl:
 	name = macname(i);
@@ -1450,7 +1450,7 @@ setaf (void)	/* return format of number register */
 {
 	register int i, j;
 
-	i = usedr(getsn());
+	i = usedr(getsn(0));
 	if (i == -1)
 		return;
 	if (numtab[i].fmt > 20)	/* it was probably a, A, i or I */

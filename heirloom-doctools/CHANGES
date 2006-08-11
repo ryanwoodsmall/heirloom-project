@@ -100,6 +100,8 @@ Release ...
   ignored.
 * [nt]roff: The ".return" request has been fixed not to ignore the next
   line of input when followed by text on the same line.
+* [nt]roff: The "\k[name]" escape sequence has been fixed to work if
+  "name" has not been previously been used.
 * [nt]roff: The "\(dq" character has been introduced as an alternate name
   for the ASCII double quote character.
 * dpost: Character height and slant changes now only apply to the current
