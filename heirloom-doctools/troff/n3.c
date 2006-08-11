@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.135 (gritter) 8/11/06
+ * Sccsid @(#)n3.c	1.136 (gritter) 8/11/06
  */
 
 /*
@@ -452,6 +452,7 @@ clrmn(register int i)
 		if (contab[i].mx)
 			ffree((filep)contab[i].mx);
 		munhash(&contab[i]);
+		memset(&contab[i], 0, sizeof contab[i]);
 		contab[i].rq = 0;
 		contab[i].mx = 0;
 		contab[i].f = 0;
