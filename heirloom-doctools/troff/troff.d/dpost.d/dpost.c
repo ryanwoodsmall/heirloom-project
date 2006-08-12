@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.152 (gritter) 8/11/06
+ * Sccsid @(#)dpost.c	1.153 (gritter) 8/12/06
  */
 
 /*
@@ -374,7 +374,7 @@ char		*realdev = DEVNAME;	/* a good description of target printer */
 
 
 struct dev	dev;			/* DESC starts this way */
-struct Font	*fontbase[NFONT+1];	/* FONT files begin this way */
+struct Font	**fontbase;		/* FONT files begin this way */
 int		*pstab;			/* list of available sizes */
 int		nsizes = 1;		/* and the number of sizes in that list */
 int		smnt;			/* index of first special font */
@@ -1852,6 +1852,7 @@ fontinit(void)
     fontab = calloc(NFONT+1, sizeof *fontab);
     codetab = calloc(NFONT+1, sizeof *codetab);
     kerntab = calloc(NFONT+1, sizeof *kerntab);
+    fontbase = calloc(NFONT+1, sizeof *fontbase);
 
     for ( i = 1; i <= NFONT; i++ )  {	/* so loadfont() knows nothing's there */
 	fontbase[i] = NULL;

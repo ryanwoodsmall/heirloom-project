@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.111 (gritter) 8/12/06
+ * Sccsid @(#)n1.c	1.112 (gritter) 8/12/06
  */
 
 /*
@@ -2085,6 +2085,10 @@ casexflag(void)
 {
 	int	i;
 
+#ifndef	NROFF
+	if (gflag == 1)
+		zapwcache(1);
+#endif
 	gflag = 0;
 	setnr(".g", gflag, 0);
 	skip(1);
@@ -2099,6 +2103,10 @@ void
 casecp(void)
 {
 	if (xflag) {
+#ifndef	NROFF
+		if (gflag == 0)
+			zapwcache(1);
+#endif
 		gflag = 1;
 		noscale++;
 		if (skip(1) || atoi() && !nonumb)

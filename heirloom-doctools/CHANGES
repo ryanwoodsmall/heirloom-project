@@ -54,6 +54,8 @@ Release ...
 * [nt]roff: The ".rnn" request has been added to rename a number register.
 * [nt]roff: The ".box" request has been added; it is like ".di" but saves
   and restores a previous partially filled line.
+* [nt]roff: The ".spacewidth" request has been introduced to default to
+  the width of the space character as obtained from the font metrics file.
 * [nt]roff: The ".rj" request (right-align next input lines) has been
   added. The ".rj" number register that holds the number of remaining
   lines to be right-adjusted has been added.

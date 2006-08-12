@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.116 (gritter) 8/11/06
+.\" Sccsid @(#)doc.tr	1.117 (gritter) 8/12/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -92,7 +92,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/11/06
+.ds Sccsdate 8/12/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1156,8 +1156,10 @@ mode (font \fIF\^\fR\^).\T
 \T'feature'\fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	Control OpenType features.\T
 .b1
 \T'fallback'\fB&fallback\fI|F|A|B|...\fR	ignored	P,T	Select the fallback sequence for font \fIF\fR.\T
-.b1 0
+.b1
 \T'hidechar'\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hide the characters \fIc\fR, \fId\fR, etc. from font F.\T
+.b1 0
+\T'spacewidth'\fB&spacewidth\fI|\fIN\fR	on	T	Use the space width from the font metrics file.\T
 .b1 0
 \T'fspacewidth'\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Set the width
 of the space character in font \fIF\fR to \fIN\fR.\T
@@ -1707,6 +1709,7 @@ Device and Font Description Files
 \T'shift'shift	7\T
 \T'so'so	19\T
 \T'sp'sp	5\T
+\T'spacewidth'spacewidth	2\T
 \T'spreadwarn'spreadwarn	21\T
 \T'ss'ss	2\T
 \T'substring'substring	7\T
@@ -2737,6 +2740,14 @@ If the characters appear in input afterwards,
 they are searched in other fonts using the fallback sequence.
 This is useful e.g. for combining characters from a regular
 and a Type\ 1 expert font.
+.bta spacewidth
+\fB&spacewidth\fI|\fIN\fR	on	T	Use the space width from the font metrics file.
+The space width normally defaults to 1/3\|em for
+variable-width fonts, or to the width of the \fBspace\fR character
+for monospaced fonts.
+With this request, the space width
+is set to the width of the \fBspace\fR character as obtained from the
+font metrics file.
 .bta fspacewidth
 \fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Set the width
 of the space character in font \fIF\fR to \fIN\fR,
@@ -2746,10 +2757,6 @@ definitions).
 If only one argument is present, the space width
 is set to the width of the \fBspace\fR character as obtained from the
 font metrics file.
-If the space width for a font is not set
-explicitly using this request, it defaults to 1/3 em for
-variable-width fonts, or to the width of the \fBspace\fR character
-for monospaced fonts.
 .xx
 When the width of spaces in output is actually computed,
 the space size as set by \T'ss'\fBss\fR\T is also taken into account.
@@ -6259,6 +6266,11 @@ The \fB&x\fR and \fB&y\fR registers
 are read-write in \*(GR compatibility mode;
 they correspond to the emulated \*(GR version number.
 The \fBcp\fR request sets them to 1 and 18, respectively.
+.pg
+The space width always defaults to the value
+obtained from the font metrics file
+in \*(GR compatibility mode;
+the \T'spacewidth'\fBspacewidth\fR\T request is not effective.
 .pg
 Any call to the \fBcp\fR request
 activates the \*(GR compatibility escape sequences described below;

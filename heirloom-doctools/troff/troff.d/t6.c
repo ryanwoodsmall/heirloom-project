@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.169 (gritter) 8/12/06
+ * Sccsid @(#)t6.c	1.170 (gritter) 8/12/06
  */
 
 /*
@@ -95,6 +95,7 @@ struct ref	*anchors, *links;
 static int	_minflg;
 int	lastrst;
 int	lastrsb;
+int	spacewidth;
 
 static void	kernsingle(int **);
 static int	_ps2cc(const char *name, int create);
@@ -215,7 +216,13 @@ getcw(register int i)
 			nocache = 1;
 		} else
 			j = spacesz;
-		k = (fontab[xfont][0] * j + 6) / 12;
+		if (fontbase[xfont]->cspacewidth >= 0)
+			k = fontbase[xfont]->cspacewidth;
+		else if (spacewidth || gflag)
+			k = fontbase[xfont]->spacewidth;
+		else
+			k = fontab[xfont][0];
+		k = (k * j + 6) / 12;
 		lastrst = lastrsb = 0;
 		/* this nonsense because .ss cmd uses 1/36 em as its units */
 		/* and default is 12 */
@@ -1785,8 +1792,6 @@ ret:
 void
 casefspacewidth(void)
 {
-	struct namecache	*np;
-	struct afmtab	*a;
 	int	f, n, i;
 
 	lgf++;
@@ -1796,23 +1801,28 @@ casefspacewidth(void)
 	if ((f = findft(i, 1)) < 0)
 		return;
 	if (skip(0)) {
-		fontab[f][0] = dev.res * dev.unitwidth / 72 / 3;
-		if (afmtab && (i = fontbase[f]->afmpos - 1) >= 0) {
-			a = afmtab[i];
-			np = afmnamelook(a, "space");
-			if (np->afpos != 0)
-				fontab[f][0] = fontab[f][np->afpos];
-		}
+		fontbase[f]->cspacewidth = -1;
+		fontab[f][0] = fontbase[f]->spacewidth;
 	} else {
 		noscale++;
 		n = atoi();
 		noscale--;
 		unitsPerEm = 1000;
-		fontab[f][0] = _unitconv(n);
+		if (n >= 0)
+			fontbase[f]->cspacewidth = fontab[f][0] = _unitconv(n);
+		else if (warn & WARN_RANGE)
+			errprint("ignoring negative space width %d", n);
 	}
 	zapwcache(1);
 }
 
+void
+casespacewidth(void)
+{
+	noscale++;
+	spacewidth = skip(0) || atoi();
+	noscale--;
+}
 
 tchar xlss(void)
 {
@@ -1927,6 +1937,7 @@ loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 	char	*path, *contents;
 	struct afmtab	*a;
 	int	i, have = 0;
+	struct namecache	*np;
 
 	if (nf < 0)
 		nf = nextfp();
@@ -1994,6 +2005,11 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	if (nf >= Nfont)
 		growfonts(nf+1);
 	a->Font.afmpos = nafm+1;
+	if ((np = afmnamelook(a, "space")) != NULL)
+		a->Font.spacewidth = a->fontab[np->afpos];
+	else
+		a->Font.spacewidth = a->fontab[0];
+	a->Font.cspacewidth = -1;
 	fontbase[nf] = &afmtab[nafm]->Font;
 	fontlab[nf] = rq;
 	free(fontab[nf]);

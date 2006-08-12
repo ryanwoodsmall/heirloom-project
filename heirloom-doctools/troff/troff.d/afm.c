@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.59 (gritter) 8/12/06
+ * Sccsid @(#)afm.c	1.60 (gritter) 8/12/06
  */
 
 #include <stdlib.h>
@@ -997,6 +997,8 @@ makefont(int nf, char *devfontab, char *devkerntab, char *devcodetab,
 		codetab[nf][i] = devcodetab[i]&0377;
 	if (devfitab) for (i = 0; i < 128 - 32 + nchtab; i++)
 		fitab[nf][i] = devfitab[i]&0377;
+	fontbase[nf]->spacewidth = fontab[nf][0];
+	fontbase[nf]->cspacewidth = -1;
 }
 
 #ifndef	DPOST

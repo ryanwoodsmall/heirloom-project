@@ -1,7 +1,7 @@
 /*
  *	Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- *	Sccsid @(#)pt.h	1.40 (gritter) 7/29/06
+ *	Sccsid @(#)pt.h	1.41 (gritter) 8/12/06
  */
 
 /* n10.c */
@@ -70,6 +70,7 @@ extern void	casedummy(void);
 #define	casebleedat	casedummy
 #define	casecropat	casedummy
 #define	casefspacewidth	casedummy
+#define	casespacewidth	casedummy
 #define	casefdeferlig	casedummy
 #define	casefkern	casedummy
 #define	caseminss	casedummy

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.11 (gritter) 4/30/06
+ * Sccsid @(#)dev.h	1.12 (gritter) 8/12/06
  */
 
 /*
@@ -82,6 +82,8 @@ struct Font {		/* characteristics of a font */
 	char	namefont[10];	/* name of this font (e.g., "R" */
 	char	intname[10];	/* internal name (=number) on device, in ascii */
 	int	afmpos;		/* afmpos-1 = position in afmtab */
+	int	spacewidth;	/* width of space character */
+	int	cspacewidth;	/* custom space width */
 };
 
 /* ligatures, ORed into ligfont */

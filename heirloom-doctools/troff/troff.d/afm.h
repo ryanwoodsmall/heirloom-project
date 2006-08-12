@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.33 (gritter) 8/8/06
+ * Sccsid @(#)afm.h	1.34 (gritter) 8/12/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -111,6 +111,7 @@ extern	short		**fitab;
 extern	int		**fontab;
 extern	char		**kerntab;
 extern	short		**codetab;
+extern	struct Font	**fontbase;
 
 extern	int		NCHARS;
 
