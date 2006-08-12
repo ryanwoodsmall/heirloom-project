@@ -100,6 +100,8 @@ Release ...
 * [nt]roff: The "right-brace" warning category has been added.
 * [nt]roff: Calls of ".vs" that result in negative numbers are now
   ignored.
+* [nt]roff: The width function "\w" now takes pairwise kerning into
+  account.
 * [nt]roff: The ".return" request has been fixed not to ignore the next
   line of input when followed by text on the same line.
 * [nt]roff: The "\k[name]" escape sequence has been fixed to work if

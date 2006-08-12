@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.91 (gritter) 8/12/06
+ * Sccsid @(#)n7.c	1.92 (gritter) 8/12/06
  */
 
 /*
@@ -447,7 +447,7 @@ nofill(void)
 	if (!ce && !rj && !pendnf)
 		setlhang(nexti);
 	while ((j = (cbits(i = nexti))) != '\n') {
-		if (stopch && issame(j, stopch))
+		if (stopch && issame(i, stopch))
 			break;
 		if (j == ohc) {
 			nexti = GETCH();

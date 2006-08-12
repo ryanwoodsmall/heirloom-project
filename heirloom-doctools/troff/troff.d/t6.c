@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.168 (gritter) 8/12/06
+ * Sccsid @(#)t6.c	1.169 (gritter) 8/12/06
  */
 
 /*
@@ -1015,7 +1015,7 @@ setwd(void)
 {
 	register int base, wid;
 	register tchar i;
-	tchar	delim;
+	tchar	delim, lasti = 0;
 	int	emsz, k;
 	int	savhp, savapts, savapts1, savfont, savfont1, savpts, savpts1;
 	int	savlgf;
@@ -1038,6 +1038,8 @@ setwd(void)
 	setwdf++;
 	while (i = getch(), !issame(i, delim) && !nlflg) {
 		k = width(i);
+		k += kernadjust(lasti, i);
+		lasti = i;
 		wid += k;
 		numtab[HP].val += k;
 		if (!ismot(i)) {
