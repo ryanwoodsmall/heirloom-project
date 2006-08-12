@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.117 (gritter) 8/12/06
+.\" Sccsid @(#)doc.tr	1.118 (gritter) 8/12/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -6220,13 +6220,18 @@ that can be used with both
 Heirloom \*(TR and \*[GR]
 and use functionality beyond the features
 that were supported by traditional \*[TR.]
-It must be noted, though,
-that many of the requests concerning font handling are different;
-moreover, even when using the same \*(PS fonts and spacing settings,
-Heirloom \*(TR and \*(GR will break lines at different points.
-Thus it is to be expected that the formatted output will be different
-even with identical input
-that uses only features available in both implementations.
+.pg
+Notable remaining differences to \*(GR are:
+The concept of an \fIinput level\fR
+regarding delimiters in escape sequences
+and macro arguments is not supported.
+Control characters are recognized
+at the beginning of a line
+even if preceded by escape sequences
+that do not result in formatting stream objects,
+such as \T'e_f'\fB\ef\fR\T, \T'e_s'\fB\es\fR\T, or \T'e_;'\fB\e;\fR\T.
+Diverted characters can be interpreted
+as control or escape characters again.
 .sc
 Conditional groff compatibility.
 A request is available to control additional
@@ -6351,22 +6356,6 @@ the replacements should suffice for most applications.
 .pg
 \*(GR two-character names are mapped to \*(PS character names
 using the \T'char'\fBchar\fR\T request.
-.sc
-Differences to \*(GR.
-Notable remaining differences to \*(GR are:
-.pg
-The concept of an \fIinput level\fR
-regarding delimiters in escape sequences
-and macro arguments is not supported.
-.pg
-The control characters are recognized
-at the beginning of a line
-even if preceded by escape sequences
-that do not result in input characters,
-such as \T'e_f'\fB\ef\fR\T, \T'e_s'\fB\es\fR\T, or \T'e_;'\fB\e;\fR\T.
-.pg
-Diverted characters can be interpreted
-as control or escape characters.
 .rm EM
 .bp
 .\" from file m5
