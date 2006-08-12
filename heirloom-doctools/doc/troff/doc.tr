@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.120 (gritter) 8/12/06
+.\" Sccsid @(#)doc.tr	1.121 (gritter) 8/12/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -6368,18 +6368,29 @@ are emulated using
 and
 \T'as'\fBas\fR\T,
 respectively.
-It is not assumed that the \*(GR compatibility macros
+It is not expected that the \*(GR compatibility macros
 are used to format documents
 that require compatibility with traditional \*[TR.]
 .pg
 The \T'ftr'\fBftr\fR\T request is removed
 since the \*(GR request with the same name
-provides different semantics.
+provides completely different semantics.
 .pg
-\T'fallback'\fBfallback\fR\T is used to emulate \fBfspecial\fR,
-and \T'track'\fBtrack\fR\T is used to emulate \fBtkf\fR.
-While these requests are not completely compatible,
-the replacements should suffice for most applications.
+\T'fallback'\fBfallback\fR\T is used to emulate \fBfspecial\fR;
+these requests should be compatible.
+No emulation is provided for the \fBspecial\fR request;
+all other fonts are searched for missing characters
+in Heirloom \*(TR by default.
+.pg
+\T'track'\fBtrack\fR\T is used to emulate \fBtkf\fR.
+These requests are not completely compatible:
+\T'track'\fBtrack\fR\T does not affect the last character on a line
+and thus does not alter the visual length of lines like \fBtkf\fR does;
+\T'track'\fBtrack\fR\T is applied when formatting an object
+defined with the \T'char'\fBchar\fR request\T;
+\T'track'\fBtrack\fR\T needs to remain in effect
+until all affected characters have been physically output.
+Nevertheless, the replacement should suffice for most applications.
 .pg
 \*(GR characters with two-character names
 are mapped to \*(PS character names
