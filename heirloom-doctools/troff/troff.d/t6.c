@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.170 (gritter) 8/12/06
+ * Sccsid @(#)t6.c	1.171 (gritter) 8/13/06
  */
 
 /*
@@ -1480,7 +1480,7 @@ casefp(int spec)
 		errprint("fp: no font name");
 	else {
 		if (skip(0) || !getname()) {
-			if (i == 0 || i > nfonts)
+			if (i == 0)
 				goto bad;
 			setfp(i, j, 0);
 		} else {		/* 3rd argument = filename */
@@ -1560,6 +1560,10 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 			fontfile, devname, shortname);
 	if ((fpout = readfont(longname, &dev, warn & WARN_FONT)) == NULL)
 		return(-1);
+	if (pos >= Nfont)
+		growfonts(pos+1);
+	if (pos > nfonts)
+		nfonts = pos;
 	fontbase[pos] = (struct Font *)fpout;
 	if ((ap = strstr(fontbase[pos]->namefont, ".afm")) != NULL) {
 		*ap = 0;
