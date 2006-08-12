@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.122 (gritter) 8/12/06
+ * Sccsid %W% (gritter) %G%
  */
 
 /*
@@ -726,6 +726,7 @@ struct acc {
 #define	adspc	env._adspc
 #define	wordp	env._wordp
 #define	spflg	env._spflg
+#define	seflg	env._seflg
 #define	linep	env._linep
 #define	wdend	env._wdend
 #define	wdstart	env._wdstart
@@ -848,6 +849,7 @@ extern struct env {
 	int	_adspc;
 	tchar	*_wordp;
 	int	_spflg;
+	int	_seflg;
 	tchar	*_linep;
 	tchar	*_wdend;
 	tchar	*_wdstart;

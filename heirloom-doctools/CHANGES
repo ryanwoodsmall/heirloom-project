@@ -106,6 +106,8 @@ Release ...
   account.
 * [nt]roff: The ".return" request has been fixed not to ignore the next
   line of input when followed by text on the same line.
+* [nt]roff: The second argument of the ".ss" request now also applies
+  to sequences of space characters that follow a sentence end character.
 * [nt]roff: The "\k[name]" escape sequence has been fixed to work if
   "name" has not been previously been used.
 * [nt]roff: The "\(dq" character has been introduced as an alternate name

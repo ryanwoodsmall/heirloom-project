@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.92 (gritter) 8/12/06
+ * Sccsid @(#)n7.c	1.93 (gritter) 8/12/06
  */
 
 /*
@@ -1117,12 +1117,12 @@ getword(int x)
 {
 	register int j, k = 0, w;
 	register tchar i = 0, *wp, nexti, gotspc = 0, t;
-	int noword;
+	int noword, n;
 #if defined (EUC) && defined (NROFF)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
 	char *mbbuf3p;
-	int wbf, n;
+	int wbf;
 	tchar m;
 #endif /* EUC && NROFF */
 
@@ -1157,6 +1157,7 @@ getword(int x)
 		goto g1;
 	}
 #endif /* EUC && NROFF */
+	n = 0;
 	while (1) {	/* picks up 1st char of word */
 		j = cbits(i = GETCH());
 #if defined (EUC) && defined (NROFF)
@@ -1174,9 +1175,19 @@ getword(int x)
 			continue;
 		}
 		if (j == ' ' && !iszbit(i)) {
+			n++;
 			if (isadjspc(i))
 				w = 0;
-			else if (spbits && xflag) {
+			else if (xflag && seflg && sesspsz == 0) {
+				i |= ZBIT;
+				w = 0;
+			} else if (xflag && seflg && sesspsz && n == 1) {
+				if (spbits) {
+					i = ' ' | SENTSP | spbits;
+					w = width(i);
+				} else
+					w = ses;
+			} else if (spbits && xflag) {
 				i = ' ' | spbits;
 				w = width(i);
 			} else
@@ -1199,6 +1210,7 @@ getword(int x)
 		}
 		break;
 	}
+	seflg = 0;
 #if defined (EUC) && defined (NROFF)
 	if (!multi_locale)
 		goto a0;
@@ -1324,14 +1336,15 @@ g1:		nexti = GETCH();
 		if (collectmb(i))
 			goto g1;
 #endif /* EUC && NROFF */
-	if (j != ' ' || iszbit(i) || isadjspc(i)) {
+	{
 		static int sentchar[] =
 			{ '.', '?', '!', ':', 0 }; /* sentence terminators */
 		int	*sp, *tp;
 		static int transchar[] =
 			{ '"', '\'', ')', ']', '*', 0, 0 };
 		transchar[5] = DAGGER;
-		if (j != '\n')
+		if (j != '\n' && j != ' ' || ismot(i) || iszbit(i) ||
+				isadjspc(i))
 #if defined (EUC) && defined (NROFF)
 			if (!multi_locale)
 #endif /* EUC && NROFF */
@@ -1361,7 +1374,10 @@ g1:		nexti = GETCH();
 					goto cont;
 			for (k = 0; sp[k] && k < NSENT; k++)
 				if (j == sp[k]) {
-					spflg++;
+					if (nlflg)
+						spflg++;
+					else
+						seflg++;
 					break;
 				}
 			break;

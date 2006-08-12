@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.81 (gritter) 8/12/06
+ * Sccsid %W% (gritter) %G%
  */
 
 /*
@@ -1045,6 +1045,7 @@ evc(struct env *dp, struct env *sp)
 	dp->_word = 0;
 	dp->_wordp = 0;
 	dp->_spflg = 0;
+	dp->_seflg = 0;
 	dp->_ce = 0;
 	dp->_rj = 0;
 	dp->_nn = 0;
@@ -1092,6 +1093,7 @@ evcline(struct env *dp, struct env *sp)
 	dp->_fldcnt = sp->_fldcnt;
 	dp->_hyoff = sp->_hyoff;
 	dp->_hlc = sp->_hlc;
+	dp->_nel = sp->_nel;
 	dp->_adflg = sp->_adflg;
 	dp->_adspc = sp->_adspc;
 	dp->_wne = sp->_wne;

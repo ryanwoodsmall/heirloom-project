@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.118 (gritter) 8/12/06
+.\" Sccsid @(#)doc.tr	1.119 (gritter) 8/12/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -3006,14 +3006,20 @@ to be the end of a \fIsentence\fR, and an additional space character is
 automatically provided during filling.
 To prevent this at individual locations,
 add \A'e_&'\fB\e&\fR to the end of the input line;
-the \T'ss'\fBss\fR request\T \T's_font'(\(sc2)\T
+the second argument to the \T'ss'\fBss\fR request\T \T's_font'(\(sc2)\T
 changes the size of this space character and can also disable it globally.
 Both the sentence-ending and the transparent characters are configurable.
 The \A'e_)'\fB\e)\fR character is always transparent
 but behaves like \fB\e&\fR in all other respects.
 Multiple inter-word space characters found in the input are retained,
-except for trailing spaces;
-initial spaces also cause a \fIbreak\fR.
+although the second character in a sequence of spaces
+following a sentence-ending character
+has the width of a sentence space;
+if the sentence space has been set to zero,
+any sequence of spaces following a sentence-ending character
+has the width of a single space.
+Trailing spaces are always discarded.
+Initial spaces are always retained and also cause a \fIbreak\fR.
 .pg
 When filling is in effect, a \A'e_p'\fB\ep\fR may be imbedded or attached to a word to
 cause a \fIbreak\fR at the \fIend\fR of the word and have the resulting output

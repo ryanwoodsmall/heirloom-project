@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.36 (gritter) 8/9/06
+ * Sccsid %W% (gritter) %G%
  */
 
 /*
@@ -309,6 +309,7 @@ struct	env env = {
 /* int	adspc	 */	0,
 /* tchar	*wordp	 */	0,
 /* int	spflg	 */	0,	/* probably to indicate space after punctuation needed */
+/* int	seflg	 */	0,
 /* tchar	*linep	 */	0,
 /* tchar	*wdend	 */	0,
 /* tchar	*wdstart	 */	0,
