@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.80 (gritter) 8/11/06
+ * Sccsid @(#)n5.c	1.81 (gritter) 8/12/06
  */
 
 /*
@@ -1066,6 +1066,10 @@ evc(struct env *dp, struct env *sp)
 	dp->_spread = 0;
 	dp->_lnmod = 0;
 	dp->_hlc = 0;
+	dp->_cht = 0;
+	dp->_cdp = 0;
+	dp->_maxcht = 0;
+	dp->_maxcdp = 0;
 	setnel();
 }
 
@@ -1099,6 +1103,8 @@ evcline(struct env *dp, struct env *sp)
 	dp->_rhang = sp->_rhang;
 	dp->_cht = sp->_cht;
 	dp->_cdp = sp->_cdp;
+	dp->_maxcht = sp->_maxcht;
+	dp->_maxcdp = sp->_maxcdp;
 	if (icf == 0)
 		dp->_ic = sp->_ic;
 	memcpy(dp->_hyptr, sp->_hyptr, NHYP * sizeof *sp->_hyptr);

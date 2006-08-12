@@ -3,7 +3,7 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g	1.7 (gritter) 8/9/06
+.\" Sccsid @(#)g	1.8 (gritter) 8/12/06
 .\"
 .cp 0
 .lc_ctype en_US
@@ -173,6 +173,9 @@
 .	char \(~n \[ntilde]
 .	char \(~o \[otilde]
 .	char \(-D \[Eth]
+.	char \[sqrt] \[radical]
 \#	for GNU tbl
 .	char \[tbl]
+\#	for GNU eqn
+.	char \(EQ
 .\}

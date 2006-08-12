@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.110 (gritter) 8/11/06
+ * Sccsid @(#)n1.c	1.111 (gritter) 8/12/06
  */
 
 /*
@@ -1352,20 +1352,22 @@ setxon(void)	/* \X'...' for copy through */
 {
 	tchar xbuf[NC];
 	register tchar *i;
-	tchar c;
-	int delim, k;
+	tchar c, delim;
+	int k;
 
 	if (ismot(c = getch()))
 		return;
-	delim = cbits(c);
+	delim = c;
 	i = xbuf;
 	*i++ = XON;
 	charf++;
-	while ((k = cbits(c = getch())) != delim && k != '\n' && i < xbuf+NC-1) {
+	while (k = cbits(c = getch()), !issame(c, delim) && k != '\n' && i < xbuf+NC-1) {
 		if (k == ' ')
 			setcbits(c, UNPAD);
 		*i++ = c | ZBIT;
 	}
+	if (!issame(c, delim))
+		nodelim(delim);
 	charf--;
 	*i++ = XOFF;
 	*i = 0;
@@ -1701,13 +1703,21 @@ getach(void)
 	lgf++;
 	j = cbits(i = getch());
 #if !defined (EUC) || !defined (NROFF)
-	if (ismot(i) || j == ' ' || j == '\n' || j & 0200) {
+	if (ismot(i) || j == XFUNC && fbits(i) || j == ' ' || j == '\n' ||
+			j & 0200) {
 		if (!ismot(i) && j >= 0200)
 #else	/* EUC && NROFF */
-	if (ismot(i) || j == ' ' || j == '\n' || j > 0200) {
+	if (ismot(i) || j == XFUNC && fbits(i) || j == ' ' || j == '\n' ||
+			j > 0200) {
 		if (!ismot(i) && j > 0200)
 #endif	/* EUC && NROFF */
 			illseq(j, NULL, -3);
+		else if (WARN_INPUT) {
+			if (ismot(i) && !isadjmot(i))
+				errprint("motion terminates name");
+			else if (j == XFUNC && fbits(i))
+				errprint("illegal character terminates name");
+		}
 
 		ch = i;
 		j = 0;
@@ -2332,6 +2342,8 @@ setchar(tchar c)
 		width(' ' | sfmask(c));
 		charout[charcount].width += lasttrack;
 	}
+	charout[charcount].height = maxcht;
+	charout[charcount].depth = maxcdp;
 	restchar(&f, 0);
 	chartab[k] = csp;
 	eschar = saveschar;
@@ -2371,6 +2383,22 @@ sfmask(tchar t)
 	return t & SFMASK;
 }
 
+int
+issame(tchar c, tchar d)
+{
+	if (ismot(c) || ismot(d))
+		return 0;
+	while (isxfunc(c, CHAR))
+		c = charout[sbits(c)].ch;
+	while (isxfunc(d, CHAR))
+		d = charout[sbits(d)].ch;
+	if (cbits(c) != cbits(d))
+		return 0;
+	if (cbits(c) == XFUNC && cbits(d) == XFUNC)
+		return fbits(c) == fbits(d);
+	return 1;
+}
+
 static int
 setgA(void)
 {
@@ -2384,7 +2412,7 @@ setgA(void)
 		lgf--;
 		return 0;
 	}
-	while ((k = cbits(c = getch())) != cbits(delim) && !nlflg)
+	while (k = cbits(c = getch()), !issame(c, delim) && !nlflg)
 		if (ismot(c) || k < ' ' && nmctab[k] || k == ' ' || k >= 0200)
 			y = 0;
 	if (nlflg)
@@ -2410,7 +2438,7 @@ setgB(void)
 		y = 0;
 	do {
 		c = getch();
-		if (!ismot(c) && cbits(c) == cbits(delim))
+		if (!ismot(c) && issame(c, delim))
 			break;
 		y = 0;
 	} while (!nlflg);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.90 (gritter) 8/10/06
+ * Sccsid @(#)n7.c	1.91 (gritter) 8/12/06
  */
 
 /*
@@ -93,6 +93,7 @@ int	brflg;
 #define	iswascii(c)	(((c) & ~(wchar_t)0177) == 0)
 
 static tchar	adjbit(tchar);
+static void	sethtdp(void);
 #ifndef	NROFF
 #define	nroff		0
 extern int	lastrst;
@@ -344,8 +345,7 @@ text(void)
 			continue;
 		spcnt++;
 		widthp = xflag ? width(i) : sps;
-		cht = lastrst;
-		cdp = -lastrsb;
+		sethtdp();
 		numtab[HP].val += widthp;
 		lasti = i;
 	}
@@ -447,7 +447,7 @@ nofill(void)
 	if (!ce && !rj && !pendnf)
 		setlhang(nexti);
 	while ((j = (cbits(i = nexti))) != '\n') {
-		if (stopch && j == cbits(stopch))
+		if (stopch && issame(j, stopch))
 			break;
 		if (j == ohc) {
 			nexti = GETCH();
@@ -462,8 +462,7 @@ nofill(void)
 		}
 		j = width(i);
 		widthp = j;
-		cht = lastrst;
-		cdp = -lastrsb;
+		sethtdp();
 		numtab[HP].val += j;
 		storeline(i, j);
 		oev = ev;
@@ -1108,6 +1107,7 @@ setnel(void)
 		lsplow = lsphigh = lspcur = lsplast = lspnc = fldcnt = 0;
 		lshwid = lshhigh = lshlow = lshcur = 0;
 #endif	/* !NROFF */
+		cht = cdp = 0;
 	}
 }
 
@@ -1423,8 +1423,7 @@ s1:
 	if (w == -1)
 		w = width(c);
 	widthp = w;
-	cht = lastrst;
-	cdp = -lastrsb;
+	sethtdp();
 	wne += w;
 	*wordp++ = c;
 	wch++;
@@ -1518,6 +1517,15 @@ adjbit(tchar c)
 	if (cbits(c) == ' ')
 		setcbits(c, WORDSP);
 	return(c | ADJBIT);
+}
+
+static void
+sethtdp(void)
+{
+	if ((cht = lastrst) > maxcht)
+		maxcht = cht;
+	if ((cdp = -lastrsb) > maxcdp)
+		maxcdp = cdp;
 }
 
 #ifndef	NROFF

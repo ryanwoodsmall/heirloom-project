@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.60 (gritter) 8/10/06
+ * Sccsid @(#)n9.c	1.61 (gritter) 8/12/06
  */
 
 /*
@@ -98,14 +98,14 @@ void
 setline(void)
 {
 	register tchar *i;
-	tchar c;
+	tchar c, delim;
 	int	length;
-	int	w, cnt, delim, rem, temp;
+	int	w, cnt, rem, temp;
 	tchar linebuf[NC];
 
 	if (ismot(c = getch()))
 		return;
-	delim = cbits(c);
+	delim = c;
 	vflag = 0;
 	dfact = EM;
 	length = quant(atoi(), HOR);
@@ -115,7 +115,7 @@ setline(void)
 		return;
 	}
 s0:
-	if ((cbits(c = getch())) == delim) {
+	if (c = getch(), issame(c, delim)) {
 		ch = c;
 		c = RULE | chbits;
 	} else if (cbits(c) == FILLER)
@@ -149,14 +149,14 @@ s1:
 }
 
 
-int 
-eat(register int c)
+tchar 
+eat(tchar c)
 {
-	register int i;
+	register tchar i;
 
-	while ((i = cbits(getch())) != c &&  (i != '\n'))
+	while (i = getch(), !issame(i, c) &&  (cbits(i) != '\n'))
 		;
-	if (c != ' ' && i != c)
+	if (cbits(c) != ' ' && !issame(i, c))
 		nodelim(c);
 	return(i);
 }
@@ -166,17 +166,17 @@ void
 setov(void)
 {
 	register int j, k;
-	tchar i, o[NOV];
-	int delim, w[NOV];
+	tchar i, delim, o[NOV];
+	int w[NOV];
 
 	if (ismot(i = getch()))
 		return;
-	delim = cbits(i);
-	for (k = 0; (k < NOV) && ((j = cbits(i = getch())) != delim) &&  (j != '\n'); k++) {
+	delim = i;
+	for (k = 0; (k < NOV) && (j = cbits(i = getch()), !issame(i, delim)) &&  (j != '\n'); k++) {
 		o[k] = i;
 		w[k] = width(i);
 	}
-	if (j != delim)
+	if (!issame(j, delim))
 		nodelim(delim);
 	o[k] = w[k] = 0;
 	if (o[0])
@@ -216,13 +216,13 @@ void
 setbra(void)
 {
 	register int k;
-	tchar i, *j, dwn;
-	int	cnt, delim;
+	tchar i, *j, dwn, delim;
+	int	cnt;
 	tchar brabuf[NC];
 
 	if (ismot(i = getch()))
 		return;
-	delim = cbits(i);
+	delim = i;
 	j = brabuf + 1;
 	cnt = 0;
 #ifdef NROFF
@@ -231,12 +231,12 @@ setbra(void)
 #ifndef NROFF
 	dwn = sabsmot((int)EM) | MOT | VMOT;
 #endif
-	while (((k = cbits(i = getch())) != delim) && (k != '\n') &&  (j <= (brabuf + NC - 4))) {
+	while ((k = cbits(i = getch()), !issame(delim, i)) && (k != '\n') &&  (j <= (brabuf + NC - 4))) {
 		*j++ = i | ZBIT;
 		*j++ = dwn;
 		cnt++;
 	}
-	if (k != delim)
+	if (!issame(i, delim))
 		nodelim(delim);
 	if (--cnt < 0)
 		return;
@@ -260,14 +260,14 @@ void
 setvline(void)
 {
 	register int i;
-	tchar c, rem, ver, neg;
-	int	cnt, delim, v;
+	tchar c, d, delim, rem, ver, neg;
+	int	cnt, v;
 	tchar vlbuf[NC];
 	register tchar *vlp;
 
 	if (ismot(c = getch()))
 		return;
-	delim = cbits(c);
+	delim = c;
 	dfact = lss;
 	vflag++;
 	i = quant(atoi(), VERT);
@@ -277,10 +277,13 @@ setvline(void)
 		vflag = 0;
 		return;
 	}
-	if ((cbits(c = getch())) == delim) {
+	if (c = getch(), issame(c, delim)) {
 		c = BOXRULE | chbits;	/*default box rule*/
-	} else 
-		getch();
+	} else {
+		d = getch();
+		if (!issame(d, delim))
+			nodelim(delim);
+	}
 	c |= ZBIT;
 	neg = 0;
 	if (i < 0) {
@@ -320,8 +323,8 @@ setvline(void)
 void
 setdraw (void)	/* generate internal cookies for a drawing function */
 {
-	int i, dx[NPAIR], dy[NPAIR], delim, type;
-	tchar c;
+	int i, dx[NPAIR], dy[NPAIR], type;
+	tchar c, delim;
 #ifndef	NROFF
 	int j, k;
 	tchar drawbuf[NC];
@@ -343,11 +346,11 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 
 	if (ismot(c = getch()))
 		return;
-	delim = cbits(c);
+	delim = c;
 	type = cbits(getch());
 	for (i = 0; i < NPAIR ; i++) {
 		c = getch();
-		if (cbits(c) == delim)
+		if (issame(c, delim))
 			break;
 	/* ought to pick up optional drawing character */
 		if (cbits(c) != ' ')
@@ -359,7 +362,7 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 			dx[i] = MAXMOT;
 		else if (dx[i] < -MAXMOT)
 			dx[i] = -MAXMOT;
-		if (cbits((c = getch())) == delim) {	/* spacer */
+		if (c = getch(), issame(c, delim)) {	/* spacer */
 			dy[i++] = 0;
 			break;
 		}
@@ -1062,7 +1065,7 @@ void
 nodelim(int delim)
 {
 	if (warn & WARN_DELIM)
-		errprint("%c delimiter missing", delim);
+		errprint("%c delimiter missing", (int)delim);
 }
 
 void

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.121 (gritter) 8/11/06
+ * Sccsid @(#)tdef.h	1.122 (gritter) 8/12/06
  */
 
 /*
@@ -566,6 +566,8 @@ struct	d {	/* diversion */
 struct	charout {	/* formatted result of .char */
 	filep	op;
 	int	width;
+	int	height;
+	int	depth;
 	tchar	ch;
 };
 
@@ -765,6 +767,8 @@ struct acc {
 #define	stopch	env._stopch
 #define	cht	env._cht
 #define	cdp	env._cdp
+#define	maxcht	env._maxcht
+#define	maxcdp	env._maxcdp
 #define	hyptr	env._hyptr
 #define	tabtab	env._tabtab
 #define	line	env._line
@@ -885,6 +889,8 @@ extern struct env {
 	tchar	_stopch;
 	int	_cht;
 	int	_cdp;
+	int	_maxcht;
+	int	_maxcdp;
 	tchar	*_hyptr[NHYP];
 	int	_tabtab[NTAB];
 	int	_sentch[NSENT];

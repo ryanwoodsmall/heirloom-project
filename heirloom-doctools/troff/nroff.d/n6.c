@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.46 (gritter) 8/11/06
+ * Sccsid @(#)n6.c	1.47 (gritter) 8/12/06
  */
 
 /*
@@ -342,13 +342,15 @@ setwd(void)
 {
 	register int base, wid;
 	register tchar i;
-	int	delim, emsz, k;
+	tchar	delim;
+	int	emsz, k;
 	int	savhp, savapts, savapts1, savfont, savfont1, savpts, savpts1;
+	int	savlgf;
 
 	base = numtab[ST].val = numtab[ST].val = wid = numtab[CT].val = 0;
 	if (ismot(i = getch()))
 		return;
-	delim = cbits(i);
+	delim = i;
 	savhp = numtab[HP].val;
 	numtab[HP].val = 0;
 	savapts = apts;
@@ -357,8 +359,10 @@ setwd(void)
 	savfont1 = font1;
 	savpts = pts;
 	savpts1 = pts1;
+	savlgf = lgf;
+	lgf = 0;
 	setwdf++;
-	while (cbits(i = getch()) != delim && !nlflg) {
+	while (i = getch(), !issame(i, delim) && !nlflg) {
 		k = width(i);
 		wid += k;
 		numtab[HP].val += k;
@@ -377,7 +381,7 @@ setwd(void)
 		if ((k = base + emsz) > numtab[ST].val)
 			numtab[ST].val = k;
 	}
-	if (cbits(i) != delim)
+	if (!issame(i, delim))
 		nodelim(delim);
 	setn1(wid, 0, (tchar) 0);
 	setnr("rst", 0, 0);
@@ -389,6 +393,7 @@ setwd(void)
 	font1 = savfont1;
 	pts = savpts;
 	pts1 = savpts1;
+	lgf = savlgf;
 	mchbits();
 	setwdf = 0;
 }
@@ -416,17 +421,18 @@ mot(void)
 {
 	register int j, n;
 	register tchar i;
-	int	delim;
+	tchar	c, delim;
 
 	j = HOR;
-	delim = cbits(getch()); /*eat delim*/
+	delim = getch(); /*eat delim*/
 	if (n = atoi()) {
 		if (vflag)
 			j = VERT;
 		i = makem(quant(n, j));
 	} else
 		i = 0;
-	if (cbits(getch()) != delim)
+	c = getch();
+	if (!issame(c, delim))
 		nodelim(delim);
 	vflag = 0;
 	dfact = 1;

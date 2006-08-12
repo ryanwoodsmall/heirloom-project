@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.76 (gritter) 8/11/06
+ * Sccsid @(#)ext.h	1.77 (gritter) 8/12/06
  */
 
 /*
@@ -281,6 +281,7 @@ extern void	casefchar(void);
 extern void	caserchar(void);
 extern tchar	setchar(tchar);
 extern tchar	sfmask(tchar);
+extern int	issame(tchar, tchar);
 /* n2.c */
 extern int	pchar(register tchar);
 extern void	pchar1(register tchar);
@@ -518,7 +519,7 @@ extern void	casehylang(void);
 /* n9.c */
 extern tchar	setz(void);
 extern void	setline(void);
-extern int	eat(register int);
+extern tchar	eat(tchar);
 extern void	setov(void);
 extern void	setbra(void);
 extern void	setvline(void);

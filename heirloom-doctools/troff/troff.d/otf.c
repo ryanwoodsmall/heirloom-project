@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.57 (gritter) 8/8/06
+ * Sccsid @(#)otf.c	1.58 (gritter) 8/12/06
  */
 
 #include <stdio.h>
@@ -1750,7 +1750,7 @@ onechar(int gid, int sid)
 	long	o;
 	int	w, tp;
 	char	*N;
-	int	B[4] = { 0, 0, 0, 0};
+	int	*b = NULL, B[4] = { 0, 0, 0, 0};
 
 	if (gid == 0 && sid != 0 || sid == 0 && gid != 0)
 		return;		/* require .notdef to be GID 0 */
@@ -1777,8 +1777,8 @@ onechar(int gid, int sid)
 		} else
 			tp = 0;
 		if (ttf)
-			get_bb(gid, B);
-		afmaddchar(a, gid, tp, 0, w, B, N, a->spec, gid);
+			get_bb(gid, b = B);
+		afmaddchar(a, gid, tp, 0, w, b, N, a->spec, gid);
 	}
 	gid2sid[gid] = sid;
 }
