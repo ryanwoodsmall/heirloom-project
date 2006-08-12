@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.112 (gritter) 8/12/06
+ * Sccsid @(#)n1.c	1.113 (gritter) 8/12/06
  */
 
 /*
@@ -1009,6 +1009,7 @@ g0:
 		if (i & MBMASK || k >= NCHARS || gchtab[k]==0)
 			return(i);
 		if (k == '\n') {
+		nl:
 			if (cbits(i) == '\n') {
 				nlflg++;
 				tailflg = istail(i);
@@ -1058,6 +1059,8 @@ ge:
 	switch (k) {
 
 	case '\n':	/* concealed newline */
+		if (fmtchar)
+			goto nl;
 		goto g0;
 	case '{':	/* LEFT */
 		i = LEFT;
@@ -1701,7 +1704,10 @@ getach(void)
 	register int j;
 
 	lgf++;
-	j = cbits(i = getch());
+	i = getch();
+	while (isxfunc(i, CHAR))
+		i = charout[sbits(i)].ch;
+	j = cbits(i);
 #if !defined (EUC) || !defined (NROFF)
 	if (ismot(i) || j == XFUNC && fbits(i) || j == ' ' || j == '\n' ||
 			j & 0200) {
@@ -2198,7 +2204,6 @@ casechar(int flag)
 			}
 			tp[i++] = c;
 		}
-		tp[i++] = makem(0);	/* escape a possible \ at the end */
 	}
 	tp[i++] = '\n';
 	tp[i] = 0;

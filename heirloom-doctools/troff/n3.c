@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.140 (gritter) 8/12/06
+ * Sccsid @(#)n3.c	1.141 (gritter) 8/12/06
  */
 
 /*
@@ -1728,7 +1728,10 @@ caseunformat(int flag)
 				noout = 0;
 			else if (j+1 < ns && isxfunc(tp[j+1], HYPHED))
 				noout = 1;
-			if (isadjspc(c = tp[j])) {
+			c = tp[j];
+			while (flag & 1 && isxfunc(c, CHAR))
+				c = charout[sbits(c)].ch;
+			if (isadjspc(c)) {
 				if (cbits(c) == WORDSP)
 					setcbits(c, ' ');
 				c &= ~ADJBIT;
@@ -1931,7 +1934,10 @@ mgetach(void)
 	int	j;
 
 	lgf++;
-	j = cbits(i = getch());
+	i = getch();
+	while (isxfunc(i, CHAR))
+		i = charout[sbits(i)].ch;
+	j = cbits(i);
 	if (ismot(i) || j == ' ' || j == '\n' || j >= 0200 ||
 			j < sizeof nmctab && nmctab[j]) {
 		if (!ismot(i) && j >= 0200)
