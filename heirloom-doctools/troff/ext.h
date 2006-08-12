@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.77 (gritter) 8/12/06
+ * Sccsid @(#)ext.h	1.78 (gritter) 8/12/06
  */
 
 /*
@@ -183,6 +183,7 @@ extern	int	*trtab;
 extern	int	tryglf;
 extern	int	tty;
 extern	int	ttyod;
+extern	int	Tflg;
 extern	int	ulfont;
 extern	int	vflag;
 extern	int	vpt;

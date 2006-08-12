@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.60 (gritter) 8/12/06
+ * Sccsid @(#)n4.c	1.61 (gritter) 8/12/06
  */
 
 /*
@@ -741,7 +741,9 @@ _atoi(int flt)
 			errprint("\\} terminates numerical expression");
 	} else if (nonumb && c && c != ' ' && c != '\n' &&
 			warn & WARN_NUMBER && illscale == 0) {
-		if ((c & ~0177) == 0 && isprint(c))
+		if (c == 'T' && Tflg)
+			/*EMPTY*/;
+		else if ((c & ~0177) == 0 && isprint(c))
 			errprint("illegal number, char %c", c);
 		else
 			errprint("illegal number");

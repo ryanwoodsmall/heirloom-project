@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.121 (gritter) 8/12/06
+.\" Sccsid @(#)doc.tr	1.122 (gritter) 8/12/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -76,6 +76,8 @@
 .kernpair B \\ B / 40
 .kernpair I f R \  60
 .kernpair BI f B \  80
+.kernpair R 0123456789 R \[middot] -150
+.kernpair R \[middot] I Z 80
 .ig
 .fps math 1 R tim_____ pfb
 .fp 2 I timi____ pfb
@@ -4064,6 +4066,17 @@ Set tab stops and types.
 The stop values are separated by spaces, and
 a value preceded by \fB+\fR
 is treated as an increment to the previous stop value.
+.bt
+\fB&ta\fI|Mv|...|Nw|\fBT\fI|At|...|Zu\fRa	\fIN\fR=0	E,\fBm\fR\
+	Set repeated tab stops and types at \fIMv\fR, ..., \fINw\fR,
+\fIN\fR|+|\fIAt\fR, ..., \fIN\fR|+|\fIZu\fR,
+\fIN\fR|+|\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|\fIZ\fR|+|\fIZu\fR,
+\fIN\fR|+|2\[middot]\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|2\[middot]\fIZ\fR|+|\fIZu\fR,
+\fIN\fR|+|3\[middot]\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|3\[middot]\fIZ\fR|+|\fIZu\fR,
+&..\ .
+Thus \fB&ta|T|0.5i\fR sets tab stops every 0.5in,
+and \fB&ta|1i|4i|T|.25i|1i\fR sets tab stops
+at 1in, 4in, 4.25in, 5in, 5.25in, 6in, 6.25in, etc.
 .bta tc
 \fB&tc\fI|c\fR	none	none	E	\
 The tab repetition character becomes \fIc\fR,
@@ -4946,23 +4959,49 @@ accept \fIanything\fR.
 all of the forms for \fBif\fR above are valid.
 \fIanything\fR is stored in an unnamed temporary macro
 each time a \fBwhile\fR loop is prepared for execution.
-Long or nested loops will thus cause many macro definitions
-and may slow down execution;
-\T'c_recursion'recursive macros (\(sc10.6)\T do not suffer from this problem.
+.xx
 In the multi-line case,
 the \fB\e}\fR terminating the loop must be placed at the end of a line.
+.xx
 When \fIanything\fR is copied to the macro,
 neither \T'copy mode'copy mode\T nor regular
 escape interpretation apply.
 References to number registers, strings, etc. must
 thus be written using a single escape character
 unless the \fBwhile\fR request is contained in a macro definition.
+.xx
+Long or nested loops will thus generate many macro definitions
+and may slow down execution;
+\T'c_recursion'recursive macros (\(sc10.6)\T do not suffer from this problem.
+In contrast to recursive macro calls,
+there is no mechanism to terminate a loop automatically
+when a repetition limit has been reached.
+In case of doubt,
+an explicit limit termination condition
+should be added to prevent endless loops.
 .bta break
 \fB&break\fI|n\fR	\(en	1	\(en	Break out of \fIn\fR nested \fBwhile\fR loops,
 or terminate the current loop if no argument is given.
+It is not necessary that all of the loops
+are contained within the same macro;
+if there are any macros executing inside the specified loop,
+control also returns from these macros.
+In case of a non-positive or non-numeric argument, \fIn\fR=1 is assumed.
+If the number of levels requested is greater
+than the number of loops currently executing,
+control returns to the highest non-looping level.
 .bta continue
 \fB&continue\fI|n\fR	\(en	1	\(en	Continue at the \fIn\fR-th nested \fBwhile\fR loop,
 or continue the current loop if no argument is given.
+Execution resumes with the test of the specified \fBwhile\fR loop;
+if this test fails, the request is effectively like \fBbreak\fR.
+\fBcontinue\fR also returns from all inside macro calls
+until it has reached the specified loop.
+In case of a non-positive or non-numeric argument, \fIn\fR=1 is assumed.
+If the number of levels requested is greater
+than the number of loops currently executing,
+control returns to the highest non-looping level,
+and no loop is continued.
 .pg
 .ne 16
 The built-in condition names are:
@@ -5238,6 +5277,7 @@ a \fIwarning\fR message is written
 in the same format as an error message,
 but processing continues.
 .sp
+.ne 6
 .TS
 center;
 rfB lfB lfB
@@ -6075,7 +6115,6 @@ The \fB\-F\fR
 command-line option may be used to change the default directory.
 .sc
 Device description file.
-.pg
 General parameters of the device are stored, one per line, in
 the file \fB/usr/ucblib/doctools/font/dev\fIname\^\fB/DESC\fR,
 as a sequence of names and values.

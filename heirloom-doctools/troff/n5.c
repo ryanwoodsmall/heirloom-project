@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid %W% (gritter) %G%
+ * Sccsid @(#)n5.c	1.84 (gritter) 8/12/06
  */
 
 /*
@@ -1346,22 +1346,26 @@ casecontinue(int _break)
 	int	i, j;
 	struct s	*s;
 
-	if (skip(0))
+	noscale++;
+	if (skip(0) || (i = atoi()) <= 0 || nonumb)
 		i = 1;
-	else {
-		noscale++;
-		i = atoi();
-		noscale--;
-	}
+	noscale--;
 	j = 0;
 	for (s = frame; s != stk; s = s->pframe)
 		if (s->loopf && ++j >= i)
 			break;
 	if (j != i) {
+		if (i == 1) {
+			if (warn & WARN_RANGE)
+				errprint("%s outside loop", macname(lastrq));
+			return;
+		}
 		if (warn & WARN_RANGE)
-			errprint("%d loop levels requested but only %d current",
-					i, j);
-		return;
+			errprint("%s: breaking out of %d current loop "
+					"levels but %d requested",
+				macname(lastrq), j, i);
+		_break = 1;
+		i = j;
 	}
 	flushi();
 	nflush++;
@@ -1605,13 +1609,21 @@ caseecr(void)
 void
 caseta(void)
 {
-	register int i;
+	int	T[NTAB];
+	register int i, j, n = 0;
 
 	tabtab[0] = nonumb = 0;
+	Tflg = 1;
 	for (i = 0; ((i < (NTAB - 1)) && !nonumb); i++) {
 		if (skip(0))
 			break;
 		tabtab[i] = max(hnumb(&tabtab[max(i-1,0)]), 0) & TABMASK;
+		if (nonumb && cbits(ch) == 'T') {
+			ch = 0;
+			nonumb = 0;
+			Tflg = 0;
+			goto T;
+		}
 		if (!nonumb) 
 			switch (cbits(ch)) {
 			case 'C':
@@ -1624,6 +1636,36 @@ caseta(void)
 				break;
 			}
 		nonumb = ch = 0;
+	}
+	Tflg = 0;
+	tabtab[i] = 0;
+	return;
+T:
+	for (j = 0; j < NTAB - 1 && !nonumb; j++) {
+		if (skip(0))
+			break;
+		T[j] = atoi() & TABMASK;
+		if (!nonumb)
+			switch (cbits(ch)) {
+			case 'C':
+				T[j] |= CTAB;
+				break;
+			case 'R':
+				T[j] |= RTAB;
+				break;
+			default:
+				break;
+			}
+		nonumb = ch = 0;
+	}
+	T[j] = 0;
+	while (i < NTAB - 1) {
+		if (T[j] == 0) {
+			j = 0;
+			n = (i ? tabtab[i-1] : 0) & TABMASK;
+		}
+		tabtab[i++] = n + (T[j] & TABMASK) | T[j] & ~TABMASK;
+		j++;
 	}
 	tabtab[i] = 0;
 }
