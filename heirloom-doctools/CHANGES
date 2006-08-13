@@ -1,4 +1,4 @@
-Release ...
+Release 060813
 * [nt]roff: A new type of traps is available: output-line traps. They are
   set with the new "\P" escape sequence and are invoked when the line that
   contains the corresponding sequence has been output.
