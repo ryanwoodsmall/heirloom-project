@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.123 (gritter) 8/13/06
+.\" Sccsid @(#)doc.tr	1.124 (gritter) 8/13/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -545,7 +545,7 @@ Gunnar Ritter
 Introduction
 .pg
 \*(NR and \*(TR are text processors under
-the \s-1UNIX\s+1 Time-Sharing System\*u1\*d
+the \T'ref_1'\s-1UNIX\s+1 Time-Sharing System\*u1\*d\T
 that format text for typewriter-like terminals and
 for a typesetter/raster devices, respectively.
 They accept lines of text interspersed with lines of
@@ -581,7 +581,7 @@ is capable of utilizing the full resolution of each terminal.
 On the Heirloom Documentation Tools Edition
 .pg
 In Summer 2005, Sun Microsystems, Inc. released
-the source code to the Solaris system,
+\T'ref_6'the source code to the Solaris system,\|\*u6\*d\T
 including the System\ V Release\ 4 version of \*[TR,]
 a derivative of AT\[ampersand]T
 \fIDocumenter's Workbench\fR \*[TR,] version 2.
@@ -652,7 +652,7 @@ Many internal limitations of \*(TR have been removed;
 most notably, \*(TR can now set characters in fractional point sizes.
 .pg
 The \*(TR language has been extended
-similarly as in the \s-1GNU\s+1 version of \*[TR,] \*(GR\|\*u6\*d;
+similarly as in the \s-1GNU\s+1 version of \*[TR,] \T'ref_7'\*(GR\|\*u7\*d\T;
 for example,
 names of requests, macros, strings, number registers, and fonts
 can consist of more than two characters.
@@ -693,9 +693,10 @@ who have unfortunately become increasingly unaware
 of how to write well-styled \*(NR documents.
 .pg
 This manual as well as some of the pre- and post-processor commands
-have been derived from \s-1UNIX\s+1 code re\%leased by Caldera\*u7\*d,
+have been derived from \s-1UNIX\s+1 code
+re\%leased by \T'ref_8'Caldera\*u8\*d\T,
 and from materials released by Lucent as parts
-of the \fIPlan\ 9\fR system\*u8\*d.
+of the \T'ref_9'\fIPlan\ 9\fR system\*u9\*d\T.
 .pg
 .ft B
 Background to the Second Edition
@@ -761,12 +762,13 @@ There are no limits on the number of characters.
 \H'8'Character height\H'10' and \S'-1'sl\S'0'a\S'1'nt\S'0' may be set
 independently of width.
 .pg
-The remainder of this document contains a description of
-usage and command-line options;
-a summary of requests, escape sequences, and pre-defined number registers;
-a reference manual;
-tutorial examples;
-and a list of commonly-available characters.
+The remainder of this document contains
+\T'part_usage'a description of usage and command-line options\T;
+\T'part_summary'a summary of requests, escape sequences,
+and pre-defined number registers\T;
+\T'part_reference'a reference manual\T;
+\T'part_tutorial'tutorial examples\T;
+and \T'Table I'a list of commonly-available characters\T.
 .pg
 .nr nosave 1
 .ft B
@@ -825,7 +827,7 @@ References
 .ta .3i
 .in .3i
 .ti 0
-[1]	M. D. McIllroy, B. W. Kernighan (Eds.),
+\A'ref_1'[1]	M. D. McIllroy, B. W. Kernighan (Eds.),
 .ul
 Unix Programmer's Manual,
 Vol.\|2,
@@ -835,40 +837,43 @@ Murray Hill,
 <http://plan9.bell-labs.com/7thEdMan/index.html>.
 .sp .4
 .ti 0
-[2]	B. W. Kernighan, L. L. Cherry,
+\A'ref_2'[2]	B. W. Kernighan, L. L. Cherry,
 .ul
 Typesetting Mathematics \(em User's Guide (Second Edition),
 in [1].
 .sp .4
 .ti 0
-[3]	M. E. Lesk,
+\A'ref_3'[3]	M. E. Lesk,
 .ul
 Tbl \(em A Program to Format Tables,
 in [1].
 .sp .4
 .ti 0
-[4]	B. W. Kernighan, \fIA TROFF Tutorial\fR,
+\A'ref_4'[4]	B. W. Kernighan, \fIA TROFF Tutorial\fR,
 in [1].
 .sp .4
 .ti 0
-[5]	J. F. Ossanna, ``Nroff/Troff User's Manual'',
+\A'ref_5'[5]	J. F. Ossanna, ``Nroff/Troff User's Manual'',
 in [1].
 .sp .4
 .ti 0
-[6]	<http://groff.ffii.org>
+\A'ref_6'[6]	<http://www.opensolaris.org>
 .sp .4
 .ti 0
-[7]	<http://www.tuhs.org/Archive/Caldera-license.pdf>
+\A'ref_7'[7]	<http://groff.ffii.org>
 .sp .4
 .ti 0
-[8]	<http://plan9.bell-labs.com/plan9>
+\A'ref_8'[8]	<http://www.tuhs.org/Archive/Caldera-license.pdf>
+.sp .4
+.ti 0
+\A'ref_9'[9]	<http://plan9.bell-labs.com/plan9>
 'in 0
 .pg
 .nr nosave 1
 .bp
 .Bookmark 0 Usage
 .ft B
-Usage
+\A'part_usage'Usage
 .pg
 The general form of invoking \*(NR (or \*(TR) at \s-1UNIX\s+1 command level is
 .x1
@@ -999,9 +1004,10 @@ specifies the output terminal as a \s-1DASI\s+1-300S,
 and invokes the macro package \fIabc\fR.
 .pg
 Various pre- and post-processors are available for use with \*(NR and \*[TR.]
-These include the equation preprocessors \fIneqn\fP and \fIeqn\fP\*u2\*d
+These include
+\T'ref_2'the equation preprocessors \fIneqn\fP and \fIeqn\fP\*u2\*d\T
 (for \*(NR and \*(TR respectively),
-the table-construction preprocessor \fItbl\fP\*u3\*d,
+the \T'ref_3'table-construction preprocessor \fItbl\fP\*u3\*d\T,
 and \fIpic\fP and \fIgrap\fP
 for various forms of graphics.
 A reverse-line postprocessor \fIcol\fP
@@ -1072,7 +1078,7 @@ e.g. \fB\-Mcut:reg\fR will print cut marks and registration marks.
 .Bookmark 0 "Summary and Index"
 .nr mh-level 2
 .ft B
-Request Summary
+\A'part_summary'Request Summary
 .ft R
 .br
 .Bookmark 1 "Request Summary"
@@ -1153,9 +1159,9 @@ mode (font \fIF\^\fR\^).\T
 \fIF\fR|= \fIx\fR, \fIxx\fR, or 1-4.\T
 \T's_f'Also \fB\ef\fIx\fR,\|\fB\ef(\fIxx\fR,\|\fB\ef\fIN\fR.\T
 .b1
-\T'fp'\fB&fp|\fIN|F|\fR[\fIfile|\fR[\fIsupply\fR]]	ignored	\(en	Font position; mounts the font \fIfile\fR.\T
+\T'fp'\fB&fp|\fIN|F|\fR[\fIfile|\fR[\fIsupply\fR]]	ignored	P	Font position; mounts the font \fIfile\fR.\T
 .b1
-\T'fps'\fB&fps\fI|map|...\fR		ignored	T	Mount a font with a special character map.\T
+\T'fps'\fB&fps\fI|map|...\fR		ignored	P,T	Mount a font with a special character map.\T
 .b1
 \T'feature'\fB&feature\fI|F|\(+-name|...\fR	ignored	P,T	Control OpenType features.\T
 .b1
@@ -1163,9 +1169,9 @@ mode (font \fIF\^\fR\^).\T
 .b1
 \T'hidechar'\fB&hidechar\fI|F|c|d|...\fR	ignored	P,T	Hide the characters \fIc\fR, \fId\fR, etc. from font F.\T
 .b1 0
-\T'spacewidth'\fB&spacewidth\fI|\fIN\fR	on	T	Use the space width from the font metrics file.\T
+\T'spacewidth'\fB&spacewidth\fI|\fIN\fR	on	O,T	If \fIN\fR\(!=0, use the space width from the font metrics file.\T
 .b1 0
-\T'fspacewidth'\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Set the width
+\T'fspacewidth'\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Set the width
 of the space character in font \fIF\fR to \fIN\fR.\T
 .mht s_page
 Page Control
@@ -1547,16 +1553,14 @@ Picture Inclusion
 .ne 8
 .mht s_pdf
 Special Features for \*[PDF] Documents
+.mht s_groff
+\f(BIgroff\fP Compatibility
+.bt 0
+\T'cp'\fB&cp\fI|N\fR	off	\(en	\(en	Enable \*(GR compatibility mode.\T
 .mht s_output
 Output Language
 .mht s_device
 Device and Font Description Files
-.ds H A
-.nr p 0 1
-.mht A1
-\f(BIgroff\fP Compatibility
-.bt 0
-\T'cp'\fB&cp\fI|N\fR	off	off	\(en	\*(GR compatibility mode enabled if \fIN\fR=0.\T
 .br
 .rm mx
 .bp
@@ -1603,7 +1607,7 @@ Device and Font Description Files
 \T'chop'chop	7\T
 \T'close'close	19\T
 \T'continue'continue	16\T
-\T'cp'cp	A1\T
+\T'cp'cp	25\T
 \T'cropat'cropat	3\T
 \T'cs'cs	2\T
 \T'cu'cu	10\T
@@ -1915,7 +1919,7 @@ Reference	Name	Description
 \T'n_st'11.2\T	\T'n_st'\fBst\fR\T	\T'n_st'Height of string above base line (generated by \fIwidth\fR function).\T
 \(en	\fByear\fR	Current year.
 \(en	\fByr\fR	Current year minus 1900.
-\T'n_.g'A1.1\T	\T'n_.g'\fB&g\fR\T	\T'n_.g'Current \*(GR compatibility mode (0=off).\T
+\T'n_.g'25.1\T	\T'n_.g'\fB&g\fR\T	\T'n_.g'Current \*(GR compatibility mode (0=off).\T
 .TE
 .sp
 .nr nosave 1
@@ -2016,7 +2020,7 @@ using \fB\ex\fI\'N\'\fR.\T
 .ps +2
 .rs
 .sp 1.0i
-REFERENCE MANUAL
+\A'part_reference'REFERENCE MANUAL
 .ft R
 .ps -2
 .sp
@@ -2123,7 +2127,7 @@ Formatter and device resolution.
 that correspond to the particular device
 for which output is being prepared;
 values from 300 to 72\|000/inch are typical.
-\T's_device'See \(sc26.\T
+\T's_device'See \(sc27.\T
 \*(NR internally uses 240 units/inch,
 corresponding to the least common multiple of the
 horizontal and vertical resolutions of various
@@ -2335,7 +2339,7 @@ Font and Character Size Control
 \A'c_char'Character set.
 The basic \*(TR character set
 is defined by a description file
-specific to each output device \T's_device'(\(sc26).\T
+specific to each output device \T's_device'(\(sc27).\T
 There are normally several regular fonts
 and one or more special fonts.
 The basic character set is shown in the attached
@@ -2461,7 +2465,7 @@ Times Bold Italic
 and the last is a Special font (\fBS\fR)
 containing miscellaneous characters.
 The set of fonts and positions is determined by the device description file,
-described in \T's_device'\(sc26\T.
+described in \T's_device'\(sc27\T.
 .pg
 The \fIcurrent\fR font, initially Roman, may be changed
 (among the mounted fonts)
@@ -2638,12 +2642,12 @@ Alternatively, imbed \fB\ef\fIF\fR.
 The font name \fBP\fR is reserved to mean the previous font,
 and the name \fBS\fR for the special font.
 .bta fp
-\fB&fp|\fIN|F|\fR[\fIfile|\fR[\fIsupply\fR]]	ignored	\(en	Font position.
+\fB&fp|\fIN|F|\fR[\fIfile|\fR[\fIsupply\fR]]	ignored	P	Font position.
 This is a statement
 that a font named \fIF\fR is mounted on position \fIN\fR.
 With two arguments,
 it is a fatal error if \fIF\fR is not known
-as a legacy \*(TR font file \T'c_fontdescr'(\(sc26.2).\T
+as a legacy \*(TR font file \T'c_fontdescr'(\(sc27.2).\T
 .xx
 With three or more arguments,
 font metrics are read from the given \fIfile\fR,
@@ -2703,7 +2707,7 @@ In the path names
 in TROFFONTS, only the \fB%\fR and \fB:\fR characters have to be masked
 using this mechanism.
 .bta fps
-\fB&fps\fI|map|...\fR		ignored	T	\
+\fB&fps\fI|map|...\fR		ignored	P,T	\
 Mount a font with a special character map.
 By default, special characters like \fB\e(\(**a\fR
 are not assigned when a font is mounted
@@ -2747,15 +2751,16 @@ they are searched in other fonts using the fallback sequence.
 This is useful e.g. for combining characters from a regular
 and a Type\ 1 expert font.
 .bta spacewidth
-\fB&spacewidth\fI|\fIN\fR	on	T	Use the space width from the font metrics file.
-The space width normally defaults to 1/3\|em for
+\fB&spacewidth\fI|\fIN\fR	on	O,T	If \fIN\fR\(!=0, use the space width from the font metrics file.
+The space width otherwise defaults to 1/3\|em for
 variable-width fonts, or to the width of the \fBspace\fR character
 for monospaced fonts.
 With this request, the space width
-is set to the width of the \fBspace\fR character as obtained from the
-font metrics file.
+is set to the width of the \fBspace\fR character
+as obtained from the font metrics file
+for variable-width fonts too.
 .bta fspacewidth
-\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	T	Set the width
+\fB&fspacewidth\fI|F|\fR[\fIN\fR]	ignored	O,T	Set the width
 of the space character in font \fIF\fR to \fIN\fR,
 which is given in units of 1/72000 of an inch multiplied by the
 current point size or 1/1000 of an em (as in \s-1AFM\s+1 kerning pair
@@ -4385,7 +4390,7 @@ Transparent output.
 The sequence \A'e_X'\fB\eX\fI\'anything\'\fR copies \fIanything\fR
 to the output,
 as a device control function in the form \fBx\ X\ \fIanything\fR
-\T's_device'(\(sc25).\T
+\T's_output'(\(sc26).\T
 Escape sequences in \fIanything\fR are processed.
 The sequence \A'e_Y'\fB\eY\fIx\fR,
 \fB\eY(\fIxx\fR, or
@@ -4679,7 +4684,7 @@ saved in number register \fIa\fR
 as done for this paragraph.
 .eb
 .sc
-Graphics.
+\A's_graphics'Graphics.
 The function \A'e_D'\fB\eD\fI\'c...\'\fR
 draws a graphic object of type \fIc\fR
 according to a sequence of parameters,
@@ -4977,9 +4982,10 @@ References to number registers, strings, etc. must
 thus be written using a single escape character
 unless the \fBwhile\fR request is contained in a macro definition.
 .xx
-Long or nested loops will thus generate many macro definitions
-and may slow down execution;
-\T'c_recursion'recursive macros (\(sc10.6)\T do not suffer from this problem.
+Nested loops will result in many macro definitions
+and may slow down execution,
+especially if their body is large.
+\T'c_recursion'Recursive macros (\(sc10.6)\T do not suffer from this problem.
 In contrast to recursive macro calls,
 there is no mechanism to terminate a loop automatically
 when a repetition limit has been reached.
@@ -5563,9 +5569,9 @@ Nothing prevents the picture from being placed off the page.
 An example how to combine the following requests and macros is:
 .x1
 &psbb picture.eps
-&nr scale 4
-&nr y (\en[ury]p\-\en[lly]p)/\en[scale]
-&nr x (\en[urx]p\-\en[llx]p)/\en[scale]
+&nrf scale .25
+&nrf y (\en[ury]p\-\en[lly]p)*\en[scale]
+&nrf x (\en[urx]p\-\en[llx]p)*\en[scale]
 &PI picture.eps "\enyu,\enxu"
 &sp \enyu
 picture description
@@ -5586,6 +5592,10 @@ the upper right \fIx\fR coordinate to \fBurx\fR,
 and the upper right \fIy\fR coordinate to \fBury\fR.
 All values are in points.
 If an error occurs, the registers are set to zero.
+.br
+.nr nosave 1
+.ne 6
+.nr nosave 0
 .pg
 The \fB\-mpictures\fR macros insert the necessary
 advices to \fIdpost\fR
@@ -5949,6 +5959,199 @@ and vertical corner radius, respectively,
 and \fIwidth\fR defines the width.
 .\"""
 .pg
+.mha s_groff
+\f(BIgroff\fP Compatibility
+.pg
+Heirloom \*(TR provides most of the extensions
+to the \*(TR language introduced in \T'ref_7'\*(GR\|\*u7\*d\T.
+Consequently, it is possible
+to create documents, macro sets, and preprocessors
+that can be used with both
+Heirloom \*(TR and \*[GR]
+and use functionality beyond the features
+that were supported by traditional \*[TR.]
+.pg
+Important differences to \*(GR are:
+The concept of an \fIinput level\fR
+regarding delimiters in escape sequences
+and macro arguments is not supported.
+Control characters are recognized
+at the beginning of a line
+even if preceded by escape sequences
+that do not result in formatting stream objects,
+such as \T'e_f'\fB\ef\fR\T, \T'e_s'\fB\es\fR\T, or \T'e_;'\fB\e;\fR\T.
+Diverted characters can be interpreted
+as control or escape characters again.
+\T's_font'Font handling\T,
+\T's_color'color support\T,
+\T's_pics'picture inclusion\T,
+and
+\T's_pdf'\*[PDF] structuring\T
+are realized using different mechanisms.
+The \fIdpost\fR post-processor does not recognize
+the \fB\eX\'ps:\fR...\fB\'\fR escape sequence
+(or \fBx\ X\ ps:\fR command, respectively)
+that is used for pass-through \*(PS
+with the \fIgrops\fR post-processor of \*(GR
+\T'x_X_PS'(\fIdpost\fR accepts \fB\eX'PS:\fR...\fB\'\fR and \fBx\ X\ PS:\fR);\T
+the \*(PS output generated by \fIdpost\fR is very different
+to that generated by \fIgrops.\fR
+\fIdpost\fR accepts the \*(GR drawing command extensions
+and sets the horizontal and vertical positions accordingly,
+but otherwise ignores line width, color, and fill specifications.
+.br
+.nr nosave 1
+.ne 6
+.nr nosave 0
+.sc
+Conditional groff compatibility.
+A request is available to control additional
+functions for \*(GR compatibility:
+.xx
+.h1
+.bta cp
+\fB&cp\fI|N\fR	off	\(en	\(en	Enable \*(GR compatibility mode.
+This is the name of \*(GR\fI's\fR own compatibility request
+with adapted semantics:
+Regardless of the argument,
+\*(GR compatibility mode is activated.
+If \fIN\fR=0, compatibility with traditional \*(TR is decreased,
+and Heirloom \*(TR \T'c_extension'extension level 3\T is set.
+If \fIN\fR\(!=0 or missing,
+compatibility with traditional \*(TR is improved,
+and Heirloom \*(TR \T'c_extension'extension level 1\T is set.
+Thus \fB&cp\ 0\fR results in maximum \*(GR compatibility.
+.pg
+The \fBcp\fR request sets the general number register \A'n_.g'\fB&g\fR
+to 1 in \*(GR compatibility mode and to 0 otherwise.
+The general number register \A'n_.C'\fB&C\fR
+is only assigned by the \fB&cp\fR request
+and corresponds to its argument.
+.pg
+Any use of the \T'xflag'\fBxflag\fR request\T disables \*(GR compatibility
+and accordingly sets the \fB&g\fR register to 0.
+.pg
+The \T'n_.X'\fB&X\fR read-only number register\T holds
+the current extension level after \fBcp\fR as usual.
+It can thus be used
+to determine whether running under \*(GR
+or in the \*(GR compatibility mode of Heirloom \*[TR.]
+Since they are read-write,
+any convenient value can then be assigned
+to the \fB&C\fR and \fB&g\fR registers.
+.pg
+The \fB&x\fR and \fB&y\fR registers
+are read-write in \*(GR compatibility mode;
+they correspond to the emulated \*(GR version number.
+The \fBcp\fR request sets them to 1 and 18, respectively.
+.pg
+The space width always defaults to the value
+obtained from the font metrics file
+in \*(GR compatibility mode;
+the \T'spacewidth'\fBspacewidth\fR\T request is not effective.
+.pg
+Any call to the \fBcp\fR request
+activates the following \*(GR compatibility escape sequences;
+any call to the \T'xflag'\fBxflag\fR\T request disables them.
+.pg
+The \fB\eA\fI'string'\fR escape sequence
+checks whether \fIstring\fR is acceptable as the name
+of a string, macro, number register, or font,
+and evaluates to ``1' if it does and to ``0'' otherwise.
+The Heirloom \*(TR anchoring escape sequence
+\T'e_A'\fB\eA\fR\T is not available in \*(GR compatibility mode.
+.pg
+The \fB\eB\fI'string'\fR escape sequence
+checks whether \fIstring\fR is a valid numerical expression
+and evaluates to ``1' if it does and to ``0'' otherwise.
+.pg
+The \A'e_/'\fB\e/\fR escape sequence inserts an italic correction,
+i.e. a small piece of horizontal motion
+(1/12\|em) that should be sufficient
+to separate an italic character from a following roman character.
+Similarly, \A'e_,'\fB\e,\fR adds a left italic correction,
+always a zero motion,
+that should be sufficient
+to separate a roman character
+from an immediately following italic character.
+Both exist to provide basic \*(GR compatibility only.
+It is otherwise recommended that the \T'kernpair'\fBkernpair\fR\T request
+is used for these purposes;
+it allows a more exact optical separation
+since the shape of both characters can be taken into account
+and also does not need to be be positioned directly in the input text
+at every occasion.
+.pg
+The \T's_graphics'\fB\eD\'p\fR|...\fB\'\fR polygon drawing escape sequence\T
+is altered such that the path is always closed,
+i.e. if the last line part does not return to the starting position,
+an additional line is added that does.
+.pg
+The escape sequences
+\fB\eF\fIx\fR, \fB\eF(\fIxx\fR, \fB\eF[\fIxxx\fB]\fR,
+\fB\em\fIx\fR, \fB\em(\fIxx\fR, \fB\em[\fIxxx\fB]\fR,
+\fB\eM\fIx\fR, \fB\eM(\fIxx\fR, \fB\eM[\fIxxx\fB]\fR,
+are read but discarded in \*(GR compatibility mode
+since the corresponding concepts of font families
+and built-in color support are foreign to Heirloom \*[TR.]
+All of them generate a \T's_warning'warning\T of the \fBescape\fR category.
+.sc
+groff compatibility macros.
+As an additional aid in formatting documents
+that had originally been written with \*(GR in mind,
+Heirloom \*(TR provides the \fB\-mg\fR compatibility macro package.
+Specifically:
+.pg
+\fB&cp\ 0\fR is executed, so
+\*(TR is operated in \*(GR compatibility mode
+at \T'c_extension'extension level\T 3.
+.pg
+The \T'p_locale'locale\T is set to \fBen_US\fR;
+this assumes that input to \*(GR is conventionally
+in the \s-1ISO-8859-1\s0 encoding.
+.pg
+The \T'hylang'hyphenation language\T is set to \fBen_US\fR.
+Since both \*(GR and Heirloom \*(TR then
+use the same hyphenation algorithm and patterns
+derived from \fIT\h'-.1n'\v'.5n'E\v'-.5n'X,\fR
+it can be assumed that words are subject
+to hyphenation at the same points.
+.pg
+The \fBde1\fR, \fBam1\fR, \fBds1\fR, and \fBas1\fR \*(GR requests
+are emulated using
+\T'de'\fBde\fR\T,
+\T'am'\fBam\fR\T,
+\T'ds'\fBds\fR\T,
+and
+\T'as'\fBas\fR\T,
+respectively.
+It is not expected that the \*(GR compatibility macros
+are used to format documents
+that require compatibility with traditional \*[TR.]
+.pg
+The \T'ftr'\fBftr\fR\T request is removed
+since the \*(GR request with the same name
+provides completely different semantics.
+.pg
+\T'fallback'\fBfallback\fR\T is used to emulate \fBfspecial\fR;
+these requests should be compatible.
+No emulation is provided for the \fBspecial\fR request;
+all other fonts are searched for missing characters
+in Heirloom \*(TR by default.
+.pg
+\T'track'\fBtrack\fR\T is used to emulate \fBtkf\fR.
+These requests are not completely compatible:
+\T'track'\fBtrack\fR\T does not affect the last character on a line
+and thus does not alter the visual length of lines like \fBtkf\fR does;
+\T'track'\fBtrack\fR\T is applied when formatting an object
+defined with the \T'char'\fBchar\fR request\T;
+\T'track'\fBtrack\fR\T needs to remain in effect
+until all affected characters have been physically output.
+Nevertheless, the replacement should suffice for most applications.
+.pg
+\*(GR characters with two-character names
+are mapped to \*(PS character names
+using the \T'char'\fBchar\fR\T request.
 .mha s_output
 Output Language.
 .pg
@@ -5996,6 +6199,10 @@ in the input, and are mandatory to separate constructions
 that would otherwise be confused.
 Graphics functions, device control functions, and comments extend to the
 end of the line they occur on.
+.br
+.nr nosave 1
+.ne 6
+.nr nosave 0
 .pg
 The device control and graphics commands are intended as open-ended
 families, to be expanded as needed.
@@ -6016,6 +6223,10 @@ In all of these, \fIx,\|y\fR is an increment on the current horizontal and
 vertical position,
 with down and right positive.
 All distances and dimensions are in units.
+.br
+.nr nosave 1
+.ne 5
+.nr nosave 0
 .pg
 The device control functions begin with \fBx\fP,
 then a command, then other parameters.
@@ -6060,10 +6271,14 @@ The commands \fBx\ T\fR, \fBx\ r\fR\ ...\fR, and \fBx\ i\fR
 fonts must be mounted before they can be used;
 \fBx\ s\fR comes last.
 There are no other order requirements.
+.br
+.nr nosave 1
+.ne 5
+.nr nosave 0
 .pg
 The following is the output from ``hello, world''
 for a typical printer,
-as described in \T's_output'\(sc25\T:
+as described in \T's_device'\(sc27\T:
 .tb
 x T post
 x res 720 1 1
@@ -6163,6 +6378,10 @@ the list of names is optional.
 A line whose first non-blank character is \fB#\fR is a comment.
 Except that \fBcharset\fR
 must occur last, parameters may appear in any order.
+.br
+.nr nosave 1
+.ne 5
+.nr nosave 0
 .pg
 Here is a subset of the \fB\s-1DESC\s+1\fR
 file for a typical Postscript printer:
@@ -6235,6 +6454,10 @@ The value is returned
 in the \T'n_ct'\fBct\fR\T register,
 as computed by the \T'e_w'\fB\ew\fR
 function\T \T'c_width'(\(sc11.2).\T
+.br
+.nr nosave 1
+.ne 5
+.nr nosave 0
 .pg
 Here are excerpts from a typical font description file
 for the same Postscript printer.
@@ -6262,198 +6485,6 @@ the value of \fBunitwidth\fR.
 Point sizes are scaled linearly and rounded, so the width of \fBa\fR
 will be 44 at size 10, 40 at size 9, 35 at size 8,
 and so on.
-.ds H A
-.nr p 0 1
-.mha A1
-\f(BIgroff\fP Compatibility
-.pg
-Heirloom \*(TR provides most of the extensions
-to the \*(TR language introduced in \*(GR\|\*u6\*d.
-Consequently, it is possible
-to create documents, macro sets, and preprocessors
-that can be used with both
-Heirloom \*(TR and \*[GR]
-and use functionality beyond the features
-that were supported by traditional \*[TR.]
-.pg
-Important differences to \*(GR are:
-The concept of an \fIinput level\fR
-regarding delimiters in escape sequences
-and macro arguments is not supported.
-Control characters are recognized
-at the beginning of a line
-even if preceded by escape sequences
-that do not result in formatting stream objects,
-such as \T'e_f'\fB\ef\fR\T, \T'e_s'\fB\es\fR\T, or \T'e_;'\fB\e;\fR\T.
-Diverted characters can be interpreted
-as control or escape characters again.
-\T's_font'Font handling\T,
-\T's_color'color support\T,
-\T's_pics'picture inclusion\T,
-and
-\T's_pdf'\*[PDF] structuring\T
-are realized using different mechanisms.
-The \fIdpost\fR post-processor does not recognize
-the \fB\eX\'ps:\fR...\fB\'\fR escape sequence
-(or \fBx\ X\ ps:\fR command, respectively)
-that is used for pass-through \*(PS
-with the \fIgrops\fR post-processor of \*(GR
-\T'x_X_PS'(\fIdpost\fR accepts \fB\eX'PS:\fR...\fB\'\fR and \fBx\ X\ PS:\fR);\T
-the \*(PS output generated by \fIdpost\fR is very different
-to that generated by \fIgrops.\fR
-\fIdpost\fR accepts the \*(GR drawing command extensions
-and sets the horizontal and vertical positions accordingly,
-but otherwise ignores line width, color, and fill specifications.
-.br
-.nr nosave 1
-.ne 6
-.nr nosave 0
-.sc
-Conditional groff compatibility.
-A request is available to control additional
-functions for \*(GR compatibility:
-.xx
-.h1
-.bta cp
-\fB&cp\fI|N\fR	off	off	\(en	\*(GR compatibility mode enabled if \fIN\fR=0.
-This is the name of \*(GR\fI's\fR own compatibility request
-with adapted semantics:
-If \fIN\fR=0, \*(GR compatibility is provided
-(i.e. compatibility with traditional \*(TR is decreased).
-This activates Heirloom \*(TR \T'c_extension'extension level 3\T.
-If \fIN\fR\(!=0 or missing,
-compatibility with traditional \*(TR is improved.
-This activates Heirloom \*(TR \T'c_extension'extension level 1\T.
-.pg
-The \fBcp\fR request sets the general number register \A'n_.g'\fB&g\fR
-to 1 in \*(GR compatibility mode and to 0 otherwise.
-The general number register \A'n_.C'\fB&C\fR
-is only assigned by the \fB&cp\fR request
-and corresponds to its argument.
-.pg
-Any use of the \T'xflag'\fBxflag\fR request\T disables \*(GR compatibility
-and accordingly sets the \fB&g\fR register to 0.
-.pg
-The \T'n_.X'\fB&X\fR read-only number register\T holds
-the current extension level after \fBcp\fR as usual.
-It can thus be used
-to determine whether running under \*(GR
-or in the \*(GR compatibility mode of Heirloom \*[TR.]
-Since they are read-write,
-any convenient value can then be assigned
-to the \fB&C\fR and \fB&g\fR registers.
-.pg
-The \fB&x\fR and \fB&y\fR registers
-are read-write in \*(GR compatibility mode;
-they correspond to the emulated \*(GR version number.
-The \fBcp\fR request sets them to 1 and 18, respectively.
-.pg
-The space width always defaults to the value
-obtained from the font metrics file
-in \*(GR compatibility mode;
-the \T'spacewidth'\fBspacewidth\fR\T request is not effective.
-.pg
-Any call to the \fBcp\fR request
-activates the following \*(GR compatibility escape sequences;
-any call to the \T'xflag'\fBxflag\fR\T request disables them.
-.pg
-The \fB\eA\fI'string'\fR escape sequence
-checks whether \fIstring\fR is acceptable as the name
-of a string, macro, number register, or font,
-and evaluates to ``1' if it does and to ``0'' otherwise.
-The Heirloom \*(TR anchoring escape sequence
-\T'e_A'\fB\eA\fR\T is not available in \*(GR compatibility mode.
-.pg
-The \fB\eB\fI'string'\fR escape sequence
-checks whether \fIstring\fR is a valid numerical expression
-and evaluates to ``1' if it does and to ``0'' otherwise.
-.pg
-The \A'e_/'\fB\e/\fR escape sequence inserts an italic correction,
-i.e. a small piece of horizontal motion
-(1/12\|em) that should be sufficient
-to separate an italic character from a following roman character.
-Similarly, \A'e_,'\fB\e,\fR adds a left italic correction,
-always a zero motion,
-that should be sufficient
-to separate a roman character
-from an immediately following italic character.
-Both exist to provide basic \*(GR compatibility only.
-It is otherwise recommended that the \T'kernpair'\fBkernpair\fR\T request
-is used for these purposes;
-it allows a more exact optical separation
-since the shape of both characters can be taken into account
-and also does not need to be be positioned directly in the input text
-at every occasion.
-.pg
-The \fB\eD\'p\fR|...\fB\'\fR polygon drawing escape sequence
-is altered such that the path is always closed,
-i.e. if the last line part does not return to the starting position,
-an additional line is added that does.
-.pg
-The escape sequences
-\fB\eF\fIx\fR, \fB\eF(\fIxx\fR, \fB\eF[\fIxxx\fB]\fR,
-\fB\em\fIx\fR, \fB\em(\fIxx\fR, \fB\em[\fIxxx\fB]\fR,
-\fB\eM\fIx\fR, \fB\eM(\fIxx\fR, \fB\eM[\fIxxx\fB]\fR,
-are read but discarded in \*(GR compatibility mode
-since the corresponding concepts of font families
-and built-in color support are foreign to Heirloom \*[TR.]
-All of them generate a \T's_warning'warning\T of the \fBescape\fR category.
-.sc
-groff compatibility macros.
-As an additional aid in formatting documents
-that had originally been written with \*(GR in mind,
-Heirloom \*(TR provides the \fB\-mg\fR compatibility macro package.
-Specifically:
-.pg
-\*(TR is operated in \*(GR compatibility mode
-at \T'c_extension'extension level\T 3.
-.pg
-The \T'p_locale'locale\T is set to \fBen_US\fR;
-this assumes that input to \*(GR is conventionally
-in the \s-1ISO-8859-1\s0 encoding.
-.pg
-The \T'hylang'hyphenation language\T is set to \fBen_US\fR.
-Since both \*(GR and Heirloom \*(TR then
-use the same hyphenation algorithm and patterns
-derived from \fIT\h'-.1n'\v'.5n'E\v'-.5n'X,\fR
-it can be assumed that words are subject
-to hyphenation at the same points.
-.pg
-The \fBde1\fR, \fBam1\fR, \fBds1\fR, and \fBas1\fR \*(GR requests
-are emulated using
-\T'de'\fBde\fR\T,
-\T'am'\fBam\fR\T,
-\T'ds'\fBds\fR\T,
-and
-\T'as'\fBas\fR\T,
-respectively.
-It is not expected that the \*(GR compatibility macros
-are used to format documents
-that require compatibility with traditional \*[TR.]
-.pg
-The \T'ftr'\fBftr\fR\T request is removed
-since the \*(GR request with the same name
-provides completely different semantics.
-.pg
-\T'fallback'\fBfallback\fR\T is used to emulate \fBfspecial\fR;
-these requests should be compatible.
-No emulation is provided for the \fBspecial\fR request;
-all other fonts are searched for missing characters
-in Heirloom \*(TR by default.
-.pg
-\T'track'\fBtrack\fR\T is used to emulate \fBtkf\fR.
-These requests are not completely compatible:
-\T'track'\fBtrack\fR\T does not affect the last character on a line
-and thus does not alter the visual length of lines like \fBtkf\fR does;
-\T'track'\fBtrack\fR\T is applied when formatting an object
-defined with the \T'char'\fBchar\fR request\T;
-\T'track'\fBtrack\fR\T needs to remain in effect
-until all affected characters have been physically output.
-Nevertheless, the replacement should suffice for most applications.
-.pg
-\*(GR characters with two-character names
-are mapped to \*(PS character names
-using the \T'char'\fBchar\fR\T request.
 .rm EM
 .bp
 .\" from file m5
@@ -6482,7 +6513,7 @@ using the \T'char'\fBchar\fR\T request.
 .ft B
 .rs
 .sp 0.5i
-TUTORIAL EXAMPLES
+\A'part_tutorial'TUTORIAL EXAMPLES
 .ft R
 .sp 2
 .nr p 0
