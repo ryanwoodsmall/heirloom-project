@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.61 (gritter) 8/12/06
+ * Sccsid @(#)n4.c	1.63 (gritter) 8/13/06
  */
 
 /*
@@ -109,7 +109,7 @@ static int
 _setn(int tm)	/* tm: test for presence of readonly register */
 {
 	extern const char	revision[];
-	char	tb[20], *cp;
+	char	tb[30], *cp;
 	const char	*name;
 	struct s	*s;
 	register int i, j;
@@ -250,6 +250,10 @@ sl:
 				cpushback((char *)revision);
 				return(0);
 			}
+			/*FALLTHRU*/
+		case 'S':
+			if (xflag)
+				goto tabs;
 			/*FALLTHRU*/
 
 		default:
@@ -392,6 +396,27 @@ sl:
 #ifdef	NROFF
 			i *= INCH / 72;
 #endif	/* NROFF */
+		} else if (strcmp(&name[1], "tabs") == 0) {
+		tabs:	TMYES;
+			for (i = 0; tabtab[i]; i++);
+			while (--i >= 0) {
+				cp = tb;
+				if (i)
+					*cp++ = ' ';
+				cp = roff_sprintf(cp, "%d", tabtab[i]&TABMASK);
+				*cp++ = 'u';
+				switch (tabtab[i] & ~TABMASK) {
+				case RTAB:
+					*cp++ = 'R';
+					break;
+				case CTAB:
+					*cp++ = 'C';
+					break;
+				}
+				*cp = 0;
+				cpushback(tb);
+			}
+			return(0);
 		} else if (strcmp(&name[1], "ce") == 0)
 			i = ce;
 		else if (strcmp(&name[1], "rj") == 0)
@@ -822,41 +847,43 @@ a0:
 		if (nonumb)
 			break;
 		acc.n += i.n;
-		acc.f += i.f;
+		if (flt) acc.f += i.f;
 		goto a0;
 	case '-':
 		i = ckph(flt);
 		if (nonumb)
 			break;
 		acc.n -= i.n;
-		acc.f -= i.f;
+		if (flt) acc.f -= i.f;
 		goto a0;
 	case '*':
 		i = ckph(flt);
 		if (nonumb)
 			break;
-		acc.n *= i.n;
-		acc.f *= i.f;
+		if (!flt) acc.n *= i.n;
+		if (flt) acc.f *= i.f;
 		goto a0;
 	case '/':
 		i = ckph(flt);
 		if (nonumb)
 			break;
-		if (i.n == 0 || i.f == 0) {
+		if (!flt && i.n == 0 || flt && i.f == 0) {
 			flusho();
 			errprint("divide by zero.");
-			acc.f = acc.n = 0;
+			acc.n = 0;
+			if (flt) acc.f = 0;
 		} else  {
-			acc.n /= i.n;
-			acc.f /= i.f;
+			if (!flt) acc.n /= i.n;
+			if (flt) acc.f /= i.f;
 		}
 		goto a0;
 	case '%':
 		i = ckph(flt);
 		if (nonumb)
 			break;
+		if (flt) acc.n = acc.f, i.n = i.f;
 		acc.n %= i.n;
-		acc.f = acc.n;
+		if (flt) acc.f = acc.n;
 		goto a0;
 	case '&':	/*and*/
 		i = ckph(flt);
@@ -866,7 +893,7 @@ a0:
 			acc.n = 1; 
 		else 
 			acc.n = 0;
-		acc.f = acc.n;
+		if (flt) acc.f = acc.n;
 		goto a0;
 	case ':':	/*or*/
 		i = ckph(flt);
@@ -876,17 +903,19 @@ a0:
 			acc.n = 1; 
 		else 
 			acc.n = 0;
-		acc.f = acc.n;
+		if (flt) acc.f = acc.n;
 		goto a0;
 	case '=':
 		if (cbits(ii = getch()) != '=')
 			ch = ii;
 		i = ckph(flt);
 		if (nonumb) {
-			acc.f = acc.n = 0; 
+			acc.n = 0; 
+			if (flt) acc.f = 0;
 			break;
 		}
-		acc.f = acc.n = flt ? i.f == acc.f : i.n == acc.n;
+		acc.n = i.n == acc.n;
+		if (flt) acc.f = i.f == acc.f;
 		goto a0;
 	case '>':
 		k = 0;
@@ -898,7 +927,8 @@ a0:
 			ch = ii;
 		i = ckph(flt);
 		if (nonumb) {
-			acc.f = acc.n = 0; 
+			acc.n = 0; 
+			if (flt) acc.f = 0;
 			break;
 		}
 		if (!flt) {
@@ -907,18 +937,18 @@ a0:
 			else 
 				acc.n = 0;
 		} else
-			acc.n = k ? acc.f >= i.f : acc.f > i.f;
-		acc.f = acc.n;
+			acc.f = k ? acc.f >= i.f : acc.f > i.f;
 		goto a0;
 	maximum:
 		i = ckph(flt);
 		if (nonumb) {
-			acc.f = acc.n = 0; 
+			acc.n = 0; 
+			if (flt) acc.f = 0;
 			break;
 		}
 		if (i.n > acc.n)
 			acc.n = i.n;
-		if (i.f > acc.f)
+		if (flt && i.f > acc.f)
 			acc.f = i.f;
 		goto a0;
 	case '<':
@@ -933,7 +963,8 @@ a0:
 			ch = ii;
 		i = ckph(flt);
 		if (nonumb) {
-			acc.f = acc.n = 0; 
+			acc.n = 0; 
+			if (flt) acc.f = 0;
 			break;
 		}
 		if (!flt) {
@@ -942,27 +973,29 @@ a0:
 			else 
 				acc.n = 0;
 		} else
-			acc.n = k ? acc.f <= i.f : acc.f < i.f;
-		acc.f = acc.n;
+			acc.f = k ? acc.f <= i.f : acc.f < i.f;
 		goto a0;
 	minimum:
 		i = ckph(flt);
 		if (nonumb) {
-			acc.f = acc.n = 0; 
+			acc.n = 0; 
+			if (flt) acc.f = 0;
 			break;
 		}
 		if (i.n < acc.n)
 			acc.n = i.n;
-		if (i.f < acc.f)
+		if (flt && i.f < acc.f)
 			acc.f = i.f;
 		goto a0;
 	notequal:
 		i = ckph(flt);
 		if (nonumb) {
-			acc.f = acc.n = 0; 
+			acc.n = 0; 
+			if (flt) acc.f = 0;
 			break;
 		}
-		acc.f = acc.n = flt ? i.f != acc.f : i.n != acc.n;
+		acc.n = i.n != acc.n;
+		if (flt) acc.f = i.f != acc.f;
 		goto a0;
 	case ')': 
 		parlevel--;
@@ -1035,8 +1068,9 @@ a1:
 	while (i >= '0' && i <= '9') {
 		field++;
 		digits++;
-		acc.n = 10 * acc.n + i - '0';
-		if (field == digits)
+		if (!flt)
+			acc.n = 10 * acc.n + i - '0';
+		else if (field == digits)
 			acc.f = 10 * acc.f + i - '0';
 		else {
 			f = i - '0';
@@ -1182,18 +1216,18 @@ a1:
 aa:
 	if (neg) {
 		acc.n = -acc.n;
-		acc.f = -acc.f;
+		if (flt) acc.f = -acc.f;
 	}
 	if (!noscale) {
-		acc.n = (acc.n * j) / i;
-		acc.f = (acc.f * j) / i;
+		if (!flt) acc.n = (acc.n * j) / i;
+		if (flt) acc.f = (acc.f * j) / i;
 	}
-	if ((field != digits) && (digits > 0))
+	if (!flt && (field != digits) && (digits > 0))
 		while (digits--)
 			acc.n /= 10;
 	if (e != 1) {
-		acc.n = (int)(e * acc.n);
-		acc.f *= e;
+		if (!flt) acc.n = (int)(e * acc.n);
+		if (flt) acc.f *= e;
 	}
 	if (abs) {
 		if (dip != d)
@@ -1206,7 +1240,7 @@ aa:
 		if (abs == 2)
 			j = -j;
 		acc.n -= j;
-		acc.f -= j;
+		if (flt) acc.f -= j;
 	}
 a2:
 	nonumb = !field;
@@ -1604,15 +1638,17 @@ _inumb(int *n, float *fp, int flt)
 	}
 	i = _atoi(flt);
 	lgf--;
-	if (n && f)
+	if (n && f && !flt)
 		i.n = *n + f * i.n;
 	if (fp && f && flt)
 		i.f = *fp + f * i.f;
-	i.n = quant(i.n, res);
+	if (!flt) i.n = quant(i.n, res);
 	vflag = 0;
 	res = dfactd = dfact = 1;
-	if (nonumb)
-		i.f = i.n = 0;
+	if (nonumb) {
+		i.n = 0;
+		if (flt) i.f = 0;
+	}
 	return(i);
 }
 

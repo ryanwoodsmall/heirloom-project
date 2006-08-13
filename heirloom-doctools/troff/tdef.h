@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.123 (gritter) 8/12/06
+ * Sccsid @(#)tdef.h	1.124 (gritter) 8/13/06
  */
 
 /*
@@ -124,6 +124,8 @@
 #define	DRAWARC		'a'	/* arbitrary arc */
 #define	DRAWSPLINE	'~'	/* quadratic B spline */
 #define	DRAWTHICKNESS	't'	/* line thickness */
+#define	DRAWPOLYGON	'p'	/* polygon */
+#define	DRAWPOLYGONFI	'P'	/* filled polygon */
 
 #define	LEFT	020	/* \{ */
 #define	RIGHT	021	/* \} */

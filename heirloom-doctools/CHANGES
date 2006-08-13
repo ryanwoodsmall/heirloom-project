@@ -72,6 +72,8 @@ Release ...
   have been added.
 * [nt]roff: The ".ta T Nt Mu" syntax to set tab stops repeatedly is now
   supported.
+* [nt]roff: The "\n(.S" and "\n[.tabs]" registers have been added to save
+  and restore tab stops.
 * [nt]roff: The "\n[.ev]" number register has been added as a method to
   determine the name of the current environment.
 * troff: The "\n[rst]" and "\n[rsb]" registers are set by the width function

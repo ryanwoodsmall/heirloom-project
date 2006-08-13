@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.61 (gritter) 8/12/06
+ * Sccsid @(#)n9.c	1.62 (gritter) 8/13/06
  */
 
 /*
@@ -326,6 +326,7 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 	int i, dx[NPAIR], dy[NPAIR], type;
 	tchar c, delim;
 #ifndef	NROFF
+	int	hpos, vpos;
 	int j, k;
 	tchar drawbuf[NC];
 #endif	/* NROFF */
@@ -382,15 +383,25 @@ setdraw (void)	/* generate internal cookies for a drawing function */
 	drawbuf[0] = DRAWFCN | chbits | ZBIT;
 	drawbuf[1] = type | chbits | ZBIT;
 	drawbuf[2] = '.' | chbits | ZBIT;	/* use default drawing character */
+	hpos = vpos = 0;
 	for (k = 0, j = 3; k < i; k++) {
 		drawbuf[j++] = MOT | ((dx[k] >= 0) ?
 				sabsmot(dx[k]) : (NMOT | sabsmot(-dx[k])));
 		drawbuf[j++] = MOT | VMOT | ((dy[k] >= 0) ?
 				sabsmot(dy[k]) : (NMOT | sabsmot(-dy[k])));
+		hpos += dx[k];
+		vpos += dy[k];
 	}
 	if (type == DRAWELLIPSE || type == DRAWELLIPSEFI) {
 		drawbuf[5] = drawbuf[4] | NMOT;	/* so the net vertical is zero */
 		j = 6;
+	}
+	if (gflag && (type == DRAWPOLYGON || type == DRAWPOLYGONFI) &&
+			(hpos || vpos)) {
+		drawbuf[j++] = MOT | ((hpos < 0) ?
+				sabsmot(-hpos) : (NMOT | sabsmot(hpos)));
+		drawbuf[j++] = MOT | VMOT | ((vpos < 0) ?
+				sabsmot(-vpos) : (NMOT | sabsmot(vpos)));
 	}
 	drawbuf[j++] = DRAWFCN | chbits | ZBIT;	/* marks end for ptout */
 	drawbuf[j] = 0;
