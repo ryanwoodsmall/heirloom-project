@@ -1,3 +1,8 @@
+Release ...
+* [nt]roff: Formatting of a ".char" object immediately before a trap is
+  executed no longer causes pending input text to disappear (bug reported
+  by Sebastian Leusch).
+
 Release 060813
 * [nt]roff: A new type of traps is available: output-line traps. They are
   set with the new "\P" escape sequence and are invoked when the line that

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.113 (gritter) 8/12/06
+ * Sccsid @(#)n1.c	1.114 (gritter) 8/20/06
  */
 
 /*
@@ -2251,6 +2251,7 @@ struct fmtchar {
 	int	savvflag;
 	int	savvpt;
 	int	savhp;
+	int	savnflush;
 	tchar	*csp;
 	int	charcount;
 };
@@ -2281,6 +2282,7 @@ prepchar(struct fmtchar *fp)
 	dip = &fp->newd;
 	offset = dip->op = startb;
 	charout[charcount].op = startb;
+	fp->savnflush = nflush;
 	fp->savvflag = vflag;
 	vflag = 0;
 	fp->savvpt = vpt;
@@ -2313,6 +2315,7 @@ restchar(struct fmtchar *fp, int keepf)
 		fp->saveev._spbits = spbits;
 	}
 	env = fp->saveev;
+	nflush = fp->savnflush;
 	vflag = fp->savvflag;
 	vpt = fp->savvpt;
 	numtab[HP].val = fp->savhp;
