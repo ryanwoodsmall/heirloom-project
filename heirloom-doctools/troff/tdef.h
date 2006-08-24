@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.127 (gritter) 8/24/06
+ * Sccsid @(#)tdef.h	1.128 (gritter) 8/24/06
  */
 
 /*
@@ -744,6 +744,7 @@ struct acc {
 #define	cu	env._cu
 #define	ce	env._ce
 #define	rj	env._rj
+#define	brnl	env._brnl
 #define	brpnl	env._brpnl
 #define	in	env._in
 #define	in1	env._in1
@@ -870,6 +871,7 @@ extern struct env {
 	int	_cu;
 	int	_ce;
 	int	_rj;
+	int	_brnl;
 	int	_brpnl;
 	int	_in;
 	int	_in1;

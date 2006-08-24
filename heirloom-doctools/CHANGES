@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: The new ".brnl" request causes a break each time a newline is
+  encountered at the end of a text input line. Unlike nofill mode, text is
+  still wrapped to the line length.
 * [nt]roff: The new ".brpnl" request causes a break and a spread each time
   a newline is encountered at the end of a text input line (as if it were
   attached a "\p"). The "\p" escape sequence changes its semantics in this
