@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.95 (gritter) 8/24/06
+ * Sccsid @(#)n7.c	1.96 (gritter) 8/24/06
  */
 
 /*
@@ -376,13 +376,16 @@ t2:
 			goto t1;
 	}
 t3:
-	if (spread)
+	if (spread && !brnl)
 		goto t5;
 	if (pendw || !wch)
 t4:
 		if (getword(0)) {
-			if (brnl && !pendw)
+			if (brnl && !pendw) {
+				if (spread)
+					goto tb;
 				goto t5;
+			}
 			goto t6;
 		}
 	if (!movword())
@@ -413,6 +416,7 @@ adj:
 			errprint("spreadlimit exceeded, %gm", (double)adsp/EM);
 	}
 	brflg = 1;
+tb:
 	tbreak();
 	spread = 0;
 	if (!trap && !recadj && !brnl)
