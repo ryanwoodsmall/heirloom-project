@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.10 (gritter) 6/26/05
+ * Sccsid @(#)service.c	1.11 (gritter) 8/25/06
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -109,7 +109,7 @@ initio(struct ionod *iop, int save)
 			} else if (flags & rshflg) {
 				failed(ion, restricted);
 			} else if (iof & IOAPP &&
-			    (fd = open((char *)ion, 1)) >= 0) {
+			    (fd = open((char *)ion, O_WRONLY)) >= 0) {
 				lseek(fd, (off_t)0, SEEK_END);
 			} else {
 				fd = create(ion);
@@ -177,7 +177,7 @@ pathopen(register const unsigned char *path, register const unsigned char *name)
 	do
 	{
 		path = catpath(path, name);
-	} while ((f = open((char *)curstak(), 0)) < 0 && path);
+	} while ((f = open((char *)curstak(), O_RDONLY)) < 0 && path);
 	return (f);
 }
 

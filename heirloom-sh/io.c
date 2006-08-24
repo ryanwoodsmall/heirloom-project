@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)io.c	1.6 (gritter) 8/25/06
  */
 /* from OpenSolaris "io.c	1.19	05/06/08 SMI"	 SVr4.0 1.10.2.1 */
 /*
@@ -161,12 +161,12 @@ renamef(register int f1, register int f2)
 
 	if (f1 != f2)
 	{
-		fs = fcntl(f2, 1, 0);
+		fs = fcntl(f2, F_GETFD, 0);
 		close(f2);
-		fcntl(f1, 0, f2);
+		fcntl(f1, F_DUPFD, f2);
 		close(f1);
 		if (fs == 1)
-			fcntl(f2, 2, 1);
+			fcntl(f2, F_SETFD, FD_CLOEXEC);
 		if (f2 == 0)
 			ioset |= 1;
 	}

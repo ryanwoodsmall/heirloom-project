@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.10 (gritter) 7/3/05
+ * Sccsid @(#)main.c	1.11 (gritter) 8/25/06
  */
 
 
@@ -484,10 +484,10 @@ Ldup(register int fa, register int fb)
 		if (fa != fb)
 		{
 			close(fb);
-			fcntl(fa, 0, fb); /* normal dup */
+			fcntl(fa, F_DUPFD, fb); /* normal dup */
 			close(fa);
 		}
-		fcntl(fb, 2, 1);	/* autoclose for fb */
+		fcntl(fb, F_SETFD, FD_CLOEXEC);	/* autoclose for fb */
 	}
 
 #endif
