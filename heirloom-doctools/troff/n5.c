@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.86 (gritter) 8/24/06
+ * Sccsid @(#)n5.c	1.87 (gritter) 8/24/06
  */
 
 /*
@@ -384,7 +384,7 @@ caserj(void)
 
 
 void
-casebrnl(void)
+casebrpnl(void)
 {
 	int	n;
 
@@ -394,11 +394,11 @@ casebrnl(void)
 	else {
 		n = atoi();
 		if (nonumb)
-			n = brnl;
+			n = brpnl;
 	}
 	noscale--;
 	tbreak();
-	brnl = n;
+	brpnl = n;
 }
 
 
@@ -1099,8 +1099,8 @@ evc(struct env *dp, struct env *sp)
 	dp->_seflg = 0;
 	dp->_ce = 0;
 	dp->_rj = 0;
-	if (dp->_brnl < INT_MAX)
-		dp->_brnl = 0;
+	if (dp->_brpnl < INT_MAX)
+		dp->_brpnl = 0;
 	dp->_nn = 0;
 	dp->_ndf = 0;
 	dp->_nms = 0;

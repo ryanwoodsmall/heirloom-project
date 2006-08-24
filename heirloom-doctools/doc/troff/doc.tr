@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.127 (gritter) 8/24/06
+.\" Sccsid @(#)doc.tr	1.128 (gritter) 8/24/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1221,7 +1221,7 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'rj'\fB&rj\fI|N\fR	off	\fIN\(eq\fR1	B,E	Right-align following \fIN\fR input text lines.\T
 .b1
-\T'brnl'\fB&brnl\fI|N\fR	off	\fIN\(eq\fR\(if	B,E	Newline causes a break with \fIN\fR input text lines.\T
+\T'brpnl'\fB&brpnl\fI|N\fR	off	\fIN\(eq\fR\(if	B,E	Break and spread at end of next \fIN\fR input text lines.\T
 .b1
 \T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
@@ -1605,8 +1605,8 @@ Device and Font Description Files
 \T'br'br	4\T
 \T'break'break	16\T
 \T'breakchar'breakchar	13\T
-\T'brnl'brnl	4\T
 \T'brp'brp	4\T
+\T'brpnl'brpnl	4\T
 \T'c2'c2	10\T
 \T'cc'cc	10\T
 \T'ce'ce	4\T
@@ -1956,7 +1956,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.ascender'5.4\T	\T'n_.ascender'\fB&ascender\fR\T	\T'n_.ascender'Ascender of current font and point size.\T
 \T'n_.b'2.3\T	\T'n_.b'\fB&b\fR\T	\T'n_.b'Emboldening level.\T
 \T'n_.breakchar'13\T	\T'n_.breakchar'\fB&breakchar\fR\T	\T'n_.breakchar'Current optional line break characters.\T
-\T'n_.brnl'4.1\T	\T'n_.brnl'\fB&brnl\fR\T	\T'n_.brnl'Remaining number of lines with newline causing a break.\T
+\T'n_.brpnl'4.1\T	\T'n_.brpnl'\fB&brpnl\fR\T	\T'n_.brpnl'Remaining number of lines with break and spread at newline.\T
 \(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
 \T'n_.cdp'11.2\T	\T'n_.cdp'\fB&cdp\fR\T	\T'n_.cdp'Visual depth below base line of previous character.\T
 \T'n_.ce'4.1\T	\T'n_.ce'\fB&ce\fR\T	\T'n_.ce'Remaining number of lines to be centered.\T
@@ -3048,7 +3048,7 @@ When filling is in effect, a \A'e_p'\fB\ep\fR may be imbedded or attached to a w
 cause a \fIbreak\fR at the \fIend\fR of the word and have the resulting output
 line \fIspread out\fR to fill the current line length.
 .pg
-With the \fBbrnl\fR request,
+With the \fBbrpnl\fR request,
 each newline at the end of a text input line in fill mode
 causes a \fIbreak\fR and a spread,
 except for lines continued with \T'e_c'\fB\ec\fR\T.
@@ -3197,10 +3197,11 @@ The number of lines to be centered, if any,
 is set to zero.
 The remaining number of lines to be centered
 is available in the \A'n_.rj'\fB&rj\fR register.
-.bta brnl
-\fB&brnl\fI|N\fR	off	\fIN\(eq\fR\(if	B,E	Newline causes a break with \fIN\fR input text lines when filling is in effect.
+.bta brpnl
+\fB&brpnl\fI|N\fR	off	\fIN\(eq\fR\(if	B,E	Break and spread at end of next \fIN\fR input text lines
+when filling is in effect.
 The remaining number of lines so treated
-is available in the \A'n_.brnl'\fB&brnl\fR register.
+is available in the \A'n_.brpnl'\fB&brpnl\fR register.
 .bta minss
 \fB&minss\fI|N\fR	off	off	E,T	Minimum word space.
 When adjusting both margins,
