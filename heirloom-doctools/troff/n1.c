@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.114 (gritter) 8/20/06
+ * Sccsid @(#)n1.c	1.115 (gritter) 8/24/06
  */
 
 /*
@@ -2301,9 +2301,7 @@ restchar(struct fmtchar *fp, int keepf)
 	wbt(0);
 	dip = fp->savedip;
 	offset = dip->op;
-	free(env._line);
-	free(env._word);
-	free(env._hcode);
+	relsev(&env);
 	if (keepf) {
 		fp->saveev._apts = apts;
 		fp->saveev._apts1 = apts1;

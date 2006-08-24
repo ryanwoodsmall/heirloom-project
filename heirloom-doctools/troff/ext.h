@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.78 (gritter) 8/12/06
+ * Sccsid @(#)ext.h	1.79 (gritter) 8/24/06
  */
 
 /*
@@ -407,6 +407,7 @@ extern void	casenh(void);
 extern void	casehlm(void);
 extern void	casehcode(void);
 extern void	caseshc(void);
+extern void	caselpfx(void);
 extern int	max(int, int);
 extern int	min(int, int);
 extern void	casece(void);
@@ -443,6 +444,7 @@ extern void	caseev(void);
 extern void	caseevc(void);
 extern void	evc(struct env *, struct env *);
 extern void	evcline(struct env *, struct env *);
+extern void	relsev(struct env *);
 extern void	caseel(void);
 extern void	caseie(void);
 extern void	caseif(int);

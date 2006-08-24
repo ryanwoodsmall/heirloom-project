@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.124 (gritter) 8/13/06
+.\" Sccsid @(#)doc.tr	1.125 (gritter) 8/24/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -96,7 +96,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/13/06
+.ds Sccsdate 8/24/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1506,6 +1506,8 @@ Miscellaneous
 .bt
 \T'mc'\fB&mc\fI|c|N\fR	\(en	off	E,\fBm\fR	Set margin character \fIc\fR and separation \fIN\fR.\T
 .b1
+\T'lpfx'\fB&lpfx\fI|string\fR	off	off	E	Set line prefix to \fIstring\fR.\T
+.b1
 \T'tm'\fB&tm\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR on terminal (standard error).\T
 .b1
 \T'tmc'\fB&tmc\fI|string\fR	\(en	newline	\(en	Print \fIstring\fR without newline on terminal.\T
@@ -1668,6 +1670,7 @@ Device and Font Description Files
 \T'lhang'lhang	4\T
 \T'li'li	10\T
 \T'll'll	6\T
+\T'lpfx'lpfx	20\T
 \T'ls'ls	5\T
 \T'lt'lt	14\T
 \T'mc'mc	20\T
@@ -1968,6 +1971,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.l'6\T	\T'n_.l'\fB&l\fR\T	\T'n_.l'Current line length.\T
 \T'n_.lc_ctype'2.1\T	\T'n_.lc_ctype'\fB&lc_ctype\fR\T	\T'n_.lc_ctype'Current \s-1LC_CTYPE\s0 locale [sic].\T
 \T'n_.letss'4\T	\T'n_.letss'\fB&letss\fR\T	\T'n_.letss'Current dynamic letter space threshold.\T
+\T'n_.lpfx'20\T	\T'n_.lpfx'\fB&lpfx\fR\T	\T'n_.lpfx'Current line prefix [sic].\T
 \T'n_.lshmin'4\T	\T'n_.lshmin'\fB&lshmin\fR\T	\T'n_.lshmin'Current minimum dynamic letter shape (may be a decimal fraction).\T
 \T'n_.lshmax'4\T	\T'n_.lshmax'\fB&lshmax\fR\T	\T'n_.lshmax'Current maximum dynamic letter shape (may be a decimal fraction).\T
 \T'n_.lspmin'4\T	\T'n_.lspmin'\fB&lspmin\fR\T	\T'n_.lspmin'Current minimum dynamic letter space (may be a decimal fraction).\T
@@ -5214,6 +5218,19 @@ If \fIN\fR is not given, the previous \fIN\fR is used; the initial \fIN\fR is
 The margin character used with this paragraph was a 12-point box-rule.
 .br
 .mc
+.bta lpfx
+\fB&lpfx\fI|string\fR	off	off	E	Set the line prefix
+.lpfx ``
+to \fIstring\fR.
+``Whenever a new output line is started,
+\fIstring\fR is then printed at its beginning.
+Font and size settings as well as automatic ligatures in \fIstring\fR
+are retained regardless of later changes.
+This request is mainly useful
+to implement a historic form of block quotation.
+The current value is available in the \A'n_.lpfx'\fB&lpfx\fR register.''
+.br
+.lpfx
 .bta tm
 \fB&tm\fI|string\fR	\(en	newline	\(en	\
 After skipping initial blanks, \fIstring\fR (rest of the line) is read in \T'copy mode'\fIcopy mode\fR\T

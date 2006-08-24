@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.141 (gritter) 8/12/06
+ * Sccsid @(#)n3.c	1.142 (gritter) 8/24/06
  */
 
 /*
@@ -134,6 +134,7 @@ static const struct {
 	{ "length",		(void(*)(int))caselength },
 	{ "letadj",		(void(*)(int))caseletadj },
 	{ "lhang",		(void(*)(int))caselhang },
+	{ "lpfx",		(void(*)(int))caselpfx },
 	{ "mediasize",		(void(*)(int))casemediasize },
 	{ "minss",		(void(*)(int))caseminss },
 	{ "nhychar",		(void(*)(int))casenhychar },
@@ -1129,13 +1130,9 @@ casedi(int box)
 			prwatchn(DN);
 			prwatchn(DL);
 			if (dip->boxenv) {
-				free(line);
-				free(word);
-				free(hcode);
+				relsev(&env);
 				evcline(&env, dip->boxenv);
-				free(dip->boxenv->_line);
-				free(dip->boxenv->_word);
-				free(dip->boxenv->_hcode);
+				relsev(dip->boxenv);
 				free(dip->boxenv);
 			}
 			dip = &d[--dilev];

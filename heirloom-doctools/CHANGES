@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: The new ".lpfx" request allows to print a string whenever
+  a new output line is started. This is mainly useful to implement a
+  historic form of block quotation.
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.84 (gritter) 8/12/06
+ * Sccsid @(#)n5.c	1.85 (gritter) 8/24/06
  */
 
 /*
@@ -297,6 +297,33 @@ void
 caseshc(void)
 {
 	shc = skip(0) ? 0 : getch();
+}
+
+void
+caselpfx(void)
+{
+	int	n;
+	tchar	c;
+
+	if (skip(0)) {
+		free(lpfx);
+		lpfx = NULL;
+		nlpfx = 0;
+	} else {
+		for (n = 0; ; n++) {
+			if (n+1 >= nlpfx) {
+				nlpfx += 10;
+				lpfx = realloc(lpfx, nlpfx * sizeof *lpfx);
+			}
+			c = getch();
+			if (nlflg)
+				break;
+			if (n == 0 && cbits(c) == '"')
+				continue;
+			lpfx[n] = c;
+		}
+		lpfx[n] = 0;
+	}
 }
 
 int 
@@ -1013,9 +1040,7 @@ caseevc(void)
 
 	if (getev(&nxev, &name) == 0 || (ep = findev(&nxev, name)) == NULL)
 		return;
-	free(env._hcode);
-	free(env._line);
-	free(env._word);
+	relsev(&env);
 	evc(&env, ep);
 }
 
@@ -1027,9 +1052,15 @@ evc(struct env *dp, struct env *sp)
 	if (dp != sp) {
 		name = dp->_evname;
 		memcpy(dp, sp, sizeof *dp);
-		dp->_hcode = malloc(dp->_nhcode * sizeof *dp->_hcode);
-		memcpy(dp->_hcode, sp->_hcode, dp->_nhcode * sizeof *dp->_hcode);
-		dp->_evname = name;
+		if (sp->_hcode) {
+			dp->_hcode = malloc(dp->_nhcode * sizeof *dp->_hcode);
+			memcpy(dp->_hcode, sp->_hcode, dp->_nhcode * sizeof *dp->_hcode);
+		}
+		if (sp->_lpfx) {
+			dp->_lpfx = malloc(dp->_nlpfx * sizeof *dp->_lpfx);
+			memcpy(dp->_lpfx, sp->_lpfx, dp->_nlpfx * sizeof *dp->_lpfx);
+			dp->_evname = name;
+		}
 	}
 	dp->_pendnf = 0;
 	dp->_pendw = 0;
@@ -1118,6 +1149,20 @@ evcline(struct env *dp, struct env *sp)
 	dp->_wordp = sp->_wordp + (dp->_word - sp->_word);
 	dp->_wdend = sp->_wdend + (dp->_word - sp->_word);
 	dp->_wdstart = sp->_wdstart + (dp->_word - sp->_word);
+}
+
+void
+relsev(struct env *ep)
+{
+	free(ep->_hcode);
+	ep->_hcode = NULL;
+	ep->_nhcode = 0;
+	free(ep->_line);
+	ep->_line = NULL;
+	ep->_lnsize = 0;
+	free(ep->_word);
+	ep->_word = NULL;
+	ep->_wdsize = 0;
 }
 
 void

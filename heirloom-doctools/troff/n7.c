@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.93 (gritter) 8/12/06
+ * Sccsid @(#)n7.c	1.94 (gritter) 8/24/06
  */
 
 /*
@@ -94,6 +94,7 @@ int	brflg;
 
 static tchar	adjbit(tchar);
 static void	sethtdp(void);
+static void	leftend(tchar, int);
 #ifndef	NROFF
 #define	nroff		0
 extern int	lastrst;
@@ -444,8 +445,7 @@ nofill(void)
 		nwd = 10000;
 	}
 	nexti = GETCH();
-	if (!ce && !rj && !pendnf)
-		setlhang(nexti);
+	leftend(nexti, !ce && !rj && !pendnf);
 	while ((j = (cbits(i = nexti))) != '\n') {
 		if (stopch && issame(i, stopch))
 			break;
@@ -890,8 +890,7 @@ movword(void)
 		wp--;
 		if (wp > wordp)
 			wne -= kernadjust(wp[-1], wp[0]);
-		if (admod != 1 && admod != 2)
-			setlhang(*wp);
+		leftend(*wp, admod != 1 && admod != 2);
 	}
 	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
 	   (!nwd || nel + lsplow + lshlow - adspc >
@@ -1542,6 +1541,28 @@ sethtdp(void)
 		maxcht = cht;
 	if ((cdp = -lastrsb) > maxcdp)
 		maxcdp = cdp;
+}
+
+static void
+leftend(tchar c, int hang)
+{
+	int	k, w;
+
+	if (lpfx) {
+		if (hang)
+			setlhang(lpfx[0]);
+		for (k = 0; lpfx[k]; k++) {
+			w = width(lpfx[k]);
+			w += k ? kernadjust(lpfx[k-1], lpfx[k]) : 0;
+			storeline(lpfx[k], w);
+		}
+		if (k) {
+			w = kernadjust(lpfx[k-1], c);
+			nel -= w;
+			ne += w;
+		}
+	} else if (hang)
+		setlhang(c);
 }
 
 #ifndef	NROFF
