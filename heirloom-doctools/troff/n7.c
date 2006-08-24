@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.94 (gritter) 8/24/06
+ * Sccsid @(#)n7.c	1.95 (gritter) 8/24/06
  */
 
 /*
@@ -47,13 +47,13 @@
  */
 
 #include <stdlib.h>
+#include <limits.h>
 #if defined (EUC) && defined (NROFF)
 #ifdef	__sun
 #include <widec.h>
 #else
 #include <wchar.h>
 #endif
-#include <limits.h>
 #endif /* EUC && NROFF */
 #include "tdef.h"
 #ifdef NROFF
@@ -380,8 +380,11 @@ t3:
 		goto t5;
 	if (pendw || !wch)
 t4:
-		if (getword(0))
+		if (getword(0)) {
+			if (brnl && !pendw)
+				goto t5;
 			goto t6;
+		}
 	if (!movword())
 		goto t3;
 t5:
@@ -412,8 +415,10 @@ adj:
 	brflg = 1;
 	tbreak();
 	spread = 0;
-	if (!trap && !recadj)
+	if (!trap && !recadj && !brnl)
 		goto t3;
+	if (brnl > 0 && brnl < INT_MAX)
+		brnl--;
 	if (!nlflg)
 		goto rtn;
 t6:

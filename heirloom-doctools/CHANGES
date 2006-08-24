@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: The new ".brnl" request causes a break each time a newline
+  is encountered at the end of a text input line (as if it were attached
+  a "\p").
 * [nt]roff: The new ".lpfx" request allows to print a string whenever
   a new output line is started. This is mainly useful to implement a
   historic form of block quotation.

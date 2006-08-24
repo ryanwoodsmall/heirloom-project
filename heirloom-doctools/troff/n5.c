@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.85 (gritter) 8/24/06
+ * Sccsid @(#)n5.c	1.86 (gritter) 8/24/06
  */
 
 /*
@@ -51,6 +51,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
 #if defined (EUC) && defined (NROFF)
 #include <stddef.h>
 #ifdef	__sun
@@ -379,6 +380,25 @@ caserj(void)
 {
 	if (xflag)
 		cerj(1);
+}
+
+
+void
+casebrnl(void)
+{
+	int	n;
+
+	noscale++;
+	if (skip(0))
+		n = INT_MAX;
+	else {
+		n = atoi();
+		if (nonumb)
+			n = brnl;
+	}
+	noscale--;
+	tbreak();
+	brnl = n;
 }
 
 
@@ -1079,6 +1099,8 @@ evc(struct env *dp, struct env *sp)
 	dp->_seflg = 0;
 	dp->_ce = 0;
 	dp->_rj = 0;
+	if (dp->_brnl < INT_MAX)
+		dp->_brnl = 0;
 	dp->_nn = 0;
 	dp->_ndf = 0;
 	dp->_nms = 0;

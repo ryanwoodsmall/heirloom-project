@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.125 (gritter) 8/24/06
+.\" Sccsid @(#)doc.tr	1.126 (gritter) 8/24/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1221,6 +1221,8 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'rj'\fB&rj\fI|N\fR	off	\fIN\(eq\fR1	B,E	Right-align following \fIN\fR input text lines.\T
 .b1
+\T'brnl'\fB&brnl\fI|N\fR	off	\fIN\(eq\fR\(if	B,E	Newline causes a break with \fIN\fR input text lines.\T
+.b1
 \T'minss'\fB&minss\fI|N\fR	off	off	E,T	Minimum word space when adjusting lines.\T
 .b1
 \T'letadj'\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.\T
@@ -1392,6 +1394,10 @@ on if \fIN\fR>0.
 \T'rchar'\fB&rchar\fI|c...\fR		ignored	\(en	Remove character definitions for \fIc...\fR.\T
 .b1 0
 \T'output'\fB&output\fI|string\fR		ignored	\(en	Write \fIstring\fR directly to intermediate output.\T
+.br
+.nr nosave 1
+.ne 4
+.nr nosave 0
 .mht s_mot
 Local Horizontal and Vertical Motions, and the Width Function
 .mht s_draw
@@ -1599,6 +1605,7 @@ Device and Font Description Files
 \T'br'br	4\T
 \T'break'break	16\T
 \T'breakchar'breakchar	13\T
+\T'brnl'brnl	4\T
 \T'brp'brp	4\T
 \T'c2'c2	10\T
 \T'cc'cc	10\T
@@ -1949,9 +1956,10 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.ascender'5.4\T	\T'n_.ascender'\fB&ascender\fR\T	\T'n_.ascender'Ascender of current font and point size.\T
 \T'n_.b'2.3\T	\T'n_.b'\fB&b\fR\T	\T'n_.b'Emboldening level.\T
 \T'n_.breakchar'13\T	\T'n_.breakchar'\fB&breakchar\fR\T	\T'n_.breakchar'Current optional line break characters.\T
+\T'n_.brnl'4.1\T	\T'n_.brnl'\fB&brnl\fR\T	\T'n_.brnl'Remaining number of lines with newline causing a break.\T
 \(en	\fB&c\fR	Number of \fIlines\fR read from current input file.
 \T'n_.cdp'11.2\T	\T'n_.cdp'\fB&cdp\fR\T	\T'n_.cdp'Visual depth below base line of previous character.\T
-\T'n_.ce'4\T	\T'n_.ce'\fB&ce\fR\T	\T'n_.ce'Remaining number of lines to be centered.\T
+\T'n_.ce'4.1\T	\T'n_.ce'\fB&ce\fR\T	\T'n_.ce'Remaining number of lines to be centered.\T
 \T'n_.cht'11.2\T	\T'n_.cht'\fB&cht\fR\T	\T'n_.cht'Visual height above base line of previous character.\T
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
@@ -1970,20 +1978,20 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.k'4.1\T	\T'n_.k'\fB&k\fR\T	\T'n_.k'Current output horizontal position.\T
 \T'n_.l'6\T	\T'n_.l'\fB&l\fR\T	\T'n_.l'Current line length.\T
 \T'n_.lc_ctype'2.1\T	\T'n_.lc_ctype'\fB&lc_ctype\fR\T	\T'n_.lc_ctype'Current \s-1LC_CTYPE\s0 locale [sic].\T
-\T'n_.letss'4\T	\T'n_.letss'\fB&letss\fR\T	\T'n_.letss'Current dynamic letter space threshold.\T
+\T'n_.letss'4.1\T	\T'n_.letss'\fB&letss\fR\T	\T'n_.letss'Current dynamic letter space threshold.\T
 \T'n_.lpfx'20\T	\T'n_.lpfx'\fB&lpfx\fR\T	\T'n_.lpfx'Current line prefix [sic].\T
-\T'n_.lshmin'4\T	\T'n_.lshmin'\fB&lshmin\fR\T	\T'n_.lshmin'Current minimum dynamic letter shape (may be a decimal fraction).\T
-\T'n_.lshmax'4\T	\T'n_.lshmax'\fB&lshmax\fR\T	\T'n_.lshmax'Current maximum dynamic letter shape (may be a decimal fraction).\T
-\T'n_.lspmin'4\T	\T'n_.lspmin'\fB&lspmin\fR\T	\T'n_.lspmin'Current minimum dynamic letter space (may be a decimal fraction).\T
-\T'n_.lspmax'4\T	\T'n_.lspmax'\fB&lspmax\fR\T	\T'n_.lspmax'Current maximum dynamic letter space (may be a decimal fraction).\T
+\T'n_.lshmin'4.1\T	\T'n_.lshmin'\fB&lshmin\fR\T	\T'n_.lshmin'Current minimum dynamic letter shape (may be a decimal fraction).\T
+\T'n_.lshmax'4.1\T	\T'n_.lshmax'\fB&lshmax\fR\T	\T'n_.lshmax'Current maximum dynamic letter shape (may be a decimal fraction).\T
+\T'n_.lspmin'4.1\T	\T'n_.lspmin'\fB&lspmin\fR\T	\T'n_.lspmin'Current minimum dynamic letter space (may be a decimal fraction).\T
+\T'n_.lspmax'4.1\T	\T'n_.lspmax'\fB&lspmax\fR\T	\T'n_.lspmax'Current maximum dynamic letter space (may be a decimal fraction).\T
 \T'n_.L'5.1\T	\T'n_.L'\fB&L\fR\T	\T'n_.L'Current \fBls\fP value.\T
-\T'n_.minss'4\T	\T'n_.minss'\fB&minss\fR\T	\T'n_.minss'Current minimum space size.\T
+\T'n_.minss'4.1\T	\T'n_.minss'\fB&minss\fR\T	\T'n_.minss'Current minimum space size.\T
 \T'n_.n'4\T	\T'n_.n'\fB&n\fR\T	\T'n_.n'Length of text portion on previous output line.\T
 \T'n_.nhychar'13\T	\T'n_.nhychar'\fB&nhychar\fR\T	\T'n_.nhychar'Current hyphenation-inhibiting characters.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
 \T'n_.ps'2.3\T	\T'n_.ps'\fB&ps\fR\T	\T'n_.ps'Current point size in units.\T
-\T'n_.rj'4\T	\T'n_.rj'\fB&rj\fR\T	\T'n_.rj'Remaining number of lines to be right-aligned.\T
+\T'n_.rj'4.1\T	\T'n_.rj'\fB&rj\fR\T	\T'n_.rj'Remaining number of lines to be right-aligned.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
 \T'n_.shc'13\T	\T'n_.shc'\fB&shc\fR\T	\T'n_.shc'Current soft hyphenation character [sic].\T
 \T'n_.sentchar'4.1\T	\T'n_.sentchar'\fB&sentchar\fR\T	\T'n_.sentchar'Current sentence-ending characters [sic].\T
@@ -3039,6 +3047,11 @@ Initial spaces are always retained and also cause a \fIbreak\fR.
 When filling is in effect, a \A'e_p'\fB\ep\fR may be imbedded or attached to a word to
 cause a \fIbreak\fR at the \fIend\fR of the word and have the resulting output
 line \fIspread out\fR to fill the current line length.
+With the \fBbrnl\fR request,
+each newline at the end of a text input line
+is treated as if it were attached a \fB\ep\fR.
+This can be used to manually specify the break points
+for longer parts of texts.
 .pg
 A text input line that happens to begin
 with a control character can
@@ -3178,6 +3191,10 @@ The number of lines to be centered, if any,
 is set to zero.
 The remaining number of lines to be centered
 is available in the \A'n_.rj'\fB&rj\fR register.
+.bta brnl
+\fB&brnl\fI|N\fR	off	\fIN\(eq\fR\(if	B,E	Newline causes a break with \fIN\fR input text lines when filling is in effect.
+The remaining number of lines so treated
+is available in the \A'n_.brnl'\fB&brnl\fR register.
 .bta minss
 \fB&minss\fI|N\fR	off	off	E,T	Minimum word space.
 When adjusting both margins,

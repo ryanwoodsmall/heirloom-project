@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.37 (gritter) 8/12/06
+ * Sccsid @(#)ni.c	1.38 (gritter) 8/24/06
  */
 
 /*
@@ -325,6 +325,7 @@ struct	env env = {
 /* int	cu	 */	0,
 /* int	ce	 */	0,
 /* int	rj	 */	0,
+/* int	brnl	 */	0,
 /* int	in	 */	0,
 /* int	in1	 */	0,
 /* int	un	 */	0,
