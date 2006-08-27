@@ -12,6 +12,9 @@ Release ...
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).
+* [nt]roff: The "\n(.S" predefined number register has been removed again
+  since it conflicts with use of this name by "dot -Tpic". (The "\n[.tabs]"
+  register continues to be available with the same semantics.)
 
 Release 060813
 * [nt]roff: A new type of traps is available: output-line traps. They are
