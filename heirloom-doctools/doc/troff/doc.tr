@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.130 (gritter) 8/27/06
+.\" Sccsid @(#)doc.tr	1.131 (gritter) 8/31/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -96,7 +96,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/27/06
+.ds Sccsdate 8/31/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1914,6 +1914,7 @@ Reference	Name	Description
 .ft R
 .xx
 \T'n_%'3\T	\T'n_%'\fB%\fR\T	\T'n_%'Current page number.\T
+\(en	\fBc.\fR	Number of \fIlines\fR read from current input file.
 \T'n_ct'11.2\T	\T'n_ct'\fBct\fR\T	\T'n_ct'Character type (set by \fIwidth\fR function).\T
 \T'n_dl'7.4\T	\T'n_dl'\fBdl\fR\T	\T'n_dl'Width (maximum) of last completed diversion.\T
 \T'n_dn'7.4\T	\T'n_dn'\fBdn\fR\T	\T'n_dn'Height (vertical size) of last completed diversion.\T
@@ -1975,12 +1976,16 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.h'4\T	\T'n_.h'\fB&h\fR\T	\T'n_.h'Text base-line high-water mark on current page or diversion.\T
 \T'n_.hlc'13\T	\T'n_.hlc'\fB&hlc\fR\T	\T'n_.hlc'Current number of consecutive hyphenated lines.\T
 \T'n_.hlm'13\T	\T'n_.hlm'\fB&hlm\fR\T	\T'n_.hlm'Maximum number of consecutive hyphenated lines.\T
+\T'n_.hy'13\T	\T'n_.hy'\fB&hy\fR\T	\T'n_.hy'Current hyphenation flags.\T
 \T'n_.hylang'13\T	\T'n_.hylang'\fB&hylang\fR\T	\T'n_.hylang'Current hyphenation language [sic].\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
-\T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent.\T
+\T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent as set by \fBin\fR.\T
+\T'n_.in'6\T	\T'n_.in'\fB&in\fR\T	\T'n_.in'Current indent including temporary indent, if any.\T
+\T'n_.int'4.2\T	\T'n_.int'\fB&int\fR\T	\T'n_.int'Non-zero if the previous line was interrupted with \fB\ec\fR.\T
 \T'n_.j'4.2\T	\T'n_.j'\fB&j\fR\T	\T'n_.j'Current \fBad\fP mode.\T
 \T'n_.k'4.1\T	\T'n_.k'\fB&k\fR\T	\T'n_.k'Current output horizontal position.\T
 \T'n_.l'6\T	\T'n_.l'\fB&l\fR\T	\T'n_.l'Current line length.\T
+\T'n_.lt'14\T	\T'n_.lt'\fB&lt\fR\T	\T'n_.lt'Current title length.\T
 \T'n_.lc_ctype'2.1\T	\T'n_.lc_ctype'\fB&lc_ctype\fR\T	\T'n_.lc_ctype'Current \s-1LC_CTYPE\s0 locale [sic].\T
 \T'n_.letss'4.1\T	\T'n_.letss'\fB&letss\fR\T	\T'n_.letss'Current dynamic letter space threshold.\T
 \T'n_.lpfx'20\T	\T'n_.lpfx'\fB&lpfx\fR\T	\T'n_.lpfx'Current line prefix [sic].\T
@@ -1991,14 +1996,18 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.L'5.1\T	\T'n_.L'\fB&L\fR\T	\T'n_.L'Current \fBls\fP value.\T
 \T'n_.minss'4.1\T	\T'n_.minss'\fB&minss\fR\T	\T'n_.minss'Current minimum space size.\T
 \T'n_.n'4\T	\T'n_.n'\fB&n\fR\T	\T'n_.n'Length of text portion on previous output line.\T
+\T'n_.ns'5\T	\T'n_.ns'\fB&ns\fR\T	\T'n_.ns'Non-zero of no-space mode is active.\T
 \T'n_.nhychar'13\T	\T'n_.nhychar'\fB&nhychar\fR\T	\T'n_.nhychar'Current hyphenation-inhibiting characters.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
+\T'n_.pn'3\T	\T'n_.pn'\fB&pn\fR\T	\T'n_.pn'Number of next page.\T
 \T'n_.ps'2.3\T	\T'n_.ps'\fB&ps\fR\T	\T'n_.ps'Current point size in units.\T
+\T'n_.psr'2.3\T	\T'n_.psr'\fB&psr\fR\T	\T'n_.psr'Last requested point size in units.\T
 \T'n_.rj'4.1\T	\T'n_.rj'\fB&rj\fR\T	\T'n_.rj'Remaining number of lines to be right-aligned.\T
 \T'n_.s'2.3\T	\T'n_.s'\fB&s\fR\T	\T'n_.s'Current point size (may be a decimal fraction).\T
 \T'n_.shc'13\T	\T'n_.shc'\fB&shc\fR\T	\T'n_.shc'Current soft hyphenation character [sic].\T
 \T'n_.sentchar'4.1\T	\T'n_.sentchar'\fB&sentchar\fR\T	\T'n_.sentchar'Current sentence-ending characters [sic].\T
+\T'n_.sr'2.3\T	\T'n_.sr'\fB&sr\fR\T	\T'n_.sr'Last requested point size (may be a decimal fraction).\T
 \T'n_.ss'2\T	\T'n_.ss'\fB&ss\fR\T	\T'n_.ss'Current space size.\T
 \T'n_.sss'2\T	\T'n_.sss'\fB&sss\fR\T	\T'n_.sss'Current sentence space size.\T
 \T'n_.t'7.5\T	\T'n_.t'\fB&t\fR\T	\T'n_.t'Distance to the next trap.\T
@@ -2565,6 +2574,11 @@ Note that this may be a decimal fraction
 if the current point size is not an integer.
 The \A'n_.ps'\fB&ps\fR register
 stores the current size in units.
+The \A'n_.sr'\fB&sr\fR and \A'n_.psr'\fB&psr\fR registers
+store the requested point size
+in points and units, respectively;
+it is identical to the current size on
+modern output devices.
 \*(NR ignores type size control.
 .pg
 The function \A'e_H'\fB\eH\fI\'\(+-N'\fR
@@ -2913,6 +2927,9 @@ The next page (when it occurs) will have the page number \fI\(+-N\fR.
 A \fBpn\fR must occur before the initial pseudo-page transition
 to effect the page number of the first page.
 The current page number is in the \A'n_%'\fB%\fR register.
+The number of the next page is in the \A'n_.pn'\fB&pn\fR register;
+this is either the value set by \fBpn\fR
+or the current page number plus 1.
 .bta po
 \fB&po\fI|\(+-N\fR	0;|1\|in	previous	\fBv\fR	Page offset.
 The current \fIleft margin\fR is set to \fI\(+-N\fR.
@@ -3049,7 +3066,7 @@ Initial spaces are always retained and also cause a \fIbreak\fR.
 .pg
 With the \fBbrnl\fR request,
 a \fIbreak\fR occurs at the end of each text input line in fill mode,
-except for lines continued with \T'e_c'\fB\ec\fR\T.
+except for lines interrupted with \T'e_c'\fB\ec\fR\T.
 Contrasting to nofill mode,
 text is still adjusted to the line length.
 .pg
@@ -3060,7 +3077,7 @@ line \fIspread out\fR to fill the current line length.
 With the \fBbrpnl\fR request,
 each end of a text input line in fill mode
 causes a \fIbreak\fR and a spread,
-except for lines continued with \T'e_c'\fB\ec\fR\T.
+except for lines interrupted with \T'e_c'\fB\ec\fR\T.
 The meaning of \fB\ep\fR is then changed
 such that a line that it is attached to is \fInot\fR spread;
 this is the only method to achieve a regular \fIbreak\fR without a spread then.
@@ -3077,6 +3094,7 @@ Still another way is to specify output translation of some
 convenient character into the control character
 using \T'tr'\fBtr\fR\T \T'c_trans'(\(sc10.5).\T
 .sc
+.tr &.
 Interrupted text.
 The copying of a input line in \fInofill\f (non-fill) mode can be \fIinterrupted\fR
 by terminating
@@ -3090,7 +3108,11 @@ the next encountered text will be taken as a continuation of the
 interrupted word.
 If the intervening control lines cause a break,
 any partial line will be forced out along with any partial word.
+The \A'n_.int'\fB&int\fR number register
+is set to a non-zero value if the previous line was interrupted
+and to zero otherwise.
 .sc
+.tr &&
 \A'c_kerning'Kerning.
 \*(TR reads kerning tables from Type\ 1,
 OpenType, and TrueType font files.
@@ -3453,6 +3475,9 @@ When on, the no-space mode inhibits \T'sp'\fBsp\fR\T requests and
 \T'bp'\fBbp\fR\T requests \fIwithout\fR a next page number.
 The no-space mode is turned off when a line of
 output occurs, or with \fBrs\fR.
+The number register \A'n_.ns'\fB&ns\fR
+is set to a non-zero value in no-space mode
+and to zero otherwise.
 .bta rs
 \fB&rs\fR	space	\(en	D	Restore spacing.
 The no-space mode is turned off.
@@ -3482,7 +3507,10 @@ until after that line is output.
 In fill mode the length of text on an output line is less than or equal to
 the line length minus the indent.
 The current line length and indent are available
-in registers \A'n_.l'\fB.l\fR and \A'n_.i'\fB.i\fR respectively.
+in registers \A'n_.l'\fB.l\fR and \A'n_.i'\fB.i\fR respectively;
+the \A'n_.in'\fB.in\fR register holds the indent
+that actually applies to the current line,
+taking a temporary indent into account.
 The length of \fIthree-part titles\fR produced by \T'tl'\fBtl\fR\T
 \T's_titles'(see \(sc14)\T is \fIindependently\fR set by \T'lt'\fBlt\fR.\T
 .h1
@@ -4810,6 +4838,7 @@ this is only effective for explicit hyphenation points
 specified with \fB\e%\fR, \fB\e:\fR, or \fBhw\fR.
 These values are additive;
 i.e. \fIN=\fR\|14 will invoke the three restrictions.
+The current value is available in the \A'n_.hy'\fB&hy\fR number register.
 .bta hylang
 \fB&hylang\fI|name\fR	off	off	E	Set the hyphenation language
 to \fIname\fR, which is one of
@@ -4915,6 +4944,7 @@ The page-number register remains \fB%\fR.
 \fB&lt\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Length of title set to \fI\(+-N\fR.
 The line-length and the title-length are \fIindependent\fR.
 Indents do not apply to titles; page-offsets do.
+The current value is available in the \A'n_.lt'\fB&lt\fR number register.
 .mha s_onl
 Output Line Numbering.
 .pg

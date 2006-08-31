@@ -9,6 +9,8 @@ Release ...
 * [nt]roff: The new ".lpfx" request allows to print a string whenever
   a new output line is started. This is mainly useful to implement a
   historic form of block quotation.
+* [nt]roff: The predefined number registers \n[.in], \n[.hy], \n[.int],
+  \n[.lt], \n[.pn], \n[.psr], and \n[.sr] have been added.
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).

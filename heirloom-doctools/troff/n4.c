@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.68 (gritter) 8/27/06
+ * Sccsid @(#)n4.c	1.69 (gritter) 8/31/06
  */
 
 /*
@@ -199,7 +199,7 @@ sl:
 		case 'x': 
 			if (gflag)
 				goto s0;
-			i = nel;	
+			i = nel - adspc;
 			break;
 		case 'y': 
 			if (gflag)
@@ -430,7 +430,26 @@ sl:
 			i = cht;
 		else if (strcmp(&name[1], "cdp") == 0)
 			i = cdp;
-		else
+		else if (strcmp(&name[1], "in") == 0)
+			i = un;
+		else if (strcmp(&name[1], "hy") == 0)
+			i = hyf;
+		else if (strcmp(&name[1], "int") == 0)
+			i = ce || rj || !fi ? pendnf : pendw != NULL;
+		else if (strcmp(&name[1], "lt") == 0)
+			i = lt;
+		else if (strcmp(&name[1], "pn") == 0)
+			i = npnflg ? npn : numtab[PN].val + 1;
+		else if (strcmp(&name[1], "psr") == 0) {
+			i = apts;
+#ifdef	NROFF
+			i *= INCH / 72;
+#endif	/* NROFF */
+		} else if (strcmp(&name[1], "sr") == 0) {
+			i = fl = u2pts(apts);
+			if (i != fl)
+				goto flt;
+		} else
 			goto s0;
 	} else {
 s0:
