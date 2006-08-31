@@ -12,6 +12,11 @@ Release ...
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).
+* [nt]roff: The distance to the next trap, and, accordingly, the "\n(.t"
+  register, can now be larger than the maximum allowed motion with "\h"
+  and "\v". This allows very long pages without a "trap botch" error,
+  although vertical motions on such pages may require multiple "\v"
+  commands.
 * [nt]roff: The "\n(.S" predefined number register has been removed again
   since it conflicts with use of this name by "dot -Tpic". (The "\n[.tabs]"
   register continues to be available with the same semantics.)
