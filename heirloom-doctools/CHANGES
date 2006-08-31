@@ -12,8 +12,13 @@ Release ...
 * [nt]roff: The predefined number registers "\n[.in]", "\n[.hy]",
   "\n[.int]", "\n[.lt]", "\n[.pn]", "\n[.psr]", and "\n[.sr]" have been
   added.
-* [nt]roff: The semantics of the number registers "\(.x" and "\(.y" are
-  now documented.
+* [nt]roff: The semantics of the number registers "\n(.x" (remaining space
+  on current output line) and "\n(.y" (current actual indent) are now
+  documented.
+* [nt]roff: The "\n[.kc]" register has been introduced; it holds the width
+  of a word interrupted with "\c" on output.
+* [nt]roff: The value of the "\n(.k" register is computed differently in
+  groff compability mode now.
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).

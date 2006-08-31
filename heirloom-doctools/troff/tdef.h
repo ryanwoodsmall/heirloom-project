@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.128 (gritter) 8/24/06
+ * Sccsid @(#)tdef.h	1.129 (gritter) 8/31/06
  */
 
 /*
@@ -733,6 +733,7 @@ struct acc {
 #define	wdend	env._wdend
 #define	wdstart	env._wdstart
 #define	wne	env._wne
+#define	wsp	env._wsp
 #define	ne	env._ne
 #define	nc	env._nc
 #define	nb	env._nb
@@ -860,6 +861,7 @@ extern struct env {
 	tchar	*_wdend;
 	tchar	*_wdstart;
 	int	_wne;
+	int	_wsp;
 	int	_ne;
 	int	_nc;
 	int	_nb;
