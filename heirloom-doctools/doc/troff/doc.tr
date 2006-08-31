@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.131 (gritter) 8/31/06
+.\" Sccsid @(#)doc.tr	1.132 (gritter) 8/31/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -336,7 +336,7 @@
 .nf
 .FN
 .rm FN
-.di
+.if !'\\n(.z'' .di
 .ev
 ..
 .de fs
@@ -2020,13 +2020,20 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.V'11.1\T	\T'n_.V'\fB&V\fR\T	\T'n_.V'Available vertical resolution in basic units.\T
 \T'n_.w'11.2\T	\T'n_.w'\fB&w\fR\T	\T'n_.w'Width of previous character.\T
 \T'n_.warn'21\T	\T'n_.warn'\fB&warn\fR\T	\T'n_.warn'Currently activated warning categories.\T
-\(en	\fB&x\fR	Reserved version-dependent register.
+\T'n_.x'4.1\T	\T'n_.x'\fB&x\fR\T	\T'n_.x'Remaining horizontal space on current output line.*\T
 \T'n_.X'1.1\T	\T'n_.X'\fB&X\fR\T	\T'n_.X'Current extension level.\T
-\(en	\fB&y\fR	Reserved version-dependent register.
+\T'n_.y'6\T	\T'n_.y'\fB&y\fR\T	\T'n_.y'Current indent including temporary indent, if any.*\T
 \T'n_.z'7.4\T	\T'n_.z'\fB&z\fR\T	\T'n_.z'Name [sic] of current diversion.\T
 .TE
 .in 0
 .fi
+.fn
+.sp .3
+\(**\|The \fB&x\fR and \fB&y\fR registers had been described
+as ``reserved version-dependent registers'' in previous editions.
+Their semantics have actually been as described
+from 7th Edition \*(TR on.
+.ef
 .rm EM
 .\" from file m1
 .bp
@@ -3011,6 +3018,8 @@ The text base-line high-water mark (lowest place) on the current page is in
 the \A'n_.h'\fB.h\fR register.
 The current horizontal output position
 is in the \A'n_.k'\fB.k\fR register.
+The \A'n_.x'\fB.x\fR register indicates
+the remaining horizontal space on the current output line.
 .pg
 \*(TR can optionally decrease word spacings,
 change the letter spacing,
@@ -3508,7 +3517,7 @@ In fill mode the length of text on an output line is less than or equal to
 the line length minus the indent.
 The current line length and indent are available
 in registers \A'n_.l'\fB.l\fR and \A'n_.i'\fB.i\fR respectively;
-the \A'n_.in'\fB.in\fR register holds the indent
+the \A'n_.y'\fB.y\fR and \A'n_.in'\fB.in\fR registers both hold the indent
 that actually applies to the current line,
 taking a temporary indent into account.
 The length of \fIthree-part titles\fR produced by \T'tl'\fBtl\fR\T

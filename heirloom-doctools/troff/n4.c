@@ -216,7 +216,7 @@ sl:
 			i = HOR;		
 			break;
 		case 'k': 
-			i = ne;		
+			i = ne + adspc;		
 			break;
 		case 'P': 
 			i = print;		
