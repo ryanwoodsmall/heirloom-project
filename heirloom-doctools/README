@@ -25,8 +25,9 @@ Currently, troff is almost exclusively targeted at generating output
 for PostScript interpreters. Its principal device independence has
 been retained, though; the intermediate output language is largely
 unchanged. The troff driver for the Autologic APS-5 is still included.
-It is untested and will likely vanish from this package unless somebody
-complains and is willing and able to support it.
+It is untested since it would be surprising to find a phototypesetter
+of this type that is still in use, but serves as an experimentation
+aid for device independence.
 
 The source code has been compiled successfully on:
 
@@ -155,4 +156,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						3/21/06
+<gunnarr@acm.org>						9/2/06
