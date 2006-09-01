@@ -32,6 +32,9 @@ Release ...
   register continues to be available with the same semantics.)
 * troff: There is now a "lc_ctype" keyword in the DESC file for the sake
   of legacy post-processors that do not understand "x X LC_CTYPE".
+* dpost: Use the device given by "x T" in intermediate language for reading
+  font files only if its name starts with "ps" or if it has the "afmfonts"
+  keyword in its DESC file; otherwise use "devpost".
 
 Release 060813
 * [nt]roff: A new type of traps is available: output-line traps. They are

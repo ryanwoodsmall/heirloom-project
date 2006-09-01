@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.153 (gritter) 8/12/06
+ * Sccsid @(#)dpost.c	1.154 (gritter) 9/2/06
  */
 
 /*
@@ -1649,10 +1649,9 @@ devcntrl(
 		/*
 		 * This used to be "strcpy(devname, realdev);" but
 		 * it does not work when DESC is a text file because
-		 * the fonts are in a different directory. As an
-		 * exception, -Taps output is processed old-style.
+		 * the fonts are in a different directory.
 		 */
-		if (strcmp(devname, "aps"))
+		if (dev.afmfonts || devname[0] == 'p' && devname[1] == 's')
 			realdev = devname;
 		else
 			strcpy(devname, realdev);
