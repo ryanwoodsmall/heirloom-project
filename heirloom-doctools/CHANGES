@@ -30,6 +30,8 @@ Release ...
 * [nt]roff: The "\n(.S" predefined number register has been removed again
   since it conflicts with use of this name by "dot -Tpic". (The "\n[.tabs]"
   register continues to be available with the same semantics.)
+* troff: There is now a "lc_ctype" keyword in the DESC file for the sake
+  of legacy post-processors that do not understand "x X LC_CTYPE".
 
 Release 060813
 * [nt]roff: A new type of traps is available: output-line traps. They are

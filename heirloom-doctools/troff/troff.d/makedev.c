@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)makedev.c	1.13 (gritter) 4/30/06
+ * Sccsid @(#)makedev.c	1.15 (gritter) 9/1/06
  */
 
 /*
@@ -130,7 +130,7 @@ static struct	Font	font;
 
 #define	NSIZE	100	/* maximum number of sizes */
 static int	size[NSIZE];
-#define	NCH	256	/* max number of characters with funny names */
+#define	NCH	512	/* max number of characters with funny names */
 static char	chname[5*NCH];	/* character names, including \0 for each */
 static short	chtab[NCH];	/* index of character in chname */
 
@@ -199,6 +199,8 @@ readdesc(const char *name)
 			dev.anysize = 1;
 		} else if (strcmp(cmd, "afmfonts") == 0) {
 			dev.afmfonts = 1;
+		} else if (strcmp(cmd, "lc_ctype") == 0) {
+			dev.lc_ctype = 1;
 		} else if (strcmp(cmd, "sizes") == 0) {
 			dev.nsizes = 0;
 			while (dget(mp, &v) != EOF && v != 0)

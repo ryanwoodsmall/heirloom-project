@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.12 (gritter) 8/12/06
+ * Sccsid @(#)dev.h	1.13 (gritter) 9/1/06
  */
 
 /*
@@ -72,6 +72,7 @@ struct dev {
 	int	lchname;	/* length of chname table */
 	int	biggestfont;	/* #chars in largest ever font */
 	int	spare2;		/* in case of expansion */
+	int	lc_ctype;	/* understands x X LC_CTYPE */
 };
 
 struct Font {		/* characteristics of a font */
