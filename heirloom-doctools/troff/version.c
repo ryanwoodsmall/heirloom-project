@@ -21,11 +21,11 @@ const char revision[] = "7.90";
 /*
 ext.h: * Sccsid @(#)ext.h	1.82 (gritter) 8/24/06
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
-n1.c: * Sccsid @(#)n1.c	1.115 (gritter) 8/24/06
+n1.c: * Sccsid @(#)n1.c	1.116 (gritter) 9/3/06
 n2.c: * Sccsid @(#)n2.c	1.28 (gritter) 8/9/06
-n3.c: * Sccsid @(#)n3.c	1.146 (gritter) 9/3/06
+n3.c: * Sccsid @(#)n3.c	1.147 (gritter) 9/3/06
 n4.c: * Sccsid @(#)n4.c	1.71 (gritter) 8/31/06
-n5.c: * Sccsid @(#)n5.c	1.90 (gritter) 9/3/06
+n5.c: * Sccsid @(#)n5.c	1.91 (gritter) 9/3/06
 n7.c: * Sccsid @(#)n7.c	1.100 (gritter) 8/31/06
 n8.c: * Sccsid @(#)n8.c	1.33 (gritter) 8/6/06
 n9.c: * Sccsid @(#)n9.c	1.62 (gritter) 8/13/06
@@ -46,7 +46,7 @@ troff.d/otf.c: * Sccsid @(#)otf.c	1.58 (gritter) 8/12/06
 troff.d/otfdump.c: * Sccsid @(#)otfdump.c	1.15 (gritter) 3/16/06
 troff.d/pt.h: * Sccsid @(#)pt.h	1.52 (gritter) 8/12/06
 troff.d/t10.c: * Sccsid @(#)t10.c	1.85 (gritter) 9/1/06
-troff.d/t6.c: * Sccsid @(#)t6.c	1.172 (gritter) 9/3/06
+troff.d/t6.c: * Sccsid @(#)t6.c	1.173 (gritter) 9/3/06
 troff.d/troff.h: * Sccsid @(#)troff.h	1.26 (gritter) 8/12/06
 troff.d/unimap.c: * Sccsid @(#)unimap.c	1.13 (gritter) 2/16/06
 troff.d/unimap.h: * Sccsid @(#)unimap.h	1.2 (gritter) 12/22/05
