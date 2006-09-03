@@ -24,6 +24,10 @@ Release ...
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).
+* troff: The escape sequence form "\s[+-]'n'" now works with fractional
+  point sizes.
+* troff: With xflag 0, fractional parts and units are now ignored with
+  the ".ps" command.
 * [nt]roff: The distance to the next trap, and, accordingly, the "\n(.t"
   register, can now be larger than the maximum allowed motion with "\h"
   and "\v". This allows very long pages without a "trap botch" error,
