@@ -19,6 +19,8 @@ Release ...
   of a word interrupted with "\c" on output.
 * [nt]roff: The value of the "\n(.k" register is computed differently in
   groff compability mode now.
+* [nt]roff: The ".rd" request now works again; it caused a segmentation
+  fault since several releases.
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
   executed no longer causes pending input text to disappear (bug reported
   by Sebastian Leusch).

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.129 (gritter) 8/31/06
+ * Sccsid @(#)tdef.h	1.130 (gritter) 9/3/06
  */
 
 /*
@@ -422,8 +422,7 @@ endif NROFF
 	#define NBLIST 512
  * i.e., the product is 16 bits long.
 
- * If filep is an unsigned long (and if your
- * compiler will let you say that) then NBLIST
+ * If filep is a long then NBLIST
  * can be a lot bigger.  Of course that makes
  * the file or core image a lot bigger too,
  * and means you don't detect missing diversion
@@ -432,18 +431,18 @@ endif NROFF
  * on non-swapping systems, since the core image
  * will be over 1Mb.
 
- * Note: As of 8/14/05, NBLIST has gone, and filep is
- * grown dynamically as needed. XBLIST is an just an
- * uninteresting relict to pass a special value.
+ * Note: As of 8/14/05, NBLIST has gone, and corebuf is
+ * grown dynamically as needed.
+
+ * filep must be a signed integer since the value -1
+ * is special (it indicates that input is read from tty).
 
  * BLK must be a power of 2
  */
 
-typedef unsigned int filep;	/* this is good for 32 bit machines */
+typedef long filep;
 
 #define	BLK	128	/* alloc block in tchars */
-
-#define	XBLIST	077777777
 
 /* Other things are stored in the temp file or corebuf:
  *	a single block for .rd input, at offset RD_OFFSET
