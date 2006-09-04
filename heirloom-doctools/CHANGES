@@ -25,6 +25,9 @@ Release ...
   groff compability mode now.
 * [nt]roff: The -mg macros now provide the fonts "C" and "CR".
 * [nt]roff: The -mg macros now provide an emulation of the ".mso" request.
+* [nt]roff: The command line options "-ds=x" and "-ra=N" are now accepted,
+  thus the string or register name before "=" can consist of more than one
+  character.
 * [nt]roff: The ".rd" request now works again; it caused a segmentation
   fault since several releases.
 * [nt]roff: Formatting of a ".char" object immediately before a trap is

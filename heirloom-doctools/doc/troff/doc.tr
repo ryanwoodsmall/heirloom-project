@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.135 (gritter) 9/4/06
+.\" Sccsid @(#)doc.tr	1.136 (gritter) 9/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -916,13 +916,26 @@ changing, and will resume upon receipt of a newline.
 \*(TR will include a ``pause'' code every \fIN\fR pages;
 its meaning, if any, depends on the output device.
 .bt
-	\fB\-m\fIname\fR	Prepends the macro file
-\fB/usr/ucblib/tmac/\fIname\fR
-to the input \fIfiles\fR.
+	\fB\-m\fIname\fR	Prepend the macro file
+\fB/usr/ucblib/doctools/tmac/\fIname\fR
+to the input \fIfiles\fR,
+or, if that file would not be accessible,
+\fB/usr/ucblib/doctools/tmac/tmac.\fIname\fR.
+If the environment variable \%\fB\s-1TROFFONTS\s+1\fR is set,
+its value is used instead of the default macro directory string,
+and no attempt is made to open \fIname\fR with the ``tmac.'' prefix.
+The value is prepended to \fIname\fR
+without inserting an additional slash as a directory separator,
+so it must either end with a slash itself
+or can be used to specify a file name prefix (as e.g. ``tmac.'').
 .bt
 	\fB\-r\fIaN\fR	Register \fIa\fR (one-character) is set to \fIN\fR.
 .bt
+	\fB\-r\fIa\fB=\fRN\fR	Register \fIa\fR (may be more than one character) is set to \fIN\fR.
+.bt
 	\fB\-d\fIaS\fR	String \fIa\fR (one-character) is set to \fIS\fR.
+.bt
+	\fB\-d\fIa\fB=\fIS\fR	String \fIa\fR (may be more than one character) is set to \fIS\fR.
 .bt
 	\fB\-i\fP	Read standard input after the input files are exhausted.
 .bt
@@ -944,10 +957,12 @@ Produce equally-spaced words in adjusted
 lines, using full terminal resolution.
 .bt
 	\fB\-h\fR	\
-Produce equally-spaced words in adjusted lines,
-using full terminal resolution.
+Use output tabs during horizontal spacing
+to speed output and reduce output character count.
+Tab settings are assumed to be every
+8 nominal character widths.
 .bt
-	\fB\-T\fIname\fR	Specifies
+	\fB\-T\fIname\fR	Specify
 the name of the output terminal type.
 Currently defined names are \fB37\fR for the (default) Model 37 Teletype\(rg,
 \fBlp\fR for any line printer or terminal without half-line capability,
@@ -961,7 +976,9 @@ It generates \s-1UTF\s+1-8 output if permitted
 by the current \s-1LC_CTYPE\s+1 locale,
 and has the same effect as \fBlp\fR otherwise.
 .sp
-.ne 3
+.nr nosave 1
+.ne 5
+.nr nosave 0
 .ft BI
 		\*(TR Only
 .br

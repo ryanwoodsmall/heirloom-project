@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.21 (gritter) 4/26/06
+.\" Sccsid @(#)troff.1b	1.22 (gritter) 9/4/06
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "4/26/06" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "9/4/06" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -42,11 +42,13 @@ troff \- (BSD) typeset or format documents
 \fB/usr/ucb/troff\fR
 [\fB\-af\&iz\fR]
 [\fB\-d\fIaS\fR]
+[\fB\-d\fIa\fB=\fIS\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
 [\fB\-o\fIlist\fR]
 [\fB\-r\fIaN\fR]
+[\fB\-r\fIa\fB=\fIN\fR]
 [\fB\-s\fIN\fR]
 [\fB\-T\fIdevice\fR]
 [\fB\-u\fIN\fR]
@@ -132,10 +134,22 @@ Set register
 (one-character) to
 .IR N .
 .TP
+.BI \-r a = N
+Set register
+.I a
+(may be more than one character) to
+.IR N .
+.TP
 .BI \-d aN
 Define string
 .I a
 (one-character) to
+.IR S .
+.TP
+.BI \-d a = N
+Define string
+.I a
+(may be more than one character) to
 .IR S .
 .TP
 .B \-i

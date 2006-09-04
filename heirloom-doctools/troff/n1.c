@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.118 (gritter) 9/4/06
+ * Sccsid @(#)n1.c	1.119 (gritter) 9/4/06
  */
 
 /*
@@ -211,13 +211,25 @@ main(int argc, char **argv)
 			continue;
 		case 'r':
 		case 'd':
-			if (&argv[0][2] != '\0' && strlen(&argv[0][2]) >= 2 && &argv[0][3] != '\0')
-			eibuf = roff_sprintf(ibuf+strlen(ibuf), ".%s %c %s%s\n",
-				argv[0][1] == 'd' ? "ds" : "nr",
-				argv[0][2],
-				argv[0][1] == 'd' ? "\"" : "",
-				&argv[0][3]); 
-			else 
+			if (&argv[0][2] != '\0' && strlen(&argv[0][2]) >= 2 && &argv[0][3] != '\0') {
+			if ((p = strchr(&argv[0][3], '=')) != NULL) {
+				*p = 0;
+				eibuf = roff_sprintf(ibuf+strlen(ibuf),
+						".do %s %s %s%s\n",
+					argv[0][1] == 'd' ? "ds" : "nr",
+					&argv[0][2],
+					argv[0][1] == 'd' ? "\"" : "",
+					&p[1]);
+				*p = '=';
+			} else {
+				eibuf = roff_sprintf(ibuf+strlen(ibuf),
+						".%s %c %s%s\n",
+					argv[0][1] == 'd' ? "ds" : "nr",
+					argv[0][2],
+					argv[0][1] == 'd' ? "\"" : "",
+					&argv[0][3]); 
+			}
+			} else 
 				errprint("wrong options");
 			continue;
 		case 'c':
