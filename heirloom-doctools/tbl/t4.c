@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t4.c	1.4 (gritter) 7/24/05
+ * Sccsid @(#)t4.c	1.5 (gritter) 9/4/06
  */
 
  /* t4.c: read table specification */
@@ -155,7 +155,9 @@ while (c=get1char())
 			snp[0]=snp[1]=stopc=0;
 			for(i=0; i<2; i++)
 				{
-				c = get1char();
+				do
+					c = get1char();
+				while (i==0 && c==' ');
 				if (i==0 && c=='(')
 					{
 					stopc=')';
@@ -164,6 +166,7 @@ while (c=get1char())
 				if (c==0) break;
 				if (c==stopc) {stopc=0; break;}
 				if (stopc==0)  if (c==' ' || c== tab ) break;
+				if (c=='.'){un1getc(c); break;}
 				if (c=='\n'){un1getc(c); break;}
 				snp[i] = c;
 				if (c>= '0' && c<= '9') break;
@@ -249,6 +252,8 @@ while (c=get1char())
 			stopc=0;
 			while (c = get1char())
 				{
+				if (snp==cll[icol-1] && c==' ')
+					continue;
 				if (snp==cll[icol-1] && c=='(')
 					{
 					stopc = ')';

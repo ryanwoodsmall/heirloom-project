@@ -56,6 +56,8 @@ Release ...
 * dpost: Use the device given by "x T" in intermediate language for reading
   font files only if its name starts with "ps" or if it has the "afmfonts"
   keyword in its DESC file; otherwise use "devpost".
+* tbl: The forms "f (X)", "w (x)", and "fX." are now accepted in column
+  specifications.
 
 Release 060813
 * [nt]roff: A new type of traps is available: output-line traps. They are
