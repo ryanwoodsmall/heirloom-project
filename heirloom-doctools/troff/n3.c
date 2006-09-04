@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.148 (gritter) 9/4/06
+ * Sccsid @(#)n3.c	1.149 (gritter) 9/5/06
  */
 
 /*
@@ -946,7 +946,7 @@ setstr(void)
 void
 collect(void)
 {
-	return _collect(0);
+	_collect(0);
 }
 
 static void
