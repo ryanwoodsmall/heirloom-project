@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.134 (gritter) 9/4/06
+.\" Sccsid @(#)doc.tr	1.135 (gritter) 9/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1555,10 +1555,18 @@ Output and Error Messages, Debugging
 \T'unwatchn'\fB&unwatchn\fI|R\fR	off	ignore	\(en	Disable notification for register \fIR\fR.\T
 .mht s_color
 Color Support
+.bt
+\T'CL'\fB&CL\fI|color|text\fR	\s-1RGB\s+1|black	\(en	Print \fItext\fR in \fIcolor\fR.*\T
 .mht s_pics
 Picture Inclusion
 .bt
 \T'psbb'\fB&psbb\fI|filename\fR	\(en	\(en	Read the \*(PS bounding box from \fIfilename\fR.\T
+.b1
+\T'BP'\fB&BP\fI|source|height|width|position|offset|flags|label\fR	Define a frame and place a picture in it.*\T
+.b1 0
+\T'EP'\fB&EP\fR	\(en	\(en	\(en	End a picture started by \fB&BP\fR.*\T
+.b1 0
+\T'PI'\fB&PI\fI|source|height\fB,\fIwidth\fB,\fIyoffset\fB,\fIxoffset|flags\fR	Low-level picture inclusion.*\T
 .br
 .ne 8
 .mht s_pdf
@@ -1567,11 +1575,18 @@ Special Features for \*[PDF] Documents
 \f(BIgroff\fP Compatibility
 .bt 0
 \T'cp'\fB&cp\fI|N\fR	off	\(en	\(en	Enable \*(GR compatibility mode.\T
+.b1 0
+\T'mso'\fB&mso\fI|name\fR	\(en	ignored	\(en	Include the macro package \fIname\fR.*\T
 .mht s_output
 Output Language
 .mht s_device
 Device and Font Description Files
 .br
+.fn
+.sp .3
+\(**\|Defined as a macro in an external package;
+refer to the detailed description on how to include it.
+.ef
 .rm mx
 .bp
 .nf
@@ -1604,6 +1619,7 @@ Device and Font Description Files
 \T'box'box	7\T
 \T'boxa'boxa	7\T
 \T'bp'bp	3\T
+\T'BP'BP	23\T
 \T'br'br	4\T
 \T'break'break	16\T
 \T'breakchar'breakchar	13\T
@@ -1618,6 +1634,7 @@ Device and Font Description Files
 \T'char'char	10\T
 \T'chop'chop	7\T
 \T'close'close	19\T
+\T'CL'CL	22\T
 \T'continue'continue	16\T
 \T'cp'cp	25\T
 \T'cropat'cropat	3\T
@@ -1635,6 +1652,7 @@ Device and Font Description Files
 \T'el'el	16\T
 \T'em'em	7\T
 \T'eo'eo	10\T
+\T'EP'EP	23\T
 \T'errprint'errprint	21\T
 \T'ev'ev	17\T
 \T'evc'evc	17\T
@@ -1687,6 +1705,7 @@ Device and Font Description Files
 \T'mediasize'mediasize	3\T
 \T'minss'minss	4\T
 \T'mk'mk	3\T
+\T'mso'mso	25\T
 \T'na'na	4\T
 \T'ne'ne	3\T
 \T'nf'nf	4\T
@@ -1706,6 +1725,7 @@ Device and Font Description Files
 \T'papersize'papersize	3\T
 \T'pc'pc	14\T
 \T'pi'pi	19\T
+\T'PI'PI	23\T
 \T'pl'pl	3\T
 \T'pm'pm	20\T
 \T'pn'pn	3\T
@@ -5627,7 +5647,7 @@ and reverse video printing.
 It includes the following macro:
 .h1
 .bta CL
-\fB&CL\fI|color|text\fR	\s-1RGB\s+1|black		Print \fItext\fR in \fIcolor\fR.
+\fB&CL\fI|color|text\fR	\s-1RGB\s+1|black	\(en	Print \fItext\fR in \fIcolor\fR.
 No arguments restores a default color
 (black in \s-1RGB\s+1 color space;
 note that this is different from the initial color).
@@ -5782,7 +5802,7 @@ text sweeps past the trap set by
 or when the \T'c_diversion'diversion\T is explicitly closed
 by \fB&EP\fR.
 .bta EP
-\fB&EP\fR				End a picture started by \fB&BP\fR;
+\fB&EP\fR	\(en	\(en	\(en	End a picture started by \fB&BP\fR;
 \fB&EP\fR is usually called implicitly by a trap
 at frame bottom.
 A picture and associated text silently disappear if
@@ -6271,6 +6291,22 @@ Nevertheless, the replacement should suffice for most applications.
 \*(GR characters with two-character names
 are mapped to \*(PS character names
 using the \T'char'\fBchar\fR\T request.
+.pg
+The following macro is also provided
+as an emulation for the corresponding \*(GR request:
+.xx
+.h1
+.bta mso
+\fB&mso\fI|name\fR	\(en	ignored	\(en	Include the macro package \fIname\fR.
+If the environment variable \fB\s-1GROFF_TMAC_PATH\s+1\fR is set,
+each of the colon-separated directories in it
+is checked for the files \fIname\fR, \fIname\fR.tmac,
+m\fIname\fR.tmac, and tmac.\fIname\fR.
+After this, the standard \*(TR macro directories
+are checked in the same way.
+Once a file has been found,
+it is read in as with the \T'so'\fBso\fR\T request,
+and the search stops.
 .mha s_output
 Output Language.
 .pg

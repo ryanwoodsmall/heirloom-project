@@ -22,6 +22,6 @@ install: all
 	$(INSTALL) -c -m 644 mpictures.7b $(ROOT)$(MANDIR)/man7b/mpictures.7b
 
 clean:
-	rm -f andoc bib doc e m s pm
+	rm -f andoc bib doc e g m s pm
 
 mrproper: clean

@@ -21,9 +21,10 @@ Release ...
   regular characters in groff compatibility mode.
 * [nt]roff: It is not a fatal error if the file specified with ".so" is not
   accessible in groff compatibility mode.
-* [nt]roff: The -mg macros now provide the fonts "C" and "CR".
 * [nt]roff: The value of the "\n(.k" register is computed differently in
   groff compability mode now.
+* [nt]roff: The -mg macros now provide the fonts "C" and "CR".
+* [nt]roff: The -mg macros now provide an emulation of the ".mso" request.
 * [nt]roff: The ".rd" request now works again; it caused a segmentation
   fault since several releases.
 * [nt]roff: Formatting of a ".char" object immediately before a trap is
