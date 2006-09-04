@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.173 (gritter) 9/3/06
+ * Sccsid @(#)t6.c	1.174 (gritter) 9/4/06
  */
 
 /*
@@ -198,7 +198,7 @@ getcw(register int i)
 	int nocache = 0;
 	int	ofont = xfont;
 	int	s, t;
-	float	z = 1, zv;
+	double	z = 1, zv;
 	struct afmtab	*a;
 
 	bd = 0;
@@ -404,7 +404,7 @@ onfont(tchar c)
 static int
 fvert2pts(int f, int s, int k)
 {
-	float	z;
+	double	z;
 
 	if (k != 0) {
 		k = (k * u2pts(s) + (Unitwidth / 2)) / Unitwidth;
@@ -552,7 +552,7 @@ getkw(tchar c, tchar d)
 	struct knode	*kp;
 	struct afmtab	*a;
 	int	f, g, i, j, k, n, s, I, J;
-	float	z;
+	double	z;
 
 	if (isxfunc(c, CHAR))
 		c = charout[sbits(c)].ch;

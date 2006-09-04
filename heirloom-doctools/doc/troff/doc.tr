@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.133 (gritter) 8/31/06
+.\" Sccsid @(#)doc.tr	1.134 (gritter) 9/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -96,7 +96,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/31/06
+.ds Sccsdate 9/4/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -5244,6 +5244,7 @@ Input/Output File Switching
 The top input (file reading) level is switched to \fIfilename\fR.
 When the new file ends,
 input is again taken from the original file.
+It is a fatal error if \fIfilename\fR cannot be opened.
 \fBso\fR's may be nested.
 .bta pso
 \fB&pso\fI|string\fR		\(en	\(en	Execute \fIstring\fR
@@ -6082,8 +6083,6 @@ at the beginning of a line
 even if preceded by escape sequences
 that do not result in formatting stream objects,
 such as \T'e_f'\fB\ef\fR\T, \T'e_s'\fB\es\fR\T, or \T'e_;'\fB\e;\fR\T.
-Diverted characters can be interpreted
-as control or escape characters again.
 \T's_font'Font handling\T,
 \T's_color'color support\T,
 \T's_pics'picture inclusion\T,
@@ -6160,6 +6159,15 @@ The space width always defaults to the value
 obtained from the font metrics file
 in \*(GR compatibility mode;
 the \T'spacewidth'\fBspacewidth\fR\T request is not effective.
+.pg
+If the file specified with a \T'so'\fBso\fR\T request
+cannot be opened,
+processing continues with the current file
+in \*(GR compatibility mode.
+.pg
+A control or escape character written in a diversion
+has no special meaning
+if the diversion is re-read in \*(GR compatibility mode.
 .pg
 Any call to the \fBcp\fR request
 activates the following \*(GR compatibility escape sequences;

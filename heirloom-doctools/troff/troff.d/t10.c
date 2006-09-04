@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.85 (gritter) 9/1/06
+ * Sccsid @(#)t10.c	1.86 (gritter) 9/4/06
  */
 
 /*
@@ -1003,7 +1003,7 @@ newpage(int n)	/* called at end of each output page (we hope) */
 			if (a->encpath == NULL)
 				a->encpath = afmencodepath(a->path);
 			fdprintf(ptid, "x font %d %s %d\n", i,
-				a->encpath, a->spec);
+				a->encpath, (int)a->spec);
 			if (a->supply)
 				ptsupplyfont(a->fontname, a->supply);
 		} else if (fontbase[i]->namefont && fontbase[i]->namefont[0])

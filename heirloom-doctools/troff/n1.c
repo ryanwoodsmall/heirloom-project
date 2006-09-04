@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.116 (gritter) 9/3/06
+ * Sccsid @(#)n1.c	1.118 (gritter) 9/4/06
  */
 
 /*
@@ -338,6 +338,8 @@ loop:
 		goto loop;
 	}
 	if (j == cc || j == c2 || isxfunc(i, CC)) {
+		if (gflag && isdi(i))
+			goto Lt;
 		if (j == c2)
 			nb++;
 		copyf++;
@@ -1543,8 +1545,12 @@ g4:
 		if (i & MBMASK1)
 			i |= ZBIT;
 #endif /* EUC && NROFF */
-	if (cbits(i) == eschar && !raw)
-		setcbits(i, ESC);
+	if (cbits(i) == eschar && !raw) {
+		if (gflag && isdi(i))
+			setcbits(i, PRESC);
+		else
+			setcbits(i, ESC);
+	}
 	return(i);
 }
 
@@ -1897,6 +1903,8 @@ caseso(void)
 	if (!getname() || ((i = open(nextf, O_RDONLY)) < 0) ||
 			(ifi >= NSO)) {
 		errprint("can't open file %s", nextf);
+		if (gflag)
+			return;
 		done(02);
 	}
 	sopso(i, -1);
