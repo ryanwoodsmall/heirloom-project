@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.83 (gritter) 9/4/06
+ * Sccsid @(#)ext.h	1.84 (gritter) 9/5/06
  */
 
 /*
@@ -214,6 +214,7 @@ extern	struct widcache {	/* width cache, indexed by character */
 extern	char *gchtab;
 extern	struct	d	*d;
 extern	struct	d	*dip;
+extern	int	initbdtab[];
 
 #ifdef	EUC
 #include <stddef.h>

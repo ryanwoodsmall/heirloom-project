@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.29 (gritter) 9/4/06
+ * Sccsid @(#)n2.c	1.30 (gritter) 9/5/06
  */
 
 /*
@@ -55,13 +55,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
-#include "tdef.h"
-#ifdef NROFF
-#include "tw.h"
-#endif
-#include "pt.h"
 #include <setjmp.h>
-#include "ext.h"
 #ifdef EUC
 #include <limits.h>
 #ifdef NROFF
@@ -79,6 +73,12 @@ wchar_t wchar;
 int	nmb1 = 0;
 #endif /* NROFF */
 #endif /* EUC */
+#include "tdef.h"
+#ifdef NROFF
+#include "tw.h"
+#endif
+#include "pt.h"
+#include "ext.h"
 
 extern	jmp_buf	sjbuf;
 int	toolate;

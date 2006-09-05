@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.119 (gritter) 9/4/06
+ * Sccsid @(#)n1.c	1.120 (gritter) 9/5/06
  */
 
 /*
@@ -198,9 +198,9 @@ main(int argc, char **argv)
 			npn = ctoi(&argv[0][2]);
 			continue;
 		case 'u':	/* set emboldening amount */
-			bdtab[3] = ctoi(&argv[0][2]);
-			if (bdtab[3] < 0 || bdtab[3] > 50)
-				bdtab[3] = 0;
+			initbdtab[3] = ctoi(&argv[0][2]);
+			if (initbdtab[3] < 0 || initbdtab[3] > 50)
+				initbdtab[3] = 0;
 			continue;
 		case 's':
 			if (!(stop = ctoi(&argv[0][2])))

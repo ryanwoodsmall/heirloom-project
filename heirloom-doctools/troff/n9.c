@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.62 (gritter) 8/13/06
+ * Sccsid @(#)n9.c	1.63 (gritter) 9/5/06
  */
 
 /*
@@ -53,17 +53,19 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#ifdef EUC
+#include <locale.h>
+#include <wctype.h>
+#include <langinfo.h>
+#endif	/* EUC */
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
 #endif
 #include "pt.h"
 #include "ext.h"
-#ifdef EUC
-#include <locale.h>
-#include <wctype.h>
-#include <langinfo.h>
 
+#ifdef EUC
 #define	ISO646	"646"
 
 int	multi_locale;

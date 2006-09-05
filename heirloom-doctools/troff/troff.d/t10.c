@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.86 (gritter) 9/4/06
+ * Sccsid @(#)t10.c	1.87 (gritter) 9/5/06
  */
 
 /*
@@ -69,6 +69,8 @@
 
 int	vpos	 = 0;	/* absolute vertical position on page */
 int	hpos	 = 0;	/* ditto horizontal */
+
+int	initbdtab[NFONT+1];
 
 short	*chtab;
 char	*chname;
@@ -184,6 +186,8 @@ ptinit(void)
 	char	*filebase, *p, *ap, *descp;
 
 	growfonts(NFONT+1);
+	memcpy(bdtab, initbdtab,
+		max((NFONT+1) * sizeof *bdtab, sizeof initbdtab));
 	uninit();
 	/* open table for device,
 	 * read in resolution, size info, font info, etc.
@@ -346,7 +350,7 @@ ptout(register tchar i)
 	if (olinep >= &oline[olinesz]) {
 		olinesz += 100;
 		k = realloc(oline, olinesz * sizeof *oline);
-		olinep += k - oline;
+		olinep = (tchar *)((char *)olinep + ((char *)k-(char *)oline));
 		oline = k;
 	}
 	if (cbits(i) != '\n') {

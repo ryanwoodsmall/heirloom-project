@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.149 (gritter) 9/5/06
+ * Sccsid @(#)n3.c	1.150 (gritter) 9/5/06
  */
 
 /*
@@ -194,12 +194,15 @@ growcontab(void)
 		for (j = 0; longrequests[j].f; j++)
 			addcon(i++, longrequests[j].n, longrequests[j].f);
 	} else {
+		j = (char *)contab - (char *)onc;
 		for (i = 0; i < sizeof mhash / sizeof *mhash; i++)
 			if (mhash[i])
-				mhash[i] += contab - onc;
+				mhash[i] = (struct contab *)
+					((char *)mhash[i] + j);
 		for (i = 0; i < NM; i++)
 			if (contab[i].link)
-				contab[i].link += contab - onc;
+				contab[i].link = (struct contab *)
+					((char *)contab[i].link + j);
 	}
 	NM += inc;
 	return contab;
@@ -225,7 +228,7 @@ growblist(void)
 	memset(&corebuf[(ENV_BLK+nblist+1) * BLK], 0,
 			inc * BLK * sizeof *corebuf);
 	if (wbuf)
-		wbuf += corebuf - ocb;
+		wbuf = (tchar *)((char *)wbuf + ((char *)corebuf-(char *)ocb));
 	nblist += inc;
 	return blist;
 }
@@ -1443,7 +1446,8 @@ casetl(void)
 				tchar	*k;
 				bufsz += 100;
 				k = realloc(buf, bufsz * sizeof *buf);
-				tp += k - buf;
+				tp = (tchar *)
+				    ((char *)tp + ((char *)k - (char *)buf));
 				buf = k;
 			}
 			*tp++ = i;

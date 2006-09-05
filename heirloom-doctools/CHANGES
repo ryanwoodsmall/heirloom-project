@@ -48,6 +48,9 @@ Release ...
   and "\v". This allows very long pages without a "trap botch" error,
   although vertical motions on such pages may require multiple "\v"
   commands.
+* [nt]roff: Fixed a reallocation problem that caused segmentation faults
+  with some compilers.
+* [nt]roff: Fixed the "-u" option not to cause a segmentation fault.
 * [nt]roff: The "\n(.S" predefined number register has been removed again
   since it conflicts with use of this name by "dot -Tpic". (The "\n[.tabs]"
   register continues to be available with the same semantics.)

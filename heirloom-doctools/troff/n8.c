@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.33 (gritter) 8/6/06
+ * Sccsid @(#)n8.c	1.34 (gritter) 9/5/06
  */
 
 /*
@@ -79,14 +79,15 @@ static int *
 growhbuf(int **pp)
 {
 	int	*nhbuf;
-	int	inc = 4;
+	int	inc = 4, j;
 
 	if ((nhbuf = realloc(hbuf, (NHEX+inc) * sizeof *hbuf)) == NULL)
 		return NULL;
 	NHEX += inc;
-	nexth += nhbuf - hbuf;
+	j = (char *)nhbuf - (char *)hbuf;
+	nexth = (int *)((char *)nexth + j);
 	if (pp)
-		*pp += nhbuf - hbuf;
+		*pp = (int *)((char *)*pp + j);
 	return hbuf = nhbuf;
 }
 

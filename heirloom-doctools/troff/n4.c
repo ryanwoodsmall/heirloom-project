@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.72 (gritter) 9/4/06
+ * Sccsid @(#)n4.c	1.73 (gritter) 9/5/06
  */
 
 /*
@@ -80,7 +80,7 @@ static struct acc	_inumb(int *, float *, int);
 void *
 grownumtab(void)
 {
-	int	i, inc = 20;
+	int	i, j, inc = 20;
 	struct numtab	*onc;
 
 	onc = numtab;
@@ -91,12 +91,15 @@ grownumtab(void)
 		for (i = 0; initnumtab[i].r; i++)
 			numtab[i] = initnumtab[i];
 	} else {
+		j = (char *)numtab - (char *)onc;
 		for (i = 0; i < sizeof nhash / sizeof *nhash; i++)
 			if (nhash[i])
-				nhash[i] += numtab - onc;
+				nhash[i] = (struct numtab *)
+					((char *)nhash[i] + j);
 		for (i = 0; i < NN; i++)
 			if (numtab[i].link)
-				numtab[i].link += numtab - onc;
+				numtab[i].link = (struct numtab *)
+					((char *)numtab[i].link + j);
 	}
 	NN += inc;
 	return numtab;
