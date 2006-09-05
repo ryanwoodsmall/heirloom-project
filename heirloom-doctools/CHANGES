@@ -1,4 +1,4 @@
-Release ...
+Release 060905
 * [nt]roff: The new ".brnl" request causes a break each time a newline is
   encountered at the end of a text input line. Unlike nofill mode, text is
   still wrapped to the line length.
