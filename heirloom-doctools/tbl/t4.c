@@ -18,31 +18,25 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t4.c	1.5 (gritter) 9/4/06
+ * Sccsid @(#)t4.c	1.7 (gritter) 9/8/06
  */
 
  /* t4.c: read table specification */
 # include "t..c"
 # include <stdlib.h>
+# include <string.h>
 int oncol;
+static int morecols(int);
+static int moreheads(int);
+static void initspec(int);
+static void inithead(int, int);
 void
 getspec(void)
 {
-int icol, i;
-for(icol=0; icol<MAXCOL; icol++)
-	{
-	sep[icol]= -1;
-	evenup[icol]=0;
-	cll[icol][0]=0;
-	for(i=0; i<MAXHEAD; i++)
-		{
-		csize[i][icol][0]=0;
-		vsize[i][icol][0]=0;
-		font[i][icol][0] = lefline[i][icol] = 0;
-		ctop[i][icol]=0;
-		style[i][icol]= 'l';
-		}
-	}
+int i;
+moreheads(0);
+morecols(0);
+initspec(0);
 nclin=ncol=0;
 oncol =0;
 left1flg=rightl=0;
@@ -75,7 +69,7 @@ while (c=get1char())
 			if (lefline[nclin][ncol]>0) {ncol++; rightl++;};
 			if(sawchar)
 				nclin++;
-			if (nclin>=MAXHEAD)
+			if (nclin>=MAXHEAD && !moreheads(nclin))
 				error("too many lines in specification");
 			icol=0;
 			if (ncol==0 || nclin==0)
@@ -119,7 +113,7 @@ while (c=get1char())
 			icol++;
 			if (c=='^' && nclin<=0)
 				error("first row can not contain vertical span");
-			if (icol>=MAXCOL)
+			if (icol>=MAXCOL && !morecols(icol))
 				error("too many columns in table");
 			sawchar=1;
 			continue;
@@ -153,8 +147,9 @@ while (c=get1char())
 			if (icol==0) continue;
 			snp=font[nclin][icol-1];
 			snp[0]=snp[1]=stopc=0;
-			for(i=0; i<2; i++)
+			for(i=0; i<CLLEN; i++)
 				{
+				if (stopc==0 && i==2) break;
 				do
 					c = get1char();
 				while (i==0 && c==' ');
@@ -191,7 +186,7 @@ while (c=get1char())
 				if (digit(c))
 					*snp++ = c;
 				else break;
-				if (snp-temp>4)
+				if (snp-temp>20)
 					error("point size too large");
 				}
 			*snp = 0;
@@ -216,7 +211,7 @@ while (c=get1char())
 				if (digit(c))
 					*snp++ = c;
 				else break;
-				if (snp-temp>4)
+				if (snp-temp>20)
 					error(
 					"vertical spacing value too large");
 				}
@@ -232,7 +227,7 @@ while (c=get1char())
 				 */
 				style[nclin][icol] = 'c';
 				icol++;
-				if (icol >= MAXCOL) {
+				if (icol >= MAXCOL && !morecols(icol)) {
 					error("too many columns in table");
 				}
 				sawchar = 1;
@@ -263,11 +258,11 @@ while (c=get1char())
 					break;
 				if (stopc && c== stopc)
 					break;
+				if (snp-cll[icol-1]>CLLEN)
+					error ("column width too long");
 				*snp++ =c;
 				}
 			*snp=0;
-			if (snp-cll[icol-1]>CLLEN)
-				error ("column width too long");
 			if (!stopc)
 				un1getc(c);
 			continue;
@@ -294,4 +289,166 @@ while (c=get1char())
 		}
 	}
 error("EOF reading table specification");
+}
+static int
+morecols(int n)
+{
+int i, j, inc = 10, maxcol;
+void *vp;
+if (n < MAXCOL) return(1);
+while ((maxcol = MAXCOL + inc) < n) inc *= 2;
+for (i=0; i<MAXHEAD; i++)
+	{
+	if ((vp = realloc(style[i], maxcol * sizeof **style)) == NULL)
+		return(0);
+	style[i] = vp;
+	if ((vp = realloc(ctop[i], maxcol * sizeof **ctop)) == NULL)
+		return(0);
+	ctop[i] = vp;
+	if ((vp = realloc(font[i], maxcol * sizeof **font)) == NULL)
+		return(0);
+	font[i] = vp;
+	if ((vp = realloc(csize[i], maxcol * sizeof **csize)) == NULL)
+		return(0);
+	csize[i] = vp;
+	if ((vp = realloc(vsize[i], maxcol * sizeof **vsize)) == NULL)
+		return(0);
+	vsize[i] = vp;
+	if ((vp = realloc(lefline[i], maxcol * sizeof **lefline)) == NULL)
+		return(0);
+	lefline[i] = vp;
+	for (j=MAXCOL; j<maxcol; j++)
+		{
+		if ((font[i][j] = calloc(CLLEN, sizeof ***font)) == NULL)
+			return(0);
+		if ((csize[i][j] = calloc(20, sizeof ***csize)) == NULL)
+			return(0);
+		if ((vsize[i][j] = calloc(20, sizeof ***vsize)) == NULL)
+			return(0);
+		}
+	}
+if ((vp = realloc(cll, maxcol * sizeof *cll)) == NULL)
+	return(0);
+cll = vp;
+for (j=MAXCOL; j<maxcol; j++)
+	if ((cll[j] = calloc(CLLEN, sizeof **cll)) == NULL)
+		return(0);
+if ((vp = realloc(evenup, maxcol * sizeof *evenup)) == NULL)
+	return(0);
+evenup = vp;
+if ((vp = realloc(sep, maxcol * sizeof *sep)) == NULL)
+	return(0);
+sep = vp;
+if ((vp = realloc(used, maxcol * sizeof *used)) == NULL)
+	return(0);
+used = vp;
+if ((vp = realloc(lused, maxcol * sizeof *lused)) == NULL)
+	return(0);
+lused = vp;
+if ((vp = realloc(rused, maxcol * sizeof *rused)) == NULL)
+	return(0);
+rused = vp;
+if ((vp = realloc(topat, maxcol * sizeof *topat)) == NULL)
+	return(0);
+topat = vp;
+MAXCOL = maxcol;
+initspec(MAXCOL - inc);
+return(1);
+}
+static int
+moreheads(int n)
+{
+int i, j, inc = 10, maxhead;
+void *vp;
+if (n<MAXHEAD) return(1);
+while ((maxhead = MAXHEAD + inc) < n) inc *= 2;
+if ((vp = realloc(style, maxhead * sizeof *style)) == NULL)
+	return(0);
+style = vp;
+if ((vp = realloc(ctop, maxhead * sizeof *ctop)) == NULL)
+	return(0);
+ctop = vp;
+if ((vp = realloc(font, maxhead * sizeof *font)) == NULL)
+	return(0);
+font = vp;
+if ((vp = realloc(csize, maxhead * sizeof *csize)) == NULL)
+	return(0);
+csize = vp;
+if ((vp = realloc(vsize, maxhead * sizeof *vsize)) == NULL)
+	return(0);
+vsize = vp;
+if ((vp = realloc(lefline, maxhead * sizeof *lefline)) == NULL)
+	return(0);
+lefline = vp;
+if (MAXCOL == 0)
+	{
+	memset(style, 0, maxhead * sizeof *style);
+	memset(ctop, 0, maxhead * sizeof *ctop);
+	memset(font, 0, maxhead * sizeof *font);
+	memset(csize, 0, maxhead * sizeof *csize);
+	memset(vsize, 0, maxhead * sizeof *vsize);
+	memset(lefline, 0, maxhead * sizeof *lefline);
+	}
+if (MAXCOL) for (i=MAXHEAD; i<maxhead; i++)
+	{
+	if ((vp = calloc(MAXCOL, sizeof **style)) == NULL)
+		return(0);
+	style[i] = vp;
+	if ((vp = calloc(MAXCOL, sizeof **ctop)) == NULL)
+		return(0);
+	ctop[i] = vp;
+	if ((vp = calloc(MAXCOL, sizeof **font)) == NULL)
+		return(0);
+	font[i] = vp;
+	if ((vp = calloc(MAXCOL, sizeof **csize)) == NULL)
+		return(0);
+	csize[i] = vp;
+	if ((vp = calloc(MAXCOL, sizeof **vsize)) == NULL)
+		return(0);
+	vsize[i] = vp;
+	if ((vp = calloc(MAXCOL, sizeof **lefline)) == NULL)
+		return(0);
+	lefline[i] = vp;
+	for (j=0; j<MAXCOL; j++)
+		{
+		if ((vp = calloc(CLLEN, sizeof ***font)) == NULL)
+			return(0);
+		font[i][j] = vp;
+		if ((vp = calloc(20, sizeof ***csize)) == NULL)
+			return(0);
+		csize[i][j] = vp;
+		if ((vp = calloc(20, sizeof ***vsize)) == NULL)
+			return(0);
+		vsize[i][j] = vp;
+		}
+	}
+MAXHEAD = maxhead;
+for (j=0; j<MAXCOL; j++)
+	inithead(MAXHEAD-inc, j);
+return(1);
+}
+static void
+initspec(int scol)
+{
+int icol;
+for(icol=scol; icol<MAXCOL; icol++)
+	{
+	sep[icol]= -1;
+	evenup[icol]=0;
+	cll[icol][0]=0;
+	inithead(0, icol);
+	}
+}
+static void
+inithead(int shead, int icol)
+{
+int i;
+for(i=shead; i<MAXHEAD; i++)
+	{
+	csize[i][icol][0]=0;
+	vsize[i][icol][0]=0;
+	font[i][icol][0] = lefline[i][icol] = 0;
+	ctop[i][icol]=0;
+	style[i][icol]= 'l';
+	}
 }

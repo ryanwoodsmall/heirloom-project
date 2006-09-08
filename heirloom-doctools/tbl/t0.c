@@ -18,12 +18,15 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t0.c	1.8 (gritter) 9/8/06
+ * Sccsid @(#)t0.c	1.10 (gritter) 9/8/06
  */
 
  /* t0.c: storage allocation */
 #
 # include "t..c"
+int MAXLIN;
+int MAXCOL;
+int MAXHEAD;
 int expflg = 0;
 int ctrflg = 0;
 int boxflg = 0;
@@ -34,7 +37,7 @@ int linsize;
 int pr1403;
 int graphics;
 int delim1, delim2;
-int evenup[MAXCOL], evenflg;
+int *evenup, evenflg;	/* evenup[MAXCOL] */
 int F1 = 0;
 int F2 = 0;
 int allflg = 0;
@@ -44,23 +47,24 @@ int left1flg = 0;
 int rightl = 0;
 char *cstore, *cspace, *cbase;
 char *last;
-struct colstr *table[MAXLIN];
-int style[MAXHEAD][MAXCOL];
-int ctop[MAXHEAD][MAXCOL];
-char font[MAXHEAD][MAXCOL][2];
-char csize[MAXHEAD][MAXCOL][4];
-char vsize[MAXHEAD][MAXCOL][4];
-int lefline[MAXHEAD][MAXCOL];
-char cll[MAXCOL][CLLEN];
+struct colstr **table;	/* *table[MAXLIN] */
+int **style;	/* style[MAXHEAD][MAXCOL] */
+int **ctop;	/* ctop[MAXHEAD][MAXCOL] */
+char ***font;	/* font[MAXHEAD][MAXCOL][CLLEN] */
+char ***csize;	/* csize[MAXHEAD][MAXCOL][20] */
+char ***vsize;	/* vsize[MAXHEAD][MAXCOL][20] */
+int **lefline;	/* lefline[MAXHEAD][MAXCOL] */
+char **cll;	/* cll[MAXCOL][CLLEN] */
 /*char *rpt[MAXHEAD][MAXCOL];*/
 /*char rpttx[MAXRPT];*/
-int stynum[MAXLIN+1];
+int *stynum;	/* stynum[MAXLIN+1] */
 int nslin, nclin;
-int sep[MAXCOL];
-int fullbot[MAXLIN];
-char *instead[MAXLIN];
-int used[MAXCOL], lused[MAXCOL], rused[MAXCOL];
-int linestop[MAXLIN];
+int *sep;	/* sep[MAXCOL] */
+int *fullbot;	/* fullbot[MAXLIN] */
+char **instead;	/* *instead[MAXLIN] */
+int *used, *lused, *rused;	/* MAXCOL */
+int *linestop;	/* linestop[MAXLIN] */
+int *topat;	/* topat[MAXLIN] */
 int nlin, ncol;
 int iline = 1;
 char *ifile = "Input";

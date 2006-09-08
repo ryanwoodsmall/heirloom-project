@@ -18,12 +18,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tb.c	1.6 (gritter) 2/26/06
+ * Sccsid @(#)tb.c	1.7 (gritter) 9/8/06
  */
 
  /* tb.c: check which entries exist, also storage allocation */
 # include "t..c"
 # include <stdlib.h>
+# include <string.h>
 # include <inttypes.h>
 void
 checkuse(void)
@@ -104,10 +105,10 @@ for (i = 0; i < spcount; i++)
 		break;
 	}
 }
-# define MAXPC 50
+static int MAXPC;
 char *thisvec;
 int tpcount = -1;
-char *tpvecs[MAXPC];
+char **tpvecs;
 
 int *
 alocv(int n)
@@ -116,13 +117,19 @@ int *tp, *q;
 if (tpcount<0 || thisvec+n > tpvecs[tpcount]+MAXCHS)
 	{
 	tpcount++;
+	if (tpcount >= MAXPC) {
+		tpvecs = realloc(tpvecs, (tpcount+1) * sizeof *tpvecs);
+		if (tpvecs == 0) goto nospace;
+		memset(&tpvecs[MAXPC], 0, (tpcount+1-MAXPC) * sizeof *tpvecs);
+		MAXPC = tpcount+1;
+	}
 	if (tpvecs[tpcount]==0)
 		{
 		tpvecs[tpcount] = calloc(MAXCHS,1);
 		}
 	thisvec = tpvecs[tpcount];
 	if (thisvec == 0)
-		error("no space for vectors");
+	nospace:error("no space for vectors");
 	}
 tp=(int *)thisvec;
 thisvec+=n;

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t8.c	1.9 (gritter) 9/8/06
+ * Sccsid @(#)t8.c	1.10 (gritter) 9/8/06
  */
 
  /* t8.c: write out one line of output table */
@@ -27,7 +27,6 @@
 # define realsplit ((ct=='a'||ct=='n') && table[nl][c].rcol)
 int watchout;
 int once;
-int topat[MAXCOL];
 void
 putline (
 	/* i is line number for deciding format */

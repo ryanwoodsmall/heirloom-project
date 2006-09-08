@@ -3,6 +3,9 @@ Release ...
   of repeated-character line drawing (troff "\l" and "\L"). The "graphics"
   option enables it per table, and the "-g" command line option enables it
   globally.
+* tbl: The static limits on the number of table lines, columns, and heading
+  lines have been removed. In effect, all lines of a table are considered
+  when the column widths are computed, and ".T&" can occur at any line.
 * [nt]roff: The blank line macro is not called when a diversion is reread
   in nofill mode anymore.
 * troff: The escape sequence "\s[0]" now resets the point size to the
