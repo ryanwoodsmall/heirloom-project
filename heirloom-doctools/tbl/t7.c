@@ -8,7 +8,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t7.c	1.4 (gritter) 8/6/06
+ * Sccsid @(#)t7.c	1.5 (gritter) 9/8/06
  */
 
 /*	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T	*/
@@ -128,6 +128,8 @@ fprintf(tabout, ".ds #d .d\n");
 fprintf(tabout, ".if \\(ts\\n(.z\\(ts\\(ts .ds #d nl\n");
 	fprintf(tabout, ".mk ##\n");
 	fprintf(tabout, ".nr ## -1v\n");
+	if (graphics)
+		fprintf(tabout, ".nr #D \\n(.vu-\\n(.sp\n");
 	fprintf(tabout, ".ls 1\n");
 	for(i=0; i<MAXHEAD; i++)
 		if (linestop[i])

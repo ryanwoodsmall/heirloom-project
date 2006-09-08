@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tu.c	1.3 (gritter) 7/23/05
+ * Sccsid @(#)tu.c	1.4 (gritter) 9/8/06
  */
 
  /* tu.c: draws horizontal lines */
@@ -79,6 +79,8 @@ if (lcount<=0) return;
 nodata = cr-cl>=ncol || noheight || allh(i);
 	if (!nodata)
 		fprintf(tabout, "\\v'-.5m'");
+	if (graphics)
+		fprintf(tabout, "\\v'\\n(#Du'");
 for(ln=oldpos=0; ln<lcount; ln++)
 	{
 	linpos = 2*ln - lcount +1;
@@ -129,11 +131,23 @@ for(ln=oldpos=0; ln<lcount; ln++)
 	}
 	else
 		fprintf(tabout, "\\h'|\\n(%du'", cl+CLEFT);
-	fprintf(tabout, "\\s\\n(%d",LSIZE);
+	if (!graphics)
+		fprintf(tabout, "\\s\\n(%d",LSIZE);
 	if (linsize)
 		fprintf(tabout, "\\v'-\\n(%dp/6u'", LSIZE);
-	if (shortl)
-		fprintf(tabout, "\\l'|\\n(%du'", cr+CRIGHT);
+	if (shortl) {
+		if (graphics)
+			fprintf(tabout, "\\D'l |\\n(%du 0'", cr+CRIGHT);
+		else
+			fprintf(tabout, "\\l'|\\n(%du'", cr+CRIGHT);
+	}
+	else if (graphics) {
+		if (cr+1>=ncol)
+			fprintf(tabout, "\\D'l |\\n(TWu%s 0'", exhr);
+		else
+			fprintf(tabout, "\\D'l (|\\n(%du+|\\n(%du)/2u%s 0'",
+					cr+CRIGHT, cr+1+CLEFT, exhr);
+	}
 	else
 	{
 	lnch = "\\(ul";
@@ -147,10 +161,13 @@ for(ln=oldpos=0; ln<lcount; ln++)
 	}
 	if (linsize)
 		fprintf(tabout, "\\v'\\n(%dp/6u'", LSIZE);
-	fprintf(tabout, "\\s0");
+	if (!graphics)
+		fprintf(tabout, "\\s0");
 	}
 if (oldpos!=0)
 	fprintf(tabout, "\\v'%dp'", -oldpos);
+if (graphics)
+	fprintf(tabout, "\\v'-\\n(#Du'");
 if (!nodata)
 	fprintf(tabout, "\\v'+.5m'");
 }

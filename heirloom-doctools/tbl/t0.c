@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t0.c	1.7 (gritter) 2/26/06
+ * Sccsid @(#)t0.c	1.8 (gritter) 9/8/06
  */
 
  /* t0.c: storage allocation */
@@ -32,6 +32,7 @@ int decimalpoint = '.';
 int tab = '\t';
 int linsize;
 int pr1403;
+int graphics;
 int delim1, delim2;
 int evenup[MAXCOL], evenflg;
 int F1 = 0;

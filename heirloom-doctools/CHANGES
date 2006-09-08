@@ -1,3 +1,9 @@
+Release ...
+* tbl: Can now optionally use graphic drawing commands (troff "\D") instead
+  of repeated-character line drawing (troff "\l" and "\L"). The "graphics"
+  option enables it per table, and the "-g" command line option enables it
+  globally.
+
 Release 060905
 * [nt]roff: The new ".brnl" request causes a break each time a newline is
   encountered at the end of a text input line. Unlike nofill mode, text is

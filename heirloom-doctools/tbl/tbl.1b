@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)tbl.1b	1.5 (gritter) 7/15/06
+.\" Sccsid @(#)tbl.1b	1.6 (gritter) 9/8/06
 .\" Derived from tbl(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,12 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TBL 1B "7/15/06" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TBL 1B "9/8/06" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 tbl \- (BSD) format tables for nroff or troff
 .SH SYNOPSIS
-\fB/usr/ucb/tbl\fR [\fB\-me\fR|\fB\-mm\fR|\fB\-ms\fR] [\fIfiles\fR] ...
+\fB/usr/ucb/tbl\fR [\fB\-g\fR]
+[\fB\-me\fR|\fB\-mm\fR|\fB\-ms\fR] [\fIfiles\fR] ...
 .SH DESCRIPTION
 .I Tbl
 is a preprocessor for formatting tables for
@@ -109,6 +110,17 @@ the
 command should be first, to minimize the volume
 of data passed through
 pipes.
+.PP
+.I tbl
+normally uses line drawing commands with repeated
+underline and box rule characters
+(i.e.
+.I troff
+\el and \eL).
+With the
+.B \-g
+option,
+graphic drawing commands (i.e. \eD) are used instead.
 .SH SEE ALSO
 troff(1B), eqn(1B)
 .br
