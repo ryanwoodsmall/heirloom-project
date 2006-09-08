@@ -7,6 +7,8 @@ Release ...
   in nofill mode anymore.
 * troff: The escape sequence "\s[0]" now resets the point size to the
   previous value as "\s0" does.
+* [nt]roff: Arbitrary delimiters are now allowed with "\s''" escape
+  sequences.
 
 Release 060905
 * [nt]roff: The new ".brnl" request causes a break each time a newline is

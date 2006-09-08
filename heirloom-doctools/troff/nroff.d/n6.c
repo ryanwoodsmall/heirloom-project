@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.47 (gritter) 8/12/06
+ * Sccsid @(#)n6.c	1.48 (gritter) 9/8/06
  */
 
 /*
@@ -239,9 +239,12 @@ mchbits(void)
 void
 setps(void)
 {
+	tchar	c;
 	register int i, j, k;
 
-	i = cbits(getch());
+	i = cbits(c = getch());
+	if (ismot(c) && xflag)
+		return;
 	if (ischar(i) && isdigit(i)) {		/* \sd or \sdd */
 		i -= '0';
 		if (i == 0)		/* \s0 */
@@ -254,27 +257,30 @@ setps(void)
 		getch();
 		getch();
 	} else if (i == '+' || i == '-') {	/* \s+, \s- */
-		j = cbits(getch());
+		j = cbits(c = getch());
 		if (ischar(j) && isdigit(j)) {		/* \s+d, \s-d */
 			;
 		} else if (j == '(') {		/* \s+(dd, \s-(dd */
 			getch();
 			getch();
-		} else if ((j == '[' || j == '\'') && xflag) {	/* \s+[dd], */
+		} else if (xflag) {	/* \s+[dd], */
 			k = j == '[' ? ']' : j;			/* \s-'dd' */
+			setcbits(c, k);
 			atoi();
 			if (nonumb)
 				return;
-			if (cbits(getch()) != k)
+			if (!issame(getch(), c))
 				nodelim(k);
 		}
-	} else if ((i == '[' || i == '\'') && xflag) {  /* \s'+dd', \s[dd] */
-		if (i == '[')
+	} else if (xflag) {  /* \s'+dd', \s[dd] */
+		if (i == '[') {
 			i = ']';
+			setcbits(c, i);
+		}
 		j = inumb(&apts);
 		if (nonumb)
 			return;
-		if (cbits(getch()) != i)
+		if (!issame(getch(), c))
 			nodelim(i);
 	}
 }
