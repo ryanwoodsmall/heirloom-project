@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.73 (gritter) 9/5/06
+ * Sccsid @(#)n4.c	1.74 (gritter) 9/8/06
  */
 
 /*
@@ -75,7 +75,7 @@ static struct acc	_atoi(int);
 static struct acc	_atoi0(int);
 static struct acc	ckph(int);
 static struct acc	atoi1(tchar, int);
-static struct acc	_inumb(int *, float *, int);
+static struct acc	_inumb(int *, float *, int, int *);
 
 void *
 grownumtab(void)
@@ -1438,7 +1438,7 @@ casenr(int flt)
 	if ((i = findr(j)) == -1)
 		goto rtn;
 	skip(1);
-	a = _inumb(&numtab[i].val, flt ? &numtab[i].fval : NULL, flt);
+	a = _inumb(&numtab[i].val, flt ? &numtab[i].fval : NULL, flt, NULL);
 	if (nonumb)
 		goto rtn;
 	numtab[i].val = a.n;
@@ -1654,12 +1654,22 @@ inumb(int *n)
 {
 	struct acc	a;
 
-	a = _inumb(n, NULL, 0);
+	a = _inumb(n, NULL, 0, NULL);
+	return a.n;
+}
+
+
+int
+inumb2(int *n, int *relative)
+{
+	struct acc	a;
+
+	a = _inumb(n, NULL, 0, relative);
 	return a.n;
 }
 
 static struct acc
-_inumb(int *n, float *fp, int flt)
+_inumb(int *n, float *fp, int flt, int *relative)
 {
 	struct acc	i;
 	register int j, f;
@@ -1688,6 +1698,8 @@ _inumb(int *n, float *fp, int flt)
 		i.n = 0;
 		if (flt) i.f = 0;
 	}
+	if (relative)
+		*relative = f;
 	return(i);
 }
 

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.101 (gritter) 9/5/06
+ * Sccsid @(#)n7.c	1.102 (gritter) 9/8/06
  */
 
 /*
@@ -517,7 +517,7 @@ callsp(void)
 	else 
 		i = lss;
 	flss = 0;
-	if (blmac)
+	if (blmac && (fi || (frame->flags & FLAG_DIVERSION) == 0))
 		control(blmac, 0);
 	else
 		casesp(i);

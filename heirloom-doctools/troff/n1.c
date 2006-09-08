@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.120 (gritter) 9/5/06
+ * Sccsid @(#)n1.c	1.121 (gritter) 9/8/06
  */
 
 /*
@@ -889,7 +889,7 @@ control(register int a, register int b)
 		if (b)
 			collect();
 		flushi();
-		newip = pushi((filep)contab[j].mx, a);
+		newip = pushi((filep)contab[j].mx, a, contab[j].flags);
 		p = frame->pframe;
 		if (tailflg && b && p != stk &&
 				p->ppendt == 0 &&

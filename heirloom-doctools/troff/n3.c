@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.150 (gritter) 9/5/06
+ * Sccsid @(#)n3.c	1.151 (gritter) 9/8/06
  */
 
 /*
@@ -409,6 +409,7 @@ casede(void)
 			munhash(&contab[newmn]);
 		contab[newmn].rq = k;
 		contab[newmn].nlink = nlink;
+		contab[newmn].flags &= ~FLAG_DIVERSION;
 		if (ds)
 			contab[newmn].flags |= FLAG_STRING;
 		else
@@ -529,7 +530,7 @@ _finds(register int mn, int als)
 			contab[i].rq = mn;
 			maddhash(&contab[i]);
 		}
-		contab[i].flags = flags & (FLAG_WATCH|FLAG_STRING);
+		contab[i].flags = flags&(FLAG_WATCH|FLAG_STRING|FLAG_DIVERSION);
 	}
 	app = 0;
 	return(als ? offset = nextb : 1);
@@ -842,7 +843,7 @@ popi(void)
 	if (p->loopf & LOOP_NEXT) {
 		d = ch;
 		ch = c;
-		pushi(p->newip, p->mname);
+		pushi(p->newip, p->mname, p->flags);
 		c = 0;
 		ch = d;
 	} else
@@ -854,7 +855,7 @@ popi(void)
 
 
 int 
-pushi(filep newip, int mname)
+pushi(filep newip, int mname, enum flags flags)
 {
 	register struct s *p;
 
@@ -865,6 +866,7 @@ pushi(filep newip, int mname)
 	p->pch = ch;
 	p->lastpbp = lastpbp;
 	p->mname = mname;
+	p->flags = flags;
 	if (mname != LOOP) {
 		p->frame_cnt = frame->frame_cnt + 1;
 		p->tail_cnt = frame->tail_cnt + 1;
@@ -940,7 +942,7 @@ setstr(void)
 		strflg++;
 		lgf--;
 		contab[j].flags |= FLAG_USED;
-		k = pushi((filep)contab[j].mx, i);
+		k = pushi((filep)contab[j].mx, i, contab[j].flags);
 		frame->contp = j;
 		return(k);
 	}
@@ -1178,6 +1180,7 @@ casedi(int box)
 		contab[newmn].rq = j;
 		contab[newmn].nlink = nlink;
 		contab[newmn].flags &= ~FLAG_STRING;
+		contab[newmn].flags |= FLAG_DIVERSION;
 		if (i != j)
 			maddhash(&contab[newmn]);
 		prwatch(newmn);
@@ -1244,7 +1247,7 @@ caseals(void)
 	if (_finds(i, 0) != 0) {
 		if (oldmn > 0 && newmn)
 			flags = contab[oldmn].flags | contab[newmn].flags;
-		flags &= FLAG_WATCH|FLAG_STRING;
+		flags &= FLAG_WATCH|FLAG_STRING|FLAG_DIVERSION;
 		clrmn(oldmn);
 		if (newmn) {
 			if (contab[newmn].rq)
@@ -1338,7 +1341,8 @@ prwatch(int i)
 		if (watchlength <= 10) {
 			errprint("%s: %s %s redefined", macname(lastrq),
 				contab[i].flags & FLAG_STRING ? "string" :
-					"macro",
+					contab[i].flags & FLAG_DIVERSION ?
+						"diversion" : "macro",
 				macname(contab[i].rq));
 			return;
 		}
@@ -1390,7 +1394,8 @@ prwatch(int i)
 		app--;
 		errprint("%s: %s %s redefined to \"%s\"", macname(lastrq),
 				contab[i].flags & FLAG_STRING ? "string" :
-					"macro",
+					contab[i].flags & FLAG_DIVERSION ?
+						"diversion" : "macro",
 				macname(contab[i].rq), buf);
 		free(buf);
 	}

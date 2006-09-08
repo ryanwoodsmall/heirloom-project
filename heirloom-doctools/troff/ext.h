@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.84 (gritter) 9/5/06
+ * Sccsid @(#)ext.h	1.85 (gritter) 9/8/06
  */
 
 /*
@@ -325,7 +325,7 @@ extern	tchar	rbf(void);
 extern	tchar	rbf0(register filep);
 extern	filep	incoff(register filep);
 extern	tchar	popi(void);
-extern	int	pushi(filep, int);
+extern	int	pushi(filep, int, enum flags);
 extern	char	*setbrk(int);
 extern	int	getsn(int);
 extern	int	setstr(void);
@@ -386,6 +386,7 @@ extern	void	prwatchn(int);
 extern	int	vnumb(int *);
 extern	int	hnumb(int *);
 extern	int	inumb(int *);
+extern	int	inumb2(int *, int *);
 extern	int	quant(int, int);
 extern	tchar	moflo(int);
 /* n5.c */

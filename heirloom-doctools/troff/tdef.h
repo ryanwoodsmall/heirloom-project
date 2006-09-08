@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.130 (gritter) 9/3/06
+ * Sccsid @(#)tdef.h	1.131 (gritter) 9/8/06
  */
 
 /*
@@ -544,7 +544,8 @@ extern enum warn {
 enum flags {
 	FLAG_WATCH	= 01,
 	FLAG_STRING	= 02,
-	FLAG_USED	= 04
+	FLAG_USED	= 04,
+	FLAG_DIVERSION	= 010
 };
 
 struct	d {	/* diversion */
@@ -591,6 +592,7 @@ struct	s {	/* stack frame */
 		LOOP_NEXT = 02,
 		LOOP_EVAL = 04
 	} loopf;
+	enum flags	flags;
 };
 
 extern struct contab {

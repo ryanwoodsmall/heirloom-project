@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.91 (gritter) 9/3/06
+ * Sccsid @(#)n5.c	1.92 (gritter) 9/8/06
  */
 
 /*
@@ -1423,7 +1423,7 @@ casewhile(void)
 		errprint("%d excess delimiter(s)", -level);
 	wbt(0);
 	copyf--, clonef--;
-	pushi(newip, LOOP);
+	pushi(newip, LOOP, 0);
 	offset = dip->op;
 }
 
@@ -1598,7 +1598,7 @@ caserd(void)
 	}
 	collect();
 	tty++;
-	pushi(-1, PAIR('r','d'));
+	pushi(-1, PAIR('r','d'), 0);
 }
 
 
