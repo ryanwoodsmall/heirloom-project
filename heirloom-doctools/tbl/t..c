@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.17 (gritter) 9/8/06
+ * Sccsid @(#)t..c	1.18 (gritter) 9/9/06
  */
 
 /* t..c : external declarations */
@@ -170,6 +170,7 @@ void restline(void);
 void cleanfc(void);
 void warnon(void);
 void warnoff(void);
+void svgraph(void);
 /* tg.c */
 int get_text(char *, int, int, char *, char *);
 void untext(void);

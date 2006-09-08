@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tf.c	1.8 (gritter) 8/6/06
+ * Sccsid @(#)tf.c	1.9 (gritter) 9/9/06
  */
 
  /* tf.c: save and restore fill mode around table */
@@ -101,4 +101,9 @@ void
 warnon(void)
 {
 fprintf(tabout, ".if \\n(.X>0 .do warn \\n(w.\n");
+}
+void
+svgraph(void)
+{
+fprintf(tabout, ".nr #D .2m\n");
 }

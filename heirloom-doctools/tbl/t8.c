@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t8.c	1.10 (gritter) 9/8/06
+ * Sccsid @(#)t8.c	1.11 (gritter) 9/9/06
  */
 
  /* t8.c: write out one line of output table */
@@ -43,7 +43,7 @@ char *s, *size, *fn;
 char space[40];
 watchout=vspf=exvspen=0;
 if (graphics)
-	fprintf(tabout, ".nr #D \\n(.vu-\\n(.sp\n");
+	svgraph();
 if (i==0) once=0;
 if (i==0 && ( allflg || boxflg || dboxflg))
 	fullwide(0,   dboxflg? '=' : '-');
