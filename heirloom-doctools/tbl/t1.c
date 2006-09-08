@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t1.c	1.11 (gritter) 2/26/06
+ * Sccsid @(#)t1.c	1.12 (gritter) 9/8/06
  */
 
  /* t1.c: main control and input switching */
@@ -117,6 +117,8 @@ swapin(void)
 			}
 		if (match("-TX", *sargv))
 			pr1403=1;
+		else if (match("-g", *sargv))
+			Graphics=1;
 		else {
 			(void) fprintf(stderr, "%s: Invalid option "
 			    "(%s).\n", progname, *sargv);

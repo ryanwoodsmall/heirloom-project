@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.16 (gritter) 9/8/06
+ * Sccsid @(#)t..c	1.17 (gritter) 9/8/06
  */
 
 /* t..c : external declarations */
@@ -63,6 +63,7 @@ extern int linsize;
 extern int tab;
 extern int pr1403;
 extern int graphics;
+extern int Graphics;
 extern int linsize, delim1, delim2;
 extern int allflg;
 extern int textflg;

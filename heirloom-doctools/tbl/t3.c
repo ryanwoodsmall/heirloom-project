@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t3.c	1.9 (gritter) 9/8/06
+ * Sccsid @(#)t3.c	1.10 (gritter) 9/8/06
  */
 
  /* t3.c: interpret commands affecting whole table */
@@ -64,6 +64,7 @@ texname = texstr[texct=0];
 texct2 = -1;
 tab = '\t';
 decimalpoint = '.';
+graphics = Graphics;
 printf(".nr %d \\n(.s\n", LSIZE);
 gets1(&line, &line, &linesize);
 /* see if this is a command line */
