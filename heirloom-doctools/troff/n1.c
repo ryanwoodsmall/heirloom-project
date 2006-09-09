@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.121 (gritter) 9/8/06
+ * Sccsid @(#)n1.c	1.122 (gritter) 9/10/06
  */
 
 /*
@@ -115,7 +115,7 @@ static tchar	setyon(void);
 static void	_setenv(void);
 static tchar	setZ(void);
 static int	setgA(void);
-static int	setgB(void);
+static int	setB(void);
 
 #ifdef	DEBUG
 int	debug = 0;	/*debug flag*/
@@ -1313,7 +1313,7 @@ copy:
 	case 'd':	/* half em down */
 		return(sethl(k));
 	case 'A':	/* set anchor */
-		if (gflag) {	/* acceptable as name: fake as true */
+		if (gflag) {	/* acceptable as name */
 			i = setgA() + '0';
 			goto gx;
 		}
@@ -1322,9 +1322,9 @@ copy:
 		if ((j = setanchor()) == 0)
 			goto g0;
 		return(j);
-	case 'B':
-		if (gflag) {	/* acceptable as expression */
-			i = setgB() + '0';
+	case 'B':	/* acceptable as expression */
+		if (xflag) {
+			i = setB() + '0';
 			goto gx;
 		}
 		goto dfl;
@@ -2458,7 +2458,7 @@ setgA(void)
 }
 
 static int
-setgB(void)
+setB(void)
 {
 	tchar	c, delim;
 	int	y = 1;
