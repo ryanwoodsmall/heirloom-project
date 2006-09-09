@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.94 (gritter) 9/9/06
+ * Sccsid @(#)n5.c	1.95 (gritter) 9/9/06
  */
 
 /*
@@ -765,6 +765,8 @@ loop:	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
 		tmbuf[i++] = '\\';
 		if (c == (OHC|BLBIT))
 			j = ':';
+		else if (istrans(c))
+			j = ')';
 		else if (j >= 0 && j < sizeof tmtab && tmtab[j])
 			j = tmtab[j];
 		else if (j == ACUTE)

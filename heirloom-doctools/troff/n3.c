@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.155 (gritter) 9/9/06
+ * Sccsid @(#)n3.c	1.156 (gritter) 9/9/06
  */
 
 /*
@@ -1383,7 +1383,10 @@ _prwatch(int i, int prc)
 			else if ((k = cbits(c)) < 0177) {
 				if (isprint(k))
 					buf[j++] = k;
-				else if (k < ' ' && prtab[k]) {
+				else if (istrans(c)) {
+					buf[j++] = '\\';
+					buf[j++] = ')';
+				} else if (k < ' ' && prtab[k]) {
 					buf[j++] = '\\';
 					buf[j++] = prtab[k];
 				} else if (k < ' ') {
@@ -1631,6 +1634,7 @@ casesubstring(void)
 void
 caselength(void)
 {
+	tchar	c;
 	int	i, j, k;
 
 	lgf++;
@@ -1641,6 +1645,8 @@ caselength(void)
 	lgf--;
 	copyf++;
 	if (skip(1) == 0) {
+		if (cbits(c = getch()) != '"' || ismot(c))
+			ch = c;
 		while(cbits(getch()) != '\n')
 			j++;
 	}
@@ -1670,6 +1676,8 @@ caseindex(void)
 	}
 	copyf++;
 	if (!skip(0)) {
+		if (cbits(c = getch()) != '"' || ismot(c))
+			ch = c;
 		while ((c = getch()) != 0 && !ismot(c) &&
 				(i = cbits(c)) != '\n') {
 			if (ns >= as)
