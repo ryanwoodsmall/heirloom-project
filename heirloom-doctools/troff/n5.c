@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.93 (gritter) 9/9/06
+ * Sccsid @(#)n5.c	1.94 (gritter) 9/9/06
  */
 
 /*
@@ -696,7 +696,7 @@ casebp(void)
 
 
 static void
-tmtmcwr(int ab, int tmc, int wr, int ep)
+tmtmcwr(int ab, int tmc, int wr, int ep, int tmm)
 {
 	const char tmtab[] = {
 		'a',000,000,000,000,000,000,000,
@@ -708,13 +708,41 @@ tmtmcwr(int ab, int tmc, int wr, int ep)
 	register int i, j;
 	tchar	c;
 	char	tmbuf[NTM];
+	filep	savip = ip;
+	int	discard = 0;
 
 	lgf++;
-	copyf++;
-	if (skip(0) && ab)
-		errprint("User Abort");
-	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
-		if ((c = getch()) == '\n') {
+	if (tmm) {
+		if (skip(1) || (i = getrq(0)) == 0)
+			return;
+		if ((j = findmn(i)) == -1 || !contab[j].mx) {
+			nosuch(i);
+			return;
+		}
+		savip = ip;
+		ip = (filep)contab[j].mx;
+		app++;
+		copyf++;
+	} else {
+		copyf++;
+		if (skip(0) && ab)
+			errprint("User Abort");
+	}
+loop:	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
+		if (tmm) {
+			if ((c = rbf()) == 0) {
+				ip = savip;
+				tmm = 0;
+				app--;
+				break;
+			}
+		} else
+			c = getch();
+		if (discard) {
+			discard--;
+			continue;
+		}
+		if (c == '\n') {
 			tmbuf[i++] = '\n';
 			break;
 		}
@@ -747,8 +775,17 @@ tmtmcwr(int ab, int tmc, int wr, int ep)
 			j = '_';
 		else if (j == MINUS)
 			j = '-';
-		else
+		else {
 			i--;
+			if (c == WORDSP)
+				j = ' ';
+			else if (j == WORDSP)
+				continue;
+			else if (j == FLSS) {
+				discard++;
+				continue;
+			}
+		}
 		if (j == XFUNC)
 			switch (fbits(c)) {
 			case CHAR:
@@ -774,6 +811,8 @@ tmtmcwr(int ab, int tmc, int wr, int ep)
 		fdprintf(stderr, "%s", tmbuf);
 	} else if (i)
 		write(wr, tmbuf, i);
+	if (tmm)
+		goto loop;
 	copyf--;
 	lgf--;
 }
@@ -781,19 +820,19 @@ tmtmcwr(int ab, int tmc, int wr, int ep)
 void
 casetm(int ab)
 {
-	tmtmcwr(ab, 0, -1, 0);
+	tmtmcwr(ab, 0, -1, 0, 0);
 }
 
 void
 casetmc(void)
 {
-	tmtmcwr(0, 1, -1, 0);
+	tmtmcwr(0, 1, -1, 0, 0);
 }
 
 void
 caseerrprint(void)
 {
-	tmtmcwr(0, 1, -1, 1);
+	tmtmcwr(0, 1, -1, 1, 0);
 }
 
 static struct stream {
@@ -845,7 +884,7 @@ getstream(const char *name)
 }
 
 static void
-write1(int writec)
+write1(int writec, int writem)
 {
 	int	i;
 
@@ -854,19 +893,25 @@ write1(int writec)
 		return;
 	if ((i = getstream(nextf)) < 0)
 		return;
-	tmtmcwr(0, writec, streams[i].fd, 0);
+	tmtmcwr(0, writec, streams[i].fd, 0, writem);
 }
 
 void
 casewrite(void)
 {
-	write1(0);
+	write1(0, 0);
 }
 
 void
 casewritec(void)
 {
-	write1(1);
+	write1(1, 0);
+}
+
+void
+casewritem(void)
+{
+	write1(0, 1);
 }
 
 void

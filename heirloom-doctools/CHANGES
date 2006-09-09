@@ -1,6 +1,8 @@
 Release ...
 * [nt]roff: The ".pull" request has been introduced to print text of a given
   height from a diversion and remove it afterwards.
+* [nt]roff: The ".writem" request has been added to write the contents of
+  a string, macro, or diversion to a file stream.
 * [nt]roff: The ".dwh" and ".dch" requests have been introduced to allow
   multiple diversion traps in the same diversion.
 * [nt]roff: The "\n[.dilev]" register contains the current diversion level.

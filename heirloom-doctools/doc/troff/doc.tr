@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.139 (gritter) 9/9/06
+.\" Sccsid @(#)doc.tr	1.140 (gritter) 9/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1536,8 +1536,10 @@ Input/Output File Switching
 \T'opena'\fB&opena\fI|stream|filename\fR	ignored	\(en	Open \fIfilename\fR as \fIstream\fR, appending.\T
 .b1
 \T'write'\fB&write\fI|stream|text\fR	ignored	\(en	Write \fItext\fR to file \fIstream\fR.\T
-.b1 0
+.b1
 \T'writec'\fB&writec\fI|stream|text\fR	ignored	\(en	Write \fItext\fR without terminating newline.\T
+.b1 0
+\T'writem'\fB&writem\fI|stream|xx\fR	ignored	\(en	Write contents of string, macro, or diversion \fIxx\fR.\T
 .b1 0
 \T'close'\fB&close\fI|stream\fR		\(en	\(en	Close the file \fIstream\fR.\T
 .mht s_misc
@@ -1622,14 +1624,6 @@ refer to the detailed description on how to include it.
 .bp
 .nf
 .ft R
-.nr zz 3
-.de cl
-.ie \\n+(cl<\n(zz \{\
-.	po +\\n(.lu/\n(zzu
-.	rt\}
-.el \{.po \\n(POu\}
-..
-.nr cl 0 1
 .di zz
 .ta 12nR
 .nf
@@ -1813,9 +1807,19 @@ refer to the detailed description on how to include it.
 \T'while'while	16\T
 \T'write'write	19\T
 \T'writec'writec	19\T
+\T'writem'writem	19\T
 \T'xflag'xflag	1\T
 .tc
 .di
+.nr zz 5
+.nr zo \n(dl+((\n(.l-(\n(zz*\n(dl))/(\n(zz-1))
+.de cl
+.ie \\n+(cl<\n(zz \{\
+.	po +\\n(zou
+.	rt\}
+.el \{.po \\n(POu\}
+..
+.nr cl 0 1
 .nr aa \n(dn/\n(zz
 .ne \n(aau+10p
 .sp
@@ -5362,6 +5366,11 @@ which must have been obtained by a previous \fBopen\fR request.
 \fItext\fR is interpreted in \T'copy mode'\fIcopy mode.\fR\T
 .bta writec
 \fB&writec\fI|stream|text\fR	ignored	\(en	Like \fBwrite\fR but does not write a terminating newline.
+.bta writem
+\fB&writem\fI|stream|xx\fR	ignored	\(en	Write contents of string, macro, or diversion \fIxx\fR.
+No newline is appended,
+so if \fIxx\fR is a string,
+the output does not terminate with a newline.
 .bta close
 \fB&close\fI|stream\fR		\(en	\(en	Close the file \fIstream\fR,
 which must have been obtained by a previous \fBopen\fR request.
