@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.137 (gritter) 9/9/06
+.\" Sccsid @(#)doc.tr	1.138 (gritter) 9/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -5453,9 +5453,9 @@ in the same format as an error message,
 but processing continues.
 .ne 6
 .TS
-allbox center;
-rfB lfB lfB
-n lfB lw(4.0i).
+box center;
+r | l | l
+n | lfB | lw(4.0i).
 Bit	Name	Description
 _
 0	none	No warnings at all.
