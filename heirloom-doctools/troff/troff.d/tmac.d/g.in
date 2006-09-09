@@ -3,7 +3,7 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g.in	1.11 (gritter) 9/4/06
+.\" Sccsid @(#)g.in	1.12 (gritter) 9/9/06
 .\"
 .cp 0
 .lc_ctype en_US
@@ -76,6 +76,7 @@
 .if t \{\
 .	fp \n[.fp] C CW
 .	fp \n[.fp] CR CW
+.	fp \n[.fp] CO CI
 .	char \(%0 \[perthousand]
 .	char \('A \[Aacute]
 .	char \('E \[Eacute]
