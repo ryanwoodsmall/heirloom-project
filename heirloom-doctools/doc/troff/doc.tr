@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.136 (gritter) 9/4/06
+.\" Sccsid @(#)doc.tr	1.137 (gritter) 9/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -96,7 +96,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 9/4/06
+.ds Sccsdate 9/9/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -219,6 +219,8 @@
 .nr nosave 1
 .barebp
 ..
+.de endpage
+..
 .de fz
 .fn
 .nf
@@ -280,6 +282,7 @@
 .if \\n(dn .fz
 .ns \}
 .el \{\
+.endpage
 .po \\n(POu
 .nr S1 \\n(.s
 .ps
@@ -471,13 +474,22 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .pl 2i
 ..
 .em EM
+.de endmacro
+..
 .de TS
 .nr nosave 1
 .sp
+.de endpage endmacro
+.chfo 0
+.T#
+.nr #T 1i+2p
+.endmacro
 ..
 .de T&
 ..
 .de TE
+.de endpage endmacro
+.endmacro
 .nr nosave 0
 .sp
 .ce 0
@@ -1321,9 +1333,11 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'boxa'\fB&boxa\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR, excluding a partially filled line.\T
 .b1
-\T'unformat'\fB&unformat\fI|xx\fR	\(en	\(en	\(en	Strip line break information from diversion \fIxx\fR.\T
+\T'unformat'\fB&unformat\fI|xx\fR	\(en	ignored	\(en	Strip line break information from diversion \fIxx\fR.\T
 .b1
-\T'asciify'\fB&asciify\fI|xx\fR	\(en	\(en	\(en	All characters in diversion \fIxx\fR changed to plain text.\T
+\T'asciify'\fB&asciify\fI|xx\fR	\(en	ignored	\(en	All characters in diversion \fIxx\fR changed to plain text.\T
+.b1
+\T'pull'\fB&pull\fI|xx|N\fR	\(en	ignored	\fBv\fR	Pull text of height \fIN\fR out of diversion \fIxx\fR.\T
 .b1
 \T'wh'\fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Set location trap; negative is w.r.t. page bottom.\T
 .b1
@@ -1750,6 +1764,7 @@ refer to the detailed description on how to include it.
 \T'ps'ps	2\T
 \T'psbb'psbb	23\T
 \T'pso'pso	19\T
+\T'pull'pull	7\T
 \T'rchar'rchar	10\T
 \T'rd'rd	18\T
 \T'recursionlimit'recursionlimit	7\T
@@ -3906,7 +3921,7 @@ requests of this type should not appear when nested diversions are being used.
 .bta boxa
 \fB&boxa\fI|xx\fR	\(en	end	D	Divert and append to \fIxx\fR, excluding a partially filled line.
 .bta unformat
-\fB&unformat\fI|xx\fR	\(en	\(en	\(en	Strip line break information from diversion \fIxx\fR.
+\fB&unformat\fI|xx\fR	\(en	ignored	\(en	Strip line break information from diversion \fIxx\fR.
 All breaks that do not result
 in explicit vertical movement are discarded,
 interword spaces that had been converted
@@ -3915,10 +3930,17 @@ become space characters again,
 the effects of tabulators and field characters are reverted,
 and hyphenated word parts are combined again.
 .bta asciify
-\fB&asciify\fI|xx\fR	\(en	\(en	\(en	All characters in diversion \fIxx\fR changed to plain text.
+\fB&asciify\fI|xx\fR	\(en	ignored	\(en	All characters in diversion \fIxx\fR changed to plain text.
 Has all effects described for \fBunformat\fR
 and additionally discards font and point size information
 and splits substituted ligatures to their individual characters.
+.bta pull
+\fB&pull\fI|xx|N\fR	\(en	ignored	\fBv\fR	Pull text of height \fIN\fR out of diversion \fIxx\fR.
+In contrast to a direct call of \fI&xx\fR,
+only \fIN\fR lines of \fIxx\fR are printed
+and are afterwards removed from \fIxx\fR.
+If the total height of \fIxx\fR is smaller than \fIN\fR,
+an empty diversion remains.
 .bta wh
 \fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Install
 a trap to invoke \fIxx\fR at page position \fIN;\fR
@@ -5429,10 +5451,9 @@ When one of the selected conditions occurs,
 a \fIwarning\fR message is written
 in the same format as an error message,
 but processing continues.
-.sp
 .ne 6
 .TS
-center;
+allbox center;
 rfB lfB lfB
 n lfB lw(4.0i).
 Bit	Name	Description

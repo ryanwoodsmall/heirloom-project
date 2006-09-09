@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.131 (gritter) 9/8/06
+ * Sccsid @(#)tdef.h	1.132 (gritter) 9/9/06
  */
 
 /*
@@ -562,6 +562,7 @@ struct	d {	/* diversion */
 	int	hnl;
 	int	curd;
 	int	flss;
+	int	soff;
 	struct env	*boxenv;
 };
 
@@ -587,6 +588,7 @@ struct	s {	/* stack frame */
 	int	frame_cnt;
 	int	tail_cnt;
 	int	contp;
+	int	pull;
 	enum {
 		LOOP_FREE = 01,
 		LOOP_NEXT = 02,

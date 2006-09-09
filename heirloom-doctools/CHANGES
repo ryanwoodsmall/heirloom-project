@@ -1,4 +1,6 @@
 Release ...
+* [nt]roff: The ".pull" request has been introduced to print text of a given
+  height from a diversion and remove it afterwards.
 * tbl: Can now optionally use graphic drawing commands (troff "\D") instead
   of repeated-character line drawing (troff "\l" and "\L"). The "graphics"
   option enables it per table, and the "-g" command line option enables it

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.102 (gritter) 9/8/06
+ * Sccsid @(#)n7.c	1.103 (gritter) 9/9/06
  */
 
 /*
@@ -92,6 +92,7 @@ int	brflg;
 #undef	iswascii
 #define	iswascii(c)	(((c) & ~(wchar_t)0177) == 0)
 
+static void	chkpull(int);
 static tchar	adjbit(tchar);
 static void	sethtdp(void);
 static void	leftend(tchar, int);
@@ -624,7 +625,7 @@ newline(int a)
 		pchar1((tchar)FLSS);
 		if (flss)
 			lss = flss;
-		i = lss + dip->blss;
+		i = nlss = lss + dip->blss;
 		dip->dnl += i;
 		pchar1((tchar)i);
 		pchar1((tchar)'\n');
@@ -635,8 +636,10 @@ newline(int a)
 			pchar1((tchar)dip->alss);
 			pchar1((tchar)'\n');
 			dip->dnl += dip->alss;
+			nlss += dip->alss;
 			dip->alss = 0;
 		}
+		chkpull(nlss);
 		if (vpt > 0 && dip->ditrap && !dip->ditf && dip->dnl >= dip->ditrap && dip->dimac)
 			if (control(dip->dimac, 0)) {
 				trap++; 
@@ -657,6 +660,7 @@ newline(int a)
 	pchar1((tchar)'\n');
 	flss = 0;
 	lss = j;
+	chkpull(nlss);
 	if (vpt == 0 || numtab[NL].val < pl)
 		goto nl2;
 nl1:
@@ -753,6 +757,17 @@ chkpn(void)
 	}
 }
 
+
+void
+chkpull(int nlss)
+{
+	if (nlss > 0 && frame->pull) {
+		if (nlss >= frame->pull)
+			popi();
+		else
+			frame->pull -= nlss;
+	}
+}
 
 int 
 findt(int a)

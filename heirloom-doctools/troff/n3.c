@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.151 (gritter) 9/8/06
+ * Sccsid @(#)n3.c	1.152 (gritter) 9/9/06
  */
 
 /*
@@ -77,6 +77,7 @@ tchar *corebuf;
 
 static void	_collect(int);
 static int	_findmn(int, int);
+static void	_prwatch(int, int);
 static void	casewatchlength(void);
 static void	caseshift(void);
 static void	casesubstring(void);
@@ -84,6 +85,8 @@ static void	caselength(void);
 static void	caseindex(void);
 static void	caseasciify(void);
 static void	caseunformat(int);
+static void	casepull(void);
+static void	pull(int);
 static int	getls(int, int *, int);
 static void	addcon(int, char *, void(*)(int));
 
@@ -148,6 +151,7 @@ static const struct {
 	{ "papersize",		(void(*)(int))casepapersize },
 	{ "psbb",		(void(*)(int))casepsbb },
 	{ "pso",		(void(*)(int))casepso },
+	{ "pull",		(void(*)(int))casepull },
 	{ "rchar",		(void(*)(int))caserchar },
 	{ "recursionlimit",	(void(*)(int))caserecursionlimit },
 	{ "return",		(void(*)(int))casereturn },
@@ -835,6 +839,8 @@ popi(void)
 	}
 	if (p->contp > 0)
 		contab[p->contp].flags &= ~FLAG_USED;
+	if (p->pull > 0)
+		pull(p->mname);
 	frame = p->pframe;
 	ip = p->pip;
 	pendt = p->ppendt;
@@ -1140,6 +1146,7 @@ casedi(int box)
 				relsev(dip->boxenv);
 				free(dip->boxenv);
 			}
+			prwatch(dip->soff);
 			dip = &d[--dilev];
 			offset = dip->op;
 		} else if (warn & WARN_DI)
@@ -1183,8 +1190,9 @@ casedi(int box)
 		contab[newmn].flags |= FLAG_DIVERSION;
 		if (i != j)
 			maddhash(&contab[newmn]);
-		prwatch(newmn);
+		_prwatch(newmn, 0);
 	}
+	dip->soff = newmn;
 	k = (int *) & dip->dnl;
 	dip->flss = 0;
 	for (j = 0; j < 10; j++)
@@ -1323,6 +1331,12 @@ casewatchlength(void)
 void
 prwatch(int i)
 {
+	_prwatch(i, 1);
+}
+
+static void
+_prwatch(int i, int prc)
+{
 	const char prtab[] = {
 		'a',000,000,000,000,000,000,000,
 		'b','t','n',000,000,000,000,000,
@@ -1338,7 +1352,7 @@ prwatch(int i)
 	if (i < 0 || i >= NM)
 		return;
 	if (contab[i].flags & FLAG_WATCH) {
-		if (watchlength <= 10) {
+		if (watchlength <= 10 || !prc) {
 			errprint("%s: %s %s redefined", macname(lastrq),
 				contab[i].flags & FLAG_STRING ? "string" :
 					contab[i].flags & FLAG_DIVERSION ?
@@ -1781,6 +1795,67 @@ caseunformat(int flag)
 			if (!noout)
 				wbf(c);
 		}
+		wbt(0);
+		if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0)
+			k = contab[oldmn].rq;
+		else {
+			k = i;
+			nlink = 0;
+		}
+		clrmn(oldmn);
+		if (newmn) {
+			if (contab[newmn].rq)
+				munhash(&contab[newmn]);
+			contab[newmn].rq = k;
+			contab[newmn].nlink = nlink;
+			maddhash(&contab[newmn]);
+			prwatch(newmn);
+		}
+	}
+	free(tp);
+	offset = dip->op;
+}
+
+
+static void
+casepull(void)
+{
+	int	i, j, n;
+
+	if (skip(1) || (i = getrq(0)) == 0)
+		return;
+	if ((j = findmn(i)) == -1 || !contab[j].mx) {
+		nosuch(i);
+		return;
+	}
+	if (skip(1) || (n = vnumb(NULL)) <= 0 || nonumb)
+		return;
+	nxf->pull = n;
+	control(i, 0);
+}
+
+
+static void
+pull(int i)
+{
+	int	j, k, sz = 0, nlink;
+	tchar	*tp = NULL, c;
+
+	if (dip != d)
+		wbfl();
+	k = 0;
+	app++;
+	while ((c = rbf()) != 0) {
+		if (k >= sz) {
+			sz += 512;
+			tp = realloc(tp, sz * sizeof *tp);
+		}
+		tp[k++] = c;
+	}
+	app--;
+	if ((offset = finds(i)) != 0) {
+		for (j = 0; j < k; j++)
+			wbf(tp[j]);
 		wbt(0);
 		if (oldmn >= 0 && (nlink = contab[oldmn].nlink) > 0)
 			k = contab[oldmn].rq;
