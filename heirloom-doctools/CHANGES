@@ -15,6 +15,9 @@ Release ...
   when the column widths are computed, and ".T&" can occur at any line.
 * troff: The CW, CI, CB, and CX fonts no longer contain the "fi" and "fl"
   ligatures with the "devps" device. This is consistent with "devpost".
+* [nt]roff: If a word starts with a motion followed by a hyphenation
+  indicator, such as "\h'1m'\%text" or "\|\%text", hyphenation for the
+  word is now suppressed, and no hyphen is generated.
 * [nt]roff: The ".length" and ".index" request now strip an initial """ in
   their last argument to allow initial white space.
 * [nt]roff: The blank line macro is not called when a diversion is reread

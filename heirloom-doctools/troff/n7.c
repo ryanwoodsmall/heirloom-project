@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.105 (gritter) 9/9/06
+ * Sccsid @(#)n7.c	1.106 (gritter) 9/9/06
  */
 
 /*
@@ -1158,7 +1158,7 @@ getword(int x)
 {
 	register int j, k = 0, w;
 	register tchar i = 0, *wp, nexti, gotspc = 0, t;
-	int noword, n;
+	int noword, n, inword = 0;
 #if defined (EUC) && defined (NROFF)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
@@ -1316,6 +1316,10 @@ g0:
 	}
 	if (hyoff != 1) {
 		if (j == ohc) {
+			if (!inword && xflag) {
+				hyoff = 1;
+				goto g1;
+			}
 			hyoff = 2;
 			*hyp++ = wordp;
 			if (hyp > (hyptr + NHYP - 1))
@@ -1374,6 +1378,8 @@ g0:
 	} else
 g1:		nexti = GETCH();
 	j = cbits(i = nexti);
+	if (!ismot(i) && j != ohc)
+		inword = 1;
 #if defined (EUC) && defined (NROFF)
 	if (multi_locale)
 		if (collectmb(i))
