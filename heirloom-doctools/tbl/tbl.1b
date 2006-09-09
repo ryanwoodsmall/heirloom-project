@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)tbl.1b	1.6 (gritter) 9/8/06
+.\" Sccsid @(#)tbl.1b	1.7 (gritter) 9/9/06
 .\" Derived from tbl(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,12 +32,15 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TBL 1B "9/8/06" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TBL 1B "9/9/06" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 tbl \- (BSD) format tables for nroff or troff
 .SH SYNOPSIS
-\fB/usr/ucb/tbl\fR [\fB\-g\fR]
-[\fB\-me\fR|\fB\-mm\fR|\fB\-ms\fR] [\fIfiles\fR] ...
+\fB/usr/ucb/tbl\fR
+[\fB\-g\fR]
+[\fB\-me\fR|\fB\-mm\fR|\fB\-ms\fR]
+[\fB\-TX\fR]
+[\fIfiles\fR] ...
 .SH DESCRIPTION
 .I Tbl
 is a preprocessor for formatting tables for
@@ -121,6 +124,12 @@ With the
 .B \-g
 option,
 graphic drawing commands (i.e. \eD) are used instead.
+.PP
+The
+.B \-TX
+option causes
+.I tbl
+not to produce fractional line motions.
 .SH SEE ALSO
 troff(1B), eqn(1B)
 .br
