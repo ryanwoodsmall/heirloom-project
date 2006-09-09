@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.132 (gritter) 9/9/06
+ * Sccsid @(#)tdef.h	1.133 (gritter) 9/9/06
  */
 
 /*
@@ -563,6 +563,8 @@ struct	d {	/* diversion */
 	int	curd;
 	int	flss;
 	int	soff;
+	int	mlist[NTRAP];
+	int	nlist[NTRAP];
 	struct env	*boxenv;
 };
 

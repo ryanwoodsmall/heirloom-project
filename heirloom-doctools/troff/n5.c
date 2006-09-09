@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.92 (gritter) 9/8/06
+ * Sccsid @(#)n5.c	1.93 (gritter) 9/9/06
  */
 
 /*
@@ -535,8 +535,17 @@ casepl(void)
 }
 
 
-void
-casewh(void)
+static void
+chkt(struct d *dp, int n)
+{
+	if (n <= 0 && dp != d)
+		if (warn & WARN_RANGE)
+			errprint("trap at %d not effective in diversion", n);
+}
+
+
+static void
+_casewh(struct d *dp)
 {
 	register int i, j, k;
 
@@ -547,25 +556,40 @@ casewh(void)
 		return;
 	skip(0);
 	j = getrq(1);
-	if ((k = findn(i)) != NTRAP) {
-		mlist[k] = j;
+	if ((k = findn(dp, i)) != NTRAP) {
+		dp->mlist[k] = j;
 		return;
 	}
 	for (k = 0; k < NTRAP; k++)
-		if (mlist[k] == 0)
+		if (dp->mlist[k] == 0)
 			break;
 	if (k == NTRAP) {
 		flusho();
 		errprint("cannot plant trap.");
 		return;
 	}
-	mlist[k] = j;
-	nlist[k] = i;
+	dp->mlist[k] = j;
+	dp->nlist[k] = i;
+	chkt(dp, i);
 }
 
 
 void
-casech(void)
+casewh(void)
+{
+	_casewh(d);
+}
+
+
+void
+casedwh(void)
+{
+	_casewh(dip);
+}
+
+
+static void
+_casech(struct d *dp)
 {
 	register int i, j, k;
 
@@ -575,7 +599,7 @@ casech(void)
 		return;
 	else  {
 		for (k = 0; k < NTRAP; k++)
-			if (mlist[k] == j)
+			if (dp->mlist[k] == j)
 				break;
 	}
 	if (k == NTRAP)
@@ -583,8 +607,23 @@ casech(void)
 	skip(0);
 	i = vnumb((int *)0);
 	if (nonumb)
-		mlist[k] = 0;
-	nlist[k] = i;
+		dp->mlist[k] = 0;
+	dp->nlist[k] = i;
+	chkt(dp, i);
+}
+
+
+void
+casech(void)
+{
+	_casech(d);
+}
+
+
+void
+casedch(void)
+{
+	_casech(dip);
 }
 
 
@@ -606,12 +645,12 @@ setolt(void)
 
 
 int 
-findn(int i)
+findn(struct d *dp, int i)
 {
 	register int k;
 
 	for (k = 0; k < NTRAP; k++)
-		if ((nlist[k] == i) && (mlist[k] != 0))
+		if ((dp->nlist[k] == i) && (dp->mlist[k] != 0))
 			break;
 	return(k);
 }

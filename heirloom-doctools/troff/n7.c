@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.103 (gritter) 9/9/06
+ * Sccsid @(#)n7.c	1.104 (gritter) 9/9/06
  */
 
 /*
@@ -93,6 +93,7 @@ int	brflg;
 #define	iswascii(c)	(((c) & ~(wchar_t)0177) == 0)
 
 static void	chkpull(int);
+static int	_findt(struct d *, int, int);
 static tchar	adjbit(tchar);
 static void	sethtdp(void);
 static void	leftend(tchar, int);
@@ -615,7 +616,7 @@ storelsh(tchar c, int w)
 void
 newline(int a)
 {
-	register int i, j, nlss = 0;
+	register int i, j, nlss = 0, nl;
 	int	opn;
 
 	if (a)
@@ -645,7 +646,7 @@ newline(int a)
 				trap++; 
 				dip->ditf++;
 			}
-		return;
+		goto nlt;
 	}
 	j = lss;
 	if (flss)
@@ -708,30 +709,35 @@ nl2:
 		nolt = 0;
 		free(olt);
 	}
+nlt:
+	if (dip != d)
+		nl = dip->dnl;
+	else
+		nl = numtab[NL].val;
 	if (vpt <= 0)
 		/*EMPTY*/;
-	else if (numtab[NL].val == 0) {
-		if ((j = findn(0)) != NTRAP)
-			trap |= control(mlist[j], 0);
-	} else if ((i = findt(numtab[NL].val - nlss)) <= nlss) {
-		if ((j = findn1(numtab[NL].val - nlss + i)) == NTRAP) {
+	else if (nl == 0) {
+		if ((j = findn(dip, 0)) != NTRAP)
+			trap |= control(dip->mlist[j], 0);
+	} else if ((i = _findt(dip, nl - nlss, 0)) <= nlss) {
+		if ((j = findn1(dip, nl - nlss + i)) == NTRAP) {
 			flusho();
 			errprint("Trap botch.");
 			done2(-5);
 		}
-		trap |= control(mlist[j], 0);
+		trap |= control(dip->mlist[j], 0);
 	}
 }
 
 
 int 
-findn1(int a)
+findn1(struct d *dp, int a)
 {
 	register int i, j;
 
 	for (i = 0; i < NTRAP; i++) {
-		if (mlist[i]) {
-			if ((j = nlist[i]) < 0)
+		if (dp->mlist[i]) {
+			if ((j = dp->nlist[i]) < 0 && dp == d)
 				j += pl;
 			if (j == a)
 				break;
@@ -758,7 +764,7 @@ chkpn(void)
 }
 
 
-void
+static void
 chkpull(int nlss)
 {
 	if (nlss > 0 && frame->pull) {
@@ -770,19 +776,24 @@ chkpull(int nlss)
 }
 
 int 
-findt(int a)
+findt(struct d *dp, int a)
+{
+	return _findt(dp, a, 1);
+}
+
+static int
+_findt(struct d *dp, int a, int maydi)
 {
 	register int i, j, k;
 
 	k = INT_MAX;
-	if (dip != d) {
+	if (dip != d && maydi) {
 		if (dip->dimac && (i = dip->ditrap - a) > 0)
 			k = i;
-		return(k);
 	}
 	for (i = 0; i < NTRAP; i++) {
-		if (mlist[i]) {
-			if ((j = nlist[i]) < 0)
+		if (dp->mlist[i]) {
+			if ((j = dp->nlist[i]) < 0 && dp == d)
 				j += pl;
 			if ((j -= a) <= 0)
 				continue;
@@ -790,9 +801,11 @@ findt(int a)
 				k = j;
 		}
 	}
-	i = pl - a;
-	if (k > i)
-		k = i;
+	if (dp == d) {
+		i = pl - a;
+		if (k > i)
+			k = i;
+	}
 	return(k);
 }
 
@@ -806,7 +819,7 @@ findt1(void)
 		i = dip->dnl;
 	else 
 		i = numtab[NL].val;
-	return(findt(i));
+	return(findt(dip, i));
 }
 
 
@@ -834,7 +847,7 @@ eject(struct s *a)
 		return;
 e1:
 	savlss = lss;
-	lss = findt(numtab[NL].val);
+	lss = findt(d, numtab[NL].val);
 	newline(0);
 	lss = savlss;
 	if (numtab[NL].val && !trap)

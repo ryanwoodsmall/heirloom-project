@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.152 (gritter) 9/9/06
+ * Sccsid @(#)n3.c	1.153 (gritter) 9/9/06
  */
 
 /*
@@ -111,6 +111,8 @@ static const struct {
 	{ "close",		(void(*)(int))caseclose },
 	{ "continue",		(void(*)(int))casecontinue },
 	{ "cropat",		(void(*)(int))casecropat },
+	{ "dch",		(void(*)(int))casedch },
+	{ "dwh",		(void(*)(int))casedwh },
 	{ "ecs",		(void(*)(int))caseecs },
 	{ "ecr",		(void(*)(int))caseecr },
 	{ "errprint",		(void(*)(int))caseerrprint },
@@ -1197,6 +1199,8 @@ casedi(int box)
 	dip->flss = 0;
 	for (j = 0; j < 10; j++)
 		k[j] = 0;	/*not op and curd*/
+	memset(dip->mlist, 0, sizeof dip->mlist);
+	memset(dip->nlist, 0, sizeof dip->nlist);
 	if (box) {
 		dip->boxenv = malloc(sizeof *dip->boxenv);
 		*dip->boxenv = env;

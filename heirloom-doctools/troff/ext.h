@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.85 (gritter) 9/8/06
+ * Sccsid @(#)ext.h	1.86 (gritter) 9/9/06
  */
 
 /*
@@ -125,7 +125,6 @@ extern	int	mflg;
 extern	int	mfont;
 extern	int	minflg;
 extern	int	minspc;
-extern	int	mlist[NTRAP];
 extern	int	mpts;
 extern	int	ndone;
 extern	int	newmn;
@@ -135,7 +134,6 @@ extern	int	nfonts;
 extern	int	nform;
 extern	int	nhyp;
 extern	int	nlflg;
-extern	int	nlist[NTRAP];
 extern	int	nmfi;
 extern	int	no_out;
 extern	int	nofeed;
@@ -424,10 +422,12 @@ extern	void	casels(void);
 extern	void	casepo(void);
 extern	void	casepl(void);
 extern	void	casewh(void);
+extern	void	casedwh(void);
 extern	void	casech(void);
+extern	void	casedch(void);
 extern	void	casevpt(void);
 extern	tchar	setolt(void);
-extern	int	findn(int);
+extern	int	findn(struct d *, int);
 extern	void	casepn(void);
 extern	void	casebp(void);
 extern	void	casetm(int);
@@ -499,9 +499,9 @@ extern	void	callsp(void);
 extern	void	ckul(void);
 extern	int	storeline(register tchar, int);
 extern	void	newline(int);
-extern	int	findn1(int);
+extern	int	findn1(struct d *, int);
 extern	void	chkpn(void);
-extern	int	findt(int);
+extern	int	findt(struct d *, int);
 extern	int	findt1(void);
 extern	void	eject(struct s *);
 extern	int	movword(void);

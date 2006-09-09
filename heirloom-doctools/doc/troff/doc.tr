@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.138 (gritter) 9/9/06
+.\" Sccsid @(#)doc.tr	1.139 (gritter) 9/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -219,8 +219,6 @@
 .nr nosave 1
 .barebp
 ..
-.de endpage
-..
 .de fz
 .fn
 .nf
@@ -282,7 +280,7 @@
 .if \\n(dn .fz
 .ns \}
 .el \{\
-.endpage
+.tblbox
 .po \\n(POu
 .nr S1 \\n(.s
 .ps
@@ -474,23 +472,21 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .pl 2i
 ..
 .em EM
-.de endmacro
-..
 .de TS
 .nr nosave 1
 .sp
-.de endpage endmacro
-.chfo 0
-.T#
-.nr #T 1i+2p
-.endmacro
 ..
 .de T&
 ..
+.ds T#
+.de tblbox
+.chfo 0
+.T#
+.nr #T 1i+2p
+..
 .de TE
-.de endpage endmacro
-.endmacro
 .nr nosave 0
+.ds T#
 .sp
 .ce 0
 .ft R
@@ -1343,6 +1339,10 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'ch'\fB&ch\fI|xx|N\fR	\(en	\(en	\fBv\fR	Change trap location.\T
 .b1
+\T'dwh'\fB&dwh\fI|N|xx\fR	\(en	\(en	D,\fBv\fR	Set location trap in current diversion.\T
+.b1
+\T'dch'\fB&dch\fI|xx|N\fR	\(en	\(en	D,\fBv\fR	Change trap location in current diversion.\T
+.b1
 \T'dt'\fB&dt\fI|N|xx\fR	\(en	off	D,\fBv\fR	Set a diversion trap.\T
 .b1
 \T'vpt'\fB&vpt\fI|N\fR	1	ignored	\(en	Enable or disable vertical position traps.\T
@@ -1672,10 +1672,12 @@ refer to the detailed description on how to include it.
 \T'cs'cs	2\T
 \T'cu'cu	10\T
 \T'da'da	7\T
+\T'dch'dch	7\T
 \T'de'de	7\T
 \T'di'di	7\T
 \T'do'do	1\T
 \T'ds'ds	7\T
+\T'dwh'dwh	7\T
 \T'dt'dt	7\T
 \T'ec'ec	10\T
 \T'ecs'ecs	10\T
@@ -2020,6 +2022,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.cht'11.2\T	\T'n_.cht'\fB&cht\fR\T	\T'n_.cht'Visual height above base line of previous character.\T
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
+\T'n_.dilev'7.4\T	\T'n_.dilev'\fB&dilev\fR\T	\T'n_.dilev'Current diversion level.\T
 \T'n_.ev'17\T	\T'n_.ev'\fB&ev\fR\T	\T'n_.ev'Name of current environment [sic].\T
 \T'n_.f'2.2\T	\T'n_.f'\fB&f\fR\T	\T'n_.f'Current font as physical quadrant (1-255).\T
 \T'n_.fp'2.2\T	\T'n_.fp'\fB&fp\fR\T	\T'n_.fp'Next unused physical font quadrant.\T
@@ -3759,6 +3762,8 @@ the internally-saved marked place (see \T'mk'\fBmk\fR\T and \T'rt'\fBrt\fR\T),
 the current vertical place (\A'n_.d'\fB.d\fR register),
 the current high-water text base-line \T'n_.h'(\fB.h\fR register)\T,
 and the current diversion name (\A'n_.z'\fB.z\fR register).
+The current diversion level is available
+in the \A'n_.dilev'\fB.dilev\fR register.
 .pg
 A previous partially filled line is included when a diversion begins.
 A partially filled line at the end of a diversion
@@ -3773,9 +3778,9 @@ from within the diversion.
 The behavior is otherwise the same as with a standard diversion.
 .sc
 \A'c_trap'Traps.
-Four types of trap mechanisms are available\(empage traps,
-output-line traps, a diversion trap, and
-an input-line-count trap.
+Five types of trap mechanisms are available\(empage traps,
+output-line traps, a single diversion trap, multiple diversion traps,
+and an input-line-count trap.
 Macro-invocation traps may be planted using
 \T'wh'\fBwh\fR\T at any page position including the top.
 This trap position may be changed using \T'ch'\fBch\fR.\T
@@ -3814,7 +3819,12 @@ They can thus be used to determine e.g. the effective page number
 of the surrounding text,
 even when it had originally been diverted on another page.
 .pg
-A macro-invocation trap effective in the current diversion may be planted using \T'dt'\fBdt\fR.\T
+A single macro-invocation trap effective in the current diversion
+may be planted using \T'dt'\fBdt\fR.\T
+If another \fBdt\fR follows in the same diversion,
+the trap position is changed.
+Multiple traps may be planted in the current diversion
+using \T'dwh'\fBdwh\fR\T and \T'dch'\fBdch\fR\T.
 The \fB.t\fR register works in a diversion; if there is no subsequent trap a \fIlarge\fR
 distance is returned.
 For a description of input-line-count traps, see \T'it'\fBit\fR below.\T
@@ -3953,6 +3963,21 @@ In the absence of \fIxx\fR, the first found trap at \fIN\fR, if any, is removed.
 \fB&ch\fI|xx|N\fR	\(en	\(en	\fBv\fR	Change
 the trap position for macro \fIxx\fR to be \fIN\fR.
 In the absence of \fIN\fR, the trap, if any, is removed.
+.bta dwh
+\fB&dwh\fI|N|xx\fR	\(en	\(en	D,\fBv\fR	Set location trap in current diversion.
+Diversion traps planted with \fBdt\fR are not affected;
+if both a \fBdwh\fR and a \fBdt\fR trap are set at the same position,
+both are effective.
+A \fBdwh\fR trap previously set at the same position is replaced.
+At the top non-diversion level,
+it is equivalent to \fBwh\fR.
+Otherwise with a negative or zero \fIN\fR,
+the trap will never be invoked
+since a diversion has no bottom
+and can never reach its top again.
+.bta dch
+\fB&dch\fI|xx|N\fR	\(en	\(en	D,\fBv\fR	Change trap location in current diversion;
+equivalent to \fBch\fR at the top non-diversion level.
 .bta dt
 \fB&dt\fI|N|xx\fR	\(en	off	D,\fBv\fR	Install a diversion trap
 at position \fIN\fR in the \fIcurrent\fR diversion to invoke
