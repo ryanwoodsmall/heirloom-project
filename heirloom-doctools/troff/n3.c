@@ -1822,14 +1822,14 @@ casepull(void)
 {
 	int	i, j, n;
 
+	if (skip(1) || (n = vnumb(NULL)) <= 0 || nonumb)
+		return;
 	if (skip(1) || (i = getrq(0)) == 0)
 		return;
 	if ((j = findmn(i)) == -1 || !contab[j].mx) {
 		nosuch(i);
 		return;
 	}
-	if (skip(1) || (n = vnumb(NULL)) <= 0 || nonumb)
-		return;
 	nxf->pull = n;
 	control(i, 0);
 }

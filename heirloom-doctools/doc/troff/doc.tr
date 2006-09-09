@@ -1337,7 +1337,7 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'asciify'\fB&asciify\fI|xx\fR	\(en	ignored	\(en	All characters in diversion \fIxx\fR changed to plain text.\T
 .b1
-\T'pull'\fB&pull\fI|xx|N\fR	\(en	ignored	\fBv\fR	Pull text of height \fIN\fR out of diversion \fIxx\fR.\T
+\T'pull'\fB&pull\fI|N|xx\fR	\(en	ignored	\fBv\fR	Pull text of height \fIN\fR out of diversion \fIxx\fR.\T
 .b1
 \T'wh'\fB&wh\fI|N|xx\fR	\(en	\(en	\fBv\fR	Set location trap; negative is w.r.t. page bottom.\T
 .b1
@@ -3935,7 +3935,7 @@ Has all effects described for \fBunformat\fR
 and additionally discards font and point size information
 and splits substituted ligatures to their individual characters.
 .bta pull
-\fB&pull\fI|xx|N\fR	\(en	ignored	\fBv\fR	Pull text of height \fIN\fR out of diversion \fIxx\fR.
+\fB&pull\fI|N|xx\fR	\(en	ignored	\fBv\fR	Pull text of height \fIN\fR out of diversion \fIxx\fR.
 In contrast to a direct call of \fI&xx\fR,
 only \fIN\fR lines of \fIxx\fR are printed
 and are afterwards removed from \fIxx\fR.
