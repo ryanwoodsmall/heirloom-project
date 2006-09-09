@@ -13,6 +13,8 @@ Release ...
 * tbl: The static limits on the number of table lines, columns, and heading
   lines have been removed. In effect, all lines of a table are considered
   when the column widths are computed, and ".T&" can occur at any line.
+* troff: The CW, CI, CB, and CX fonts no longer contain the "fi" and "fl"
+  ligatures with the "devps" device. This is consistent with "devpost".
 * [nt]roff: The blank line macro is not called when a diversion is reread
   in nofill mode anymore.
 * troff: The escape sequence "\s[0]" now resets the point size to the
