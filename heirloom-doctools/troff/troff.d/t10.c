@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.87 (gritter) 9/5/06
+ * Sccsid @(#)t10.c	1.88 (gritter) 9/9/06
  */
 
 /*
@@ -486,6 +486,10 @@ ptout0(tchar *pi, tchar *pend)
 		case LINKOFF:
 			ptlink(sbits(i));
 			linkout = 0;
+			return(pi+outsize);
+		case INDENT:
+			if (linkout)
+				linkhp += sbits(i);
 			return(pi+outsize);
 		case LETSP:
 			lettrack = sbits(i);
