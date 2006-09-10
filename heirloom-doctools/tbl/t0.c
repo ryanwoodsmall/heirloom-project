@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t0.c	1.11 (gritter) 9/8/06
+ * Sccsid @(#)t0.c	1.12 (gritter) 9/11/06
  */
 
  /* t0.c: storage allocation */
@@ -74,6 +74,7 @@ int texct = 0;
 int texct2 = -1;
 char texstr[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ0123456789";
 int linstart;
+int nokeep;
 char *exstore, *exlim;
 const char *progname;
 FILE *tabin  /*= stdin */;

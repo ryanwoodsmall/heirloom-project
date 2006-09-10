@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.18 (gritter) 9/9/06
+ * Sccsid @(#)t..c	1.19 (gritter) 9/11/06
  */
 
 /* t..c : external declarations */
@@ -84,6 +84,7 @@ extern int texct;
 extern int texct2;
 extern char texstr[];
 extern int linstart;
+extern int nokeep;
 
 extern const char *progname;
 

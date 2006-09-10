@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t3.c	1.11 (gritter) 9/9/06
+ * Sccsid @(#)t3.c	1.12 (gritter) 9/11/06
  */
 
  /* t3.c: interpret commands affecting whole table */
@@ -50,6 +50,8 @@ struct optstr {char *optnam; int *optadd;} options [] = {
 	"DELIM", &delim1,
 	"graphics", &graphics,
 	"GRAPICS", &graphics,
+	"nokeep", &nokeep,
+	"NOKEEP", &nokeep,
 	0,0};
 void
 getcomm(void)
