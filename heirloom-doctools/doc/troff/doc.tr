@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.143 (gritter) 9/11/06
+.\" Sccsid @(#)doc.tr	1.144 (gritter) 9/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -6367,6 +6367,11 @@ A control or escape character written in a diversion
 has no special meaning
 if the diversion is re-read in \*(GR compatibility mode.
 .pg
+Unless a string is interpolated with explicit arguments,
+the arguments to the surrounding macro instance remain visible
+and can be referenced by the \T'e_$'\fB\e$\fR\T escape sequence
+inside the string in \*(GR compatibility mode.
+.pg
 Any call to the \fBcp\fR request
 activates the following \*(GR compatibility escape sequences;
 any call to the \T'xflag'\fBxflag\fR\T request disables them.
@@ -6442,9 +6447,12 @@ It is not expected that the \*(GR compatibility macros
 are used to format documents
 that require compatibility with traditional \*[TR.]
 .pg
+.nr nosave 1
 The \T'ftr'\fBftr\fR\T request is removed
 since the \*(GR request with the same name
 provides completely different semantics.
+.br
+.nr nosave 0
 .pg
 \T'fallback'\fBfallback\fR\T is used to emulate \fBfspecial\fR;
 these requests should be compatible.

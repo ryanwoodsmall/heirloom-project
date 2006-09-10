@@ -26,6 +26,9 @@ Release ...
 * [nt]roff: If a word starts with a motion followed by a hyphenation
   indicator, such as "\h'1m'\%text" or "\|\%text", hyphenation for the
   word is now suppressed, and no hyphen is generated.
+* [nt]roff: In groff compatibility mode, unless a string is interpolated
+  with explicit arguments, the arguments to the surrounding macro instance
+  remain visible and can be referenced by "\$" from within the string.
 * [nt]roff: The ".length" and ".index" request now strip an initial """ in
   their last argument to allow initial white space.
 * [nt]roff: The blank line macro is not called when a diversion is reread

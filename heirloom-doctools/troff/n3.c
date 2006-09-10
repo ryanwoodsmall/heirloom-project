@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.159 (gritter) 9/10/06
+ * Sccsid @(#)n3.c	1.160 (gritter) 9/11/06
  */
 
 /*
@@ -1165,7 +1165,14 @@ seta(void)
 	char q[] = { 0, 0 };
 	struct s	*s;
 
-	for (s = frame; s->loopf && s != stk; s = s->pframe);
+	for (s = frame; s != stk; s = s->pframe) {
+		if (s->loopf)
+			continue;
+		if (gflag && s->contp && s->contp->flags & FLAG_STRING
+				&& s->nargs == 0)
+			continue;
+		break;
+	}
 	switch (c = cbits(getch())) {
 	case '@':
 		q[0] = '"';
