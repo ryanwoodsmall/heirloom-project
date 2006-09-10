@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.88 (gritter) 9/9/06
+ * Sccsid @(#)t10.c	1.90 (gritter) 9/11/06
  */
 
 /*
@@ -896,11 +896,12 @@ ptlink(int n)
 static void
 ptyon(int i)
 {
+	struct contab	*cp;
 	tchar	c;
-	int	j, k, nl;
+	int	k, nl;
 	filep	savip;
 
-	if ((j = findmn(i)) < 0 || !contab[j].mx) {
+	if ((cp = findmx(i)) == NULL || !cp->mx) {
 		nosuch(i);
 		return;
 	}
@@ -912,7 +913,7 @@ ptyon(int i)
 		ptlead();
 	fdprintf(ptid, "x X ");
 	savip = ip;
-	ip = (filep)contab[j].mx;
+	ip = (filep)cp->mx;
 	app = 1;
 	k = -1;
 	nl = 0;

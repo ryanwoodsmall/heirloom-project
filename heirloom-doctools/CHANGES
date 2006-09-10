@@ -1,4 +1,8 @@
 Release ...
+* [nt]roff: Local strings and number registers are now supported. They can
+  be defined using ".lds", ".lnr", and ".lnrf". A local string or register
+  is visible only in the instance of the macro in which is has been defined
+  and can then be accessed like a standard global string or register.
 * [nt]roff: The ".pull" request has been introduced to print text of a given
   height from a diversion and remove it afterwards.
 * [nt]roff: The ".writem" request has been added to write the contents of

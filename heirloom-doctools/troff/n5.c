@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.95 (gritter) 9/9/06
+ * Sccsid @(#)n5.c	1.97 (gritter) 9/10/06
  */
 
 /*
@@ -530,7 +530,7 @@ casepl(void)
 		pl = i;
 	if (numtab[NL].val > pl) {
 		numtab[NL].val = pl;
-		prwatchn(NL);
+		prwatchn(&numtab[NL]);
 	}
 }
 
@@ -664,7 +664,7 @@ casepn(void)
 	skip(1);
 	noscale++;
 	i = max(inumb(&numtab[PN].val), 0);
-	prwatchn(PN);
+	prwatchn(&numtab[PN]);
 	noscale = 0;
 	if (!nonumb) {
 		npn = i;
@@ -705,6 +705,7 @@ tmtmcwr(int ab, int tmc, int wr, int ep, int tmm)
 		'!',000,000,000,000,000,000,'~',
 		000
 	};
+	struct contab	*cp;
 	register int i, j;
 	tchar	c;
 	char	tmbuf[NTM];
@@ -715,12 +716,12 @@ tmtmcwr(int ab, int tmc, int wr, int ep, int tmm)
 	if (tmm) {
 		if (skip(1) || (i = getrq(0)) == 0)
 			return;
-		if ((j = findmn(i)) == -1 || !contab[j].mx) {
+		if ((cp = findmn(i)) == NULL || !cp->mx) {
 			nosuch(i);
 			return;
 		}
 		savip = ip;
-		ip = (filep)contab[j].mx;
+		ip = (filep)cp->mx;
 		app++;
 		copyf++;
 	} else {
@@ -1412,7 +1413,8 @@ caseif(int x)
 		warn &= ~(WARN_MAC|WARN_SPACE|WARN_REG);
 		if (!skip(1)) {
 			j = getrq(2);
-			true = (cbits(i) == 'r' ? usedr(j) : findmn(j)) >= 0;
+			true = (cbits(i) == 'r' ?
+					usedr(j) != NULL : findmn(j) != NULL);
 		}
 		warn = w;
 		break;
@@ -2031,7 +2033,8 @@ casenhychar(void)
 void
 casemk(void)
 {
-	register int i, j, k;
+	register int i, j;
+	struct numtab	*np;
 
 	if (dip != d)
 		j = dip->dnl; 
@@ -2043,8 +2046,9 @@ casemk(void)
 	}
 	if ((i = getrq(1)) == 0)
 		return;
-	numtab[k = findr(i)].val = j;
-	prwatchn(k);
+	np = findr(i);
+	np->val = j;
+	prwatchn(np);
 }
 
 
@@ -2091,7 +2095,7 @@ casenm(void)
 	i = inumb(&numtab[LN].val);
 	if (!nonumb)
 		numtab[LN].val = max(i, 0);
-	prwatchn(LN);
+	prwatchn(&numtab[LN]);
 	getnm(&ndf, 1);
 	getnm(&nms, 0);
 	getnm(&ni, 0);

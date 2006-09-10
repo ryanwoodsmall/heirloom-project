@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.30 (gritter) 9/5/06
+ * Sccsid @(#)n2.c	1.31 (gritter) 9/10/06
  */
 
 /*
@@ -377,7 +377,7 @@ done(int x)
 	register int i;
 
 	error |= x;
-	app = ds = lgf = 0;
+	dl = app = ds = lgf = 0;
 	if (i = em) {
 		donef = -1;
 		em = 0;

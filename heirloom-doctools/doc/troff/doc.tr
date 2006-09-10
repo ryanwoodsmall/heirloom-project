@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.142 (gritter) 9/10/06
+.\" Sccsid @(#)doc.tr	1.143 (gritter) 9/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 9/10/06
+.ds Sccsdate 9/11/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -215,6 +215,7 @@
 .if dmx .mx
 .nr cl 0 1
 .mk
+.put-table-header
 ..
 .rn bp barebp
 .de bp
@@ -477,16 +478,37 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .de TS
 .nr nosave 1
 .sp
+.ie '\\$1'H' \{\
+.di table-header
+.\}
+.el .ds table-header
+..
+.de TH
+.nr T. 0
+.T#
+.di
+.put-table-header
+..
+.de put-table-header
+.if d table-header \{\
+.lnr save-in \\n(.i
+.in 0
+.table-header
+.in \\n[save-in]u
+.mk #T
+.\}
 ..
 .de T&
 ..
 .ds T#
 .de tblbox
 .chfo 0
+.nr T. 1
 .T#
 .nr #T 1i+2p
 ..
 .de TE
+.rm table-header
 .nr nosave 0
 .ds T#
 .sp
@@ -1313,6 +1335,8 @@ Macros, Strings, Diversion, and Position Traps
 .b1
 \T'as'\fB&as\fI|xx|string\fR	\(en	ignored	\(en	Append \fIstring\fR to string \fIxx\fR.\T
 .b1
+\T'lds'\fB&lds\fI|xx|string\fR	\(en	ignored	\(en	Define local string \fIxx\fR containing \fIstring\fR.\T
+.b1
 \T'substring'\fB&substring\fI|xx|N|\fR[\fIM\fR]	\fIM\fR\(eq\|\(mi1	\(en	Replace string \fIxx\fR by its substring between \fIN\fR and \fIM\fR.\T
 .b1
 \T'length'\fB&length\fI|R|string\fR	\fIR\fR|set|to|0	\(en	Store the length of \fIstring\fR in register \fIR\fR.\T
@@ -1372,6 +1396,10 @@ Number Registers
 \T'nr'\fB&nr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	Define and set number register \fIR\fR; auto-increment by \fIM\fR.\T
 .b1
 \T'nrf'\fB&nrf\fI|R|\(+-F|G\fR		\(en	\fBu\fR	Define and set floating-point register \fIR\fR; auto-increment by \fIG\fR.\T
+.b1
+\T'lnr'\fB&lnr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	Define and set local number register \fIR\fR.\T
+.b1
+\T'lnrf'\fB&lnrf\fI|R|\(+-F|G\fR		\(en	\fBu\fR	Define and set local floating-point register \fIR\fR.\T
 .b1
 \T'af'\fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format to register \fIR\fR (\fIc=\fB1\fR, \fBi\fR, \fBI\fR, \fBa\fR, \fBA\fR).\T
 .b1
@@ -1722,6 +1750,7 @@ refer to the detailed description on how to include it.
 \T'kernpair'kernpair	4\T
 \T'lc'lc	9\T
 \T'lc_ctype'lc_ctype	2\T
+\T'lds'lds	7\T
 \T'length'length	7\T
 \T'letadj'letadj	4\T
 \T'lf'lf	20\T
@@ -1729,6 +1758,8 @@ refer to the detailed description on how to include it.
 \T'lhang'lhang	4\T
 \T'li'li	10\T
 \T'll'll	6\T
+\T'lnr'lnr	8\T
+\T'lnrf'lnrf	8\T
 \T'lpfx'lpfx	20\T
 \T'ls'ls	5\T
 \T'lt'lt	14\T
@@ -3869,6 +3900,35 @@ but must actually occur in the last line
 for tail-recursion elimination to become effective,
 although it may be prefixed by \T'if'\fB&if\fR\T or \T'el'\fB&el\fR\T
 or followed by \T'e_}'\fB\e}\fR\T.
+.sc
+\A'c_local_strings'Local strings.
+Strings, macros, and diversions are, once defined,
+normally accessible from any part of a \*(TR program.
+Local strings, defined with \fBlds\fR,
+are accessible only within the currently executing macro instance,
+and are not inherited to macros invoked from them.
+When the currently executing macro terminates,
+they are automatically deleted,
+and all associated storage is reclaimed.
+.xx
+As long as a local string named \fIxx\fR exists,
+any reference with \fB\e(\fIxx\fR or \fB\e[\fIxx\fB]\fR
+retrieves the value of the local string;
+the global string \fIxx\fR, if any, becomes inaccessible by this method.
+Calls to \fBas\fR, \fBsubstring\fR, \fBindex\fR, and \fBchop\fR
+modify the local string.
+\T'watch'\fBwatch\fR\T with the name of a local string as argument
+notifies on modifications of the local string.
+\fBrm\fR removes a local string and
+possibly makes a global string visible again,
+\fBrn\fR renames a local string to another local string,
+and \fBals\fR creates a local alias to a local string.
+.xx
+It is not allowed to define local macros or diversions.
+Calls to \fI&xx\fR or \fB\'\fIxx\fR reference a global macro or diversion
+even if a local string \fIxx\fR exists.
+\T'c_trap'Traps\T and the \T'e_Y'\fB\eY\fR\T escape sequence
+always operate on global macros or diversions.
 .h1
 .bta de
 \A'e_.'\fB&de\fI|xx|yy\fR	\(en	\fI.yy=\fB..\fR	\(en	Define or redefine the macro \fIxx\fR.
@@ -3896,6 +3956,9 @@ initial blanks.
 \fB&as\fI|xx|string\fR	\(en	ignored	\(en	Append
 \fIstring\fR to string \fIxx\fR
 (append version of \fBds\fR).
+.bta lds
+\fB&lds\fI|xx|string\fR	\(en	ignored	\(en	Define local string \fIxx\fR containing \fIstring\fR.
+Equivalent to \fBds\fR at the top non-macro level.
 .bta substring
 \fB&substring\fI|xx|N|\fR[\fIM\fR]	\fIM\fR\(eq\|\(mi1	\(en	Replace string \fIxx\fR by its substring between indices \fIN\fR and \fIM\fR.
 \fIN\fR and \fIM\fR start at 0.
@@ -4108,6 +4171,31 @@ lower-case sequential alphabetic,
 or
 upper-case sequential alphabetic
 according to the format specified by \T'af'\fBaf\fR\T.
+.xx
+Local number registers can be created and modified
+using \fBlnr\fR and \fBlnrf\fR.
+Like \T'c_local_strings'local strings,\T
+local registers are accessible only
+within the currently executing macro instance,
+are not inherited to macros invoked from them,
+and are deleted when the current macro returns.
+.xx
+The existence of a local number register \fIxx\fR
+makes the global number register \fIxx\fR, if any, completely inaccessible.
+The sequences
+\fB\en(\fIxx\fR and \fB\en[\fIxx\fB]\fR
+retrieve the value of the local register,
+\fB\eR\fI'xx\|...'\fR,
+\fB\en+(\fIxx\fR and \fB\en+[\fIxx\fB]\fR (and likewise) modify it,
+and \fB\eg(\fIxx\fR and \fB\eg[\fIxx\fB]\fR retrieve its format.
+Subsequent calls to \fBnr\fR, \fBnrf\fR, \fBaf\fR,
+\T'length'\fBlength\fR\T, and \T'index'\fBindex\fR\T
+with \fIxx\fR as argument modify the local register.
+\T'watchn'\fBwatchn\fR\T notifies on modifications of the local register.
+\fBrr\fR removes a local register and
+possibly makes a global register visible again,
+\fBrnn\fR renames a local register to another local register,
+and \fBaln\fR creates a local alias to a local register.
 .h1
 .bta nr
 \fB&nr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	\
@@ -4125,6 +4213,10 @@ are performed using floating-point values.
 The increment for auto-incrementing,
 which also is a floating-point value,
 is set to \fIG\fR.
+.bta lnr
+\fB&lnr\fI|R|\(+-N|M\fR		\(en	\fBu\fR	Define and set local number register \fIR\fR.
+.bta lnrf
+\fB&lnrf\fI|R|\(+-F|G\fR		\(en	\fBu\fR	Define and set local floating-point register \fIR\fR.
 .bta af
 \fB&af\fI|R|c\fR	arabic	\(en	\(en	Assign format \fIc\fR to register \fIR\fR.
 The available formats are:
@@ -5495,12 +5587,13 @@ a \fIwarning\fR message is written
 in the same format as an error message,
 but processing continues.
 .ne 6
-.TS
-box center;
+.TS H
+nokeep box center;
 r | l | l
 n | lfB | lw(4.0i).
 Bit	Name	Description
 _
+.TH
 0	none	No warnings at all.
 1	char	T{
 Warn when unknown character names like \fB\e(xx\fR or \fB\e[xxx]\fR

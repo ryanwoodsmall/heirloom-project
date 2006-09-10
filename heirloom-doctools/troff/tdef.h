@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.134 (gritter) 9/9/06
+ * Sccsid @(#)tdef.h	1.136 (gritter) 9/10/06
  */
 
 /*
@@ -546,7 +546,8 @@ enum flags {
 	FLAG_WATCH	= 01,
 	FLAG_STRING	= 02,
 	FLAG_USED	= 04,
-	FLAG_DIVERSION	= 010
+	FLAG_DIVERSION	= 010,
+	FLAG_LOCAL	= 020
 };
 
 struct	d {	/* diversion */
@@ -563,7 +564,7 @@ struct	d {	/* diversion */
 	int	hnl;
 	int	curd;
 	int	flss;
-	int	soff;
+	struct contab	*soff;
 	int	mlist[NTRAP];
 	int	nlist[NTRAP];
 	struct env	*boxenv;
@@ -590,8 +591,14 @@ struct	s {	/* stack frame */
 	int	mname;
 	int	frame_cnt;
 	int	tail_cnt;
-	int	contp;
+	struct contab	*contp;
 	int	pull;
+	struct numtab	*numtab;
+	struct numtab	**nhash;
+	struct contab	*contab;
+	struct contab	**mhash;
+	int	NN;
+	int	NM;
 	enum {
 		LOOP_FREE = 01,
 		LOOP_NEXT = 02,

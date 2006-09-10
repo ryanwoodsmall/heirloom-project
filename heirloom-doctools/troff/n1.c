@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.122 (gritter) 9/10/06
+ * Sccsid @(#)n1.c	1.125 (gritter) 9/10/06
  */
 
 /*
@@ -157,8 +157,6 @@ main(int argc, char **argv)
 	oargv = argv;
 	cfname[0] = malloc(17);
 	strcpy(cfname[0], "<standard input>");
-	mrehash();
-	nrehash();
 	init0();
 #ifdef EUC
 	localize();
@@ -842,11 +840,11 @@ static char *sprintn(register char *s, register long n, int b)
 int
 control(register int a, register int b)
 {
-	register int	j;
+	struct contab	*cp;
 	int	newip;
 	struct s	*p;
 
-	if (a == 0 || (j = findmn(a)) == -1) {
+	if (a == 0 || (cp = findmx(a)) == NULL) {
 		nosuch(a);
 		return(0);
 	}
@@ -881,15 +879,15 @@ control(register int a, register int b)
 #ifdef	DEBUG
 	if (debug & DB_MAC)
 		fdprintf(stderr, "control: macro %s, contab[%d]\n",
-			macname(a), j);
+			macname(a), cp - contab);
 #endif	/* DEBUG */
-	if (contab[j].f == 0) {
+	if (cp->f == 0) {
 		nxf->nargs = 0;
 		tailflg = 0;
 		if (b)
 			collect();
 		flushi();
-		newip = pushi((filep)contab[j].mx, a, contab[j].flags);
+		newip = pushi((filep)cp->mx, a, cp->flags);
 		p = frame->pframe;
 		if (tailflg && b && p != stk &&
 				p->ppendt == 0 &&
@@ -898,20 +896,17 @@ control(register int a, register int b)
 				p->lastpbp == frame->lastpbp) {
 			frame->pframe = p->pframe;
 			frame->frame_cnt--;
-			if (p->nargs > 0) {
-				free(p->argt);
-				free(p->argsp);
-			}
+			sfree(p);
 			*p = *frame;
 			free(frame);
 			frame = p;
 		}
-		contab[j].flags |= FLAG_USED;
-		frame->contp = j;
+		cp->flags |= FLAG_USED;
+		frame->contp = cp;
 		tailflg = 0;
 		return newip;
 	} else if (b) {
-		(*contab[j].f)(0);
+		(*cp->f)(0);
 		return 0;
 	} else
 		return(0);
@@ -987,6 +982,7 @@ getch(void)
 {
 	register int	k;
 	register tchar i, j;
+	struct numtab	*np;
 
 g0:
 	if (i = ch) {
@@ -1274,9 +1270,9 @@ copy:
 		setov();
 		goto g0;
 	case 'k':	/* mark hor place */
-		if ((k = findr(getsn(1))) != -1) {
-			numtab[k].val = numtab[HP].val;
-			prwatchn(k);
+		if ((np = findr(getsn(1))) != NULL) {
+			np->val = numtab[HP].val;
+			prwatchn(np);
 		}
 		goto g0;
 	case '0':	/* number space */
@@ -1776,10 +1772,7 @@ casenx(void)
 	while (frame != stk) {
 		pp = frame;
 		frame = frame->pframe;
-		if (pp->nargs > 0) {
-			free(pp->argt);
-			free(pp->argsp);
-		}
+		sfree(pp);
 		free(pp);
 	}
 	nxf = calloc(1, sizeof *nxf);
