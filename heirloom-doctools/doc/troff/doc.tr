@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.141 (gritter) 9/10/06
+.\" Sccsid @(#)doc.tr	1.142 (gritter) 9/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -933,7 +933,7 @@ its meaning, if any, depends on the output device.
 to the input \fIfiles\fR,
 or, if that file would not be accessible,
 \fB/usr/ucblib/doctools/tmac/tmac.\fIname\fR.
-If the environment variable \%\fB\s-1TROFFONTS\s+1\fR is set,
+If the environment variable \%\fB\s-1TROFFMACS\s+1\fR is set,
 its value is used instead of the default macro directory string,
 and no attempt is made to open \fIname\fR with the ``tmac.'' prefix.
 The value is prepended to \fIname\fR
