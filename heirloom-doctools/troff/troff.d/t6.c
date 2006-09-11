@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.177 (gritter) 9/10/06
+ * Sccsid @(#)t6.c	1.178 (gritter) 9/11/06
  */
 
 /*
@@ -140,8 +140,10 @@ width(register tchar j)
 		return(ses);
 	if (i==ohc)
 		return(0);
-	i = trtab[i];
-	i = ftrans(fbits(j), i);
+	if (!xflag || !isdi(j)) {
+		i = trtab[i];
+		i = ftrans(fbits(j), i);
+	}
 	if (i < 32)
 		return(0);
 	lasttrack = 0;
@@ -446,10 +448,14 @@ kernadjust(tchar c, tchar d)
 	lastkern = 0;
 	if (!kern || ismot(c) || ismot(d))
 		return 0;
-	c = trtab[cbits(c)] | c & SFMASK;
-	c = ftrans(fbits(c), cbits(c)) | c & SFMASK;
-	d = trtab[cbits(d)] | d & SFMASK;
-	d = ftrans(fbits(d), cbits(d)) | d & SFMASK;
+	if (!isdi(c)) {
+		c = trtab[cbits(c)] | c & SFMASK;
+		c = ftrans(fbits(c), cbits(c)) | c & SFMASK;
+	}
+	if (!isdi(d)) {
+		d = trtab[cbits(d)] | d & SFMASK;
+		d = ftrans(fbits(d), cbits(d)) | d & SFMASK;
+	}
 	return getkw(c, d);
 }
 

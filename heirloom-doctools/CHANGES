@@ -9,6 +9,8 @@ Release ...
   a string, macro, or diversion to a file stream.
 * [nt]roff: The ".dwh" and ".dch" requests have been introduced to allow
   multiple diversion traps in the same diversion.
+* [nt]roff: The ".trin" (translate but retranslate with ".asciify") and
+  ".trnt" (translate but not in transparent mode) requests have been added.
 * [nt]roff: The "\n[.dilev]" register contains the current diversion level.
 * [nt]roff: The "\B" escape sequence (check for valid numerical expression)
   is now available in regular mode too, not only in groff compatibility mode.
@@ -26,6 +28,8 @@ Release ...
 * [nt]roff: If a word starts with a motion followed by a hyphenation
   indicator, such as "\h'1m'\%text" or "\|\%text", hyphenation for the
   word is now suppressed, and no hyphen is generated.
+* [nt]roff: When text from a diversion is output or rediverted, it is no
+  longer subject to character translations specified with ".tr" and ".ftr".
 * [nt]roff: In groff compatibility mode, unless a string is interpolated
   with explicit arguments, the arguments to the surrounding macro instance
   remain visible and can be referenced by "\$" from within the string.

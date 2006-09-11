@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.78 (gritter) 9/10/06
+ * Sccsid @(#)n4.c	1.79 (gritter) 9/11/06
  */
 
 /*
@@ -79,35 +79,35 @@ static struct acc	atoi1(tchar, int);
 static struct acc	_inumb(int *, float *, int, int *);
 
 static void *
-_grownumtab(struct numtab **np, int *NNp, struct numtab ***nh)
+_grownumtab(struct numtab **numtp, int *NNp, struct numtab ***hashp)
 {
 	int	i, j, inc = 20;
 	struct numtab	*onc;
 
-	onc = *np;
-	if ((*np = realloc(*np, (*NNp+inc) * sizeof *numtab)) == NULL)
+	onc = *numtp;
+	if ((*numtp = realloc(*numtp, (*NNp+inc) * sizeof *numtab)) == NULL)
 		return NULL;
-	memset(&(*np)[*NNp], 0, inc * sizeof *numtab);
+	memset(&(*numtp)[*NNp], 0, inc * sizeof *numtab);
 	if (*NNp == 0) {
-		if (np == &numtab)
+		if (numtp == &numtab)
 			for (i = 0; initnumtab[i].r; i++)
-				(*np)[i] = initnumtab[i];
-		if (*nh == NULL)
-			*nh = calloc(128, sizeof *nh);
-		nrehash(*np, *NNp + inc, *nh);
+				(*numtp)[i] = initnumtab[i];
+		if (*hashp == NULL)
+			*hashp = calloc(128, sizeof *hashp);
+		nrehash(*numtp, *NNp + inc, *hashp);
 	} else {
-		j = (char *)(*np) - (char *)onc;
+		j = (char *)(*numtp) - (char *)onc;
 		for (i = 0; i < 128; i++)
-			if ((*nh)[i])
-				(*nh)[i] = (struct numtab *)
-					((char *)((*nh)[i]) + j);
+			if ((*hashp)[i])
+				(*hashp)[i] = (struct numtab *)
+					((char *)((*hashp)[i]) + j);
 		for (i = 0; i < *NNp; i++)
-			if ((*np)[i].link)
-				(*np)[i].link = (struct numtab *)
-					((char *)((*np)[i].link) + j);
+			if ((*numtp)[i].link)
+				(*numtp)[i].link = (struct numtab *)
+					((char *)((*numtp)[i].link) + j);
 	}
 	*NNp += inc;
-	return *np;
+	return *numtp;
 }
 
 void *
@@ -123,7 +123,7 @@ static int
 _setn(int tm)	/* tm: test for presence of readonly register */
 {
 	extern const char	revision[];
-	struct numtab	*np;
+	struct numtab	*numtp;
 	char	tb[30], *cp;
 	const char	*name;
 	struct s	*s;
@@ -482,22 +482,22 @@ sl:
 	} else {
 s0:
 		TMNO;
-		if ((np = _findr(i, 1, 2, 0, &j)) == NULL) {
+		if ((numtp = _findr(i, 1, 2, 0, &j)) == NULL) {
 			if (j < 0) {
 				i = -j;
 				goto sl;
 			}
 			i = 0;
-		} else if (np->fmt == -1) {
-			fl = np->fval = np->fval + np->finc*f;
-			if (np->finc)
-				prwatchn(np);
+		} else if (numtp->fmt == -1) {
+			fl = numtp->fval = numtp->fval + numtp->finc*f;
+			if (numtp->finc)
+				prwatchn(numtp);
 			goto flt;
 		} else {
-			i = np->val = np->val + np->inc*f;
-			if (np->inc)
-				prwatchn(np);
-			nform = np->fmt;
+			i = numtp->val = numtp->val + numtp->inc*f;
+			if (numtp->inc)
+				prwatchn(numtp);
+			nform = numtp->fmt;
 		}
 	}
 	TMYES;
@@ -544,21 +544,21 @@ setn1(int i, int form, tchar bits)
 
 
 static void
-nrehash(struct numtab *np, int n, struct numtab **nh)
+nrehash(struct numtab *numtp, int n, struct numtab **hashp)
 {
 	register struct numtab *p;
 	register int i;
 
 	for (i=0; i<128; i++)
-		nh[i] = 0;
-	for (p=np; p < &np[n]; p++)
+		hashp[i] = 0;
+	for (p=numtp; p < &numtp[n]; p++)
 		p->link = 0;
-	for (p=np; p < &np[n]; p++) {
+	for (p=numtp; p < &numtp[n]; p++) {
 		if (p->r == 0)
 			continue;
 		i = NHASH(p->r);
-		p->link = nh[i];
-		nh[i] = p;
+		p->link = hashp[i];
+		hashp[i] = p;
 	}
 }
 
@@ -567,21 +567,21 @@ nunhash(register struct numtab *rp)
 {	
 	register struct numtab *p;
 	register struct numtab **lp;
-	struct numtab	**nh;
+	struct numtab	**hashp;
 	struct s	*sp;
 
 	if (rp->r == 0)
 		return;
 	if (rp >= numtab && rp < &numtab[NN])
-		nh = nhash;
+		hashp = nhash;
 	else {
 		sp = macframe();
 		if (rp >= sp->numtab && rp < &sp->numtab[sp->NN])
-			nh = sp->nhash;
+			hashp = sp->nhash;
 		else
 			return;
 	}
-	lp = &nh[NHASH(rp->r)];
+	lp = &hashp[NHASH(rp->r)];
 	p = *lp;
 	while (p) {
 		if (p == rp) {
@@ -601,7 +601,7 @@ findr(int i)
 }
 
 static struct numtab *
-findr1(struct numtab **np, int *NNp, struct numtab ***nh,
+findr1(struct numtab **numtp, int *NNp, struct numtab ***hashp,
 		register int i, int rd, int aln, int create, int *rop)
 {
 	register struct numtab *p;
@@ -611,8 +611,8 @@ findr1(struct numtab **np, int *NNp, struct numtab ***nh,
 		*rop = 0;
 	if (i == 0 || i == -2)
 		return(NULL);
-	if (*nh != NULL) {
-		for (p = (*nh)[h]; p; p = p->link)
+	if (*hashp != NULL) {
+		for (p = (*hashp)[h]; p; p = p->link)
 			if (i == p->r) {
 				if (p->aln < 0) {
 					if (aln > 1) {
@@ -623,7 +623,7 @@ findr1(struct numtab **np, int *NNp, struct numtab ***nh,
 						continue;
 				}
 				if (aln && p->aln > 0)
-					return(&(*np)[p->aln - 1]);
+					return(&(*numtp)[p->aln - 1]);
 				return(p);
 			}
 	}
@@ -631,18 +631,19 @@ findr1(struct numtab **np, int *NNp, struct numtab ***nh,
 		if (rd && warn & WARN_REG)
 			errprint("no such register %s", macname(i));
 		do {
-			for (p = *np; p < &(*np)[*NNp]; p++) {
+			for (p = *numtp; p < &(*numtp)[*NNp]; p++) {
 				if (p->r == 0) {
 					p->r = i;
-					p->link = (*nh)[h];
-					(*nh)[h] = p;
+					p->link = (*hashp)[h];
+					(*hashp)[h] = p;
 					regcnt++;
-					if (*np != numtab)
+					if (*numtp != numtab)
 						p->flags |= FLAG_LOCAL;
 					return(p);
 				}
 			}
-		} while (p == &(*np)[*NNp] && _grownumtab(np, NNp, nh) != NULL);
+		} while (p == &(*numtp)[*NNp] &&
+				_grownumtab(numtp, NNp, hashp) != NULL);
 		errprint("too many number registers (%d).", *NNp);
 		done2(04); 
 	}
@@ -653,12 +654,12 @@ static struct numtab *
 _findr(register int i, int rd, int aln, int forcecreate, int *rop)
 {
 	struct s	*sp;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	if ((sp = macframe()) != stk) {
-		if ((np = findr1(&sp->numtab, &sp->NN, &sp->nhash,
+		if ((numtp = findr1(&sp->numtab, &sp->NN, &sp->nhash,
 				i, rd, aln, forcecreate == 1, rop)) != NULL)
-			return np;
+			return numtp;
 	}
 	return findr1(&numtab, &NN, &nhash, i, rd, aln, forcecreate >= 0, rop);
 }
@@ -1328,33 +1329,33 @@ void
 setnr(const char *name, int val, int inc)
 {
 	int	j;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	if ((j = makerq(name)) < 0)
 		return;
-	if ((np = findr(j)) == NULL)
+	if ((numtp = findr(j)) == NULL)
 		return;
-	np->val = val;
-	np->inc = inc;
-	if (np->fmt == -1)
-		np->fmt = 0;
-	prwatchn(np);
+	numtp->val = val;
+	numtp->inc = inc;
+	if (numtp->fmt == -1)
+		numtp->fmt = 0;
+	prwatchn(numtp);
 }
 
 void
 setnrf(const char *name, float val, float inc)
 {
 	int	j;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	if ((j = makerq(name)) < 0)
 		return;
-	if ((np = findr(j)) == NULL)
+	if ((numtp = findr(j)) == NULL)
 		return;
-	np->val = np->fval = val;
-	np->inc = np->finc = inc;
-	np->fmt = -1;
-	prwatchn(np);
+	numtp->val = numtp->fval = val;
+	numtp->inc = numtp->finc = inc;
+	numtp->fmt = -1;
+	prwatchn(numtp);
 }
 
 
@@ -1405,7 +1406,7 @@ void
 casernn(void)
 {
 	int	i, j;
-	struct numtab	*kp, *np;
+	struct numtab	*kp, *numtp;
 
 	lgf++;
 	skip(1);
@@ -1418,22 +1419,22 @@ casernn(void)
 	}
 	skip(1);
 	j = getrq(1);
-	np = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
-	if (np != NULL) {
-		if (np->nlink) {
-			np->nlink--;
-			np->r = -1;
+	numtp = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
+	if (numtp != NULL) {
+		if (numtp->nlink) {
+			numtp->nlink--;
+			numtp->r = -1;
 		}
-		np = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
+		numtp = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
 	}
-	if (np != NULL) {
-		*np = *kp;
-		np->r = j;
+	if (numtp != NULL) {
+		*numtp = *kp;
+		numtp->r = j;
 	}
 	clrnr(kp);
-	if (np->flags & FLAG_WATCH)
+	if (numtp->flags & FLAG_WATCH)
 		errprint("%s: renaming %sregister %s to %s", macname(lastrq),
-				np->flags & FLAG_LOCAL ? "local " : "",
+				numtp->flags & FLAG_LOCAL ? "local " : "",
 				macname(i), macname(j));
 }
 
@@ -1442,25 +1443,25 @@ void
 setr(void)
 {
 	int	termc, j;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	lgf++;
 	termc = getach();
 	j = getrq(3);
 	lgf--;
-	if ((np = findr(j)) == NULL || skip(1))
+	if ((numtp = findr(j)) == NULL || skip(1))
 		return;
-	j = inumb(&np->val);
+	j = inumb(&numtp->val);
 	if (nonumb)
 		return;
 	if (getach() != termc) {
 		nodelim(termc);
 		return;
 	}
-	np->val = j;
-	if (np->fmt == -1)
-		np->fmt = 0;
-	prwatchn(np);
+	numtp->val = j;
+	if (numtp->fmt == -1)
+		numtp->fmt = 0;
+	prwatchn(numtp);
 }
 
 static void
@@ -1468,23 +1469,23 @@ casnr1(int flt, int local)
 {
 	register int j;
 	struct acc	a;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	lgf++;
 	skip(1);
 	j = getrq(3);
-	if ((np = _findr(j, 0, 1, local, NULL)) == NULL)
+	if ((numtp = _findr(j, 0, 1, local, NULL)) == NULL)
 		goto rtn;
 	skip(!local);
-	a = _inumb(&np->val, flt ? &np->fval : NULL, flt, NULL);
+	a = _inumb(&numtp->val, flt ? &numtp->fval : NULL, flt, NULL);
 	if (nonumb)
 		goto rtn;
-	np->val = a.n;
+	numtp->val = a.n;
 	if (flt) {
-		np->fval = a.f;
-		np->fmt = -1;
-	} else if (np->fmt == -1)
-		np->fmt = 0;
+		numtp->fval = a.f;
+		numtp->fmt = -1;
+	} else if (numtp->fmt == -1)
+		numtp->fmt = 0;
 	/*
 	 * It is common use in pre-processors and macro packages
 	 * to append a unit definition to a user-supplied number
@@ -1499,11 +1500,11 @@ casnr1(int flt, int local)
 	a = _atoi(flt);
 	if (nonumb)
 		goto rtns;
-	np->inc = a.n;
+	numtp->inc = a.n;
 	if (flt)
-		np->finc = a.f;
+		numtp->finc = a.f;
 rtns:
-	prwatchn(np);
+	prwatchn(numtp);
 rtn:
 	return;
 }
@@ -1538,7 +1539,7 @@ caseaf(void)
 {
 	register int i, k;
 	register tchar j, jj;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	lgf++;
 	if (skip(1) || !(i = getrq(3)))
@@ -1554,14 +1555,14 @@ caseaf(void)
 	}
 	if (!k)
 		k = j;
-	np = findr(i);
-	if (np->fmt == -1) {
+	numtp = findr(i);
+	if (numtp->fmt == -1) {
 		if (warn & WARN_RANGE)
 			errprint("cannot change format of floating-point register");
 		return;
 	}
-	np->fmt = k & BYTEMASK;
-	if (np->flags & FLAG_WATCH) {
+	numtp->fmt = k & BYTEMASK;
+	if (numtp->flags & FLAG_WATCH) {
 		char	b[40];
 		int	x;
 		if (k & BYTEMASK > ' ') {
@@ -1574,7 +1575,7 @@ caseaf(void)
 		}
 		errprint("%s: format of %sregister %s set to %s",
 				macname(lastrq),
-				np->flags & FLAG_LOCAL ? "local " : "",
+				numtp->flags & FLAG_LOCAL ? "local " : "",
 				macname(i), b);
 	}
 }
@@ -1583,17 +1584,17 @@ void
 setaf (void)	/* return format of number register */
 {
 	register int j;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
-	np = usedr(getsn(0));
-	if (np == NULL)
+	numtp = usedr(getsn(0));
+	if (numtp == NULL)
 		return;
-	if (np->fmt > 20)	/* it was probably a, A, i or I */
-		pbbuf[pbp++] = np->fmt;
-	else if (np->fmt == -1)
+	if (numtp->fmt > 20)	/* it was probably a, A, i or I */
+		pbbuf[pbp++] = numtp->fmt;
+	else if (numtp->fmt == -1)
 		pbbuf[pbp++] = '0';
 	else {
-		for (j = (np->fmt ? np->fmt : 1); j; j--) {
+		for (j = (numtp->fmt ? numtp->fmt : 1); j; j--) {
 			if (pbp >= pbsize-3)
 				if (growpbbuf() == NULL) {
 					errprint("no space for .af");
@@ -1654,18 +1655,18 @@ void
 casewatchn(int unwatch)
 {
 	int	j;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	lgf++;
 	if (skip(1))
 		return;
 	do {
-		if (!(j = getrq(1)) || (np = findr(j)) == NULL)
+		if (!(j = getrq(1)) || (numtp = findr(j)) == NULL)
 			break;
 		if (unwatch)
-			np->flags &= ~FLAG_WATCH;
+			numtp->flags &= ~FLAG_WATCH;
 		else
-			np->flags |= FLAG_WATCH;
+			numtp->flags |= FLAG_WATCH;
 	} while (!skip(0));
 }
 
@@ -1678,22 +1679,24 @@ caseunwatchn(void)
 
 
 void
-prwatchn(struct numtab *np)
+prwatchn(struct numtab *numtp)
 {
 	char	*local;
 
-	if (np == NULL)
+	if (numtp == NULL)
 		return;
-	local = np->flags & FLAG_LOCAL ? "local " : "";
-	if (np->flags & FLAG_WATCH) {
-		if (np->fmt == -1)
+	local = numtp->flags & FLAG_LOCAL ? "local " : "";
+	if (numtp->flags & FLAG_WATCH) {
+		if (numtp->fmt == -1)
 			errprint("%s: %sfloating-point register %s set to %g, increment %g",
-					macname(lastrq), local, macname(np->r),
-					np->fval, np->finc);
+					macname(lastrq), local,
+					macname(numtp->r),
+					numtp->fval, numtp->finc);
 		else
 			errprint("%s: %sregister %s set to %d, increment %d",
-					macname(lastrq), local, macname(np->r),
-					np->val, np->inc);
+					macname(lastrq), local,
+					macname(numtp->r),
+					numtp->val, numtp->inc);
 	}
 }
 

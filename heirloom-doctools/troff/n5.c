@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.97 (gritter) 9/10/06
+ * Sccsid @(#)n5.c	1.98 (gritter) 9/11/06
  */
 
 /*
@@ -1872,7 +1872,7 @@ casene(void)
 
 
 void
-casetr(void)
+casetr(int flag)
 {
 	register int i, j;
 	tchar k;
@@ -1887,7 +1887,29 @@ casetr(void)
 		if ((j = cbits(k)) == '\n')
 			j = ' ';
 		trtab[i] = j;
+		if (flag & 1)
+			trintab[j] = i;
+		else
+			trintab[j] = 0;
+		if (flag & 2)
+			trnttab[i] = i;
+		else
+			trnttab[i] = j;
 	}
+}
+
+
+void
+casetrin(void)
+{
+	casetr(1);
+}
+
+
+void
+casetrnt(void)
+{
+	casetr(2);
 }
 
 

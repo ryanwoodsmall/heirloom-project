@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.125 (gritter) 9/10/06
+ * Sccsid @(#)n1.c	1.127 (gritter) 9/11/06
  */
 
 /*
@@ -415,9 +415,9 @@ init1(char a)
 	register int i;
 
 	for (i = NTRTAB; --i; )
-		trtab[i] = i;
-	trtab[UNPAD] = ' ';
-	trtab[STRETCH] = ' ';
+		trnttab[i] = trtab[i] = i;
+	trnttab[UNPAD] = trtab[UNPAD] = ' ';
+	trnttab[STRETCH] = trtab[STRETCH] = ' ';
 }
 
 
@@ -840,11 +840,11 @@ static char *sprintn(register char *s, register long n, int b)
 int
 control(register int a, register int b)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	int	newip;
 	struct s	*p;
 
-	if (a == 0 || (cp = findmx(a)) == NULL) {
+	if (a == 0 || (contp = findmx(a)) == NULL) {
 		nosuch(a);
 		return(0);
 	}
@@ -879,15 +879,15 @@ control(register int a, register int b)
 #ifdef	DEBUG
 	if (debug & DB_MAC)
 		fdprintf(stderr, "control: macro %s, contab[%d]\n",
-			macname(a), cp - contab);
+			macname(a), contp - contab);
 #endif	/* DEBUG */
-	if (cp->f == 0) {
+	if (contp->f == 0) {
 		nxf->nargs = 0;
 		tailflg = 0;
 		if (b)
 			collect();
 		flushi();
-		newip = pushi((filep)cp->mx, a, cp->flags);
+		newip = pushi((filep)contp->mx, a, contp->flags);
 		p = frame->pframe;
 		if (tailflg && b && p != stk &&
 				p->ppendt == 0 &&
@@ -901,12 +901,12 @@ control(register int a, register int b)
 			free(frame);
 			frame = p;
 		}
-		cp->flags |= FLAG_USED;
-		frame->contp = cp;
+		contp->flags |= FLAG_USED;
+		frame->contp = contp;
 		tailflg = 0;
 		return newip;
 	} else if (b) {
-		(*cp->f)(0);
+		(*contp->f)(0);
 		return 0;
 	} else
 		return(0);

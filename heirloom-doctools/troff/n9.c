@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.63 (gritter) 9/5/06
+ * Sccsid @(#)n9.c	1.64 (gritter) 9/11/06
  */
 
 /*
@@ -1146,8 +1146,11 @@ morechars(int n)
 	widcache = realloc(widcache, nnc * sizeof *widcache);
 	memset(&widcache[NCHARS], 0, (nnc-NCHARS) * sizeof *widcache);
 	trtab = realloc(trtab, nnc * sizeof *trtab);
+	trnttab = realloc(trnttab, nnc * sizeof *trnttab);
 	for (i = NCHARS; i < nnc; i++)
-		trtab[i] = i;
+		trnttab[i] = trtab[i] = i;
+	trintab = realloc(trintab, nnc * sizeof *trintab);
+	memset(&trintab[NCHARS], 0, (nnc-NCHARS) * sizeof *trintab);
 	gchtab = realloc(gchtab, nnc * sizeof *gchtab);
 	memset(&gchtab[NCHARS], 0, (nnc-NCHARS) * sizeof *gchtab);
 	chartab = realloc(chartab, nnc * sizeof *chartab);

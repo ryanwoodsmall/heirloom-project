@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.90 (gritter) 9/10/06
+ * Sccsid @(#)ext.h	1.91 (gritter) 9/11/06
  */
 
 /*
@@ -177,6 +177,8 @@ extern	int	tflg;
 extern	int	totout;
 extern	int	trap;
 extern	int	*trtab;
+extern	int	*trintab;
+extern	int	*trnttab;
 extern	int	tryglf;
 extern	int	tty;
 extern	int	ttyod;
@@ -468,7 +470,9 @@ extern	void	caseecs(void);
 extern	void	caseecr(void);
 extern	void	caseta(void);
 extern	void	casene(void);
-extern	void	casetr(void);
+extern	void	casetr(int);
+extern	void	casetrin(void);
+extern	void	casetrnt(void);
 extern	void	casecu(void);
 extern	void	caseul(void);
 extern	void	caseuf(void);

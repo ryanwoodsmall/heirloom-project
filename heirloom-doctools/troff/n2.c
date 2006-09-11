@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.31 (gritter) 9/10/06
+ * Sccsid @(#)n2.c	1.32 (gritter) 9/11/06
  */
 
 /*
@@ -130,14 +130,16 @@ pchar(register tchar i)
 			j = eschar;	/* fall through */
 	default:
 	dfl:
+		if (!xflag || !isdi(i)) {
 #if !defined (EUC) || !defined (NROFF)
-		setcbits(i, trtab[j]);
+			setcbits(i, tflg ? trnttab[j] : trtab[j]);
 #else	/* EUC && NROFF */
-		if (!multi_locale || (!(j & CSMASK) && !(j & MBMASK1)))
-			setcbits(i, trtab[j]);
+			if (!multi_locale || (!(j & CSMASK) && !(j & MBMASK1)))
+				setcbits(i, tflg ? trnttab[j] : trtab[j]);
 #endif /* EUC && NROFF */
-		if (xon == 0)
-			setcbits(i, ftrans(fbits(i), cbits(i)));
+			if (xon == 0)
+				setcbits(i, ftrans(fbits(i), cbits(i)));
+		}
 	}
 	pchar1(i);
 	return 1;

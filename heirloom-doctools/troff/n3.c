@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.160 (gritter) 9/11/06
+ * Sccsid @(#)n3.c	1.162 (gritter) 9/11/06
  */
 
 /*
@@ -178,6 +178,8 @@ static const struct {
 	{ "track",		(void(*)(int))casetrack },
 	{ "transchar",		(void(*)(int))casetranschar },
 	{ "trimat",		(void(*)(int))casetrimat },
+	{ "trin",		(void(*)(int))casetrin },
+	{ "trnt",		(void(*)(int))casetrnt },
 	{ "unformat",		(void(*)(int))caseunformat },
 	{ "unwatch",		(void(*)(int))caseunwatch },
 	{ "unwatchn",		(void(*)(int))caseunwatchn },
@@ -195,38 +197,38 @@ static const struct {
 };
 
 static void *
-_growcontab(struct contab **cp, int *NMp, struct contab ***cs)
+_growcontab(struct contab **contp, int *NMp, struct contab ***hashp)
 {
 	int	i, j, inc = 256;
 	struct contab	*onc;
 
-	onc = *cp;
-	if ((*cp = realloc(*cp, (*NMp+inc) * sizeof **cp)) == NULL)
+	onc = *contp;
+	if ((*contp = realloc(*contp, (*NMp+inc) * sizeof **contp)) == NULL)
 		return NULL;
-	memset(&(*cp)[*NMp], 0, inc * sizeof **cp);
+	memset(&(*contp)[*NMp], 0, inc * sizeof **contp);
 	if (*NMp == 0) {
-		if (cp == &contab) {
+		if (contp == &contab) {
 			for (i = 0; initcontab[i].f; i++)
-				(*cp)[i] = initcontab[i];
+				(*contp)[i] = initcontab[i];
 			for (j = 0; longrequests[j].f; j++)
 				addcon(i++, longrequests[j].n,
 						longrequests[j].f);
 		}
-		*cs = calloc(128, sizeof **cs);
-		mrehash(*cp, inc, *cs);
+		*hashp = calloc(128, sizeof **hashp);
+		mrehash(*contp, inc, *hashp);
 	} else {
-		j = (char *)*cp - (char *)onc;
+		j = (char *)*contp - (char *)onc;
 		for (i = 0; i < 128; i++)
-			if ((*cs)[i])
-				(*cs)[i] = (struct contab *)
-					((char *)((*cs)[i]) + j);
+			if ((*hashp)[i])
+				(*hashp)[i] = (struct contab *)
+					((char *)((*hashp)[i]) + j);
 		for (i = 0; i < *NMp; i++)
-			if ((*cp)[i].link)
-				(*cp)[i].link = (struct contab *)
-					((char *)((*cp)[i].link) + j);
+			if ((*contp)[i].link)
+				(*contp)[i].link = (struct contab *)
+					((char *)((*contp)[i].link) + j);
 	}
 	*NMp += inc;
-	return *cp;
+	return *contp;
 }
 
 void *
@@ -361,47 +363,47 @@ munhash(register struct contab *mp)
 }
 
 static void
-mrehash(struct contab *cp, int n, struct contab **cs)
+mrehash(struct contab *contp, int n, struct contab **hashp)
 {
 	register struct contab *p;
 	register int i;
 
 	for (i=0; i<128; i++)
-		cs[i] = 0;
-	for (p=cp; p < &cp[n]; p++)
+		hashp[i] = 0;
+	for (p=contp; p < &contp[n]; p++)
 		p->link = 0;
-	for (p=cp; p < &cp[n]; p++) {
+	for (p=contp; p < &contp[n]; p++) {
 		if (p->rq == 0)
 			continue;
 		i = MHASH(p->rq);
-		p->link = cs[i];
-		cs[i] = p;
+		p->link = hashp[i];
+		hashp[i] = p;
 	}
 }
 
 void
 caserm(void)
 {
-	struct contab	*cp, *ct;
+	struct contab	*contp, *contt;
 	int j, cnt = 0;
 
 	lgf++;
 	while (!skip(!cnt++) && (j = getrq(0)) != 0) {
-		if ((cp = _findmn(j, 0, 0)) == NULL)
+		if ((contp = _findmn(j, 0, 0)) == NULL)
 			continue;
-		if (cp->als) {
-			ct = _findmn(j, 1, cp->flags & FLAG_LOCAL);
-			if (--ct->nlink <= 0)
-				clrmn(ct);
+		if (contp->als) {
+			contt = _findmn(j, 1, contp->flags & FLAG_LOCAL);
+			if (--contt->nlink <= 0)
+				clrmn(contt);
 		}
-		if (cp->nlink > 0)
-			cp->nlink--;
-		if (cp->flags & FLAG_WATCH)
+		if (contp->nlink > 0)
+			contp->nlink--;
+		if (contp->flags & FLAG_WATCH)
 			errprint("%s: %s%s removed", macname(lastrq),
-				cp->flags & FLAG_LOCAL ? "local " : "",
+				contp->flags & FLAG_LOCAL ? "local " : "",
 				macname(j));
-		if (cp->nlink <= 0)
-			clrmn(cp);
+		if (contp->nlink <= 0)
+			clrmn(contp);
 	}
 	lgf--;
 }
@@ -495,14 +497,14 @@ de1:
 
 
 static struct contab *
-findmn1(struct contab **cs, register int i, int als)
+findmn1(struct contab **hashp, register int i, int als)
 {
 	register struct contab *p;
 
-	for (p = cs[MHASH(i)]; p; p = p->link)
+	for (p = hashp[MHASH(i)]; p; p = p->link)
 		if (i == p->rq) {
 			if (als && p->als)
-				return(findmn1(cs, p->als, als));
+				return(findmn1(hashp, p->als, als));
 			return(p);
 		}
 	return(NULL);
@@ -513,14 +515,14 @@ static struct contab *
 _findmn(register int i, int als, int forcelocal)
 {
 	struct s	*s;
-	struct contab	*cp;
+	struct contab	*contp;
 
 	s = macframe();
 	if (forcelocal || s != stk && s->mhash) {
 		if (s->mhash == NULL)
 			return NULL;
-		if ((cp = findmn1(s->mhash, i, als)) != NULL)
-			return cp;
+		if ((contp = findmn1(s->mhash, i, als)) != NULL)
+			return contp;
 		if (forcelocal)
 			return NULL;
 	}
@@ -543,27 +545,27 @@ findmx(int i)
 
 
 void
-clrmn(struct contab *cp)
+clrmn(struct contab *contp)
 {
 	struct s	*s;
 
-	if (cp != NULL) {
-		if (cp->flags & FLAG_USED) {
+	if (contp != NULL) {
+		if (contp->flags & FLAG_USED) {
 			if (warn & WARN_MAC)
 				errprint("Macro %s removed while in use",
-						macname(cp->rq));
+						macname(contp->rq));
 			for (s = frame; s != stk; s = s->pframe)
-				if (s->contp == cp)
+				if (s->contp == contp)
 					s->contp = NULL;
-		} else if (cp->mx)
-			ffree((filep)cp->mx);
-		munhash(cp);
-		memset(cp, 0, sizeof *cp);
-		cp->rq = 0;
-		cp->mx = 0;
-		cp->f = 0;
-		cp->als = 0;
-		cp->nlink = 0;
+		} else if (contp->mx)
+			ffree((filep)contp->mx);
+		munhash(contp);
+		memset(contp, 0, sizeof *contp);
+		contp->rq = 0;
+		contp->mx = 0;
+		contp->f = 0;
+		contp->als = 0;
+		contp->nlink = 0;
 	}
 }
 
@@ -575,7 +577,7 @@ finds(register int mn, int als, int globonly)
 	register filep savip;
 	enum flags	flags = 0;
 	struct s	*s;
-	struct contab	**cp, ***cs;
+	struct contab	**contp, ***hashp;
 	int	*NMp;
 
 	oldmn = _findmn(mn, als, dl);
@@ -608,21 +610,21 @@ finds(register int mn, int als, int globonly)
 		if (oldmn && oldmn->flags & FLAG_LOCAL)
 			dl++;
 		if (dl && (s = macframe()) != stk) {
-			cp = &s->contab;
+			contp = &s->contab;
 			NMp = &s->NM;
-			cs = &s->mhash;
+			hashp = &s->mhash;
 		} else {
 			dl = 0;
-			cp = &contab;
+			contp = &contab;
 			NMp = &NM;
-			cs = &mhash;
+			hashp = &mhash;
 		}
 		for (i = 0; i < *NMp; i++) {
-			if ((*cp)[i].rq == 0)
+			if ((*contp)[i].rq == 0)
 				break;
 		}
 		nextb = 0;
-		if (i == *NMp && _growcontab(cp, NMp, cs) == NULL ||
+		if (i == *NMp && _growcontab(contp, NMp, hashp) == NULL ||
 				als && (nextb = alloc()) == 0) {
 			app = 0;
 			if (macerr++ > 1)
@@ -631,8 +633,8 @@ finds(register int mn, int als, int globonly)
 			edone(04);
 			return(als ? offset = 0 : 0);
 		}
-		(*cp)[i].mx = (unsigned) nextb;
-		newmn = &(*cp)[i];
+		(*contp)[i].mx = (unsigned) nextb;
+		newmn = &(*contp)[i];
 		if (!diflg) {
 			if (oldmn == NULL)
 				newmn->rq = -1;
@@ -671,14 +673,14 @@ copyb(void)
 	int	req;
 	filep savoff = 0, tailoff = 0;
 	tchar	tailc = 0;
-	char	*cp, *mn;
+	char	*contp, *mn;
 
 	if (skip(0) || !(j = getrq(1)))
 		j = '.';
 	req = j;
-	cp = macname(req);
-	mn = malloc(strlen(cp) + 1);
-	strcpy(mn, cp);
+	contp = macname(req);
+	mn = malloc(strlen(contp) + 1);
+	strcpy(mn, contp);
 	copyf++;
 	flushi();
 	nlflg = 0;
@@ -1053,14 +1055,14 @@ getsn(int create)
 int 
 setstr(void)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	register int i, k;
 	int	space = 0;
 	tchar	c;
 
 	lgf++;
-	if ((i = _getsn(&space, 0)) == 0 || (cp = findmn(i)) == NULL ||
-			!cp->mx) {
+	if ((i = _getsn(&space, 0)) == 0 || (contp = findmn(i)) == NULL ||
+			!contp->mx) {
 		if (space) {
 			do {
 				if (cbits(c = getch()) == ']')
@@ -1079,9 +1081,9 @@ setstr(void)
 			nxf->nargs = 0;
 		strflg++;
 		lgf--;
-		cp->flags |= FLAG_USED;
-		k = pushi((filep)cp->mx, i, cp->flags);
-		frame->contp = cp;
+		contp->flags |= FLAG_USED;
+		k = pushi((filep)contp->mx, i, contp->flags);
+		frame->contp = contp;
 		return(k);
 	}
 }
@@ -1370,7 +1372,7 @@ casedt(void)
 void
 caseals(void)
 {
-	struct contab	*kp;
+	struct contab	*contp;
 	int	i, j, t;
 	int	flags = 0;
 
@@ -1380,26 +1382,26 @@ caseals(void)
 	if (skip(1))
 		return;
 	j = getrq(1);
-	if ((kp = findmn(j)) == NULL) {
+	if ((contp = findmn(j)) == NULL) {
 		nosuch(j);
 		return;
 	}
-	if (kp->nlink == 0) {
-		munhash(kp);
+	if (contp->nlink == 0) {
+		munhash(contp);
 		t = makerq(NULL);
-		kp->rq = t;
-		maddhash(kp);
-		if (kp->flags & FLAG_LOCAL)
+		contp->rq = t;
+		maddhash(contp);
+		if (contp->flags & FLAG_LOCAL)
 			dl++;
 		if (finds(j, 0, 0) != 0 && newmn) {
 			newmn->als = t;
 			newmn->rq = j;
 			maddhash(newmn);
-			kp->nlink = 1;
+			contp->nlink = 1;
 		}
 	} else
 		t = j;
-	if (kp->flags & FLAG_LOCAL)
+	if (contp->flags & FLAG_LOCAL)
 		dl++;
 	if (finds(i, 0, !dl) != 0) {
 		if (oldmn != NULL && newmn != NULL)
@@ -1413,13 +1415,14 @@ caseals(void)
 			newmn->rq = i;
 			newmn->flags |= flags;
 			maddhash(newmn);
-			kp->nlink++;
+			contp->nlink++;
 			if (flags & FLAG_WATCH)
 				errprint("%s: creating alias %s to %s%s %s",
 					macname(lastrq),
-					kp->flags & FLAG_LOCAL ? "local " : "",
-					kp->flags & FLAG_STRING ? "string" :
-						kp->flags & FLAG_DIVERSION ?
+					contp->flags & FLAG_LOCAL ?
+						"local " : "",
+					contp->flags & FLAG_STRING ? "string" :
+						contp->flags & FLAG_DIVERSION ?
 							"diversion" : "macro",
 					macname(i), macname(j));
 		}
@@ -1430,7 +1433,7 @@ caseals(void)
 void
 casewatch(int unwatch)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	int	j;
 
 	lgf++;
@@ -1439,19 +1442,19 @@ casewatch(int unwatch)
 	do {
 		if (!(j = getrq(1)))
 			break;
-		if ((cp = findmn(j)) == NULL) {
+		if ((contp = findmn(j)) == NULL) {
 			if (finds(j, 0, 0) == 0 || newmn == NULL)
 				continue;
 			if (newmn->rq)
 				munhash(newmn);
 			newmn->rq = j;
 			maddhash(newmn);
-			cp = newmn;
+			contp = newmn;
 		}
 		if (unwatch)
-			cp->flags &= ~FLAG_WATCH;
+			contp->flags &= ~FLAG_WATCH;
 		else
-			cp->flags |= FLAG_WATCH;
+			contp->flags |= FLAG_WATCH;
 	} while (!skip(0));
 }
 
@@ -1484,7 +1487,7 @@ casewatchlength(void)
 
 
 void
-prwatch(struct contab *cp, int rq, int prc)
+prwatch(struct contab *contp, int rq, int prc)
 {
 	const char prtab[] = {
 		'a',000,000,000,000,000,000,000,
@@ -1499,23 +1502,23 @@ prwatch(struct contab *cp, int rq, int prc)
 	tchar	c;
 	int	j, k;
 
-	if (cp == NULL)
+	if (contp == NULL)
 		return;
 	if (rq == 0)
-		rq = cp->rq;
-	local = cp->flags & FLAG_LOCAL ? "local " : "";
-	if (cp->flags & FLAG_WATCH) {
+		rq = contp->rq;
+	local = contp->flags & FLAG_LOCAL ? "local " : "";
+	if (contp->flags & FLAG_WATCH) {
 		if (watchlength <= 10 || !prc) {
 			errprint("%s: %s%s %s redefined", macname(lastrq),
 				local,
-				cp->flags & FLAG_STRING ? "string" :
-					cp->flags & FLAG_DIVERSION ?
+				contp->flags & FLAG_STRING ? "string" :
+					contp->flags & FLAG_DIVERSION ?
 						"diversion" : "macro",
 				macname(rq));
 			return;
 		}
 		savip = ip;
-		ip = (filep)cp->mx;
+		ip = (filep)contp->mx;
 		app++;
 		j = 0;
 		buf = malloc(watchlength);
@@ -1565,8 +1568,8 @@ prwatch(struct contab *cp, int rq, int prc)
 		app--;
 		errprint("%s: %s%s %s redefined to \"%s\"", macname(lastrq),
 				local,
-				cp->flags & FLAG_STRING ? "string" :
-					cp->flags & FLAG_DIVERSION ?
+				contp->flags & FLAG_STRING ? "string" :
+					contp->flags & FLAG_DIVERSION ?
 						"diversion" : "macro",
 				macname(rq), buf);
 		free(buf);
@@ -1671,7 +1674,7 @@ void
 casechop(void)
 {
 	int	i;
-	struct contab	*cp;
+	struct contab	*contp;
 	filep	savip;
 
 	if (dip != d)
@@ -1680,28 +1683,28 @@ casechop(void)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
-	if ((cp = findmn(i)) == NULL || !cp->mx) {
+	if ((contp = findmn(i)) == NULL || !contp->mx) {
 		nosuch(i);
 		return;
 	}
 	savip = ip;
-	ip = (filep)cp->mx;
+	ip = (filep)contp->mx;
 	app = 1;
 	while (rbf() != 0);
 	app = 0;
-	if (ip > (filep)cp->mx) {
+	if (ip > (filep)contp->mx) {
 		offset = ip - 1;
 		wbt(0);
 	}
 	ip = savip;
 	offset = dip->op;
-	prwatch(cp, i, 1);
+	prwatch(contp, i, 1);
 }
 
 void
 casesubstring(void)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	int	i, j, k, sz = 0, st;
 	int	n1, n2 = -1, nlink;
 	tchar	*tp = NULL, c;
@@ -1713,7 +1716,7 @@ casesubstring(void)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
-	if ((cp = findmn(i)) == NULL || !cp->mx) {
+	if ((contp = findmn(i)) == NULL || !contp->mx) {
 		nosuch(i);
 		return;
 	}
@@ -1725,7 +1728,7 @@ casesubstring(void)
 		n2 = atoi();
 	noscale--;
 	savip = ip;
-	ip = (filep)cp->mx;
+	ip = (filep)contp->mx;
 	k = 0;
 	app = 1;
 	while ((c = rbf()) != 0) {
@@ -1788,7 +1791,7 @@ caselength(void)
 {
 	tchar	c;
 	int	i, j;
-	struct numtab	*np;
+	struct numtab	*numtp;
 
 	lgf++;
 	skip(1);
@@ -1804,20 +1807,20 @@ caselength(void)
 			j++;
 	}
 	copyf--;
-	np = findr(i);
-	np->val = j;
-	prwatchn(np);
+	numtp = findr(i);
+	numtp->val = j;
+	prwatchn(numtp);
 }
 
 void
 caseindex(void)
 {
 	int	i, j, n, N;
-	struct contab	*cp;
+	struct contab	*contp;
 	int	*sp = NULL, as = 0, ns = 0, *np;
 	tchar	c;
 	filep	savip;
-	struct numtab	*p;
+	struct numtab	*numtp;
 
 	lgf++;
 	skip(1);
@@ -1826,7 +1829,7 @@ caseindex(void)
 	skip(1);
 	if ((i = getrq(1)) == 0)
 		return;
-	if ((cp = findmn(i)) == NULL || !cp->mx) {
+	if ((contp = findmn(i)) == NULL || !contp->mx) {
 		nosuch(i);
 		return;
 	}
@@ -1851,7 +1854,7 @@ caseindex(void)
 				j = np[j];
 		}
 		savip = ip;
-		ip = (filep)cp->mx;
+		ip = (filep)contp->mx;
 		app = 1;
 		j = 0;
 		n = 0;
@@ -1869,9 +1872,9 @@ caseindex(void)
 	} else
 		n = -1;
 	copyf--;
-	p = findr(N);
-	p->val = n;
-	prwatchn(p);
+	numtp = findr(N);
+	numtp->val = n;
+	prwatchn(numtp);
 }
 
 static void
@@ -1883,7 +1886,7 @@ caseasciify(void)
 static void
 caseunformat(int flag)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	int	i, j, k, nlink;
 	int	ns = 0, as = 0;
 	tchar	*tp = NULL, c;
@@ -1896,12 +1899,12 @@ caseunformat(int flag)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
-	if ((cp = findmn(i)) == NULL || !cp->mx) {
+	if ((contp = findmn(i)) == NULL || !contp->mx) {
 		nosuch(i);
 		return;
 	}
 	savip = ip;
-	ip = (filep)cp->mx;
+	ip = (filep)contp->mx;
 	ns = 0;
 	app = 1;
 	while ((c = rbf()) != 0) {
@@ -1964,6 +1967,8 @@ caseunformat(int flag)
 #endif
 					c = cbits(c);
 			}
+			if (flag & 1 && !ismot(c) && (k = trintab[c]) != 0)
+				c = k;
 			if (!noout)
 				wbf(c);
 		}
@@ -1992,14 +1997,14 @@ caseunformat(int flag)
 static void
 casepull(void)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	int	i, n;
 
 	if (skip(1) || (n = vnumb(NULL)) <= 0 || nonumb)
 		return;
 	if (skip(1) || (i = getrq(0)) == 0)
 		return;
-	if ((cp = findmn(i)) == NULL || !cp->mx) {
+	if ((contp = findmn(i)) == NULL || !contp->mx) {
 		nosuch(i);
 		return;
 	}
@@ -2111,7 +2116,7 @@ mapadd(const char *cp, int n)
 void
 casepm(void)
 {
-	struct contab	*cp;
+	struct contab	*contp;
 	register int i, k;
 	int	xx, cnt, tcnt, kk, tot;
 	filep j;
@@ -2120,8 +2125,8 @@ casepm(void)
 	tot = !skip(0);
 	for (i = 0; i < NM; i++) {
 		if ((xx = contab[i].rq) == 0 || contab[i].mx == 0) {
-			if (contab[i].als && (cp = findmx(xx)) != NULL) {
-				k = cp - contab;
+			if (contab[i].als && (contp = findmx(xx)) != NULL) {
+				k = contp - contab;
 				if (contab[k].rq == 0 || contab[k].mx == 0)
 					continue;
 			} else
