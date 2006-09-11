@@ -45,6 +45,8 @@ Release ...
   that continues from the previous line.
 * troff, dpost: The short font name is now part of the "x font" commands
   in intermediate output for Type 1, TrueType, and OpenType fonts.
+* eqn: Avoid to recognize delimiters inside troff escape sequences with "("
+  or "[" as well as directly behind a sequence of backslash characters.
 
 Release 060905
 * [nt]roff: The new ".brnl" request causes a break each time a newline is

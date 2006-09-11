@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.9 (gritter) 10/29/05
+ * Sccsid @(#)io.c	1.10 (gritter) 9/11/06
  */
 
 # include "e.h"
@@ -92,7 +92,7 @@ eqn(int argc,char **argv) {
 
 int
 getline(char **sp, size_t *np) {
-	register int c, n = 0;
+	register int c, n = 0, esc = 0, par = 0, brack = 0;
 	char *xp;
 	for (;;) {
 		c = gtc();
@@ -107,10 +107,40 @@ getline(char **sp, size_t *np) {
 			*sp = xp;
 		}
 		(*sp)[n++] = c;
-		if (c=='\n' || c==EOF || c==lefteq)
-			break;
+		if (c=='\\')
+			esc++;
+		else {
+			if (c=='\n' || c==EOF ||
+					c==lefteq && !esc && !par && !brack)
+				break;
+			if (par)
+				par--;
+			if (brack && c == ']')
+				brack = 0;
+			if (esc) {
+				switch (c) {
+				case '*':
+				case 'f':
+				case 'g':
+				case 'k':
+				case 'n':
+				case 'P':
+				case 'V':
+				case 'Y':
+					break;
+				case '(':
+					par += 2;
+					break;
+				case '[':
+					brack++;
+					break;
+				default:
+					esc = 0;
+				}
+			}
+		}
 	}
-	if (c==lefteq)
+	if (c==lefteq && !esc)
 		n--;
 	(*sp)[n++] = '\0';
 	return(c);

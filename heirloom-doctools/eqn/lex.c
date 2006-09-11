@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lex.c	1.4 (gritter) 8/13/05
+ * Sccsid @(#)lex.c	1.5 (gritter) 9/11/06
  */
 
 #include "e.h"
@@ -263,7 +263,7 @@ include(void) {
 void
 delim(void) {
 	yyval = eqnreg = 0;
-	if (cstr(token, 0, SSIZE))
+	if (cstr(token, 0, SSIZE) || token[0] & 0200 || token[1] & 0200)
 		error(FATAL, "Bizarre delimiters at %.20s", token);
 	lefteq = token[0];
 	righteq = token[1];
