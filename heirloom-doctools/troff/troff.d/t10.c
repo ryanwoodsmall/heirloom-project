@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.90 (gritter) 9/11/06
+ * Sccsid @(#)t10.c	1.91 (gritter) 9/11/06
  */
 
 /*
@@ -466,12 +466,8 @@ ptout0(tchar *pi, tchar *pend)
 		return(pi+outsize);
 	}
 	if (k == FONTPOS) {
-		char temp[3];
 		n = i >> 22;
-		temp[0] = n & BYTEMASK;
-		temp[1] = n >> BYTE;
-		temp[2] = 0;
-		ptfpcmd(0, temp);
+		ptfpcmd(0, macname(n), NULL, 0);
 		return(pi+outsize);
 	}
 	if (k == XFUNC) {
@@ -778,11 +774,17 @@ ptfont(void)
 }
 
 void
-ptfpcmd(int f, char *s)
+ptfpcmd(int f, char *s, char *path, int flags)
 {
 	if (ascii)
 		return;
-	fdprintf(ptid, "x font %d %s\n", f, s);
+	fdprintf(ptid, "x font %d %s", f, s);
+	if (path) {
+		fdprintf(ptid, " %s", path);
+		if (flags)
+			fdprintf(ptid, " %d", flags);
+	}
+	fdprintf(ptid, "\n");
 	ptfont();	/* make sure that it gets noticed */
 }
 
@@ -1011,12 +1013,13 @@ newpage(int n)	/* called at end of each output page (we hope) */
 			struct afmtab	*a = afmtab[(fontbase[i]->afmpos)-1];
 			if (a->encpath == NULL)
 				a->encpath = afmencodepath(a->path);
-			fdprintf(ptid, "x font %d %s %d\n", i,
+			fdprintf(ptid, "x font %d %s %s %d\n", i,
+				macname(fontlab[i]),
 				a->encpath, (int)a->spec);
 			if (a->supply)
 				ptsupplyfont(a->fontname, a->supply);
 		} else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
-			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
+			fdprintf(ptid, "x font %d %s\n", i, macname(fontlab[i]));
 	}
 	ptps();
 	ptfont();

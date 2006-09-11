@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.145 (gritter) 9/11/06
+.\" Sccsid @(#)doc.tr	1.146 (gritter) 9/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -6597,7 +6597,7 @@ then a command, then other parameters.
 .nr nosave 1
 \fBx i	\fRinitialize\fP
 \fBx f \fIn s\fP	\fRmount font \fIs\fR on font position \fIn\fR
-\fBx f \fIn filename flags\fR	\fIfilename\fR contains metrics for font on position \fIn\fR using \fIflags\fR
+\fBx f \fIn s filename flags\fR	\fIfilename\fR contains metrics for font \fIs\fR on position \fIn\fR using \fIflags\fR
 \fBx p	\fRpause\(emcan restart
 \fBx s	\fRstop\(emdone forever
 \fBx t	\fRgenerate trailer information, if any
@@ -6646,19 +6646,19 @@ x res 72000 1 1
 x init
 V0
 p1
-x font 1 /usr/ucblib/doctools/font/devps/R.afm 4
-x font 2 /usr/ucblib/doctools/font/devps/I.afm 4
-x font 3 /usr/ucblib/doctools/font/devps/B.afm 4
-x font 4 /usr/ucblib/doctools/font/devps/BI.afm 4
-x font 5 /usr/ucblib/doctools/font/devps/CW.afm 4
-x font 6 /usr/ucblib/doctools/font/devps/H.afm 4
-x font 7 /usr/ucblib/doctools/font/devps/HB.afm 4
-x font 8 /usr/ucblib/doctools/font/devps/HX.afm 4
-x font 9 /usr/ucblib/doctools/font/devps/S1.afm 516
-x font 10 /usr/ucblib/doctools/font/devps/S.afm 1028
+x font 1 R /usr/ucblib/doctools/font/devps/R.afm 4
+x font 2 I /usr/ucblib/doctools/font/devps/I.afm 4
+x font 3 B /usr/ucblib/doctools/font/devps/B.afm 4
+x font 4 BI /usr/ucblib/doctools/font/devps/BI.afm 4
+x font 5 CW /usr/ucblib/doctools/font/devps/CW.afm 4
+x font 6 H /usr/ucblib/doctools/font/devps/H.afm 4
+x font 7 HB /usr/ucblib/doctools/font/devps/HB.afm 4
+x font 8 HX /usr/ucblib/doctools/font/devps/HX.afm 4
+x font 9 S1 /usr/ucblib/doctools/font/devps/S1.afm 516
+x font 10 S /usr/ucblib/doctools/font/devps/S.afm 1028
 s10
 f1
-x X LC_CTYPE en_US.utf8
+x X LC_CTYPE de_DE.utf8
 H72000
 V12000
 ch
@@ -6682,8 +6682,12 @@ x stop
 \*(TR output is normally not redundant;
 size and font changes and position information are not included
 unless needed.
-Nevertheless, each page is self-contained, for the benefit of postprocessors
+Nevertheless, each page is normally self-contained,
+for the benefit of postprocessors
 that re-order pages or process only a subset.
+The \fBx X PSSetup\fR command is an exception from this rule;
+it is included only once at the point where the corresponding
+\T'e_X'\fB\eX\fI'\fBPSSetup:\fR\|...\fI'\fR escape sequence\T occurs.
 .pg
 .mha s_device
 Device and Font Description Files

@@ -43,6 +43,8 @@ Release ...
   sequences.
 * troff: The indent of the current line is no longer part of a PDF link
   that continues from the previous line.
+* troff, dpost: The short font name is now part of the "x font" commands
+  in intermediate output for Type 1, TrueType, and OpenType fonts.
 
 Release 060905
 * [nt]roff: The new ".brnl" request causes a break each time a newline is

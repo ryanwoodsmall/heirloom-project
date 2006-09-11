@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.14 (gritter) 3/12/06
+ * Sccsid @(#)gen.h	1.15 (gritter) 9/11/06
  */
 
 /*
@@ -91,7 +91,7 @@ void account(void);
 void conv(register FILE *);
 void devcntrl(FILE *);
 void fontinit(void);
-void loadfont(int, char *, char *, int);
+void loadfont(int, char *, char *, int, int);
 void loadspecial(void);
 void loaddefault(void);
 void fontprint(int);

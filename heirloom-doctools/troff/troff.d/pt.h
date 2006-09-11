@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pt.h	1.52 (gritter) 8/12/06
+ * Sccsid @(#)pt.h	1.53 (gritter) 9/11/06
  */
 
 /* t6.c */
@@ -84,7 +84,7 @@ extern void	ptout(register tchar);
 extern tchar	*ptout0(tchar *, tchar *);
 extern void	ptps(void);
 extern void	ptfont(void);
-extern void	ptfpcmd(int, char *);
+extern void	ptfpcmd(int, char *, char *, int);
 extern void	ptlead(void);
 extern void	ptesc(void);
 extern void	newpage(int);

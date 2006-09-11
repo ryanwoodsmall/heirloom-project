@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.154 (gritter) 9/2/06
+ * Sccsid @(#)dpost.c	1.155 (gritter) 9/11/06
  */
 
 /*
@@ -1679,8 +1679,9 @@ devcntrl(
 		fgets(buf, size, fp);	/* in case there's a filename */
 		ungetc('\n', fp);	/* fgets() goes too far */
 		str1[0] = '\0';		/* in case there's nothing to come in */
-		sscanf(buf, "%s", str1);
-		loadfont(n, mapdevfont(str), str1, 0);
+		c = 0;
+		sscanf(buf, "%s %d", str1, &c);
+		loadfont(n, mapdevfont(str), str1, 0, c);
 		break;
 
 	/* these don't belong here... */
@@ -1871,7 +1872,8 @@ loadfont (
     int n,			/* load this font position */
     char *s,			/* with the file for this font */
     char *s1,			/* taken from here - possibly */
-    int forcespecial		/* this is definitively a special font */
+    int forcespecial,		/* this is definitively a special font */
+    int spec			/* map specification */
 )
 
 
@@ -1903,18 +1905,25 @@ loadfont (
 	return;
 
     path = temp;
-    if (strchr(s, '/') != NULL)
+    if (s1 && strchr(s1, '/') != NULL)
+	path = afmdecodepath(s1);
+    else if (s1 && strstr(s1, ".afm") != NULL)
+	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s1);
+    else if (strchr(s, '/') != NULL) {
 	path = afmdecodepath(s);
-    else if (strstr(s, ".afm") != NULL)
+	if (spec == 0 && s1)
+		spec = atoi(s1);
+    } else if (strstr(s, ".afm") != NULL) {
 	snprintf(temp, sizeof temp, "%s/dev%s/%s", fontdir, devname, s);
-    else snprintf(temp, sizeof temp, "%s/dev%s/%s.afm", fontdir, devname, s);
+	if (spec == 0 && s1)
+		spec = atoi(s1);
+    } else snprintf(temp, sizeof temp, "%s/dev%s/%s.afm", fontdir, devname, s);
 
     if ( (fin = open(path, O_RDONLY)) >= 0 )  {
 	struct afmtab	*a;
 	struct stat	st;
 	char	*contents;
 	int	i;
-	enum spec	spec;
 	if ((p = strrchr(s, '/')) == NULL)
 		p = s;
 	else
@@ -1922,7 +1931,6 @@ loadfont (
 	if (p[0] == 'S' && (p[1] == '\0' || digitchar(p[1]&0377) &&
 				p[2] == '\0' || p[2] == '.'))
 		forcespecial = 1;
-	spec = s1 && *s1 ? atoi(s1) : SPEC_NONE;
 	for (i = 0; i < afmcount; i++)
 		if (afmfonts[i] && strcmp(afmfonts[i]->path, path) == 0 &&
 				afmfonts[i]->spec == spec) {
@@ -2029,7 +2037,7 @@ loadspecial(void)
 	for ( i = 1, p = chname + dev.lchname; i <= dev.nfonts; i++ )  {
 	    nw = *p & BMASK;
 	    if ( ((struct Font *) p)->specfont == 1 )
-		loadfont(++nfonts, ((struct Font *)p)->namefont, NULL, 1);
+		loadfont(++nfonts, ((struct Font *)p)->namefont, NULL, 1, 0);
 	    p += 3 * nw + dev.nchtab + 128 - 32 + sizeof(struct Font);
 	}   /* End for */
 
@@ -2048,7 +2056,7 @@ loaddefault(void)
   int i;
 
   for (i = 0; defaultFonts[i] != NULL ; i++)
-    loadfont(++nfonts, defaultFonts[i], NULL, defaultFonts[i][0] == 'S');
+    loadfont(++nfonts, defaultFonts[i], NULL, defaultFonts[i][0] == 'S', 0);
 }
 
 

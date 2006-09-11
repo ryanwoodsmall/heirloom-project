@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.178 (gritter) 9/11/06
+ * Sccsid @(#)t6.c	1.179 (gritter) 9/11/06
  */
 
 /*
@@ -1632,7 +1632,7 @@ setfp(int pos, int f, char *truename)	/* mount font f at position pos[0...nfonts
 		/* comes out too soon.  pushing back FONTPOS doesn't work */
 		/* with .ft commands because input is flushed after .xx cmds */
 	if (realpage && ap == NULL)
-		ptfpcmd(pos, shortname);
+		ptfpcmd(pos, shortname, NULL, 0);
 	if (pos == 0)
 		ch = (tchar) FONTPOS | (tchar) f << 22;
 	return(pos);
@@ -2084,7 +2084,7 @@ done:	afmtab = realloc(afmtab, (nafm+1) * sizeof *afmtab);
 	}
 	checkenminus(nf);
 	if (realpage)
-		ptfpcmd(nf, a->path);
+		ptfpcmd(nf, macname(fontlab[nf]), a->path, (int)a->spec);
 	return 1;
 }
 
