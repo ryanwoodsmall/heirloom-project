@@ -49,6 +49,8 @@ Release ...
   arguments is not a defined macro or register, respectively.
 * troff, dpost: The short font name is now part of the "x font" commands
   in intermediate output for Type 1, TrueType, and OpenType fonts.
+* dpost: Unless an explicit "-e" option is given, the encoding is now
+  switched on the fly between 2 and 4 as suitable for the input.
 * dpost: With the "-e2" and "-e3" encoding options, use only word spaces as
   indicated by troff for the "widthshow" PostScript operator. This usually
   results in slightly larger PostScript output but is better encodable when

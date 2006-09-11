@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.146 (gritter) 9/11/06
+.\" Sccsid @(#)doc.tr	1.147 (gritter) 9/11/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1103,7 +1103,7 @@ unless the \fBtrack\fR request has been used;
 \fB4\fR using \fBashow\fR,
 storing positions as differences;
 \fB5\fR like 4 but using a binary \*(PS Level\~2 representation.
-The default is 4.
+The default is to switch automatically between 2 and 4.
 \fB
 .bt
 	\fB\-M\ \fImarks\fR	\

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.156 (gritter) 9/11/06
+ * Sccsid @(#)dpost.c	1.157 (gritter) 9/11/06
  */
 
 /*
@@ -1294,6 +1294,8 @@ setup(void)
  */
 
 
+    if (realencoding == -1)
+	encoding = 4;
     writerequest(0, stdout);		/* global requests eg. manual feed */
     fprintf(stdout, "/resolution %d def\n", res);
     fprintf(stdout, "setup\n");
@@ -2734,6 +2736,8 @@ t_page (
     fprintf(tf, "save\n");
     fprintf(tf, "mark\n");
     writerequest(printed+1, tf);
+    if (realencoding == -1)
+        fprintf(tf, "%d SD\n", encoding);
     fprintf(tf, "%d pagesetup\n", printed+1);
     setcolor();
 
@@ -2939,7 +2943,8 @@ t_track(char *buf)
  * Currently this is done in encodings 0, 4, and 5 only.
  */
 
-	if (encoding != 0 && encoding != 4 && encoding != 5)
+	if (encoding != 0 && encoding != 4 && encoding != 5 &&
+			realencoding != -1)
 		return;
 	if (sscanf(buf, "%d", &t) != 1)
 		t = 0;
@@ -3636,6 +3641,16 @@ oprep(int maysplit, int stext)
 	endline();
 
     if (stext) {
+	if (realencoding == -1 && (encoding == 2 || encoding == 4)) {
+	    int prevencoding = encoding;
+	    encoding = tracked ? 4 : 2;
+	    if (prevencoding != encoding) {
+	      endtext();
+	      fprintf(tf, "%d SD\n", encoding);
+	      if (encoding == 4)
+	        endline();
+	    }
+	}
         starttext();
 
         if ( ABS(hpos - lastx) > slop )
