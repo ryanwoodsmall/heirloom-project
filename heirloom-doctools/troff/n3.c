@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.163 (gritter) 9/11/06
+ * Sccsid @(#)n3.c	1.164 (gritter) 9/11/06
  */
 
 /*
@@ -388,7 +388,9 @@ caserm(void)
 	int j, cnt = 0;
 
 	lgf++;
-	while (!skip(!cnt++) && (j = getrq(0)) != 0) {
+	while (!skip(!cnt++)) {
+		if ((j = getrq(2)) <= 0)
+			continue;
 		if ((contp = _findmn(j, 0, 0)) == NULL)
 			continue;
 		if (contp->als) {

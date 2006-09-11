@@ -41,10 +41,12 @@ Release ...
   previous value as "\s0" does.
 * [nt]roff: Arbitrary delimiters are now allowed with "\s''" escape
   sequences.
-* troff: Fixed a bug that caused ".shift" without arguments to be ignored
+* [nt]roff: Fixed a bug that caused ".shift" without arguments to be ignored
   if the last previous numerical expression was invalid.
 * troff: The indent of the current line is no longer part of a PDF link
   that continues from the previous line.
+* [nt]roff: ".rm" and ".rr" no longer issue a warning if one of their
+  arguments is not a defined macro or register, respectively.
 * troff, dpost: The short font name is now part of the "x font" commands
   in intermediate output for Type 1, TrueType, and OpenType fonts.
 * eqn: Avoid to recognize delimiters inside troff escape sequences with "("

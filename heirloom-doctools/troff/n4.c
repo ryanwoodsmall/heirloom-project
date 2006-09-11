@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.79 (gritter) 9/11/06
+ * Sccsid @(#)n4.c	1.80 (gritter) 9/11/06
  */
 
 /*
@@ -1378,11 +1378,8 @@ caserr(void)
 	lgf++;
 	while (!skip(!cnt++) && (i = getrq(2)) ) {
 		p = _usedr(i, 0, NULL);
-		if (p == NULL) {
-			if (warn & WARN_REG)
-				errprint("no such register %s", macname(i));
+		if (p == NULL)
 			continue;
-		}
 		nunhash(p);
 		if (p->aln && (kp = _usedr(i, 1, NULL)) != NULL) {
 			if (--kp->nlink <= 0)
