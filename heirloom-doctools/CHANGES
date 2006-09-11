@@ -49,6 +49,10 @@ Release ...
   arguments is not a defined macro or register, respectively.
 * troff, dpost: The short font name is now part of the "x font" commands
   in intermediate output for Type 1, TrueType, and OpenType fonts.
+* dpost: With the "-e2" and "-e3" encoding options, use only word spaces as
+  indicated by troff for the "widthshow" PostScript operator. This usually
+  results in slightly larger PostScript output but is better encodable when
+  distilled to PDF so that PDF files become smaller.
 * eqn: Avoid to recognize delimiters inside troff escape sequences with "("
   or "[" as well as directly behind a sequence of backslash characters.
 

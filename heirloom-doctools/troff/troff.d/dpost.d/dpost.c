@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.155 (gritter) 9/11/06
+ * Sccsid @(#)dpost.c	1.156 (gritter) 9/11/06
  */
 
 /*
@@ -433,6 +433,7 @@ int		res;			/* resolution assumed in input file */
 float		widthfac = 1.0;		/* for emulation = res/dev.res */
 float		horscale = 1.0;		/* horizontal font scaling */
 float		lasthorscale = 1.0;	/* last horizontal font scaling */
+int		wordspace = 0;		/* w command was last */
 
 
 /*
@@ -1559,6 +1560,7 @@ conv(
 		    break;
 
 	    case 'w':			/* word space */
+		    wordspace++;
 		    break;
 
 	    case 'V':			/* absolute vertical position */
@@ -3639,6 +3641,7 @@ oprep(int maysplit, int stext)
         if ( ABS(hpos - lastx) > slop )
 	    endstring();
     }
+    wordspace = 0;
 }
 
 
@@ -3890,6 +3893,11 @@ endstring(void)
 
 	case 2:
 	case 3:
+	    if (!wordspace) {
+		    endtext();
+		    starttext();
+		    break;
+	    }
 	    dx = hpos - lastx;
 	    if ( spacecount++ == 0 )
 		line[textcount].dx = dx;
