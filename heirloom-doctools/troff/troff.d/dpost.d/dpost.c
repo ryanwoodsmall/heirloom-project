@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.157 (gritter) 9/11/06
+ * Sccsid @(#)dpost.c	1.158 (gritter) 9/12/06
  */
 
 /*
@@ -323,6 +323,7 @@ int		picflag = ON;		/* enable/disable picture inclusion */
 
 int		encoding = DFLTENCODING;
 int		realencoding = DFLTENCODING;
+int		setencoding = DFLTENCODING;
 int		maxencoding = MAXENCODING;
 int		eflag;
 
@@ -670,6 +671,7 @@ static void	sethorscale(char *);
 static void	t_papersize(char *);
 static void	t_cutat(const char *, struct box *, char *);
 static void	t_track(char *);
+static void	t_sd(void);
 static void	t_strack(void);
 static void	t_pdfmark(char *);
 static void	t_locale(char *);
@@ -1065,7 +1067,7 @@ options(void)
 			encoding = DFLTENCODING;
 		    else
 		        eflag = 1;
-		    realencoding = encoding;
+		    setencoding = realencoding = encoding;
 		    break;
 
 	    case 'm':			/* magnification */
@@ -1294,8 +1296,8 @@ setup(void)
  */
 
 
-    if (realencoding == -1)
-	encoding = 4;
+    if (setencoding == -1)
+	realencoding = encoding = 4;
     writerequest(0, stdout);		/* global requests eg. manual feed */
     fprintf(stdout, "/resolution %d def\n", res);
     fprintf(stdout, "setup\n");
@@ -2336,7 +2338,7 @@ t_init(void)
 		if (Sflag == 0)
 			pointslop = 0;
 		if (eflag == 0)
-			realencoding = encoding = HIGHDFLTENCODING;
+			setencoding = -1;
 	}
 	if (encoding == 5) {
 	    LanguageLevel = MAX(LanguageLevel, 2);
@@ -2736,8 +2738,8 @@ t_page (
     fprintf(tf, "save\n");
     fprintf(tf, "mark\n");
     writerequest(printed+1, tf);
-    if (realencoding == -1)
-        fprintf(tf, "%d SD\n", encoding);
+    if (setencoding == -1)
+        t_sd();
     fprintf(tf, "%d pagesetup\n", printed+1);
     setcolor();
 
@@ -2928,6 +2930,14 @@ sethorscale(char *buf)
 
 /*****************************************************************************/
 static void
+t_sd(void)
+{
+	if (setencoding == -1)
+	    fprintf(tf, "%d SD\n", encoding);
+}
+
+/*****************************************************************************/
+static void
 t_track(char *buf)
 {
 	int	t;
@@ -2944,7 +2954,7 @@ t_track(char *buf)
  */
 
 	if (encoding != 0 && encoding != 4 && encoding != 5 &&
-			realencoding != -1)
+			setencoding != -1)
 		return;
 	if (sscanf(buf, "%d", &t) != 1)
 		t = 0;
@@ -3246,8 +3256,10 @@ t_sf(int forceflush)
 	    fprintf(tf, "%d %g changefont\n", fontname[font].fontslant, (fontname[font].fontheight != 0) ? (double)fontname[font].fontheight : (double)fractsize);
     }
 
-    if (tracked < 0)
+    if (tracked < 0 || tracked > 0 && forceflush)
 	    t_strack();
+    if (forceflush)
+	    t_sd();
 
 }   /* End of t_sf */
 
@@ -3641,12 +3653,12 @@ oprep(int maysplit, int stext)
 	endline();
 
     if (stext) {
-	if (realencoding == -1 && (encoding == 2 || encoding == 4)) {
+	if (setencoding == -1 && (encoding == 2 || encoding == 4)) {
 	    int prevencoding = encoding;
-	    encoding = tracked ? 4 : 2;
+	    realencoding = encoding = tracked ? 4 : 2;
 	    if (prevencoding != encoding) {
 	      endtext();
-	      fprintf(tf, "%d SD\n", encoding);
+	      t_sd();
 	      if (encoding == 4)
 	        endline();
 	    }
