@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.7 (gritter) 9/11/06
+.\" Sccsid @(#)an	2.8 (gritter) 9/13/06
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -282,10 +282,12 @@
 .do ds }$3 "\\$3
 .do ds }$4 "\\$4
 .do shift 4
-.do nr }.X \\n(.X
-.do if \\n[}.X]<2 .do xflag 3
+.if \\n(.X<2 \{\
+.nr )X \\n(.X
+.do xflag 3
+.\}
 .}S \\*[}$2] \\*[}$1] "\\*[}$3]\f\\*[}$1]\\*[}$4]\\*(]F" \\$@
-.do if \\n[}.X]<2 .do xflag \\n[}.X]
+.if \\n()X .do xflag \\n()X
 .\}
 .el \\$3
 .}f
