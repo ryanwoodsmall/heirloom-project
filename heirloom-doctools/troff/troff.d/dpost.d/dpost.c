@@ -3069,7 +3069,7 @@ end\n",
 	fprintf(gf, "/&%s", a->Font.intname);
 	if (n)
 		fprintf(gf, "@%d", n);
-	fprintf(gf, "{@%s", a->Font.intname);
+	fprintf(gf, " {@%s", a->Font.intname);
 	if (n)
 		fprintf(gf, "@%d", n);
 	fprintf(gf, " F} bind def\n");
