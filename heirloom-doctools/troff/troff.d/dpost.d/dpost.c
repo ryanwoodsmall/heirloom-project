@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.158 (gritter) 9/12/06
+ * Sccsid @(#)dpost.c	1.159 (gritter) 9/16/06
  */
 
 /*
@@ -452,6 +452,7 @@ int		lastfont = -1;		/* last font we told printer about */
 int		lastsubfont = -1;	/* last extra encoding vector */
 float		lastx = -1;		/* printer's current position */
 int		lasty = -1;
+int		savey = -1;
 int		lastend;		/* where last character on this line was */
 
 
@@ -2268,7 +2269,7 @@ reset(void)
 
 
     lastx = -(slop + 1);
-    lasty = -1;
+    savey = lasty = -1;
     lastfont = lastsubfont = lastsize = -1;
     if (tracked)
 	    tracked = -1;
@@ -2299,7 +2300,7 @@ resetpos(void)
 
 
     lastx = -(slop + 1);
-    lasty = -1;
+    savey = lasty = -1;
 
 }   /* End of resetpos */
 
@@ -3065,6 +3066,13 @@ end\n",
 	if (n)
 		fprintf(gf, "@%d", n);
 	fprintf(gf, " def\n");
+	fprintf(gf, "/&%s", a->Font.intname);
+	if (n)
+		fprintf(gf, "@%d", n);
+	fprintf(gf, "{@%s", a->Font.intname);
+	if (n)
+		fprintf(gf, "@%d", n);
+	fprintf(gf, " F} bind def\n");
 }
 
 static void
@@ -3207,7 +3215,7 @@ t_sf(int forceflush)
     }	/* End if */
 
     cmd = 'f';
-    if (forceflush == 0 && (encoding == 4 || encoding == 5)) {
+    if (forceflush == 0) {
 	if (font == lastfont && subfont == lastsubfont)
 	    cmd = 's';
 	else if (size == lastsize && fractsize == lastfractsize)
@@ -3237,7 +3245,13 @@ t_sf(int forceflush)
         else
 	    fprintf(tf, "%g ", (double)fractsize);
     }
-    if (cmd == 'f' || cmd == 'F' || cmd == 'h') {
+    if (fontname[font].afm && cmd == 'F') {
+        if (subfont)
+    	    fprintf(tf, "&%s@%d\n", fontname[font].afm->Font.intname, subfont);
+        else
+    	    fprintf(tf, "&%s\n", fontname[font].afm->Font.intname);
+	cmd = 0;
+    } else if (cmd == 'f' || cmd == 'F' || cmd == 'h') {
         if (fontname[font].afm && subfont)
     	    fprintf(tf, "@%s@%d ", fontname[font].afm->Font.intname, subfont);
         else if (fontname[font].afm)
@@ -3247,7 +3261,8 @@ t_sf(int forceflush)
     }
     if (cmd == 'h')
 	    fprintf(tf, "%g ", horscale);
-    fprintf(tf, "%c\n", cmd);
+    if (cmd)
+	    fprintf(tf, "%c\n", cmd);
 
     if ( fontname[font].fontheight != 0 || fontname[font].fontslant != 0 ) {
 	if (size != FRACTSIZE)
@@ -3488,7 +3503,7 @@ xymove (
     fprintf(tf, "%d %d m\n", hpos, vpos);
 
     lastx = hpos;
-    lasty = vpos;
+    savey = lasty = vpos;
 
 }   /* End of xymove */
 
@@ -3783,7 +3798,9 @@ endtext(void)
 
 {
 
+    char	buf[STRINGSPACE+100];
     int		i;			/* loop index */
+    int		n, m;
 
 
 /*
@@ -3826,19 +3843,55 @@ endtext(void)
 		*strptr = '\0';
 		line[textcount].width = lastx - line[textcount].start;
 		if ( spacecount != 0 || textcount != 1 )  {
-		    for ( i = textcount; i > 0; i-- )
-			fprintf(tf, "(%s)%d %d\n", line[i].str, line[i].spaces, line[i].width);
-		    fprintf(tf, " %d %d %d t\n", textcount, stringstart, lasty);
-		} else fprintf(tf, "(%s)%d %d w\n", line[1].str, stringstart, lasty);
+		    n = 0;
+		    for ( i = textcount; i > 0; i-- ) {
+			m = snprintf(buf, sizeof buf, "(%s)%d %d",
+				line[i].str, line[i].spaces, line[i].width);
+			if (i < textcount && n + m >= 80) {
+			    putc('\n', tf);
+			    n = 0;
+			}
+			fputs(buf, tf);
+			n += m;
+		    }
+		    if (lasty != savey)
+		        fprintf(tf, " %d %d %d t\n", textcount, stringstart, lasty);
+		    else
+		        fprintf(tf, " %d %d u\n", textcount, stringstart);
+		} else {
+			if (lasty != savey)
+			    fprintf(tf, "(%s)%d %d w\n", line[1].str, stringstart, lasty);
+			else
+			    fprintf(tf, "(%s)%d v\n", line[1].str, stringstart);
+		}
+		savey = lasty;
 		break;
 
 	    case 3:
 		*strptr = '\0';
 		if ( spacecount != 0 || textcount != 1 )  {
-		    for ( i = textcount; i > 0; i-- )
-			fprintf(tf, "(%s)%d", line[i].str, line[i].dx);
-		    fprintf(tf, " %d %d %d t\n", textcount, stringstart, lasty);
-		} else fprintf(tf, "(%s)%d %d w\n", line[1].str, stringstart, lasty);
+		    n = 0;
+		    for ( i = textcount; i > 0; i-- ) {
+			m = snprintf(buf, sizeof buf, "(%s)%d",
+				line[i].str, line[i].dx);
+			if (i < textcount && n + m >= 80) {
+			    putc('\n', tf);
+			    n = 0;
+			}
+			fputs(buf, tf);
+			n += m;
+		    }
+		    if (lasty != savey)
+		        fprintf(tf, " %d %d %d t\n", textcount, stringstart, lasty);
+		    else
+		        fprintf(tf, " %d %d u\n", textcount, stringstart);
+		} else {
+			if (lasty != savey)
+			    fprintf(tf, "(%s)%d %d w\n", line[1].str, stringstart, lasty);
+			else
+			    fprintf(tf, "(%s)%d v\n", line[1].str, stringstart);
+		}
+		savey = lasty;
 		break;
 
 	    case MAXENCODING+1:
@@ -3988,9 +4041,10 @@ endline(void)
 
     endtext();
 
-    if ( encoding == 0 || encoding == 4 || encoding == MAXENCODING+1 )
+    if ( encoding == 0 || encoding == 4 || encoding == MAXENCODING+1 ) {
 	fprintf(tf, "%d %d m\n", hpos, vpos);
-    else if (encoding == 5) {
+	savey = vpos;
+    } else if (encoding == 5) {
 	    putint(hpos, tf);
 	    putint(vpos, tf);
 	    putc('m', tf);
@@ -4202,6 +4256,7 @@ charlib (
 		cat(temp, tf);
 	}   /* End if */
 	fprintf(tf, "%d %d m\n", stringstart = hpos + lastw, vpos);
+	savey = vpos;
     }	/* End if */
 
 }   /* End of charlib */

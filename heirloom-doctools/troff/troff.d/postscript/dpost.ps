@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.16 0
+%%BeginResource: procset dpost 4.17 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.16 (gritter) 9/11/06
+% Sccsid @(#)dpost.ps	4.17 (gritter) 9/16/06
 %
 
 /#copies 1 store
@@ -144,8 +144,8 @@
 /decodingdefs [
 	{counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
 	{neg /y exch def counttomark 2 idiv {y moveto show} repeat}
-	{neg moveto {2 index stringwidth pop sub exch div 0 32 4 -1 roll widthshow} repeat}
-	{neg moveto {spacewidth sub 0.0 32 4 -1 roll widthshow} repeat}
+	{neg dup /y exch def moveto {2 index stringwidth pop sub exch div 0 32 4 -1 roll widthshow} repeat}
+	{neg dup /y exch def moveto {spacewidth sub 0.0 32 4 -1 roll widthshow} repeat}
 	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
 	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
 	{counttomark 2 idiv {y moveto show} repeat}
@@ -157,7 +157,9 @@
 
 /T {/track exch def} bind def
 
-/w {neg moveto show} bind def
+/w {neg dup /y exch def moveto show} bind def
+/v {y moveto show} bind def
+/u {y neg t} bind def
 /m {neg dup /y exch def moveto} bind def
 /done {/lastpage where {pop lastpage} if} def
 
