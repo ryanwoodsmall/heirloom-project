@@ -47,6 +47,8 @@ Release ...
   that continues from the previous line.
 * [nt]roff: ".rm" and ".rr" no longer issue a warning if one of their
   arguments is not a defined macro or register, respectively.
+* troff: Fixed an error that sometimes caused the "x X Track" command to miss
+  in intermediate output.
 * troff, dpost: The short font name is now part of the "x font" commands
   in intermediate output for Type 1, TrueType, and OpenType fonts.
 * dpost: The PostScript "awidthshow" operator is now used with the "-e2" and
