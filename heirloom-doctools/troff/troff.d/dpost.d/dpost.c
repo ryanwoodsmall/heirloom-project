@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.160 (gritter) 9/17/06
+ * Sccsid @(#)dpost.c	1.161 (gritter) 9/17/06
  */
 
 /*
@@ -3615,7 +3615,7 @@ put1 (
 	    lastw = horscale * widthfac * (int)((pw[i] * fractsize + unitwidth/2) / unitwidth);
 	if (widthfac == 1)	/* ignore fractional parts since troff */
 		lastw = (int)lastw;	/* does the same */
-	if (track)
+	if (track && encoding != MAXENCODING+2)
 		lastw += track;
 	if (code == -1 && fontname[k].afm)
 		code = c + 32;
