@@ -1,4 +1,4 @@
-%%BeginResource: procset dpost 4.17 0
+%%BeginResource: procset dpost 4.18 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -27,7 +27,7 @@
 %
 % Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
-% Sccsid @(#)dpost.ps	4.17 (gritter) 9/16/06
+% Sccsid @(#)dpost.ps	4.18 (gritter) 9/17/06
 %
 
 /#copies 1 store
@@ -143,22 +143,21 @@
 
 /decodingdefs [
 	{counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
-	{neg /y exch def counttomark 2 idiv {y moveto show} repeat}
-	{neg dup /y exch def moveto {2 index stringwidth pop sub exch div 0 32 4 -1 roll widthshow} repeat}
-	{neg dup /y exch def moveto {spacewidth sub 0.0 32 4 -1 roll widthshow} repeat}
+	{neg /y exch def counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
+	{neg dup /y exch def moveto {2 index dup length track mul exch stringwidth pop add sub exch div 0 32 track 0 6 -1 roll awidthshow} repeat}
+	{neg dup /y exch def moveto {spacewidth sub track sub 0.0 32 track 0 6 -1 roll awidthshow} repeat}
 	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
 	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
-	{counttomark 2 idiv {y moveto show} repeat}
+	{counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
 	{neg setfunnytext}
 ] def
 
 /setdecoding {/t decodingdefs 3 -1 roll get def} bind def
-/SD {setdecoding} bind def
 
 /T {/track exch def} bind def
 
-/w {neg dup /y exch def moveto show} bind def
-/v {y moveto show} bind def
+/w {neg dup /y exch def moveto track 0 3 -1 roll ashow} bind def
+/v {y moveto track 0 3 -1 roll ashow} bind def
 /u {y neg t} bind def
 /m {neg dup /y exch def moveto} bind def
 /done {/lastpage where {pop lastpage} if} def
