@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.92 (gritter) 9/17/06
+ * Sccsid @(#)t10.c	1.93 (gritter) 9/19/06
  */
 
 /*
@@ -433,6 +433,8 @@ ptout0(tchar *pi, tchar *pend)
 			ptps();
 		if (lead)
 			ptlead();
+		if (esc)
+			ptesc();
 		fdprintf(ptid, "x X ");
 		/* 
 	     * not guaranteed of finding a XOFF if a word overflow
@@ -913,6 +915,8 @@ ptyon(int i)
 		ptps();
 	if (lead)
 		ptlead();
+	if (esc)
+		ptesc();
 	fdprintf(ptid, "x X ");
 	savip = ip;
 	ip = (filep)cp->mx;

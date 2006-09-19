@@ -51,6 +51,9 @@ Release ...
   in intermediate output.
 * troff, dpost: The short font name is now part of the "x font" commands
   in intermediate output for Type 1, TrueType, and OpenType fonts.
+* troff: Before generating an "x X" command because of a "\X" or "\Y" escape
+  sequence, the current horizonal position is now emitted to intermediate
+  output. This makes input like "\h'1i'\X'anything'" work as expected.
 * dpost: The PostScript "awidthshow" operator is now used with the "-e2" and
   "-e3" encoding options, resulting in reasonable output in combination with
   the ".track" request.
