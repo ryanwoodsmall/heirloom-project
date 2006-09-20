@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.148 (gritter) 9/17/06
+.\" Sccsid @(#)doc.tr	1.149 (gritter) 9/20/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 9/17/06
+.ds Sccsdate 9/20/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1127,10 +1127,10 @@ and leads to the most compact \*[PDF] documents.
 With lower-resolution devices, \fB2\fR is preferred over \fB3\fR
 since the latter may produce incorrect alignment
 because of accumulated rounding errors.
-\fB0\fR, \fB1\fR, or \fB4\fR are recommended
+\fB0\fR, \fB1\fR, or \fB4\fR may be preferable
 if the text font contains many kerning pairs
-since \fB2\fR or \fB3\fR may result
-in less efficient and less compact output
+since \fB2\fR or \fB3\fR can result
+in less efficient or less compact output
 under these circumstances.
 .ta .3i 1.2i
 .in 1.2i
