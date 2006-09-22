@@ -16,7 +16,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)deroff.sl	1.8 (gritter) 9/22/06";
+static const char sccsid[] USED = "@(#)deroff.sl	1.9 (gritter) 9/23/06";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -463,8 +463,8 @@ putmac(char *rp, int vconst)
 			;
 		if(*rp == '\"')
 			rp++;
-		if(t > rp+vconst && charclass(*rp) == LETTER
-				&& charclass(rp[1]) == LETTER) {
+		if(t > rp+vconst && charclass(*rp&0377) == LETTER
+				&& charclass(rp[1]&0377) == LETTER) {
 			while(rp < t)
 				if(*rp == '\"')
 					rp++;
@@ -475,7 +475,7 @@ putmac(char *rp, int vconst)
 			last = t[-1];
 			found++;
 		} else
-		if(found && charclass(*rp) == PUNCT && rp[1] == '\0') {
+		if(found && charclass(*rp&0377) == PUNCT && rp[1] == '\0') {
 			putchar(*rp & 0377);
 			rp++;
 		} else {
@@ -484,7 +484,7 @@ putmac(char *rp, int vconst)
 		}
 	}
 	putchar('\n');
-	if(msflag && charclass(last) == PUNCT)
+	if(msflag && charclass(last&0377) == PUNCT)
 		printf(" %c\n", last);
 }
 
@@ -502,11 +502,11 @@ putwords(void)
 		/*
 		 * skip initial specials ampersands and apostrophes
 		 */
-		while((i = charclass(*p1)) != EXTENDED && i < DIGIT)
+		while((i = charclass(*p1&0377)) != EXTENDED && i < DIGIT)
 			if(*p1++ == '\0')
 				return;
 		nlet = 0;
-		for(p = p1; (i = charclass(*p)) != SPECIAL || (underscoreflag && *p=='_'); p++)
+		for(p = p1; (i = charclass(*p&0377)) != SPECIAL || (underscoreflag && *p=='_'); p++)
 			if(i == LETTER || (underscoreflag && *p == '_'))
 				nlet++;
 		/*
@@ -517,7 +517,7 @@ putwords(void)
 			 * delete trailing ampersands and apostrophes
 			 */
 			while(*--p == '\'' || *p == '&'
-					   || charclass(*p) == PUNCT)
+					   || charclass(*p&0377) == PUNCT)
 				;
 			while(p1 <= p) {
 				putchar(*p1 & 0377);
@@ -1061,7 +1061,7 @@ refer(int c1)
 			else {
 				while(C != '\n')
 					c2 = c;
-				if(charclass(c2) == PUNCT)
+				if(charclass(c2&0377) == PUNCT)
 					printf(" %c", c2);
 				return;
 			}
