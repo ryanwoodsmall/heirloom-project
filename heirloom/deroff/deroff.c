@@ -16,7 +16,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)deroff.sl	1.7 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)deroff.sl	1.8 (gritter) 9/22/06";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,6 +70,7 @@ static const char sccsid[] USED = "@(#)deroff.sl	1.7 (gritter) 5/29/05";
 /* lose those macros! */
 #define	C	fC()
 #define	C1	fC1()
+#define	U(c)	fU(c)
 
 #define	SKIP	while(C != '\n') 
 #define SKIP1	while(C1 != '\n')
@@ -105,6 +106,8 @@ static int	disp	= 0;
 static int	inmacro	= NO;
 static int	intable	= NO;
 static int	eqnflag	= 0;
+static int	_xflag = 1;
+static int	xflag;
 
 #define	MAX_ASCII	256
 
@@ -135,6 +138,23 @@ static FILE	*infile;
 
 static const char	*progname;
 static const char	*Progname;
+
+static const char *const skiprq[] = {
+	"fp", "fps", "feature", "fallback", "hidechar", "papersize",
+	"mediasize", "cropat", "trimat", "bleedat", "letadj", "track",
+	"kernpair", "kernafter", "kernbefore", "lhang", "rhang",
+	"substring", "index", "flig", "fdeferlig", "fzoom", "rm", "rn",
+	"wh", "dwh", "dt", "it", "itc", "als", "rnm", "aln",
+	"nr", "nrf", "af", "warn", "ftr", "tr", "trin", "trnt", "rchar",
+	"lc_ctype", "hylang", "sentchar", "transchar", "breakchar",
+	NULL
+};
+static const char *const skip1rq[] = {
+	"ft", "ds", "as", "lds", "substring", "length", "index", "chop",
+	"di", "da", "box", "boxa", "unformat", "asciify", "ch", "dch",
+	"blm", "em", "char", "fchar",
+	NULL
+};
 
 static long	skeqn(void);
 static FILE	*opn(char *p);
@@ -168,8 +188,10 @@ fC(void)
 		return eof();
 	if(c == ldelim && filesp == files)
 		return skeqn();
-	if(c == '\n')
+	if(c == '\n') {
 		linect++;
+		xflag = _xflag;
+	}
 	return c;
 }
 
@@ -179,9 +201,19 @@ fC1(void)
 	c = getc(infile);
 	if(c == EOF)
 		return eof();
-	if(c == '\n')
+	if(c == '\n') {
 		linect++;
+		xflag = _xflag;
+	}
 	return c;
+}
+
+static void
+fU(int i)
+{
+	ungetc(i, infile);
+	if(i == '\n')
+		linect--;
 }
 
 int
@@ -195,7 +227,7 @@ main(int argc, char *av[])
 	strcpy((char *)Progname, progname);
 	((char *)Progname)[0] = toupper(Progname[0]);
 	files = srealloc(files, (filec = 1) * sizeof *files);
-	while ((i = getopt(argc, argv, "im:w")) != EOF) {
+	while ((i = getopt(argc, argv, "im:wx:")) != EOF) {
 	switch (i) {
 	case 'w':
 		wordflag = YES;
@@ -216,6 +248,9 @@ main(int argc, char *av[])
 		break;
 	case 'i':
 		iflag = YES;
+		break;
+	case 'x':
+		_xflag = atoi(optarg);
 		break;
 	default:
 		usage();
@@ -241,15 +276,9 @@ main(int argc, char *av[])
 	chars[';'] = PUNCT;
 	chars['?'] = PUNCT;
 	chars[':'] = PUNCT;
-	/*
-	 * Unix troff can only handle ASCII, groff can only
-	 * handle ISO-8859-1. Thus assume that ISO-8859-1 is
-	 * used for high-bit characters.
-	 */
-	for (i=0241; i<=0277; ++i)
-		chars[i] = PUNCT;
-	for (i=0300; i<=0377; ++i)
+	for (i=0200; i<=0377; ++i)
 		chars[i] = LETTER;
+	xflag = _xflag;
 	work();
 	return 0;
 }
@@ -504,6 +533,8 @@ static void
 comline(void)
 {
 	long c1, c2;
+	int i, j;
+	char cc[4096];
 
 	while(C==' ' || c=='\t')
 		;
@@ -511,6 +542,44 @@ comx:
 	if((c1=c) == '\n')
 		return;
 	c2 = C;
+	cc[0] = c1;
+	if (c2 != '\n') {
+		cc[1] = c2;
+		i = 2;
+	} else
+		i = 0;
+	cc[i] = 0;
+	if(xflag > 1 && i == 2) {
+		for ( ; i < sizeof cc - 1; i++) {
+			if (C1 == ' ' || c == '\n') {
+				U(c);
+				break;
+			}
+			cc[i] = c;
+		}
+		cc[i] = 0;
+		if (strcmp(cc, "xflag") == 0) {
+			while (C1 == ' ');
+			U(c);
+			for (i = 0; i < sizeof cc - 1; i++) {
+				if (C1 == ' ' || c == '\n') {
+					U(c);
+					break;
+				}
+				cc[i] = c;
+			}
+			cc[i] = 0;
+			xflag = _xflag = atoi(cc);
+			return;
+		}
+	}
+	for (j = 0; skiprq[j]; j++)
+		if (strcmp(cc, skiprq[j]) == 0) {
+			SKIP;
+			return;
+		}
+	if (i > 2 && xflag > 2)
+		goto mac;
 	if(c1=='.' && c2!='.')
 		inmacro = NO;
 	if(msflag && c1 == '['){
@@ -570,6 +639,11 @@ comx:
 	else
 	if(c1=='h' && c2=='w')
 		SKIP; 
+	else
+	if(xflag && c1=='d' && c2=='o') {
+		xflag = 3;
+		comline();
+	}
 	else
 	if(msflag && c1 == 'T' && c2 == 'L') {
 		SKIP_TO_COM;
@@ -642,11 +716,19 @@ comx:
 			while(C == '.')
 				;
 		}
+	mac:
 		inmacro++;
 		if(c1 <= 'Z' && msflag)
 			regline(YES,ONE);
 		else {
-			if(wordflag)
+			for (j = 0; skip1rq[j]; j++)
+				if (strcmp(cc, skip1rq[j]) == 0) {
+					while (C1 == ' ');
+					U(c);
+					while (C1 != ' ' && c != '\n');
+					U(c);
+				}
+			if(skip1rq[j] == 0 && wordflag)
 				C;
 			regline(YES,TWO);
 		}
@@ -829,6 +911,8 @@ sw:
 	case 's':
 		if(C1 == '\\')
 			backsl();
+		else if (c == '[' && xflag > 1)
+			goto bracket;
 		else {
 			while(C1>='0' && c<='9')
 				;
@@ -841,7 +925,14 @@ sw:
 	case 'f':
 	case 'n':
 	case '*':
-		if(C1 != '(')
+	case 'g':
+	case 'k':
+	case 'P':
+	case 'V':
+	case 'Y':
+		if(C1 == '[' && xflag > 1)
+			goto bracket;
+		if(c != '(')
 			return;
 
 	case '(':
@@ -865,6 +956,12 @@ sw:
 		C1;	/* discard argument number */
 		return;
 
+	case '[':
+	bracket:
+		if (xflag)
+			while (C1 != ']' && c != '\n');
+		return;
+
 	case 'b':
 	case 'x':
 	case 'v':
@@ -873,6 +970,15 @@ sw:
 	case 'o':
 	case 'l':
 	case 'L':
+	case 'X':
+	case 'A':
+	case 'B':
+	case 'D':
+	case 'H':
+	case 'R':
+	case 'S':
+	case 'T':
+	case 'U':
 		if((bdelim=C1) == '\n')
 			return;
 		while(C1!='\n' && c!=bdelim)

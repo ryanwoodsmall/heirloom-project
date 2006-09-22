@@ -8,13 +8,13 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)deroff.1	1.6 (gritter) 5/15/04
+.\" Sccsid @(#)deroff.1	1.7 (gritter) 9/22/06
 .\"
-.TH DEROFF 1 "5/15/04" "Heirloom Toolchest" "User Commands"
+.TH DEROFF 1 "9/22/06" "Heirloom Toolchest" "User Commands"
 .SH NAME
 deroff \- remove nroff/troff, tbl, and eqn constructs
 .SH SYNOPSIS
-\fBderoff\fR [\fB\-m\fIx\fR] [\fB\-w\fR] [ \fIfiles\fR ]
+\fBderoff\fR [\fB\-m\fIx\fR] [\fB\-w\fR] [\fB\-x\fIN\fR] [ \fIfiles\fR ]
 .SH DESCRIPTION
 .I Deroff
 reads each file in sequence
@@ -82,6 +82,14 @@ documents.
 Same as
 .BR \-mm ,
 but remove lists as well.
+.TP
+.BI \-x N
+Set the extension level to \fIN\fR
+(cf. the \fIHeirloom nroff/troff User's Manual).
+.I deroff
+also sets the extension level
+when it encounters the \fB.do\fR and \fB.xflag\fR commands,
+so use of this option will often be unnecessary.
 .SH "SEE ALSO"
 troff(1), 
 spell(1)
