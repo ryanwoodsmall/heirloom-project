@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)header.c	1.11 (gritter) 11/26/05
+ * Sccsid @(#)header.c	1.12 (gritter) 9/23/06
  */
 
 #include "ldefs.c"
@@ -193,6 +193,7 @@ static const char yylexid[] USED = \"lex: %s\"\n", rel);
 		fprintf(fout,
 		"# define REJECT { nstr = yyreject_w(); goto yyfussy;}\n");
 		fprintf(fout, "#define yyless yyless_w\n");
+		fprintf(fout, "int yyreject_w(void);\n");
 		fprintf(fout, "int yyleng;\n");
 
 		/*
@@ -228,6 +229,7 @@ static const char yylexid[] USED = \"lex: %s\"\n", rel);
 		if (handleeuc) {
 			fprintf(fout,
 "# define REJECT { nstr = yyreject_e(); goto yyfussy;}\n");
+			fprintf(fout, "int yyreject_e(void);\n");
 			fprintf(fout, "int yyleng;\n");
 			fprintf(fout, "size_t yywleng;\n");
 			/*
