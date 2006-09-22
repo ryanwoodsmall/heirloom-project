@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.149 (gritter) 9/20/06
+.\" Sccsid @(#)doc.tr	1.150 (gritter) 9/22/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 9/20/06
+.ds Sccsdate 9/22/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1118,9 +1118,8 @@ storing text positions as differences
 .in 1.2i
 .ti 0
 .xx
-		The default is \fB4\fR, or \fB0\fR for devices
-with legacy fonts.
-\fB3\fR is often the best choice with the default
+		The default is device-specific.
+\fB3\fR is the default with the
 high-resolution \fBps\fR device;
 it usually produces the most efficient \*(PS output
 and leads to the most compact \*[PDF] documents.

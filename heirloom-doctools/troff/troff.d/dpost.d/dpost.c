@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.161 (gritter) 9/17/06
+ * Sccsid @(#)dpost.c	1.162 (gritter) 9/22/06
  */
 
 /*
@@ -2334,9 +2334,8 @@ t_init(void)
 	if (dev.afmfonts) {
 		if (Sflag == 0)
 			pointslop = 0;
-		if (eflag == 0)
-			encoding = HIGHDFLTENCODING;
 	}
+	encoding = dev.encoding;
 	if (encoding == 5) {
 	    LanguageLevel = MAX(LanguageLevel, 2);
 	    Binary++;

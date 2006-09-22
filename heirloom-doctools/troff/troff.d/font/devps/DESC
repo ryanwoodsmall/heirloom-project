@@ -41,6 +41,7 @@ anysize
 allpunct
 afmfonts
 lc_ctype
+encoding 3
 res 72000
 hor 1
 vert 1
