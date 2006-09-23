@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/ta.sl	1.6 (gritter) 9/5/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/ta.sl	1.7 (gritter) 9/24/06";
 
 /*
  * University Copyright- Copyright (c) 1982, 1986, 1988
@@ -184,7 +184,7 @@ void vgoto(int);
 void vmot(int);
 void put1s(char *);
 void put1(int);
-void setsize(int);
+void setsize(double);
 void t_fp(int, char *);
 void setfont(int);
 void done(void);
@@ -353,8 +353,13 @@ conv(register FILE *fp)
 			}
 			break;
 		case 's':
-			fscanf(fp, "%d", &n);	/* ignore fractional sizes */
-			setsize(t_size(n));
+			fscanf(fp, "%d", &n);
+			if (n == -23) {
+				float	f;
+				fscanf(fp, "%f", &f);
+				setsize(f);
+			} else
+				setsize(t_size(n));/* ignore fractional sizes */
 			break;
 		case 'f':
 			sget(str, sizeof str, fp);
@@ -802,7 +807,7 @@ put1(int c)	/* output char c */
 }
 
 void
-setsize(int n)	/* set point size to n (internal) */
+setsize(double n)	/* set point size to n (internal) */
 {
 }
 
