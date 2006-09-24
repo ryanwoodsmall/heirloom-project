@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.150 (gritter) 9/22/06
+.\" Sccsid @(#)doc.tr	1.151 (gritter) 9/24/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 9/22/06
+.ds Sccsdate 9/24/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -3460,7 +3460,10 @@ by the \T'fallback'\fBfallback\fP\T sequence.
 disabled if \fIN\fR=0, otherwise enabled.
 .bta fkern
 \fB&fkern\fI|F|N\fR	1	1	P,T	Control the use of kerning tables from font \fIF\fR;
-disabled if \fIN\fR=0, otherwise enabled.
+disabled if \fIN\fR=0,
+enabled if \fIN\fR=1 or missing.
+For \fIN\fR\(>=2,
+only kerning pairs with absolute values greater or equal to \fIN\fR are used.
 \*(TR kerning adjustments as defined by the following requests
 are not affected.
 .bta kernpair

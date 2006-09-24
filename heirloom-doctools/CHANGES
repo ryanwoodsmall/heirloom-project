@@ -14,6 +14,9 @@ Release ...
 * [nt]roff: The "\n[.dilev]" register contains the current diversion level.
 * [nt]roff: The "\B" escape sequence (check for valid numerical expression)
   is now available in regular mode too, not only in groff compatibility mode.
+* troff: The second argument to the ".fkern" request now specifies a minimum
+  absolute amount for kerning pairs read from font metrics files. Kerning
+  pairs with smaller adjustments are ignored.
 * tbl: Can now optionally use graphic drawing commands (troff "\D") instead
   of repeated-character line drawing (troff "\l" and "\L"). The "graphics"
   option enables it per table, and the "-g" command line option enables it

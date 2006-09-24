@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.179 (gritter) 9/11/06
+ * Sccsid @(#)t6.c	1.180 (gritter) 9/24/06
  */
 
 /*
@@ -586,7 +586,7 @@ getkw(tchar c, tchar d)
 			k = kp->n;
 		else if ((n = (fontbase[f]->afmpos)-1) >= 0 &&
 				n == (fontbase[g]->afmpos)-1 &&
-				(fontbase[f]->flgfont & FNOKERN) == 0) {
+				fontbase[f]->kernfont >= 0) {
 			a = afmtab[n];
 			I = i - 32;
 			J = j - 32;
@@ -595,6 +595,8 @@ getkw(tchar c, tchar d)
 			if (J >= nchtab + 128)
 				J -= nchtab + 128;
 			k = afmgetkern(a, I, J);
+			if (abs(k) < fontbase[f]->kernfont)
+				k = 0;
 		}
 		if (j>32 && kernafter != NULL && kernafter[fbits(c)] != NULL)
 			k += kernafter[fbits(c)][i];
@@ -2211,7 +2213,7 @@ casekern(void)
 void
 casefkern(void)
 {
-	int	f, i;
+	int	f, i, j;
 
 	lgf++;
 	if (skip(1))
@@ -2219,10 +2221,13 @@ casefkern(void)
 	i = getrq(2);
 	if ((f = findft(i, 1)) < 0)
 		return;
-	if (skip(0) || atoi())
-		fontbase[f]->flgfont &= ~FNOKERN;
-	else
-		fontbase[f]->flgfont |= FNOKERN;
+	if (skip(0))
+		fontbase[f]->kernfont = 0;
+	else {
+		j = atoi();
+		if (!nonumb)
+			fontbase[f]->kernfont = j ? j : -1;
+	}
 }
 
 static void
