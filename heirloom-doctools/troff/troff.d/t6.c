@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.180 (gritter) 9/24/06
+ * Sccsid @(#)t6.c	1.181 (gritter) 9/27/06
  */
 
 /*
@@ -154,9 +154,10 @@ width(register tchar j)
 		xbits(j, 0);
 	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf &&
 			!_minflg && !horscale) {
-		k = rawwidth = widcache[i-32].width;
+		k = rawwidth = widcache[i-32].width + lettrack;
 		lastrst = widcache[i-32].rst;
 		lastrsb = widcache[i-32].rsb;
+		lasttrack = widcache[i-32].track;
 	} else {
 		if (_minflg && i == 32 && cbits(j) != 32)
 			_minflg = 0;
@@ -337,31 +338,28 @@ getcw(register int i)
 	rawwidth = k;
 	s = xpts;
 	lasttrack = 0;
-	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1) {
-		nocache = 1;
+	if (s <= tracktab[ofont].s1 && tracktab[ofont].n1)
 		lasttrack = tracktab[ofont].n1;
-	} else if (s >= tracktab[ofont].s2 && tracktab[ofont].n2) {
-		nocache = 1;
+	else if (s >= tracktab[ofont].s2 && tracktab[ofont].n2)
 		lasttrack = tracktab[ofont].n2;
-	} else if (s > tracktab[ofont].s1 && s < tracktab[ofont].s2) {
+	else if (s > tracktab[ofont].s1 && s < tracktab[ofont].s2) {
 		int	r;
 		r = (s * tracktab[ofont].n2 - s * tracktab[ofont].n1
 				+ tracktab[ofont].s2 * tracktab[ofont].n1
 				- tracktab[ofont].s1 * tracktab[ofont].n2)
 			/ (tracktab[ofont].s2 - tracktab[ofont].s1);
-		if (r != 0) {
-			nocache = 1;
+		if (r != 0)
 			lasttrack = r;
-		}
 	}
 	k += lasttrack + lettrack;
-	if (nocache|bd|lettrack)
+	if (nocache|bd)
 		widcache[i].fontpts = 0;
 	else {
 		widcache[i].fontpts = xfont + (xpts<<8);
-		widcache[i].width = k;
+		widcache[i].width = k - lettrack;
 		widcache[i].rst = lastrst;
 		widcache[i].rsb = lastrsb;
+		widcache[i].track = lasttrack;
 	}
 	return(k);
 	/* Unitwidth is Units/Point, where
