@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.80 (gritter) 9/11/06
+ * Sccsid @(#)n4.c	1.81 (gritter) 10/2/06
  */
 
 /*
@@ -594,6 +594,13 @@ nunhash(register struct numtab *rp)
 	}
 }
 
+
+/*
+ * Note: Pointers returned by findr(), usedr(), etc. may
+ * become invalid after a following call to getch() since
+ * it may result in a number register creation and following
+ * grownumtab().
+ */
 struct numtab *
 findr(int i)
 {
@@ -1409,13 +1416,13 @@ casernn(void)
 	skip(1);
 	if ((i = getrq(0)) == 0)
 		return;
+	skip(1);
+	j = getrq(1);
 	if ((kp = _usedr(i, 0, NULL)) == NULL) {
 		if (warn & WARN_REG)
 			errprint("no such register %s", macname(i));
 		return;
 	}
-	skip(1);
-	j = getrq(1);
 	numtp = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
 	if (numtp != NULL) {
 		if (numtp->nlink) {
@@ -1455,6 +1462,7 @@ setr(void)
 		nodelim(termc);
 		return;
 	}
+	numtp = findr(j);	/* twice because of getch() before */
 	numtp->val = j;
 	if (numtp->fmt == -1)
 		numtp->fmt = 0;
@@ -1464,19 +1472,20 @@ setr(void)
 static void
 casnr1(int flt, int local)
 {
-	register int j;
+	register int j, rq;
 	struct acc	a;
 	struct numtab	*numtp;
 
 	lgf++;
 	skip(1);
-	j = getrq(3);
-	if ((numtp = _findr(j, 0, 1, local, NULL)) == NULL)
+	rq = getrq(3);
+	if ((numtp = _findr(rq, 0, 1, local, NULL)) == NULL)
 		goto rtn;
 	skip(!local);
 	a = _inumb(&numtp->val, flt ? &numtp->fval : NULL, flt, NULL);
 	if (nonumb)
 		goto rtn;
+	numtp = _findr(rq, 0, 1, local, NULL);
 	numtp->val = a.n;
 	if (flt) {
 		numtp->fval = a.f;
@@ -1497,6 +1506,7 @@ casnr1(int flt, int local)
 	a = _atoi(flt);
 	if (nonumb)
 		goto rtns;
+	numtp = _findr(rq, 0, 1, local, NULL);
 	numtp->inc = a.n;
 	if (flt)
 		numtp->finc = a.f;
