@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.4 (gritter) 10/3/06
+	Sccsid @(#)odt2tr.xsl	1.5 (gritter) 10/3/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -139,6 +139,7 @@
 <preserve-space elements="text:h text:p text:span"/>
 
 <template name="text">
+  <param name="t"/>
   <choose>
     <when test="contains($t, '\')">
       <call-template name="text">
@@ -292,7 +293,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.4 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.5 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
