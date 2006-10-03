@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.5 (gritter) 10/3/06
+	Sccsid @(#)odt2tr.xsl	1.6 (gritter) 10/3/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -138,17 +138,13 @@
 <strip-space elements="*"/>
 <preserve-space elements="text:h text:p text:span"/>
 
-<template name="text">
+<template name="dqconv">
   <param name="t"/>
   <choose>
-    <when test="contains($t, '\')">
-      <call-template name="text">
+    <when test="contains($t, '&quot;')">
+        <value-of select="substring-before($t, '&quot;')"/>\(dq<call-template name="dqconv">
         <with-param name="t">
-          <value-of select="substring-before($t, '\')"/>
-        </with-param>
-      </call-template>\(rs<call-template name="text">
-        <with-param name="t">
-          <value-of select="substring-after($t, '\')"/>
+          <value-of select="substring-after($t, '&quot;')"/>
         </with-param>
       </call-template>
     </when>
@@ -158,9 +154,33 @@
   </choose>
 </template>
 
+<template name="rsconv">
+  <param name="t"/>
+  <choose>
+    <when test="contains($t, '\')">
+      <call-template name="dqconv">
+        <with-param name="t">
+          <value-of select="substring-before($t, '\')"/>
+        </with-param>
+      </call-template>\(rs<call-template name="rsconv">
+        <with-param name="t">
+          <value-of select="substring-after($t, '\')"/>
+        </with-param>
+      </call-template>
+    </when>
+    <otherwise>
+      <call-template name="dqconv">
+        <with-param name="t">
+          <value-of select="$t"/>
+        </with-param>
+      </call-template>
+    </otherwise>
+  </choose>
+</template>
+
 <template match="text()">
   <if test='starts-with(., ".") or starts-with(., "&apos;")'>\&amp;</if>
-  <call-template name="text">
+  <call-template name="rsconv">
     <with-param name="t">
       <value-of select="."/>
     </with-param>
@@ -293,7 +313,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.5 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.6 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
