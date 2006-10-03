@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.1 (gritter) 10/3/06
+	Sccsid @(#)odt2tr.xsl	1.2 (gritter) 10/3/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -42,7 +42,7 @@
 	save the former but discards the latter. This is not
 	always possible - an office document is organized as a
 	set of "styles" which have only restricted significance
-	as visual markup elements. Since the styles are typically
+	as generic markup elements. Since the styles are typically
 	useless for typesetting, they are discarded, but some
 	of their markup information is directly included in the
 	generated troff document.
@@ -256,7 +256,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.1 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.2 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
