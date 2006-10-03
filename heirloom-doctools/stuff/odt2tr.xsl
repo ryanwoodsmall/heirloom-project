@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.3 (gritter) 10/3/06
+	Sccsid @(#)odt2tr.xsl	1.4 (gritter) 10/3/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -138,6 +138,34 @@
 <strip-space elements="*"/>
 <preserve-space elements="text:h text:p text:span"/>
 
+<template name="text">
+  <choose>
+    <when test="contains($t, '\')">
+      <call-template name="text">
+        <with-param name="t">
+          <value-of select="substring-before($t, '\')"/>
+        </with-param>
+      </call-template>\(rs<call-template name="text">
+        <with-param name="t">
+          <value-of select="substring-after($t, '\')"/>
+        </with-param>
+      </call-template>
+    </when>
+    <otherwise>
+      <value-of select="$t"/>
+    </otherwise>
+  </choose>
+</template>
+
+<template match="text()">
+  <if test='starts-with(., ".") or starts-with(., "&apos;")'>\&amp;</if>
+  <call-template name="text">
+    <with-param name="t">
+      <value-of select="."/>
+    </with-param>
+  </call-template>
+</template>
+
 <template name="parastyle">
 <choose>
 <when test="number(translate(//style:style[@style:name = current()/@text:style-name]/style:paragraph-properties/@fo:margin-left, 'cimnptx', '       ')) > 0">
@@ -264,7 +292,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.3 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.4 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
