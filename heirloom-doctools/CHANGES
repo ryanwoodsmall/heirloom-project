@@ -57,6 +57,8 @@ Release ...
 * troff: Before generating an "x X" command because of a "\X" or "\Y" escape
   sequence, the current horizonal position is now emitted to intermediate
   output. This makes input like "\h'1i'\X'anything'" work as expected.
+* troff: Changes between environments with different ".ss" settings are now
+  handled correctly.
 * dpost: The default encoding for the "ps" device is now "3".
 * dpost: The PostScript "awidthshow" operator is now used with the "-e2" and
   "-e3" encoding options, resulting in reasonable output in combination with

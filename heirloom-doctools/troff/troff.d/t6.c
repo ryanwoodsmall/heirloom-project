@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.181 (gritter) 9/27/06
+ * Sccsid @(#)t6.c	1.182 (gritter) 10/3/06
  */
 
 /*
@@ -152,9 +152,11 @@ width(register tchar j)
 		xpts = ppts;
 	} else 
 		xbits(j, 0);
-	if (widcache[i-32].fontpts == xfont + (xpts<<8) && !setwdf &&
-			!_minflg && !horscale) {
-		k = rawwidth = widcache[i-32].width + lettrack;
+	if (widcache[i-32].fontpts == xfont + (xpts<<8) &&
+			(i > 32 || widcache[i-32].evid == evname) &&
+			!setwdf && !_minflg && !horscale) {
+		rawwidth = widcache[i-32].width - widcache[i-32].track;
+		k = widcache[i-32].width + lettrack;
 		lastrst = widcache[i-32].rst;
 		lastrsb = widcache[i-32].rsb;
 		lasttrack = widcache[i-32].track;
@@ -360,6 +362,7 @@ getcw(register int i)
 		widcache[i].rst = lastrst;
 		widcache[i].rsb = lastrsb;
 		widcache[i].track = lasttrack;
+		widcache[i].evid = evname;
 	}
 	return(k);
 	/* Unitwidth is Units/Point, where
