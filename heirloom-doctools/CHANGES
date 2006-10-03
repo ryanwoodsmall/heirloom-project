@@ -72,6 +72,8 @@ Release ...
   distilled to PDF so that PDF files become smaller.
 * eqn: Avoid to recognize delimiters inside troff escape sequences with "("
   or "[" as well as directly behind a sequence of backslash characters.
+* -mm macros: Fixed a bug which caused .ML output to disappear unless in
+  troff -x0 mode.
 
 Release 060905
 * [nt]roff: The new ".brnl" request causes a break each time a newline is

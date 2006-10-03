@@ -28,7 +28,7 @@
 .\"	C NROFF Version	from OpenSolaris mmn.src	11.31
 .\"
 .\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-.\" Sccsid @(#)mmn	1.4 (gritter) 3/11/06
+.\" Sccsid @(#)mmn	1.5 (gritter) 10/3/06
 .nr :a 0 1
 .nr :b 0
 .nr :c 0
@@ -434,7 +434,7 @@
 ..
 .de ML
 .if \\n(.$<1 .)D "ML:missing arg"
-.nr ;0 \w\\$1u/3u/\\n(.su+1u
+.nr ;0 \w\\$1u/3u/\\n(.sp+1u
 .ie \\n(.$<2 .LB \\n(;0 0 1 0 "\\$1"
 .el .if \\n(.$=2 .LB 0\\$2 0 1 0 "\\$1"
 .if \\n(.$>2 \{.if !\w\\$2 .LB \\n(;0 0 1 0 "\\$1" 0 1
