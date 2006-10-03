@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.2 (gritter) 10/3/06
+	Sccsid @(#)odt2tr.xsl	1.3 (gritter) 10/3/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -59,19 +59,29 @@
 
 		xsltproc odt2tr.xsl content.xml >converted.tr
 
-	The generated troff file contains the following markup:
+	No macro set is supplied with the generated troff document,
+	but the generated macros are roughly compatible with -mm,
+	which makes it possible to obtain a preview by
+
+		tbl converted.tr | troff -mm | dpost >converted.ps
+
+	It is normally necessary (and part of the process for which
+	the stylesheet is intended) to further edit the output.
+
+	The generated troff document contains the following markup:
 
 	\fX		The following fonts are expected: R, I,
 			B, BI, and SC (for small capitals). All
 			other font information is discarded.
 
-	.H1, .H2, ...	A heading of level 1, 2, ..., with three
-			arguments: The first argument contains
-			markup for the heading, the second argument
-			contains the actual heading text, and the
-			third contains markup reset instructions.
-			These are separated from the text to ease
-			the creation of table of contents entries.
+	.H		A heading of with four arguments: The first
+			argument is the heading level (1, 2, 3, ...);
+			the second argument contains the heading text.
+			The third argument contains markup for the
+			heading, and the third contains markup reset
+			instructions. These are separated from the
+			text to ease the creation of table of contents
+			entries.
 
 	.P		A paragraph. Actually, almost any <text:p>
 			tag results in a .P call, although <text:p>
@@ -89,10 +99,10 @@
 			a .P or .IP call but there is no code emitted
 			for them.
 
-	.LB		Begin a bulleted list. The single argument is
-			the bullet character.
+	.ML		Begin a marked list. The single argument is
+			the mark character.
 
-	.LN		Begin a numbered list.
+	.AL		Begin a numbered list.
 
 	.LE		End a list (bulleted or numbered).
 
@@ -100,7 +110,7 @@
 
 	.LP		Paragraph (any <text:p> tag) inside a list.
 
-	\**		The numbering for the next footnote.
+	\*F		The numbering for the next footnote.
 
 	.FS/.FE		Footnote text start/end macros.
 
@@ -112,8 +122,6 @@
 
 	Of course, it is easy to modify the stylesheet if other macro
 	names are more suitable.
-
-	No macro set is supplied with the generated troff document.
 -->
 <stylesheet
 	xmlns="http://www.w3.org/1999/XSL/Transform"
@@ -171,10 +179,10 @@
 <template name="liststyle">
 <choose>
 <when test="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-bullet">
-.LB <value-of select="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-bullet[1]/@text:bullet-char"/>
+.ML <value-of select="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-bullet[1]/@text:bullet-char"/>
 </when>
 <when test="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-number">
-.LN</when>
+.AL</when>
 </choose>
 </template>
 
@@ -199,9 +207,9 @@
 .LI<apply-templates/></template>
 
 <template match="text:h">
-.H<value-of select="@text:outline-level"/> "<call-template name="textstyle"/>" "<apply-templates/>" "<call-template name="endtextstyle"/>"</template>
+.H <value-of select="@text:outline-level"/> "<apply-templates/>" "<call-template name="textstyle"/>" "<call-template name="endtextstyle"/>"</template>
 
-<template match="text:note">\**\c
+<template match="text:note">\*F\c
 <apply-templates/>
 </template>
 
@@ -256,7 +264,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.2 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.3 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
