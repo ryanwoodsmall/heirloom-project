@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.164 (gritter) 9/11/06
+ * Sccsid @(#)n3.c	1.165 (gritter) 10/5/06
  */
 
 /*
@@ -572,6 +572,10 @@ clrmn(struct contab *contp)
 }
 
 
+/*
+ * Note: finds() may invalidate the result of a previous findmn()
+ * for another macro since it may call growcontab().
+ */
 static filep 
 finds(register int mn, int als, int globonly)
 {
@@ -635,6 +639,7 @@ finds(register int mn, int als, int globonly)
 			edone(04);
 			return(als ? offset = 0 : 0);
 		}
+		oldmn = _findmn(mn, als, dl);
 		(*contp)[i].mx = (unsigned) nextb;
 		newmn = &(*contp)[i];
 		if (!diflg) {
@@ -1417,6 +1422,7 @@ caseals(void)
 			newmn->rq = i;
 			newmn->flags |= flags;
 			maddhash(newmn);
+			contp = findmn(j);
 			contp->nlink++;
 			if (flags & FLAG_WATCH)
 				errprint("%s: creating alias %s to %s%s %s",

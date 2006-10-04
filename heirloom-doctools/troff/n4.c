@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.81 (gritter) 10/2/06
+ * Sccsid @(#)n4.c	1.83 (gritter) 10/5/06
  */
 
 /*
@@ -597,9 +597,9 @@ nunhash(register struct numtab *rp)
 
 /*
  * Note: Pointers returned by findr(), usedr(), etc. may
- * become invalid after a following call to getch() since
- * it may result in a number register creation and following
- * grownumtab().
+ * become invalid after a following call to getch() or another
+ * call to findr() since these may result in a number register
+ * creation and following grownumtab().
  */
 struct numtab *
 findr(int i)
@@ -1409,7 +1409,7 @@ caserr(void)
 void
 casernn(void)
 {
-	int	i, j;
+	int	i, j, flags;
 	struct numtab	*kp, *numtp;
 
 	lgf++;
@@ -1423,14 +1423,16 @@ casernn(void)
 			errprint("no such register %s", macname(i));
 		return;
 	}
-	numtp = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
+	flags = kp->flags;
+	numtp = _findr(j, 0, 0, flags & FLAG_LOCAL, NULL);
 	if (numtp != NULL) {
 		if (numtp->nlink) {
 			numtp->nlink--;
 			numtp->r = -1;
 		}
-		numtp = _findr(j, 0, 0, kp->flags & FLAG_LOCAL, NULL);
+		numtp = _findr(j, 0, 0, flags & FLAG_LOCAL, NULL);
 	}
+	kp = _usedr(i, 0, NULL);
 	if (numtp != NULL) {
 		*numtp = *kp;
 		numtp->r = j;
@@ -1446,14 +1448,14 @@ casernn(void)
 void
 setr(void)
 {
-	int	termc, j;
+	int	termc, j, rq;
 	struct numtab	*numtp;
 
 	lgf++;
 	termc = getach();
-	j = getrq(3);
+	rq = getrq(3);
 	lgf--;
-	if ((numtp = findr(j)) == NULL || skip(1))
+	if ((numtp = findr(rq)) == NULL || skip(1))
 		return;
 	j = inumb(&numtp->val);
 	if (nonumb)
@@ -1462,7 +1464,7 @@ setr(void)
 		nodelim(termc);
 		return;
 	}
-	numtp = findr(j);	/* twice because of getch() before */
+	numtp = findr(rq);	/* twice because of getch() before */
 	numtp->val = j;
 	if (numtp->fmt == -1)
 		numtp->fmt = 0;
@@ -1616,9 +1618,9 @@ setaf (void)	/* return format of number register */
 void
 casealn(void)
 {
-	int	i, j, k;
-	int	flags, local;
-	struct numtab	*op, *rp;
+	int	c, i, j, k;
+	int	flags, local = 0;
+	struct numtab	*op, *rp = NULL;
 
 	if (skip(1))
 		return;
@@ -1626,20 +1628,25 @@ casealn(void)
 	if (skip(1))
 		return;
 	j = getrq(1);
-	if (((op = _usedr(j, 2, &k)) == NULL)) {
-		if (k < -1)
-			/*EMPTY*/;
-		else if (_setn(j))
-			k = -j;
-		else {
-			if (warn & WARN_REG)
-				errprint("no such register %s", macname(j));
-			return;
+	for (c = 0; ; c++) {
+		if (((op = _usedr(j, 2, &k)) == NULL)) {
+			if (k < -1)
+				/*EMPTY*/;
+			else if (_setn(j))
+				k = -j;
+			else {
+				if (warn & WARN_REG)
+					errprint("no such register %s",
+							macname(j));
+				return;
+			}
 		}
+		if (c)
+			break;
+		local = op != NULL && op->flags & FLAG_LOCAL;
+		if ((rp = _findr(i, 0, 0, local, NULL)) == NULL)
+			return;
 	}
-	local = op != NULL && op->flags & FLAG_LOCAL;
-	if ((rp = _findr(i, 0, 0, local, NULL)) == NULL)
-		return;
 	if (op != NULL) {
 		rp->aln = op - (local ? macframe()->numtab : numtab) + 1;
 		if (op->nlink == 0)
