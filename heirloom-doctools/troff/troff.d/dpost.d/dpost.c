@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.163 (gritter) 9/23/06
+ * Sccsid @(#)dpost.c	1.164 (gritter) 10/5/06
  */
 
 /*
@@ -383,9 +383,9 @@ int		fsize;			/* max size of a font files in bytes */
 int		unitwidth;		/* set to dev.unitwidth */
 char		*chname;		/* special character strings */
 short		*chtab;			/* used to locate character names */
-short		**fitab;		/* locates char info on each font */
+unsigned short	**fitab;		/* locates char info on each font */
 int		**fontab;		/* character width data for each font */
-short		**codetab;		/* and codes to get characters printed */
+unsigned short	**codetab;		/* and codes to get characters printed */
 char		**kerntab;		/* for makefont() */
 
 
@@ -2411,7 +2411,7 @@ ple32(const char *cp)
 }
 
 static const char ps_adobe_font_[] = "%!PS-AdobeFont-";
-static const char ps_truetypefont_[] = "%!PS-TrueTypeFont-";
+static const char ps_truetypefont[] = "%!PS-TrueTypeFont";
 static const char hex[] = "0123456789abcdef";
 
 static void
@@ -2624,9 +2624,9 @@ supply1(char *font, char *file, char *type)
     if (fgets(line, sizeof line, fp) == NULL)
             error(FATAL, "missing data in %s", file);
     if (strncmp(line, ps_adobe_font_, strlen(ps_adobe_font_)) &&
-		    strncmp(line, ps_truetypefont_, strlen(ps_truetypefont_)))
+		    strncmp(line, ps_truetypefont, strlen(ps_truetypefont)))
 	    error(FATAL, "file %s does not start with \"%s\" or \"%s\"",
-			    file, ps_adobe_font_, ps_truetypefont_);
+			    file, ps_adobe_font_, ps_truetypefont);
     if (sfcount++ == 0)
         fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
     else
@@ -3522,8 +3522,8 @@ put1s (
 	 struct afmtab	*a;
 	 if ((a = fontname[font].afm) != NULL &&
 			 (np = afmnamelook(a, &s[2])) != NULL &&
-			 ((m = np->fival[0]) != -1 ||
-			  (m = np->fival[1]) != -1)) {
+			 ((m = np->fival[0]) != NOCODE ||
+			  (m = np->fival[1]) != NOCODE)) {
 	     put1(m+32);
 	     return;
 	 }
@@ -3556,7 +3556,7 @@ put1 (
     register int	j;		/* number of fonts we've checked so far */
     register int	k;		/* font we're currently looking at */
     int			*pw = NULL;	/* font widthtab and */
-    short		*p = NULL;	/* and codetab where c was found */
+    unsigned short	*p = NULL;	/* and codetab where c was found */
     int			code;		/* code used to get c printed */
     int			ofont;		/* font when we started */
 
@@ -3617,7 +3617,7 @@ put1 (
 		lastw = (int)lastw;	/* does the same */
 	if (track && encoding != MAXENCODING+2)
 		lastw += track;
-	if (code == -1 && fontname[k].afm)
+	if (code == NOCODE && fontname[k].afm)
 		code = c + 32;
 	oput(code);
     }	/* End if */

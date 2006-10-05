@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.182 (gritter) 10/3/06
+ * Sccsid @(#)t6.c	1.183 (gritter) 10/5/06
  */
 
 /*
@@ -653,10 +653,10 @@ postchar1(const char *temp, int f)
 		a = afmtab[i];
 		np = afmnamelook(a, temp);
 		if (np->afpos != 0) {
-			if (np->fival[0] >= 0 &&
+			if (np->fival[0] != NOCODE &&
 					fitab[f][np->fival[0]])
 				return np->fival[0] + 32 + nchtab + 128;
-			else if (np->fival[1] >= 0 &&
+			else if (np->fival[1] != NOCODE &&
 					fitab[f][np->fival[1]])
 				return np->fival[1] + 32 + nchtab + 128;
 			else
@@ -1328,13 +1328,13 @@ addlig(int f, tchar *from, int to)
 	 * Fi, and Fl, hide them. The ".flig" request is intended for
 	 * use in combination with expert fonts only.
 	 */
-	if (to == LIG_FF && fitab[f][LIG_FF-32] >= 0)
+	if (to == LIG_FF && fitab[f][LIG_FF-32] != NOCODE)
 		if (codetab[f][fitab[f][LIG_FF-32]] < 32)
 			fitab[f][LIG_FF-32] = 0;
-	if (to == LIG_FFI && fitab[f][LIG_FFI-32] >= 0)
+	if (to == LIG_FFI && fitab[f][LIG_FFI-32] != NOCODE)
 		if (codetab[f][fitab[f][LIG_FFI-32]] < 32)
 			fitab[f][LIG_FFI-32] = 0;
-	if (to == LIG_FFL && fitab[f][LIG_FFL-32] >= 0)
+	if (to == LIG_FFL && fitab[f][LIG_FFL-32] != NOCODE)
 		if (codetab[f][fitab[f][LIG_FFL-32]] < 32)
 			fitab[f][LIG_FFL-32] = 0;
 }

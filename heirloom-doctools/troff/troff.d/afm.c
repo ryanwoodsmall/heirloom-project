@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.60 (gritter) 8/12/06
+ * Sccsid @(#)afm.c	1.61 (gritter) 10/5/06
  */
 
 #include <stdlib.h>
@@ -586,7 +586,7 @@ afmremap(struct afmtab *a)
 	struct namecache	*np;
 
 	for (i = 1; i < a->nchars; i++) {
-		if (a->codetab[i] == -1 && a->nametab[i] != NULL) {
+		if (a->codetab[i] == NOCODE && a->nametab[i] != NULL) {
 #if defined (DPOST) || defined (DUMP)
 			while (a->fitab[j] != 0)
 				j++;
@@ -718,7 +718,7 @@ afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 	else if (C > 32 && C < 127 && a->fitab[C - 32] == 0)
 		a->codetab[a->nchars] = C;
 	else
-		a->codetab[a->nchars] = -1;
+		a->codetab[a->nchars] = NOCODE;
 	if (C > 32 && C < 127 && a->fitab[C - 32] == 0) {
 		a->fitab[C - 32] = a->nchars;
 		if (gid && a->gid2tr)
@@ -755,7 +755,7 @@ addcharlib(struct afmtab *a, int symbol)
 				B[1] = charlib[i].kern & 1 ? -11 : 0;
 				B[3] = charlib[i].kern & 2 ?
 					a->capheight + 1 : 0;
-				afmaddchar(a, -1, j+128, charlib[i].code,
+				afmaddchar(a, NOCODE, j+128, charlib[i].code,
 					charlib[i].width * unitsPerEm / 1024,
 					B, NULL, SPEC_NONE, 0);
 			}
@@ -766,7 +766,7 @@ static void
 addmetrics(struct afmtab *a, char *_line, enum spec s)
 {
 	char	*lp = _line, c, *xp;
-	int	C = -1, WX = 0, tp;
+	int	C = NOCODE, WX = 0, tp;
 	char	*N = NULL;
 	int	B[4] = { -1, -1, -1, -1 };
 
@@ -849,7 +849,7 @@ afmalloc(struct afmtab *a, int n)
 	a->codetab = malloc((n+NCHARLIB+1)*sizeof *a->codetab);
 	a->codetab[0] = 0;
 	for (i = 1; i < n+NCHARLIB+1; i++)
-		a->codetab[i] = -1;
+		a->codetab[i] = NOCODE;
 	a->nametab = malloc((n+NCHARLIB+1)*sizeof *a->nametab);
 	a->nametab[0] = 0;
 	a->nchars = 1;
@@ -857,8 +857,8 @@ afmalloc(struct afmtab *a, int n)
 	a->nameprime = nextprime(n+NCHARLIB+1);
 	a->namecache = calloc(a->nameprime, sizeof *a->namecache);
 	for (i = 0; i < a->nameprime; i++) {
-		a->namecache[i].fival[0] = -1;
-		a->namecache[i].fival[1] = -1;
+		a->namecache[i].fival[0] = NOCODE;
+		a->namecache[i].fival[1] = NOCODE;
 	}
 }
 
@@ -1065,9 +1065,9 @@ addkernpair(struct afmtab *a, char *_line)
 		*lp = c;
 		n = _unitconv(strtol(&lp[1], NULL, 10));
 		for (i = 0; i < 2; i++)
-			if (np1->fival[i] >= 0)
+			if (np1->fival[i] != NOCODE)
 				for (j = 0; j < 2; j++)
-					if (np2->fival[j] >= 0)
+					if (np2->fival[j] != NOCODE)
 						afmaddkernpair(a,
 								np1->fival[i],
 								np2->fival[j],

@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.58 (gritter) 8/12/06
+ * Sccsid @(#)otf.c	1.59 (gritter) 10/5/06
  */
 
 #include <stdio.h>
@@ -2620,13 +2620,13 @@ kernpair(int first, int second, int x)
 	np2 = GID2name(second);
 	if (np1 == NULL || np2 == NULL)
 		return;
-	if (np1->fival[0] >= 0 && np2->fival[0] >= 0)
+	if (np1->fival[0] != NOCODE && np2->fival[0] != NOCODE)
 		afmaddkernpair(a, np1->fival[0], np2->fival[0], x);
-	if (np1->fival[0] >= 0 && np2->fival[1] >= 0)
+	if (np1->fival[0] != NOCODE && np2->fival[1] != NOCODE)
 		afmaddkernpair(a, np1->fival[0], np2->fival[1], x);
-	if (np1->fival[1] >= 0 && np2->fival[0] >= 0)
+	if (np1->fival[1] != NOCODE && np2->fival[0] != NOCODE)
 		afmaddkernpair(a, np1->fival[1], np2->fival[0], x);
-	if (np1->fival[1] >= 0 && np2->fival[1] >= 0)
+	if (np1->fival[1] != NOCODE && np2->fival[1] != NOCODE)
 		afmaddkernpair(a, np1->fival[1], np2->fival[1], x);
 }
 
@@ -3293,6 +3293,8 @@ sfnts2(struct table *tp, FILE *fp)
 		}
 		if (i == next)
 			fprintf(fp, "00><");
+		if (i && i % 65534 == 0 && tp->in_sfnts != 3)
+			fprintf(fp, "00>\n<");
 		putc(hex[(contents[o+i]&0360)>>4], fp);
 		putc(hex[contents[o+i]&017], fp);
 	}

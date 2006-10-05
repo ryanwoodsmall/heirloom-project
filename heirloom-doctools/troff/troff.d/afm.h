@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.h	1.34 (gritter) 8/12/06
+ * Sccsid @(#)afm.h	1.35 (gritter) 10/5/06
  */
 
 #ifndef	TROFF_AFM_H
@@ -39,6 +39,8 @@ enum spec {
 	SPEC_S		= 02000
 };
 
+#define	NOCODE		((unsigned short)-1)
+
 #define	NKERNPAIRS	45
 struct kernpairs {
 	struct kernpairs	*next;
@@ -49,8 +51,8 @@ struct kernpairs {
 };
 
 struct namecache {
-	short	afpos;
-	short	fival[2];
+	unsigned short	afpos;
+	unsigned short	fival[2];
 	unsigned short	gid;
 };
 
@@ -76,8 +78,8 @@ extern struct afmtab {
 	int	*fontab;
 	short	**bbtab;
 	char	*kerntab;
-	short	*codetab;
-	short	*fitab;
+	unsigned short	*codetab;
+	unsigned short	*fitab;
 	char	**nametab;
 	int	*unitab;
 	int	nunitab;
@@ -107,10 +109,10 @@ extern struct afmtab {
 } **afmtab;
 extern int nafm;
 
-extern	short		**fitab;
+extern	unsigned short	**fitab;
 extern	int		**fontab;
 extern	char		**kerntab;
-extern	short		**codetab;
+extern	unsigned short	**codetab;
 extern	struct Font	**fontbase;
 
 extern	int		NCHARS;
