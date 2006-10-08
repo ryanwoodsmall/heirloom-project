@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.8 (gritter) 10/8/06
+	Sccsid @(#)odt2tr.xsl	1.9 (gritter) 10/8/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -138,6 +138,12 @@
 <strip-space elements="*"/>
 <preserve-space elements="text:h text:p text:span"/>
 
+<template name="println">
+  <param name="t"/>
+  <if test='starts-with($t, ".") or starts-with($t, "&apos;")'>\&amp;</if>
+  <value-of select="$t"/>
+</template>
+
 <template name="fold">
   <param name="t"/>
   <choose>
@@ -164,12 +170,16 @@
               </call-template>
             </when>
             <otherwise>
-              <value-of select="$t"/>
+              <call-template name="println">
+                <with-param name="t" select="$t"/>
+              </call-template>
             </otherwise>
           </choose>
         </when>
         <otherwise>
-          <value-of select="$t"/>
+          <call-template name="println">
+            <with-param name="t" select="$t"/>
+          </call-template>
         </otherwise>
       </choose>
     </otherwise>
@@ -210,7 +220,7 @@
           </call-template>
         </variable>
         <choose>
-        <when test="string-length($w) &gt; 2 or $p = '\&amp;'">
+        <when test="string-length($w) > 2">
           <text>&#10;</text>
         </when>
         <otherwise>
@@ -271,14 +281,40 @@
 </template>
 
 <template match="text()">
-  <if test='starts-with(., ".") or starts-with(., "&apos;")'>\&amp;</if>
+  <choose>
+    <when test='starts-with(., ".") or starts-with(., "&apos;")'>
+      <text>\&amp;</text>
+      <choose>
+        <when test="substring(., 1, 2) = '. '">
+          <value-of select="substring(., 1, 1)"/><text>&#10;</text>
+          <call-template name="text">
+            <with-param name="t" select="substring(., 3)"/>
+          </call-template>
+        </when>
+        <otherwise>
+          <call-template name="text">
+            <with-param name="t" select="."/>
+          </call-template>
+        </otherwise>
+      </choose>
+    </when>
+    <otherwise>
+      <call-template name="text">
+        <with-param name="t" select="."/>
+      </call-template>
+    </otherwise>
+  </choose>
+</template>
+
+<template name="text">
+  <param name="t"/>
   <call-template name="fold">
     <with-param name="t">
       <call-template name="spconv">
         <with-param name="t">
           <call-template name="rsconv">
             <with-param name="t">
-              <value-of select="."/>
+              <value-of select="$t"/>
             </with-param>
           </call-template>
         </with-param>
@@ -422,7 +458,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.8 (gritter) 10/8/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.9 (gritter) 10/8/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
