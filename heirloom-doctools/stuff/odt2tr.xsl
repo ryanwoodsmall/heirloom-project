@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.6 (gritter) 10/3/06
+	Sccsid @(#)odt2tr.xsl	1.8 (gritter) 10/8/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -138,6 +138,98 @@
 <strip-space elements="*"/>
 <preserve-space elements="text:h text:p text:span"/>
 
+<template name="fold">
+  <param name="t"/>
+  <choose>
+    <when test="contains($t, '&#10;')">
+      <call-template name="fold">
+        <with-param name="t" select="substring-before($t, '&#10;')"/>
+      </call-template>
+      <text>&#10;</text>
+      <call-template name="fold">
+        <with-param name="t" select="substring-after($t, '&#10;')"/>
+      </call-template>
+    </when>
+    <otherwise>
+      <choose>
+        <when test="string-length($t) > 66">
+          <variable name="p" select="substring($t, 1, 50)"/>
+          <variable name="s" select="substring($t, 51)"/>
+          <choose>
+            <when test="contains($s, ' ')">
+              <variable name="m" select="substring-before($s, ' ')"/>
+              <value-of select="$p"/><value-of select="$m"/><text>&#10;</text>
+              <call-template name="fold">
+                <with-param name="t" select="substring-after($s, ' ')"/>
+              </call-template>
+            </when>
+            <otherwise>
+              <value-of select="$t"/>
+            </otherwise>
+          </choose>
+        </when>
+        <otherwise>
+          <value-of select="$t"/>
+        </otherwise>
+      </choose>
+    </otherwise>
+  </choose>
+</template>
+
+<template name="lastword">
+  <param name="t"/>
+  <variable name="u" select="translate($t, ' .', '  ')"/>
+  <choose>
+    <when test="contains($u, ' ')">
+      <call-template name="lastword">
+        <with-param name="t">
+          <value-of select="substring-after($u, ' ')"/>
+        </with-param>
+      </call-template>
+    </when>
+    <otherwise>
+      <value-of select="$t"/>
+    </otherwise>
+  </choose>
+</template>
+
+<template name="spconv">
+  <param name="t"/>
+  <variable name="u" select="translate($t, '.:!?', '....')"/>
+  <choose>
+    <when test="contains($u, '. ')">
+      <variable name="p" select="substring-before($u, '. ')"/>
+      <variable name="n" select="string-length($p)"/>
+      <value-of select="$p"/><value-of select="substring($t, $n+1, 1)"/>
+      <if test="$n &lt; string-length($t) - 2">
+        <variable name="w">
+          <call-template name="lastword">
+            <with-param name="t">
+              <value-of select="$p"/>
+            </with-param>
+          </call-template>
+        </variable>
+        <choose>
+        <when test="string-length($w) &gt; 2 or $p = '\&amp;'">
+          <text>&#10;</text>
+        </when>
+        <otherwise>
+          <text> </text>
+        </otherwise>
+        </choose>
+        <call-template name="spconv">
+          <with-param name="t">
+            <value-of select="substring($t, $n + 3)"/>
+          </with-param>
+        </call-template>
+      </if>
+    </when>
+    <otherwise>
+      <value-of select="$t"/>
+    </otherwise>
+  </choose>
+</template>
+
 <template name="dqconv">
   <param name="t"/>
   <choose>
@@ -179,6 +271,23 @@
 </template>
 
 <template match="text()">
+  <if test='starts-with(., ".") or starts-with(., "&apos;")'>\&amp;</if>
+  <call-template name="fold">
+    <with-param name="t">
+      <call-template name="spconv">
+        <with-param name="t">
+          <call-template name="rsconv">
+            <with-param name="t">
+              <value-of select="."/>
+            </with-param>
+          </call-template>
+        </with-param>
+      </call-template>
+    </with-param>
+  </call-template>
+</template>
+
+<template match="text:h//text()">
   <if test='starts-with(., ".") or starts-with(., "&apos;")'>\&amp;</if>
   <call-template name="rsconv">
     <with-param name="t">
@@ -313,7 +422,7 @@ T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></templat
 <apply-templates/><call-template name="endtextstyle"/>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.6 (gritter) 10/3/06 on <value-of select="date:date-time()"/><apply-templates/>
+<template match="/">.\" Converted by odt2tr.xsl 1.8 (gritter) 10/8/06 on <value-of select="date:date-time()"/><apply-templates/>
 <text>&#10;</text></template>
 
 </stylesheet>
