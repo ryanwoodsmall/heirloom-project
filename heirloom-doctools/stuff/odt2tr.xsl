@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.13 (gritter) 10/9/06
+	Sccsid @(#)odt2tr.xsl	1.14 (gritter) 10/10/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -99,7 +99,7 @@
 			a .P or .IP call but there is no code emitted
 			for them.
 
-	.br		A hard line-break.
+	.br		A hard line break.
 
 	line break	A line break is generated instead of a space
 			following a "." or another sentence-ending
@@ -318,7 +318,7 @@
   <variable name="n" select="string-length($t)"/>
   <variable name="z" select="substring($t, $n)"/>
   <choose>
-    <when test="$z = ' ' and $n > 8 and
+    <when test="$z = ' ' and $n > 8 and following-sibling::node() and
         (following::node()[position() = 1][self::text()] or
          following::node()[position() = 1][self::text:span])">
       <call-template name="foldtext">
@@ -619,7 +619,7 @@
 </template>
 
 <template match="/">
-  <text>.\" Converted by odt2tr.xsl 1.13 (gritter) 10/9/06 on </text>
+  <text>.\" Converted by odt2tr.xsl 1.14 (gritter) 10/10/06 on </text>
   <value-of select="date:date-time()"/>
   <text>&#10;</text>
   <apply-templates/>
