@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.10 (gritter) 10/8/06
+	Sccsid @(#)odt2tr.xsl	1.11 (gritter) 10/9/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -98,6 +98,17 @@
 			Temporary indents result in a comment after
 			a .P or .IP call but there is no code emitted
 			for them.
+
+	.br		A hard line-break.
+
+	line break	A line break is generated instead of a space
+			following a "." or another sentence-ending
+			character under most circumstances. Since
+			there is no markup for such characters in the
+			original document, some handwork is to be
+			expected. This issue can be ignored if troff
+			is configured not to instead an additional
+			space following a sentence-ending character.
 
 	.ML		Begin a marked list. The single argument is
 			the mark character.
@@ -211,28 +222,33 @@
       <variable name="p" select="substring-before($u, '. ')"/>
       <variable name="n" select="string-length($p)"/>
       <value-of select="substring($t, 1, $n)"/><value-of select="substring($t, $n+1, 1)"/>
-      <if test="$n &lt; string-length($t) - 2">
-        <variable name="w">
-          <call-template name="lastword">
+      <choose>
+        <when test="$n &lt; string-length($t) - 2">
+          <variable name="w">
+            <call-template name="lastword">
+              <with-param name="t">
+                <value-of select="$p"/>
+              </with-param>
+            </call-template>
+          </variable>
+          <choose>
+          <when test="string-length($w) > 2">
+            <text>&#10;</text>
+          </when>
+          <otherwise>
+            <text> </text>
+          </otherwise>
+          </choose>
+          <call-template name="spconv">
             <with-param name="t">
-              <value-of select="$p"/>
+              <value-of select="substring($t, $n + 3)"/>
             </with-param>
           </call-template>
-        </variable>
-        <choose>
-        <when test="string-length($w) > 2">
-          <text>&#10;</text>
         </when>
         <otherwise>
           <text> </text>
         </otherwise>
-        </choose>
-        <call-template name="spconv">
-          <with-param name="t">
-            <value-of select="substring($t, $n + 3)"/>
-          </with-param>
-        </call-template>
-      </if>
+      </choose>
     </when>
     <otherwise>
       <value-of select="$t"/>
@@ -308,6 +324,27 @@
 
 <template name="text">
   <param name="t"/>
+  <variable name="n" select="string-length($t)"/>
+  <variable name="z" select="substring($t, $n)"/>
+  <choose>
+    <when test="$z = ' ' and $n > 8 and
+        (following::node()[position() = 1][self::text()] or
+         following::node()[position() = 1][self::text:span])">
+      <call-template name="foldtext">
+        <with-param name="t" select="substring($t, 1, $n - 1)"/>
+      </call-template>
+      <text>&#10;</text>
+    </when>
+    <otherwise>
+      <call-template name="foldtext">
+        <with-param name="t" select="$t"/>
+      </call-template>
+    </otherwise>
+  </choose>
+</template>
+
+<template name="foldtext">
+  <param name="t"/>
   <call-template name="fold">
     <with-param name="t">
       <call-template name="spconv">
@@ -332,133 +369,264 @@
   </call-template>
 </template>
 
+<template match="text:tab[preceding-sibling::text() or
+    following-sibling::text()]">
+  <text>&#9;</text>
+</template>
+
 <template name="parastyle">
-<choose>
-<when test="number(translate(//style:style[@style:name = current()/@text:style-name]/style:paragraph-properties/@fo:margin-left, 'cimnptx', '       ')) > 0">
-.IP \" indent <value-of select="//style:style[@style:name = current()/@text:style-name]/style:paragraph-properties/@fo:margin-left"/><text>&#10;</text>
-</when>
-<otherwise>
-.P<text>&#10;</text>
-</otherwise>
-</choose>
-<choose>
-<when test="//style:style[@style:name = current()/@text:style-name]/style:paragraph-properties/@fo:text-indent">.\" temporary indent <value-of select="//style:style[@style:name = current()/@text:style-name]/style:paragraph-properties/@fo:text-indent"/><text>&#10;</text>
-</when>
-</choose>
+  <choose>
+    <when test="number(translate(//style:style[@style:name =
+        current()/@text:style-name]/style:paragraph-properties/@fo:margin-left,
+        'cimnptx', '       ')) > 0">
+      <text>.IP \" indent </text>
+      <value-of select="//style:style[@style:name =
+          current()/@text:style-name]/style:paragraph-properties/@fo:margin-left"/>
+      <text>&#10;</text>
+    </when>
+    <otherwise>
+      <text>.P&#10;</text>
+    </otherwise>
+  </choose>
+  <choose>
+    <when test="//style:style[@style:name =
+        current()/@text:style-name]/style:paragraph-properties/@fo:text-indent">
+      <text>.\" temporary indent </text>
+      <value-of select="//style:style[@style:name =
+        current()/@text:style-name]/style:paragraph-properties/@fo:text-indent"/>
+      <text>&#10;</text>
+    </when>
+  </choose>
 </template>
 
 <template name="textstyle">
-<choose>
-<when test="//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-variant='small-caps'">\f(SC</when>
-<when test="//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-style = 'italic' and //style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-weight='bold'">\f(BI</when>
-<when test="//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-style = 'italic'">\fI</when>
-<when test="//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-style = 'bold'">\fB</when>
-</choose>
-<!-- discard font sizes
-<choose>
-<when test="contains(//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-size, 'pt')">\s[<value-of select="substring-before(//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-size, 'p')"/>]</when>
-<when test="contains(//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-size, '%')">\s[\n(PS*<value-of select="substring-before(//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-size, '%')"/>/100]</when>
-</choose>--></template>
+  <choose>
+    <when test="//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-variant =
+        'small-caps'">
+      <text>\f(SC</text>
+    </when>
+    <when test="//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-style =
+        'italic' and
+        //style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-weight =
+        'bold'">
+      <text>\f(BI</text>
+    </when>
+    <when test="//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-style =
+        'italic'">
+      <text>\fI</text>
+    </when>
+    <when test="//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-weight =
+        'bold'">
+      <text>\fB</text>
+    </when>
+  </choose>
+  <!-- discard font sizes
+  <choose>
+    <when test="contains(//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-size,
+        'pt')">
+      <text>\s[<value-of select="substring-before(//style:style[@style:name =
+          current()/@text:style-name]/style:text-properties/@fo:font-size,
+          'p')"/>]</text>
+    </when>
+    <when test="contains(//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-size,
+        '%')">
+      <text>\s[\n(PS*<value-of
+          select="substring-before(//style:style[@style:name =
+          current()/@text:style-name]/style:text-properties/@fo:font-size,
+          '%')"/>/100]</text>
+    </when>
+  </choose>
+  -->
+</template>
 
 <template name="endtextstyle">
-<choose>
-<when test="//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-variant='small-caps' or //style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-style = 'italic' or //style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-weight='bold'">\fR</when>
-</choose>
-<!-- discard font sizes
-<choose>
-<when test="contains(//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-size, 'pt')">\s[\n(PS]</when>
-<when test="contains(//style:style[@style:name = current()/@text:style-name]/style:text-properties/@fo:font-size, '%')">\s[\n(PS]</when>
-</choose>--></template>
+  <choose>
+    <when test="//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-variant =
+        'small-caps' or
+        //style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-style =
+        'italic' or
+        //style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-weight =
+        'bold'">
+    <text>\fR</text>
+  </when>
+  </choose>
+  <!-- discard font sizes
+  <choose>
+    <when test="contains(//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-size,
+        'pt')">
+      <text>\s[\n(PS]</text>
+    </when>
+    <when test="contains(//style:style[@style:name =
+        current()/@text:style-name]/style:text-properties/@fo:font-size,
+        '%')">
+      <text>\s[\n(PS]</text>
+    </when>
+  </choose>
+  -->
+</template>
 
 <template name="liststyle">
-<choose>
-<when test="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-bullet">
-.ML <value-of select="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-bullet[1]/@text:bullet-char"/>
-</when>
-<when test="//text:list-style[@style:name = current()/@text:style-name]/text:list-level-style-number">
-.AL</when>
-</choose>
+  <choose>
+    <when test="//text:list-style[@style:name =
+        current()/@text:style-name]/text:list-level-style-bullet">
+      <text>.ML </text>
+      <value-of select="//text:list-style[@style:name =
+          current()/@text:style-name]/text:list-level-style-bullet[1]/@text:bullet-char"/>
+      <text>&#10;</text>
+    </when>
+    <when test="//text:list-style[@style:name =
+        current()/@text:style-name]/text:list-level-style-number">
+      <text>.AL&#10;</text>
+    </when>
+    <otherwise>
+      <text>.AL&#10;</text>
+    </otherwise>
+    </choose>
 </template>
 
-<template match="text:span"><call-template name="textstyle"/><apply-templates/><call-template name="endtextstyle"/></template>
+<template match="text:span">
+  <call-template name="textstyle"/>
+    <apply-templates/>
+  <call-template name="endtextstyle"/>
+</template>
 
-<template match="text:p[text()]">
-<call-template name="parastyle"/>
-<call-template name="textstyle"/>
-<apply-templates/><call-template name="endtextstyle"/></template>
+<template match="text:p//text:line-break">
+  <if test="preceding::node()[position() = 1][self::text()] or
+      preceding::node()[position() = 1][self::text:span]">
+    <text>&#10;</text>
+  </if>
+  <text>.br</text>
+  <if test="following-sibling::node()">
+    <text>&#10;</text>
+  </if>
+</template>
 
-<template match="text:list-item/text:p[text()]">
-.LP
-<call-template name="textstyle"/>
-<apply-templates/><call-template name="endtextstyle"/></template>
+<template match="text:p[descendant-or-self::text()]">
+  <call-template name="parastyle"/>
+  <call-template name="textstyle"/>
+  <apply-templates/>
+  <call-template name="endtextstyle"/>
+  <text>&#10;</text>
+</template>
+
+<template match="text:list-item/text:p[descendant-or-self::text()]">
+  <text>.LP&#10;</text>
+  <call-template name="textstyle"/>
+  <apply-templates/>
+  <call-template name="endtextstyle"/>
+</template>
 
 <template match="text:list">
-<call-template name="liststyle"/>
-<apply-templates/>
-.LE</template>
-
-<template match="text:list-item">
-.LI<apply-templates/></template>
-
-<template match="text:h">
-.H <value-of select="@text:outline-level"/> "<apply-templates/>" "<call-template name="textstyle"/>" "<call-template name="endtextstyle"/>"</template>
-
-<template match="text:note">\*F\c
-<apply-templates/>
+  <call-template name="liststyle"/>
+  <apply-templates/>
+  <text>.LE&#10;</text>
 </template>
 
-<template match="text:note-citation">.\" footnote <apply-templates/>
+<template match="text:list-item">
+  <text>.LI&#10;</text>
+  <apply-templates/>
+  <text>&#10;</text>
+</template>
+
+<template match="text:h">
+  <text>.H </text>
+  <value-of select="@text:outline-level"/>
+  <text> "</text>
+  <apply-templates/>
+  <text>" "</text>
+  <call-template name="textstyle"/>
+  <text>" "</text>
+  <call-template name="endtextstyle"/>
+  <text>"&#10;</text>
+</template>
+
+<template match="text:note">
+  <text>\*F\c&#10;</text>
+  <apply-templates/>
+</template>
+
+<template match="text:note-citation">
+  <text>.\" footnote </text>
+  <apply-templates/>
+  <text>&#10;</text>
 </template>
 
 <template match="text:note-body">
-.FS
-<apply-templates mode="footnote"/>
-.FE
+  <text>.FS&#10;</text>
+  <apply-templates mode="footnote"/>
+  <text>.FE&#10;</text>
 </template>
 
 <template match="text:p[1]" mode="footnote">
-<apply-templates/>
+  <apply-templates/>
+  <text>&#10;</text>
 </template>
 
 <template match="table:table">
-.TS
-<apply-templates/>
-.TE</template>
+  <text>.TS&#10;</text>
+  <apply-templates/>
+  <text>.TE&#10;</text>
+</template>
 
 <template match="table:table-column">
-<call-template name="tablekey">
-<with-param name="n">
-<value-of select="@table:number-columns-repeated"/>
-</with-param>
-</call-template>
-<if test="not(following-sibling::table:table-column)">.</if>
+  <call-template name="tablekey">
+    <with-param name="n" select="@table:number-columns-repeated"/>
+  </call-template>
+  <if test="not(following-sibling::table:table-column)">
+    <text>.&#10;</text>
+  </if>
 </template>
 
 <template name="tablekey">
-<text>l </text>
-<if test="$n > 1">
-<call-template name="tablekey">
-<with-param name="n">
-<value-of select="$n - 1"/>
-</with-param>
-</call-template>
-</if>
+  <text>l </text>
+  <if test="$n > 1">
+    <call-template name="tablekey">
+      <with-param name="n" select="$n - 1"/>
+    </call-template>
+  </if>
 </template>
 
 <template match="table:table-row">
-<text>&#10;</text><apply-templates/>
+  <apply-templates/>
 </template>
 
-<template match="table:table-cell">T{
-<apply-templates/>
-T}<if test="following-sibling::table:table-cell"><text>&#9;</text></if></template>
-
-<template match="table:table-cell/text:p[1][text()]">
-<call-template name="textstyle"/>
-<apply-templates/><call-template name="endtextstyle"/>
+<template match="table:table-cell">
+  <text>T{&#10;</text>
+  <apply-templates/>
+  <text>T}</text>
+  <choose>
+    <when test="following-sibling::table:table-cell">
+      <text>&#9;</text>
+    </when>
+    <otherwise>
+      <text>&#10;</text>
+    </otherwise>
+  </choose>
 </template>
 
-<template match="/">.\" Converted by odt2tr.xsl 1.10 (gritter) 10/8/06 on <value-of select="date:date-time()"/><apply-templates/>
-<text>&#10;</text></template>
+<template match="table:table-cell/text:p[1][descendant::text()]">
+  <call-template name="textstyle"/>
+  <apply-templates/>
+  <call-template name="endtextstyle"/>
+  <text>&#10;</text>
+</template>
+
+<template match="/">
+  <text>.\" Converted by odt2tr.xsl 1.11 (gritter) 10/9/06 on </text>
+  <value-of select="date:date-time()"/>
+  <text>&#10;</text>
+  <apply-templates/>
+</template>
 
 </stylesheet>
