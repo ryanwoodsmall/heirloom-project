@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.12 (gritter) 10/9/06
+	Sccsid @(#)odt2tr.xsl	1.13 (gritter) 10/9/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -107,7 +107,7 @@
 			there is no markup for such characters in the
 			original document, some handwork is to be
 			expected. This issue can be ignored if troff
-			is configured not to instead an additional
+			is configured not to insert an additional
 			space following a sentence-ending character.
 
 	.ML		Begin a marked list. The single argument is
@@ -619,7 +619,7 @@
 </template>
 
 <template match="/">
-  <text>.\" Converted by odt2tr.xsl 1.12 (gritter) 10/9/06 on </text>
+  <text>.\" Converted by odt2tr.xsl 1.13 (gritter) 10/9/06 on </text>
   <value-of select="date:date-time()"/>
   <text>&#10;</text>
   <apply-templates/>
