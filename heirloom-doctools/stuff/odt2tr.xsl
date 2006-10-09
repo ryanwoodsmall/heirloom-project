@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Sccsid @(#)odt2tr.xsl	1.11 (gritter) 10/9/06
+	Sccsid @(#)odt2tr.xsl	1.12 (gritter) 10/9/06
 
 	A simplistic OpenDocument to troff converter in form of
 	an XSLT stylesheet. See the usage instructions below.
@@ -298,21 +298,12 @@
 
 <template match="text()">
   <choose>
-    <when test='starts-with(., ".") or starts-with(., "&apos;")'>
+    <when test='starts-with(., ". ")'>
       <text>\&amp;</text>
-      <choose>
-        <when test="substring(., 1, 2) = '. '">
-          <value-of select="substring(., 1, 1)"/><text>&#10;</text>
-          <call-template name="text">
-            <with-param name="t" select="substring(., 3)"/>
-          </call-template>
-        </when>
-        <otherwise>
-          <call-template name="text">
-            <with-param name="t" select="."/>
-          </call-template>
-        </otherwise>
-      </choose>
+      <value-of select="substring(., 1, 1)"/><text>&#10;</text>
+      <call-template name="text">
+        <with-param name="t" select="substring(., 3)"/>
+      </call-template>
     </when>
     <otherwise>
       <call-template name="text">
@@ -368,6 +359,8 @@
     </with-param>
   </call-template>
 </template>
+
+<template match="text:s"/>
 
 <template match="text:tab[preceding-sibling::text() or
     following-sibling::text()]">
@@ -502,13 +495,16 @@
 </template>
 
 <template match="text:p//text:line-break">
-  <if test="preceding::node()[position() = 1][self::text()] or
-      preceding::node()[position() = 1][self::text:span]">
-    <text>&#10;</text>
-  </if>
-  <text>.br</text>
-  <if test="following-sibling::node()">
-    <text>&#10;</text>
+  <if test="preceding-sibling::node()">
+    <if test="preceding::node()[position() = 1][self::text()] or
+        preceding::node()[position() = 1][self::text:span] or
+        preceding::node()[position() = 1][self::text:s]">
+      <text>&#10;</text>
+    </if>
+    <text>.br</text>
+    <if test="following-sibling::node()">
+      <text>&#10;</text>
+    </if>
   </if>
 </template>
 
@@ -623,7 +619,7 @@
 </template>
 
 <template match="/">
-  <text>.\" Converted by odt2tr.xsl 1.11 (gritter) 10/9/06 on </text>
+  <text>.\" Converted by odt2tr.xsl 1.12 (gritter) 10/9/06 on </text>
   <value-of select="date:date-time()"/>
   <text>&#10;</text>
   <apply-templates/>
