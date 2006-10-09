@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.183 (gritter) 10/5/06
+ * Sccsid @(#)t6.c	1.184 (gritter) 10/9/06
  */
 
 /*
@@ -205,12 +205,14 @@ getcw(register int i)
 	int	s, t;
 	double	z = 1, zv;
 	struct afmtab	*a;
+	int	cd = 0;
 
 	bd = 0;
 	if (i >= nchtab + 128-32) {
-		if (afmtab && fontbase[xfont]->afmpos - 1 >= 0)
-			i -= nchtab + 128;
-		else {
+		if (afmtab && fontbase[xfont]->afmpos - 1 >= 0) {
+			cd = nchtab + 128;
+			i -= cd;
+		} else {
 			j = abscw(i + 32 - (nchtab+128));
 			goto g0;
 		}
@@ -354,6 +356,7 @@ getcw(register int i)
 			lasttrack = r;
 	}
 	k += lasttrack + lettrack;
+	i += cd;
 	if (nocache|bd)
 		widcache[i].fontpts = 0;
 	else {

@@ -70,6 +70,9 @@ Release ...
   indicated by troff for the "widthshow" PostScript operator. This usually
   results in slightly larger PostScript output but is better encodable when
   distilled to PDF so that PDF files become smaller.
+* troff: An internal character width caching error has been fixed; it could
+  lead to misaligned characters when setting text in fonts containing more
+  than 400 characters.
 * troff, dpost: Can now handle fonts with up to 65534 characters.
 * eqn: Avoid to recognize delimiters inside troff escape sequences with "("
   or "[" as well as directly behind a sequence of backslash characters.
