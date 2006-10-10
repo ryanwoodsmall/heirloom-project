@@ -1,4 +1,4 @@
-Release ...
+Release 061010
 * A simplistic XSLT stylesheet to convert OpenDocument text to troff input
   has been added. See the comments in the file "stuff/odt2tr.xsl" for usage
   instructions.
