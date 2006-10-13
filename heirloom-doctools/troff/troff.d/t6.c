@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.184 (gritter) 10/9/06
+ * Sccsid @(#)t6.c	1.185 (gritter) 10/13/06
  */
 
 /*
@@ -582,7 +582,7 @@ getkw(tchar c, tchar d)
 	}
 	i = cbits(c);
 	j = cbits(d);
-	if (i == SLANT || j == SLANT || cstab[f])
+	if (i == SLANT || j == SLANT || i == XFUNC || j == XFUNC || cstab[f])
 		return 0;
 	k = 0;
 	if (i >= 32 && j >= 32) {

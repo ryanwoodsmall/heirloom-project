@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.34 (gritter) 9/5/06
+ * Sccsid @(#)n8.c	1.35 (gritter) 10/13/06
  */
 
 /*
@@ -533,7 +533,7 @@ addc(int m, char **cp, tchar **wp, int **wpp, int distance)
 		*(*cp)++ = m >> 12 & 017 | 0340;
 		*(*wpp)++ = distance;
 		*(*cp)++ = m >> 6 & 077 | 0200;
-		*(*wp)++ = -1000;
+		*(*wpp)++ = -1000;
 		*(*cp)++ = m & 077 | 0200;
 		*(*wpp)++ = -1000;
 	} else
