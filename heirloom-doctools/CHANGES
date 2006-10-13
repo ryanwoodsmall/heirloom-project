@@ -1,7 +1,7 @@
 Release ...
-* Fixed a typo in the hyphenation code that could result in the insertion
-  of a large negative vertical motion in a word with a character code above
-  Unicode point U+0800.
+* troff: Fixed a typo in the hyphenation code that could result in the
+  insertion of a large negative vertical motion in a word containing a
+  character above Unicode point U+0800.
 
 Release 061010
 * A simplistic XSLT stylesheet to convert OpenDocument text to troff input
