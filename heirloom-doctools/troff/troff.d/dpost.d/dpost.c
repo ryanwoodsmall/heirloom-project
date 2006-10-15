@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.164 (gritter) 10/5/06
+ * Sccsid @(#)dpost.c	1.165 (gritter) 10/15/06
  */
 
 /*
@@ -271,6 +271,7 @@
 #include	<time.h>
 #include	<limits.h>
 #include	<locale.h>
+#include	<stdarg.h>
 
 #include	"comments.h"		/* PostScript file structuring comments */
 #include	"gen.h"			/* general purpose definitions */
@@ -344,9 +345,6 @@ char		seenfonts[MAXINTERNAL+1];
 int		docfonts = 0;
 struct afmtab	**afmfonts;
 int		afmcount = 0;
-
-int		got_otf;
-
 
 /*
  *
@@ -647,8 +645,10 @@ FILE		*tf = NULL;		/* PostScript output goes here */
 FILE		*gf = NULL;		/* global data goes here */
 FILE		*rf = NULL;		/* resource data goes here */
 FILE		*sf = NULL;		/* supplied resource comments go here */
+FILE		*nf = NULL;		/* needed resource comments go here */
 FILE		*pf = NULL;		/* elements of _custompagesetup */
 int		sfcount;		/* count of supplied resources */
+int		nfcount;		/* count of needed resources */
 int		ostdout;		/* old standard output */
 FILE		*fp_acct = NULL;	/* accounting stuff written here */
 
@@ -726,6 +726,12 @@ main(int agc, char *agv[])
     unlink(tp);
     if (close(mkstemp(tp = strdup(template))) < 0 ||
 			    (sf = fopen(tp, "r+")) == NULL) {
+	    perror(tp);
+	    return 2;
+    }
+    unlink(tp);
+    if (close(mkstemp(tp = strdup(template))) < 0 ||
+			    (nf = fopen(tp, "r+")) == NULL) {
 	    perror(tp);
 	    return 2;
     }
@@ -939,8 +945,10 @@ header(FILE *fp)
     if (mediasize.flag & 2)
 	fprintf(fp, "%%%%DocumentMedia: x%gy%g %g %g 0 () ()\n", x, y, x, y);
 
-    if (got_otf)
-        fprintf(fp, "%%%%DocumentNeededResources: procset FontSetInit 0 0\n");
+    fflush(nf);
+    rewind(nf);
+    while ((n = fread(buf, 1, sizeof buf, nf)) > 0)
+	    fwrite(buf, 1, n, fp);
     fflush(sf);
     rewind(sf);
     while ((n = fread(buf, 1, sizeof buf, sf)) > 0)
@@ -2356,6 +2364,22 @@ t_init(void)
 
 /*****************************************************************************/
 
+void
+needresource(const char *s, ...)
+{
+	va_list	ap;
+
+	if (nfcount++ == 0)
+		fprintf(nf, "%%%%DocumentNeededResources: ");
+	else
+		fprintf(nf, "%%%%+ ");
+	va_start(ap, s);
+	vfprintf(nf, s, ap);
+	va_end(ap);
+	putc('\n', nf);
+}
+
+
 static struct supplylist {
 	struct supplylist	*next;
 	char	*font;
@@ -2529,8 +2553,10 @@ supplyotf(char *font, char *path, FILE *fp)
 	 * Adobe Distiller 7 complains about it with DSC warnings
 	 * enabled. What follows is an attempt to fix this.
 	 */
-	if (cffcount++ == 0)
+	if (cffcount++ == 0) {
 		fprintf(rf, "%%%%IncludeResource: procset FontSetInit 0 0\n");
+		needresource("procset FontSetInit 0 0");
+	}
         if (sfcount++ == 0)
         	fprintf(sf, "%%%%DocumentSuppliedResources: font %s\n", font);
         else
@@ -2561,7 +2587,6 @@ supplyotf(char *font, char *path, FILE *fp)
 	}
 	fprintf(rf, "%%%%EndResource\n");
 	free(contents);
-	got_otf = 1;
 	LanguageLevel = MAX(LanguageLevel, 3);
 }
 
@@ -2639,15 +2664,19 @@ supply1(char *font, char *file, char *type)
 }
 
 static void
-t_dosupply(char *font)
+t_dosupply(const char *font)
 {
 	struct supplylist	*sp;
 
 	for (sp = supplylist; sp; sp = sp->next)
-		if (sp->done == 0 && strcmp(sp->font, font) == 0) {
-			supply1(sp->font, sp->file, sp->type);
-			sp->done = 1;
+		if (strcmp(sp->font, font) == 0) {
+			if (sp->done == 0) {
+				supply1(sp->font, sp->file, sp->type);
+				sp->done = 1;
+			}
+			return;
 		}
+	needresource("font %s", font);
 }
 
 /*****************************************************************************/
@@ -3214,8 +3243,6 @@ t_sf(int forceflush)
 	lasthorscale = horscale;
 	if ( seenfonts[fnum] == 0 ) {
 	    documentfonts();
-	    if (fontname[font].afm)
-		t_dosupply(fontname[font].afm->fontname);
 	}
 	if (fontname[font].afm && fontname[font].afm->encmap == NULL)
 	    fontname[font].afm->encmap = printencvector(fontname[font].afm);
@@ -4273,6 +4300,45 @@ doglobal (
 
 /*****************************************************************************/
 
+void
+documentfont(const char *name)
+{
+    static FILE	*fp_out;		/* PostScript name added to this file */
+    static int	pos;
+    static struct fn {
+	struct fn	*next;
+	const char	*name;
+    } *fn;
+    struct fn *ft;
+    int	n;
+
+    if ( temp_file == NULL )		/* generate a temp file name */
+	if ( (temp_file = tempname("dpost")) == NULL )
+	    return;
+
+    if ( fp_out == NULL && (fp_out = fopen(temp_file, "w")) == NULL )
+	return;
+    for (ft = fn; ft; ft = ft->next)
+	    if (strcmp(name, ft->name) == 0)
+		    return;
+    ft = calloc(1, sizeof *ft);
+    ft->name = strdup(name);
+    ft->next = fn;
+    fn = ft;
+    if ( docfonts++ == 0 )
+	pos += fprintf(fp_out, "%s", DOCUMENTFONTS);
+    else {
+	n = strlen(name);
+	if (pos + n >= 80) {
+	    fprintf(fp_out, "\n%s", CONTINUECOMMENT);
+	    pos = 0;
+	}
+    }
+    pos += fprintf(fp_out, " %s", name);
+    fflush(fp_out);
+    t_dosupply(name);
+}
+
 
 void
 documentfonts(void)
@@ -4282,7 +4348,6 @@ documentfonts(void)
 
 
     FILE	*fp_in = NULL;		/* PostScript font name read from here */
-    FILE	*fp_out;		/* and added to this file */
 
 
 /*
@@ -4296,29 +4361,17 @@ documentfonts(void)
  */
 
 
-    if ( temp_file == NULL )		/* generate a temp file name */
-	if ( (temp_file = tempname("dpost")) == NULL )
-	    return;
-
     snprintf(temp, sizeof temp, "%s/dev%s/%s.name",
 		    fontdir, realdev, fontname[font].name);
 
     if (fontname[font].afm == NULL && (fp_in = fopen(temp, "r")) != NULL )  {
 	if ( sget(temp, sizeof temp, fp_in) == 1 )  {
-    print:  if ( (fp_out = fopen(temp_file, "a")) != NULL )  {
-		if ( docfonts++ == 0 )
-		    fprintf(fp_out, "%s", DOCUMENTFONTS);
-		else if ( (docfonts - 1) % 4  == 0 )
-		    fprintf(fp_out, "\n%s", CONTINUECOMMENT);
-		fprintf(fp_out, " %s", temp);
-	    }	/* End if */
-	    fclose(fp_out);
+	    documentfont(temp);
 	}   /* End if */
 	if (fp_in != NULL)
 	    fclose(fp_in);
     } else if (fontname[font].afm != NULL){
-	strcpy(temp, fontname[font].afm->fontname);
-	goto print;
+	documentfont(fontname[font].afm->fontname);
     }	/* End if */
 
 }   /* End of documentfonts */

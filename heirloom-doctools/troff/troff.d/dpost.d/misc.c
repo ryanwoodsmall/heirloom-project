@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.11 (gritter) 3/12/06
+ * Sccsid @(#)misc.c	1.12 (gritter) 10/15/06
  */
 
 /*
@@ -329,6 +329,11 @@ tempname(const char *sfx)
 #endif
 
 #define	LSIZE	512
+
+int psskip(size_t n, FILE *fp)
+{
+	return fseek(fp, n, SEEK_CUR);
+}
 
 char *psgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 {

@@ -2,6 +2,8 @@ Release ...
 * troff: Fixed a typo in the hyphenation code that could result in the
   insertion of a large negative vertical motion in a word containing a
   character above Unicode point U+0800.
+* dpost: Now handles DSC font comments in included PostScript files and
+  supplies glyph data for them if specified with a troff ".fp" request.
 
 Release 061010
 * A simplistic XSLT stylesheet to convert OpenDocument text to troff input

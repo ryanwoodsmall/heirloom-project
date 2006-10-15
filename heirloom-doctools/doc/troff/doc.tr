@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.153 (gritter) 10/5/06
+.\" Sccsid @(#)doc.tr	1.154 (gritter) 10/15/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 10/5/06
+.ds Sccsdate 10/15/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -5910,9 +5910,24 @@ If a \*(PS file lacks page-delimiting comments,
 the entire file is included.
 If no
 .B %%BoundingBox
+or
+.B %%HiResBoundingBox
 comment is present, the picture is
 assumed to fill an 8.5\(mu11-inch page.
 Nothing prevents the picture from being placed off the page.
+.pg
+\fIdpost\fR handles \s-1DSC\s+1 font comments
+in the included files,
+but it can only supply glyph data
+if a path to the respective font file
+has previously been specified
+with a \*(TR \T'fp'\fBfp\fR\T request.
+It is not necessary that the font is otherwise used
+in the \*(TR input text.
+If \fIdpost\fR cannot retrieve a matching font by this mechanism,
+it indicates this in the \%\fB%%DocumentNeededResources\fR comment
+so that a print manager at a later production stage
+may include the missing data.
 .pg
 .nr nosave 1
 .ne 9

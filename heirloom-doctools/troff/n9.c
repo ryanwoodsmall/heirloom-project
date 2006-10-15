@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.64 (gritter) 9/11/06
+ * Sccsid @(#)n9.c	1.65 (gritter) 10/15/06
  */
 
 /*
@@ -837,13 +837,13 @@ getpsbb(const char *name, double bb[4])
 				atend++;
 				continue;
 			}
-			bb[0] = strtol(cp, &cp, 10);
+			bb[0] = strtod(cp, &cp);
 			if (*cp)
-				bb[1] = strtol(cp, &cp, 10);
+				bb[1] = strtod(cp, &cp);
 			if (*cp)
-				bb[2] = strtol(cp, &cp, 10);
+				bb[2] = strtod(cp, &cp);
 			if (*cp) {
-				bb[3] = strtol(cp, &cp, 10);
+				bb[3] = strtod(cp, &cp);
 				found = 1;
 			} else
 				errprint("missing arguments to "

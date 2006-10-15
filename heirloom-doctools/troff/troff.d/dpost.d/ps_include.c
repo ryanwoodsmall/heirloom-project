@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ps_include.c	1.9 (gritter) 3/12/06
+ * Sccsid @(#)ps_include.c	1.10 (gritter) 10/15/06
  */
 
 /*
@@ -49,7 +49,7 @@
 
 
 #define var(x)		fprintf(fout, "/%s %g def\n", #x, x)
-#define has(word)	(strncmp(buf, word, strlen(word)) == 0)
+#define	has(word)	_has(buf, word)
 #define grab(n)		((Section *)(nglobal \
 			? realloc((char *)global, n*sizeof(Section)) \
 			: calloc(n, sizeof(Section))))
@@ -60,6 +60,8 @@ static size_t	bufsize;
 typedef struct {long start, end;} Section;
 
 static void copy(FILE *, FILE *, Section *);
+static char *_has(const char *, const char *);
+static void addfonts(char *);
 
 /*****************************************************************************/
 
@@ -98,7 +100,15 @@ ps_include(
     int		i;			/* loop index */
     int		lineno = 0;
     int		epsf = 0;
-    char	*bp;
+    int		hires = 0;
+    int		state = 0;
+    int		indoc = 0;
+    char	*bp, *cp;
+    enum {
+	    NORMAL,
+	    DOCUMENTFONTS,
+	    DOCUMENTNEEDEDRESOURCES,
+    } cont = NORMAL;
 
 
 /*
@@ -137,13 +147,30 @@ ps_include(
 			while (*bp && *bp != '\n' && *bp != '\r' &&
 					spacechar(*bp&0377))
 				bp++;
-			if (strncmp(bp, "EPSF-3.0", 8) == 0 &&
-					(bp[8] == 0 || spacechar(bp[8]&0377)))
+			if (strncmp(bp, "EPSF-", 5) == 0)
 				epsf++;
 		}
-		if (!has("%%"))
+		if (state == 0 && (*buf == '\n' || has("%%EndComments") ||
+				buf[0] != '%' || buf[1] == ' ' ||
+				buf[1] == '\t' || buf[1] == '\r' ||
+				buf[1] == '\n')) {
+			state = 1;
 			continue;
-		else if (has("%%Page: ")) {
+		}
+		if (buf[0] != '%' || buf[1] != '%')
+			continue;
+		if (state != 1 && (bp = has("%%+")) != NULL) {
+			switch (cont) {
+			case DOCUMENTFONTS:
+				addfonts(bp);
+				break;
+			case DOCUMENTNEEDEDRESOURCES:
+				goto needres;
+			}
+			continue;
+		} else
+			cont = NORMAL;
+		if (has("%%Page: ")) {
 			if (!foundpage)
 				page.start = ftell(fin);
 			sscanf(buf, "%*s %*s %d", &i);
@@ -159,19 +186,66 @@ ps_include(
 			}
 			if (!foundpage)
 				page.start = ftell(fin);
-		} else if (has("%%BoundingBox:")) {
+		} else if (state != 1 && !indoc &&
+				has("%%BoundingBox:") && !hires) {
 			sscanf(buf, "%%%%BoundingBox: %lf %lf %lf %lf", &llx, &lly, &urx, &ury);
+			if (epsf)
+				epsf++;
+		} else if (state != 1 && !indoc && has("%%HiResBoundingBox:")) {
+			sscanf(buf, "%%%%HiResBoundingBox: %lf %lf %lf %lf", &llx, &lly, &urx, &ury);
+			hires++;
 			if (epsf)
 				epsf++;
 		} else if (has("%%LanguageLevel:")) {
 			int	n;
 			sscanf(buf, "%%%%LanguageLevel: %d", &n);
 			LanguageLevel = MAX(LanguageLevel, n);
-		} else if (has("%%EndProlog") || has("%%EndSetup") || has("%%EndDocumentSetup"))
+		} else if ((bp = has("%%DocumentNeededFonts:")) != NULL ||
+				(bp = has("%%DocumentFonts:")) != NULL) {
+			cont = DOCUMENTFONTS;
+			addfonts(bp);
+		} else if ((bp = has("%%DocumentNeededResources:")) != NULL) {
+		needres:
+			if ((cp = _has(bp, "font")))
+				addfonts(cp);
+			else {
+				for (cp = bp; *cp && *cp != '\n' &&
+						*cp != '\r'; cp++);
+				*cp = '\0';
+				needresource("%s", bp);
+			}
+			cont = DOCUMENTNEEDEDRESOURCES;
+		} else if (indoc == 0 && (has("%%EndProlog") ||
+				has("%%EndSetup") || has("%%EndDocumentSetup")))
 			prolog.end = page.start = ftell(fin);
-		else if (has("%%Trailer"))
+		else if (indoc == 0 && has("%%EOF"))
+			break;
+		else if (state == 1 && indoc == 0 && has("%%Trailer")) {
 			trailer.start = ftell(fin);
-		else if (has("%%BeginGlobal")) {
+			state = 2;
+		} else if (state == 1 && has("%%BeginDocument:"))
+			indoc++;
+		else if (state == 1 && indoc > 0 && has("%%EndDocument"))
+			indoc--;
+		else if (state == 1 && (cp = has("%%BeginBinary:")) != NULL) {
+			if ((i = strtol(cp, &cp, 10)) > 0)
+				psskip(i, fin);
+		} else if (state == 1 && (cp = has("%%BeginData:")) != NULL) {
+			if ((i = strtol(cp, &cp, 10)) > 0) {
+				while (*cp == ' ' || *cp == '\t')
+					cp++;
+				while (*cp && *cp != ' ' && *cp != '\t')
+					cp++;
+				while (*cp == ' ' || *cp == '\t')
+					cp++;
+				if (strncmp(cp, "Bytes", 5) == 0)
+					psskip(i, fin);
+				else if (strncmp(cp, "Lines", 5) == 0) {
+					while (i-- && psgetline(&buf,
+						&bufsize, NULL, fin) != NULL);
+				}
+			}
+		} else if (has("%%BeginGlobal")) {
 			if (page.end <= page.start) {
 				if (nglobal >= maxglobal) {
 					maxglobal += 20;
@@ -205,12 +279,19 @@ fprintf(stderr, "trailer=(%d,%d)\n", trailer.start, trailer.end);
 	var(llx); var(lly); var(urx); var(ury); var(w); var(o); var(s);
 	var(cx); var(cy); var(sx); var(sy); var(ax); var(ay); var(rot);
 	fprintf(fout, "_ps_include_setup\n");
-	if (epsf == 2) {
+	if (epsf >= 2) {
 		size_t	len;
 		rewind(fin);
 		fprintf(fout, "%%%%BeginDocument: %s\n", name);
-		while (psgetline(&buf, &bufsize, &len, fin) != NULL)
+		while (psgetline(&buf, &bufsize, &len, fin) != NULL) {
+			if (has("%%BeginPreview:")) {
+				while (psgetline(&buf, &bufsize, &len, fin)
+						!= NULL &&
+						!has("%%EndPreview"));
+				continue;
+			}
 			fwrite(buf, 1, len, fout);
+		}
 		fprintf(fout, "%%%%EndDocument\n");
 	} else {
 		copy(fin, fout, &prolog);
@@ -242,3 +323,39 @@ copy(FILE *fin, FILE *fout, Section *s)
 	}
 }
 
+static char *
+_has(const char *buf, const char *word)
+{
+	int	n;
+
+	n = strlen(word);
+	if (strncmp(buf, word, n) != 0)
+		return NULL;
+	if (buf[n] == ' ' || buf[n] == '\t' || buf[n] == '\r' ||
+			buf[n] == '\n' || buf[n] == 0) {
+		while (buf[n] == ' ' || buf[n] == '\t')
+			n++;
+		return (char *)&buf[n];
+	}
+	return NULL;
+}
+
+static void
+addfonts(char *line)
+{
+	char	*lp = line, c;
+
+	do {
+		while (*lp == ' ' || *lp == '\t')
+			lp++;
+		line = lp;
+		while (*lp && *lp != ' ' && *lp != '\t' && *lp != '\n' &&
+				*lp != '\r')
+			lp++;
+		c = *lp;
+		*lp = '\0';
+		if (*line && strcmp(line, "(atend)"))
+			documentfont(line);
+		*lp = c;
+	} while (c && c != '\n' && c != '\r');
+}

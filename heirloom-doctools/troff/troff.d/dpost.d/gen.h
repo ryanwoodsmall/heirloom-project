@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.15 (gritter) 9/11/06
+ * Sccsid @(#)gen.h	1.16 (gritter) 10/15/06
  */
 
 /*
@@ -111,6 +111,7 @@ void setfont(int);
 void t_sf(int);
 void t_charht(int, float);
 void t_slant(int);
+void needresource(const char *, ...);
 void t_supply(char *);
 void t_reset(int);
 void t_trailer(void);
@@ -130,6 +131,7 @@ void addchar(int);
 void addoctal(int);
 void charlib(int);
 int doglobal(char *);
+void documentfont(const char *);
 void documentfonts(void);
 void redirect(int);
 /* draw.c */
@@ -154,6 +156,7 @@ int in_olist(int);
 int cat(char *, FILE *);
 int str_convert(char **, int);
 char *tempname(const char *);
+int psskip(size_t, FILE *);
 char *psgetline(char **, size_t *, size_t *, FILE *);
 int sget(char *, size_t, FILE *);
 /* pictures.c */
