@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.12 (gritter) 10/15/06
+ * Sccsid @(#)misc.c	1.13 (gritter) 10/16/06
  */
 
 /*
@@ -105,19 +105,19 @@ error(int kind, char *mesg, ...)
 void
 verrprint(char *fmt, va_list ap)
 {
-	fprintf(stderr, "%s: ", prog_name);
-	vfprintf(stderr, fmt, ap);
-	putc('\n', stderr);
+    fprintf(stderr, "%s: ", prog_name);
+    vfprintf(stderr, fmt, ap);
+    putc('\n', stderr);
 }
 
 void
 errprint(char *fmt, ...)
 {
-	va_list	ap;
+    va_list	ap;
 
-	va_start(ap, fmt);
-	verrprint(fmt, ap);
-	va_end(ap);
+    va_start(ap, fmt);
+    verrprint(fmt, ap);
+    va_end(ap);
 }
 
 /*****************************************************************************/
@@ -312,11 +312,11 @@ void interrupt(sig)
 char *
 tempname(const char *sfx)
 {
-	char *pat = malloc(strlen(TEMPDIR) + strlen(sfx) + 10);
-	sprintf(pat, "%s/%sXXXXXX", TEMPDIR, sfx);
-	if (close(mkstemp(pat)) < 0)
-		return NULL;
-	return pat;
+    char *pat = malloc(strlen(TEMPDIR) + strlen(sfx) + 10);
+    sprintf(pat, "%s/%sXXXXXX", TEMPDIR, sfx);
+    if (close(mkstemp(pat)) < 0)
+	return NULL;
+    return pat;
 }
 
 
@@ -332,42 +332,42 @@ tempname(const char *sfx)
 
 int psskip(size_t n, FILE *fp)
 {
-	return fseek(fp, n, SEEK_CUR);
+    return fseek(fp, n, SEEK_CUR);
 }
 
 char *psgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 {
-	int c;
-	size_t n = 0;
-	int nl = 0;
+    int c;
+    size_t n = 0;
+    int nl = 0;
 
-	if (*line == NULL || *linesize < LSIZE + n + 1)
-		*line = realloc(*line, *linesize = LSIZE + n + 1);
-	for (;;) {
-		if (n >= *linesize - LSIZE / 2)
-			*line = realloc(*line, *linesize += LSIZE);
-		c = getc(fp);
-		if (c != EOF) {
-			if (nl && c != '\n') {
-				ungetc(c, fp);
-				break;
-			}
-			(*line)[n++] = c;
-			(*line)[n] = '\0';
-			if (c == '\n')
-				break;
-			if (c == '\r')
-				nl = 1;
-		} else {
-			if (n > 0)
-				break;
-			else
-				return NULL;
-		}
+    if (*line == NULL || *linesize < LSIZE + n + 1)
+	*line = realloc(*line, *linesize = LSIZE + n + 1);
+    for (;;) {
+	if (n >= *linesize - LSIZE / 2)
+	    *line = realloc(*line, *linesize += LSIZE);
+	c = getc(fp);
+	if (c != EOF) {
+	    if (nl && c != '\n') {
+		ungetc(c, fp);
+		break;
+	    }
+	    (*line)[n++] = c;
+	    (*line)[n] = '\0';
+	    if (c == '\n')
+		break;
+	    if (c == '\r')
+		nl = 1;
+	} else {
+	    if (n > 0)
+		break;
+	    else
+		return NULL;
 	}
-	if (llen)
-		*llen = n;
-	return *line;
+    }
+    if (llen)
+	*llen = n;
+    return *line;
 }
 
 
@@ -377,17 +377,17 @@ char *psgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
 int
 sget(char *buf, size_t size, FILE *fp)
 {
-	int	c, n = 0;
+    int	c, n = 0;
 
-	do
-		c = getc(fp);
-	while (spacechar(c));
-	if (c != EOF) do {
-		if (n+1 < size)
-			buf[n++] = c;
-		c = getc(fp);
-	} while (c != EOF && !spacechar(c));
-	ungetc(c, fp);
-	buf[n] = 0;
-	return n > 1 ? 1 : c == EOF ? EOF : 0;
+    do
+	c = getc(fp);
+    while (spacechar(c));
+    if (c != EOF) do {
+	if (n+1 < size)
+	    buf[n++] = c;
+	c = getc(fp);
+    } while (c != EOF && !spacechar(c));
+    ungetc(c, fp);
+    buf[n] = 0;
+    return n > 1 ? 1 : c == EOF ? EOF : 0;
 }
