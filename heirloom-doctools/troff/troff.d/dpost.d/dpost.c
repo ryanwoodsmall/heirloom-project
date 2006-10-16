@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.168 (gritter) 10/16/06
+ * Sccsid @(#)dpost.c	1.169 (gritter) 10/16/06
  */
 
 /*
@@ -488,12 +488,13 @@ struct  {
  * to TRUE after we've seen the first page command in the input file. It controls
  * what's done in t_font() and is needed because nfonts is no longer set when the
  * DESC file is read, but rather is updated from "x font" commands in the
- * input files.
+ * input files. gotregular ensures that at least one regular font is mounted.
  *
  */
 
 
 int		gotspecial = FALSE;
+int		gotregular = FALSE;
 int		seenpage = FALSE;
 
 
@@ -2043,6 +2044,9 @@ loadspecial(void)
  *
  */
 
+    if ( gotregular == FALSE )
+	loadfont(++nfonts, ((struct Font *)(&chname[dev.lchname]))->namefont,
+		NULL, 0, 0);
 
     if ( gotspecial == FALSE )
 	for ( i = 1, p = chname + dev.lchname; i <= dev.nfonts; i++ )  {
@@ -2338,6 +2342,7 @@ t_init(void)
     if ( initialized == FALSE )  {	/* only do this stuff once per job */
 	fontinit();
 	gotspecial = FALSE;
+	gotregular = FALSE;
 	widthfac = (float) res /dev.res;
 	if (dev.afmfonts) {
 	    if (Sflag == 0)
@@ -2897,6 +2902,7 @@ t_fp (
     if ( n > nfonts )  {		/* got more positions */
 	nfonts = n;
 	gotspecial = FALSE;
+	gotregular = FALSE;
     }	/* End if */
 
 }   /* End of t_fp */
@@ -2933,7 +2939,7 @@ t_font (
 	if ( n < 0  ||  n > nfonts )
 	    error(FATAL, "illegal font position %d", n);
 
-	if ( gotspecial == FALSE )
+	if ( gotspecial == FALSE || gotregular == FALSE )
 	    loadspecial();
     }	/* End if */
 
@@ -3579,7 +3585,7 @@ put1 (
 {
 
 
-    register int	i;		/* character code from fitab */
+    register int	i = 0;		/* character code from fitab */
     register int	j;		/* number of fonts we've checked so far */
     register int	k;		/* font we're currently looking at */
     int			*pw = NULL;	/* font widthtab and */
@@ -3619,13 +3625,13 @@ put1 (
 
     k = ofont = font;
 
-    if ( (i = fitab[k][c]) != 0 )  {	/* it's on this font */
+    if ( fitab[k] && (i = fitab[k][c]) != 0 )  {	/* it's on this font */
 	p = codetab[font];
 	pw = fontab[font];
     } else if ( smnt > 0 )  {		/* on special (we hope) */
 	for ( k=smnt, j=0; j <= nfonts; j++, k = (k+1) % (nfonts+1) )  {
 	    if ( k == 0 )  continue;
-	    if ( (i = fitab[k][c]) != 0 )  {
+	    if ( fitab[k] && (i = fitab[k][c]) != 0 )  {
 		p = codetab[k];
 		pw = fontab[k];
 		setfont(k);
