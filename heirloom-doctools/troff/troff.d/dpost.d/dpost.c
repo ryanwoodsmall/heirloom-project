@@ -2010,6 +2010,8 @@ have:   fontbase[n] = &a->Font;
 done:
     if ( smnt == 0 && (fontbase[n]->specfont == 1 || forcespecial) )
 	smnt = n;
+    if (fontbase[n]->specfont == 1 || forcespecial)
+	gotregular = TRUE;
 
     if ( debug == ON )
 	fontprint(n);
@@ -2056,6 +2058,7 @@ loadspecial(void)
 	    p += 3 * nw + dev.nchtab + 128 - 32 + sizeof(struct Font);
 	}   /* End for */
 
+    gotregular = TRUE;
     gotspecial = TRUE;
 
 }   /* End of loadspecial */
