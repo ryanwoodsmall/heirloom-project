@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.167 (gritter) 10/16/06
+ * Sccsid @(#)dpost.c	1.168 (gritter) 10/16/06
  */
 
 /*
@@ -4670,9 +4670,9 @@ t_linkcolor(char *lp)
 {
     float	r, g, b;
 
-    r = strtof(lp, &lp);
-    g = strtof(lp, &lp);
-    b = strtof(lp, &lp);
+    r = strtod(lp, &lp);
+    g = strtod(lp, &lp);
+    b = strtod(lp, &lp);
     snprintf(linkcolor, sizeof linkcolor, "%g %g %g", r, g, b);
 }
 
@@ -4681,8 +4681,8 @@ t_linkborder(char *lp)
 {
     float	bx, by, c;
 
-    bx = strtof(lp, &lp);
-    by = strtof(lp, &lp);
-    c = strtof(lp, &lp);
+    bx = strtod(lp, &lp);
+    by = strtod(lp, &lp);
+    c = strtod(lp, &lp);
     snprintf(linkborder, sizeof linkborder, "%g %g %g", bx, by, c);
 }

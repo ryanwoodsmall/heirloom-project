@@ -7,6 +7,7 @@ Release ...
   option was explicitly specified.
 * dpost: Now handles DSC font comments in included PostScript files and
   supplies glyph data for them if specified with a troff ".fp" request.
+* dpost: Fixed to compile on NetBSD again (Bugreport by Dirk-Wilhelm Peters).
 
 Release 061010
 * A simplistic XSLT stylesheet to convert OpenDocument text to troff input

@@ -30,8 +30,8 @@ misc.o: misc.c gen.h ext.h path.h asciitype.h
 pictures.o: pictures.c comments.h gen.h path.h
 ps_include.o: ps_include.c ext.h gen.h asciitype.h path.h
 request.o: request.c gen.h request.h path.h
-afm.o: ../dev.h ../afm.h ../afm.c
-otf.o: ../dev.h ../afm.h ../otf.c
-makedev.o: ../dev.h ../makedev.c
+afm.o: afm.c ../dev.h ../afm.h ../afm.c
+otf.o: otf.c ../dev.h ../afm.h ../otf.c
+makedev.o: makedev.c ../dev.h ../makedev.c
 asciitype.o: asciitype.h
 version.o: version.c ../../version.c
