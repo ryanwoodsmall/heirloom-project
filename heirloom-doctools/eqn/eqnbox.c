@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)eqnbox.c	1.5 (gritter) 11/6/05
+ * Sccsid @(#)eqnbox.c	1.6 (gritter) 10/19/06
  */
 
 # include "e.h"
@@ -49,7 +49,7 @@ eqnbox(int p1, int p2, int lu) {
 	else
 		sh = "";
 	if (lu) {
-		printf(".nr %d \\w'\\s%d\\*(%d%s'\n", p1, ps, p1, sh);
+		printf(".nr %d \\w'\\s%s\\*(%d%s'\n", p1, tsize(ps), p1, sh);
 		printf(".ds %d \\h'|\\n(97u-\\n(%du'\\*(%d\n", p1, p1, p1);
 	}
 	printf(".as %d \"%s\\*(%d\n", yyval, sh, p2);

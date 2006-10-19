@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)over.c	1.4 (gritter) 10/29/05
+ * Sccsid @(#)over.c	1.5 (gritter) 10/19/06
  */
 
 # include "e.h"
@@ -54,7 +54,7 @@ boverb(int p1, int p2) {
 	printf(".nr %d \\n(%d\n", treg, p1);
 	printf(".if \\n(%d>\\n(%d .nr %d \\n(%d\n", p2, treg, treg, p2);
 #ifndef NEQN
-	printf(".nr %d \\n(%d+\\s%d.5m\\s0\n", treg, treg, EFFPS(ps));
+	printf(".nr %d \\n(%d+\\s%s.5m\\s0\n", treg, treg, tsize(EFFPS(ps)));
 	printf(".ds %d \\v'%gp'\\h'\\n(%du-\\n(%du/2u'\\*(%d\\\n", 
 		yyval, eht[p2]-ebase[p2]-d, treg, p2, p2);
 	printf("\\h'-\\n(%du-\\n(%du/2u'\\v'%gp'\\*(%d\\\n", 

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.8 (gritter) 11/6/05
+ * Sccsid @(#)e.h	1.9 (gritter) 10/19/06
  */
 
 #include <stdio.h>
@@ -51,10 +51,10 @@ extern int	dbg;
 extern int	ct;
 extern int	lp[];
 extern int	used[];	/* available registers */
-extern int	ps;	/* dflt init pt size */
+extern float	ps;	/* dflt init pt size */
 #define	resolution	72	/* was: resolution of ditroff */
-extern int	deltaps;	/* default change in ps */
-extern int	gsize;	/* global size */
+extern float	deltaps;	/* default change in ps */
+extern float	gsize;	/* global size */
 extern int	gfont;	/* global font */
 extern int	ft;	/* dflt font */
 extern FILE	*curfile;	/* current input file */
@@ -115,15 +115,11 @@ int eqn(int, char **);
 int getline(char **, size_t *);
 void do_inline(void);
 void putout(int);
-#ifndef	NEQN
 float max(float, float);
-#else	/* NEQN */
-int max(int, int);
-#endif	/* NEQN */
 int oalloc(void);
 void ofree(int);
-void setps(int);
-void nrwid(int, int, int);
+void setps(float);
+void nrwid(int, float, int);
 void setfile(int, char **);
 void yyerror(char *);
 void init(void);
@@ -164,8 +160,9 @@ void shift(int);
 void shift2(int, int, int);
 /* size.c */
 void setsize(char *);
-void size(int, int);
+void size(float, int);
 void globsize(void);
+char *tsize(float);
 /* sqrt.c */
 #define	sqrt(n)	eqnsqrt(n)
 void sqrt(int);

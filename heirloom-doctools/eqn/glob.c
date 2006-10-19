@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glob.c	1.7 (gritter) 10/29/05
+ * Sccsid @(#)glob.c	1.8 (gritter) 10/19/06
  */
 
 #include "e.h"
@@ -27,10 +27,10 @@ int	dbg;	/* debugging print if non-zero */
 int	lp[80];	/* stack for things like piles and matrices */
 int	ct;	/* pointer to lp */
 int	used[100];	/* available registers */
-int	ps;	/* default init point size */
+float	ps;	/* default init point size */
 /*int	resolution = 72;	 * was: resolution of ditroff */
-int	deltaps	= 3;	/* default change in ps */
-int	gsize	= 10;	/* default initial point size */
+float	deltaps	= 3;	/* default change in ps */
+float	gsize	= 10;	/* default initial point size */
 int	gfont	= ITAL;	/* italic */
 int	ft;	/* default font */
 FILE	*curfile;	/* current input file */

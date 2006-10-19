@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)funny.c	1.5 (gritter) 10/29/05
+ * Sccsid @(#)funny.c	1.6 (gritter) 10/19/06
  */
 
 # include "e.h"
@@ -42,7 +42,7 @@ funny(int n) {
 		error(FATAL, "funny type %d in funny", n);
 	}
 #ifndef NEQN
-	printf(".ds %d \\s%d\\v'.3m'\\s+5%s\\s-5\\v'-.3m'\\s%d\n", yyval, ps, f, ps);
+	printf(".ds %d \\s%s\\v'.3m'\\s+5%s\\s-5\\v'-.3m'\\s%s\n", yyval, tsize(ps), f, tsize(ps));
 	eht[yyval] = VERT(EM(1.0, ps+5) - EM(0.2, ps));
 	ebase[yyval] = VERT(EM(0.3, ps));
 	if(dbg)printf(".\tfunny: S%d <- %s; h=%g b=%g\n", 

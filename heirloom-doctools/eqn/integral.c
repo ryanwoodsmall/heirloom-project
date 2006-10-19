@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)integral.c	1.4 (gritter) 10/29/05
+ * Sccsid @(#)integral.c	1.5 (gritter) 10/19/06
  */
 
 # include "e.h"
@@ -55,8 +55,8 @@ setintegral(void) {
 	yyval = oalloc();
 	f = "\\(is";
 #ifndef NEQN
-	printf(".ds %d \\s%d\\v'.1m'\\s+4%s\\s-4\\v'-.1m'\\s%d\n", 
-		yyval, ps, f, ps);
+	printf(".ds %d \\s%s\\v'.1m'\\s+4%s\\s-4\\v'-.1m'\\s%s\n", 
+		yyval, tsize(ps), f, tsize(ps));
 	eht[yyval] = VERT(EM(1.15, ps+4));
 	ebase[yyval] = VERT(EM(0.3, ps));
 #else /* NEQN */

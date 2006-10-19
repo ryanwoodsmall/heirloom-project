@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sqrt.c	1.4 (gritter) 10/29/05
+ * Sccsid @(#)sqrt.c	1.5 (gritter) 10/19/06
  */
 
 # include "e.h"
@@ -26,9 +26,9 @@
 void
 sqrt(int p2) {
 #ifndef NEQN
-	int nps;
+	float nps;
 
-	nps = EFFPS(((eht[p2]*9)/10+(resolution/POINT-1))/(resolution/POINT));
+	nps = (int)(EFFPS(((eht[p2]*9)/10+(resolution/POINT-1))/(resolution/POINT)));
 #endif /* NEQN */
 	yyval = p2;
 #ifndef NEQN
@@ -40,8 +40,8 @@ sqrt(int p2) {
 #endif /* NEQN */
 	nrwid(p2, ps, p2);
 #ifndef NEQN
-	printf(".ds %d \\v'%gp'\\s%d\\v'-.2m'\\(sr\\l'\\n(%du\\(rn'\\v'.2m'\\s%d", 
-		yyval, ebase[p2], nps, p2, ps);
+	printf(".ds %d \\v'%gp'\\s%s\\v'-.2m'\\(sr\\l'\\n(%du\\(rn'\\v'.2m'\\s%s", 
+		yyval, ebase[p2], tsize(nps), p2, tsize(ps));
 	printf("\\v'%gp'\\h'-\\n(%du'\\*(%d\n", -ebase[p2], p2, p2);
 	lfont[yyval] = ROM;
 #else /* NEQN */

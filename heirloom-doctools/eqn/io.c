@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.10 (gritter) 9/11/06
+ * Sccsid @(#)io.c	1.11 (gritter) 10/19/06
  */
 
 # include "e.h"
@@ -61,6 +61,7 @@ eqn(int argc,char **argv) {
 			for (i=11; i<100; used[i++]=0);
 			printf("%s",in);
 			printf(".nr 99 \\n(.s\n.nr 98 \\n(.f\n");
+			printf(".if \\n(.X .nrf 99 \\n(.s\n");
 			markline = 0;
 			init();
 			yyparse();
@@ -151,6 +152,7 @@ do_inline(void) {
 	int ds;
 
 	printf(".nr 99 \\n(.s\n.nr 98 \\n(.f\n");
+	printf(".if \\n(.X .nrf 99 \\n(.s\n");
 	ds = oalloc();
 	printf(".rm %d \n", ds);
 	do{
@@ -173,7 +175,6 @@ do_inline(void) {
 
 void
 putout(int p1) {
-	extern int gsize, gfont;
 #ifndef	NEQN
 	float before, after;
 	if(dbg)printf(".\tanswer <- S%d, h=%g,b=%g\n",p1, eht[p1], ebase[p1]);
@@ -197,8 +198,11 @@ putout(int p1) {
 #else	/* NEQN */
 		printf("\\x'0-%du'", before);
 #endif	/* NEQN */
-	printf("\\f%c\\s%d\\*(%d%s\\s\\n(99\\f\\n(98",
-		gfont, gsize, p1, rfont[p1] == ITAL ? "\\|" : "");
+	printf("\\f%c\\s%s\\*(%d%s\n",
+		gfont, tsize(gsize), p1, rfont[p1] == ITAL ? "\\|" : "");
+	printf(".ie \\n(.X=0 .as %d \\s\\n(99\n", p1);
+	printf(".el .as %d \\s[\\n(99]\n", p1);
+	printf(".as %d \\f\\n(98", p1);
 #ifndef NEQN
 	after = ebase[p1] - VERT(EM(0.2, ps));
 #else /* NEQN */
@@ -219,13 +223,8 @@ putout(int p1) {
 
 }
 
-#ifndef	NEQN
 float
 max(float i,float j) {
-#else	/* NEQN */
-int
-max(int i,int j) {
-#endif	/* NEQN */
 	return (i>j ? i : j);
 }
 
@@ -244,13 +243,13 @@ ofree(int n) {
 }
 
 void
-setps(int p) {
-	printf(".ps %d\n", EFFPS(p));
+setps(float p) {
+	printf(".ps %g\n", EFFPS(p));
 }
 
 void
-nrwid(int n1, int p, int n2) {
-	printf(".nr %d \\w'\\s%d\\*(%d'\n", n1, EFFPS(p), n2);
+nrwid(int n1, float p, int n2) {
+	printf(".nr %d \\w'\\s%s\\*(%d'\n", n1, tsize(EFFPS(p)), n2);
 }
 
 void
@@ -263,8 +262,8 @@ setfile(int argc, char **argv) {
 		switch (svargv[1][1]) {
 
 		case 'd': lefteq=svargv[1][2]; righteq=svargv[1][3]; break;
-		case 's': gsize = atoi(&svargv[1][2]); break;
-		case 'p': deltaps = atoi(&svargv[1][2]); break;
+		case 's': gsize = atof(&svargv[1][2]); break;
+		case 'p': deltaps = atof(&svargv[1][2]); break;
 		case 'f': gfont = svargv[1][2]; break;
 		case 'e': noeqn++; break;
 		case 'r': /*resolution = atoi(&svargv[1][2]);*/ break;

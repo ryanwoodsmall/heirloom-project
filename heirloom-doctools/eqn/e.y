@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.y	1.5 (gritter) 8/13/05
+ * Sccsid @(#)e.y	1.6 (gritter) 10/19/06
  */
 #include "e.h"
 #include <stdlib.h>
@@ -144,12 +144,12 @@ diacrit	: HAT	{ $$ = HAT; }
 	;
 
 from	: FROM	{ $$=ps; ps -= 3; fromflg = 1;
-		if(dbg)printf(".\tfrom: old ps %d, new ps %d, fflg %d\n", $$, ps, fromflg);
+		if(dbg)printf(".\tfrom: old ps %d, new ps %g, fflg %d\n", $$, ps, fromflg);
 		}
 	;
 
 to	: TO	{ $$=ps; if(fromflg==0)ps -= 3; 
-			if(dbg)printf(".\tto: old ps %d, new ps %d\n", $$, ps);
+			if(dbg)printf(".\tto: old ps %d, new ps %g\n", $$, ps);
 		}
 	;
 
