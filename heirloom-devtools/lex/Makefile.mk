@@ -40,6 +40,7 @@ install: all
 	$(STRIP) $(ROOT)$(BINDIR)/lex
 	$(INSTALL) -c -m 644 ncform $(ROOT)$(LEXDIR)/ncform
 	$(INSTALL) -c -m 644 nceucform $(ROOT)$(LEXDIR)/nceucform
+	$(INSTALL) -c -m 644 nrform $(ROOT)$(LEXDIR)/nrform
 	$(INSTALL) -c -m 644 libl.a $(ROOT)$(LIBDIR)/libl.a
 	test -d $(ROOT)$(MANDIR)/man1 || mkdir -p $(ROOT)$(MANDIR)/man1
 	$(INSTALL) -c -m 644 lex.1 $(ROOT)$(MANDIR)/man1/lex.1
