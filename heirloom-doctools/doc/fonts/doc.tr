@@ -1,11 +1,11 @@
-.\" Sccsid @(#)doc.tr	2.20 (gritter) 7/4/06
+.\" Sccsid @(#)doc.tr	2.21 (gritter) 10/22/06
 .do xflag 3
 .warn
 .spreadwarn 5p
 .lc_ctype de_DE.utf8
 .mediasize a5
 .hylang en_US
-.hw Post-Script
+.hw Post-Script work-around
 .fp 1 R GaramondPremrPro-Med otf
 .fp 2 I GaramondPremrPro-MedIt otf
 .fp 0 N GaramondPremrPro-Med otf
@@ -69,8 +69,8 @@
 .nr PS 10p
 .nr VS 12p
 .ll \n(LLu
-.ss 12 0
-.minss 9
+.ss 10 0
+.minss 8
 .de Breakpage
 .	ch Breakpage
 '	bp
@@ -186,7 +186,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-7/4/06
+10/22/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -205,7 +205,7 @@ Heirloom Documentation Tools
 .Impression
 .fi
 .bp
-.ad b
+.ad p
 .ft R
 .S "The basics"
 .nr print-pageno 1
@@ -669,7 +669,6 @@ spaces is shifted in the example above, each word space is enlarged
 by only 1/100 em.
 .S "Mathematical and other special characters"
 .P
-.ss 11 0
 Special mathematical characters like
 ``\[backslash](\[plus]\[minus]'', greek letters like ``\[backslash](*a'',
 and, with the ``pslow'' device,
@@ -685,8 +684,6 @@ access characters from the current font.)
 The ``.fps'' request can be used to override this behavior. In particular,
 this is useful to set mathematical text with a different font. To use
 Adobe Garamond Premier Pro for greek letters and mathematical symbols:
-.br
-.ss 12 0
 .EX
 &do xflag 3
 &fps math,greek,punct 1 \fCR\fN GaramondPremrPro otf
