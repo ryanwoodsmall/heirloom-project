@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.165 (gritter) 10/5/06
+ * Sccsid @(#)n3.c	1.168 (gritter) 10/21/06
  */
 
 /*
@@ -75,13 +75,12 @@ int	strflg;
 tchar *wbuf;
 tchar *corebuf;
 
-static struct contab	*oldmn;
-static struct contab	*newmn;
+struct contab	*oldmn;
+struct contab	*newmn;
 
 static void	mrehash(struct contab *, int, struct contab **);
 static void	_collect(int);
 static struct contab	*_findmn(int, int, int);
-static filep	finds(register int, int, int);
 static void	clrmn(struct contab *);
 static void	caselds(void);
 static void	casewatchlength(void);
@@ -576,7 +575,7 @@ clrmn(struct contab *contp)
  * Note: finds() may invalidate the result of a previous findmn()
  * for another macro since it may call growcontab().
  */
-static filep 
+filep 
 finds(register int mn, int als, int globonly)
 {
 	register tchar i;
@@ -962,6 +961,14 @@ popi(void)
 	} else
 		if (p->loopf & LOOP_FREE)
 			ffree(p->newip);
+	if (p->flags & FLAG_PARAGRAPH) {
+		static jmp_buf	jmp;
+
+		ffree(p->contp->mx);
+		memcpy(&jmp, p->jmp, sizeof jmp);
+		free(p);
+		longjmp(jmp, 1);
+	}
 	free(p);
 	return(c);
 }

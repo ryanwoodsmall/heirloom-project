@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.154 (gritter) 10/15/06
+.\" Sccsid @(#)doc.tr	1.156 (gritter) 10/22/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 10/15/06
+.ds Sccsdate 10/22/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -179,6 +179,7 @@
 .nr m -1i
 .nr x 0 1
 .nr y 0+\nmu
+.ad p
 .ii
 .ev 1
 .ps \n(PS-2
@@ -678,6 +679,16 @@ The last form allows direct input of international language texts
 in almost any character encoding,
 including \s-1UTF\s+1-8.
 .pg
+Improvements to the line breaking mechanism
+can be activated to achieve more aesthetically pleasant output:
+\*(TR can adjust whole paragraphs at once
+using an algorithm developed by
+\T'ref_10'James O. Achugbue\|\*u10\*d\T.
+Interword spaces can be shrunk and expanded.
+Inter-letter spaces and letter shapes
+can also be varied (sometimes called ``microtypography'').
+All of these options can be arbitrarily combined.
+.pg
 A variety of international paper formats
 and hyphenation languages are supported by \*[TR.]
 .pg
@@ -902,7 +913,14 @@ in [1].
 .sp .4
 .ti 0
 \A'ref_9'[9]	<http://plan9.bell-labs.com/plan9>
-'in 0
+.sp .4
+.ti 0
+\A'ref_10'[10]	James O. Achugbue,
+``On the line breaking problem in text formatting''.
+\fIProceedings of the \s-1ACM SIGPLAN SIGOA\s0
+symposium on Text manipulation\fR,
+Portland, Oregon, 1981, pp. 117-122.
+.in 0
 .pg
 .nr nosave 1
 .bp
@@ -1293,7 +1311,7 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'nf'\fB&nf\fR	fill	\(en	B,E	No filling or adjusting of output lines.\T
 .b1
-\T'ad'\fB&ad\fI|c\fR	adj,both	adjust	E	Adjust output lines with mode \fIc\fR; \fIc\fP\^=\^l,\^r,\^c,\^b,\^\fInone\fP\T
+\T'ad'\fB&ad\fI|c\fR	adj,both	adjust	E	Adjust output lines with mode \fIc\fR; \fIc\fP\^=\^l,\^r,\^c,\^b,\^p,\^\fInone\fP\T
 .b1
 \T'na'\fB&na\fR	adjust	\(en	E	No output line adjusting.\T
 .b1
@@ -3186,6 +3204,32 @@ which may result in condensed spacing and shaping.
 The horizontal positions in the \fB.k\fR and \fB.x\fR registers
 are always computed using default character and spacing widths.
 .pg
+In addition to adjusting one line at once as described,
+\*(TR also supports adjusting one paragraph at once,
+enabled with \T'ad'\fBad\ p\fR\T.
+In this mode,
+words are collected from input lines
+and requests are processed
+until a \fIbreak\fR occurs.
+The words are then split into lines
+such that the interword spaces
+are closest to the optimum setting
+across the entire paragraph.
+The lines so determinted
+are written to a temporary \T'c_diversion'diversion\T.
+Ultimately, this diversion is printed.
+\T'c_trap'Traps\T, page breaks,
+and any positioning become effective only at this time.
+It is thus well possible that the current page number
+as read on the input line in the \T'n_%'\fB%\fR\T register
+is lower than the number of the page
+on which the corresponding text is actually output.
+Any reference to the page number or page position
+(e.g. writing an index entry)
+should thus be handled using
+the \T's_olt'output-line trap\T mechanism
+instead of in-line macros.
+.pg
 .tr &&
 An input text line ending with \fB.\fR\^, \fB?\fR, \fB!\fR, or \fB:\fR,
 optionally followed by any number of \fB"\fR, \fB\'\fR,
@@ -3346,6 +3390,10 @@ _
 \fBr\fR	adjust right margin only
 \fBc\fR	center
 \fBb\fR or \fBn\fR	adjust both margins
+\fBp\fR or \fBpb\fR	adjust both margins paragraph-wise
+\fBpl\fR	adjust left margin paragraph-wise
+\fBpr\fR	adjust right margin paragraph-wise
+\fBpc\fR	center paragraph-wise
 absent	unchanged
 .TE
 The number register \A'n_.j'\fB.j\fR contains the current value
@@ -3884,7 +3932,7 @@ in the \A'n_.t'\fB.t\fR register;
 if there are no traps between the current position and the bottom of the page,
 the distance returned is the distance to the page bottom.
 .pg
-An output-line trap is planted using
+\A's_olt'An output-line trap is planted using
 the escape sequence \A'e_P'\fB\eP\fIx\fR,
 \fB\eP(\fIxx\fR, or \fB\eP[\fIxxx\fB]\fR.
 It is converted to an internal character code
@@ -5550,6 +5598,7 @@ If \fIN\fR is not given, the previous \fIN\fR is used; the initial \fIN\fR is
 0.2|inches in \*(NR and 1\|em in \*[TR.]
 The margin character used with this paragraph was a 12-point box-rule.
 .br
+.ad b
 .mc
 .bta lpfx
 \fB&lpfx\fI|string\fR	off	off	E	Set the line prefix
@@ -5563,6 +5612,7 @@ This request is mainly useful
 to implement a historic form of block quotation.
 The current value is available in the \A'n_.lpfx'\fB&lpfx\fR register.''
 .br
+.ad p
 .lpfx
 .bta tm
 \fB&tm\fI|string\fR	\(en	newline	\(en	\
@@ -5639,6 +5689,7 @@ When one of the selected conditions occurs,
 a \fIwarning\fR message is written
 in the same format as an error message,
 but processing continues.
+.br
 .ne 6
 .TS H
 nokeep box center;
@@ -7539,7 +7590,7 @@ Non-\s-1ASCII\s+1 characters and \', \`, \_\|, \(pl, \(mi, \(eq, and \(** on the
 .fi
 .ps 10
 In traditional \*[TR,]
-the ASCII characters @, #, ", \', \`, <, >, \\, {, }, ~, ^, and \(ul existed
+the ASCII characters @, #, ", \', \`, <, >, \e, {, }, ~, ^, and \(ul existed
 \fIonly\fR on the special font and were printed as a 1-em space if that font
 was not mounted.
 The following characters exist only on the special font.

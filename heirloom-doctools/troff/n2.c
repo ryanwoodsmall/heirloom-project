@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.32 (gritter) 9/11/06
+ * Sccsid @(#)n2.c	1.35 (gritter) 10/22/06
  */
 
 /*
@@ -161,7 +161,8 @@ pchar1(register tchar i)
 			dip->flss++;
 		else if (dip->flss > 0)
 			dip->flss--;
-		else if (!ismot(i) && cbits(i) > 32 && !tflg)
+		else if (!ismot(i) && (cbits(i) > 32 || cbits(i) == XFUNC) &&
+				!tflg)
 			i |= DIBIT;
 		wbf(i);
 		dip->op = offset;
@@ -380,6 +381,8 @@ done(int x)
 
 	error |= x;
 	dl = app = ds = lgf = 0;
+	if (pa && pglines == 0 && pgchars)
+		tbreak();
 	if (i = em) {
 		donef = -1;
 		em = 0;

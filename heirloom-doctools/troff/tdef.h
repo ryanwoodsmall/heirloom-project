@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.136 (gritter) 9/10/06
+ * Sccsid @(#)tdef.h	1.143 (gritter) 10/22/06
  */
 
 /*
@@ -459,6 +459,7 @@ typedef long filep;
 #define	ENV_BLK		((NEV * sizeof(env) / sizeof(tchar) + BLK-1) / BLK)
 				/* rounded up to even BLK */
 
+#include <setjmp.h>
 #include <inttypes.h>
 #ifndef	NROFF
 typedef	int64_t		tchar;
@@ -547,7 +548,8 @@ enum flags {
 	FLAG_STRING	= 02,
 	FLAG_USED	= 04,
 	FLAG_DIVERSION	= 010,
-	FLAG_LOCAL	= 020
+	FLAG_LOCAL	= 020,
+	FLAG_PARAGRAPH	= 040
 };
 
 struct	d {	/* diversion */
@@ -605,6 +607,7 @@ struct	s {	/* stack frame */
 		LOOP_EVAL = 04
 	} loopf;
 	enum flags	flags;
+	jmp_buf	*jmp;
 };
 
 extern struct contab {
@@ -739,6 +742,7 @@ struct acc {
 #define	admod	env._admod
 #define	adflg	env._adflg
 #define	adspc	env._adspc
+#define	pa	env._pa
 #define	wordp	env._wordp
 #define	spflg	env._spflg
 #define	seflg	env._seflg
@@ -774,6 +778,13 @@ struct acc {
 #define	itmac	env._itmac
 #define	lnsize	env._lnsize
 #define	wdsize	env._wdsize
+#define	pgsize	env._pgsize
+#define	pgcsize	env._pgcsize
+#define	pgssize	env._pgssize
+#define	pgchars	env._pgchars
+#define	pgspacs	env._pgspacs
+#define	pgwords	env._pgwords
+#define	pglines	env._pglines
 #define	linkin	env._linkin
 #define	linkout	env._linkout
 #define	linkhp	env._linkhp
@@ -798,6 +809,21 @@ struct acc {
 #define	transch	env._transch
 #define	breakch	env._breakch
 #define	nhych	env._nhych
+#define	para	env._para
+#define	parsp	env._parsp
+#define	pgwordp	env._pgwordp
+#define	pgspacp	env._pgspacp
+#define	pgwordw	env._pgwordw
+#define	pghyphw	env._pghyphw
+#define	pgadspw	env._pgadspw
+#define	pgadspc	env._pgadspc
+#define	pglsphw	env._pglsphw
+#define	pglsphc	env._pglsphc
+#define	pgfwd	env._pgfwd
+#define	pglinew	env._pglinew
+#define	pgback	env._pgback
+#define	pgopt	env._pgopt
+#define	pgspacw	env._pgspacw
 #define	evname	env._evname
 
 extern struct env {
@@ -867,6 +893,7 @@ extern struct env {
 	int	_admod;
 	int	_adflg;
 	int	_adspc;
+	int	_pa;
 	tchar	*_wordp;
 	int	_spflg;
 	int	_seflg;
@@ -902,6 +929,13 @@ extern struct env {
 	int	_itmac;
 	int	_lnsize;
 	int	_wdsize;
+	int	_pgsize;
+	int	_pgcsize;
+	int	_pgssize;
+	int	_pgchars;
+	int	_pgspacs;
+	int	_pgwords;
+	int	_pglines;
 	int	_linkin;
 	int	_linkout;
 	int	_linkhp;
@@ -926,5 +960,20 @@ extern struct env {
 	int	_nhych[NSENT];
 	tchar	*_line;
 	tchar	*_word;
+	tchar	*_para;
+	tchar	*_parsp;
+	int	*_pgwordp;
+	int	*_pgspacp;
+	int	*_pgwordw;
+	int	*_pghyphw;
+	int	*_pgadspw;
+	int	*_pgadspc;
+	int	*_pglsphw;
+	int	*_pglsphc;
+	int	*_pgfwd;
+	int	*_pglinew;
+	int	*_pgback;
+	int	*_pgopt;
+	int	*_pgspacw;
 	char	*_evname;
 } env, initenv;

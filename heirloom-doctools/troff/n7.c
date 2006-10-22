@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.106 (gritter) 9/9/06
+ * Sccsid @(#)n7.c	1.122 (gritter) 10/22/06
  */
 
 /*
@@ -74,6 +74,8 @@ tchar	gettch();
  * text
  */
 
+#include <math.h>
+#include <string.h>
 #include <ctype.h>
 #if defined (EUC) && defined (NROFF)
 #include <wctype.h>
@@ -96,7 +98,9 @@ static void	chkpull(int);
 static int	_findt(struct d *, int, int);
 static tchar	adjbit(tchar);
 static void	sethtdp(void);
-static void	leftend(tchar, int);
+static void	leftend(tchar, int, int);
+static void	parword(void);
+static void	pbreak(void);
 #ifndef	NROFF
 #define	nroff		0
 extern int	lastrst;
@@ -127,6 +131,7 @@ tbreak(void)
 	register int resol = 0;
 	int _minflg;
 
+restart:
 	trap = 0;
 	if (nb)
 		return;
@@ -134,7 +139,7 @@ tbreak(void)
 		newline(1);
 		return;
 	}
-	if (!nc) {
+	if (!nc && !pgchars) {
 		setnel();
 		if (!wch)
 			return;
@@ -148,6 +153,10 @@ tbreak(void)
 		adflg |= 2;
 		text();
 		return;
+	}
+	if (pa && pglines == 0 && pgchars && !ce && !rj && fi) {
+		pbreak();
+		goto restart;
 	}
 	if (minspsz && !brflg && ad && !admod)
 		ne += adspc;
@@ -460,7 +469,7 @@ nofill(void)
 		nwd = 10000;
 	}
 	nexti = GETCH();
-	leftend(nexti, !ce && !rj && !pendnf);
+	leftend(nexti, !ce && !rj && !pendnf, !isdi(nexti));
 	while ((j = (cbits(i = nexti))) != '\n') {
 		if (stopch && issame(i, stopch))
 			break;
@@ -896,12 +905,31 @@ nhychar(tchar c)
 	}
 }
 
+static int
+ishyp(tchar *wp)
+{
+	tchar	*tp;
+	int	yes = 0;
+
+	tp = (tchar *)((intptr_t)*hyp & ~(intptr_t)03);
+	if (hyoff != 1 && tp == wp) {
+		if (!wdstart || (wp > wdstart + 1 && wp < wdend &&
+		   (!(hyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
+		   (!(hyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
+		   (hyf & 020 && wp == wdend) ||		/* 020 = allow last */
+		   (hyf & 040 && wp == wdstart + 1))		/* 040 = allow first */
+			yes = 1;
+		hyp++;
+	}
+	return yes;
+}
+
 
 int
 movword(void)
 {
 	register int w;
-	register tchar i, *wp, c, *lp, *lastlp, lasti = 0, *tp;
+	register tchar i, *wp, c, *lp, *lastlp, lasti = 0;
 	int	savwch, hys, stretches = 0, wholewd = 0, mnel, hyphenated = 0;
 	int	hc;
 #ifndef	NROFF
@@ -917,6 +945,10 @@ movword(void)
 #define	optlinep	0
 #endif	/* NROFF */
 
+	if (pa) {
+		parword();
+		return(0);
+	}
 	over = 0;
 	wp = wordp;
 	if (!nwd) {
@@ -931,7 +963,7 @@ movword(void)
 		wp--;
 		if (wp > wordp)
 			wne -= kernadjust(wp[-1], wp[0]);
-		leftend(*wp, admod != 1 && admod != 2);
+		leftend(*wp, admod != 1 && admod != 2, 1);
 	}
 	wsp = 0;
 	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
@@ -945,19 +977,11 @@ movword(void)
 	while (*hyp && *hyp <= wp)
 		hyp++;
 	while (wch) {
-		tp = (tchar *)((intptr_t)*hyp & ~(intptr_t)03);
-		if (hyoff != 1 && tp == wp) {
-			if (!wdstart || (wp > wdstart + 1 && wp < wdend &&
-			   (!(hyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
-			   (!(hyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
-			   (hyf & 020 && wp == wdend) ||		/* 020 = allow last */
-			   (hyf & 040 && wp == wdstart + 1)) {		/* 040 = allow first */
-				i = IMP;
-				setsbits(i, (intptr_t)*hyp & 03);
-				if (storeline(i, 0))
-					nhyp++;
-			}
-			hyp++;
+		if (ishyp(wp)) {
+			i = IMP;
+			setsbits(i, (intptr_t)(hyp[-1]) & 03);
+			if (storeline(i, 0))
+				nhyp++;
 		}
 		i = *wp++;
 		minflg = minspsz && ad && !admod;
@@ -1596,11 +1620,11 @@ sethtdp(void)
 }
 
 static void
-leftend(tchar c, int hang)
+leftend(tchar c, int hang, int dolpfx)
 {
 	int	k, w;
 
-	if (lpfx) {
+	if (dolpfx && lpfx) {
 		if (hang)
 			setlhang(lpfx[0]);
 		for (k = 0; lpfx[k]; k++) {
@@ -1746,3 +1770,415 @@ lspcomp(int idiff)
 	return idiff + diff;
 }
 #endif	/* !NROFF */
+
+/*
+ * An implementation of:
+ *
+ * James O. Achugbue, "On the line breaking problem in text formatting".
+ * Proceedings of the ACM SIGPLAN SIGOA symposium on Text manipulation,
+ * Portland, Oregon, 1981, pp. 117-122.
+ */
+
+static void
+line_by_line(void)
+{
+	int	i;
+
+	pglines = 0;
+	pgfwd[0] = 0;
+	pglinew[pglines] = pgwordw[0];
+	pgadspw[pglines] = 0;
+	pglsphw[pglines] = 0;
+	for (i = 1; i < pgwords; i++) {
+		/* add next word to current line */
+		pglinew[pglines] += pgspacw[i] + pgwordw[i];
+		pgadspw[pglines] += pgadspc[i];
+		pglsphw[pglines] += pglsphc[i];
+		if (pglinew[pglines] + pghyphw[i] > nel) {
+			pglinew[pglines] -= pgspacw[i] + pgwordw[i];
+			pgadspw[pglines] -= pgadspc[i];
+			pglsphw[pglines] -= pglsphc[i];
+			/* start new line */
+			pglines++;
+			pgfwd[pglines] = i;
+			pglinew[pglines] = pgwordw[i];
+			pgadspw[pglines] = pgadspc[i];
+			pglsphw[pglines] = pglsphc[i];
+		}
+	}
+	pglines++;
+}
+
+static void
+line_by_line_r(void)
+{
+	int	i, j, l, m;
+
+	pgback[0] = 0;
+	l = pgwordw[pgwords-1];
+	/*
+	 * The number of lines aligned in backward direction
+	 * may be shorter than the number of lines aligned
+	 * in forward direction. Restart if this is the case.
+	 */
+	for (j = 1; (m = pglines - j) > 0; j++) {
+		for (i = pgwords - 2; i >= 0; i--) {
+			l += pgspacw[i] + pgwordw[i];
+			if (l > nel) {
+				/*
+				 * A backward break point must
+				 * not be at a higher position
+				 * than the corresponding
+				 * forward break point.
+				 */
+				if (i + 1 > pgfwd[m])
+					i = pgfwd[m] - 1;
+				pgback[m--] = i + 1;
+				l = pgwordw[i] + pghyphw[i];
+			}
+		}
+		if (m == 0)
+			break;
+	}
+}
+
+/*
+ * Computation of optimal starting indices pgopt[] for pglines > 2.
+ * Assume pgfwd[], pgback[], pglinew[] have been computed.
+ */
+static void
+line_breaker(void)
+{
+	int	i, j, k;
+	int	x, y, xa, ya, xs, ys;
+	double	t, z;
+	double	*cost;
+
+	memset(pgopt, 0, pgsize * sizeof *pgopt);
+	cost = calloc(pgsize, sizeof *cost);
+	if (spread) {
+		x = -pgspacw[pglines-1];
+		for (i = pgfwd[pglines-1]; i >= pgfwd[pglines-2]; i--) {
+			x += pgspacw[i] + pgwordw[i];
+			t = nel - x;
+			cost[i] = 1 + t / nel * t / nel * t / nel;
+		}
+	} else {
+		for (i = pgfwd[pglines-2]; i <= pgfwd[pglines-1]; i++)
+			cost[i] = 1.0;
+	}
+	/* loop on lines backwards */
+	for (i = pglines - 2; i >= 0; i--) {
+		x = pglinew[i] - pgspacw[pgfwd[i]] -
+			pgwordw[pgfwd[i]] - pghyphw[pgfwd[i]];
+		xa = pgadspw[i];
+		xs = pglsphw[i];
+		/* loop over i-th slack */
+		for (j = pgfwd[i]; j >= pgback[i]; j--) {
+			x = x + pgspacw[j] + pgwordw[j];
+			xa += pgadspc[j];
+			xs += pglsphc[j];
+			y = x + pghyphw[j] + pgspacw[pgfwd[i+1]] +
+				pgwordw[pgfwd[i+1]];
+			ya = xa;
+			ys = xs;
+			cost[j] = HUGE_VAL;
+			/* loop over (i+1)-th slack */
+			for (k = pgfwd[i+1]; k >= pgback[i+1]; k--) {
+				y -= pgspacw[k] + pgwordw[k];
+				ya -= pgadspc[k];
+				ys -= pglsphc[k];
+				if (y - ya - ys + pghyphw[k-1] <= nel) {
+					/* update cost[j] */
+					t = nel - y;
+					z = 1 + t / nel * t / nel * t / nel;
+					z *= cost[k];
+					if (z < cost[j] && k > j) {
+						cost[j] = z;
+						pgopt[j] = k;
+					}
+				}
+			}
+		}
+	}
+	/*for (i = 0; i < pgwords; i++)
+		fdprintf(stderr, "cost[%d] = %g, P[%d] = %d\n",
+				i, cost[i], i, pgopt[i]);*/
+	/* retrieve optimal starting indices */
+	j = pgopt[0];
+	pgopt[0] = 0;
+	for (i = 1; i < pglines - !spread; i++) {
+		k = pgopt[j];	/* erroneously k = pgopt[i] in the paper */
+		if (i < pglines - 1 && (k < pgback[i+1] || k > pgfwd[i+1]))
+			errprint("dubious break point, slack %d", i+1);
+		pgopt[i] = j;
+		j = k;
+	}
+	/*for (i = 0; i < pglines; i++)
+		fdprintf(stderr, "slack %d S=%d E=%d P=%d\n",
+				i, pgfwd[i], pgback[i], pgopt[i]);*/
+	if (!spread)
+		pgopt[pglines-1] = pgfwd[pglines-1];
+	free(cost);
+}
+
+static void
+growpgsize(void)
+{
+	pgsize += 20;
+	pgwordp = realloc(pgwordp, pgsize * sizeof *pgwordp);
+	pgwordw = realloc(pgwordw, pgsize * sizeof *pgwordw);
+	pghyphw = realloc(pghyphw, pgsize * sizeof *pghyphw);
+	pgadspw = realloc(pgadspw, pgsize * sizeof *pgadspw);
+	pgadspc = realloc(pgadspc, pgsize * sizeof *pgadspc);
+	pglsphw = realloc(pglsphw, pgsize * sizeof *pglsphw);
+	pglsphc = realloc(pglsphc, pgsize * sizeof *pglsphc);
+	pgfwd = realloc(pgfwd, pgsize * sizeof *pgfwd);
+	pglinew = realloc(pglinew, pgsize * sizeof *pglinew);
+	pgback = realloc(pgback, pgsize * sizeof *pgback);
+	pgopt = realloc(pgopt, pgsize * sizeof *pgopt);
+	pgspacp = realloc(pgspacp, pgsize * sizeof *pgspacp);
+	pgspacw = realloc(pgspacw, pgsize * sizeof *pgspacw);
+	if (pgwordp == NULL || pgwordw == NULL || pgfwd == NULL ||
+			pglinew == NULL || pgback == NULL || pghyphw == NULL ||
+			pgopt == NULL || pgspacw == NULL || pgadspw == NULL ||
+			pgadspc == NULL || pglsphc == NULL || pglsphw == NULL) {
+		errprint("out of memory justifying paragraphs");
+		done(02);
+	}
+}
+
+static tchar	*pgoflow;
+
+static void
+parword(void)
+{
+	int	a, c, w, hc;
+	tchar	i, *wp;
+
+	if (pgwords + 1 >= pgsize)
+		growpgsize();
+	hc = shc ? shc : HYPHEN;
+	wp = wordp;
+	a = w = 0;
+	pgspacp[pgwords] = pgspacs;
+	while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
+		if (iszbit(i))
+			break;
+		wch--;
+		minflg = minspsz && ad && !admod;
+		w += width(i);
+		a += minspc;
+		if (wp > wordp)
+			w += kernadjust(wp[-1], wp[0]);
+		if (pgspacs >= pgssize) {
+			pgssize += 60;
+			parsp = realloc(parsp, pgssize * sizeof *parsp);
+			if (parsp == NULL) {
+				errprint("no memory for spaces in paragraph");
+				done(02);
+			}
+		}
+		parsp[pgspacs++] = i;
+	}
+	pgspacp[pgwords+1] = pgspacs;
+	if (--wp > wordp)
+		w += kernadjust(wp[-1], wp[0]);
+	wne -= w;
+	pgspacw[pgwords] = pgwords ? w + a : 0;
+	pghyphw[pgwords] = 0;
+	pgadspc[pgwords] = pgwords ? a : 0;
+	pglsphc[pgwords] = 0;
+	pgwordw[pgwords] = 0;
+	pgwordp[pgwords] = pgchars;
+	if (!hyoff && hyf)
+		hyphen(wp);
+	hyp = hyptr;
+	nhyp = 0;
+	while (*hyp && *hyp <= wp)
+		hyp++;
+	if (pgchars == 0 && un != in) {
+		if (para == NULL) {
+			pgcsize = 600;
+			para = malloc(pgcsize * sizeof *para);
+			if (para == NULL)
+				goto oom;
+		}
+		para[pgchars++] = makem(un - in);
+		pgwordw[pgwords] += un - in;
+		un = in;
+	}
+	while (wch) {
+		if (ishyp(wp) && !maybreak(wp[-1])) {
+			i = sfmask(wp[-1]) | hc;
+			w = width(i);
+			w += kernadjust(wp[-1], i);
+			pghyphw[pgwords] = w;
+		}
+		if (pghyphw[pgwords] || wp > word && maybreak(wp[-1])) {
+			pgwordp[++pgwords] = pgchars;
+			if (pgwords + 1 >= pgsize)
+				growpgsize();
+			pgspacp[pgwords] = pgspacs;
+			pgspacp[pgwords+1] = pgspacs;
+			pgspacw[pgwords] = 0;
+			pgwordw[pgwords] = 0;
+			pghyphw[pgwords] = 0;
+			pgadspc[pgwords] = 0;
+			pglsphc[pgwords] = 0;
+		}
+		i = *wp++;
+		w = width(i);
+		w += kernadjust(i, *wp ? *wp : ' ' | (spbits?spbits:sfmask(i)));
+		wne -= w;
+		wch--;
+		pgwordw[pgwords] += w;
+		if (pgchars + 1 >= pgcsize) {
+			pgcsize += 600;
+			para = realloc(para, pgcsize * sizeof *para);
+			if (para == NULL) {
+			oom:
+				errprint("no memory for characters "
+				         "in paragraph");
+				done(02);
+			}
+		}
+		para[pgchars++] = i;
+	}
+	pgwordp[++pgwords] = pgchars;
+	if (pgwordw[pgwords-1] >= nel) {
+		para[pgchars++] = 0;
+		pgoflow = &para[pgwordp[--pgwords]];
+		spread = 1;
+		tbreak();
+		pgoflow = NULL;
+	}
+	if (spread)
+		tbreak();
+}
+
+void
+parpr(void)
+{
+	int	i, j, k = 0, w, stretches, _spread = spread, hc, savlnmod;
+	tchar	c, lastc, savic;
+
+	savic = ic;
+	ic = 0;
+	savlnmod = lnmod;
+	lnmod = 0;
+	hc = shc ? shc : HYPHEN;
+	for (i = 0; i < pgwords; i++) {
+		if (pgopt[k] == i) {
+			if (k++ > 0) {
+				if (pghyphw[i-1]) {
+					c = sfmask(para[pgwordp[i]-1]) | hc;
+					w = width(c);
+					storelsh(c, rawwidth);
+					w += kernadjust(para[pgwordp[i]-1], c);
+					storeline(c, w);
+					if (letsps)
+						storelsp(c, 0);
+				}
+				adflg |= 5;
+				tbreak();
+			}
+			nwd = 1;
+			storeline(makem(-in), 0);
+			leftend(para[pgwordp[i]], admod != 1 && admod != 2, 1);
+		} else {
+			for (j = pgspacp[i]; j < pgspacp[i+1]; j++) {
+				c = parsp[j];
+				minflg = minspsz && ad && !admod;
+				w = width(c);
+				adspc += minspc;
+				if (j == pgspacp[i+1]-1)
+					w += kernadjust(c, para[pgwordp[i]]);
+				storeline(c, w);
+				spbits = sfmask(c);
+			}
+			nwd += pgspacp[i] != pgspacp[i+1];
+		}
+		stretches = 0;
+		lastc = 0;
+		for (j = pgwordp[i]; j < pgwordp[i+1]; j++) {
+			c = para[j];
+			w = width(c);
+			storelsh(c, rawwidth);
+			if (j == 0 && i > 0 && pgspacp[i] == pgspacp[i+1])
+				w += kernadjust(para[j-1], c);
+			w += kernadjust(c, j < pgwordp[i+1]-1 ? para[j+1] :
+					' ' | (spbits?spbits:sfmask(i)));
+			storeline(c, w);
+			if (cbits(c) == STRETCH && cbits(lastc) != STRETCH)
+				stretches++;
+			lastc = c;
+			if (letsps)
+				storelsp(c, 0);
+		}
+		nwd += stretches;
+	}
+	if (_spread)
+		adflg |= 1;
+	tbreak();
+	if (pgoflow) {
+		for (j = 0; (c = pgoflow[j]) != 0; j++) {
+			w = width(c);
+			w += kernadjust(c, pgoflow[j+1]);
+			storeline(c, w);
+		}
+		nwd = 1;
+		adflg |= 1;
+		tbreak();
+	}
+	pgwords = pgchars = pgspacs = pglines = 0;
+	ic = savic;
+	lnmod = savlnmod;
+}
+
+static void
+pardi(void)
+{
+	struct d	dt, *dp;
+	struct contab	*cp;
+	int	_nlflg = nlflg;
+
+	if (dip != d)
+		wbt(0);
+	memset(&dt, 0, sizeof dt);
+	dp = dip;
+	dip = &dt;
+	dip->curd = makerq(NULL);
+	dip->op = finds(dip->curd, 1, 1);
+	newmn->rq = dip->curd;
+	newmn->flags = FLAG_PARAGRAPH;
+	maddhash(newmn);
+	cp = newmn;
+	parpr();
+	wbt(0);
+	nxf->jmp = malloc(sizeof *nxf->jmp);
+	if (setjmp(*nxf->jmp) == 0) {
+		pushi((filep)cp->mx, dip->curd, FLAG_PARAGRAPH);
+		cp->flags |= FLAG_USED;
+		frame->contp = cp;
+		dip = dp;
+		offset = dip->op;
+		fi = 0;
+		nlflg = 1;
+		mainloop();
+	}
+	fi = 1;
+	nlflg = _nlflg;
+}
+
+static void
+pbreak(void)
+{
+	if (pgchars == 0)
+		return;
+	setnel();
+	line_by_line();
+	line_by_line_r();
+	line_breaker();
+	pardi();
+}

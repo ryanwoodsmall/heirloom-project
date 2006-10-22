@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.93 (gritter) 10/3/06
+ * Sccsid @(#)ext.h	1.96 (gritter) 10/21/06
  */
 
 /*
@@ -128,6 +128,7 @@ extern	int	minflg;
 extern	int	minspc;
 extern	int	mpts;
 extern	int	ndone;
+extern	struct contab	*newmn;
 extern	int	nflush;
 extern	int	nfo;
 extern	int	nfonts;
@@ -144,6 +145,7 @@ extern	int	npn;
 extern	int	npnflg;
 extern	int	nx;
 extern	int	oldbits;
+extern	struct contab	*oldmn;
 extern	int	*olt;
 extern	int	over;
 extern	int	padc;
@@ -240,6 +242,7 @@ extern	int	spreadlimit;
 extern	int	lastrq;
 
 /* n1.c */
+extern	void	mainloop(void);
 extern	int	tryfile(char *, char *, int);
 extern	void	catch(int);
 extern	void	kcatch(int);
@@ -305,6 +308,7 @@ extern	void	caseig(void);
 extern	void	casern(void);
 extern	void	maddhash(register struct contab *);
 extern	void	munhash(register struct contab *);
+extern	filep	finds(register int, int, int);
 extern	void	caserm(void);
 extern	void	caseas(void);
 extern	void	caseds(void);

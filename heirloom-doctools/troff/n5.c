@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.98 (gritter) 9/11/06
+ * Sccsid @(#)n5.c	1.107 (gritter) 10/22/06
  */
 
 /*
@@ -103,6 +103,8 @@ casead(void)
 	/*leave admod alone*/
 	if (skip(0))
 		return;
+	pa = 0;
+loop:
 	switch (i = cbits(getch())) {
 	case 'r':	/*right adj, left ragged*/
 		admod = 2;
@@ -125,6 +127,14 @@ casead(void)
 	case '3': 
 	case '5':
 		admod = (i - '0') / 2;
+		break;
+	case 'p':
+	case '7':
+		if (xflag) {
+			pa = 1;
+			admod = 0;
+			goto loop;
+		}
 	}
 }
 
@@ -969,10 +979,11 @@ casesp(int a)
 void
 casebrp(void)
 {
-	if (nc) {
+	if (nc || pgchars) {
 		spread++;
 		flushi();
-		pendt++;
+		if (!pgchars)
+			pendt++;
 		text();
 	} else
 		tbreak();
@@ -1207,6 +1218,29 @@ evc(struct env *dp, struct env *sp)
 	dp->_seflg = 0;
 	dp->_ce = 0;
 	dp->_rj = 0;
+	dp->_pgsize = 0;
+	dp->_pgcsize = 0;
+	dp->_pgssize = 0;
+	dp->_pglines = 0;
+	dp->_pgwords = 0;
+	dp->_pgchars = 0;
+	dp->_pgspacs = 0;
+	dp->_para = NULL;
+	dp->_parsp = NULL;
+	dp->_pgwordp = NULL;
+	dp->_pgspacp = NULL;
+	dp->_pgwordw = NULL;
+	dp->_pghyphw = NULL;
+	dp->_pgadspw = NULL;
+	dp->_pgadspc = NULL;
+	dp->_pglsphw = NULL;
+	dp->_pglsphc = NULL;
+	dp->_pgfwd = NULL;
+	dp->_pglinew = NULL;
+	dp->_pgback = NULL;
+	dp->_pgopt = NULL;
+	dp->_pgspacw = NULL;
+	dp->_pgspacp = NULL;
 	if (dp->_brnl < INT_MAX)
 		dp->_brnl = 0;
 	if (dp->_brpnl < INT_MAX)
@@ -1282,6 +1316,41 @@ evcline(struct env *dp, struct env *sp)
 	dp->_wordp = sp->_wordp + (dp->_word - sp->_word);
 	dp->_wdend = sp->_wdend + (dp->_word - sp->_word);
 	dp->_wdstart = sp->_wdstart + (dp->_word - sp->_word);
+	dp->_para = malloc((dp->_pgcsize = sp->_pgcsize) * sizeof *dp->_para);
+	memcpy(dp->_para, sp->_para, dp->_pgcsize * sizeof *sp->_para);
+	dp->_parsp = malloc((dp->_pgssize = sp->_pgssize) * sizeof *dp->_parsp);
+	memcpy(dp->_parsp, sp->_parsp, dp->_pgssize * sizeof *sp->_parsp);
+	dp->_pgsize = sp->_pgsize;
+	dp->_pgwordp = malloc(dp->_pgsize * sizeof *dp->_pgwordp);
+	memcpy(dp->_pgwordp, sp->_pgwordp, dp->_pgsize * sizeof *dp->_pgwordp);
+	dp->_pgwordw = malloc(dp->_pgsize * sizeof *dp->_pgwordw);
+	memcpy(dp->_pgwordw, sp->_pgwordw, dp->_pgsize * sizeof *dp->_pgwordw);
+	dp->_pghyphw = malloc(dp->_pgsize * sizeof *dp->_pghyphw);
+	memcpy(dp->_pghyphw, sp->_pghyphw, dp->_pgsize * sizeof *dp->_pghyphw);
+	dp->_pgadspw = malloc(dp->_pgsize * sizeof *dp->_pgadspw);
+	memcpy(dp->_pgadspw, sp->_pgadspw, dp->_pgsize * sizeof *dp->_pgadspw);
+	dp->_pgadspc = malloc(dp->_pgsize * sizeof *dp->_pgadspc);
+	memcpy(dp->_pgadspc, sp->_pgadspc, dp->_pgsize * sizeof *dp->_pgadspc);
+	dp->_pglsphw = malloc(dp->_pgsize * sizeof *dp->_pglsphw);
+	memcpy(dp->_pglsphw, sp->_pglsphw, dp->_pgsize * sizeof *dp->_pglsphw);
+	dp->_pglsphc = malloc(dp->_pgsize * sizeof *dp->_pglsphc);
+	memcpy(dp->_pglsphc, sp->_pglsphc, dp->_pgsize * sizeof *dp->_pglsphc);
+	dp->_pgfwd = malloc(dp->_pgsize * sizeof *dp->_pgfwd);
+	memcpy(dp->_pgfwd, sp->_pgfwd, dp->_pgsize * sizeof *dp->_pgfwd);
+	dp->_pglinew = malloc(dp->_pgsize * sizeof *dp->_pglinew);
+	memcpy(dp->_pglinew, sp->_pglinew, dp->_pgsize * sizeof *dp->_pglinew);
+	dp->_pgback = malloc(dp->_pgsize * sizeof *dp->_pgback);
+	memcpy(dp->_pgback, sp->_pgback, dp->_pgsize * sizeof *dp->_pgback);
+	dp->_pgopt = malloc(dp->_pgsize * sizeof *dp->_pgopt);
+	memcpy(dp->_pgopt, sp->_pgopt, dp->_pgsize * sizeof *dp->_pgopt);
+	dp->_pgspacw = malloc(dp->_pgsize * sizeof *dp->_pgspacw);
+	memcpy(dp->_pgspacw, sp->_pgspacw, dp->_pgsize * sizeof *dp->_pgspacw);
+	dp->_pgspacp = malloc(dp->_pgsize * sizeof *dp->_pgspacp);
+	memcpy(dp->_pgspacp, sp->_pgspacp, dp->_pgsize * sizeof *dp->_pgspacp);
+	dp->_pgwords = sp->_pgwords;
+	dp->_pgchars = sp->_pgchars;
+	dp->_pgspacs = sp->_pgspacs;
+	dp->_pglines = sp->_pglines;
 }
 
 void
@@ -1296,6 +1365,36 @@ relsev(struct env *ep)
 	free(ep->_word);
 	ep->_word = NULL;
 	ep->_wdsize = 0;
+	free(ep->_para);
+	ep->_para = NULL;
+	ep->_pgcsize = 0;
+	free(ep->_pgwordp);
+	ep->_pgwordp = NULL;
+	free(ep->_pgwordw);
+	ep->_pgwordw = NULL;
+	free(ep->_pghyphw);
+	ep->_pghyphw = NULL;
+	free(ep->_pgadspw);
+	ep->_pgadspw = NULL;
+	free(ep->_pgadspc);
+	ep->_pgadspc = NULL;
+	free(ep->_pglsphw);
+	ep->_pglsphw = NULL;
+	free(ep->_pglsphc);
+	ep->_pglsphc = NULL;
+	free(ep->_pgfwd);
+	ep->_pgfwd = NULL;
+	free(ep->_pglinew);
+	ep->_pglinew = NULL;
+	free(ep->_pgback);
+	ep->_pgback = NULL;
+	free(ep->_pgopt);
+	ep->_pgopt = NULL;
+	free(ep->_pgspacw);
+	ep->_pgspacw = NULL;
+	free(ep->_pgspacp);
+	ep->_pgspacp = NULL;
+	ep->_pgsize = 0;
 }
 
 void

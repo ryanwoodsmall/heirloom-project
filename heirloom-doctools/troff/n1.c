@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.127 (gritter) 9/11/06
+ * Sccsid @(#)n1.c	1.128 (gritter) 10/21/06
  */
 
 /*
@@ -128,8 +128,6 @@ main(int argc, char **argv)
 {
 	register char	*p;
 	register int j;
-	register tchar i;
-	int eileenct;		/*count to test for "Eileen's loop"*/
 	char	**oargv;
 
 	setlocale(LC_CTYPE, "");
@@ -310,6 +308,18 @@ start:
 	rargc = argc;
 	nmfi = 0;
 	init2();
+	mainloop();
+	/*NOTREACHED*/
+	return(0);
+}
+
+void
+mainloop(void)
+{
+	register int j;
+	register tchar i;
+	int eileenct;		/*count to test for "Eileen's loop"*/
+
 	_xflag = xflag;
 	setjmp(sjbuf);
 	eileenct = 0;		/*reset count for "Eileen's loop"*/
