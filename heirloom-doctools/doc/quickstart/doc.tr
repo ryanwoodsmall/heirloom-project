@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.2 (gritter) 10/24/06
+.\" Sccsid @(#)doc.tr	1.3 (gritter) 10/24/06
 .do xflag 3
 .warn
 .lc_ctype en_US.utf8
@@ -9,7 +9,8 @@
 .po 2c
 \X'PDFMark: Author Gunnar Ritter'
 \X'PDFMark: Keywords Heirloom Documentation Tools, troff'
-\X'PDFMark: Title Heirloom Documentation Tools - Quickstart Guide'
+\X'PDFMark: Title Heirloom Documentation Tools: Quickstart Guide'
+\X'PS: [ {Catalog} << /ViewerPreferences << /DisplayDocTitle true >> >> /PUT pdfmark'
 .ss 12 0
 .fp 1 R MyriadPro-Regular otf
 .fp 2 I MyriadPro-It otf
