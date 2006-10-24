@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.185 (gritter) 10/13/06
+ * Sccsid @(#)t6.c	1.186 (gritter) 10/24/06
  */
 
 /*
@@ -996,6 +996,7 @@ tchar setht(void)		/* set character height from \H'...' */
 		n = apts;	/* does this work? */
 	c = CHARHT;
 	c |= ZBIT;
+	setfbits(c, font);
 	setsbits(c, n);
 	return(c);
 }
@@ -1013,7 +1014,8 @@ tchar setslant(void)		/* set slant from \S'...' */
 		n = 0;
 	c = SLANT;
 	c |= ZBIT;
-	setsfbits(c, n+180);
+	setfbits(c, font);
+	setsbits(c, n+180);
 	return(c);
 }
 

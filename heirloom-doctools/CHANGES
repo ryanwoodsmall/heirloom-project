@@ -4,6 +4,8 @@ Release ...
 * troff: Fixed a typo in the hyphenation code that could result in the
   insertion of a large negative vertical motion in a word containing a
   character above Unicode point U+0800.
+* troff: Fixed "\H" and "\S" to become effective if positioned directly
+  after a font change (Bugreport by Dirk-Wilhelm Peters).
 * dpost: Fixed a bug introduced with the previous release that caused
   PostScript errors on a page following colored text unless the "-e"
   option was explicitly specified.
