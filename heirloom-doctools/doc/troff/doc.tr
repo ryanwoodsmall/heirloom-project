@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.156 (gritter) 10/22/06
+.\" Sccsid @(#)doc.tr	1.157 (gritter) 10/24/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 10/22/06
+.ds Sccsdate 10/24/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -681,11 +681,9 @@ including \s-1UTF\s+1-8.
 .pg
 Improvements to the line breaking mechanism
 can be activated to achieve more aesthetically pleasant output:
-\*(TR can adjust whole paragraphs at once
-using an algorithm developed by
-\T'ref_10'James O. Achugbue\|\*u10\*d\T.
-Interword spaces can be shrunk and expanded.
-Inter-letter spaces and letter shapes
+\*(TR can adjust whole paragraphs at once;
+interword spaces can be shrunk and expanded;
+inter-letter spaces and letter shapes
 can also be varied (sometimes called ``microtypography'').
 All of these options can be arbitrarily combined.
 .pg
@@ -913,13 +911,6 @@ in [1].
 .sp .4
 .ti 0
 \A'ref_9'[9]	<http://plan9.bell-labs.com/plan9>
-.sp .4
-.ti 0
-\A'ref_10'[10]	James O. Achugbue,
-``On the line breaking problem in text formatting''.
-\fIProceedings of the \s-1ACM SIGPLAN SIGOA\s0
-symposium on Text manipulation\fR,
-Portland, Oregon, 1981, pp. 117-122.
 .in 0
 .pg
 .nr nosave 1

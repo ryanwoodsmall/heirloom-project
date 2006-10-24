@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.143 (gritter) 10/22/06
+ * Sccsid @(#)tdef.h	1.144 (gritter) 10/24/06
  */
 
 /*
@@ -815,13 +815,8 @@ struct acc {
 #define	pgspacp	env._pgspacp
 #define	pgwordw	env._pgwordw
 #define	pghyphw	env._pghyphw
-#define	pgadspw	env._pgadspw
 #define	pgadspc	env._pgadspc
-#define	pglsphw	env._pglsphw
 #define	pglsphc	env._pglsphc
-#define	pgfwd	env._pgfwd
-#define	pglinew	env._pglinew
-#define	pgback	env._pgback
 #define	pgopt	env._pgopt
 #define	pgspacw	env._pgspacw
 #define	evname	env._evname
@@ -966,13 +961,8 @@ extern struct env {
 	int	*_pgspacp;
 	int	*_pgwordw;
 	int	*_pghyphw;
-	int	*_pgadspw;
 	int	*_pgadspc;
-	int	*_pglsphw;
 	int	*_pglsphc;
-	int	*_pgfwd;
-	int	*_pglinew;
-	int	*_pgback;
 	int	*_pgopt;
 	int	*_pgspacw;
 	char	*_evname;

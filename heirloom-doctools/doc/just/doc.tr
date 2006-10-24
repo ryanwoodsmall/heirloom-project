@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.4 (gritter) 7/16/06
+.\" Sccsid @(#)doc.tr	1.5 (gritter) 10/24/06
 .do xflag 3
 .mediasize a4
 .warn
@@ -48,7 +48,7 @@ Justification in Heirloom troff
 ..
 .de xx
 .ft R
-.ad b
+.ad p
 .minss \\$1
 .letadj \\$2 \\$3 \\$4 \\$5 \\$6
 .wh \\n(nlu+12v yy
@@ -144,7 +144,7 @@ Justification by glyph reshaping only.
 ..
 .po \n(O1u
 .ft I
-.ad b
+.ad p
 .ss 11 0
 .minss 9
 .letadj 97 98 18 102 101
@@ -173,6 +173,6 @@ partially compensate for the distortions caused by the other.
 It is thus recommended that they are used in combination.
 .br
 .ad r
-Gunnar Ritter, 7/16/06
+Gunnar Ritter, 10/24/06
 .br
 <http\&://heirloom.sourceforge.net/doctools.html>

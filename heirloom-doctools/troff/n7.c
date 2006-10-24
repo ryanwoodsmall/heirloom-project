@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.128 (gritter) 10/24/06
+ * Sccsid @(#)n7.c	1.130 (gritter) 10/24/06
  */
 
 /*
@@ -1791,182 +1791,96 @@ lspcomp(int idiff)
 }
 #endif	/* !NROFF */
 
-/*
- * An implementation of:
- *
- * James O. Achugbue, "On the line breaking problem in text formatting".
- * Proceedings of the ACM SIGPLAN SIGOA symposium on Text manipulation,
- * Portland, Oregon, 1981, pp. 117-122.
- */
-
-static void
-line_by_line(void)
+static double
+penalty(int k)
 {
-	int	i;
+	double	t;
 
-	pglines = 0;
-	pgfwd[0] = 0;
-	pglinew[pglines] = pgwordw[0];
-	pgadspw[pglines] = 0;
-	pglsphw[pglines] = 0;
-	hlc = 0;
-	for (i = 1; i < pgwords; i++) {
-		/* add next word to current line */
-		pglinew[pglines] += pgspacw[i] + pgwordw[i];
-		pgadspw[pglines] += pgadspc[i];
-		pglsphw[pglines] += pglsphc[i];
-		if (pglinew[pglines] + pghyphw[i] > nel) {
-			pglinew[pglines] -= pgspacw[i] + pgwordw[i];
-			pgadspw[pglines] -= pgadspc[i];
-			pglsphw[pglines] -= pglsphc[i];
-			if (hlm >= 0 && pghyphw[i-1]) {
-				if (++hlc > hlm) {
-					while (i > pgfwd[pglines] &&
-							pghyphw[i-1]) {
-						i--;
-						pglinew[pglines] -= pgspacw[i] -
-							pgwordw[i];
-						pgadspw[pglines] -= pgadspc[i];
-						pglsphw[pglines] -= pglsphc[i];
-					}
-					hlc = 0;
-				}
-			} else
-				hlc = 0;
-			/* start new line */
-			pglines++;
-			pgfwd[pglines] = i;
-			pglinew[pglines] = pgwordw[i];
-			pgadspw[pglines] = 0;
-			pglsphw[pglines] = 0;
-		}
-	}
-	pglines++;
-}
-
-static void
-line_by_line_r(void)
-{
-	int	i, j, l, m;
-
-	pgback[0] = 0;
-	l = pgwordw[pgwords-1];
-	/*
-	 * The number of lines aligned in backward direction
-	 * may be shorter than the number of lines aligned
-	 * in forward direction. Restart if this is the case.
-	 */
-	for (j = 1; (m = pglines - j) > 0; j++) {
-		for (i = pgwords - 2; i >= 0; i--) {
-			l += pgwordw[i] + pgspacw[i+1];
-			if (l > nel) {
-				/*
-				 * A backward break point must
-				 * not be at a higher position
-				 * than the corresponding
-				 * forward break point.
-				 */
-				if (i + 1 > pgfwd[m])
-					i = pgfwd[m] - 1;
-				pgback[m--] = i + 1;
-				l = pgwordw[i] + pghyphw[i];
-			}
-		}
-		if (m == 0)
-			break;
-	}
+	t = (double)abs(nel - k) / nel;
+	t = t * t * t;
+	return t;
 }
 
 /*
- * Computation of optimal starting indices pgopt[] for pglines > 2.
- * Assume pgfwd[], pgback[], pglinew[] have been computed.
+ * This is the Knuth-Plass algorithm in the form given by
+ * D. S. Hirschberg & L. L. Larmore, "New Applications of
+ * Failure Functions", JACM Vol. 34 Issue 3, (July 1987),
+ * pp. 616-625.
  */
-static void
-line_breaker(void)
-{
-	int	i, j, k;
-	int	x, y, xa, ya, xs, ys;
-	double	t, z;
-	double	*cost;
-	int	*chyp;
 
-	memset(pgopt, 0, pgsize * sizeof *pgopt);
+static void
+parcomp(void)
+{
+	double	*cost, t;
+	int	*nextbreak, *hypc;
+	int	i, j, k, m, h, step = 0;
+
 	cost = calloc(pgsize, sizeof *cost);
-	chyp = calloc(pgsize, sizeof *chyp);
-	if (spread) {
-		x = -pgspacw[pglines-1];
-		for (i = pgfwd[pglines-1]; i >= pgfwd[pglines-2]; i--) {
-			x += pgspacw[i] + pgwordw[i];
-			t = abs(nel - x);
-			cost[i] = 1 + t / nel * t / nel * t / nel;
+	nextbreak = calloc(pgsize, sizeof *nextbreak);
+	hypc = calloc(pgsize, sizeof *hypc);
+	cost[pgwords] = 0;
+	k = m = 0;
+	for (i = pgwords - 1; i >= 0; i--) {
+		if (step == 0) {
+			k += pgwordw[i] + pgspacw[i+1];
+			m += pgadspc[i] + pglsphc[i+1];
 		}
-	} else {
-		for (i = pgfwd[pglines-2]; i <= pgfwd[pglines-1]; i++)
-			cost[i] = 1.0;
-	}
-	/* loop on lines backwards */
-	for (i = pglines - 2; i >= 0; i--) {
-		x = pglinew[i] - pgspacw[pgfwd[i]+1] - pgwordw[pgfwd[i]];
-		xa = pgadspw[i] - pgadspc[pgfwd[i]+1];
-		xs = pglsphw[i] - pglsphc[pgfwd[i]];
-		/* loop over i-th slack */
-		for (j = pgfwd[i]; j >= pgback[i]; j--) {
-			x = x + pgspacw[j+1] + pgwordw[j];
-			xa += pgadspc[j+1];
-			xs += pglsphc[j];
-			y = x + pgspacw[pgfwd[i+1]] + pgwordw[pgfwd[i+1]];
-			ya = xa + pgadspc[pgfwd[i+1]];
-			ys = xs + pglsphc[pgfwd[i+1]];
-			cost[j] = HUGE_VAL;
-			/* loop over (i+1)-th slack */
-			for (k = pgfwd[i+1]; k >= pgback[i+1]; k--) {
-				y -= pgspacw[k] + pgwordw[k];
-				ya -= pgadspc[k];
-				ys -= pglsphc[k];
-				if (y - ya - ys + pghyphw[k-1] <= nel) {
-					/* update cost[j] */
-					t = abs(nel - y);
-					z = 1 + t / nel * t / nel * t / nel;
-					z *= cost[k];
-					if (z < cost[j] && k > j) {
-						if (pghyphw[k-1])
-							chyp[j] = chyp[k] + 1;
+		if (step == 0 && k - m <= nel) {
+			cost[i] = spread ? penalty(k) : 0;
+			nextbreak[i] = pgwords;
+		} else {
+			step = 1;
+			cost[i] = HUGE_VAL;
+			k = pgwordw[i];
+			m = pglsphc[i];
+			for (j = i + 1; j < pgwords; j++) {
+				k += pgspacw[j-1] + pgwordw[j];
+				m += pgadspc[j-1] + pglsphc[j];
+				if (k - m + pghyphw[j] <= nel) {
+					t = cost[j+1] + penalty(k);
+					if (t <= cost[i]) {
+						if (pghyphw[j])
+							h = hypc[j+1] + 1;
 						else
-							chyp[j] = 0;
-						if (hlm < 0 || chyp[j] <= hlm) {
-							cost[j] = z;
-							pgopt[j] = k;
+							h = 0;
+						if (hlm < 0 || h <= hlm) {
+							hypc[i] = h;
+							cost[i] = t;
+							nextbreak[i] = j + 1;
 						}
 					}
+				} else {
+					if (j == i + 1) {
+						cost[i] = cost[j] + 1;
+						nextbreak[i] = j;
+					}
+					break;
 				}
 			}
 		}
 	}
 	/*for (i = 0; i < pgwords; i++)
-		fdprintf(stderr, "cost[%d] = %g, P[%d] = %d\n",
-				i, cost[i], i, pgopt[i]);*/
-	/* retrieve optimal starting indices */
-	j = pgopt[0];
-	pgopt[0] = 0;
-	for (i = 1; i < pglines; i++) {
-		k = pgopt[j];	/* erroneously k = pgopt[i] in the paper */
-		if (i < pglines - 1 && (k < pgback[i+1] || k > pgfwd[i+1])) {
-			char	*text = NULL;
-			if (hlm > 0)
-				text = ", consider to raise .hlm";
-			errprint("unable to adjust paragraph%s", text);
-			for (i = 1; i < pglines; i++)
-				pgopt[i] = pgfwd[i];
-			break;
-		}
-		pgopt[i] = j;
-		j = k;
+		fdprintf(stderr, "cost[%d] = %g %c%c%c%c to %c%c%c%c\n",
+				i, cost[i],
+				(char)para[pgwordp[i]],
+				(char)para[pgwordp[i]+1],
+				(char)para[pgwordp[i]+2],
+				(char)para[pgwordp[i]+3],
+				(char)para[pgwordp[nextbreak[i]-1]],
+				(char)para[pgwordp[nextbreak[i]-1]+1],
+				(char)para[pgwordp[nextbreak[i]-1]+2],
+				(char)para[pgwordp[nextbreak[i]-1]+3]
+			);*/
+	j = 0;
+	pglines = 0;
+	memset(pgopt, 0, pgsize * sizeof *pgopt);
+	while (j < pgwords && pglines < pgwords) {
+		pgopt[pglines++] = j;
+		j = nextbreak[j];
 	}
-	/*for (i = 0; i < pglines; i++)
-		fdprintf(stderr, "slack %d S=%d E=%d P=%d\n",
-				i, pgfwd[i], pgback[i], pgopt[i]);*/
-	free(chyp);
 	free(cost);
+	free(nextbreak);
+	free(hypc);
 }
 
 static void
@@ -1976,26 +1890,18 @@ growpgsize(void)
 	pgwordp = realloc(pgwordp, pgsize * sizeof *pgwordp);
 	pgwordw = realloc(pgwordw, pgsize * sizeof *pgwordw);
 	pghyphw = realloc(pghyphw, pgsize * sizeof *pghyphw);
-	pgadspw = realloc(pgadspw, pgsize * sizeof *pgadspw);
 	pgadspc = realloc(pgadspc, pgsize * sizeof *pgadspc);
-	pglsphw = realloc(pglsphw, pgsize * sizeof *pglsphw);
 	pglsphc = realloc(pglsphc, pgsize * sizeof *pglsphc);
-	pgfwd = realloc(pgfwd, pgsize * sizeof *pgfwd);
-	pglinew = realloc(pglinew, pgsize * sizeof *pglinew);
-	pgback = realloc(pgback, pgsize * sizeof *pgback);
 	pgopt = realloc(pgopt, pgsize * sizeof *pgopt);
 	pgspacp = realloc(pgspacp, pgsize * sizeof *pgspacp);
 	pgspacw = realloc(pgspacw, pgsize * sizeof *pgspacw);
-	if (pgwordp == NULL || pgwordw == NULL || pgfwd == NULL ||
-			pglinew == NULL || pgback == NULL || pghyphw == NULL ||
-			pgopt == NULL || pgspacw == NULL || pgadspw == NULL ||
-			pgadspc == NULL || pglsphc == NULL || pglsphw == NULL) {
+	if (pgwordp == NULL || pgwordw == NULL || pghyphw == NULL ||
+			pgopt == NULL || pgspacw == NULL ||
+			pgadspc == NULL || pglsphc == NULL) {
 		errprint("out of memory justifying paragraphs");
 		done(02);
 	}
 }
-
-static tchar	*pgoflow;
 
 static void
 parword(void)
@@ -2076,13 +1982,13 @@ parword(void)
 		}
 		i = *wp++;
 		w = width(i);
-		pglsphc[pgwords] += getlsh(i, rawwidth);
+		pglsphc[pgwords] += getlsh(i, rawwidth) * lshmin / LAFACT;
 		w += kernadjust(i, *wp);
 		wne -= w;
 		wch--;
 		pgwordw[pgwords] += w;
 		if (letsps)
-			pglsphc[pgwords] += getlsp(i);
+			pglsphc[pgwords] += getlsp(i) * lspmin / LAFACT;
 		if (pgchars + 1 >= pgcsize) {
 			pgcsize += 600;
 			para = realloc(para, pgcsize * sizeof *para);
@@ -2096,13 +2002,11 @@ parword(void)
 		para[pgchars++] = i;
 	}
 	pgwordp[++pgwords] = pgchars;
-	if (pgwordw[pgwords-1] >= nel) {
-		para[pgchars++] = 0;
-		pgoflow = &para[pgwordp[--pgwords]];
-		spread = 1;
-		tbreak();
-		pgoflow = NULL;
-	}
+	pgspacw[pgwords] = 0;
+	pgwordw[pgwords] = 0;
+	pghyphw[pgwords] = 0;
+	pgadspc[pgwords] = 0;
+	pglsphc[pgwords] = 0;
 	if (spread)
 		tbreak();
 }
@@ -2172,16 +2076,6 @@ parpr(void)
 	if (_spread)
 		adflg |= 1;
 	tbreak();
-	if (pgoflow) {
-		for (j = 0; (c = pgoflow[j]) != 0; j++) {
-			w = width(c);
-			w += kernadjust(c, pgoflow[j+1]);
-			storeline(c, w);
-		}
-		nwd = 1;
-		adflg |= 1;
-		tbreak();
-	}
 	pgwords = pgchars = pgspacs = pglines = 0;
 	ic = savic;
 	lnmod = savlnmod;
@@ -2228,8 +2122,6 @@ pbreak(void)
 	if (pgchars == 0)
 		return;
 	setnel();
-	line_by_line();
-	line_by_line_r();
-	line_breaker();
+	parcomp();
 	pardi();
 }

@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	2.21 (gritter) 10/22/06
+.\" Sccsid @(#)doc.tr	2.22 (gritter) 10/24/06
 .do xflag 3
 .warn
 .spreadwarn 5p
@@ -69,8 +69,8 @@
 .nr PS 10p
 .nr VS 12p
 .ll \n(LLu
-.ss 10 0
-.minss 8
+.ss 12 0
+.minss 9
 .de Breakpage
 .	ch Breakpage
 '	bp
@@ -186,7 +186,7 @@ WITH POSTSCRIPT DEVICES
 Gunnar Ritter
 .ft R
 .sp
-10/22/06
+10/24/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v

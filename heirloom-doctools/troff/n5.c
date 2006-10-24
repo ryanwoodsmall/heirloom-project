@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.107 (gritter) 10/22/06
+ * Sccsid @(#)n5.c	1.108 (gritter) 10/24/06
  */
 
 /*
@@ -1231,13 +1231,8 @@ evc(struct env *dp, struct env *sp)
 	dp->_pgspacp = NULL;
 	dp->_pgwordw = NULL;
 	dp->_pghyphw = NULL;
-	dp->_pgadspw = NULL;
 	dp->_pgadspc = NULL;
-	dp->_pglsphw = NULL;
 	dp->_pglsphc = NULL;
-	dp->_pgfwd = NULL;
-	dp->_pglinew = NULL;
-	dp->_pgback = NULL;
 	dp->_pgopt = NULL;
 	dp->_pgspacw = NULL;
 	dp->_pgspacp = NULL;
@@ -1327,20 +1322,10 @@ evcline(struct env *dp, struct env *sp)
 	memcpy(dp->_pgwordw, sp->_pgwordw, dp->_pgsize * sizeof *dp->_pgwordw);
 	dp->_pghyphw = malloc(dp->_pgsize * sizeof *dp->_pghyphw);
 	memcpy(dp->_pghyphw, sp->_pghyphw, dp->_pgsize * sizeof *dp->_pghyphw);
-	dp->_pgadspw = malloc(dp->_pgsize * sizeof *dp->_pgadspw);
-	memcpy(dp->_pgadspw, sp->_pgadspw, dp->_pgsize * sizeof *dp->_pgadspw);
 	dp->_pgadspc = malloc(dp->_pgsize * sizeof *dp->_pgadspc);
 	memcpy(dp->_pgadspc, sp->_pgadspc, dp->_pgsize * sizeof *dp->_pgadspc);
-	dp->_pglsphw = malloc(dp->_pgsize * sizeof *dp->_pglsphw);
-	memcpy(dp->_pglsphw, sp->_pglsphw, dp->_pgsize * sizeof *dp->_pglsphw);
 	dp->_pglsphc = malloc(dp->_pgsize * sizeof *dp->_pglsphc);
 	memcpy(dp->_pglsphc, sp->_pglsphc, dp->_pgsize * sizeof *dp->_pglsphc);
-	dp->_pgfwd = malloc(dp->_pgsize * sizeof *dp->_pgfwd);
-	memcpy(dp->_pgfwd, sp->_pgfwd, dp->_pgsize * sizeof *dp->_pgfwd);
-	dp->_pglinew = malloc(dp->_pgsize * sizeof *dp->_pglinew);
-	memcpy(dp->_pglinew, sp->_pglinew, dp->_pgsize * sizeof *dp->_pglinew);
-	dp->_pgback = malloc(dp->_pgsize * sizeof *dp->_pgback);
-	memcpy(dp->_pgback, sp->_pgback, dp->_pgsize * sizeof *dp->_pgback);
 	dp->_pgopt = malloc(dp->_pgsize * sizeof *dp->_pgopt);
 	memcpy(dp->_pgopt, sp->_pgopt, dp->_pgsize * sizeof *dp->_pgopt);
 	dp->_pgspacw = malloc(dp->_pgsize * sizeof *dp->_pgspacw);
@@ -1374,20 +1359,10 @@ relsev(struct env *ep)
 	ep->_pgwordw = NULL;
 	free(ep->_pghyphw);
 	ep->_pghyphw = NULL;
-	free(ep->_pgadspw);
-	ep->_pgadspw = NULL;
 	free(ep->_pgadspc);
 	ep->_pgadspc = NULL;
-	free(ep->_pglsphw);
-	ep->_pglsphw = NULL;
 	free(ep->_pglsphc);
 	ep->_pglsphc = NULL;
-	free(ep->_pgfwd);
-	ep->_pgfwd = NULL;
-	free(ep->_pglinew);
-	ep->_pglinew = NULL;
-	free(ep->_pgback);
-	ep->_pgback = NULL;
 	free(ep->_pgopt);
 	ep->_pgopt = NULL;
 	free(ep->_pgspacw);
