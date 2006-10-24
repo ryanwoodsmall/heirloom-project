@@ -13,8 +13,8 @@ Release ...
   supplies glyph data for them if specified with a troff ".fp" request.
 * dpost: Fixed to compile on NetBSD again (Bugreport by Dirk-Wilhelm Peters).
 * eqn: Handles fractional point sizes with "size" and "gsize" now.
-* tbl: Fixed a segmentation fault that occurred due to the changed memory
-  layout introduced in the last release.
+* tbl: Fixed a segmentation fault with empty tables that occurred due
+  to the changed memory layout introduced in the last release.
 * A "Quickstart Guide" document has been added. It is aimed at people
   who know other variants of troff to some extent and want to explore
   Heirloom troff.
