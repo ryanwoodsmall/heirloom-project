@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.127 (gritter) 10/23/06
+ * Sccsid @(#)n7.c	1.128 (gritter) 10/24/06
  */
 
 /*
@@ -1819,10 +1819,10 @@ line_by_line(void)
 			pglinew[pglines] -= pgspacw[i] + pgwordw[i];
 			pgadspw[pglines] -= pgadspc[i];
 			pglsphw[pglines] -= pglsphc[i];
-			if (hlm >= 0 && pghyphw[i]) {
+			if (hlm >= 0 && pghyphw[i-1]) {
 				if (++hlc > hlm) {
 					while (i > pgfwd[pglines] &&
-							pghyphw[i]) {
+							pghyphw[i-1]) {
 						i--;
 						pglinew[pglines] -= pgspacw[i] -
 							pgwordw[i];
@@ -1851,7 +1851,6 @@ line_by_line_r(void)
 
 	pgback[0] = 0;
 	l = pgwordw[pgwords-1];
-	hlc = 0;
 	/*
 	 * The number of lines aligned in backward direction
 	 * may be shorter than the number of lines aligned
@@ -1861,15 +1860,6 @@ line_by_line_r(void)
 		for (i = pgwords - 2; i >= 0; i--) {
 			l += pgwordw[i] + pgspacw[i+1];
 			if (l > nel) {
-				if (hlm >= 0 && pghyphw[i]) {
-					if (++hlc > hlm) {
-						while (i <= pgback[m+1] &&
-								pghyphw[i])
-							i++;
-						hlc = 0;
-					}
-				} else
-					hlc = 0;
 				/*
 				 * A backward break point must
 				 * not be at a higher position
