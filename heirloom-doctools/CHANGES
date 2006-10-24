@@ -13,6 +13,9 @@ Release ...
   supplies glyph data for them if specified with a troff ".fp" request.
 * dpost: Fixed to compile on NetBSD again (Bugreport by Dirk-Wilhelm Peters).
 * eqn: Handles fractional point sizes with "size" and "gsize" now.
+* A "Quickstart Guide" document has been added. It is aimed at people
+  who know other variants of troff to some extent and want to explore
+  Heirloom troff.
 
 Release 061010
 * A simplistic XSLT stylesheet to convert OpenDocument text to troff input
