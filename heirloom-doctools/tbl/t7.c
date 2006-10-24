@@ -8,7 +8,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t7.c	1.7 (gritter) 9/11/06
+ * Sccsid @(#)t7.c	1.8 (gritter) 10/25/06
  */
 
 /*	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T	*/
@@ -145,7 +145,7 @@ if (boxflg || allflg || dboxflg) { /* bottom of table line */
 }
 	for(c=0; c<ncol; c++)
 		{
-		if ((lf=left(nlin-1,c, &lwid))>=0)
+		if (nlin>0 && (lf=left(nlin-1,c, &lwid))>=0)
 			{
 			fprintf(tabout, ".if \\n(#%c>=0 .sp -1\n",linestop[lf]+'a'-1);
 			fprintf(tabout, ".if \\n(#%c>=0 ", linestop[lf]+'a'-1);
