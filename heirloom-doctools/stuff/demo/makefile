@@ -5,7 +5,7 @@ DISTFLAGS = -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite \
 	-sProcessColorModel=DeviceGray -dPDFX
 
 .tr.ps:
-	troff $(TFLAGS) $< | dpost -e3 >$@
+	troff $(TFLAGS) $< | dpost >$@
 
 .ps.pdf:
 	gs -sOutputFile=$@ $(DISTFLAGS) -f PDFX_def.ps -f $<

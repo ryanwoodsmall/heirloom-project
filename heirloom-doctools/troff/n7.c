@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.131 (gritter) 10/27/06
+ * Sccsid @(#)n7.c	1.134 (gritter) 10/28/06
  */
 
 /*
@@ -1008,7 +1008,7 @@ movword(void)
 		w = width(i);
 		storelsh(i, rawwidth);
 		adspc += minspc;
-		w += kernadjust(i, *wp ? *wp : ' ' | (spbits?spbits:sfmask(i)));
+		w += kernadjust(i, *wp);
 		wne -= w;
 		wch--;
 		if (cbits(i) == STRETCH && cbits(lasti) != STRETCH)
@@ -1031,6 +1031,9 @@ movword(void)
 		nwd += stretches + 1;
 		if (nel - adspc < 0 && nwd > 1)
 			adflg |= 5;
+		w = kernadjust(lasti,  ' ' | (spbits?spbits:sfmask(lasti)));
+		ne += w;
+		nel -= w;
 		return(0);	/* line didn't fill up */
 	}
 m0:
@@ -1813,7 +1816,7 @@ parcomp(void)
 {
 	double	*cost, t;
 	int	*nextbreak, *hypc;
-	int	i, j, k, m, h, step = 0;
+	int	i, j, k, m, h, v, step = 0;
 
 	cost = calloc(pgsize, sizeof *cost);
 	nextbreak = calloc(pgsize, sizeof *nextbreak);
@@ -1831,13 +1834,14 @@ parcomp(void)
 		} else {
 			step = 1;
 			cost[i] = HUGE_VAL;
-			k = pgwordw[i];
-			m = pglsphc[i];
+			k = pgwordw[i] + pglgsw[i];
+			m = pglsphc[i] + pglgsh[i];
 			for (j = i + 1; j < pgwords; j++) {
-				k += pgspacw[j-1] + pgwordw[j];
-				m += pgadspc[j-1] + pglsphc[j];
-				if (k - m + pghyphw[j] <= nel) {
-					t = cost[j+1] + penalty(k);
+				k += pgspacw[j] + pgwordw[j];
+				m += pgadspc[j] + pglsphc[j];
+				v = k + pghyphw[j] + pglgew[j];
+				if (v - m - pglgeh[j] <= nel) {
+					t = cost[j+1] + penalty(v);
 					if (t <= cost[i]) {
 						if (pghyphw[j])
 							h = hypc[j+1] + 1;
@@ -1895,12 +1899,32 @@ growpgsize(void)
 	pgopt = realloc(pgopt, pgsize * sizeof *pgopt);
 	pgspacp = realloc(pgspacp, pgsize * sizeof *pgspacp);
 	pgspacw = realloc(pgspacw, pgsize * sizeof *pgspacw);
+	pglgsc = realloc(pglgsc, pgsize * sizeof *pglgsc);
+	pglgec = realloc(pglgec, pgsize * sizeof *pglgec);
+	pglgsw = realloc(pglgsw, pgsize * sizeof *pglgsw);
+	pglgew = realloc(pglgew, pgsize * sizeof *pglgew);
+	pglgsh = realloc(pglgsh, pgsize * sizeof *pglgsh);
+	pglgeh = realloc(pglgeh, pgsize * sizeof *pglgeh);
 	if (pgwordp == NULL || pgwordw == NULL || pghyphw == NULL ||
 			pgopt == NULL || pgspacw == NULL ||
-			pgadspc == NULL || pglsphc == NULL) {
+			pgadspc == NULL || pglsphc == NULL ||
+			pglgsc == NULL || pglgec == NULL ||
+			pglgsw == NULL || pglgew == NULL ||
+			pglgsh == NULL || pglgeh == NULL) {
 		errprint("out of memory justifying paragraphs");
 		done(02);
 	}
+}
+
+static void
+parlgzero(int i)
+{
+	pglgsc[i] = 0;
+	pglgec[i] = 0;
+	pglgsw[i] = 0;
+	pglgew[i] = 0;
+	pglgsh[i] = 0;
+	pglgeh[i] = 0;
 }
 
 static void
@@ -1943,6 +1967,8 @@ parword(void)
 	pglsphc[pgwords] = 0;
 	pgwordw[pgwords] = 0;
 	pgwordp[pgwords] = pgchars;
+	parlgzero(pgwords);
+	parlgzero(pgwords+1);
 	if (!hyoff && hyf && hlm)
 		hyphen(wp);
 	hyp = hyptr;
@@ -1966,6 +1992,37 @@ parword(void)
 			w = width(i);
 			w += kernadjust(wp[-1], i);
 			pghyphw[pgwords] = w;
+#ifndef	NROFF
+			{
+			int	n, *ip;
+			tchar	e, s;
+
+			n = (intptr_t)(hyp[-1]) & 03;
+			ip = n ? lgrevtab[fbits(*wp)][cbits(*wp)] : NULL;
+			if (n != 0 && ip != NULL) {
+				pglgec[pgwords] = e =
+					strlg(fbits(*wp), ip, n) |
+						sfmask(*wp) | AUTOLIG;
+				for (w = 0; ip[n+w]; w++);
+				pglgsc[pgwords+1] = s =
+					strlg(fbits(*wp), &ip[n], w) |
+						sfmask(*wp) | AUTOLIG;
+				pglgew[pgwords] = width(e);
+				pglgeh[pgwords] = getlsh(e, rawwidth) *
+					lshmin / LAFACT;
+				pglgew[pgwords] += kernadjust(wp[-1], e);
+				pghyphw[pgwords] += kernadjust(e, i);
+				pghyphw[pgwords] -= kernadjust(wp[-1], i);
+				pglgsw[pgwords+1] = width(s);
+				pglgsh[pgwords+1] = getlsh(s, rawwidth) *
+					lshmin / LAFACT;
+				pglgsw[pgwords+1] -= width(*wp);
+				pglgsh[pgwords+1] -= getlsh(*wp, rawwidth) *
+					lshmin / LAFACT;
+				pglgsw[pgwords+1] += kernadjust(s, wp[1]);
+				pglgsw[pgwords+1] -= kernadjust(wp[0], wp[1]);
+			} }
+#endif	/* !NROFF */
 		}
 		if (pghyphw[pgwords] || wp > word && maybreak(wp[-1])) {
 			pghyphw[pgwords] -= kernadjust(wp[-1], wp[0]);
@@ -1979,6 +2036,7 @@ parword(void)
 			pghyphw[pgwords] = 0;
 			pgadspc[pgwords] = 0;
 			pglsphc[pgwords] = 0;
+			parlgzero(pgwords+1);
 		}
 		i = *wp++;
 		w = width(i);
@@ -2007,6 +2065,7 @@ parword(void)
 	pghyphw[pgwords] = 0;
 	pgadspc[pgwords] = 0;
 	pglsphc[pgwords] = 0;
+	parlgzero(pgwords);
 	if (spread)
 		tbreak();
 }
@@ -2014,22 +2073,36 @@ parword(void)
 void
 parpr(void)
 {
-	int	i, j, k = 0, w, stretches, _spread = spread, hc, savlnmod;
-	tchar	c, lastc, savic;
+	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc, savlnmod;
+	tchar	c, e, lastc, savic, lgs;
 
 	savic = ic;
 	ic = 0;
 	savlnmod = lnmod;
 	lnmod = 0;
 	hc = shc ? shc : HYPHEN;
+	nw = 0;
 	for (i = 0; i < pgwords; i++) {
+		lgs = 0;
 		if (pgopt[k] == i) {
 			if (k++ > 0) {
 				if (pghyphw[i-1]) {
-					c = sfmask(para[pgwordp[i]-1]) | hc;
+#ifndef	NROFF
+					if ((e = pglgec[i-1]) != 0) {
+						w = width(e);
+						storelsh(e, rawwidth);
+						w += kernadjust(para[pgwordp[i]-1], e);
+						storeline(e, w);
+						if (letsps)
+							storelsp(e, 0);
+						lgs = pglgsc[i];
+					} else
+#endif
+						e = para[pgwordp[i]-1];
+					c = sfmask(e) | hc;
 					w = width(c);
 					storelsh(c, rawwidth);
-					w += kernadjust(para[pgwordp[i]-1], c);
+					w += kernadjust(e, c);
 					storeline(c, w);
 					if (letsps)
 						storelsp(c, 0);
@@ -2037,7 +2110,7 @@ parpr(void)
 				adflg |= 5;
 				tbreak();
 			}
-			nwd = 1;
+			nw = nwd = 1;
 			storeline(makem(-in), 0);
 			leftend(para[pgwordp[i]], admod != 1 && admod != 2, 1);
 		} else {
@@ -2046,6 +2119,8 @@ parpr(void)
 				minflg = minspsz && ad && !admod;
 				w = width(c);
 				adspc += minspc;
+				if (j == pgspacp[i] && i > 0 && nwd > 1)
+					w += kernadjust(para[pgwordp[i]-1], c);
 				if (j == pgspacp[i+1]-1)
 					w += kernadjust(c, para[pgwordp[i]]);
 				storeline(c, w);
@@ -2056,14 +2131,15 @@ parpr(void)
 		stretches = 0;
 		lastc = 0;
 		for (j = pgwordp[i]; j < pgwordp[i+1]; j++) {
-			c = para[j];
+			c = lgs ? lgs : para[j];
+			lgs = 0;
 			w = width(c);
 			storelsh(c, rawwidth);
-			if (j == pgwordp[i] && i > 0 &&
+			if (j == pgwordp[i] && i > 0 && nw > 1 &&
 					pgspacp[i] == pgspacp[i+1])
 				w += kernadjust(para[j-1], c);
-			w += kernadjust(c, j < pgwordp[i+1]-1 ? para[j+1] :
-					' ' | (spbits?spbits:sfmask(i)));
+			if (j < pgwordp[i+1]-1)
+				w += kernadjust(c, para[j+1]);
 			storeline(c, w);
 			if (cbits(c) == STRETCH && cbits(lastc) != STRETCH)
 				stretches++;
@@ -2072,6 +2148,7 @@ parpr(void)
 				storelsp(c, 0);
 		}
 		nwd += stretches;
+		nw++;
 	}
 	if (_spread)
 		adflg |= 1;

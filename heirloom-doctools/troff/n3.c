@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.168 (gritter) 10/21/06
+ * Sccsid @(#)n3.c	1.169 (gritter) 10/27/06
  */
 
 /*
@@ -200,6 +200,7 @@ _growcontab(struct contab **contp, int *NMp, struct contab ***hashp)
 {
 	int	i, j, inc = 256;
 	struct contab	*onc;
+	struct s	*s;
 
 	onc = *contp;
 	if ((*contp = realloc(*contp, (*NMp+inc) * sizeof **contp)) == NULL)
@@ -225,6 +226,10 @@ _growcontab(struct contab **contp, int *NMp, struct contab ***hashp)
 			if ((*contp)[i].link)
 				(*contp)[i].link = (struct contab *)
 					((char *)((*contp)[i].link) + j);
+		for (s = frame; s != stk; s = s->pframe)
+			if (s->contp >= onc && s->contp < &onc[*NMp])
+				s->contp = (struct contab *)
+					((char *)(s->contp) + j);
 	}
 	*NMp += inc;
 	return *contp;

@@ -6,6 +6,8 @@ Release ...
   character above Unicode point U+0800.
 * troff: Fixed "\H" and "\S" to become effective if positioned directly
   after a font change (Bugreport by Dirk-Wilhelm Peters).
+* [nt]roff: Fixed an invalid memory access that had been introduced with
+  local strings in the last release.
 * dpost: Fixed a bug introduced with the previous release that caused
   PostScript errors on a page following colored text unless the "-e"
   option was explicitly specified.

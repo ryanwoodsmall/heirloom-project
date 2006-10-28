@@ -1,5 +1,5 @@
 .\" Heirloom troff demonstration page
-.\" Sccsid @(#)troffdemo.tr	1.36 (gritter) 7/4/06
+.\" Sccsid @(#)troffdemo.tr	1.37 (gritter) 10/28/06
 .\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .\" Enable long request names and warnings.
 .do xflag 3
@@ -174,9 +174,9 @@
 .ps 12
 \fEGunnar Ritter\fR
 .br
-7/4/06
+10/28/06
 .sp 2v
-.ad b
+.ad p
 .ps 12
 .\" Begin of text
 The \fItroff\fP text processor

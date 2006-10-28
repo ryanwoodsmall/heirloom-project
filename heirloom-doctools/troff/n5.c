@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.108 (gritter) 10/24/06
+ * Sccsid @(#)n5.c	1.109 (gritter) 10/27/06
  */
 
 /*
@@ -1236,6 +1236,12 @@ evc(struct env *dp, struct env *sp)
 	dp->_pgopt = NULL;
 	dp->_pgspacw = NULL;
 	dp->_pgspacp = NULL;
+	dp->_pglgsc = NULL;
+	dp->_pglgec = NULL;
+	dp->_pglgsw = NULL;
+	dp->_pglgew = NULL;
+	dp->_pglgsh = NULL;
+	dp->_pglgeh = NULL;
 	if (dp->_brnl < INT_MAX)
 		dp->_brnl = 0;
 	if (dp->_brpnl < INT_MAX)
@@ -1332,6 +1338,18 @@ evcline(struct env *dp, struct env *sp)
 	memcpy(dp->_pgspacw, sp->_pgspacw, dp->_pgsize * sizeof *dp->_pgspacw);
 	dp->_pgspacp = malloc(dp->_pgsize * sizeof *dp->_pgspacp);
 	memcpy(dp->_pgspacp, sp->_pgspacp, dp->_pgsize * sizeof *dp->_pgspacp);
+	dp->_pglgsc = malloc(dp->_pgsize * sizeof *dp->_pglgsc);
+	memcpy(dp->_pglgsc, sp->_pglgsc, dp->_pgsize * sizeof *dp->_pglgsc);
+	dp->_pglgec = malloc(dp->_pgsize * sizeof *dp->_pglgec);
+	memcpy(dp->_pglgec, sp->_pglgec, dp->_pgsize * sizeof *dp->_pglgec);
+	dp->_pglgsw = malloc(dp->_pgsize * sizeof *dp->_pglgsw);
+	memcpy(dp->_pglgsw, sp->_pglgsw, dp->_pgsize * sizeof *dp->_pglgsw);
+	dp->_pglgew = malloc(dp->_pgsize * sizeof *dp->_pglgew);
+	memcpy(dp->_pglgew, sp->_pglgew, dp->_pgsize * sizeof *dp->_pglgew);
+	dp->_pglgsh = malloc(dp->_pgsize * sizeof *dp->_pglgsh);
+	memcpy(dp->_pglgsh, sp->_pglgsh, dp->_pgsize * sizeof *dp->_pglgsh);
+	dp->_pglgeh = malloc(dp->_pgsize * sizeof *dp->_pglgeh);
+	memcpy(dp->_pglgeh, sp->_pglgeh, dp->_pgsize * sizeof *dp->_pglgeh);
 	dp->_pgwords = sp->_pgwords;
 	dp->_pgchars = sp->_pgchars;
 	dp->_pgspacs = sp->_pgspacs;
@@ -1368,6 +1386,18 @@ relsev(struct env *ep)
 	free(ep->_pgspacw);
 	ep->_pgspacw = NULL;
 	free(ep->_pgspacp);
+	free(ep->_pglgsc);
+	ep->_pglgsc = NULL;
+	free(ep->_pglgec);
+	ep->_pglgec = NULL;
+	free(ep->_pglgsw);
+	ep->_pglgsw = NULL;
+	free(ep->_pglgew);
+	ep->_pglgew = NULL;
+	free(ep->_pglgsh);
+	ep->_pglgsh = NULL;
+	free(ep->_pglgeh);
+	ep->_pglgeh = NULL;
 	ep->_pgspacp = NULL;
 	ep->_pgsize = 0;
 }
