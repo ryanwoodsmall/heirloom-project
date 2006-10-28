@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.169 (gritter) 10/27/06
+ * Sccsid @(#)n3.c	1.170 (gritter) 10/28/06
  */
 
 /*
@@ -90,8 +90,6 @@ static void	caselength(void);
 static void	caseindex(void);
 static void	caseasciify(void);
 static void	caseunformat(int);
-static void	casepull(void);
-static void	pull(int);
 static int	getls(int, int *, int);
 static void	addcon(int, char *, void(*)(int));
 
@@ -161,7 +159,6 @@ static const struct {
 	{ "papersize",		(void(*)(int))casepapersize },
 	{ "psbb",		(void(*)(int))casepsbb },
 	{ "pso",		(void(*)(int))casepso },
-	{ "pull",		(void(*)(int))casepull },
 	{ "rchar",		(void(*)(int))caserchar },
 	{ "recursionlimit",	(void(*)(int))caserecursionlimit },
 	{ "return",		(void(*)(int))casereturn },
@@ -950,8 +947,6 @@ popi(void)
 	sfree(p);
 	if (p->contp != NULL)
 		p->contp->flags &= ~FLAG_USED;
-	if (p->pull > 0)
-		pull(p->mname);
 	frame = p->pframe;
 	ip = p->pip;
 	pendt = p->ppendt;
@@ -1992,68 +1987,6 @@ caseunformat(int flag)
 			if (!noout)
 				wbf(c);
 		}
-		wbt(0);
-		if (oldmn != NULL && (nlink = oldmn->nlink) > 0)
-			k = oldmn->rq;
-		else {
-			k = i;
-			nlink = 0;
-		}
-		clrmn(oldmn);
-		if (newmn) {
-			if (newmn->rq)
-				munhash(newmn);
-			newmn->rq = k;
-			newmn->nlink = nlink;
-			maddhash(newmn);
-			prwatch(newmn, i, 1);
-		}
-	}
-	free(tp);
-	offset = dip->op;
-}
-
-
-static void
-casepull(void)
-{
-	struct contab	*contp;
-	int	i, n;
-
-	if (skip(1) || (n = vnumb(NULL)) <= 0 || nonumb)
-		return;
-	if (skip(1) || (i = getrq(0)) == 0)
-		return;
-	if ((contp = findmn(i)) == NULL || !contp->mx) {
-		nosuch(i);
-		return;
-	}
-	nxf->pull = n;
-	control(i, 0);
-}
-
-
-static void
-pull(int i)
-{
-	int	j, k, sz = 0, nlink;
-	tchar	*tp = NULL, c;
-
-	if (dip != d)
-		wbfl();
-	k = 0;
-	app++;
-	while ((c = rbf()) != 0) {
-		if (k >= sz) {
-			sz += 512;
-			tp = realloc(tp, sz * sizeof *tp);
-		}
-		tp[k++] = c;
-	}
-	app--;
-	if ((offset = finds(i, 1, 0)) != 0) {
-		for (j = 0; j < k; j++)
-			wbf(tp[j]);
 		wbt(0);
 		if (oldmn != NULL && (nlink = oldmn->nlink) > 0)
 			k = oldmn->rq;

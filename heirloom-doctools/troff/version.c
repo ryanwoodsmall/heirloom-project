@@ -7,32 +7,32 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	7.151 (gritter) 10/28/06";
+	"@(#)/usr/ucb/otfdump.sl	7.152 (gritter) 10/28/06";
 #elif defined (DPOST)
-static const char sccsid[] USED = "@(#)dpost.sl  7.151 (gritter) 10/28/06";
-const char creator[] = "Heirloom Documentation Tools - dpost 7.151 (gritter) 10/28/06";
+static const char sccsid[] USED = "@(#)dpost.sl  7.152 (gritter) 10/28/06";
+const char creator[] = "Heirloom Documentation Tools - dpost 7.152 (gritter) 10/28/06";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	7.151 (gritter) 10/28/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	7.152 (gritter) 10/28/06";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	7.151 (gritter) 10/28/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	7.152 (gritter) 10/28/06";
 #endif	/* !DUMP, !NROFF */
-const char revision[] = "7.151";
+const char revision[] = "7.152";
 /* SLIST */
 /*
 ext.h: * Sccsid @(#)ext.h	1.96 (gritter) 10/21/06
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
 n1.c: * Sccsid @(#)n1.c	1.128 (gritter) 10/21/06
 n2.c: * Sccsid @(#)n2.c	1.35 (gritter) 10/22/06
-n3.c: * Sccsid @(#)n3.c	1.169 (gritter) 10/27/06
+n3.c: * Sccsid @(#)n3.c	1.170 (gritter) 10/28/06
 n4.c: * Sccsid @(#)n4.c	1.84 (gritter) 10/21/06
 n5.c: * Sccsid @(#)n5.c	1.109 (gritter) 10/27/06
-n7.c: * Sccsid @(#)n7.c	1.134 (gritter) 10/28/06
+n7.c: * Sccsid @(#)n7.c	1.135 (gritter) 10/28/06
 n8.c: * Sccsid @(#)n8.c	1.36 (gritter) 10/28/06
 n9.c: * Sccsid @(#)n9.c	1.65 (gritter) 10/15/06
 ni.c: * Sccsid @(#)ni.c	1.42 (gritter) 10/21/06
 nii.c: * Sccsid @(#)nii.c	1.45 (gritter) 9/11/06
 suftab.c: * Sccsid @(#)suftab.c	1.4 (gritter) 8/16/05
-tdef.h: * Sccsid @(#)tdef.h	1.145 (gritter) 10/27/06
+tdef.h: * Sccsid @(#)tdef.h	1.146 (gritter) 10/28/06
 nroff.d/n10.c: * Sccsid @(#)n10.c	1.30 (gritter) 9/5/06
 nroff.d/n6.c: * Sccsid @(#)n6.c	1.48 (gritter) 9/8/06
 nroff.d/pt.h: *	Sccsid @(#)pt.h	1.41 (gritter) 8/12/06

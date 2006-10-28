@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.145 (gritter) 10/27/06
+ * Sccsid @(#)tdef.h	1.146 (gritter) 10/28/06
  */
 
 /*
@@ -594,7 +594,6 @@ struct	s {	/* stack frame */
 	int	frame_cnt;
 	int	tail_cnt;
 	struct contab	*contp;
-	int	pull;
 	struct numtab	*numtab;
 	struct numtab	**nhash;
 	struct contab	*contab;

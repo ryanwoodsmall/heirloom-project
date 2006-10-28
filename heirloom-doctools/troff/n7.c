@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.134 (gritter) 10/28/06
+ * Sccsid @(#)n7.c	1.135 (gritter) 10/28/06
  */
 
 /*
@@ -94,7 +94,6 @@ int	brflg;
 #undef	iswascii
 #define	iswascii(c)	(((c) & ~(wchar_t)0177) == 0)
 
-static void	chkpull(int);
 static int	_findt(struct d *, int, int);
 static tchar	adjbit(tchar);
 static void	sethtdp(void);
@@ -670,7 +669,6 @@ newline(int a)
 			nlss += dip->alss;
 			dip->alss = 0;
 		}
-		chkpull(nlss);
 		if (vpt > 0 && dip->ditrap && !dip->ditf && dip->dnl >= dip->ditrap && dip->dimac)
 			if (control(dip->dimac, 0)) {
 				trap++; 
@@ -691,7 +689,6 @@ newline(int a)
 	pchar1((tchar)'\n');
 	flss = 0;
 	lss = j;
-	chkpull(nlss);
 	if (vpt == 0 || numtab[NL].val < pl)
 		goto nl2;
 nl1:
@@ -793,17 +790,6 @@ chkpn(void)
 	}
 }
 
-
-static void
-chkpull(int nlss)
-{
-	if (nlss > 0 && frame->pull) {
-		if (nlss >= frame->pull)
-			popi();
-		else
-			frame->pull -= nlss;
-	}
-}
 
 int 
 findt(struct d *dp, int a)
