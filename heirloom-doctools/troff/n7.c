@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.136 (gritter) 10/28/06
+ * Sccsid @(#)n7.c	1.137 (gritter) 10/29/06
  */
 
 /*
@@ -1043,10 +1043,9 @@ m1:
 	if ((*--linep & ~SMASK) != IMP)
 		goto m5;
 #ifndef	NROFF
-	if ((s = sbits(*linep)) != 0) {
-		i = *(linep + 1);
-		if ((ip = lgrevtab[fbits(i)][cbits(i)]) == NULL)
-			goto m5;
+	i = *(linep + 1);
+	if ((s = sbits(*linep)) != 0 &&
+			(ip = lgrevtab[fbits(i)][cbits(i)]) != NULL) {
 		lgs = strlg(fbits(i), ip, s) | sfmask(i) | AUTOLIG;
 		for (w = 0; ip[s+w]; w++);
 		lge = strlg(fbits(i), &ip[s], w) | sfmask(i) | AUTOLIG;

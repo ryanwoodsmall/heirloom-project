@@ -11,6 +11,8 @@ Release ...
   re-divert text is used instead.
 * [nt]roff: Fixed an invalid memory access that had been introduced with
   local strings in the last release.
+* troff: Fixed a segmentation violation if a ligature in a hyphenated
+  word was not in the current font (Bugreport by Dirk-Wilhelm Peters).
 * dpost: Fixed a bug introduced with the previous release that caused
   PostScript errors on a page following colored text unless the "-e"
   option was explicitly specified.
