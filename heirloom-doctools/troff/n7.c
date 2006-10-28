@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.135 (gritter) 10/28/06
+ * Sccsid @(#)n7.c	1.136 (gritter) 10/28/06
  */
 
 /*
@@ -1780,6 +1780,28 @@ lspcomp(int idiff)
 }
 #endif	/* !NROFF */
 
+/*
+ * A dynamic programming approach to line breaking over
+ * a paragraph as introduced by D. E. Knuth & M. F. Plass,
+ * "Breaking paragraphs into lines", Software - Practice
+ * and Experience, Vol. 11, Issue 12 (1981), pp. 1119-1184.
+ *
+ * The concrete implementation is based on Algorithm 1 of
+ * D. S. Hirschberg & L. L. Larmore, "New Applications of
+ * Failure Functions", JACM Vol. 34 Issue 3 (July 1987),
+ * pp. 616-625.
+ *
+ * For lines of reasonable length, the actual breakpoint
+ * computation takes 5-10 % of total run time. It seems
+ * therefore unnecessary to employ the asymptotic run time
+ * improvements proposed by Hirschberg & Larmore.
+ *
+ * To hyphenate all words of a paragraph typically takes
+ * another 5-10 % of total run time. It is thus no problem
+ * to do this first and then work with the resulting word
+ * parts, which spares a lot of complications.
+ */
+
 static double
 penalty(int k)
 {
@@ -1789,13 +1811,6 @@ penalty(int k)
 	t = t * t * t;
 	return t;
 }
-
-/*
- * This is the Knuth-Plass algorithm in the form given by
- * D. S. Hirschberg & L. L. Larmore, "New Applications of
- * Failure Functions", JACM Vol. 34 Issue 3, (July 1987),
- * pp. 616-625.
- */
 
 static void
 parcomp(void)
@@ -1833,6 +1848,14 @@ parcomp(void)
 							h = hypc[j+1] + 1;
 						else
 							h = 0;
+						/*
+						 * This is not completely
+						 * correct: It might be
+						 * preferable to disallow
+						 * an earlier (i.e. later)
+						 * hyphenation point. But
+						 * it seems good enough.
+						 */
 						if (hlm < 0 || h <= hlm) {
 							hypc[i] = h;
 							cost[i] = t;
