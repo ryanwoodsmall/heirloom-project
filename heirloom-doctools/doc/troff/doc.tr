@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.159 (gritter) 10/29/06
+.\" Sccsid @(#)doc.tr	1.160 (gritter) 10/29/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1522,6 +1522,8 @@ Hyphenation.
 .b1
 \T'hylen'\fB&hylen\fI|N\fR	5	5	E	Hyphenate only words of at least \fIN\fR characters in length.\T
 .b1
+\T'hypp'\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \fBad p\fR mode.\T
+.b1
 \T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
 \T'nhychar'\fB&nhychar\fI|c...\fR	\fB\(hy\(em\fR	off	E	Hyphenation-inhibiting characters.\T
@@ -1780,6 +1782,7 @@ refer to the detailed description on how to include it.
 \T'hy'hy	13\T
 \T'hylang'hylang	13\T
 \T'hylen'hylen	13\T
+\T'hypp'hypp	13\T
 \T'ie'ie	16\T
 \T'if'if	16\T
 \T'ig'ig	20\T
@@ -2118,6 +2121,8 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.hy'13\T	\T'n_.hy'\fB&hy\fR\T	\T'n_.hy'Current hyphenation flags.\T
 \T'n_.hylang'13\T	\T'n_.hylang'\fB&hylang\fR\T	\T'n_.hylang'Current hyphenation language [sic].\T
 \T'n._hylen'13\T	\T'n_.hylen'\fB&hylen\fR\T	\T'n_.hylen'Current minimum hyphenation word length.\T
+\T'n._hypp'13\T	\T'n_.hypp'\fB&hypp\fR\T	\T'n_.hypp'Penalty for hyphen in \fBad p\fR mode.\T
+\T'n._hypp2'13\T	\T'n_.hypp2'\fB&hypp2\fR\T	\T'n_.hypp2'Penalty for consecutive hyphens in \fBad p\fR mode.\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
 \T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent as set by \fBin\fR.\T
 \T'n_.in'6\T	\T'n_.in'\fB&in\fR\T	\T'n_.in'Current indent including temporary indent, if any.\T
@@ -5169,6 +5174,17 @@ and the ``long \[longs]'' character is mapped to a ``round s''.
 .bta hylen
 \fB&hylen\fI|N\fR	5	5	E	Hyphenate only words of at least \fIN\fR characters in length.
 The current value is available in the \A'n_.hylen'\fB&hylen\fR number register.
+.bta hypp
+\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \fBad p\fR mode.
+Every inserted hyphen is given a penalty of \fIN\fR
+when computing optimal break points;
+each hyphen that is followed by another hyphen
+gets an additional penalty of \fIM\fR.
+A value of zero means no penalty;
+a value of one means maximum penalty.
+Effective penalties correspond to values between 0.01 and 0.1.
+The current values are available in the
+\A'n_.hypp'\fB&hypp\fR and \A'n_.hypp2'\fB&hypp2\fR number registers.
 .bta breakchar
 \fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.
 A line may always be split after one of these characters.

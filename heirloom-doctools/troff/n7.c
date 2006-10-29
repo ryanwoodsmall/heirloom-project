@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.139 (gritter) 10/29/06
+ * Sccsid @(#)n7.c	1.141 (gritter) 10/29/06
  */
 
 /*
@@ -1804,13 +1804,17 @@ lspcomp(int idiff)
  */
 
 static double
-penalty(int k)
+penalty(int k, int h, int h2)
 {
 	double	t;
 
 	t = nel - k;
-	t = t >= 0 ? 5 * t : 3 * -t;
+	t = t >= 0 ? t * 5 / 3 : -t;
 	t /= nel;
+	if (h)
+		t += hypp / 1000.0;
+	if (h2)
+		t += hypp2 / 1000.0;
 	t = t * t * t;
 	return t;
 }
@@ -1833,7 +1837,7 @@ parcomp(void)
 			m += pgadspc[i] + pglsphc[i+1];
 		}
 		if (step == 0 && k - m <= nel) {
-			cost[i] = spread ? penalty(k) : 0;
+			cost[i] = spread ? penalty(k, 0, 0) : 0;
 			nextbreak[i] = pgwords;
 		} else {
 			step = 1;
@@ -1845,7 +1849,8 @@ parcomp(void)
 				m += pgadspc[j] + pglsphc[j];
 				v = k + pghyphw[j] + pglgew[j];
 				if (v - m - pglgeh[j] <= nel) {
-					t = cost[j+1] + penalty(v);
+					t = cost[j+1] + penalty(v, pghyphw[j],
+						pghyphw[j] && hypc[j+1]);
 					if (t <= cost[i]) {
 						if (pghyphw[j])
 							h = hypc[j+1] + 1;

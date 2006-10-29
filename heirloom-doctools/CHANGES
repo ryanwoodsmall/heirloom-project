@@ -5,6 +5,8 @@ Release ...
   minimum number of characters a word must contain in order to be subject
   to hyphenation. The default is 5 independent of whether the ".hylang"
   request is active (in that case, it previously had been 4).
+* [nt]roff: The ".hypp" request has been introduced to control penalties
+  of hyphenation points in ".ad p" mode.
 * troff: Fixed a typo in the hyphenation code that could result in the
   insertion of a large negative vertical motion in a word containing a
   character above Unicode point U+0800.

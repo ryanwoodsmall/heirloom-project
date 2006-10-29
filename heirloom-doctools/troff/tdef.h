@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.147 (gritter) 10/29/06
+ * Sccsid @(#)tdef.h	1.149 (gritter) 10/29/06
  */
 
 /*
@@ -732,6 +732,8 @@ struct acc {
 #define	hlm	env._hlm
 #define	hlc	env._hlc
 #define	hylen	env._hylen
+#define	hypp	env._hypp
+#define	hypp2	env._hypp2
 #define	un1	env._un1
 #define	tabc	env._tabc
 #define	dotc	env._dotc
@@ -885,6 +887,8 @@ extern struct env {
 	int	_hlm;
 	int	_hlc;
 	int	_hylen;
+	int	_hypp;
+	int	_hypp2;
 	int	_un1;
 	int	_tabc;
 	int	_dotc;
