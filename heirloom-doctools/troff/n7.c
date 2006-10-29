@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.138 (gritter) 10/29/06
+ * Sccsid @(#)n7.c	1.139 (gritter) 10/29/06
  */
 
 /*
@@ -1808,7 +1808,9 @@ penalty(int k)
 {
 	double	t;
 
-	t = (double)abs(nel - k) / nel;
+	t = nel - k;
+	t = t >= 0 ? 5 * t : 3 * -t;
+	t /= nel;
 	t = t * t * t;
 	return t;
 }
