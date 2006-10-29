@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.158 (gritter) 10/28/06
+.\" Sccsid @(#)doc.tr	1.159 (gritter) 10/29/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 10/28/06
+.ds Sccsdate 10/29/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1520,6 +1520,8 @@ Hyphenation.
 .b1
 \T'hcode'\fB&hcode\fI|abcd...\fR	\(en	E	Hyphenation code of \fIa\fR is \fIb\fR, etc.\T
 .b1
+\T'hylen'\fB&hylen\fI|N\fR	5	5	E	Hyphenate only words of at least \fIN\fR characters in length.\T
+.b1
 \T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
 \T'nhychar'\fB&nhychar\fI|c...\fR	\fB\(hy\(em\fR	off	E	Hyphenation-inhibiting characters.\T
@@ -1777,6 +1779,7 @@ refer to the detailed description on how to include it.
 \T'hw'hw	13\T
 \T'hy'hy	13\T
 \T'hylang'hylang	13\T
+\T'hylen'hylen	13\T
 \T'ie'ie	16\T
 \T'if'if	16\T
 \T'ig'ig	20\T
@@ -2114,6 +2117,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.hlm'13\T	\T'n_.hlm'\fB&hlm\fR\T	\T'n_.hlm'Maximum number of consecutive hyphenated lines.\T
 \T'n_.hy'13\T	\T'n_.hy'\fB&hy\fR\T	\T'n_.hy'Current hyphenation flags.\T
 \T'n_.hylang'13\T	\T'n_.hylang'\fB&hylang\fR\T	\T'n_.hylang'Current hyphenation language [sic].\T
+\T'n._hylen'13\T	\T'n_.hylen'\fB&hylen\fR\T	\T'n_.hylen'Current minimum hyphenation word length.\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
 \T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent as set by \fBin\fR.\T
 \T'n_.in'6\T	\T'n_.in'\fB&in\fR\T	\T'n_.in'Current indent including temporary indent, if any.\T
@@ -5162,6 +5166,9 @@ When determining the hyphenation points for an input word,
 When no hyphenation code is specified for a character,
 it is mapped to its lower-case variant if necessary,
 and the ``long \[longs]'' character is mapped to a ``round s''.
+.bta hylen
+\fB&hylen\fI|N\fR	5	5	E	Hyphenate only words of at least \fIN\fR characters in length.
+The current value is available in the \A'n_.hylen'\fB&hylen\fR number register.
 .bta breakchar
 \fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.
 A line may always be split after one of these characters.
