@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.137 (gritter) 10/29/06
+ * Sccsid @(#)n7.c	1.138 (gritter) 10/29/06
  */
 
 /*
@@ -608,12 +608,13 @@ storelsp(tchar c, int neg)
 		fldcnt += neg ? -1 : 1;
 		return;
 	}
-	s = getlsp(c);
-	if (neg)
-		s = -s;
-	lsplow += s * lspmin / LAFACT;
-	lsphigh += s * lspmax / LAFACT;
-	lspnc += neg ? -1 : 1;
+	if ((s = getlsp(c)) != 0) {
+		if (neg)
+			s = -s;
+		lsplow += s * lspmin / LAFACT;
+		lsphigh += s * lspmax / LAFACT;
+		lspnc += neg ? -1 : 1;
+	}
 }
 
 static int
@@ -635,10 +636,11 @@ storelsh(tchar c, int w)
 		lshlow = lshhigh = lshwid = 0;
 		return;
 	}
-	s = getlsh(c, w);
-	lshwid += w;
-	lshlow = lshwid * lshmin / LAFACT;
-	lshhigh = lshwid * lshmax / LAFACT;
+	if ((s = getlsh(c, w)) != 0) {
+		lshwid += s;
+		lshlow = lshwid * lshmin / LAFACT;
+		lshhigh = lshwid * lshmax / LAFACT;
+	}
 }
 #endif	/* !NROFF */
 
