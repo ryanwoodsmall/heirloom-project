@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.141 (gritter) 10/29/06
+ * Sccsid @(#)n7.c	1.142 (gritter) 10/30/06
  */
 
 /*
@@ -1786,21 +1786,6 @@ lspcomp(int idiff)
  * a paragraph as introduced by D. E. Knuth & M. F. Plass,
  * "Breaking paragraphs into lines", Software - Practice
  * and Experience, Vol. 11, Issue 12 (1981), pp. 1119-1184.
- *
- * The concrete implementation is based on Algorithm 1 of
- * D. S. Hirschberg & L. L. Larmore, "New Applications of
- * Failure Functions", JACM Vol. 34 Issue 3 (July 1987),
- * pp. 616-625.
- *
- * For lines of reasonable length, the actual breakpoint
- * computation takes 5-10 % of total run time. It seems
- * therefore unnecessary to employ the asymptotic run time
- * improvements proposed by Hirschberg & Larmore.
- *
- * To hyphenate all words of a paragraph typically takes
- * another 5-10 % of total run time. It is thus no problem
- * to do this first and then work with the resulting word
- * parts, which spares a lot of complications.
  */
 
 static double
@@ -1822,86 +1807,100 @@ penalty(int k, int h, int h2)
 static void
 parcomp(void)
 {
-	double	*cost, t;
-	int	*nextbreak, *hypc;
-	int	i, j, k, m, h, v, step = 0;
+	double	*cost, *_cost, t;
+	int	*prevbreak, *hypc, *_hypc;
+	int	i, j, k, m, h, v;
 
-	cost = calloc(pgsize, sizeof *cost);
-	nextbreak = calloc(pgsize, sizeof *nextbreak);
-	hypc = calloc(pgsize, sizeof *hypc);
-	cost[pgwords] = 0;
-	k = m = 0;
-	for (i = pgwords - 1; i >= 0; i--) {
-		if (step == 0) {
-			k += pgwordw[i] + pgspacw[i+1];
-			m += pgadspc[i] + pglsphc[i+1];
-		}
-		if (step == 0 && k - m <= nel) {
-			cost[i] = spread ? penalty(k, 0, 0) : 0;
-			nextbreak[i] = pgwords;
-		} else {
-			step = 1;
-			cost[i] = HUGE_VAL;
-			k = pgwordw[i] + pglgsw[i];
-			m = pglsphc[i] + pglgsh[i];
-			for (j = i + 1; j < pgwords; j++) {
+	_cost = malloc((pgsize + 1) * sizeof *_cost);
+	cost = &_cost[1];
+	_hypc = calloc(pgsize + 1, sizeof *_hypc);
+	hypc = &_hypc[1];
+	prevbreak = calloc(pgsize, sizeof *prevbreak);
+	cost[-1] = 0;
+	for (i = 0; i < pgwords; i++)
+		cost[i] = HUGE_VAL;
+	for (i = 0; i < pgwords; i++) {
+		k = pgwordw[i] + pglgsw[i];
+		m = pglsphc[i] + pglgsh[i];
+		for (j = i; j < pgwords; j++) {
+			if (j > i) {
 				k += pgspacw[j] + pgwordw[j];
 				m += pgadspc[j] + pglsphc[j];
-				v = k + pghyphw[j] + pglgew[j];
-				if (v - m - pglgeh[j] <= nel) {
-					t = cost[j+1] + penalty(v, pghyphw[j],
-						pghyphw[j] && hypc[j+1]);
-					if (t <= cost[i]) {
-						if (pghyphw[j])
-							h = hypc[j+1] + 1;
-						else
-							h = 0;
-						/*
-						 * This is not completely
-						 * correct: It might be
-						 * preferable to disallow
-						 * an earlier (i.e. later)
-						 * hyphenation point. But
-						 * it seems good enough.
-						 */
-						if (hlm < 0 || h <= hlm) {
-							hypc[i] = h;
-							cost[i] = t;
-							nextbreak[i] = j + 1;
-						}
+			}
+			v = k + pghyphw[j] + pglgew[j];
+			if (v - m - pglgeh[j] <= nel) {
+				if (!spread && j == pgwords - 1)
+					t = 0;
+				else
+					t = penalty(v, pghyphw[j],
+						pghyphw[j] && hypc[i-1]);
+				t += cost[i-1];
+				/*fdprintf(stderr, "%c%c%c%c to %c%c%c%c "
+				                 "t=%g cost[%d]=%g\n",
+						(char)para[pgwordp[i]],
+						(char)para[pgwordp[i]+1],
+						(char)para[pgwordp[i]+2],
+						(char)para[pgwordp[i]+3],
+						(char)para[pgwordp[j]],
+						(char)para[pgwordp[j]+1],
+						(char)para[pgwordp[j]+2],
+						(char)para[pgwordp[j]+3],
+						t, j, cost[j]
+					);*/
+				if (t <= cost[j]) {
+					if (pghyphw[j])
+						h = hypc[i-1] + 1;
+					else
+						h = 0;
+					/*
+					 * This is not completely
+					 * correct: It might be
+					 * preferable to disallow
+					 * an earlier hyphenation
+					 * point. But it seems
+					 * good enough.
+					 */
+					if (hlm < 0 || h <= hlm) {
+						hypc[j] = h;
+						cost[j] = t;
+						prevbreak[j] = i;
 					}
-				} else {
-					if (j == i + 1) {
-						cost[i] = cost[j] + 1;
-						nextbreak[i] = j;
-					}
-					break;
 				}
+			} else {
+				if (j == i) {
+					t = 1 + cost[i-1];
+					cost[j] = t;
+					prevbreak[j] = i;
+				}
+				break;
 			}
 		}
 	}
 	/*for (i = 0; i < pgwords; i++)
 		fdprintf(stderr, "cost[%d] = %g %c%c%c%c to %c%c%c%c\n",
 				i, cost[i],
+				(char)para[pgwordp[prevbreak[i]]],
+				(char)para[pgwordp[prevbreak[i]]+1],
+				(char)para[pgwordp[prevbreak[i]]+2],
+				(char)para[pgwordp[prevbreak[i]]+3],
 				(char)para[pgwordp[i]],
 				(char)para[pgwordp[i]+1],
 				(char)para[pgwordp[i]+2],
-				(char)para[pgwordp[i]+3],
-				(char)para[pgwordp[nextbreak[i]-1]],
-				(char)para[pgwordp[nextbreak[i]-1]+1],
-				(char)para[pgwordp[nextbreak[i]-1]+2],
-				(char)para[pgwordp[nextbreak[i]-1]+3]
+				(char)para[pgwordp[i]+3]
 			);*/
-	j = 0;
 	pglines = 0;
 	memset(pgopt, 0, pgsize * sizeof *pgopt);
-	while (j < pgwords && pglines < pgwords) {
-		pgopt[pglines++] = j;
-		j = nextbreak[j];
-	}
-	free(cost);
-	free(nextbreak);
-	free(hypc);
+	i = j = pgwords - 1;
+	do {
+		pglines++;
+		j = prevbreak[j];
+		pgopt[i--] = j--;
+	} while (j > 0 && i > 0);
+	pgopt[0] = 0;
+	memmove(&pgopt[0], &pgopt[i+1], pglines * sizeof *pgopt);
+	free(_cost);
+	free(_hypc);
+	free(prevbreak);
 }
 
 static void
