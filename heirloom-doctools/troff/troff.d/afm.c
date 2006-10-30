@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.61 (gritter) 10/5/06
+ * Sccsid @(#)afm.c	1.62 (gritter) 10/30/06
  */
 
 #include <stdlib.h>
@@ -661,19 +661,9 @@ thisword(const char *text, const char *wrd)
 int
 unitconv(int i)
 {
-	float	d, uw, Point;
-	int	Units;
-
-	Units = unitsPerEm;
-	Point = dev.res / 72;
-	uw = Units / Point;
-	if (uw > dev.unitwidth) {
-		d = uw / dev.unitwidth;
-		return i / d + (i % (int)d >= d/2);
-	} else if (uw < dev.unitwidth)
-		return i * dev.unitwidth / uw;
-	else
-		return i;
+	if (unitsPerEm * 72 > dev.unitwidth * dev.res)
+		i = i * dev.unitwidth * dev.res / 72 / unitsPerEm;
+	return i;
 }
 
 #ifndef	DUMP

@@ -19,6 +19,7 @@ Release ...
   local strings in the last release.
 * troff: Fixed a segmentation violation if a ligature in a hyphenated
   word was not in the current font (Bugreport by Dirk-Wilhelm Peters).
+* troff, dpost: Fixed a rounding error when reading TrueType metrics.
 * dpost: Fixed a bug introduced with the previous release that caused
   PostScript errors on a page following colored text unless the "-e"
   option was explicitly specified.
