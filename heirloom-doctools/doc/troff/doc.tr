@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.162 (gritter) 10/31/06
+.\" Sccsid @(#)doc.tr	1.163 (gritter) 10/31/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -478,6 +478,7 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 ..
 .em EM
 .de TS
+.br
 .nr nosave 1
 .sp
 .ie '\\$1'H' \{\
@@ -1524,13 +1525,13 @@ Hyphenation.
 .b1
 \T'hylen'\fB&hylen\fI|N\fR	5	5	E	Hyphenate only words of at least \fIN\fR characters in length.\T
 .b1
+\T'hlm'\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.\T
+.b1
 \T'hypp'\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \fBad p\fR mode.\T
 .b1
 \T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
 \T'nhychar'\fB&nhychar\fI|c...\fR	\fB\(hy\(em\fR	off	E	Hyphenation-inhibiting characters.\T
-.b1
-\T'hlm'\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.\T
 .b1 0
 \T'hc'\fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character \fIc\fR.\T
 .b1 0
@@ -3204,7 +3205,7 @@ which may result in condensed spacing and shaping.
 The horizontal positions in the \fB.k\fR and \fB.x\fR registers
 are always computed using default character and spacing widths.
 .pg
-In addition to adjusting one line at once as described,
+\A'ad_p'In addition to adjusting one line at once as described,
 \*(TR also supports adjusting one paragraph at once,
 enabled with \T'ad'\fBad\ p\fR\T.
 In this mode,
@@ -3215,7 +3216,7 @@ The words are then split into lines
 such that the interword spaces
 are closest to the optimum setting
 across the entire paragraph.
-The lines so determinted
+The lines so determined
 are written to a temporary \T'c_diversion'diversion\T.
 Ultimately, this diversion is printed.
 \T'c_trap'Traps\T, page breaks,
@@ -3229,6 +3230,8 @@ Any reference to the page number or page position
 should thus be handled using
 the \T's_olt'output-line trap\T mechanism
 instead of in-line macros.
+Likewise the \T'n_.k'\fB.k\fR\T and \T'n_.x'\fB.x\fR\T
+registers are not meaningful in this mode.
 .pg
 .tr &&
 An input text line ending with \fB.\fR\^, \fB?\fR, \fB!\fR, or \fB:\fR,
@@ -3713,6 +3716,14 @@ that actually applies to the current line,
 taking a temporary indent into account.
 The length of \fIthree-part titles\fR produced by \T'tl'\fBtl\fR\T
 \T's_titles'(see \(sc14)\T is \fIindependently\fR set by \T'lt'\fBlt\fR.\T
+.xx
+In \T'ad_p'\fBad\ p\fR\T mode,
+indent and line length can only be set directly
+for an entire paragraph;
+a temporary indent can be specified only
+for the first line of a paragraph.
+To vary indent and line length inside a paragraph,
+a shape can be defined with \T'pshape'\fBpshape\fR\T.
 .h1
 .bta ll
 \fB&ll\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Line length is set to \(+-\fIN\fR.
@@ -3730,7 +3741,7 @@ The current indent is not changed.
 .hylang en_US
 .minss 9
 .letadj 95 98 18 105 102
-\fB&pshape\fI|I1|L1|I2|L2|\fR...	off	E,\fBm\fR	Set a special shape for the current paragraph in \fBad\ p\fR mode.
+\fB&pshape\fI|I1|L1|I2|L2|\fR...	off	E,\fBm\fR	Set a special shape for the current paragraph in \T'ad_p'\fBad\ p\fR\T mode.
 \#.ds l 4m 6m 8m 10m 12m 14m 16m 18m 20m 22m 24m \
 \#22m 20m 18m 16m 14m 12m 10m 8m 6m 4m
 \#.ds s
@@ -5257,8 +5268,22 @@ and the ``long \[longs]'' character is mapped to a ``round s''.
 .bta hylen
 \fB&hylen\fI|N\fR	5	5	E	Hyphenate only words of at least \fIN\fR characters in length.
 The current value is available in the \A'n_.hylen'\fB&hylen\fR number register.
+.bta hlm
+\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.
+Each time a line is hyphenated automatically,
+the count of consecutive hyphenated lines
+(accessible in the \A'n_.hlc'\fB&hlc\fR number register)
+is incremented;
+whenever a line is not automatically hyphenated,
+it is reset to zero.
+This request allows to set a limit on the maximum number
+of consecutive hyphenated lines;
+when the count of consecutive lines has reached the maximum,
+the current line is not hyphenated.
+The default is no limit.
+The current value is accessible in the \A'n_.hlm'\fB&hlm\fR number register.
 .bta hypp
-\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \fBad p\fR mode.
+\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \T'ad_p'\fBad p\fR\T mode.
 Every inserted hyphen is given a penalty of \fIN\fR
 when computing optimal break points;
 each hyphen that is followed by another hyphen
@@ -5281,20 +5306,6 @@ except that it may be split across lines
 if one of these characters is also an optional line break character.
 The current set of hyphenation-inhibiting characters is available
 in the \A'n_.nhychar'\fB&nhychar\fR number register.
-.bta hlm
-\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.
-Each time a line is hyphenated automatically,
-the count of consecutive hyphenated lines
-(accessible in the \A'n_.hlc'\fB&hlc\fR number register)
-is incremented;
-whenever a line is not automatically hyphenated,
-it is reset to zero.
-This request allows to set a limit on the maximum number
-of consecutive hyphenated lines;
-when the count of consecutive lines has reached the maximum,
-the current line is not hyphenated.
-The default is no limit.
-The current value is accessible in the \A'n_.hlm'\fB&hlm\fR number register.
 .bta hc
 \fB&hc\fI|c\fR	\fB\e%	\e%\fR	E	Hyphenation indicator character is set
 to \fIc\fR or to the default \fB\e%\fR.
@@ -6175,27 +6186,39 @@ below the frame.
 .in \n[Ind]u
 .xx
 If there is room,
-.B &BP
+.B BP
 fills text around the frame.
 Everything destined for either side of the frame
 goes into a \T'c_diversion'diversion\T to be retrieved when the accumulated
 text sweeps past the trap set by
-.B &BP
+.B BP
 or when the \T'c_diversion'diversion\T is explicitly closed
-by \fB&EP\fR.
+by \fBEP\fR.
+.xx
+\fBBP\fR cannot be used for text filling
+in \T'ad_p'\fBad\ p\fR\T mode
+since its trap-based mechanism
+cannot work properly then,
+and since it is not possible
+to define the shape of a complete paragraph
+with the information it has.
+Use a combination of
+\T'psbb'\fBpsbb\fR\T,
+\T'pshape'\fBpshape\fR\T,
+and \T'PI'\fBPI\fR\T instead.
 .bta EP
-\fB&EP\fR	\(en	\(en	\(en	End a picture started by \fB&BP\fR;
-\fB&EP\fR is usually called implicitly by a trap
+\fB&EP\fR	\(en	\(en	\(en	End a picture started by \fBBP\fR;
+\fBEP\fR is usually called implicitly by a trap
 at frame bottom.
 A picture and associated text silently disappear if
 a diversion trap set by
-.B &BP
+.B BP
 is not reached.
 Call
-.B &EP
+.B EP
 at the end of the document to retrieve it.
 .bta PI
-\fB&PI\fI|source|height\fB,\fIwidth\fB,\fIyoffset\fB,\fIxoffset|flags\fR	This low-level macro, used by \fB&BP\fR,
+\fB&PI\fI|source|height\fB,\fIwidth\fB,\fIyoffset\fB,\fIxoffset|flags\fR	This low-level macro, used by \fBBP\fR,
 can help do more complex things.
 The two arguments not already described are:
 .Arg
