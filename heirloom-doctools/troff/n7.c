@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.144 (gritter) 10/31/06
+ * Sccsid @(#)n7.c	1.145 (gritter) 10/31/06
  */
 
 /*
@@ -1856,7 +1856,8 @@ parcomp(void)
 						pghyphw[j] && hypc[i-1]);
 				t += cost[i-1];
 				/*fdprintf(stderr, "%c%c%c%c to %c%c%c%c "
-				                 "t=%g cost[%d]=%g\n",
+				                 "t=%g cost[%d]=%g "
+						 "brcnt=%d oldbrcnt=%d\n",
 						(char)para[pgwordp[i]],
 						(char)para[pgwordp[i]+1],
 						(char)para[pgwordp[i]+2],
@@ -1865,7 +1866,9 @@ parcomp(void)
 						(char)para[pgwordp[j]+1],
 						(char)para[pgwordp[j]+2],
 						(char)para[pgwordp[j]+3],
-						t, j, cost[j]
+						t, j, cost[j],
+						1 + brcnt[i-1],
+						brcnt[j]
 					);*/
 				if (t <= cost[j]) {
 					if (pghyphw[j])
@@ -1917,9 +1920,9 @@ parcomp(void)
 		pglines++;
 		j = prevbreak[j];
 		pgopt[i--] = j--;
-	} while (j > 0 && i > 0);
+	} while (j >= 0 && i >= 0);
+	memmove(&pgopt[1], &pgopt[i+2], pglines * sizeof *pgopt);
 	pgopt[0] = 0;
-	memmove(&pgopt[0], &pgopt[i+1], pglines * sizeof *pgopt);
 	free(_cost);
 	free(_hypc);
 	free(prevbreak);
