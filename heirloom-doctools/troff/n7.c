@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.143 (gritter) 10/31/06
+ * Sccsid @(#)n7.c	1.144 (gritter) 10/31/06
  */
 
 /*
@@ -468,6 +468,13 @@ nofill(void)
 		}
 		adsp = adrem = 0;
 		nwd = 10000;
+		if (frame->flags & FLAG_PARAGRAPH) {
+			if (pshapes) {
+				j = pglnout < pshapes ? pglnout : pshapes - 1;
+				un = pgin[j];
+			}
+			pglnout++;
+		}
 	}
 	nexti = GETCH();
 	leftend(nexti, !ce && !rj && !pendnf, !isdi(nexti));
@@ -1808,18 +1815,31 @@ static void
 parcomp(void)
 {
 	double	*cost, *_cost, t;
-	int	*prevbreak, *hypc, *_hypc;
+	int	*prevbreak, *hypc, *_hypc, *brcnt, *_brcnt;
 	int	i, j, k, m, h, v;
 
 	_cost = malloc((pgsize + 1) * sizeof *_cost);
 	cost = &_cost[1];
 	_hypc = calloc(pgsize + 1, sizeof *_hypc);
 	hypc = &_hypc[1];
+	_brcnt = calloc(pgsize + 1, sizeof *_brcnt);
+	brcnt = &_brcnt[1];
 	prevbreak = calloc(pgsize, sizeof *prevbreak);
 	cost[-1] = 0;
 	for (i = 0; i < pgwords; i++)
 		cost[i] = HUGE_VAL;
 	for (i = 0; i < pgwords; i++) {
+		if (pshapes) {
+			/*
+			 * TODO: Store different optimal break
+			 * points for different output lines.
+			 */
+			j = brcnt[i-1];
+			if (j < pshapes)
+				nel = pgll[j] - pgin[j];
+			else
+				nel = pgll[pshapes-1] - pgin[pshapes-1];
+		}
 		k = pgwordw[i] + pglgsw[i];
 		m = pglsphc[i] + pglgsh[i];
 		for (j = i; j < pgwords; j++) {
@@ -1864,6 +1884,7 @@ parcomp(void)
 						hypc[j] = h;
 						cost[j] = t;
 						prevbreak[j] = i;
+						brcnt[j] = 1 + brcnt[i-1];
 					}
 				}
 			} else {
@@ -1871,6 +1892,7 @@ parcomp(void)
 					t = 1 + cost[i-1];
 					cost[j] = t;
 					prevbreak[j] = i;
+					brcnt[j] = 1 + brcnt[i-1];
 				}
 				break;
 			}
@@ -1903,7 +1925,7 @@ parcomp(void)
 	free(prevbreak);
 }
 
-static void
+void
 growpgsize(void)
 {
 	pgsize += 20;
@@ -1921,12 +1943,15 @@ growpgsize(void)
 	pglgew = realloc(pglgew, pgsize * sizeof *pglgew);
 	pglgsh = realloc(pglgsh, pgsize * sizeof *pglgsh);
 	pglgeh = realloc(pglgeh, pgsize * sizeof *pglgeh);
+	pgin = realloc(pgin, pgsize * sizeof *pgin);
+	pgll = realloc(pgll, pgsize * sizeof *pgll);
 	if (pgwordp == NULL || pgwordw == NULL || pghyphw == NULL ||
 			pgopt == NULL || pgspacw == NULL ||
 			pgadspc == NULL || pglsphc == NULL ||
 			pglgsc == NULL || pglgec == NULL ||
 			pglgsw == NULL || pglgew == NULL ||
-			pglgsh == NULL || pglgeh == NULL) {
+			pglgsh == NULL || pglgeh == NULL ||
+			pgin == NULL || pgll == NULL) {
 		errprint("out of memory justifying paragraphs");
 		done(02);
 	}
@@ -2090,12 +2115,14 @@ void
 parpr(void)
 {
 	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc, savlnmod;
+	int	savll;
 	tchar	c, e, lastc, savic, lgs;
 
 	savic = ic;
 	ic = 0;
 	savlnmod = lnmod;
 	lnmod = 0;
+	savll = ll;
 	hc = shc ? shc : HYPHEN;
 	nw = 0;
 	for (i = 0; i < pgwords; i++) {
@@ -2126,6 +2153,12 @@ parpr(void)
 				adflg |= 5;
 				un = 0;
 				tbreak();
+			}
+			if (pshapes) {
+				j = k-1 < pshapes ? k-1 : pshapes - 1;
+				ll = pgll[j];
+				un = pgin[j];
+				nel = ll - un;
 			}
 			nw = nwd = 1;
 			storeline(FILLER, 0);
@@ -2176,6 +2209,7 @@ parpr(void)
 	pgwords = pgchars = pgspacs = pglines = 0;
 	ic = savic;
 	lnmod = savlnmod;
+	ll = savll;
 }
 
 static void
@@ -2198,6 +2232,7 @@ pardi(void)
 	cp = newmn;
 	parpr();
 	wbt(0);
+	pglnout = 0;
 	nxf->jmp = malloc(sizeof *nxf->jmp);
 	if (setjmp(*nxf->jmp) == 0) {
 		pushi((filep)cp->mx, dip->curd, FLAG_PARAGRAPH);
@@ -2211,6 +2246,7 @@ pardi(void)
 	}
 	fi = 1;
 	nlflg = _nlflg;
+	pshapes = 0;
 }
 
 static void

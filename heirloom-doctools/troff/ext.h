@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.98 (gritter) 10/29/06
+ * Sccsid @(#)ext.h	1.99 (gritter) 10/31/06
  */
 
 /*
@@ -417,6 +417,7 @@ extern	void	casehcode(void);
 extern	void	caseshc(void);
 extern	void	casehylen(void);
 extern	void	casehypp(void);
+extern	void	casepshape(void);
 extern	void	caselpfx(void);
 extern	int	max(int, int);
 extern	int	min(int, int);
@@ -522,6 +523,7 @@ extern	void	horiz(int);
 extern	void	setnel(void);
 extern	int	getword(int);
 extern	void	storeword(register tchar, register int);
+extern	void	growpgsize(void);
 /* n8.c */
 extern	void	hyphen(tchar *);
 extern	int	punct(tchar);
