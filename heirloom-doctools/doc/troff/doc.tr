@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.164 (gritter) 11/1/06
+.\" Sccsid @(#)doc.tr	1.165 (gritter) 11/1/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -160,6 +160,7 @@
 .ds GR: "\fIgroff:\fR
 .ds PS "\fRPostScript\fR
 .ds PDF "\s-1PDF\s+1
+.ds TEX "\fIT\h'-.13m'\v'.165m'E\v'-.165m'\h'-.01m'X\fR
 .ds H
 .nr PS 10
 .nr PO 1i
@@ -683,22 +684,36 @@ The last form allows direct input of international language texts
 in almost any character encoding,
 including \s-1UTF\s+1-8.
 .pg
-Improvements to the line breaking mechanism
+Improvements to the line adjusting mechanism
 can be activated to achieve more aesthetically pleasant output:
-\*(TR can adjust whole paragraphs at once;
-interword spaces can be shrunk and expanded;
-inter-letter spaces and letter shapes
-can also be varied (sometimes called ``microtypography'').
-All of these options can be arbitrarily combined.
+\*(TR can compute line breaks for a whole paragraph at once,
+using a variant of an algorithm
+originally developed by Donald Knuth and Michael Plass
+for the \*[TEX] system\T'ref_7'\|\*u7\*d\T.
+Interword spaces can be shrunk
+as an alternative to being expanded.
+Inter-letter spaces and letter shapes
+can be dynamically varied
+both for computing break points
+and for adjusting output lines;
+this is sometimes called ``micro-typography'',
+cf. e.g. the thesis by Hàn Thế Thành\T'ref_8'\|\*u8\*d\T.
+All paragraph formatting options can be arbitrarily combined.
 .pg
 A variety of international paper formats
 and hyphenation languages are supported by \*[TR.]
+The algorithm for the latter is derived
+from the respective one developed for \*[TEX]
+by Franklin Liang\T'ref_9'\|\*u9\*d\T;
+\*(TR uses the implementation of \fILibHnj\fR by Raph Levien.
+\*[TEX] hyphenation patterns can be converted
+to the format accepted by \*[TR.]
 .pg
 Many internal limitations of \*(TR have been removed;
 most notably, \*(TR can now set characters in fractional point sizes.
 .pg
 The \*(TR language has been extended
-similarly as in the \s-1GNU\s+1 version of \*[TR,] \T'ref_7'\*(GR\|\*u7\*d\T;
+similarly as in the \s-1GNU\s+1 version of \*[TR,] \T'ref_10'\*(GR\|\*u10\*d\T;
 for example,
 names of requests, macros, strings, number registers, and fonts
 can consist of more than two characters.
@@ -742,9 +757,9 @@ of how to write well-styled \*(NR documents.
 .pg
 This manual as well as some of the pre- and post-processor commands
 have been derived from \s-1UNIX\s+1 code
-re\%leased by \T'ref_8'Caldera\*u8\*d\T,
+re\%leased by \T'ref_11'Caldera\*u11\*d\T,
 and from materials released by Lucent as parts
-of the \T'ref_9'\fIPlan\ 9\fR system\*u9\*d\T.
+of the \T'ref_12'\fIPlan\ 9\fR system\*u12\*d\T.
 .pg
 .ft B
 Background to the Second Edition
@@ -874,8 +889,14 @@ References
 .pg
 .ta .3i
 .in .3i
+.de ref
 .ti 0
-\A'ref_1'[1]	M. D. McIllroy, B. W. Kernighan (Eds.),
+.sp .4
+\A'ref_\\$1'[\\$1]	\c
+..
+.ns
+.ref 1
+M. D. McIllroy, B. W. Kernighan (Eds.),
 .ul
 Unix Programmer's Manual,
 Vol.\|2,
@@ -883,38 +904,45 @@ AT\[ampersand]T Bell Laboratories,
 Murray Hill,
 \s-1NJ\s+1 07974, 1979;
 <http://plan9.bell-labs.com/7thEdMan/index.html>.
-.sp .4
-.ti 0
-\A'ref_2'[2]	B. W. Kernighan, L. L. Cherry,
-.ul
-Typesetting Mathematics \(em User's Guide (Second Edition),
+.ref 2
+B. W. Kernighan, L. L. Cherry,
+``Typesetting Mathematics \(em User's Guide (Second Edition)'',
 in [1].
-.sp .4
-.ti 0
-\A'ref_3'[3]	M. E. Lesk,
-.ul
-Tbl \(em A Program to Format Tables,
+.ref 3
+M. E. Lesk,
+``Tbl \(em A Program to Format Tables'',
 in [1].
-.sp .4
-.ti 0
-\A'ref_4'[4]	B. W. Kernighan, \fIA TROFF Tutorial\fR,
+.ref 4
+B. W. Kernighan, ``A TROFF Tutorial'',
 in [1].
-.sp .4
-.ti 0
-\A'ref_5'[5]	J. F. Ossanna, ``Nroff/Troff User's Manual'',
+.ref 5
+J. F. Ossanna, ``Nroff/Troff User's Manual'',
 in [1].
-.sp .4
-.ti 0
-\A'ref_6'[6]	<http://www.opensolaris.org>
-.sp .4
-.ti 0
-\A'ref_7'[7]	<http://groff.ffii.org>
-.sp .4
-.ti 0
-\A'ref_8'[8]	<http://www.tuhs.org/Archive/Caldera-license.pdf>
-.sp .4
-.ti 0
-\A'ref_9'[9]	<http://plan9.bell-labs.com/plan9>
+.ref 6
+<http://www.opensolaris.org>
+.ref 7
+D. E. Knuth, M. F. Plass,
+``Breaking paragraphs into lines'',
+\fISoftware\(emPractice and Experience\fR,
+Vol. 11, Issue 12 (1981), pp.\ 1119\(en1184;
+also in D. E. Knuth, \fIDigital Typography\fR,
+Stanford, 1999 (\s-1CSLI\s0 lecture notes no. 78),
+pp.\ 67\(en155.
+.ref 8
+Hàn Thế Thành, \fIMicro-typographic extensions to the \*[TEX]\fI
+typesetting system\fR,
+Masaryk University Brno, 2000.
+.ref 9
+F. M. Liang, \fIWord Hy-phen-a-tion by Com-put-er\fR,
+Stanford University, \s-1CA\s0 94305,
+Report No. \s-1STAN\s0-\s-1CS\s0-83-977,
+1983.
+.ref 10
+<http://groff.ffii.org>
+.ref 11
+<http://www.tuhs.org/Archive/Caldera-license.pdf>
+.ref 12
+<http://plan9.bell-labs.com/plan9>
 .in 0
 .pg
 .nr nosave 1
@@ -6495,7 +6523,7 @@ and \fIwidth\fR defines the width.
 \f(BIgroff\fP Compatibility
 .pg
 Heirloom \*(TR provides most of the extensions
-to the \*(TR language introduced in \T'ref_7'\*(GR\|\*u7\*d\T.
+to the \*(TR language introduced in \T'ref_10'\*(GR\|\*u10\*d\T.
 Consequently, it is possible
 to create documents, macro sets, and preprocessors
 that can be used with both
