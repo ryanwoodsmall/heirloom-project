@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.99 (gritter) 10/31/06
+ * Sccsid @(#)ext.h	1.100 (gritter) 11/1/06
  */
 
 /*
@@ -149,6 +149,7 @@ extern	struct contab	*oldmn;
 extern	int	*olt;
 extern	int	over;
 extern	int	padc;
+extern	int	padj;
 extern	int	pfont;
 extern	int	pfrom;
 extern	pid_t	pipeflg;
@@ -401,6 +402,7 @@ extern	void	casead(void);
 extern	void	casena(void);
 extern	void	casefi(void);
 extern	void	casenf(void);
+extern	void	casepadj(void);
 extern	void	casers(void);
 extern	void	casens(void);
 extern	void	casespreadwarn(void);

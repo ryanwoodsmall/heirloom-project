@@ -43,12 +43,13 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.165 (gritter) 11/1/06
+.\" Sccsid @(#)doc.tr	1.166 (gritter) 11/1/06
 .\"
 .\" from file m.mac
 .do xflag 3
 .warn
 .mediasize letter
+.padj
 .fps math,greek 1 R times ttf
 .fp 2 I timesi ttf
 .fp 3 B timesbd ttf
@@ -1338,6 +1339,8 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'na'\fB&na\fR	adjust	\(en	E	No output line adjusting.\T
 .b1
+\T'padj'\fB&padj\fI|N\fR	off	on	\(en	Control paragraph-at-once adjustment globally.\T
+.b1
 \T'ce'\fB&ce\fI|N\fR	off	\fIN\(eq\fR1	B,E	Center following \fIN\fR input text lines.\T
 .b1
 \T'rj'\fB&rj\fI|N\fR	off	\fIN\(eq\fR1	B,E	Right-align following \fIN\fR input text lines.\T
@@ -1864,6 +1867,7 @@ refer to the detailed description on how to include it.
 \T'opena'opena	19\T
 \T'os'os	5\T
 \T'output'output	10\T
+\T'padj'padj	4\T
 \T'papersize'papersize	3\T
 \T'pc'pc	14\T
 \T'pi'pi	19\T
@@ -2181,6 +2185,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.nhychar'13\T	\T'n_.nhychar'\fB&nhychar\fR\T	\T'n_.nhychar'Current hyphenation-inhibiting characters.\T
 \T'n_.o'3\T	\T'n_.o'\fB&o\fR\T	\T'n_.o'Current page offset.\T
 \T'n_.p'3\T	\T'n_.p'\fB&p\fR\T	\T'n_.p'Current page length.\T
+\T'n_.padj'4\T	\T'n_.padj'\fB&padj\fR\T	\T'n_.padj'Current paragraph-at-once global setting.\T
 \T'n_.pn'3\T	\T'n_.pn'\fB&pn\fR\T	\T'n_.pn'Number of next page.\T
 \T'n_.ps'2.3\T	\T'n_.ps'\fB&ps\fR\T	\T'n_.ps'Current point size in units.\T
 \T'n_.psr'2.3\T	\T'n_.psr'\fB&psr\fR\T	\T'n_.psr'Last requested point size in units.\T
@@ -3440,6 +3445,12 @@ Adjustment is turned off;
 the right margin will be ragged.
 The adjustment type for \fBad\fR is not changed.
 Output line filling still occurs if fill mode is on.
+.bta padj
+\fB&padj\fI|N\fR	off	on	\(en	Control paragraph-at-once adjustment globally.
+If \fIN\fR\(!=0 or missing,
+paragraph-at-once adjustment is enabled in all environments,
+and \fBad\ \fIx\fR effectively acts like \fBad\ p\fIx\fR.
+The current value is available in the \A'n_.padj'\fB&padj\fR register.
 .bta ce
 \fB&ce\fI|N\fR	off	\fIN\fR\(eq1	B,E	Center the next \fIN\fR input text lines
 within the current (line-length minus indent).
@@ -7730,7 +7741,7 @@ Non-\s-1ASCII\s+1 characters and \', \`, \_\|, \(pl, \(mi, \(eq, and \(** on the
 .fi
 .ps 10
 In traditional \*[TR,]
-the ASCII characters @, #, ", \', \`, <, >, \e, {, }, ~, ^, and \(ul existed
+the ASCII characters @, #, ", \', \`, <, >, \\, {, }, ~, ^, and \(ul existed
 \fIonly\fR on the special font and were printed as a 1-em space if that font
 was not mounted.
 The following characters exist only on the special font.

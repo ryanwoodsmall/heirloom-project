@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.88 (gritter) 11/1/06
+ * Sccsid @(#)n4.c	1.89 (gritter) 11/1/06
  */
 
 /*
@@ -413,6 +413,8 @@ sl:
 			i = hypp;
 		} else if (strcmp(&name[1], "hypp2") == 0) {
 			i = hypp2;
+		} else if (strcmp(&name[1], "padj") == 0) {
+			i = padj;
 		} else if (strcmp(&name[1], "ev") == 0) {
 			TMYES;
 			cpushback(evname ? evname : "0");

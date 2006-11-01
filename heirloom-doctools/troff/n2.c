@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.35 (gritter) 10/22/06
+ * Sccsid @(#)n2.c	1.37 (gritter) 11/1/06
  */
 
 /*
@@ -128,6 +128,8 @@ pchar(register tchar i)
 	case PRESC:
 		if (dip == &d[0])
 			j = eschar;	/* fall through */
+		if (frame->flags & FLAG_PARAGRAPH)
+			setcbits(i, j);
 	default:
 	dfl:
 		if (!xflag || !isdi(i)) {
@@ -381,7 +383,7 @@ done(int x)
 
 	error |= x;
 	dl = app = ds = lgf = 0;
-	if (pa && pglines == 0 && pgchars)
+	if ((pa || padj) && pglines == 0 && pgchars)
 		tbreak();
 	if (i = em) {
 		donef = -1;
