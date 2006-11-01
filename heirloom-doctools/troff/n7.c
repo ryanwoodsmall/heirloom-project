@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.145 (gritter) 10/31/06
+ * Sccsid @(#)n7.c	1.146 (gritter) 11/1/06
  */
 
 /*
@@ -1796,17 +1796,25 @@ lspcomp(int idiff)
  */
 
 static double
-penalty(int k, int h, int h2)
+penalty(int k, int s, int h, int h2)
 {
-	double	t;
+	double	t, d;
 
 	t = nel - k;
 	t = t >= 0 ? t * 5 / 3 : -t;
+	if (ad && !admod) {
+		d = s;
+		if (k - s && (letsps || lshmin || lshmax))
+			d += (double)(k - s) / 100;
+		if (d)
+			t /= d;
+	} else
+		t /= nel / 10;
 	t /= nel;
-	if (h)
-		t += hypp / 1000.0;
-	if (h2)
-		t += hypp2 / 1000.0;
+	if (h && hypp)
+		t += hypp / 10000000.0;
+	if (h2 && hypp2)
+		t += hypp2 / 10000000.0;
 	t = t * t * t;
 	return t;
 }
@@ -1816,7 +1824,7 @@ parcomp(void)
 {
 	double	*cost, *_cost, t;
 	int	*prevbreak, *hypc, *_hypc, *brcnt, *_brcnt;
-	int	i, j, k, m, h, v;
+	int	i, j, k, m, h, v, s;
 
 	_cost = malloc((pgsize + 1) * sizeof *_cost);
 	cost = &_cost[1];
@@ -1830,10 +1838,6 @@ parcomp(void)
 		cost[i] = HUGE_VAL;
 	for (i = 0; i < pgwords; i++) {
 		if (pshapes) {
-			/*
-			 * TODO: Store different optimal break
-			 * points for different output lines.
-			 */
 			j = brcnt[i-1];
 			if (j < pshapes)
 				nel = pgll[j] - pgin[j];
@@ -1842,17 +1846,19 @@ parcomp(void)
 		}
 		k = pgwordw[i] + pglgsw[i];
 		m = pglsphc[i] + pglgsh[i];
+		s = 0;
 		for (j = i; j < pgwords; j++) {
 			if (j > i) {
 				k += pgspacw[j] + pgwordw[j];
 				m += pgadspc[j] + pglsphc[j];
+				s += pgspacw[j];
 			}
 			v = k + pghyphw[j] + pglgew[j];
 			if (v - m - pglgeh[j] <= nel) {
 				if (!spread && j == pgwords - 1)
 					t = 0;
 				else
-					t = penalty(v, pghyphw[j],
+					t = penalty(v, s, pghyphw[j],
 						pghyphw[j] && hypc[i-1]);
 				t += cost[i-1];
 				/*fdprintf(stderr, "%c%c%c%c to %c%c%c%c "
@@ -1948,13 +1954,14 @@ growpgsize(void)
 	pglgeh = realloc(pglgeh, pgsize * sizeof *pglgeh);
 	pgin = realloc(pgin, pgsize * sizeof *pgin);
 	pgll = realloc(pgll, pgsize * sizeof *pgll);
+	pglno = realloc(pglno, pgsize * sizeof *pglno);
 	if (pgwordp == NULL || pgwordw == NULL || pghyphw == NULL ||
 			pgopt == NULL || pgspacw == NULL ||
 			pgadspc == NULL || pglsphc == NULL ||
 			pglgsc == NULL || pglgec == NULL ||
 			pglgsw == NULL || pglgew == NULL ||
 			pglgsh == NULL || pglgeh == NULL ||
-			pgin == NULL || pgll == NULL) {
+			pgin == NULL || pgll == NULL || pglno == NULL) {
 		errprint("out of memory justifying paragraphs");
 		done(02);
 	}
@@ -1982,6 +1989,7 @@ parword(void)
 	hc = shc ? shc : HYPHEN;
 	wp = wordp;
 	a = w = 0;
+	pglno[pgwords] = numtab[CD].val;
 	pgspacp[pgwords] = pgspacs;
 	while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
 		if (iszbit(i))
@@ -2073,6 +2081,7 @@ parword(void)
 			pgwordp[++pgwords] = pgchars;
 			if (pgwords + 1 >= pgsize)
 				growpgsize();
+			pglno[pgwords] = numtab[CD].val;
 			pgspacp[pgwords] = pgspacs;
 			pgspacp[pgwords+1] = pgspacs;
 			pgspacw[pgwords] = 0;
@@ -2118,7 +2127,7 @@ void
 parpr(void)
 {
 	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc, savlnmod;
-	int	savll;
+	int	savll, savcd;
 	tchar	c, e, lastc, savic, lgs;
 
 	savic = ic;
@@ -2126,10 +2135,12 @@ parpr(void)
 	savlnmod = lnmod;
 	lnmod = 0;
 	savll = ll;
+	savcd = numtab[CD].val;
 	hc = shc ? shc : HYPHEN;
 	nw = 0;
 	for (i = 0; i < pgwords; i++) {
 		lgs = 0;
+		numtab[CD].val = pglno[i];
 		if (pgopt[k] == i) {
 			if (k++ > 0) {
 				if (pghyphw[i-1]) {
@@ -2213,6 +2224,7 @@ parpr(void)
 	ic = savic;
 	lnmod = savlnmod;
 	ll = savll;
+	numtab[CD].val = savcd;
 }
 
 static void

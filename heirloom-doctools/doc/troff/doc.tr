@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.163 (gritter) 10/31/06
+.\" Sccsid @(#)doc.tr	1.164 (gritter) 11/1/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 10/31/06
+.ds Sccsdate 11/1/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -186,6 +186,7 @@
 .vs \n(PS
 .ll 6.5i
 'in 0
+.ad p
 .ev
 .tr &.
 .de xx
@@ -464,11 +465,13 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .xx
 .in .5i
 .nf
+.nr nosave 1
 ..
 .de x2
 .xx
 .in 0
 .fi
+.nr nosave 0
 ..
 .de EM
 .br
@@ -5288,9 +5291,8 @@ Every inserted hyphen is given a penalty of \fIN\fR
 when computing optimal break points;
 each hyphen that is followed by another hyphen
 gets an additional penalty of \fIM\fR.
-A value of zero means no penalty;
-a value of one means maximum penalty.
-Effective penalties correspond to values between 0.01 and 0.1.
+A value of zero means no penalty.
+Effective penalties correspond to values between 10 and 200.
 The current values are available in the
 \A'n_.hypp'\fB&hypp\fR and \A'n_.hypp2'\fB&hypp2\fR number registers.
 .bta breakchar
