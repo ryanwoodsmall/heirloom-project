@@ -28,7 +28,7 @@
 .\"	TROFF Version	from OpenSolaris mmt.src	16.29
 .\"
 .\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-.\" Sccsid @(#)mmt	1.6 (gritter) 10/3/06
+.\" Sccsid @(#)mmt	1.7 (gritter) 11/1/06
 .nr :a 0 1
 .nr :b 0
 .nr :c 0
@@ -2373,7 +2373,7 @@ PRIVATE\h'-\w'PRIVATE'u'\l'\w'PRIVATE'u'
 'nr :q \\n(dn
 'nr dn 0
 'nr :s 0
-.if !\\(;C=1 .rr !A
+.if !\\n(;C=1 .rr !A
 .)R
 'ps
 'vs \\n(.sp+2p
