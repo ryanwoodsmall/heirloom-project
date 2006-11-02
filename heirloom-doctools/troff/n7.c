@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.147 (gritter) 11/1/06
+ * Sccsid @(#)n7.c	1.148 (gritter) 11/2/06
  */
 
 /*
@@ -1810,11 +1810,10 @@ penalty(int k, int s, int h, int h2)
 			t /= d;
 	} else
 		t /= nel / 10;
-	t /= nel;
 	if (h && hypp)
-		t += hypp / 10000000.0;
+		t += hypp / 50.0;
 	if (h2 && hypp2)
-		t += hypp2 / 10000000.0;
+		t += hypp2 / 50.0;
 	t = t * t * t;
 	return t;
 }
@@ -1843,6 +1842,9 @@ parcomp(void)
 				nel = pgll[j] - pgin[j];
 			else
 				nel = pgll[pshapes-1] - pgin[pshapes-1];
+		} else if (un != in) {
+			nel = ll;
+			nel -= i ? in : un;
 		}
 		k = pgwordw[i] + pglgsw[i];
 		m = pglsphc[i] + pglgsh[i];
@@ -1868,10 +1870,10 @@ parcomp(void)
 						(char)para[pgwordp[i]+1],
 						(char)para[pgwordp[i]+2],
 						(char)para[pgwordp[i]+3],
-						(char)para[pgwordp[j]],
-						(char)para[pgwordp[j]+1],
-						(char)para[pgwordp[j]+2],
-						(char)para[pgwordp[j]+3],
+						(char)para[pgwordp[j+1]-4],
+						(char)para[pgwordp[j+1]-3],
+						(char)para[pgwordp[j+1]-2],
+						(char)para[pgwordp[j+1]-1],
 						t, j, cost[j],
 						1 + brcnt[i-1],
 						brcnt[j]
@@ -2019,6 +2021,7 @@ parword(void)
 	pglsphc[pgwords] = 0;
 	pgwordw[pgwords] = 0;
 	pgwordp[pgwords] = pgchars;
+	pgne += pgspacw[pgwords];
 	parlgzero(pgwords);
 	parlgzero(pgwords+1);
 	if (!hyoff && hyf && hlm)
@@ -2027,17 +2030,6 @@ parword(void)
 	nhyp = 0;
 	while (*hyp && *hyp <= wp)
 		hyp++;
-	if (pgchars == 0 && un != in) {
-		if (para == NULL) {
-			pgcsize = 600;
-			para = malloc(pgcsize * sizeof *para);
-			if (para == NULL)
-				goto oom;
-		}
-		para[pgchars++] = makem(un - in);
-		pgwordw[pgwords] += un - in;
-		un = in;
-	}
 	while (wch) {
 		if (ishyp(wp) && !maybreak(wp[-1])) {
 			i = sfmask(wp[-1]) | hc;
@@ -2078,6 +2070,7 @@ parword(void)
 		}
 		if (pghyphw[pgwords] || wp > word && maybreak(wp[-1])) {
 			pghyphw[pgwords] -= kernadjust(wp[-1], wp[0]);
+			pgne += pgwordw[pgwords];
 			pgwordp[++pgwords] = pgchars;
 			if (pgwords + 1 >= pgsize)
 				growpgsize();
@@ -2104,7 +2097,6 @@ parword(void)
 			pgcsize += 600;
 			para = realloc(para, pgcsize * sizeof *para);
 			if (para == NULL) {
-			oom:
 				errprint("no memory for characters "
 				         "in paragraph");
 				done(02);
@@ -2112,6 +2104,7 @@ parword(void)
 		}
 		para[pgchars++] = i;
 	}
+	pgne += pgwordw[pgwords];
 	pgwordp[++pgwords] = pgchars;
 	pgspacw[pgwords] = 0;
 	pgwordw[pgwords] = 0;
@@ -2127,7 +2120,7 @@ void
 parpr(void)
 {
 	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc, savlnmod;
-	int	savll, savcd;
+	int	savll, savcd, savun;
 	tchar	c, e, lastc, savic, lgs;
 
 	savic = ic;
@@ -2136,6 +2129,7 @@ parpr(void)
 	lnmod = 0;
 	savll = ll;
 	savcd = numtab[CD].val;
+	savun = un;
 	hc = shc ? shc : HYPHEN;
 	nw = 0;
 	for (i = 0; i < pgwords; i++) {
@@ -2173,7 +2167,8 @@ parpr(void)
 				ll = pgll[j];
 				un = pgin[j];
 				nel = ll - un;
-			}
+			} else if (in != un)
+				nel = ll - un;
 			nw = nwd = 1;
 			storeline(FILLER, 0);
 			leftend(para[pgwordp[i]], admod != 1 && admod != 2, 1);
@@ -2220,11 +2215,12 @@ parpr(void)
 		adflg |= 5;
 	un = 0;
 	tbreak();
-	pgwords = pgchars = pgspacs = pglines = 0;
+	pgwords = pgchars = pgspacs = pglines = pgne = 0;
 	ic = savic;
 	lnmod = savlnmod;
 	ll = savll;
 	numtab[CD].val = savcd;
+	un = savun;
 }
 
 static void

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.151 (gritter) 11/1/06
+ * Sccsid @(#)tdef.h	1.152 (gritter) 11/2/06
  */
 
 /*
@@ -789,6 +789,7 @@ struct acc {
 #define	pglines	env._pglines
 #define	pglnout	env._pglnout
 #define	pshapes	env._pshapes
+#define	pgne	env._pgne
 #define	linkin	env._linkin
 #define	linkout	env._linkout
 #define	linkhp	env._linkhp
@@ -949,6 +950,7 @@ extern struct env {
 	int	_pglines;
 	int	_pglnout;
 	int	_pshapes;
+	int	_pgne;
 	int	_linkin;
 	int	_linkout;
 	int	_linkhp;

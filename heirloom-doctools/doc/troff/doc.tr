@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.166 (gritter) 11/1/06
+.\" Sccsid @(#)doc.tr	1.167 (gritter) 11/1/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -3804,7 +3804,7 @@ The current indent is not changed.
 .nr l (\n(.lu-\n(.iu-7.4m)/3
 .nr t \nlu+3.7m
 .pshape \
-\n(.iu \n(.iu+\nlu-1m \
+0 \n(.iu+\nlu-1m \
 \n(.iu \n(.iu+\nlu-.75m \
 \n(.iu \n(.iu+\nlu-.5m \
 \n(.iu \n(.iu+\nlu-.25m \
