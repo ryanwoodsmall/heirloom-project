@@ -1,6 +1,7 @@
 Release ...
 * [nt]roff: Support for paragraph-based justification has been added,
-  enabled with ".ad p".
+  enabled with ".ad p". The "Justification in Heirloom Troff" document
+  has been expanded to cover the new features.
 * [nt]roff: The ".hylen" request has been introduced to control the
   minimum number of characters a word must contain in order to be subject
   to hyphenation. The default is 5 independent of whether the ".hylang"
