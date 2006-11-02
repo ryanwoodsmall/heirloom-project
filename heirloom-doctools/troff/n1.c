@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.130 (gritter) 11/2/06
+ * Sccsid @(#)n1.c	1.131 (gritter) 11/2/06
  */
 
 /*
@@ -97,7 +97,6 @@ char	*cfname[NSO+1];		/*file name stack*/
 int	cfline[NSO];		/*input line count stack*/
 static int	cfpid[NSO+1];	/* .pso process IDs */
 char	*progname;	/* program name (troff) */
-static int	defcf;
 #ifdef	EUC
 char	mbbuf1[MB_LEN_MAX + 1];
 char	*mbbuf1p = mbbuf1;
@@ -2180,7 +2179,7 @@ casechar(int flag)
 	c = getch();
 	while (isxfunc(c, CHAR))
 		c = charout[sbits(c)].ch;
-	if ((k = cbits(c)) == eschar) {
+	if ((k = cbits(c)) == eschar || k == WORDSP) {
 		switch (cbits(c = getch())) {
 		case '(':
 			name[0] = getch();

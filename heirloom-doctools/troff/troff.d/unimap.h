@@ -22,7 +22,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.h	1.2 (gritter) 12/22/05
+ * Sccsid @(#)unimap.h	1.3 (gritter) 11/2/06
  */
 
 extern const struct rawunimap {
@@ -38,4 +38,5 @@ extern struct unimap {
 	} u;
 } **unimap[256];
 
-extern void	uninit(void);
+extern	void	uninit(void);
+extern	void	unadd(int, const char *);

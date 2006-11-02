@@ -22,10 +22,11 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unimap.c	1.13 (gritter) 2/16/06
+ * Sccsid @(#)unimap.c	1.14 (gritter) 11/2/06
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "unimap.h"
 
 const struct rawunimap	rawunimap[] = {
@@ -883,21 +884,31 @@ struct unimap	**unimap[256];
 void
 uninit(void)
 {
-	struct unimap	*up, *u;
 	int	i;
+
+	for (i = 0; rawunimap[i].psc; i++)
+		unadd(rawunimap[i].code, rawunimap[i].psc);
+}
+
+void
+unadd(int c, const char *cp)
+{
+	struct unimap	*up, *u;
 	int	x, y;
 
-	for (i = 0; rawunimap[i].psc; i++) {
-		x = rawunimap[i].code >> 8;
-		y = rawunimap[i].code & 0377;
-		if (unimap[x] == NULL)
-			unimap[x] = calloc(256, sizeof *unimap);
-		u = calloc(1, sizeof *u);
-		u->u.psc = rawunimap[i].psc;
-		if (unimap[x][y] != NULL) {
-			for (up = unimap[x][y]; up->next; up = up->next);
-			up->next = u;
-		} else
-			unimap[x][y] = u;
+	x = c >> 8;
+	y = c & 0377;
+	if (unimap[x] == NULL)
+		unimap[x] = calloc(256, sizeof *unimap);
+	u = calloc(1, sizeof *u);
+	if (cp == NULL) {
+		cp = malloc(12);
+		sprintf((char *)cp, "uni%04X", c);
 	}
+	u->u.psc = cp;
+	if (unimap[x][y] != NULL) {
+		for (up = unimap[x][y]; up->next; up = up->next);
+		up->next = u;
+	} else
+		unimap[x][y] = u;
 }

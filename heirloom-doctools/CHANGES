@@ -12,6 +12,8 @@ Release ...
 * [nt]roff: The ".padj" request has been added; it enables ".ad p" mode
   globally in all environments. It is most useful to enable paragraph-at-
   once adjustment in existing documents.
+* troff: The ".char" request is now able to construct replacements for
+  otherwise unknown locale-specific characters.
 * troff: Fixed a typo in the hyphenation code that could result in the
   insertion of a large negative vertical motion in a word containing a
   character above Unicode point U+0800.

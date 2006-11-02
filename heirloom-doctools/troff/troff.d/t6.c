@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.187 (gritter) 10/31/06
+ * Sccsid @(#)t6.c	1.188 (gritter) 11/2/06
  */
 
 /*
@@ -2750,6 +2750,12 @@ un2tr(int c, int *fp)
 		else if ((c & ~0177) == 0) {
 			illseq(c, NULL, 0);
 			return 0;
+		} else if (defcf && (c & ~0xffff) == 0) {
+			char	buf[20];
+			sprintf(buf, "[uni%04X]", c);
+			cpushback(buf);
+			unadd(c, NULL);
+			return WORDSP;
 		} else {
 			if (warn & WARN_CHAR)
 				errprint("no glyph available for %U", c);
