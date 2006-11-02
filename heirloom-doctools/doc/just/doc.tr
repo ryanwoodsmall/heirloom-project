@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.8 (gritter) 11/2/06
+.\" Sccsid @(#)doc.tr	1.9 (gritter) 11/3/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -308,7 +308,7 @@ HEIRLOOM TROFF
 Gunnar Ritter
 .ft R
 .sp
-11/2/06
+11/3/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -805,8 +805,8 @@ pp.\ 67\(en155.
 .sp
 .RF 3
 F. M. Liang, \fIWord Hy-phen-a-tion by Com-put-er\fR,
-Stanford University, \s-1CA\s0\ 94305,
-Report No.\ \s-1STAN\s0-\s-1CS\s0-83-977,
+Stanford University, \fVCA\fR\ 94305,
+Report No.\ \fVSTAN\fR-\fVCS\fR-83-977,
 1983.
 .sp
 .RF 4
