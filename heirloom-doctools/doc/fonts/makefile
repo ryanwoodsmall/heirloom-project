@@ -15,8 +15,11 @@ CRYPT = -sOwnerPassword="`dd if=/dev/random bs=12 count=1 2>/dev/null | \
 
 all: doc.ps
 
-book.ps: doc.ps
-	psbook doc.ps | psnup -2 -pa4 -Pa5 | \
+print.ps: doc.pdf
+	pdftops -paper match doc.pdf $@
+
+book.ps: print.ps
+	psbook print.ps | psnup -2 -pa4 -Pa5 | \
 	sed 's/^\(%%DocumentMedia:\).*/\1 x595y842 595 842 0 () ()/' >$@
 
 odd.ps: book.ps
@@ -26,5 +29,5 @@ even.ps: book.ps
 	psselect -e book.ps $@
 
 clean:
-	rm -f book.ps book.pdf doc.ps doc.pdf \
+	rm -f book.ps book.pdf doc.ps doc.pdf print.ps \
 		odd.ps odd.pdf even.ps even.pdf core log *~
