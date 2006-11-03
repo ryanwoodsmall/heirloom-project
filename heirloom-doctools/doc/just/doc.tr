@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.11 (gritter) 11/3/06
+.\" Sccsid @(#)doc.tr	1.12 (gritter) 11/3/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -257,17 +257,17 @@ that by such acceptance,
 .	fi
 .	in
 .	ev
+.	ev zz
 .	if !\\$1 \{\
 .	mk B
-.	ev zz
 .	sp |\\nTu+1v
 .	ll \\n(XIu-1m
 .	ad pr
 .	ft I
 \&\\$*
 .	sp |\\nBu
-.	ev
 .	\}
+.	ev
 ..
 .ds TR \fItroff\fR
 .ds TR, \fItroff,\fR
