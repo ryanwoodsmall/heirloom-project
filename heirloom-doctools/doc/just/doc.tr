@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.9 (gritter) 11/3/06
+.\" Sccsid @(#)doc.tr	1.10 (gritter) 11/3/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -568,13 +568,13 @@ and microtypography are all combined:
 .sp 2
 .xx 9 95 100 18 105 100 p 10.42P 12 "Paragraph-at-once adjustment, \
 word spacing 75\|% to 150\|%, \
-letter spacing 95\|% to 105\|%, no glyph reshaping \
-(.letadj\ 95\ 100\ 18\ 105\ 100)"
+letter spacing 95\|% to 105\|%, no glyph reshaping\p \
+(.letadj\ 95\ 100 18\ 105\ 100)"
 .sp 2
 .xx 9 95 98 18 105 102 p 10.42P 12 "Paragraph-at-once adjustment, \
 word spacing 75\|% to 150\|%, \
-letter spacing 95\|% to 105\|%, glyph reshaping 98\|% to 102\|% \
-(.letadj\ 95\ 98\ 18\ 105\ 102)"
+letter spacing 95\|% to 105\|%, glyph reshaping 98\|% to 102\|%\p \
+(.letadj\ 95\ 98 18\ 105\ 102)"
 .sp 2
 For layouts with longer lines than in this example,
 best results are normally achieved
@@ -709,19 +709,8 @@ For paragraph-at-once adjustment,
 originally developed by Donald Knuth
 and Michael Plass for the \*[TEX] system².
 .P
-The \*(TR implemenation does not make multiple passes
-with hyphenation disabled or enabled,
-and does not restrict hyphenation to words located at feasible breakpoints.
-This is because the hyphenation implementation used in \*(TR,
-originally developed by Raph Levien as part of \fILibHnj\fR
-and based on a \*[TEX] algorithm (by Franklin Liang³) as well,
-has been found to hyphenate all words of a document
-in just the same time as
-consumed by a run of the line-breaking function
-with average line lengths.
-\*(TR does not penalize hyphenation by default.
-.P
-There is no total stretchability value for a line,
+The criteria for the quality of a line differ:
+There is no explicit stretchability setting,
 and the total shrinkability is used to determine
 whether a breakpoing is feasible,
 but not for computing its optimality.
@@ -730,6 +719,11 @@ It might make sense to have this configurable,
 but it seems
 that the fact that a line may be stretched or shrinked by a high amount
 does not necessarily indicate the optimality of doing so.
+.P
+\*(TR does not generate ``overfull boxes'',
+i.e. unadjustable text extending beyond the margin,
+unless the width of a single word exceeds that of the line.
+Its warning mechanism can inform about unacceptable adjustments.
 .P
 \*(TR makes no use of \fIfitness classes\fR
 and does not prefer to group lines of similar non-optimal spacing.
@@ -753,7 +747,7 @@ Future evaluation may indicate that doing so is necessary.
 .P
 \*(TR implements ``microtypography''
 similarly as described
-by Hàn Thế Thành for \*[TEX]\|\[foursuperior].
+by Hàn Thế Thành for \*[TEX]\|³.
 In particular, it performs a function like
 ``level 2 font expansion'' (p.\ 70),
 i.e. it considers the possibility to shrink interletter spaces
@@ -769,16 +763,6 @@ The sample text is an excerpt of George Washington's
 Its choice for this purpose is due to
 examples in James Felici's
 \fIComplete Manual of Typography\fR¹.
-In comparison to the typesetting program
-used by Felici,
-\fIHeirloom troff\fR has a stricter preference for the
-spacing settings configured as optimal.
-Setting the minimum or maximum to more extreme values
-will thus not result in much differences
-in its output\(emunless
-there is a line where the extremes
-are actually the only option for automatic justification,
-in which case manual intervention would certainly be preferable.
 .S References
 .ad l
 .feature N +onum +tnum
@@ -804,12 +788,6 @@ Stanford, 1999 (\fVCSLI\fR\ lecture notes no.\ 78),
 pp.\ 67\(en155.
 .sp
 .RF 3
-F. M. Liang, \fIWord Hy-phen-a-tion by Com-put-er\fR,
-Stanford University, \fVCA\fR\ 94305,
-Report No.\ \fVSTAN\fR-\fVCS\fR-83-977,
-1983.
-.sp
-.RF 4
 Hàn Thế Thành, \fIMicro-typographic extensions to the \*[TEX]\fI
 typesetting \%system\fR,
 Masaryk University Brno, 2000.
