@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.10 (gritter) 11/3/06
+.\" Sccsid @(#)doc.tr	1.11 (gritter) 11/3/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -743,7 +743,7 @@ which is not a realistic option.
 .P
 Breakpoints that might occur at different lines
 are currently not evaluated separately for each such line.
-Future evaluation may indicate that doing so is necessary.
+Future evaluation may indicate that doing so is necessary in practice.
 .P
 \*(TR implements ``microtypography''
 similarly as described
