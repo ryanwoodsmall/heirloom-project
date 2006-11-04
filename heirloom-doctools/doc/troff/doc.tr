@@ -43,13 +43,12 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.167 (gritter) 11/1/06
+.\" Sccsid @(#)doc.tr	1.168 (gritter) 11/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
 .warn
 .mediasize letter
-.padj
 .fps math,greek 1 R times ttf
 .fp 2 I timesi ttf
 .fp 3 B timesbd ttf
@@ -99,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 11/1/06
+.ds Sccsdate 11/4/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -7159,12 +7158,15 @@ have by design a syntax reminiscent
 of earlier text processors*
 .fn
 .xx
+.ad b
 *For example:
 P.|A.|Crisman, Ed.,
 .ul
 The Compatible Time-Sharing System,
 MIT Press, 1965, Section|AH9.01
-(Description of RUNOFF program on MIT's CTSS system).
+(Description of \%RUNOFF program on MIT's CTSS system).
+.br
+.ad p
 .ef
 with the intent of easing their use,
 it is almost always necessary to
