@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.148 (gritter) 11/2/06
+ * Sccsid @(#)n7.c	1.149 (gritter) 11/4/06
  */
 
 /*
@@ -2209,9 +2209,7 @@ parpr(void)
 		nwd += stretches;
 		nw++;
 	}
-	if (_spread)
-		adflg |= 1;
-	if (nel - adspc < 0 && nwd > 1)
+	if (nel - adspc < 0 && nwd > 1 || _spread)
 		adflg |= 5;
 	un = 0;
 	tbreak();
@@ -2229,6 +2227,7 @@ pardi(void)
 	struct d	dt, *dp;
 	struct contab	*cp;
 	int	_nlflg = nlflg;
+	int	_spread = spread;
 
 	if (dip != d)
 		wbt(0);
@@ -2257,7 +2256,14 @@ pardi(void)
 	}
 	fi = 1;
 	nlflg = _nlflg;
-	pshapes = 0;
+	if (_spread == 1 && pshapes > pglnout) {
+		memmove(&pgin[0], &pgin[pglnout],
+			(pshapes - pglnout) * sizeof *pgin);
+		memmove(&pgll[0], &pgll[pglnout],
+			(pshapes - pglnout) * sizeof *pgll);
+		pshapes -= pglnout;
+	} else
+		pshapes = 0;
 }
 
 static void

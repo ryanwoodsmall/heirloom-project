@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.12 (gritter) 11/3/06
+.\" Sccsid @(#)doc.tr	1.13 (gritter) 11/4/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -308,7 +308,7 @@ HEIRLOOM TROFF
 Gunnar Ritter
 .ft R
 .sp
-11/3/06
+11/4/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -695,7 +695,8 @@ even if it has simply a rectangular shape.
 note that the indent
 is included in the line length in \*[TR,]
 so you have to add every first value to every second one
-for reusing such shapes.\p
+for reusing such shapes.
+.brp
 .di
 .ne \n(dnu
 .nf

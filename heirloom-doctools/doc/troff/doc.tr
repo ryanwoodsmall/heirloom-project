@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.168 (gritter) 11/4/06
+.\" Sccsid @(#)doc.tr	1.169 (gritter) 11/4/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -379,6 +379,7 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 .de bt
 .ft R
 .xx
+.nr nosave 1
 .ne 1.1
 .ti 0
 .nr nosave 0
@@ -2160,7 +2161,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.hylang'13\T	\T'n_.hylang'\fB&hylang\fR\T	\T'n_.hylang'Current hyphenation language [sic].\T
 \T'n._hylen'13\T	\T'n_.hylen'\fB&hylen\fR\T	\T'n_.hylen'Current minimum hyphenation word length.\T
 \T'n._hypp'13\T	\T'n_.hypp'\fB&hypp\fR\T	\T'n_.hypp'Penalty for hyphen in \fBad p\fR mode.\T
-\T'n._hypp2'13\T	\T'n_.hypp2'\fB&hypp2\fR\T	\T'n_.hypp2'Penalty for consecutive hyphens in \fBad p\fR mode.\T
+\T'n._hypp2'13\T	\T'n_.hypp2'\fB&hypp2\fR\T	\T'n_.hypp2'Penalty for consecutive hyphens in \fBad\ p\fR mode.\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
 \T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent as set by \fBin\fR.\T
 \T'n_.in'6\T	\T'n_.in'\fB&in\fR\T	\T'n_.in'Current indent including temporary indent, if any.\T
@@ -3240,9 +3241,8 @@ which may result in condensed spacing and shaping.
 The horizontal positions in the \fB.k\fR and \fB.x\fR registers
 are always computed using default character and spacing widths.
 .pg
-\A'ad_p'In addition to adjusting one line at once as described,
-\*(TR also supports adjusting one paragraph at once,
-enabled with \T'ad'\fBad\ p\fR\T.
+\A'ad_p'As an alternative to adjusting one line at a time as described,
+\*(TR also supports adjusting one paragraph at once.
 In this mode,
 words are collected from input lines
 and requests are processed
@@ -3266,7 +3266,9 @@ should thus be handled using
 the \T's_olt'output-line trap\T mechanism
 instead of in-line macros.
 Likewise the \T'n_.k'\fB.k\fR\T and \T'n_.x'\fB.x\fR\T
-registers are not meaningful in this mode.
+registers are not meaningful in this mode,
+except that \T'n_.k'\fB.k\fR\T is never zero
+when text is present in a partial paragraph.
 .pg
 .tr &&
 An input text line ending with \fB.\fR\^, \fB?\fR, \fB!\fR, or \fB:\fR,
@@ -3400,7 +3402,10 @@ Text lines beginning with space characters
 and empty text lines (blank lines) also cause a break.
 .bta brp
 \fB&brp\fR	\(en	\(en	B	Break and spread;
-same effect as the \T'e_p'\fB\ep\fR\T escape sequence.
+same effect as the \T'e_p'\fB\ep\fR\T escape sequence
+except that it causes the remaining part
+of a paragraph shape as set with
+\T'pshape'\fBpshape\fR\T to be discarded.
 .bta fi
 .lg 0
 \fB&fi\fR	\(fill|on	\(en	B,E	Fill subsequent output lines.
@@ -3844,9 +3849,11 @@ Once the current paragraph has been printed,
 the shape specification is forgotten,
 and the standard indent and line length values are in effect again
 unless another \fBpshape\fR request occurs.
+As an exception, \T'e_p'\fB\ep\fR\T preserves the remaining part
+of the shape.
 Combine this mechanism with \T'c_trap'page or diversion traps\T
 to move lines in vertical direction
-as shown here.\p
+as shown here.
 .br
 .di
 .ne \n(dnu
