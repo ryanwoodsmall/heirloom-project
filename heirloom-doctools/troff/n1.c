@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.132 (gritter) 11/4/06
+ * Sccsid @(#)n1.c	1.133 (gritter) 11/5/06
  */
 
 /*
@@ -1352,9 +1352,17 @@ copy:
 	case 'R':
 		if (xflag)
 			setr();
-		goto g0;
+		goto dfl;
 	case 'Z':
-		if (xflag && (j = setZ()) != 0)
+		if (xflag == 0)
+			goto dfl;
+		if ((j = setZ()) != 0)
+			return(j);
+		goto g0;
+	case 'j':
+		if (xflag == 0)
+			goto dfl;
+		if ((j = setpenalty()) != 0)
 			return(j);
 		goto g0;
 	case ';':	/* ligature suppressor (only) */

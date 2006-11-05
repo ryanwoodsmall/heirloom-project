@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.101 (gritter) 11/2/06
+ * Sccsid @(#)ext.h	1.102 (gritter) 11/5/06
  */
 
 /*
@@ -395,6 +395,7 @@ extern	int	vnumb(int *);
 extern	int	hnumb(int *);
 extern	int	inumb(int *);
 extern	int	inumb2(int *, int *);
+extern	float	atop(void);
 extern	int	quant(int, int);
 extern	tchar	moflo(int);
 /* n5.c */
@@ -551,6 +552,7 @@ extern	void	setvline(void);
 extern	void	setdraw(void);
 extern	void	casefc(void);
 extern	tchar	setfield(int);
+extern	tchar	setpenalty(void);
 extern	tchar	mkxfunc(int, int);
 extern	void	localize(void);
 extern	void	caselc_ctype(void);

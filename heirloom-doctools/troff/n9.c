@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.65 (gritter) 10/15/06
+ * Sccsid @(#)n9.c	1.66 (gritter) 11/5/06
  */
 
 /*
@@ -637,6 +637,31 @@ rtn:
 
 
 tchar
+setpenalty(void)
+{
+	tchar	c, delim;
+	int	n;
+
+	if (ismot(delim = getch()))
+		return 0;
+	noscale++;
+	n = atoi();
+	noscale--;
+	if (nonumb)
+		return 0;
+	c = getch();
+	if (!issame(c, delim))
+		nodelim(delim);
+	if (n > INFPENALTY0)
+		n = INFPENALTY0;
+	else if (n < -INFPENALTY0)
+		n = -INFPENALTY0;
+	n += INFPENALTY0 + 1;
+	return mkxfunc(PENALTY, n);
+}
+
+
+tchar
 mkxfunc(int f, int s)
 {
 	tchar	t = XFUNC;
@@ -1100,7 +1125,7 @@ illseq(int wc, const char *mb, int n)
 void
 storerq(int i)
 {
-	tchar	tp[6];
+	tchar	tp[NSRQ+1];
 
 	tp[0] = mkxfunc(RQ1, i & 037);
 	tp[1] = mkxfunc(RQ2, i >> 5 & 037);

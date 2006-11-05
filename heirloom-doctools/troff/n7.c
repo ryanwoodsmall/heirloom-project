@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.149 (gritter) 11/4/06
+ * Sccsid @(#)n7.c	1.150 (gritter) 11/5/06
  */
 
 /*
@@ -1220,6 +1220,7 @@ getword(int x)
 	wordp = word;
 	over = wne = wch = 0;
 	hyoff = 0;
+	memset(wdpenal, 0, wdsize * sizeof *wdpenal);
 #if defined (EUC) && defined (NROFF)
 	mtbufp = mtbuf;
 	if (pendmb) {
@@ -1508,16 +1509,20 @@ storeword(register tchar c, register int w)
 
 	if (wordp == NULL || wordp >= &word[wdsize - 3]) {
 		tchar	*k, **h;
-		int	j;
+		int	j, *pp, owdsize;
 		if (over)
 			return;
+		owdsize = wdsize;
 		wdsize += wdsize ? 100 : WDSIZE;
-		if ((k = realloc(word, wdsize * sizeof *word)) == NULL) {
+		if ((k = realloc(word, wdsize * sizeof *word)) == NULL ||
+				(pp = realloc(wdpenal,
+				    wdsize * sizeof *wdpenal)) == NULL) {
 			flusho();
 			errprint("Word overflow.");
 			over++;
 			c = LEFTHAND;
 			w = -1;
+			wdsize = owdsize;
 			goto s1;
 		}
 		j = (char *)k - (char *)word;
@@ -1526,8 +1531,15 @@ storeword(register tchar c, register int w)
 			if (*h)
 				*h = (tchar *)((char *)*h + j);
 		word = k;
+		wdpenal = pp;
+		memset(&wdpenal[owdsize], 0,
+				(wdsize - owdsize) * sizeof *wdpenal);
 	}
 s1:
+	if (isxfunc(c, PENALTY)) {
+		wdpenal[max(0, wordp - word - 1)] = sbits(c);
+		return;
+	}
 	if (w == -1)
 		w = width(c);
 	widthp = w;
@@ -1811,10 +1823,12 @@ penalty(int k, int s, int h, int h2)
 	} else
 		t /= nel / 10;
 	if (h && hypp)
-		t += hypp / 50.0;
+		t += hypp;
 	if (h2 && hypp2)
-		t += hypp2 / 50.0;
+		t += hypp2;
 	t = t * t * t;
+	if (t > MAXPENALTY)
+		t = MAXPENALTY;
 	return t;
 }
 
@@ -1857,11 +1871,13 @@ parcomp(void)
 			}
 			v = k + pghyphw[j] + pglgew[j];
 			if (v - m - pglgeh[j] <= nel) {
-				if (!spread && j == pgwords - 1)
+				if (!spread && j == pgwords - 1 &&
+						pgpenal[j] == 0)
 					t = 0;
 				else
 					t = penalty(v, s, pghyphw[j],
 						pghyphw[j] && hypc[i-1]);
+				t += pgpenal[j];
 				t += cost[i-1];
 				/*fdprintf(stderr, "%c%c%c%c to %c%c%c%c "
 				                 "t=%g cost[%d]=%g "
@@ -1957,13 +1973,15 @@ growpgsize(void)
 	pgin = realloc(pgin, pgsize * sizeof *pgin);
 	pgll = realloc(pgll, pgsize * sizeof *pgll);
 	pglno = realloc(pglno, pgsize * sizeof *pglno);
+	pgpenal = realloc(pgpenal, pgsize * sizeof *pgpenal);
 	if (pgwordp == NULL || pgwordw == NULL || pghyphw == NULL ||
 			pgopt == NULL || pgspacw == NULL ||
 			pgadspc == NULL || pglsphc == NULL ||
 			pglgsc == NULL || pglgec == NULL ||
 			pglgsw == NULL || pglgew == NULL ||
 			pglgsh == NULL || pglgeh == NULL ||
-			pgin == NULL || pgll == NULL || pglno == NULL) {
+			pgin == NULL || pgll == NULL || pglno == NULL ||
+			pgpenal == NULL) {
 		errprint("out of memory justifying paragraphs");
 		done(02);
 	}
@@ -1980,6 +1998,18 @@ parlgzero(int i)
 	pglgeh[i] = 0;
 }
 
+static float
+makepgpenal(int p)
+{
+	p -= INFPENALTY0 + 1;
+	if (p >= INFPENALTY0)
+		return INFPENALTY;
+	else if (p <= -INFPENALTY0)
+		return -INFPENALTY;
+	else
+		return p * PENALSCALE;
+}
+
 static void
 parword(void)
 {
@@ -1993,6 +2023,7 @@ parword(void)
 	a = w = 0;
 	pglno[pgwords] = numtab[CD].val;
 	pgspacp[pgwords] = pgspacs;
+	pgpenal[pgwords] = 0;
 	while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
 		if (iszbit(i))
 			break;
@@ -2010,6 +2041,8 @@ parword(void)
 			}
 		}
 		parsp[pgspacs++] = i;
+		if (wdpenal[wp-word-1])
+			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
 	}
 	pgspacp[pgwords+1] = pgspacs;
 	if (--wp > wordp && pgchars > 0)
@@ -2082,6 +2115,7 @@ parword(void)
 			pghyphw[pgwords] = 0;
 			pgadspc[pgwords] = 0;
 			pglsphc[pgwords] = 0;
+			pgpenal[pgwords] = 0;
 			parlgzero(pgwords+1);
 		}
 		i = *wp++;
@@ -2103,6 +2137,8 @@ parword(void)
 			}
 		}
 		para[pgchars++] = i;
+		if (wdpenal[wp-word-1])
+			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
 	}
 	pgne += pgwordw[pgwords];
 	pgwordp[++pgwords] = pgchars;
@@ -2111,6 +2147,7 @@ parword(void)
 	pghyphw[pgwords] = 0;
 	pgadspc[pgwords] = 0;
 	pglsphc[pgwords] = 0;
+	pgpenal[pgwords] = 0;
 	parlgzero(pgwords);
 	if (spread)
 		tbreak();

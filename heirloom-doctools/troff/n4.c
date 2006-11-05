@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.91 (gritter) 11/2/06
+ * Sccsid @(#)n4.c	1.92 (gritter) 11/5/06
  */
 
 /*
@@ -1802,6 +1802,24 @@ _inumb(int *n, float *fp, int flt, int *relative)
 	if (relative)
 		*relative = f;
 	return(i);
+}
+
+
+float
+atop(void)
+{
+	float	t;
+
+	noscale++;
+	t = atof();
+	noscale--;
+	if (t < -INFPENALTY)
+		t = -INFPENALTY;
+	else if (t > INFPENALTY)
+		t = INFPENALTY;
+	else
+		t *= PENALSCALE;
+	return t;
 }
 
 

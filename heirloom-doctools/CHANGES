@@ -13,6 +13,8 @@ Release ...
 * [nt]roff: The ".padj" request has been added; it enables ".ad p" mode
   globally in all environments. It is most useful to enable paragraph-at-
   once adjustment in existing documents.
+* [nt]roff: The "\j" escape sequence has been introduced to specify custom
+  penalties for line breaks in ".ad p" mode.
 * troff: The ".char" request is now able to construct replacements for
   otherwise unknown locale-specific characters.
 * troff: Fixed a typo in the hyphenation code that could result in the

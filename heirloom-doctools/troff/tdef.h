@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.152 (gritter) 11/2/06
+ * Sccsid @(#)tdef.h	1.153 (gritter) 11/5/06
  */
 
 /*
@@ -167,6 +167,7 @@
 #define	NSRQ	5	/* number of tchars to store a request */
 #define	CHAR	0022	/* formatted result of a .char execution */
 #define	INDENT	0023	/* current indent (informational only, no move) */
+#define	PENALTY	0024	/* line breaking penalty */
 
 #define	isxfunc(c, x)	(cbits(c) == XFUNC && fbits(c) == (x))
 
@@ -391,6 +392,11 @@ endif NROFF
 #define	FCBIT	010
 #define	LGBIT	020
 #define	CHBIT	040
+
+#define	INFPENALTY0	(1e6)
+#define	INFPENALTY	(1e9)
+#define	MAXPENALTY	(1e6)
+#define	PENALSCALE	(1.0/50)
 
 #define	PAIR(A,B)	(A|(B<<BYTE))
 #define	LOOP		(-4)
@@ -810,6 +816,7 @@ struct acc {
 #define	tabtab	env._tabtab
 #define	line	env._line
 #define	word	env._word
+#define	wdpenal	env._wdpenal
 #define	sentch	env._sentch
 #define	transch	env._transch
 #define	breakch	env._breakch
@@ -833,6 +840,7 @@ struct acc {
 #define	pgin	env._pgin
 #define	pgll	env._pgll
 #define	pglno	env._pglno
+#define	pgpenal	env._pgpenal
 #define	evname	env._evname
 
 extern struct env {
@@ -893,8 +901,8 @@ extern struct env {
 	int	_hlm;
 	int	_hlc;
 	int	_hylen;
-	int	_hypp;
-	int	_hypp2;
+	float	_hypp;
+	float	_hypp2;
 	int	_un1;
 	int	_tabc;
 	int	_dotc;
@@ -975,6 +983,7 @@ extern struct env {
 	int	_nhych[NSENT];
 	tchar	*_line;
 	tchar	*_word;
+	int	*_wdpenal;
 	tchar	*_para;
 	tchar	*_parsp;
 	int	*_pgwordp;
@@ -994,5 +1003,6 @@ extern struct env {
 	int	*_pgin;
 	int	*_pgll;
 	int	*_pglno;
+	float	*_pgpenal;
 	char	*_evname;
 } env, initenv;

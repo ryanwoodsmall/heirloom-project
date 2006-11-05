@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.116 (gritter) 11/4/06
+ * Sccsid @(#)n5.c	1.117 (gritter) 11/5/06
  */
 
 /*
@@ -342,20 +342,20 @@ casehylen(void)
 void
 casehypp(void)
 {
-	int	n;
+	float	t;
 
 	if (skip(0))
 		hypp = 0;
 	else {
-		n = atoi();
-		if (!nonumb && n >= 0)
-			hypp = n;
+		t = atop();
+		if (!nonumb)
+			hypp = t;
 		if (skip(0))
 			hypp2 = 0;
 		else {
-			n = atoi();
-			if (!nonumb && n >= 0)
-				hypp2 = n;
+			t = atop();
+			if (!nonumb)
+				hypp2 = t;
 		}
 	}
 }
@@ -1297,6 +1297,7 @@ evc(struct env *dp, struct env *sp)
 	dp->_linep = NULL;
 	dp->_wdsize = 0;
 	dp->_word = 0;
+	dp->_wdpenal = 0;
 	dp->_wordp = 0;
 	dp->_spflg = 0;
 	dp->_seflg = 0;
@@ -1329,6 +1330,7 @@ evc(struct env *dp, struct env *sp)
 	dp->_pgin = NULL;
 	dp->_pgll = NULL;
 	dp->_pglno = NULL;
+	dp->_pgpenal = NULL;
 	if (dp->_brnl < INT_MAX)
 		dp->_brnl = 0;
 	if (dp->_brpnl < INT_MAX)
@@ -1400,6 +1402,9 @@ evcline(struct env *dp, struct env *sp)
 	memcpy(dp->_line, sp->_line, sp->_lnsize * sizeof *sp->_line);
 	dp->_word = malloc((dp->_wdsize = sp->_wdsize) * sizeof *dp->_word);
 	memcpy(dp->_word, sp->_word, sp->_wdsize * sizeof *sp->_word);
+	dp->_wdpenal = malloc((dp->_wdsize = sp->_wdsize) *
+			sizeof *dp->_wdpenal);
+	memcpy(dp->_wdpenal, sp->_wdpenal, sp->_wdsize * sizeof *sp->_wdpenal);
 	dp->_linep = sp->_linep + (dp->_line - sp->_line);
 	dp->_wordp = sp->_wordp + (dp->_word - sp->_word);
 	dp->_wdend = sp->_wdend + (dp->_word - sp->_word);
@@ -1443,6 +1448,8 @@ evcline(struct env *dp, struct env *sp)
 	memcpy(dp->_pgll, sp->_pgll, dp->_pgsize * sizeof *dp->_pgll);
 	dp->_pglno = malloc(dp->_pgsize * sizeof *dp->_pglno);
 	memcpy(dp->_pglno, sp->_pglno, dp->_pgsize * sizeof *dp->_pglno);
+	dp->_pgpenal = malloc(dp->_pgsize * sizeof *dp->_pgpenal);
+	memcpy(dp->_pgpenal, sp->_pgpenal, dp->_pgsize * sizeof *dp->_pgpenal);
 	dp->_pgwords = sp->_pgwords;
 	dp->_pgchars = sp->_pgchars;
 	dp->_pgspacs = sp->_pgspacs;
@@ -1460,6 +1467,8 @@ relsev(struct env *ep)
 	ep->_lnsize = 0;
 	free(ep->_word);
 	ep->_word = NULL;
+	free(ep->_wdpenal);
+	ep->_wdpenal = NULL;
 	ep->_wdsize = 0;
 	free(ep->_para);
 	ep->_para = NULL;
@@ -1498,6 +1507,8 @@ relsev(struct env *ep)
 	ep->_pgll = NULL;
 	free(ep->_pglno);
 	ep->_pglno = NULL;
+	free(ep->_pgpenal);
+	ep->_pgpenal = NULL;
 	ep->_pgsize = 0;
 }
 
