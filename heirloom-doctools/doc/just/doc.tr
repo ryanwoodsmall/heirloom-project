@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.13 (gritter) 11/4/06
+.\" Sccsid @(#)doc.tr	1.14 (gritter) 11/5/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -308,7 +308,7 @@ HEIRLOOM TROFF
 Gunnar Ritter
 .ft R
 .sp
-11/4/06
+11/5/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -731,7 +731,7 @@ and does not prefer to group lines of similar non-optimal spacing.
 This is because doing so may lead to a more even appearance
 of the lines of a paragraph,
 but at the expense of a less even appearance
-if the entire document is considered.
+in the context of the whole document.
 For example, consider the case of
 multiple consecutive lines with loose spacing:
 If these lines are viewn in isolation,
@@ -755,7 +755,7 @@ i.e. it considers the possibility to shrink interletter spaces
 and character shapes
 when computing breakpoints.
 Both stretchability and shrinkability
-are considered for computing the optimality of a breakpoint,
+are taken into account for computing the optimality of a breakpoint,
 but only as far as the width of the possible line is concerned;
 the percentual adjustment limits do not influence optimality.
 .P
