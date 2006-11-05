@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.14 (gritter) 11/5/06
+.\" Sccsid @(#)doc.tr	1.15 (gritter) 11/5/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -579,7 +579,14 @@ letter spacing 95\|% to 105\|%, glyph reshaping 98\|% to 102\|%\p \
 For layouts with longer lines than in this example,
 best results are normally achieved
 with even smaller ranges for letter spacing and glyph reshaping.
-.S "Hyphenation penalties"
+.S "Penalties for line breaks and hyphenation"
+.P
+It is possible to tell \*(TR
+that a line break after a certain word
+(or hyphenated word part)
+is preferred or discouraged by writing ``\(rsj\fI'N'\fR''.
+A positive \fIN\fR makes a breakpoint less likely,
+a negative \fIN\fR makes it more likely.
 .P
 By default,
 \*(TR hyphenates words whenever necessary
@@ -601,18 +608,14 @@ as its first argument
 and the penalty for consecutive hyphens as second.
 Effective penalties are between 10 and 200.
 .P
-The hyphenation penalties only make hyphens less likely
-but do not limit them forcibly;
-even with high penalties,
-it is still possible that multiple consecutive hyphens are produced.
+Hyphenation penalties only make hyphens less likely
+but do not limit them forcibly.
 The ``.hlm'' request imposes a strict limit
 on the number of consecutive hyphens.
 It causes a certain breakpoint to be disabled completely
 and can thus result in a non-optimal adjustment.
-If e.g. more than four consecutive hyphens are to be avoided
-by all means, ``.hlm'' is useful, though.
 It is recommended to use it in combination with ``.spreadwarn''
-to detect the problematic paragraphs.
+to detect such problems.
 .S "Paragraph shapes"
 .P
 The standard requests
