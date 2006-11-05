@@ -8,7 +8,7 @@ CRYPT = -sOwnerPassword="`dd if=/dev/random bs=12 count=1 2>/dev/null | \
 
 .tr.ps:
 	rm -f $@; trap "rm -f $$$$.ps" 0 2 3; \
-		tbl $< | eqn | troff | dpost -e4 >$$$$.ps && mv $$$$.ps $@
+		tbl $< | eqn | troff | dpost >$$$$.ps && mv $$$$.ps $@
 
 .ps.pdf:
 	gs -sOutputFile=$@ $(DISTFLAGS) -f $<

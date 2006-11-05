@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.15 (gritter) 11/5/06
+.\" Sccsid @(#)doc.tr	1.16 (gritter) 11/5/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -716,7 +716,7 @@ and Michael Plass for the \*[TEX] system².
 The criteria for the quality of a line differ:
 There is no explicit stretchability setting,
 and the total shrinkability is used to determine
-whether a breakpoing is feasible,
+whether a breakpoint is feasible,
 but not for computing its optimality.
 \*(TR currently has a slight preference for tight lines.
 It might make sense to have this configurable,
