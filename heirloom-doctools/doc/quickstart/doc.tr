@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.3 (gritter) 10/24/06
+.\" Sccsid @(#)doc.tr	1.4 (gritter) 11/5/06
 .do xflag 3
 .warn
 .lc_ctype en_US.utf8
@@ -60,7 +60,7 @@ Quickstart Guide\fR
 .vs 15
 .mk T
 .sp |27.7c
-.tl 'Gunnar Ritter''10/24/06'
+.tl 'Gunnar Ritter''11/5/06'
 .rt \nTu
 .ad p
 So you want to explore Heirloom \fItroff\fR
@@ -99,7 +99,7 @@ See the source directory for this quickstart guide
 You can adapt \fItroff\fR to local language conventions
 by setting the paper size, the hyphenation language,
 and the input locale.
-A document in German that uses \fVUTF-8\fR
+For example, a document in German that is using \fVUTF-8\fR
 as input character encoding would usually configure these as
 .CS
 \&.mediasize a4
@@ -127,10 +127,10 @@ hanging punctuation,
 \fVPDF\fR bookmarks and links,
 floating-point registers,
 and local variables per macro instance.
-These are documented in the
-\fINroff/Troff User's Manual,\fR
-which, like Heirloom \fItroff\fR in general,
-is derived from the original sources.
+These are documented in
+\fIJustification in Heirloom Troff\fR
+and in the
+\fINroff/Troff User's Manual.\fR
 .sp
 .Q
 Heirloom \fItroff\fR provides
