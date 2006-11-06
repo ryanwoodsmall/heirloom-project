@@ -1,4 +1,4 @@
-Release ...
+Release 061106
 * [nt]roff: Support for paragraph-based justification has been added,
   enabled with ".ad p". The "Justification in Heirloom Troff" document
   has been expanded to cover the new features.
