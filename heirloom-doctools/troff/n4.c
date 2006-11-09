@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.92 (gritter) 11/5/06
+ * Sccsid @(#)n4.c	1.93 (gritter) 11/9/06
  */
 
 /*
@@ -1256,6 +1256,30 @@ a1:
 	case 'P':	/*Picas*/
 		j = INCH;
 		i = 6;
+		break;
+	case 'D':	/* Didot points */
+		if (!xflag)
+			goto dfl;
+		j = INCH * 24;	/* following H. R. Bosshard, */
+		i = 1621;	/* Technische Grundlagen zur */
+		break;		/* Satzherstellung, Berne 1980, p. 17 */
+	case 'C':	/* Cicero */
+		if (!xflag)
+			goto dfl;
+		j = INCH * 24 * 12;
+		i = 1621;
+		break;
+	case 't':	/* printer's points */
+		if (!xflag)
+			goto dfl;
+		j = INCH * 100;	/* following Knuth */
+		i = 7227;
+		break;
+	case 'T':	/* printer's picas */
+		if (!xflag)
+			goto dfl;
+		j = INCH * 100 * 4;
+		i = 2409;
 		break;
 	case 'M':	/*Ems/100*/
 		if (!xflag)

@@ -1,3 +1,7 @@
+Release ...
+* [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
+  (Didot point) and "C" (cicero) have been introduced.
+
 Release 061106
 * [nt]roff: Support for paragraph-based justification has been added,
   enabled with ".ad p". The "Justification in Heirloom Troff" document

@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.171 (gritter) 11/6/06
+.\" Sccsid @(#)doc.tr	1.172 (gritter) 11/9/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 11/6/06
+.ds Sccsdate 11/9/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -2384,6 +2384,10 @@ _
 \fBM\fR	1/100 Em	\fIS\fR/100	\fIC\fR/100
 \fBp\fR,\fBz\fR	Point = 1/72 inch	1000	240/72
 \fBu\fR,\fBs\fR	Basic unit	1	1
+\fBt\fR	Printer's point	72000\(mu100/7227	240\(mu100/7227
+\fBT\fR	Printer's pica	72000\(mu400/2409	240\(mu400/2409
+\fBD\fR	Didot point	72000\(mu24/1621	240\(mu24/1621
+\fBC\fR	Cicero	72000\(mu288/1621	240\(mu288/1621
 \fBv\fR	Vertical line space	\fIV\fR	\fIV\fR
 none	Default, see below
 .TE
