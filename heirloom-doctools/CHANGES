@@ -4,6 +4,8 @@ Release ...
 * [nt]roff: ".ad p" mode no longer employs a temporary diversion; the
   lines are now written directly to the current output level, possibly
   interrupted by trap processing.
+* [nt]roff: A memory allocation error that could occur with extensive
+  use of output-line traps has been fixed.
 
 Release 061106
 * [nt]roff: Support for paragraph-based justification has been added,
