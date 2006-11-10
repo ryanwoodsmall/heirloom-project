@@ -3,7 +3,9 @@ Release ...
   (Didot point) and "C" (cicero) have been introduced.
 * [nt]roff: ".ad p" mode no longer employs a temporary diversion; the
   lines are now written directly to the current output level, possibly
-  interrupted by trap processing.
+  interrupted by trap processing. This makes it possible to use "'in"
+  and ".ll" inside a paragraph, although the line breaking decisions
+  may be suboptimal in this case.
 * [nt]roff: The ".hypp" request now accepts a third argument specifying
   a penalty for hyphenating the last word of a paragraph.
 * [nt]roff: A memory allocation error that could occur with extensive

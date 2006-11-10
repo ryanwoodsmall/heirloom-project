@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.18 (gritter) 11/10/06
+.\" Sccsid @(#)doc.tr	1.19 (gritter) 11/10/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -455,16 +455,17 @@ preprocessors as well with the standard
 ``\(enmm'', ``\(enms'', ``\(enme'',
 and ``\(enman'' macro sets.
 .P
-Indenting and line length
-can only be set for an entire paragraph
-with the ``.in'', ``.ti'', and ``.ll'' requests,
-and they cannot be changed from page traps
-since the paragraph has already been adjusted
-when they are invoked.
+The ``.in'', ``.ti'', and ``.ll'' requests
+should only be used to set
+indenting and line length
+for an entire paragraph.
+If they are used within a paragraph,
+breakpoints must be recomputed,
+and previous breakpoints are suboptimal.
 Documents that use such methods
 e.g. for inline pictures
-thus require changes in order
-to be formatted with paragraph-at-once adjustment.
+should be adapted to achieve optimum results
+with paragraph-at-once adjustment.
 .nr Pagemacro 1
 .de Pagemacro
 .nr Pagemacro 0

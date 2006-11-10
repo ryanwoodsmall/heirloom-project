@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.118 (gritter) 11/10/06
+ * Sccsid @(#)n5.c	1.119 (gritter) 11/10/06
  */
 
 /*
@@ -532,7 +532,7 @@ casein(void)
 	tbreak();
 	in1 = in;
 	in = i;
-	if (!nc) {
+	if (!nc && !pgwords) {
 		un = in;
 		setnel();
 	}
@@ -1336,6 +1336,8 @@ evc(struct env *dp, struct env *sp)
 	dp->_pglgeh = NULL;
 	dp->_pgin = NULL;
 	dp->_pgll = NULL;
+	dp->_pgwdin = NULL;
+	dp->_pgwdll = NULL;
 	dp->_pglno = NULL;
 	dp->_pgpenal = NULL;
 	if (dp->_brnl < INT_MAX)
@@ -1453,6 +1455,10 @@ evcline(struct env *dp, struct env *sp)
 	memcpy(dp->_pgin, sp->_pgin, dp->_pgsize * sizeof *dp->_pgin);
 	dp->_pgll = malloc(dp->_pgsize * sizeof *dp->_pgll);
 	memcpy(dp->_pgll, sp->_pgll, dp->_pgsize * sizeof *dp->_pgll);
+	dp->_pgwdin = malloc(dp->_pgsize * sizeof *dp->_pgwdin);
+	memcpy(dp->_pgwdin, sp->_pgwdin, dp->_pgsize * sizeof *dp->_pgwdin);
+	dp->_pgwdll = malloc(dp->_pgsize * sizeof *dp->_pgwdll);
+	memcpy(dp->_pgwdll, sp->_pgwdll, dp->_pgsize * sizeof *dp->_pgwdll);
 	dp->_pglno = malloc(dp->_pgsize * sizeof *dp->_pglno);
 	memcpy(dp->_pglno, sp->_pglno, dp->_pgsize * sizeof *dp->_pglno);
 	dp->_pgpenal = malloc(dp->_pgsize * sizeof *dp->_pgpenal);
@@ -1512,6 +1518,10 @@ relsev(struct env *ep)
 	ep->_pgin = NULL;
 	free(ep->_pgll);
 	ep->_pgll = NULL;
+	free(ep->_pgwdin);
+	ep->_pgwdin = NULL;
+	free(ep->_pgwdll);
+	ep->_pgwdll = NULL;
 	free(ep->_pglno);
 	ep->_pglno = NULL;
 	free(ep->_pgpenal);

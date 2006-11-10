@@ -43,12 +43,13 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.174 (gritter) 11/10/06
+.\" Sccsid @(#)doc.tr	1.175 (gritter) 11/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
 .warn
 .mediasize letter
+.lc_ctype en_US.utf8
 .fps math,greek 1 R times ttf
 .fp 2 I timesi ttf
 .fp 3 B timesbd ttf
@@ -3785,12 +3786,14 @@ The length of \fIthree-part titles\fR produced by \T'tl'\fBtl\fR\T
 \T's_titles'(see \(sc14)\T is \fIindependently\fR set by \T'lt'\fBlt\fR.\T
 .xx
 In \T'ad_p'\fBad\ p\fR\T mode,
-indent and line length can only be set directly
-for an entire paragraph;
-a temporary indent can be specified only
-for the first line of a paragraph.
-To vary indent and line length inside a paragraph,
+indent, temporary indent, and line length should be predefined
+for the entire paragraph
+at the time a \fIbreak\fR occurs.
+To achieve this with indent and line length varying inside a paragraph,
 a shape can be defined with \T'pshape'\fBpshape\fR\T.
+The \T'll'\fBll\fR\T and \T'in'\fBin\fR\T requests
+are also effective while formatting a paragraph
+but may result in less optimal line breaking decisions then.
 .h1
 .bta ll
 \fB&ll\fI|\(+-N\fR	6.5\|in	previous	E,\fBm\fR	Line length is set to \(+-\fIN\fR.
@@ -6270,10 +6273,10 @@ text sweeps past the trap set by
 or when the \T'c_diversion'diversion\T is explicitly closed
 by \fBEP\fR.
 .xx
-\fBBP\fR cannot be used for text filling
+\fBBP\fR is not recommended for text filling
 in \T'ad_p'\fBad\ p\fR\T mode
 since its trap-based mechanism
-cannot work properly then,
+may result in less optimal output,
 and since it is not possible
 to define the shape of a complete paragraph
 with the information it has.
