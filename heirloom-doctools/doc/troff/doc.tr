@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.173 (gritter) 11/10/06
+.\" Sccsid @(#)doc.tr	1.174 (gritter) 11/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1561,7 +1561,7 @@ Hyphenation.
 .b1
 \T'hlm'\fB&hlm\fI|N\fR	off	off	E	Maximum number of consecutive hyphenated lines.\T
 .b1
-\T'hypp'\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \fBad p\fR mode.\T
+\T'hypp'\fB&hypp\fI|N|M|L\fR	0|0|0	0|0|0	E	Define hyphenation penalties for \fBad p\fR mode.\T
 .b1
 \T'breakchar'\fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.\T
 .b1
@@ -2163,6 +2163,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n._hylen'13\T	\T'n_.hylen'\fB&hylen\fR\T	\T'n_.hylen'Current minimum hyphenation word length.\T
 \T'n._hypp'13\T	\T'n_.hypp'\fB&hypp\fR\T	\T'n_.hypp'Penalty for hyphen in \fBad p\fR mode.\T
 \T'n._hypp2'13\T	\T'n_.hypp2'\fB&hypp2\fR\T	\T'n_.hypp2'Penalty for consecutive hyphens in \fBad\ p\fR mode.\T
+\T'n._hypp3'13\T	\T'n_.hypp3'\fB&hypp3\fR\T	\T'n_.hypp3'Penalty for hyphenating the last word of a paragraph in \fBad\ p\fR mode.\T
 \T'n_.H'11.1\T	\T'n_.H'\fB&H\fR\T	\T'n_.H'Available horizontal resolution in basic units.\T
 \T'n_.i'6\T	\T'n_.i'\fB&i\fR\T	\T'n_.i'Current indent as set by \fBin\fR.\T
 \T'n_.in'6\T	\T'n_.in'\fB&in\fR\T	\T'n_.in'Current indent including temporary indent, if any.\T
@@ -5351,15 +5352,20 @@ the current line is not hyphenated.
 The default is no limit.
 The current value is accessible in the \A'n_.hlm'\fB&hlm\fR number register.
 .bta hypp
-\fB&hypp\fI|N|\fR[\fIM\fR]	0;|0	0;|0	E	Define hyphenation penalties for \T'ad_p'\fBad p\fR\T mode.
+\fB&hypp\fI|N|M|L\fR	0|0|0	0|0|0	E	Define hyphenation penalties for \T'ad_p'\fBad p\fR\T mode.
 Every inserted hyphen is given a penalty of \fIN\fR
 when computing optimal break points;
 each hyphen that is followed by another hyphen
 gets an additional penalty of \fIM\fR.
+A hyphen that is inserted in the last word of a paragraph
+gets an additional penalty of \fIL\fR.
 A value of zero means no penalty.
 Effective penalties correspond to values between 10 and 200.
 The current values are available in the
-\A'n_.hypp'\fB&hypp\fR and \A'n_.hypp2'\fB&hypp2\fR number registers.
+\A'n_.hypp'\fB&hypp\fR,
+\A'n_.hypp2'\fB&hypp2\fR, and
+\A'n_.hypp3'\fB&hypp3\fR
+number registers.
 .bta breakchar
 \fB&breakchar\fI|c.\fR	\fB\(hy\(em\fR	off	E	Optional line break characters.
 A line may always be split after one of these characters.
@@ -6342,6 +6348,7 @@ To generate such data,
 use the \fBPDFMark\fR device command of \fIdpost\fR
 with the \*(TR \T'e_X'\fB\eX\fR escape sequence\T, e.g.\&
 .x1
+.ne 2
 \fB\eX\'PDFMark: Author \fIMy Name\fB\'
 \fB\eX\'PDFMark: Keywords \fITypesetting, PDF documents\fB\'
 \fB\eX\'PDFMark: Subject \fItroff, dpost, and pdfmark\fB\'

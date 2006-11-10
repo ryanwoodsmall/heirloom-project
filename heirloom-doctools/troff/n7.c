@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.152 (gritter) 11/10/06
+ * Sccsid @(#)n7.c	1.153 (gritter) 11/10/06
  */
 
 /*
@@ -1802,7 +1802,7 @@ lspcomp(int idiff)
  */
 
 static double
-penalty(int k, int s, int h, int h2)
+penalty(int k, int s, int h, int h2, int h3)
 {
 	double	t, d;
 
@@ -1820,6 +1820,8 @@ penalty(int k, int s, int h, int h2)
 		t += hypp;
 	if (h2 && hypp2)
 		t += hypp2;
+	if (h3 && hypp3)
+		t += hypp3;
 	t = t * t * t;
 	if (t > MAXPENALTY)
 		t = MAXPENALTY;
@@ -1870,7 +1872,8 @@ parcomp(void)
 					t = 0;
 				else
 					t = penalty(v, s, pghyphw[j],
-						pghyphw[j] && hypc[i-1]);
+						pghyphw[j] && hypc[i-1],
+						pghyphw[j] && j >= pglastw);
 				t += pgpenal[j];
 				t += cost[i-1];
 				/*fdprintf(stderr, "%c%c%c%c to %c%c%c%c "
@@ -2013,6 +2016,7 @@ parword(void)
 	if (pgwords + 1 >= pgsize)
 		growpgsize();
 	hc = shc ? shc : HYPHEN;
+	pglastw = pgwords;
 	wp = wordp;
 	a = w = 0;
 	pglno[pgwords] = numtab[CD].val;
@@ -2260,7 +2264,7 @@ parpr(void)
 		nw++;
 	}
 	pbreak(nel - adspc < 0 && nwd > 1 || _spread);
-	pgwords = pgchars = pgspacs = pglines = pgne = 0;
+	pgwords = pgchars = pgspacs = pglines = pgne = pglastw = 0;
 	ll = savll;
 	numtab[CD].val = savcd;
 }

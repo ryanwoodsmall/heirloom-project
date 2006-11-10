@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.17 (gritter) 11/10/06
+.\" Sccsid @(#)doc.tr	1.18 (gritter) 11/10/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -183,7 +183,7 @@
 .	ss 12 0
 .	minss 9
 .	letadj 98 99 18 102 101
-.	hypp 20 50
+.	hypp 20 50 100
 ..
 .SS
 .de TS
@@ -208,7 +208,7 @@
 .	minss \\$1
 .	letadj \\$2 \\$3 \\$4 \\$5 \\$6
 .	ad \\$7
-.	hypp 0 0
+.	hypp 0 0 0
 .	nr XL \\$8
 .	ie 1:((\\n(LLu-\\n(XLu)>5m) .nr XI ((\\n(LLu-\\n(XLu)/2u)
 .	el .nr XI ((\\n(LLu-\\n(XLu))
@@ -598,12 +598,14 @@ and another breakpoint that does not require
 a hyphenated word may be preferred
 even though more adjustment may become necessary.
 .P
-An additional penalty can be configured
-for breakpoints that involve two successive hyphens.
+Additional penalties can be configured
+for breakpoints that involve two successive hyphens,
+and for hyphenating the last word of a paragraph.
 .P
 The ``.hypp'' request takes the single hyphen penalty
-as its first argument
-and the penalty for consecutive hyphens as second.
+as its first argument,
+the penalty for consecutive hyphens as second,
+and the penalty for hyphenating the last word as third.
 Effective penalties are between 10 and 200.
 .P
 Hyphenation penalties only make hyphens less likely

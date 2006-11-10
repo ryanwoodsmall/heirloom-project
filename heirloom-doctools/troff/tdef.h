@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.153 (gritter) 11/5/06
+ * Sccsid @(#)tdef.h	1.154 (gritter) 11/10/06
  */
 
 /*
@@ -740,6 +740,7 @@ struct acc {
 #define	hylen	env._hylen
 #define	hypp	env._hypp
 #define	hypp2	env._hypp2
+#define	hypp3	env._hypp3
 #define	un1	env._un1
 #define	tabc	env._tabc
 #define	dotc	env._dotc
@@ -796,6 +797,7 @@ struct acc {
 #define	pglnout	env._pglnout
 #define	pshapes	env._pshapes
 #define	pgne	env._pgne
+#define	pglastw	env._pglastw
 #define	linkin	env._linkin
 #define	linkout	env._linkout
 #define	linkhp	env._linkhp
@@ -903,6 +905,7 @@ extern struct env {
 	int	_hylen;
 	float	_hypp;
 	float	_hypp2;
+	float	_hypp3;
 	int	_un1;
 	int	_tabc;
 	int	_dotc;
@@ -959,6 +962,7 @@ extern struct env {
 	int	_pglnout;
 	int	_pshapes;
 	int	_pgne;
+	int	_pglastw;
 	int	_linkin;
 	int	_linkout;
 	int	_linkhp;
