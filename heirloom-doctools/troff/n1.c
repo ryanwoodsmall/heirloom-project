@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.133 (gritter) 11/5/06
+ * Sccsid @(#)n1.c	1.134 (gritter) 11/10/06
  */
 
 /*
@@ -1049,7 +1049,7 @@ g0:
 			setrpt();
 			goto g0;
 		}
-		if (!copyf && !(frame->flags & FLAG_PARAGRAPH)) {
+		if (!copyf) {
 			if (gchtab[k]&LGBIT && !isdi(i) && lg && !lgf) {
 				k = cbits(i = getlg(i));
 				goto chartest;
@@ -1571,7 +1571,7 @@ g4:
 			i |= ZBIT;
 #endif /* EUC && NROFF */
 	if (cbits(i) == eschar && !raw) {
-		if ((gflag || frame->flags & FLAG_PARAGRAPH) && isdi(i))
+		if (gflag && isdi(i))
 			setcbits(i, PRESC);
 		else
 			setcbits(i, ESC);

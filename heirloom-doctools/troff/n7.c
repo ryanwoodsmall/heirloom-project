@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.150 (gritter) 11/5/06
+ * Sccsid @(#)n7.c	1.151 (gritter) 11/10/06
  */
 
 /*
@@ -99,7 +99,7 @@ static tchar	adjbit(tchar);
 static void	sethtdp(void);
 static void	leftend(tchar, int, int);
 static void	parword(void);
-static void	pbreak(void);
+static void	parfmt(void);
 #ifndef	NROFF
 #define	nroff		0
 extern int	lastrst;
@@ -156,7 +156,7 @@ restart:
 		return;
 	}
 	if ((pa || padj) && pglines == 0 && pgchars && !ce && !rj && fi) {
-		pbreak();
+		parfmt();
 		goto restart;
 	}
 	if (minspsz && !brflg && ad && !admod)
@@ -468,13 +468,6 @@ nofill(void)
 		}
 		adsp = adrem = 0;
 		nwd = 10000;
-		if (frame->flags & FLAG_PARAGRAPH) {
-			if (pshapes) {
-				j = pglnout < pshapes ? pglnout : pshapes - 1;
-				un = pgin[j];
-			}
-			pglnout++;
-		}
 	}
 	nexti = GETCH();
 	leftend(nexti, !ce && !rj && !pendnf, !isdi(nexti));
@@ -2153,20 +2146,41 @@ parword(void)
 		tbreak();
 }
 
+static void
+pbreak(int sprd)
+{
+	struct s	*s;
+	int	j;
+
+	s = frame;
+	if (sprd)
+		adflg |= 5;
+	if (pshapes) {
+		j = pglnout < pshapes ? pglnout : pshapes - 1;
+		un = pgin[j];
+	}
+	nlflg = 1;
+	tbreak();
+	pglnout++;
+	if (trap) {
+		if (setjmp(*s->jmp) == 0) {
+			nlflg = 1;
+			mainloop();
+		}
+		while (frame != s)
+			popi();
+	}
+}
+
 void
 parpr(void)
 {
-	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc, savlnmod;
-	int	savll, savcd, savun;
-	tchar	c, e, lastc, savic, lgs;
+	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc;
+	int	savll, savcd;
+	tchar	c, e, lastc, lgs;
 
-	savic = ic;
-	ic = 0;
-	savlnmod = lnmod;
-	lnmod = 0;
 	savll = ll;
 	savcd = numtab[CD].val;
-	savun = un;
 	hc = shc ? shc : HYPHEN;
 	nw = 0;
 	for (i = 0; i < pgwords; i++) {
@@ -2195,9 +2209,7 @@ parpr(void)
 					if (letsps)
 						storelsp(c, 0);
 				}
-				adflg |= 5;
-				un = 0;
-				tbreak();
+				pbreak(1);
 			}
 			if (pshapes) {
 				j = k-1 < pshapes ? k-1 : pshapes - 1;
@@ -2246,52 +2258,23 @@ parpr(void)
 		nwd += stretches;
 		nw++;
 	}
-	if (nel - adspc < 0 && nwd > 1 || _spread)
-		adflg |= 5;
-	un = 0;
-	tbreak();
+	pbreak(nel - adspc < 0 && nwd > 1 || _spread);
 	pgwords = pgchars = pgspacs = pglines = pgne = 0;
-	ic = savic;
-	lnmod = savlnmod;
 	ll = savll;
 	numtab[CD].val = savcd;
-	un = savun;
 }
 
 static void
-pardi(void)
+parframe(void)
 {
-	struct d	dt, *dp;
-	struct contab	*cp;
 	int	_nlflg = nlflg;
 	int	_spread = spread;
 
-	if (dip != d)
-		wbt(0);
-	memset(&dt, 0, sizeof dt);
-	dp = dip;
-	dip = &dt;
-	dip->curd = makerq(NULL);
-	dip->op = finds(dip->curd, 1, 1);
-	newmn->rq = dip->curd;
-	newmn->flags = FLAG_PARAGRAPH;
-	maddhash(newmn);
-	cp = newmn;
-	parpr();
-	wbt(0);
-	pglnout = 0;
 	nxf->jmp = malloc(sizeof *nxf->jmp);
-	if (setjmp(*nxf->jmp) == 0) {
-		pushi((filep)cp->mx, dip->curd, FLAG_PARAGRAPH);
-		cp->flags |= FLAG_USED;
-		frame->contp = cp;
-		dip = dp;
-		offset = dip->op;
-		fi = 0;
-		nlflg = 1;
-		mainloop();
-	}
-	fi = 1;
+	pushi(-2, 0, FLAG_PARAGRAPH);
+	pglnout = 0;
+	parpr();
+	ch = popi();
 	nlflg = _nlflg;
 	if (_spread == 1 && pshapes > pglnout) {
 		memmove(&pgin[0], &pgin[pglnout],
@@ -2304,11 +2287,11 @@ pardi(void)
 }
 
 static void
-pbreak(void)
+parfmt(void)
 {
 	if (pgchars == 0)
 		return;
 	setnel();
 	parcomp();
-	pardi();
+	parframe();
 }

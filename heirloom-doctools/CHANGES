@@ -1,6 +1,9 @@
 Release ...
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
   (Didot point) and "C" (cicero) have been introduced.
+* [nt]roff: ".ad p" mode no longer employs a temporary diversion; the
+  lines are now written directly to the current output level, possibly
+  interrupted by trap processing.
 
 Release 061106
 * [nt]roff: Support for paragraph-based justification has been added,

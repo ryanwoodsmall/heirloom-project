@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.16 (gritter) 11/5/06
+.\" Sccsid @(#)doc.tr	1.17 (gritter) 11/10/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -308,7 +308,7 @@ HEIRLOOM TROFF
 Gunnar Ritter
 .ft R
 .sp
-11/5/06
+11/10/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -428,12 +428,9 @@ if all interword spaces in the paragraph
 are as close to the optimum setting as possible.
 .P
 Once the optimal breakpoints have been computed,
-the resulting lines are adjusted and
-are then written to a temporary diversion.
-Ultimately, this diversion is re-read in
-\fInofill\fR mode.
-At this time, \fIpage traps\fR become effective.
-When the diversion has been emptied,
+the resulting lines are output.
+At this time, \fItraps\fR become effective.
+When the entire paragraph has been printed,
 execution continues with the request
 that initially caused the \fIbreak\fR
 at the end of the paragraph.
@@ -450,11 +447,12 @@ across all environments;
 it is especially useful to change existing documents
 to use this mode.
 .P
-Since paragraph-at-once adjustment
-uses the established diversion mechanism,
-it is compatible with almost all existing \*(TR code.
-Most importantly, it works with the standard
-the ``\(enmm'', ``\(enms'', ``\(enme'',
+Paragraph-at-once adjustment
+is compatible with almost all existing \*(TR code.
+Most importantly, it works in combination
+with the \fItbl, eqn,\fR and \fIpic\fR
+preprocessors as well with the standard
+``\(enmm'', ``\(enms'', ``\(enme'',
 and ``\(enman'' macro sets.
 .P
 Indenting and line length

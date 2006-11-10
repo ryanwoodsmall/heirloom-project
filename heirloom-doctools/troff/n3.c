@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.174 (gritter) 11/1/06
+ * Sccsid @(#)n3.c	1.175 (gritter) 11/10/06
  */
 
 /*
@@ -885,6 +885,11 @@ rbf (void)		/*return next char from blist[] block*/
 		else
 			return(popi());
 	}
+	if (ip == -2) {
+		errprint("Bad storage while processing paragraph");
+		ip = 0;
+		done2(-5);
+	}
 	/* this is an inline expansion of rbf0: dirty! */
 	i = corebuf[ip];
 	/* end of rbf0 */
@@ -965,15 +970,9 @@ popi(void)
 	} else
 		if (p->loopf & LOOP_FREE)
 			ffree(p->newip);
-	if (p->flags & FLAG_PARAGRAPH) {
-		static jmp_buf	jmp;
-
-		ffree(p->contp->mx);
-		memcpy(&jmp, p->jmp, sizeof jmp);
-		free(p);
-		longjmp(jmp, 1);
-	}
 	free(p);
+	if (frame->flags & FLAG_PARAGRAPH)
+		longjmp(*frame->jmp, 1);
 	return(c);
 }
 

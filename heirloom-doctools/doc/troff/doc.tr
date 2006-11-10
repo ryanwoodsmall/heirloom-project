@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.172 (gritter) 11/9/06
+.\" Sccsid @(#)doc.tr	1.173 (gritter) 11/10/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -98,7 +98,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 11/9/06
+.ds Sccsdate 11/10/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -3256,9 +3256,8 @@ The words are then split into lines
 such that the interword spaces
 are closest to the optimum setting
 across the entire paragraph.
-The lines so determined
-are written to a temporary \T'c_diversion'diversion\T.
-Ultimately, this diversion is printed.
+Ultimately, the lines so determined
+are printed.
 \T'c_trap'Traps\T, page breaks,
 and any positioning become effective only at this time.
 It is thus well possible that the current page number
