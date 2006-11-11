@@ -1,4 +1,4 @@
-.\" Sccsid @(#)doc.tr	1.19 (gritter) 11/10/06
+.\" Sccsid @(#)doc.tr	1.20 (gritter) 11/11/06
 .do xflag 3
 .mediasize a5
 .warn
@@ -308,7 +308,7 @@ HEIRLOOM TROFF
 Gunnar Ritter
 .ft R
 .sp
-11/10/06
+11/11/06
 .sp 24p
 \*[Ornament]
 .sp |\n(PEu-1v
@@ -450,7 +450,7 @@ to use this mode.
 Paragraph-at-once adjustment
 is compatible with almost all existing \*(TR code.
 Most importantly, it works in combination
-with the \fItbl, eqn,\fR and \fIpic\fR
+with the \fItbl, eqn, refer,\fR and \fIpic\fR
 preprocessors as well with the standard
 ``\(enmm'', ``\(enms'', ``\(enme'',
 and ``\(enman'' macro sets.
