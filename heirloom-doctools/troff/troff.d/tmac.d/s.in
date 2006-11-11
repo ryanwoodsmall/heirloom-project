@@ -34,7 +34,7 @@
 .\"
 .\" Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)s.in	1.2 (gritter) 8/13/05
+.\" Sccsid @(#)s.in	1.3 (gritter) 11/11/06
 .\"
 .ds // @MACDIR@/
 .	\" IZ - initialize (before text begins)
@@ -1002,8 +1002,20 @@
 .rm @T
 ..
 .	\" IX - index words to stderr
+.if \n(.X .do nr IXcount 0 1
 .de IX
+.ie \\n(.X \{\
+.do de IX-\\n+[IXcount]
+.tm \\$1\t\\$2\t\\$3\t\\$4 ... \\\\n(PN
+\\..
+.do nr IXsaveX \\n(.X
+.do xflag 3
+\\P[IX-\\n[IXcount]]\c
+.do xflag \\n[IXsaveX]
+.\}
+.el \{\
 .tm \\$1\t\\$2\t\\$3\t\\$4 ... \\n(PN
+.\}
 ..
 .	\" UX - UNIX macro
 .de UX
