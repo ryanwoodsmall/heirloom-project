@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.154 (gritter) 11/10/06
+ * Sccsid @(#)n7.c	1.155 (gritter) 11/12/06
  */
 
 /*
@@ -190,7 +190,8 @@ restart:
 	if (lastl + un > dip->maxl)
 		dip->maxl = lastl + un;
 	horiz(un);
-	pchar(mkxfunc(INDENT, un));
+	if (un != 0)
+		pchar(mkxfunc(INDENT, un));
 #ifdef NROFF
 	if (adrem % t.Adj)
 		resol = t.Hor; 
@@ -2257,7 +2258,6 @@ parpr(void)
 			}
 			nel = ll - un;
 			nw = nwd = 1;
-			storeline(FILLER, 0);
 			leftend(para[pgwordp[i]], admod != 1 && admod != 2, 1);
 		} else {
 			for (j = pgspacp[i]; j < pgspacp[i+1]; j++) {

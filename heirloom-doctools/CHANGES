@@ -10,6 +10,9 @@ Release ...
   a penalty for hyphenating the last word of a paragraph.
 * [nt]roff: A memory allocation error that could occur with extensive
   use of output-line traps has been fixed.
+* [nt]roff: A control character written in a diversion is now correctly
+  interpreted when the diversion is re-read (unless in groff compatibility
+  mode). This fixes the ".AU" macro of "-mm".
 * -ms: The ".IX" index macro now works in ".padj" mode.
 * -me: The ".(x" and ".)x" index macros now work in ".padj" mode.
 * A "-mpadj" macro set has been added. It simply executes ".do padj"
