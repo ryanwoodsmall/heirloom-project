@@ -15,6 +15,9 @@ Release ...
   mode). This fixes the ".AU" macro of "-mm".
 * [nt]roff: The "\R" escape sequence works correctly again; in the last
   release, it had inserted the letter "R" into the text.
+* [nt]roff: Long names including a string in their name are now handled
+  correctly, e.g. ".nr x\*yz 1" no longer tries to set the register "x\*y"
+  to the value "z".
 * -ms: The ".IX" index macro now works in ".padj" mode.
 * -me: The ".(x" and ".)x" index macros now work in ".padj" mode.
 * A "-mpadj" macro set has been added. It simply executes ".do padj"

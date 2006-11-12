@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.175 (gritter) 11/10/06
+ * Sccsid @(#)n3.c	1.176 (gritter) 11/12/06
  */
 
 /*
@@ -2179,14 +2179,14 @@ int
 maybemore(int sofar, int flags)
 {
 	char	c, buf[NC+1], pb[] = { '\n', 0 };
-	int	i = 2, n, _raw = raw, _init = init;
+	int	i = 2, n, _raw = raw, _init = init, _app = app;
 
 	if (xflag < 2)
 		return sofar;
 	if (xflag == 2)
 		raw = 1;
 	else
-		init++;
+		app = 0;
 	buf[0] = sofar&BYTEMASK;
 	buf[1] = (sofar>>BYTE)&BYTEMASK;
 	do {
@@ -2209,6 +2209,7 @@ maybemore(int sofar, int flags)
 				cpushback(&buf[2]);
 			raw = _raw;
 			init = _init;
+			app = _app;
 			if (flags & 2) {
 				if (i > 3 && xflag >= 3)
 					sofar = -2;
@@ -2236,6 +2237,7 @@ maybemore(int sofar, int flags)
 		cpushback(pb);
 	raw = _raw;
 	init = _init;
+	app = _app;
 	return MAXRQ2 + n;
 }
 
