@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.176 (gritter) 11/12/06
+ * Sccsid @(#)n3.c	1.177 (gritter) 11/12/06
  */
 
 /*
@@ -231,6 +231,10 @@ _growcontab(struct contab **contp, int *NMp, struct contab ***hashp)
 			if (s->contp >= onc && s->contp < &onc[*NMp])
 				s->contp = (struct contab *)
 					((char *)(s->contp) + j);
+		for (i = 0; i <= dilev; i++)
+			if (d[i].soff >= onc && d[i].soff < &onc[*NMp])
+				d[i].soff = (struct contab *)
+					((char *)(d[i].soff) + j);
 	}
 	*NMp += inc;
 	return *contp;
@@ -1776,7 +1780,8 @@ casesubstring(void)
 						st = 1;
 				}
 				if (st == 1) {
-					wbf(tp[j]);
+					if (tp)
+						wbf(tp[j]);
 					if (j >= n2)
 						break;
 				}
