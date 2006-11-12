@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.155 (gritter) 11/12/06
+ * Sccsid @(#)n7.c	1.157 (gritter) 11/12/06
  */
 
 /*
@@ -546,7 +546,8 @@ ckul(void)
 		font = sfont;
 		mchbits();
 	}
-	if (it && (!itc || !pendw && !pendnf) && (--it == 0) && itmac)
+	if (it && !pglines && (!itc || !pendw && !pendnf) &&
+			(--it == 0) && itmac)
 		control(itmac, 0);
 }
 
@@ -697,8 +698,8 @@ newline(int a)
 nl1:
 	ejf = dip->hnl = numtab[NL].val = 0;
 	ejl = frame->tail_cnt;
-	if (donef) {
-		if ((!nc && !wch) || ndone)
+	if (donef || ndone && pgchars && !pglines) {
+		if ((!nc && !wch && !pglines) || ndone)
 			done1(0);
 		ndone++;
 		donef = 0;

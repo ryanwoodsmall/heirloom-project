@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.134 (gritter) 11/10/06
+ * Sccsid @(#)n1.c	1.135 (gritter) 11/12/06
  */
 
 /*
@@ -1350,8 +1350,10 @@ copy:
 			goto g0;
 		return(j);
 	case 'R':
-		if (xflag)
+		if (xflag) {
 			setr();
+			goto g0;
+		}
 		goto dfl;
 	case 'Z':
 		if (xflag == 0)
