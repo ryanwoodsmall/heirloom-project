@@ -3,7 +3,7 @@ MACS = acm.me bib chars.me deltext.me e eqn.me \
 	ms.cov ms.eqn ms.ref ms.tbl ms.ths ms.toc null.me refer.me \
 	s sh.me tbl.me thesis.me v vgrind \
 	an andoc doc doc-common doc-ditroff doc-nroff doc-syms \
-	pictures color pm srefs ptx safe g
+	pictures color pm srefs ptx safe g padj
 
 .SUFFIXES: .in
 .in:

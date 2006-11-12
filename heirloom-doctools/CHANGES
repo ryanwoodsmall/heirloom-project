@@ -12,6 +12,9 @@ Release ...
   use of output-line traps has been fixed.
 * -ms: The ".IX" index macro now works in ".padj" mode.
 * -me: The ".(x" and ".)x" index macros now work in ".padj" mode.
+* A "-mpadj" macro set has been added. It simply executes ".do padj"
+  and is useful to enable paragraph-at-once adjustment from the command
+  line.
 
 Release 061106
 * [nt]roff: Support for paragraph-based justification has been added,
