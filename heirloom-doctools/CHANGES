@@ -20,6 +20,8 @@ Release ...
   to the value "z".
 * [nt]roff: Fixed some more memory access problems that had been introduced
   with support for local variables.
+* [nt]roff: Fixed a non-local goto error that could lead to segmentation
+  faults with ".ad p" at the end of the input.
 * -ms: The ".IX" index macro now works in ".padj" mode.
 * -me: The ".(x" and ".)x" index macros now work in ".padj" mode.
 * A "-mpadj" macro set has been added. It simply executes ".do padj"
