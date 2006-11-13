@@ -16,10 +16,10 @@ troff generates typesetter output from the same document source code as
 nroff. Thus a special use of it is to prepare manual pages for printing.
 troff is a general-purpose typesetting processor, though. Significant
 features have been added in this implementation; see the "Nroff/Troff
-User's Manual" and "Font Handling in Troff with PostScript Devices"
-for details. Both documents are included in the "doc" subdirectory
-of the source code distribution; compiled PDF files can be downloaded
-from the project home page.
+User's Manual", "Font Handling in Troff with PostScript Devices", and
+"Justification in Heirloom Troff" for details. All documents are
+included in the "doc" subdirectory of the source code distribution;
+compiled PDF files can be downloaded from the project home page.
 
 Currently, troff is almost exclusively targeted at generating output
 for PostScript interpreters. Its principal device independence has
@@ -36,7 +36,7 @@ Solaris		9 and above
 HP-UX		B.11.11 and above
 AIX		5.1
 FreeBSD		5.4
-NetBSD		2.0
+NetBSD		2.0, 3.0
 DragonFlyBSD	1.3.7-DEVELOPMENT
 Mac OS X	10.4.3
 
@@ -120,6 +120,10 @@ following:
   "doc*" and "andoc". "nroff -mandoc" will then switch automatically
   between the two macro packages.
 
+- Heirloom nroff can optimize line breaking over whole paragraphs.
+  This results in fewer ugly holes of successive spaces in the output.
+  To enable it with manual pages, add "-mpadj" to the command line.
+
 - It is recommended that the "-msafe" macro package is used when
   viewing manual pages. It will remove those requests that allow to
   call programs or to write to files. If your man command runs with
@@ -129,18 +133,18 @@ following:
   own version.
 
 - Thus a complete pipeline to format manual pages for viewing is:
-  tbl input.1 | neqn | nroff -Tlp -mg -msafe -mandoc | col -x
+  tbl input.1 | neqn | nroff -Tlp -mg -msafe -mpadj -mandoc | col -x
 
 - To print manual pages with troff, use
-  tbl input.1 | eqn | troff -mg -msafe -mandoc | dpost | lp
+  tbl input.1 | eqn | troff -mg -msafe -mpadj -mandoc | dpost | lp
 
 - You should of course configure your "man" command such that it
   executes these pipelines automatically for you. For the "man"
   command from the Heirloom Toolchest, suitable entries in
   "/etc/default/man" are:
 
-	NROFF=/usr/ucb/nroff -Tlocale -mg -msafe
-	TROFF=/usr/ucb/troff -mg -msafe
+	NROFF=/usr/ucb/nroff -Tlocale -mg -msafe -mpadj
+	TROFF=/usr/ucb/troff -mg -msafe -mpadj
 	TBL=/usr/ucb/tbl
 	EQN=/usr/ucb/eqn
 	NEQN=/usr/ucb/neqn
@@ -156,4 +160,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/12/06
+<gunnarr@acm.org>						11/13/06
