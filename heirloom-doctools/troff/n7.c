@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.160 (gritter) 11/13/06
+ * Sccsid @(#)n7.c	1.161 (gritter) 11/13/06
  */
 
 /*
@@ -48,13 +48,6 @@
 
 #include <stdlib.h>
 #include <limits.h>
-#if defined (EUC) && defined (NROFF)
-#ifdef	__sun
-#include <widec.h>
-#else
-#include <wchar.h>
-#endif
-#endif /* EUC && NROFF */
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
@@ -77,18 +70,10 @@ tchar	gettch();
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
-#if defined (EUC) && defined (NROFF)
-#include <wctype.h>
-#endif /* EUC && NROFF */
 #include "ext.h"
-#if defined (EUC) && defined (NROFF)
-char	mbbuf2[MB_LEN_MAX + 1];
-char	*mbbuf2p = mbbuf2;
-tchar	mtbuf[MB_LEN_MAX + 1];
-tchar	*mtbufp;
-int	pendmb = 0;
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 wchar_t	cwc, owc, wceoll;
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 int	brflg;
 
 #undef	iswascii
@@ -202,7 +187,7 @@ restart:
 #endif
 	adrem = (adrem / resol) * resol;
 	for (i = line; nc > 0; ) {
-		if ((c = cbits(j = *i++) & ~MBMASK) == ' ' || c == STRETCH) {
+		if ((c = cbits(j = *i++)) == ' ' || c == STRETCH) {
 			if (xflag && !fi && dilev || iszbit(j) || isadjspc(j))
 				goto std;
 			pad = 0;
@@ -214,8 +199,7 @@ restart:
 				minflg = _minflg;
 				pad += width(j);
 				nc--;
-			} while ((c = cbits(j = *i++) & ~MBMASK) == ' ' ||
-					c == STRETCH);
+			} while ((c = cbits(j = *i++)) == ' ' || c == STRETCH);
 			pad += kernadjust(i[-2], i[-1]);
 			i--;
 			pad += adsp;
@@ -963,7 +947,7 @@ movword(void)
 	over = 0;
 	wp = wordp;
 	if (!nwd) {
-		while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
+		while ((c = cbits(i = *wp++)) == ' ') {
 			if (iszbit(i))
 				break;
 			wch--;
@@ -1196,13 +1180,13 @@ getword(int x)
 	register int j, k = 0, w;
 	register tchar i = 0, *wp, nexti, gotspc = 0, t;
 	int noword, n, inword = 0;
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
 	char *mbbuf3p;
 	int wbf;
 	tchar m;
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 
 	noword = 0;
 	if (x)
@@ -1217,33 +1201,13 @@ getword(int x)
 	over = wne = wch = 0;
 	hyoff = 0;
 	memset(wdpenal, 0, wdsize * sizeof *wdpenal);
-#if defined (EUC) && defined (NROFF)
-	mtbufp = mtbuf;
-	if (pendmb) {
-		while(*mtbufp) {
-			switch(*mtbufp & MBMASK) {
-			case LASTOFMB:
-			case BYTE_CHR:
-				storeword(*mtbufp++, -1);
-				break;
-
-			default:
-				storeword(*mtbufp++, 0);
-			}
-		}
-		mtbufp = mtbuf;
-		pendmb = 0;
-		goto g1;
-	}
-#endif /* EUC && NROFF */
 	n = 0;
 	while (1) {	/* picks up 1st char of word */
 		j = cbits(i = GETCH());
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 		if (multi_locale)
-			if (collectmb(i))
-				continue;
-#endif /* EUC && NROFF */
+			collectmb(i);
+#endif /* EUC && NROFF && ZWDELIMS */
 		if (j == '\n') {
 			wne = wch = 0;
 			noword = 1;
@@ -1290,7 +1254,7 @@ getword(int x)
 		break;
 	}
 	seflg = 0;
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 	if (!multi_locale)
 		goto a0;
 	if (wddlm && iswprint(wceoll) && iswprint(cwc) &&
@@ -1306,16 +1270,7 @@ getword(int x)
 				while (*wddelim) {
 					if ((n = wctomb(mbbuf3, *wddelim++))
 					    > 0) {
-						mbbuf3[n] = 0;
-						n--;
-						mbbuf3p = mbbuf3 + n;
-						while(n) {
-							m = *(mbbuf3p-- - n--) &
-							    0xff | MIDDLEOFMB |
-							    ZBIT;
-							storeword(m, 0);
-						}
-						m = *mbbuf3p & 0xff | LASTOFMB;
+						m = setuc0(wddelim[-1]);
 						storeword(m, -1);
 					} else {
 						storeword(' ' | chbits, sps);
@@ -1328,7 +1283,7 @@ getword(int x)
 		}
 	}
 a0:
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 	if (spbits && xflag) {
 		t = ' ' | spbits;
 		w = width(t);
@@ -1379,27 +1334,7 @@ g0:
 	}
 	j = width(i);
 	numtab[HP].val += j;
-#if !defined (EUC) || !defined (NROFF)
 	storeword(i, j);
-#else	/* EUC && NROFF */
-	if (multi_locale) {
-		mtbufp = mtbuf;
-		while(*mtbufp) {
-			switch(*mtbufp & MBMASK) {
-			case LASTOFMB:
-			case BYTE_CHR:
-				storeword(*mtbufp++, j);
-				break;
-
-			default:
-				storeword(*mtbufp++, 0);
-			}
-		}
-		mtbufp = mtbuf;
-	} else {
-		storeword(i, j);
-	}
-#endif /* EUC && NROFF */
 	if (1) {
 		int	oev = ev;
 		nexti = GETCH();
@@ -1418,11 +1353,10 @@ g1:		nexti = GETCH();
 	j = cbits(i = nexti);
 	if (!ismot(i) && j != ohc)
 		inword = 1;
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 	if (multi_locale)
-		if (collectmb(i))
-			goto g1;
-#endif /* EUC && NROFF */
+		collectmb(i);
+#endif /* EUC && NROFF && ZWDELIMS */
 	{
 		static int sentchar[] =
 			{ '.', '?', '!', ':', 0 }; /* sentence terminators */
@@ -1432,23 +1366,22 @@ g1:		nexti = GETCH();
 		transchar[5] = DAGGER;
 		if (j != '\n' && j != ' ' || ismot(i) || iszbit(i) ||
 				isadjspc(i))
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 			if (!multi_locale)
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 			goto g0;
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 			else {
 				if (!wdbdg || (iswascii(cwc) && iswascii(owc)))
 					goto g0;
 				if ((wbf = (*wdbdg)(owc, cwc, 1)) < 5) {
-					pendmb++;
 					storeword((wbf < 3) ? ZWDELIM(1) :
 						  ZWDELIM(2), 0);
 					*wordp = 0;
 					goto rtn;
 				} else goto g0;
 			}
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 		wp = wordp-1;	/* handle extra space at end of sentence */
 		sp = *sentch ? sentch : sentchar;
 		tp = *transch ? transch : transchar;
@@ -1471,9 +1404,9 @@ g1:		nexti = GETCH();
 		cont:;
 		}
 	}
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 	wceoll = owc;
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 	*wordp = 0;
 	numtab[HP].val += xflag ? width(i) : sps;
 rtn:
@@ -1579,53 +1512,17 @@ tchar gettch(void)
 
 
 #endif
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 int
 collectmb(tchar i)
 {
-	int busy;
-
-	*mtbufp++ = i;
-	*mbbuf2p++ = i & BYTEMASK;
-	*mtbufp = *mbbuf2p = 0;
-	if (ismot(i)) {
-		mtbufp = mtbuf;
-		mbbuf2p = mbbuf2;
-		owc = 0;
-		cwc = 0;
-		return(busy = 0);
-	}
-	if ((i & MBMASK) == MIDDLEOFMB) {
-		if (mtbufp <= (mtbuf + mb_cur_max)) {
-			busy = 1;
-		} else {
-			*(mtbufp - 1) &= ~MBMASK;
-			goto gotmb;
-		}
-	} else {
-		if ((i & MBMASK) == LASTOFMB)
-			*(mtbufp - 1) &= ~MBMASK;
-gotmb:
-		mtbufp = mtbuf;
-		owc = cwc;
-		if ((*mbbuf2&~(wchar_t)0177) == 0) {
-			cwc = *mbbuf2;
-		} else if (mbtowc(&cwc, mbbuf2, mb_cur_max) <= 0) {
-			mtbufp = mtbuf;
-			while (*mtbufp) {
-				setcbits(*mtbufp, (*mtbufp & 0x1ff));
-				mtbufp++;
-			}
-			mtbufp = mtbuf;
-		}
-		mbbuf2p = mbbuf2;
-		busy = 0;
-	}
-	return(busy);
+	owc = cwc;
+	cwc = tr2un(cbits(i), fbits(i));
+	return(0);
 }
 
 
-#endif /* EUC && NROFF */
+#endif /* EUC && NROFF && ZWDELIMS */
 
 static tchar
 adjbit(tchar c)
@@ -2031,7 +1928,7 @@ parword(void)
 	pgwdin[pgwords] = in;
 	pgwdll[pgwords] = ll;
 	un1 = -1;
-	while ((c = cbits(i = *wp++) & ~MBMASK) == ' ') {
+	while ((c = cbits(i = *wp++)) == ' ') {
 		if (iszbit(i))
 			break;
 		wch--;

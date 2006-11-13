@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.135 (gritter) 11/12/06
+ * Sccsid @(#)n1.c	1.136 (gritter) 11/13/06
  */
 
 /*
@@ -1025,7 +1025,7 @@ g0:
 		return(i);
 	k = cbits(i);
 	if (k != ESC) {
-		if (i & MBMASK || k >= NCHARS || gchtab[k]==0)
+		if (k >= NCHARS || gchtab[k]==0)
 			return(i);
 		if (k == '\n') {
 		nl:
@@ -1425,9 +1425,6 @@ tchar getch0(void)
 	register tchar i;
 #ifdef	EUC
 	register int	n;
-#ifdef	NROFF
-	int col_index;
-#endif	/* NROFF */
 #endif	/* EUC */
 
 again:
@@ -1471,7 +1468,6 @@ g2:
 		ioff++;
 		if (i >= 040 && i < 0177)
 #else	/* EUC */
-#ifndef	NROFF
 		i = *ibufp++ & 0377;
 		ioff++;
 		*mbbuf1p++ = i;
@@ -1501,47 +1497,6 @@ g2:
 				i &= 0177;
 		}
 		if (i >= 040 && i < 0177)
-#else	/* NROFF */
-		i = *ibufp++ & 0377;
-		*mbbuf1p++ = i;
-		*mbbuf1p = 0;
-		if (!multi_locale) {
-			twc = 0;
-			mbbuf1p = mbbuf1;
-		} else if ((*mbbuf1&~(wchar_t)0177) == 0) {
-			twc = *mbbuf1;
-			i |= (BYTE_CHR);
-			setcsbits(i, 0);
-			twc = 0;
-			mbbuf1p = mbbuf1;
-		} else if ((n = mbtowc(&twc, mbbuf1, mb_cur_max)) <= 0) {
-			if (mbbuf1p >= mbbuf1 + mb_cur_max) {
-				illseq(-1, mbbuf1, mb_cur_max);
-				i &= ~(MBMASK | CSMASK);
-				twc = 0;
-				mbbuf1p = mbbuf1;
-				*mbbuf1p = 0;
-			} else {
-				i |= (MIDDLEOFMB);
-			}
-		} else {
-			if (n > 1)
-				i |= (LASTOFMB);
-			else
-				i |= (BYTE_CHR);
-			if (isascii(twc)) {
-				col_index = 0;
-			} else {
-				if ((col_index = wcwidth(twc)) < 0)
-					col_index = 0;
-			}
-			setcsbits(i, col_index);
-			twc = 0;
-			mbbuf1p = mbbuf1;
-		}
-		ioff++;
-		if (i >= 040 && i != 0177)
-#endif	/* NROFF */
 #endif	/* EUC */
 			goto g4;
 		if (i != 0177) {
@@ -1561,17 +1516,8 @@ g2:
 g4:
 	if (!copyf && iscopy(i))
 		i = setuc0(cbits(i));
-#if !defined (EUC) || !defined (NROFF)
 	if (copyf == 0 && (i & ~BYTEMASK) == 0)
-#else	/* EUC && NROFF */
-	if (copyf == 0 && (i & ~CHMASK) == 0)
-#endif	/* EUC && NROFF */
 		i |= chbits;
-#if defined (EUC) && defined (NROFF)
-	if (multi_locale)
-		if (i & MBMASK1)
-			i |= ZBIT;
-#endif /* EUC && NROFF */
 	if (cbits(i) == eschar && !raw) {
 		if (gflag && isdi(i))
 			setcbits(i, PRESC);
@@ -1743,15 +1689,9 @@ getach(void)
 	while (isxfunc(i, CHAR))
 		i = charout[sbits(i)].ch;
 	j = cbits(i);
-#if !defined (EUC) || !defined (NROFF)
 	if (ismot(i) || j == XFUNC && fbits(i) || j == ' ' || j == '\n' ||
 			j & 0200) {
 		if (!ismot(i) && j >= 0200)
-#else	/* EUC && NROFF */
-	if (ismot(i) || j == XFUNC && fbits(i) || j == ' ' || j == '\n' ||
-			j > 0200) {
-		if (!ismot(i) && j > 0200)
-#endif	/* EUC && NROFF */
 			illseq(j, NULL, -3);
 		else if (WARN_INPUT) {
 			if (ismot(i) && !isadjmot(i))
@@ -1806,11 +1746,7 @@ getname(void)
 
 	lgf++;
 	for (k = 0; ; k++) {
-#if !defined (EUC) || !defined (NROFF)
 		if (((j = cbits(i = getch())) <= ' ') || (j > 0176))
-#else	/* EUC && NROFF */
-		if (((j = cbits(i = getch())) <= ' ') || (j == 0177))
-#endif /* EUC && NROFF */
 			break;
 		if (k + 1 >= NS)
 			nextf = realloc(nextf, NS += 14);

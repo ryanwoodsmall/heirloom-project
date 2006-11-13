@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.155 (gritter) 11/10/06
+ * Sccsid @(#)tdef.h	1.156 (gritter) 11/13/06
  */
 
 /*
@@ -226,7 +226,6 @@ extern	int	NCHARS;	/* maximum size of troff character set */
 
 /*
 	Internal character representation:
-ifndef NROFF
 	Internally, every character is carried around as
 	a 64 bit cookie, called a "tchar" (typedef int64_t).
 	Bits are numbered 63..0 from left to right.
@@ -237,27 +236,8 @@ ifndef NROFF
 		if bit 63	zero motion
 		bits 62..40	size
 		bits 39..32	font
-else NROFF
-	Internally, every character is carried around as
-	a 32 bit cookie, called a "tchar" (typedef int32_t).
-	Bits are numbered 31..0 from left to right.
-	If bit 15 is 1, the character is motion, with
-		if bit 16 it's vertical motion
-		if bit 17 it's negative motion
-	If bit 15 is 0, the character is a real character.
-		if bit 31	zero motion
-		bits 28..24	size
-		bits 23..16	font
-ifdef EUC
-		bits 14,13	identifier for the colunm of print of character.
-		bits 12,11	multibyte position identifier
-	This applies only to nroff; troff stores wide characters
-	as PostScript characters.
-endif EUC
-endif NROFF
 */
 
-#ifndef	NROFF
 /* in the following, "LL" should really be a tchar, but ... */
 
 #define	MOT	(01LL<<21)	/* motion character indicator */
@@ -308,79 +288,16 @@ endif NROFF
 #define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 32
 #define	setcbits(n,c)	n = (n & ~0x001FFFFFLL | (c))	/* set character bits */
 
-#else	/* NROFF */
-/* in the following, "L" should really be a tchar, but ... */
-
-#define	MOT	(01L<<15)	/* motion character indicator */
-#define	MOTV	(07L<<15)	/* clear for motion part */
-#define	VMOT	(01L<<16)	/* vert motion bit */
-#define	NMOT	(01L<<17)	/* negative motion indicator*/
-#define	MAXMOT	32767	/* bad way to write this!!! */
-#define	ismot(n)	((n) & MOT)
-#define	isvmot(n)	((n) & VMOT)	/* must have tested MOT previously */
-#define	isnmot(n)	((n) & NMOT)	/* ditto */
-#define	absmot(n)	(unsigned)(0177777 & (n) & ~MOT)	/* (short) is cheap mask */
-#define	sabsmot(n)	(!xflag || (n) <= MAXMOT ? (n)&0177777 : moflo(n))
-
-#define	ZBIT	0x80000000 	/*  (01L << 31) */	/* zero width char */
-#define	iszbit(n)	((n) & ZBIT)
-#define	BLBIT	0x40000000	/* optional break-line char */
-#define	isblbit(n)	((n) & BLBIT)
-#define	COPYBIT	0x20000000	 /* wide character in copy mode */
-#define	iscopy(n)	((n) & COPYBIT && !ismot(n) && cbits(n) & ~0177)
-#define	ADJBIT	0x20000000	/* adjusted space */
-#define	isadjspc(n)	((n) & ADJBIT && !ismot(n) && (cbits(n) & ~0177) == 0 \
-				&& cbits(n) != FILLER)
-#define	isadjmot(n)	((n) & ADJBIT && ismot(n))
-#define	TRANBIT	0x20000000	/* transparent filler */
-#define	istrans(n)	((n) & TRANBIT && cbits(n) == FILLER)
-#define	TAILBIT	0x10000000	/* tail recursion */
-#define	istail(n)	(((n) & (TAILBIT|MOT|'\n')) == (TAILBIT|'\n'))
-#define	ABSCHAR		0400	/* absolute char number in this font */
-#define	AUTOLIG	0		/* ligature substituted automatically */
-#define	islig(n)	((n) ? 0 : 0)
-#define	SENTSP		0	/* sentence space */
-#define	issentsp(n)	((n) ? 0 : 0)
-#define	DIBIT	0		/* written in a diversion */
-#define	isdi(n)		((n) ? 0 : 0)
-
-#define	SMASK		(0037L << 24)
-#define	FMASK		(0377L << 16)
-#define	SFMASK		(SMASK|FMASK)	/* size and font in a tchar */
-#define	sbits(n)	(unsigned)(((n) >> 24) & 0037)
-#define	fbits(n)	(((n) >> 16) & 0377)
-#define	sfbits(n)	(unsigned)(0177777 & (((n) & SFMASK) >> 16))
-#define	cbits(n)	(unsigned)(0177777 & (n))	/* isolate bottom 16 bits  */
-#define	absbits(n)	(cbits(n) & ~ABSCHAR)
-
-#define	setsbits(n,s)	n = (n & ~SMASK) | (tchar)(s) << 24
-#define	setfbits(n,f)	n = (n & ~FMASK) | (tchar)(f) << 16
-#define	setsfbits(n,sf)	n = (n & ~SFMASK) | (tchar)(sf) << 16
-#define	setcbits(n,c)	n = (n & ~077777L | (c))	/* set character bits */
-#endif	/* NROFF */
-
 #define	BYTEMASK	0377
 #define	BYTE	8
 
 #define	ischar(n)	(((n) & ~BYTEMASK) == 0)
 
-#if defined (EUC) && defined (NROFF)
-#define CSMASK	0x6000	/* colunm of print identifier */
-#define MBMASK	0x1c00	/* bits identifying position in a multibyte char */
-#define MBMASK1	0x1800
-#define FIRSTOFMB	0x1000
-#define MIDDLEOFMB	0x0800
-#define LASTOFMB	0x0400
-#define BYTE_CHR	0x0000
-#define	cs(n)	(((n) & CSMASK) >> 13)	/* colum of print of character */
-#define	setcsbits(n,c)	n = ((n & ~CSMASK) | ((c) << 13))
-#define CHMASK	(BYTEMASK | CSMASK | MBMASK)
+#if defined (NROFF) && defined (EUC) && defined (ZWDELIMS)
 #define ZWDELIM1	ZBIT | FIRSTOFMB | ' '	/* non-ASCII word delimiter 1 */
 #define ZWDELIM2	ZBIT | MIDDLEOFMB | ' '	/* non-ASCII word delimiter 2 */
 #define ZWDELIM(c)	((c) == 0) ? ' ' : ((c) == 1) ? ZWDELIM1 : ZWDELIM2
-#else	/* !EUC || !NROFF */
-#define	MBMASK	0
-#endif	/* !EUC || !NROFF */
+#endif	/* NROFF && EUC && ZWDELIMS */
 
 #define	ZONE	5	/* 5 hrs for EST */
 #define	TABMASK	0x3FFFFFFF
@@ -404,11 +321,6 @@ endif NROFF
 #ifndef EUC
 #define	oput(c)	if ((*obufp++ = (c)), obufp >= &obuf[OBUFSZ]) flusho(); else
 #else
-#ifdef notdef
-#ifndef NROFF
-#define	oput(c)	if ((*obufp++ = (c)), obufp >= &obuf[OBUFSZ]) flusho(); else
-#endif /* NROFF */
-#endif
 #define	oput(c)	if ((*obufp++ = cbits(c) & BYTEMASK), obufp >= &obuf[OBUFSZ]) flusho(); else
 #endif /* EUC */
 
@@ -467,11 +379,7 @@ typedef long filep;
 
 #include <setjmp.h>
 #include <inttypes.h>
-#ifndef	NROFF
 typedef	int64_t		tchar;
-#else	/* NROFF */
-typedef	int32_t		tchar;
-#endif	/* NROFF */
 
 extern	int	Inch, Hor, Vert, Unitwidth;
 

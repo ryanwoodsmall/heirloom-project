@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n3.c	1.177 (gritter) 11/12/06
+ * Sccsid @(#)n3.c	1.178 (gritter) 11/13/06
  */
 
 /*
@@ -1547,12 +1547,9 @@ prwatch(struct contab *contp, int rq, int prc)
 		while ((c = rbf()) != 0) {
 			while (isxfunc(c, CHAR))
 				c = charout[sbits(c)].ch;
-#if !defined (NROFF) && defined (EUC)
 			if (iscopy(c) && (k = wctomb(&buf[j], cbits(c))) > 0)
 				j += k;
-			else
-#endif	/* !NROFF && EUC */
-			if (ismot(c))
+			else if (ismot(c))
 				buf[j++] = '?';
 			else if ((k = cbits(c)) < 0177) {
 				if (isprint(k))

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.120 (gritter) 11/13/06
+ * Sccsid @(#)n5.c	1.121 (gritter) 11/13/06
  */
 
 /*
@@ -851,7 +851,6 @@ loop:	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
 			break;
 		}
 	c:	j = cbits(c);
-#if !defined (NROFF) && defined (EUC)
 		if (iscopy(c)) {
 			int	n;
 			if ((n = wctomb(&tmbuf[i], j)) > 0) {
@@ -859,7 +858,6 @@ loop:	for (i = 0; i < NTM - 5 - mb_cur_max; ) {
 				continue;
 			}
 		}
-#endif	/* !NROFF && EUC */
 		if (xflag == 0) {
 			tmbuf[i++] = c;
 			continue;
@@ -1630,13 +1628,6 @@ caseif(int x)
 		tryglf++;
 		if (!skip(1)) {
 			j = getch();
-#if defined (NROFF) && defined (EUC)
-			if (multi_locale && j & MBMASK) {
-				while ((j & MBMASK) != LASTOFMB)
-					j = getch();
-				true++;
-			} else
-#endif	/* NROFF && EUC */
 			true = !ismot(j) && cbits(j) && cbits(j) != ' ';
 		}
 		tryglf--;
@@ -1931,7 +1922,9 @@ rdtty(void)
 {
 	char	onechar;
 #if defined (EUC) && defined (NROFF)
-	int	i, n, col_index;
+	int	i, n;
+
+loop:
 #endif /* EUC && NROFF */
 
 	onechar = 0;
@@ -1951,33 +1944,23 @@ rdtty(void)
 			*mbbuf1p++ = i;
 			*mbbuf1p = 0;
 			if ((*mbbuf1&~(wchar_t)0177) == 0) {
-				twc = *mbbuf1;
-				i |= (BYTE_CHR);
-				setcsbits(i, 0);
 				twc = 0;
 				mbbuf1p = mbbuf1;
+				goto loop;
 			}
 			else if ((n = mbtowc(&twc, mbbuf1, mb_cur_max)) <= 0) {
 				if (mbbuf1p >= mbbuf1 + mb_cur_max) {
-					i &= ~(MBMASK | CSMASK);
+					illseq(-1, mbbuf1, mbbuf1p-mbbuf1);
 					twc = 0;
 					mbbuf1p = mbbuf1;
 					*mbbuf1p = 0;
+					i &= 0177;
 				} else {
-					i |= (MIDDLEOFMB);
+					goto loop;
 				}
 			} else {
 				if (n > 1)
-					i |= (LASTOFMB);
-				else
-					i |= (BYTE_CHR);
-				if ((twc & ~(wchar_t)0177) == 0) {
-					col_index = 0;
-				} else {
-					if ((col_index = wcwidth(twc)) < 0)
-						col_index = 0;
-				}
-				setcsbits(i, col_index);
+					i = twc | COPYBIT;
 				twc = 0;
 				mbbuf1p = mbbuf1;
 			}

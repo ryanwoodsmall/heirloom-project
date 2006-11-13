@@ -8,6 +8,9 @@ Release ...
   may be suboptimal in this case.
 * [nt]roff: The ".hypp" request now accepts a third argument specifying
   a penalty for hyphenating the last word of a paragraph.
+* nroff: Characters are now internally stored as 64-bit integers as
+  in troff. As a consequence, hyphenation of words in international
+  languages now works if non-ASCII characters are involved.
 * [nt]roff: A memory allocation error that could occur with extensive
   use of output-line traps has been fixed.
 * [nt]roff: A control character written in a diversion is now correctly

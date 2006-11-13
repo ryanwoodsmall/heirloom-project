@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.38 (gritter) 11/6/06
+ * Sccsid @(#)n8.c	1.39 (gritter) 11/13/06
  */
 
 /*
@@ -188,25 +188,27 @@ alph(tchar j)
 	if (!ismot(j) && i < nhcode && (h = hcode[i]) != 0) {
 		if (h & ~0177)
 			h = tr2un(h, f);
-#if !defined (NROFF) && defined (EUC)
+#ifdef EUC
 		return hyext ? iswalnum(h) : iswalpha(h);
 	} else
-#else	/* NROFF || !EUC */
+#else	/* !EUC */
 		i = h;
 	}
-#endif	/* NROFF || !EUC */
-#if !defined (NROFF) && defined (EUC)
+#endif	/* !EUC */
+#ifdef EUC
 	if (!ismot(j) && i & ~0177) {
 		int	u;
+#ifndef	NROFF
 		if (islig(j) && hyext &&
 				lgrevtab && lgrevtab[f] && lgrevtab[f][i])
 			return 1;
+#endif	/* !NROFF */
 		u = tr2un(i, f);
 		if (u == 0x017F)	/* longs */
 			u = 's';
 		return hyext ? iswalnum(u) : iswalpha(u);
 	} else
-#endif	/* !NROFF && EUC */
+#endif	/* EUC */
 	if (!ismot(j) && i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z' ||
 			hyext && i >= '0' && i <= '9')
 		return(1);
@@ -378,7 +380,7 @@ maplow(tchar t)
 		h = tr2un(h, f);
 		return(h);
 	} else
-#if !defined (NROFF) && defined (EUC)
+#ifdef EUC
 	if (!ismot(t) && i & ~0177) {
 		i = tr2un(i, f);
 		if (i == 0x017F)	/* longs */
@@ -386,7 +388,7 @@ maplow(tchar t)
 		if (iswupper(i))
 			i = towlower(i);
 	} else
-#endif	/* !NROFF && EUC */
+#endif	/* EUC */
 	if (ischar(i) && isupper(i)) 
 		i = tolower(i);
 	return(i);

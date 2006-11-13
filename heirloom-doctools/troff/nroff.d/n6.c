@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.48 (gritter) 9/8/06
+ * Sccsid @(#)n6.c	1.49 (gritter) 11/13/06
  */
 
 /*
@@ -98,24 +98,14 @@ width(register tchar j)
 	if (i==ohc)
 		return(0);
 #ifdef EUC
-#ifdef NROFF
-	if (multi_locale) {
-		if ((j & MBMASK) || (j & CSMASK)) {
-			switch(j & MBMASK) {
-				case BYTE_CHR:
-				case LASTOFMB:
-					k = t.Char * csi_width[cs(j)];
-					break;
-				default:
-					k = 0;
-					break;
-			}
-			widthp = k;
-			return(k);
-		}
+	if (multi_locale && i >= nchtab + _SPECCHAR_ST) {
+		i = tr2un(i, fbits(j));
+		if ((i = wcwidth(i)) < 0)
+			i = 0;
+		k = t.Char * csi_width[i];
+		widthp = k;
+		return(k);
 	}
-	i &= 0x1ff;
-#endif /* NROFF */
 #endif /* EUC */
 	i = trtab[i];
 	if (i < 32)
@@ -201,7 +191,14 @@ setabs (void)		/* set absolute char from \C'...' */
 int
 tr2un(tchar c, int f)
 {
-	return(cbits(c));
+	int	k;
+
+	k = cbits(c);
+	if (k >= nchtab + _SPECCHAR_ST)
+		return k - nchtab - _SPECCHAR_ST;
+	if (k & ~0177)
+		return 0;
+	return k;
 }
 
 int 
@@ -615,22 +612,14 @@ setuc0(int n)
 {
 	if (n & ~0177) {
 #ifdef	EUC
-		char	mb[MB_LEN_MAX+1];
-		tchar	tc[MB_LEN_MAX+1];
-		int	i, j, w;
-
-		if ((i = wctomb(mb, n)) > 0) {
-			if ((w = wcwidth(n)) < 0)
-				w = 0;
-			for (j = 0; j < i-1; j++)
-				tc[j] = mb[j]&0377 | MIDDLEOFMB;
-			tc[j] = mb[j]&0377 | LASTOFMB;
-			setcsbits(tc[j], w);
-			tc[++j] = 0;
-			pushback(tc);
-		}
-#endif
+		int	k;
+		k = n + nchtab + _SPECCHAR_ST | chbits;
+		if (k >= NCHARS)
+			morechars(k);
+		return k;
+#else
 		return 0;
+#endif
 	} else
 		return n | chbits;
 }
