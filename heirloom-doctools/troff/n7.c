@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.157 (gritter) 11/12/06
+ * Sccsid @(#)n7.c	1.158 (gritter) 11/13/06
  */
 
 /*
@@ -1833,7 +1833,8 @@ penalty(int k, int s, int h, int h2, int h3)
 static void
 parcomp(int start)
 {
-	double	*cost, *_cost, t;
+	double	*cost, *_cost;
+	long double	t;
 	int	*prevbreak, *hypc, *_hypc, *brcnt, *_brcnt;
 	int	i, j, k, m, h, v, s;
 
@@ -1894,7 +1895,7 @@ parcomp(int start)
 						1 + brcnt[i-1],
 						brcnt[j]
 					);*/
-				if (t <= cost[j]) {
+				if ((double)t <= cost[j]) {
 					if (pghyphw[j])
 						h = hypc[i-1] + 1;
 					else
