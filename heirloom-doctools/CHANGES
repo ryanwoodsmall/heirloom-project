@@ -22,6 +22,8 @@ Release ...
   with support for local variables.
 * [nt]roff: Fixed a non-local goto error that could lead to segmentation
   faults with ".ad p" at the end of the input.
+* [nt]roff: Fixed a problem in ".bp" that could lead to the page number
+  being reset to zero in ".ad p" mode.
 * -ms: The ".IX" index macro now works in ".padj" mode.
 * -me: The ".(x" and ".)x" index macros now work in ".padj" mode.
 * A "-mpadj" macro set has been added. It simply executes ".do padj"
