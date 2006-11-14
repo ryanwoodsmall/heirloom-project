@@ -1,3 +1,9 @@
+Release ...
+* troff: In ".ad p" mode, when the character before the first interword
+  space formed a kerning pair with the space character, the line length
+  was incorrectly computed, and the line was prolongated by this amount.
+  This has been fixed.
+
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
   (Didot point) and "C" (cicero) have been introduced.

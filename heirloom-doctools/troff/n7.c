@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.162 (gritter) 11/14/06
+ * Sccsid @(#)n7.c	1.163 (gritter) 11/14/06
  */
 
 /*
@@ -2168,7 +2168,7 @@ parpr(void)
 				minflg = minspsz && ad && !admod;
 				w = width(c);
 				adspc += minspc;
-				if (j == pgspacp[i] && i > 0 && nwd > 1)
+				if (j == pgspacp[i] && i > 0)
 					w += kernadjust(para[pgwordp[i]-1], c);
 				if (j == pgspacp[i+1]-1)
 					w += kernadjust(c, para[pgwordp[i]]);
