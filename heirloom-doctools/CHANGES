@@ -27,6 +27,9 @@ Release ...
   faults with ".ad p" at the end of the input.
 * [nt]roff: Fixed a problem in ".bp" that could lead to the page number
   being reset to zero in ".ad p" mode.
+* [nt]roff: A null pointer dereference in ".ad p" mode that occured when
+  nofill mode was activated while a partial paragraph was present has been
+  fixed.
 * -ms: The ".IX" index macro now works in ".padj" mode.
 * -me: The ".(x" and ".)x" index macros now work in ".padj" mode.
 * A "-mpadj" macro set has been added. It simply executes ".do padj"
