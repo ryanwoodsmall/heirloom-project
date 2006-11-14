@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.41 (gritter) 11/13/06
+ * Sccsid @(#)n2.c	1.42 (gritter) 11/14/06
  */
 
 /*
@@ -103,9 +103,17 @@ pchar(register tchar i)
 	case IMP:
 	case RIGHT:
 	case LEFT:
+		if (xflag) {
+			i = j = FILLER;	/* avoid kerning in output routine */
+			goto dfl;
+		}
 		return 1;
 	case HX:
 		hx = 1;
+		if (xflag) {
+			i = j = FILLER;	/* avoid kerning in output routine */
+			goto dfl;
+		}
 		return 1;
 	case XON:
 		xon = 1;

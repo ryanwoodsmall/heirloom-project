@@ -3,6 +3,9 @@ Release ...
   space formed a kerning pair with the space character, the line length
   was incorrectly computed, and the line was prolongated by this amount.
   This has been fixed.
+* troff: The "\{", "\}", and "\x" escape sequences inhibited kerning in
+  the adjustment computation but not in the output routine, which could
+  lead to prolongated output lines. They now inhibit kerning completely.
 
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
