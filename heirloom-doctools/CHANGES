@@ -6,6 +6,8 @@ Release ...
 * troff: The "\{", "\}", and "\x" escape sequences inhibited kerning in
   the adjustment computation but not in the output routine, which could
   lead to prolongated output lines. They now inhibit kerning completely.
+* nroff: The content of a "\X" function is now ignored (instead of being
+  printed with zero width).
 
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.156 (gritter) 11/13/06
+ * Sccsid @(#)tdef.h	1.157 (gritter) 11/14/06
  */
 
 /*
@@ -159,12 +159,7 @@
 #define	OLT	0012	/* output line trap */
 #define	YON	0013	/* indirect copy through */
 #define	CC	0014	/* unchangeable control character */
-#define	RQ1	0015	/* first five bits of request number */
-#define	RQ2	0016	/* second five bits of request number */
-#define	RQ3	0017	/* third five bits of request number */
-#define	RQ4	0020	/* fourth five bits of request number */
-#define	RQ5	0021	/* fifth five bits of request number */
-#define	NSRQ	5	/* number of tchars to store a request */
+#define	RQ	0015	/* request number */
 #define	CHAR	0022	/* formatted result of a .char execution */
 #define	INDENT	0023	/* current indent (informational only, no move) */
 #define	PENALTY	0024	/* line breaking penalty */
