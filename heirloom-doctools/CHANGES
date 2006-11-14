@@ -8,6 +8,7 @@ Release ...
   lead to prolongated output lines. They now inhibit kerning completely.
 * nroff: The content of a "\X" function is now ignored (instead of being
   printed with zero width).
+* nroff: Combining UTF-8 characters are now assumed to have width zero.
 
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
