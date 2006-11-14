@@ -1,4 +1,4 @@
-Release ...
+Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
   (Didot point) and "C" (cicero) have been introduced.
 * [nt]roff: ".ad p" mode no longer employs a temporary diversion; the
