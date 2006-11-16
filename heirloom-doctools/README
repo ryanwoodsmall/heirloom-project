@@ -135,6 +135,11 @@ following:
 - Thus a complete pipeline to format manual pages for viewing is:
   tbl input.1 | neqn | nroff -Tlp -mg -msafe -mpadj -mandoc | col -x
 
+- If you like italic text to appear underlined and boldfaced text to
+  appear bold on a CRT or X Window System terminal, also add a call
+  to the "ul" filter:
+  tbl input.1 | neqn | nroff -Tlp -mg -msafe -mpadj -mandoc | col -x | ul
+
 - To print manual pages with troff, use
   tbl input.1 | eqn | troff -mg -msafe -mpadj -mandoc | dpost | lp
 
@@ -149,7 +154,7 @@ following:
 	EQN=/usr/ucb/eqn
 	NEQN=/usr/ucb/neqn
 	TCAT=/usr/ucb/dpost
-	COL=col -x
+	COL=col -x | ul
 	MACSET=-mandoc
 
 The project homepage is currently at <http://heirloom.sourceforge.net>.
@@ -160,4 +165,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						11/13/06
+<gunnarr@acm.org>						11/16/06
