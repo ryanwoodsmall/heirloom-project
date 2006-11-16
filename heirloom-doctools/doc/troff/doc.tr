@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.175 (gritter) 11/10/06
+.\" Sccsid @(#)doc.tr	1.176 (gritter) 11/16/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -99,7 +99,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 11/10/06
+.ds Sccsdate 11/16/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1109,6 +1109,13 @@ A reverse-line postprocessor \fIcol\fP
 is available for multiple-column \*(NR output on terminals without reverse-line ability;
 \fIcol\fP expects the Model 37 Teletype
 escape sequences that \*(NR produces by default.
+\fIcol\fR can optionally also filter the backspace sequences
+which \*(NR emits for \T'c_nrofful'underlining\T and
+\T'bd'emboldening\T in order to produce a plain text file.
+Another option is the \fIul\fR postprocessor
+which converts backspace sequences to underline
+and reverse video escape sequences
+for \s-1CRT\s0 terminals.
 .pg
 The \fBdpost\fR postprocessor has a special role
 as it translates \*(TR intermediate output to \*(PS,
@@ -2660,6 +2667,8 @@ and those that can reasonably be mapped
 into other printable characters.
 The exact behavior is determined by a driving
 table prepared for each device.
+In a \s-1UTF-\s+18 locale,
+combining characters are processed.
 The characters
 \fB\'\fR,
 \fB\`\fR,
@@ -4921,7 +4930,7 @@ and an initial double-quote is discarded.
 .sc
 Transparent output.
 The sequence \A'e_X'\fB\eX\fI\'anything\'\fR copies \fIanything\fR
-to the output,
+to the \*(TR output,
 as a device control function in the form \fBx\ X\ \fIanything\fR
 \T's_output'(\(sc26).\T
 Escape sequences in \fIanything\fR are processed.
@@ -4933,6 +4942,7 @@ copies the contents of the string or macro
 to the output as a device control function
 without processing escape sequences.
 Newlines in the macro are embedded in the output.
+\*(NR discards transparent output sequences and their contents.
 .sc
 Comments and concealed newlines.
 An uncomfortably long input line that must stay
