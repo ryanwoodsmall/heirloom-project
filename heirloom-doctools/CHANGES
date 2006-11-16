@@ -9,6 +9,9 @@ Release ...
 * nroff: The content of a "\X" function is now ignored (instead of being
   printed with zero width).
 * nroff: Combining UTF-8 characters are now assumed to have width zero.
+* nroff: The ".rd" request has been fixed; it had not been working since
+  the last release.
+* troff: The ".rd" request now accepts locale-dependent input characters.
 
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"

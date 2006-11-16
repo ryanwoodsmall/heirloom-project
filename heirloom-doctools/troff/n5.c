@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.121 (gritter) 11/13/06
+ * Sccsid @(#)n5.c	1.122 (gritter) 11/16/06
  */
 
 /*
@@ -52,14 +52,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC)
 #include <stddef.h>
-#ifdef	__sun
-#include <widec.h>
-#else
 #include <wchar.h>
-#endif
-#endif	/* EUC && NROFF */
+#endif	/* EUC */
 #include <string.h>
 #include <unistd.h>
 #include "tdef.h"
@@ -1921,11 +1917,11 @@ int
 rdtty(void)
 {
 	char	onechar;
-#if defined (EUC) && defined (NROFF)
+#if defined (EUC)
 	int	i, n;
 
 loop:
-#endif /* EUC && NROFF */
+#endif /* EUC */
 
 	onechar = 0;
 	if (read(0, &onechar, 1) == 1) {
@@ -1933,10 +1929,10 @@ loop:
 			tty++;
 		else 
 			tty = 1;
-#if !defined (EUC) || !defined (NROFF)
+#if !defined (EUC)
 		if (tty != 3)
 			return(onechar);
-#else	/* EUC && NROFF */
+#else	/* EUC */
 		if (tty != 3) {
 			if (!multi_locale)
 				return(onechar);
@@ -1946,7 +1942,6 @@ loop:
 			if ((*mbbuf1&~(wchar_t)0177) == 0) {
 				twc = 0;
 				mbbuf1p = mbbuf1;
-				goto loop;
 			}
 			else if ((n = mbtowc(&twc, mbbuf1, mb_cur_max)) <= 0) {
 				if (mbbuf1p >= mbbuf1 + mb_cur_max) {
@@ -1959,14 +1954,13 @@ loop:
 					goto loop;
 				}
 			} else {
-				if (n > 1)
-					i = twc | COPYBIT;
+				i = twc | COPYBIT;
 				twc = 0;
 				mbbuf1p = mbbuf1;
 			}
 			return(i);
 		}
-#endif /* EUC && NROFF */
+#endif /* EUC */
 	}
 	popi();
 	tty = 0;
