@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.163 (gritter) 11/14/06
+ * Sccsid @(#)n7.c	1.164 (gritter) 11/20/06
  */
 
 /*
@@ -2062,12 +2062,10 @@ parword(void)
 }
 
 static void
-pbreak(int sprd)
+pbreak(int sprd, struct s *s)
 {
-	struct s	*s;
 	int	j;
 
-	s = frame;
 	if (sprd)
 		adflg |= 5;
 	if (pshapes) {
@@ -2086,13 +2084,11 @@ pbreak(int sprd)
 			mainloop();
 		}
 		memcpy(&sjbuf, &savsjbuf, sizeof sjbuf);
-		while (frame != s)
-			popi();
 	}
 }
 
 void
-parpr(void)
+parpr(struct s *s)
 {
 	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc;
 	int	savll, savin, savcd, lastin, lastll, curin, curll, ignel = 0;
@@ -2137,7 +2133,9 @@ parpr(void)
 					if (letsps)
 						storelsp(c, 0);
 				}
-				pbreak(1);
+				pbreak(1, s);
+				if (i >= pgwords)
+					break;
 			}
 			if (pshapes) {
 				if (k == 1)
@@ -2199,7 +2197,7 @@ parpr(void)
 		nwd += stretches;
 		nw++;
 	}
-	pbreak(nel - adspc < 0 && nwd > 1 || _spread);
+	pbreak(nel - adspc < 0 && nwd > 1 || _spread, s);
 	pgwords = pgchars = pgspacs = pglines = pgne = pglastw = 0;
 	ll = savll;
 	in = un = savin;
@@ -2211,15 +2209,18 @@ parfmt(void)
 {
 	int	_nlflg = nlflg;
 	int	_spread = spread;
+	struct s	*s;
 
 	if (pgchars == 0)
 		return;
 	setnel();
 	pglnout = 0;
+	s = frame;
 	nxf->jmp = malloc(sizeof *nxf->jmp);
 	pushi(-2, 0, FLAG_PARAGRAPH);
-	parpr();
-	ch = popi();
+	parpr(frame);
+	while (frame != s)
+		ch = popi();
 	nlflg = _nlflg;
 	if (_spread == 1 && pshapes > pglnout) {
 		memmove(&pgin[0], &pgin[pglnout],
