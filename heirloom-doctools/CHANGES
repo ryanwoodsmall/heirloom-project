@@ -1,5 +1,5 @@
 Release ...
-* [nt]roff: In ".ad p" mode, when a line break was inserted after an
+* troff: In ".ad p" mode, when a line break was inserted after an
   existing hyphen or em dash, another hyphen was added when the previous
   characters formed a kerning pair. This has been fixed.
 * troff: In ".ad p" mode, when the character before the first interword
