@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.11 (gritter) 10/19/06
+ * Sccsid @(#)io.c	1.12 (gritter) 11/23/06
  */
 
 # include "e.h"
@@ -183,7 +183,7 @@ putout(int p1) {
 	if(dbg)printf(".\tanswer <- S%d, h=%d,b=%d\n",p1, eht[p1], ebase[p1]);
 #endif	/* NEQN */
 	eqnht = eht[p1];
-	printf(".ds %d \\x'0'", p1);
+	printf(".ds %d ", p1);
 	/* suppposed to leave room for a subscript or superscript */
 #ifndef NEQN
 	before = eht[p1] - ebase[p1] - VERT(EM(1.2, ps));

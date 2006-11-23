@@ -9,6 +9,8 @@ Release ...
 * troff: The "\{", "\}", and "\x" escape sequences inhibited kerning in
   the adjustment computation but not in the output routine, which could
   lead to prolongated output lines. They now inhibit kerning completely.
+* eqn: Generated equations no longer start with "\x'0'". This allows
+  kerning with the preceding character in an inline equation.
 * nroff: The content of a "\X" function is now ignored (instead of being
   printed with zero width).
 * nroff: Combining UTF-8 characters are now assumed to have width zero.
