@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.39 (gritter) 11/13/06
+ * Sccsid @(#)n8.c	1.40 (gritter) 11/25/06
  */
 
 /*
@@ -523,13 +523,6 @@ addc(int m, char **cp, tchar **wp, int **wpp, int distance)
 	tchar	t;
 
 	t = m ? m | sfmask(**wp) : **wp;
-#ifdef	NROFF
-	if (m & ~0177)
-		return 0;
-	m = maplow(t);
-	*(*cp)++ = m;
-	*(*wpp)++ = distance;
-#else
 	m = maplow(t);
 	if (m > 0 && m <= 0x7f) {
 		*(*cp)++ = m;
@@ -548,7 +541,6 @@ addc(int m, char **cp, tchar **wp, int **wpp, int distance)
 		*(*wpp)++ = -1000;
 	} else
 		return 0;
-#endif
 	return 1;
 }
 

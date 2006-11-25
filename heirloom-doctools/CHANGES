@@ -19,6 +19,9 @@ Release ...
 * troff: The ".rd" request now accepts locale-dependent input characters.
 * [nt]roff: Fixed an error in ".ad p" mode which could lead to core dumps
   with ".ev" requests that were not properly paired.
+* nroff: Hyphenation of words containing non-ASCII characters now really
+  works; such characters were erroneously dropped with the last release,
+  leading to incorrect hyphenations in some cases.
 
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
