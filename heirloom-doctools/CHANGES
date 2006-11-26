@@ -22,6 +22,11 @@ Release ...
 * nroff: Hyphenation of words containing non-ASCII characters now really
   works; such characters were erroneously dropped with the last release,
   leading to incorrect hyphenations in some cases.
+* troff: Use of the "\s+[n]", "\s-[n]", "\s+'n'", or "\s-'n'" escape
+  sequence forms now leaves the arithmetic unit handling in a clean
+  state. The previous failure to do so lead to wrong numeric results
+  under certain circumstances; in particular, it caused the "over" eqn
+  keyword to produce incorrect output.
 
 Release 061114
 * [nt]roff: The units "t" (printer's point), "T" (printer's pica), "D"
