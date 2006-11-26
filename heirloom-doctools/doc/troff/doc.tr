@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.176 (gritter) 11/16/06
+.\" Sccsid @(#)doc.tr	1.177 (gritter) 11/26/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -99,7 +99,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 11/16/06
+.ds Sccsdate 11/26/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1406,7 +1406,7 @@ Line Length and Indenting
 .b1 0
 \T'ti'\fB&ti\fI|\(+-N\fR	\(en	ignored	B,E,\fBm\fR	Temporary indent.\T
 .b1 0
-\T'pshape'\fB&pshape\fI|I1|L1|I2|L2|\fR...	off	E,\fBm\fR	Define the shape of the current paragraph in \fBad p\fR mode.\T
+\T'pshape'\fB&pshape\fI|\(+-I1|\(+-L1|\(+-I2|\(+-L2|\fR...|off	E,\fBm\fR	Define the shape of the current paragraph in \fBad p\fR mode.\T
 .mht s_mac
 Macros, Strings, Diversion, and Position Traps
 .bt
@@ -3820,7 +3820,7 @@ The current indent is not changed.
 .hylang en_US
 .minss 9
 .letadj 95 98 18 105 102
-\fB&pshape\fI|I1|L1|I2|L2|\fR...	off	E,\fBm\fR	Set a special shape for the current paragraph in \T'ad_p'\fBad\ p\fR\T mode.
+\fB&pshape\fI|\(+-I1|\(+-L1|\(+-I2|\(+-L2|\fR...|off	E,\fBm\fR	Set a special shape for the current paragraph in \T'ad_p'\fBad\ p\fR\T mode.
 \#.ds l 4m 6m 8m 10m 12m 14m 16m 18m 20m 22m 24m \
 \#22m 20m 18m 16m 14m 12m 10m 8m 6m 4m
 \#.ds s
@@ -3839,6 +3839,7 @@ The current indent is not changed.
 \#.\}
 \#.pshape \*s
 .nr l (\n(.lu-\n(.iu-7.4m)/3
+.nr h (\n(.lu-\n(.iu-5m)/2
 .nr t \nlu+3.7m
 .pshape \
 0 \n(.iu+\nlu-1m \
@@ -3856,9 +3857,26 @@ The current indent is not changed.
 \n(.lu-\nlu+.5m \n(.lu \
 \n(.lu-\nlu+.25m \n(.lu \
 \n(.lu-\nlu \n(.lu \
+\n(.iu \n(.lu \
+\n(.iu \n(.lu \
+\n(.iu \n(.lu \
+\n(.iu \n(.lu \
+\n(.iu \n(.iu+\nhu \
+\n(.iu \n(.iu+\nhu \
+\n(.iu \n(.iu+\nhu \
+\n(.iu \n(.iu+\nhu \
+\n(.iu \n(.iu+\nhu \
+\n(.iu \n(.iu+\nhu \
+\n(.iu+\nhu+5m \n(.lu \
+\n(.iu+\nhu+5m \n(.lu \
+\n(.iu+\nhu+5m \n(.lu \
+\n(.iu+\nhu+5m \n(.lu \
+\n(.iu+\nhu+5m \n(.lu \
+\n(.iu+\nhu+5m \n(.lu \
 \n(.iu \n(.lu
 .mk T
 .nr B \nTu+5v
+.nr C \nTu+15v
 .dt \nBu T2
 .de T2
 .ch T2
@@ -3868,25 +3886,35 @@ The current indent is not changed.
 .de T3
 .ch T3
 .sp |\nTu
+.dt \nCu T4
+.
+..
+.de T4
+.ch T4
+.sp |\nCu-6v
 ..
 At the next \fIbreak\fR when the paragraph gets formatted,
 its first line is indented by \fII1\fR and has length \fIL1\fR,
 its second line is indented by \fII2\fR and has length \fIL2\fR,
 and so forth.
+Relative numbers refer to the previous indent or line length pair,
+or to the values set
+by \T'in'\fBin\fR\T and \T'll'\fBll\fR\T
+for the first pair.
 The last of the indent and line length pairs stays effective
 if the paragraph has more lines
 than pairs are given.
-In the absence of a terminating line length measure,
-the standard line length as set by \T'll'\fBll\fR\T is used.
+With an odd number of arguments,
+the standard line length as set by \T'll'\fBll\fR\T is used at the end.
 Once the current paragraph has been printed,
 the shape specification is forgotten,
 and the standard indent and line length values are in effect again
 unless another \fBpshape\fR request occurs.
 As an exception, \T'e_p'\fB\ep\fR\T preserves the remaining part
 of the shape.
-Combine this mechanism with \T'c_trap'page or diversion traps\T
-to move lines in vertical direction
-as shown here.
+To produce shapes with holes as in this example,
+\T'c_trap'diversion traps\T can be used
+to move formatted lines in vertical direction.
 .br
 .di
 .ne \n(dnu

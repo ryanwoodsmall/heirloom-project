@@ -1,4 +1,9 @@
 Release ...
+* [nt]roff: Relative numbers can be used with the ".pshape" request now;
+  they refer to the preceding indent and line length pair, or, for the
+  initial pair, to the standard indent and line lenght settings.
+* [nt]roff: A warning of the "range" category is now printed when the
+  indent is set to a value exceeding the line length.
 * troff: In ".ad p" mode, when a line break was inserted after an
   existing hyphen or em dash, another hyphen was added when the previous
   characters formed a kerning pair. This has been fixed.

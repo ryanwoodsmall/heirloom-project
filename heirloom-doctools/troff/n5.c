@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.122 (gritter) 11/16/06
+ * Sccsid @(#)n5.c	1.123 (gritter) 11/26/06
  */
 
 /*
@@ -363,10 +363,20 @@ casehypp(void)
 	}
 }
 
+static void
+chkin(int indent, int linelength, const char *note)
+{
+	if (indent > linelength - INCH / 10) {
+		if (warn & WARN_RANGE)
+			errprint("excess of %sindent", note);
+	}
+}
+
 void
 casepshape(void)
 {
 	int	i, l;
+	int	lastin = in, lastll = ll;
 
 	pshapes = 0;
 	if (skip(0)) {
@@ -374,23 +384,24 @@ casepshape(void)
 		return;
 	}
 	do {
-		dfact = EM;
-		i = atoi();
+		i = max(hnumb(&lastin), 0);
 		if (nonumb)
 			break;
 		if (skip(0))
 			l = ll;
 		else {
-			dfact = EM;
-			l = atoi();
+			l = max(hnumb(&lastll), INCH / 10);
 			if (nonumb)
 				break;
 		}
 		if (pshapes >= pgsize)
 			growpgsize();
+		chkin(i, l, "");
 		pgin[pshapes] = i;
 		pgll[pshapes] = l;
 		pshapes++;
+		lastin = i;
+		lastll = l;
 	} while (!skip(0));
 }
 
@@ -528,6 +539,7 @@ casein(void)
 	tbreak();
 	in1 = in;
 	in = i;
+	chkin(in, ll, "");
 	if (!nc && !pgwords) {
 		un = in;
 		setnel();
@@ -546,6 +558,7 @@ casell(void)
 		i = max(hnumb(&ll), INCH / 10);
 	ll1 = ll;
 	ll = i;
+	chkin(in, ll, "");
 	setnel();
 }
 
@@ -574,6 +587,7 @@ caseti(void)
 	i = max(hnumb(&in), 0);
 	tbreak();
 	un1 = i;
+	chkin(i, ll, "temporary ");
 	setnel();
 }
 
