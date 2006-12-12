@@ -1,4 +1,4 @@
-Release ...
+Release 061212
 * [nt]roff: Relative numbers can be used with the ".pshape" request now;
   they refer to the preceding indent and line length pair, or, for the
   initial pair, to the standard indent and line lenght settings.
