@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.68 (gritter) 12/17/06
+ * Sccsid @(#)n9.c	1.69 (gritter) 12/17/06
  */
 
 /*
@@ -641,7 +641,7 @@ readpenalty(int *valp)
 {
 	int	n, t;
 
-	t = dpenal - INFPENALTY0 - 1;
+	t = dpenal ? dpenal - INFPENALTY0 - 1 : 0;
 	noscale++;
 	n = inumb(&t);
 	noscale--;
