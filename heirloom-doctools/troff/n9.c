@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.69 (gritter) 12/17/06
+ * Sccsid @(#)n9.c	1.70 (gritter) 12/17/06
  */
 
 /*
@@ -687,15 +687,6 @@ void
 setdpenal(void)
 {
 	getpenalty(&dpenal);
-}
-
-void
-casedefpenalty(void)
-{
-	if (skip(0))
-		dpenal = 0;
-	else
-		readpenalty(&dpenal);
 }
 
 

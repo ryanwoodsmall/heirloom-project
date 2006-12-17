@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.166 (gritter) 12/17/06
+ * Sccsid @(#)n7.c	1.167 (gritter) 12/17/06
  */
 
 /*
@@ -1200,8 +1200,7 @@ getword(int x)
 	wordp = word;
 	over = wne = wch = 0;
 	hyoff = 0;
-	for (j = 0; j < wdsize; j++)
-		wdpenal[j] = dpenal;
+	memset(wdpenal, 0, wdsize * sizeof *wdpenal);
 	n = 0;
 	while (1) {	/* picks up 1st char of word */
 		j = cbits(i = GETCH());
@@ -1948,6 +1947,8 @@ parword(void)
 		parsp[pgspacs++] = i;
 		if (wdpenal[wp-word-1])
 			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
+		else if (dpenal)
+			pgpenal[pgwords] = makepgpenal(dpenal);
 	}
 	pgspacp[pgwords+1] = pgspacs;
 	if (--wp > wordp && pgchars > 0)
@@ -2047,6 +2048,8 @@ parword(void)
 		para[pgchars++] = i;
 		if (wdpenal[wp-word-1])
 			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
+		else if (dpenal)
+			pgpenal[pgwords] = makepgpenal(dpenal);
 	}
 	pgne += pgwordw[pgwords];
 	pgwordp[++pgwords] = pgchars;

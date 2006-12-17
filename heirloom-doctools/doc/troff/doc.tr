@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.178 (gritter) 12/17/06
+.\" Sccsid @(#)doc.tr	1.179 (gritter) 12/17/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -1361,8 +1361,6 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'letadj'\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.\T
 .b1
-\T'defpenalty'\fB&defpenalty\fI|\(+-N\fR	0	E	Default line breaking penalty.\T
-.b1
 \T'sentchar'\fB&sentchar\fI|c...\fR	\fB.?!:\fR	off	E	Sentence-ending characters.\T
 .b1
 \T'transchar'\fB&transchar\fI|c..\fR	\fB"')]*\(dg\fR	off	E	Transparent characters for sentence-ending.\T
@@ -1791,7 +1789,6 @@ refer to the detailed description on how to include it.
 \T'da'da	7\T
 \T'dch'dch	7\T
 \T'de'de	7\T
-\T'defpenalty'defpenalty	4\T
 \T'di'di	7\T
 \T'do'do	1\T
 \T'ds'ds	7\T
@@ -3336,13 +3333,14 @@ are taken as infinitive penalties
 and always prevent a line break;
 values of \-1\^000\^000 always cause a line break.
 A default penalty can be set
-with the \T'defpenalty'\fBdefpenalty\fR\T request
-or the \A'e_J'\fB\eJ\fI\'\(+-N\'\fR escape sequence;
+with the \A'e_J'\fB\eJ\fI\'\(+-N\'\fR escape sequence;
 this is useful to discourage line breaks
 within a certain group of words,
 e.g. a person's name or a formula.
 Relative values in the argument to \fB\ej\fR
 refer to the default penalty.
+The current default penalty is available
+in the \A'n_.defpenalty'\fB.defpenalty\fR number register.
 Separate penalties can be specified
 for breaking a line after a hyphenated word part
 using the \T'hypp'\fBhypp\fR\T request
@@ -3563,10 +3561,6 @@ and \A'n_.lshmax'\fB&lshmax\fR
 contain the current values of
 \fIX\fR, \fIU\fR, \fIS\fR, \fIY\fR, and \fIV\fR,
 respectively.
-.bta defpenalty
-\fB&defpenalty\fI|\(+-N\fR	0	E	Default line breaking penalty.
-The current value is available
-in the \A'n_.defpenalty'\fB&defpenalty\fR number register.
 .bta sentchar
 \fB&sentchar\fI|c...\fR	\fB.?!:\fR	off	E	Sentence-ending characters.
 When one of the characters \fIc...\fR appears at the end
