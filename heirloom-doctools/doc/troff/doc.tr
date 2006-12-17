@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.177 (gritter) 11/26/06
+.\" Sccsid @(#)doc.tr	1.178 (gritter) 12/17/06
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -99,7 +99,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 11/26/06
+.ds Sccsdate 12/17/06
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1361,6 +1361,8 @@ Text Filling, Adjusting, and Centering
 .b1
 \T'letadj'\fB&letadj\fI|X|U|S|Y|V\fR	off	E,T	Dynamic letter spacing and reshaping when adjusting lines.\T
 .b1
+\T'defpenalty'\fB&defpenalty\fI|\(+-N\fR	0	E	Default line breaking penalty.\T
+.b1
 \T'sentchar'\fB&sentchar\fI|c...\fR	\fB.?!:\fR	off	E	Sentence-ending characters.\T
 .b1
 \T'transchar'\fB&transchar\fI|c..\fR	\fB"')]*\(dg\fR	off	E	Transparent characters for sentence-ending.\T
@@ -1789,6 +1791,7 @@ refer to the detailed description on how to include it.
 \T'da'da	7\T
 \T'dch'dch	7\T
 \T'de'de	7\T
+\T'defpenalty'defpenalty	4\T
 \T'di'di	7\T
 \T'do'do	1\T
 \T'ds'ds	7\T
@@ -2029,7 +2032,8 @@ Reference	Sequence	Meaning
 \T'e_g'8\T	\T'e_g'\fB\eg\fIx\fR,\fB\eg(\fIxx\fR,\fB\eg[\fIxxx\fB]\fR\T	\T'e_g'Format of number register \fIx\fP, \fIxx\fR, or \fIxxx\fR\T
 \T'e_h'11.1\T	\T'e_h'\fB\eh\fI\'N\'\fR\T	\T'e_h'Local horizontal motion; move right \fIN\fR \fI(negative left)\fR\T
 \T'e_H'2.3\T	\T'e_H'\fB\eH\fI\'N\'\fR\T	\T'e_H'Height of current font is \fIN\fR\T
-\T'e_j'4.1\T	\T'e_j'\fB\ej\fI\'N\'\fR\T	\T'e_j'Penalty for breaking a line after the current word is \fIN\fR\T
+\T'e_j'4.1\T	\T'e_j'\fB\ej\fI\'\(+-N\'\fR\T	\T'e_j'Penalty for breaking a line after the current word is \fIN\fR\T
+\T'e_J'4.1\T	\T'e_J'\fB\eJ\fI\'\(+-N\'\fR\T	\T'e_J'Default line breaking penalty is \fIN\fR\T
 \T'e_k'11.3\T	\T'e_k'\fB\ek\fIx\fR,\fB\ek(\fIxx\fR,\fB\ek[\fIxxx\fB]\fR\T	\T'e_k'Mark horizontal \fIinput\fR place in register \fIx,\fR \fIxx\fR, or \fIxxx\fR\T
 \T'e_l'12.4\T	\T'e_l'\fB\el\fI\^\'Nc\'\fR\T	\T'e_l'Horizontal line drawing function (optionally with \fIc\fR\|)\T
 \T'e_L'12.4\T	\T'e_L'\fB\eL\fI\'Nc\'\fR\T	\T'e_L'Vertical line drawing function (optionally with \fIc\fR\|)\T
@@ -2156,6 +2160,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.ce'4.1\T	\T'n_.ce'\fB&ce\fR\T	\T'n_.ce'Remaining number of lines to be centered.\T
 \T'n_.cht'11.2\T	\T'n_.cht'\fB&cht\fR\T	\T'n_.cht'Visual height above base line of previous character.\T
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
+\T'n_.defpenalty'4.1\T	\T'n_.defpenalty'\fB&defpenalty\fR\T	\T'n_.defpenalty'Default line breaking penalty.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
 \T'n_.dilev'7.4\T	\T'n_.dilev'\fB&dilev\fR\T	\T'n_.dilev'Current diversion level.\T
 \T'n_.ev'17\T	\T'n_.ev'\fB&ev\fR\T	\T'n_.ev'Name of current environment [sic].\T
@@ -3323,13 +3328,21 @@ When adjusting paragraphs at once,
 is possible to specify additional \fIpenalties\fR
 for putting a line break after the current word
 (or part of a hyphenated word)
-by imbedding or attaching a \A'e_j'\fB\ej\fI\'N\'\fR to it.
+by imbedding or attaching a \A'e_j'\fB\ej\fI\'\(+-N\'\fR to it.
 A positive value of \fIN\fR discourages a line break,
 a negative value encourages it.
 Values of 1\^000\^000 and above
 are taken as infinitive penalties
 and always prevent a line break;
 values of \-1\^000\^000 always cause a line break.
+A default penalty can be set
+with the \T'defpenalty'\fBdefpenalty\fR\T request
+or the \A'e_J'\fB\eJ\fI\'\(+-N\'\fR escape sequence;
+this is useful to discourage line breaks
+within a certain group of words,
+e.g. a person's name or a formula.
+Relative values in the argument to \fB\ej\fR
+refer to the default penalty.
 Separate penalties can be specified
 for breaking a line after a hyphenated word part
 using the \T'hypp'\fBhypp\fR\T request
@@ -3550,6 +3563,10 @@ and \A'n_.lshmax'\fB&lshmax\fR
 contain the current values of
 \fIX\fR, \fIU\fR, \fIS\fR, \fIY\fR, and \fIV\fR,
 respectively.
+.bta defpenalty
+\fB&defpenalty\fI|\(+-N\fR	0	E	Default line breaking penalty.
+The current value is available
+in the \A'n_.defpenalty'\fB&defpenalty\fR number register.
 .bta sentchar
 \fB&sentchar\fI|c...\fR	\fB.?!:\fR	off	E	Sentence-ending characters.
 When one of the characters \fIc...\fR appears at the end
@@ -5268,6 +5285,7 @@ which are generally pairs of numbers.
 \fB\eD\'p \fIdh1 dv1 dh2 dv2 ...\'	\fRdraw polygon, i.e. a line to \fIdh1,\|dv1\fR, then to \fIdh2,\|dv2\fR, then ...
 \fB\eD\'c \fId\'	\fRdraw circle of diameter \fId\fR with left side at current position
 \fB\eD\'e \fIu v\'	\fRdraw ellipse of diameters \fIu\fP and \fIv\fP
+.ne 2
 \fB\eD\'a \fIa b c d\'\fB	\fRdraw arc from current position to \fIa\fR+\fIc\fR,\|\fIb\fR+\fId\fR, \fRwith center at \fIa\fR,\|\fIb\fR from current position
 \fB\eD\'\(ap \fIa b c d...\'\fB	\fRdraw B-spline from current position by \fIa\fR,\|\fIb\fR, \fRthen by \fIc\fR,\|\fId\fR, then by \fIc\fR,\|\fId\fR, then ...
 .pg

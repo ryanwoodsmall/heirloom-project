@@ -7,32 +7,32 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	8.25 (gritter) 11/26/06";
+	"@(#)/usr/ucb/otfdump.sl	8.26 (gritter) 12/17/06";
 #elif defined (DPOST)
-static const char sccsid[] USED = "@(#)dpost.sl  8.25 (gritter) 11/26/06";
-const char creator[] = "Heirloom Documentation Tools - dpost 8.25 (gritter) 11/26/06";
+static const char sccsid[] USED = "@(#)dpost.sl  8.26 (gritter) 12/17/06";
+const char creator[] = "Heirloom Documentation Tools - dpost 8.26 (gritter) 12/17/06";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	8.25 (gritter) 11/26/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	8.26 (gritter) 12/17/06";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	8.25 (gritter) 11/26/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	8.26 (gritter) 12/17/06";
 #endif	/* !DUMP, !NROFF */
-const char revision[] = "8.25";
+const char revision[] = "8.26";
 /* SLIST */
 /*
-ext.h: * Sccsid @(#)ext.h	1.102 (gritter) 11/5/06
+ext.h: * Sccsid @(#)ext.h	1.103 (gritter) 12/17/06
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
-n1.c: * Sccsid @(#)n1.c	1.136 (gritter) 11/13/06
+n1.c: * Sccsid @(#)n1.c	1.137 (gritter) 12/17/06
 n2.c: * Sccsid @(#)n2.c	1.44 (gritter) 11/14/06
-n3.c: * Sccsid @(#)n3.c	1.178 (gritter) 11/13/06
-n4.c: * Sccsid @(#)n4.c	1.96 (gritter) 11/12/06
+n3.c: * Sccsid @(#)n3.c	1.179 (gritter) 12/17/06
+n4.c: * Sccsid @(#)n4.c	1.97 (gritter) 12/17/06
 n5.c: * Sccsid @(#)n5.c	1.123 (gritter) 11/26/06
-n7.c: * Sccsid @(#)n7.c	1.165 (gritter) 11/21/06
+n7.c: * Sccsid @(#)n7.c	1.166 (gritter) 12/17/06
 n8.c: * Sccsid @(#)n8.c	1.40 (gritter) 11/25/06
-n9.c: * Sccsid @(#)n9.c	1.67 (gritter) 11/14/06
-ni.c: * Sccsid @(#)ni.c	1.46 (gritter) 11/10/06
+n9.c: * Sccsid @(#)n9.c	1.68 (gritter) 12/17/06
+ni.c: * Sccsid @(#)ni.c	1.47 (gritter) 12/17/06
 nii.c: * Sccsid @(#)nii.c	1.47 (gritter) 11/2/06
 suftab.c: * Sccsid @(#)suftab.c	1.4 (gritter) 8/16/05
-tdef.h: * Sccsid @(#)tdef.h	1.157 (gritter) 11/14/06
+tdef.h: * Sccsid @(#)tdef.h	1.158 (gritter) 12/17/06
 nroff.d/n10.c: * Sccsid @(#)n10.c	1.32 (gritter) 11/14/06
 nroff.d/n6.c: * Sccsid @(#)n6.c	1.49 (gritter) 11/13/06
 nroff.d/pt.h: *	Sccsid @(#)pt.h	1.41 (gritter) 8/12/06

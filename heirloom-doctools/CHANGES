@@ -1,3 +1,9 @@
+Release ...
+* [nt]roff: The ".defpenalty" request and the "\J" escape sequence have
+  been introduced to specify a default line breaking penalty; useful to
+  discourage line breaks within a person's name or a formula. Relative
+  values in the "\j" sequence now refer to the default penalty value.
+
 Release 061212
 * [nt]roff: Relative numbers can be used with the ".pshape" request now;
   they refer to the preceding indent and line length pair, or, for the

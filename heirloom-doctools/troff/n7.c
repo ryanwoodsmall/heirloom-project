@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.165 (gritter) 11/21/06
+ * Sccsid @(#)n7.c	1.166 (gritter) 12/17/06
  */
 
 /*
@@ -1200,7 +1200,8 @@ getword(int x)
 	wordp = word;
 	over = wne = wch = 0;
 	hyoff = 0;
-	memset(wdpenal, 0, wdsize * sizeof *wdpenal);
+	for (j = 0; j < wdsize; j++)
+		wdpenal[j] = dpenal;
 	n = 0;
 	while (1) {	/* picks up 1st char of word */
 		j = cbits(i = GETCH());

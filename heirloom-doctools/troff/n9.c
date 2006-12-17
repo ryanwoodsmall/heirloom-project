@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.67 (gritter) 11/14/06
+ * Sccsid @(#)n9.c	1.68 (gritter) 12/17/06
  */
 
 /*
@@ -636,28 +636,66 @@ rtn:
 }
 
 
-tchar
-setpenalty(void)
+static int
+readpenalty(int *valp)
 {
-	tchar	c, delim;
-	int	n;
+	int	n, t;
 
-	if (ismot(delim = getch()))
-		return 0;
+	t = dpenal - INFPENALTY0 - 1;
 	noscale++;
-	n = atoi();
+	n = inumb(&t);
 	noscale--;
 	if (nonumb)
 		return 0;
-	c = getch();
-	if (!issame(c, delim))
-		nodelim(delim);
 	if (n > INFPENALTY0)
 		n = INFPENALTY0;
 	else if (n < -INFPENALTY0)
 		n = -INFPENALTY0;
 	n += INFPENALTY0 + 1;
-	return mkxfunc(PENALTY, n);
+	*valp = n;
+	return 1;
+}
+
+static int
+getpenalty(int *valp)
+{
+	tchar	c, delim;
+
+	if (ismot(delim = getch()))
+		return 0;
+	if (readpenalty(valp) == 0)
+		return 0;
+	c = getch();
+	if (!issame(c, delim)) {
+		nodelim(delim);
+		return 0;
+	}
+	return 1;
+}
+
+tchar
+setpenalty(void)
+{
+	int	n;
+
+	if (getpenalty(&n))
+		return mkxfunc(PENALTY, n);
+	return 0;
+}
+
+void
+setdpenal(void)
+{
+	getpenalty(&dpenal);
+}
+
+void
+casedefpenalty(void)
+{
+	if (skip(0))
+		dpenal = 0;
+	else
+		readpenalty(&dpenal);
 }
 
 

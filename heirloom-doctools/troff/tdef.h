@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.157 (gritter) 11/14/06
+ * Sccsid @(#)tdef.h	1.158 (gritter) 12/17/06
  */
 
 /*
@@ -685,6 +685,7 @@ struct acc {
 #define	pendw	env._pendw
 #define	pendnf	env._pendnf
 #define	spread	env._spread
+#define	dpenal	env._dpenal
 #define	it	env._it
 #define	itc	env._itc
 #define	itmac	env._itmac
@@ -852,6 +853,7 @@ extern struct env {
 	tchar	*_pendw;
 	int	_pendnf;
 	int	_spread;
+	int	_dpenal;
 	int	_it;
 	int	_itc;
 	int	_itmac;
