@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.167 (gritter) 12/17/06
+ * Sccsid @(#)n7.c	1.168 (gritter) 12/19/06
  */
 
 /*
@@ -1466,7 +1466,12 @@ storeword(register tchar c, register int w)
 	}
 s1:
 	if (isxfunc(c, PENALTY)) {
-		wdpenal[max(0, wordp - word - 1)] = sbits(c);
+		wdpenal[max(0, wordp - word - 1)] = sbits(c) | 0x80000000;
+		return;
+	}
+	if (isxfunc(c, DPENAL)) {
+		if ((wdpenal[max(0, wordp - word - 1)]&0x80000000) == 0)
+			wdpenal[max(0, wordp - word - 1)] = sbits(c);
 		return;
 	}
 	if (w == -1)
@@ -1476,6 +1481,8 @@ s1:
 	wne += w;
 	*wordp++ = c;
 	wch++;
+	if (dpenal)
+		wdpenal[max(0, wordp - word - 1)] = dpenal;
 }
 
 
@@ -1901,6 +1908,7 @@ parlgzero(int i)
 static float
 makepgpenal(int p)
 {
+	p &= ~0x80000000;
 	p -= INFPENALTY0 + 1;
 	if (p >= INFPENALTY0)
 		return INFPENALTY;
@@ -1947,8 +1955,6 @@ parword(void)
 		parsp[pgspacs++] = i;
 		if (wdpenal[wp-word-1])
 			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
-		else if (dpenal)
-			pgpenal[pgwords] = makepgpenal(dpenal);
 	}
 	pgspacp[pgwords+1] = pgspacs;
 	if (--wp > wordp && pgchars > 0)
@@ -2048,8 +2054,6 @@ parword(void)
 		para[pgchars++] = i;
 		if (wdpenal[wp-word-1])
 			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
-		else if (dpenal)
-			pgpenal[pgwords] = makepgpenal(dpenal);
 	}
 	pgne += pgwordw[pgwords];
 	pgwordp[++pgwords] = pgchars;
