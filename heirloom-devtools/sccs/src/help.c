@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)help.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)help.c	1.5 (gritter) 12/21/06
  */
 /*	from OpenSolaris "sccs:cmd/help2.c"	*/
 #include	<defines.h>
@@ -114,7 +114,9 @@ findprt (
 
 	if (*q == '\0') {		/* all alphabetics */
 		strcpy(key,p);
-		sprintf(hfile,"%s/%s",HELPLOC,DFTFILE);
+		sprintf(hfile,"%s/cmds",HELPLOC);
+		if (!exists(hfile))
+			sprintf(hfile,"%s/%s",HELPLOC,DFTFILE);
 	}
 	else
 		if (q == p) {		/* first char numeric */
