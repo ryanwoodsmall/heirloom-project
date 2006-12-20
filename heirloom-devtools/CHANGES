@@ -1,4 +1,6 @@
-Release ...
+Release 061220
+* The SCCS version control system has been added as a port of the source
+  code released by Sun yesterday.
 * lex: An appropriate prototype for yyreject() is now supplied when the
   -e or -w options are used.
 

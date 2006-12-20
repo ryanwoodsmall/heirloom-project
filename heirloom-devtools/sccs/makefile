@@ -1,10 +1,10 @@
-SUBDIRS = yacc lex m4 sccs/cassi sccs/comobj sccs/mpwlib sccs/src sccs/help.d
+SUBDIRS = cassi comobj mpwlib src help.d
 
 MAKEFILES = $(SUBDIRS:=/Makefile)
 
 .SUFFIXES: .mk
 .mk:
-	cat mk.config $< >$@
+	cat ../mk.config $< >$@
 
 dummy: $(MAKEFILES) all
 

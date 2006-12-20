@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-devtools.spec	1.3 (gritter) 12/16/05
+# Sccsid @(#)heirloom-devtools.spec	1.4 (gritter) 12/20/06
 #
 Summary: The Heirloom Development Tools.
 Name: heirloom-devtools
@@ -27,11 +27,11 @@ BuildRoot: %{_tmppath}/%{name}-root
 %define	makeflags	ROOT=%{buildroot} INSTALL=install BINDIR=%{bindir} SUSDIR=%{susdir} LIBDIR=%{libdir} MANDIR=%{mandir} CC=%{xcc} CFLAGS=%{cflags} CPPFLAGS=%{cppflags}
 
 %description
-The Heirloom Development Tools provide yacc, lex, and m4, as portable
-derivatives of the utilities released by Sun as part of OpenSolaris.
-The OpenSolaris utilities were in turn derived from the original Unix
-versions, and are assumed be conforming implementations of the POSIX
-standard.
+The Heirloom Development Tools provide yacc, lex, m4, and SCCS, as
+portable derivatives of the utilities released by Sun as part of
+OpenSolaris. The OpenSolaris utilities were in turn derived from
+the original Unix versions, and are assumed be conforming
+implementations of the POSIX standard.
 
 %prep
 rm -rf %{buildroot}
