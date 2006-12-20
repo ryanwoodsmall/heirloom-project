@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)help.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)help.c	1.4 (gritter) 12/20/06
  */
 /*	from OpenSolaris "sccs:cmd/help2.c"	*/
 #include	<defines.h>
@@ -65,6 +65,7 @@
 */
 
 #define HELPLOC LIBDIR "/help"
+#define	DFTFILE	"default"
 
 
 char	SccsError[MAXERRORLEN];
@@ -84,6 +85,7 @@ main(int argc, char *argv[])
 	register int i;
 	int numerrs=0;
 
+	Fflags = FTLMSG;
 	if (argc == 1)
 		numerrs += findprt(ask());
 	else
@@ -112,12 +114,12 @@ findprt (
 
 	if (*q == '\0') {		/* all alphabetics */
 		strcpy(key,p);
-		sprintf(hfile,"%s",HELPLOC);
+		sprintf(hfile,"%s/%s",HELPLOC,DFTFILE);
 	}
 	else
 		if (q == p) {		/* first char numeric */
 			strcpy(key,p);
-			sprintf(hfile,"%s",HELPLOC);
+			sprintf(hfile,"%s/%s",HELPLOC,DFTFILE);
 		}
 	else {				/* first char alpha, then numeric */
 		strcpy(key,p);		/* key used as temporary */
@@ -129,7 +131,7 @@ findprt (
 		strcpy(key,q);
 		if (!exists(hfile)) {
 			strcpy(key,p);
-			sprintf(hfile,"%s",HELPLOC);
+			sprintf(hfile,"%s/%s",HELPLOC,DFTFILE);
 		}
 	}
 
