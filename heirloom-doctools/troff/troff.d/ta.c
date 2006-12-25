@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/ta.sl	1.7 (gritter) 9/24/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/ta.sl	1.8 (gritter) 12/25/06";
 
 /*
  * University Copyright- Copyright (c) 1982, 1986, 1988
@@ -843,7 +843,7 @@ callunix(char line[])
 		return;
 	else{	signal(SIGINT, SIG_IGN); signal(SIGQUIT, SIG_IGN);
 		while( (rc = wait(&status)) != unixpid && rc != -1 ) ;
-		signal(SIGINT,(void(*)())done); signal(SIGQUIT,(void(*)())sigquit);
+		signal(SIGINT,(void(*)(int))done); signal(SIGQUIT,(void(*)(int))sigquit);
 	}
 }
 

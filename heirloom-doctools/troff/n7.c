@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.168 (gritter) 12/19/06
+ * Sccsid @(#)n7.c	1.169 (gritter) 12/25/06
  */
 
 /*
@@ -55,7 +55,7 @@
 #include "pt.h"
 #ifdef NROFF
 #define GETCH gettch
-tchar	gettch();
+tchar	gettch(void);
 #endif
 #ifndef NROFF
 #define GETCH getch

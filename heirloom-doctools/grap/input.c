@@ -9,7 +9,7 @@
  * Distributed under the terms of the Lucent Public License Version 1.02.
  */
 
-/*	Sccsid @(#)input.c	1.6 (gritter) 1/19/06	*/
+/*	Sccsid @(#)input.c	1.7 (gritter) 12/25/06	*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -419,8 +419,6 @@ void pbstr(char *s)
 
 double errcheck(double x, char *s)
 {
-	extern int errno;
-
 	if (errno == EDOM) {
 		errno = 0;
 		WARNING("%s argument out of domain", s);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.169 (gritter) 10/16/06
+ * Sccsid @(#)dpost.c	1.170 (gritter) 12/25/06
  */
 
 /*
@@ -831,7 +831,7 @@ init_signals(void)
 {
 
 
-    void	interrupt();		/* signal handler */
+    void	interrupt(int);		/* signal handler */
 
 
 /*

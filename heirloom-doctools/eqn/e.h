@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.9 (gritter) 10/19/06
+ * Sccsid @(#)e.h	1.10 (gritter) 12/25/06
  */
 
 #include <stdio.h>
@@ -91,7 +91,7 @@ extern  char    *spaceval;  /* use in place of normal \x (for pic) */
 /* diacrit.c */
 void diacrit(int, int);
 /* e.c */
-int yyparse();
+int yyparse(void);
 /* eqnbox.c */
 void eqnbox(int, int, int);
 /* font.c */

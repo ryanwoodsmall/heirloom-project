@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.71 (gritter) 12/19/06
+ * Sccsid @(#)n9.c	1.72 (gritter) 12/25/06
  */
 
 /*
@@ -706,8 +706,8 @@ mkxfunc(int f, int s)
 void
 localize(void)
 {
-	extern int	wdbindf();
-	extern wchar_t	*wddelim();
+	extern int	wdbindf(wchar_t, wchar_t, int);
+	extern wchar_t	*wddelim(wchar_t, wchar_t, int);
 	char	*codeset;
 
 	codeset = nl_langinfo(CODESET);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.98 (gritter) 12/17/06
+ * Sccsid @(#)n4.c	1.99 (gritter) 12/25/06
  */
 
 /*
@@ -828,7 +828,7 @@ agetch(void)
 }
 
 int
-atoi()
+atoi(void)
 {
 	struct acc	a;
 
@@ -839,7 +839,7 @@ atoi()
 }
 
 float
-atof()
+atof(void)
 {
 	struct acc	a;
 

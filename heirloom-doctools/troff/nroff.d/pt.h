@@ -1,7 +1,7 @@
 /*
  *	Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- *	Sccsid @(#)pt.h	1.41 (gritter) 8/12/06
+ *	Sccsid @(#)pt.h	1.42 (gritter) 12/25/06
  */
 
 /* n10.c */
@@ -17,8 +17,8 @@ extern char	*plot(char *);
 extern void	move(void);
 extern void	ptlead(void);
 extern void	dostop(void);
-extern void	newpage();
-extern void	pttrailer();
+extern void	newpage(int);
+extern void	pttrailer(void);
 /* n6.c */
 extern int	width(register tchar);
 extern tchar	setch(int);

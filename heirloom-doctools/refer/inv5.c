@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)inv5.c	1.4 (gritter) 10/22/05
+ * Sccsid @(#)inv5.c	1.5 (gritter) 12/25/06
  */
 
 #include <stdio.h>
@@ -32,7 +32,7 @@ recopy (FILE *ft, FILE *fb, FILE *fa, int nhash)
 	/* copy fb (old hash items/pointers) to ft (new ones) */
 	int n, i, iflong;
 	int *hpt_s = 0;
-	int (*getfun)();
+	int (*getfun)(FILE *);
 	long *hpt_l = 0;
 	long k, lp;
 	if (fa==NULL)
@@ -56,7 +56,7 @@ recopy (FILE *ft, FILE *fb, FILE *fa, int nhash)
 		fprintf(stderr, "Changing hash value to old %d\n",n);
 	fclose(fa);
 	if (iflong)
-		getfun = (int(*)())getl;
+		getfun = (int(*)(FILE *))getl;
 	else
 #ifdef	EUC
 		getfun = getw;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.13 (gritter) 10/16/06
+ * Sccsid @(#)misc.c	1.14 (gritter) 12/25/06
  */
 
 /*
@@ -282,10 +282,10 @@ str_convert (
 
 
 
-void interrupt(sig)
+void interrupt(
 
 
-    int		sig;			/* signal that we caught */
+    int		sig)			/* signal that we caught */
 
 
 {

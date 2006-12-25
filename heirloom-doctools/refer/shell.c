@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)shell.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)shell.c	1.4 (gritter) 12/25/06
  */
 
 /*
@@ -27,7 +27,7 @@
  * THE COMPARISON GAP (IGAP) IS HALVED FOR THE NEXT SWEEP
  */
 void
-shell (int n, int (*comp)(), int (*exch)())
+shell (int n, int (*comp)(int, int), int (*exch)(int, int))
 {
 	int igap, iplusg, iex, i, imax;
 	igap=n;

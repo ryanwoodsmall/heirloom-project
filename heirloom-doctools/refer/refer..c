@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)refer..c	1.4 (gritter) 10/22/05
+ * Sccsid @(#)refer..c	1.5 (gritter) 12/25/06
  */
 
 #include <stdio.h>
@@ -174,7 +174,7 @@ char *input(char *);
 char *lookat(void);
 void addch(char *, int);
 /* shell.c */
-void shell(int, int (*)(), int (*)());
+void shell(int, int (*)(int, int), int (*)(int, int));
 /* tick.c */
 void tick(void);
 void tock(void);
