@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vput.c	1.51 (gritter) 8/6/05";
+static char sccsid[] = "@(#)ex_vput.c	1.52 (gritter) 12/25/06";
 #endif
 #endif
 
@@ -893,7 +893,7 @@ vnpins(int dosync)
 		e = vglitchup(vcline, d);
 		vigoto(e, 0); vclreol();
 		if (dosync) {
-			int (*Ooutchar)() = Outchar;
+			int (*Ooutchar)(int) = Outchar;
 			Outchar = vputchar;
 			vsync(e + 1);
 			Outchar = Ooutchar;

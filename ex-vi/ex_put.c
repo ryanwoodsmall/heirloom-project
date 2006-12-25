@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_put.c	1.34 (gritter) 8/6/05";
+static char sccsid[] = "@(#)ex_put.c	1.35 (gritter) 12/25/06";
 #endif
 #endif
 
@@ -1054,7 +1054,7 @@ setoutt(void)
 void
 vlprintf(char *cp, va_list ap)
 {
-	register int (*P)();
+	register int (*P)(int);
 
 	P = setlist(1);
 	vprintf(cp, ap);

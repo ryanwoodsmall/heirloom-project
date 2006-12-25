@@ -70,12 +70,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Sccsid @(#)ex_version.c	1.145 (gritter) 8/18/05
+ * Sccsid @(#)ex_version.c	1.146 (gritter) 12/25/06
  */
 
 #include "ex.h"
 
-static char *versionstring = "@(#)Version 4.0 (gritter) 8/18/05";
+static char *versionstring = "@(#)Version 4.0 (gritter) 12/25/06";
 
 void 
 printver(void)
@@ -102,13 +102,13 @@ ex_extern.c:static char sccsid[] = "@(#)ex_extern.c	1.6 (gritter) 11/23/04";
 ex_get.c:static char sccsid[] = "@(#)ex_get.c	1.18 (gritter) 8/4/05";
 ex_io.c:static char sccsid[] = "@(#)ex_io.c	1.42 (gritter) 8/4/05";
 ex_proto.h: *	Sccsid @(#)ex_proto.h	1.33 (gritter) 8/6/05
-ex_put.c:static char sccsid[] = "@(#)ex_put.c	1.34 (gritter) 8/6/05";
+ex_put.c:static char sccsid[] = "@(#)ex_put.c	1.35 (gritter) 12/25/06";
 ex_re.c:static char sccsid[] = "@(#)ex_re.c	1.60 (gritter) 8/6/05";
 ex_re.h: *	Sccsid @(#)ex_re.h	1.24 (gritter) 8/4/05
 ex_set.c:static char sccsid[] = "@(#)ex_set.c	1.11 (gritter) 11/24/04";
-ex_subr.c:static char sccsid[] = "@(#)ex_subr.c	1.40 (gritter) 8/6/05";
+ex_subr.c:static char sccsid[] = "@(#)ex_subr.c	1.41 (gritter) 12/25/06";
 ex_tagio.c:static char sccsid[] = "@(#)ex_tagio.c	1.12 (gritter) 8/4/05";
-ex_temp.c:static char sccsid[] = "@(#)ex_temp.c	1.26 (gritter) 8/4/05";
+ex_temp.c:static char sccsid[] = "@(#)ex_temp.c	1.27 (gritter) 12/25/06";
 ex_temp.h: *	Sccsid @(#)ex_temp.h	1.10 (gritter) 8/4/05
 ex_tty.c:static char sccsid[] = "@(#)ex_tty.c	1.30 (gritter) 8/4/05";
 ex_tty.h: *	Sccsid @(#)ex_tty.h	1.14 (gritter) 8/4/05
@@ -121,12 +121,12 @@ ex_vis.h: *	Sccsid @(#)ex_vis.h	1.22 (gritter) 8/6/05
 ex_vmain.c:static char sccsid[] = "@(#)ex_vmain.c	1.34 (gritter) 8/6/05";
 ex_voper.c:static char sccsid[] = "@(#)ex_voper.c	1.28 (gritter) 8/6/05";
 ex_vops.c:static char sccsid[] = "@(#)ex_vops.c	1.28 (gritter) 8/4/05";
-ex_vops2.c:static char sccsid[] = "@(#)ex_vops2.c	1.35 (gritter) 8/4/05";
+ex_vops2.c:static char sccsid[] = "@(#)ex_vops2.c	1.36 (gritter) 12/25/06";
 ex_vops3.c:static char sccsid[] = "@(#)ex_vops3.c	1.21 (gritter) 8/4/05";
-ex_vput.c:static char sccsid[] = "@(#)ex_vput.c	1.51 (gritter) 8/6/05";
+ex_vput.c:static char sccsid[] = "@(#)ex_vput.c	1.52 (gritter) 12/25/06";
 ex_vwind.c:static char sccsid[] = "@(#)ex_vwind.c	1.9 (gritter) 11/23/04";
 expreserve.c:static char sccsid[] UNUSED = "@(#)expreserve.c	1.23 (gritter) 11/27/04";
-exrecover.c:static char sccsid[] UNUSED = "@(#)exrecover.c	1.22 (gritter) 8/4/05";
+exrecover.c:static char sccsid[] UNUSED = "@(#)exrecover.c	1.23 (gritter) 12/25/06";
 mapmalloc.c: *	Sccsid @(#)mapmalloc.c	1.7 (gritter) 8/18/05
 printf.c:static char sccsid[] = "@(#)printf.c	1.15 (gritter) 12/1/04";
 */

@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_subr.c	1.40 (gritter) 8/6/05";
+static char sccsid[] = "@(#)ex_subr.c	1.41 (gritter) 12/25/06";
 #endif
 #endif
 
@@ -638,7 +638,7 @@ qcolumn(register char *lim, register char *gp)
 {
 	register int x = 0, n = 1;
 	int	c, i;
-	int (*OO)();
+	int (*OO)(int);
 
 	OO = Outchar;
 	Outchar = qcount;
@@ -851,7 +851,7 @@ char *
 vfindcol(int i)
 {
 	register char *cp;
-	register int (*OO)() = Outchar;
+	register int (*OO)(int) = Outchar;
 	int	c, n = 0;
 
 	Outchar = qcount;

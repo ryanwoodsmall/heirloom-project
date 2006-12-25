@@ -83,7 +83,7 @@ char *copyright =
 "@(#) Copyright (c) 1980 Regents of the University of California.\n\
  All rights reserved.\n";
 #endif
-static char sccsid[] UNUSED = "@(#)exrecover.c	1.22 (gritter) 8/4/05";
+static char sccsid[] UNUSED = "@(#)exrecover.c	1.23 (gritter) 12/25/06";
 #endif
 
 /* from exrecover.c	7.9.2 (2.11BSD) 1996/10/26 */
@@ -428,7 +428,7 @@ listfiles(char *dirname)
 		xfprintf(xstderr, catgets(catd, 2, 6, "No files saved.\n"));
 		return;
 	}
-	qsort(&svbuf[0], ecount, sizeof svbuf[0], (int(*)()) qucmp);
+	qsort(&svbuf[0], ecount, sizeof svbuf[0], (int(*)(const void *, const void *)) qucmp);
 	for (fp = &svbuf[0]; fp < &svbuf[ecount]; fp++) {
 		cp = ctime(&fp->sf_time);
 		cp[10] = 0;
@@ -449,7 +449,7 @@ enter(struct svfile *fp, char *fname, int count)
 {
 	register char *cp, *cp2;
 	register struct svfile *f, *fl;
-	time_t curtime, itol();
+	time_t curtime;
 
 	f = 0;
 	if (count >= NENTRY) {
@@ -841,14 +841,15 @@ getblock(line atl, int iof)
 		return (obuff + off);
 	if (iof == READ) {
 		if (ichanged)
-			blkio(iblock, ibuff, (ssize_t(*)())write);
+			blkio(iblock, ibuff,
+				(ssize_t(*)(int, void *, size_t))write);
 		ichanged = 0;
 		iblock = bno;
-		blkio(bno, ibuff, (ssize_t(*)())read);
+		blkio(bno, ibuff, (ssize_t(*)(int, void *, size_t))read);
 		return (ibuff + off);
 	}
 	if (oblock >= 0)
-		blkio(oblock, obuff, (ssize_t(*)())write);
+		blkio(oblock, obuff, (ssize_t(*)(int, void *, size_t))write);
 	oblock = bno;
 	return (obuff + off);
 }

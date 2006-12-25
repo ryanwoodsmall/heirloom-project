@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_temp.c	1.26 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_temp.c	1.27 (gritter) 12/25/06";
 #endif
 #endif
 
@@ -265,25 +265,29 @@ getblock(line atl, int iof)
 	if (iof == READ) {
 		if (hitin2 == 0) {
 			if (ichang2) {
-				blkio(iblock2, ibuff2, (ssize_t(*)())write);
+				blkio(iblock2, ibuff2,
+					(ssize_t(*)(int, void *, size_t))write);
 			}
 			ichang2 = 0;
 			iblock2 = bno;
-			blkio(bno, ibuff2, (ssize_t(*)())read);
+			blkio(bno, ibuff2,
+				(ssize_t(*)(int, void *, size_t))read);
 			hitin2 = 1;
 			return (ibuff2 + off);
 		}
 		hitin2 = 0;
 		if (ichanged) {
-			blkio(iblock, ibuff, (ssize_t(*)())write);
+			blkio(iblock, ibuff,
+				(ssize_t(*)(int, void *, size_t))write);
 		}
 		ichanged = 0;
 		iblock = bno;
-		blkio(bno, ibuff, (ssize_t(*)())read);
+		blkio(bno, ibuff, (ssize_t(*)(int, void *, size_t))read);
 		return (ibuff + off);
 	}
 	if (oblock >= 0) {
-			blkio(oblock, obuff, (ssize_t(*)())write);
+			blkio(oblock, obuff,
+				(ssize_t(*)(int, void *, size_t))write);
 	}
 	oblock = bno;
 	return (obuff + off);
@@ -301,7 +305,7 @@ blkio(bloc b, char *buf, ssize_t (*iofcn)(int, void *, size_t))
 
 #ifdef INCORB
 	if (b < INCORB) {
-		if (iofcn == (ssize_t(*)())read) {
+		if (iofcn == (ssize_t(*)(int, void *, size_t))read) {
 			copy(buf, pagrnd(incorb[b+1]), (size_t) BUFSIZ);
 			return;
 		}
@@ -358,13 +362,13 @@ synctmp(void)
 	if (dol == zero)
 		return;
 	if (ichanged)
-		blkio(iblock, ibuff, (ssize_t(*)())write);
+		blkio(iblock, ibuff, (ssize_t(*)(int, void *, size_t))write);
 	ichanged = 0;
 	if (ichang2)
-		blkio(iblock2, ibuff2, (ssize_t(*)())write);
+		blkio(iblock2, ibuff2, (ssize_t(*)(int, void *, size_t))write);
 	ichang2 = 0;
 	if (oblock != -1)
-		blkio(oblock, obuff, (ssize_t(*)())write);
+		blkio(oblock, obuff, (ssize_t(*)(int, void *, size_t))write);
 	time(&H.Time);
 	uid = getuid();
 	*zero = (line) H.Time;
@@ -566,7 +570,7 @@ shread(void)
 	return (0);
 }
 
-int	getREG();
+int	getREG(void);
 
 void
 putreg(int c)

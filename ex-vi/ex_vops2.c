@@ -73,7 +73,7 @@
 
 #ifndef	lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)ex_vops2.c	1.35 (gritter) 8/4/05";
+static char sccsid[] = "@(#)ex_vops2.c	1.36 (gritter) 12/25/06";
 #endif
 #endif
 
@@ -611,7 +611,7 @@ vgetline(int cnt, char *gcursor, bool *aescaped, int commch)
 	int x, y, iwhite, backsl=0;
 	cell *iglobp;
 	char cstr[2];
-	int (*OO)() = Outchar;
+	int (*OO)(int) = Outchar;
 
 	/*
 	 * Clear the output state and counters
