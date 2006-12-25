@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fatal.h	1.3 (gritter) 6/24/05
+ * Sccsid @(#)fatal.h	1.4 (gritter) 12/25/06
  */
 
 #ifdef	__cplusplus
@@ -41,7 +41,6 @@ extern "C" {
 extern	int	Fflags;
 extern	char	*Ffile;
 extern	int	Fvalue;
-extern	int	(*Ffunc)();
 extern	int	Fjmp[10];
 
 #define	FTLMSG		0100000

@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)lib.c	1.26 (gritter) 6/26/05>
+   Sccsid @(#)lib.c	1.27 (gritter) 12/25/06>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -71,7 +71,6 @@ static int	MAXFLD;	/* number of allocated fields */
 int	maxfld	= 0;	/* last used field */
 int	argno	= 1;	/* current input argument number */
 extern	Awkfloat *ARGC;
-extern	unsigned char	*getargv();
 
 static void growrec(unsigned char **, int *, int, unsigned char **, int);
 

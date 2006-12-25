@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)test.c	1.9 (gritter) 6/29/05
+ * Sccsid @(#)test.c	1.10 (gritter) 12/25/06
  */
 /* from OpenSolaris "test.c	1.15	05/06/08 SMI" */
 
@@ -268,7 +268,8 @@ static int
 filtyp(const unsigned char *f, int field)
 {
 	struct stat statb;
-	int (*statf)() = (field == S_IFLNK) ? lstat : stat;
+	int (*statf)(const char *, struct stat *) =
+		(field == S_IFLNK) ? lstat : stat;
 
 	if ((*statf)(f, &statb) < 0)
 		return(0);

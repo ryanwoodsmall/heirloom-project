@@ -78,7 +78,7 @@ char copyright[] =
 #endif
 
 /*	from 4.4BSD /usr/src/old/awk/proc.c	4.4 (Berkeley) 4/17/91	*/
-/*	Sccsid @(#)proc.c	1.7 (gritter) 10/2/04>	*/
+/*	Sccsid @(#)proc.c	1.8 (gritter) 12/25/06>	*/
 
 #include "awk.h"
 #include <stdio.h>
@@ -151,13 +151,13 @@ main(void)
 {	struct xx *p;
 	int i;
 	printf("#include \"awk.def\"\n");
-	printf("obj nullproc();\n");
+	printf("obj nullproc(node **, int);\n");
 	for(p=proc;p->token!=0;p++)
 		if(p==proc || strcmp(p->name, (p-1)->name))
-			printf("extern obj %s();\n",p->name);
+			printf("extern obj %s(node **, int);\n",p->name);
 	for(p=proc;p->token!=0;p++)
 		table[p->token-FIRSTTOKEN]=p->name;
-	printf("obj (*proctab[%d])() = {\n", SIZE);
+	printf("obj (*proctab[%d])(node **, int) = {\n", SIZE);
 	for(i=0;i<SIZE;i++)
 		if(table[i]==0) printf("/*%s*/\tnullproc,\n",tokname(i+FIRSTTOKEN));
 		else printf("/*%s*/\t%s,\n",tokname(i+FIRSTTOKEN),table[i]);

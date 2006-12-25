@@ -30,7 +30,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)shl.sl	1.28 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)shl.sl	1.29 (gritter) 12/25/06";
 
 #if !defined (__FreeBSD__) && !defined (__hpux) && !defined (_AIX) && \
 	!defined (__NetBSD__) && !defined (__OpenBSD__) && \
@@ -185,13 +185,13 @@ struct termios	otio;			/* old terminal attributes */
 struct termios	dtio;			/* default terminal attributes */
 struct termios	rtio;			/* raw terminal attributes */
 struct winsize	winsz;			/* window sizes */
-void		(*oldhup)();		/* old SIGHUP handler */
-void		(*oldint)();		/* old SIGINT handler */
-void		(*oldquit)();		/* old SIGQUIT handler */
-void		(*oldttou)();		/* old SIGTTOU handler */
-void		(*oldtstp)();		/* old SIGTSTP handler */
-void		(*oldttin)();		/* old SIGTTIN handler */
-void		(*oldwinch)();		/* old SIGWINCH handler */
+void		(*oldhup)(int);		/* old SIGHUP handler */
+void		(*oldint)(int);		/* old SIGINT handler */
+void		(*oldquit)(int);	/* old SIGQUIT handler */
+void		(*oldttou)(int);	/* old SIGTTOU handler */
+void		(*oldtstp)(int);	/* old SIGTSTP handler */
+void		(*oldttin)(int);	/* old SIGTTIN handler */
+void		(*oldwinch)(int);	/* old SIGWINCH handler */
 
 /*
  * Common english error messages.

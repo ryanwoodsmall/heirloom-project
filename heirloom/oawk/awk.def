@@ -72,7 +72,7 @@
  *
  *	from 4.4BSD /usr/src/old/awk/awk.def	4.6 (Berkeley) 4/27/91
  *
- *	Sccsid @(#)awk.def	1.18 (gritter) 10/5/04
+ *	Sccsid @(#)awk.def	1.19 (gritter) 12/25/06
  */
 
 #include <stdlib.h>
@@ -214,7 +214,7 @@ extern node	*nullstat;
 #define NEXPR	3
 #define NPA2	4
 
-extern obj	(*proctab[])();
+extern obj	(*proctab[])(node **, int);
 extern obj	true, false;
 extern int	pairstack[], paircnt;
 
@@ -282,7 +282,7 @@ extern node *genprint(void);
 extern void run(void);
 extern obj execute(node *);
 extern obj program(node **, int);
-extern obj getline(void);
+extern obj getline(node **, int);
 extern obj array(node **, int);
 extern obj arrayel(node *, obj);
 extern obj matchop(node **, int);
@@ -310,7 +310,7 @@ extern obj instat(node **, int);
 extern obj jump(node **, int);
 extern obj fncn(node **, int);
 extern obj print(node **, int);
-extern obj nullproc(void);
+extern obj nullproc(node **, int);
 extern obj nodetoobj(node *);
 extern void redirprint(const char *, int, node *);
 extern int chrlen(const char *);

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.11 (gritter) 6/22/05
+ * Sccsid @(#)fault.c	1.12 (gritter) 12/25/06
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -43,7 +43,7 @@
 #include	<errno.h>
 #include	<string.h>
 
-static	void (*psig0_func)() = SIG_ERR;	/* previous signal handler for signal 0 */
+static	void (*psig0_func)(int) = SIG_ERR;	/* previous signal handler for signal 0 */
 static	char sigsegv_stack[SIGSTKSZ];
 
 static BOOL sleeping = 0;
@@ -89,7 +89,7 @@ static BOOL trapflg[MAXTRAP] =
 };
 
 void (*(
-sigval[MAXTRAP]))() =
+sigval[MAXTRAP]))(int) =
 {
 	0,
 	0,	/* 	done, 	   hangup */
@@ -513,7 +513,7 @@ sigsegv(int sig, siginfo_t *sip)
 void 
 init_sigval(void)
 {
-	extern void	(*(sigval[]))();
+	extern void	(*(sigval[]))(int);
 
 #ifdef	SIGHUP
 	if (SIGHUP < MAXTRAP)
@@ -557,7 +557,7 @@ init_sigval(void)
 #endif
 #ifdef	SIGSEGV
 	if (SIGSEGV < MAXTRAP)
-		sigval[SIGSEGV] = sigsegv;
+		sigval[SIGSEGV] = (void(*)(int))sigsegv;
 #endif
 #ifdef	SIGEMT
 	if (SIGEMT < MAXTRAP)

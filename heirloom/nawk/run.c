@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)run.c	1.32 (gritter) 6/19/05>
+   Sccsid @(#)run.c	1.33 (gritter) 12/25/06>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -103,7 +103,7 @@ int run(Node *a)
 
 Cell *r_execute(Node *u)
 {
-	register Cell *(*proc)();
+	register Cell *(*proc)(Node **, int);
 	register Cell *x;
 	register Node *a;
 
@@ -523,7 +523,7 @@ Cell *matchop(Node **a, int n)
 	register unsigned char *s, *t;
 	register int i;
 	fa *pfa;
-	int (*mf)() = match, mode = 0;
+	int (*mf)(void *, unsigned char *) = match, mode = 0;
 
 	if (n == MATCHFCN) {
 		mf = pmatch;

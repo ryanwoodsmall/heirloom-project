@@ -13,3 +13,5 @@ install: all
 
 clean:
 	rm -f bdiff bdiff.o core log *~
+
+bdiff.o: bdiff.c fatal.h ../libcommon/sigset.h

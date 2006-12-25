@@ -50,7 +50,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/deroff.sl	1.12 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/deroff.sl	1.13 (gritter) 12/25/06";
 
 /*	from deroff.c	8.1 (Berkeley) 6/6/93	*/
 
@@ -129,7 +129,7 @@ typedef	int pacmac;		/* compressed macro name */
 struct	mactab{
 	int	condition;
 	pacmac	macname;
-	int	(*func)();
+	int	(*func)(pacmac);
 };
 
 static int	wordflag;
@@ -829,7 +829,7 @@ extern struct	mactab	manmactab[];
 /*
  *	macro table initialization
  */
-#define	M(cond, c1, c2, func) {cond, tomac(c1, c2), func}
+#define	M(cond, c1, c2, func) {cond, tomac(c1, c2), (int(*)(pacmac))func}
 
 /*
  *	Put out a macro line, using ms and mm conventions.

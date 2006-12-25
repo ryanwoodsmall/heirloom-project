@@ -42,7 +42,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*	Sccsid @(#)dc.c	1.20 (gritter) 2/4/05>	*/
+/*	Sccsid @(#)dc.c	1.21 (gritter) 12/25/06>	*/
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -301,10 +301,10 @@ casediv:
 			release(basptr);
 			if(sign == 1)obase = (long)-l;
 			basptr = p;
-			outdit = (int (*)())bigot;
+			outdit = (int (*)(struct blk *, int, int))bigot;
 			if(n == 1 && sign == 0){
 				if(c <= 16){
-					outdit = (int (*)())hexot;
+					outdit = (int (*)(struct blk *, int, int))hexot;
 					fw = 1;
 					fw1 = 0;
 					ll = 68;
