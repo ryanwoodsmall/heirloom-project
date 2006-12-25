@@ -1,3 +1,11 @@
+Release ...
+* SCCS: Do not use the SYS_NMLN constant since it is not portable (bug
+  reported by John Cowan).
+* help: Fixed for arguments consisting of letters only (command usage),
+  default messages file, and error message if no appropriate key could
+  be found. These problems had been introduced with the removal of the
+  internationalization code during the port.
+
 Release 061220
 * The SCCS version control system has been added as a port of the source
   code released by Sun yesterday.

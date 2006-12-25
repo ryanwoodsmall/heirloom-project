@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lockit.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)lockit.c	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/mpwlib/lockit.c"	*/
 
@@ -61,8 +61,7 @@
 # include	<ccstypes.h>
 # include	<signal.h>
 # include	<limits.h>
-
-# define	nodenamelength	SYS_NMLN
+# include	<stdlib.h>
 
 static	int	onelock(pid_t, char *, char *);
 
@@ -75,11 +74,12 @@ char	*uuname)
 {  
 	int	fd;
 	pid_t	opid;
-	char	ouuname[nodenamelength];
+	char	*ouuname;
 	long	ltime, omtime;
 	char	uniqfilename[PATH_MAX+48];
 	char	tempfile[PATH_MAX];
 	int	uniq_nmbr;
+	int	nodenamelength;
 
 	copy(lockfile, tempfile);
 	sprintf(uniqfilename, "%s/%lu.%s%ld", dname(tempfile),
@@ -98,9 +98,14 @@ char	*uuname)
 	   close(fd);
 	   unlink(uniqfilename);
 	}
+	nodenamelength = strlen(uuname) + 1;
+	if ((ouuname = calloc(nodenamelength, 1)) == NULL)
+		return(-1);
 	for (++count; --count; sleep(10)) {
-		if (onelock(pid, uuname, lockfile) == 0)
+		if (onelock(pid, uuname, lockfile) == 0) {
+		   free(ouuname);
 		   return(0);
+		}
 		if (!exists(lockfile))
 		   continue;
 		omtime = Statbuf.st_mtime;
@@ -128,6 +133,7 @@ char	*uuname)
 		}
 		continue;
 	}
+	free(ouuname);
 	return(-1);
 }
 
@@ -139,17 +145,23 @@ char	*uuname)
 {
 	int	fd, n;
 	pid_t	opid;
-	char	ouuname[nodenamelength];
+	char	*ouuname;
+	int	nodenamelength;
 
 	if ((fd = open(lockfile, O_RDONLY)) < 0) {
 	   return(-1);
 	}
+	nodenamelength = strlen(uuname) + 1;
+	if ((ouuname = calloc(nodenamelength, 1)) == NULL)
+	   return(-1);
 	n = read(fd, (char *)&opid, sizeof(opid));
 	read(fd, ouuname, nodenamelength);
 	close(fd);
 	if (n == sizeof(opid) && opid == pid && (equal(ouuname,uuname))) {
+	   free(ouuname);
 	   return(unlink(lockfile));
 	} else {
+	   free(ouuname);
 	   return(-1);
 	}
 }
@@ -161,6 +173,7 @@ char	*uuname,
 char	*lockfile)
 {
 	int	fd;
+	int	nodenamelength = strlen(uuname) + 1;
 	
         if ((fd = open(lockfile, O_WRONLY|O_CREAT|O_EXCL, 0444)) >= 0) {
 	   if (write(fd, (char *)&pid, sizeof(pid)) != sizeof(pid)) {
@@ -191,16 +204,22 @@ char	*uuname)
 {
 	int	fd, n;
 	pid_t	opid;
-	char	ouuname[nodenamelength];
+	char	*ouuname;
+	int	nodenamelength;
 
 	if ((fd = open(lockfile, O_RDONLY)) < 0)
+	   return(0);
+	nodenamelength = strlen(uuname) + 1;
+	if ((ouuname = calloc(nodenamelength, 1)) == NULL)
 	   return(0);
 	n = read(fd, (char *)&opid, sizeof(opid));
 	read(fd, ouuname, nodenamelength);
 	close(fd);
 	if (n == sizeof(opid) && opid == pid && (equal(ouuname, uuname))) {
+	   free(ouuname);
 	   return(1);
 	} else {
+	   free(ouuname);
 	   return(0);
 	}
 }
