@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fatal.h	1.3 (gritter) 12/20/06
+ * Sccsid @(#)fatal.h	1.4 (gritter) 12/25/06
  */
 
 #include <setjmp.h>
@@ -41,7 +41,7 @@
 extern	int	Fflags;
 extern	char	*Ffile;
 extern	int	Fvalue;
-extern	int	(*Ffunc)();
+extern	int	(*Ffunc)(char *);
 extern	jmp_buf	Fjmp;
 extern  char    *nsedelim;
 
@@ -56,4 +56,4 @@ extern  char    *nsedelim;
 # define FSAVE(val)	SAVE(Fflags,old_Fflags); Fflags = val;
 # define FRSTR()	RSTR(Fflags,old_Fflags);
 
-extern  char    *nse_file_trim();
+extern  char    *nse_file_trim(char *, int);

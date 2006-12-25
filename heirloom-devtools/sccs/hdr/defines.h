@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defines.h	1.4 (gritter) 12/20/06
+ * Sccsid @(#)defines.h	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:hdr/defines.h"	*/
 # include	<sys/types.h>
@@ -243,7 +243,7 @@ struct	pfile	{
 extern	int 	cmrcheck(char *, char *);
 extern	int 	deltack(char [], char *, char *, char *);
 extern	void 	error(const char *);
-extern	int 	sweep(int, char *, char *, int, int, int, char *[], char *, char *[], int (*)(), int (*)());
+extern	int 	sweep(int, char *, char *, int, int, int, char *[], char *, char *[], int (*)(char *, int, char **), int (*)(char **, char **, int));
 extern	char *	gf(char *);
 
 /*
@@ -263,7 +263,7 @@ extern	char 	del_ab(register char *, register struct deltab *, struct packet *);
 extern	void 	get_Del_Date_time(register char *, struct deltab *, struct packet *, struct tm *);
 extern	char *	del_ba(register struct deltab *, char *);
 extern	struct idel *	dodelt(register struct packet *, struct stats *, struct sid *, int);
-extern	void 	do_file(register char *, void (*)(), int);
+extern	void 	do_file(register char *, void (*)(char *), int);
 extern	void 	dohist(char *);
 extern	int 	valmrs(struct packet *, char *);
 extern	void 	mrfixup(void);

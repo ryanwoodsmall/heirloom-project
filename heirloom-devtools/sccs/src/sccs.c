@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)sccs.c	1.4 (gritter) 12/25/06
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -345,10 +345,6 @@ struct  stat 		Statbuf;
 extern char	*sys_siglist[];
 #endif
 
-static char *gstrcat();
-static char *gstrncat();
-static char *gstrcpy();
-static void gstrbotch();
 extern	int Fcnt;
 
 static int create_macro  = 0;	/* 1 if "sccs create ..."  command is running. */
@@ -2298,8 +2294,6 @@ unedit(char *fn)
 	 * the file in question (assuming it exists).
 	 */
 	if (delete) {
-		extern int errno;
-
 		errno = 0;
 		if (access(gfile, 0) < 0 && errno != ENOENT)
 			goto bad;

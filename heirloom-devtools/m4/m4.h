@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)m4.h	1.3 (gritter) 10/29/05
+ * Sccsid @(#)m4.h	1.4 (gritter) 12/25/06
  */
 
 #include	<ctype.h>
@@ -123,7 +123,7 @@ extern char	*tempfile;
 extern wchar_t	*token;
 extern wchar_t	*toklm;
 extern wchar_t	C;
-extern wchar_t	getchr();
+extern wchar_t	getchr(void);
 extern wchar_t	lcom[];
 extern wchar_t	lquote[];
 extern wchar_t	nullstr[];
@@ -147,8 +147,8 @@ extern struct bs	barray[];
 extern struct call	*Cp;
 extern struct call	*callst;
 extern struct nlist	**hshtab;
-extern void	install();
-extern struct nlist	*lookup();
+extern void	install(wchar_t *, wchar_t *, int);
+extern struct nlist	*lookup(wchar_t *);
 extern struct Wrap	*wrapstart;
 extern int	wide;
 extern ibuf_t	ibuffer[];

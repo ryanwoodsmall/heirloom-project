@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fatal.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)fatal.c	1.4 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/mpwlib/fatal.c"	*/
 # include	<defines.h>
@@ -92,7 +92,7 @@ int	Fcnt;
 int	Fflags;
 char	*Ffile;
 int	Fvalue = -1;
-int	(*Ffunc)();
+int	(*Ffunc)(char *);
 jmp_buf	Fjmp;
 char    *nsedelim = (char *) 0;
 
@@ -107,8 +107,7 @@ static  int     delimlen = 0;
 int 
 fatal(char *msg)
 {
-	void	clean_up();
-	int	userexit();
+	void	clean_up(void);
 
 	++Fcnt;
 	if (Fflags & FTLMSG) {

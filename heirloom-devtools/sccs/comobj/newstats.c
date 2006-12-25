@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)newstats.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)newstats.c	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/comobj/newstats.c"	*/
 # include	<defines.h>
@@ -44,7 +44,6 @@ newstats(register struct packet *pkt, register char *strp, register char *ch)
 	char fivech[6];
 	register char *r;
 	int i;
-	void	putline();
 
 	r = fivech;
 	for (i=0; i < 5; i++)

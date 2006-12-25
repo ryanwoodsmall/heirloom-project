@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dodelt.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)dodelt.c	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/comobj/dodelt.c"	*/
 #include	<defines.h>
@@ -58,7 +58,7 @@ dodelt(register struct packet *pkt, struct stats *statp, struct sid *sidp, int t
 	struct deltab dt;
 	register struct idel *rdp = NULL;
 	int n, founddel;
-	void	fredck(), escdodelt();
+	void	fredck(struct packet *), escdodelt(struct packet *);
 	register char *p;
 
 	pkt->p_idel = 0;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unget.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)unget.c	1.4 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:cmd/unget.c"	*/
 # include	<defines.h>
@@ -69,7 +69,7 @@ static void	catpfile(struct packet *);
 struct stat	Statbuf;
 char	SccsError[MAXERRORLEN];
 
-void	clean_up();
+void	clean_up(void);
 
 int 
 main(int argc, char *argv[])

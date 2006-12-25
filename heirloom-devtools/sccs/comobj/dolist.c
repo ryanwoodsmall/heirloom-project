@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dolist.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)dolist.c	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/comobj/dolist.c"	*/
 # include	<defines.h>
@@ -44,7 +44,7 @@ static char *getasid(register char *, register struct sid *);
 void 
 dolist(struct packet *pkt, register char *list, int ch)
 {
-	void	enter();
+	void	enter(struct packet *, int, int, struct sid *);
 	struct sid lowsid, highsid, sid;
 	int n;
 

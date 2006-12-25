@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)rmchg.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)rmchg.c	1.4 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:cmd/rmchg.c"	*/
 # include	<defines.h>
@@ -110,9 +110,7 @@ static void	put_delmrs(struct packet *);
 void	clean_up(void);
 
 int
-main(argc,argv)
-int argc;
-char *argv[];
+main(int argc,char **argv)
 {
 	register int i;
 	register char *p;

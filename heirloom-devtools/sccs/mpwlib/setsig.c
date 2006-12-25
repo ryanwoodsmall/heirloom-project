@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)setsig.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)setsig.c	1.4 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/mpwlib/setsig.c"	*/
 # include       <defines.h>
@@ -97,8 +97,7 @@ setsig(void)
 static void 
 setsig1(int sig)
 {
-	int userexit();
-	void	clean_up();
+	void	clean_up(void);
 
 	static int die = 0;
 	

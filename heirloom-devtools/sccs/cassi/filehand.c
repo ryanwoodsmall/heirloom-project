@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)filehand.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)filehand.c	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/cassi/filehand.c"	*/
 
@@ -305,8 +305,8 @@ sweep (
     char *fmatch[],						/* Fields to match. */
     char *usrbuf,						/* User's copy of matching record. */
     char *usrmatch[],					/* Pointers to arguments. */
-    int (*chop)(),						/* Routine to seperate the fields. */
-    int (*compare)()					/* Routine to compare records. */
+    int (*chop)(char *, int, char **),			/* Routine to seperate the fields. */
+    int (*compare)(char **, char **, int)		/* Routine to compare records. */
 )
 {
 	char	**arg = NULL,						/* Pointers to the fields. */

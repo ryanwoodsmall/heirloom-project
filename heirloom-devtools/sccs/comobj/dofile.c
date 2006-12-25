@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dofile.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)dofile.c	1.5 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:lib/comobj/dofile.c"	*/
 # include	<defines.h>
@@ -43,7 +43,7 @@ char	had_dir;
 char	had_standinp;
 
 void 
-do_file(register char *p, void (*func)(), int check_file)
+do_file(register char *p, void (*func)(char *), int check_file)
 {
 	extern char *Ffile;
 	int fd;

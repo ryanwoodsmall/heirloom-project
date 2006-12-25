@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)val.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)val.c	1.4 (gritter) 12/25/06
  */
 /*	from OpenSolaris "sccs:cmd/val.c"	*/
 /************************************************************************/
@@ -74,7 +74,6 @@ static char	name[50];	/* storage for name (-m) value */
 static char	*Argv[BUFSIZ];
 static char	line[BUFSIZ];
 static char	save_line[BUFSIZ];
-static char	*get_line();	/* function returning ptr to line read */
 
 static struct delent {		/* structure for delta table entry */
 	char type;
@@ -335,7 +334,6 @@ process(char *p_line, int argc, char *argv[])
 static void 
 validate(char *c_path, char *c_sid, char *c_type, char *c_name)
 {
-	char *auxf();
 	register char	*l;
 	int	goods,goodt,goodn,hadmflag;
 
