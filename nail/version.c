@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.352 (gritter) 7/7/06";
+static char sccsid[] = "@(#)version.c	2.353 (gritter) 12/25/06";
 #endif
 #endif /* not lint */
 
@@ -48,13 +48,13 @@ static char sccsid[] = "@(#)version.c	2.352 (gritter) 7/7/06";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = V " 7/7/06";
+const char *version = V " 12/25/06";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)mailx " V " (gritter) 7/7/06";
+= "@(#)mailx " V " (gritter) 12/25/06";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -80,7 +80,7 @@ imap.c:static char sccsid[] = "@(#)imap.c	1.217 (gritter) 3/4/06";
 imap_gssapi.c:static char sccsid[] = "@(#)imap_gssapi.c	1.10 (gritter) 3/4/06";
 imap_search.c:static char sccsid[] = "@(#)imap_search.c	1.29 (gritter) 3/4/06";
 junk.c:static char sccsid[] = "@(#)junk.c	1.73 (gritter) 3/4/06";
-lex.c:static char sccsid[] = "@(#)lex.c	2.85 (gritter) 3/20/06";
+lex.c:static char sccsid[] = "@(#)lex.c	2.86 (gritter) 12/25/06";
 list.c:static char sccsid[] = "@(#)list.c	2.60 (gritter) 3/4/06";
 lzw.c: * Sccsid @(#)lzw.c	1.11 (gritter) 3/4/06
 macro.c:static char sccsid[] = "@(#)macro.c	1.13 (gritter) 3/4/06";
@@ -90,7 +90,7 @@ md5.c:	Sccsid @(#)md5.c	1.8 (gritter) 3/4/06
 md5.h:	Sccsid @(#)md5.h	1.8 (gritter) 3/4/06	
 mime.c:static char sccsid[]  = "@(#)mime.c	2.66 (gritter) 4/7/06";
 names.c:static char sccsid[] = "@(#)names.c	2.22 (gritter) 3/4/06";
-nss.c:static char sccsid[] = "@(#)nss.c	1.44 (gritter) 3/4/06";
+nss.c:static char sccsid[] = "@(#)nss.c	1.45 (gritter) 12/25/06";
 openssl.c:static char sccsid[] = "@(#)openssl.c	1.24 (gritter) 3/4/06";
 pop3.c:static char sccsid[] = "@(#)pop3.c	2.43 (gritter) 3/4/06";
 popen.c:static char sccsid[] = "@(#)popen.c	2.20 (gritter) 3/4/06";

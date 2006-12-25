@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)lex.c	2.85 (gritter) 3/20/06";
+static char sccsid[] = "@(#)lex.c	2.86 (gritter) 12/25/06";
 #endif
 #endif /* not lint */
 
@@ -79,7 +79,6 @@ setfile(char *name, int newmail)
 	char isedit;
 	char *who = name[1] ? name + 1 : myname;
 	static int shudclob;
-	extern int errno;
 	size_t offset;
 	int omsgCount = 0;
 	struct shortcut *sh;

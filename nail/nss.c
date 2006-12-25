@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.44 (gritter) 3/4/06";
+static char sccsid[] = "@(#)nss.c	1.45 (gritter) 12/25/06";
 #endif
 #endif /* not lint */
 
@@ -147,7 +147,7 @@ nss_check_host(const char *server, struct sock *sp)
 	PRArenaPool	*arena;
 	CERTGeneralName	*gn;
 	SECItem	altname;
-	AltNameEncodedContext	ec;
+	CERTAltNameEncodedContext	ec;
 	int	i;
 	const SEC_ASN1Template	gntempl[] = {
 		{ SEC_ASN1_SEQUENCE_OF, 0, SEC_AnyTemplate }

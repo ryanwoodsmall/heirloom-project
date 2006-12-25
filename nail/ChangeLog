@@ -2,6 +2,7 @@
 * A "STRIP" makefile variable has been introduced to control the strip
   command at "make install".
 * Made it compile on UnixWare again (patch by Joe Julian).
+* Fixes to build with more recent versions of Mozilla NSS.
 
 [12.1] released 6/15/06
 * The base64 encoder also used an invalid encoding for the last unit of

@@ -1,7 +1,7 @@
-# Sccsid @(#)mailx.spec	1.34 (gritter) 3/4/06
+# Sccsid @(#)mailx.spec	1.35 (gritter) 12/25/06
 
 %define	use_nss	0
-%define	mozilla_version	1.6
+%define	mozilla_version	1.0.5
 
 Summary: An enhanced implementation of the mailx command
 Name: mailx
@@ -16,11 +16,11 @@ Packager: Didar Hussain <dhs@rediffmail.com>
 BuildRoot: %{_tmppath}/%{name}-root
 
 %if %{use_nss}
-Requires: mozilla-nss
-Requires: mozilla-nspr
-BuildRequires: mozilla-nss-devel
-BuildRequires: mozilla-nspr-devel
-BuildRequires: /usr/include/mozilla-%{mozilla_version}/nss/cms.h
+Requires: seamonkey-nss
+Requires: seamonkey-nspr
+BuildRequires: seamonkey-nss-devel
+BuildRequires: seamonkey-nspr-devel
+BuildRequires: /usr/include/mozilla-seamonkey-%{mozilla_version}/nss/cms.h
 %endif
 
 %description
@@ -60,8 +60,8 @@ test -d /usr/kerberos/lib &&
 	LDFLAGS="$LDFLAGS -L/usr/kerberos/lib" export LDFLAGS
 
 %if %{use_nss}
-INCLUDES="$INCLUDES -I/usr/include/mozilla-%{mozilla_version}/nspr"
-INCLUDES="$INCLUDES -I/usr/include/mozilla-%{mozilla_version}/nss"
+INCLUDES="$INCLUDES -I/usr/include/mozilla-seamonkey-%{mozilla_version}/nspr"
+INCLUDES="$INCLUDES -I/usr/include/mozilla-seamonkey-%{mozilla_version}/nss"
 export INCLUDES
 %endif
 
