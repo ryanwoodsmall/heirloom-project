@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.52 (gritter) 2/5/05>	*/
+/*	Sccsid @(#)grep.c	1.53 (gritter) 12/27/06>	*/
 
 /*
  * Code common to all grep flavors.
@@ -34,6 +34,7 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
+#include	<sys/wait.h>
 #include	<fcntl.h>
 #include	<unistd.h>
 #include	<stdio.h>
@@ -191,10 +192,11 @@ redirect(struct iblok *ip, const char *arg0, const char *arg1)
 {
 	struct iblok	*nip = NULL;
 	int	pd[2];
+	pid_t	pid;
 
 	if (pipe(pd) < 0)
 		return NULL;
-	switch (fork()) {
+	switch (pid = fork()) {
 	case 0:
 		if (lseek(ip->ib_fd, -(ip->ib_end - ip->ib_cur),
 					SEEK_CUR) == (off_t)-1) {
@@ -242,10 +244,13 @@ redirect(struct iblok *ip, const char *arg0, const char *arg1)
 		_exit(0177);
 		/*NOTREACHED*/
 	case -1:
+		fprintf(stderr, "%s: cannot fork()\n", progname);
+		status = 2;
 		return NULL;
 	default:
 		close(pd[1]);
 		nip = ib_alloc(pd[0], 0);
+		nip->ib_pid = pid;
 		return nip;
 	}
 }
@@ -573,9 +578,15 @@ fngrep(const char *fn, int level)
 	} else
 		ip = ib_alloc(0, 0);
 	ip = grep(ip);
-	if (ip->ib_fd)
+	if (ip->ib_fd) {
 		ib_close(ip);
-	else
+		if (zflag && ip->ib_pid) {
+			int	s;
+			waitpid(ip->ib_pid, &s, 0);
+			if (s)
+				status = 2;
+		}
+	} else
 		ib_free(ip);
 }
 

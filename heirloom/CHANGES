@@ -11,6 +11,8 @@ Release ...
 * file: UTF-8 characters in troff input files are now recognized.
 * cp: The "-s" option now displays correct sizes and related statistics
   for special files with st_size == 0.
+* grep: With the "-z" option, decompressor children processes are now
+  properly waited for, avoiding failures when processing many files.
 * su: Works with PAM on Mac OS X now (Stefan Tramm).
 * ps: Handles dead processes as on other platforms now (Stefan Tramm).
 * pgrep: Ignores dead processes now (Stefan Tramm).
