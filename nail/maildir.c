@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)maildir.c	1.19 (gritter) 3/4/06";
+static char sccsid[] = "@(#)maildir.c	1.20 (gritter) 12/28/06";
 #endif
 #endif /* not lint */
 
@@ -538,7 +538,7 @@ mkname(time_t t, enum mflag f, const char *pref)
 				(unsigned long)t,
 				(unsigned long)mypid, ++count, node);
 	} else {
-		size = (n = strlen(pref)) + 10;
+		size = (n = strlen(pref)) + 13;
 		cp = salloc(size);
 		strcpy(cp, pref);
 		for (i = n; i > 3; i--)
@@ -547,6 +547,10 @@ mkname(time_t t, enum mflag f, const char *pref)
 				n = i;
 				break;
 			}
+		if (i <= 3) {
+			strcpy(&cp[n], ":2,");
+			n += 3;
+		}
 	}
 	if (n < size - 7) {
 		if (f & MDRAFTED)

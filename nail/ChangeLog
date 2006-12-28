@@ -1,4 +1,6 @@
 [12.2] released ...
+* When message file names in a maildir folder do not contain the ":2,"
+  preceding the flags part, append one (Brandon Andrews).
 * A "STRIP" makefile variable has been introduced to control the strip
   command at "make install".
 * Made it compile on UnixWare again (patch by Joe Julian).
