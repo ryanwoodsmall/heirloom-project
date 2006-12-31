@@ -1,4 +1,8 @@
 Release ...
+* delta: If the "bdiff" utility cannot be found, execute regular "diff"
+  instead. This removes a circular dependency on the Heirloom Toolchest
+  on systems lacking "bdiff" in their default installation, such as
+  Linux or FreeBSD.
 * SCCS: Do not use the SYS_NMLN constant since it is not portable (bug
   reported by John Cowan).
 * help: Fixed for arguments consisting of letters only (command usage),

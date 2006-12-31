@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)delta.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)delta.c	1.5 (gritter) 12/31/06
  */
 /*	from OpenSolaris "sccs:cmd/delta.c"	*/
 
@@ -456,13 +456,7 @@ delta(char *file)
  		 Check top byte (exit code of child).
  		*/
 
- 		/*
- 		 * The logical shift operator construct ">>" below
- 		 * does not violate i18n rules, since "status" is
- 		 * an internally used variable and is not used
- 		 * for i/o.
- 		 */
- 		if (((status >> 8) & 0377) == 32) { /* 'execl' failed */
+		if (WEXITSTATUS(status) == 32) { /* 'execl' failed */
  		   sprintf(SccsError,
  		      "cannot execute '%s' (de12)", BDiffpgm);
  		   fatal(SccsError);
@@ -846,6 +840,23 @@ dodiff(char *newf,char *oldf,int difflim)
  		   execlp(Diffpgm,Diffpgm,oldf,newf,NULL);
  		} else {
  		   execlp(BDiffpgm,BDiffpgm,oldf,newf,num,"-s",NULL);
+		   if (errno == ENOENT) {	/* emulate bdiff */
+		       int	status;
+		       switch (i = fork()) {
+		       default:
+			   waitpid(i, &status, 0);
+			   if (status && WEXITSTATUS(status) != 1)
+			       _exit(1);
+			   else
+			       _exit(0);
+			   /*NOTREACHED*/
+		       case 0:
+			   execlp(Diffpgm,Diffpgm,oldf,newf,NULL);
+			   /*FALLTHRU*/
+		       case -1:
+			   _exit(32);
+		       }
+		   }
  		}
 		close(1);
 		_exit(32);	/* tell parent that 'execl' failed */
@@ -1074,6 +1085,7 @@ clean_up(void)
 			fclose(gpkt.p_iop);
 		if (Xiop) {
 			fclose(Xiop);
+			Xiop = NULL;
 			unlink(auxf(gpkt.p_file,'x'));
 		}
 		if(Gin)
