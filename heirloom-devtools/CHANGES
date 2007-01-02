@@ -1,4 +1,4 @@
-Release ...
+Release 070102
 * delta: If the "bdiff" utility cannot be found, execute regular "diff"
   instead. This removes a circular dependency on the Heirloom Toolchest
   on systems lacking "bdiff" in their default installation, such as
