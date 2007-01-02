@@ -3,6 +3,8 @@
   preceding the flags part, append one (Brandon Andrews).
 * A "STRIP" makefile variable has been introduced to control the strip
   command at "make install".
+* The "remove" command no longer causes a core dump because of a null
+  pointer dereference when it is given a name with invalid shell syntax.
 * Made it compile on UnixWare again (patch by Joe Julian).
 * Fixes to build with more recent versions of Mozilla NSS.
 

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.83 (gritter) 3/4/06";
+static char sccsid[] = "@(#)cmd3.c	2.84 (gritter) 01/02/07";
 #endif
 #endif /* not lint */
 
@@ -1612,7 +1612,8 @@ cremove(void *v)
 		return 1;
 	}
 	do {
-		name = expand(*args);
+		if ((name = expand(*args)) == NULL)
+			continue;
 		if (strcmp(name, mailname) == 0) {
 			fprintf(stderr,
 				"Cannot remove current mailbox \"%s\".\n",

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.70 (gritter) 3/20/06";
+static char sccsid[] = "@(#)fio.c	2.71 (gritter) 01/02/07";
 #endif
 #endif /* not lint */
 
@@ -504,8 +504,6 @@ globname(char *name)
 	case WRDE_BADCHAR:
 	case WRDE_SYNTAX:
 	default:
-		printf("val=%d\n", i);
-		perror("wordexp");
 		fprintf(stderr, catgets(catd, CATSET, 242,
 				"Syntax error in \"%s\"\n"), name);
 		return NULL;
