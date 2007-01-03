@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fmterr.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)fmterr.c	1.5 (gritter) 01/03/07
  */
 /*	from OpenSolaris "sccs:lib/comobj/fmterr.c"	*/
 # include	<defines.h>
@@ -45,6 +45,7 @@ fmterr(register struct packet *pkt)
 	extern char SccsError[];
 
 	fclose(pkt->p_iop);
+	pkt->p_iop = NULL;
 	sprintf(SccsError, "format error at line %d (co4)", pkt->p_slnno);
 	fatal(SccsError);
 }

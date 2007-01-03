@@ -1,3 +1,6 @@
+Release ...
+* get: Do not dump core on a corrupted s-file.
+
 Release 070102
 * delta: If the "bdiff" utility cannot be found, execute regular "diff"
   instead. This removes a circular dependency on the Heirloom Toolchest

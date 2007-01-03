@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sinit.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)sinit.c	1.5 (gritter) 01/03/07
  */
 /*	from OpenSolaris "sccs:lib/comobj/sinit.c"	*/
 # include	<defines.h>
@@ -61,7 +61,6 @@ sinit(register struct packet *pkt, register char *file, int openflag)
 		if (Statbuf.st_nlink > 1)
 			fatal("more than one link (co3)");
 		if ((p = getline(pkt)) == NULL || *p++ != CTLCHAR || *p++ != HEAD) {
-			fclose(pkt->p_iop);
 			fmterr(pkt);
 		}
 		p = satoi(p,&pkt->p_ihash);

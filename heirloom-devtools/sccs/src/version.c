@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.9 (gritter) 12/31/06";
+static const char id[] = "@(#)sccs.sl	1.10 (gritter) 01/03/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.3 (gritter) 12/20/06
@@ -35,7 +35,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../comobj/encode.c: * Sccsid @(#)encode.c	1.4 (gritter) 12/20/06
 ../comobj/eqsid.c: * Sccsid @(#)eqsid.c	1.4 (gritter) 12/20/06
 ../comobj/flushto.c: * Sccsid @(#)flushto.c	1.4 (gritter) 12/20/06
-../comobj/fmterr.c: * Sccsid @(#)fmterr.c	1.4 (gritter) 12/20/06
+../comobj/fmterr.c: * Sccsid @(#)fmterr.c	1.5 (gritter) 01/03/07
 ../comobj/getline.c: * Sccsid @(#)getline.c	1.4 (gritter) 12/20/06
 ../comobj/getser.c: * Sccsid @(#)getser.c	1.4 (gritter) 12/20/06
 ../comobj/logname.c: * Sccsid @(#)logname.c	1.4 (gritter) 12/20/06
@@ -49,7 +49,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../comobj/sid_ab.c: * Sccsid @(#)sid_ab.c	1.4 (gritter) 12/20/06
 ../comobj/sid_ba.c: * Sccsid @(#)sid_ba.c	1.4 (gritter) 12/20/06
 ../comobj/sidtoser.c: * Sccsid @(#)sidtoser.c	1.4 (gritter) 12/20/06
-../comobj/sinit.c: * Sccsid @(#)sinit.c	1.4 (gritter) 12/20/06
+../comobj/sinit.c: * Sccsid @(#)sinit.c	1.5 (gritter) 01/03/07
 ../comobj/stats_ab.c: * Sccsid @(#)stats_ab.c	1.4 (gritter) 12/20/06
 ../comobj/strptim.c: * Sccsid @(#)strptim.c	1.4 (gritter) 12/20/06
 ../hdr/ccstypes.h: * Sccsid @(#)ccstypes.h	1.4 (gritter) 12/20/06
