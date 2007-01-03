@@ -1,4 +1,8 @@
 Release ...
+* sccs: Accept the "-a", "-p", and "-B" options to "diff" with the "diffs"
+  and "sccsdiff" sub-commands.
+* sccsdiff: Accept the "-a" and "-B" options to "diff"; also accept the
+  "-P" option but pass it as "-p" to "diff".
 * get: Do not dump core on a corrupted s-file.
 
 Release 070102

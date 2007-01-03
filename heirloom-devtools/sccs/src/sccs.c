@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.4 (gritter) 12/25/06
+ * Sccsid @(#)sccs.c	1.5 (gritter) 01/03/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -836,7 +836,10 @@ command(char **argv, int forkflag, char *arg0)
 			    }
 		            break;
 			 case 'a':
- 			    if (strcmp(cmd->sccsname,"prs") != 0) {
+ 			    if ((strcmp(cmd->sccsname,"prs") != 0) &&
+ 			        (strcmp(cmd->sccsname,"sccsdiff") != 0) &&
+				(strcmp(cmd->sccsname,"diffs") != 0) &&
+				(strcmp(cmd->sccsname,"-diff") != 0)) {
 			       if ( editchs != NULL
  			            && strchr(editchs,p[1]) == NULL ) {
  			          argv++;
@@ -939,7 +942,10 @@ command(char **argv, int forkflag, char *arg0)
  			    }   
  		            break;  		                        
 			 case 'p':
- 			    if (strcmp(cmd->sccsname,"comb") == 0) {
+ 			    if ((strcmp(cmd->sccsname,"comb") == 0) &&
+ 			        (strcmp(cmd->sccsname,"sccsdiff") != 0) &&
+				(strcmp(cmd->sccsname,"diffs") != 0) &&
+				(strcmp(cmd->sccsname,"-diff") != 0)) {
 			       if ( editchs != NULL
  			            && strchr(editchs,p[1]) == NULL ) {
  			          argv++;
@@ -1016,6 +1022,12 @@ command(char **argv, int forkflag, char *arg0)
 	               	 if (strcmp(cmd->sccsname,"-diff") == 0) {
 	               	    if (pp != NULL)
 	               	       *pp = "-i";
+	               	 }
+ 		      }
+	              if (strcmp(p,"-p") == 0) {
+	               	 if (strcmp(cmd->sccsname,"sccsdiff") == 0) {
+	               	    if (pp != NULL)
+	               	       *pp = "-P";
 	               	 }
  		      }
  		      pp = NULL;
@@ -2649,7 +2661,7 @@ diffs(char *file)
 			|| ( isfile(pfile) && !isfile(gfile) )
 		)
 		{
-			if( command(&diffs_ap[1], TRUE, NOGETTEXT("-diff:elsfnhbwtCIDUu")) > 1 )
+			if( command(&diffs_ap[1], TRUE, NOGETTEXT("-diff:elsfnhbwtCIDUuapB")) > 1 )
 			{
 				Fcnt = 1;
 			}

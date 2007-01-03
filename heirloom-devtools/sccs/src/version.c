@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.10 (gritter) 01/03/07";
+static const char id[] = "@(#)sccs.sl	1.11 (gritter) 01/03/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.3 (gritter) 12/20/06
@@ -9,7 +9,7 @@ help.c: * Sccsid @(#)help.c	1.5 (gritter) 12/21/06
 prs.c: * Sccsid @(#)prs.c	1.4 (gritter) 12/25/06
 prt.c: * Sccsid @(#)prt.c	1.3 (gritter) 12/20/06
 rmchg.c: * Sccsid @(#)rmchg.c	1.4 (gritter) 12/25/06
-sccs.c: * Sccsid @(#)sccs.c	1.4 (gritter) 12/25/06
+sccs.c: * Sccsid @(#)sccs.c	1.5 (gritter) 01/03/07
 unget.c: * Sccsid @(#)unget.c	1.4 (gritter) 12/25/06
 val.c: * Sccsid @(#)val.c	1.4 (gritter) 12/25/06
 vc.c: * Sccsid @(#)vc.c	1.3 (gritter) 12/20/06

@@ -31,7 +31,7 @@
 #
 # Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
 #
-# Sccsid @(#)sccsdiff.sh	1.3 (gritter) 12/20/06
+# Sccsid @(#)sccsdiff.sh	1.4 (gritter) 01/03/07
 #
 #	DESCRIPTION:
 #		Execute diff(1) on two versions of a set of
@@ -95,8 +95,11 @@ do
 			nseflag=-q
 			get=`dirname $0`/get
 			;;
-		-[cefnhbwitu]*)
+		-[cefnhbwituaB]*)
 			flags="$flags $i"
+			;;
+		-P)
+			flags="$flags -p"
 			;;
 		-D*)
 			Dopt="-D"
