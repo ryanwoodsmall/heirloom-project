@@ -8,7 +8,8 @@ OBJ = hnjalloc.o hyphen.o
 all: libhnj.a test
 
 libhnj.a: $(OBJ)
-	ar -rv libhnj.a $(OBJ)
+	$(AR) -rv libhnj.a $(OBJ)
+	$(RANLIB) $@
 
 test: test.o libhnj.a
 	$(CC) $(LDFLAGS) test.o -L. -lhnj -o test
