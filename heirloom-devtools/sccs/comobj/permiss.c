@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)permiss.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)permiss.c	1.5 (gritter) 01/05/07
  */
 /*	from OpenSolaris "sccs:lib/comobj/permiss.c"	*/
 # include	<defines.h>
@@ -77,8 +77,8 @@ finduser(register struct packet *pkt)
 		fmterr(pkt);
 }
 
-
-char	*Sflags[NFLAGS];
+/* initialize this variable to make the Mac OS X linker happy */
+char	*Sflags[NFLAGS] = { 0 };
 
 void 
 doflags(struct packet *pkt)

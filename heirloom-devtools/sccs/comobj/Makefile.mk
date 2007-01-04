@@ -13,6 +13,7 @@ all: libcomobj.a
 
 libcomobj.a: $(OBJ)
 	$(AR) -rv $@ $(OBJ)
+	$(RANLIB) $@
 
 install: all
 

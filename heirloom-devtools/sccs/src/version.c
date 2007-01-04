@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.11 (gritter) 01/03/07";
+static const char id[] = "@(#)sccs.sl	1.12 (gritter) 01/05/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.3 (gritter) 12/20/06
@@ -38,10 +38,10 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../comobj/fmterr.c: * Sccsid @(#)fmterr.c	1.5 (gritter) 01/03/07
 ../comobj/getline.c: * Sccsid @(#)getline.c	1.4 (gritter) 12/20/06
 ../comobj/getser.c: * Sccsid @(#)getser.c	1.4 (gritter) 12/20/06
-../comobj/logname.c: * Sccsid @(#)logname.c	1.4 (gritter) 12/20/06
+../comobj/logname.c: * Sccsid @(#)logname.c	1.5 (gritter) 01/05/07
 ../comobj/newsid.c: * Sccsid @(#)newsid.c	1.4 (gritter) 12/20/06
 ../comobj/newstats.c: * Sccsid @(#)newstats.c	1.5 (gritter) 12/25/06
-../comobj/permiss.c: * Sccsid @(#)permiss.c	1.4 (gritter) 12/20/06
+../comobj/permiss.c: * Sccsid @(#)permiss.c	1.5 (gritter) 01/05/07
 ../comobj/pf_ab.c: * Sccsid @(#)pf_ab.c	1.4 (gritter) 12/20/06
 ../comobj/putline.c: * Sccsid @(#)putline.c	1.5 (gritter) 12/20/06
 ../comobj/rdmod.c: * Sccsid @(#)rdmod.c	1.4 (gritter) 12/20/06

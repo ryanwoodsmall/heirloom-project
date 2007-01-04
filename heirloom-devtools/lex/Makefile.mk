@@ -17,6 +17,7 @@ lex: $(XOBJ)
 
 libl.a: $(LOBJ)
 	$(AR) -rv libl.a $(LOBJ)
+	$(RANLIB) $@
 
 allprint_w.o: allprint.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(WARN) $(WFLAGS) allprint.c -o $@

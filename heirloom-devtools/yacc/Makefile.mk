@@ -11,6 +11,7 @@ yacc: $(YOBJ)
 
 liby.a: $(LOBJ)
 	$(AR) -rv liby.a $(LOBJ)
+	$(RANLIB) $@
 
 install: all
 	test -d $(ROOT)$(BINDIR) || mkdir -p $(ROOT)$(BINDIR)

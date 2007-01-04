@@ -33,13 +33,14 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)logname.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)logname.c	1.5 (gritter) 01/05/07
  */
 /*	from OpenSolaris "sccs:lib/comobj/logname.c"	*/
 # include	<defines.h>
 # include	<pwd.h>
 
-char saveid[50];
+/* initialize this variable to make the Mac OS X linker happy */
+char saveid[50] = { 0 };
 char *
 logname(void)
 {

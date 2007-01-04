@@ -4,6 +4,7 @@ Release ...
 * sccsdiff: Accept the "-a" and "-B" options to "diff"; also accept the
   "-P" option but pass it as "-p" to "diff".
 * get: Do not dump core on a corrupted s-file.
+* Mac OS X portability fixes (Stefan Tramm).
 
 Release 070102
 * delta: If the "bdiff" utility cannot be found, execute regular "diff"

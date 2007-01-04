@@ -8,6 +8,7 @@ all: libcassi.a
 
 libcassi.a: $(OBJ)
 	$(AR) -rv $@ $(OBJ)
+	$(RANLIB) $@
 
 install: all
 

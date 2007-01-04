@@ -11,6 +11,7 @@ all: libmpw.a
 
 libmpw.a: $(OBJ)
 	$(AR) -rv $@ $(OBJ)
+	$(RANLIB) $@
 
 install: all
 
