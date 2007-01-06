@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)mailx.1	2.320 (gritter) 7/7/06
+.\"     Sccsid: @(#)mailx.1	2.321 (gritter) 01/06/07
 .\"
-.TH MAILX 1 "7/7/06" "Heirloom mailx 12.2" "User Commands"
+.TH MAILX 1 "01/06/07" "Heirloom mailx 12.2" "User Commands"
 .SH NAME
 mailx \- send and receive Internet mail
 .SH SYNOPSIS
@@ -721,9 +721,9 @@ If the message contains characters that cannot be represented
 in any of the given character sets,
 the message will not be sent,
 and its text will be saved to the `dead.letter' file.
-Messages that contains NUL bytes are not converted.
+Messages that contain NUL bytes are not converted.
 .PP
-Outgoing attachments are also not converted even if they are plain text.
+Outgoing attachments are converted if they are plain text.
 If the
 .I sendcharsets
 variable contains more than one character set name,

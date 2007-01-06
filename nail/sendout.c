@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.92 (gritter) 3/4/06";
+static char sccsid[] = "@(#)sendout.c	2.93 (gritter) 01/06/07";
 #endif
 #endif /* not lint */
 
@@ -205,6 +205,9 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 	char *buf;
 	size_t bufsize, count;
 	int	lastc = EOF;
+#ifdef	HAVE_ICONV
+	char	*tcs;
+#endif
 
 	if ((fi = Fopen(ap->a_name, "r")) == NULL) {
 		perror(ap->a_name);
@@ -218,6 +221,8 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 		contenttype = ap->a_content_type;
 	else
 		contenttype = mime_filecontent(basename);
+	if (ap->a_charset)
+		charset = ap->a_charset;
 	convert = get_mime_convert(fi, &contenttype, &charset, &isclean,
 			dosign);
 	fprintf(fo,
@@ -227,8 +232,7 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 	if (charset == NULL)
 		putc('\n', fo);
 	else
-		fprintf(fo, ";\n charset=%s\n", ap->a_charset ?
-				ap->a_charset : charset);
+		fprintf(fo, ";\n charset=%s\n", charset);
 	if (ap->a_content_disposition == NULL)
 		ap->a_content_disposition = "attachment";
 	fprintf(fo, "Content-Transfer-Encoding: %s\n"
@@ -245,13 +249,43 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 		fprintf(fo, "Content-Description: %s\n",
 				ap->a_content_description);
 	putc('\n', fo);
+#ifdef	HAVE_ICONV
+	if (iconvd != (iconv_t)-1) {
+		iconv_close(iconvd);
+		iconvd = (iconv_t)-1;
+	}
+	tcs = gettcharset();
+	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR)) == 0 &&
+			ascncasecmp(contenttype, "text/", 5) == 0 &&
+			isclean & MIME_HIGHBIT &&
+			charset != NULL && asccasecmp(charset, tcs)) {
+		if ((iconvd = iconv_open_ft(charset, tcs)) == (iconv_t)-1 &&
+				errno != 0) {
+			if (errno == EINVAL)
+				fprintf(stderr, catgets(catd, CATSET, 179,
+			"Cannot convert from %s to %s\n"), tcs, charset);
+			else
+				perror("iconv_open");
+			Fclose(fi);
+			return -1;
+		}
+	}
+#endif	/* HAVE_ICONV */
 	buf = smalloc(bufsize = INFIX_BUF);
-	if (convert == CONV_TOQP) {
+	if (convert == CONV_TOQP
+#ifdef	HAVE_ICONV
+			|| iconvd != (iconv_t)-1
+#endif
+			) {
 		fflush(fi);
 		count = fsize(fi);
 	}
 	for (;;) {
-		if (convert == CONV_TOQP) {
+		if (convert == CONV_TOQP
+#ifdef	HAVE_ICONV
+				|| iconvd != (iconv_t)-1
+#endif
+				) {
 			if (fgetline(&buf, &bufsize, &count, &sz, fi, 0)
 					== NULL)
 				break;
@@ -260,7 +294,7 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 				break;
 		}
 		lastc = buf[sz-1];
-		if (mime_write(buf, sizeof *buf, sz, fo, convert, TD_NONE,
+		if (mime_write(buf, sizeof *buf, sz, fo, convert, TD_ICONV,
 					NULL, (size_t)0) == 0)
 			err = -1;
 	}
@@ -432,6 +466,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 		iconvd = (iconv_t)-1;
 	}
 	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR)) == 0 &&
+			ascncasecmp(contenttype, "text/", 5) == 0 &&
 			isclean & MIME_HIGHBIT &&
 			charset != NULL && asccasecmp(charset, tcs)) {
 		if (iconvd != (iconv_t)-1)
