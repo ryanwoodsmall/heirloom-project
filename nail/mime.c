@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.66 (gritter) 4/7/06";
+static char sccsid[]  = "@(#)mime.c	2.67 (gritter) 01/06/07";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -792,7 +792,9 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 	int convert;
 
 	*isclean = mime_isclean(fp);
-	if (*isclean & (MIME_HASNUL)) {
+	if (*isclean & MIME_HASNUL ||
+			*contenttype && ascncasecmp(*contenttype, "text/", 5) ||
+			*contenttype == NULL && *isclean & MIME_CTRLCHAR) {
 		convert = CONV_TOB64;
 		if (*contenttype == NULL ||
 				ascncasecmp(*contenttype, "text/", 5) == 0)
