@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.170 (gritter) 12/25/06
+ * Sccsid @(#)dpost.c	1.171 (gritter) 01/06/07
  */
 
 /*
@@ -2574,11 +2574,11 @@ supplyotf(char *font, char *path, FILE *fp)
     if (encoding == 5) {
 	fprintf(rf, "%%%%BeginData: %ld Binary Bytes\n",
 		(long)(length + 13 + strlen(font) + 12));
-	fprintf(rf, "/%s %12d StartData ", font, length);
+	fprintf(rf, "/%s %12ld StartData ", font, (long)length);
 	fwrite(&contents[offset], 1, length, rf);
 	fprintf(rf, "\n%%%%EndData\n");
     } else {
-	fprintf(rf, "/%s %d ", font, length);
+	fprintf(rf, "/%s %ld ", font, (long)length);
 	fprintf(rf, "currentfile /ASCIIHexDecode filter cvx exec\n");
 	for (i = 0; StartData[i]; i++) {
 	    putc(hex[(StartData[i]&0360)>>4], rf);
@@ -4537,10 +4537,10 @@ t_pdfmark(char *buf)
 	Bookmarks[nBookmarks-1].closed =
 	    strcmp(buf, "BookmarkClosed") == 0;
 	endtext();
-	fprintf(tf, "[ /Dest /Bookmark$%d\n"
+	fprintf(tf, "[ /Dest /Bookmark$%ld\n"
 		    "  /View [/XYZ -4 %g 0]\n"
 		    "/DEST pdfmark\n",
-	    nBookmarks - 1,
+	    (long)nBookmarks - 1,
 	    pagelength - (lasty >= 0 ? vpos * 72.0 / res : -4));
     } else
 	error(NON_FATAL, "unknown PDFMark attribute %s", buf);
