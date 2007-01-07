@@ -43,9 +43,9 @@ yacc and lex    Several of the included yacc and lex programs need to
                 such changes can no longer be considered important, and
                 will not be made as part of the regular maintenance of
                 this project.
-make            Implementations known to work are GNU make, AIX make,
-                and NetBSD make. The build system is designed to be
-                portable, but in practice, other make commands have
+make            Implementations known to work are GNU make, Solaris make,
+                AIX make, and NetBSD make. The build system is designed to
+                be portable, but in practice, other make commands have
                 been found to be so flawed that none of them has worked
                 yet. GNU make <http://www.gnu.org/software/make> is
                 recommended if the vendor-supplied make command fails
@@ -313,4 +313,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                5/14/06
+<gunnarr@acm.org>                                                01/07/07
