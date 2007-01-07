@@ -1,4 +1,4 @@
-[12.2] released ...
+[12.2] released 1/7/07
 * When a MIME message part is not of the "text/" content type, always
   send it in base64 to avoid issues with CRLF conversion (David Ronis).
 * Character set conversion is now also applied to attachments if they

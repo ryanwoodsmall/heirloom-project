@@ -1,4 +1,4 @@
-#define	V	"12.2pre"
+#define	V	"12.2"
 /*
  * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.358 (gritter) 01/07/07";
+static char sccsid[] = "@(#)version.c	2.359 (gritter) 01/07/07";
 #endif
 #endif /* not lint */
 
