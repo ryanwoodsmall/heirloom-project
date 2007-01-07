@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.60 (gritter) 3/4/06";
+static char sccsid[] = "@(#)list.c	2.61 (gritter) 01/07/07";
 #endif
 #endif /* not lint */
 
@@ -940,10 +940,14 @@ first(int f, int m)
 		if (!(mp->m_flag & MHIDDEN) && (mp->m_flag & m) == f)
 			return mp - message + 1;
 	}
-	for (mp = dot-1; mb.mb_threaded ? mp != NULL : mp >= &message[0];
-			mb.mb_threaded ? mp = prev_in_thread(mp) : mp--) {
-		if (!(mp->m_flag & MHIDDEN) && (mp->m_flag & m) == f)
-			return mp - message + 1;
+	if (dot > &message[0]) {
+		for (mp = dot-1; mb.mb_threaded ?
+					mp != NULL : mp >= &message[0];
+				mb.mb_threaded ?
+					mp = prev_in_thread(mp) : mp--) {
+			if (!(mp->m_flag & MHIDDEN) && (mp->m_flag & m) == f)
+				return mp - message + 1;
+		}
 	}
 	return 0;
 }

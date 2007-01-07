@@ -11,6 +11,8 @@
   converted.
 * When message file names in a maildir folder do not contain the ":2,"
   preceding the flags part, append one (Brandon Andrews).
+* An invalid memory access when determining the current message in
+  threaded mode has been fixed (MJ Ray).
 * A "STRIP" makefile variable has been introduced to control the strip
   command at "make install".
 * The "remove" command no longer causes a core dump because of a null
