@@ -43,22 +43,17 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.179 (gritter) 12/17/06
+.\" Sccsid @(#)doc.tr	1.180 (gritter) 01/08/07
 .\"
 .\" from file m.mac
 .do xflag 3
 .warn
 .mediasize letter
 .lc_ctype en_US.utf8
-.fps math,greek 1 R times ttf
-.fp 2 I timesi ttf
-.fp 3 B timesbd ttf
-.fp 4 BI timesbi ttf
-.fp 5 CW cour ttf
-.flig R fi \[fi] fl \[fl]
-.flig I fi \[fi] fl \[fl]
-.flig B fi \[fi] fl \[fl]
-.flig BI fi \[fi] fl \[fl]
+.fps math,greek 1 R texgyretermes-regular otf
+.fp 2 I texgyretermes-italic otf
+.fp 3 B texgyretermes-bold otf
+.fp 4 BI texgyretermes-bolditalic otf
 .flig CW 0
 .kernpair R f R i 55
 .kernpair B f B l 100
@@ -72,15 +67,26 @@
 .kernpair I S R ) 70
 .kernpair I N B \' 90
 .kernpair R [ I f 200
-.kernpair R [ I \[fi] 200
+.kernpair R [ I \(fi 200
 .kernpair R , B p 80
 .kernpair R \[longs] R ' 110
 .kernpair B f I F 50
 .kernpair B \\ B / 40
 .kernpair I f R \  60
 .kernpair BI f B \  80
-.kernpair R 0123456789 R \[middot] -150
-.kernpair R \[middot] I Z 80
+.ig
+.fps math,greek 1 R times ttf
+.fp 2 I timesi ttf
+.fp 3 B timesbd ttf
+.fp 4 BI timesbi ttf
+.fp 5 CW cour ttf
+.flig R fi \[fi] fl \[fl]
+.flig I fi \[fi] fl \[fl]
+.flig B fi \[fi] fl \[fl]
+.flig BI fi \[fi] fl \[fl]
+.kernpair R 0123456789 R · -150
+.kernpair R · I Z 80
+..
 .ig
 .fps math 1 R tim_____ pfb
 .fp 2 I timi____ pfb
@@ -99,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 12/17/06
+.ds Sccsdate 01/08/07
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -4648,8 +4654,8 @@ it can thus be used to save and restore tab stops.
 	Set repeated tab stops and types at \fIMv\fR, ..., \fINw\fR,
 \fIN\fR|+|\fIAt\fR, ..., \fIN\fR|+|\fIZu\fR,
 \fIN\fR|+|\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|\fIZ\fR|+|\fIZu\fR,
-\fIN\fR|+|2\[middot]\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|2\[middot]\fIZ\fR|+|\fIZu\fR,
-\fIN\fR|+|3\[middot]\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|3\[middot]\fIZ\fR|+|\fIZu\fR,
+\fIN\fR|+|2·\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|2·\fIZ\fR|+|\fIZu\fR,
+\fIN\fR|+|3·\fIZ\fR|+|\fIAt\fR, ..., \fIN\fR|+|3·\fIZ\fR|+|\fIZu\fR,
 &..\ .
 Thus \fB&ta|T|0.5i\fR sets tab stops every 0.5in,
 and \fB&ta|1i|4i|T|.25i|1i\fR sets tab stops
