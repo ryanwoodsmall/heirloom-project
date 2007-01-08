@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.40 (gritter) 01/08/07";
+static char sccsid[] = "@(#)smtp.c	2.41 (gritter) 01/08/07";
 #endif
 #endif /* not lint */
 
@@ -229,12 +229,14 @@ read_smtp(struct sock *sp, int value, int ign_eof)
  * Macros for talk_smtp.
  */
 #define	_SMTP_ANSWER(x, ign_eof)	\
-			if (!debug && !_debug && \
-					read_smtp(sp, x, ign_eof) != (x) && \
-					(!(ign_eof) || (x) != -1)) { \
-				if (b != NULL) \
-					free(b); \
-				return 1; \
+			if (!debug && !_debug) { \
+				int	y; \
+				if ((y = read_smtp(sp, x, ign_eof)) != (x) && \
+					(!(ign_eof) || y != -1)) { \
+					if (b != NULL) \
+						free(b); \
+					return 1; \
+				} \
 			}
 
 #define	SMTP_ANSWER(x)	_SMTP_ANSWER(x, 0)
