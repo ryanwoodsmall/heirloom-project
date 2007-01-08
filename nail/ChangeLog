@@ -1,4 +1,7 @@
 [12.3] released ...
+* In an SMTP exchange, ignore if the server closes the connection
+  following the QUIT command instead of sending a proper response code,
+  fixing a problem with GMail (Dr. Gary E. Rafe).
 * Build without socket support again (patch by Andreas Niederl).
 
 [12.2] released 1/7/07

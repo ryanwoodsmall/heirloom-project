@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.38 (gritter) 3/4/06";
+static char sccsid[] = "@(#)smtp.c	2.39 (gritter) 01/08/07";
 #endif
 #endif /* not lint */
 
@@ -207,7 +207,7 @@ read_smtp(struct sock *sp, int value)
 			if (len >= 0)
 				fprintf(stderr, catgets(catd, CATSET, 241,
 					"Unexpected EOF on SMTP connection\n"));
-			return 5;
+			return -1;
 		}
 		if (verbose || debug || _debug)
 			fputs(smtpbuf, stderr);
@@ -228,11 +228,15 @@ read_smtp(struct sock *sp, int value)
 /*
  * Macros for talk_smtp.
  */
-#define	SMTP_ANSWER(x)	if (!debug && !_debug && read_smtp(sp, x) != (x)) { \
+#define	_SMTP_ANSWER(x, ign_eof)	\
+			if (!debug && !_debug && read_smtp(sp, x) != (x) && \
+					(!(ign_eof) || (x) != -1)) { \
 				if (b != NULL) \
 					free(b); \
 				return 1; \
 			}
+
+#define	SMTP_ANSWER(x)	_SMTP_ANSWER(x, 0)
 
 #define	SMTP_OUT(x)	if (verbose || debug || _debug) \
 				fprintf(stderr, ">>> %s", x); \
@@ -380,7 +384,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	SMTP_OUT(".\r\n");
 	SMTP_ANSWER(2);
 	SMTP_OUT("QUIT\r\n");
-	SMTP_ANSWER(2);
+	_SMTP_ANSWER(2, 1);
 	if (b != NULL)
 		free(b);
 	return 0;
