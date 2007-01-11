@@ -17,3 +17,5 @@ all: doc.ps
 
 clean:
 	rm -f doc.ps doc.pdf core log *~
+
+mrproper: clean

@@ -31,3 +31,5 @@ even.ps: book.ps
 clean:
 	rm -f book.ps book.pdf doc.ps doc.pdf print.ps \
 		odd.ps odd.pdf even.ps even.pdf core log *~
+
+mrproper: clean
