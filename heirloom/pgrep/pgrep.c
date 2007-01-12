@@ -32,7 +32,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)pgrep.sl	1.23 (gritter) 2/21/06";
+static const char sccsid[] USED = "@(#)pgrep.sl	1.24 (gritter) 01/12/07";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -535,7 +535,7 @@ getproc_status(struct proc *p, pid_t expected_pid)
 	static size_t	buflen;
 	union value	*v;
 	FILE	*fp;
-	char	*cp, *ce;
+	char	*cp, *ce, *cq;
 	size_t	sz, sc;
 	int	mj, mi;
 
@@ -579,12 +579,30 @@ getproc_status(struct proc *p, pid_t expected_pid)
 	p->p_pgid = v->v_int;
 	GETVAL_REQ(VT_INT);
 	p->p_sid = v->v_int;
-	GETVAL_COMMA(VT_INT);
-	mj = v->v_int;
-	GETVAL_REQ(VT_INT);
-	mi = v->v_int;
-	if (mj != -1 || mi != -1)
-		p->p_ttydev = makedev(mj, mi);
+	if (isdigit(*cp)) {
+		GETVAL_COMMA(VT_INT);
+		mj = v->v_int;
+		GETVAL_REQ(VT_INT);
+		mi = v->v_int;
+		if (mj != -1 || mi != -1)
+			p->p_ttydev = makedev(mj, mi);
+	} else {
+		struct stat	st;
+		char	*dev;
+		cq = cp;
+		while (*cp != ' ') cp++;
+		*cp = '\0';
+		dev = smalloc(cp - cq + 8);
+		strcpy(dev, "/dev/");
+		strcpy(&dev[5], cq);
+		if (stat(dev, &st) < 0)
+			p->p_ttydev = PRNODEV;
+		else
+			p->p_ttydev = st.st_rdev;
+		free(dev);
+		*cp = ' ';
+		while (*cp == ' ') cp++;
+	}
 	while (*cp != ' ') cp++; while (*cp == ' ') cp++;
 	/* skip flags */
 	GETVAL_COMMA(VT_LONG);

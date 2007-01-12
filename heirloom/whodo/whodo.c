@@ -34,7 +34,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)whodo.sl	1.41 (gritter) 5/14/06";
+static const char sccsid[] USED = "@(#)whodo.sl	1.42 (gritter) 01/12/07";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -818,7 +818,7 @@ getproc_status(char *pdir, struct pslot *p)
 	char	fn[_POSIX_PATH_MAX];
 	union value	*v;
 	FILE	*fp;
-	char	*cp, *ce;
+	char	*cp, *ce, *cq;
 	size_t	sz, sc;
 	int	mj, mi;
 
@@ -863,12 +863,30 @@ getproc_status(char *pdir, struct pslot *p)
 	/* pgid unused */
 	GETVAL(VT_INT);
 	/* sid unused */
-	GETVAL_COMMA(VT_INT);
-	mj = v->v_int;
-	GETVAL(VT_INT);
-	mi = v->v_int;
-	if (mj != -1 || mi != -1)
-		p->p_termid = makedev(mj, mi);
+	if (isdigit(*cp)) {
+		GETVAL_COMMA(VT_INT);
+		mj = v->v_int;
+		GETVAL(VT_INT);
+		mi = v->v_int;
+		if (mj != -1 || mi != -1)
+			p->p_termid = makedev(mj, mi);
+	} else {
+		struct stat	st;
+		char	*dev;
+		cq = cp;
+		while (*cp != ' ') cp++;
+		*cp = '\0';
+		dev = smalloc(cp - cq + 8);
+		strcpy(dev, "/dev/");
+		strcpy(&dev[5], cq);
+		if (stat(dev, &st) < 0)
+			p->p_termid = PRNODEV;
+		else
+			p->p_termid = st.st_rdev;
+		free(dev);
+		*cp = ' ';
+		while (*cp == ' ') cp++;
+	}
 	while (*cp != ' ') cp++; while (*cp == ' ') cp++;
 	/* skip flags */
 	GETVAL_COMMA(VT_LONG);

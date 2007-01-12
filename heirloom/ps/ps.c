@@ -33,16 +33,16 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.113 (gritter) 7/23/06";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.114 (gritter) 01/12/07";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.113 (gritter) 7/23/06";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.114 (gritter) 01/12/07";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.113 (gritter) 7/23/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.114 (gritter) 01/12/07";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.113 (gritter) 7/23/06";
+static const char sccsid[] USED = "@(#)ps.sl	2.114 (gritter) 01/12/07";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.113 (gritter) 7/23/06";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.114 (gritter) 01/12/07";
 
 #if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
 	&& !defined (__DragonFly__)
@@ -1953,12 +1953,30 @@ getproc_status(struct proc *p, pid_t expected_pid)
 	p->p_pgid = v->v_int;
 	GETVAL_REQ(VT_INT);
 	p->p_sid = v->v_int;
-	GETVAL_COMMA(VT_INT);
-	mj = v->v_int;
-	GETVAL_REQ(VT_INT);
-	mi = v->v_int;
-	if (mj != -1 || mi != -1)
-		p->p_ttydev = makedev(mj, mi);
+	if (isdigit(*cp)) {
+		GETVAL_COMMA(VT_INT);
+		mj = v->v_int;
+		GETVAL_REQ(VT_INT);
+		mi = v->v_int;
+		if (mj != -1 || mi != -1)
+			p->p_ttydev = makedev(mj, mi);
+	} else {
+		struct stat	st;
+		char	*dev;
+		cq = cp;
+		while (*cp != ' ') cp++;
+		*cp = '\0';
+		dev = smalloc(cp - cq + 8);
+		strcpy(dev, "/dev/");
+		strcpy(&dev[5], cq);
+		if (stat(dev, &st) < 0)
+			p->p_ttydev = PRNODEV;
+		else
+			p->p_ttydev = st.st_rdev;
+		free(dev);
+		*cp = ' ';
+		while (*cp == ' ') cp++;
+	}
 	while (*cp != ' ') cp++; while (*cp == ' ') cp++;
 	/* skip flags */
 	GETVAL_COMMA(VT_LONG);

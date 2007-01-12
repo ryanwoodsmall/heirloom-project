@@ -18,6 +18,7 @@ Release ...
 * pgrep: Ignores dead processes now (Stefan Tramm).
 * spell: A value of the wrong type that was passed to scanf() could lead
   to build errors on 64-bit platforms (Jeffrey H. Johnson).
+* ps, pgrep, whodo: Works on FreeBSD 6 now.
 * df, find, ps: Changes have been made to build on NetBSD 3 (Aleksey Cheusov).
 * Changes have been made to build on OpenBSD 3.8 (Aleksey Cheusov).
 * Changes have been made to build with GNU make 3.81.

@@ -21,7 +21,7 @@ Solaris         8 and above; Sun C, gcc
 Open UNIX       8.0.0; native (cc), LKP (gcc)
 HP-UX           B.11.11, B.11.22, B.11.23; HP-UX ANSI C, gcc
 AIX             5.1; VisualAge C, gcc
-FreeBSD         4.9, 5.2.1
+FreeBSD         4.9, 5.2.1, 6.1
 NetBSD          1.6, 2.0, 3.0
 OpenBSD         3.4, 3.8
 DragonFlyBSD    1.3.7-DEVELOPMENT
@@ -313,4 +313,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                01/07/07
+<gunnarr@acm.org>                                                01/12/07
