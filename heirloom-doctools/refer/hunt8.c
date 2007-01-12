@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hunt8.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)hunt8.c	1.4 (gritter) 01/12/07
  */
 
 #include <locale.h>
@@ -67,12 +67,14 @@ makefgrep(char *indexname)
 	else
 		if (ckexist(indexname, ""))
 		{
+			time_t	t;
 			/* make fgrep */
 # if D1
 			fprintf(stderr, "make fgrep\n");
 # endif
 			runbib(indexname);
-			time(&indexdate);
+			time(&t);
+			indexdate = t;
 		}
 		else /* failure */
 		return(0);
