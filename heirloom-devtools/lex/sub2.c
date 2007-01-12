@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sub2.c	1.6 (gritter) 11/26/05
+ * Sccsid @(#)sub2.c	1.7 (gritter) 01/12/07
  */
 
 #include "ldefs.c"
@@ -555,7 +555,7 @@ packtrans(int st, CHR *tch, int *tst, int cnt, int tryit)
 			} else {
 				fprintf(stderr,
 "lex`sub2`packtran: tch[%d] out of bounds (%ld)\n",
-				i, tch[i]);
+				i, (long)tch[i]);
 			}
 		}
 		for (i = 0; i < cnt; i++) {
@@ -984,7 +984,7 @@ layout(void)
 				if (ctable[nchar[j]] <= 0)
 					printf(
 					"j %d nchar %ld ctable.nch %d\n",
-					j, nchar[j], ctable[nchar[k]]);
+					j, (long)nchar[j], ctable[nchar[k]]);
 				verify[k] = i + 1;	/* state number + 1 */
 				advance[k] = nexts[j+1]+1;
 				if (yytop < k)

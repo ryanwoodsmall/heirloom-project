@@ -22,9 +22,9 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  */
-const char sccsid[] = "@(#)lex.sl	2.10 (gritter) 9/23/06";
+const char sccsid[] = "@(#)lex.sl	2.11 (gritter) 01/12/07";
 const char pkg[] = "Heirloom Development Tools";
-const char rel[] = "2.10 (gritter) 9/23/06";
+const char rel[] = "2.11 (gritter) 01/12/07";
 /* SLIST */
 /*
 allprint.c: * Sccsid @(#)allprint.c	1.4 (gritter) 11/27/05
@@ -39,11 +39,13 @@ parser.y: * Sccsid @(#)parser.y	1.8 (gritter) 11/26/05
 reject.c: * Sccsid @(#)reject.c	1.4 (gritter) 11/27/05
 search.h: * Sccsid @(#)search.h	1.4 (gritter) 11/26/05
 sub1.c: * Sccsid @(#)sub1.c	1.5 (gritter) 11/26/05
-sub2.c: * Sccsid @(#)sub2.c	1.6 (gritter) 11/26/05
+sub2.c: * Sccsid @(#)sub2.c	1.7 (gritter) 01/12/07
 sub3.c: * Sccsid @(#)sub3.c	1.4 (gritter) 11/26/05
 wcio.c: * Sccsid @(#)wcio.c	1.1 (gritter) 6/25/05
 yyless.c: * Sccsid @(#)yyless.c	1.6 (gritter) 11/27/05
 yywrap.c: * Sccsid @(#)yywrap.c	1.3 (gritter) 6/18/05
 nceucform: * Sccsid @(#)nceucform	1.6 (gritter) 11/18/05
 ncform: * Sccsid @(#)ncform	1.4 (gritter) 11/18/05
+nrform:# Sccsid @(#)nrform	1.4 (gritter) 10/20/06
+
 */
