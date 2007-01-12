@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.12 (gritter) 01/05/07";
+static const char id[] = "@(#)sccs.sl	1.13 (gritter) 01/12/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.3 (gritter) 12/20/06
@@ -6,7 +6,7 @@ comb.c: * Sccsid @(#)comb.c	1.3 (gritter) 12/20/06
 delta.c: * Sccsid @(#)delta.c	1.5 (gritter) 12/31/06
 get.c: * Sccsid @(#)get.c	1.5 (gritter) 12/20/06
 help.c: * Sccsid @(#)help.c	1.5 (gritter) 12/21/06
-prs.c: * Sccsid @(#)prs.c	1.4 (gritter) 12/25/06
+prs.c: * Sccsid @(#)prs.c	1.5 (gritter) 01/12/07
 prt.c: * Sccsid @(#)prt.c	1.3 (gritter) 12/20/06
 rmchg.c: * Sccsid @(#)rmchg.c	1.4 (gritter) 12/25/06
 sccs.c: * Sccsid @(#)sccs.c	1.5 (gritter) 01/03/07
@@ -23,7 +23,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../comobj/chkid.c: * Sccsid @(#)chkid.c	1.4 (gritter) 12/20/06
 ../comobj/chksid.c: * Sccsid @(#)chksid.c	1.4 (gritter) 12/20/06
 ../comobj/cmpdate.c: * Sccsid @(#)cmpdate.c	1.4 (gritter) 12/20/06
-../comobj/date_ab.c: * Sccsid @(#)date_ab.c	1.4 (gritter) 12/20/06
+../comobj/date_ab.c: * Sccsid @(#)date_ab.c	1.5 (gritter) 01/12/07
 ../comobj/date_ba.c: * Sccsid @(#)date_ba.c	1.4 (gritter) 12/20/06
 ../comobj/del_ab.c: * Sccsid @(#)del_ab.c	1.4 (gritter) 12/20/06
 ../comobj/del_ba.c: * Sccsid @(#)del_ba.c	1.4 (gritter) 12/20/06

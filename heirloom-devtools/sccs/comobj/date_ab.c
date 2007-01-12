@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)date_ab.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)date_ab.c	1.5 (gritter) 01/12/07
  */
 /*	from OpenSolaris "sccs:lib/comobj/date_ab.c"	*/
 # include	<sys/types.h>
@@ -62,6 +62,13 @@ date_ab(char *adt,time_t *bdt)
 {
 	int y, t, d, h, m, s, i, dn, cn, warn = 0;
 	time_t	tim;
+#if defined (__FreeBSD__) || defined (__DragonFly__)
+	long	timezone;
+	struct tm	*tp;
+	tim = 999;
+	tp = localtime(&tim);
+	timezone = -tp->tm_gmtoff;
+#endif	/* __FreeBSD__, __DragonFly__ */
 
 #if !(defined(BUG_1205145) || defined(GMT_TIME))
 	tzset();
@@ -145,6 +152,13 @@ parse_date(char *adt,time_t *bdt)
 {
 	int y, t, d, h, m, s, i;
 	time_t	tim;
+#if defined (__FreeBSD__) || defined (__DragonFly__)
+	long	timezone;
+	struct tm	*tp;
+	tim = 999;
+	tp = localtime(&tim);
+	timezone = -tp->tm_gmtoff;
+#endif	/* __FreeBSD__, __DragonFly__ */
 
 	tzset();
 

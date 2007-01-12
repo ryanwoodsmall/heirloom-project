@@ -5,6 +5,7 @@ Release ...
   "-P" option but pass it as "-p" to "diff".
 * get: Do not dump core on a corrupted s-file.
 * Mac OS X portability fixes (Stefan Tramm).
+* Handle the timezone offset on FreeBSD (bugreport by Joerg Schilling).
 
 Release 070102
 * delta: If the "bdiff" utility cannot be found, execute regular "diff"

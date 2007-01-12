@@ -39,7 +39,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)prs.c	1.4 (gritter) 12/25/06
+ * Sccsid @(#)prs.c	1.5 (gritter) 01/12/07
  */
 /*	from OpenSolaris "sccs:cmd/prs.c"	*/
 /*************************************************************************/
@@ -1172,7 +1172,6 @@ getbody(struct sid *gsid, struct packet *pkt)
 {
 	int	i;
 	int	status;
-	extern	char	Getpgm[];
 	char	str[128];
 	char	rarg[20];
 	char	filearg[80];
