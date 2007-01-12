@@ -49,7 +49,7 @@ IBM AIX             5.1, 4.3
 NEC SUPER-UX        10.2
 NEC UX/4800         Release11.5 Rev.A
 Control Data EP/IX  2.2.1AA
-FreeBSD             3.1, 4.5, 5.x
+FreeBSD             3.1, 4.5, 5.x, 6.1
 NetBSD              1.6, 2.0
 DragonFlyBSD        1.3.7-DEVELOPMENT
 Mac OS X            10.4.3
@@ -139,7 +139,7 @@ the erase key once after entering a multibyte character will result in an
 incomplete byte sequence.
 
 
-Gunnar Ritter                                           1/1/06
+Gunnar Ritter                                           01/12/07
 Freiburg i. Br.
 Germany
 <gunnarr@acm.org>
