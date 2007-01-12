@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.41 (gritter) 01/08/07";
+static char sccsid[] = "@(#)smtp.c	2.42 (gritter) 01/12/07";
 #endif
 #endif /* not lint */
 
@@ -393,7 +393,7 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	return 0;
 }
 
-static jmp_buf	smtpjmp;
+static sigjmp_buf	smtpjmp;
 
 static void
 onterm(int signo)
