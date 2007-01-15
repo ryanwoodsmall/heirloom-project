@@ -1,4 +1,4 @@
-Release ...
+Release 070115
 * deroff: Now recognizes the ".do" and ".xflag" requests as well as an "-xN"
   command line option to handle Heirloom nroff/troff extensions.
 * ed: Substituting only a specific occurence of the pattern, as in the
