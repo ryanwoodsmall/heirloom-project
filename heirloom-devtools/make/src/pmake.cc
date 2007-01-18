@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pmake.cc	1.5 (gritter) 01/14/07
+ * Sccsid @(#)pmake.cc	1.6 (gritter) 01/18/07
  */
 
 /*
@@ -89,7 +89,9 @@ read_make_machines(Name make_machines_name)
 {
 	wchar_t 		c;
 	Boolean			default_make_machines;
+#ifdef TEAMWARE_MAKE_CMN
 	struct hostent		*hp;
+#endif
 	wchar_t			local_host[MAX_HOSTNAMELEN + 1];
 	char			local_host_mb[MAX_HOSTNAMELEN + 1] = "";
 	int			local_host_wslen;
@@ -202,6 +204,7 @@ read_make_machines(Name make_machines_name)
 	MBSTOWCS(local_host, local_host_mb);
 	local_host_wslen = wslen(local_host);
 
+#ifdef TEAMWARE_MAKE_CMN
 	// There is no getdomainname() function on Solaris.
 	// And netname2host() function does not work on Linux.
 	// So we have to use different APIs.
@@ -215,6 +218,7 @@ read_make_machines(Name make_machines_name)
 		MBSTOWCS(full_host, mbs_buffer2);
 		full_host_wslen = wslen(full_host);
 	}
+#endif
 
 	for (ms = make_machines_list;
 	     (ms) && (*ms );
@@ -252,6 +256,7 @@ read_make_machines(Name make_machines_name)
 			 * 1) hostname is longer than MAX_HOSTNAMELEN, or
 			 * 2) hostname is unknown
 			 */
+#ifdef TEAMWARE_MAKE_CMN
 			if ((wslen(mp) > MAX_HOSTNAMELEN) ||
 			    ((hp = gethostbyname(mbs_buffer)) == NULL)) {
 				warning("Ignoring unknown host %s",
@@ -261,7 +266,9 @@ read_make_machines(Name make_machines_name)
 				if (*ms) {
 					ms++;
 				}
-			} else {
+			} else
+#endif
+			{
 				/* Compare current hostname with local_host. */
 				if (wslen(mp) == local_host_wslen &&
 				    IS_WEQUALN(mp, local_host, local_host_wslen)) {

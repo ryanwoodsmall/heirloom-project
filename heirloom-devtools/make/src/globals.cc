@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)globals.cc	1.5 (gritter) 01/14/07
+ * Sccsid @(#)globals.cc	1.6 (gritter) 01/18/07
  */
 
 /*
@@ -106,9 +106,7 @@
 	Name		dot_keep_state;
 	Name		dot_keep_state_file;
 	Name		empty_name;
-#ifndef __sun
 	int		exit_status;
-#endif
 	Boolean		fatal_in_progress;
 	int		file_number;
 #if 0

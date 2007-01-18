@@ -5,7 +5,7 @@
 #else
 #define USED
 #endif
-static const char id[] USED = "@(#)make.sl	1.15 (gritter) 01/16/07";
+static const char id[] USED = "@(#)make.sl	1.16 (gritter) 01/18/07";
 /* SLIST */
 /*
 ../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.5 (gritter) 01/13/07
@@ -25,11 +25,11 @@ static const char id[] USED = "@(#)make.sl	1.15 (gritter) 01/16/07";
 ../src/getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
 ../src/nse.cc: * Sccsid @(#)nse.cc	1.2 (gritter) 01/07/07
 ../src/dmake.cc: * Sccsid @(#)dmake.cc	1.2 (gritter) 01/07/07
-../src/globals.cc: * Sccsid @(#)globals.cc	1.5 (gritter) 01/14/07
+../src/globals.cc: * Sccsid @(#)globals.cc	1.6 (gritter) 01/18/07
 ../src/rep.cc: * Sccsid @(#)rep.cc	1.3 (gritter) 01/13/07
 ../src/state.cc: * Sccsid @(#)state.cc	1.3 (gritter) 01/13/07
 ../src/doname.cc: * Sccsid @(#)doname.cc	1.9 (gritter) 01/14/07
-../src/pmake.cc: * Sccsid @(#)pmake.cc	1.5 (gritter) 01/14/07
+../src/pmake.cc: * Sccsid @(#)pmake.cc	1.6 (gritter) 01/18/07
 ../src/read2.cc: * Sccsid @(#)read2.cc	1.5 (gritter) 01/13/07
 ../src/nse_printdep.cc: * Sccsid @(#)nse_printdep.cc	1.4 (gritter) 01/13/07
 ../mksh/i18n.cc: * Sccsid @(#)i18n.cc	1.3 (gritter) 01/13/07
@@ -86,5 +86,4 @@ static const char id[] USED = "@(#)make.sl	1.15 (gritter) 01/16/07";
 ../include/vroot/args.h: * Sccsid @(#)args.h	1.3 (gritter) 01/13/07
 ../include/vroot/vroot.h: * Sccsid @(#)vroot.h	1.2 (gritter) 01/07/07
 ../include/mksdmsi18n/mksdmsi18n.h: * Sccsid @(#)mksdmsi18n.h	1.2 (gritter) 01/07/07
-
 */

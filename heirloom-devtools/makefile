@@ -23,3 +23,6 @@ mrproper: clean
 		(cd "$$i" && $(MAKE) $@) || exit; \
 	done
 	rm -f $(MAKEFILES)
+
+sun:
+	/usr/xpg4/bin/make CXX=CC CFLAGS=-O CXXFLAGS=-O WARN= CXXWARN=
