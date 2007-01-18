@@ -1,4 +1,16 @@
 Release ...
+* The "make" command has been added from OpenSolaris sources. Important
+  changes to the OpenSolaris version are:
+
+  * The "-j jobs" option is available, based on code distributed by Sun
+    that was previously disabled.
+  * SUN_MAKE_COMPAT_MODE is "GNU" by default. This has the effect that
+    macro definitions on the command line become part of the MAKEFLAGS
+    variable, and thus override definitions within makefiles in recursive
+    operation. Also "$<" resolves to the first prerequisite in a target
+    rule. Setting "SUN_MAKE_COMPAT_MODE=SUN" in the environment restores
+    the previous behavior.
+
 * sccs: Accept the "-a", "-p", and "-B" options to "diff" with the "diffs"
   and "sccsdiff" sub-commands.
 * sccsdiff: Accept the "-a" and "-B" options to "diff"; also accept the

@@ -1,11 +1,11 @@
 README file for the Heirloom Development Tools
 ==============================================
 
-The Heirloom Development Tools provide yacc, lex, m4, and SCCS, as
-portable derivatives of the utilities released by Sun as part of
-OpenSolaris. The OpenSolaris utilities were in turn derived from
-the original Unix versions, and are assumed be conforming
-implementations of the POSIX standard.
+The Heirloom Development Tools provide yacc, lex, m4, make, and
+SCCS, as portable derivatives of the utilities released by Sun
+as part of OpenSolaris. The OpenSolaris utilities were in turn
+derived from the original Unix versions, and are assumed be
+conforming implementations of the POSIX standard.
 
 Note that manual pages for m4 and SCCS are not yet available under
 Open Source licenses. In the meantime, please refer to the online
@@ -50,4 +50,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						01/12/07
+<gunnarr@acm.org>						01/18/07

@@ -1,0 +1,309 @@
+.\"
+.\" Sccsid @(#)make.1	1.5 (gritter) 01/18/07
+.\" Derived from make(1), Unix 7th edition:
+.\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\"   Redistributions of source code and documentation must retain the
+.\"    above copyright notice, this list of conditions and the following
+.\"    disclaimer.
+.\"   Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"   All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"      This product includes software developed or owned by Caldera
+.\"      International, Inc.
+.\"   Neither the name of Caldera International, Inc. nor the names of
+.\"    other contributors may be used to endorse or promote products
+.\"    derived from this software without specific prior written permission.
+.\"
+.\" USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
+.\" INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+.\" BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+.\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+.\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+.\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.TH MAKE 1 "01/18/07" "Heirloom Development Tools" "User Commands"
+.SH NAME
+make \- maintain, update, and regenerate groups of programs
+.SH SYNOPSIS
+\fBmake\fR
+[\fB\-f\fI\ makefile\fR]
+[\fB\-j\fI\ jobs\fR]
+[\fB\-eiknpqrst\fR]
+[\fInames\fR]
+.SH DESCRIPTION
+.I make
+executes commands in
+.I makefile
+to update
+one or more target
+.IR names .
+.I Name
+is typically a program.
+If no
+.B \-f
+option is present, `makefile' and `Makefile' are
+tried in order.
+If
+.I makefile
+is `\-', the standard input is taken.
+More than one
+.B \-f
+option may appear.
+.PP
+.I make
+updates a target if it depends on prerequisite files
+that have been modified since the target was last modified,
+or if the target does not exist.
+.PP
+.I make
+accepts the following options:
+.TP
+.B \-e
+Variables in the environment
+have higher precedence than assignments
+in makefiles with this option.
+.TP
+\fB\-f\fI\ file
+Uses commands from
+.IR file .
+.TP
+.B \-i
+Equivalent to the special entry `.IGNORE:'.
+.TP
+\fB\-j\fI\ n\fR
+Execute \fIn\fR jobs in parallel.
+On a machine with multiple processors,
+this may result in faster operation.
+.TP
+.B \-k
+When a command returns nonzero status,
+abandon work on the current entry, but
+continue on branches that do not depend on the current entry.
+.TP
+.B \-n
+Trace and print, but do not execute the commands
+needed to update the targets.
+.TP
+.B \-p
+Print all effective rules and assignments to standard output
+but do not execute any commands.
+.TP
+.B \-q
+Query the current up-to-date status
+and set the exit status accordingly,
+but do not execute commands.
+.TP
+.B \-r
+Equivalent to an initial special entry `.SUFFIXES:'
+with no list.
+.TP 
+.B \-s
+Equivalent to the special entry
+`.SILENT:'.
+.TP
+.B \-t
+Touch, i.e. update the modified date of targets, without
+executing any commands.
+.PP
+.I Makefile
+contains a sequence of entries that specify dependencies.
+The first line of an entry is a
+blank-separated list of targets, then a colon,
+then a list of prerequisite files.
+Text following a semicolon, and all following lines
+that begin with a tab, are shell commands
+to be executed to update the target.
+.PP
+Sharp `#' and newline surround comments.
+.PP
+The following makefile says that `pgm' depends on two
+files `a.o' and `b.o', and that they in turn depend on
+`.c' files and a common file `incl'.
+.RS 
+.HP
+.PD 0
+.nf
+pgm: a.o b.o
+cc a.o b.o \-lm \-o pgm
+.HP
+a.o: incl a.c
+cc \-c a.c
+.HP
+b.o: incl b.c
+cc \-c b.c
+.fi
+.RE
+.PD
+.PP
+.I Makefile
+entries of the form
+.PP
+.IP
+string1 = string2
+.PP
+are macro definitions.
+All environment variables and their values
+are also considered macro definitions,
+albeit with a lower precedence.
+Subsequent appearances of 
+.BI $( string1 )
+are replaced by
+.IR string2 .
+If
+.I string1
+is a single character, the parentheses are optional.
+The form
+.BI $( string1 : subst1 = subst2 )
+is also accepted
+and causes all occurences of
+.I subst1
+in
+.I string2
+to be replaced by
+.IR subst2 .
+.PP
+.I make 
+infers prerequisites for files for which
+.I makefile
+gives no construction commands.
+For example, a
+`.c' file may be inferred as prerequisite for a `.o' file
+and be compiled to produce the `.o' file.
+Thus the preceding example can be done more briefly:
+.RS
+.HP
+.PD 0
+.nf
+pgm: a.o b.o
+cc a.o b.o \-lm \-o pgm
+.HP
+a.o b.o: incl
+.fi
+.RE
+.PD
+.PP
+Prerequisites are inferred according to selected suffixes
+listed as the `prerequisites' for the special name `.SUFFIXES';
+multiple lists accumulate;
+an empty list clears what came before.
+Order is significant; the first possible name for which both
+a file and a rule as described in the next paragraph exist
+is inferred.
+The default list includes
+.IP
+\&.SUFFIXES: .out .o .c .e .r .f .y .l .s
+.PP
+The rule to create a file with suffix
+.I s2
+that depends on a similarly named file with suffix
+.I s1
+is specified as an entry
+for the `target'
+.IR s1s2 .
+In such an entry, the special macro $* stands for
+the target name with suffix deleted, $@ for the full target name,
+$< for the complete list of prerequisites,
+and
+$? for the list of prerequisites that are out of date.
+By appending a 
+.B D
+to the name of any of these special macros,
+as in `$(@D)',
+only the directory portion of the value is substituted;
+appending a
+.B F
+only gives the file portion.
+.PP
+For example, a rule for making
+optimized `.o' files from `.c' files is
+.IP
+\&.c.o: ; cc \-c \-O \-o $@ $*.c
+.PP
+A `~' appended to a suffix corresponds
+to an SCCS file.
+For example, a rule for `.c~.o' specifies
+how to generate an object file
+from the SCCS file of a C program.
+If an SCCS file is found to be newer
+that the respective source file,
+.IR get (1)
+is executed to retrieve it.
+This mechanism is also applied to `makefile' and `Makefile'.
+.PP
+A rule with only one suffix
+defines how to generate a file without an extension.
+For example, a rule for `.c'
+specifies how to generate an executable
+from a C program
+without the creation of an intermediate `.o' object.
+.PP
+Certain macros are used by the default inference rules
+to communicate optional arguments to
+any resulting compilations.
+In particular, `CFLAGS' is used for
+.I cc
+and 
+.IR f77 (1)
+options, `LFLAGS' and `YFLAGS' for 
+.I lex
+and
+.IR yacc (1)
+options.
+.PP
+Command lines are executed one at a time, each by its
+own shell.
+A command line can be joined with the following one
+by placing a backslash `\e' at its end.
+A line is printed when it is executed unless
+the special target `.SILENT'
+is in 
+.I makefile,
+or the first character of the command is `@'.
+.PP
+Commands returning nonzero status (see
+.IR intro (1))
+cause
+.I make
+to terminate unless
+the special target `.IGNORE' is in
+.I makefile
+or the command begins with
+<tab><hyphen>.
+.PP
+Interrupt and quit cause the target to be deleted
+unless the target depends on the special name `.PRECIOUS'.
+.SH FILES
+makefile, Makefile
+.br
+/usr/ccs/share/lib/make/make.rules
+.br
+/usr/ccs/share/lib/make/svr4.make.rules
+.SH "SEE ALSO"
+get(1), sh(1), touch(1)
+.br
+S. I. Feldman
+.I
+Make \- A Program for Maintaining Computer Programs
+.SH NOTES
+Some commands return nonzero status inappropriately.
+Use
+.B \-i
+to overcome the difficulty.
+.br
+Commands that are directly executed by the shell,
+notably
+.IR  cd (1),
+are ineffectual across unescaped newlines in
+.I make.

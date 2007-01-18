@@ -1,11 +1,10 @@
-SUBDIRS = yacc lex m4 sccs/cassi sccs/comobj sccs/mpwlib sccs/src sccs/help.d \
-	make/bsd make/makestate make/mksdmsi18n make/mksh make/vroot make/src
+SUBDIRS = bsd makestate mksdmsi18n mksh vroot src
 
 MAKEFILES = $(SUBDIRS:=/Makefile)
 
 .SUFFIXES: .mk
 .mk:
-	cat mk.config $< >$@
+	cat ../mk.config $< >$@
 
 dummy: $(MAKEFILES) all
 
