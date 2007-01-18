@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xcreat.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)xcreat.c	1.4 (gritter) 01/18/07
  */
 /*	from OpenSolaris "sccs:lib/mpwlib/xcreat.c"	*/
 # include	<defines.h>
@@ -86,7 +86,7 @@ xcreat(char *name,mode_t mode)
 	 * }
 	 */
 	while (creat_attempts < SCCS_CREAT_ATTEMPTS) {
-		if ((fd = creat(name, mode)) >= 0) {
+		if ((fd = open(name, O_WRONLY|O_CREAT|O_EXCL, mode)) >= 0) {
 			return(fd);
 		/* if it fails due to NFS bug, remove it and retry */
 		} else {

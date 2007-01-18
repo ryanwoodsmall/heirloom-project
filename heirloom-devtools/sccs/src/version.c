@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.13 (gritter) 01/12/07";
+static const char id[] = "@(#)sccs.sl	1.14 (gritter) 01/18/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.3 (gritter) 12/20/06
@@ -82,7 +82,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../mpwlib/strend.c: * Sccsid @(#)strend.c	1.3 (gritter) 12/20/06
 ../mpwlib/trnslat.c: * Sccsid @(#)trnslat.c	1.3 (gritter) 12/20/06
 ../mpwlib/userexit.c: * Sccsid @(#)userexit.c	1.3 (gritter) 12/20/06
-../mpwlib/xcreat.c: * Sccsid @(#)xcreat.c	1.3 (gritter) 12/20/06
+../mpwlib/xcreat.c: * Sccsid @(#)xcreat.c	1.4 (gritter) 01/18/07
 ../mpwlib/xlink.c: * Sccsid @(#)xlink.c	1.3 (gritter) 12/20/06
 ../mpwlib/xmsg.c: * Sccsid @(#)xmsg.c	1.3 (gritter) 12/20/06
 ../mpwlib/xopen.c: * Sccsid @(#)xopen.c	1.3 (gritter) 12/20/06

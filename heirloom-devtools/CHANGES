@@ -17,7 +17,9 @@ Release ...
   "-P" option but pass it as "-p" to "diff".
 * get: Do not dump core on a corrupted s-file.
 * Mac OS X portability fixes (Stefan Tramm).
-* Handle the timezone offset on FreeBSD (bugreport by Joerg Schilling).
+* SCCS: Handle the timezone offset on FreeBSD (bugreport by Joerg Schilling).
+* SCCS: Use O_EXCL when opening files with unique names (thanks to Joerg
+  Schilling for notification).
 
 Release 070102
 * delta: If the "bdiff" utility cannot be found, execute regular "diff"
