@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-devtools.spec	1.5 (gritter) 01/18/07
+# Sccsid @(#)heirloom-devtools.spec	1.6 (gritter) 01/19/07
 #
 Summary: The Heirloom Development Tools.
 Name: heirloom-devtools
@@ -12,10 +12,11 @@ Vendor: Gunnar Ritter <gunnarr@acm.org>
 URL: <http://heirloom.sourceforge.net>
 BuildRoot: %{_tmppath}/%{name}-root
 
-%define	bindir		/usr/ccs/bin
+%define	prefix		/usr/ccs
+%define	bindir		%{prefix}/bin
 %define	susdir		/usr/5bin/posix
-%define	libdir		/usr/ccs/lib
-%define	mandir		/usr/ccs/share/man
+%define	libdir		%{prefix}/lib
+%define	mandir		%{prefix}/share/man
 
 %define	xcc		gcc
 %define	cflags		'-O -fomit-frame-pointer'
@@ -24,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 #
 # Combine the settings defined above.
 #
-%define	makeflags	ROOT=%{buildroot} INSTALL=install BINDIR=%{bindir} SUSDIR=%{susdir} LIBDIR=%{libdir} MANDIR=%{mandir} CC=%{xcc} CFLAGS=%{cflags} CPPFLAGS=%{cppflags}
+%define	makeflags	ROOT=%{buildroot} INSTALL=install PREFIX=%{prefix} BINDIR=%{bindir} SUSDIR=%{susdir} LIBDIR=%{libdir} MANDIR=%{mandir} CC=%{xcc} CFLAGS=%{cflags} CPPFLAGS=%{cppflags}
 
 %description
 The Heirloom Development Tools provide yacc, lex, m4, make, and
@@ -44,7 +45,7 @@ make %{makeflags}
 make %{makeflags} install
 
 rm -f filelist.rpm
-for f in %{bindir} %{susdir} %{libdir}
+for f in %{bindir} %{susdir} %{libdir} %{prefix}/share
 do
 	if test -d %{buildroot}/$f
 	then
