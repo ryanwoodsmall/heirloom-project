@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dist.cc	1.4 (gritter) 01/13/07
+ * Sccsid @(#)dist.cc	1.5 (gritter) 01/20/07
  */
 
 #ifdef DISTRIBUTED
@@ -275,11 +275,7 @@ startup_rxm(void)
 		sprintf(&rxm_command[strlen(rxm_command)],
 		               NOCATGETS(" %d %d"),
 		               pipe1[0], pipe2[1]);
-#ifndef __sun
-		execl(NOCATGETS("/bin/sh"),
-#else
-		execl(NOCATGETS("/usr/bin/sh"),
-#endif
+		execl(bourne_shell,
 		      NOCATGETS("sh"),
 		      NOCATGETS("-c"),
 		      rxm_command,

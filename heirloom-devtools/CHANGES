@@ -1,3 +1,10 @@
+Release ...
+* make: Use a POSIX shell or a Bourne shell as default value for $(SHELL)
+  depending on whether POSIX mode is enabled or not. The path names of
+  these shells are set in "mk.config". Both default to "/bin/sh" to ensure
+  that the package can be built portably, thus to actually use this feature,
+  install the Heirloom Bourne shell in advance and then edit "mk.config".
+
 Release 070119
 * The "make" command has been added from OpenSolaris sources. Important
   changes to the OpenSolaris version are:

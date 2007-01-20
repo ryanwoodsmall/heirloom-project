@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)globals.cc	1.6 (gritter) 01/18/07
+ * Sccsid @(#)globals.cc	1.7 (gritter) 01/20/07
  */
 
 /*
@@ -211,6 +211,8 @@
 	wchar_t		*wcs_ptr;
 	wchar_t		*wcs_ptr2;
 	long int	hostid;
+	const char	bourne_shell[] = SHELL;
+	const char	posix_shell[] = POSIX_SHELL;
 
 /*
  * File table of contents

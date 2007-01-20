@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.8 (gritter) 01/14/07
+ * Sccsid @(#)misc.cc	1.9 (gritter) 01/20/07
  */
 
 /*
@@ -743,19 +743,11 @@ load_cached_names(void)
 	dollar->dollar = false;
 
 	/* Set the value of $(SHELL) */
-	#ifdef HP_UX
-	MBSTOWCS(wcs_buffer, NOCATGETS("/bin/posix/sh"));
-	#else
-	#if defined(SUN5_0)
 	if (posix) {
-	  MBSTOWCS(wcs_buffer, NOCATGETS("/usr/xpg4/bin/sh"));
+	  MBSTOWCS(wcs_buffer, posix_shell);
 	} else {
-	  MBSTOWCS(wcs_buffer, NOCATGETS("/bin/sh"));
+	  MBSTOWCS(wcs_buffer, bourne_shell);
 	}
-	#else  /* ^SUN5_0 */
-	MBSTOWCS(wcs_buffer, NOCATGETS("/bin/sh"));
-	#endif /* ^SUN5_0 */
-	#endif
 	SETVAR(shell_name, GETNAME(wcs_buffer, FIND_LENGTH), false);
 
 	/*

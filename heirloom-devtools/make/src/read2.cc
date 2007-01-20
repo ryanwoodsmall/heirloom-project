@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read2.cc	1.5 (gritter) 01/13/07
+ * Sccsid @(#)read2.cc	1.6 (gritter) 01/20/07
  */
 
 /*
@@ -1182,11 +1182,9 @@ special_reader(Name target, register Name_vector depes, Cmd_line command)
 		sccs_get_rule = sccs_get_posix_rule;
 			/* turn keep state off being SunPro make specific */
 		keep_state = false;
-		#if defined(SUN5_0)
 		/* Use /usr/xpg4/bin/sh on Solaris */
-		MBSTOWCS(wcs_buffer, NOCATGETS("/usr/xpg4/bin/sh"));
+		MBSTOWCS(wcs_buffer, posix_shell);
 		SETVAR(shell_name, GETNAME(wcs_buffer, FIND_LENGTH), false);
-		#endif
 		if (trace_reader) {
 			printf("%s:\n", posix_name->string_mb);
 		}

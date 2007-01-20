@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.6 (gritter) 01/14/07
+ * Sccsid @(#)defs.h	1.7 (gritter) 01/20/07
  */
 
 /*
@@ -324,6 +324,8 @@ extern	wchar_t		*wcs_ptr;
 extern	wchar_t		*wcs_ptr2;
 extern	nl_catd		catd;
 extern	long int	hostid;
+extern	const char	bourne_shell[];
+extern	const char	posix_shell[];
 
 /*
  * Declarations of system defined variables

@@ -4,7 +4,9 @@ OBJ = ar.o depvar.o dist.o dmake.o doname.o dosys.o files.o globals.o \
 	implicit.o macro.o main.o make.o misc.o nse.o nse_printdep.o \
 	parallel.o pmake.o read.o read2.o rep.o state.o getopt.o version.o
 
-XFLAGS = -I../include -D_GNU_SOURCE -DSUNOS4_AND_AFTER -DHDRSDIR='"$(HDRSDIR)"'
+XFLAGS = -I../include -D_GNU_SOURCE -DSUNOS4_AND_AFTER \
+	-DHDRSDIR='"$(HDRSDIR)"' \
+	-DSHELL='"$(SHELL)"' -DPOSIX_SHELL='"$(POSIX_SHELL)"'
 
 .c.o:
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(XFLAGS) -c $<

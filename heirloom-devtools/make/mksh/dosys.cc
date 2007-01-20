@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dosys.cc	1.7 (gritter) 01/14/07
+ * Sccsid @(#)dosys.cc	1.8 (gritter) 01/20/07
  */
 
 /*
@@ -362,15 +362,7 @@ doshell(wchar_t *command, register Boolean ignore_error, Boolean redirect_out_er
 		argv[argv_index++] = strdup(nice_prio_buf);
 	}
 	argv[argv_index++] = shellname;
-#ifndef __sun
-	if(0 == strcmp(shell->string_mb, (char*)NOCATGETS("/bin/sh"))) {
-		argv[argv_index++] = (char*)(ignore_error ? NOCATGETS("-c") : NOCATGETS("-ce"));
-	} else {
-		argv[argv_index++] = (char*)NOCATGETS("-c");
-	}
-#else
 	argv[argv_index++] = (char*)(ignore_error ? NOCATGETS("-c") : NOCATGETS("-ce"));
-#endif
 	if ((length = wslen(command)) >= MAXPATHLEN) {
 		tmp_mbs_buffer = getmem((length * MB_LEN_MAX) + 1);
                 wcstombs(tmp_mbs_buffer, command, (length * MB_LEN_MAX) + 1);
