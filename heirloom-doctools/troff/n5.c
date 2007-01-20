@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.123 (gritter) 11/26/06
+ * Sccsid @(#)n5.c	1.124 (gritter) 01/20/07
  */
 
 /*
@@ -1186,7 +1186,7 @@ getev(int *nxevp, char **namep)
 	char	*name = NULL;
 	int nxev = 0;
 	char	c;
-	int	i = 0, sz = 0;
+	int	i = 0, sz = 0, valid = 1;
 
 	*namep = NULL;
 	*nxevp = 0;
@@ -1203,16 +1203,18 @@ getev(int *nxevp, char **namep)
 		}
 	} else {
 		do {
-			c = getach();
+			c = rgetach();
 			if (i >= sz)
 				name = realloc(name, (sz += 8) * sizeof *name);
 			name[i++] = c;
 		} while (c);
+		if (*name == 0)
+			valid = 0;
 	}
 	flushi();
 	*namep = name;
 	*nxevp = nxev;
-	return 1;
+	return valid;
 }
 
 void

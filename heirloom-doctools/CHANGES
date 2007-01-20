@@ -3,6 +3,10 @@ Release ...
   default line breaking penalty; useful to discourage line breaks within
   a person's name or a formula. Relative values in the "\j" sequence now
   refer to the default penalty value.
+* [nt]roff: Special characters like "\}" do now terminate environment
+  names in arguments to the ".ev" and ".evc" requests as with other names.
+  Thus ".ev \}" is no longer misinterpreted as an attempt to change to an
+  environment named "\}". (Bugreport by Dirk-Wilhelm Peters.)
 * dpost: Cast size_t arguments to long for printf (Stefan Tramm).
 * The reference manual now uses the free TeX Gyre Termes fonts available
   from <http://www.janusz.nowacki.strefa.pl/>. For this and the other

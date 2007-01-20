@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.138 (gritter) 12/19/06
+ * Sccsid @(#)n1.c	1.139 (gritter) 01/20/07
  */
 
 /*
@@ -922,7 +922,7 @@ control(register int a, register int b)
 }
 
 
-static int
+int
 rgetach(void)
 {
 	extern const char	nmctab[];

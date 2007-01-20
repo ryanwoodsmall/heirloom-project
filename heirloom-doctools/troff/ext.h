@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.106 (gritter) 12/25/06
+ * Sccsid @(#)ext.h	1.107 (gritter) 01/20/07
  */
 
 /*
@@ -271,6 +271,7 @@ extern	int	nextfile(void);
 extern	int	popf(void);
 extern	void	flushi(void);
 extern	int	getach(void);
+extern	int	rgetach(void);
 extern	void	casenx(void);
 extern	int	getname(void);
 extern	void	caseso(void);
