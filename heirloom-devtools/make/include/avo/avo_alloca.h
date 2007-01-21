@@ -31,13 +31,13 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)avo_alloca.h	1.3 (gritter) 01/13/07
+ * Sccsid @(#)avo_alloca.h	1.4 (gritter) 01/21/07
  */
 
 #ifndef _AVO_ALLOCA_H
 #define _AVO_ALLOCA_H
 
-#if defined (__sun) || defined (__linux__)
+#if defined (__sun) || defined (__linux__) || defined (__hpux)
 #include <alloca.h>
 #endif
 

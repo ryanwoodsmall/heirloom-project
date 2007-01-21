@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.7 (gritter) 01/13/07
+ * Sccsid @(#)defs.h	1.8 (gritter) 01/21/07
  */
 
 /*
@@ -67,6 +67,9 @@
 /*
  * Definition of wchar functions.
  */
+#	ifdef __hpux
+#		include <stdarg.h>
+#	endif
 #	include <wctype.h>
 #	include <wchar.h>
 #	undef wsdup
@@ -89,7 +92,7 @@
 #	define wsncmp(x,y,z) wcsncmp(x,y,z)
 #endif
 
-#if defined (__FreeBSD__) || defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux)
 extern "C" { wchar_t	*wcsdup(const wchar_t *s); }
 #endif
 

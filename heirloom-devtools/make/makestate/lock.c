@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lock.c	1.6 (gritter) 01/13/07
+ * Sccsid @(#)lock.c	1.7 (gritter) 01/21/07
  */
 
 #include <stdio.h>
@@ -48,7 +48,7 @@
  * LP64 libc.  Use strerror(3C) instead.
  */
 #else  /* #_LP64 */
-#ifdef __sun
+#if defined (__sun) || defined (__hpux)
 extern	char *		sys_errlist[];
 extern	int		sys_nerr;
 #endif

@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.15 (gritter) 01/21/07";
+static const char id[] = "@(#)sccs.sl	1.16 (gritter) 01/21/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.4 (gritter) 01/21/07
@@ -10,7 +10,7 @@ prs.c: * Sccsid @(#)prs.c	1.6 (gritter) 01/21/07
 prt.c: * Sccsid @(#)prt.c	1.4 (gritter) 01/21/07
 rmchg.c: * Sccsid @(#)rmchg.c	1.5 (gritter) 01/21/07
 sccs.c: * Sccsid @(#)sccs.c	1.6 (gritter) 01/21/07
-unget.c: * Sccsid @(#)unget.c	1.5 (gritter) 01/21/07
+unget.c: * Sccsid @(#)unget.c	1.6 (gritter) 01/21/07
 val.c: * Sccsid @(#)val.c	1.5 (gritter) 01/21/07
 vc.c: * Sccsid @(#)vc.c	1.3 (gritter) 12/20/06
 what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
@@ -64,7 +64,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../hdr/macros.h:#define	SCCSID(arg)		static char Sccsid[] = "arg"
 ../mpwlib/abspath.c: * Sccsid @(#)abspath.c	1.3 (gritter) 12/20/06
 ../mpwlib/any.c: * Sccsid @(#)any.c	1.3 (gritter) 12/20/06
-../mpwlib/cat.c: * Sccsid @(#)cat.c	1.3 (gritter) 12/20/06
+../mpwlib/cat.c: * Sccsid @(#)cat.c	1.4 (gritter) 01/21/07
 ../mpwlib/dname.c: * Sccsid @(#)dname.c	1.3 (gritter) 12/20/06
 ../mpwlib/fatal.c: * Sccsid @(#)fatal.c	1.4 (gritter) 12/25/06
 ../mpwlib/fdfopen.c: * Sccsid @(#)fdfopen.c	1.3 (gritter) 12/20/06

@@ -4,6 +4,7 @@ Release ...
   these shells are set in "mk.config". Both default to "/bin/sh" to ensure
   that the package can be built portably, thus to actually use this feature,
   install the Heirloom Bourne shell in advance and then edit "mk.config".
+* The tools have been ported to HP-UX.
 
 Release 070119
 * The "make" command has been added from OpenSolaris sources. Important

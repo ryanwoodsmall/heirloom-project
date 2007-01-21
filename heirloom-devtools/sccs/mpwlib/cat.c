@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)cat.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)cat.c	1.4 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:lib/mpwlib/cat.c"	*/
 #include	<stdlib.h>
@@ -47,7 +47,7 @@
 
 /*VARARGS*/
 char *
-cat(register char *dest, ...)
+cat(char *dest, ...)
 {
 	register char *d, *s;
 	va_list ap;

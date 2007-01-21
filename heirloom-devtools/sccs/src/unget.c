@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unget.c	1.5 (gritter) 01/21/07
+ * Sccsid @(#)unget.c	1.6 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/unget.c"	*/
 # include	<defines.h>
@@ -354,3 +354,11 @@ catpfile(struct packet *pkt)
 	   fclose(in);
 	}
 }
+
+#ifdef __hpux
+int
+seteuid(uid_t euid)
+{
+	return euid ? setuid(euid) : -1;
+}
+#endif

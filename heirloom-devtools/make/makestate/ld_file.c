@@ -30,13 +30,15 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ld_file.c	1.6 (gritter) 01/13/07
+ * Sccsid @(#)ld_file.c	1.7 (gritter) 01/21/07
  */
 
 #if defined (__GNUC__)
 static void	ld_support_init(void) __attribute__ ((constructor));
 #elif defined (__SUNPRO_C)
 #pragma init(ld_support_init)
+#elif defined (__HP_aCC) || defined (__hpux)
+#pragma init "ld_support_init"
 #else
 #error need constructor statement
 #endif
@@ -49,7 +51,9 @@ static void	ld_support_init(void) __attribute__ ((constructor));
 #include <libelf.h>
 #endif
 #include <sys/param.h>
+#ifndef __hpux
 #include <link.h>
+#endif
 
 #define	SUNPRO_DEPENDENCIES	"SUNPRO_DEPENDENCIES"
 
