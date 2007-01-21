@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)unget.c	1.4 (gritter) 12/25/06
+ * Sccsid @(#)unget.c	1.5 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/unget.c"	*/
 # include	<defines.h>
@@ -153,7 +153,7 @@ main(int argc, char *argv[])
                                 }
                                 break;
 			default:
-				fatal("Usage: unget [-ns][-r SID] file..");
+				fatal("unknown key letter (cm1)");
 			}
 
 			if (testmore) {

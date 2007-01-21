@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.5 (gritter) 01/03/07
+ * Sccsid @(#)sccs.c	1.6 (gritter) 01/21/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -36,6 +36,7 @@
 # include	<stdlib.h>
 # include	<dirent.h>
 # include	<errno.h>
+# include	<libgen.h>
 # include	<signal.h>
 #define EX_OK 0
 #define EX_USAGE 64
@@ -52,6 +53,8 @@ static  char **diffs_np, **diffs_ap;
 int	Domrs;
 char	*Comments,*Mrs;
 char    Null[1];
+
+static const char	*progname;
 
 /*
 **  SCCS.C -- human-oriented front end to the SCCS system.
@@ -366,6 +369,7 @@ main(int argc, char **argv)
 	register struct passwd *pw;
 	char buf[FBUFSIZ], cwdpath[FBUFSIZ];
 
+	progname = basename(argv[0]);
 	Fflags = FTLEXIT | FTLMSG | FTLCLN;
 
 	/* Pull "SccsDir" out of the environment variable         */
@@ -499,7 +503,7 @@ main(int argc, char **argv)
 
 			  default:
 				usrerr("%s %s", "unknown option", argv[i]);
-				fprintf(stderr, "Usage: sccs [ -r ][ -drootprefix ][ -p subdir ]\n\t subcommand [ option ...] [ filename ...]\n");
+				fprintf(stderr, "Usage: %s [flags] command [flags]\n", progname);
 				exit(EX_USAGE);
 			}
 	}
@@ -510,7 +514,8 @@ main(int argc, char **argv)
 
 	if (*argv == NULL)
 	{
-		fprintf(stderr, "Usage: sccs [ -r ][ -drootprefix ][ -p subdir ]\n\t subcommand [ option ...] [ filename ...]\n");
+		fprintf(stderr, "Usage: %s [flags] command [flags]\n",
+				progname);
 		exit(EX_USAGE);
 		/*NOTREACHED*/
 	}
@@ -1694,7 +1699,9 @@ callprog(char *progpath, int flags, char **argv, int forkflag)
 	/* bandaid */
 	sigmsg = "fork() error";
 #endif
-					fprintf(stderr, "sccs: %s: %s%s\n", argv[0],
+					fprintf(stderr, "%s: %s: %s%s\n",
+					    progname,
+					    argv[0],
 					    sigmsg,
 					    coredumped ? " - core dumped" : "");
 				}
@@ -2282,7 +2289,7 @@ unedit(char *fn)
 			/* a match */
 			delete++;
 			if (delete > 1) {
-				printf("%s: more than one delta of a file is checked out. Use 'sccs unget -r<SID>' instead.\n", gfile);
+				printf("%s: more than one delta of a file is checked out. Use '%s unget -r<SID>' instead.\n", gfile, progname);
 				fclose(tfp);
 				fclose(pfp);
 				unlink(tfn);

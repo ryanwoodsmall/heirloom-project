@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)rmchg.c	1.4 (gritter) 12/25/06
+ * Sccsid @(#)rmchg.c	1.5 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/rmchg.c"	*/
 # include	<defines.h>
@@ -198,7 +198,7 @@ main(int argc,char **argv)
 			case 'z':
 				break;
 			default:
-				fatal("Usage: rmdel [ -r SID ] s.filename ...");
+				fatal("unknown key letter (cm1)");
 			}
 
 			if (had[c - 'a']++)

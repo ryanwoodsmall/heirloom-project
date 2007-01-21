@@ -39,7 +39,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)prt.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)prt.c	1.4 (gritter) 01/21/07
  */
 
 /*
@@ -245,7 +245,7 @@ main(int argc, char *argv[])
 				break;
 
 			default:
-				fatal("Usage: prt [ -abdefistu ][ -c date-time ]\n\t[ -r date-time ][ -ySID ] s.filename...");
+				fatal("unknown key letter (cm1)");
 			}
 
 			if (had[c - 'a']++ && testklt++)

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)get.c	1.5 (gritter) 12/20/06
+ * Sccsid @(#)get.c	1.6 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/get.c"	*/
 
@@ -244,7 +244,7 @@ main(int argc, register char *argv[])
                                 }
                                 break;
 			default:
-			   fatal("Usage: get [-begkmLpst] [-l[p]] [-asequence] [-cdate-time] [-Gg-file] [-isid-list] [-rsid] [-xsid-list] file ...");
+			   fatal("unknown key letter (cm1)");
 			
 			}
 

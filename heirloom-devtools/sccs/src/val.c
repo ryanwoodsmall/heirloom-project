@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)val.c	1.4 (gritter) 12/25/06
+ * Sccsid @(#)val.c	1.5 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/val.c"	*/
 /************************************************************************/
@@ -251,13 +251,7 @@ process(char *p_line, int argc, char *argv[])
 					break;
 				default:
 					Fflags &= ~FTLEXIT;
-					fatal("Usage: val [ -s ] [ -m name ] [ -r SID ] [ -y type ] s.filename...");
 					inline_err |= UNKDUP_ERR;
-					if (inpstd)
-					   report(inline_err,savelinep,"");
-					else
-					   report(inline_err,"","");
-					return;
 			}
 			/*
 			use 'had' array and determine if the keyletter

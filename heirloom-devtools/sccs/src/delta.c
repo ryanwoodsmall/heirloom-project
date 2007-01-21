@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)delta.c	1.5 (gritter) 12/31/06
+ * Sccsid @(#)delta.c	1.6 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/delta.c"	*/
 
@@ -200,7 +200,7 @@ main(int argc, register char *argv[])
 			case 'z':
 				break;
 			default:
-				fatal("Usage: delta [ -dnps ][ -g sid-list ][ -m mr-list ]\n\t[ -r SID ][ -y[comment] ] s.filename... ");
+				fatal("unknown key letter (cm1)");
 			}
 
 			/* The following is necessary in case the user types */

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)admin.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)admin.c	1.4 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/admin.c"	*/
 
@@ -454,7 +454,7 @@ main(int argc, char *argv[])
 				break;
 
 			default:
-				fatal("Usage: admin [ -bhnz ][ -ausername|groupid ]\n\t[ -dflag ][ -eusername|groupid ]\n\t[ -fflag [value]][ -i [filename]]\n\t[ -m mr-list][ -r release ][ -t [description-file]]\n\t[ -y[comment]] s.filename ...");
+				fatal("unknown key letter (cm1)");
 			}
 
 			if (had[c - 'a']++ && testklt++)

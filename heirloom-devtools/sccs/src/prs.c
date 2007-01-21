@@ -39,7 +39,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)prs.c	1.5 (gritter) 01/12/07
+ * Sccsid @(#)prs.c	1.6 (gritter) 01/21/07
  */
 /*	from OpenSolaris "sccs:cmd/prs.c"	*/
 /*************************************************************************/
@@ -247,7 +247,7 @@ main(int argc, char *argv[])
                                 }
                                 break;
 			default:
-				fatal("Usage: prs [ -ael ][ -c date-time ][ -d dataspec ]\n\t[ -r SID ] s.filename ...");
+				fatal("unknown key letter (cm1)");
 			}
 
 			/* The following is necessary in case the */
