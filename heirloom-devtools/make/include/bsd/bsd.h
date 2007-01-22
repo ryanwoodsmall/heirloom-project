@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bsd.h	1.3 (gritter) 01/13/07
+ * Sccsid @(#)bsd.h	1.4 (gritter) 01/22/07
  */
 
 /*
@@ -54,9 +54,9 @@ typedef void (*SIG_PF) (int);
 #endif
 
 #ifdef __cplusplus
-extern "C" SIG_PF bsd_signal(int a, SIG_PF b);
+extern "C" SIG_PF bsdsignal(int a, SIG_PF b);
 #else
-extern void (*bsd_signal(int, void (*) (int))) (int);
+extern void (*bsdsignal(int, void (*) (int))) (int);
 #endif
 extern void bsd_signals(void);
 

@@ -5,16 +5,16 @@
 #else
 #define USED
 #endif
-static const char id[] USED = "@(#)make.sl	1.18 (gritter) 01/21/07";
+static const char id[] USED = "@(#)make.sl	1.19 (gritter) 01/22/07";
 /* SLIST */
 /*
-../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.5 (gritter) 01/13/07
+../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.6 (gritter) 01/22/07
 ../src/read.cc: * Sccsid @(#)read.cc	1.6 (gritter) 01/13/07
 ../src/dist.cc: * Sccsid @(#)dist.cc	1.5 (gritter) 01/20/07
 ../src/ar.cc: * Sccsid @(#)ar.cc	1.5 (gritter) 01/13/07
 ../src/dosys.cc: * Sccsid @(#)dosys.cc	1.4 (gritter) 01/13/07
 ../src/macro.cc: * Sccsid @(#)macro.cc	1.4 (gritter) 01/13/07
-../src/main.cc: * Sccsid @(#)main.cc	1.17 (gritter) 01/16/07
+../src/main.cc: * Sccsid @(#)main.cc	1.18 (gritter) 01/22/07
 ../src/make.cc: * Sccsid @(#)make.cc	1.2 (gritter) 01/07/07
 ../src/depvar.cc: * Sccsid @(#)depvar.cc	1.3 (gritter) 01/13/07
 ../src/implicit.cc: * Sccsid @(#)implicit.cc	1.4 (gritter) 01/13/07
@@ -37,7 +37,7 @@ static const char id[] USED = "@(#)make.sl	1.18 (gritter) 01/21/07";
 ../mksh/dosys.cc: * Sccsid @(#)dosys.cc	1.8 (gritter) 01/20/07
 ../mksh/macro.cc: * Sccsid @(#)macro.cc	1.6 (gritter) 01/13/07
 ../mksh/posix.cc: * Sccsid @(#)posix.cc	1.1 (gritter) 01/13/07
-../mksh/misc.cc: * Sccsid @(#)misc.cc	1.5 (gritter) 01/13/07
+../mksh/misc.cc: * Sccsid @(#)misc.cc	1.6 (gritter) 01/22/07
 ../mksh/mksh.cc: * Sccsid @(#)mksh.cc	1.4 (gritter) 01/13/07
 ../mksh/globals.cc: * Sccsid @(#)globals.cc	1.3 (gritter) 01/13/07
 ../mksh/wcslen.c: * Sccsid @(#)wcslen.c	1.2 (gritter) 01/21/07
@@ -72,7 +72,7 @@ static const char id[] USED = "@(#)make.sl	1.18 (gritter) 01/21/07";
 ../include/mk/copyright.h: * Sccsid @(#)copyright.h	1.2 (gritter) 01/07/07
 ../include/avo/avo_alloca.h: * Sccsid @(#)avo_alloca.h	1.4 (gritter) 01/21/07
 ../include/avo/intl.h: * Sccsid @(#)intl.h	1.3 (gritter) 01/13/07
-../include/bsd/bsd.h: * Sccsid @(#)bsd.h	1.3 (gritter) 01/13/07
+../include/bsd/bsd.h: * Sccsid @(#)bsd.h	1.4 (gritter) 01/22/07
 ../include/mksh/dosys.h: * Sccsid @(#)dosys.h	1.2 (gritter) 01/07/07
 ../include/mksh/macro.h: * Sccsid @(#)macro.h	1.2 (gritter) 01/07/07
 ../include/mksh/i18n.h: * Sccsid @(#)i18n.h	1.2 (gritter) 01/07/07

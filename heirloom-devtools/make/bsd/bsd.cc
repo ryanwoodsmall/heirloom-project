@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bsd.cc	1.5 (gritter) 01/13/07
+ * Sccsid @(#)bsd.cc	1.6 (gritter) 01/22/07
  */
 
 #include <signal.h>
@@ -48,7 +48,7 @@
  */
 
 extern SIG_PF
-bsd_signal (int Signal, SIG_PF Handler)
+bsdsignal (int Signal, SIG_PF Handler)
 {
   auto SIG_PF                   previous_handler;
 #ifdef SUN5_0
@@ -86,101 +86,101 @@ bsd_signals (void)
 #if 0
 #if !defined(SUN5_0) && !defined(linux)
 #if defined(SIGHUP)
-      bsd_signal (SIGHUP, SIG_DFL);
+      bsdsignal (SIGHUP, SIG_DFL);
 #endif
 #if defined(SIGINT)
-      bsd_signal (SIGINT, SIG_DFL);
+      bsdsignal (SIGINT, SIG_DFL);
 #endif
 #if defined(SIGQUIT)
-      bsd_signal (SIGQUIT, SIG_DFL);
+      bsdsignal (SIGQUIT, SIG_DFL);
 #endif
 #if defined(SIGILL)
-      bsd_signal (SIGILL, SIG_DFL);
+      bsdsignal (SIGILL, SIG_DFL);
 #endif
 #if defined(SIGTRAP)
-      bsd_signal (SIGTRAP, SIG_DFL);
+      bsdsignal (SIGTRAP, SIG_DFL);
 #endif
 #if defined(SIGIOT)
-      bsd_signal (SIGIOT, SIG_DFL);
+      bsdsignal (SIGIOT, SIG_DFL);
 #endif
 #if defined(SIGABRT)
-      bsd_signal (SIGABRT, SIG_DFL);
+      bsdsignal (SIGABRT, SIG_DFL);
 #endif
 #if defined(SIGEMT)
-      bsd_signal (SIGEMT, SIG_DFL);
+      bsdsignal (SIGEMT, SIG_DFL);
 #endif
 #if defined(SIGFPE)
-      bsd_signal (SIGFPE, SIG_DFL);
+      bsdsignal (SIGFPE, SIG_DFL);
 #endif
 #if defined(SIGBUS)
-      bsd_signal (SIGBUS, SIG_DFL);
+      bsdsignal (SIGBUS, SIG_DFL);
 #endif
 #if defined(SIGSEGV)
-      bsd_signal (SIGSEGV, SIG_DFL);
+      bsdsignal (SIGSEGV, SIG_DFL);
 #endif
 #if defined(SIGSYS)
-      bsd_signal (SIGSYS, SIG_DFL);
+      bsdsignal (SIGSYS, SIG_DFL);
 #endif
 #if defined(SIGPIPE)
-      bsd_signal (SIGPIPE, SIG_DFL);
+      bsdsignal (SIGPIPE, SIG_DFL);
 #endif
 #if defined(SIGALRM)
-      bsd_signal (SIGALRM, SIG_DFL);
+      bsdsignal (SIGALRM, SIG_DFL);
 #endif
 #if defined(SIGTERM)
-      bsd_signal (SIGTERM, SIG_DFL);
+      bsdsignal (SIGTERM, SIG_DFL);
 #endif
 #if defined(SIGUSR1)
-      bsd_signal (SIGUSR1, SIG_DFL);
+      bsdsignal (SIGUSR1, SIG_DFL);
 #endif
 #if defined(SIGUSR2)
-      bsd_signal (SIGUSR2, SIG_DFL);
+      bsdsignal (SIGUSR2, SIG_DFL);
 #endif
 #if defined(SIGCLD)
-      bsd_signal (SIGCLD, SIG_DFL);
+      bsdsignal (SIGCLD, SIG_DFL);
 #endif
 #if defined(SIGCHLD)
-      bsd_signal (SIGCHLD, SIG_DFL);
+      bsdsignal (SIGCHLD, SIG_DFL);
 #endif
 #if defined(SIGPWR)
-      bsd_signal (SIGPWR, SIG_DFL);
+      bsdsignal (SIGPWR, SIG_DFL);
 #endif
 #if defined(SIGWINCH)
-      bsd_signal (SIGWINCH, SIG_DFL);
+      bsdsignal (SIGWINCH, SIG_DFL);
 #endif
 #if defined(SIGURG)
-      bsd_signal (SIGURG, SIG_DFL);
+      bsdsignal (SIGURG, SIG_DFL);
 #endif
 #if defined(SIGIO)
-      bsd_signal (SIGIO, SIG_DFL);
+      bsdsignal (SIGIO, SIG_DFL);
 #else
 #if defined(SIGPOLL)
-      bsd_signal (SIGPOLL, SIG_DFL);
+      bsdsignal (SIGPOLL, SIG_DFL);
 #endif
 #endif
 #if defined(SIGTSTP)
-      bsd_signal (SIGTSTP, SIG_DFL);
+      bsdsignal (SIGTSTP, SIG_DFL);
 #endif
 #if defined(SIGCONT)
-      bsd_signal (SIGCONT, SIG_DFL);
+      bsdsignal (SIGCONT, SIG_DFL);
 #endif
 #if defined(SIGTTIN)
-      bsd_signal (SIGTTIN, SIG_DFL);
+      bsdsignal (SIGTTIN, SIG_DFL);
 #endif
 #if defined(SIGTTOU)
-      bsd_signal (SIGTTOU, SIG_DFL);
+      bsdsignal (SIGTTOU, SIG_DFL);
 #endif
 #if defined(SIGVTALRM)
-      bsd_signal (SIGVTALRM, SIG_DFL);
+      bsdsignal (SIGVTALRM, SIG_DFL);
 #endif
 #if defined(SIGPROF)
-      bsd_signal (SIGPROF, SIG_DFL);
+      bsdsignal (SIGPROF, SIG_DFL);
 #endif
 #if defined(SIGXCPU)
-      bsd_signal (SIGXCPU, SIG_DFL);
+      bsdsignal (SIGXCPU, SIG_DFL);
 #endif
 #if defined(SIGXFSZ)
-      bsd_signal (SIGXFSZ, SIG_DFL);
+      bsdsignal (SIGXFSZ, SIG_DFL);
 #endif
 #endif
 #endif

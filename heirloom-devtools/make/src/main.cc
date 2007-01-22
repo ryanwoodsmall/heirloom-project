@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.17 (gritter) 01/16/07
+ * Sccsid @(#)main.cc	1.18 (gritter) 01/22/07
  */
 
 /*
@@ -66,7 +66,7 @@
 #endif
 #endif
 
-#include <bsd/bsd.h>		/* bsd_signal() */
+#include <bsd/bsd.h>		/* bsdsignal() */
 
 #ifdef DISTRIBUTED
 #	include <dm/Avo_AcknowledgeMsg.h>
@@ -703,7 +703,7 @@ main(int argc, char *argv[])
 /*
  *	Enable interrupt handler for alarms
  */
-        bsd_signal(SIGALRM, (SIG_PF)doalarm);
+        bsdsignal(SIGALRM, (SIG_PF)doalarm);
 
 /*
  *	Check if make should report
@@ -1078,7 +1078,7 @@ handle_interrupt(int)
 		}
 	}
 	if (getpid() == getpgrp()) {
-		bsd_signal(SIGTERM, SIG_IGN);
+		bsdsignal(SIGTERM, SIG_IGN);
 		kill (-getpid(), SIGTERM);
 	}
 	/* Clean up all parallel/distributed children already finished */

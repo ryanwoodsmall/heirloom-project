@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.5 (gritter) 01/13/07
+ * Sccsid @(#)misc.cc	1.6 (gritter) 01/22/07
  */
 
 /*
@@ -50,7 +50,7 @@
 /*
  * Included files
  */
-#include <bsd/bsd.h>		/* bsd_signal() */
+#include <bsd/bsd.h>		/* bsdsignal() */
 #include <mksh/i18n.h>		/* get_char_semantics_value() */
 #include <mksh/misc.h>
 #include <mksdmsi18n/mksdmsi18n.h>
@@ -295,28 +295,28 @@ enable_interrupt(register void (*handler) (int))
 #else
 	if (sigivalue != (void (*) (int)) SIG_IGN) {
 #endif
-		bsd_signal(SIGINT, (SIG_PF) handler);
+		bsdsignal(SIGINT, (SIG_PF) handler);
 	}
 #ifdef SUN5_0
 	if (sigqvalue != SIG_IGN) {
 #else
 	if (sigqvalue != (void (*) (int)) SIG_IGN) {
 #endif
-		bsd_signal(SIGQUIT, (SIG_PF) handler);
+		bsdsignal(SIGQUIT, (SIG_PF) handler);
 	}
 #ifdef SUN5_0
 	if (sigtvalue != SIG_IGN) {
 #else
 	if (sigtvalue != (void (*) (int)) SIG_IGN) {
 #endif
-		bsd_signal(SIGTERM, (SIG_PF) handler);
+		bsdsignal(SIGTERM, (SIG_PF) handler);
 	}
 #ifdef SUN5_0
 	if (sighvalue != SIG_IGN) {
 #else
 	if (sighvalue != (void (*) (int)) SIG_IGN) {
 #endif
-		bsd_signal(SIGHUP, (SIG_PF) handler);
+		bsdsignal(SIGHUP, (SIG_PF) handler);
 	}
 }
 
@@ -892,15 +892,15 @@ void
 setup_interrupt(register void (*handler) (int))
 {
 #ifdef SUN5_0
-	sigivalue = bsd_signal(SIGINT, SIG_IGN);
-	sigqvalue = bsd_signal(SIGQUIT, SIG_IGN);
-	sigtvalue = bsd_signal(SIGTERM, SIG_IGN);
-	sighvalue = bsd_signal(SIGHUP, SIG_IGN);
+	sigivalue = bsdsignal(SIGINT, SIG_IGN);
+	sigqvalue = bsdsignal(SIGQUIT, SIG_IGN);
+	sigtvalue = bsdsignal(SIGTERM, SIG_IGN);
+	sighvalue = bsdsignal(SIGHUP, SIG_IGN);
 #else
-	sigivalue = (void (*) (int)) bsd_signal(SIGINT, SIG_IGN);
-	sigqvalue = (void (*) (int)) bsd_signal(SIGQUIT, SIG_IGN);
-	sigtvalue = (void (*) (int)) bsd_signal(SIGTERM, SIG_IGN);
-	sighvalue = (void (*) (int)) bsd_signal(SIGHUP, SIG_IGN);
+	sigivalue = (void (*) (int)) bsdsignal(SIGINT, SIG_IGN);
+	sigqvalue = (void (*) (int)) bsdsignal(SIGQUIT, SIG_IGN);
+	sigtvalue = (void (*) (int)) bsdsignal(SIGTERM, SIG_IGN);
+	sighvalue = (void (*) (int)) bsdsignal(SIGHUP, SIG_IGN);
 #endif
 	enable_interrupt(handler);
 }
