@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)files.cc	1.6 (gritter) 01/21/07
+ * Sccsid @(#)files.cc	1.7 (gritter) 01/23/07
  */
 
 /*
@@ -159,7 +159,7 @@ exists(register Name target)
 			/* target->stat.time = buf.st_mtime; */
 /* BID_1129806 */
 /* vis@nbsp.nsk.su */
-#if defined(linux) || defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux)
+#if defined(linux) || defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux) || defined (_AIX)
 			timestruc_t ttime = { buf.st_mtime, 0 };
 			target->stat.time = MAX(ttime, file_min_time);
 #else
@@ -201,7 +201,7 @@ set_target_stat(register Name target, struct stat buf)
 		/* target->stat.time = buf.st_mtime; */
 /* BID_1129806 */
 /* vis@nbsp.nsk.su */
-#if defined(linux) || defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux)
+#if defined(linux) || defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux) || defined (_AIX)
 		timestruc_t ttime = { buf.st_mtime, 0 };
 		target->stat.time = ttime;
 #else

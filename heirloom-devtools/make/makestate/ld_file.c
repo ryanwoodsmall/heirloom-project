@@ -30,18 +30,8 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ld_file.c	1.7 (gritter) 01/21/07
+ * Sccsid @(#)ld_file.c	1.8 (gritter) 01/23/07
  */
-
-#if defined (__GNUC__)
-static void	ld_support_init(void) __attribute__ ((constructor));
-#elif defined (__SUNPRO_C)
-#pragma init(ld_support_init)
-#elif defined (__HP_aCC) || defined (__hpux)
-#pragma init "ld_support_init"
-#else
-#error need constructor statement
-#endif
 
 #include <stdio.h>
 #include <unistd.h>
@@ -51,7 +41,7 @@ static void	ld_support_init(void) __attribute__ ((constructor));
 #include <libelf.h>
 #endif
 #include <sys/param.h>
-#ifndef __hpux
+#ifdef __sun
 #include <link.h>
 #endif
 
@@ -69,7 +59,7 @@ struct Stritem {
 
 typedef struct Stritem 	Stritem;
 
-static char 		* depend_file = NULL;
+static char 		* depend_file = (char *)-1;
 static Stritem		* list = NULL;
 
 
@@ -106,6 +96,8 @@ prepend_str(Stritem **list, const char * str)
 void
 mk_state_collect_dep(const char * file)
 {
+	if (depend_file == (char *)-1)
+		mk_state_init();
 	/*
 	 * SUNPRO_DEPENDENCIES wasn't set, we don't collect .make.state
 	 * information.
@@ -126,6 +118,8 @@ mk_state_update_exit(void)
 	FILE		* ofp;
 	extern char 	* file_lock(char *, char *, int);
 
+	if (depend_file == (char *)-1)
+		mk_state_init();
 	if (!depend_file)
 		return;
 
@@ -156,14 +150,6 @@ mk_state_update_exit(void)
 	*space = ' ';
 
 } /* mk_state_update_exit() */
-
-static void
-/* LINTED static unused */
-ld_support_init(void)
-{
-	mk_state_init();
-
-} /* ld_support_init() */
 
 #ifdef __sun
 /* ARGSUSED */

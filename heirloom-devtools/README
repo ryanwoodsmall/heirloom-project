@@ -18,6 +18,7 @@ The source code has been compiled successfully on:
 Linux		glibc
 Solaris		10 and above
 HP-UX		B.11.11
+AIX		5.1
 FreeBSD		5.4, 6.1
 Open UNIX	8.0.0
 Mac OS X	10.4.3
@@ -51,4 +52,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						01/21/07
+<gunnarr@acm.org>						01/23/07

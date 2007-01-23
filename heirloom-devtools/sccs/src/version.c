@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.16 (gritter) 01/21/07";
+static const char id[] = "@(#)sccs.sl	1.17 (gritter) 01/23/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.4 (gritter) 01/21/07
@@ -58,7 +58,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../hdr/filehand.h: * Sccsid @(#)filehand.h	1.3 (gritter) 12/20/06
 ../hdr/had.h: * Sccsid @(#)had.h	1.3 (gritter) 12/20/06
 ../hdr/i18n.h: * Sccsid @(#)i18n.h	1.3 (gritter) 12/20/06
-../hdr/macros.h: * Sccsid @(#)macros.h	1.2 (gritter) 12/20/06
+../hdr/macros.h: * Sccsid @(#)macros.h	1.3 (gritter) 01/23/07
 ../hdr/macros.h: *	Note:	Sccsid[] strings are still supported but not the prefered
 ../hdr/macros.h:#define	SCCSID(arg)		static char Sccsid[] = #arg
 ../hdr/macros.h:#define	SCCSID(arg)		static char Sccsid[] = "arg"

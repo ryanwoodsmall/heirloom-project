@@ -31,9 +31,10 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mount.cc	1.3 (gritter) 01/13/07
+ * Sccsid @(#)mount.cc	1.4 (gritter) 01/23/07
  */
 
+#ifndef _AIX
 #include <sys/types.h>
 #if defined (__FreeBSD__) || defined (__APPLE__)
 #include <sys/param.h>
@@ -60,3 +61,4 @@ int	mount_vroot(char *target, char *name, int mode, pathpt vroot_path, pathpt vr
 	translate_with_thunk(target, mount_thunk, vroot_path, vroot_vroot, rw_read);
 	return(vroot_result);
 }
+#endif

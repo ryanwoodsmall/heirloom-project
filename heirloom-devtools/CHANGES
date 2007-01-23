@@ -5,6 +5,7 @@ Release ...
   that the package can be built portably, thus to actually use this feature,
   install the Heirloom Bourne shell in advance and then edit "mk.config".
 * The tools have been ported to HP-UX.
+* The tools have been ported to AIX.
 
 Release 070119
 * The "make" command has been added from OpenSolaris sources. Important

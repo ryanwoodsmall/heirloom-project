@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.8 (gritter) 01/21/07
+ * Sccsid @(#)defs.h	1.9 (gritter) 01/23/07
  */
 
 /*
@@ -426,7 +426,7 @@ typedef enum {
  * Magic values for the timestamp stored with each name object
  */
 
-#ifndef __sun
+#if !defined(__sun) && !defined(_AIX)
 typedef struct timespec timestruc_t;
 #endif
 

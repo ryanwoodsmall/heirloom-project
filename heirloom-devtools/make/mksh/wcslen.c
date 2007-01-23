@@ -1,7 +1,7 @@
 /*
- * Sccsid @(#)wcslen.c	1.2 (gritter) 01/21/07
+ * Sccsid @(#)wcslen.c	1.3 (gritter) 01/23/07
  */
-#if defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux)
+#if defined (__FreeBSD__) || defined (__APPLE__) || defined (__hpux) || defined (_AIX)
 #include <wchar.h>
 #include <stdlib.h>
 wchar_t *

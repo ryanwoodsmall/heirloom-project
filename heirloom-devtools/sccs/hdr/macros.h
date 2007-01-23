@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macros.h	1.2 (gritter) 12/20/06
+ * Sccsid @(#)macros.h	1.3 (gritter) 01/23/07
  */
 
 #include <sys/types.h>
@@ -46,14 +46,22 @@ extern "C" {
  *	max() and min() depend on the types of the operands
  *	abs() is absolute value
  */
+#undef	numeric
 #define	numeric(c)		((c) >= '0' && (c) <= '9')
+#undef	max
 #define	max(a, b) 		((a) < (b) ? (b) : (a))
+#undef	min
 #define	min(a, b) 		((a) > (b) ? (b) : (a))
+#undef	abs
 #define	abs(x)			((x) >= 0 ? (x) : -(x))
 
+#undef	compare
 #define	compare(str1, str2)	strcmp((str1), (str2))
+#undef	equal
 #define	equal(str1, str2)	(strcmp((str1), (str2)) == 0)
+#undef	length
 #define	length(str)		strlen(str)
+#undef	size
 #define	size(str)		(strlen(str) + 1)
 
 /*

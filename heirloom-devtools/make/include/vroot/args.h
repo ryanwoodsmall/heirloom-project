@@ -31,13 +31,15 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)args.h	1.3 (gritter) 01/13/07
+ * Sccsid @(#)args.h	1.4 (gritter) 01/23/07
  */
 
 #ifndef _ARGS_H_
 #define _ARGS_H_
 
+#ifndef _AIX
 #include <sys/syscall.h>
+#endif
 #include <errno.h>
 #include <sys/time.h>
 #include <sys/param.h>

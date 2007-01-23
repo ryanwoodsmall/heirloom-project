@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ldefs.c	1.5 (gritter) 11/26/05
+ * Sccsid @(#)ldefs.c	1.6 (gritter) 01/23/07
  */
 
 #include <stdio.h>
@@ -171,6 +171,8 @@ extern int charc;
 #define	freturn(s) s
 #endif
 
+#undef	FALSE
+#undef	TRUE
 enum {
 	FALSE,
 	TRUE

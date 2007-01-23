@@ -22,15 +22,15 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  */
-const char sccsid[] = "@(#)lex.sl	2.11 (gritter) 01/12/07";
+const char sccsid[] = "@(#)lex.sl	2.12 (gritter) 01/23/07";
 const char pkg[] = "Heirloom Development Tools";
-const char rel[] = "2.11 (gritter) 01/12/07";
+const char rel[] = "2.12 (gritter) 01/23/07";
 /* SLIST */
 /*
 allprint.c: * Sccsid @(#)allprint.c	1.4 (gritter) 11/27/05
 getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
 header.c: * Sccsid @(#)header.c	1.12 (gritter) 9/23/06
-ldefs.c: * Sccsid @(#)ldefs.c	1.5 (gritter) 11/26/05
+ldefs.c: * Sccsid @(#)ldefs.c	1.6 (gritter) 01/23/07
 libmain.c: * Sccsid @(#)libmain.c	1.4 (gritter) 11/26/05
 lsearch.c: * Sccsid @(#)lsearch.c	1.4 (gritter) 11/26/05
 main.c: * Sccsid @(#)main.c	1.9 (gritter) 11/26/05

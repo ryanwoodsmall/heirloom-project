@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dosys.cc	1.8 (gritter) 01/20/07
+ * Sccsid @(#)dosys.cc	1.9 (gritter) 01/23/07
  */
 
 /*
@@ -691,7 +691,11 @@ await(register Boolean ignore_error, register Boolean silent_error, Name target,
 #endif
 
         termination_signal = WTERMSIG(status);
+#ifndef _AIX
         core_dumped = WCOREDUMP(status);
+#else
+	core_dumped = 0;
+#endif
 
 	/*
 	 * If the child returned an error, we now try to print a

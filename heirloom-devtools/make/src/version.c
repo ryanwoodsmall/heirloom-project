@@ -5,7 +5,7 @@
 #else
 #define USED
 #endif
-static const char id[] USED = "@(#)make.sl	1.19 (gritter) 01/22/07";
+static const char id[] USED = "@(#)make.sl	1.20 (gritter) 01/23/07";
 /* SLIST */
 /*
 ../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.6 (gritter) 01/22/07
@@ -18,7 +18,7 @@ static const char id[] USED = "@(#)make.sl	1.19 (gritter) 01/22/07";
 ../src/make.cc: * Sccsid @(#)make.cc	1.2 (gritter) 01/07/07
 ../src/depvar.cc: * Sccsid @(#)depvar.cc	1.3 (gritter) 01/13/07
 ../src/implicit.cc: * Sccsid @(#)implicit.cc	1.4 (gritter) 01/13/07
-../src/files.cc: * Sccsid @(#)files.cc	1.6 (gritter) 01/21/07
+../src/files.cc: * Sccsid @(#)files.cc	1.7 (gritter) 01/23/07
 ../src/posix.cc: * Sccsid @(#)posix.cc	1.1 (gritter) 01/13/07
 ../src/misc.cc: * Sccsid @(#)misc.cc	1.9 (gritter) 01/20/07
 ../src/parallel.cc: * Sccsid @(#)parallel.cc	1.5 (gritter) 01/14/07
@@ -34,15 +34,15 @@ static const char id[] USED = "@(#)make.sl	1.19 (gritter) 01/22/07";
 ../src/nse_printdep.cc: * Sccsid @(#)nse_printdep.cc	1.4 (gritter) 01/13/07
 ../mksh/i18n.cc: * Sccsid @(#)i18n.cc	1.3 (gritter) 01/13/07
 ../mksh/read.cc: * Sccsid @(#)read.cc	1.3 (gritter) 01/13/07
-../mksh/dosys.cc: * Sccsid @(#)dosys.cc	1.8 (gritter) 01/20/07
+../mksh/dosys.cc: * Sccsid @(#)dosys.cc	1.9 (gritter) 01/23/07
 ../mksh/macro.cc: * Sccsid @(#)macro.cc	1.6 (gritter) 01/13/07
 ../mksh/posix.cc: * Sccsid @(#)posix.cc	1.1 (gritter) 01/13/07
 ../mksh/misc.cc: * Sccsid @(#)misc.cc	1.6 (gritter) 01/22/07
 ../mksh/mksh.cc: * Sccsid @(#)mksh.cc	1.4 (gritter) 01/13/07
 ../mksh/globals.cc: * Sccsid @(#)globals.cc	1.3 (gritter) 01/13/07
-../mksh/wcslen.c: * Sccsid @(#)wcslen.c	1.2 (gritter) 01/21/07
+../mksh/wcslen.c: * Sccsid @(#)wcslen.c	1.3 (gritter) 01/23/07
 ../makestate/lock.c: * Sccsid @(#)lock.c	1.7 (gritter) 01/21/07
-../makestate/ld_file.c: * Sccsid @(#)ld_file.c	1.7 (gritter) 01/21/07
+../makestate/ld_file.c: * Sccsid @(#)ld_file.c	1.8 (gritter) 01/23/07
 ../vroot/rmdir.cc: * Sccsid @(#)rmdir.cc	1.2 (gritter) 01/07/07
 ../vroot/unmount.cc: * Sccsid @(#)unmount.cc	1.2 (gritter) 01/07/07
 ../vroot/report.cc: * Sccsid @(#)report.cc	1.5 (gritter) 01/13/07
@@ -56,7 +56,7 @@ static const char id[] USED = "@(#)make.sl	1.19 (gritter) 01/22/07";
 ../vroot/chown.cc: * Sccsid @(#)chown.cc	1.2 (gritter) 01/07/07
 ../vroot/execve.cc: * Sccsid @(#)execve.cc	1.2 (gritter) 01/07/07
 ../vroot/lstat.cc: * Sccsid @(#)lstat.cc	1.2 (gritter) 01/07/07
-../vroot/mount.cc: * Sccsid @(#)mount.cc	1.3 (gritter) 01/13/07
+../vroot/mount.cc: * Sccsid @(#)mount.cc	1.4 (gritter) 01/23/07
 ../vroot/unlink.cc: * Sccsid @(#)unlink.cc	1.2 (gritter) 01/07/07
 ../vroot/mkdir.cc: * Sccsid @(#)mkdir.cc	1.2 (gritter) 01/07/07
 ../vroot/chroot.cc: * Sccsid @(#)chroot.cc	1.2 (gritter) 01/07/07
@@ -76,14 +76,14 @@ static const char id[] USED = "@(#)make.sl	1.19 (gritter) 01/22/07";
 ../include/mksh/dosys.h: * Sccsid @(#)dosys.h	1.2 (gritter) 01/07/07
 ../include/mksh/macro.h: * Sccsid @(#)macro.h	1.2 (gritter) 01/07/07
 ../include/mksh/i18n.h: * Sccsid @(#)i18n.h	1.2 (gritter) 01/07/07
-../include/mksh/defs.h: * Sccsid @(#)defs.h	1.8 (gritter) 01/21/07
+../include/mksh/defs.h: * Sccsid @(#)defs.h	1.9 (gritter) 01/23/07
 ../include/mksh/misc.h: * Sccsid @(#)misc.h	1.2 (gritter) 01/07/07
 ../include/mksh/mksh.h: * Sccsid @(#)mksh.h	1.2 (gritter) 01/07/07
 ../include/mksh/read.h: * Sccsid @(#)read.h	1.2 (gritter) 01/07/07
 ../include/mksh/globals.h: * Sccsid @(#)globals.h	1.2 (gritter) 01/07/07
 ../include/mksh/libmksh_init.h: * Sccsid @(#)libmksh_init.h	1.2 (gritter) 01/07/07
 ../include/vroot/report.h: * Sccsid @(#)report.h	1.2 (gritter) 01/07/07
-../include/vroot/args.h: * Sccsid @(#)args.h	1.3 (gritter) 01/13/07
+../include/vroot/args.h: * Sccsid @(#)args.h	1.4 (gritter) 01/23/07
 ../include/vroot/vroot.h: * Sccsid @(#)vroot.h	1.2 (gritter) 01/07/07
 ../include/mksdmsi18n/mksdmsi18n.h: * Sccsid @(#)mksdmsi18n.h	1.2 (gritter) 01/07/07
 */
