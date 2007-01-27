@@ -61,7 +61,7 @@ PKGFLAGS =	CC=cc CFLAGS2=-O CFLAGSS=-O CFLAGSS=-O CFLAGSU=-O \
 		XO5FL= XO6FL= GNUFL= \
 		DEFBIN=/usr/5bin SV3BIN=/usr/5bin S42BIN=/usr/5bin/s42 \
 		SUSBIN=/usr/5bin/posix SU3BIN=/usr/5bin/posix2001 \
-		UCBBIN=/usr/ucb/heirloom \
+		UCBBIN=/usr/ucb/heirloom CCSBIN=/usr/ccs/heirloom \
 		DEFLIB=/usr/5lib DEFSBIN=/usr/5bin MANDIR=/usr/share/man/5man \
 		DFLDIR=/etc/default/heirloom SPELLHIST=/var/adm/spellhist \
 		SULOG=/var/log/sulog MAGIC=/usr/5lib/magic YACC=yacc
@@ -108,6 +108,7 @@ DIETFLAGS =	CC="$(HOME)/src/diet gcc" HOSTCC="$(HOME)/src/diet gcc" \
 		IWCHAR=-I../libwchar LWCHAR="-L../libwchar -lwchar" \
 		DEFBIN=/5bin SV3BIN=/5bin S42BIN=/5bin/s42 \
 		SUSBIN=/5bin/posix SU3BIN=/5bin/posix2001 UCBBIN=/5bin/ucb \
+		CCSBIN=/5bin/ccs \
 		DEFLIB=/5bin/lib DEFSBIN=/5bin MANDIR=/tmp/__man__ \
 		DFLDIR=/etc/default SPELLHIST=/var/adm/spellhist \
 		SULOG=/var/log/sulog MAGIC=/5bin/lib/magic

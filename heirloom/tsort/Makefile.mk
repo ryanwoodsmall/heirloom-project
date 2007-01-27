@@ -7,8 +7,8 @@ tsort.o: tsort.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -c tsort.c
 
 install: all
-	$(UCBINST) -c tsort $(ROOT)$(DEFBIN)/tsort
-	$(STRIP) $(ROOT)$(DEFBIN)/tsort
+	$(UCBINST) -c tsort $(ROOT)$(CCSBIN)/tsort
+	$(STRIP) $(ROOT)$(CCSBIN)/tsort
 	$(MANINST) -c -m 644 tsort.1 $(ROOT)$(MANDIR)/man1/tsort.1
 
 clean:

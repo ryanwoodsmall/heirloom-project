@@ -1,3 +1,11 @@
+Release ...
+* The directory for development utilities, by default "/usr/ccs/bin", is
+  now configurable in "build/mk.config" . It is expected that the utilities
+  from the "Heirloom Development Tools" package are installed in it.
+* getconf: "/usr/ccs/bin" is now included in the default path as printed
+  with the "PATH" argument.
+* tsort: Is now installed in "/usr/ccs/bin".
+
 Release 070115
 * deroff: Now recognizes the ".do" and ".xflag" requests as well as an "-xN"
   command line option to handle Heirloom nroff/troff extensions.

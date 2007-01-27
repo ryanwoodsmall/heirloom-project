@@ -8,7 +8,7 @@ clean:
 
 MRPROPER = intro.1
 
-install: links directories
+install: directories links
 
 directories:
 	test -d $(ROOT)$(DEFBIN) || mkdir -p $(ROOT)$(DEFBIN)
@@ -20,6 +20,7 @@ directories:
 	test -d $(ROOT)$(SU3BIN) || mkdir -p $(ROOT)$(SU3BIN)
 	test -d $(ROOT)$(DEFSBIN) || mkdir -p $(ROOT)$(DEFSBIN)
 	test -d $(ROOT)$(UCBBIN) || mkdir -p $(ROOT)$(UCBBIN)
+	test -d $(ROOT)$(CCSBIN) || mkdir -p $(ROOT)$(CCSBIN)
 	for i in 1 1b 1m 2 3 4 5 6 7 8; \
 	do \
 		test -d $(ROOT)$(MANDIR)/man$$i || \
@@ -72,6 +73,11 @@ links:
 	sh build/crossln $(ROOT)$(SV3BIN)/more $(ROOT)$(UCBBIN)/more $(ROOT)
 	rm -f $(ROOT)$(UCBBIN)/catman
 	sh build/crossln $(ROOT)$(DEFSBIN)/catman $(ROOT)$(UCBBIN)/catman $(ROOT)
+	for i in sccs prt; \
+	do \
+		rm -f $(ROOT)$(UCBBIN)/$$i; \
+		sh build/crossln $(ROOT)$(CCSBIN)/$$i $(ROOT)$(UCBBIN)/$$i $(ROOT); \
+	done
 	rm -f $(ROOT)$(SV3BIN)/awk
 	sh build/crossln $(ROOT)$(DEFBIN)/oawk $(ROOT)$(SV3BIN)/awk $(ROOT)
 	rm -f $(ROOT)$(S42BIN)/awk
