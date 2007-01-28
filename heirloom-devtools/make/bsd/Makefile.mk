@@ -4,7 +4,7 @@ OBJ = bsd.o
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CXXWARN) $(CPPFLAGS) -I../include -c $<
+	$(CXX) $(CXXFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 all: libbsd.a
 

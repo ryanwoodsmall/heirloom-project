@@ -4,7 +4,7 @@ OBJ = ld_file.o lock.o
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CXXWARN) $(CPPFLAGS) -I../include -c $<
+	$(CXX) $(CXXFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 all: libmakestate.a
 

@@ -7,7 +7,7 @@ OBJ = access.o args.o chdir.o chmod.o chown.o chroot.o creat.o \
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CXXWARN) $(CPPFLAGS) -I../include -c $<
+	$(CXX) $(CXXFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 all: libvroot.a
 

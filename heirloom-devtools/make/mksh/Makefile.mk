@@ -4,7 +4,7 @@ OBJ = dosys.o globals.o i18n.o macro.o misc.o mksh.o read.o wcslen.o posix.o
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CXXWARN) $(CPPFLAGS) -I../include -c $<
+	$(CXX) $(CXXFLAGS) $(WARN) $(CPPFLAGS) -I../include -c $<
 
 all: libmksh.a
 

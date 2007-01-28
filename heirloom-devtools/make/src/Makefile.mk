@@ -12,7 +12,7 @@ XFLAGS = -I../include -D_GNU_SOURCE -DSUNOS4_AND_AFTER \
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(XFLAGS) -c $<
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CXXWARN) $(CPPFLAGS) $(XFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(WARN) $(CPPFLAGS) $(XFLAGS) -c $<
 
 
 MAKELIBS = -L../bsd -lbsd -L../makestate -lmakestate \

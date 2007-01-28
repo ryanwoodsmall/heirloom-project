@@ -25,4 +25,4 @@ mrproper: clean
 	rm -f $(MAKEFILES)
 
 sun:
-	/usr/xpg4/bin/make CXX=CC CFLAGS=-O CXXFLAGS=-O WARN= CXXWARN=
+	/usr/xpg4/bin/make CXX=CC CFLAGS=-O CXXFLAGS=-O WARN=
