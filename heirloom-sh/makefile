@@ -44,7 +44,7 @@ LNS=ln -s
 #
 # Compiler flags.
 #
-CFLAGS=-O
+CFLAGS=-O -fomit-frame-pointer
 
 #
 # Flags for the C preprocessor.
@@ -59,7 +59,12 @@ LARGEF=-D_FILE_OFFSET_BITS=64L
 #
 # The compiler warning options.
 #
-WARN = -v -w2
+WERROR=-Werror
+WARN = -Wchar-subscripts -Wformat -Wno-format-y2k -Wimplicit \
+	-Wmissing-braces -Wsequence-point -Wreturn-type -Wtrigraphs \
+	-Wunused-function -Wunused-label -Wunused-variable -Wunused-value \
+	-Wuninitialized -Wmultichar -Wpointer-arith \
+	-Wdeclaration-after-statement -Wstrict-prototypes $(WERROR)
 #WARN=
 
 #
