@@ -49,7 +49,7 @@ CFLAGS=-O
 #
 # Flags for the C preprocessor.
 #
-CPPFLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=1 -D__NO_STRING_INLINES
+CPPFLAGS=-D_GNU_SOURCE -D_FORTIFY_SOURCE=1
 
 #
 # A define for large file support, if necessary.
