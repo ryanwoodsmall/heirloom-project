@@ -15,6 +15,8 @@ dpost: $(OBJ)
 install:
 	$(INSTALL) -c dpost $(ROOT)$(BINDIR)/dpost
 	$(STRIP) $(ROOT)$(BINDIR)/dpost
+	mkdir -p $(ROOT)$(MANDIR)/man1
+	$(INSTALL) -c -m 644 dpost.1 $(ROOT)$(MANDIR)/man1/dpost.1
 
 clean:
 	rm -f $(OBJ) dpost core log *~
