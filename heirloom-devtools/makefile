@@ -1,4 +1,5 @@
-SUBDIRS = yacc lex m4 sccs/cassi sccs/comobj sccs/mpwlib sccs/src sccs/help.d \
+SUBDIRS = yacc lex m4 \
+	sccs/cassi sccs/comobj sccs/mpwlib sccs/src sccs/help.d sccs/man \
 	make/bsd make/makestate make/mksdmsi18n make/mksh make/vroot make/src
 
 MAKEFILES = $(SUBDIRS:=/Makefile)

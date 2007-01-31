@@ -1,0 +1,149 @@
+.\"
+.\" CDDL HEADER START
+.\"
+.\" The contents of this file are subject to the terms of the
+.\" Common Development and Distribution License (the "License").  
+.\" You may not use this file except in compliance with the License.
+.\"
+.\" You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+.\" or http://www.opensolaris.org/os/licensing.
+.\" See the License for the specific language governing permissions
+.\" and limitations under the License.
+.\"
+.\" When distributing Covered Code, include this CDDL HEADER in each
+.\" file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+.\" If applicable, add the following below this CDDL HEADER, with the
+.\" fields enclosed by brackets "[]" replaced with your own identifying
+.\" information: Portions Copyright [yyyy] [name of copyright owner]
+.\"
+.\" CDDL HEADER END
+.\"  Copyright (c) 1999, Sun Microsystems, Inc. All Rights Reserved
+.\"
+.\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
+.\"
+.\" Sccsid @(#)delta.1	1.6 (gritter) 01/31/07
+.\"
+.\" from OpenSolaris sccs-delta 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
+.TH DELTA 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.SH NAME
+delta \- make a delta to an SCCS file
+.SH SYNOPSIS
+.HP
+.ad l
+.nh
+\fBdelta\fR
+[\fB\-dnps\fR]
+[\fB\-g\fR\fIsid-list\fR] 
+[\fB\-m\fR\fImr\(hylist\fR]
+[\fB\-r\fR\fIsid\fR] 
+[\fB\-y\fR\ [\fIcomment\fR]]\fI s.filename\fR...
+.br
+.ad b
+.SH DESCRIPTION
+.LP
+The \fBdelta\fR utility checks in a record of the line-by-line differences made to a checked-out version of a file under \fBSCCS\fR control.
+These changes are taken from the writable working copy that was retrieved using the \fBSCCS\fR \fBget\fR command (see 
+\fBget\fR(1)).
+This working copy does not have the `\fBs.\fR' prefix, and is also referred to as a \fBg\fR-file.
+.PP
+If a directory name is used in place of the \fIs.filename\fR argument, the \fBdelta\fR command applies to all \fBs.\fRfiles in that directory.
+Unreadable \fBs.\fRfiles produce an error; processing continues with the next file (if any).
+The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the names of files are to be read from the standard input, one \fBs.\fRfile per
+line (requires \fB\-y\fR, and in some cases, \fB\-m\fR).
+.PP
+\fBdelta\fR may issue prompts on the standard output depending upon the options specified and the flags that are set in the \fBs.\fRfile (see 
+\fBadmin\fR(1), and the \fB\-m\fR and \fB\-y\fR options below, for details).
+.TP 15
+\fB\-d\fR
+Use command 
+\fBdiff\fR(1) instead of 
+\fBbdiff\fR(1).
+Returns exit status \fB2\fR if \fIs.filename\fR argument is not specified.
+.TP
+\fB\-n\fR
+Retain the edited \fBg\fR-file, which is normally removed at the completion of processing.
+.TP
+\fB\-p\fR
+Display line-by-line differences (in 
+\fBdiff\fR(1) format) on the standard output.
+.TP
+\fB\-s\fR
+Silent.
+Do not display warning or confirmation messages.
+Do not suppress error messages (which are written to standard error).
+.TP
+\fB\-g\fR\fIsid-list\fR
+Specify a list of deltas to omit when the file is accessed at the \fBSCCS\fR version \fBID\fR (\fBSID\fR) created by this delta.
+\fIsid-list\fR is a comma-separated list of \fBSID\fRs.
+To specify a range of deltas, use a `\fB\(mi\fR' separator instead of a comma, between two \fBSID\fRs in the list.
+.TP
+\fB\-m\fR\fImr-list\fR
+If the SCCS file has the \fBv\fR flag set (see 
+\fBadmin\fR(1)), you must supply one or more Modification Request (MR) numbers for the new delta.
+When specifying more than one MR number on the command line, \fImr-list\fR takes the form of a quoted, space-separated list.
+If \fB\-m\fR is not used and the standard input is a terminal, \fBdelta\fR prompts with \fBMRs?\fR for the list (before issuing the \fBcomments?\fR prompt).
+If the \fBv\fR flag in the \fBs.\fRfile has a value, it is taken to be the name of a program to validate the MR numbers.
+If that validation program returns a non-zero exit status, \fBdelta\fR terminates
+without checking in the changes.
+.TP
+\fB\-r\fR\fIsid\fR
+When two or more versions are checked out, specify the version to check in.
+This \fBSID\fR value can be either the \fBSID\fR specified on the \fBget\fR command line, or the \fBSID\fR of the new version to be checked in as reported by \fBget\fR.
+A diagnostic
+results if the specified \fBSID\fR is ambiguous, or if one is required but not supplied.
+.TP
+\fB\-y\fR[\fIcomment\fR]\fR
+Supply a comment for the delta table (version log).
+A null comment is accepted, and produces an empty commentary in the log.
+If \fB\-y\fR is not specified and the standard input is a terminal, \fBdelta\fR prompts with `\fBcomments?\fR'.
+An unescaped NEWLINE terminates the comment.
+.PP
+The following exit values are returned:
+.TP
+\fB0\fR
+Successful completion.
+.TP
+\fB1\fR
+An error occurred and the \fB\-d\fR option had not been specified.
+.TP
+\fB2\fR
+An error occurred, the \fB\-d\fR option had been specified, and the \fIs.filename\fR argument was not specified.
+.SH FILES
+.TP 14
+.PD 0
+\fBd.file\fR
+temporary file of differences
+.TP
+\fBp.file\fR
+lock file for a checked-out version
+.TP
+\fBq.file\fR
+temporary file
+.TP
+\fBs.file\fR
+\fBSCCS\fR history file
+.TP
+\fBx.file\fR
+temporary copy of the \fBs.\fRfile
+.TP
+\fBz.file\fR
+temporary file
+.PD
+.SH SEE ALSO
+.LP
+admin(1), 
+bdiff(1), 
+cdc(1), 
+diff(1), 
+get(1), 
+help(1), 
+prs(1), 
+rmdel(1), 
+sccsfile(5)
+.SH DIAGNOSTICS
+Use the \fBSCCS\fR \fBhelp\fR command for explanations (see 
+\fBhelp\fR(1)).
+.SH WARNINGS
+Lines beginning with an \fBASCII SOH\fR character (binary 001) cannot be placed in the \fBSCCS\fR file unless the \fBSOH\fR is escaped.
+This character has special meaning to \fBSCCS\fR (see 
+\fBsccsfile\fR(5)) and produces an error.

@@ -1,4 +1,4 @@
-SUBDIRS = cassi comobj mpwlib src help.d
+SUBDIRS = cassi comobj mpwlib src help.d man
 
 MAKEFILES = $(SUBDIRS:=/Makefile)
 

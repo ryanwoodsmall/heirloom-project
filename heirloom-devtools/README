@@ -7,11 +7,11 @@ as part of OpenSolaris. The OpenSolaris utilities were in turn
 derived from the original Unix versions, and are assumed be
 conforming implementations of the POSIX standard.
 
-Note that manual pages for m4 and SCCS are not yet available under
-Open Source licenses. In the meantime, please refer to the online
-Solaris documentation at <http://docs.sun.com>. There have been
-very few semantical changes with these tools, so the descriptions
-are still generally applicable.
+Note that the manual pages for m4 and some of the SCCS commands
+are not yet available under Open Source licenses. In the meantime,
+please refer to the online Solaris documentation at
+<http://docs.sun.com>. There have been very few semantical changes
+with these tools, so the descriptions are still generally applicable.
 
 The source code has been compiled successfully on:
 
@@ -52,4 +52,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>						01/23/07
+<gunnarr@acm.org>						01/31/07
