@@ -21,7 +21,7 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)dpost.1	1.5 (gritter) 01/31/07
+.\" Sccsid @(#)dpost.1	1.6 (gritter) 01/31/07
 .\"
 .\" from OpenSolaris dpost 1 "9 Sep 1996" "SunOS 5.11" "User Commands"
 .TH DPOST 1 "01/31/07" "Heirloom Documentation Tools" "User Commands"
@@ -50,21 +50,21 @@ dpost \- troff postprocessor for PostScript printers
 .br
 .ad b
 .SH DESCRIPTION
-\fBdpost\fR translates \fIfiles\fR created by 
-\fBtroff\fR(1)
+\fIdpost\fR translates \fIfiles\fR created by 
+\fItroff\fR(1)
 into PostScript and writes the results on the standard output.
 If no
 \fIfiles\fR are specified, or if \- is one of the input \fIfiles\fR,
 the standard input
 is read.
 .PP
-The \fIfiles\fR should be prepared by \fBtroff\fR.
+The \fIfiles\fR should be prepared by \fItroff\fR.
 The default font
 files in \fB/usr/ucblib/doctools/font/devps\fR produce the best output.
 They assume a resolution of 72000 dpi, and can be used to format files by
-adding the \fB\-Tpost\fR option to the \fBtroff\fR call.
+adding the \fB\-Tpost\fR option to the \fItroff\fR call.
 .PP
-\fBdpost\fR makes no assumptions about resolutions.
+\fIdpost\fR makes no assumptions about resolutions.
 The first
 \fBx\ res\fR command sets the resolution used to translate the input
 \fIfiles\fR, the \fBDESC\fR file, usually
@@ -74,7 +74,7 @@ the binary font files, and the PostScript prologue is responsible for
 setting up an appropriate
 user coordinate system.
 .SH OPTIONS
-.TP
+.TP 15
 \fB\-c\fR\fI num\fR
 Print \fInum\fR copies of each page.
 By default
@@ -85,7 +85,7 @@ Sets the text encoding level to \fInum\fR.
 The recognized choices are
 digits between 0 and 5.
 \fB0\fR uses the PostScript \fBashow\fR operator, and produces
-output essentially identical to previous versions of \fBdpost\fR.
+output essentially identical to previous versions of \fIdpost\fR.
 \fB1\fR also uses \fBashow\fR but integrates motion commands
 with text commands.
 \fB2\fR uses the PostScript \fBawidthshow\fR operator,
@@ -135,7 +135,7 @@ The default
 \fImode\fR is portrait.
 .TP
 \fB\-w\fR\fI num\fR
-Set the line width used to implement \fBtroff\fR graphics commands to
+Set the line width used to implement \fItroff\fR graphics commands to
 \fInum\fR
 points, where a point is approximately 1/72 of an inch.
 By default,
@@ -161,7 +161,7 @@ The default offset is
 \fB\-F\fR\fI dir\fR
 Use \fIdir\fR as the font directory.
 The default \fIdir\fR is
-\fB/usr/ucblib/doctools/font\fR, and \fBdpost\fR reads binary font files from
+\fB/usr/ucblib/doctools/font\fR, and \fIdpost\fR reads binary font files from
 directory \fB/usr/ucblib/doctools/font/devps\fR.
 .TP
 \fB\-H\fR\fI dir\fR
@@ -169,13 +169,13 @@ Use \fIdir\fR as the host resident font directory.
 Files in this
 directory should be complete
 PostScript font descriptions, and must be assigned a name that
-corresponds to the appropriate two-character \fBtroff\fR font name.
+corresponds to the appropriate two-character \fItroff\fR font name.
 Each font file is copied to the output file only when needed
 and at most once during each job.
 There is no default directory.
 .TP
 \fB\-L\fR\fI file\fR
-Use \fBfile\fR as the PostScript prologue which, by default, is
+Use \fIfile\fR as the PostScript prologue which, by default, is
 \fB/usr/lib/lp/postscript/dpost.ps\fR.
 .TP
 \fB\-M \fImarks\fR
@@ -193,16 +193,16 @@ e.g. \fB\-Mcut:reg\fR will print cut marks and registration marks.
 \fB\-O\fR
 Disables PostScript picture inclusion.
 A recommended option when
-\fBdpost\fR is run by a spooler in a networked environment.
+\fIdpost\fR is run by a spooler in a networked environment.
 .TP
 \fB\-T\fR\fI name\fR
 Use font files for device \fIname\fR as the best description of
 available PostScript fonts.
-By default, \fIname\fR is set to \fBpost\fR and \fBdpost\fR reads
+By default, \fIname\fR is set to \fBpost\fR and \fIdpost\fR reads
 files from \fB/usr/ucblib/doctools/font/devps\fR.
 .SH EXAMPLES
 .HP
-$ \fBpic \fR\fBfile\fR\fB | tbl | eqn | troff \fR\fB\-mm\fR\fB
+\fBpic \fR\fBfile\fR\fB | tbl | eqn | troff \fR\fB\-mm\fR\fB
 \fR\fB\-Tpost\fR\fB | dpost\fR
 .SH FILES
 /usr/ucblib/doctools/font/devps/*
@@ -226,19 +226,19 @@ $ \fBpic \fR\fBfile\fR\fB | tbl | eqn | troff \fR\fB\-mm\fR\fB
 troff(1)
 .SH DIAGNOSTICS
 The following exit values are returned:
-.TP
+.TP 10
 \fB\fB0\fR\fR
 Successful completion.
 .TP
 \fBnon-zero\fR
 An error occurred.
 .SH NOTES
-Although \fBdpost\fR can handle files formatted for any device,
+Although \fIdpost\fR can handle files formatted for any device,
 emulation is expensive and can easily double the print time and the
 size of the output file.
 No attempt has been made to
 implement the character sets or fonts available on all devices
-supported by \fBtroff\fR.
+supported by \fItroff\fR.
 Missing characters will be replaced by white
 space, and unrecognized fonts will usually default to one
 of the Times fonts (that is, \fBR\fR, \fBI\fR, \fBB\fR, or \fBBI\fR).
