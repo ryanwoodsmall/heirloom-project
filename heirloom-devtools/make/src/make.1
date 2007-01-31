@@ -22,10 +22,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)make.1	1.7 (gritter) 01/30/07
+.\" Sccsid @(#)make.1	1.8 (gritter) 01/31/07
 .\"
 .\" from OpenSolaris sysV-make 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH MAKE 1 "01/30/07" "Heirloom Development Tools" "User Commands"
+.TH MAKE 1 "01/31/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 make \- maintain, update, and regenerate groups of programs
 .SH SYNOPSIS
@@ -33,7 +33,7 @@ make \- maintain, update, and regenerate groups of programs
 .ad l
 .nh
 \fBmake\fR [\fB\-f\fR\ \fImakefile\fR]
-[\fB\-j\ \fIjobs\fR] [\fB-eiknpqrst\fR] [\fInames\fR]
+[\fB\-j\ \fIjobs\fR] [\fB\-eiknpqrst\fR] [\fInames\fR]
 .br
 .ad b
 .SH DESCRIPTION
@@ -411,7 +411,7 @@ the following command is used:
 .RE
 .sp
 A tilde in the above rules refers to an SCCS file (see
-\fBsccsfile\fR(4)).
+\fBsccsfile\fR(5)).
 Thus, the rule \fB\&.c~.o\fR would transform an
 SCCS C source file into an object file
 (\fB\&.o\fR).
@@ -570,7 +570,7 @@ cc(1),
 cd(1),
 sh(1),
 printf(3),
-sccsfile(4)
+sccsfile(5)
 .SH NOTES
 Some commands return non-zero status inappropriately; use \fB\-i\fR or
 the `\fB\-\fR' command line prefix to overcome
