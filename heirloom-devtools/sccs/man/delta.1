@@ -21,7 +21,7 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)delta.1	1.8 (gritter) 02/01/07
+.\" Sccsid @(#)delta.1	1.9 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris sccs-delta 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
 .TH DELTA 1 "02/01/07" "Heirloom Development Tools" "User Commands"
@@ -145,6 +145,6 @@ sccsfile(5)
 Use the \s-1SCCS\s+1 \fIhelp\fR command for explanations (see 
 \fIhelp\fR(1)).
 .SH WARNINGS
-Lines beginning with an \fBASCII SOH\fR character (binary 001) cannot be placed in the \s-1SCCS\s+1 file unless the \fBSOH\fR is escaped.
+Lines beginning with an \s-1ASCII SOH\s+1 character (binary 001) cannot be placed in the \s-1SCCS\s+1 file unless the \s-1SOH\s+1 is escaped.
 This character has special meaning to \s-1SCCS\s+1 (see 
 \fIsccsfile\fR(5)) and produces an error.
