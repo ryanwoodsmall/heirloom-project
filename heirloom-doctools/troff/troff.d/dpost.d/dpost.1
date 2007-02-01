@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)dpost.1	1.6 (gritter) 01/31/07
+.\" Sccsid @(#)dpost.1	1.7 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris dpost 1 "9 Sep 1996" "SunOS 5.11" "User Commands"
-.TH DPOST 1 "01/31/07" "Heirloom Documentation Tools" "User Commands"
+.TH DPOST 1 "02/01/07" "Heirloom Documentation Tools" "User Commands"
 .SH NAME
 dpost \- troff postprocessor for PostScript printers
 .SH SYNOPSIS
@@ -49,6 +49,7 @@ dpost \- troff postprocessor for PostScript printers
 [\fIfile\fR] .\|.\|.
 .br
 .ad b
+.hy 1
 .SH DESCRIPTION
 \fIdpost\fR translates \fIfiles\fR created by 
 \fItroff\fR(1)
@@ -179,14 +180,14 @@ Use \fIfile\fR as the PostScript prologue which, by default, is
 \fB/usr/lib/lp/postscript/dpost.ps\fR.
 .TP
 \fB\-M \fImarks\fR
-Print marks (in combination with the \fBtrimat\fR \fItroff\fR request).
+Print marks (in combination with the \fB\%trimat\fR \fItroff\fR request).
 Valid types of \fImarks\fR are:
-\fBcutmarks\fR,
-\fBregistrationmarks\fR,
-\fBstartargets\fR,
-\fBcolorbars\fR,
+\fB\%cutmarks\fR,
+\fB\%registrationmarks\fR,
+\fB\%startargets\fR,
+\fB\%colorbars\fR,
 and
-\fBall\fR.
+\fB\%all\fR.
 Mark names can be abbreviated and combined by colons,
 e.g. \fB\-Mcut:reg\fR will print cut marks and registration marks.
 .TP
