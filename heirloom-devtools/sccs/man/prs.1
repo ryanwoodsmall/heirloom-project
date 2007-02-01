@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)prs.1	1.5 (gritter) 01/31/07
+.\" Sccsid @(#)prs.1	1.6 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris sccs-prs 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH PRS 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.TH PRS 1 "02/01/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 prs \- display selected portions of an SCCS history
 .SH SYNOPSIS
@@ -38,20 +38,20 @@ prs \- display selected portions of an SCCS history
 .ad b
 .SH DESCRIPTION
 .LP
-The \fBprs\fR utility displays part or all of the \fBSCCS\fR file (see 
-\fBsccsfile\fR(5)) in a user supplied format.
+The \fIprs\fR utility displays part or all of the \s-1SCCS\s+1 file (see 
+\fIsccsfile\fR(5)) in a user supplied format.
 .PP
-If a directory name is used in place of the \fIs.filename\fR argument, the \fBprs\fR command applies to all \fBs.\fRfiles in that directory.
+If a directory name is used in place of the \fIs.filename\fR argument, the \fIprs\fR command applies to all \fBs.\fRfiles in that directory.
 Unreadable \fBs.\fRfiles produce an error; processing continues with the next file (if any).
 The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the names of files are to be read from the standard input, one \fBs.\fRfile per
 line.
 .PP
-In the absence of options, \fBprs\fR displays the delta table (version log).
-In the absence of \fB\-d\fR, or \fB\-l\fR, \fBprs\fR displays the entry for each delta indicated by the other options.
+In the absence of options, \fIprs\fR displays the delta table (version log).
+In the absence of \fB\-d\fR, or \fB\-l\fR, \fIprs\fR displays the entry for each delta indicated by the other options.
 .TP
 \fB\-a\fR \fR
 Includes all deltas, including those marked as removed (see 
-\fBrmdel\fR(1)).
+\fIrmdel\fR(1)).
 .TP
 \fB\-e\fR \fR
 Requests information for all deltas created \fIearlier\fR than, and including, the delta indicated with \fB\-r\fR or \fB\-c\fR.
@@ -75,17 +75,17 @@ Values in the range of \fB00\(mi68\fR refer to the twenty-first century.
 .TP
 \fB\-d\fR\fIdataspec\fR \fR
 Produce a report according to the indicated data specification.
-\fIdataspec\fR consists of a (quoted) text string that includes embedded data keywords of the form: `\fB:\fR\fIkey\fR\fB:\fR' (see \fBData Keywords\fR, below).
-\fBprs\fR expands these keywords in the output it produces.
+\fIdataspec\fR consists of a (quoted) text string that includes embedded data keywords of the form: `\fB:\fR\fIkey\fR\fB:\fR' (see \fIData Keywords\fR, below).
+\fIprs\fR expands these keywords in the output it produces.
 To specify a \fBTAB\fR character in the output, use \fB\et\fR; to specify a NEWLINE in the output, use \fB\en\fR\&.
 .TP
 \fB\-r\fR\fIsid\fR \fR
-Specifies the \fBSCCS\fR delta \fBID\fR (\fBSID\fR) of the delta for which information is desired.
-If no \fBSID\fR is specified, the most recently created delta is used.
+Specifies the \s-1SCCS\s+1 delta \s-1ID\s+1 (\s-1SID\s+1) of the delta for which information is desired.
+If no \s-1SID\s+1 is specified, the most recently created delta is used.
 .SH "DATA KEYWORDS"
-Data keywords specify which parts of an \fBSCCS\fR file are to be retrieved.
-All parts of an \fBSCCS\fR file (see 
-\fBsccsfile\fR(4)) have an associated data keyword.
+Data keywords specify which parts of an \s-1SCCS\s+1 file are to be retrieved.
+All parts of an \s-1SCCS\s+1 file (see 
+\fIsccsfile\fR(5)) have an associated data keyword.
 A data keyword may appear any number of times in a data specification argument to \fB\-d\fR.
 These data keywords are listed in the
 table below: 
@@ -97,7 +97,7 @@ c1 l1 c1 c1 c.
 \fIKeyword\fR\fIData Item\fR\fIFile Section*\fR\fIValue\fR\fIFormat\fR**
 _
 \fB:A:\fRT{
-a format for the \fBwhat\fR string:
+a format for the \fIwhat\fR string:
 T}N/A\fB:Z::Y: :M: :I::Z:\fRS
 \fB:B:\fRT{
 branch number
@@ -243,13 +243,13 @@ T}D\fInn\fRS
 user names
 T}U\fItext\fRM
 \fB:W:\fRT{
-a form of \fBwhat\fR string
+a form of \fIwhat\fR string
 T}N/A\fB:Z::M:\et:I:\fRS
 \fB:Y:\fRT{
 module type flag
 T}F\fItext\fRS
 \fB:Z:\fRT{
-\fBwhat\fR string delimiter
+\fIwhat\fR string delimiter
 T}N/A\fB@(#)\fRS
 .TE
 .LP
@@ -289,5 +289,5 @@ get(1),
 help(1), 
 sccsfile(5)
 .SH DIAGNOSTICS
-Use the \fBSCCS\fR \fBhelp\fR command for explanations (see 
-\fBhelp\fR(1)).
+Use the \s-1SCCS\s+1 \fIhelp\fR command for explanations (see 
+\fIhelp\fR(1)).

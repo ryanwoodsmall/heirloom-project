@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)prt.1	1.5 (gritter) 01/31/07
+.\" Sccsid @(#)prt.1	1.6 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris sccs-prt 1 "5 Oct 1990" "SunOS 5.11" "User Commands"
-.TH PRT 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.TH PRT 1 "02/01/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 prt \- display delta table information from an SCCS file
 .SH SYNOPSIS
@@ -38,10 +38,10 @@ prt \- display delta table information from an SCCS file
 .ad b
 .SH DESCRIPTION
 .LP
-\fBprt\fR prints selected portions of an \fBSCCS\fR file.
+\fIprt\fR prints selected portions of an \s-1SCCS\s+1 file.
 By default, it prints the delta table (version log).
 .PP
-If a directory name is used in place of the \fIs.filename\fR argument, the \fBprt\fR command applies to all \fBs.\fRfiles in that directory.
+If a directory name is used in place of the \fIs.filename\fR argument, the \fIprt\fR command applies to all \fBs.\fRfiles in that directory.
 Unreadable \fBs.\fRfiles produce an error; processing continues with the next file (if any).
 The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the names
 of files are to be read from the standard input, one \fBs.\fRfile per line.
@@ -80,25 +80,25 @@ Print only the first line of the delta table entries; that is, only up to the st
 Print the descriptive text contained in the \fBs.\fRfile.
 .TP
 \fB\-u\fR
-Print the user-names and/or numerical group \fBIDs\fR of users allowed to make deltas.
+Print the user-names and/or numerical group \s-1ID\s+1R of users allowed to make deltas.
 .TP
 \fB\-c\fR\fIdate-time\fR
 Exclude delta table entries that are specified cutoff date and time.
 Each entry is printed as a single line,
-preceded by the name of the \fBSCCS\fR file.
+preceded by the name of the \s-1SCCS\s+1 file.
 This format (also produced by \fB\-r\fR \fB,\fR and \fB\-y\fR) makes it easy to sort multiple delta
 tables in chronological order.
-When both \fB\-y\fR and \fB\-c\fR, or \fB\-y\fR and \fB\-r\fR are supplied, \fBprt\fR stops printing when the first of the
+When both \fB\-y\fR and \fB\-c\fR, or \fB\-y\fR and \fB\-r\fR are supplied, \fIprt\fR stops printing when the first of the
 two conditions is met.
 .TP
 \fB\-r\fR\fIdate-time\fR
 Exclude delta table entries that are newer than the specified cutoff date and time.
 .TP
 \fB\-y\fR\fIsid\fR
-Exclude delta table entries made prior to the \fBSID\fR specified.
+Exclude delta table entries made prior to the \s-1SID\s+1 specified.
 If no delta in the
 table has the specified SID, the entire table is printed.
-If no \fBSID\fR is specified, the most recent delta is printed.
+If no \s-1SID\s+1 is specified, the most recent delta is printed.
 .SS Output Format
 The following format is used to print those portions of the \fBs.\fRfile that are specified by the various options.
 .TP 3
@@ -113,7 +113,7 @@ Type of delta (\fBD\fR or \fBR\fR)
 \fBSPACE\fR
 .TP
 \(bu
-\fBSCCS\fR delta \fBID\fR (SID)
+\s-1SCCS\s+1 delta \s-1ID\s+1 (SID)
 .TP
 \(bu
 \fBTAB\fR
@@ -182,5 +182,5 @@ what(1),
 sccs(1),
 sccsfile(5)
 .SH DIAGNOSTICS
-Use the \fBSCCS\fR \fBhelp\fR command for explanations (see 
-\fBhelp\fR(1)).
+Use the \s-1SCCS\s+1 \fIhelp\fR command for explanations (see 
+\fIhelp\fR(1)).

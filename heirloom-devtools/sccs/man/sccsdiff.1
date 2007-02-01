@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)sccsdiff.1	1.5 (gritter) 01/31/07
+.\" Sccsid @(#)sccsdiff.1	1.6 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris sccs-sccsdiff 1 "28 Sep 2001" "SunOS 5.11" "User Commands"
-.TH SCCSDIFF 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.TH SCCSDIFF 1 "02/01/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 sccsdiff \- compare two versions of an SCCS file
 .SH SYNOPSIS
@@ -37,8 +37,8 @@ sccsdiff \- compare two versions of an SCCS file
 .ad b
 .SH DESCRIPTION
 .LP
-\fBsccsdiff\fR compares two versions of an \fBSCCS\fR file and displays the differences between the two versions.
-Any number of \fBSCCS\fR files may be specified.
+\fIsccsdiff\fR compares two versions of an \s-1SCCS\s+1 file and displays the differences between the two versions.
+Any number of \s-1SCCS\s+1 files may be specified.
 The options specified apply to all named \fBs.\fRfiles.
 .TP 20
 \fB\-p\fR
@@ -46,13 +46,13 @@ Pipe output for each file through
 \fBpr\fR(1).
 .TP
 \fB\-r\fR\fIsid\fR
-Specify a version corresponding to the indicated \fBSCCS\fR delta \fBID\fR (SID) for comparison.
+Specify a version corresponding to the indicated \s-1SCCS\s+1 delta \s-1ID\s+1 (SID) for comparison.
 Versions are passed to 
-\fBdiff\fR(1) in the order given.
+\fIdiff\fR(1) in the order given.
 .TP
 \fB\fIdiff-options\fR
 Pass options to 
-\fBdiff\fR(1), including: \fB\-b\fR, \fB\-c\fR, \fB\-e\fR, \fB\-f\fR, \fB\-h\fR, \fB\-u\fR, \fB\-C\fR \fInumber\fR, \fB\-U\fR \fInumber\fR, and \fB\-D\fR \fIstring\fR.
+\fIdiff\fR(1), including: \fB\-b\fR, \fB\-c\fR, \fB\-e\fR, \fB\-f\fR, \fB\-h\fR, \fB\-u\fR, \fB\-C\fR \fInumber\fR, \fB\-U\fR \fInumber\fR, and \fB\-D\fR \fIstring\fR.
 .SH FILES
 .TP 16
 \fB/tmp/get?????\fR
@@ -67,6 +67,6 @@ pr(1)
 \fB\fIfilename\fR\fB: No differences\fR
 If the two versions are the same.
 .PP
-Use the \fBSCCS\fR \fBhelp\fR command for explanations of other messages.
+Use the \s-1SCCS\s+1 \fIhelp\fR command for explanations of other messages.
 See 
-\fBhelp\fR(1).
+\fIhelp\fR(1).

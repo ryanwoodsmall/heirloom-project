@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)vc.1	1.5 (gritter) 01/31/07
+.\" Sccsid @(#)vc.1	1.6 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris vc 1 "5 Jul 1990" "SunOS 5.11" "User Commands"
-.TH VC 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.TH VC 1 "02/01/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 vc \- version control
 .SH SYNOPSIS
@@ -39,12 +39,12 @@ vc \- version control
 This command is obsolete and will be removed in the next release.
 .\" (not really)
 .PP
-The \fBvc\fR command copies lines from the standard input to the standard output under control of its arguments and of ``control statements'' encountered in the standard input.
+The \fIvc\fR command copies lines from the standard input to the standard output under control of its arguments and of ``control statements'' encountered in the standard input.
 In the
 process of performing the copy operation, user-declared \fIkeyword\fRs may be replaced by their string \fIvalue\fR when they appear in plain text and/or control
 statements.
 .PP
-The copying of lines from the standard input to the standard output is conditional, based on tests (in control statements) of keyword values specified in control statements or as \fBvc\fR
+The copying of lines from the standard input to the standard output is conditional, based on tests (in control statements) of keyword values specified in control statements or as \fIvc\fR
 command arguments.
 .PP
 A control statement is a single line beginning with a control character, except as modified by the \fB\-t\fR keyletter (see below).
@@ -55,7 +55,7 @@ to the standard output with the backslash removed.
 Lines beginning with a backslash followed by a non-control character are copied in their entirety.
 .PP
 A keyword is composed of 9 or less alphanumerics; the first must be alphabetic.
-A value is any \fBASCII\fR string that can be created with \fBed\fR; a numeric
+A value is any \fBASCII\fR string that can be created with \fIed\fR; a numeric
 value is an unsigned string of digits.
 Keyword values may not contain blanks or tabs.
 .PP
@@ -69,7 +69,7 @@ The following options are supported:
 .TP 14
 \fB\-a\fR
 Forces replacement of keywords surrounded by control characters with their assigned value in
-all text lines and not just in \fBvc\fR statements.
+all text lines and not just in \fIvc\fR statements.
 .TP
 \fB\-t\fR
 All characters from the beginning of a line up to and including the first tab character are ignored for the purpose of detecting a control statement.
@@ -81,7 +81,7 @@ Specifies a control character to be used in place of the ``\fB:\fR'' default.
 \fB\-s\fR
 Silences warning messages (not error) that are normally printed on the diagnostic output.
 .PP
-\fBvc\fR recognizes the following version control statements:
+\fIvc\fR recognizes the following version control statements:
 .TP 5
 \fB:dcl \fR\fIkeyword\fR[\fB, \fR...\fB, \fR\fIkeyword\fR]\fR
 Declare keywords.
@@ -89,8 +89,8 @@ All keywords must be declared.
 .TP
 \fB:asg \fR\fIkeyword\fR\fB=\fR\fIvalue\fR
 Assign values to keywords.
-An \fBasg\fR
-statement overrides the assignment for the corresponding keyword on the \fBvc\fR command line and all previous \fBasg\fR statements for that keyword.
+An \fIasg\fR
+statement overrides the assignment for the corresponding keyword on the \fIvc\fR command line and all previous \fIasg\fR statements for that keyword.
 Keywords that are declared
 but are not assigned values have null values.
 .TP
@@ -102,11 +102,11 @@ but are not assigned values have null values.
 \fB:end\fR
 .PD
 Skip lines of the standard input.
-If the condition is true, all lines between the \fBif\fR statement and the matching \fBend\fR statement are copied to the standard output.
+If the condition is true, all lines between the \fIif\fR statement and the matching \fIend\fR statement are copied to the standard output.
 If the condition is false, all intervening
 lines are discarded, including control statements.
-Note: Intervening \fBif\fR statements and matching \fBend\fR statements are recognized solely for the purpose of maintaining
-the proper \fBif-end\fR matching.
+Note: Intervening \fIif\fR statements and matching \fIend\fR statements are recognized solely for the purpose of maintaining
+the proper \fIif-end\fR matching.
 .sp
 The syntax of a condition is:
 .RS 12
@@ -158,7 +158,7 @@ less than
 used for logical groupings
 .TP
 \fBnot\fR
-may only occur immediately after the \fBif\fR, and when present, inverts the value of the entire condition
+may only occur immediately after the \fIif\fR, and when present, inverts the value of the entire condition
 .RE
 .PD
 .IP
@@ -210,6 +210,6 @@ Print \fImessage\fR followed by:
 \fB      ERROR: err statement on line ... (915)\fR
 .sp
 on the diagnostic output.
-\fBvc\fR halts execution, and returns an exit code of \fB1\fR.
+\fIvc\fR halts execution, and returns an exit code of \fB1\fR.
 .SH SEE ALSO
 ed(1)

@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)val.1	1.5 (gritter) 01/31/07
+.\" Sccsid @(#)val.1	1.6 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris sccs-val 1 "30 Sep 2002" "SunOS 5.11" "User Commands"
-.TH VAL 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.TH VAL 1 "02/01/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 val \- validate an SCCS file
 .SH SYNOPSIS
@@ -40,28 +40,28 @@ val \- validate an SCCS file
 .PD
 .ad b
 .SH DESCRIPTION
-The \fBval\fR utility determines if the specified \fBs.\fRfiles meet the characteristics specified by the indicated arguments.
-\fBval\fR can process up to 50 files on a single command line.
+The \fIval\fR utility determines if the specified \fBs.\fRfiles meet the characteristics specified by the indicated arguments.
+\fIval\fR can process up to 50 files on a single command line.
 .PP
-\fBval\fR has a special argument, `\fB\(mi\fR', which reads the standard input until the end-of-file condition is detected.
+\fIval\fR has a special argument, `\fB\(mi\fR', which reads the standard input until the end-of-file condition is detected.
 Each line read is independently processed as if it were a command line argument list.
 .PP
-\fBval\fR generates diagnostic messages on the standard output for each command line and file processed and also returns a single 8\(mibit code upon exit as described below.
+\fIval\fR generates diagnostic messages on the standard output for each command line and file processed and also returns a single 8\(mibit code upon exit as described below.
 .TP 12
 \fB\-s\fR
 Silent.
 Suppresses the normal error or warning messages.
 .TP
 \fB\-m\fR \fIname\fR
-Compares \fIname\fR with the \fBval.1\fR ID keyword in the \fBs.\fRfile.
+Compares \fIname\fR with the \fIval.1\fR ID keyword in the \fBs.\fRfile.
 .TP
 \fB\-r\fR\fIsid\fR
-Checks to see if the indicated \fBSID\fR is ambiguous, invalid, or absent from the \fBs.\fRfile.
+Checks to see if the indicated \s-1SID\s+1 is ambiguous, invalid, or absent from the \fBs.\fRfile.
 .TP
 \fB\-y\fR \fItype\fR
 Compares \fItype\fR with the \fB\fR ID keyword.
 .PP
-The 8-bit code returned by \fBval\fR is a disjunction of the possible errors, that is, it can be interpreted as a bit string where (moving from left to right) the bits set are interpreted as follows:
+The 8-bit code returned by \fIval\fR is a disjunction of the possible errors, that is, it can be interpreted as a bit string where (moving from left to right) the bits set are interpreted as follows:
 .PP
 .in +12
 .nf
@@ -76,7 +76,7 @@ bit 7 = mismatch between val.1 and \-m argument
 .fi
 .in -12
 .PP
-\fBval\fR can process two or more files on a given command line, and in turn can process multiple command lines (when reading the standard input).
+\fIval\fR can process two or more files on a given command line, and in turn can process multiple command lines (when reading the standard input).
 In these cases, an aggregate code is returned which is the logical \fBOR\fR of the codes generated for each command line and file processed.
 .SH SEE ALSO
 .LP
@@ -86,5 +86,5 @@ get(1),
 help(1), 
 prs(1)
 .SH DIAGNOSTICS
-Use the SCCS \fBhelp\fR command for explanations (see 
-\fBhelp\fR(1)).
+Use the SCCS \fIhelp\fR command for explanations (see 
+\fIhelp\fR(1)).
