@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.8 (gritter) 9/13/06
+.\" Sccsid @(#)an	2.9 (gritter) 02/01/07
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -350,7 +350,16 @@
 .ti \\n(INu
 .ie !\\n()Iu+\\n()Ru-\w\\*(]Xu-3p \{\\*(]X
 .br\}
-.el \\*(]X\h|\\n()Iu+\\n()Ru\c
+.el \{\
+\\*(]X\h|\\n()Iu+\\n()Ru\c
+.if \\n(.X \{\
+.do nop \k[}pos]
+.do vpt 0
+.sp -1
+.do vpt 1
+.do nop \h'\\n[}pos]u'\c
+.\}
+.\}
 .}f
 ..
 '	# handle end of 1-line features

@@ -5,6 +5,10 @@ Release ...
   refer to the default penalty value.
 * dpost: A manual page has been added since it has now been released by
   Sun under the CDDL license.
+* -man macros: The ".TP" macro has been fixed not to spread the initial
+  string. This is particularly for use in combination with "-mpadj" since
+  paragraph-at-once line breaking can lead to more spreading in the first
+  line.
 * [nt]roff: Special characters like "\}" do now terminate environment
   names in arguments to the ".ev" and ".evc" requests as with other names.
   Thus ".ev \}" is no longer misinterpreted as an attempt to change to an
