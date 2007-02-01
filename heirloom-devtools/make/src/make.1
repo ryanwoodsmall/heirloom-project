@@ -22,10 +22,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)make.1	1.9 (gritter) 01/31/07
+.\" Sccsid @(#)make.1	1.10 (gritter) 02/01/07
 .\"
 .\" from OpenSolaris sysV-make 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH MAKE 1 "01/31/07" "Heirloom Development Tools" "User Commands"
+.TH MAKE 1 "02/01/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 make \- maintain, update, and regenerate groups of programs
 .SH SYNOPSIS
@@ -37,9 +37,9 @@ make \- maintain, update, and regenerate groups of programs
 .br
 .ad b
 .SH DESCRIPTION
-\fBmake\fR allows the programmer to maintain, update,
+\fImake\fR allows the programmer to maintain, update,
 and regenerate groups of computer programs.
-\fBmake\fR executes
+\fImake\fR executes
 commands in \fImakefile\fR to update one or more target \fInames\fR
 (\fInames\fR are typically programs).
 If the \fB\-f\fR option is not present, then \fBmakefile\fR,
@@ -51,7 +51,7 @@ input is taken.
 More than one \fB\-f\fR\fI makefile\fR argument pair
 may appear.
 .PP
-\fBmake\fR updates a target only if its dependents are
+\fImake\fR updates a target only if its dependents are
 newer than the target.
 All prerequisite files of a target are added
 recursively
@@ -59,7 +59,7 @@ to the list of targets.
 Missing files are deemed to be outdated.
 .PP
 The following list of four directives can be included in \fImakefile\fR
-to extend the options provided by \fBmake\fR.
+to extend the options provided by \fImake\fR.
 They are used in \fImakefile\fR as if they were targets:
 .RS 2
 .TP 14
@@ -82,7 +82,7 @@ Same
 effect as the \fB\-s\fR option.
 .RE
 .PP
-The options for \fBmake\fR are listed below:
+The options for \fImake\fR are listed below:
 .RS 2
 .TP 14
 \fB\-e\fR
@@ -121,7 +121,7 @@ complete set of macro definitions and target descriptions.
 .TP
 \fB\-q\fR
 Question.
-\fBmake\fR returns a zero or non\-zero status code depending
+\fImake\fR returns a zero or non\-zero status code depending
 on whether
 or not the target file has been updated.
 .TP
@@ -199,13 +199,13 @@ b.o: incl.h b.c
 Command lines are executed one at a time, each by its own shell.
 The
 \fBSHELL\fR macro can be used to specify which shell
-\fBmake\fR should use to execute commands.
+\fImake\fR should use to execute commands.
 The first one or two characters in a command can
 be the following: `\fB@\fR', `\fB\(mi\fR',
 `\fB@\(mi\fR', or `\fB\(mi@\fR'.
 If `\fB@\fR' is present, printing of
 the command is suppressed.
-If `\fB\(mi\fR' is present, \fBmake\fR
+If `\fB\(mi\fR' is present, \fImake\fR
 ignores an error.
 A line is printed when it is executed unless the \fB\-s\fR option
 is present, or the entry \fB\&.SILENT:\fR is included in
@@ -214,13 +214,13 @@ a \fB@\fR.
 The \fB\-n\fR option specifies printing
 without execution; however, if the command line has the string
 \fB$(MAKE)\fR in it, the line is always executed (see the discussion
-of the \fBMAKEFLAGS\fR macro in the \fBmake\fR \fBEnvironment\fR
+of the \fBMAKEFLAGS\fR macro in the \fIEnvironment\fR
 sub-section below).
 The \fB\-t\fR (touch)
 option updates the modified date of a file without executing any
 commands.
 .PP
-Commands returning non-zero status normally terminate \fBmake\fR.
+Commands returning non-zero status normally terminate \fImake\fR.
 If
 the \fB\-i\fR option is present, if the entry \fB\&.IGNORE:\fR is
 included in \fImakefile\fR, or
@@ -233,7 +233,7 @@ that do not depend on that entry.
 Interrupt and quit cause the target to be deleted unless the target
 is a dependent of the directive \fB\&.PRECIOUS\fR.
 .SS Environment
-The environment is read by \fBmake\fR.
+The environment is read by \fImake\fR.
 All variables
 are assumed to be macro definitions and are processed as such.
 The
@@ -248,10 +248,10 @@ Suffixes and their associated rules in the makefile will
 override any identical suffixes in the built-in rules.
 .PP
 The \fBMAKEFLAGS\fR environment variable is processed
-by \fBmake\fR as containing any legal input option (except \fB\-f\fR
+by \fImake\fR as containing any legal input option (except \fB\-f\fR
 and \fB\-p\fR) defined for the command line.
 Further,
-upon invocation, \fBmake\fR "invents" the variable
+upon invocation, \fImake\fR "invents" the variable
 if it is not in the environment, puts the current options into it, and
 passes
 it on to invocations of commands.
@@ -261,7 +261,7 @@ This feature proves very useful for
 "super-makes".
 In fact, as noted above, when the \fB\-n\fR option is used, the
 command \fB$(MAKE)\fR is executed anyway; hence, one can perform
-a \fBmake \fR\fB\-n\fR recursively on a whole software
+a \fImake \fR\fB\-n\fR recursively on a whole software
 system to see what would have been executed.
 This result is possible
 because
@@ -299,7 +299,7 @@ by
 BLANKs, TABs, NEWLINE characters, and beginnings of lines.
 An example
 of
-the use of the substitute sequence is shown in the \fBLibraries\fR
+the use of the substitute sequence is shown in the \fILibraries\fR
 sub-section below.
 .SS Internal Macros
 There are five internally maintained macros that are useful for writing
@@ -374,7 +374,7 @@ If no
 update commands for such a file appear in \fImakefile\fR, and if an
 inferable prerequisite exists, that prerequisite
 is compiled to make the target.
-In this case, \fBmake\fR has
+In this case, \fImake\fR has
 inference rules that allow building files from other files by examining
 the suffixes and determining an appropriate inference rule to use.
 The
@@ -395,13 +395,13 @@ l2 l2 l2 l2 l2 l2 l2 l2 l2 l2.
 .ft R
 .RE
 .PP
-The internal rules for \fBmake\fR are contained in the
-source file \fBmake.rules\fR for the \fBmake\fR
+The internal rules for \fImake\fR are contained in the
+source file \fBmake.rules\fR for the \fImake\fR
 program.
 These rules can be locally modified.
 To print out the rules
 compiled
-into the \fBmake\fR on any machine in a form suitable for
+into the \fImake\fR on any machine in a form suitable for
 recompilation,
 the following command is used:
 .sp
@@ -412,12 +412,12 @@ the following command is used:
 .RE
 .sp
 A tilde in the above rules refers to an SCCS file (see
-\fBsccsfile\fR(5)).
+\fIsccsfile\fR(5)).
 Thus, the rule \fB\&.c~.o\fR would transform an
 SCCS C source file into an object file
 (\fB\&.o\fR).
 Because the \fBs.\fR of the SCCS files
-is a prefix, it is incompatible with the \fBmake\fR suffix
+is a prefix, it is incompatible with the \fImake\fR suffix
 point of view.
 Hence, the tilde is a way of changing any file reference
 into an SCCS file reference.
@@ -460,7 +460,7 @@ a.o b.o: incl.h\fR
 .fi
 .RE
 .PP
-This abbreviation is possible because \fBmake\fR has
+This abbreviation is possible because \fImake\fR has
 a set of internal rules for building files.
 The user may add rules to
 this
@@ -525,7 +525,7 @@ we assume the source files are all C type source:
 .fi
 .RE
 .PP
-In fact, the \fB\&.c.a\fR rule listed above is built into \fBmake\fR
+In fact, the \fB\&.c.a\fR rule listed above is built into \fImake\fR
 and is unnecessary in this example.
 A more interesting, but
 more limited example of an archive library maintenance construction
@@ -582,8 +582,8 @@ will not work.
 .PP
 Commands that are
 directly executed by the shell, notably
-\fBcd\fR(1),
-are ineffectual across \fBNEWLINEs\fR in \fBmake\fR.
+\fIcd\fR(1),
+are ineffectual across \fBNEWLINEs\fR in \fImake\fR.
 .PP
 The syntax
 \fBlib(file1.o\fR \fBfile2.o\fR \fBfile3.o)\fR is illegal.
