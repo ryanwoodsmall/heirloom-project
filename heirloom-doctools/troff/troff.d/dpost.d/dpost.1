@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)dpost.1	1.7 (gritter) 02/01/07
+.\" Sccsid @(#)dpost.1	1.8 (gritter) 02/02/07
 .\"
 .\" from OpenSolaris dpost 1 "9 Sep 1996" "SunOS 5.11" "User Commands"
-.TH DPOST 1 "02/01/07" "Heirloom Documentation Tools" "User Commands"
+.TH DPOST 1 "02/02/07" "Heirloom Documentation Tools" "User Commands"
 .SH NAME
 dpost \- troff postprocessor for PostScript printers
 .SH SYNOPSIS
@@ -63,7 +63,7 @@ The \fIfiles\fR should be prepared by \fItroff\fR.
 The default font
 files in \fB/usr/ucblib/doctools/font/devps\fR produce the best output.
 They assume a resolution of 72000 dpi, and can be used to format files by
-adding the \fB\-Tpost\fR option to the \fItroff\fR call.
+adding the \fB\-Tps\fR option to the \fItroff\fR call.
 .PP
 \fIdpost\fR makes no assumptions about resolutions.
 The first
@@ -204,7 +204,7 @@ files from \fB/usr/ucblib/doctools/font/devps\fR.
 .SH EXAMPLES
 .HP
 \fBpic \fR\fBfile\fR\fB | tbl | eqn | troff \fR\fB\-mm\fR\fB
-\fR\fB\-Tpost\fR\fB | dpost\fR
+\fR\fB\-Tps\fR\fB | dpost\fR
 .SH FILES
 /usr/ucblib/doctools/font/devps/*
 .br
@@ -213,6 +213,8 @@ files from \fB/usr/ucblib/doctools/font/devps\fR.
 /usr/ucblib/doctools/font/devpost/postscript/dpost.ps
 .br
 /usr/ucblib/doctools/font/devpost/postscript/color.ps
+.br
+/usr/ucblib/doctools/font/devpost/postscript/cutmarks.ps
 .br
 /usr/ucblib/doctools/font/devpost/postscript/draw.ps
 .br
