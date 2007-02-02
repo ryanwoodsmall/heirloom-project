@@ -4,7 +4,10 @@ Release ...
   from the "Heirloom Development Tools" package are installed in it.
 * getconf: "/usr/ccs/bin" is now included in the default path as printed
   with the "PATH" argument.
+* what: Has been replaced by an OpenSolaris-derived implementation.
 * tsort: Is now installed in "/usr/ccs/bin".
+* OpenSolaris-derived manual pages are now included for bdiff, newform,
+  and fspec(5).
 
 Release 070115
 * deroff: Now recognizes the ".do" and ".xflag" requests as well as an "-xN"

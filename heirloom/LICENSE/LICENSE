@@ -128,15 +128,17 @@ Some utilities and manual pages are based on various releases of
 The following utilities include 4BSD code:
 
 	bc	ching	dc	deroff(1b)	diff	diff3	fmt
-	ln(1b)	more	nawk	oawk	renice	tcopy	ul	what
+	ln(1b)	more	nawk	oawk	renice	tcopy	ul
 
 ********************************************************************************
 The following utilities are based on Sun's OpenSolaris code; the file
 OPENSOLARIS.LICENSE contains the licensing conditions for them:
 
 	bdiff	bfs	dircmp	echo	fmtmsg	getconf	getopt	mail
-	mvdir	spell	test
+	mvdir	spell	test	what
 
+Some manual pages have also been derived from OpenSolaris code; see
+the header of the respective page.
 Changes to these programs are also subject to the original license.
 ********************************************************************************
 One utilities is based on the MINIX 2.0 sources, to which the
@@ -349,4 +351,4 @@ of this code was put in the public domain by Mark Adler.
 
 ********************************************************************************
 
-Gunnar Ritter								8/2/05
+Gunnar Ritter								2/3/07

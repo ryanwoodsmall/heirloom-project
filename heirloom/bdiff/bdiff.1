@@ -2,9 +2,8 @@
 .\" CDDL HEADER START
 .\"
 .\" The contents of this file are subject to the terms of the
-.\" Common Development and Distribution License, Version 1.0 only
-.\" (the "License").  You may not use this file except in compliance
-.\" with the License.
+.\" Common Development and Distribution License (the "License").  
+.\" You may not use this file except in compliance with the License.
 .\"
 .\" You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
 .\" or http://www.opensolaris.org/os/licensing.
@@ -18,41 +17,50 @@
 .\" information: Portions Copyright [yyyy] [name of copyright owner]
 .\"
 .\" CDDL HEADER END
+.\"  Copyright 1989 AT&T  Copyright (c) 1996, Sun Microsystems, Inc.  All Rights Reserved
+.\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany.
-.\"
-.\" Sccsid @(#)bdiff.1	1.1 (gritter) 6/24/05
-.TH BDIFF 1 "6/24/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)bdiff.1	1.3 (gritter) 2/3/07
+.\" from OpenSolaris bdiff 1 "14 Sep 1992" "SunOS 5.11" "User Commands"
+.TH BDIFF 1 "2/3/07" "Heirloom Toolchest" "User Commands"
 .SH NAME
 bdiff \- big diff
 .SH SYNOPSIS
-\fBbdiff\fI file1 file2 \fR[\fIsegmentsize\fR] [\fB\-s\fR]
+\fBbdiff\fR \fIfilename1\fR \fIfilename2\fR [\fIn\fR] [\fB\-s\fR]
 .SH DESCRIPTION
-.I bdiff
-produces a list of differences for files which
-.IR diff (1)
-cannot handle directly because of their size.
-It does this by splitting the content of both
-.I files
-given into pieces of at most
-.I segmentsize
-bytes (3500 by default).
-This may result in more identical lines listed as differences,
-but produces meaningful listings for tools
-which post-process
-.I diff
-output.
+\fBbdiff\fR is used in a manner analogous to \fBdiff\fR to find which lines in \fIfilename1\fR and \fIfilename2\fR must be changed
+to bring the files into agreement.
+Its purpose is to allow processing of files too large for \fBdiff\fR.
+If \fIfilename1 (filename2)\fR is \fB\(mi\fR, the
+standard input is read.
 .PP
-If either
-.I file1
-or
-.I file2
-is `\-', the standard input is used instead.
+\fBbdiff\fR ignores lines common to the beginning of both files, splits the remainder of each file into \fIn\fR-line segments, and invokes \fBdiff\fR
+on corresponding segments.
+If both optional arguments are specified, they must appear in the order indicated above.
 .PP
-The
-.B \-s
-option suppresses error messages.
+The output of \fBbdiff\fR is exactly that of \fBdiff\fR, with line numbers adjusted to account for the segmenting of the files (that is, to make it look as if the files had
+been processed whole).
+Note:
+Because of the segmenting of the files, \fBbdiff\fR does not necessarily find a smallest sufficient set of file differences.
+.PP
+The options are:
+.TP
+\fB\fIn\fR \fR
+The number of line segments.
+The value of \fIn\fR is 3500 by
+default.
+If the optional third argument is given and it is numeric, it is used as the value for \fIn\fR.
+This is useful in those cases in which 3500-line segments are too large for \fBdiff\fR, causing it to fail.
+.TP
+\fB\fB\-s\fR \fR
+Specifies that no diagnostics are to be printed by \fBbdiff\fR (silent option).
+Note:  However, this does not suppress possible
+diagnostic messages from \fBdiff\fR, which \fBbdiff\fR calls.
 .SH FILES
-/tmp/bd*
-.SH "SEE ALSO"
-diff(1)
+/tmp/bd?????
+.SH SEE ALSO
+.IR diff (1)
+.SH DIAGNOSTICS
+Use 
+.IR help (1)
+for explanations.
