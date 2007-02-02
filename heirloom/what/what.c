@@ -34,9 +34,18 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)what.c	1.9 (gritter) 2/3/07
+ * Sccsid @(#)what.c	1.10 (gritter) 2/3/07
  */
 /*	from OpenSolaris "sccs:cmd/what.c"	*/
+
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#define	USED	__attribute__ ((used))
+#elif defined __GNUC__
+#define	USED	__attribute__ ((unused))
+#else
+#define	USED
+#endif
+static const char sccsid[] USED = "@(#)what.sl	1.10 (gritter) 2/3/07";
 
 #include <stdio.h>
 #include <unistd.h>
@@ -164,10 +173,4 @@ trypat(register FILE *iop,register char *pat)
 	else if (c != EOF)
 		ungetc(c, iop);
 	return(FALSE);
-}
-
-/* for fatal() */
-void 
-clean_up(void)
-{
 }
