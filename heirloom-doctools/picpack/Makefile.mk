@@ -13,7 +13,7 @@ picpack: $(OBJ)
 install:
 	$(INSTALL) -c picpack $(ROOT)$(BINDIR)/picpack
 	$(STRIP) $(ROOT)$(BINDIR)/picpack
-	$(INSTALL) -c -m 644 picpack.1b $(ROOT)$(MANDIR)/man1b/picpack.1b
+	$(INSTALL) -c -m 644 picpack.1 $(ROOT)$(MANDIR)/man1/picpack.1
 
 clean:
 	rm -f $(OBJ) picpack core log *~

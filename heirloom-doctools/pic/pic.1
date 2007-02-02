@@ -8,8 +8,8 @@
 .\"
 .\" Distributed under the terms of the Lucent Public License Version 1.02.
 .\"
-.\" Sccsid @(#)pic.1b	1.6 (gritter) 12/9/05
-.TH PIC 1B "12/9/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.\" Sccsid @(#)pic.1	1.7 (gritter) 2/2/07
+.TH PIC 1 "2/2/07" "Heirloom Documentation Tools" "User Commands"
 .\".de PS	\" start picture
 .\".	\" $1 is height, $2 is width, both in inches
 .\".if \\$1>0 .sp .35
@@ -23,7 +23,7 @@
 .\".if \\n($1>0 .sp .65
 .\"..
 .SH NAME
-pic \- (BSD) troff preprocessor for drawing pictures
+pic \- troff preprocessor for drawing pictures
 .SH SYNOPSIS
 \fB/usr/ucb/pic\fR [\fB\-SU\fR] [\fIfiles\fR]
 .SH DESCRIPTION
@@ -37,11 +37,13 @@ code is contained between
 and
 .B .PE
 lines:
+.sp
+.RS
 .nf
-.IP
 \&.PS \f2optional-width\fP \f2optional-height\fP
 \f2element-list\fP
 \&.PE
+.RE
 .fi
 .LP
 or in a file mentioned in a
@@ -352,7 +354,7 @@ reverts the effect of a previous
 .\".SH SOURCE
 .\".B /sys/src/cmd/pic
 .SH "SEE ALSO"
-.IR grap (1B), 
+.IR grap (1), 
 .IR troff (1B)
 .br
 B. W. Kernighan,

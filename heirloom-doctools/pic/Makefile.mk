@@ -19,7 +19,8 @@ y.tab.h: picy.c
 install:
 	$(INSTALL) -c pic $(ROOT)$(BINDIR)/pic
 	$(STRIP) $(ROOT)$(BINDIR)/pic
-	$(INSTALL) -c -m 644 pic.1b $(ROOT)$(MANDIR)/man1b/pic.1b
+	test -d $(ROOT)$(MANDIR)/man1 || mkdir -p $(ROOT)$(MANDIR)/man1
+	$(INSTALL) -c -m 644 pic.1 $(ROOT)$(MANDIR)/man1/pic.1
 
 clean:
 	rm -f $(OBJ) picl.c picy.c y.tab.h pic core log *~

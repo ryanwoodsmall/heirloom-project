@@ -13,7 +13,7 @@ ptx: $(OBJ)
 install:
 	$(INSTALL) -c ptx $(ROOT)$(BINDIR)/ptx
 	$(STRIP) $(ROOT)$(BINDIR)/ptx
-	$(INSTALL) -c -m 644 ptx.1b $(ROOT)$(MANDIR)/man1b/ptx.1b
+	$(INSTALL) -c -m 644 ptx.1 $(ROOT)$(MANDIR)/man1/ptx.1
 	test -d $(ROOT)$(LIBDIR) || mkdir -p $(ROOT)$(LIBDIR)
 	$(INSTALL) -c -m 644 eign $(ROOT)$(LIBDIR)/eign
 

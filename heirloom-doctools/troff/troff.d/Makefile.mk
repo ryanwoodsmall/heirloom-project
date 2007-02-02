@@ -30,7 +30,7 @@ install:
 	$(INSTALL) -c otfdump $(ROOT)$(BINDIR)/otfdump
 	$(STRIP) $(ROOT)$(BINDIR)/otfdump
 	$(INSTALL) -c -m 644 troff.1b $(ROOT)$(MANDIR)/man1b/troff.1b
-	$(INSTALL) -c -m 644 otfdump.1b $(ROOT)$(MANDIR)/man1b/otfdump.1b
+	$(INSTALL) -c -m 644 otfdump.1 $(ROOT)$(MANDIR)/man1/otfdump.1
 
 clean:
 	rm -f $(OBJ) draw.o ta.o troff ta otfdump otfdump.o otfdump_vs.o \

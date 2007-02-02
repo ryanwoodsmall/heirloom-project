@@ -19,6 +19,9 @@ Release ...
   documentation texts, README files have been added to explain which
   fonts are needed in order to build them. (Thanks to Werner Lemberg for
   notification.)
+* Several manual pages have been moved from "BSD Compatibility" to the
+  standard sections if they had not actually been part of the SVR4 BSD
+  compatibility package.
 
 Release 061212
 * [nt]roff: Relative numbers can be used with the ".pshape" request now;
