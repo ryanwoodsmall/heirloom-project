@@ -8,6 +8,8 @@ Release ...
   install the Heirloom Bourne shell in advance and then edit "mk.config".
 * make: A new manual page is available, based on source code released by
   Sun.
+* get: The %G% and %H% keywords omit leading zero digits in month or day
+  numbers now, as previous (non-Solaris) versions of SCCS did.
 * The tools have been ported to HP-UX.
 * The tools have been ported to AIX.
 

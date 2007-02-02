@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)get.c	1.6 (gritter) 01/21/07
+ * Sccsid @(#)get.c	1.7 (gritter) 2/2/07
  */
 /*	from OpenSolaris "sccs:cmd/get.c"	*/
 
@@ -690,19 +690,6 @@ idsetup(register struct packet *pkt)
 		Qsect = Null;
 }
 
-#if	defined (__STDC__)
-static void 
-makgdate(register char *old, register char *new)
-{
-	struct tm	time;
-	sscanf(old, "%d/%d/%d", &(time.tm_year), &(time.tm_mon), &(time.tm_mday));
-	time.tm_mon--;
-	strftime (new, (size_t) DATELEN, NOGETTEXT("%D"), &time);
-}
-	
-
-#else	/* __STDC__ not defined */
-
 static void 
 makgdate(register char *old, register char *new)
 {
@@ -718,8 +705,6 @@ makgdate(register char *old, register char *new)
 	*new++ = old[1];
 	*new = 0;
 }
-#endif	/* __STDC__ */
-
 
 static char Zkeywd[5] = "@(#)";
 static char *tline = NULL;

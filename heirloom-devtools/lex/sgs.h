@@ -22,9 +22,9 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  */
-const char sccsid[] = "@(#)lex.sl	2.12 (gritter) 01/23/07";
+const char sccsid[] = "@(#)lex.sl	2.12 (gritter) 1/23/07";
 const char pkg[] = "Heirloom Development Tools";
-const char rel[] = "2.12 (gritter) 01/23/07";
+const char rel[] = "2.12 (gritter) 1/23/07";
 /* SLIST */
 /*
 allprint.c: * Sccsid @(#)allprint.c	1.4 (gritter) 11/27/05

@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)prt.1b	1.8 (gritter) 02/01/07
+.\" Sccsid @(#)prt.1b	1.8 (gritter) 2/1/07
 .\"
 .\" from OpenSolaris sccs-prt 1 "5 Oct 1990" "SunOS 5.11" "User Commands"
-.TH PRT 1B "02/01/07" "Heirloom Development Tools" "BSD System Compatibility"
+.TH PRT 1B "2/1/07" "Heirloom Development Tools" "BSD System Compatibility"
 .SH NAME
 prt \- (BSD) display delta table information from an SCCS file
 .SH SYNOPSIS
