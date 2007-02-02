@@ -1,4 +1,4 @@
-Release ...
+Release 070202
 * [nt]roff: The "\J" escape sequence has been introduced to specify a
   default line breaking penalty; useful to discourage line breaks within
   a person's name or a formula. Relative values in the "\j" sequence now
