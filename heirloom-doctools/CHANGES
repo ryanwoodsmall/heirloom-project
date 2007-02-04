@@ -1,3 +1,7 @@
+Release ...
+* [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
+  Peters.)
+
 Release 070202
 * [nt]roff: The "\J" escape sequence has been introduced to specify a
   default line breaking penalty; useful to discourage line breaks within

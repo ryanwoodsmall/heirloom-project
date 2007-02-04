@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.124 (gritter) 01/20/07
+ * Sccsid @(#)n5.c	1.125 (gritter) 2/4/07
  */
 
 /*
@@ -1208,8 +1208,11 @@ getev(int *nxevp, char **namep)
 				name = realloc(name, (sz += 8) * sizeof *name);
 			name[i++] = c;
 		} while (c);
-		if (*name == 0)
+		if (*name == 0) {
+			free(name);
+			name = NULL;
 			valid = 0;
+		}
 	}
 	flushi();
 	*namep = name;
