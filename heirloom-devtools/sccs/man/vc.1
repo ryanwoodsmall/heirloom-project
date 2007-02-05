@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)vc.1	1.8 (gritter) 2/1/07
+.\" Sccsid @(#)vc.1	1.9 (gritter) 2/5/07
 .\"
 .\" from OpenSolaris vc 1 "5 Jul 1990" "SunOS 5.11" "User Commands"
-.TH VC 1 "2/1/07" "Heirloom Development Tools" "User Commands"
+.TH VC 1 "2/5/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 vc \- version control
 .SH SYNOPSIS
@@ -94,10 +94,10 @@ An \fIasg\fR
 statement overrides the assignment for the corresponding keyword on the \fIvc\fR command line and all previous \fIasg\fR statements for that keyword.
 Keywords that are declared
 but are not assigned values have null values.
-.TP
+.LP
 .PD 0
 \fB:if\fR\fI condition\fR
-.TP
+.IP
 \fB\&.\|.\|.\fR
 .TP
 \fB:end\fR
@@ -191,7 +191,7 @@ Replace keywords on lines that are copied to the standard output.
 The two leading control characters are removed,
 and keywords surrounded by control characters in text are replaced by their value before the line is copied to the output file.
 This action is independent of the \fB\-a\fR keyletter.
-.TP
+.LP
 .PD 0
 \fB:on\fR
 .TP
