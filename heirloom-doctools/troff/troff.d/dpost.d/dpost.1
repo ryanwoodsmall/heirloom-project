@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)dpost.1	1.9 (gritter) 2/2/07
+.\" Sccsid @(#)dpost.1	1.10 (gritter) 2/6/07
 .\"
 .\" from OpenSolaris dpost 1 "9 Sep 1996" "SunOS 5.11" "User Commands"
-.TH DPOST 1 "2/2/07" "Heirloom Documentation Tools" "User Commands"
+.TH DPOST 1 "2/6/07" "Heirloom Documentation Tools" "User Commands"
 .SH NAME
 dpost \- troff postprocessor for PostScript printers
 .SH SYNOPSIS
@@ -52,29 +52,13 @@ dpost \- troff postprocessor for PostScript printers
 .hy 1
 .SH DESCRIPTION
 \fIdpost\fR translates \fIfiles\fR created by 
-\fItroff\fR(1)
+\fItroff\fR(1B)
 into PostScript and writes the results on the standard output.
 If no
 \fIfiles\fR are specified, or if \- is one of the input \fIfiles\fR,
 the standard input
 is read.
-.PP
-The \fIfiles\fR should be prepared by \fItroff\fR.
-The default font
-files in \fB/usr/ucblib/doctools/font/devps\fR produce the best output.
-They assume a resolution of 72000 dpi, and can be used to format files by
-adding the \fB\-Tps\fR option to the \fItroff\fR call.
-.PP
-\fIdpost\fR makes no assumptions about resolutions.
-The first
-\fBx\ res\fR command sets the resolution used to translate the input
-\fIfiles\fR, the \fBDESC\fR file, usually
-\fB/usr/ucblib/doctools/font/devps/DESC\fR,
-defines the resolution used in
-the binary font files, and the PostScript prologue is responsible for
-setting up an appropriate
-user coordinate system.
-.SH OPTIONS
+The following options are accepted:
 .TP 15
 \fB\-c\fR\fI num\fR
 Print \fInum\fR copies of each page.
@@ -201,6 +185,22 @@ Use font files for device \fIname\fR as the best description of
 available PostScript fonts.
 By default, \fIname\fR is set to \fBpost\fR and \fIdpost\fR reads
 files from \fB/usr/ucblib/doctools/font/devps\fR.
+.PP
+The \fIfiles\fR should be prepared by \fItroff\fR.
+The default font
+files in \fB/usr/ucblib/doctools/font/devps\fR produce the best output.
+They assume a resolution of 72000 dpi, and can be used to format files by
+adding the \fB\-Tps\fR option to the \fItroff\fR call.
+.PP
+\fIdpost\fR makes no assumptions about resolutions.
+The first
+\fBx\ res\fR command sets the resolution used to translate the input
+\fIfiles\fR, the \fBDESC\fR file, usually
+\fB/usr/ucblib/doctools/font/devps/DESC\fR,
+defines the resolution used in
+the binary font files, and the PostScript prologue is responsible for
+setting up an appropriate
+user coordinate system.
 .SH EXAMPLES
 .HP
 \fBpic \fR\fBfile\fR\fB | tbl | eqn | troff \fR\fB\-mm\fR\fB
@@ -226,7 +226,7 @@ files from \fB/usr/ucblib/doctools/font/devps\fR.
 .br
 /usr/ucblib/doctools/tmac/color
 .SH SEE ALSO
-troff(1)
+troff(1B)
 .SH DIAGNOSTICS
 The following exit values are returned:
 .TP 10
