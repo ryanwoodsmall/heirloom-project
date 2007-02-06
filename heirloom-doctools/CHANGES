@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: An internal problem with paragraph-at-once line breaking mode
+  has been fixed; it caused a ".in" or ".ll" command to be ignored under
+  rare circumstances.
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
 
