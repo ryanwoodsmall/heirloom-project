@@ -22,10 +22,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)make.1	1.11 (gritter) 2/1/07
+.\" Sccsid @(#)make.1	1.12 (gritter) 2/8/07
 .\"
 .\" from OpenSolaris sysV-make 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH MAKE 1 "2/1/07" "Heirloom Development Tools" "User Commands"
+.TH MAKE 1 "2/8/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 make \- maintain, update, and regenerate groups of programs
 .SH SYNOPSIS
@@ -370,6 +370,7 @@ Thus, \fB$(@D)\fR refers to the directory part of the string \fB$@\fR.
 If there is no directory part, \fB\&./\fR is generated.
 The only macro excluded from this alternative form is \fB$?\fR.
 .SS Suffixes
+Certain names (for instance, those ending with \fB\&.o\fR)
 have inferable prerequisites such as \fB\&.c\fR, \fB\&.s\fR, etc.
 If no
 update commands for such a file appear in \fImakefile\fR, and if an
