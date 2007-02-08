@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Sccsid @(#)makeconfig	1.41 (gritter) 3/4/06
+# Sccsid @(#)makeconfig	1.42 (gritter) 2/8/07
 #
 
 tmp=___build$$
@@ -459,8 +459,8 @@ cat >$tmp2.c <<\!
 #endif
 #ifndef	HAVE_FCHDIR
 : * The function fchdir() could not be found. mailx will be compiled to use
-: chdir() instead. This is not a problem unless mailx's current working
-: directory is moved while the IMAP cache is used.
+: chdir() instead. This is not a problem unless the current working
+: directory of mailx is moved while the IMAP cache is used.
 #endif
 :
 !

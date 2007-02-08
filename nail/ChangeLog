@@ -3,6 +3,8 @@
   following the QUIT command instead of sending a proper response code,
   fixing a problem with GMail (Dr. Gary E. Rafe).
 * Build without socket support again (patch by Andreas Niederl).
+* Fixed a single quote in "makeconfig" that could cause a problem with
+  the C preprocessor (patch by Martin Neitzel).
 
 [12.2] released 1/7/07
 * When a MIME message part is not of the "text/" content type, always
