@@ -1,4 +1,4 @@
-Release ...
+Release 070211
 * SCCS: Most of the manual pages are now available, based on source code
   released by Sun.
 * make: Use a POSIX shell or a Bourne shell as default value for $(SHELL)
