@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)val.1	1.8 (gritter) 2/2/07
+.\" Sccsid @(#)val.1	1.9 (gritter) 2/13/07
 .\"
 .\" from OpenSolaris sccs-val 1 "30 Sep 2002" "SunOS 5.11" "User Commands"
-.TH VAL 1 "2/2/07" "Heirloom Development Tools" "User Commands"
+.TH VAL 1 "2/13/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 val \- validate an SCCS file
 .SH SYNOPSIS
@@ -54,13 +54,13 @@ Silent.
 Suppresses the normal error or warning messages.
 .TP
 \fB\-m\fR \fIname\fR
-Compares \fIname\fR with the \fIval.1\fR ID keyword in the \fBs.\fRfile.
+Compares \fIname\fR with the \fB%\&M%\fR ID keyword in the \fBs.\fRfile.
 .TP
 \fB\-r\fR\fIsid\fR
 Checks to see if the indicated \s-1SID\s+1 is ambiguous, invalid, or absent from the \fBs.\fRfile.
 .TP
 \fB\-y\fR \fItype\fR
-Compares \fItype\fR with the \fB\fR ID keyword.
+Compares \fItype\fR with the \fB%\&Y%\fR ID keyword.
 .PP
 The 8-bit code returned by \fIval\fR is a disjunction of the possible errors, that is, it can be interpreted as a bit string where (moving from left to right) the bits set are interpreted as follows:
 .PP
