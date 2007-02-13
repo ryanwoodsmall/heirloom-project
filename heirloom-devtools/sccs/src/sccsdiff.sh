@@ -31,7 +31,7 @@
 #
 # Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
 #
-# Sccsid @(#)sccsdiff.sh	1.4 (gritter) 01/03/07
+# Sccsid @(#)sccsdiff.sh	1.4 (gritter) 1/3/07
 #
 #	DESCRIPTION:
 #		Execute diff(1) on two versions of a set of

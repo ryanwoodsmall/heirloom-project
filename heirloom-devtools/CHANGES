@@ -1,3 +1,14 @@
+Release: ...
+* sccs: Support for recursive operation has been added. If all file
+  arguments name directories that contain no s-files, or if the "-R"
+  option is present, all subdirectories of all file arguments are
+  handled at once with the "delta", "get", "prs", "prt", "sact", "edit",
+  "delget", "deledit", "unedit", "unget", "diffs", "print", and "branch"
+  sub-commands. For sub-commands involving "delta", this implies that
+  all s-files that are currently edited are processed in their respective
+  directories. For the other sub-commands, this implies that all s-files
+  are processed.
+
 Release 070211
 * SCCS: Most of the manual pages are now available, based on source code
   released by Sun.

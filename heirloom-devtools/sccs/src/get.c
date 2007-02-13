@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)get.c	1.7 (gritter) 2/2/07
+ * Sccsid @(#)get.c	1.8 (gritter) 2/13/07
  */
 /*	from OpenSolaris "sccs:cmd/get.c"	*/
 
@@ -77,6 +77,7 @@ static char	gfile[PATH_MAX];
 static char	*Type;
 static struct utsname un;
 static char *uuname;
+static char	*Prefix = "";
 
 /* Beginning of modifications made for CMF system. */
 #define CMRLIMIT 128
@@ -126,7 +127,8 @@ main(int argc, register char *argv[])
 			}
 			no_arg = 0;
 			i = current_optind;
-		        c = getopt(argc, argv, "-r:c:ebi:x:kl:Lpsmngta:G:w:zqd");
+		        c = getopt(argc, argv,
+				"-r:c:ebi:x:kl:Lpsmngta:G:w:zqdP:");
 				/* this takes care of options given after
 				** file names.
 				*/
@@ -243,6 +245,9 @@ main(int argc, register char *argv[])
                                    nsedelim = (char *) 0;
                                 }
                                 break;
+			case 'P':
+				Prefix = p;
+				break;
 			default:
 			   fatal("unknown key letter (cm1)");
 			
@@ -329,8 +334,8 @@ get(char *file)
 	gpkt.p_cutoff = cutoff;
 	gpkt.p_lfile = lfile;
 	if (Gfile[0] == 0 || !first) {
-		copy(auxf(gpkt.p_file,'g'),gfile);
-		copy(auxf(gpkt.p_file,'A'),Gfile);
+		cat(gfile,Prefix,auxf(gpkt.p_file,'g'),NULL);
+		cat(Gfile,Prefix,auxf(gpkt.p_file,'A'),NULL);
 	}
 	strcpy(buf1, dname(Gfile));
 	strcat(buf1, template);

@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.6 (gritter) 01/21/07
+ * Sccsid @(#)sccs.c	1.8 (gritter) 2/13/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -53,8 +53,6 @@ static  char **diffs_np, **diffs_ap;
 int	Domrs;
 char	*Comments,*Mrs;
 char    Null[1];
-
-static const char	*progname;
 
 /*
 **  SCCS.C -- human-oriented front end to the SCCS system.
@@ -215,6 +213,8 @@ struct list_files
 static char	*getNsid(char *, char *);
 static int	command(char **, int, char *);
 static void	get_list_files(struct list_files *, char *, int);
+static bool	have_sfile_in(const char *);
+static void	get_comments(void);
 static struct sccsprog	*lookup(char *);
 static int	callprog(char *, int, char **, int);
 static char	*makefile(char *, const char *);
@@ -237,6 +237,7 @@ static char	*gstrcpy(char *, const char *, unsigned);
 static void	gstrbotch(const char *, const char *);
 static void	diffs(char *);
 static char	*makegfile(char *);
+static int	recurse(char **, char **, struct sccsprog *, const char *);
 
 
 /* values for sccsoper */
@@ -254,6 +255,8 @@ static char	*makegfile(char *);
 /* bits for sccsflags */
 # define NO_SDOT	0001	/* no s. on front of args */
 # define REALUSER	0002	/* protected (e.g., admin) */
+# define RFLAG		0004	/* may operate recursively */
+# define DELTA		0010	/* implies a "delta" operation */
 
 /* modes for the "clean", "info", "check" ops */
 # define CLEANC		0	/* clean command */
@@ -275,13 +278,13 @@ static struct sccsprog SccsProg[] =
 	"admin",	PROG,	REALUSER,		PROGPATH(admin),
 	"cdc",		PROG,	0,			PROGPATH(rmdel),
 	"comb",		PROG,	0,			PROGPATH(comb),
-	"delta",	PROG,	0,			PROGPATH(delta),
-	"get",		PROG,	0,			PROGPATH(get),
+	"delta",	PROG,	RFLAG|DELTA,		PROGPATH(delta),
+	"get",		PROG,	RFLAG,			PROGPATH(get),
 	"help",		PROG,	NO_SDOT,		PROGPATH(help),
-	"prs",		PROG,	0,			PROGPATH(prs),
-	"prt",		PROG,	0,			PROGPATH(prt),
+	"prs",		PROG,	RFLAG,			PROGPATH(prs),
+	"prt",		PROG,	RFLAG,			PROGPATH(prt),
 	"rmdel",	PROG,	REALUSER,		PROGPATH(rmdel),
- 	"sact",		PROG,	0,			PROGPATH(sact),
+ 	"sact",		PROG,	RFLAG,			PROGPATH(sact),
 	"val",		PROG,	0,			PROGPATH(val),
 	"what",		PROG,	NO_SDOT,		PROGPATH(what),
 #ifndef V6	
@@ -289,22 +292,22 @@ static struct sccsprog SccsProg[] =
 #else
 	"sccsdiff",	SHELL,	REALUSER,		PROGPATH(sccsdiff),
 #endif /* V6		 */
-	"edit",		CMACRO,	NO_SDOT,		"get -e",
-	"delget",	CMACRO,	NO_SDOT,
+	"edit",		CMACRO,	NO_SDOT|RFLAG,		"get -e",
+	"delget",	CMACRO,	NO_SDOT|RFLAG|DELTA,
 	   "delta:mysrpd/get:ixbeskcl -t",
-	"deledit",	CMACRO,	NO_SDOT,
+	"deledit",	CMACRO,	NO_SDOT|RFLAG|DELTA,
 	   "delta:mysrpd/get:ixbskcl -e -t -d",
 	"fix",		FIX,	NO_SDOT,		NULL,
 	"clean",	CLEAN,	REALUSER|NO_SDOT,	(char *) CLEANC,
 	"info",		CLEAN,	REALUSER|NO_SDOT,	(char *) INFOC,
 	"check",	CLEAN,	REALUSER|NO_SDOT,	(char *) CHECKC,
 	"tell",		CLEAN,	REALUSER|NO_SDOT,	(char *) TELLC,
-	"unedit",	UNEDIT,	NO_SDOT,		NULL,
-	"unget",	PROG,	0,			PROGPATH(unget),
-	"diffs",	DIFFS,	NO_SDOT|REALUSER,	NULL,
-	"-diff",	PROG,	NO_SDOT|REALUSER,	"diff",
-	"print",	CMACRO,	NO_SDOT,			"prs -e/get -p -m -s",
-	"branch",	CMACRO,	NO_SDOT,
+	"unedit",	UNEDIT,	NO_SDOT|RFLAG,		NULL,
+	"unget",	PROG,	RFLAG,			PROGPATH(unget),
+	"diffs",	DIFFS,	NO_SDOT|REALUSER|RFLAG,	NULL,
+	"-diff",	PROG,	NO_SDOT|REALUSER|RFLAG,	"diff",
+	"print",	CMACRO,	NO_SDOT|RFLAG,		"prs -e/get -p -m -s",
+	"branch",	CMACRO,	NO_SDOT|RFLAG,
 	   "get:ixrc -e -b/delta: -s -n -ybranch-place-holder/get:pl -e -t -g",
 	"enter",	ENTER,	NO_SDOT,		NULL,
 	"create",	CMACRO,	NO_SDOT,
@@ -329,7 +332,7 @@ static char	*SccsDir = SCCSDIR;	/* directory to begin search from */
 # else
 static char	*SccsDir = "";
 # endif
-static char	MyName[] = MYNAME;	/* name used in messages */
+static char	*MyName;		/* name used in messages */
 static int	OutFile = -1;		/* override output file for commands */
 static bool	RealUser;		/* if set, running as real user */
 # ifdef DEBUG
@@ -353,6 +356,9 @@ extern	int Fcnt;
 static int create_macro  = 0;	/* 1 if "sccs create ..."  command is running. */
 static int del_macro     = 0;	/* 1 if "sccs deledit ..." or "sccs delget ..." commands are running. */
 
+static int	Rflag;		/* recursive operation */
+static char	*Pflag;		/* directory prefix */
+
 #define	FBUFSIZ	BUFSIZ
 #define	PFILELG	120
 
@@ -369,7 +375,7 @@ main(int argc, char **argv)
 	register struct passwd *pw;
 	char buf[FBUFSIZ], cwdpath[FBUFSIZ];
 
-	progname = basename(argv[0]);
+	MyName = basename(argv[0]);
 	Fflags = FTLEXIT | FTLMSG | FTLCLN;
 
 	/* Pull "SccsDir" out of the environment variable         */
@@ -473,7 +479,7 @@ main(int argc, char **argv)
 			   }
 			   i = current_optind;
 			}
-		        c = getopt(argc, argv, "-rp:d:T");
+		        c = getopt(argc, argv, "-rRp:d:T");
 			if (c == EOF) {
 			   break;
 			}
@@ -483,6 +489,10 @@ main(int argc, char **argv)
 			  case 'r':		/* run as real user */
 				setuid(getuid());
 				RealUser++;
+				break;
+
+			  case 'R':
+				Rflag = 1;	/* operate recursively */
 				break;
 
 # ifndef SCCSDIR
@@ -503,7 +513,7 @@ main(int argc, char **argv)
 
 			  default:
 				usrerr("%s %s", "unknown option", argv[i]);
-				fprintf(stderr, "Usage: %s [flags] command [flags]\n", progname);
+				fprintf(stderr, "Usage: %s [flags] command [flags]\n", MyName);
 				exit(EX_USAGE);
 			}
 	}
@@ -515,7 +525,7 @@ main(int argc, char **argv)
 	if (*argv == NULL)
 	{
 		fprintf(stderr, "Usage: %s [flags] command [flags]\n",
-				progname);
+				MyName);
 		exit(EX_USAGE);
 		/*NOTREACHED*/
 	}
@@ -647,11 +657,13 @@ command(char **argv, int forkflag, char *arg0)
 			while (*++p != '\0' && *p != '/' && *p != ' ') ;
 		}
 	}
-	/* added three elements for: */
+	/* added five elements for: */
 	/* - command;		     */
+	/* - -ycomment;		     */
+	/* - -Pprefix;		     */
 	/* - additional DIFFS param; */
 	/* - last element (NULL).    */
-	for (nav_size += 3, ap = argv; *ap != NULL; ap++) {
+	for (nav_size += 5, ap = argv; *ap != NULL; ap++) {
 		nav_size++;
 	}
 	if ((nav = malloc(nav_size * (sizeof(char *)))) == NULL) {
@@ -703,6 +715,10 @@ command(char **argv, int forkflag, char *arg0)
 	if (maincmd == NULL)
 	   maincmd = cmd;
 	no_sdot = bitset(NO_SDOT, cmd->sccsflags);
+	if (Rflag && !(cmd->sccsflags & RFLAG)) {
+		usrerr("must not use -R with '%s'", cmd->sccsname);
+		return (EX_USAGE);
+	}
 	if (cmd->sccsoper == CMACRO) {
 	
 	   char *cp, *cp_opstr;
@@ -1053,6 +1069,42 @@ command(char **argv, int forkflag, char *arg0)
 		nav = new_nav;
 		ap  = &new_nav[1]; 
 	}
+	if (Rflag == 0 && cmd->sccsflags & RFLAG) {
+	  int	found = 0;
+	  for (listfilesp = head_files.next; listfilesp;
+	      listfilesp = listfilesp->next) {
+	    if (isdir(listfilesp->filename)) {
+	      found = 1;
+	      if (have_sfile_in(listfilesp->filename))
+	        break;
+	    }
+	  }
+	  if (found && listfilesp == NULL)
+	    Rflag = 1;
+	}
+	if (Rflag == 1) {
+	  if (!hady) {
+	    if (!strcmp(cmd->sccsname, "delta") ||
+		!strcmp(cmd->sccsname, "deledit") ||
+		!strcmp(cmd->sccsname, "delget")) {
+	      get_comments();
+	      *np++ = Comments;
+	      hady = 1;
+	    }
+	  }
+	  np[1] = NULL;
+	  for (listfilesp = head_files.next; listfilesp;
+	      listfilesp = listfilesp->next) {
+	    rval |= recurse(ap, np, cmd, listfilesp->filename);
+	  }
+	  return rval;
+	}
+	if (Pflag && cmd->sccsoper == PROG) {
+	  if (!strcmp(cmd->sccsname, "get") ||
+	      !strcmp(cmd->sccsname, "delta")) {
+	    *np++ = Pflag;
+	  }
+	}
 	nfiles = 0;
 	listfilesp = head_files.next;
 	while (listfilesp != 0) {
@@ -1219,7 +1271,7 @@ command(char **argv, int forkflag, char *arg0)
 			while (*p != '\0' && *p != '/')
 				p++;
 			if (*p == '\0') {
-				if (nfiles == 1) {
+				if (nfiles == 1 && Rflag == 0) {
 					forkflag = FALSE;
 				}
 				p--;  	/* In case command() returns */
@@ -1247,20 +1299,8 @@ command(char **argv, int forkflag, char *arg0)
 					if (!hady) {
 						if (!strcmp(cmd->sccsname, "deledit") ||
 						    !strcmp(cmd->sccsname, "delget")) {
-							char * cp;
-
-							if (isatty(0) == 1)
-								printf("comments? ");
-							cp = get_Sccs_Comments();
-							if ((Comments = malloc(strlen(cp) + 3)) == NULL) {
-								perror("Sccs: no mem");
-						 	     	exit(EX_OSERR);
-							}
-							strcpy(Comments, "-y"); 
-							strcat(Comments, cp);
+							get_comments();
 							ap1[size - 3] = Comments;
-							if (cp != NULL)
-								free(cp);
 						}
 					}
 					next_file = ap  + cnt  - nfiles;
@@ -1296,7 +1336,7 @@ command(char **argv, int forkflag, char *arg0)
 		if (ap_for_get != NULL) {
 			free(ap_for_get);
 		}
-		if (Comments != NULL) {
+		if (Comments != NULL && Rflag == 0) {
 			free(Comments);
 		}
 		break;
@@ -1585,6 +1625,44 @@ get_list_files(struct list_files *listfilesp, char *filename, int no_sdot)
    listfilesp->s_filename = filename;
 }
 
+static bool
+have_sfile_in(const char *name)
+{
+  struct stat	st;
+  DIR	*dirfd;
+  struct dirent	*dp;
+  bool	yes = FALSE;
+
+  if ((dirfd = opendir(name)) == NULL)
+    return FALSE;
+  while ((dp = readdir(dirfd)) != NULL) {
+    if (dp->d_name[0] == 's' && dp->d_name[1] == '.' && dp->d_name[2] != '\0') {
+      yes = TRUE;
+      break;
+    }
+  }
+  closedir(dirfd);
+  return yes;
+}
+
+static void
+get_comments(void)
+{
+	char * cp;
+
+	if (isatty(0) == 1)
+		printf("comments? ");
+	cp = get_Sccs_Comments();
+	if ((Comments = malloc(strlen(cp) + 3)) == NULL) {
+		perror("Sccs: no mem");
+ 	     	exit(EX_OSERR);
+	}
+	strcpy(Comments, "-y"); 
+	strcat(Comments, cp);
+	if (cp != NULL)
+		free(cp);
+}
+
 /*
 **  LOOKUP -- look up an SCCS command name.
 **
@@ -1700,7 +1778,7 @@ callprog(char *progpath, int flags, char **argv, int forkflag)
 	sigmsg = "fork() error";
 #endif
 					fprintf(stderr, "%s: %s: %s%s\n",
-					    progname,
+					    MyName,
 					    argv[0],
 					    sigmsg,
 					    coredumped ? " - core dumped" : "");
@@ -2227,6 +2305,7 @@ unedit(char *fn)
 {
 	register FILE *pfp;
 	char *gfile, *pfn;
+	char *_gfile = NULL;
 	char   template[] = NOGETTEXT("/tmp/sccsXXXXX");
 	static char tfn[20];
 	FILE *tfp;
@@ -2250,6 +2329,15 @@ unedit(char *fn)
 		return;
 	}
 	gfile = auxf(pfn, 'g');
+	if (Pflag) {
+		if ((_gfile = malloc(strlen(Pflag)+strlen(gfile)-1)) == NULL) {
+			perror("Sccs: no mem");
+			exit(EX_OSERR);
+		}
+		strcpy(_gfile, &Pflag[2]);
+		strcat(_gfile, gfile);
+		gfile = _gfile;
+	}
 	q = strrchr(pfn, '/');
 	if (q == NULL)
 		q = &pfn[-1];
@@ -2262,6 +2350,7 @@ unedit(char *fn)
 	{
 		printf("%12s: not being edited\n",
 		       gfile);
+		free(_gfile);
 		return;
 	}
 
@@ -2289,10 +2378,11 @@ unedit(char *fn)
 			/* a match */
 			delete++;
 			if (delete > 1) {
-				printf("%s: more than one delta of a file is checked out. Use '%s unget -r<SID>' instead.\n", gfile, progname);
+				printf("%s: more than one delta of a file is checked out. Use '%s unget -r<SID>' instead.\n", gfile, MyName);
 				fclose(tfp);
 				fclose(pfp);
 				unlink(tfn);
+				free(_gfile);
 				return;
 			}
 		}
@@ -2328,6 +2418,7 @@ unedit(char *fn)
 				fclose(tfp);
 				fclose(pfp);
 				unlink(tfn);
+				free(_gfile);
 				return;
 			}
 	}
@@ -2343,6 +2434,7 @@ unedit(char *fn)
 		if (freopen(pfn, "w", pfp) == NULL)
 		{
 			usrerr("cannot create \"%s\"", pfn);
+			free(_gfile);
 			return;
 		}
 		while (fgets(buf, sizeof buf, tfp) != NULL) {
@@ -2375,11 +2467,13 @@ unedit(char *fn)
 		if (unlink(gfile) >= 0)
 			printf("%12s: removed\n", gfile);
 		Fcnt = 0;
+		free(_gfile);
 		return;
 	}
 	else
 	{
 		printf("%12s: not being edited by you\n", gfile);
+		free(_gfile);
 		return;
 	}
 }
@@ -2742,4 +2836,134 @@ makegfile(char *name)
 void 
 clean_up(void)
 {
+}
+
+static int
+deltaselect(char **ap, char **np, struct sccsprog *cmd, const char *name)
+{
+  static char	*myname;
+  DIR	*dirfd;
+  struct dirent	*dp;
+  char	*path = NULL;
+  size_t	size = 0, pn;
+  int	rval = 0;
+  FILE	*fp;
+  struct p_file	*pent;
+
+  if (myname == NULL)
+    myname = logname();
+  if ((dirfd = opendir(name)) == NULL) {
+    usrerr("cannot open directory %s", name);
+    return 1;
+  }
+  pn = strlen(name);
+  size = pn + 40;
+  if ((path = malloc(size)) == NULL) {
+    perror("Sccs: no mem");
+    exit(EX_OSERR);
+  }
+  strcpy(path, name);
+  path[pn++] = '/';
+  path[pn] = '\0';
+  while ((dp = readdir(dirfd)) != NULL) {
+    if (dp->d_name[0] != 'p' || dp->d_name[1] != '.' || dp->d_name[2] == '\0')
+      continue;
+    if (pn + strlen(dp->d_name) + 1 >= size) {
+      size = pn + strlen(dp->d_name) + 40;
+      if ((path = realloc(path, size)) == NULL) {
+          perror("Sccs: no mem");
+          exit(EX_OSERR);
+      }
+    }
+    strcpy(&path[pn], dp->d_name);
+    if ((fp = fopen(path, "r")) == NULL) {
+      usrerr("cannot read %s", path);
+      rval |= 1;
+      continue;
+    }
+    while ((pent = getpfent(fp)) != NULL) {
+      if (strcmp(pent->p_user, myname) == 0) {
+	path[pn] = 's';
+	np[0] = path;
+	rval |= command(ap, 1, "");
+	break;
+      }
+    }
+    fclose(fp);
+  }
+  closedir(dirfd);
+}
+
+static int
+recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
+{
+  char	*path = NULL;
+  char	*_Pflag = NULL;
+  char	*sav_Pflag;
+  size_t	size = 0, pn;
+  DIR	*dirfd;
+  struct dirent	*dp;
+  int	rval = 0;
+  struct stat	st;
+
+  if (lstat(name, &st) < 0 || !S_ISDIR(st.st_mode)) {
+    *np = name;
+    Rflag = -1;
+    rval = command(ap, 1, "");
+    Rflag = 1;
+    return rval;
+  }
+  pn = strlen(name);
+  size = pn + 40;
+  if ((path = malloc(size)) == NULL || (_Pflag = malloc(pn + 4)) == NULL) {
+    perror("Sccs: no mem");
+    exit(EX_OSERR);
+  }
+  strcpy(path, name);
+  path[pn++] = '/';
+  path[pn] = '\0';
+  strcpy(_Pflag, "-P");
+  strcpy(&_Pflag[2], path);
+  if ((dirfd = opendir(name)) == NULL) {
+    usrerr("cannot open directory %s", name);
+    rval = 1;
+  } else {
+    while ((dp = readdir(dirfd)) != NULL) {
+      if (dp->d_name[0] == '.')
+	continue;
+      if (pn + strlen(dp->d_name) + 1 >= size) {
+	size = pn + strlen(dp->d_name) + 40;
+	if ((path = realloc(path, size)) == NULL) {
+          perror("Sccs: no mem");
+          exit(EX_OSERR);
+	}
+      }
+      strcpy(&path[pn], dp->d_name);
+      if (lstat(path, &st) < 0) {
+	perror(path);
+	rval |= 1;
+	continue;
+      }
+      if (S_ISDIR(st.st_mode)) {
+        if (strcmp(dp->d_name, SccsPath) == 0) {
+	  Rflag = 2;
+	}
+      } else if (dp->d_name[0] != 's' || dp->d_name[1] != '.' ||
+	  dp->d_name[2] == '\0')
+	continue;
+      np[0] = path;
+      sav_Pflag = Pflag;
+      Pflag = _Pflag;
+      if (Rflag == 2 && cmd->sccsflags & DELTA)
+        rval |= deltaselect(ap, np, cmd, path);
+      else
+        rval |= command(ap, 1, "");
+      Rflag = 1;
+      Pflag = sav_Pflag;
+    }
+    closedir(dirfd);
+  }
+  free(path);
+  free(_Pflag);
+  return rval;
 }

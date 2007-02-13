@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)delta.c	1.6 (gritter) 01/21/07
+ * Sccsid @(#)delta.c	1.7 (gritter) 2/13/07
  */
 /*	from OpenSolaris "sccs:cmd/delta.c"	*/
 
@@ -62,6 +62,7 @@ static char	Diffpgm[]   =   "diff";
 static char	*ilist, *elist, *glist, Cmrs[300], *Nsid;
 static char	Pfilename[FILESIZE];
 static char	*uuname;
+static char	*Prefix = "";
 
 static	time_t	gfile_mtime;
 static	time_t	cutoff = (time_t)0x7FFFFFFFL;
@@ -130,7 +131,7 @@ main(int argc, register char *argv[])
 			}
 			no_arg = 0;
 			i = current_optind;
-		        c = getopt(argc, argv, "-r:dpsnm:g:y:fhqz");
+		        c = getopt(argc, argv, "-r:dpsnm:g:y:fhqzP:");
 
 				/* this takes care of options given after
 				** file names.
@@ -198,6 +199,9 @@ main(int argc, register char *argv[])
                                 }
                                 break;
 			case 'z':
+				break;
+			case 'P':
+				Prefix = p;
 				break;
 			default:
 				fatal("unknown key letter (cm1)");
@@ -274,7 +278,7 @@ delta(char *file)
 		fatal("cannot create lock file (cm4)");
 	gpkt.p_reopen = 1;
 	gpkt.p_stdout = stdout;
-	copy(auxf(gpkt.p_file,'g'),gfilename);
+	cat(gfilename,Prefix,auxf(gpkt.p_file,'g'),NULL);
 	Gin = xfopen(gfilename, O_RDONLY);
 	pp = rdpfile(&gpkt,&sid);
 
