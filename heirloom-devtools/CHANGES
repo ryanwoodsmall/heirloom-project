@@ -8,6 +8,7 @@ Release: ...
   all s-files that are currently edited are processed in their respective
   directories. For the other sub-commands, this implies that all s-files
   are processed.
+* sccs: A manual page has been added (based on the 4.3BSD-Tahoe page).
 
 Release 070211
 * SCCS: Most of the manual pages are now available, based on source code

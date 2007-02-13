@@ -17,6 +17,7 @@ install: all
 	$(INSTALL) -c -m 644 what.1 $(ROOT)$(MANDIR)/man1/what.1
 	test -d $(ROOT)$(MANDIR)/man1b || mkdir -p $(ROOT)$(MANDIR)/man1b
 	$(INSTALL) -c -m 644 prt.1b $(ROOT)$(MANDIR)/man1b/prt.1b
+	$(INSTALL) -c -m 644 sccs.1b $(ROOT)$(MANDIR)/man1b/sccs.1b
 	test -d $(ROOT)$(MANDIR)/man5 || mkdir -p $(ROOT)$(MANDIR)/man5
 	$(INSTALL) -c -m 644 sccsfile.5 $(ROOT)$(MANDIR)/man5/sccsfile.5
 
