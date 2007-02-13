@@ -2891,6 +2891,7 @@ deltaselect(char **ap, char **np, struct sccsprog *cmd, const char *name)
     }
     fclose(fp);
   }
+  free(path);
   closedir(dirfd);
 }
 
