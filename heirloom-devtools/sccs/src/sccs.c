@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.8 (gritter) 2/13/07
+ * Sccsid @(#)sccs.c	1.9 (gritter) 2/15/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -2949,8 +2949,7 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
         if (strcmp(dp->d_name, SccsPath) == 0) {
 	  Rflag = 2;
 	}
-      } else if (dp->d_name[0] != 's' || dp->d_name[1] != '.' ||
-	  dp->d_name[2] == '\0')
+      } else
 	continue;
       np[0] = path;
       sav_Pflag = Pflag;
