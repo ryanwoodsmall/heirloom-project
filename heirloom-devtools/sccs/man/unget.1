@@ -21,17 +21,17 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)unget.1	1.6 (gritter) 2/1/07
+.\" Sccsid @(#)unget.1	1.7 (gritter) 2/16/07
 .\"
 .\" from OpenSolaris sccs-unget 1 "11 Oct 1990" "SunOS 5.11" "User Commands"
-.TH UNGET 1 "2/1/07" "Heirloom Development Tools" "User Commands"
+.TH UNGET 1 "2/16/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 unget \- undo a previous get of an SCCS file
 .SH SYNOPSIS
 \fBunget\fR [\fB\-ns\fR] [\fB\-r\fR\fIsid\fR] \fIs.filename\fR...
 .SH DESCRIPTION
 .LP
-The \fIunget\fR utility undoes the effect of a \fBget\fR\fB\-e\fR command executed before the creation of the pending delta.
+The \fIunget\fR utility undoes the effect of a \fBget\ \-e\fR command executed before the creation of the pending delta.
 .PP
 If a directory name is used in place of the \fIs.filename\fR argument, the \fIunget\fR command applies to all \fBs.\fRfiles in that directory. Unreadable \fBs.\fRfiles produce an error; processing continues with the next file (if any). The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the names of files are to be read from the standard input, one \fBs.\fRfile per
 line.
