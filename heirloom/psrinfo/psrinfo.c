@@ -34,7 +34,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)psrinfo.sl	1.15 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)psrinfo.sl	1.16 (gritter) 2/15/07";
 
 #include	<sys/utsname.h>
 #include	<unistd.h>
@@ -248,9 +248,9 @@ freqs(void)
 void
 stats(void)
 {
-	char buf[32], line[512];
+	char line[512], *lp;
 	FILE *fp;
-	unsigned long long j_user, j_nice, j_sys, j_idle;
+	unsigned long long j, t;
 	time_t now;
 
 	if ((fp = fopen("/proc/stat", "r")) == NULL) {
@@ -260,18 +260,24 @@ stats(void)
 	}
 	time(&now);
 	while (fgets(line, sizeof line, fp) != NULL) {
-		if (sscanf(line, "%32s %llu %llu %llu %llu", buf,
-				&j_user, &j_nice, &j_sys, &j_idle) != 5
-			|| strncmp(buf, "cpu", 3) || buf[3] == 0)
+		if (strncmp(line, "cpu", 3) || !isdigit(line[3]))
 			continue;
+		t = 0;
+		lp = line;
+		while (*lp != ' ')
+			lp++;
+		for (;;) {
+			j = strtoull(lp, &lp, 10);
+			if (*lp != ' ')
+				break;
+			t += j;
+		}
 		ncpu++;
 		chain = srealloc(chain, sizeof *chain * (ncpu + 1));
 		chain[ncpu] = srealloc(NULL, sizeof **chain);
 		memset(chain[ncpu], 0, sizeof **chain);
 		chain[ncpu]->c_now = now;
-		chain[ncpu]->c_since = now -
-			(unsigned long long)(j_user + j_nice + j_sys + j_idle)
-					/ hz;
+		chain[ncpu]->c_since = now - t / hz;
 	}
 	fclose(fp);
 }
