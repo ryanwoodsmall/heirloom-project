@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)doname.cc	1.9 (gritter) 01/14/07
+ * Sccsid @(#)doname.cc	1.10 (gritter) 2/16/07
  */
 
 /*
@@ -3142,7 +3142,7 @@ sccs_get(register Name target, register Property *command)
 		}
 		line->body.line.sccs_command = true;
 		line->body.line.command_template = sccs_get_rule;
-		if(!svr4 && (!allrules_read || posix)) {
+		if(!svr4 && (!allrules_read || posix || !sun_style)) {
 		   if((target->prop) &&
 		      (target->prop->body.sccs.file) &&
 		      (target->prop->body.sccs.file->string_mb)) {
@@ -3151,7 +3151,8 @@ sccs_get(register Name target, register Property *command)
 		        (target->prop->body.sccs.file->string_mb[0] == 's') &&
 		        (target->prop->body.sccs.file->string_mb[1] == '.')) {
 
-		         line->body.line.command_template = get_posix_rule;
+		         line->body.line.command_template = posix ?
+			 	get_posix_rule : get_rule;
 		      }
 		   }
 		}

@@ -21,7 +21,11 @@
 # Copyright 2003 Sun Microsystems, Inc. All rights reserved.
 # Use is subject to license terms.
 #
-# @(#)make.rules.file 1.22 06/12/12
+# from OpenSolaris make.rules.file 1.22 06/12/12
+#
+# Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
+#
+# Sccsid @(#)make.rules.file	1.2 (gritter) 2/16/07
 #
 
 SUFFIXES = .o .c .c~ .cc .cc~ .y .y~ .l .l~ .s .s~ .sh .sh~ .S .S~ .i .ln \
@@ -495,6 +499,9 @@ SCCSGETFLAGS=-s
 
 .SCCS_GET_POSIX:
 	sccs $(SCCSFLAGS) get $(SCCSGETFLAGS) $@ 
+
+.GET:
+	$(GET) $(GFLAGS) s.$@ 
 
 .GET_POSIX:
 	$(GET) $(GFLAGS) s.$@ 

@@ -5,7 +5,7 @@
 #else
 #define USED
 #endif
-static const char id[] USED = "@(#)make.sl	1.20 (gritter) 1/23/07";
+static const char id[] USED = "@(#)make.sl	1.21 (gritter) 2/16/07";
 /* SLIST */
 /*
 ../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.6 (gritter) 01/22/07
@@ -17,7 +17,7 @@ static const char id[] USED = "@(#)make.sl	1.20 (gritter) 1/23/07";
 ../src/main.cc: * Sccsid @(#)main.cc	1.18 (gritter) 01/22/07
 ../src/make.cc: * Sccsid @(#)make.cc	1.2 (gritter) 01/07/07
 ../src/depvar.cc: * Sccsid @(#)depvar.cc	1.3 (gritter) 01/13/07
-../src/implicit.cc: * Sccsid @(#)implicit.cc	1.4 (gritter) 01/13/07
+../src/implicit.cc: * Sccsid @(#)implicit.cc	1.5 (gritter) 2/16/07
 ../src/files.cc: * Sccsid @(#)files.cc	1.7 (gritter) 01/23/07
 ../src/posix.cc: * Sccsid @(#)posix.cc	1.1 (gritter) 01/13/07
 ../src/misc.cc: * Sccsid @(#)misc.cc	1.9 (gritter) 01/20/07
@@ -28,9 +28,9 @@ static const char id[] USED = "@(#)make.sl	1.20 (gritter) 1/23/07";
 ../src/globals.cc: * Sccsid @(#)globals.cc	1.7 (gritter) 01/20/07
 ../src/rep.cc: * Sccsid @(#)rep.cc	1.3 (gritter) 01/13/07
 ../src/state.cc: * Sccsid @(#)state.cc	1.3 (gritter) 01/13/07
-../src/doname.cc: * Sccsid @(#)doname.cc	1.9 (gritter) 01/14/07
+../src/doname.cc: * Sccsid @(#)doname.cc	1.10 (gritter) 2/16/07
 ../src/pmake.cc: * Sccsid @(#)pmake.cc	1.6 (gritter) 01/18/07
-../src/read2.cc: * Sccsid @(#)read2.cc	1.6 (gritter) 01/20/07
+../src/read2.cc: * Sccsid @(#)read2.cc	1.7 (gritter) 2/16/07
 ../src/nse_printdep.cc: * Sccsid @(#)nse_printdep.cc	1.4 (gritter) 01/13/07
 ../mksh/i18n.cc: * Sccsid @(#)i18n.cc	1.3 (gritter) 01/13/07
 ../mksh/read.cc: * Sccsid @(#)read.cc	1.3 (gritter) 01/13/07

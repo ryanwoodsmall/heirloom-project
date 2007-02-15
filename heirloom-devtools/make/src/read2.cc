@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read2.cc	1.6 (gritter) 01/20/07
+ * Sccsid @(#)read2.cc	1.7 (gritter) 2/16/07
  */
 
 /*
@@ -1437,7 +1437,7 @@ special_reader(Name target, register Name_vector depes, Cmd_line command)
 		break;
 
 	case get_special:
-		if(!svr4) {
+		if(!svr4 && sun_style) {
 		  break;
 		}
 		if (depes->used != 0) {
@@ -1445,7 +1445,8 @@ special_reader(Name target, register Name_vector depes, Cmd_line command)
 				     target->string_mb);
 		}
 		get_rule = command;
-		sccs_get_rule = command;
+		if (svr4)
+			sccs_get_rule = command;
 		if (trace_reader) {
 			printf("%s:\n", get_name->string_mb);
 			print_rule(command);
@@ -1547,7 +1548,7 @@ read_suffixes_list(register Name_vector depes)
 				}
 				printf("%s ", depes->names[n]->string_mb);
 			}
-		if(!(posix|svr4)) {
+		if(!(posix|svr4) && sun_style) {
 			/* If the suffix is suffixed with "~" we */
 			/* strip that and mark the suffix nameblock */
 			str.init(np);

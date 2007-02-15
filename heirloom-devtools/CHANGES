@@ -9,6 +9,10 @@ Release: ...
   processed in their respective directories. For the other sub-commands,
   this implies that all s.files inside "SCCS" directories are processed.
 * sccs: A manual page has been added (based on the 4.3BSD-Tahoe page).
+* make: The default variant now has the ".GET:" special target enabled
+  to retrieve data from an s.file in the current directory, similar to
+  the ".GET_POSIX:" target in the POSIX variant and the behavior of the
+  SVR4 variant.
 
 Release 070211
 * SCCS: Most of the manual pages are now available, based on source code

@@ -21,7 +21,11 @@
 # Copyright 1993 Sun Microsystems, Inc. All rights reserved.
 # Use is subject to license terms.
 #
-# @(#)default.mk.file 1.4 06/12/12
+# from OpenSolaris default.mk.file 1.4 06/12/12
+#
+# Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
+#
+# Sccsid @(#)default.mk.file	1.2 (gritter) 2/16/07
 #
 
 SUFFIXES = .o .c .c~ .cc .cc~ .s .s~ .S .S~ .ln .f .f~ .F .F~ .l .l~ \
