@@ -34,10 +34,10 @@
 .\"
 .\"	from 4.3BSD-Tahoe sccs.1	2.5 (Berkeley) 5/12/86
 .\"
-.\" Sccsid @(#)sccs.1b	1.5 (gritter) 2/15/07
+.\" Sccsid @(#)sccs.1b	1.6 (gritter) 2/16/07
 .\"
 .\" SCCS 1 "May 12, 1986"
-.TH SCCS 1B "2/15/07" "Heirloom Development Tools" "BSD System Compatibility"
+.TH SCCS 1B "2/16/07" "Heirloom Development Tools" "BSD System Compatibility"
 .SH NAME
 sccs \- (BSD) front end for the Source Code Control System (\s-1SCCS\s0)
 .SH SYNOPSIS
@@ -359,6 +359,10 @@ and
 sub-commands.
 For sub-commands involving
 .BR delta ,
+or for
+.B unedit
+and
+.BR unget ,
 this implies that all s.files
 inside
 .BI ` SCCS '

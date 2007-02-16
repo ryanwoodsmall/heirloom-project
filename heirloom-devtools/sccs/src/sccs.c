@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.9 (gritter) 2/15/07
+ * Sccsid @(#)sccs.c	1.10 (gritter) 2/16/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -256,7 +256,7 @@ static int	recurse(char **, char **, struct sccsprog *, const char *);
 # define NO_SDOT	0001	/* no s. on front of args */
 # define REALUSER	0002	/* protected (e.g., admin) */
 # define RFLAG		0004	/* may operate recursively */
-# define DELTA		0010	/* implies a "delta" operation */
+# define PFONLY		0010	/* operate on p.files only */
 
 /* modes for the "clean", "info", "check" ops */
 # define CLEANC		0	/* clean command */
@@ -278,7 +278,7 @@ static struct sccsprog SccsProg[] =
 	"admin",	PROG,	REALUSER,		PROGPATH(admin),
 	"cdc",		PROG,	0,			PROGPATH(rmdel),
 	"comb",		PROG,	0,			PROGPATH(comb),
-	"delta",	PROG,	RFLAG|DELTA,		PROGPATH(delta),
+	"delta",	PROG,	RFLAG|PFONLY,		PROGPATH(delta),
 	"get",		PROG,	RFLAG,			PROGPATH(get),
 	"help",		PROG,	NO_SDOT,		PROGPATH(help),
 	"prs",		PROG,	RFLAG,			PROGPATH(prs),
@@ -293,17 +293,17 @@ static struct sccsprog SccsProg[] =
 	"sccsdiff",	SHELL,	REALUSER,		PROGPATH(sccsdiff),
 #endif /* V6		 */
 	"edit",		CMACRO,	NO_SDOT|RFLAG,		"get -e",
-	"delget",	CMACRO,	NO_SDOT|RFLAG|DELTA,
+	"delget",	CMACRO,	NO_SDOT|RFLAG|PFONLY,
 	   "delta:mysrpd/get:ixbeskcl -t",
-	"deledit",	CMACRO,	NO_SDOT|RFLAG|DELTA,
+	"deledit",	CMACRO,	NO_SDOT|RFLAG|PFONLY,
 	   "delta:mysrpd/get:ixbskcl -e -t -d",
 	"fix",		FIX,	NO_SDOT,		NULL,
 	"clean",	CLEAN,	REALUSER|NO_SDOT,	(char *) CLEANC,
 	"info",		CLEAN,	REALUSER|NO_SDOT,	(char *) INFOC,
 	"check",	CLEAN,	REALUSER|NO_SDOT,	(char *) CHECKC,
 	"tell",		CLEAN,	REALUSER|NO_SDOT,	(char *) TELLC,
-	"unedit",	UNEDIT,	NO_SDOT|RFLAG,		NULL,
-	"unget",	PROG,	RFLAG,			PROGPATH(unget),
+	"unedit",	UNEDIT,	NO_SDOT|RFLAG|PFONLY,	NULL,
+	"unget",	PROG,	RFLAG|PFONLY,		PROGPATH(unget),
 	"diffs",	DIFFS,	NO_SDOT|REALUSER|RFLAG,	NULL,
 	"-diff",	PROG,	NO_SDOT|REALUSER|RFLAG,	"diff",
 	"print",	CMACRO,	NO_SDOT|RFLAG,		"prs -e/get -p -m -s",
@@ -2839,7 +2839,7 @@ clean_up(void)
 }
 
 static int
-deltaselect(char **ap, char **np, struct sccsprog *cmd, const char *name)
+pfileselect(char **ap, char **np, struct sccsprog *cmd, const char *name)
 {
   static char	*myname;
   DIR	*dirfd;
@@ -2954,8 +2954,8 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
       np[0] = path;
       sav_Pflag = Pflag;
       Pflag = _Pflag;
-      if (Rflag == 2 && cmd->sccsflags & DELTA)
-        rval |= deltaselect(ap, np, cmd, path);
+      if (Rflag == 2 && cmd->sccsflags & PFONLY)
+        rval |= pfileselect(ap, np, cmd, path);
       else
         rval |= command(ap, 1, "");
       Rflag = 1;
