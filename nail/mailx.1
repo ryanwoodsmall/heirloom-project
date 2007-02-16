@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)mailx.1	2.322 (gritter) 01/07/07
+.\"     Sccsid: @(#)mailx.1	2.323 (gritter) 2/16/07
 .\"
-.TH MAILX 1 "01/07/07" "Heirloom mailx 12.3" "User Commands"
+.TH MAILX 1 "2/16/07" "Heirloom mailx 12.3" "User Commands"
 .SH NAME
 mailx \- send and receive Internet mail
 .SH SYNOPSIS
@@ -1924,7 +1924,8 @@ and the user is asked for a filename
 to save each other part;
 if the contents of the first part are not to be saved,
 `write /dev/null' can be used.
-If the filename given starts with a `|' character,
+For the second and subsequent parts,
+if the filename given starts with a `|' character,
 the part is piped through the remainder of the filename
 interpreted as a shell command.
 In non-interactive mode, only the parts of the multipart message
