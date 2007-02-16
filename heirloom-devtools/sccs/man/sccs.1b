@@ -34,7 +34,7 @@
 .\"
 .\"	from 4.3BSD-Tahoe sccs.1	2.5 (Berkeley) 5/12/86
 .\"
-.\" Sccsid @(#)sccs.1b	1.6 (gritter) 2/16/07
+.\" Sccsid @(#)sccs.1b	1.7 (gritter) 2/16/07
 .\"
 .\" SCCS 1 "May 12, 1986"
 .TH SCCS 1B "2/16/07" "Heirloom Development Tools" "BSD System Compatibility"
@@ -107,7 +107,38 @@ rather than as whatever effective user
 is ``set user id'' to.
 .TP
 .B \-R
-Force recursive operation (see below).
+Operate recursively.
+All subdirectories of all file arguments
+are handled at once
+with the
+.BR delta ,
+.BR get ,
+.BR prs ,
+.BR prt ,
+.BR sact ,
+.BR edit ,
+.BR delget ,
+.BR deledit ,
+.BR unedit ,
+.BR diffs ,
+and
+.B print
+sub-commands.
+If no file argument is given,
+the current directory is processed.
+For sub-commands involving edited files,
+this implies that all s.files
+inside
+.BI ` SCCS '
+directories
+for which a p.file exists
+are processed in their respective directories.
+For the other sub-commands,
+this implies that all s.files
+inside
+.BI ` SCCS '
+directories
+are processed.
 This option is an extension.
 .TP
 \fB\-d\fIprefixpath\fR
@@ -335,46 +366,6 @@ as
 .B print
 This command prints out verbose information
 about the named files.
-.PP
-If all file arguments name directories
-that contain no s.files,
-or if the 
-.B \-R
-option is present,
-all subdirectories of all file arguments
-are handled at once
-with the
-.BR delta ,
-.BR get ,
-.BR prs ,
-.BR prt ,
-.BR sact ,
-.BR edit ,
-.BR delget ,
-.BR deledit ,
-.BR unedit ,
-.BR diffs ,
-and
-.B print
-sub-commands.
-For sub-commands involving
-.BR delta ,
-or for
-.B unedit
-and
-.BR unget ,
-this implies that all s.files
-inside
-.BI ` SCCS '
-directories
-that are currently edited
-are processed in their respective directories.
-For the other sub-commands,
-this implies that all s.files
-inside
-.BI ` SCCS '
-directories
-are processed.
 .SH EXAMPLES
 .de BX
 .PP

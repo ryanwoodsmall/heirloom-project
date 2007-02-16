@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.10 (gritter) 2/16/07
+ * Sccsid @(#)sccs.c	1.11 (gritter) 2/16/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -213,7 +213,6 @@ struct list_files
 static char	*getNsid(char *, char *);
 static int	command(char **, int, char *);
 static void	get_list_files(struct list_files *, char *, int);
-static bool	have_sfile_in(const char *);
 static void	get_comments(void);
 static struct sccsprog	*lookup(char *);
 static int	callprog(char *, int, char **, int);
@@ -304,7 +303,7 @@ static struct sccsprog SccsProg[] =
 	"tell",		CLEAN,	REALUSER|NO_SDOT,	(char *) TELLC,
 	"unedit",	UNEDIT,	NO_SDOT|RFLAG|PFONLY,	NULL,
 	"unget",	PROG,	RFLAG|PFONLY,		PROGPATH(unget),
-	"diffs",	DIFFS,	NO_SDOT|REALUSER|RFLAG,	NULL,
+	"diffs",	DIFFS,	NO_SDOT|REALUSER|RFLAG|PFONLY,	NULL,
 	"-diff",	PROG,	NO_SDOT|REALUSER|RFLAG,	"diff",
 	"print",	CMACRO,	NO_SDOT|RFLAG,		"prs -e/get -p -m -s",
 	"branch",	CMACRO,	NO_SDOT|RFLAG,
@@ -657,13 +656,14 @@ command(char **argv, int forkflag, char *arg0)
 			while (*++p != '\0' && *p != '/' && *p != ' ') ;
 		}
 	}
-	/* added five elements for: */
+	/* added six elements for: */
 	/* - command;		     */
 	/* - -ycomment;		     */
 	/* - -Pprefix;		     */
 	/* - additional DIFFS param; */
+	/* - default directory       */
 	/* - last element (NULL).    */
-	for (nav_size += 5, ap = argv; *ap != NULL; ap++) {
+	for (nav_size += 6, ap = argv; *ap != NULL; ap++) {
 		nav_size++;
 	}
 	if ((nav = malloc(nav_size * (sizeof(char *)))) == NULL) {
@@ -1069,19 +1069,6 @@ command(char **argv, int forkflag, char *arg0)
 		nav = new_nav;
 		ap  = &new_nav[1]; 
 	}
-	if (Rflag == 0 && cmd->sccsflags & RFLAG) {
-	  int	found = 0;
-	  for (listfilesp = head_files.next; listfilesp;
-	      listfilesp = listfilesp->next) {
-	    if (isdir(listfilesp->filename)) {
-	      found = 1;
-	      if (have_sfile_in(listfilesp->filename))
-	        break;
-	    }
-	  }
-	  if (found && listfilesp == NULL)
-	    Rflag = 1;
-	}
 	if (Rflag == 1) {
 	  if (!hady) {
 	    if (!strcmp(cmd->sccsname, "delta") ||
@@ -1093,9 +1080,13 @@ command(char **argv, int forkflag, char *arg0)
 	    }
 	  }
 	  np[1] = NULL;
-	  for (listfilesp = head_files.next; listfilesp;
-	      listfilesp = listfilesp->next) {
-	    rval |= recurse(ap, np, cmd, listfilesp->filename);
+	  if (head_files.next == NULL)
+	    rval |= recurse(ap, np, cmd, ".");
+	  else {
+	    for (listfilesp = head_files.next; listfilesp;
+		listfilesp = listfilesp->next) {
+	      rval |= recurse(ap, np, cmd, listfilesp->filename);
+	    }
 	  }
 	  return rval;
 	}
@@ -1623,26 +1614,6 @@ get_list_files(struct list_files *listfilesp, char *filename, int no_sdot)
       filename = makefile(filename,SccsDir);
    }
    listfilesp->s_filename = filename;
-}
-
-static bool
-have_sfile_in(const char *name)
-{
-  struct stat	st;
-  DIR	*dirfd;
-  struct dirent	*dp;
-  bool	yes = FALSE;
-
-  if ((dirfd = opendir(name)) == NULL)
-    return FALSE;
-  while ((dp = readdir(dirfd)) != NULL) {
-    if (dp->d_name[0] == 's' && dp->d_name[1] == '.' && dp->d_name[2] != '\0') {
-      yes = TRUE;
-      break;
-    }
-  }
-  closedir(dirfd);
-  return yes;
 }
 
 static void
