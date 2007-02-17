@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.6 (gritter) 01/13/07
+ * Sccsid @(#)read.cc	1.7 (gritter) 2/17/07
  */
 
 /*
@@ -1547,8 +1547,10 @@ case scan_name_state:
 				if(svr4) {
 				  fatal_reader("syntax error");
 				}
-				else {
+				else if (sun_style) {
 				  fatal_reader("Macro assignment on dependency line");
+				} else {
+				  on_eoln_state = enter_conditional_state;
 				}
 			}
 			if (append) {

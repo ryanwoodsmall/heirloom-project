@@ -6,6 +6,8 @@ Release: ...
   to retrieve data from an s.file in the current directory, similar to
   the ".GET_POSIX:" target in the POSIX variant and the behavior of the
   SVR4 variant.
+* make: The GNU syntax for conditional macros, "target: variable=value",
+  is now accepted.
 
 Release 070211
 * SCCS: Most of the manual pages are now available, based on source code
