@@ -11,6 +11,8 @@ Release: ...
 * make: Partial support for GNU style functions, "$(function arguments)",
   has been added. Currently, the supported functions are "dir", "notdir",
   "suffix", "basename", "addsuffix", "addprefix", "join", and "wildcard".
+* make: Fixed the "-jn" option for recursive operation if given without
+  space between option and option argument; it was previously ignored.
 
 Release 070211
 * SCCS: Most of the manual pages are now available, based on source code

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.18 (gritter) 01/22/07
+ * Sccsid @(#)main.cc	1.19 (gritter) 2/17/07
  */
 
 /*
@@ -2527,7 +2527,9 @@ read_files_and_state(int argc, char **argv)
 			   (argv[i][0] == (int) hyphen_char) &&
 			   (argv[i][1] == 'c' ||
 			    argv[i][1] == 'g' ||
+#ifdef TEAMWARE_MAKE_CMN
 			    argv[i][1] == 'j' ||
+#endif
 			    argv[i][1] == 'K' ||
 			    argv[i][1] == 'M' ||
 			    argv[i][1] == 'm' ||
@@ -2810,12 +2812,14 @@ enter_argv_values(int argc, char *argv[], ASCII_Dyn_Array *makeflags_and_macro)
 	Boolean			append = false;
 	Property		macro;
 	struct stat		statbuf;
+	Boolean			nospace = false;
 
 
 	/* Read argv options and "=" type args and make them readonly. */
 	makefile_type = reading_nothing;
 	for (i = 1; i < argc; ++i) {
 		append = false;
+		nospace = false;
 		if (argv[i] == NULL) {
 			continue;
 		} else if (((argv[i][0] == '-') && (argv[i][1] == '-')) ||
@@ -2852,8 +2856,8 @@ enter_argv_values(int argc, char *argv[], ASCII_Dyn_Array *makeflags_and_macro)
 #ifndef TEAMWARE_MAKE_CMN
 				if (argv[i][2]) {
 					argv[i] += 2;
-					if (i < argc - 1)
-						i--;
+					i--;
+					nospace = true;
 				} else
 #endif
 				if (argv[i+1] == NULL) {
@@ -2934,7 +2938,8 @@ enter_argv_values(int argc, char *argv[], ASCII_Dyn_Array *makeflags_and_macro)
 				argv[i] = NULL;
 				continue;
 			}
-			argv[i] = NULL;
+			if (nospace == false)
+				argv[i] = NULL;
 			if (i == (argc - 1)) {
 				break;
 			}
