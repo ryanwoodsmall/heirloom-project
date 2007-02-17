@@ -1618,6 +1618,7 @@ f_wildcard(wchar_t *args, String destination)
 			append_char(space_char, destination);
 		append_string(*rp, destination, FIND_LENGTH);
 	}
+	wordfree(&we);
 	return true;
 }
 
