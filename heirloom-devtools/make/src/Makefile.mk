@@ -19,12 +19,15 @@ MAKELIBS = -L../bsd -lbsd -L../makestate -lmakestate \
 	-L../mksh -lmksh -L../vroot -lvroot \
 	-L../mksdmsi18n -lmksdmsi18n
 
+MAKEARCHIVES = ../bsd/libbsd.a ../makestate/libmakestate.a \
+	../mksdmsi18n/libmksdmsi18n.a ../mksh/libmksh.a ../vroot/libvroot.a
+
 all: make make_sus
 
-make: $(OBJ)
+make: $(OBJ) $(MAKEARCHIVES)
 	$(CXX) $(LDFLAGS) $(OBJ) $(MAKELIBS) $(LIBS) -o $@
 
-make_sus: $(OBJ) posix.o
+make_sus: $(OBJ) posix.o $(MAKEARCHIVES)
 	$(CXX) $(LDFLAGS) $(OBJ) posix.o $(MAKELIBS) $(LIBS) -o $@
 
 install: all

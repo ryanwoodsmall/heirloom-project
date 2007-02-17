@@ -8,6 +8,9 @@ Release: ...
   SVR4 variant.
 * make: The GNU syntax for conditional macros, "target: variable=value",
   is now accepted.
+* make: Partial support for GNU style functions, "$(function arguments)",
+  has been added. Currently, the supported functions are "dir", "notdir",
+  "suffix", "basename", "addsuffix", "addprefix", "join", and "wildcard".
 
 Release 070211
 * SCCS: Most of the manual pages are now available, based on source code

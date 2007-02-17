@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.cc	1.6 (gritter) 01/13/07
+ * Sccsid @(#)macro.cc	1.7 (gritter) 2/17/07
  */
 
 /*
@@ -43,6 +43,7 @@
 /*
  * Included files
  */
+#include <wordexp.h>
 #include <mksh/dosys.h>		/* sh_command2string() */
 #include <mksh/i18n.h>		/* get_char_semantics_value() */
 #include <mksh/macro.h>
@@ -59,6 +60,7 @@ static void	expand_value_with_daemon(Name name, register Property macro, registe
 #else
 static void	expand_value_with_daemon(Name, register Property macro, register String destination, Boolean cmd);
 #endif
+static Boolean	expand_function(wchar_t *, wchar_t *, String);
 
 static void	init_arch_macros(void);
 static void	init_mach_macros(void);
@@ -604,6 +606,17 @@ get_macro_value:
 				right_hand[i] = NULL;
 			}
 			replacement = pattern_replace;
+		}
+	}
+	if (!sun_style && !svr4) {
+		wchar_t	*args;
+		if ((args = wschr(string.buffer.start, space_char)) != NULL) {
+			*args++ = 0;
+			while (*args == space_char)
+				args++;
+			if (expand_function(string.buffer.start, args,
+				destination) == true)
+				return;
 		}
 	}
 	if (name == NULL) {
@@ -1417,4 +1430,215 @@ found_it:;
 		}
 	}
 	return macro;
+}
+
+/*
+ * GNU-style function handling support: $(function arguments)
+ */
+static wchar_t *
+skip_space(wchar_t *s)
+{
+	while (*s == space_char)
+		s++;
+	while (*s && *s != space_char)
+		s++;
+	if (*s != 0)
+		*s++ = 0;
+	return s;
+}
+
+static wchar_t *
+h_dir(wchar_t *args)
+{
+	wchar_t	*ap, *sp;
+
+	sp = NULL;
+	for (ap = args; *ap; ap++)
+		if (*ap == slash_char)
+			sp = ap;
+	if (sp != NULL)
+		sp[1] = 0;
+	else
+		args = L"./";
+	return args;
+}
+
+static wchar_t *
+h_notdir(wchar_t *args)
+{
+	wchar_t	*ap;
+
+	for (ap = args; *ap; ap++)
+		if (*ap == slash_char)
+			args = &ap[1];
+	return args;
+}
+
+static wchar_t *
+h_suffix(wchar_t *args)
+{
+	wchar_t	*ap;
+
+	ap = args;
+	args = L"";
+	for ( ; *ap; ap++)
+		if (*ap == period_char)
+			args = ap;
+	return args;
+}
+
+static wchar_t *
+h_basename(wchar_t *args)
+{
+	wchar_t	*ap, *sp, *pp;
+
+	sp = args;
+	for (ap = args; *ap; ap++)
+		if (*ap == slash_char)
+			sp = ap;
+	pp = NULL;
+	for ( ; *sp; sp++)
+		if (*sp == period_char)
+			pp = sp;
+	if (pp)
+		*pp = 0;
+	return args;
+}
+
+static Boolean
+f_sep_space(wchar_t *args, String destination, wchar_t *(*handler)(wchar_t *))
+{
+	wchar_t	*np;
+	int	c = 0;
+
+	do {
+		np = skip_space(args);
+		args = handler(args);
+		if (c++)
+			append_char(space_char, destination);
+		append_string(args, destination, FIND_LENGTH);
+		args = np;
+	} while (*args);
+	return true;
+}
+
+static Boolean
+f_addsuffix(wchar_t *args, String destination)
+{
+	wchar_t	*np, *suffix;
+	int	c = 0;
+
+	suffix = args;
+	for (np = args; *np; np++)
+		if (*np == comma_char)
+			break;
+	if (*np == NULL)
+		fatal_reader_mksh("addsuffix: no suffix specified");
+	*np++ = 0;
+	args = np;
+	do {
+		np = skip_space(args);
+		if (c++)
+			append_char(space_char, destination);
+		append_string(args, destination, FIND_LENGTH);
+		append_string(suffix, destination, FIND_LENGTH);
+		args = np;
+	} while (*args);
+	return true;
+}
+
+static Boolean
+f_addprefix(wchar_t *args, String destination)
+{
+	wchar_t	*np, *prefix;
+	int	c = 0;
+
+	prefix = args;
+	for (np = args; *np; np++)
+		if (*np == comma_char)
+			break;
+	if (*np == NULL)
+		fatal_reader_mksh("addprefix: no prefix specified");
+	*np++ = 0;
+	args = np;
+	do {
+		np = skip_space(args);
+		if (c++)
+			append_char(space_char, destination);
+		append_string(prefix, destination, FIND_LENGTH);
+		append_string(args, destination, FIND_LENGTH);
+		args = np;
+	} while (*args);
+	return true;
+}
+
+static Boolean
+f_join(wchar_t *args, String destination)
+{
+	wchar_t	*ap, *join, *jp;
+	int	c = 0;
+
+	join = NULL;
+	for (ap = args; *ap; ap++)
+		if (*ap == comma_char)
+			join = ap;
+	if (join == NULL)
+		fatal_reader_mksh("join: nothing to join");
+	*join++ = 0;
+	do {
+		ap = skip_space(args);
+		jp = skip_space(join);
+		if (c++)
+			append_char(space_char, destination);
+		append_string(args, destination, FIND_LENGTH);
+		append_string(join, destination, FIND_LENGTH);
+		if (*ap)
+			args = ap;
+		if (*jp)
+			join = jp;
+	} while (*ap || *jp);
+	return true;
+}
+
+static Boolean
+f_wildcard(wchar_t *args, String destination)
+{
+	wordexp_t	we;
+	size_t	n;
+	char	*cp;
+	char	**rp;
+
+	n = MB_CUR_MAX * wcslen(args) + 1;
+	cp = (char *)alloca(n);
+	if (wcstombs(cp, args, n) == (size_t)-1 ||
+			wordexp(cp, &we, WRDE_NOCMD) != 0)
+		fatal_reader_mksh("wildcard: syntax error");
+	for (rp = we.we_wordv; *rp; rp++) {
+		if (rp != we.we_wordv)
+			append_char(space_char, destination);
+		append_string(*rp, destination, FIND_LENGTH);
+	}
+	return true;
+}
+
+static Boolean
+expand_function(wchar_t *func, wchar_t *args, String destination)
+{
+	if (wcscmp(func, L"dir") == 0)
+		return f_sep_space(args, destination, h_dir);
+	if (wcscmp(func, L"notdir") == 0)
+		return f_sep_space(args, destination, h_notdir);
+	if (wcscmp(func, L"suffix") == 0)
+		return f_sep_space(args, destination, h_suffix);
+	if (wcscmp(func, L"basename") == 0)
+		return f_sep_space(args, destination, h_basename);
+	if (wcscmp(func, L"addsuffix") == 0)
+		return f_addsuffix(args, destination);
+	if (wcscmp(func, L"addprefix") == 0)
+		return f_addprefix(args, destination);
+	if (wcscmp(func, L"join") == 0)
+		return f_join(args, destination);
+	if (wcscmp(func, L"wildcard") == 0)
+		return f_wildcard(args, destination);
+	return false;
 }
