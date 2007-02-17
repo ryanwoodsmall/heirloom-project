@@ -34,10 +34,10 @@
 .\"
 .\"	from 4.3BSD-Tahoe sccs.1	2.5 (Berkeley) 5/12/86
 .\"
-.\" Sccsid @(#)sccs.1b	1.7 (gritter) 2/16/07
+.\" Sccsid @(#)sccs.1b	1.8 (gritter) 2/17/07
 .\"
 .\" SCCS 1 "May 12, 1986"
-.TH SCCS 1B "2/16/07" "Heirloom Development Tools" "BSD System Compatibility"
+.TH SCCS 1B "2/17/07" "Heirloom Development Tools" "BSD System Compatibility"
 .SH NAME
 sccs \- (BSD) front end for the Source Code Control System (\s-1SCCS\s0)
 .SH SYNOPSIS
@@ -107,25 +107,10 @@ rather than as whatever effective user
 is ``set user id'' to.
 .TP
 .B \-R
-Operate recursively.
-All subdirectories of all file arguments
-are handled at once
-with the
-.BR delta ,
-.BR get ,
-.BR prs ,
-.BR prt ,
-.BR sact ,
-.BR edit ,
-.BR delget ,
-.BR deledit ,
-.BR unedit ,
-.BR diffs ,
-and
-.B print
-sub-commands.
+Operate recursively on all subdirectories
+of all file arguments.
 If no file argument is given,
-the current directory is processed.
+operation starts in the current directory.
 For sub-commands involving edited files,
 this implies that all s.files
 inside

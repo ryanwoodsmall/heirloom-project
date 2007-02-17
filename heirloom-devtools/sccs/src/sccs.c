@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.11 (gritter) 2/16/07
+ * Sccsid @(#)sccs.c	1.12 (gritter) 2/17/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -297,10 +297,10 @@ static struct sccsprog SccsProg[] =
 	"deledit",	CMACRO,	NO_SDOT|RFLAG|PFONLY,
 	   "delta:mysrpd/get:ixbskcl -e -t -d",
 	"fix",		FIX,	NO_SDOT,		NULL,
-	"clean",	CLEAN,	REALUSER|NO_SDOT,	(char *) CLEANC,
-	"info",		CLEAN,	REALUSER|NO_SDOT,	(char *) INFOC,
-	"check",	CLEAN,	REALUSER|NO_SDOT,	(char *) CHECKC,
-	"tell",		CLEAN,	REALUSER|NO_SDOT,	(char *) TELLC,
+	"clean",	CLEAN,	REALUSER|NO_SDOT|RFLAG,	(char *) CLEANC,
+	"info",		CLEAN,	REALUSER|NO_SDOT|RFLAG,	(char *) INFOC,
+	"check",	CLEAN,	REALUSER|NO_SDOT|RFLAG,	(char *) CHECKC,
+	"tell",		CLEAN,	REALUSER|NO_SDOT|RFLAG,	(char *) TELLC,
 	"unedit",	UNEDIT,	NO_SDOT|RFLAG|PFONLY,	NULL,
 	"unget",	PROG,	RFLAG|PFONLY,		PROGPATH(unget),
 	"diffs",	DIFFS,	NO_SDOT|REALUSER|RFLAG|PFONLY,	NULL,
@@ -356,6 +356,7 @@ static int create_macro  = 0;	/* 1 if "sccs create ..."  command is running. */
 static int del_macro     = 0;	/* 1 if "sccs deledit ..." or "sccs delget ..." commands are running. */
 
 static int	Rflag;		/* recursive operation */
+static int	Rlevel;		/* recursion level */
 static char	*Pflag;		/* directory prefix */
 
 #define	FBUFSIZ	BUFSIZ
@@ -2038,7 +2039,8 @@ clean(int mode, char **argv)
 #endif
 	char buf[MAXPATHLEN];
 	char namefile[MAXPATHLEN];
-	char *bufend;
+	char basebuf[MAXPATHLEN];
+	char *bufend, *baseend;
 	register DIR *dirfd;
 	register char *basefile;
 	bool gotedit;
@@ -2098,10 +2100,16 @@ clean(int mode, char **argv)
 	gstrcpy(buf, SccsDir, sizeof(buf));
 	if (buf[0] != '\0')
 		gstrcat(buf, "/", sizeof(buf));
+	*basebuf = '\0';
+	baseend = basebuf;
 	if (subdir != NULL)
 	{
 		gstrcat(buf, subdir, sizeof(buf));
 		gstrcat(buf, "/", sizeof(buf));
+		if (Rflag) {
+			strcpy(basebuf, buf);
+			baseend = &basebuf[strlen(basebuf)];
+		}
 	}
 	gstrcat(buf, SccsPath, sizeof(buf));
 	bufend = &buf[strlen(buf)];
@@ -2134,9 +2142,12 @@ clean(int mode, char **argv)
 		}
 		
 		/* got an s. file -- see if the p. file exists */
-		gstrcpy(bufend, NOGETTEXT("/p."), sizeof(buf));
+		gstrcpy(bufend, NOGETTEXT("/p."), sizeof(buf) - (bufend - buf));
 		basefile = bufend + 3;
-		gstrcpy(basefile, &dir->d_name[2], sizeof(buf));
+		gstrcpy(basefile, &dir->d_name[2],
+				sizeof(buf) - (basefile - buf));
+		gstrcpy(baseend, &dir->d_name[2],
+				sizeof(basebuf) - (baseend - basebuf));
 
 		/*
 		**  open and scan the p-file.
@@ -2161,11 +2172,13 @@ clean(int mode, char **argv)
 				gotpfent = TRUE;
 				if (mode == TELLC)
 				{
-					printf("%s\n", basefile);
+					printf("%s\n", Rflag ?
+							basebuf : basefile);
 					break;
 				}
 				if (checkpfent(pf)) {
-					printf("%12s: being edited: ", basefile);
+					printf("%12s: being edited: ", Rflag ?
+							basebuf : basefile);
 					putpfent(pf, stdout);
 				} else {
 					fatal("bad p-file format (co17)");
@@ -2176,18 +2189,15 @@ clean(int mode, char **argv)
 		
 		/* the s. file exists and no p. file exists -- unlink the g-file */
 		if (mode == CLEANC && !gotpfent) {
-		   char	unlinkbuf[FBUFSIZ];
-		   
-		   gstrcpy(unlinkbuf, &dir->d_name[2], sizeof(unlinkbuf));
-		   if (exists(unlinkbuf) != 0) {
+		   if (exists(basebuf) != 0) {
 		      if (((Statbuf.st_mode & (S_IWUSR|S_IWGRP|S_IWOTH)) == 0)||
 		          (edited != 0)) {
-			 unlink(unlinkbuf);
+			 unlink(basebuf);
 		      } else {
 		  	 ex_status = 1;
 			 fprintf(stderr, 
 			   "ERROR [%s]: the file `%s' is writable\n",
-			   namefile, basefile);
+			   namefile, Rflag ? basebuf : basefile);
 		      }
 		   }
 		}
@@ -2195,7 +2205,7 @@ clean(int mode, char **argv)
 
 	/* cleanup & report results */
 	closedir(dirfd);
-	if (!gotedit && mode == INFOC)
+	if (!gotedit && mode == INFOC && (!Rflag || Rlevel <= 1))
 	{
 		printf("Nothing being edited");
 		if (nobranch)
@@ -2885,6 +2895,7 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
     Rflag = 1;
     return rval;
   }
+  Rlevel++;
   pn = strlen(name);
   size = pn + 40;
   if ((path = malloc(size)) == NULL || (_Pflag = malloc(pn + 4)) == NULL) {
@@ -2925,7 +2936,14 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
       np[0] = path;
       sav_Pflag = Pflag;
       Pflag = _Pflag;
-      if (Rflag == 2 && cmd->sccsflags & PFONLY)
+      if (cmd->sccsoper == CLEAN) {
+	if (Rflag == 2) {
+	  np[0] = name;
+          rval |= command(ap, 1, "");
+	  break;
+	} else
+          rval |= command(ap, 1, "");
+      } else if (Rflag == 2 && cmd->sccsflags & PFONLY)
         rval |= pfileselect(ap, np, cmd, path);
       else
         rval |= command(ap, 1, "");
@@ -2936,5 +2954,6 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
   }
   free(path);
   free(_Pflag);
+  Rlevel--;
   return rval;
 }
