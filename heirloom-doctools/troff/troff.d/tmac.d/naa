@@ -1,7 +1,7 @@
 .\"
 .\" tmac.naa - nroff macros for Unix 6th Edition manual pages
 .\"
-.\" Sccsid @(#)naa	1.3 (gritter) 2/18/07
+.\" Sccsid @(#)naa	1.4 (gritter) 2/18/07
 .\"
 .\" from Unix 6th Edition /usr/doc/man/man0/naa
 .\"
@@ -45,7 +45,7 @@
 ..
 .de lp
 .i0
-.ta \\$2+1
+.ta \\$2
 .in \\$1
 .ti -\\$2
 ..
