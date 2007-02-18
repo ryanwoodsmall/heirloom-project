@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.cc	1.8 (gritter) 2/18/07
+ * Sccsid @(#)macro.cc	1.9 (gritter) 2/18/07
  */
 
 /*
@@ -1918,6 +1918,37 @@ f_words(wchar_t *args, String destination)
 }
 
 static Boolean
+f_shell(wchar_t *args, String destination)
+{
+	String_rec	string;
+
+	INIT_STRING_FROM_STACK(string, args);
+	sh_command2string(&string, destination);
+	return true;
+}
+
+extern const char	*progname;
+
+static Boolean
+f_error(wchar_t *args, String destination)
+{
+	fprintf(stderr, "%s: *** %ls\n", progname, args);
+#ifdef SUN5_0
+	exit_status = 2;
+#endif
+	exit(2);
+	/*NOTREACHED*/
+	return true;
+}
+
+static Boolean
+f_warning(wchar_t *args, String destination)
+{
+	fprintf(stderr, "%s: %ls\n", progname, args);
+	return true;
+}
+
+static Boolean
 expand_function(wchar_t *func, wchar_t *args, String destination)
 {
 	if (wcscmp(func, L"dir") == 0)
@@ -1958,5 +1989,11 @@ expand_function(wchar_t *func, wchar_t *args, String destination)
 		return f_words(args, destination);
 	if (wcscmp(func, L"firstword") == 0)
 		return s_word(1, 1, args, destination);
+	if (wcscmp(func, L"shell") == 0)
+		return f_shell(args, destination);
+	if (wcscmp(func, L"error") == 0)
+		return f_error(args, destination);
+	if (wcscmp(func, L"warning") == 0)
+		return f_warning(args, destination);
 	return false;
 }

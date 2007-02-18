@@ -12,7 +12,8 @@ Release: ...
   has been added. Currently, the supported functions are "dir", "notdir",
   "suffix", "basename", "addsuffix", "addprefix", "join", "wildcard",
   "subst", "patsubst", "strip", "findstring", "filter", "filter-out",
-  "sort", "word", "wordlist", "words", and "firstword".
+  "sort", "word", "wordlist", "words", "firstword", "shell", "error", and
+  "warning".
 * make: Fixed the "-jn" option for recursive operation if given without
   space between option and option argument; it was previously ignored.
 
