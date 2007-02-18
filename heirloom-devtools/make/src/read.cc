@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.8 (gritter) 2/18/07
+ * Sccsid @(#)read.cc	1.9 (gritter) 2/18/07
  */
 
 /*
@@ -801,6 +801,8 @@ start_new_line_no_skip:
 		MBSTOWCS(include_tab, NOCATGETS("include\t"));
 	    }
 	check_conditional:
+	    Boolean	had_else = false;
+	next_conditional:
 	    if (!sun_style && !svr4) {
 		wchar_t	*save_source_p = source_p;
 		enum conditional_type {
@@ -847,8 +849,10 @@ start_new_line_no_skip:
 		    source_p = save_source_p;
 		    goto no_conditional;
 		}
+		if (had_else && conditional_type == ELSE)
+		    fatal_reader("syntax error");
 		if (conditional_type == ELSE || conditional_type == ENDIF) {
-		    if (GET_CHAR() != newline_char)
+		    if (conditional_type == ENDIF && GET_CHAR() != newline_char)
 			fatal_reader("syntax error");
 		    if (conditional_level == 0)
 			fatal_reader("excess %s", conditional_type == ELSE ?
@@ -865,11 +869,19 @@ start_new_line_no_skip:
 			else
 			    use_this = true;
 		    }
-		    if (in_dependencies_state == false || use_this == true)
+		    if (conditional_type == ELSE && use_this == true) {
+			had_else = true;
+			goto next_conditional;
+		    }
+		    if (in_dependencies_state == false || use_this == true) {
 		        source_p++;
+			if (source->fd >= 0)
+			    line_number++;
+		    }
 		} else {
-		    conditional_level++;
-		    if (use_this == false) {
+		    if (had_else == false)
+			conditional_level++;
+		    if (use_this == false && had_else == true) {
 			not_use_level++;
 			goto no_conditional;
 		    }
@@ -889,6 +901,8 @@ start_new_line_no_skip:
 			    append_string(string_start, &name_string,
 				    source_p - string_start);
 		    	    source_p++;
+			    if (source->fd >= 0)
+				line_number++;
 			    goto eoln_3;
 			default:
 			    source_p++;
@@ -951,6 +965,8 @@ start_new_line_no_skip:
 			    source_p++;
 			}
 		    }
+		    if (source->fd >= 0)
+			line_number++;
 		    source_p++;
 		    if (in_dependencies_state == true)
 			goto check_conditional;

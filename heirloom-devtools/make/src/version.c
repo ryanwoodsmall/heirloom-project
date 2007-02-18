@@ -5,11 +5,11 @@
 #else
 #define USED
 #endif
-static const char id[] USED = "@(#)make.sl	1.29 (gritter) 2/18/07";
+static const char id[] USED = "@(#)make.sl	1.30 (gritter) 2/18/07";
 /* SLIST */
 /*
 ../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.6 (gritter) 01/22/07
-../src/read.cc: * Sccsid @(#)read.cc	1.8 (gritter) 2/18/07
+../src/read.cc: * Sccsid @(#)read.cc	1.9 (gritter) 2/18/07
 ../src/dist.cc: * Sccsid @(#)dist.cc	1.5 (gritter) 01/20/07
 ../src/ar.cc: * Sccsid @(#)ar.cc	1.5 (gritter) 01/13/07
 ../src/dosys.cc: * Sccsid @(#)dosys.cc	1.4 (gritter) 01/13/07
