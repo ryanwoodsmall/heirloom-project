@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.7 (gritter) 2/17/07
+ * Sccsid @(#)read.cc	1.8 (gritter) 2/18/07
  */
 
 /*
@@ -75,6 +75,8 @@ static	void		parse_makefile(register Name true_makefile_name, register Source so
 static	Source		push_macro_value(register Source bp, register wchar_t *buffer, int size, register Source source);
 extern  void 		enter_target_groups_and_dependencies(Name_vector target, Name_vector depes, Cmd_line command, Separator separator, Boolean target_group_seen);
 extern	Name		normalize_name(register wchar_t *name_string, register int length);
+static	Boolean		eq_condition(wchar_t *);
+static	Boolean		de_condition(wchar_t *);
 
 /*
  *	read_simple_file(makefile_name, chase_path, doname_it,
@@ -567,6 +569,10 @@ parse_makefile(register Name true_makefile_name, register Source source)
 
 	String_rec		include_name;
 	wchar_t			include_buffer[STRING_BUFFER_LENGTH];
+	Boolean			use_this = true;
+	unsigned long		not_use_level = 0;
+	unsigned long		conditional_level = 0;
+	Boolean			in_dependencies_state = false;
 
 	target.next = depes.next = NULL;
 	/* Move some values from their struct to register declared locals */
@@ -787,12 +793,174 @@ start_new_line_no_skip:
 	if (source == NULL) {
 		GOTO_STATE(exit_state);
 	}
-	/* Check if this is an include command */
+	/* Check if this is an include command or a conditional*/
 	if ((makefile_type == reading_makefile) &&
 	    !source->already_expanded) {
 	    if (include_space[0] == (int) nul_char) {
 		MBSTOWCS(include_space, NOCATGETS("include "));
 		MBSTOWCS(include_tab, NOCATGETS("include\t"));
+	    }
+	check_conditional:
+	    if (!sun_style && !svr4) {
+		wchar_t	*save_source_p = source_p;
+		enum conditional_type {
+    		  NONE, IFEQ, IFNEQ, IFDEF, IFNDEF, ELSE, ENDIF
+		} conditional_type;
+		Boolean hadspace = false;
+
+		while (*source_p == space_char)
+		    source_p++;
+		if (IS_WEQUALN(source_p, L"ifeq", 4)) {
+		    conditional_type = IFEQ;
+		    source_p += 4;
+		} else if (IS_WEQUALN(source_p, L"ifneq", 5)) {
+		    conditional_type = IFNEQ;
+		    source_p += 5;
+		} else if (IS_WEQUALN(source_p, L"ifdef", 5)) {
+		    conditional_type = IFDEF;
+		    source_p += 5;
+		} else if (IS_WEQUALN(source_p, L"ifndef", 6)) {
+		    conditional_type = IFNDEF;
+		    source_p += 6;
+		} else if (IS_WEQUALN(source_p, L"else", 4)) {
+		    conditional_type = ELSE;
+		    source_p += 4;
+		} else if (IS_WEQUALN(source_p, L"endif", 5)) {
+		    conditional_type = ENDIF;
+		    source_p += 5;
+		} else
+		    goto no_conditional;
+		while (*source_p == space_char || *source_p == tab_char ||
+			*source_p == nul_char) {
+		    switch (GET_CHAR()) {
+		    case nul_char:
+			GET_NEXT_BLOCK(source);
+			if (source == NULL)
+			    GOTO_STATE(on_eoln_state);
+			break;
+		    default:
+			hadspace = true;
+			source_p++;
+		    }
+		}
+		if (*source_p != newline_char && hadspace == false) {
+		    source_p = save_source_p;
+		    goto no_conditional;
+		}
+		if (conditional_type == ELSE || conditional_type == ENDIF) {
+		    if (GET_CHAR() != newline_char)
+			fatal_reader("syntax error");
+		    if (conditional_level == 0)
+			fatal_reader("excess %s", conditional_type == ELSE ?
+				"else" : "endif");
+		    if (conditional_type == ELSE && not_use_level == 0) {
+			if (use_this == false)
+			    use_this = true;
+			else
+			    use_this = false;
+		    } else if (conditional_type == ENDIF) {
+			conditional_level--;
+			if (not_use_level > 0)
+			    not_use_level--;
+			else
+			    use_this = true;
+		    }
+		    if (in_dependencies_state == false || use_this == true)
+		        source_p++;
+		} else {
+		    conditional_level++;
+		    if (use_this == false) {
+			not_use_level++;
+			goto no_conditional;
+		    }
+		    INIT_STRING_FROM_STACK(name_string, name_buffer);
+		    string_start = source_p;
+		    for (;;) {
+			switch (GET_CHAR()) {
+			case nul_char:
+			    append_string(string_start, &name_string,
+				    source_p - string_start);
+			    GET_NEXT_BLOCK(source);
+			    if (source == NULL)
+			        GOTO_STATE(on_eoln_state);
+			    string_start = source_p;
+			    break;
+			case newline_char:
+			    append_string(string_start, &name_string,
+				    source_p - string_start);
+		    	    source_p++;
+			    goto eoln_3;
+			default:
+			    source_p++;
+			}
+		    }
+		eoln_3: ;
+		    String_rec	expanded;
+		    wchar_t	expanded_buffer[STRING_BUFFER_LENGTH];
+		    INIT_STRING_FROM_STACK(expanded, expanded_buffer);
+		    expand_value(GETNAME(name_string.buffer.start,
+				FIND_LENGTH),
+			    &expanded,
+			    false);
+		    switch (conditional_type) {
+		    case IFEQ:
+			use_this = eq_condition(expanded.buffer.start) == true ?
+			    true : false;
+			break;
+		    case IFNEQ:
+			use_this = eq_condition(expanded.buffer.start) == true ?
+			    false : true;
+			break;
+		    case IFDEF:
+			use_this = de_condition(expanded.buffer.start) == true ?
+			    true : false;
+			break;
+		    case IFNDEF:
+			use_this = de_condition(expanded.buffer.start) == true ?
+			    false : true;
+			break;
+		    default:
+			/*NOTREACHED*/
+			;
+		    }
+		    if (name_string.free_after_use)
+			retmem(name_string.buffer.start);
+		    if (expanded.free_after_use)
+			retmem(expanded.buffer.start);
+		}
+		if (in_dependencies_state == true) {
+		    if (use_this == false)
+			goto no_conditional;
+		    in_dependencies_state = false;
+		    goto enter_dependencies_label;
+		} else
+		    goto start_new_line;
+	    no_conditional:
+		if (use_this == false) {
+		    while (*source_p != newline_char) {
+			switch (GET_CHAR()) {
+			case nul_char:
+			    GET_NEXT_BLOCK(source);
+			    if (source == NULL) {
+				if (in_dependencies_state == true)
+		    		    goto finish_dependencies;
+				GOTO_STATE(on_eoln_state);
+			    }
+			    break;
+			default:
+			    source_p++;
+			}
+		    }
+		    source_p++;
+		    if (in_dependencies_state == true)
+			goto check_conditional;
+		    else
+			goto start_new_line;
+		}
+		if (in_dependencies_state == true) {
+		    in_dependencies_state = false;
+		    goto finish_dependencies;
+		}
 	    }
 	    if ((IS_WEQUALN(source_p, include_space, 8)) ||
 		(IS_WEQUALN(source_p, include_tab, 8))) {
@@ -954,6 +1122,21 @@ start_new_line_no_skip:
 			if (IS_WEQUALN(source_p,
 				       include_space,
 				       tmp_bytes_left_in_string)) {
+				tmp_maybe_include = true;
+			}
+			if (!sun_style && !svr4) {
+			    if (IS_WEQUALN(source_p, L"ifeq",
+					tmp_bytes_left_in_string) ||
+			    	    IS_WEQUALN(source_p, L"ifneq",
+				        tmp_bytes_left_in_string) ||
+			    	    IS_WEQUALN(source_p, L"ifdef",
+				        tmp_bytes_left_in_string) ||
+			    	    IS_WEQUALN(source_p, L"ifndef",
+				        tmp_bytes_left_in_string) ||
+			    	    IS_WEQUALN(source_p, L"else",
+				        tmp_bytes_left_in_string) ||
+			    	    IS_WEQUALN(source_p, L"endif",
+				        tmp_bytes_left_in_string))
 				tmp_maybe_include = true;
 			}
 			if (tmp_maybe_include) {
@@ -1874,6 +2057,12 @@ case scan_name_state:
 		GOTO_STATE(scan_command_state);
 	}
 
+	if (!sun_style && !svr4) {
+	    in_dependencies_state = true;
+	    goto check_conditional;
+	}
+finish_dependencies:
+
 	/* We read all the command lines for the target/dependency line. */
 	/* Enter the stuff */
 	enter_target_groups_and_dependencies( &target, &depes, command, 
@@ -2061,6 +2250,10 @@ case illegal_eoln_state:
 case poorly_formed_macro_state:
 	fatal_reader("Badly formed macro assignment");
 case exit_state:
+	if (conditional_level > 0) {
+	    line_number = 0;
+	    fatal_reader("missing endif");
+	}
 	return;
 default:
 	fatal_reader("Internal error. Unknown reader state");
@@ -2207,4 +2400,81 @@ enter_target_groups_and_dependencies(Name_vector target, Name_vector depes, Cmd_
 	}
 }
 				     
+static	Boolean	
+eq_condition(wchar_t *args)
+{
+    wchar_t	*arg1, *arg2;
+    wchar_t	c;
 
+    while (*args == space_char || *args == tab_char)
+	args++;
+    arg1 = &args[1];
+    switch (c = *args) {
+    case quote_char:
+    case doublequote_char:
+	for (args = arg1; *args && *args != c; args++);
+	if (*args != c)
+	    fatal_reader("syntax error");
+	*args++ = 0;
+	while (*args == space_char || *args == tab_char)
+	    args++;
+	arg2 = &args[1];
+	switch (c = *args) {
+	case quote_char:
+	case doublequote_char:
+	    for (args = arg2; *args && *args != c; args++);
+	    if (*args != c)
+		fatal_reader("syntax error");
+	    *args++ = 0;
+	    break;
+	default:
+	    fatal_reader("syntax error");
+	}
+	break;
+    case parenleft_char:
+	while (*args && *args != comma_char)
+	    args++;
+	if (*args != comma_char)
+	    fatal_reader("syntax error");
+	*args = 0;
+	arg2 = &args[1];
+	while (*arg2 == space_char || *arg2 == tab_char)
+	    arg2++;
+	for (args = arg2; *args && *args != parenright_char; args++);
+	if (*args != parenright_char)
+	    fatal_reader("syntax error");
+	*args++ = 0;
+	break;
+    default:
+	fatal_reader("syntax error");
+    }
+    while (*args == space_char || *args == tab_char)
+	args++;
+    if (*args)
+	fatal_reader("syntax error");
+    return wcscmp(arg1, arg2) ? false : true;
+}
+
+static	Boolean	
+de_condition(wchar_t *args)
+{
+    wchar_t	*ap;
+    Name	name;
+    Property	macro;
+
+    while (*args == space_char || *args == tab_char)
+	args++;
+    for (ap = args; *ap; ap++);
+    ap--;
+    while (ap >= args) {
+	if (*ap == space_char || *ap == tab_char)
+	    *ap-- = 0;
+	else
+	    break;
+    }
+    name = GETNAME(args, FIND_LENGTH);
+    if ((macro = get_prop(name->prop, macro_prop)) != NULL &&
+	    macro->body.macro.value != NULL)
+	return true;
+    return false;
+}

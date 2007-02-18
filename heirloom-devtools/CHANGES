@@ -8,6 +8,8 @@ Release: ...
   SVR4 variant.
 * make: The GNU syntax for conditional macros, "target: variable=value",
   is now accepted.
+* make: The GNU syntax for parse-time conditionals, "ifeq (arg1, arg2)",
+  "ifdef name", etc., is now supported.
 * make: Partial support for GNU style functions, "$(function arguments)",
   has been added. Currently, the supported functions are "dir", "notdir",
   "suffix", "basename", "addsuffix", "addprefix", "join", "wildcard",
