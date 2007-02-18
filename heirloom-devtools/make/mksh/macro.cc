@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.cc	1.7 (gritter) 2/17/07
+ * Sccsid @(#)macro.cc	1.8 (gritter) 2/18/07
  */
 
 /*
@@ -1442,9 +1442,24 @@ skip_space(wchar_t *s)
 		s++;
 	while (*s && *s != space_char)
 		s++;
-	if (*s != 0)
+	if (*s != 0) {
 		*s++ = 0;
+		while (*s == space_char)
+			s++;
+	}
 	return s;
+}
+
+static wchar_t *
+skip_comma(wchar_t *s)
+{
+	while (*s && *s != comma_char)
+		s++;
+	if (*s != 0) {
+		*s++ = 0;
+		return s;
+	} else
+		return NULL;
 }
 
 static wchar_t *
@@ -1529,12 +1544,8 @@ f_addsuffix(wchar_t *args, String destination)
 	int	c = 0;
 
 	suffix = args;
-	for (np = args; *np; np++)
-		if (*np == comma_char)
-			break;
-	if (*np == NULL)
+	if ((np = skip_comma(args)) == NULL)
 		fatal_reader_mksh("addsuffix: no suffix specified");
-	*np++ = 0;
 	args = np;
 	do {
 		np = skip_space(args);
@@ -1554,12 +1565,8 @@ f_addprefix(wchar_t *args, String destination)
 	int	c = 0;
 
 	prefix = args;
-	for (np = args; *np; np++)
-		if (*np == comma_char)
-			break;
-	if (*np == NULL)
+	if ((np = skip_comma(args)) == NULL)
 		fatal_reader_mksh("addprefix: no prefix specified");
-	*np++ = 0;
 	args = np;
 	do {
 		np = skip_space(args);
@@ -1578,13 +1585,8 @@ f_join(wchar_t *args, String destination)
 	wchar_t	*ap, *join, *jp;
 	int	c = 0;
 
-	join = NULL;
-	for (ap = args; *ap; ap++)
-		if (*ap == comma_char)
-			join = ap;
-	if (join == NULL)
+	if ((join = skip_comma(args)) == NULL)
 		fatal_reader_mksh("join: nothing to join");
-	*join++ = 0;
 	do {
 		ap = skip_space(args);
 		jp = skip_space(join);
@@ -1623,6 +1625,299 @@ f_wildcard(wchar_t *args, String destination)
 }
 
 static Boolean
+f_subst(wchar_t *args, String destination)
+{
+	wchar_t	*from, *to, *text, *tp, *pp;
+	size_t	fn, tn;
+
+	from = args;
+	if ((to = skip_comma(from)) == NULL || (text = skip_comma(to)) == NULL)
+		fatal_reader_mksh("subst: missing argument");
+	fn = wcslen(from);
+	tn = wcslen(to);
+	tp = text;
+	while ((pp = wcsstr(tp, from)) != NULL) {
+		append_string(tp, destination, pp - tp);
+		append_string(to, destination, tn);
+		tp = &pp[fn];
+	}
+	append_string(tp, destination, FIND_LENGTH);
+	return true;
+}
+
+static Boolean
+patsplit(wchar_t *pp, wchar_t **left, wchar_t **right)
+{
+	wchar_t	*op;
+	Boolean	found = false;
+
+	*right = L"";
+	*left = pp;
+	op = pp;
+	while (*pp) {
+		if (*pp == percent_char) {
+			found = true;
+			*pp++ = 0;
+			*op = 0;
+			*right = pp;
+			op = pp;
+			continue;
+		}
+		if (pp[0] == backslash_char && pp[1])
+			pp++;
+		*op++ = *pp++;
+	}
+	return found;
+}
+
+static Boolean
+f_patsubst(wchar_t *args, String destination)
+{
+	wchar_t	*pattern, *replacement, *text;
+	wchar_t	*pleft, *pright;
+	wchar_t	*rleft, *rright;
+	wchar_t	*np, *ap, *pp;
+	int	c = 0;
+	Boolean	pperc, rperc;
+	size_t	pn;
+
+	pattern = args;
+	if ((replacement = skip_comma(args)) == NULL ||
+			(text = skip_comma(replacement)) == NULL)
+		fatal_reader_mksh("patsubst: missing argument");
+	pperc = patsplit(pattern, &pleft, &pright);
+	rperc = patsplit(replacement, &rleft, &rright);
+	pn = wcslen(pleft);
+	do {
+		np = skip_space(text);
+		if (c++)
+			append_char(space_char, destination);
+		if (pperc) {
+			if (wcsncmp(text, pleft, pn))
+				append_string(text, destination, FIND_LENGTH);
+			else {
+				ap = &text[pn];
+				pp = NULL;
+				while (*ap) {
+					if (wcscmp(ap, pright) == 0)
+						pp = ap;
+					ap++;
+				}
+				if (pp == NULL)
+					append_string(text, destination,
+						FIND_LENGTH);
+				else {
+					append_string(rleft, destination,
+						FIND_LENGTH);
+					if (rperc)
+						append_string(&text[pn],
+							destination,
+							pp - &text[pn]);
+					append_string(rright, destination,
+						FIND_LENGTH);
+				}
+			}
+		} else {
+			if (wcscmp(text, pleft) == 0) {
+				append_string(rleft, destination, FIND_LENGTH);
+				if (rperc)
+					append_char(percent_char, destination);
+				append_string(rright, destination, FIND_LENGTH);
+			} else
+				append_string(text, destination, FIND_LENGTH);
+		}
+		text = np;
+	} while (*text);
+	return true;
+}
+
+static wchar_t *
+h_strip(wchar_t *args)
+{
+	return args;
+}
+
+static Boolean
+f_findstring(wchar_t *args, String destination)
+{
+	wchar_t	*find, *in;
+
+	find = args;
+	if ((in = skip_comma(args)) == NULL)
+		fatal_reader_mksh("findstring: missing argument");
+	if (wcsstr(in, find) != NULL)
+		append_string(find, destination, FIND_LENGTH);
+	return true;
+}
+
+static Boolean
+f_filter(wchar_t *args, String destination, Boolean invert)
+{
+	wchar_t	*text, *tp, *pp, *ap;
+	wchar_t	**pleft = NULL, **pright = NULL;
+	Boolean	*pperc = NULL;
+	size_t	i, n, pn;
+	Boolean	found;
+	int	c = 0;
+
+	if ((text = skip_comma(args)) == NULL)
+		fatal_reader_mksh("%s: missing argument",
+				invert ? "filter-out" : "filter");
+	n = 0;
+	do {
+		pp = skip_space(args);
+		pleft = (wchar_t **)realloc(pleft,
+				(n+1) * sizeof *pleft);
+		pright = (wchar_t **)realloc(pright,
+				(n+1) * sizeof *pright);
+		pperc = (Boolean *)realloc(pperc,
+				(n+1) * sizeof *pperc);
+		pperc[n] = patsplit(args, &pleft[n], &pright[n]);
+		n++;
+		args = pp;
+	} while (*args);
+	if (n == 0)
+		return true;
+	do {
+		tp = skip_space(text);
+		found = false;
+		for (i = 0; i < n; i++) {
+			if (pperc[i]) {
+				pn = wcslen(pleft[i]);
+				if (wcsncmp(text, pleft[i], pn) == 0) {
+					ap = &text[pn];
+					while (*ap) {
+						if (wcscmp(ap, pright[i]) == 0){
+							found = true;
+							break;
+						}
+						ap++;
+					}
+				}
+			} else {
+				if (wcscmp(text, pleft[i]) == 0)
+					found = true;
+			}
+			if (found == true)
+				break;
+		}
+		if (found != invert) {
+			if (c++)
+				append_char(space_char, destination);
+			append_string(text, destination, FIND_LENGTH);
+		}
+		text = tp;
+	} while (*text);
+	return true;
+}
+
+static int
+f_sort_cmp(const void *_p, const void *_q)
+{
+	wchar_t	*p, *q;
+
+	p = (wchar_t *)*(const void **)_p;
+	q = (wchar_t *)*(const void **)_q;
+	return wcscmp(p, q);
+}
+
+static Boolean
+f_sort(wchar_t *args, String destination)
+{
+	wchar_t	**list = NULL;
+	wchar_t	*ap;
+	size_t	i, n = 0;
+	int	c = 0;
+
+	do {
+		ap = skip_space(args);
+		list = (wchar_t **)realloc(list, (n+1) * sizeof *list);
+		list[n++] = args;
+		args = ap;
+	} while (*args);
+	qsort(list, n, sizeof *list, f_sort_cmp);
+	for (i = 0; i < n; i++) {
+		if (i == 0 || wcscmp(list[i], list[i-1])) {
+			if (c++)
+				append_char(space_char, destination);
+			append_string(list[i], destination, FIND_LENGTH);
+		}
+	}
+	return true;
+}
+
+static Boolean
+s_word(size_t n, size_t m, wchar_t *text, String destination)
+{
+	wchar_t	*tp;
+	size_t	i;
+	int	c = 0;
+
+	for (i = 1; i <= m; i++) {
+		tp = skip_space(text);
+		if (i >= n) {
+			if (c++)
+				append_char(space_char, destination);
+			append_string(text, destination, FIND_LENGTH);
+		}
+		text = tp;
+		if (*text == 0)
+			break;
+	}
+	return true;
+}
+
+static Boolean
+f_word(wchar_t *args, String destination)
+{
+	wchar_t	*text, *xp;
+	unsigned long	n;
+
+	if ((text = skip_comma(args)) == NULL)
+		fatal_reader_mksh("word: missing argument");
+	n = wcstoul(args, &xp, 10);
+	if (*xp)
+		fatal_reader_mksh("word: \"%s\" is not a number", args);
+	return s_word(n, n, text, destination);
+}
+
+static Boolean
+f_wordlist(wchar_t *args, String destination)
+{
+	wchar_t	*end, *text, *xp;
+	unsigned long	s, e;
+
+	if ((end = skip_comma(args)) == NULL ||
+			(text = skip_comma(end)) == NULL)
+		fatal_reader_mksh("word: missing argument");
+	s = wcstoul(args, &xp, 10);
+	if (*xp)
+		fatal_reader_mksh("word: \"%s\" is not a number", args);
+	e = wcstoul(end, &xp, 10);
+	if (*xp)
+		fatal_reader_mksh("word: \"%s\" is not a number", end);
+	return s_word(s, e, text, destination);
+}
+
+static Boolean
+f_words(wchar_t *args, String destination)
+{
+	wchar_t	*np;
+	char	buf[40];
+	unsigned long	n = 0;
+
+	do {
+		np = skip_space(args);
+		if (*args)
+			n++;
+		args = np;
+	} while (*args);
+	snprintf(buf, sizeof buf, "%lu", n);
+	append_string(buf, destination, FIND_LENGTH);
+	return true;
+}
+
+static Boolean
 expand_function(wchar_t *func, wchar_t *args, String destination)
 {
 	if (wcscmp(func, L"dir") == 0)
@@ -1641,5 +1936,27 @@ expand_function(wchar_t *func, wchar_t *args, String destination)
 		return f_join(args, destination);
 	if (wcscmp(func, L"wildcard") == 0)
 		return f_wildcard(args, destination);
+	if (wcscmp(func, L"subst") == 0)
+		return f_subst(args, destination);
+	if (wcscmp(func, L"patsubst") == 0)
+		return f_patsubst(args, destination);
+	if (wcscmp(func, L"strip") == 0)
+		return f_sep_space(args, destination, h_strip);
+	if (wcscmp(func, L"findstring") == 0)
+		return f_findstring(args, destination);
+	if (wcscmp(func, L"filter") == 0)
+		return f_filter(args, destination, false);
+	if (wcscmp(func, L"filter-out") == 0)
+		return f_filter(args, destination, true);
+	if (wcscmp(func, L"sort") == 0)
+		return f_sort(args, destination);
+	if (wcscmp(func, L"word") == 0)
+		return f_word(args, destination);
+	if (wcscmp(func, L"wordlist") == 0)
+		return f_wordlist(args, destination);
+	if (wcscmp(func, L"words") == 0)
+		return f_words(args, destination);
+	if (wcscmp(func, L"firstword") == 0)
+		return s_word(1, 1, args, destination);
 	return false;
 }

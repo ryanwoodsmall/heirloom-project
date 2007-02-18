@@ -10,7 +10,9 @@ Release: ...
   is now accepted.
 * make: Partial support for GNU style functions, "$(function arguments)",
   has been added. Currently, the supported functions are "dir", "notdir",
-  "suffix", "basename", "addsuffix", "addprefix", "join", and "wildcard".
+  "suffix", "basename", "addsuffix", "addprefix", "join", "wildcard",
+  "subst", "patsubst", "strip", "findstring", "filter", "filter-out",
+  "sort", "word", "wordlist", "words", and "firstword".
 * make: Fixed the "-jn" option for recursive operation if given without
   space between option and option argument; it was previously ignored.
 
