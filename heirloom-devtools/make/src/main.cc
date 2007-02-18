@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.19 (gritter) 2/17/07
+ * Sccsid @(#)main.cc	1.20 (gritter) 2/18/07
  */
 
 /*
@@ -1241,8 +1241,12 @@ read_command_options(register int argc, register char **argv)
 						    */
 	const char		*tptr;
 	const char		*CMD_OPTS;
+	const char		*SUNPRO_CMD_OPTS;
 
-#define SUNPRO_CMD_OPTS	"-~Bbc:Ddef:g:ij:K:kM:m:NnO:o:PpqRrSsTtuVvwx:"
+	if (sun_style)
+		SUNPRO_CMD_OPTS="-~Bbc:Ddef:g:ij:K:kM:m:NnO:o:PpqRrSsTtuVvwx:";
+	else
+		SUNPRO_CMD_OPTS="-~BbDdef:ij:K:kNnO:PpqrSsTtuVw";
 
 #ifdef TEAMWARE_MAKE_CMN
 #	define SVR4_CMD_OPTS   "-c:ef:g:ij:km:nO:o:pqrsTtVv"
