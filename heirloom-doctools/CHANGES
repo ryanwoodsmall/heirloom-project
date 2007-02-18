@@ -4,6 +4,9 @@ Release ...
   rare circumstances.
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
+* -man macros: ".P" is now recognized; it is the same as ".PP".
+* Unix 6th Edition manual macro packages have been added.
+* -mandoc macros: Recognize Unix 6th Edition pages.
 
 Release 070202
 * [nt]roff: The "\J" escape sequence has been introduced to specify a

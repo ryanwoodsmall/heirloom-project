@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.9 (gritter) 02/01/07
+.\" Sccsid @(#)an	2.10 (gritter) 2/18/07
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -302,6 +302,9 @@
 .}E
 .nr )I .5i
 .ns
+..
+.de P
+.PP
 ..
 '	# paragraph distance
 .de PD
