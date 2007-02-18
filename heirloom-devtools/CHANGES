@@ -1,4 +1,4 @@
-Release: ...
+Release 070218
 * sccs: A "-R" option has been added to enable recursive operation on
   subdirectories.
 * sccs: A manual page has been added (based on the 4.3BSD-Tahoe page).
