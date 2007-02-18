@@ -5,7 +5,7 @@
 #else
 #define USED
 #endif
-static const char id[] USED = "@(#)make.sl	1.24 (gritter) 2/17/07";
+static const char id[] USED = "@(#)make.sl	1.25 (gritter) 2/18/07";
 /* SLIST */
 /*
 ../bsd/bsd.cc: * Sccsid @(#)bsd.cc	1.6 (gritter) 01/22/07
@@ -37,7 +37,7 @@ static const char id[] USED = "@(#)make.sl	1.24 (gritter) 2/17/07";
 ../mksh/dosys.cc: * Sccsid @(#)dosys.cc	1.9 (gritter) 01/23/07
 ../mksh/macro.cc: * Sccsid @(#)macro.cc	1.7 (gritter) 2/17/07
 ../mksh/posix.cc: * Sccsid @(#)posix.cc	1.1 (gritter) 01/13/07
-../mksh/misc.cc: * Sccsid @(#)misc.cc	1.6 (gritter) 01/22/07
+../mksh/misc.cc: * Sccsid @(#)misc.cc	1.7 (gritter) 2/18/07
 ../mksh/mksh.cc: * Sccsid @(#)mksh.cc	1.4 (gritter) 01/13/07
 ../mksh/globals.cc: * Sccsid @(#)globals.cc	1.3 (gritter) 01/13/07
 ../mksh/wcslen.c: * Sccsid @(#)wcslen.c	1.3 (gritter) 01/23/07

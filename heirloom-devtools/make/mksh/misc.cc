@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.6 (gritter) 01/22/07
+ * Sccsid @(#)misc.cc	1.7 (gritter) 2/18/07
  */
 
 /*
@@ -408,7 +408,7 @@ errmsg(int errnum)
 #endif // !__sun
 }
 
-static char static_buf[MAXPATHLEN*3];
+extern const char	*progname;
 
 /*
  *	fatal_mksh(format, args...)
@@ -424,43 +424,30 @@ void
 fatal_mksh(char * message, ...)
 {
 	va_list args;
-	char    *buf = static_buf;
 	char	*mksh_fat_err = "mksh: Fatal error: ";
 	char	*cur_wrk_dir = "Current working directory: ";
 	int	mksh_fat_err_len = strlen(mksh_fat_err);
 
 	va_start(args, message);
 	fflush(stdout);
-	strcpy(buf, mksh_fat_err);
-	size_t buf_len = vsnprintf(static_buf + mksh_fat_err_len,
-				   sizeof(static_buf) - mksh_fat_err_len,
-				   message, args)
-			+ mksh_fat_err_len
-			+ strlen(cur_wrk_dir)
-			+ strlen(get_current_path_mksh())
-			+ 3; // "\n\n"
 	va_end(args);
-	if (buf_len >= sizeof(static_buf)) {
-		buf = getmem(buf_len);
-		strcpy(buf, mksh_fat_err);
-		va_start(args, message);
-		vsprintf(buf + mksh_fat_err_len, message, args);
-		va_end(args);
-	}
-	strcat(buf, "\n");
+	if (sun_style)
+		fputs(mksh_fat_err, stderr);
+	else
+		fprintf(stderr, "%s: fatal error: ", progname);
+	va_start(args, message);
+	vfprintf(stderr, message, args);
+	va_end(args);
+	putc('\n', stderr);
 /*
 	if (report_pwd) {
  */
-	if (1) {
-		strcat(buf, cur_wrk_dir);
-		strcat(buf, get_current_path_mksh());
-		strcat(buf, "\n");
+	if (sun_style) {
+		fputs(cur_wrk_dir, stderr);
+		fputs(get_current_path_mksh(), stderr);
+		putc('\n', stderr);
 	}
-	fputs(buf, stderr);
 	fflush(stderr);
-	if (buf != static_buf) {
-		retmem_mb(buf);
-	}
 #ifdef SUN5_0
 	exit_status = 1;
 #endif
@@ -502,7 +489,10 @@ fatal_reader_mksh(char * pattern, ...)
  */
 
 	fflush(stdout);
-	fprintf(stderr, "mksh: Fatal error in reader: ");
+	if (sun_style)
+		fprintf(stderr, "mksh: Fatal error in reader: ");
+	else
+		fprintf(stderr, "%s: fatal error: ", progname);
 	vfprintf(stderr, pattern, args);
 	fprintf(stderr, "\n");
 	va_end(args);
@@ -519,7 +509,7 @@ fatal_reader_mksh(char * pattern, ...)
 /*
 	if (report_pwd) {
  */
-	if (1) {
+	if (sun_style) {
 		fprintf(stderr,
 			       "Current working directory %s\n",
 			       get_current_path_mksh());
@@ -548,14 +538,17 @@ warning_mksh(char * message, ...)
 
 	va_start(args, message);
 	fflush(stdout);
-	fprintf(stderr, "mksh: Warning: ");
+	if (sun_style)
+		fprintf(stderr, "mksh: Warning: ");
+	else
+		fprintf(stderr, "%s: ", progname);
 	vfprintf(stderr, message, args);
 	fprintf(stderr, "\n");
 	va_end(args);
 /*
 	if (report_pwd) {
  */
-	if (1) {
+	if (sun_style) {
 		fprintf(stderr,
 			       "Current working directory %s\n",
 			       get_current_path_mksh());
