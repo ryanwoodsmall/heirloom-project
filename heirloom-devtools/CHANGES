@@ -1,3 +1,7 @@
+Release ...
+* make: Comments following "ifeq" and other conditionals are now handled
+  correctly.
+
 Release 070218
 * sccs: A "-R" option has been added to enable recursive operation on
   subdirectories.

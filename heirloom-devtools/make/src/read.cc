@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.9 (gritter) 2/18/07
+ * Sccsid @(#)read.cc	1.10 (gritter) 2/20/07
  */
 
 /*
@@ -71,7 +71,8 @@ static int line_started_with_space=0; // Used to diagnose spaces instead of tabs
 /*
  * File table of contents
  */
-static	void		parse_makefile(register Name true_makefile_name, register Source source);
+static	void		parse_makefile(register Name true_makefile_name, Source source);
+static Boolean		skip_comment(wchar_t * &source_p, wchar_t * &source_end, Source &source);
 static	Source		push_macro_value(register Source bp, register wchar_t *buffer, int size, register Source source);
 extern  void 		enter_target_groups_and_dependencies(Name_vector target, Name_vector depes, Cmd_line command, Separator separator, Boolean target_group_seen);
 extern	Name		normalize_name(register wchar_t *name_string, register int length);
@@ -517,13 +518,13 @@ read_simple_file(register Name makefile_name, register Boolean chase_path, regis
  *		empty_name	The Name ""
  */
 static void
-parse_makefile(register Name true_makefile_name, register Source source)
+parse_makefile(register Name true_makefile_name, Source source)
 {
 /*
 	char			mb_buffer[MB_LEN_MAX];
  */
-	register wchar_t	*source_p = NULL;
-	register wchar_t	*source_end = NULL;
+	wchar_t			*source_p = NULL;
+	wchar_t			*source_end = NULL;
 	register wchar_t	*string_start;
 	wchar_t			*string_end;
 	register Boolean	macro_seen_in_string;
@@ -636,48 +637,15 @@ parse_makefile(register Name true_makefile_name, register Source source)
 		break;
 	case numbersign_char:
 		/* Comment. Skip over it */
-		for (; 1; source_p++) {
-			switch (GET_CHAR()) {
-			case nul_char:
-				GET_NEXT_BLOCK_NOCHK(source);
-				if (source == NULL) {
-					GOTO_STATE(on_eoln_state);
-				}
-				if (source->error_converting) {
-				// Illegal byte sequence - skip its first byte
-					source->inp_buf_ptr++;
-				}
-				source_p--;
-				break;
-			case backslash_char:
-				/* Comments can be continued */
-				if (*++source_p == (int) nul_char) {
-					GET_NEXT_BLOCK_NOCHK(source);
-					if (source == NULL) {
-						GOTO_STATE(on_eoln_state);
-					}
-					if (source->error_converting) {
-					// Illegal byte sequence - skip its first byte
-						source->inp_buf_ptr++;
-						source_p--;
-						break;
-					}
-				}
-				if(*source_p == (int) newline_char) {
-					if (source->fd >= 0) {
-						line_number++;
-					}
-				}
-				break;
-			case newline_char:
-				/*
-				 * After we skip the comment we go to
-				 * the end of line handler since end of
-				 * line terminates comments.
-				 */
-				goto end_of_line;
-			}
+		if (skip_comment(source_p, source_end, source) == false) {
+			GOTO_STATE(on_eoln_state);
 		}
+		/*
+		 * After we skip the comment we go to
+		 * the end of line handler since end of
+		 * line terminates comments.
+		 */
+		goto end_of_line;
 	case dollar_char:
 		/* Macro reference */
 		if (source->already_expanded) {
@@ -833,12 +801,16 @@ start_new_line_no_skip:
 		} else
 		    goto no_conditional;
 		while (*source_p == space_char || *source_p == tab_char ||
-			*source_p == nul_char) {
+			*source_p == nul_char || *source_p == numbersign_char) {
 		    switch (GET_CHAR()) {
 		    case nul_char:
 			GET_NEXT_BLOCK(source);
 			if (source == NULL)
 			    GOTO_STATE(on_eoln_state);
+			break;
+		    case numbersign_char:
+			hadspace = true;
+			skip_comment(source_p, source_end, source);
 			break;
 		    default:
 			hadspace = true;
@@ -897,9 +869,12 @@ start_new_line_no_skip:
 			        GOTO_STATE(on_eoln_state);
 			    string_start = source_p;
 			    break;
+			case numbersign_char:
 			case newline_char:
 			    append_string(string_start, &name_string,
 				    source_p - string_start);
+			    if (GET_CHAR() == numbersign_char)
+				skip_comment(source_p, source_end, source);
 		    	    source_p++;
 			    if (source->fd >= 0)
 				line_number++;
@@ -1228,46 +1203,13 @@ case scan_name_state:
 		break;
 	case numbersign_char:
 		/* Comment. Skip over it */
-		for (; 1; source_p++) {
-			switch (GET_CHAR()) {
-			case nul_char:
-				GET_NEXT_BLOCK_NOCHK(source);
-				if (source == NULL) {
-					GOTO_STATE(on_eoln_state);
-				}
-				if (source->error_converting) {
-				// Illegal byte sequence - skip its first byte
-					source->inp_buf_ptr++;
-				}
-				source_p--;
-				break;
-			case backslash_char:
-				if (*++source_p == (int) nul_char) {
-					GET_NEXT_BLOCK_NOCHK(source);
-					if (source == NULL) {
-						GOTO_STATE(on_eoln_state);
-					}
-					if (source->error_converting) {
-					// Illegal byte sequence - skip its first byte
-						source->inp_buf_ptr++;
-						source_p--;
-						break;
-					}
-				}
-				if(*source_p == (int) newline_char) {
-					if (source->fd >= 0) {
-						line_number++;
-					}
-				}
-				break;
-			case newline_char:
-				source_p++;
-				if (source->fd >= 0) {
-					line_number++;
-				}
-				GOTO_STATE(on_eoln_state);
+		if (skip_comment(source_p, source_end, source) == true) {
+			source_p++;
+			if (source->fd >= 0) {
+				line_number++;
 			}
 		}
+		GOTO_STATE(on_eoln_state);
 	case dollar_char:
 		/* Macro reference. Expand and push value */
 		if (source->already_expanded) {
@@ -2028,47 +1970,14 @@ case scan_name_state:
 			source_p++;
 			GOTO_STATE(scan_command_state);
 		}
-		for (; 1; source_p++) {
-			switch (GET_CHAR()) {
-			case nul_char:
-				GET_NEXT_BLOCK_NOCHK(source);
-				if (source == NULL) {
-					GOTO_STATE(on_eoln_state);
-				}
-				if (source->error_converting) {
-				// Illegal byte sequence - skip its first byte
-					source->inp_buf_ptr++;
-				}
-				source_p--;
-				break;
-			case backslash_char:
-				if (*++source_p == (int) nul_char) {
-					GET_NEXT_BLOCK_NOCHK(source);
-					if (source == NULL) {
-						GOTO_STATE(on_eoln_state);
-					}
-					if (source->error_converting) {
-					// Illegal byte sequence - skip its first byte
-						source->inp_buf_ptr++;
-						source_p--;
-						break;
-					}
-				}
-				if(*source_p == (int) newline_char) {
-					if (source->fd >= 0) {
-						line_number++;
-					}
-				}
-				break;
-			case newline_char:
-				source_p++;
-				if (source->fd >= 0) {
-					line_number++;
-				}
-				goto enter_dependencies_label;
-			}
+		if (skip_comment(source_p, source_end, source) == false) {
+			GOTO_STATE(on_eoln_state);
 		}
-
+		source_p++;
+		if (source->fd >= 0) {
+			line_number++;
+		}
+		goto enter_dependencies_label;
 	case tab_char:
 		GOTO_STATE(scan_command_state);
 	}
@@ -2274,6 +2183,48 @@ case exit_state:
 default:
 	fatal_reader("Internal error. Unknown reader state");
 }
+}
+
+static Boolean
+skip_comment(wchar_t * &source_p, wchar_t * &source_end, Source &source)
+{
+	/* Comment. Skip over it */
+	for (; 1; source_p++) {
+		switch (GET_CHAR()) {
+		case nul_char:
+			GET_NEXT_BLOCK_NOCHK(source);
+			if (source == NULL) {
+				return false;
+			}
+			if (source->error_converting) {
+			// Illegal byte sequence - skip its first byte
+				source->inp_buf_ptr++;
+			}
+			source_p--;
+			break;
+		case backslash_char:
+			if (*++source_p == (int) nul_char) {
+				GET_NEXT_BLOCK_NOCHK(source);
+				if (source == NULL) {
+					return false;
+				}
+				if (source->error_converting) {
+				// Illegal byte sequence - skip its first byte
+					source->inp_buf_ptr++;
+						source_p--;
+						break;
+				}
+			}
+			if(*source_p == (int) newline_char) {
+				if (source->fd >= 0) {
+					line_number++;
+				}
+			}
+			break;
+		case newline_char:
+			return true;
+		}
+	}
 }
 
 /*
