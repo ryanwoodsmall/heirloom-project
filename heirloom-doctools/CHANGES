@@ -1,4 +1,13 @@
 Release ...
+* [nt]roff: The concept of an "inline environment" has been introduced.
+  An inline environment contains the values of the current point size, the
+  current font, the current escape character, and other similar parameters.
+  It can be saved with "\@{" and then restored with "\@}". Unlike the "\s0"
+  and "\fP" escape sequences, inline environments form a stack. Thus after
+  executing "\fB...\@{\fR...\@{\fI...\@}...\@}", the current font is "B"
+  again, while it would be "I" with "\fB...\fR...\fI...\fP...\fP". Inline
+  environments can be used to represent constructs like "<i>...</i>" in
+  HTML, which would be translated as "\@{\fI...\@}".
 * [nt]roff: An internal problem with paragraph-at-once line breaking mode
   has been fixed; it caused a ".in" or ".ll" command to be ignored under
   rare circumstances.

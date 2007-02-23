@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.125 (gritter) 2/4/07
+ * Sccsid @(#)n5.c	1.126 (gritter) 2/23/07
  */
 
 /*
@@ -64,8 +64,6 @@
 #include "tw.h"
 #endif
 #include "pt.h"
-
-extern void mchbits(void);
 
 /*
  * troff5.c
@@ -1358,6 +1356,7 @@ evc(struct env *dp, struct env *sp)
 	dp->_pgwdll = NULL;
 	dp->_pglno = NULL;
 	dp->_pgpenal = NULL;
+	dp->_inlevp = NULL;
 	if (dp->_brnl < INT_MAX)
 		dp->_brnl = 0;
 	if (dp->_brpnl < INT_MAX)
@@ -1481,6 +1480,8 @@ evcline(struct env *dp, struct env *sp)
 	memcpy(dp->_pglno, sp->_pglno, dp->_pgsize * sizeof *dp->_pglno);
 	dp->_pgpenal = malloc(dp->_pgsize * sizeof *dp->_pgpenal);
 	memcpy(dp->_pgpenal, sp->_pgpenal, dp->_pgsize * sizeof *dp->_pgpenal);
+	dp->_inlevp = malloc(dp->_ainlev * sizeof *dp->_inlevp);
+	memcpy(dp->_inlevp, sp->_inlevp, dp->_ninlev * sizeof *dp->_inlevp);
 	dp->_pgwords = sp->_pgwords;
 	dp->_pgchars = sp->_pgchars;
 	dp->_pgspacs = sp->_pgspacs;
@@ -1545,6 +1546,10 @@ relsev(struct env *ep)
 	free(ep->_pgpenal);
 	ep->_pgpenal = NULL;
 	ep->_pgsize = 0;
+	free(ep->_inlevp);
+	ep->_inlevp = NULL;
+	ep->_ninlev = 0;
+	ep->_ainlev = 0;
 }
 
 void

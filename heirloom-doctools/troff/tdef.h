@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.159 (gritter) 12/19/06
+ * Sccsid @(#)tdef.h	1.160 (gritter) 2/23/07
  */
 
 /*
@@ -565,6 +565,23 @@ struct acc {
 	double	f;
 };
 
+/* inline environment */
+struct inlev {
+	int	_apts;
+	int	_apts1;
+	int	_pts;
+	int	_pts1;
+	int	_font;
+	int	_font1;
+	int	_cc;
+	int	_c2;
+	int	_ohc;
+	int	_hyf;
+	int	_tabc;
+	int	_dotc;
+	int	_dpenal;
+};
+
 /* the infamous environment block */
 
 #define	ics	env._ics
@@ -750,6 +767,9 @@ struct acc {
 #define	pgwdll	env._pgwdll
 #define	pglno	env._pglno
 #define	pgpenal	env._pgpenal
+#define	ninlev	env._ninlev
+#define	ainlev	env._ainlev
+#define	inlevp	env._inlevp
 #define	evname	env._evname
 
 extern struct env {
@@ -918,5 +938,8 @@ extern struct env {
 	int	*_pgwdll;
 	int	*_pglno;
 	float	*_pgpenal;
+	int	_ninlev;
+	int	_ainlev;
+	struct inlev	*_inlevp;
 	char	*_evname;
 } env, initenv;

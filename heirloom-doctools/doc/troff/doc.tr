@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.180 (gritter) 01/08/07
+.\" Sccsid @(#)doc.tr	1.181 (gritter) 2/23/07
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -105,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 01/08/07
+.ds Sccsdate 2/23/07
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -2021,6 +2021,7 @@ Reference	Sequence	Meaning
 \T'e_*'7.1\T	\T'e_*'\fB\e\(**[\fIxxx\ arg\ \fR...\fB]\fR\T	\T'e_*'Interpolate string \fIxxx\fR with arguments \fIarg\ \fR...\T
 \T'e_:'13\T	\T'e_:'\fB\e:\fR\T	\T'e_:'Optional line-break character\T
 \T'e_;'10.2\T	\T'e_;'\fB\e;\fR\T	\T'e_;'Ligature suppressor\T
+\T'e_@'17\T	\T'e_@'\fB\e@{\fR,\fB\e@}\fR\T	\T'e_@'Inline environment push/pop\T
 \T'e_a'9.1\T	\T'e_a'\fB\ea\fR\T	\T'e_a'Non-interpreted leader character\T
 \T'e_A'24.6\T	\T'e_A'\fB\eA\fI\'string\'\fR\T	\T'e_A'Anchor definition\T
 \T'e_b'12.3\T	\T'e_b'\fB\eb\fI\'abc...\'\fR\T	\T'e_b'Bracket building function\T
@@ -5701,6 +5702,37 @@ Everything else is global; examples are page-oriented parameters,
 number registers, and macro and string definitions.
 All environments are initialized with default parameter values.
 The number of possible environments is only limited by available memory.
+.pg
+\A'c_inline_environment'Inside each environment,
+a smaller set of parameters
+forms the \fIinline environment\fR.
+These are:
+the current and previous point size,
+as set by \T'ps'\fBps\fR\T and \T'e_s'\fB\es\fR\T;
+the current and previous font,
+as set by \T'ft'\fBft\fR\T and \T'e_f'\fB\ef\fR\T;
+the control and nobreak control character,
+as set by \T'cc'\fBcc\fR\T and \T'c2'\fBc2\fR\T, respectively;
+the optional hyphenation character,
+as set by \T'hc'\fBhc\fR\T;
+the hyphenation flag,
+as set by \T'hy'\fBhy\fR\T;
+the tab and leader repetition characters,
+as set by \T'tc'\fBtc\fR\T and \T'lc'\fBlc\fR\T, respectively;
+and the default line breaking penalty,
+as set by \T'e_J'\fB\eJ\fR\T.
+The inline environment is pushed
+by \A'e_@'\fB\e@{\fR,
+meaning that the current values of these parameters are saved.
+When a \fB\e@}\fR occurs,
+the last pushed inline environment is popped,
+meaning that the previous values of the parameters are restored.
+Inline environments can be nested to arbitrary depths.
+They differ from \fB\es0\fR and \fB\efP\fR
+since they form a stack.
+Thus, the current font is ``B'' again
+after the sequence ``\efB...\e@{\efR...\e@{\efI...\e@}...\e@}'',
+but ``I'' after the sequence ``\efB...\efR...\efI...\efP...\efP''.
 .h1
 .bta ev
 \fB&ev\fI|name\fR	\fIname\(eq\fR0	previous	\(en	Environment switched to

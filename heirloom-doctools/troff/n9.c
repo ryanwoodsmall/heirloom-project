@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.72 (gritter) 12/25/06
+ * Sccsid @(#)n9.c	1.73 (gritter) 2/23/07
  */
 
 /*
@@ -699,6 +699,59 @@ mkxfunc(int f, int s)
 	setfbits(t, f);
 	setsbits(t, s);
 	return t;
+}
+
+void
+pushinlev(void)
+{
+	if (ninlev >= ainlev) {
+		ainlev += 4;
+		inlevp = realloc(inlevp, ainlev * sizeof *inlevp);
+	}
+	inlevp[ninlev]._apts = apts;
+	inlevp[ninlev]._apts1 = apts1;
+	inlevp[ninlev]._pts = pts;
+	inlevp[ninlev]._pts1 = pts1;
+	inlevp[ninlev]._font = font;
+	inlevp[ninlev]._font1 = font1;
+	inlevp[ninlev]._cc = cc;
+	inlevp[ninlev]._c2 = c2;
+	inlevp[ninlev]._ohc = ohc;
+	inlevp[ninlev]._hyf = hyf;
+	inlevp[ninlev]._tabc = tabc;
+	inlevp[ninlev]._dotc = dotc;
+	inlevp[ninlev]._dpenal = dpenal;
+	ninlev++;
+}
+
+void
+popinlev(void)
+{
+	if (--ninlev < 0) {
+		ninlev = 0;
+		return;
+	}
+	if (dpenal != inlevp[ninlev]._dpenal)
+		mkxfunc(DPENAL, inlevp[ninlev]._dpenal);
+	apts = inlevp[ninlev]._apts;
+	apts1 = inlevp[ninlev]._apts1;
+	pts = inlevp[ninlev]._pts;
+	pts1 = inlevp[ninlev]._pts1;
+	font = inlevp[ninlev]._font;
+	font1 = inlevp[ninlev]._font1;
+	cc = inlevp[ninlev]._cc;
+	c2 = inlevp[ninlev]._c2;
+	ohc = inlevp[ninlev]._ohc;
+	hyf = inlevp[ninlev]._hyf;
+	tabc = inlevp[ninlev]._tabc;
+	dotc = inlevp[ninlev]._dotc;
+	dpenal = inlevp[ninlev]._dpenal;
+	mchbits();
+	if (ninlev == 0) {
+		free(inlevp);
+		inlevp = NULL;
+		ainlev = 0;
+	}
 }
 
 #ifdef EUC
