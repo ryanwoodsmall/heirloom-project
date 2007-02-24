@@ -72,7 +72,7 @@
 #
 #	from Makefile	7.13.1.3 (2.11BSD GTE) 1996/10/23
 #
-#	@(#)Makefile	1.50 (gritter) 2/20/05
+#	@(#)Makefile	1.51 (gritter) 2/25/07
 #
 
 #
@@ -332,6 +332,22 @@ install: all install-man
 	ln -s ex $(DESTDIR)$(BINDIR)/view
 	test -d $(DESTDIR)$(PRESERVEDIR) || mkdir -p $(DESTDIR)$(PRESERVEDIR)
 	chmod 1777 $(DESTDIR)$(PRESERVEDIR)
+
+PKGROOT = /var/tmp/heirloom-sh
+PKGTEMP = /var/tmp
+PKGPROTO = pkgproto
+
+ex.pkg: all
+	rm -rf $(PKGROOT)
+	mkdir -p $(PKGROOT)
+	$(MAKE) ROOT=$(PKGROOT) install
+	rm -f $(PKGPROTO)
+	echo 'i pkginfo' >$(PKGPROTO)
+	(cd $(PKGROOT) && find . -print | pkgproto) | >>$(PKGPROTO) sed 's:^\([df] [^ ]* [^ ]* [^ ]*\) .*:\1 root root:; s:^f\( [^ ]* etc/\):v \1:; s:^f\( [^ ]* var/\):v \1:; s:^\(s [^ ]* [^ ]*=\)\([^/]\):\1./\2:'
+	rm -rf $(PKGTEMP)/$@
+	pkgmk -a `uname -m` -d $(PKGTEMP) -r $(PKGROOT) -f $(PKGPROTO) $@
+	pkgtrans -o -s $(PKGTEMP) `pwd`/$@ $@
+	rm -rf $(PKGROOT) $(PKGPROTO) $(PKGTEMP)/$@
 
 ex.o: config.h ex_argv.h ex.h ex_proto.h ex_temp.h ex_tty.h ex_tune.h
 ex.o: ex_vars.h libterm/libterm.h
