@@ -9,6 +9,8 @@ Release ...
 * OpenSolaris-derived manual pages are now included for bdiff, newform,
   and fspec(5).
 * psrinfo: Fixed the computation of the "on-line since" time for Linux 2.6.
+* The package build target "make pkg" for Solaris and Open UNIX is no
+  longer supported.
 
 Release 070115
 * deroff: Now recognizes the ".do" and ".xflag" requests as well as an "-xN"

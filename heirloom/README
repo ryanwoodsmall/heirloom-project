@@ -79,26 +79,16 @@ in the package will automatically use the Heirloom Bourne shell if it is
 installed at compilation time; the Heirloom Toolchest package then
 requires the Heirloom Bourne shell package to be also installed.
 
-On Solaris and Open UNIX, you can build a package for pkgadd from
-the sources. Extract them, change to the heirloom-<version> directory,
-and execute
-
-        gmake pkg
-
-This will create a file heirloom.pkg which you can then give to pkgadd.
-On Solaris, you will have to delete the existing symbolic link /usr/5bin
-to install it.
-
-If your system lacks rpm or pkgadd or if you want to make changes to
-the Heirloom Toolchest, you have to build it manually. The first thing
-to understand is the build system. This is actually quite simple: Every
-directory contains a file named Makefile.mk that includes the directory-
-specific make instructions. To generate the real Makefile, configuration
+If your system lacks rpm or if you want to make changes to the Heirloom
+Toolchest, you have to build it manually. The first thing to understand
+is the build system. This is actually quite simple: Every directory
+contains a file named Makefile.mk that includes the directory-specific
+make instructions. To generate the real Makefile, configuration
 settings are prepended to the directory-specific file. You have to edit
 these configuration settings before you start compiling; they are
 located in the file build/mk.config which is also in make syntax.
-Follow the descriptions in this file and select appropriate values
-for your system.
+Follow the descriptions in this file and select appropriate values for
+your system.
 
 Be very careful at this step! If you overwrite your system utilities
 or put the Heirloom Toolchest at an early place in your system's PATH,
@@ -306,4 +296,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                01/23/07
+<gunnarr@acm.org>                                                2/24/07

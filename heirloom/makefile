@@ -53,29 +53,14 @@ casecheck: .foo .Foo
 .foo .Foo:
 	echo $@ > $@
 
-PKGFLAGS =	CC=cc CFLAGS2=-O CFLAGSS=-O CFLAGSS=-O CFLAGSU=-O \
-		CFLAGS=-O CPPFLAGS='-D__EXTENSIONS__' \
-		TTYGRP= LCURS=-lcurses LIBGEN=-lgen \
-		LSOCKET='-lsocket -lnsl' STRIP=: \
-		LIBZ= USE_ZLIB=0 LIBBZ2= USE_BZLIB=0 \
-		XO5FL= XO6FL= GNUFL= \
-		DEFBIN=/usr/5bin SV3BIN=/usr/5bin S42BIN=/usr/5bin/s42 \
-		SUSBIN=/usr/5bin/posix SU3BIN=/usr/5bin/posix2001 \
-		UCBBIN=/usr/ucb/heirloom CCSBIN=/usr/ccs/heirloom \
-		DEFLIB=/usr/5lib DEFSBIN=/usr/5bin MANDIR=/usr/share/man/5man \
-		DFLDIR=/etc/default/heirloom SPELLHIST=/var/adm/spellhist \
-		SULOG=/var/log/sulog MAGIC=/usr/5lib/magic YACC=yacc
 PKGROOT =	/var/tmp/heirloom-root
 PKGTEMP =	/var/tmp
 PKGPROTO =	prototype
 
-pkgbuild:
-	$(MAKE) $(PKGFLAGS)
-
 ou8:
 	$(MAKE) pkgbuild LEX=flex
 
-pkg: pkgbuild
+heirloom.pkg: all
 	rm -rf $(PKGROOT)
 	mkdir $(PKGROOT)
 	$(MAKE) $(PKGFLAGS) ROOT=$(PKGROOT) install
@@ -85,17 +70,10 @@ pkg: pkgbuild
 		cpio -pdm $(PKGROOT)/usr/share/doc/heirloom
 	rm -f $(PKGPROTO)
 	echo 'i pkginfo' >$(PKGPROTO)
-	(cd $(PKGROOT) && find . -print | pkgproto) | >>$(PKGPROTO) sed '\
-		s:^\([df] [^ ]* [^ ]* [^ ]*\) .*:\1 root root:; \
-		s:^\(f [^ ]* [^ ]*/ps \).*:\14755 root root:; \
-		s:^\(f [^ ]* [^ ]*/shl \).*:\12755 root adm:; \
-		s:^\(f [^ ]* [^ ]*/su \).*:\14755 root root:; \
-		s:^f\( [^ ]* etc/\):v \1:; \
-		s:^f\( [^ ]* var/\):v \1:; \
-		s:^\(s [^ ]* [^ ]*=\)\([^/]\):\1./\2:'
-	rm -rf $(PKGTEMP)/heirloom
-	pkgmk -a `uname -m` -d $(PKGTEMP) -r $(PKGROOT) -f $(PKGPROTO) heirloom
-	pkgtrans -o -s $(PKGTEMP) `pwd`/heirloom.pkg heirloom
+	(cd $(PKGROOT) && find . -print | pkgproto) | >>$(PKGPROTO) sed 's:^\([df] [^ ]* [^ ]* [^ ]*\) .*:\1 root root:; s:^\(f [^ ]* [^ ]*/ps \).*:\14755 root root:; s:^\(f [^ ]* [^ ]*/shl \).*:\12755 root adm:; s:^\(f [^ ]* [^ ]*/su \).*:\14755 root root:; s:^f\( [^ ]* etc/\):v \1:; s:^f\( [^ ]* var/\):v \1:; s:^\(s [^ ]* [^ ]*=\)\([^/]\):\1./\2:'
+	rm -rf $(PKGTEMP)/$@
+	pkgmk -a `uname -m` -d $(PKGTEMP) -r $(PKGROOT) -f $(PKGPROTO) $@
+	pkgtrans -o -s $(PKGTEMP) `pwd`/$@ $@
 	rm -rf $(PKGROOT)
 	rm -rf $(PKGPROTO) $(PKGTEMP)/heirloom
 
