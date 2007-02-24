@@ -122,6 +122,22 @@ clean:
 
 mrproper: clean
 
+PKGROOT = /var/tmp/heirloom-sh
+PKGTEMP = /var/tmp
+PKGPROTO = pkgproto
+
+heirloom-sh.pkg: all
+	rm -rf $(PKGROOT)
+	mkdir -p $(PKGROOT)
+	$(MAKE) ROOT=$(PKGROOT) install
+	rm -f $(PKGPROTO)
+	echo 'i pkginfo' >$(PKGPROTO)
+	(cd $(PKGROOT) && find . -print | pkgproto) | >>$(PKGPROTO) sed 's:^\([df] [^ ]* [^ ]* [^ ]*\) .*:\1 root root:; s:^f\( [^ ]* etc/\):v \1:; s:^f\( [^ ]* var/\):v \1:; s:^\(s [^ ]* [^ ]*=\)\([^/]\):\1./\2:'
+	rm -rf $(PKGTEMP)/$@
+	pkgmk -a `uname -m` -d $(PKGTEMP) -r $(PKGROOT) -f $(PKGPROTO) $@
+	pkgtrans -o -s $(PKGTEMP) `pwd`/$@ $@
+	rm -rf $(PKGROOT) $(PKGPROTO) $(PKGTEMP)/heirloom
+
 args.o: args.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 blok.o: blok.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h
 bltin.o: bltin.c defs.h mac.h mode.h name.h stak.h brkincr.h ctype.h \
