@@ -60,4 +60,4 @@ heirloom-doctools.pkg: all
 	rm -rf $(PKGTEMP)/$@
 	pkgmk -a `uname -m` -d $(PKGTEMP) -r $(PKGROOT) -f $(PKGPROTO) $@
 	pkgtrans -o -s $(PKGTEMP) `pwd`/$@ $@
-	rm -rf $(PKGROOT) $(PKGPROTO) $(PKGTEMP)/heirloom
+	rm -rf $(PKGROOT) $(PKGPROTO) $(PKGTEMP)/$@
