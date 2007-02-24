@@ -26,7 +26,7 @@
  */
 
 /*
- * Sccsid @(#)cpio.c	1.300 (gritter) 1/22/06
+ * Sccsid @(#)cpio.c	1.301 (gritter) 2/24/07
  */
 
 #include <sys/types.h>
@@ -748,6 +748,7 @@ int			Bflag;		/* 5120 blocking */
 int			cflag;		/* ascii format */
 int			Cflag;		/* user-defined blocking */
 int			dflag;		/* create directories */
+int			Dflag;		/* do not ask for next device */
 int			eflag;		/* DEC format */
 int			cray_eflag;	/* do not archive if values too large */
 const char		*Eflag;		/* filename for files to be extracted */
@@ -2281,7 +2282,8 @@ newmedia(int err)
 		errcnt++;
 	}
 	mfl = -1;
-	if ((mtst.st_mode&S_IFMT)!=S_IFCHR && (mtst.st_mode&S_IFMT)!=S_IFBLK) {
+	if ((mtst.st_mode&S_IFMT)!=S_IFCHR && (mtst.st_mode&S_IFMT)!=S_IFBLK ||
+			Dflag) {
 		if (action == 'o') {
 			switch (err) {
 			case 0:

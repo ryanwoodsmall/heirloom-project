@@ -5,17 +5,17 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cpio.sl	2.2 (gritter) 11/22/05";
+static const char sccsid[] USED = "@(#)cpio.sl	2.3 (gritter) 2/24/07";
 /* SLIST */
 /*
 blast.c: * Sccsid @(#)blast.c	1.2 (gritter) 2/17/04
 blast.h: * Sccsid @(#)blast.h	1.2 (gritter) 2/17/04
-cpio.c: * Sccsid @(#)cpio.c	1.299 (gritter) 11/22/05
-cpio.h:	Sccsid @(#)cpio.h	1.27 (gritter) 2/6/05	
+cpio.c: * Sccsid @(#)cpio.c	1.301 (gritter) 2/24/07
+cpio.h:	Sccsid @(#)cpio.h	1.28 (gritter) 2/24/07	
 crc32.c: * Sccsid @(#)crc32.c	1.2 (gritter) 5/29/03
 expand.c:	Sccsid @(#)expand.c	1.6 (gritter) 12/15/03	
 explode.c: * Sccsid @(#)explode.c	1.6 (gritter) 9/30/03
-flags.c:	Sccsid @(#)flags.c	1.4 (gritter) 3/5/05	
+flags.c:	Sccsid @(#)flags.c	1.5 (gritter) 2/24/07	
 inflate.c: * Sccsid @(#)inflate.c	1.6 (gritter) 10/13/04
 nonpax.c:	Sccsid @(#)nonpax.c	1.1 (gritter) 2/24/04	
 pax.c:static const char sccsid[] USED = "@(#)pax_su3.sl	1.26 (gritter) 6/26/05";
