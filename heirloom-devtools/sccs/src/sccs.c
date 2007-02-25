@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.12 (gritter) 2/17/07
+ * Sccsid @(#)sccs.c	1.13 (gritter) 2/25/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -2029,6 +2029,32 @@ safepath(register char *p)
 **		Exits if a "check" command.
 */
 
+static bool	_gotedit;
+static bool	_nobranch;
+static char	*_usernm;
+
+static void
+nothingedited(int nobranch, const char *usernm)
+{
+	printf("Nothing being edited");
+	if (nobranch)
+/*
+TRANSLATION_NOTE
+The following message is a possible continuation of the text
+"Nothing being edited" ...
+*/
+		printf(" (on trunk)");
+	if (usernm == NULL)
+		printf("\n");
+	else
+/*
+TRANSLATION_NOTE
+The following message is a possible continuation of the text
+"Nothing being edited" ...
+*/
+		printf(" by %s\n", usernm);
+}
+
 static int 
 clean(int mode, char **argv)
 {
@@ -2205,26 +2231,11 @@ clean(int mode, char **argv)
 
 	/* cleanup & report results */
 	closedir(dirfd);
-	if (!gotedit && mode == INFOC && (!Rflag || Rlevel <= 1))
-	{
-		printf("Nothing being edited");
-		if (nobranch)
-/*
-TRANSLATION_NOTE
-The following message is a possible continuation of the text
-"Nothing being edited" ...
-*/
-			printf(" (on trunk)");
-		if (usernm == NULL)
-			printf("\n");
-		else
-/*
-TRANSLATION_NOTE
-The following message is a possible continuation of the text
-"Nothing being edited" ...
-*/
-			printf(" by %s\n", usernm);
-	}
+	if (!gotedit && mode == INFOC && !Rflag)
+		nothingedited(nobranch, usernm);
+	_gotedit += gotedit;
+	_nobranch = nobranch;
+	_usernm = usernm;
 	if (mode == CHECKC)
 		return (gotedit);
 	else
@@ -2937,12 +2948,9 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
       sav_Pflag = Pflag;
       Pflag = _Pflag;
       if (cmd->sccsoper == CLEAN) {
-	if (Rflag == 2) {
+	if (Rflag == 2)
 	  np[0] = name;
-          rval |= command(ap, 1, "");
-	  break;
-	} else
-          rval |= command(ap, 1, "");
+        rval |= command(ap, 1, "");
       } else if (Rflag == 2 && cmd->sccsflags & PFONLY)
         rval |= pfileselect(ap, np, cmd, path);
       else
@@ -2955,5 +2963,7 @@ recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
   free(path);
   free(_Pflag);
   Rlevel--;
+  if (cmd->sccsoper == CLEAN && !_gotedit && Rlevel == 0)
+	  nothingedited(_nobranch, _usernm);
   return rval;
 }

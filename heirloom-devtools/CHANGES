@@ -1,6 +1,10 @@
 Release ...
 * make: Comments following "ifeq" and other conditionals are now handled
   correctly.
+* sccs: The commands "-R info", "-R tell", and "-R clean" now operate
+  correctly. They previously terminated operation prematurely when an
+  "SCCS" directory was found but other sub-directories at the current
+  recursion level had not yet been processed.
 
 Release 070218
 * sccs: A "-R" option has been added to enable recursive operation on
