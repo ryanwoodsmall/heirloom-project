@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.cc	1.9 (gritter) 2/18/07
+ * Sccsid @(#)macro.cc	1.10 (gritter) 2/25/07
  */
 
 /*
@@ -1627,7 +1627,7 @@ f_wildcard(wchar_t *args, String destination)
 static Boolean
 f_subst(wchar_t *args, String destination)
 {
-	wchar_t	*from, *to, *text, *tp, *pp;
+	wchar_t	*from, *to, *text = NULL, *tp, *pp;
 	size_t	fn, tn;
 
 	from = args;
@@ -1673,7 +1673,7 @@ patsplit(wchar_t *pp, wchar_t **left, wchar_t **right)
 static Boolean
 f_patsubst(wchar_t *args, String destination)
 {
-	wchar_t	*pattern, *replacement, *text;
+	wchar_t	*pattern, *replacement, *text = NULL;
 	wchar_t	*pleft, *pright;
 	wchar_t	*rleft, *rright;
 	wchar_t	*np, *ap, *pp;
@@ -1884,7 +1884,7 @@ f_word(wchar_t *args, String destination)
 static Boolean
 f_wordlist(wchar_t *args, String destination)
 {
-	wchar_t	*end, *text, *xp;
+	wchar_t	*end, *text = NULL, *xp;
 	unsigned long	s, e;
 
 	if ((end = skip_comma(args)) == NULL ||

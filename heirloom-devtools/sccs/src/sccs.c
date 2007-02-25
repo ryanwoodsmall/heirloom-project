@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sccs.c	1.13 (gritter) 2/25/07
+ * Sccsid @(#)sccs.c	1.14 (gritter) 2/25/07
  */
 /*	from sccs.c 1.2 2/27/90	*/
 # include	<i18n.h>
@@ -236,7 +236,7 @@ static char	*gstrcpy(char *, const char *, unsigned);
 static void	gstrbotch(const char *, const char *);
 static void	diffs(char *);
 static char	*makegfile(char *);
-static int	recurse(char **, char **, struct sccsprog *, const char *);
+static int	recurse(char **, char **, struct sccsprog *, char *);
 
 
 /* values for sccsoper */
@@ -2885,10 +2885,11 @@ pfileselect(char **ap, char **np, struct sccsprog *cmd, const char *name)
   }
   free(path);
   closedir(dirfd);
+  return 0;
 }
 
 static int
-recurse(char **ap, char **np, struct sccsprog *cmd, const char *name)
+recurse(char **ap, char **np, struct sccsprog *cmd, char *name)
 {
   char	*path = NULL;
   char	*_Pflag = NULL;

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.7 (gritter) 2/18/07
+ * Sccsid @(#)misc.cc	1.8 (gritter) 2/25/07
  */
 
 /*
@@ -426,7 +426,6 @@ fatal_mksh(char * message, ...)
 	va_list args;
 	char	*mksh_fat_err = "mksh: Fatal error: ";
 	char	*cur_wrk_dir = "Current working directory: ";
-	int	mksh_fat_err_len = strlen(mksh_fat_err);
 
 	va_start(args, message);
 	fflush(stdout);

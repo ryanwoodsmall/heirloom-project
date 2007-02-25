@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.10 (gritter) 2/20/07
+ * Sccsid @(#)read.cc	1.11 (gritter) 2/25/07
  */
 
 /*
@@ -2370,7 +2370,7 @@ enter_target_groups_and_dependencies(Name_vector target, Name_vector depes, Cmd_
 static	Boolean	
 eq_condition(wchar_t *args)
 {
-    wchar_t	*arg1, *arg2;
+    wchar_t	*arg1, *arg2 = NULL;
     wchar_t	c;
 
     while (*args == space_char || *args == tab_char)
