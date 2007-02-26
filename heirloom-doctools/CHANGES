@@ -11,6 +11,10 @@ Release ...
 * [nt]roff: An internal problem with paragraph-at-once line breaking mode
   has been fixed; it caused a ".in" or ".ll" command to be ignored under
   rare circumstances.
+* [nt]roff: At the end of input in paragraph-at-once line breaking mode,
+  make sure that any partial paragraph is flushed before executing other
+  termination procedures. The previous failure to do so lead to missing
+  output at the end of the document if it did not fit on the current page.
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
 * -man macros: ".P" is now recognized; it is the same as ".PP".
