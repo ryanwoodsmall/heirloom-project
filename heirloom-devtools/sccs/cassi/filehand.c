@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)filehand.c	1.5 (gritter) 12/25/06
+ * Sccsid @(#)filehand.c	1.6 (gritter) 2/26/07
  */
 /*	from OpenSolaris "sccs:lib/cassi/filehand.c"	*/
 
@@ -501,7 +501,7 @@ begin:
 		strncpy (hackrec, realrec, (unsigned) maxlen);
 
 		/* Seperate the command into arguments. */
-		if (chop == (int (*)()) NULL)
+		if (chop == (int (*)(char *, int, char **)) NULL)
 			i = argchop (hackrec, fldsep, arg);
 		else
 			i = (*chop) (hackrec, fldsep, arg);
@@ -509,7 +509,7 @@ begin:
 			break;						/* Something funny in record. */
 
 		/* Now, determine the alphabetic status of this record. */
-		if (compare == (int (*)()) NULL)
+		if (compare == (int (*)(char **, char **, int)) NULL)
 			cmpstat = rec_cmp (arg, fmatch, recsep);
 		else
 			cmpstat = (*compare) (arg, fmatch, recsep);

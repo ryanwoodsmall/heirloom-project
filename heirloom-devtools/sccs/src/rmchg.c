@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)rmchg.c	1.5 (gritter) 01/21/07
+ * Sccsid @(#)rmchg.c	1.6 (gritter) 2/26/07
  */
 /*	from OpenSolaris "sccs:cmd/rmchg.c"	*/
 # include	<defines.h>
@@ -277,6 +277,7 @@ rmchg(char *file)
 	extern char Pgmr[LOGSIZE];
 	int fowner, downer, user;
 
+	(void) &found;
 	if (setjmp(Fjmp))	/* set up to return here from 'fatal' */
 		return;		/* and return to caller of rmchg */
 
@@ -785,8 +786,11 @@ testfred(char *cmr, char *fredfile)
 		cmrh[0]=cmr;
 		dcmrh[0]=dcmr;
 		return(sweep(SEQVERIFY,fredfile,NULL,'\n',WHITE,80,cmrh,NULL,NULL,
-		(int(*)())NULL,(int(*)())NULL) == FOUND || sweep(SEQVERIFY,fredfile
-		,NULL,'\n',WHITE,80,dcmrh,NULL,NULL,(int(*)())NULL,(int(*)())NULL)
+		(int(*)(char *, int, char **))NULL,
+		(int(*)(char **, char **, int))NULL) == FOUND
+		|| sweep(SEQVERIFY,fredfile,NULL,'\n',WHITE,80,dcmrh,NULL,NULL,
+		(int(*)(char *, int, char **))NULL,
+		(int(*)(char **, char **, int))NULL)
 		== FOUND);
 	}
 	

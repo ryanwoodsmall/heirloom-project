@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)cmrcheck.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)cmrcheck.c	1.5 (gritter) 2/26/07
  */
 /*	from OpenSolaris "sccs:lib/cassi/cmrcheck.c"	*/
 
@@ -80,8 +80,8 @@ cmrcheck(char *cmr, char *appl)
 	while ((p[0] = strrchr (lcmr, ',')) != EMPTY) {
 		p[0]++;		/* Skip the ','. */
 		if (strlen (p[0]) != MAXLENCMR || sweep (SEQVERIFY, gf (appl), EMPTY,
-		  '\n', WHITE, 40, p, EMPTY, (char**) NULL, (int (*)()) NULL,
-		  (int (*)()) NULL) != FOUND) {
+		  '\n', WHITE, 40, p, EMPTY, (char**) NULL, (int (*)(char *, int, char **)) NULL,
+		  (int (*)(char **, char **, int)) NULL) != FOUND) {
 			fprintf (stdout, format, p[0]);
 			TR("Cmrcheck: return=1\n", NULL, NULL, NULL);
 			return (1);
@@ -92,7 +92,7 @@ cmrcheck(char *cmr, char *appl)
 	TR("Cmrcheck: last entry\n", NULL, NULL, NULL);
 	p[0] = lcmr;						/* Last entry on the list. */
 	if (strlen (p[0]) != MAXLENCMR || sweep (SEQVERIFY, gf (appl), EMPTY, '\n',
-	  WHITE, 40, p, EMPTY, (char**) NULL, (int (*)()) NULL, (int (*)()) NULL)
+	  WHITE, 40, p, EMPTY, (char**) NULL, (int (*)(char *, int, char **)) NULL, (int (*)(char **, char **, int)) NULL)
 	  != FOUND) {
 		fprintf (stdout, format, p[0]);
 		TR("Cmrcheck: return=1\n", NULL, NULL, NULL);

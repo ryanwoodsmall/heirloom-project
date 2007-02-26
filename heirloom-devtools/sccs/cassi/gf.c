@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gf.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)gf.c	1.5 (gritter) 2/26/07
  */
 /*	from OpenSolaris "sccs:lib/cassi/gf.c"	*/
 
@@ -73,7 +73,8 @@ gf(char *appl)
 	fmat[1] = EMPTY;
 	TR("Gf: fmat[0]=(%s) fmat[1]=(%s)\n", fmat[0], fmat[1], EMPTY);
 	if (sweep (VERIFY, filename, EMPTY, '\n', ':', SIZE, fmat, in_line, ptrs,
-	  (int (*)()) NULL, (int (*)()) NULL) != FOUND) {
+	  (int (*)(char *, int, char **)) NULL,
+	  (int (*)(char **, char **, int)) NULL) != FOUND) {
 		TR("Gf: not found\n", EMPTY, EMPTY, EMPTY);
 		return (EMPTY);
 		}

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)deltack.c	1.4 (gritter) 12/20/06
+ * Sccsid @(#)deltack.c	1.5 (gritter) 2/26/07
  */
 /*	from OpenSolaris "sccs:lib/cassi/deltack.c"	*/
 #include <had.h>
@@ -422,7 +422,8 @@ verif(char *cmr, char *fred)
 	cmrpass[0] = cmr;
 	cmrpass[1] = NULL;
 	res=sweep(SEQVERIFY,fred,NULL,'\n',WHITE,40,cmrpass,NULL,NULL,
-		 (int(*)()) NULL, (int (*)()) NULL);
+		 (int(*)(char *, int, char **)) NULL,
+		 (int (*)(char **, char **, int)) NULL);
 	if(res != FOUND)
 		{
 		 return(0);

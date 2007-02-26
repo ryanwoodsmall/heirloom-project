@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)admin.c	1.4 (gritter) 01/21/07
+ * Sccsid @(#)admin.c	1.5 (gritter) 2/26/07
  */
 /*	from OpenSolaris "sccs:cmd/admin.c"	*/
 
@@ -536,6 +536,10 @@ admin(char *afile)
 	int	from_stdin = 0; /* used for ifile */
 	extern	char had_dir;
 
+	(void) &iptr;
+	(void) &lval;
+	(void) &ck_it;
+	(void) &from_stdin;
 	if (setjmp(Fjmp))	/* set up to return here from 'fatal' */
 		return;		/* and return to caller of admin */
 
