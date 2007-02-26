@@ -1,4 +1,4 @@
-Release ...
+Release 070227
 * The directory for development utilities, by default "/usr/ccs/bin", is
   now configurable in "build/mk.config" . It is expected that the utilities
   from the "Heirloom Development Tools" package are installed in it.
