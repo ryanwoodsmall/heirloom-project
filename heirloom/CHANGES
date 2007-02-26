@@ -9,6 +9,9 @@ Release ...
 * OpenSolaris-derived manual pages are now included for bdiff, newform,
   and fspec(5).
 * psrinfo: Fixed the computation of the "on-line since" time for Linux 2.6.
+* cpio: Added a "-D" option to make it usable in combination with SVR4
+  packaging tools. This option is not intended for general use, and is
+  thus not documented.
 * The package build target "make pkg" for Solaris and Open UNIX is no
   longer supported.
 
