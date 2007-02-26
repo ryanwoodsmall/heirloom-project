@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.9 (gritter) 01/20/07
+ * Sccsid @(#)misc.cc	1.10 (gritter) 2/26/07
  */
 
 /*
@@ -278,6 +278,7 @@ time_to_string(const timestruc_t &time)
 {
 	struct tm		*tm;
 	char			buf[128];
+	const char		*fmt = NOCATGETS("%c %Z");
 
         if (time == file_doesnt_exist) {
                 return "File does not exist";
@@ -286,7 +287,7 @@ time_to_string(const timestruc_t &time)
                 return "Younger than any file";
         }
 	tm = localtime(&time.tv_sec);
-	strftime(buf, sizeof (buf), NOCATGETS("%c %Z"), tm);
+	strftime(buf, sizeof (buf), fmt, tm);
         buf[127] = (int) nul_char;
         return strdup(buf);
 }

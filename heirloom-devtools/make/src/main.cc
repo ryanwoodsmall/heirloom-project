@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.20 (gritter) 2/18/07
+ * Sccsid @(#)main.cc	1.21 (gritter) 2/26/07
  */
 
 /*
@@ -1108,17 +1108,11 @@ handle_interrupt(int)
 				       "\n*** %s ",
 				       current_target->string_mb);
 			if (current_target->stat.is_dir) {
-				fprintf(stderr,
-					       "not removed.\n",
-					       current_target->string_mb);
+				fprintf(stderr, "not removed.\n");
 			} else if (unlink(current_target->string_mb) == 0) {
-				fprintf(stderr,
-					       "removed.\n",
-					       current_target->string_mb);
+				fprintf(stderr, "removed.\n");
 			} else {
-				fprintf(stderr,
-					       "could not be removed: %s.\n",
-					       current_target->string_mb,
+				fprintf(stderr, "could not be removed: %s.\n",
 					       errmsg(errno));
 			}
 		}
@@ -1143,17 +1137,12 @@ handle_interrupt(int)
 					       "\n*** %s ",
 					       rp->target->string_mb);
 				if (rp->target->stat.is_dir) {
-					fprintf(stderr,
-						       "not removed.\n",
-						       rp->target->string_mb);
+					fprintf(stderr, "not removed.\n");
 				} else if (unlink(rp->target->string_mb) == 0) {
-					fprintf(stderr,
-						       "removed.\n",
-						       rp->target->string_mb);
+					fprintf(stderr, "removed.\n");
 				} else {
 					fprintf(stderr,
-						       "could not be removed: %s.\n",
-						       rp->target->string_mb,
+						"could not be removed: %s.\n",
 						       errmsg(errno));
 				}
 			}

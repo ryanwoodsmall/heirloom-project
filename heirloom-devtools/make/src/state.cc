@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)state.cc	1.3 (gritter) 01/13/07
+ * Sccsid @(#)state.cc	1.4 (gritter) 2/26/07
  */
 
 /*
@@ -152,6 +152,8 @@ write_state_file(int, Boolean exiting)
 	register Cmd_line	cp;
 
 
+	(void) &fd;
+	(void) &attempts;
 	if (!rewrite_statefile ||
 	    !command_changed ||
 	    !keep_state ||
