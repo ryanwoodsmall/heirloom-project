@@ -9,7 +9,7 @@
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., February 2007
  *
- * Sccsid @(#)lemon.c	1.2 (gritter) 2/24/07
+ * Sccsid @(#)lemon.c	1.3 (gritter) 2/27/07
  */
 #include <stdio.h>
 #include <stdlib.h>

@@ -23,7 +23,7 @@
 **     ROLLBACK
 **     PRAGMA
 **
-** $Id$
+** from Id: build.c,v 1.156 2003/07/01 18:13:15 drh Exp
 */
 #include "sqliteInt.h"
 #include <ctype.h>

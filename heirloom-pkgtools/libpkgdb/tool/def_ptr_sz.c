@@ -24,7 +24,13 @@
  * Use is subject to license terms.
  */
 
-#pragma ident	"@(#)def_ptr_sz.c	1.2	06/02/27 SMI"
+/*	from OpenSolaris "def_ptr_sz.c	1.2	06/02/27 SMI"	*/
+
+/*
+ * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
+ *
+ * Sccsid @(#)def_ptr_sz.c	1.2 (gritter) 2/27/07
+ */
 
 #include <stdio.h>
 

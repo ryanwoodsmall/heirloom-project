@@ -1,4 +1,4 @@
-#pragma ident	"@(#)printf.c	1.2	06/02/27 SMI"
+/* from OpenSolaris printf.c	1.2	06/02/27 SMI	*/
 
 /*
 ** The "printf" code that follows dates from the 1980's.  It is in
