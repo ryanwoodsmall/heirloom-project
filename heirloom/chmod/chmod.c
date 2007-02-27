@@ -35,7 +35,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -43,9 +43,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)chmod_sus.sl	1.10 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)chmod_sus.sl	1.8 (gritter) 4/20/04";
 #else
-static const char sccsid[] USED = "@(#)chmod.sl	1.10 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)chmod.sl	1.8 (gritter) 4/20/04";
 #endif
 /*
  * chmod [-R] [ugoa][+-=][rwxXlstugo] files
@@ -87,7 +87,7 @@ static int	Rflag;
 static void	chng(const char *, const char *);
 static mode_t	newmode(const char *, const mode_t, const char *);
 static mode_t	absol(const char **);
-static mode_t	who(const char **, mode_t *);
+static mode_t	who(const char **);
 static int	what(const char **);
 static mode_t	where(const char **, mode_t, int *, int *, const mode_t);
 static void	*srealloc(void *, size_t);
@@ -174,7 +174,7 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 {
 	register mode_t	o, m, b;
 	int	lock, setsgid = 0, didprc = 0, cleared = 0, copy = 0;
-	mode_t	nm, om, mm;
+	mode_t	nm, om;
 
 	nm = om = pm;
 	m = absol(&ms);
@@ -186,19 +186,19 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 			== 01)
 		nm &= ~(mode_t)S_ENFMT;
 	do {
-		m = who(&ms, &mm);
+		m = who(&ms);
 		while (o = what(&ms)) {
 			b = where(&ms, nm, &lock, &copy, pm);
 			switch (o) {
 			case '+':
-				nm |= b & m & ~mm;
+				nm |= b & m;
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
 					lock |= 02;
 				break;
 			case '-':
-				nm &= ~(b & m & ~mm);
+				nm &= ~(b & m);
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
@@ -206,7 +206,7 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 				break;
 			case '=':
 				nm &= ~m;
-				nm |= b & m & ~mm;
+				nm |= b & m;
 				lock &= ~01;
 				if (lock & 04)
 					lock |= 02;
@@ -291,12 +291,11 @@ absol(const char **ms)
 }
 
 static mode_t
-who(const char **ms, mode_t *mp)
+who(const char **ms)
 {
 	register int m;
 
 	m = 0;
-	*mp = 0;
 	for (;;) switch (*(*ms)++) {
 	case 'u':
 		m |= USER;
@@ -312,10 +311,8 @@ who(const char **ms, mode_t *mp)
 		continue;
 	default:
 		(*ms)--;
-		if (m == 0) {
-			m = ALL;
-			*mp = um;
-		}
+		if (m == 0)
+			m = ALL & ~um;
 		return m;
 	}
 }

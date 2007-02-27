@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.45 (gritter) 2/26/07
+ * Sccsid @(#)n2.c	1.6 (gritter) 8/8/05
  */
 
 /*
@@ -55,31 +55,40 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
-#include <setjmp.h>
-#ifdef EUC
-#include <limits.h>
-#include <ctype.h>
-#include <unistd.h>
-#endif /* EUC */
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "pt.h"
+#include "proto.h"
+#include <setjmp.h>
 #include "ext.h"
+#ifdef EUC
+#ifdef NROFF
+#include <stddef.h>
+#ifdef	__sun
+#include <widec.h>
+#else
+#include <wchar.h>
+#endif
+#include <limits.h>
+#include <ctype.h>
+#include <unistd.h>
+
+char mbobuf[MB_LEN_MAX] = {0};
+wchar_t wchar;
+int	nmb1 = 0;
+#endif /* NROFF */
+#endif /* EUC */
 
 extern	jmp_buf	sjbuf;
 int	toolate;
 int	error;
 
-static void	outtp(tchar);
-
-int
+void
 pchar(register tchar i)
 {
 	register int j;
 	static int hx = 0;	/* records if have seen HX */
-	static int xon = 0;	/* records if have seen XON */
 
 	if (hx) {
 		hx = 0;
@@ -92,73 +101,48 @@ pchar(register tchar i)
 				dip->alss = j;
 			ralss = dip->alss;
 		}
-		return 1;
+		return;
 	}
 	if (ismot(i)) {
 		pchar1(i); 
-		return 1;
+		return;
 	}
 	switch (j = cbits(i)) {
 	case 0:
 	case IMP:
 	case RIGHT:
 	case LEFT:
-		if (xflag) {
-			i = j = FILLER;	/* avoid kerning in output routine */
-			goto dfl;
-		}
-		return 1;
+		return;
 	case HX:
 		hx = 1;
-		if (xflag) {
-			i = j = FILLER;	/* avoid kerning in output routine */
-			goto dfl;
-		}
-		return 1;
-	case XON:
-		xon = 1;
-		goto dfl;
-	case XOFF:
-		xon = 0;
-		goto dfl;
+		return;
 	case PRESC:
 		if (dip == &d[0])
 			j = eschar;	/* fall through */
 	default:
-	dfl:
-		if (!xflag || !isdi(i)) {
-			setcbits(i, tflg ? trnttab[j] : trtab[j]);
-			if (xon == 0)
-				setcbits(i, ftrans(fbits(i), cbits(i)));
-		}
+#ifndef EUC
+		setcbits(i, trtab[j]);
+#else
+#ifndef NROFF
+		setcbits(i, trtab[j]);
+#else
+		if (!multi_locale || (!(j & CSMASK) && !(j & MBMASK1)))
+			setcbits(i, trtab[j]);
+#endif /* NROFF */
+#endif /* EUC */
 	}
-#ifdef	NROFF
-	if (xon && xflag)
-		return 1;
-#endif	/* NROFF */
 	pchar1(i);
-	return 1;
 }
 
 
 void
 pchar1(register tchar i)
 {
-	static int	_olt;
-	tchar	_olp[1];
 	register int j;
-	filep	savip;
 	extern void ptout(tchar);
 
 	j = cbits(i);
 	if (dip != &d[0]) {
-		if (i == FLSS)
-			dip->flss++;
-		else if (dip->flss > 0)
-			dip->flss--;
-		else if (!ismot(i) && (cbits(i) > 32 || cbits(i) == XFUNC) &&
-				!tflg)
-			i |= DIBIT;
 		wbf(i);
 		dip->op = offset;
 		return;
@@ -168,42 +152,11 @@ pchar1(register tchar i)
 			dip->alss = dip->blss = 0;
 		return;
 	}
-	if (no_out)
+	if (no_out || j == FILLER)
 		return;
 	if (tflg) {	/* transparent mode, undiverted */
-		outtp(i);
+		fdprintf(ptid, "%c", j);
 		return;
-	}
-	if (cbits(i) == XFUNC) {
-		switch (fbits(i)) {
-		case OLT:
-			olt = realloc(olt, (nolt + 1) * sizeof *olt);
-			_olt = 1;
-			return;
-		case CHAR:
-#ifndef	NROFF
-			if (!ascii)
-				break;
-#endif	/* !NROFF */
-			savip = ip;
-			ip = charout[sbits(i)].op;
-			app++;
-			fmtchar++;
-			while ((i = rbf()) != 0 && cbits(i) != '\n' &&
-					cbits(i) != FLSS)
-				pchar(i);
-			fmtchar--;
-			app--;
-			ip = savip;
-			return;
-		}
-	}
-	if (cbits(i) == 'x')
-		fmtchar = fmtchar;
-	if (_olt) {
-		_olp[0] = i;
-		olt[nolt++] = fetchrq(_olp);
-		_olt = 0;
 	}
 #ifndef NROFF
 	if (ascii)
@@ -213,70 +166,13 @@ pchar1(register tchar i)
 		ptout(i);
 }
 
-static void
-outtp(tchar i)
-{
-	int	j = cbits(i);
-
-#ifdef	EUC
-	if (iscopy(i))
-		fdprintf(ptid, "%lc", j);
-	else
-#endif	/* EUC */
-		fdprintf(ptid, "%c", j);
-}
-
-#ifndef	NROFF
-static void
-outmb(tchar i)
-{
-	extern int nchtab;
-	int j = cbits(i);
-#ifdef	EUC
-	wchar_t	wc;
-	char	mb[MB_LEN_MAX+1];
-	int	n;
-	int	f;
-#endif	/* EUC */
-
-	if (j < 0177) {
-		oput(j);
-		return;
-	}
-#ifdef	EUC
-	if (iscopy(i))
-		wc = cbits(i);
-	else {
-		if ((f = fbits(i)) == 0)
-			f = font;
-		wc = tr2un(j, f);
-	}
-	if (wc != -1 && (n = wctomb(mb, wc)) > 0) {
-		mb[n] = 0;
-		oputs(mb);
-	} else
-#endif	/* EUC */
-	if (j < 128 + nchtab) {
-		oput('\\');
-		oput('(');
-		oput(chname[chtab[j-128]]);
-		oput(chname[chtab[j-128]+1]);
-	}
-}
-
 void
 outascii (	/* print i in best-guess ascii */
     tchar i
 )
 {
 	int j = cbits(i);
-	int f = fbits(i);
-	int k;
 
-	if (j == FILLER)
-		return;
-	if (isadjspc(i))
-		return;
 	if (ismot(i)) {
 		oput(' ');
 		return;
@@ -285,23 +181,31 @@ outascii (	/* print i in best-guess ascii */
 		oput(j);
 		return;
 	}
-	if (f == 0)
-		f = xfont;
 	if (j == DRAWFCN)
 		oputs("\\D");
 	else if (j == HYPHEN || j == MINUS)
 		oput('-');
 	else if (j == XON)
 		oputs("\\X");
-	else if (islig(i) && lgrevtab && lgrevtab[f] && lgrevtab[f][j]) {
-		for (k = 0; lgrevtab[f][j][k]; k++)
-			outmb(sfmask(i) | lgrevtab[f][j][k]);
-	} else if (j == WORDSP)
+	else if (j == LIG_FI)
+		oputs("fi");
+	else if (j == LIG_FL)
+		oputs("fl");
+	else if (j == LIG_FF)
+		oputs("ff");
+	else if (j == LIG_FFI)
+		oputs("ffi");
+	else if (j == LIG_FFL)
+		oputs("ffl");
+	else if (j == WORDSP)
 		;	/* nothing at all */
-	else if (j > 0177)
-		outmb(i);
+	else if (j > 0177) {
+		oput('\\');
+		oput('(');
+		oput(chname[chtab[j-128]]);
+		oput(chname[chtab[j-128]+1]);
+	}
 }
-#endif
 
 
 /*
@@ -319,7 +223,7 @@ void
 oputs(register char *i)
 {
 	while (*i != 0)
-		oput(*i++&0377);
+		oput(*i++);
 }
 
 
@@ -347,25 +251,6 @@ flusho(void)
 	obufp = obuf;
 }
 
-void
-caseoutput(void)
-{
-	tchar	i;
-
-	copyf++;
-	if (!skip(0)) {
-		if (cbits(i = getch()) == '"')
-			i = getch();
-		while (i != 0) {
-			outtp(i);
-			if (cbits(i) == '\n')
-				break;
-			i = getch();
-		}
-	}
-	copyf--;
-}
-
 
 void
 done(int x)
@@ -373,9 +258,7 @@ done(int x)
 	register int i;
 
 	error |= x;
-	dl = app = ds = lgf = 0;
-	if (pgchars && !pglines)
-		tbreak();
+	app = ds = lgf = 0;
 	if (i = em) {
 		donef = -1;
 		em = 0;
@@ -396,7 +279,7 @@ done(int x)
 	donef = 1;
 	ip = 0;
 	frame = stk;
-	nxf = calloc(1, sizeof *nxf);
+	nxf = frame + 1;
 	if (!ejf)
 		tbreak();
 	nflush++;
@@ -419,7 +302,8 @@ done1(int x)
 		flusho();
 		done3(0);
 	} else {
-		pttrailer();
+		if (!gflag)
+			pttrailer();
 		done2(0);
 	}
 }
@@ -443,6 +327,7 @@ done3(int x)
 	error |= x;
 	signal(SIGINT, SIG_IGN);
 	signal(SIGTERM, SIG_IGN);
+	unlink(unlkp);
 #ifdef NROFF
 	twdone();
 #endif
@@ -456,7 +341,7 @@ void
 edone(int x)
 {
 	frame = stk;
-	nxf = calloc(1, sizeof *nxf);
+	nxf = frame + 1;
 	ip = 0;
 	done(x);
 }
@@ -466,12 +351,10 @@ edone(int x)
 void
 casepi(void)
 {
-	register pid_t i;
+	register int i;
 	int	id[2];
 
-	if (skip(1))
-		return;
-	if (toolate || !getname() || pipe(id) == -1 || (i = fork()) == -1) {
+	if (toolate || skip() || !getname() || pipe(id) == -1 || (i = fork()) == -1) {
 		errprint("Pipe not created.");
 		return;
 	}
@@ -479,7 +362,7 @@ casepi(void)
 	if (i > 0) {
 		close(id[0]);
 		toolate++;
-		pipeflg = i;
+		pipeflg++;
 		return;
 	}
 	close(0);

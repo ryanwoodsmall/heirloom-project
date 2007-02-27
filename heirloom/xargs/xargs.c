@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)xargs.sl	1.15 (gritter) 6/21/05";
+static const char sccsid[] USED = "@(#)xargs.sl	1.12 (gritter) 10/13/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -260,7 +260,6 @@ flags(int ac, char **av)
 			else
 				lflag = 1;
 			xflag = 1;
-			iflag = NULL;
 			continue;
 		case 'L':
 			if (av[i][2])
@@ -270,7 +269,6 @@ flags(int ac, char **av)
 			else
 				mustbepos('L', "");
 			xflag = 1;
-			iflag = NULL;
 			nflag = 0;
 			continue;
 		case 'n':
@@ -362,17 +360,17 @@ run(const char **args)
 		/*NOTREACHED*/
 	case 0:
 		execvp(args[0], (char **)args);
-		_exit(errno == ENOENT ? 127 : 126);
+		_exit(255);
 	default:
 		while (wait(&status) != pid);
 		if (status && ((WIFEXITED(status)&&WEXITSTATUS(status)==255) ||
 				WIFSIGNALED(status))) {
 			fprintf(stderr, "%s: %s not executed or returned -1\n",
 					progname, args[0]);
-			exit(125);
+			exit(127);
 		}
 		if (status)
-			errcnt |= WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+			errcnt |= 1;
 	}
 }
 
@@ -465,7 +463,7 @@ addarg(const char *s, int always)
 					a_vec[a_cur++] = s;
 				else
 					toolong = 1;
-			doit:	if (nflag && xflag && a_cnt > nflag)
+			doit:	if (nflag && xflag && a_csz + sz > nflag)
 					overflow();
 				if (lflag && xflag && !always)
 					overflow();

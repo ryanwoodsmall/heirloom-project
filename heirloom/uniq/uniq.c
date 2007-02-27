@@ -36,14 +36,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)uniq.sl	1.10 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)uniq.sl	1.8 (gritter) 5/1/04";
 
 /*
  * Deal with duplicated lines in a file
@@ -57,7 +57,6 @@ static const char sccsid[] USED = "@(#)uniq.sl	1.10 (gritter) 5/29/05";
 #include <locale.h>
 #include <unistd.h>
 #include <blank.h>
-#include <libgen.h>
 
 static int	fields;
 static int	letters;
@@ -66,7 +65,6 @@ static char	mode;
 static int	uniq;
 static struct iblok	*ip;
 static int	mb_cur_max;
-static const char	*progname;
 
 static void	pline(const char *, size_t);
 static int	equal(const char *, size_t, const char *, size_t);
@@ -78,33 +76,16 @@ static void	*srealloc(void *, size_t);
 		 (n) = ((n) > 0 ? (n) : (n) < 0 ? (wc=WEOF, 1) : 1)) : \
 	((wc) = *(s) & 0377, (n) = 1))
 
-static void
-missing(int c)
-{
-	fprintf(stderr, "%s: missing argument to -%c option\n",
-			progname, c);
-	exit(2);
-}
-
 int
 main(int argc, char **argv)
 {
 	static char *b1, *b2;
 	static size_t	s1 = 0, s2 = 0, l1, l2;
 
-	progname = basename(argv[0]);
 	setlocale(LC_CTYPE, "");
 	mb_cur_max = MB_CUR_MAX;
 	while(argc > 1) {
-		if(argv[1][0] == '-') {
-			if (argv[1][1] == '-' && argv[1][2] == '\0') {
-				if (argv[2]) {
-					argc--;
-					argv++;
-					goto op;
-				}
-				break;
-			}
+		if(*argv[1] == '-') {
 		optc:	if (isdigit(argv[1][1]))
 				fields = atoi(&argv[1][1]);
 			else switch (argv[1][1]) {
@@ -115,8 +96,7 @@ main(int argc, char **argv)
 					fields = atoi(argv[2]);
 					argc--;
 					argv++;
-				} else
-					missing('f');
+				}
 				break;
 			case 's':
 				if (argv[1][2])
@@ -125,8 +105,7 @@ main(int argc, char **argv)
 					letters = atoi(argv[2]);
 					argc--;
 					argv++;
-				} else
-					missing('s');
+				}
 				break;
 			default:
 				mode = argv[1][1];
@@ -145,7 +124,7 @@ main(int argc, char **argv)
 			argv++;
 			continue;
 		}
-	op:	if ((ip = ib_open(argv[1], 0)) == NULL)
+		if ((ip = ib_open(argv[1], 0)) == NULL)
 			printe("cannot open %s\n", argv[1]);
 		break;
 	}

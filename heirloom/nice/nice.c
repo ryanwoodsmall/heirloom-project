@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)nice.sl	1.10 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)nice.sl	1.8 (gritter) 4/20/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -57,15 +57,8 @@ pnerror(int eno, const char *string)
 static void
 usage(void)
 {
-	fprintf(stderr, "%s: usage: %s [-num] command\n",
+	fprintf(stderr, "%s: usage: %s [-num | -n num] command\n",
 			progname, progname);
-	exit(2);
-}
-
-static void
-notnumeric(void)
-{
-	fprintf(stderr, "%s: argument must be numeric.\n", progname);
 	exit(2);
 }
 
@@ -76,8 +69,10 @@ get_niceval(char *arg)
 	int	n;
 
 	n = strtol(arg, &x, 10);
-	if (*x != '\0')
-		notnumeric();
+	if (*x != '\0') {
+		fprintf(stderr, "%s: argument must be numeric.\n", progname);
+		usage();
+	}
 	return n;
 }
 
@@ -94,10 +89,8 @@ main(int argc, char **argv)
 		case 'n':
 			if (argv[i][2])
 				niceval = get_niceval(&argv[i][2]);
-			else if (argv[i+1])
-				niceval = get_niceval(argv[++i]);
 			else
-				notnumeric();
+				niceval = get_niceval(argv[++i]);
 			break;
 		case '-':
 			if (argv[i][2] == '\0') {
@@ -110,7 +103,9 @@ main(int argc, char **argv)
 			niceval = get_niceval(&argv[i][1]);
 			break;
 		default:
-			notnumeric();
+			fprintf(stderr, "%s: illegal option -- %c\n",
+					progname, argv[i][1]);
+			usage();
 		}
 	}
 optend:

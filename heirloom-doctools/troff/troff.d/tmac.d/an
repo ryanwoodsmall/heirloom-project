@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.10 (gritter) 2/18/07
+.\" Sccsid @(#)tmac.an	1.11 (gritter) 8/12/05
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -38,6 +38,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'	# groff adjustments
+.if \n(.g==1 \{\
+'	# Disable all warnings.
+.do warn 0
+.\}
 '	# reset the basic page layout
 .de }E
 .}f
@@ -61,7 +66,7 @@
 'sp .5i
 .ft 1
 .ps \\nS
-.tl \\*(]H\\*(]D\\*(]H
+.tl \\*(]H\\*(]D\\*(]H
 'sp .5i
 .ev
 .ns
@@ -72,11 +77,10 @@
 .ft 1
 .ps \\nS
 'sp .5i
-.tl \\*(]W\\*(]L%
+.tl \\*(]W\\*(]L%
 'bp
 .ev
 ..
-.ig
 '	# the cut mark
 .if n .ig
 .de }C
@@ -95,7 +99,6 @@
 .}N
 .pl 1
 .ll \\n(LLu
-..
 ..
 .em }K
 '	# set title and heading
@@ -232,63 +235,51 @@
 .de I
 .ft 2
 .it 1 }N
-.if !"\\$1"" \&\\$*
+.if !"\\$1"" \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
 ..
 '	# bold
 .de B
 .ft 3
 .it 1 }N
-.if !"\\$1"" \&\\$*
+.if !"\\$1"" \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
 ..
 '	# small
 .de SM
 .ps \\nS-1
 .it 1 }N
-.if !"\\$1"" \&\\$*
+.if !"\\$1"" \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
 ..
 '	# small and bold
 .de SB
 .ps \\nS-1
 .it 1 }N
 .ft B
-.if !"\\$1"" \&\\$*
+.if !"\\$1"" \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
 ..
 '	# combinations of Roman, italic, bold
 .de RI
-.}S 1 2 \& \\$@
+.}S 1 2 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
 .de RB
-.}S 1 3 \& \\$@
+.}S 1 3 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
 .de IR
-.}S 2 1 \& \\$@
+.}S 2 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
 .de IB
-.}S 2 3 \& \\$@
+.}S 2 3 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
 .de BR
-.}S 3 1 \& \\$@
+.}S 3 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
 .de BI
-.}S 3 2 \& \\$@
+.}S 3 2 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
 '	# make special case of shift out of italic
 .de }S
 .ds ]F
 .if "\\$1"2" .if !"\\$5"" .ds ]F \^
-.ie !"\\$4"" \{\
-.do ds }$1 "\\$1
-.do ds }$2 "\\$2
-.do ds }$3 "\\$3
-.do ds }$4 "\\$4
-.do shift 4
-.if \\n(.X<2 \{\
-.nr )X \\n(.X
-.do xflag 3
-.\}
-.}S \\*[}$2] \\*[}$1] "\\*[}$3]\f\\*[}$1]\\*[}$4]\\*(]F" \\$@
-.if \\n()X .do xflag \\n()X
-.\}
+.ie !"\\$4"" .}S \\$2 \\$1 "\\$3\f\\$1\\$4\\*(]F" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
 .el \\$3
 .}f
 ..
@@ -302,9 +293,6 @@
 .}E
 .nr )I .5i
 .ns
-..
-.de P
-.PP
 ..
 '	# paragraph distance
 .de PD
@@ -335,14 +323,9 @@
 .nr )E 1
 .ns
 .it 1 }N
-.nf
 .di ]B
 ..
 '	# end of TP (cf }N below)
-.de }0
-.fi
-.}1
-..
 .de }1
 .ds ]X \&\\*(]B\\
 .nr )E 0
@@ -351,18 +334,9 @@
 .ll \\n(LLu
 .in \\n()Ru+\\n(INu+\\n()Iu
 .ti \\n(INu
-.ie !\\n()Iu+\\n()Ru-\w\\*(]Xu-3p \{\\*(]X
+.ie !\\n()Iu+\\n()Ru-\w\\*(]Xu-3p \{\\*(]X
 .br\}
-.el \{\
-\\*(]X\h|\\n()Iu+\\n()Ru\c
-.if \\n(.X \{\
-.do nop \k[}pos]
-.do vpt 0
-.sp -1
-.do vpt 1
-.do nop \h'\\n[}pos]u'\c
-.\}
-.\}
+.el \\*(]X\h|\\n()Iu+\\n()Ru\c
 .}f
 ..
 '	# handle end of 1-line features
@@ -370,7 +344,7 @@
 .if \\n()E .br
 .di
 .if "\\n()E"0" .}f
-.if "\\n()E"1" .}0
+.if "\\n()E"1" .}1
 .if "\\n()E"2" .}2
 .nr )E 0
 ..

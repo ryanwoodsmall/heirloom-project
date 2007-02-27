@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)csplit.1	1.9 (gritter) 8/14/05
-.TH CSPLIT 1 "8/14/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)csplit.1	1.5 (gritter) 10/11/03
+.TH CSPLIT 1 "10/11/03" "Heirloom Toolchest" "User Commands"
 .SH NAME
 csplit \- context split
 .SH SYNOPSIS
@@ -62,10 +62,9 @@ With
 .I rexp
 is treated as a simple regular expression,
 whereas
-.BR /usr/5bin/s42/csplit ,
-.BR /usr/5bin/posix/csplit ,
+.B /usr/5bin/s42/csplit
 and
-.B /usr/5bin/posix2001/csplit
+.B /usr/5bin/posix/csplit
 treat it as a basic regular expression (see
 .IR ed (1).
 Backslash escapes a literal
@@ -117,7 +116,6 @@ Use
 positions for the second part of the file names created,
 instead of the default 2.
 This allows for the creation of more than 100 file pieces.
-This option was introduced by POSIX.2.
 .TP
 .B \-k
 When
@@ -143,7 +141,7 @@ Create individual files
 document:
 .RS
 .sp
-csplit \-k \-f section doc.ms \'/^\.[NS]H/\' {100}
+csplit \-k \-f section doc.ms '/^\.[NS]H/' {100}
 .RE
 .SH "ENVIRONMENT VARIABLES"
 .TP

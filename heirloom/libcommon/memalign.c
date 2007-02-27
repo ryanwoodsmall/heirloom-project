@@ -19,11 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)memalign.c	1.7 (gritter) 1/22/06	*/
+/*	Sccsid @(#)memalign.c	1.5 (gritter) 11/7/04	*/
 
 #if defined (__FreeBSD__) || defined (__dietlibc__) || defined (_AIX) || \
-	defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (__NetBSD__) || defined (__OpenBSD__)
 /*
  * FreeBSD malloc(3) promises to page-align the return of malloc() calls
  * if size is at least a page. This serves for a poor man's memalign() 
@@ -47,5 +46,4 @@ memalign(size_t alignment, size_t size)
 		size = pagesize;
 	return malloc(size);
 }
-#endif	/* __FreeBSD__ || __dietlibc__ || _AIX || __NetBSD__ || __OpenBSD__ ||
-	__DragonFly__ || __APPLE__ */
+#endif	/* __FreeBSD__ || __dietlibc__ || _AIX || __NetBSD__ || __OpenBSD__ */

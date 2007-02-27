@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)pax.1	1.37 (gritter) 9/5/05
-.TH PAX 1 "9/5/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)pax.1	1.23 (gritter) 4/16/04
+.TH PAX 1 "4/16/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 pax \- portable archive interchange
 .SH SYNOPSIS
@@ -39,14 +39,14 @@ pax \- portable archive interchange
 [\fB\-x\ \fIhdr\fR] [\fIpatterns\fR]
 .HP
 .ad l
-\fBpax\fR \fB\-w\fR[\fBadiHtuvLX\fR] [\fB\-b\ \fIsize\fR]
+\fBpax\fR \fB\-w\fR[\fBadituvLX\fR] [\fB\-b\ \fIsize\fR]
 [\fB\-f\ \fIfile\fR]
 [\fB\-o\ \fIoptions\fR]
 [\fB\-s\ \fIreplstr\fR]
 [\fB\-x\ \fIhdr\fR] [\fIfiles\fR]
 .HP
 .ad l
-\fBpax\fR \fB\-rw\fR[\fBdiHklntuvLX\fR]
+\fBpax\fR \fB\-rw\fR[\fBdiklntuvLX\fR]
 [\fB\-p\ \fIpriv\fR] [\fB\-s\ \fIreplstr\fR]
 [\fIfiles\fR] \fIdirectory\fR
 .br
@@ -175,20 +175,10 @@ The archive must be seekable,
 such as a regular file or a block device,
 or a tape device capable of writing between filemarks.
 .TP
-\fB\-b\fI size\fR[\fBw\fR|\fBb\fR|\fBk\fR|\fBm\fR]
+\fB\-b\fI size\fR
 Blocks input and output archives at
 .I size
 byte records.
-The optional suffix multiplies
-.I size
-by 2 for
-.BR w ,
-512 for
-.BR b ,
-1024 for
-.BR k ,
-and 1048576 for
-.BR m .
 .TP
 .B \-c
 Reverses the sense of patterns
@@ -218,13 +208,6 @@ option instead of standard input
 or written with the
 .I \-w
 option instead of standard output.
-.TP
-.B \-H
-Follow symbolic links given on the command line when reading files with
-.I \-w
-or
-.IR \-rw ,
-but do not follow symbolic links encountered during directory traversal.
 .TP
 .B \-i
 Rename files interactively.
@@ -256,9 +239,6 @@ Follow symbolic links when reading files with
 .I \-w
 or
 .IR \-rw .
-.B /usr/posix2001/bin/pax
-terminates immediately when it
-detects a symbolic link loop with this option.
 .TP
 .B \-n
 If any
@@ -273,7 +253,7 @@ only the first occurence of
 a file that occurs more than once in the archive
 is selected, the following are ignored.
 .TP
-\fB\-o\ \fIoption\fB,\fR[\fIoption\fB,\fR\|...]
+\fB-o\ \fIoption\fB,\fR[\fIoption\fB,\fR\|...]
 Specifies options as described for \fI\-x pax\fR.
 .TP
 \fB\-p\ \fIstring\fR
@@ -292,7 +272,8 @@ Causes preservation of every possible mode, ownership and time.
 Inhibits preservation of file modification times.
 .TP
 .B o
-Causes preservation of owner and group IDs.
+Causes preservation of owner and group IDs
+(for the super-user only).
 .TP
 .B p
 Causes preservation of file mode bits
@@ -300,20 +281,6 @@ regardless of the umask
 (see
 .IR umask (2)).
 .RE
-.IP
-If file ownership is preserved,
-.I pax
-tries to set the group ownerships to those specified in the archive
-or the original hierarchy, respectively,
-regardless of the privilegues of the invoking user.
-.BR /usr/5bin/pax ,
-.BR /usr/5bin/s42/pax ,
-and
-.B /usr/5bin/posix/pax
-try to set the user ownerships only if invoked by the super-user;
-if invoked by regular users,
-.B /usr/5bin/posix2001/pax
-will produce an error for any file that is not owned by the invoking user.
 .TP
 \fB\-s\ /\fIregular expression\fB/\fIreplacement\fB/\fR[\fBgp\fR]
 Modifies file names in a manner similar to that described in
@@ -458,13 +425,13 @@ is traditional ASCII cpio
 .I (odc)
 format.
 .PP
-.ne 38
+.ne 30
 Characteristics of archive formats are as follows:
 .sp
 .TS
 allbox;
 l r r r l
-l1fB r2 n2 r2 c.
+lfB1 r2 n2 r2 c.
 	T{
 .ad l
 maximum user/\%group id
@@ -674,7 +641,7 @@ capable of reading
 archives,
 although files may be extracted under wrong names
 and extended headers may be extracted as separate files.
-If a file name contains non-UTF-8 characters,
+If a file name contains non-ASCII characters,
 it may not be archived or extracted correctly
 because of a problem of the
 .I pax
@@ -695,7 +662,7 @@ by implementations that support only the
 format and vice-versa.
 The
 .I sun
-format has also problems with non-UTF-8 characters in file names.
+format has also problems with non-ASCII characters in file names.
 .PP
 The
 .B GNU
@@ -785,7 +752,7 @@ from the archive stored on
 overwriting recent files:
 .RS 2
 .sp
-pax \-r \-f /dev/rmt/c0s0 \'[Mm]akefile\' \'*/[Mm]akefile\'
+pax \-r \-f /dev/rmt/c0s0 '[Mm]akefile' '*/[Mm]akefile'
 .RE
 .PP
 List the files contained in a software distribution archive:
@@ -803,13 +770,11 @@ archive containing all files below the directory
 to the file
 .IR \%project.tar.gz ,
 excluding all directories named
-.I CVS
-or
 .I SCCS
 and their contents:
 .RS 2
 .sp
-find project \-depth \-print | egrep \-v \'/(CVS|SCCS)(/|$)\' |
+find project \-depth \-print | egrep \-v '/SCCS(/|$)' |
 .br
       pax \-wd \-x ustar | gzip \-c > project.tar.gz
 .RE
@@ -822,7 +787,7 @@ to the directory
 preserving all file attributes:
 .RS 2
 .sp
-pax \-rw \-pe work savedfiles
+pax -rw -pe work savedfiles
 .RE
 .PP
 Self-extracting zip archives are not automatically recognized,
@@ -831,7 +796,7 @@ but can normally be read using the
 option, as with
 .RS 2
 .sp
-pax \-rK \-x zip \-f archive.exe
+pax \-rK -x zip -f archive.exe
 .sp
 .RE
 .SH "ENVIRONMENT VARIABLES"
@@ -856,7 +821,7 @@ tar(1)
 exits with
 .sp
 .TS
-l8fB l.
+lfB8 l.
 0	after successful operation;
 1	on usage errors;
 2	when operation was continued after minor errors;
@@ -904,14 +869,3 @@ The
 .I \-s
 option can be used to substitute relative for absolute path names
 and vice-versa.
-.PP
-.I Pax
-does not currently accept the
-\fB\-o delete\fR,
-\fB\-o exthdr.name\fR,
-\fB\-o globexthdr.name\fR,
-\fB\-o invalid\fR,
-\fB\-o listopt\fR,
-and
-\fB\-o keyword\fR
-options from POSIX.1-2001.

@@ -25,18 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)touch_sus.sl	1.21 (gritter) 5/29/05";
-#else	/* !SUS */
-static const char sccsid[] USED = "@(#)touch.sl	1.21 (gritter) 5/29/05";
-#endif	/* !SUS */
+static const char sccsid[] USED = "@(#)touch.sl	1.15 (gritter) 9/7/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -267,8 +263,11 @@ static void
 usage(void)
 {
 	if (settime == 0)
-		fprintf(stderr, "usage: %s [-amc] [mmddhhmm[yy]] file ...\n",
-       			progname);
+		fprintf(stderr, "\
+usage: %s [-amc] [mmddhhmm[yy]] file ...\n\
+       %s [-amc] [-r ref_file] file ...\n\
+       %s [-amc] [-t [[CC]YY]MMDDhhmm[.SS]] file ...\n",
+       		progname, progname, progname);
 	else
 		fprintf(stderr, "usage: %s [-f file] [mmddhhmm[yy]] file ...\n",
 				progname);
@@ -278,6 +277,7 @@ usage(void)
 int
 main(int argc, char **argv)
 {
+	char *cp;
 	int i;
 
 #ifdef	__GLIBC__
@@ -319,34 +319,20 @@ main(int argc, char **argv)
 		}
 	}
 	if (nacc == (time_t)-1 && nmod == (time_t)-1 && argv[optind]
-#ifdef	SUS
 			&& argv[optind + 1]) {
-		char	*cp;
 		for (cp = argv[optind]; *cp && isdigit(*cp & 0377); cp++);
 		if (*cp == '\0' && (cp - argv[optind] == 8 ||
 					cp - argv[optind] == 10))
-#else	/* !SUS */
-			) {
-		if (isdigit(argv[optind][0]))
-#endif	/* !SUS */
 			otime(argv[optind++]);
 	}
-	if (nacc == (time_t)-1 && nmod == (time_t)-1 && aflag == 0 &&
-			mflag == 0)
+	if (nacc == (time_t)-1 && nmod == (time_t)-1) {
+		nacc = nmod = now;
 		nulltime = 1;
-	if (nacc == (time_t)-1)
-		nacc = now;
-	if (nmod == (time_t)-1)
-		nmod = now;
+	}
 	if (aflag == 0 && mflag == 0)
 		aflag = mflag = 1;
-#ifdef	SUS
 	if (optind >= argc)
 		usage();
-#else	/* !SUS */
-	if (optind >= argc && date_time == 0)
-		usage();
-#endif	/* !SUS */
 	for (i = optind; i < argc; i++)
 		touch(argv[i]);
 	return errcnt < 0100 ? errcnt : 077;

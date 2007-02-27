@@ -40,22 +40,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SU3)
-static const char sccsid[] USED = "@(#)ed_su3.sl	1.99 (gritter) 7/27/06";
-#elif defined (SUS)
-static const char sccsid[] USED = "@(#)ed_sus.sl	1.99 (gritter) 7/27/06";
+#if defined (SUS)
+static const char sccsid[] USED = "@(#)ed_sus.sl	1.79 (gritter) 10/5/04";
 #elif defined (S42)
-static const char sccsid[] USED = "@(#)ed_s42.sl	1.99 (gritter) 7/27/06";
-#else	/* !SU3, !SUS, !S42 */
-static const char sccsid[] USED = "@(#)ed.sl	1.99 (gritter) 7/27/06";
-#endif	/* !SU3, !SUS, !S42 */
+static const char sccsid[] USED = "@(#)ed_s42.sl	1.79 (gritter) 10/5/04";
+#else	/* !SUS, !S42 */
+static const char sccsid[] USED = "@(#)ed.sl	1.79 (gritter) 10/5/04";
+#endif	/* !SUS, !S42 */
+
+/*#define	ADDONS*/		/* b, help, o, N, and z commands */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -88,10 +88,10 @@ static int	GBSIZE;
 #define	puts(s)		xxputs(s)
 #define	getline(t, n)	xxgetline(t, n)
 
-#if (LONG_MAX > 017777777777L)
-#define	MAXCNT	0777777777777777777777L		/* 2^63-1 */
+#if (LONG_MAX > 2147483647)
+#define	MAXCNT	01777777777777777		/* 64 TB */
 #else
-#define	MAXCNT	017777777777L			/* 2^31-1 */
+#define	MAXCNT	017777777777			/* 2 GB */
 #endif
 #define	BLKMSK	(MAXCNT>>8)			/* was 0377 */
 
@@ -120,6 +120,7 @@ static long	*dot;
 static long	*unddot;
 static long	*dol;
 static long	*unddol;
+static long	*undrdol;
 static long	*addr1;
 static long	*addr2;
 static char	*genbuf;
@@ -147,8 +148,8 @@ static char	obuff[512];
 static int	oblock	= -1;
 static int	ichanged;
 static int	nleft;
-static long	*names;
-static long	*undnames;
+static long	names[26];
+static long	undnames[26];
 static int	anymarks;
 static int	subnewa;
 static int	fchange;
@@ -169,9 +170,13 @@ static int	insub;
 static struct tabulator	*tabstops;
 static int	maxlength;
 static int	rspec;
+#ifdef	ADDONS
 static int	Nflag;
 static int	bcount = 22;
 static int	ocount = 11;
+#else	/* !ADDONS */
+#define	Nflag	0
+#endif	/* !ADDONS */
 
 static jmp_buf	savej;
 
@@ -224,7 +229,6 @@ static void	cmplerr(int);
 static void	doprnt(long *, long *);
 static void	putd(long);
 static void	puts(const char *);
-static void	nlputs(const char *);
 static void	list(const char *);
 static int	lstchr(int);
 static void	putstr(const char *);
@@ -243,7 +247,9 @@ static void	expand(const char *);
 static void	growlb(const char *);
 static void	growrhs(const char *);
 static void	growfn(const char *);
+#ifdef	ADDONS
 static void	help(void);
+#endif	/* ADDONS */
 
 #define	INIT
 #define	GETC()		getchr()
@@ -253,7 +259,7 @@ static void	help(void);
 #define	ERROR(c)	cmplerr(c)
 static wint_t	GETWC(char *);
 
-#if defined (SUS) || defined (S42) || defined (SU3)
+#if defined (SUS) || defined (S42)
 
 #include <regex.h>
 
@@ -269,11 +275,11 @@ static int	nodelim;
 static char	*compile(char *, char *, const char *, int);
 static int	step(const char *, const char *);
 
-#else	/* !SUS, !S42, !SU3 */
+#else	/* !SUS, !S42 */
 
 #include <regexp.h>
 
-#endif	/* !SUS, !S42, !SU3 */
+#endif	/* !SUS, !S42 */
 
 int
 main(int argc, char **argv)
@@ -282,7 +288,7 @@ main(int argc, char **argv)
 	void (*oldintr)(int);
 
 	progname = basename(argv[0]);
-#if defined (SUS) || defined (S42) || defined (SU3)
+#if defined (SUS) || defined (S42)
 	setlocale(LC_COLLATE, "");
 #endif
 	setlocale(LC_CTYPE, "");
@@ -346,10 +352,8 @@ main(int argc, char **argv)
 				growfn("maximum of characters in "
 						"file names reached");
 		while (savedfile[i] = (*argv)[i]);
-		globp = "e";
+		globp = "r";
 	}
-	names = malloc(26*sizeof *names);
-	undnames = malloc(26*sizeof *undnames);
 	zero = malloc(nlall*sizeof *zero);
 	if ((undzero = malloc(nlall*sizeof *undzero)) == NULL)
 		puts("no memory for undo");
@@ -448,19 +452,8 @@ commands(void)
 		continue;
 
 	case 'c':
-#if defined (SU3)
-		if (addr1 == zero && addr1+1 <= dol) {
-			if (addr1 == addr2)
-				addr2++;
-			addr1++;
-		}
-#endif	/* SU3 */
 		delete();
 		append(gettty, addr1-1);
-#if defined (SUS) || defined (SU3)
-		if (dot == addr1-1 && addr1 <= dol)
-			dot = addr1;
-#endif	/* SUS || SU3 */
 		continue;
 
 	case 'd':
@@ -500,6 +493,7 @@ commands(void)
 		/*FALLTHRU*/
 
 	case 'h':
+#ifdef	ADDONS
 		if ((peekc = getchr()) == 'e') {
 			peekc = 0;
 			if (getchr() != 'l' || getchr() != 'p' ||
@@ -509,6 +503,7 @@ commands(void)
 			help();
 			continue;
 		}
+#endif	/* ADDONS */
 		newline();
 		setnoaddr();
 		if (prvmsg)
@@ -517,16 +512,7 @@ commands(void)
 
 	case 'i':
 		setdot();
-#if defined (SU3)
-		if (addr1 == zero) {
-			if (addr1 == addr2)
-				addr2++;
-			addr1++;
-			if (dol != zero)
-				nonzero();
-		} else
-#endif	/* SU3 */
-			nonzero();
+		nonzero();
 		newline();
 		checkpoint();
 		append(gettty, addr2-1);
@@ -573,6 +559,7 @@ commands(void)
 		newline();
 		goto print;
 
+#ifdef	ADDONS
 	case 'N':
 		newline();
 		setnoaddr();
@@ -601,6 +588,7 @@ commands(void)
 			dot = addr2;
 		}
 		continue;
+#endif	/* ADDONS */
 
 	case 'l':
 		listf++;
@@ -675,10 +663,11 @@ commands(void)
 	case 'W':
 		wrapp++;
 	case 'w':
+#ifdef	ADDONS
 	write:
+#endif	/* ADDONS */
 		setall();
-		if (zero != dol)
-			nonzero();
+		nonzero();
 		filename(c);
 		if(!wrapp ||
 		  ((io = open(file,O_WRONLY|O_APPEND)) == -1) ||
@@ -714,23 +703,25 @@ commands(void)
 					error("cannot create output file");
 			}
 		}
-		if (zero != dol) {
-			ioeof = 0;
-			wrapp = 0;
-			putfile();
-		}
+		ioeof = 0;
+		wrapp = 0;
+		putfile();
 		exfile();
-		if (addr1==zero+1 && addr2==dol || addr1==addr2 && dol==zero)
+		if (addr1==zero+1 && addr2==dol)
 			fchange = 0;
+#ifdef	ADDONS
 		if (c == 'z')
 			quit(0);
+#endif	/* ADDONS */
 		continue;
 
+#ifdef	ADDONS
 	case 'z':
 		if ((peekc=getchr()) != '\n')
 			error("illegal suffix");
 		setnoaddr();
 		goto write;
+#endif	/* ADDONS */
 
 	case '=':
 		setall();
@@ -999,7 +990,6 @@ onhup(int signo)
 			putfile();
 	}
 	fchange = 0;
-	status = 0200 | signo;
 	quit(0);
 }
 
@@ -1106,7 +1096,7 @@ gettty(void)
 	linebuf[i++] = 0;
 	if (linebuf[0]=='.' && linebuf[1]==0)
 		return(EOF);
-#if !defined (SUS) && !defined (SU3)
+#ifndef	SUS
 	if (linebuf[0]=='\\' && linebuf[1]=='.' && linebuf[2]==0)
 		linebuf[0]='.', linebuf[1]=0;
 #endif
@@ -1139,10 +1129,6 @@ getfile(void)
 	do {
 		if (--ninbuf < 0) {
 			if (ioeof || (ninbuf=read(io, genbuf, LBSIZE)-1) < 0) {
-				if (ioeof == 0 && ninbuf < -1) {
-					puts("input error");
-					status = 1;
-				}
 				if (i > 0) {
 					puts("'\\n' appended");
 					c = '\n';
@@ -1234,8 +1220,6 @@ append(int (*f)(void), long *a)
 			}
 			dot += zero - ozero;
 			dol += zero - ozero;
-			addr1 += zero - ozero;
-			addr2 += zero - ozero;
 			if (unddot) {
 				unddot += zero - ozero;
 				unddol += zero - ozero;
@@ -1246,7 +1230,8 @@ append(int (*f)(void), long *a)
 						nlall*sizeof *undzero)) == 0) {
 					puts("no memory for undo");
 					free(ozero);
-				}
+				} else
+					undrdol += undzero - ozero;
 			}
 		}
 		tl = putline();
@@ -1326,7 +1311,7 @@ readcmd(void)
 		error("line too long");
 	strcpy(prev, line);
 	if (mod)
-		nlputs(line);
+		puts(line);
 	return line;
 }
 
@@ -1484,7 +1469,6 @@ blkio(long b, char *buf, int wr)
 {
 	lseek(tfile, b<<9, SEEK_SET);
 	if ((wr ? write(tfile, buf, 512) : read (tfile, buf, 512)) != 512) {
-		status = 1;
 		error("I/O error on temp file");
 	}
 }
@@ -1516,7 +1500,6 @@ global(int k, int ia)
 	register long *a1;
 	static char *globuf;
 	char	mb[MB_LEN_MAX+1];
-	int	spflag = 0;
 
 	if (globp)
 		error("multiple globals not allowed");
@@ -1529,11 +1512,8 @@ global(int k, int ia)
 		globrd(&globuf, EOF);
 		if (globuf[0] == '\n')
 			globuf[0] = 'p', globuf[1] = '\n', globuf[2] = '\0';
-	} else {
-		newline();
-		spflag = pflag;
-		pflag = 0;
-	}
+	} else if ((c = getchr()) != '\n')
+		error("illegal suffix");
 	checkpoint();
 	for (a1=zero; a1<=dol; a1++) {
 		*a1 &= ~01;
@@ -1574,8 +1554,6 @@ global(int k, int ia)
 			a1 = zero;
 		}
 	}
-	if (ia)
-		pflag = spflag;
 }
 
 static void
@@ -1692,7 +1670,7 @@ compsub(void)
 			rhsbuf[i++] = c;
 			c = GETWC(mb);
 		} else if (c=='\n') {
-			if (globp && *globp) {
+			if (globp) {
 				if (i >= RHSIZE-2)
 					growrhs("replacement string too long");
 				rhsbuf[i++] = '\\';
@@ -1759,8 +1737,6 @@ dosub(int really)
 	register int i, j, k;
 	int c;
 
-	if (!really)
-		goto copy;
 	i = 0;
 	j = 0;
 	k = 0;
@@ -1783,16 +1759,6 @@ dosub(int really)
 	}
 	i = loc2 - linebuf;
 	loc2 = j + linebuf;
-#if defined (SUS) || defined (SU3) || defined (S42)
-	if (loc1 == &linebuf[i]) {
-		int	n;
-		wchar_t	wc;
-		if (mb_cur_max > 1 && (n = mbtowc(&wc, loc2, mb_cur_max)) > 0)
-			loc2 += n;
-		else
-			loc2++;
-	}
-#endif	/* SUS || SU3 || S42 */
 	while (genbuf[j++] = linebuf[i++])
 		if (j >= LBSIZE)
 			growlb("line too long");
@@ -1800,7 +1766,7 @@ dosub(int really)
 		lp = linebuf;
 		sp = genbuf;
 	} else {
-	copy:	sp = linebuf;
+		sp = linebuf;
 		lp = genbuf;
 	}
 	while (*lp++ = *sp++)
@@ -1904,6 +1870,17 @@ execute(int gf, long *addr, int subst)
 		p2 = genbuf;
 		while (*p1++ = *p2++)
 			;
+#if defined (SUS) || defined (S42)
+		if (loc1 == loc2) {
+			int	n;
+			wchar_t	wc;
+			if (mb_cur_max > 1 &&
+					(n = mbtowc(&wc, loc2, mb_cur_max)) > 0)
+				loc2 += n;
+			else
+				loc2++;
+		}
+#endif
 		locs = p1 = loc2;
 	} else {
 		if (addr==zero)
@@ -1920,7 +1897,7 @@ cmplerr(int c)
 {
 	const char	*msg;
 
-#if !defined (SUS) && !defined (S42) && !defined (SU3)
+#if !defined (SUS) && !defined (S42)
 	expbuf[0] = 0;
 #endif
 	switch (c) {
@@ -1981,7 +1958,7 @@ doprnt(long *bot, long *top)
 			putd(a1-zero);
 			putchr('\t');
 		}
-		nlputs(getline(*a1++, 0));
+		puts(getline(*a1++, 0));
 	} while (a1 <= top);
 	pflag = 0;
 	listf = 0;
@@ -2001,25 +1978,19 @@ putd(long c)
 }
 
 static void
-nlputs(register const char *sp)
+puts(register const char *sp)
 {
 	if (listf)
 		list(sp);
 	else if (tabstops)
 		expand(sp);
 	else
-		puts(sp);
-}
-
-static void
-puts(register const char *sp)
-{
-	while (*sp) {
-		if (*sp != '\n')
-			putchr(*sp++ & 0377);
-		else
-			sp++, putchr('\0');
-	}
+		while (*sp) {
+			if (*sp != '\n')
+				putchr(*sp++ & 0377);
+			else
+				sp++, putchr('\0');
+		}
 	putchr('\n');
 }
 
@@ -2043,9 +2014,9 @@ list(const char *lp)
 			putchr('\n');
 		}
 		if (n<0 ||
-#if defined (SUS) || defined (S42) || defined (SU3)
+#if defined (SUS) || defined (S42)
 				c == '\\' ||
-#endif	/* SUS || S42 || SU3 */
+#endif	/* SUS || S42 */
 				!(mb_cur_max>1 ? iswprint(c) : isprint(c))) {
 			if (n<0)
 				n = 1;
@@ -2060,10 +2031,9 @@ list(const char *lp)
 			col++;
 		}
 	}
-#if defined (SUS) || defined (S42) || defined (SU3)
+#if defined (SUS) || defined (S42)
 	putchr('$');
 #endif
-	putchr('\n');
 }
 
 static int
@@ -2071,7 +2041,7 @@ lstchr(int c)
 {
 	int	cad = 1, d;
 
-#if !defined (SUS) && !defined (S42) && !defined (SU3)
+#if !defined (SUS) && !defined (S42)
 	if (c=='\t') {
 		c = '>';
 		goto esc;
@@ -2088,7 +2058,7 @@ lstchr(int c)
 		putchr('0');
 		putchr('0');
 		cad = 4;
-#else	/* !SUS, !S42, !SU3 */
+#else	/* !SUS, !S42 */
 	if (c == '\n')
 		c = '\0';
 	if (c == '\\') {
@@ -2119,7 +2089,7 @@ lstchr(int c)
 		putchr('\\');
 		putchr('v');
 		cad = 2;
-#endif	/* !SUS, !S42, !SU3 */
+#endif	/* !SUS, !S42 */
 	} else {
 		putchr('\\');
 		putchr(((c&~077)>>6)+'0');
@@ -2167,26 +2137,32 @@ checkpoint(void)
 	if (undzero && globp == NULL) {
 		for (a1 = zero+1, a2 = undzero+1; a1 <= dol; a1++, a2++)
 			*a2 = *a1;
-		unddot = &undzero[dot-zero];
-		unddol = &undzero[dol-zero];
+		undrdol = a2-1;
+		unddot = dot;
+		unddol = dol;
 		for (a1 = names, a2 = undnames; a1 < &names[26]; a1++, a2++)
 			*a2 = *a1;
 	}
 }
 
-#define	swap(a, b)	(t = a, a = b, b = t)
+#define	swapa(a, b)	(t = a, a = b, b = t)
+#define	swapp(a, b)	(a1 = a, a = b, b = a1)
 
 static void
 undo(void)
 {
-	long	*t;
+	long	*a1, *a2;
+	long	t;
 
 	if (undzero == NULL)
 		error("no undo information saved");
-	swap(zero, undzero);
-	swap(dot, unddot);
-	swap(dol, unddol);
-	swap(names, undnames);
+	for (a1 = zero+1, a2 = undzero+1; a1<=dol || a2<=undrdol; a1++, a2++)
+		swapa(*a1, *a2);
+	undrdol = &undzero[dol-zero];
+	swapp(dot, unddot);
+	swapp(dol, unddol);
+	for (a1 = names, a2 = undnames; a1 < &names[26]; a1++, a2++)
+		swapa(*a1, *a2);
 }
 
 static int
@@ -2508,7 +2484,6 @@ expand(const char *s)
 	}
 	if (tabcnt)
 		putstr("\ntab count");
-	putchr('\n');
 }
 
 static wint_t
@@ -2577,7 +2552,7 @@ growfn(const char *msg)
 		file[0] = savedfile[0] = 0;
 }
 
-#if defined (SUS) || defined (S42) || defined (SU3)
+#if defined (SUS) || defined (S42)
 union	ptrstore {
 	void	*vp;
 	char	bp[sizeof (void *)];
@@ -2681,8 +2656,8 @@ compile(char *unused, char *ep, const char *endbuf, int seof)
 #ifdef	REG_ANGLES
 		reflags |= REG_ANGLES;
 #endif
-#if defined (SU3) && defined (REG_AVOIDNULL)
-		reflags |= REG_AVOIDNULL;
+#ifdef	REG_BADRANGE
+		reflags |= REG_BADRANGE;
 #endif
 		if (op[0])
 			regfree(rp);
@@ -2749,8 +2724,9 @@ step(const char *lp, const char *ep)
 	}
 	return res == 0;
 }
-#endif	/* SUS || S42 || SU3 */
+#endif	/* SUS || S42 */
 
+#ifdef	ADDONS
 static void
 help(void)
 {
@@ -2820,3 +2796,4 @@ help(void)
 		puts(line);
 	}
 }
+#endif	/* ADDONS */

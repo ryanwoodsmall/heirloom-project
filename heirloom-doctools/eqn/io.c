@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.12 (gritter) 11/23/06
+ * Sccsid @(#)io.c	1.7 (gritter) 8/13/05
  */
 
 # include "e.h"
@@ -61,7 +61,6 @@ eqn(int argc,char **argv) {
 			for (i=11; i<100; used[i++]=0);
 			printf("%s",in);
 			printf(".nr 99 \\n(.s\n.nr 98 \\n(.f\n");
-			printf(".if \\n(.X .nrf 99 \\n(.s\n");
 			markline = 0;
 			init();
 			yyparse();
@@ -93,7 +92,7 @@ eqn(int argc,char **argv) {
 
 int
 getline(char **sp, size_t *np) {
-	register int c, n = 0, esc = 0, par = 0, brack = 0;
+	register int c, n = 0;
 	char *xp;
 	for (;;) {
 		c = gtc();
@@ -108,40 +107,10 @@ getline(char **sp, size_t *np) {
 			*sp = xp;
 		}
 		(*sp)[n++] = c;
-		if (c=='\\')
-			esc++;
-		else {
-			if (c=='\n' || c==EOF ||
-					c==lefteq && !esc && !par && !brack)
-				break;
-			if (par)
-				par--;
-			if (brack && c == ']')
-				brack = 0;
-			if (esc) {
-				switch (c) {
-				case '*':
-				case 'f':
-				case 'g':
-				case 'k':
-				case 'n':
-				case 'P':
-				case 'V':
-				case 'Y':
-					break;
-				case '(':
-					par += 2;
-					break;
-				case '[':
-					brack++;
-					break;
-				default:
-					esc = 0;
-				}
-			}
-		}
+		if (c=='\n' || c==EOF || c==lefteq)
+			break;
 	}
-	if (c==lefteq && !esc)
+	if (c==lefteq)
 		n--;
 	(*sp)[n++] = '\0';
 	return(c);
@@ -152,7 +121,6 @@ do_inline(void) {
 	int ds;
 
 	printf(".nr 99 \\n(.s\n.nr 98 \\n(.f\n");
-	printf(".if \\n(.X .nrf 99 \\n(.s\n");
 	ds = oalloc();
 	printf(".rm %d \n", ds);
 	do{
@@ -175,15 +143,11 @@ do_inline(void) {
 
 void
 putout(int p1) {
-#ifndef	NEQN
-	float before, after;
-	if(dbg)printf(".\tanswer <- S%d, h=%g,b=%g\n",p1, eht[p1], ebase[p1]);
-#else	/* NEQN */
+	extern int gsize, gfont;
 	int before, after;
 	if(dbg)printf(".\tanswer <- S%d, h=%d,b=%d\n",p1, eht[p1], ebase[p1]);
-#endif	/* NEQN */
 	eqnht = eht[p1];
-	printf(".ds %d ", p1);
+	printf(".ds %d \\x'0'", p1);
 	/* suppposed to leave room for a subscript or superscript */
 #ifndef NEQN
 	before = eht[p1] - ebase[p1] - VERT(EM(1.2, ps));
@@ -193,27 +157,16 @@ putout(int p1) {
 	if (spaceval != NULL)
 		printf("\\x'0-%s'", spaceval);
 	else if (before > 0)
-#ifndef	NEQN
-		printf("\\x'0-%gp'", before);
-#else	/* NEQN */
 		printf("\\x'0-%du'", before);
-#endif	/* NEQN */
-	printf("\\f%c\\s%s\\*(%d%s\n",
-		gfont, tsize(gsize), p1, rfont[p1] == ITAL ? "\\|" : "");
-	printf(".ie \\n(.X=0 .as %d \\s\\n(99\n", p1);
-	printf(".el .as %d \\s[\\n(99]\n", p1);
-	printf(".as %d \\f\\n(98", p1);
+	printf("\\f%c\\s%d\\*(%d%s\\s\\n(99\\f\\n(98",
+		gfont, gsize, p1, rfont[p1] == ITAL ? "\\|" : "");
 #ifndef NEQN
 	after = ebase[p1] - VERT(EM(0.2, ps));
 #else /* NEQN */
 	after = ebase[p1] - VERT(1);
 #endif /* NEQN */
 	if (spaceval == NULL && after > 0)
-#ifndef	NEQN
-		printf("\\x'%gp'", after);
-#else	/* NEQN */
 		printf("\\x'%du'", after);
-#endif	/* NEQN */
 	putchar('\n');
 	eqnreg = p1;
 	if (spaceval != NULL) {
@@ -223,8 +176,8 @@ putout(int p1) {
 
 }
 
-float
-max(float i,float j) {
+int
+max(int i,int j) {
 	return (i>j ? i : j);
 }
 
@@ -243,13 +196,13 @@ ofree(int n) {
 }
 
 void
-setps(float p) {
-	printf(".ps %g\n", EFFPS(p));
+setps(int p) {
+	printf(".ps %d\n", EFFPS(p));
 }
 
 void
-nrwid(int n1, float p, int n2) {
-	printf(".nr %d \\w'\\s%s\\*(%d'\n", n1, tsize(EFFPS(p)), n2);
+nrwid(int n1, int p, int n2) {
+	printf(".nr %d \\w'\\s%d\\*(%d'\n", n1, EFFPS(p), n2);
 }
 
 void
@@ -262,11 +215,10 @@ setfile(int argc, char **argv) {
 		switch (svargv[1][1]) {
 
 		case 'd': lefteq=svargv[1][2]; righteq=svargv[1][3]; break;
-		case 's': gsize = atof(&svargv[1][2]); break;
-		case 'p': deltaps = atof(&svargv[1][2]); break;
+		case 's': gsize = atoi(&svargv[1][2]); break;
+		case 'p': deltaps = atoi(&svargv[1][2]); break;
 		case 'f': gfont = svargv[1][2]; break;
 		case 'e': noeqn++; break;
-		case 'r': /*resolution = atoi(&svargv[1][2]);*/ break;
 		case 0:	goto endargs; 
 		default: dbg = 1;
 		}

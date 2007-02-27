@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)stak.h	1.5 (gritter) 6/15/05
+ * Sccsid @(#)stak.h	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "stak.h	1.8	05/06/08 SMI" */
 /*
@@ -64,7 +64,7 @@
 /* for local use only since it hands
  * out a real address for the stack top
  */
-extern unsigned char		*locstak(void);
+extern unsigned char		*locstak();
 
 /* Will allocate the item being used and return its
  * address (safe now).
@@ -74,31 +74,29 @@ extern unsigned char		*locstak(void);
 /* For use after `locstak' to hand back
  * new stack top and then allocate item
  */
-extern unsigned char		*endstak(unsigned char *);
+extern unsigned char		*endstak();
 
 /* Copy a string onto the stack and
  * allocate the space.
  */
-extern unsigned char		*cpystak(unsigned char *);
+extern unsigned char		*cpystak();
 
 /* Copy a string onto the stack, checking for stack overflow
  * as the copy is done.  Same calling sequence as "movstr".
  */
-extern unsigned char		*movstrstak(const unsigned char *,
-					unsigned char *);
+extern unsigned char		*movstrstak();
 
 /* Move bytes onto the stack, checking for stack overflow
  * as the copy is done.  Same calling sequence as the C
  * library routine "memcpy".
  */
-extern unsigned char		*memcpystak(unsigned char *,
-					const unsigned char *, int);
+extern unsigned char		*memcpystak();
 
 /* Allocate given ammount of stack space */
-extern unsigned char		*getstak(intptr_t);
+extern unsigned char		*getstak();
 
 /* Grow the data segment to include a given location */
-extern void		growstak(unsigned char *);
+extern void		growstak();
 
 /* A chain of ptrs of stack blocks that
  * have become covered by heap allocation.
@@ -119,4 +117,4 @@ extern unsigned char		*stakbot;
 extern unsigned char		*staktop;
 
 /* Used with tdystak */
-extern unsigned char		*savstak(void);
+extern unsigned char		*savstak();

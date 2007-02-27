@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.12 (gritter) 12/25/06
+ * Sccsid @(#)fault.c	1.4 (gritter) 6/14/05
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -43,9 +43,10 @@
 #include	<errno.h>
 #include	<string.h>
 
-static	void (*psig0_func)(int) = SIG_ERR;	/* previous signal handler for signal 0 */
+static	void (*psig0_func)() = SIG_ERR;	/* previous signal handler for signal 0 */
 static	char sigsegv_stack[SIGSTKSZ];
 
+static void sigsegv(int sig, siginfo_t *sip, ucontext_t *uap);
 static BOOL sleeping = 0;
 static unsigned char *trapcom[MAXTRAP]; /* array of actions, one per signal */
 static BOOL trapflg[MAXTRAP] =
@@ -85,52 +86,53 @@ static BOOL trapflg[MAXTRAP] =
 	0, 	/* process's lwps are blocked */
 	0,	/* special signal used by thread library */
 	0, 	/* check point freeze */
-	0	/* check point thaw */
+	0,	/* check point thaw */
 };
 
 void (*(
-sigval[MAXTRAP]))(int) =
+sigval[MAXTRAP]))() =
 {
 	0,
-	0,	/* 	done, 	   hangup */
-	0,	/* 	fault,	   interrupt */
-	0,	/* 	fault,	   quit */
-	0,	/* 	done,	   illegal instr */
-	0,	/* 	done,	   trace trap */
-	0,	/* 	done,	   IOT */
-	0,	/* 	done,	   EMT */
-	0,	/* 	done,	   floating pt. exp */
-	0,	/* 	0,	   kill */
-	0,	/* 	done, 	   bus error */
-	0,	/* 	sigsegv,	   memory faults */
-	0,	/* 	done, 	   bad sys call */
-	0,	/* 	done,	   bad pipe call */
-	0,	/* 	done,	   alarm */
-	0,	/* 	fault,	   software termination */
-	0,	/* 	done,	   unassigned */
-	0,	/* 	done,	   unassigned */
-	0,	/* 	0,	   death of child */
-	0,	/* 	done,	   power fail */
-	0,	/* 	0,	   window size change */
-	0,	/* 	done,	   urgent IO condition */
-	0,	/* 	done,	   pollable event occured */
-	0,	/* 	0,	   uncatchable stop */
-	0,	/* 	0,	   foreground stop */
-	0,	/* 	0,	   stopped process continued */
-	0,	/* 	0,	   background tty read */
-	0,	/* 	0,	   background tty write */
-	0,	/* 	done,	   virtual timer expired */
-	0,	/* 	done,	   profiling timer expired */
-	0,	/* 	done,	   exceeded cpu limit */
-	0,	/* 	done,	   exceeded file size limit */
-	0,	/* 	0, 	   process's lwps are blocked */
-	0,	/* 	0,	   special signal used by thread library */
-	0,	/* 	0, 	   check point freeze */
-	0	/* 	0,	   check point thaw */
+	done, 	/* hangup */
+	fault,	/* interrupt */
+	fault,	/* quit */
+	done,	/* illegal instr */
+	done,	/* trace trap */
+	done,	/* IOT */
+	done,	/* EMT */
+	done,	/* floating pt. exp */
+	0,	/* kill */
+	done, 	/* bus error */
+	sigsegv,	/* memory faults */
+	done, 	/* bad sys call */
+	done,	/* bad pipe call */
+	done,	/* alarm */
+	fault,	/* software termination */
+	done,	/* unassigned */
+	done,	/* unassigned */
+	0,	/* death of child */
+	done,	/* power fail */
+	0,	/* window size change */
+	done,	/* urgent IO condition */
+	done,	/* pollable event occured */
+	0,	/* uncatchable stop */
+	0,	/* foreground stop */
+	0,	/* stopped process continued */
+	0,	/* background tty read */
+	0,	/* background tty write */
+	done,	/* virtual timer expired */
+	done,	/* profiling timer expired */
+	done,	/* exceeded cpu limit */
+	done,	/* exceeded file size limit */
+	0, 	/* process's lwps are blocked */
+	0,	/* special signal used by thread library */
+	0, 	/* check point freeze */
+	0,	/* check point thaw */
 };
 
-static int 
-ignoring(register int i)
+static int
+ignoring(i)
+register int i;
 {
 	struct sigaction act;
 	if (trapflg[i] & SIGIGN)
@@ -143,8 +145,9 @@ ignoring(register int i)
 	return (0);
 }
 
-static void 
-clrsig(int i)
+static void
+clrsig(i)
+int	i;
 {
 	if (trapcom[i] != 0) {
 		free(trapcom[i]);
@@ -168,8 +171,8 @@ clrsig(int i)
 	}
 }
 
-void 
-done(int sig)
+void
+done(sig)
 {
 	register unsigned char	*t;
 	int	savxit;
@@ -197,7 +200,7 @@ done(int sig)
 		collect_fg_job();
 	}
 
-	endjobs(0);
+	(void) endjobs(0);
 	if (sig) {
 		sigset_t set;
 		sigemptyset(&set);
@@ -209,17 +212,16 @@ done(int sig)
 	exit(exitval);
 }
 
-void 
-fault(register int sig)
+void
+fault(sig)
+register int	sig;
 {
-	register int flag = 0;
+	register int flag;
 
 	switch (sig) {
 		case SIGALRM:
 			if (sleeping)
 				return;
-			if (flags & waiting)
-				done(0);
 			break;
 	}
 
@@ -234,8 +236,10 @@ fault(register int sig)
 	trapflg[sig] |= flag;
 }
 
-int 
-handle(int sig, void (*func)(int))
+int
+handle(sig, func)
+	int sig;
+	void (*func)();
 {
 	int	ret;
 	struct sigaction act, oact;
@@ -275,8 +279,8 @@ handle(int sig, void (*func)(int))
 	return (ret);
 }
 
-void 
-stdsigs(void)
+void
+stdsigs()
 {
 	register int	i;
 	stack_t	ss;
@@ -286,7 +290,7 @@ stdsigs(void)
 	int rtmax = (int)SIGRTMAX;
 #else
 	int rtmin = 0;
-	int rtmax = -1;
+	int rtmax = 0;
 #endif
 
 	ss.ss_size = SIGSTKSZ;
@@ -319,8 +323,8 @@ stdsigs(void)
 	}
 }
 
-void 
-oldsigs(void)
+void
+oldsigs()
 {
 	register int	i;
 	register unsigned char	*t;
@@ -340,8 +344,8 @@ oldsigs(void)
  * check for traps
  */
 
-void 
-chktrap(void)
+void
+chktrap()
 {
 	register int	i = MAXTRAP;
 	register unsigned char	*t;
@@ -363,8 +367,9 @@ chktrap(void)
 	}
 }
 
-int 
-systrap(int argc, char **argv)
+systrap(argc, argv)
+int argc;
+char **argv;
 {
 	int sig;
 
@@ -395,7 +400,7 @@ systrap(int argc, char **argv)
 		while (*++argv) {
 			if (str_2_sig(*argv, &sig) < 0 ||
 			    sig >= MAXTRAP || sig < MINTRAP ||
-			    sig == SIGSEGV || sig == SIGALRM) {
+			    sig == SIGSEGV) {
 				failure(cmd, badtrap);
 			} else if (noa1) {
 				/*
@@ -427,11 +432,11 @@ systrap(int argc, char **argv)
 			}
 		}
 	}
-	return 0;
 }
 
-void
-sleep(unsigned int ticks)
+unsigned int
+sleep(ticks)
+unsigned int ticks;
 {
 	sigset_t set, oset;
 	struct sigaction act, oact;
@@ -474,7 +479,7 @@ sleep(unsigned int ticks)
 }
 
 void
-sigsegv(int sig, siginfo_t *sip)
+sigsegv(int sig, siginfo_t *sip, ucontext_t *uap)
 {
 	if (sip == (siginfo_t *)NULL) {
 		/*
@@ -508,139 +513,4 @@ sigsegv(int sig, siginfo_t *sip)
 			exit(ERROR);
 		}
 	}
-}
-
-void 
-init_sigval(void)
-{
-	extern void	(*(sigval[]))(int);
-
-#ifdef	SIGHUP
-	if (SIGHUP < MAXTRAP)
-		sigval[SIGHUP] = done;
-#endif
-#ifdef	SIGINT
-	if (SIGINT < MAXTRAP)
-		sigval[SIGINT] = fault;
-#endif
-#ifdef	SIGQUIT
-	if (SIGQUIT < MAXTRAP)
-		sigval[SIGQUIT] = fault;
-#endif
-#ifdef	SIGILL
-	if (SIGILL < MAXTRAP)
-		sigval[SIGILL] = done;
-#endif
-#ifdef	SIGTRAP
-	if (SIGTRAP < MAXTRAP)
-		sigval[SIGTRAP] = done;
-#endif
-#ifdef	SIGIOT
-	if (SIGIOT < MAXTRAP)
-		sigval[SIGIOT] = done;
-#endif
-#ifdef	SIGBUS
-	if (SIGBUS < MAXTRAP)
-		sigval[SIGBUS] = done;
-#endif
-#ifdef	SIGFPE
-	if (SIGFPE < MAXTRAP)
-		sigval[SIGFPE] = done;
-#endif
-#ifdef	SIGKILL
-	if (SIGKILL < MAXTRAP)
-		sigval[SIGKILL] = 0;
-#endif
-#ifdef	SIGUSR1
-	if (SIGUSR1 < MAXTRAP)
-		sigval[SIGUSR1] = done;
-#endif
-#ifdef	SIGSEGV
-	if (SIGSEGV < MAXTRAP)
-		sigval[SIGSEGV] = (void(*)(int))sigsegv;
-#endif
-#ifdef	SIGEMT
-	if (SIGEMT < MAXTRAP)
-		sigval[SIGEMT] = done;
-#endif
-#ifdef	SIGUSR2
-	if (SIGUSR2 < MAXTRAP)
-		sigval[SIGUSR2] = done;
-#endif
-#ifdef	SIGPIPE
-	if (SIGPIPE < MAXTRAP)
-		sigval[SIGPIPE] = done;
-#endif
-#ifdef	SIGALRM
-	if (SIGALRM < MAXTRAP)
-		sigval[SIGALRM] = fault;
-#endif
-#ifdef	SIGTERM
-	if (SIGTERM < MAXTRAP)
-		sigval[SIGTERM] = fault;
-#endif
-#ifdef	SIGSTKFLT
-	if (SIGSTKFLT < MAXTRAP)
-		sigval[SIGSTKFLT] = done;
-#endif
-#ifdef	SIGCHLD
-	if (SIGCHLD < MAXTRAP)
-		sigval[SIGCHLD] = 0;
-#endif
-#ifdef	SIGCONT
-	if (SIGCONT < MAXTRAP)
-		sigval[SIGCONT] = 0;
-#endif
-#ifdef	SIGSTOP
-	if (SIGSTOP < MAXTRAP)
-		sigval[SIGSTOP] = 0;
-#endif
-#ifdef	SIGTSTP
-	if (SIGTSTP < MAXTRAP)
-		sigval[SIGTSTP] = 0;
-#endif
-#ifdef	SIGTTIN
-	if (SIGTTIN < MAXTRAP)
-		sigval[SIGTTIN] = 0;
-#endif
-#ifdef	SIGTTOU
-	if (SIGTTOU < MAXTRAP)
-		sigval[SIGTTOU] = 0;
-#endif
-#ifdef	SIGURG
-	if (SIGURG < MAXTRAP)
-		sigval[SIGURG] = 0;
-#endif
-#ifdef	SIGXCPU
-	if (SIGXCPU < MAXTRAP)
-		sigval[SIGXCPU] = done;
-#endif
-#ifdef	SIGXFSZ
-	if (SIGXFSZ < MAXTRAP)
-		sigval[SIGXFSZ] = done;
-#endif
-#ifdef	SIGVTALRM
-	if (SIGVTALRM < MAXTRAP)
-		sigval[SIGVTALRM] = done;
-#endif
-#ifdef	SIGPROF
-	if (SIGPROF < MAXTRAP)
-		sigval[SIGPROF] = done;
-#endif
-#ifdef	SIGWINCH
-	if (SIGWINCH < MAXTRAP)
-		sigval[SIGWINCH] = 0;
-#endif
-#ifdef	SIGPOLL
-	if (SIGPOLL < MAXTRAP)
-		sigval[SIGPOLL] = done;
-#endif
-#ifdef	SIGPWR
-	if (SIGPWR < MAXTRAP)
-		sigval[SIGPWR] = done;
-#endif
-#ifdef	SIGSYS
-	if (SIGSYS < MAXTRAP)
-		sigval[SIGSYS] = done;
-#endif
 }

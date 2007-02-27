@@ -37,7 +37,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	REGEXP_H_USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	REGEXP_H_USED	__attribute__ ((unused))
@@ -45,9 +45,9 @@
 #define	REGEXP_H_USED
 #endif
 static const char regexp_h_sccsid[] REGEXP_H_USED =
-	"@(#)regexp.sl	1.56 (gritter) 5/29/05";
+	"@(#)regexp.sl	1.48 (gritter) 10/12/04";
 
-#if !defined (REGEXP_H_USED_FROM_VI) && !defined (__dietlibc__)
+#ifndef	__dietlibc__
 #define	REGEXP_H_WCHARS
 #endif
 
@@ -70,7 +70,6 @@ static const char regexp_h_sccsid[] REGEXP_H_USED =
 
 #define	STAR	01
 #define RNGE	03
-#define	REGEXP_H_LEAST	0100
 
 #ifdef	REGEXP_H_WCHARS
 #define	CMB	0200
@@ -165,7 +164,7 @@ regexp_h_static unsigned char	bittab[] = {
 };
 static int	regexp_h_advance(register const char *lp,
 			register const char *ep);
-static void	regexp_h_getrnge(register const char *str, int least);
+static void	regexp_h_getrnge(register const char *str);
 
 static const char	*regexp_h_bol;	/* beginning of input line (for \<) */
 
@@ -300,22 +299,8 @@ regexp_h_cclass_wc(const char *set, register wint_t c, int af)
 	set += 17;
 	while (set < end) {
 		wc = regexp_h_fetch(set, 0);
-#ifdef	REGEXP_H_VI_BACKSLASH
-		if (wc == '\\' && set < end &&
-				(*set == ']' || *set == '-' ||
-				 *set == '^' || *set == '\\')) {
+		if (wc == L'-' && wl != WEOF && set < end) {
 			wc = regexp_h_fetch(set, 0);
-		} else
-#endif	/* REGEXP_H_VI_BACKSLASH */
-		if (wc == '-' && wl != WEOF && set < end) {
-			wc = regexp_h_fetch(set, 0);
-#ifdef	REGEXP_H_VI_BACKSLASH
-			if (wc == '\\' && set < end &&
-					(*set == ']' || *set == '-' ||
-					 *set == '^' || *set == '\\')) {
-				wc = regexp_h_fetch(set, 0);
-			}
-#endif	/* REGEXP_H_VI_BACKSLASH */
 			if (c > wl && c < wc)
 				return af;
 		}
@@ -429,27 +414,11 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 					c &= 0377;
 					if(c == '\0' || c == '\n')
 						ERROR(49);
-#ifdef	REGEXP_H_VI_BACKSLASH
-					if(c == '\\' && ((c = PEEKC()) == ']' ||
-							c == '-' || c == '^' ||
-							c == '\\')) {
-						c = GETC();
-						c &= 0377;
-					} else
-#endif	/* REGEXP_H_VI_BACKSLASH */
 					if(c == '-' && lc != 0) {
 						if ((c = GETC()) == ']') {
 							PLACE('-');
 							break;
 						}
-#ifdef	REGEXP_H_VI_BACKSLASH
-						if(c == '\\' &&
-							((c = PEEKC()) == ']' ||
-								c == '-' ||
-								c == '^' ||
-								c == '\\'))
-							c = GETC();
-#endif	/* REGEXP_H_VI_BACKSLASH */
 						c &= 0377;
 						while(lc < c) {
 							PLACE(lc);
@@ -484,14 +453,6 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 				do {
 					if (c == '\0' || c == '\n')
 						ERROR(49);
-#ifdef	REGEXP_H_VI_BACKSLASH
-					if(c == '\\' && ((c = PEEKC()) == ']' ||
-							c == '-' || c == '^' ||
-							c == '\\')) {
-						regexp_h_store(c, eq, endbuf);
-						regexp_h_getwc(c);
-					} else
-#endif	/* REGEXP_H_VI_BACKSLASH */
 					if (c == '-' && lc != 0 && lc <= 0177) {
 						regexp_h_store(c, eq, endbuf);
 						regexp_h_getwc(c);
@@ -499,17 +460,6 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 							PLACE('-');
 							break;
 						}
-#ifdef	REGEXP_H_VI_BACKSLASH
-						if(c == '\\' &&
-							((c = PEEKC()) == ']' ||
-								c == '-' ||
-								c == '^' ||
-								c == '\\')) {
-							regexp_h_store(c, eq,
-								endbuf);
-							regexp_h_getwc(c);
-						}
-#endif	/* REGEXP_H_VI_BACKSLASH */
 						while (lc < (c & 0177)) {
 							PLACE(lc);
 							lc++;
@@ -572,16 +522,15 @@ compile(char *instring, char *ep, const char *endbuf, int seof)
 					else
 						ERROR(16);
 				} while(((c = GETC()) != '\\') && (c != ','));
-				if (i > 255)
+				if (i >= 255)
 					ERROR(11);
 				*ep++ = i;
 				if (c == ',') {
 					if(cflg++)
 						ERROR(44);
-					if((c = GETC()) == '\\') {
+					if((c = GETC()) == '\\')
 						*ep++ = (char)255;
-						*lastep |= REGEXP_H_LEAST;
-					} else {
+					else {
 						UNGETC(c);
 						goto nlim; /* get 2'nd number */
 					}
@@ -787,20 +736,14 @@ regexp_h_pushwc(struct regexp_h_stack **sb,
 }
 
 static regexp_h_inline const char *
-regexp_h_pop(struct regexp_h_stack **sb, struct regexp_h_stack **sp,
-		const char ***sc, const char *lp)
+regexp_h_pop(struct regexp_h_stack **sp, const char ***sc,
+		const char *lp)
 {
 	if (regexp_h_firstwc == NULL || lp <= regexp_h_firstwc)
 		return &lp[-1];
-	if (*sp == NULL)
-		return regexp_h_firstwc;
 	if (*sc == &(*sp)->s_ptr[0]) {
-		if ((*sp)->s_prv == NULL) {
-			regexp_h_free(*sp);
-			*sp = NULL;
-			*sb = NULL;
-			return regexp_h_firstwc;
-		}
+		if ((*sp)->s_prv == NULL)
+			return NULL;
 		*sp = (*sp)->s_prv;
 		regexp_h_free((*sp)->s_nxt);
 		(*sp)->s_nxt = NULL ;
@@ -830,16 +773,16 @@ static int
 regexp_h_advance(const char *lp, const char *ep)
 {
 	register const char *curlp;
-	int c, least;
+	int c;
 #ifdef	REGEXP_H_WCHARS
 	int d;
-	struct regexp_h_stack	*sb = NULL, *sp = NULL;
+	struct regexp_h_stack	*sb = NULL, *sp;
 	const char	**sc;
 #endif	/* REGEXP_H_WCHARS */
 	char *bbeg;
 	int ct;
 
-	for (;;) switch (least = *ep++ & 0377, least & ~REGEXP_H_LEAST) {
+	for (;;) switch (*ep++ & 0377) {
 
 	case CCHR:
 #ifdef	REGEXP_H_WCHARS
@@ -952,7 +895,7 @@ regexp_h_advance(const char *lp, const char *ep)
 
 	case CCHR|RNGE:
 		c = *ep++;
-		regexp_h_getrnge(ep, least);
+		regexp_h_getrnge(ep);
 		while(low--)
 			if(*lp++ != c)
 				return(0);
@@ -975,7 +918,7 @@ regexp_h_advance(const char *lp, const char *ep)
 	case CCH2|RNGE:
 	case CCH3|RNGE:
 		c = regexp_h_fetch(ep, 0);
-		regexp_h_getrnge(ep, least);
+		regexp_h_getrnge(ep);
 		while (low--)
 			if (regexp_h_fetch(lp, 1) != c)
 				return 0;
@@ -994,7 +937,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #endif	/* REGEXP_H_WCHARS */
 
 	case CDOT|RNGE:
-		regexp_h_getrnge(ep, least);
+		regexp_h_getrnge(ep);
 		while(low--)
 			if(*lp++ == '\0')
 				return(0);
@@ -1013,7 +956,7 @@ regexp_h_advance(const char *lp, const char *ep)
 
 #ifdef	REGEXP_H_WCHARS
 	case CDOT|RNGE|CMB:
-		regexp_h_getrnge(ep, least);
+		regexp_h_getrnge(ep);
 		while (low--)
 			if ((c = regexp_h_fetch(lp, 1)) == L'\0' || c == WEOF)
 				return 0;
@@ -1032,7 +975,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #endif	/* REGEXP_H_WCHARS */
 
 	case CCL|RNGE:
-		regexp_h_getrnge(ep + 32, least);
+		regexp_h_getrnge(ep + 32);
 		while(low--) {
 			c = *lp++ & 0377;
 			if(!ISTHERE(c))
@@ -1055,12 +998,11 @@ regexp_h_advance(const char *lp, const char *ep)
 #ifdef	REGEXP_H_WCHARS
 	case CCL|RNGE|CMB:
 	case CNCL|RNGE|CMB:
-		regexp_h_getrnge(ep + (*ep & 0377) + 17, least);
+		regexp_h_getrnge(ep + (*ep & 0377) + 17);
 		while (low--) {
 			c = regexp_h_fetch(lp, 1);
 			if (!regexp_h_cclass(ep, c,
-					(ep[-1] & 0377 & ~REGEXP_H_LEAST)
-					== (CCL|RNGE|CMB)))
+					(ep[-1] & 0377) == (CCL|RNGE|CMB)))
 				return 0;
 		}
 		curlp = lp;
@@ -1068,8 +1010,7 @@ regexp_h_advance(const char *lp, const char *ep)
 			regexp_h_push(&sb, &sp, &sc, lp);
 			c = regexp_h_fetch(lp, 1);
 			if (!regexp_h_cclass(ep, c,
-					(ep[-1] & 0377 & ~REGEXP_H_LEAST)
-					== (CCL|RNGE|CMB)))
+					(ep[-1] & 0377) == (CCL|RNGE|CMB)))
 				break;
 		}
 		if (size < 0) {
@@ -1176,7 +1117,7 @@ regexp_h_advance(const char *lp, const char *ep)
 #ifdef	REGEXP_H_WCHARS
 		} else {
 			do {
-				lp = regexp_h_pop(&sb, &sp, &sc, lp);
+				lp = regexp_h_pop(&sp, &sc, lp);
 				if (lp <= locs)
 					break;
 				if (regexp_h_advance(lp, ep)) {
@@ -1193,10 +1134,10 @@ regexp_h_advance(const char *lp, const char *ep)
 }
 
 static void
-regexp_h_getrnge(register const char *str, int least)
+regexp_h_getrnge(register const char *str)
 {
 	low = *str++ & 0377;
-	size = least & REGEXP_H_LEAST ? /*20000*/INT_MAX : (*str & 0377) - low;
+	size = (*str & 0377) == 255 ? /*20000*/INT_MAX : (*str & 0377) - low;
 }
 
 int

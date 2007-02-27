@@ -38,14 +38,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tail.sl	1.25 (gritter) 6/3/05";
+static const char sccsid[] USED = "@(#)tail.sl	1.20 (gritter) 7/17/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -60,10 +60,7 @@ static const char sccsid[] USED = "@(#)tail.sl	1.25 (gritter) 6/3/05";
 #include	<errno.h>
 #include	<libgen.h>
 #include	<limits.h>
-#include	<ctype.h>
 #include	"atoll.h"
-
-#define	check0(n)	((n) > 0 ? (n) : 512)
 
 enum	from {
 	FR_BEGIN,
@@ -82,7 +79,6 @@ static unsigned	errcnt;			/* count of errors */
 static int	fflag;			/* follow file changes */
 static int	rflag;			/* reverse count */
 static char	*progname;		/* argv[0] to main() */
-static int	newopt;			/* new option invocation */
 static size_t	outblk;
 
 static void *
@@ -102,8 +98,9 @@ usage(void)
 {
 	fprintf(stderr, "\
 usage: %s [+/-[n][lbc][f]] [file]\n\
-       %s [+/-[n][l][r|f]] [file]\n",
-		progname, progname);
+       %s [+/-[n][l][r|f]] [file]\n\
+       %s [-f] [-c number | -n number] [file]\n",
+		progname, progname, progname);
 	exit(2);
 }
 
@@ -143,7 +140,7 @@ tailf(int fd, struct stat *sp)
 	size_t	bufsize;
 	ssize_t	sz;
 
-	buf = srealloc(NULL, bufsize = check0(sp->st_blksize));
+	buf = srealloc(NULL, bufsize = sp->st_blksize);
 	for (;;) {
 		poll(NULL, 0, 1000);
 		while ((sz = read(fd, buf, bufsize)) > 0)
@@ -160,7 +157,7 @@ copy(int fd, struct stat *sp)
 	size_t	bufsize;
 	ssize_t	sz;
 
-	buf = srealloc(NULL, bufsize = check0(sp->st_blksize));
+	buf = srealloc(NULL, bufsize = sp->st_blksize);
 	while ((sz = read(fd, buf, bufsize)) > 0)
 		bwrite(1, buf, sz);
 	free(buf);
@@ -178,7 +175,7 @@ endtail(struct count *cnt, int fd, struct stat *sp)
 	char	*spc;
 	size_t	spcsize;
 
-	if (cnt->c_off <= 0 && (!fflag || !newopt))
+	if (cnt->c_off <= 0)
 		return 0;
 	n = (cnt->c_typ == 'b' ? (cnt->c_off << 9) : cnt->c_off);
 	if (cnt->c_typ != 'l' &&
@@ -353,7 +350,7 @@ begintail(struct count *cnt, int fd, struct stat *sp)
 	int	sz;
 	long long	n;
 
-	buf = srealloc(NULL, bufsize = check0(sp->st_blksize));
+	buf = srealloc(NULL, bufsize = sp->st_blksize);
 	if (cnt->c_off > 0) {
 		if (cnt->c_typ == 'l') {
 			n = cnt->c_off;
@@ -397,11 +394,8 @@ getcount(const char *arg, int type)
 	if (arg[0] == '+') {
 		cnt.c_frm = FR_BEGIN;
 		arg++;
-	} else if (arg[0] == '-') {
-		if (arg[1] == '-' && arg[2] == '\0')
-			return NULL;
+	} else if (arg[0] == '-')
 		arg++;
-	}
 	else if (type == '\0')
 		return NULL;
 	if (arg[0] == '+' || arg[0] == '-')
@@ -412,11 +406,9 @@ getcount(const char *arg, int type)
 	if (type == '\0') {
 		cnt.c_typ = 'l';
 		if (x == arg) {
-			if (cnt.c_frm != FR_BEGIN && (*x == 'f' ||
-						*x == 'c' && (x[1] == '\0' ||
-							isdigit(x[1] & 0377))))
+			if (*x == 'f' || *x == 'c')
 				return NULL;
-			cnt.c_off = cnt.c_frm == FR_BEGIN ? 9 : 10;
+			cnt.c_off = 10;
 		}
 		while (*x != '\0') {
 			switch (*x) {
@@ -467,12 +459,8 @@ main(int argc, char **argv)
 	progname = basename(argv[0]);
 	if (argc > 1 && (cnt = getcount(argv[1], '\0')) != NULL) {
 		optind = 2;
-		if (argc > 2 && argv[2][0] == '-' && argv[2][1] == '-' &&
-				argv[2][2] == '\0')
-			optind++;
 		goto optend;
 	}
-	newopt = 1;
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
 		case 'c':
@@ -499,7 +487,7 @@ optend:
 		fprintf(stderr, "%s: cannot stat stdout\n", progname);
 		exit(8);
 	}
-	outblk = check0(st.st_blksize);
+	outblk = st.st_blksize;
 	if (optind < argc) {
 		if ((fd = open(argv[optind], O_RDONLY)) < 0) {
 			fprintf(stderr, "%s: cannot open input\n", progname);

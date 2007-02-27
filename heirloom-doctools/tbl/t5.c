@@ -18,27 +18,23 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t5.c	1.7 (gritter) 9/8/06
+ * Sccsid @(#)t5.c	1.5 (gritter) 8/12/05
  */
 
  /* t5.c: read data for table */
-# include <stdlib.h>
-# include <string.h>
 # include "t..c"
 # include <inttypes.h>
-static int morelines(int);
 void
 gettbl(void)
 {
 int icol, ch;
-char *ocbase;
+char *ocstore;
 size_t linesize = MAXSTR;
-morelines(0);
-cbase=cstore=cspace= chspace();
+cstore=cspace= chspace();
 textflg=0;
-for (nlin=nslin=0; ocbase=cbase, gets1(&cbase, &cstore, &linesize); nlin++)
+for (nlin=nslin=0; ocstore = cstore, gets1(&cstore, &linesize); nlin++)
 	{
-	cspace += cbase - ocbase;
+	cspace += cstore - ocstore;
 	stynum[nlin]=nslin;
 	if (prefix(".TE", cstore))
 		{
@@ -50,7 +46,7 @@ for (nlin=nslin=0; ocbase=cbase, gets1(&cbase, &cstore, &linesize); nlin++)
 		readspec();
 		nslin++;
 		}
-	if (nlin>=MAXLIN && !morelines(nlin))
+	if (nlin>=MAXLIN)
 		{
 		leftover=cstore;
 		break;
@@ -121,7 +117,7 @@ for (nlin=nslin=0; ocbase=cbase, gets1(&cbase, &cstore, &linesize); nlin++)
 	while (*cstore != '\0')
 		 cstore++;
 	if (cstore-cspace > MAXCHS)
-		cbase = cstore = cspace = chspace();
+		cstore = cspace = chspace();
 	}
 last = cstore;
 permute();
@@ -203,31 +199,4 @@ vspen(char *s)
 if (s==0) return(0);
 if (!point((intptr_t)s)) return(0);
 return(match(s, SPAN));
-}
-static int
-morelines(int n)
-{
-int inc = 200, maxlin;
-void *vp;
-if (n>MAXLIN) return(1);
-while ((maxlin = MAXLIN + inc) < n) inc *= 2;
-if ((vp = realloc(table, maxlin * sizeof *table)) == NULL)
-	return(0);
-table = vp;
-if ((vp = realloc(stynum, (maxlin + 1) * sizeof *stynum)) == NULL)
-	return(0);
-stynum = vp;
-if ((vp = realloc(fullbot, maxlin * sizeof *fullbot)) == NULL)
-	return(0);
-fullbot = vp;
-memset(&fullbot[MAXLIN], 0, inc * sizeof *fullbot);
-if ((vp = realloc(instead, maxlin * sizeof *instead)) == NULL)
-	return(0);
-instead = vp;
-memset(&instead[MAXLIN], 0, inc * sizeof *instead);
-if ((vp = realloc(linestop, maxlin * sizeof *linestop)) == NULL)
-	return(0);
-linestop = vp;
-MAXLIN = maxlin;
-return(1);
 }

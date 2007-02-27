@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)print.c	1.11 (gritter) 6/19/05
+ * Sccsid @(#)print.c	1.6 (gritter) 6/14/05
  */
 /* from OpenSolaris "print.c	1.17	05/06/08 SMI"	 SVr4.0 1.12.6.1 */
 /*
@@ -42,7 +42,6 @@
 #include	"defs.h"
 #include	<sys/param.h>
 #include	<locale.h>
-#include 	<ctype.h>
 #include	<wctype.h>	/* iswprint() */
 
 #define		BUFLEN		256
@@ -51,16 +50,22 @@ unsigned char numbuf[21];
 
 static unsigned char buffer[BUFLEN];
 static unsigned char *bufp = buffer;
-#undef	index
 #define	index	sh_index
 static int index = 0;
 static int buffd = 1;
 
+void	prc_buff(unsigned char c);
+void	prs_buff(unsigned char *s);
+void	prn_buff(int n);
+void	prs_cntl(unsigned char *s);
+void	prs(unsigned char *as);
+void	itos(int n);
+
 /*
  * printing and io conversion
  */
-void 
-prp(void)
+void
+prp()
 {
 	if ((flags & prompt) == 0 && cmdadr) {
 		prs_cntl(cmdadr);
@@ -69,9 +74,9 @@ prp(void)
 }
 
 void
-prs(const unsigned char *as)
+prs(unsigned char *as)
 {
-	const char	*s;
+	char	*s;
 
 	if ((s = (char *)as) != 0) {
 		write(output, s, length(s) - 1);
@@ -95,7 +100,7 @@ prwc(wchar_t c)
 	if (c == 0) {
 		return;
 	}
-	if ((len = putb(mb, c)) < 0) {
+	if ((len = wctomb(mb, c)) < 0) {
 		mb[0] = (unsigned char)c;
 		len = 1;
 	}
@@ -106,12 +111,12 @@ void
 prt(long t)
 {
 	int hr, min, sec;
-	static long clk_tck;
+	static long hz;
 	
-	if (clk_tck == 0)
-		clk_tck = sysconf(_SC_CLK_TCK);
-	t += clk_tck / 2;
-	t /= clk_tck;
+	if (hz == 0)
+		hz = sysconf(_SC_CLK_TCK);
+	t += hz / 2;
+	t /= hz;
 	sec = t % 60;
 	t /= 60;
 	min = t % 60;
@@ -152,9 +157,9 @@ itos(int n)
 }
 
 int
-stoi(const unsigned char *icp)
+stoi(unsigned char *icp)
 {
-	const unsigned char	*cp = icp;
+	unsigned char	*cp = icp;
 	int	r = 0;
 	unsigned char	c;
 
@@ -162,30 +167,11 @@ stoi(const unsigned char *icp)
 		r = r * 10 + c - '0';
 		cp++;
 	}
-	if (r < 0 || cp == icp)
+	if (r < 0 || cp == icp) {
 		failed(icp, badnum);
-	return (r);
-}
-
-long long
-stoifll(const unsigned char *icp)
-{
-	const unsigned char	*cp;
-	long long	r = 0;
-	int		sign = 1;
-	unsigned char	c;
-
-	for (cp = icp; space(*cp); cp++);
-	if (*cp == '-') {
-		sign = -1;
-		cp++;
-	} else if (*cp == '+')
-		cp++;
-	while ((c = *cp, digit(c)) && c) {
-		r = r * 10 + c - '0';
-		cp++;
+	} else {
+		return (r);
 	}
-	return (r * sign);
 }
 
 int
@@ -236,8 +222,8 @@ prull(unsigned long long n)
 	prs_buff(&numbuf[i]);
 }
 
-void 
-flushb(void)
+void
+flushb()
 {
 	if (index) {
 		bufp[index] = '\0';
@@ -262,18 +248,18 @@ prc_buff(unsigned char c)
 }
 
 void
-prs_buff(const unsigned char *s)
+prs_buff(unsigned char *s)
 {
-	int len = length((const char *)s) - 1;
+	int len = length((char *)s) - 1;
 
 	if (buffd != -1 && index + len >= BUFLEN) {
 		flushb();
 	}
 
 	if (buffd != -1 && len >= BUFLEN) {
-		write(buffd, (const char *)s, len);
+		write(buffd, (char *)s, len);
 	} else {
-		movstr((const char *)s, &bufp[index]);
+		movstr((char *)s, &bufp[index]);
 		index += len;
 	}
 }
@@ -289,15 +275,15 @@ octal(unsigned char c, unsigned char *ptr)
 }
 
 void
-prs_cntl(const unsigned char *s)
+prs_cntl(unsigned char *s)
 {
 	int n;
 	wchar_t wc;
-	const unsigned char *olds = s;
+	unsigned char *olds = s;
 	unsigned char *ptr = bufp;
 	wchar_t c;
 
-	if ((n = nextc(&wc, (const char *)s)) <= 0) {
+	if ((n = mbtowc(&wc, (const char *)s, MB_LEN_MAX)) <= 0) {
 		n = 0;
 	}
 	while (n != 0) {
@@ -306,7 +292,7 @@ prs_cntl(const unsigned char *s)
 		} else {
 			c = wc;
 			s += n;
-			if (!(mb_cur_max > 1 ? iswprint(c) : isprint(c))) {
+			if (!iswprint(c)) {
 				if (c < '\040' && c > 0) {
 					/*
 					 * assumes ASCII char
@@ -340,7 +326,7 @@ prs_cntl(const unsigned char *s)
 			ptr = bufp;
 		}
 		olds = s;
-		if ((n = nextc(&wc, (const char *)s)) <= 0) {
+		if ((n = mbtowc(&wc, (const char *)s, MB_LEN_MAX)) <= 0) {
 			n = 0;
 		}
 	}

@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ls.1	1.33 (gritter) 2/24/05
+.\" Sccsid @(#)ls.1	1.27 (gritter) 6/19/04
 .\" Parts taken from ls(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,16 +32,16 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH LS 1 "2/24/05" "Heirloom Toolchest" "User Commands"
+.TH LS 1 "6/19/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ls, lc \- list contents of directory
 .SH SYNOPSIS
 \fBls\fR
-[\fB\-abcCdfFgHilLmnopqrRstux1hSUX\fR]
+[\fB\-abcCdfFgilLmnopqrRstux1\fR]
 [\fIfile\fR ...]
 .br
 \fBlc\fR
-[\fB\-abcCdfFgHilLmnopqrRstux1hSUX\fR]
+[\fB\-abcCdfFgilLmnopqrRstux1\fR]
 [\fIfile\fR ...]
 .SH DESCRIPTION
 For each directory argument,
@@ -114,17 +114,10 @@ lfB l.
 @	symbolic link
 |	named pipe
 \&=	socket
->	Solaris door
+>	door
 .TE
+.sp
 .RE
-.IP
-Symbolic links specified as arguments are not followed with this option in
-.B /usr/5bin/posix2001/ls
-unless the
-.I \-H
-or
-.I \-L
-option is also present.
 .TP
 .B  \-g
 Give group ID, but omit owner ID in long listing
@@ -142,19 +135,9 @@ for each file.
 (See below.)
 If the file is a special file the size field will instead contain
 the major and minor device numbers.
-Symbolic links specified as arguments are not followed with this option
-unless the
-.I \-H
-or
-.I \-L
-option is also present.
 .TP
 .B \-L
-Follow symbolic links in arguments,
-and,
-with the
-.I \-R
-option, symbolic links encountered during directory traversal.
+Follow symbolic links in arguments.
 .TP
 .B \-m
 Files are listed across the page, separated by commas.
@@ -212,32 +195,6 @@ Print one filename per output line.
 This is the default
 if standard output does not refer to a terminal.
 .PP
-The following option was introduced with POSIX.1-2001:
-.TP
-.B \-H
-Follow symbolic links given as arguments.
-.PP
-The following options are available as extensions:
-.TP
-.B \-h
-Print file sizes in human-readable powers of 1024,
-i.\|e. `K' for kilobyte,
-`M' for megabyte,
-`G' for gigabyte,
-`T' for terabyte,
-`P' for petabyte,
-and `E' for exabyte.
-.TP
-.B \-S
-Sort by file size.
-.TP
-.B \-U
-Do not sort at all.
-.TP
-.B \-X
-Sort by file name extension,
-i.\|e. by the component of the file name following the last dot.
-.PP
 The mode printed under the
 .BR \-l ,
 .BR \-g ,
@@ -258,8 +215,7 @@ l	if the entry is a symbolic link;
 S	if the entry is a socket;
 s	if the entry is a \s-1XENIX\s0 semaphore;
 m	if the entry is a \s-1XENIX\s0 shared data (memory) file;
-D	if the entry is a Solaris door;
-n	if the entry is a HP-UX network special file;
+D	if the entry is a door;
 \-	if the entry is a plain file.
 .TE
 .PP
@@ -295,7 +251,7 @@ if mandatory locking is enabled for the file
 T}
 L	T{
 if mandatory locking is enabled for the file
-(with \fB/usr/5bin/posix/ls\fR and \fB/usr/5bin/posix2001/ls\fR).
+(with \fB/usr/5bin/posix/ls\fR).
 T}
 .TE
 .PP
@@ -338,11 +294,8 @@ blue/bold	if the file is a directory;
 yellow/bold	if the file is a special file;
 yellow	if the file is a named pipe;
 cyan	if the file is a symbolic link;
-magenta/bold	if the file is a socket or a Solaris door;
-magenta	T{
-if the file is a XENIX special file
-or a HP-UX network special file;
-T}
+magenta/bold	if the file is a socket or a door;
+magenta	if the file is a XENIX special file;
 green/bold	if the file is executable.
 .TE
 .sp

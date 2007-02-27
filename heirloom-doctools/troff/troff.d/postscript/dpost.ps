@@ -1,4 +1,3 @@
-%%BeginResource: procset dpost 4.18 0
 %
 % Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
 % Use is subject to license terms.
@@ -23,11 +22,9 @@
 %
 % CDDL HEADER END
 %
-% from OpenSolaris "dpost.ps	1.7	05/06/08 SMI"
+%ident	"@(#)dpost.ps	1.7	05/06/08 SMI"
 %
-% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
-%
-% Sccsid @(#)dpost.ps	4.18 (gritter) 9/17/06
+% Version 3.16 prologue for troff files.
 %
 
 /#copies 1 store
@@ -92,9 +89,6 @@
 /inch {72 mul} bind def
 /min {2 copy gt {exch} if pop} bind def
 
-/track 0 def
-/horscale 1.0 def
-
 /setup {
 	counttomark 2 idiv {def} repeat pop
 
@@ -137,42 +131,29 @@
 	currentdict /pagedict known currentdict page known and {
 		page load pagedict exch get cvx exec
 	} if
-	/Dsetup where {pop Dsetup} if
-	_custompagesetup
 } def
 
 /decodingdefs [
-	{counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
-	{neg /y exch def counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
-	{neg dup /y exch def moveto {2 index dup length track mul exch stringwidth pop add sub exch div 0 32 track 0 6 -1 roll awidthshow} repeat}
-	{neg dup /y exch def moveto {spacewidth sub track sub 0.0 32 track 0 6 -1 roll awidthshow} repeat}
-	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
-	{/x exch def counttomark 2 idiv 1 add {x y moveto counttomark 1 gt {x exch sub /x exch def} if track 0 3 -1 roll ashow} repeat}
-	{counttomark 2 idiv {y moveto track 0 3 -1 roll ashow} repeat}
+	{counttomark 2 idiv {y moveto show} repeat}
+	{neg /y exch def counttomark 2 idiv {y moveto show} repeat}
+	{neg moveto {2 index stringwidth pop sub exch div 0 32 4 -1 roll widthshow} repeat}
+	{neg moveto {spacewidth sub 0.0 32 4 -1 roll widthshow} repeat}
+	{counttomark 2 idiv {y moveto show} repeat}
 	{neg setfunnytext}
 ] def
 
-/setdecoding {/t decodingdefs 3 -1 roll get def} bind def
+/setdecoding {/t decodingdefs 3 -1 roll get bind def} bind def
 
-/T {/track exch def} bind def
-
-/w {neg dup /y exch def moveto track 0 3 -1 roll ashow} bind def
-/v {y moveto track 0 3 -1 roll ashow} bind def
-/u {y neg t} bind def
+/w {neg moveto show} bind def
 /m {neg dup /y exch def moveto} bind def
 /done {/lastpage where {pop lastpage} if} def
 
 /f {
-	dup /font exch def exch
-	dup /ptsize exch def scaling div dup /size exch def
-	horscale 1.0 ne {horscale mul [exch 0 0 size 0 0]} if SF
+	dup /font exch def findfont exch
+	dup /ptsize exch def scaling div dup /size exch def scalefont setfont
 	linewidth ptsize mul scaling 10 mul div setlinewidth
 	/spacewidth ( ) stringwidth pop def
-	/horscale 1.0 def
 } bind def
-/F {ptsize exch f} bind def
-/s {font f} bind def
-/h {/horscale exch def f} bind def
 
 /changefont {
 	/fontheight exch def
@@ -216,12 +197,11 @@
 %
 
 /Sdefs [
-	/underscore		[0 0 502 0]
-	/bracketlefttp		[208 500]
-	/bracketleftbt		[208 500]
-	/bracketrighttp		[-60 380]
-	/bracketrightbt		[-60 380]
-	/braceleftbt		[209 490]
+	/bracketlefttp		[220 500]
+	/bracketleftbt		[220 500]
+	/bracketrighttp		[-70 380]
+	/bracketrightbt		[-70 380]
+	/braceleftbt		[220 490]
 	/bracketrightex		[220 -125 500 0]
 	/radical		[0 0 550 0]
 	% NeWSprint's \(br is too low, compensate
@@ -230,56 +210,14 @@
 		/parenleftex		[-20 100 0 0]
 
 	} {
-		/radicalex		[-50 0 500.001 0]
+		/radicalex		[-50 0 500 0]
 		/parenleftex		[-20 -170 0 0]
 	} ifelse
 	/integral		[100 -50 500 0]
 	/infinity		[10 -75 730 0]
 ] def
 
-%
-% This adjusts the y left bearing of the underscore character in the
-% Symbol font to the position expected by troff, depending on the
-% font variant actually in use with the current document.
-%
-/_Sdefsadj {
-	gsave
-	/Symbol findfont 1000 scalefont setfont
-	0 0 moveto
-	(\137) false charpath flattenpath pathbbox pop pop exch pop
-	grestore
-	252 add neg
-	Sdefs 1 [0 5 -1 roll 502 0] put
-} def
-
 /S1defs [
-	/underscore		[0 80 500.001 0]
+	/underscore		[0 80 500 0]
 	/endash			[7 90 650 0]
 ] def
-
-% from Adobe's PostScript Language Reference Manual, 2nd ed. 1990, pp. 588-589
-/*SF {					% Complete selectfont emulation
-	exch findfont exch
-	dup type /arraytype eq {makefont}{scalefont} ifelse setfont
-} bind def
-/languagelevel where			% Determine language level
-	{pop languagelevel} {1} ifelse	% of implementation
-	2 lt {				% ifelse
-		/SF /*SF load def	% Level 1 interpreter present, so
-	} {				% else
-		/SF /selectfont load def% Level 2 interpreter present, so
-	}
-ifelse
-
-% from Adobe's pdfmark Reference Manual for Acrobat 7.0, 11/30/04, p. 10
-/pdfmark where				% Is pdfmark already available?
-	{pop}				% Yes: do nothing (use that definition)
-	{				% No: define pdfmark as follows:
-	/globaldict where		% globaldict is preferred because
-		{pop globaldict}	% globaldict is always visible; else,
-		{userdict}		% use userdict otherwise.
-	ifelse
-	/pdfmark /cleartomark load put
-	}				% Define pdfmark to remove all objects
-ifelse					% up to and including the mark object.
-%%EndResource

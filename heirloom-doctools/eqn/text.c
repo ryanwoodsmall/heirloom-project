@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)text.c	1.7 (gritter) 11/6/05
+ * Sccsid @(#)text.c	1.4 (gritter) 8/13/05
  */
 
 # include "e.h"
@@ -70,36 +70,24 @@ text(int t,char *p1) {
 		lfont[yyval] = lf;
 		rfont[yyval] = rf;
 	}
-#ifndef	NEQN
-	if(dbg)printf(".\t%dtext: S%d <- %s; b=%g,h=%g,lf=%c,rf=%c\n",
-		t, yyval, p, ebase[yyval], eht[yyval], lfont[yyval], rfont[yyval]);
-#else	/* NEQN */
 	if(dbg)printf(".\t%dtext: S%d <- %s; b=%d,h=%d,lf=%c,rf=%c\n",
 		t, yyval, p, ebase[yyval], eht[yyval], lfont[yyval], rfont[yyval]);
-#endif	/* NEQN */
 	printf(".ds %d \"%s\n", yyval, p);
 }
 
 int
 trans(int c,char *p1) {
 	int f;
-	int half = 0;
 	f = ROM;
 	switch( c) {
-	case ')':
-		half = 1;
-		/*FALLTHRU*/
 	case '0': case '1': case '2': case '3': case '4':
 	case '5': case '6': case '7': case '8': case '9':
 	case ':': case ';': case '!': case '%':
-	case '(': case '[': case ']':
-		if (rf == ITAL)
-			shim(half);
-		roman(c); break;
+	case '(': case '[': case ')': case ']':
 	case ',':
-		roman(c);
-		shim(0);
-		break;
+		if (rf == ITAL)
+			shim();
+		roman(c); break;
 	case '.':
 		if (rf == ROM)
 			roman(c);
@@ -109,21 +97,21 @@ trans(int c,char *p1) {
 		break;
 	case '|':
 		if (rf == ITAL)
-			shim(0);
-		shim(0); roman(c); shim(0); break;
+			shim();
+		shim(); roman(c); shim(); break;
 	case '=':
 		if (rf == ITAL)
-			shim(0);
+			shim();
 		name4('e','q');
 		break;
 	case '+':
 		if (rf == ITAL)
-			shim(0);
+			shim();
 		name4('p', 'l');
 		break;
 	case '>': case '<':
 		if (rf == ITAL)
-			shim(0);
+			shim();
 		if (p1[psp]=='=') {	/* look ahead for == <= >= */
 			name4(c,'=');
 			psp++;
@@ -133,7 +121,7 @@ trans(int c,char *p1) {
 		break;
 	case '-':
 		if (rf == ITAL)
-			shim(0);
+			shim();
 		if (p1[psp]=='>') {
 			name4('-','>'); psp++;
 		} else {
@@ -142,30 +130,21 @@ trans(int c,char *p1) {
 		break;
 	case '/':
 		if (rf == ITAL)
-			shim(0);
+			shim();
 		name4('s','l');
 		break;
 	case '~': case ' ':
-		shim(0); shim(0); break;
+		shim(); shim(); break;
 	case '^':
-		shim(0); break;
+		shim(); break;
 	case '\\':	/* troff - pass 2 or 3 more chars */
 		if (rf == ITAL)
-			shim(0);
+			shim();
 		cs[csp++] = c; cs[csp++] = c = p1[psp++]; cs[csp++] = p1[psp++];
 		if (c=='(') cs[csp++] = p1[psp++];
 		if (c=='*' && cs[csp-1] == '(') {
 			cs[csp++] = p1[psp++];
 			cs[csp++] = p1[psp++];
-		} else if (c == '[' || c == '*' && cs[csp-1] == '[') {
-			do
-				cs[csp++] = p1[psp++];
-			while (p1[psp-1] != ' ' && p1[psp-1] != '\t' &&
-					p1[psp-1] != '\n' && p1[psp-1] != ']');
-			if (cs[csp-1] != ']') {
-				csp--;
-				psp--;
-			}
 		}
 		break;
 	case '\'':
@@ -203,8 +182,8 @@ trans(int c,char *p1) {
 }
 
 void
-shim(int small) {
-	cs[csp++] = '\\'; cs[csp++] = small ? '^' : '|';
+shim(void) {
+	cs[csp++] = '\\'; cs[csp++] = '|';
 }
 
 void

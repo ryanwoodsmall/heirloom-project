@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)cmd.c	1.4 (gritter) 6/15/05
+ * Sccsid @(#)cmd.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "cmd.c	1.14	05/06/08 SMI"	 SVr4.0 1.12.1.4 */
 /*
@@ -41,22 +41,24 @@
 #include	"defs.h"
 #include	"sym.h"
 
-static struct trenod *makelist(int, struct trenod *, struct trenod *);
-static struct trenod *list(int);
-static struct trenod *term(int);
-static struct regnod *syncase(register int);
-static struct trenod *item(BOOL);
-static int skipnl(void);
-static struct ionod *inout(struct ionod *);
-static void chkword(void);
-static void chksym(int);
-static void prsym(int);
-static void synbad(void);
+static struct ionod *	inout();
+static int	chkword();
+static int	chksym();
+static struct trenod *	term();
+static struct trenod *	makelist();
+static struct trenod *	list();
+static struct regnod *	syncase();
+static struct trenod *	item();
+static int	skipnl();
+static int	prsym();
+static int	synbad();
+
 
 /* ======== storage allocation for functions ======== */
 
 unsigned char *
-getstor(int asize)
+getstor(asize)
+	int asize;
 {
 	if (fndef)
 		return((unsigned char *)alloc(asize));
@@ -71,7 +73,9 @@ getstor(int asize)
 
 
 struct trenod *
-makefork(int flgs, struct trenod *i)
+makefork(flgs, i)
+	int	flgs;
+	struct trenod *i;
 {
 	register struct forknod *t;
 
@@ -83,9 +87,11 @@ makefork(int flgs, struct trenod *i)
 }
 
 static struct trenod *
-makelist(int type, struct trenod *i, struct trenod *r)
+makelist(type, i, r)
+	int	type;
+	struct trenod *i, *r;
 {
-	register struct lstnod *t = NULL;
+	register struct lstnod *t;
 
 	if (i == 0 || r == 0)
 		synbad();
@@ -107,7 +113,9 @@ makelist(int type, struct trenod *i, struct trenod *r)
  *	list [ ; cmd ]
  */
 struct trenod *
-cmd(register int sym, int flg)
+cmd(sym, flg)
+	register int	sym;
+	int		flg;
 {
 	register struct trenod *i, *e;
 	i = list(flg);
@@ -155,7 +163,7 @@ cmd(register int sym, int flg)
  *	list || term
  */
 static struct trenod *
-list(int flg)
+list(flg)
 {
 	register struct trenod *r;
 	register int		b;
@@ -171,7 +179,7 @@ list(int flg)
  *	item |^ term
  */
 static struct trenod *
-term(int flg)
+term(flg)
 {
 	register struct trenod *t;
 
@@ -195,7 +203,8 @@ term(int flg)
 
 
 static struct regnod *
-syncase(register int esym)
+syncase(esym)
+register int	esym;
 {
 	skipnl();
 	if (wdval == esym)
@@ -252,7 +261,8 @@ syncase(register int esym)
  *	begin ... end
  */
 static struct trenod *
-item(BOOL flag)
+item(flag)
+	BOOL	flag;
 {
 	register struct trenod *r;
 	register struct ionod *io;
@@ -357,7 +367,7 @@ item(BOOL flag)
 			p = (struct parnod *)getstor(sizeof(struct parnod));
 			p->partre = cmd(')', NLFLG);
 			p->partyp = TPAR;
-			r = makefork(0, (struct trenod *)p);
+			r = makefork(0, p);
 			break;
 		}
 
@@ -484,8 +494,8 @@ item(BOOL flag)
 }
 
 
-static int 
-skipnl(void)
+static int
+skipnl()
 {
 	while ((reserv++, word() == NL))
 		chkpr();
@@ -493,7 +503,8 @@ skipnl(void)
 }
 
 static struct ionod *
-inout(struct ionod *lastio)
+inout(lastio)
+	struct ionod *lastio;
 {
 	register int	iof;
 	register struct ionod *iop;
@@ -550,15 +561,15 @@ inout(struct ionod *lastio)
 	return(iop);
 }
 
-static void
-chkword(void)
+static int
+chkword()
 {
 	if (word())
 		synbad();
 }
 
-static void
-chksym(int sym)
+static int
+chksym(sym)
 {
 	register int	x = sym & wdval;
 
@@ -566,8 +577,8 @@ chksym(int sym)
 		synbad();
 }
 
-static void
-prsym(int sym)
+static int
+prsym(sym)
 {
 	if (sym & SYMFLG)
 	{
@@ -590,8 +601,8 @@ prsym(int sym)
 	}
 }
 
-static void
-synbad(void)
+static int
+synbad()
 {
 	prp();
 	prs(synmsg);

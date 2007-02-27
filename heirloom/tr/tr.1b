@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)tr.1b	1.7 (gritter) 8/6/05
+.\" Sccsid @(#)tr.1b	1.3 (gritter) 2/22/03
 .\" Parts taken from tr(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TR 1B "8/6/05" "Heirloom Toolchest" "BSD System Compatibility"
+.TH TR 1B "2/22/03" "Heirloom Toolchest" "BSD System Compatibility"
 .SH NAME
 tr \- (BSD) translate characters
 .SH SYNOPSIS
-\fB/usr/ucb/tr\fR [\fB\-cCds\fR] [\fIstring1\fR [\fIstring2\fR]]
+\fB/usr/ucb/tr\fR [\fB\-cds\fR] [\fIstring1\fR [\fIstring2\fR]]
 .SH DESCRIPTION
 .I Tr
 copies the standard input to the standard output with 
@@ -74,15 +74,6 @@ in
 .I string2
 to single characters.
 .PP
-The following option has been introduced by POSIX.1-2001:
-.TP
-.B \-C
-complements the set of characters in
-.I string1
-like
-.IR \-c ,
-but orders ranges according to the collation sequence.
-.PP
 In either string the following character sequences are
 treated specially:
 .TP 8
@@ -113,10 +104,6 @@ to
 in increasing byte order,
 or with a multibyte character set,
 in increasing wide character order.
-With the
-.I \-C
-option,
-characters are ordered according to the collation sequence.
 .TP 8
 \fB[:\fIclass\fB:]\fR
 means all characters that belong to character class
@@ -180,6 +167,14 @@ ed(1),
 ascii(7),
 locale(7)
 .SH NOTES
+In multibyte locales,
+characters with a wide character value greater than 65535
+are not fully supported with the
+.B \-c
+option
+or within character classes
+(other than case mapping).
+.PP
 tr does not handle ASCII NUL in
 .I string1
 or
@@ -187,9 +182,4 @@ or
 it always deletes NUL from input.
 .PP
 The LC_COLLATE variable is not respected;
-equivalence classes consist of exactly one character,
-and the
-.I \-c
-and
-.I \-C
-options produce identical results.
+equivalence classes consist of exactly one character.

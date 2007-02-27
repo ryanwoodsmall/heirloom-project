@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tv.c	1.4 (gritter) 9/8/06
+ * Sccsid @(#)tv.c	1.3 (gritter) 7/23/05
  */
 
  /* tv.c: draw vertical lines */
@@ -108,17 +108,11 @@ for(ln=0; ln<lwid; ln++)
 		fprintf(tabout, "\\v'%s'", exb);
 	if (epb)
 		fprintf(tabout, "\\v'%dp'", epb);
-	if (graphics)
-		fprintf(tabout, "\\v'\\n(#Du'");
-	else
-		fprintf(tabout, "\\s\\n(%d",LSIZE);
+	fprintf(tabout, "\\s\\n(%d",LSIZE);
 	if (linsize)
 		fprintf(tabout, "\\v'-\\n(%dp/6u'", LSIZE);
 	fprintf(tabout, "\\h'-\\n(#~u'"); /* adjustment for T450 nroff boxes */
-	if (graphics)
-		fprintf(tabout, "\\D'l 0 |\\n(#%cu-%s", linestop[start]+'a'-1, vm=='v'? "1v" : "\\n(35u");
-	else
-		fprintf(tabout, "\\L'|\\n(#%cu-%s", linestop[start]+'a'-1, vm=='v'? "1v" : "\\n(35u");
+	fprintf(tabout, "\\L'|\\n(#%cu-%s", linestop[start]+'a'-1, vm=='v'? "1v" : "\\n(35u");
 	if (ext)
 		fprintf(tabout, "-(%s)",ext);
 	if (exb)
@@ -128,12 +122,7 @@ for(ln=0; ln<lwid; ln++)
 		fprintf(tabout, "%s%dp", pos>=0? "+" : "", pos);
 	/* the string #d is either "nl" or ".d" depending
 	   on diversions; on GCOS not the same */
-	fprintf(tabout, "'");
-	if (graphics)
-		fprintf(tabout, "\\v'-\\n(#Du'");
-	else
-		fprintf(tabout, "\\s0");
-	fprintf(tabout, "\\v'\\n(\\*(#du-\\n(#%cu+%s", linestop[start]+'a'-1,vm=='v' ? "1v" : "\\n(35u");
+	fprintf(tabout, "'\\s0\\v'\\n(\\*(#du-\\n(#%cu+%s", linestop[start]+'a'-1,vm=='v' ? "1v" : "\\n(35u");
 	if (ext)
 		fprintf(tabout, "+%s",ext);
 	if (ept)

@@ -1,16 +1,22 @@
 all: shl
 
-shl: shl.o
-	$(LD) $(LDFLAGS) shl.o $(LCOMMON) $(LWCHAR) $(LIBS) -o shl
+shl: shl.o pslist.o shlid.o
+	$(LD) $(LDFLAGS) shl.o pslist.o shlid.o $(LCOMMON) $(LWCHAR) $(LIBS) -o shl
 
 shl.o: shl.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -DSV3BIN='"$(SV3BIN)"' -DDEFBIN='"$(DEFBIN)"' -c shl.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(GNUFL) $(IWCHAR) $(ICOMMON) -c shl.c
+
+pslist.o: pslist.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -c pslist.c
+
+shlid.o: shlid.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(XO5FL) $(IWCHAR) $(ICOMMON) -c shlid.c
 
 install: all
 	u=`uname`; \
 	if test "$$u" != FreeBSD && test "$$u" != HP-UX && \
 		test "$$u" != AIX && test "$$u" != NetBSD && \
-		test "$$u" != OpenBSD && test "$$u" != DragonFly ; \
+		test "$$u" != OpenBSD ; \
 	then \
 		$(UCBINST) -c $(TTYGRP) -m 2755 shl $(ROOT)$(DEFBIN)/shl &&\
 		$(STRIP) $(ROOT)$(DEFBIN)/shl &&\
@@ -20,4 +26,8 @@ install: all
 	fi
 
 clean:
-	rm -f shl shl.o core log *~
+	rm -f shl shl.o pslist.o shlid.o core log *~
+
+shl.o: shl.h
+pslist.o: shl.h
+shlid.o: shl.h

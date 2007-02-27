@@ -1,5 +1,4 @@
-%%BeginResource: procset dpost_charL1 1.0 0
-% from OpenSolaris "lp:filter/postscript/font/devpost/charlib/L1	1.2"
+%ident	"@(#)lp:filter/postscript/font/devpost/charlib/L1	1.2"
 %
 % CDDL HEADER START
 %
@@ -21,8 +20,6 @@
 %
 % CDDL HEADER END
 %
-% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
-%
 /build_L1 {
     pop
     /picstr 40 string def
@@ -35,4 +32,3 @@
     {currentfile picstr readhexstring pop} image
     grestore
 } def
-%%EndResource

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.21 (gritter) 7/3/05
+ * Sccsid @(#)defs.h	1.6 (gritter) 6/14/05
  */
 
 #ifndef	_DEFS_H
@@ -51,7 +51,6 @@ extern "C" {
 #define		XEC_EXECED	01
 #define			XEC_LINKED	02
 #define		XEC_NOSTOP	04
-#define		XEC_PIPED	010
 
 /* endjobs flags */
 #define			JOB_STOPPED	01
@@ -147,9 +146,6 @@ extern "C" {
 /* arg list terminator */
 #define		ENDARGS		0
 
-/* enable shell accounting */
-#define		ACCT
-
 #include	<unistd.h>
 #include	"mac.h"
 #include	"mode.h"
@@ -157,19 +153,6 @@ extern "C" {
 #include	<signal.h>
 #include	<string.h>
 #include	<sys/types.h>
-#include	<inttypes.h>
-
-/* Multibyte characters */
-#include <stdlib.h>
-#include <limits.h>
-#define	MULTI_BYTE_MAX MB_LEN_MAX
-extern int	mb_cur_max;
-#define	nextc(wc, sp)	(mb_cur_max > 1 && *(sp) & 0200 ? \
-				mbtowc(wc, sp, mb_cur_max) : \
-				(*(wc) = *(sp) & 0377, *(wc) != 0))
-#define	putb(mb, wc)	(mb_cur_max > 1 && wc & ~(wchar_t)0177 ? \
-				wctomb(mb, wc) : \
-				(*(mb) = wc, 1))
 
 /* id's */
 extern pid_t	mypid;
@@ -180,236 +163,47 @@ extern pid_t	mysid;
 
 extern int		optind;
 extern int		opterr;
-extern int 		getopt_sp;
+extern int 		_sp;
 extern char 		*optarg;
 
+extern void	*alloc();
 #define	free	sh_free
 
 /* result type declarations */
-/* args.c */
-int options(int, unsigned char **);
-void setargs(unsigned char *[]);
-struct dolnod *freeargs(struct dolnod *);
-struct dolnod *clean_args(struct dolnod *);
-void clearup(void);
-struct dolnod *savargs(int);
-void restorargs(struct dolnod *, int);
-struct dolnod *useargs(void);
-/* blok.c */
-void *alloc(size_t);
-void addblok(unsigned);
-void sh_free(void *);
-size_t blklen(char *);
-/* bltin.c */
-void builtin(int, int, unsigned char **, struct trenod *);
-/* cmd.c */
-unsigned char *getstor(int);
-struct trenod *makefork(int, struct trenod *);
-struct trenod *cmd(int, int);
-/* ctype.c */
-/* defs.c */
-/* echo.c */
-int echo(int, unsigned char **);
-/* error.c */
-void failed(const unsigned char *, const unsigned char *);
-void error(const unsigned char *);
-void exitsh(int);
-void rmtemp(struct ionod *);
-void rmfunctmp(void);
-void failure(const unsigned char *, const unsigned char *);
-/* expand.c */
-int expand(unsigned char *, int);
-void makearg(struct argnod *);
-/* fault.c */
-void done(int);
-void fault(int);
-int handle(int, void (*)(int));
-void stdsigs(void);
-void oldsigs(void);
-void chktrap(void);
-int systrap(int, char **);
-#define	sleep(a)	sh_sleep(a)
-void sleep(unsigned int);
-void sigsegv(int, siginfo_t *);
-void init_sigval(void);
-/* func.c */
-void freefunc(struct namnod *);
-void freetree(struct trenod *);
-void free_arg(struct argnod *);
-void freeio(struct ionod *);
-void freereg(struct regnod *);
-void prbgnlst(void);
-void prendlst(void);
-void prcmd(struct trenod *);
-void prf(struct trenod *);
-void prarg(struct argnod *);
-void prio(struct ionod *);
-/* gmatch.c */
-int gmatch(const char *, const char *);
-/* hashserv.c */
-short pathlook(unsigned char *, int, struct argnod *);
-void zaphash(void);
-void zapcd(void);
-void hashpr(void);
-void set_dotpath(void);
-void hash_func(unsigned char *);
-void func_unhash(unsigned char *);
-short hash_cmd(unsigned char *);
-int what_is_path(unsigned char *);
-int findpath(unsigned char *, int);
-int chk_access(unsigned char *, mode_t, int);
-void pr_path(unsigned char *, int);
-/* io.c */
-void initf(int);
-int estabf(unsigned char *);
-void push(struct fileblk *);
-int pop(void);
-void pushtemp(int, struct tempblk *);
-int poptemp(void);
-void chkpipe(int *);
-int chkopen(const unsigned char *, int);
-void renamef(int, int);
-int create(unsigned char *);
-int tmpfil(struct tempblk *);
-void copy(struct ionod *);
-void link_iodocs(struct ionod *);
-void swap_iodoc_nm(struct ionod *);
-int savefd(int);
-void restore(int);
-/* jobs.c */
-void collect_fg_job(void);
-void freejobs(void);
-int settgid(pid_t, pid_t);
-void startjobs(void);
-int endjobs(int);
-void deallocjob(void);
-void allocjob(char *, unsigned char *, int);
-void clearjobs(void);
-void makejob(int, int);
-void postjob(pid_t, int);
-void sysjobs(int, char *[]);
-void sysfgbg(int, char *[]);
-void syswait(int, char *[]);
-void sysstop(int, char *[]);
-void syskill(int, char *[]);
-void syssusp(int, char *[]);
-/* macro.c */
-unsigned char *macro(unsigned char *);
-void comsubst(int);
-void subst(int, int);
-void flush(int);
-/* main.c */
-void chkpr(void);
-void settmp(void);
-void Ldup(int, int);
-void chkmail(void);
-void setmail(unsigned char *);
-void setwidth(void);
-void sh_setmode(int);
-/* msg.c */
-/* name.c */
-int syslook(unsigned char *, const struct sysnod [], int);
-void setlist(struct argnod *, int);
-void setname(unsigned char *, int);
-void replace(unsigned char **, const unsigned char *);
-void dfault(struct namnod *, const unsigned char *);
-void assign(struct namnod *, const unsigned char *);
-int readvar(unsigned char **);
-void assnum(unsigned char **, long);
-unsigned char *make(const unsigned char *);
-struct namnod *lookup(unsigned char *);
-BOOL chkid(unsigned char *);
-void namscan(void (*)(struct namnod *));
-void printnam(struct namnod *);
-void exname(struct namnod *);
-void printro(struct namnod *);
-void printexp(struct namnod *);
-void setup_env(void);
-unsigned char **local_setenv(void);
-void setvars(void);
-struct namnod *findnam(unsigned char *);
-void unset_name(unsigned char *);
-/* print.c */
-void prp(void);
-void prs(const unsigned char *);
-void prc(unsigned char);
-void prwc(wchar_t);
-void prt(long);
-void prn(int);
-void itos(int);
-int stoi(const unsigned char *);
-long long stoifll(const unsigned char *);
-int ltos(long);
-void prl(long);
-int ulltos(unsigned long long);
-void prull(unsigned long long);
-void flushb(void);
-void prc_buff(unsigned char);
-void prs_buff(const unsigned char *);
-unsigned char *octal(unsigned char, unsigned char *);
-void prs_cntl(const unsigned char *);
-void prl_buff(long);
-void prull_buff(unsigned long long);
-void prn_buff(int);
-void prsp_buff(int);
-int setb(int);
-/* pwd.c */
-void cwd(unsigned char *);
-void cwd2(void);
-unsigned char *cwdget(void);
-void cwdprint(void);
-/* service.c */
-int initio(struct ionod *, int);
-unsigned char *simple(unsigned char *);
-unsigned char *getpath(unsigned char *);
-int pathopen(const unsigned char *, const unsigned char *);
-unsigned char *catpath(const unsigned char *, const unsigned char *);
-unsigned char *nextpath(const unsigned char *);
-void execa(unsigned char *[], int);
-void trim(unsigned char *);
-void trims(unsigned char *);
-unsigned char *mactrim(unsigned char *);
-unsigned char **scan(int);
-int getarg(struct comnod *);
-void suspacct(void);
-void preacct(unsigned char *);
-void doacct(void);
-int compress(clock_t);
-/* setbrk.c */
-unsigned char *setbrk(int);
-/* stak.c */
-void tdystak(unsigned char *);
-void stakchk(void);
-/* string.c */
-unsigned char *movstr(const unsigned char *, unsigned char *);
-int any(wchar_t, const unsigned char *);
-int anys(const unsigned char *, const unsigned char *);
-int cf(const unsigned char *, const unsigned char *);
-int length(const unsigned char *);
-unsigned char *movstrn(const unsigned char *, unsigned char *, int);
-/* strsig.c */
-int str_2_sig(const char *, int *);
-int sig_2_str(int, char *);
-char *str_signal(int);
-/* test.c */
-int test(int, unsigned char *[]);
-/* ulimit.c */
-void sysulimit(int, char **);
-/* umask.c */
-void sysumask(int, char **);
-/* word.c */
-int word(void);
-unsigned int skipwc(void);
-unsigned int nextwc(void);
-unsigned char *readw(wchar_t);
-unsigned int readwc(void);
-/* xec.c */
-int execute(struct trenod *, int, int, int *, int *);
-void execexp(unsigned char *, intptr_t);
-void execprint(unsigned char **);
+
+extern int handle();
+extern void chktrap();
+extern void done();
+extern void fault();
+extern void sh_free();
+extern unsigned char *make();
+extern unsigned char *movstr();
+extern unsigned char *movstrn();
+extern unsigned char *cwdget();
+extern struct trenod *cmd();
+extern struct trenod *makefork();
+extern struct namnod *lookup();
+extern struct namnod *findnam();
+extern struct dolnod *useargs();
+extern float expr();
+extern unsigned char *catpath();
+extern unsigned char *getpath();
+extern unsigned char *nextpath();
+extern unsigned char **scan();
+extern unsigned char *mactrim();
+extern unsigned char *macro();
+extern int exname();
+extern int printnam();
+extern int printro();
+extern int printexp();
+extern unsigned int readwc();
+extern unsigned int nextwc();
+extern unsigned char skipc();
+extern unsigned char **local_setenv();
+extern time_t time();
 
 #define		attrib(n, f)		(n->namflg |= f)
-#define		round(a, b)	(((intptr_t)(((char *)(a)+b)-1))&~((b)-1))
+#define		round(a, b)		(((int)(((char *)(a)+b)-1))&~((b)-1))
 #define		closepipe(x)	(close(x[INPIPE]), close(x[OTPIPE]))
 #define		eq(a, b)		(cf(a, b) == 0)
 #define		max(a, b)		((a) > (b)?(a):(b))
@@ -432,6 +226,14 @@ extern struct argnod	*gchain;
 
 /* stak stuff */
 #include		"stak.h"
+
+/*
+ * If non-ANSI C, make const go away.  We bring it back
+ * at the end of the file to avoid side-effects.
+ */
+#ifndef __STDC__
+#define	const
+#endif
 
 /* string constants */
 extern const char				atline[];
@@ -464,6 +266,10 @@ extern const char				supprompt[];
 extern const char				profile[];
 extern const char				sysprofile[];
 
+/* locale testing */
+extern const char			localedir[];
+extern int				localedir_exists;
+
 /* built in names */
 extern struct namnod	fngnod;
 extern struct namnod	cdpnod;
@@ -476,7 +282,6 @@ extern struct namnod	ps2nod;
 extern struct namnod	mchknod;
 extern struct namnod	acctnod;
 extern struct namnod	mailpnod;
-extern struct namnod	timeoutnod;
 
 /* special names */
 extern unsigned char				flagadr[];
@@ -496,7 +301,6 @@ extern const char				ps2name[];
 extern const char				mchkname[];
 extern const char				acctname[];
 extern const char				mailpname[];
-extern const char				timeoutname[];
 
 /* transput */
 extern unsigned char				tmpout[];
@@ -513,7 +317,11 @@ extern struct fileblk	*standin;
 extern int				peekc;
 extern int				peekn;
 extern unsigned char				*comdiv;
-extern const char				devnull[];
+extern
+#ifdef __STDC__
+const
+#endif
+char				devnull[];
 
 /* flags */
 #define			noexec		01
@@ -540,7 +348,6 @@ extern const char				devnull[];
 #define			privflg		04000000
 #define			forcexit	010000000
 #define			jcoff		020000000
-#define			waiting		040000000
 
 extern long				flags;
 extern int				rwait;	/* flags read waiting */
@@ -555,11 +362,7 @@ extern jmp_buf			errshell;
 
 extern unsigned			brkincr;
 #define		MINTRAP		0
-#if defined (NSIG) && (NSIG) >= 36
 #define		MAXTRAP		NSIG
-#else
-#define		MAXTRAP		36
-#endif
 
 #define		TRAPSET		2
 #define		SIGSET		4
@@ -655,6 +458,10 @@ extern const char				jobsrunning[];
 extern const char				btest[];
 extern const char				badop[];
 
+#ifndef __STDC__
+#undef const 					/* bring back const */
+#endif
+
 /*	fork constant	*/
 
 #define		FORKLIM 	32
@@ -678,6 +485,13 @@ extern int				ucb_builtins;
 					exitsh(exitval ? exitval : SIGFAIL)
 
 #define		exitset()	retval = exitval
+
+/* Multibyte characters */
+void setwidth();
+unsigned char *readw();
+#include <stdlib.h>
+#include <limits.h>
+#define	MULTI_BYTE_MAX MB_LEN_MAX
 
 
 #ifdef	__cplusplus

@@ -22,19 +22,10 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
-#define	USED	__attribute__ ((used))
-#elif defined __GNUC__
-#define	USED	__attribute__ ((unused))
-#else
-#define	USED
-#endif
-static const char sccsid[] USED = "@(#)shl.sl	1.29 (gritter) 12/25/06";
+/*	Sccsid @(#)shl.c	1.22 (gritter) 11/21/04	*/
 
 #if !defined (__FreeBSD__) && !defined (__hpux) && !defined (_AIX) && \
-	!defined (__NetBSD__) && !defined (__OpenBSD__) && \
-	!defined (__DragonFly__) && !defined (__APPLE__)
+	!defined (__NetBSD__) && !defined (__OpenBSD__)
 
 /*
  * UnixWare 2.1 needs _KMEMUSER to access some flags for STREAMS. Maybe other
@@ -43,25 +34,6 @@ static const char sccsid[] USED = "@(#)shl.sl	1.29 (gritter) 12/25/06";
 #ifndef	sun
 #define	_KMEMUSER
 #endif
-
-#include	<sys/types.h>
-#include	<termios.h>
-
-/*
- * Structure for a single shell layer.
- */
-struct layer {
-	struct layer	*l_prev;	/* previous node in layer list */
-	struct layer	*l_next;	/* next node in layer list */
-	struct termios	l_tio;		/* termios struct of layer */
-	char		l_name[9];	/* name of layer */
-	char		l_line[64];	/* device name for tty */
-	pid_t		l_pid;		/* pid/pgid of layer */
-	int		l_pty;		/* pty master */
-	int		l_blk;		/* output is blocked */
-};
-
-extern int	sysv3;
 
 #ifdef	__dietlibc__
 #define	_XOPEN_SOURCE	600L
@@ -74,6 +46,7 @@ extern int	sysv3;
  * is collected by the same mechanism in reverse direction.
  */
 
+#include	"shl.h"
 #include	<sys/wait.h>
 #include	<sys/stat.h>
 #include	<sys/ioctl.h>
@@ -185,13 +158,13 @@ struct termios	otio;			/* old terminal attributes */
 struct termios	dtio;			/* default terminal attributes */
 struct termios	rtio;			/* raw terminal attributes */
 struct winsize	winsz;			/* window sizes */
-void		(*oldhup)(int);		/* old SIGHUP handler */
-void		(*oldint)(int);		/* old SIGINT handler */
-void		(*oldquit)(int);	/* old SIGQUIT handler */
-void		(*oldttou)(int);	/* old SIGTTOU handler */
-void		(*oldtstp)(int);	/* old SIGTSTP handler */
-void		(*oldttin)(int);	/* old SIGTTIN handler */
-void		(*oldwinch)(int);	/* old SIGWINCH handler */
+void		(*oldhup)();		/* old SIGHUP handler */
+void		(*oldint)();		/* old SIGINT handler */
+void		(*oldquit)();		/* old SIGQUIT handler */
+void		(*oldttou)();		/* old SIGTTOU handler */
+void		(*oldtstp)();		/* old SIGTSTP handler */
+void		(*oldttin)();		/* old SIGTTIN handler */
+void		(*oldwinch)();		/* old SIGWINCH handler */
 
 /*
  * Common english error messages.
@@ -661,8 +634,7 @@ doinput(void)
 			static char hadlnext;
 
 #ifdef	VLNEXT
-			if (c && (c&0377) == (lcur->l_tio.c_cc[VLNEXT]&0377) &&
-					hadlnext == 0) {
+			if (c && (c&0377) == (lcur->l_tio.c_cc[VLNEXT]&0377)) {
 				hadlnext = c;
 			} else
 #endif	/* VLNEXT */
@@ -940,27 +912,12 @@ llist(struct layer *l)
 int
 lpslist(struct layer *l)
 {
-	pid_t	pid;
-	int	status;
+	int ret;
 
 	llist(l);
-	switch (pid = fork()) {
-	case -1:
-		return 1;
-	default:
-		while (waitpid(pid, &status, 0) != pid);
-		msg("");
-		break;
-	case 0:
-		putenv("PATH=" SV3BIN ":" DEFBIN ":/bin:/usr/bin");
-		if (sysv3 && getenv("SYSV3") == NULL)
-			putenv("SYSV3=set");
-		dup2(2, 1);
-		execlp("ps", "ps", "-f", "-t", &l->l_line[5], NULL);
-		msg("no ps command found");
-		_exit(0177);
-	}
-	return status;
+	ret = pslist(l, msg);
+	msg("");
+	return ret;
 }
 
 /*
@@ -1568,8 +1525,7 @@ struct command commands[] = {
 		NULL, 0 }
 };
 
-#else	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__, __DragonFly__,
-	 __APPLE__ */
+#else	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__ */
 
 #include <stdio.h>
 
@@ -1580,5 +1536,4 @@ main(void)
 	return 1;
 }
 
-#endif	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__, __DragonFly__,
-	 __APPLE__ */
+#endif	/* __FreeBSD__, __hpux, _AIX, __NetBSD__, __OpenBSD__ */

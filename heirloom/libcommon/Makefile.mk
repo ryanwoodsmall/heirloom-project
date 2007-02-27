@@ -6,8 +6,7 @@ OBJ = asciitype.o ib_alloc.o ib_close.o ib_free.o ib_getlin.o ib_getw.o \
 	sigset.o signal.o sigrelse.o sighold.o sigignore.o sigpause.o \
 	getopt.o pfmt.o vpfmt.o setlabel.o setuxlabel.o pfmt_label.o sysv3.o
 libcommon.a: headers $(OBJ)
-	$(AR) -rv $@ $(OBJ)
-	$(RANLIB) $@
+	$(AR) -rv libcommon.a $(OBJ)
 
 CHECK: CHECK.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LARGEF) -E CHECK.c >CHECK

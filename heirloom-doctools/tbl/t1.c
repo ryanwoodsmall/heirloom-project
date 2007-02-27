@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t1.c	1.12 (gritter) 9/8/06
+ * Sccsid @(#)t1.c	1.9 (gritter) 8/13/05
  */
 
  /* t1.c: main control and input switching */
@@ -73,7 +73,7 @@ size_t linesize = 0;
 /* required by GCOS because "stdout" is set by troff preprocessor */
 tabin=stdin; tabout=stdout;
 setinp(argc,argv);
-while (gets1(&line, &line, &linesize))
+while (gets1(&line, &linesize))
 	{
 	fprintf(tabout, "%s\n",line);
 	if (prefix(".TS", line))
@@ -117,8 +117,6 @@ swapin(void)
 			}
 		if (match("-TX", *sargv))
 			pr1403=1;
-		else if (match("-g", *sargv))
-			Graphics=1;
 		else {
 			(void) fprintf(stderr, "%s: Invalid option "
 			    "(%s).\n", progname, *sargv);
@@ -139,7 +137,6 @@ swapin(void)
 /* file names are all put into f. by the GCOS troff preprocessor */
 	fprintf(tabout, ".ds f. %s\n",ifile);
 # endif
-	fprintf(tabout, ".lf 1 %s\n", ifile);
 	if (tabin==NULL)
 		error("Can't open file");
 	sargc--;

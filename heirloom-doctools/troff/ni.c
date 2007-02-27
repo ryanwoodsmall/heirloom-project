@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ni.c	1.47 (gritter) 12/17/06
+ * Sccsid @(#)ni.c	1.6 (gritter) 8/13/05
  */
 
 /*
@@ -47,28 +47,26 @@
  */
 
 #include "tdef.h"
-#include "ext.h"
 
 /* You may want to change these names */
 
 #ifdef NROFF
 
-char	*termtab = TABDIR "/tab.";  /* term type added in ptinit() */
-char	*fontfile = "";		/* not used */
+char	termtab[NS] = TABDIR "/tab.";  /* term type added in ptinit() */
+char	fontfile[NS] = "";	/* not used */
 char	devname[20] = "37";
 
 #else
 
-char	*termtab = FNTDIR;              /* rest added in ptinit() */
-char	*fontfile = FNTDIR;             /* rest added in casefp() */
-char	devname[20]	 = "ps";	/* default typesetter */
+char	termtab[NS] = FNTDIR;           /* rest added in ptinit() */
+char	fontfile[NS] = FNTDIR;          /* rest added in casefp() */
+char	devname[20]	 = "post";	/* default typesetter */
 
 #endif
+char	tmp_name[] = "/var/tmp/trtmpXXXXXX";
 char	obuf[OBUFSZ];	/* characters collected here for typesetter output */
 char	*obufp = obuf;
-int	NN;
-struct numtab *numtab;
-const struct numtab initnumtab[] = {
+struct numtab numtab[NN] = {
 	{ PAIR('%', 0) },
 	{ PAIR('n', 'l') },
 	{ PAIR('y', 'r') },
@@ -84,25 +82,21 @@ const struct numtab initnumtab[] = {
 	{ PAIR('s', 'b') },
 	{ PAIR('c', '.') },
 	{ PAIR('$', '$') },
-	{ 0 }
 };
 
 
 int	pto = 10000;
 int	pfrom = 1;
 int	print = 1;
-char	*nextf;
-int	NS;
-char	**mfiles;
+char	nextf[NS] = MACDIR "/";
+char	mfiles[NMF][NS];
 int	nmfi = 0;
-int	NMF;
 #ifndef NROFF
 int	oldbits = -1;
 #endif
 int	init = 1;
 int	fc = IMP;	/* field character */
 int	eschar = '\\';
-int	ecs = '\\';
 #ifdef	NROFF
 int	pl = 11*INCH;
 int	po = PO;
@@ -118,7 +112,6 @@ int	ascii = ASCII;
 int	ptid = PTID;
 int	lg = LG;
 int	pnlist[NPN] = { -1 };
-int	vpt = 1;
 
 
 int	*pnp = pnlist;
@@ -133,12 +126,8 @@ int	ldrch = LEADER;
 extern void	caseft(void), caseps(void), casevs(void), casefp(void),
        		casess(void), casecs(void), casebd(void), caselg(void);
 
-enum warn	warn = WARN_FONT;
-
-int	NM;
-struct contab *contab;
 #define	C(a,b)	{a, 0, (void(*)(int))b, 0}
-const struct contab initcontab[] = {
+struct contab contab[NM] = {
 	C(PAIR('d', 's'), caseds),
 	C(PAIR('a', 's'), caseas),
 	C(PAIR('s', 'p'), casesp),
@@ -160,7 +149,6 @@ const struct contab initcontab[] = {
 	C(PAIR('n', 'e'), casene),
 	C(PAIR('n', 'f'), casenf),
 	C(PAIR('c', 'e'), casece),
-	C(PAIR('r', 'j'), caserj),
 	C(PAIR('f', 'i'), casefi),
 	C(PAIR('i', 'n'), casein),
 	C(PAIR('l', 'l'), casell),
@@ -228,13 +216,10 @@ const struct contab initcontab[] = {
 	C(PAIR('l', 'f'), caself),
 	C(PAIR('d', 'b'), casedb),
 /*	C(PAIR('!', 0), casesy), */	/* synonym for .sy */
-	C(PAIR(XFUNC, 0), caseif),	/* while loop execution */
-	C(PAIR('c', 'p'), casecp),
-	C(0,              0)
 };
 
 
-tchar *oline;
+tchar oline[LNSIZE+1];
 
 /*
  * troff environment block
@@ -243,29 +228,7 @@ tchar *oline;
 struct	env env = {
 /* int	ics	 */	0,
 /* int	sps	 */	0,
-/* int	ses	 */	0,
 /* int	spacesz	 */	0,
-/* int	sesspsz  */	0,
-#ifndef	NROFF
-/* int	minsps	 */	0,
-/* int	minspsz  */	0,
-/* int	letspsz	 */	0,
-/* int	letsps	 */	0,
-/* int	lspmin	 */	0,
-/* int	lspmax	 */	0,
-/* int	lspnc	 */	0,
-/* int	lsplow	 */	0,
-/* int	lsphigh	 */	0,
-/* int	lspcur	 */	0,
-/* int	lsplast	 */	0,
-/* int	lshmin	 */	0,
-/* int	lshmax	 */	0,
-/* int	lshwid	 */	0,
-/* int	lshlow	 */	0,
-/* int	lshhigh	 */	0,
-/* int	lshcur	 */	0,
-#endif	/* !NROFF */
-/* int	fldcnt	 */	0,
 /* int	lss	 */	0,
 /* int	lss1	 */	0,
 /* int	ll	 */	0,
@@ -293,14 +256,8 @@ struct	env env = {
 /* int	c2	 */	'\'',
 /* int	ohc	 */	OHC,
 /* int	tdelim	 */	IMP,
-/* int	hyf	 */	1,
+/* int	hyf	 */	0,
 /* int	hyoff	 */	0,
-/* int	hlm	 */	-1,
-/* int	hlc	 */	0,
-/* int	hylen	 */	5,
-/* float hypp	 */	0,
-/* float hypp2	 */	0,
-/* float hypp3	 */	0,
 /* int	un1	 */	-1,
 /* int	tabc	 */	0,
 /* int	dotc	 */	'.',
@@ -309,17 +266,12 @@ struct	env env = {
 /* int	lastl	 */	0,
 /* int	nel	 */	0,
 /* int	admod	 */	0,
-/* int	adflg	 */	0,
-/* int	adspc	 */	0,
-/* int	pa	 */	0,
 /* tchar	*wordp	 */	0,
 /* int	spflg	 */	0,	/* probably to indicate space after punctuation needed */
-/* int	seflg	 */	0,
 /* tchar	*linep	 */	0,
 /* tchar	*wdend	 */	0,
 /* tchar	*wdstart	 */	0,
 /* int	wne	 */	0,
-/* int	wsp	 */	0,
 /* int	ne	 */	0,
 /* int	nc	 */	0,
 /* int	nb	 */	0,
@@ -330,22 +282,15 @@ struct	env env = {
 /* int	ul	 */	0,
 /* int	cu	 */	0,
 /* int	ce	 */	0,
-/* int	rj	 */	0,
-/* int	brnl	 */	0,
-/* int	brpnl	 */	0,
 /* int	in	 */	0,
 /* int	in1	 */	0,
 /* int	un	 */	0,
 /* int	wch	 */	0,
-/* int	rhang	 */	0,
 /* int	pendt	 */	0,
 /* tchar	*pendw	 */	(tchar *)0,
 /* int	pendnf	 */	0,
 /* int	spread	 */	0,
-/* int	dpenal	 */	0,
 /* int	it	 */	0,
-/* int	itc	 */	0,
 /* int	itmac	 */	0,
-/* int	lnsize	 */	0,
-/* int	wdsize	 */	0,
+/* int	lnsize	 */	LNSIZE,
 };

@@ -1,5 +1,5 @@
 /*	from Unix 7th Edition sed	*/
-/*	Sccsid @(#)sed0.c	1.64 (gritter) 3/12/05>	*/
+/*	Sccsid @(#)sed0.c	1.59 (gritter) 7/24/04>	*/
 /*
  * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
  *
@@ -140,9 +140,9 @@ main(int argc, char **argv)
 #ifdef	__GLIBC__
 	putenv("POSIXLY_CORRECT=1");
 #endif	/* __GLIBC__ */
-#if defined (SUS) || defined (SU3) || defined (S42)
+#if defined (SUS) || defined (S42)
 	setlocale(LC_COLLATE, "");
-#endif	/* SUS || SU3 || S42 */
+#endif	/* SUS || S42 */
 	setlocale(LC_CTYPE, "");
 	multibyte = MB_CUR_MAX > 1;
 	ycomp = multibyte ? ycomp_mb : ycomp_sb;
@@ -331,8 +331,7 @@ swit:
 
 				tp = L(lab)->asc;
 				while((*tp++ = *cp++))
-					if(tp >= &(L(lab)->asc[sizeof
-								L(lab)->asc]))
+					if(tp >= &(L(lab)->asc[8]))
 						fatal(LTL, linebuf);
 				*--tp = '\0';
 
@@ -413,8 +412,7 @@ jtcommon:
 				}
 				tp = L(lab)->asc;
 				while((*tp++ = *cp++))
-					if(tp >= &(L(lab)->asc[sizeof
-								L(lab)->asc]))
+					if(tp >= &(L(lab)->asc[8]))
 						fatal(LTL, linebuf);
 				cp--;
 				*--tp = '\0';
@@ -455,13 +453,13 @@ jtcommon:
 				P(rep)->command = RCOM;
 				if(P(rep)->ad2)
 					fatal(AD1MES, linebuf);
-#if !defined (SUS) && !defined (SU3)
+#ifndef	SUS
 				if(*cp++ != ' ')
 					fatal(CGMES, linebuf);
-#else	/* SUS, SU3 */
+#else	/* SUS */
 				while (*cp == ' ' || *cp == '\t')
 					cp++;
-#endif	/* SUS, SU3 */
+#endif	/* SUS */
 				text(&P(rep)->bptr.re1);
 				break;
 
@@ -515,7 +513,7 @@ jtcommon:
 					}
 					goto sloop;
 				}
-#if !defined (SUS) && !defined (SU3)
+#ifndef	SUS
 				if (P(rep)->gfl > 0 && P(rep)->gfl > 512)
 			fatal("Suffix too large - 512 max: %s", linebuf);
 #endif
@@ -756,8 +754,7 @@ cmp(const char *a, const char *b)
 static void
 text(char **textbuf)
 {
-	register char	*p, *oq;
-	char *q;
+	register char	*p, *q;
 	size_t sz = 128;
 
 	*textbuf = smalloc(sz);
@@ -765,18 +762,14 @@ text(char **textbuf)
 	q = cp;
 	for(;;) {
 
-		oq = q;
-		if(fetch(&q) == '\\') {
-			oq = q;
-			fetch(&q);
-		}
-		while(oq < q)
-			*p++ = *oq++;
-		if(p[-1] == '\0') {
+		if((*p = *q++) == '\\')
+			*p = *q++;
+		if(*p == '\0') {
 			cp = --q;
 			return;
 		}
 		check(p, *textbuf, sz, 128, null)
+		p++;
 	}
 }
 
@@ -1023,7 +1016,7 @@ scalloc(size_t nmemb, size_t size)
 	return p;
 }
 
-#if defined (SUS) || defined (SU3) || defined (S42)
+#if defined (SUS) || defined (S42)
 static char *
 sed_compile(char **ep)
 {
@@ -1110,9 +1103,9 @@ sed_compile(char **ep)
 #ifdef	REG_ANGLES
 		reflags |= REG_ANGLES;
 #endif	/* REG_ANGLES */
-#if defined (SU3) && defined (REG_AVOIDNULL)
-		reflags |= REG_AVOIDNULL;
-#endif	/* SU3 && AVOIDNULL */
+#ifdef	REG_BADRANGE
+		reflags |= REG_BADRANGE;
+#endif	/* REG_BADRANGE */
 		if (regcomp(&re->r_preg, pat, reflags) != 0)
 			re = (struct re_emu *)badp;
 	} else
@@ -1122,7 +1115,7 @@ sed_compile(char **ep)
 		p++;
 	return p;
 }
-#else	/* !SUS, !SU3, !S42 */
+#else	/* !SUS, !S42 */
 static char *
 sed_compile(char **ep)
 {
@@ -1142,7 +1135,7 @@ sed_compile(char **ep)
 	**ep = circf;
 	return p;
 }
-#endif	/* !SUS, !SU3, !S42 */
+#endif	/* !SUS, !S42 */
 
 wint_t
 wc_get(char **sc, int move)
@@ -1233,13 +1226,13 @@ wfile(void)
 {
 	int	i;
 
-#if !defined (SUS) && !defined (SU3)
+#ifndef	SUS
 	if(*cp++ != ' ')
 		fatal(CGMES, linebuf);
-#else	/* SUS, SU3 */
+#else	/* SUS */
 	while (*cp == ' ' || *cp == '\t')
 		cp++;
-#endif	/* SUS, SU3 */
+#endif	/* SUS */
 
 	text(&fname[nfiles]);
 	for(i = nfiles - 1; i >= 0; i--)

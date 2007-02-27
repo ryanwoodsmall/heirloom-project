@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)word.c	1.7 (gritter) 6/22/05
+ * Sccsid @(#)word.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "word.c	1.21	05/06/08 SMI"	 SVr4.0 1.11.2.2 */
 /*
@@ -48,8 +48,7 @@ static int	readb(struct fileblk *, int, int);
 /* ========	character handling for command lines	======== */
 
 
-int 
-word(void)
+word()
 {
 	register unsigned int	c, d, cc;
 	struct argnod	*arg = (struct argnod *)locstak();
@@ -243,8 +242,7 @@ word(void)
 	return (wdval);
 }
 
-unsigned int 
-skipwc(void)
+unsigned int skipwc()
 {
 	register unsigned int c;
 
@@ -253,8 +251,7 @@ skipwc(void)
 	return (c);
 }
 
-unsigned int 
-nextwc(void)
+unsigned int nextwc()
 {
 	register unsigned int	c, d;
 
@@ -269,18 +266,19 @@ retry:
 	return (d);
 }
 
-unsigned char *
-readw(wchar_t d)
+unsigned char *readw(d)
+wchar_t	d;
 {
 	static unsigned char c[MULTI_BYTE_MAX + 1];
 	int length;
+	wchar_t l;
 	if (isascii(d)) {
 		c[0] = d;
 		c[1] = '\0';
 		return (c);
 	}
 
-	length = putb((char *)c, d);
+	length = wctomb((char *)c, d);
 	if (length <= 0) {
 		c[0] = (unsigned char)d;
 		length = 1;
@@ -289,13 +287,14 @@ readw(wchar_t d)
 	return (c);
 }
 
-unsigned int 
-readwc(void)
+unsigned int
+readwc()
 {
 	wchar_t	c;
 	int	len;
 	struct fileblk	*f;
-	int	i, mlen = 0;
+	int	mbmax = MB_CUR_MAX;
+	int	i, mlen;
 
 	if (peekn) {
 		c = peekn & 0x7fffffff;
@@ -340,15 +339,14 @@ retry:
 			return (c);
 		}
 
-		for (i = 1; i <= mb_cur_max; i++) {
+		for (i = 1; i <= mbmax; i++) {
 			int	rest;
 			if ((rest = f->fend - f->fnxt) < i) {
 				/*
 				 * not enough bytes available
 				 * f->fsiz could be BUFFERSIZE or 1
-				 * since mb_cur_max is enough smaller than
-				 * BUFFERSIZE, this loop won't overrun
-				 * the f->fbuf buffer.
+				 * since mbmax is enough smaller than BUFFERSIZE,
+				 * this loop won't overrun the f->fbuf buffer.
 				 */
 				len = readb(f,
 					(f->fsiz == 1) ? 1 : (f->fsiz - rest),
@@ -356,16 +354,12 @@ retry:
 				if (len == 0)
 					break;
 			}
-			mlen = mb_cur_max > 1 ?
-				mbtowc(&c, (char *)f->fnxt, i) :
-				(c = *f->fnxt & 0377, c != 0);
+			mlen = mbtowc(&c, (char *)f->fnxt, i);
 			if (mlen > 0)
 				break;
-			if (mb_cur_max > 1)
-				mbtowc(NULL, NULL, 0);
 		}
 
-		if (i > mb_cur_max) {
+		if (i > mbmax) {
 			/*
 			 * enough bytes available but cannot be converted to
 			 * a valid wchar.
@@ -412,7 +406,7 @@ readb(struct fileblk *f, int toread, int rest)
 		 * copies the remaining 'rest' bytes from f->fnxt
 		 * to f->fbuf
 		 */
-		memcpy(f->fbuf, f->fnxt, rest);
+		(void) memcpy(f->fbuf, f->fnxt, rest);
 		f->fnxt = f->fbuf;
 		f->fend = f->fnxt + rest;
 		f->nxtoff = 0;

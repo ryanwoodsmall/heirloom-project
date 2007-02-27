@@ -71,13 +71,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diff.c	1.24 (gritter) 3/27/05>	*/
+/*	Sccsid @(#)diff.c	1.20 (gritter) 7/11/04>	*/
 /*	from 4.3BSD diff.c 4.6 4/3/86	*/
 
 #include "diff.h"
 #include <unistd.h>
 #include <locale.h>
-#include <iblok.h>
 /*
  * diff - driver and subroutines
  */
@@ -90,7 +89,6 @@ const char	*argv0;
 
 static void	usage(void);
 static void	xadd(const char *);
-static void	Xadd(const char *);
 
 int
 main(int argc, char **argv)
@@ -106,7 +104,7 @@ main(int argc, char **argv)
 	status = 2;
 	argv0 = argv[0];
 	diffargv = argv;
-	while ((i = getopt(argc, argv, ":D:efnbBwitcC:uU:hS:rslNx:a12pX:"))
+	while ((i = getopt(argc, argv, ":D:efnbBwitcC:uU:hS:rslNx:a12"))
 			!= EOF) {
 		switch (i) {
 #ifdef notdef
@@ -218,12 +216,6 @@ main(int argc, char **argv)
 		case 'a':
 			aflag++;
 			break;
-		case 'p':
-			pflag++;
-			break;
-		case 'X':
-			Xadd(optarg);
-			break;
 		default:
 			if (invalid == 0 && !sysv3)
 				invalid = optopt;
@@ -241,19 +233,6 @@ main(int argc, char **argv)
 	if (invalid) {
 		fprintf(stderr, "%s: invalid option -%c\n", progname, invalid);
 		usage();
-	}
-	if (pflag) {
-		if (opt == D_UNIFIED || opt == D_CONTEXT)
-			/*EMPTY*/;
-		else if (opt == 0) {
-			opt = D_CONTEXT;
-			context = 3;
-		} else {
-			fprintf(stderr,
-				"%s: -p doesn't support -e, -f, -n, or -I\n",
-		    		progname);
-			done();
-		}
 	}
 	if (hflag && opt) {
 		fprintf(stderr,
@@ -303,7 +282,7 @@ static void
 usage(void)
 {
 	fprintf(stderr, "\
-usage: %s [ -bcefhilnrstw -C num -D string -S name ] file1 file2\n",
+usage: %s [ -abBcefhilNnrstuw12 -CU num -D string -S name -x pat ] file1 file2\n",
 		progname);
 	done();
 }
@@ -433,36 +412,6 @@ xadd(const char *cp)
 	xp->x_pat = cp;
 	xp->x_nxt = xflag;
 	xflag = xp;
-}
-
-static void
-Xadd(const char *name)
-{
-	struct iblok	*ip;
-	char	*line = NULL;
-	size_t	size = 0, len;
-
-	if (name[0] == '-' && name[1] == '\0')
-		ip = ib_alloc(0, 0);
-	else
-		ip = ib_open(name, 0);
-	if (ip == NULL) {
-		fprintf(stderr, "%s: -X %s: %s\n", progname, name,
-				strerror(errno));
-		done();
-	}
-	while ((len = ib_getlin(ip, &line, &size, realloc)) != 0) {
-		if (line[len-1] == '\n')
-			line[--len] = '\0';
-		xadd(line);
-		line = NULL;
-		size = 0;
-	}
-	free(line);
-	if (ip->ib_fd)
-		ib_close(ip);
-	else
-		ib_free(ip);
 }
 
 void

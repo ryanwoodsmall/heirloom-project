@@ -21,36 +21,23 @@ Solaris         8 and above; Sun C, gcc
 Open UNIX       8.0.0; native (cc), LKP (gcc)
 HP-UX           B.11.11, B.11.22, B.11.23; HP-UX ANSI C, gcc
 AIX             5.1; VisualAge C, gcc
-FreeBSD         4.9, 5.2.1, 6.1
-NetBSD          1.6, 2.0, 3.0
-OpenBSD         3.4, 3.8
-DragonFlyBSD    1.3.7-DEVELOPMENT
-Mac OS X        10.4.3 and above
+FreeBSD         4.9, 5.2.1
+NetBSD          1.6
+OpenBSD         3.4
 
 The following prerequisites are necessary:
 
-yacc and lex    Several of the included yacc and lex programs need to
-                access internals of the yacc and lex implementations
-                beyond the respective POSIX specifications. This has
-                been made to work with Unix yacc and lex as well as
-                with many versions of Berkeley yacc, bison, and flex.
-                However, recent changes in these programs may result
-                in incompatibilities. If this happens, install the
-                "Heirloom Development Tools" package first and use
-                the yacc and lex versions provided with it. You could
-                also fix the problem on your own, but now that portable
-                Open Source versions of Unix yacc and lex are available,
-                such changes can no longer be considered important, and
-                will not be made as part of the regular maintenance of
-                this project.
+flex            <http://www.gnu.org/software/flex>. Unix lex cannot
+                be used here.
+a yacc command  The commercial vendors' yacc, Berkeley yacc, and bison
+                are all okay.
+GNU or AIX make <http://www.gnu.org/software/make>. The build system
+                is designed to be portable, but in practice, other make
+                commands have been found to be so flawed that none of
+                them has worked yet.
 
 The following prerequisites are optional:
 
-Bourne shell    It is recommended that the Heirloom Bourne shell from
-                <http://heirloom.sourceforge.net/sh.html> is installed
-                first. The tools will work with any shell, but use of the
-                Bourne shell ensures maximum compatibility with traditional
-                Unix behavior.
 gzip            <http://www.gzip.org/>. Invoked by cpio/pax, file, and
                 tar when a gzip compressed file is encountered.
 bzip2           <http://sources.redhat.com/bzip2>. Invoked by cpio/pax,
@@ -63,10 +50,8 @@ libbz2          <http://sources.redhat.com/bzip2>. It is needed if
                 compressed entries in zip files.
 
 Unless you are a developer, it is strongly recommended that you use the
-RPM packaging system to build and install the Heirloom Toolchest on Linux.
-This requires the "heirloom-devtools" package to be installed; its source
-code is available from <http://heirloom.sourceforge.net/devtools.html>.
-Then simply execute
+rpm command to build and install the Heirloom Toolchest on Linux. Simply
+execute
 
         rpmbuild -tb heirloom-<version>.tar.bz2
 
@@ -74,21 +59,28 @@ wait a few minutes and install the resulting rpm that is found in
 /usr/src/redhat/RPMS/i386/heirloom-<version>-1.i386.rpm (or wherever
 your vendor's setup puts such files). Then access the tools by prefixing
 your PATH with /usr/5bin and skip the rest of this section. (With older
-versions of rpm you need to use 'rpm' instead of 'rpmbuild'.) The tools
-in the package will automatically use the Heirloom Bourne shell if it is
-installed at compilation time; the Heirloom Toolchest package then
-requires the Heirloom Bourne shell package to be also installed.
+versions of rpm you need to use 'rpm' instead of 'rpmbuild'.)
 
-If your system lacks rpm or if you want to make changes to the Heirloom
-Toolchest, you have to build it manually. The first thing to understand
-is the build system. This is actually quite simple: Every directory
-contains a file named Makefile.mk that includes the directory-specific
-make instructions. To generate the real Makefile, configuration
+On Solaris and Open UNIX, you can build a package for pkgadd from
+the sources. Extract them, change to the heirloom-<version> directory,
+and execute
+
+        gmake pkg
+
+This will create a file heirloom.pkg which you can then give to pkgadd.
+On Solaris, you will have to delete the existing symbolic link /usr/5bin
+to install it.
+
+If your system lacks rpm or pkgadd or if you want to make changes to
+the Heirloom Toolchest, you have to build it manually. The first thing
+to understand is the build system. This is actually quite simple: Every
+directory contains a file named Makefile.mk that includes the directory-
+specific make instructions. To generate the real Makefile, configuration
 settings are prepended to the directory-specific file. You have to edit
 these configuration settings before you start compiling; they are
 located in the file build/mk.config which is also in make syntax.
-Follow the descriptions in this file and select appropriate values for
-your system.
+Follow the descriptions in this file and select appropriate values
+for your system.
 
 Be very careful at this step! If you overwrite your system utilities
 or put the Heirloom Toolchest at an early place in your system's PATH,
@@ -250,18 +242,18 @@ Extending the Heirloom Toolchest
 
 If you want to add an extension to a utility, just go on and do it - as
 you've read in the section above, accessibility for hacking is intended
-to be easy. For my version, though, the concept is to have not too many
-extensions. I sometimes include extensions because the functionality is
-really expected these days (such as diff -u), adds a real advantage for
-interactive use (such as colored output for ls), or is widely used for
-convenience and does not add much overhead (such as grep -r). I am not
-much interested in extensions that change the behavior of tools for use
-in scripts, though. Such extensions lead to subtly incompatible shell
-scripts, and these should be avoided by all means. It is much better to
-make a fresh start by creating a new utility with a different name for
-such cases. Such utilities are then beyond the scope of this collection.
-In general, chances are rather low that I will accept your extension for
-my version. But that doesn't mean that you should not do it for yourself.
+to be easy. If you want to have it included in my version, however, read
+on here. The Heirloom Toolchest provides the traditional Unix utilities,
+but not much beyond. And it will remain this way. While I've included a
+few extensions that are in really wide use today and are justified since
+it would be difficult to get their functionality by other means (such as
+diff -u), I will not add extensions just for the convenience of people.
+For example, the Heirloom Toolchest 'grep' command will not support the
+'-r' option of GNU grep, because one can have the same result by using
+'find' in addition and can put that in a small script if one deems it
+too much to type. In general, chances are quite low that I will accept
+your extension for my version. But that doesn't mean that you should
+not do it for yourself.
 
 Reporting bugs
 ==============
@@ -283,11 +275,11 @@ the following to be sure not to report a feature:
   Toolchest is oriented on System V behavior. Verify that real System V
   derivatives behave differently before reporting.
 
-- If you are using one of the POSIX personalities and the specification
-  says something different, it is likely to be a bug. But be careful to
-  read the respective specification itself; some incompatibilities to
-  the wording of the specification may even exist in certified systems,
-  so you cannot rely on a vendor's implementation or documentation here.
+- If you are using the POSIX.2 personality and the specification says
+  something different, it is likely to be a bug. But be careful to read
+  the specification itself; there are quite a few incompatibilities to
+  the wording of POSIX.2 even in certified systems, so you cannot rely
+  on a vendor's implementation or documentation here.
 
 If you went through these statements and you're still sure that it is
 a bug, report it.
@@ -296,4 +288,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                                2/24/07
+<Gunnar.Ritter@pluto.uni-freiburg.de>                           11/7/04

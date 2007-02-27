@@ -42,7 +42,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*	Sccsid @(#)dc.c	1.21 (gritter) 12/25/06>	*/
+/*	Sccsid @(#)dc.c	1.18 (gritter) 11/21/04>	*/
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -301,10 +301,10 @@ casediv:
 			release(basptr);
 			if(sign == 1)obase = (long)-l;
 			basptr = p;
-			outdit = (int (*)(struct blk *, int, int))bigot;
+			outdit = (int (*)())bigot;
 			if(n == 1 && sign == 0){
 				if(c <= 16){
-					outdit = (int (*)(struct blk *, int, int))hexot;
+					outdit = (int (*)())hexot;
 					fw = 1;
 					fw1 = 0;
 					ll = 68;
@@ -451,8 +451,8 @@ casediv:
 			p = pop();
 			EMPTY;
 			if(c >= ARRAYST){
-				q = copy(p,length(p));
-				for(n = 0;n < PTRSZ;n++)sputc(q,0);
+				q = copy(p,PTRSZ);
+				for(n = 0;n < PTRSZ-1;n++)sputc(q,0);
 				release(p);
 				p = q;
 			}
@@ -579,8 +579,8 @@ sempty:
 					}
 				}
 			}
-			q = salloc(1);
-			sputc(q, 0);
+			q = salloc(PTRSZ);
+			putwd(q, (struct blk *)0);
 			pushp(q);
 			continue;
 		case 'x':
@@ -635,7 +635,7 @@ execute:
 }
 
 struct blk *
-div(struct blk *ddivd,struct blk *ddivr)
+dcdiv(struct blk *ddivd,struct blk *ddivr)
 {
 	int divsign,remsign,offset,divcarry = 0;
 	int carry, dig = 0,magic,d = 0,dd;
@@ -824,7 +824,7 @@ removr(struct blk *p,int n)
 }
 
 struct blk *
-sqrt(struct blk *p)
+dcsqrt(struct blk *p)
 {
 	struct blk *t;
 	struct blk *r,*q,*s;
@@ -875,7 +875,7 @@ sqrt(struct blk *p)
 }
 
 struct blk *
-exp(struct blk *base,struct blk *ex)
+dcexp(struct blk *base,struct blk *ex)
 {
 	register struct blk *r,*e,*p;
 	struct blk *e1,*t,*cp;
@@ -978,7 +978,7 @@ init(int argc,char **argv)
 	readptr = &readstk[0];
 	k=0;
 	sp = sptr = &symlst[0];
-	while(sptr < &symlst[TBLSZ]){
+	while(sptr < &symlst[TBLSZ-1]){
 		sptr->next = ++sp;
 		sptr++;
 	}
@@ -1295,7 +1295,7 @@ print(struct blk *hptr)
 		q = dcdiv(p,basptr);
 		release(p);
 		p = q;
-		(*outdit)(rem,0,1);
+		(*outdit)(rem,0);
 	}
 	release(p);
 	fsfile(strptr);
@@ -1313,7 +1313,7 @@ print(struct blk *hptr)
 		release(dec);
 		dec = getdec(q,sc);
 		p = removc(q,sc);
-		(*outdit)(p,1,ct+1<dout);
+		(*outdit)(p,1);
 	}while(++ct < dout);
 	release(dec);
 	rewind(strptr);
@@ -1358,16 +1358,15 @@ void
 tenot(struct blk *p,int sc)
 {
 	register int c,f;
-	char	b[3];
 
 	fsfile(p);
 	f=0;
 	while((sfbeg(p) == 0) && ((p->rd-p->beg-1)*2 >= sc)){
 		c = sbackc(p);
-		if((c<10) && (f == 1))snprintf(b, sizeof b, "0%d",c);
-		else snprintf(b, sizeof b, "%d",c);
+		if((c<10) && (f == 1))printf("0%d",c);
+		else printf("%d",c);
 		f=1;
-		TEST2(b);
+		TEST2;
 	}
 	if(sc == 0){
 		printf("\n");
@@ -1376,8 +1375,8 @@ tenot(struct blk *p,int sc)
 	}
 	if((p->rd-p->beg)*2 > sc){
 		c = sbackc(p);
-		snprintf(b, sizeof b, "%d.",c/10);
-		TEST2(b);
+		printf("%d.",c/10);
+		TEST2;
 		OUTC(c%10 +'0');
 		sc--;
 	}
@@ -1392,10 +1391,10 @@ tenot(struct blk *p,int sc)
 	}
 	while(sc > 1){
 		c = sbackc(p);
-		if(c<10)snprintf(b, sizeof b, "0%d",c);
-		else snprintf(b, sizeof b, "%d",c);
+		if(c<10)printf("0%d",c);
+		else printf("%d",c);
 		sc -= 2;
-		TEST2(b);
+		TEST2;
 	}
 	if(sc == 1){
 		OUTC(sbackc(p)/10 +'0');
@@ -1425,7 +1424,7 @@ oneot(struct blk *p,int sc,char ch)
 }
 
 void
-hexot(struct blk *p,int flg,int unused)
+hexot(struct blk *p,int flg)
 {
 	register int c;
 	rewind(p);
@@ -1445,7 +1444,7 @@ hexot(struct blk *p,int flg,int unused)
 }
 
 void
-bigot(struct blk *p,int flg,int putspc)
+bigot(struct blk *p,int flg)
 {
 	register struct blk *t,*q;
 	register int l = 0;
@@ -1492,8 +1491,7 @@ bigot(struct blk *p,int flg,int putspc)
 			sputc(strptr,'-');
 		}
 	}
-	if (putspc)
-		sputc(strptr,' ');
+	sputc(strptr,' ');
 	return;
 }
 
@@ -2040,7 +2038,7 @@ char *
 nalloc(register char *p,unsigned nbytes)
 {
 	register char *q, *r;
-	q = r = malloc(nbytes ? nbytes : 1);
+	q = r = malloc(nbytes);
 	if(q==0)
 		return(0);
 	while(nbytes--)

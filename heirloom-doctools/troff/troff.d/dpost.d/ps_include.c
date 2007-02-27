@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ps_include.c	1.10 (gritter) 10/15/06
+ * Sccsid @(#)ps_include.c	1.5 (gritter) 8/13/05
  */
 
 /*
@@ -41,27 +41,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include "gen.h"
-#include "ext.h"
-#include "path.h"
-#include "asciitype.h"
+#include "ps_include.h"
 
 
 #define var(x)		fprintf(fout, "/%s %g def\n", #x, x)
-#define	has(word)	_has(buf, word)
+#define has(word)	(strncmp(buf, word, strlen(word)) == 0)
 #define grab(n)		((Section *)(nglobal \
 			? realloc((char *)global, n*sizeof(Section)) \
 			: calloc(n, sizeof(Section))))
 
 
-static char	*buf;
-static size_t	bufsize;
+char	buf[512];
 typedef struct {long start, end;} Section;
 
+static void print(FILE *, char **);
 static void copy(FILE *, FILE *, Section *);
-static char *_has(const char *, const char *);
-static void addfonts(char *);
 
 /*****************************************************************************/
 
@@ -70,7 +65,6 @@ void
 ps_include(
 
 
-    const char	*name,			/* file name */
     FILE	*fin, FILE *fout,	/* input and output files */
     int		page_no,		/* physical page number from *fin */
     int		whiteout,		/* erase picture area */
@@ -85,7 +79,6 @@ ps_include(
 
 {
 
-    static int	gotinclude;
 
     int		foundpage = 0;		/* found the page when non zero */
     int		nglobal = 0;		/* number of global defs so far */
@@ -98,17 +91,6 @@ ps_include(
     double	o = outline != 0;
     double	s = scaleboth != 0;
     int		i;			/* loop index */
-    int		lineno = 0;
-    int		epsf = 0;
-    int		hires = 0;
-    int		state = 0;
-    int		indoc = 0;
-    char	*bp, *cp;
-    enum {
-	    NORMAL,
-	    DOCUMENTFONTS,
-	    DOCUMENTNEEDEDRESOURCES,
-    } cont = NORMAL;
 
 
 /*
@@ -125,10 +107,6 @@ ps_include(
  *
  */
 
-	if (gotinclude == 0 && access(PSINCLUDEFILE, 04) == 0) {
-		doglobal(PSINCLUDEFILE);
-		gotinclude++;
-	}
 
 	llx = lly = 0;			/* default BoundingBox - 8.5x11 inches */
 	urx = 72 * 8.5;
@@ -139,38 +117,12 @@ ps_include(
 	prolog.start = prolog.end = 0;
 	page.start = page.end = 0;
 	trailer.start = 0;
-	fseek(fin, 0L, SEEK_SET);
+	fseek(fin, 0L, 0);
 
-	while ( psgetline(&buf, &bufsize, NULL, fin) != NULL ) {
-		if (++lineno == 1 && strncmp(buf, "%!PS-", 5) == 0) {
-			for (bp = buf; !spacechar(*bp&0377); bp++);
-			while (*bp && *bp != '\n' && *bp != '\r' &&
-					spacechar(*bp&0377))
-				bp++;
-			if (strncmp(bp, "EPSF-", 5) == 0)
-				epsf++;
-		}
-		if (state == 0 && (*buf == '\n' || has("%%EndComments") ||
-				buf[0] != '%' || buf[1] == ' ' ||
-				buf[1] == '\t' || buf[1] == '\r' ||
-				buf[1] == '\n')) {
-			state = 1;
+	while ( fgets(buf, sizeof(buf), fin) != NULL )
+		if (!has("%%"))
 			continue;
-		}
-		if (buf[0] != '%' || buf[1] != '%')
-			continue;
-		if (state != 1 && (bp = has("%%+")) != NULL) {
-			switch (cont) {
-			case DOCUMENTFONTS:
-				addfonts(bp);
-				break;
-			case DOCUMENTNEEDEDRESOURCES:
-				goto needres;
-			}
-			continue;
-		} else
-			cont = NORMAL;
-		if (has("%%Page: ")) {
+		else if (has("%%Page: ")) {
 			if (!foundpage)
 				page.start = ftell(fin);
 			sscanf(buf, "%*s %*s %d", &i);
@@ -186,66 +138,13 @@ ps_include(
 			}
 			if (!foundpage)
 				page.start = ftell(fin);
-		} else if (state != 1 && !indoc &&
-				has("%%BoundingBox:") && !hires) {
+		} else if (has("%%BoundingBox:"))
 			sscanf(buf, "%%%%BoundingBox: %lf %lf %lf %lf", &llx, &lly, &urx, &ury);
-			if (epsf)
-				epsf++;
-		} else if (state != 1 && !indoc && has("%%HiResBoundingBox:")) {
-			sscanf(buf, "%%%%HiResBoundingBox: %lf %lf %lf %lf", &llx, &lly, &urx, &ury);
-			hires++;
-			if (epsf)
-				epsf++;
-		} else if (has("%%LanguageLevel:")) {
-			int	n;
-			sscanf(buf, "%%%%LanguageLevel: %d", &n);
-			LanguageLevel = MAX(LanguageLevel, n);
-		} else if ((bp = has("%%DocumentNeededFonts:")) != NULL ||
-				(bp = has("%%DocumentFonts:")) != NULL) {
-			cont = DOCUMENTFONTS;
-			addfonts(bp);
-		} else if ((bp = has("%%DocumentNeededResources:")) != NULL) {
-		needres:
-			if ((cp = _has(bp, "font")))
-				addfonts(cp);
-			else {
-				for (cp = bp; *cp && *cp != '\n' &&
-						*cp != '\r'; cp++);
-				*cp = '\0';
-				needresource("%s", bp);
-			}
-			cont = DOCUMENTNEEDEDRESOURCES;
-		} else if (indoc == 0 && (has("%%EndProlog") ||
-				has("%%EndSetup") || has("%%EndDocumentSetup")))
+		else if (has("%%EndProlog") || has("%%EndSetup") || has("%%EndDocumentSetup"))
 			prolog.end = page.start = ftell(fin);
-		else if (indoc == 0 && has("%%EOF"))
-			break;
-		else if (state == 1 && indoc == 0 && has("%%Trailer")) {
+		else if (has("%%Trailer"))
 			trailer.start = ftell(fin);
-			state = 2;
-		} else if (state == 1 && has("%%BeginDocument:"))
-			indoc++;
-		else if (state == 1 && indoc > 0 && has("%%EndDocument"))
-			indoc--;
-		else if (state == 1 && (cp = has("%%BeginBinary:")) != NULL) {
-			if ((i = strtol(cp, &cp, 10)) > 0)
-				psskip(i, fin);
-		} else if (state == 1 && (cp = has("%%BeginData:")) != NULL) {
-			if ((i = strtol(cp, &cp, 10)) > 0) {
-				while (*cp == ' ' || *cp == '\t')
-					cp++;
-				while (*cp && *cp != ' ' && *cp != '\t')
-					cp++;
-				while (*cp == ' ' || *cp == '\t')
-					cp++;
-				if (strncmp(cp, "Bytes", 5) == 0)
-					psskip(i, fin);
-				else if (strncmp(cp, "Lines", 5) == 0) {
-					while (i-- && psgetline(&buf,
-						&bufsize, NULL, fin) != NULL);
-				}
-			}
-		} else if (has("%%BeginGlobal")) {
+		else if (has("%%BeginGlobal")) {
 			if (page.end <= page.start) {
 				if (nglobal >= maxglobal) {
 					maxglobal += 20;
@@ -256,9 +155,8 @@ ps_include(
 		} else if (has("%%EndGlobal"))
 			if (page.end <= page.start)
 				global[nglobal++].end = ftell(fin);
-	}
 
-	fseek(fin, 0L, SEEK_END);
+	fseek(fin, 0L, 2);
 	if (trailer.start == 0)
 		trailer.start = ftell(fin);
 	trailer.end = ftell(fin);
@@ -275,32 +173,16 @@ fprintf(stderr, "trailer=(%d,%d)\n", trailer.start, trailer.end);
 */
 
 	/* all output here */
-	fprintf(fout, "_ps_include_head\n");
+	print(fout, PS_head);
 	var(llx); var(lly); var(urx); var(ury); var(w); var(o); var(s);
 	var(cx); var(cy); var(sx); var(sy); var(ax); var(ay); var(rot);
-	fprintf(fout, "_ps_include_setup\n");
-	if (epsf >= 2) {
-		size_t	len;
-		rewind(fin);
-		fprintf(fout, "%%%%BeginDocument: %s\n", name);
-		while (psgetline(&buf, &bufsize, &len, fin) != NULL) {
-			if (has("%%BeginPreview:")) {
-				while (psgetline(&buf, &bufsize, &len, fin)
-						!= NULL &&
-						!has("%%EndPreview"));
-				continue;
-			}
-			fwrite(buf, 1, len, fout);
-		}
-		fprintf(fout, "%%%%EndDocument\n");
-	} else {
-		copy(fin, fout, &prolog);
-		for(i = 0; i < nglobal; i++)
-			copy(fin, fout, &global[i]);
-		copy(fin, fout, &page);
-		copy(fin, fout, &trailer);
-	}
-	fprintf(fout, "_ps_include_tail\n");
+	print(fout, PS_setup);
+	copy(fin, fout, &prolog);
+	for(i = 0; i < nglobal; i++)
+		copy(fin, fout, &global[i]);
+	copy(fin, fout, &page);
+	copy(fin, fout, &trailer);
+	print(fout, PS_tail);
 
 	if(nglobal)
 		free(global);
@@ -308,54 +190,20 @@ fprintf(stderr, "trailer=(%d,%d)\n", trailer.start, trailer.end);
 }
 
 static void
-copy(FILE *fin, FILE *fout, Section *s)
+print(FILE *fout, char **s)
 {
-	size_t	len;
-
-	if (s->end <= s->start)
-		return;
-	fseek(fin, s->start, SEEK_SET);
-	while (ftell(fin) < s->end &&
-			psgetline(&buf, &bufsize, &len, fin) != NULL) {
-		if (buf[0] == '%')
-			putc(' ', fout);
-		fwrite(buf, 1, len, fout);
-	}
-}
-
-static char *
-_has(const char *buf, const char *word)
-{
-	int	n;
-
-	n = strlen(word);
-	if (strncmp(buf, word, n) != 0)
-		return NULL;
-	if (buf[n] == ' ' || buf[n] == '\t' || buf[n] == '\r' ||
-			buf[n] == '\n' || buf[n] == 0) {
-		while (buf[n] == ' ' || buf[n] == '\t')
-			n++;
-		return (char *)&buf[n];
-	}
-	return NULL;
+	while (*s)
+		fprintf(fout, "%s\n", *s++);
 }
 
 static void
-addfonts(char *line)
+copy(FILE *fin, FILE *fout, Section *s)
 {
-	char	*lp = line, c;
-
-	do {
-		while (*lp == ' ' || *lp == '\t')
-			lp++;
-		line = lp;
-		while (*lp && *lp != ' ' && *lp != '\t' && *lp != '\n' &&
-				*lp != '\r')
-			lp++;
-		c = *lp;
-		*lp = '\0';
-		if (*line && strcmp(line, "(atend)"))
-			documentfont(line);
-		*lp = c;
-	} while (c && c != '\n' && c != '\r');
+	if (s->end <= s->start)
+		return;
+	fseek(fin, s->start, 0);
+	while (ftell(fin) < s->end && fgets(buf, sizeof(buf), fin) != NULL)
+		if (buf[0] != '%')
+			fprintf(fout, "%s", buf);
 }
+

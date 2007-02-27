@@ -2,7 +2,7 @@
 #
 # Routines common to all man sub-commands.
 #
-#	Sccsid common.ksh	1.37 (gritter) 8/12/05
+#	Sccsid common.ksh	1.30 (gritter) 11/7/04
 #
 
 #
@@ -10,7 +10,6 @@
 # names to search for.
 #
 whatpropos() {
-	status=1
 	case "$1" in
 	apropos)
 		cmd=apropos
@@ -48,26 +47,26 @@ whatpropos() {
 			then
 				case "$cmd" in
 				apropos)
-					egrep -i "$name" windex && status=0
+					egrep -i "$name" windex
 					;;
 				whatis)
-					egrep "^$name[ 	]+" windex && status=0
+					egrep "^$name[ 	]+" windex
 					;;
 				esac
 			elif test -r whatis
 			then
 				case "$cmd" in
 				apropos)
-					egrep -i "$name" whatis && status=0
+					egrep -i "$name" whatis
 					;;
 				whatis)
-					egrep "^$name[ 	]+\(" whatis && status=0
+					egrep "^$name[ 	]+\(" whatis
 					;;
 				esac
 			fi
 		done
 	done
-	exit $status
+	exit
 }
 
 #
@@ -161,10 +160,6 @@ format() {
 				;;
 			.so\ *)
 				f_so="${f_firstline#.so+( )}"
-				case $f_so in
-				*/*)	;;
-				*)	f_so=${1%%/*}/$f_so ;;
-				esac
 				for f_i in "$f_so"*
 				do
 					format "$f_i" "$2" "$3" "$4"
@@ -183,9 +178,6 @@ format() {
 			if test -z "$tflag" -a -n "$COL"
 			then
 				f_cmd="$f_cmd | $COL"
-			elif test -n "$tflag" -a -n "$TCAT"
-			then
-				f_cmd="$f_cmd | $TCAT"
 			fi
 			;;
 		html)
@@ -284,7 +276,7 @@ trydir() {
 }
 
 #
-# Called when a signal is caught.
+# Called when a signal is catched.
 #
 cleanup() {
 	test -n "$texts" && rm -f $texts
@@ -305,7 +297,7 @@ usage() {
 		echo "usage:	$progname [-p] [-n] [-w] [-M path] [-T man] [sections]" >&2
 		;;
 	*)
-		echo "Usage:	$progname [-] [-t] [-M path] [-T man] [ section ] name ..." >&2
+		echo "Usage:	$progname [-] [-adlt] [-M path] [-T man] [ section ] name ..." >&2
 		echo "	$progname -k keyword ..." >&2
 		echo "	$progname -f file ..." >&2
 		;;
@@ -314,7 +306,7 @@ usage() {
 }
 
 progname=${0##*/} oldpwd="$PWD"
-debug= texts= section= system= ontty= specpath=
+debug= texts= section= MACSET= system= ontty= specpath=
 aflag= dflag= fflag= kflag= lflag= nflag= tflag= wflag=
 if test "x$1" = x-
 then
@@ -414,9 +406,6 @@ then
 		COL=*)
 			test -z "$COL" && COL="${line#*=}"
 			;;
-		TCAT=*)
-			test -z "$TCAT" && TCAT="${line#*=}"
-			;;
 		PAGER=*)
 			test -z "$PAGER" && PAGER="${line#*=}"
 			;;
@@ -437,6 +426,9 @@ then
 			;;
 		MACSET=*)
 			test -z "$MACSET" && MACSET="${line#*=}"
+			;;
+		TCAT=*)
+			test -z "$TCAT" && TCAT="${line#*=}"
 			;;
 		HTML1=*)
 			test -z "$HTML1" && HTML1="${line#*=}"
@@ -471,6 +463,7 @@ test -z "$TBL" && TBL=tbl
 test -z "$REFER" && REFER=refer
 test -z "$VGRIND" && VGRIND=vgrind
 test -z "$MACSET" && MACSET=-man
+test -z "$TCAT" && TCAT=cat
 test -z "$HTML1" && {
 	if (type w3m) >/dev/null 2>&1
 	then
@@ -508,7 +501,6 @@ then
 	echo "TROFF=$TROFF"
 	echo "NROFF=$NROFF"
 	echo "COL=$COL"
-	echo "TCAT=$TCAT"
 	echo "PAGER=$PAGER"
 	echo "EQN=$EQN"
 	echo "NEQN=$NEQN"
@@ -516,6 +508,7 @@ then
 	echo "REFER=$REFER"
 	echo "VGRIND=$VGRIND"
 	echo "MACSET=$MACSET"
+	echo "TCAT=$TCAT"
 	echo
 fi
 
@@ -644,6 +637,9 @@ do
 		elif test -n "$ontty" -a -z "$tflag"
 		then
 			$PAGER $texts
+		elif test -n "$tflag"
+		then
+			$TCAT $texts
 		else
 			cat $texts
 		fi
@@ -657,7 +653,6 @@ then
 	echo "But what do you want from section $psection?" >&2
 	exit 1
 fi
-
 
 
 

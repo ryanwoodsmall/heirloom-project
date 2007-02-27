@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cat.sl	2.18 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)cat.sl	2.16 (gritter) 10/12/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -251,9 +251,11 @@ main(int argc, char **argv)
 		case 't':
 			tflag = 1;
 			break;
+#ifdef	ADDONS
 		case 'B':
 			Bflag = atol(optarg);
 			break;
+#endif	/* ADDONS */
 		default:
 			usage();
 		}

@@ -25,20 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SU3)
-static const char sccsid[] USED = "@(#)csplit_su3.sl	1.10 (gritter) 5/29/05";
-#elif defined (SUS)
-static const char sccsid[] USED = "@(#)csplit_sus.sl	1.10 (gritter) 5/29/05";
-#else
-static const char sccsid[] USED = "@(#)csplit.sl	1.10 (gritter) 5/29/05";
-#endif
+static const char sccsid[] USED = "@(#)csplit.sl	1.5 (gritter) 7/13/04";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +57,7 @@ static const char sccsid[] USED = "@(#)csplit.sl	1.10 (gritter) 5/29/05";
 #endif
 #endif
 
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 #include <regex.h>
 #else
 #include <regexpr.h>
@@ -78,7 +72,7 @@ static struct	arg {
 	long long	a_once;
 	const char	*a_op;
 	const char	*a_rp;
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 	regex_t		*a_re;
 #else
 	char		*a_re;
@@ -115,7 +109,7 @@ main(int argc, char **argv)
 	char	*fn;
 
 	progname = basename(argv[0]);
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 	setlocale(LC_COLLATE, "");
 #endif
 	setlocale(LC_CTYPE, "");
@@ -152,8 +146,9 @@ main(int argc, char **argv)
 static void
 usage(void)
 {
-	fprintf(stderr, "%s: Usage: %s [-s] [-k] [-f prefix] file args ...\n",
-		progname, progname);
+	fprintf(stderr,
+		"Usage: %s [-s] [-k] [-f prefix] [-n digits] file args ...\n",
+		progname);
 	exit(2);
 }
 
@@ -180,9 +175,6 @@ scan(char *s)
 	static int	ncur = -1;
 	long long	c;
 	char	*sp, *x;
-#if defined (SUS) || defined (SU3)
-	int	reflags;
-#endif
 
 	if (*s != '{') {
 		args[++ncur] = scalloc(1, sizeof *args[ncur]);
@@ -203,16 +195,13 @@ scan(char *s)
 		args[ncur]->a_nx = strtoll(&sp[1], &x, 10);
 		if (*x != '\0')
 			msg(1, "%s: illegal offset", s);
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 		args[ncur]->a_re = smalloc(sizeof *args[ncur]->a_re);
-		reflags = REG_ANGLES|REG_NOSUB;
-#if defined (SU3)
-		reflags |= REG_AVOIDNULL;
-#endif	/* SU3 */
-		if (regcomp(args[ncur]->a_re, &s[1], reflags) != 0)
-#else	/* !SUS, !SU3 */
+		if (regcomp(args[ncur]->a_re, &s[1],
+				REG_ANGLES|REG_BADRANGE|REG_NOSUB) != 0)
+#else
 		if ((args[ncur]->a_re = compile(&s[1], 0, 0)) == 0)
-#endif	/* !SUS, !SU3 */
+#endif
 			msg(1, "%s: Illegal Regular Expression", s);
 		break;
 	default:
@@ -343,7 +332,7 @@ match(const char *line, long long lineno, long long *noffp, int *skip)
 			if (--args[ncur]->a_no > 0)
 				return 0;
 		} else {
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 			if (regexec(args[ncur]->a_re, line, 0, NULL, 0) != 0)
 #else
 			if (step(line, args[ncur]->a_re) == 0)
@@ -383,10 +372,8 @@ match(const char *line, long long lineno, long long *noffp, int *skip)
 				*noffp = -args[ncur]->a_nx;
 			else
 				*noffp = 0;
-		} else {
+		} else
 			*noffp = 0;
-			*skip = 0;
-		}
 	}
 	return 1 + ((lineno==1&&ncur==0) || args[ncur]==0 ||
 			args[ncur]->a_re==0 || args[ncur]->a_nx < 0);

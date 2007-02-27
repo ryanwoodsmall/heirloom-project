@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)run.c	1.33 (gritter) 12/25/06>
+   Sccsid @(#)run.c	1.26 (gritter) 7/28/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -26,7 +26,7 @@
 
 
 /*	from unixsrc:usr/src/common/cmd/awk/run.c /main/uw7_nj/1	*/
-/*	from RCS Header: run.c 1.3 91/08/12 	*/
+/*	from $Header$	*/
 
 #define tempfree(x,s)	if (istemp(x)) tfree(x,s); else
 
@@ -103,7 +103,7 @@ int run(Node *a)
 
 Cell *r_execute(Node *u)
 {
-	register Cell *(*proc)(Node **, int);
+	register Cell *(*proc)();
 	register Cell *x;
 	register Node *a;
 
@@ -523,7 +523,7 @@ Cell *matchop(Node **a, int n)
 	register unsigned char *s, *t;
 	register int i;
 	fa *pfa;
-	int (*mf)(void *, unsigned char *) = match, mode = 0;
+	int (*mf)() = match, mode = 0;
 
 	if (n == MATCHFCN) {
 		mf = pmatch;
@@ -701,7 +701,7 @@ Cell *substr(Node **a, int nnn)
 			tempfree(z, "");
 		}
 		x = gettemp("");
-		setsval(x, (unsigned char *)"");
+		setsval(x, "");
 		return(x);
 	}
 	m = getfval(y);
@@ -832,7 +832,7 @@ int format(unsigned char **buf, int *bufsize, const unsigned char *s, Node *a)
 			*++t = '\0';
 			break;
 		case 'o': case 'x': case 'X': case 'u':
-			flag = *(s-1) == 'l' ? 12 : 13;
+			flag = *(s-1) == 'l' ? 2 : 3;
 			break;
 		case 's':
 			/*
@@ -873,12 +873,6 @@ int format(unsigned char **buf, int *bufsize, const unsigned char *s, Node *a)
 			break;
 		case 3:	growsprintf(buf, &p, bufsize, (char *)fmt,
 					(int) getfval(x));
-			break;
-		case 12:growsprintf(buf, &p, bufsize, (char *)fmt,
-					(unsigned long) getfval(x));
-			break;
-		case 13:growsprintf(buf, &p, bufsize, (char *)fmt,
-					(unsigned int) getfval(x));
 			break;
 		case 4:	growsprintf(buf, &p, bufsize, (char *)fmt, getsval(x));
 			break;
@@ -950,7 +944,7 @@ Cell *aprintf(Node **a, int n)
 Cell *arith(Node **a, int n)
 {
 	Awkfloat i, j = 0;
-	double v;
+	double v, ipow();
 	register Cell *x, *y, *z;
 
 	x = execute(a[0]);
@@ -990,7 +984,7 @@ Cell *arith(Node **a, int n)
 		if (j >= 0 && modf(j, &v) == 0.0)	/* pos integer exponent */
 			i = ipow(i, (int) j);
 		else
-			i = errcheck(pow(i, j), (unsigned char *)"pow");
+			i = errcheck(pow(i, j), "pow");
 		break;
 	default:	/* can't happen */
 		error(MM_ERROR, ":66:Illegal arithmetic operator %d", n);
@@ -1036,7 +1030,7 @@ Cell *assign(Node **a, int n)
 {
 	register Cell *x, *y;
 	Awkfloat xf, yf;
-	double v;
+	double v, ipow();
 
 	y = execute(a[1]);
 	x = execute(a[0]);	/* order reversed from before... */
@@ -1082,7 +1076,7 @@ Cell *assign(Node **a, int n)
 		if (yf >= 0 && modf(yf, &v) == 0.0)	/* pos integer exponent */
 			xf = ipow(xf, (int) yf);
 		else
-			xf = errcheck(pow(xf, yf), (unsigned char *)"pow");
+			xf = errcheck(pow(xf, yf), "pow");
 		break;
 	default:
 		error(MM_ERROR, ":69:Illegal assignment operator %d", n);
@@ -1437,13 +1431,13 @@ Cell *bltin(Node **a, int n)
 	case FLENGTH:
 		u = (Awkfloat) chrlen(getsval(x)); break;
 	case FLOG:
-		u = errcheck(log(getfval(x)), (unsigned char *)"log"); break;
+		u = errcheck(log(getfval(x)), "log"); break;
 	case FINT:
 		modf(getfval(x), &u); break;
 	case FEXP:
-		u = errcheck(exp(getfval(x)), (unsigned char *)"exp"); break;
+		u = errcheck(exp(getfval(x)), "exp"); break;
 	case FSQRT:
-		u = errcheck(sqrt(getfval(x)), (unsigned char *)"sqrt"); break;
+		u = errcheck(sqrt(getfval(x)), "sqrt"); break;
 	case FSIN:
 		u = sin(getfval(x)); break;
 	case FCOS:
@@ -1586,6 +1580,7 @@ FILE *openfile(int a, unsigned char *s)
 {
 	register int i, m;
 	register FILE *fp = 0;
+	extern FILE *popen();
 
 	if (*s == '\0')
 		error(MM_ERROR, ":75:Null file name in print or getline");
@@ -1919,9 +1914,9 @@ int chrlen(const unsigned char *s)
 int chrdist(const unsigned char *s, const unsigned char *end)
 {
 	wchar_t wc;
-	int m = 0, n;
+	int m = 1, n;
 
-	while (next(wc, s, n), s <= end) {
+	while (next(wc, s, n), s < end) {
 		s += n;
 		m++;
 	}
@@ -1932,7 +1927,7 @@ static void caseconv(unsigned char *s, wint_t (*conv)(wint_t))
 {
 	unsigned char *t = s;
 	wchar_t wc;
-	int len, nlen;
+	int len;
 
 	while (*s) {
 		len = mbtowc(&wc, (char *)s, mb_cur_max);
@@ -1940,13 +1935,12 @@ static void caseconv(unsigned char *s, wint_t (*conv)(wint_t))
 			*t++ = *s++;
 		else {
 			wc = conv(wc);
-			if ((nlen = wctomb((char *)t, wc)) <= len) {
-				t += nlen, s += len;
-			} else
+			if (wctomb((char *)t, wc) == len)
+				t += len, s += len;
+			else
 				*t++ = *s++;
 		}
 	}
-	*t = '\0';
 }
 
 static void growbuf(unsigned char **buf, int *bufsize, int incr,

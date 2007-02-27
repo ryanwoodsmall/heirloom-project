@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hash.c	1.6 (gritter) 6/26/05
+ * Sccsid @(#)hash.c	1.3 (gritter) 6/14/05
  */
 
 /* from OpenSolaris "hash.c	1.8	05/06/08 SMI"	 SVr4.0 1.3.2.1 */
@@ -59,10 +59,9 @@ static struct node 	**table;
 static unsigned int 	bitsper;		/* Bits per byte */
 static unsigned int	shift;
 
-static unsigned int crunch(unsigned char *);
+static unsigned int crunch();
 
-void
-hcreate(void)
+hcreate()
 {
 	unsigned char c = (unsigned char)~0;			/* A byte full of 1's */
 	int j;
@@ -86,8 +85,8 @@ hcreate(void)
 }
 
 
-void
-hscan(void (*uscan)(ENTRY *))
+void hscan(uscan)	
+	void	(*uscan)();
 {
 	struct node		*p, *nxt;
 	int				j;
@@ -107,12 +106,13 @@ hscan(void (*uscan)(ENTRY *))
 
 
 ENTRY *
-hfind(unsigned char *str)
+hfind(str)
+	unsigned char	*str;
 {
 	struct node 	*p;
 	struct node 	**q;
 	unsigned int 	i;
-	int 			res = 0;
+	int 			res;		
 
 	i = hash(str);
 
@@ -144,7 +144,8 @@ hfind(unsigned char *str)
 }
 
 ENTRY *
-henter(ENTRY item)
+henter(item)
+	ENTRY item;
 {
 	struct node	*p = (struct node *)alloc(sizeof(struct node));
 
@@ -156,7 +157,8 @@ henter(ENTRY item)
 
 
 static unsigned int 
-crunch(unsigned char *key)	
+crunch(key)	
+	unsigned char	*key;
 {
 	unsigned int 	sum = 0;	
 	int s;

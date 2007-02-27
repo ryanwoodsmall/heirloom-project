@@ -24,14 +24,14 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tty.sl	1.14 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)tty.sl	1.11 (gritter) 11/7/04";
 
 #include <unistd.h>
 #include <stdio.h>
@@ -39,11 +39,10 @@ static const char sccsid[] USED = "@(#)tty.sl	1.14 (gritter) 1/22/06";
 #include <errno.h>
 #include <stdlib.h>
 #if !defined (__linux) && !defined (__FreeBSD__) && !defined (__hpux) && \
-	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__) && \
-	!defined (__DragonFly__) && !defined (__APPLE__)
+	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__)
 #include <sys/stermio.h>
 #endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__,
-	   !__OpenBSD__, !__DragonFly__, !__APPLE__ */
+	   !__OpenBSD__ */
 
 static int	lflag;
 static int	sflag;

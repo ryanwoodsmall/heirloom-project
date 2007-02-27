@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/install.sl	1.12 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/install.sl	1.10 (gritter) 4/20/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -152,8 +152,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 	ssize_t	rsz, wo, wt;
 
 	if ((bufsize = ssp->st_blksize) < dsp->st_blksize)
-		if ((bufsize = dsp->st_blksize) <= 0)
-			bufsize = 512;
+		bufsize = dsp->st_blksize;
 	buf = smalloc(bufsize);
 	while ((rsz = read(sfd, buf, bufsize)) > 0) {
 		wt = 0;

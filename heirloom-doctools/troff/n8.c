@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.40 (gritter) 11/25/06
+ * Sccsid @(#)n8.c	1.4 (gritter) 7/24/05
  */
 
 /*
@@ -46,19 +46,10 @@
  * contributors.
  */
 
-#include	<stdio.h>
-#ifdef	EUC
-#include	<wctype.h>
-#endif
 #include	<ctype.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	"tdef.h"
 #include "ext.h"
-#include "pt.h"
-#include "libhnj/hyphen.h"
-#define	HY_BIT	0200	/* generic stuff in here only works for ascii */
-#define	HY_BIT2	0x80000000
+#define	HY_BIT	0200	/* stuff in here only works for ascii */
 
 /*
  * troff8.c
@@ -66,87 +57,37 @@
  * hyphenation
  */
 
-int	*hbuf;
-int	NHEX;
-int	*nexth;
+char	hbuf[NHEX];
+char	*nexth = hbuf;
 tchar	*hyend;
 #define THRESH 160 /*digram goodness threshold*/
 int	thresh = THRESH;
-
-static	void		hyphenhnj(void);
-
-static int *
-growhbuf(int **pp)
-{
-	int	*nhbuf;
-	int	inc = 4, j;
-
-	if ((nhbuf = realloc(hbuf, (NHEX+inc) * sizeof *hbuf)) == NULL)
-		return NULL;
-	NHEX += inc;
-	j = (char *)nhbuf - (char *)hbuf;
-	nexth = (int *)((char *)nexth + j);
-	if (pp)
-		*pp = (int *)((char *)*pp + j);
-	return hbuf = nhbuf;
-}
 
 void
 hyphen(tchar *wp)
 {
 	register int j;
 	register tchar *i;
-	tchar	*_wdstart, *_wdend;
 
 	i = wp;
-	while (punct(*i++))
+	while (punct(cbits(*i++)))
 		;
-	if (!alph(*--i))
+	if (!alph(cbits(*--i)))
 		return;
 	wdstart = i++;
-	while (hyext ? *i++ : alph(*i++))
+	while (alph(cbits(*i++)))
 		;
 	hyend = wdend = --i - 1;
-	while (punct(*i++))
+	while (punct(cbits(*i++)))
 		;
 	if (*--i)
 		return;
-	if (!(hyf & 060) && (wdend - wdstart - (hylen - 1)) < 0)
+	if ((wdend - wdstart - 4) < 0)
 		return;
 	hyp = hyptr;
 	*hyp = 0;
 	hyoff = 2;
-	if (dicthnj) {
-		i = _wdstart = wdstart;
-		_wdend = wdend;
-		do {
-			if (cbits(*i) == '-' || cbits(*i) == EMDASH ||
-					i == _wdend) {
-				while (wdstart <= i && (punct(*wdstart) ||
-						cbits(*wdstart) >= '0' &&
-						cbits(*wdstart) <= '9'))
-					wdstart++;
-				for (wdend = wdstart; wdend <= i; wdend++) {
-					if (!alph(*wdend) ||
-							cbits(*wdend) >= '0' &&
-							cbits(*wdend) <= '9')
-						break;
-				}
-				hyend = --wdend;
-				if ((hyf & 060 || wdstart + 3 <= wdend) &&
-						!exword())
-					hyphenhnj();
-				wdstart = &i[1];
-				if (i < _wdend) {
-					*hyp++ = &i[1];
-					if (hyp > (hyptr + NHYP - 1))
-						hyp = hyptr + NHYP - 1;
-				}
-			}
-		} while (i++ <= _wdend);
-		wdstart = _wdstart;
-		wdend = _wdend;
-	} else if (!exword() && !suffix())
+	if (!exword() && !suffix())
 		digram();
 	*hyp++ = 0;
 	if (*hyptr) 
@@ -165,9 +106,9 @@ hyphen(tchar *wp)
 
 
 int 
-punct(tchar i)
+punct(int i)
 {
-	if (!cbits(i) || alph(i))
+	if (!i || alph(i))
 		return(0);
 	else
 		return(1);
@@ -175,42 +116,9 @@ punct(tchar i)
 
 
 int 
-alph(tchar j)
+alph(int i)
 {
-	int i;
-	int f;
-	int	h;
-
-	while (isxfunc(j, CHAR))
-		j = charout[sbits(j)].ch;
-	i = cbits(j);
-	f = fbits(j);
-	if (!ismot(j) && i < nhcode && (h = hcode[i]) != 0) {
-		if (h & ~0177)
-			h = tr2un(h, f);
-#ifdef EUC
-		return hyext ? iswalnum(h) : iswalpha(h);
-	} else
-#else	/* !EUC */
-		i = h;
-	}
-#endif	/* !EUC */
-#ifdef EUC
-	if (!ismot(j) && i & ~0177) {
-		int	u;
-#ifndef	NROFF
-		if (islig(j) && hyext &&
-				lgrevtab && lgrevtab[f] && lgrevtab[f][i])
-			return 1;
-#endif	/* !NROFF */
-		u = tr2un(i, f);
-		if (u == 0x017F)	/* longs */
-			u = 's';
-		return hyext ? iswalnum(u) : iswalpha(u);
-	} else
-#endif	/* EUC */
-	if (!ismot(j) && i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z' ||
-			hyext && i >= '0' && i <= '9')
+	if (i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z')
 		return(1);
 	else
 		return(0);
@@ -221,7 +129,7 @@ void
 caseht(void)
 {
 	thresh = THRESH;
-	if (skip(0))
+	if (skip())
 		return;
 	noscale++;
 	thresh = atoi();
@@ -233,15 +141,12 @@ void
 casehw(void)
 {
 	register int i, k;
-	int	*j;
+	register char	*j;
 	tchar t;
-	int	cnt = 0;
 
-	if (nexth == NULL)
-		growhbuf(NULL);
 	k = 0;
-	while (!skip(!cnt++)) {
-		if ((j = nexth) >= (hbuf + NHEX - 2) && growhbuf(&j) == NULL)
+	while (!skip()) {
+		if ((j = nexth) >= (hbuf + NHEX - 2))
 			goto full;
 		for (; ; ) {
 			if (ismot(t = getch()))
@@ -257,12 +162,12 @@ casehw(void)
 					return;
 			}
 			if (i == '-') {
-				k = HY_BIT2;
+				k = HY_BIT;
 				continue;
 			}
-			*j++ = maplow(t) | k;
+			*j++ = maplow(i) | k;
 			k = 0;
-			if (j >= (hbuf + NHEX - 2) && growhbuf(&j) == NULL)
+			if (j >= (hbuf + NHEX - 2))
 				goto full;
 		}
 	}
@@ -277,24 +182,24 @@ int
 exword(void)
 {
 	register tchar *w;
-	register int	*e;
-	int	*save;
+	register char	*e;
+	char	*save;
 
 	e = hbuf;
 	while (1) {
 		save = e;
-		if (e == NULL || *e == 0)
+		if (*e == 0)
 			return(0);
 		w = wdstart;
-		while (*e && w <= hyend && (*e&~HY_BIT2) == maplow(*w)) {
+		while (*e && w <= hyend && (*e & 0177) == maplow(cbits(*w))) {
 			e++; 
 			w++;
 		};
 		if (!*e) {
-			if (w-1 == hyend || (w == wdend && maplow(*w) == 's')) {
+			if (w-1 == hyend || (w == wdend && maplow(cbits(*w)) == 's')) {
 				w = wdstart;
 				for (e = save; *e; e++) {
-					if (*e & HY_BIT2)
+					if (*e & HY_BIT)
 						*hyp++ = w;
 					if (hyp > (hyptr + NHYP - 1))
 						hyp = hyptr + NHYP - 1;
@@ -316,13 +221,12 @@ int
 suffix(void)
 {
 	register tchar *w;
-	register const char	*s, *s0;
+	register char	*s, *s0;
 	tchar i;
-	extern const char	*suftab[];
+	extern char	*suftab[];
 
 again:
-	i = cbits(*hyend);
-	if (i >= 128 || !alph(*hyend))
+	if (!alph(cbits(i = cbits(*hyend))))
 		return(0);
 	if (i < 'a')
 		i -= 'A' - 'a';
@@ -333,7 +237,7 @@ again:
 			return(0);
 		s = s0 + i - 1;
 		w = hyend - 1;
-		while (s > s0 && w >= wdstart && (*s & 0177) == maplow(*w)) {
+		while (s > s0 && w >= wdstart && (*s & 0177) == maplow(cbits(*w))) {
 			s--;
 			w--;
 		}
@@ -366,29 +270,8 @@ mark:
 
 
 int 
-maplow(tchar t)
+maplow(register int i)
 {
-	int	h, i, f;
-
-	while (isxfunc(t, CHAR))
-		t = charout[sbits(t)].ch;
-	i = cbits(t);
-	f = fbits(t);
-	if (!ismot(t) && i < nhcode && (h = hcode[i]) != 0) {
-		if (h & ~0177)
-			h = tr2un(h, f);
-		h = tr2un(h, f);
-		return(h);
-	} else
-#ifdef EUC
-	if (!ismot(t) && i & ~0177) {
-		i = tr2un(i, f);
-		if (i == 0x017F)	/* longs */
-			i = 's';
-		if (iswupper(i))
-			i = towlower(i);
-	} else
-#endif	/* EUC */
 	if (ischar(i) && isupper(i)) 
 		i = tolower(i);
 	return(i);
@@ -396,7 +279,7 @@ maplow(tchar t)
 
 
 int 
-vowel(tchar i)
+vowel(int i)
 {
 	switch (maplow(i)) {
 	case 'a':
@@ -416,7 +299,7 @@ tchar *
 chkvow(tchar *w)
 {
 	while (--w >= wdstart)
-		if (vowel(*w))
+		if (vowel(cbits(*w)))
 			return(w);
 	return(0);
 }
@@ -429,11 +312,7 @@ digram(void)
 	register int val;
 	tchar * nhyend, *maxw = 0;
 	int	maxval;
-	extern const char	bxh[26][13], bxxh[26][13], xxh[26][13], xhx[26][13], hxx[26][13];
-
-	for (w = wdstart; w <= wdend; w++)
-		if (cbits(*w) & ~0177)
-			return;
+	extern char	bxh[26][13], bxxh[26][13], xxh[26][13], xhx[26][13], hxx[26][13];
 
 again:
 	if (!(w = chkvow(hyend + 1)))
@@ -447,13 +326,13 @@ again:
 	while ((++w < hyend) && (w < (wdend - 1))) {
 		val = 1;
 		if (w == wdstart)
-			val *= dilook('a', *w, bxh);
+			val *= dilook('a', cbits(*w), bxh);
 		else if (w == wdstart + 1)
-			val *= dilook(*(w-1), *w, bxxh);
+			val *= dilook(cbits(*(w-1)), cbits(*w), bxxh);
 		else 
-			val *= dilook(*(w-1), *w, xxh);
-		val *= dilook(*w, *(w+1), xhx);
-		val *= dilook(*(w+1), *(w+2), hxx);
+			val *= dilook(cbits(*(w-1)), cbits(*w), xxh);
+		val *= dilook(cbits(*w), cbits(*(w+1)), xhx);
+		val *= dilook(cbits(*(w+1)), cbits(*(w+2)), hxx);
 		if (val > maxval) {
 			maxval = val;
 			maxw = w + 1;
@@ -467,7 +346,7 @@ again:
 
 
 int 
-dilook(tchar a, tchar b, const char t[26][13])
+dilook(int a, int b, char t[26][13])
 {
 	register int i, j;
 
@@ -477,126 +356,4 @@ dilook(tchar a, tchar b, const char t[26][13])
 	return(i & 017);
 }
 
-void
-casehylang(void)
-{
-	int	c, i = 0, sz = 0;
-	char	*path = NULL;
 
-	dicthnj = NULL;
-	free(hylang);
-	hylang = NULL;
-	hyext = 0;
-	skip(0);
-	do {
-		c = getach();
-		if (i >= sz)
-			hylang = realloc(hylang, (sz += 8) * sizeof *hylang);
-		hylang[i++] = c;
-	} while (c);
-	if (i == 1) {
-		free(hylang);
-		hylang = NULL;
-		return;
-	}
-	if (strchr(hylang, '/') == NULL) {
-		path = malloc(strlen(hylang) + strlen(HYPDIR) + 12);
-		sprintf(path, "%s/hyph_%s.dic", HYPDIR, hylang);
-	} else {
-		path = malloc(strlen(hylang) + 1);
-		strcpy(path, hylang);
-	}
-	if ((dicthnj = hnj_hyphen_load(path)) == NULL) {
-		errprint("Can't load %s", path);
-		free(hylang);
-		hylang = NULL;
-		free(path);
-		return;
-	}
-	free(path);
-	hyext = 1;
-}
-
-static int
-addc(int m, char **cp, tchar **wp, int **wpp, int distance)
-{
-	tchar	t;
-
-	t = m ? m | sfmask(**wp) : **wp;
-	m = maplow(t);
-	if (m > 0 && m <= 0x7f) {
-		*(*cp)++ = m;
-		*(*wpp)++ = distance;
-	} else if (m >= 0x80 && m <= 0x7ff) {
-		*(*cp)++ = m >> 6 & 037 | 0300;
-		*(*wpp)++ = distance;
-		*(*cp)++ = m & 077 | 0200;
-		*(*wpp)++ = -1000;
-	} else if (m >= 0x800 && m <= 0xffff) {
-		*(*cp)++ = m >> 12 & 017 | 0340;
-		*(*wpp)++ = distance;
-		*(*cp)++ = m >> 6 & 077 | 0200;
-		*(*wpp)++ = -1000;
-		*(*cp)++ = m & 077 | 0200;
-		*(*wpp)++ = -1000;
-	} else
-		return 0;
-	return 1;
-}
-
-static void
-hyphenhnj(void)
-{
-	tchar	*wp;
-	char	*cb, *cp, *hb;
-	int	*wpos, *wpp;
-	int	f, i, j, k, m;
-
-	i = 12 * (wdend - wdstart) + 1;
-	cb = malloc(i * sizeof *cb);
-	hb = malloc(i * sizeof *hb);
-	wpos = malloc(i * sizeof *wpos);
-	cp = cb;
-	wpp = wpos;
-	for (wp = wdstart; wp <= wdend; wp++) {
-		m = cbits(*wp);
-		f = fbits(*wp);
-#ifndef	NROFF
-		if (islig(*wp) && lgrevtab && lgrevtab[f] && lgrevtab[f][m]) {
-			for (i = 0; lgrevtab[f][m][i]; i++) {
-				if (addc(lgrevtab[f][m][i], &cp, &wp, &wpp,
-						i ? -i : wp-wdstart) == 0)
-					goto retn;
-			}
-		} else
-#endif
-		{
-			if (addc(0, &cp, &wp, &wpp, wp - wdstart) == 0)
-				goto retn;
-		}
-	}
-	*cp = '\0';
-	j = cp - cb;
-	while (wpp <= &wpos[j])
-		*wpp++ = -1000;
-	hnj_hyphen_hyphenate(dicthnj, cb, j, hb);
-	k = 0;
-	for (i = 0; i < j; i++) {
-		if (wpos[i+1] >= 0)
-			k = wpos[i+1];
-		if (hb[i] - '0' & 1 && wpos[i+1] >= -3) {
-			if (wpos[i+1] >= 0)
-				*hyp = &wdstart[wpos[i+1]];
-			else {
-				*hyp = &wdstart[wpos[k]];
-				*hyp = (void *)((intptr_t)*hyp | -wpos[i+1]);
-			}
-			if (++hyp > (hyptr + NHYP - 1))
-				hyp = hyptr + NHYP - 1;
-		}
-	}
-retn:
-	free(cb);
-	free(hb);
-	free(wpos);
-}

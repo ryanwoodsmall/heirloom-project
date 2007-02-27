@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)nii.c	1.47 (gritter) 11/2/06
+ * Sccsid @(#)nii.c	1.4 (gritter) 8/8/05
  */
 
 /*
@@ -50,14 +50,13 @@
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "pt.h"
+#include "proto.h"
 #include "ext.h"
 
-struct 	s *frame, *stk;
-int	ejl;
+struct 	s *frame, *stk, *ejl;
 struct	s *nxf;
 
-pid_t	pipeflg = -1;
+int	pipeflg;
 int	hflg;	/* used in nroff only */
 int	eqflg;	/* used in nroff only */
 
@@ -70,7 +69,6 @@ int	mfont;
 int	cs;
 int	ccs;
 int	bd;
-char	*fchartab;
 #endif
 
 int	stdi;
@@ -83,20 +81,19 @@ char	*ibufp;
 char	*xbufp;
 char	*eibuf;
 char	*xeibuf;
-tchar	*pbbuf;		/* pushback buffer for arguments, \n, etc. */
-int	pbsize;		/* number of members allocated for pbbuf */
-int	pbp;		/* next free slot in pbbuf */
-int	lastpbp;	/* pbp in previous stack frame */
+tchar	pbbuf[NC];	/* pushback buffer for arguments, \n, etc. */
+tchar	*pbp = pbbuf;	/* next free slot in pbbuf */
+tchar	*lastpbp = pbbuf;	/* pbp in previous stack frame */
 int	nx;
 int	mflg;
 tchar	ch = 0;
+int	ibf;
 int	ttyod;
 int	iflg;
+char	*enda;
 int	rargc;
 char	**argp;
-int	*trtab;
-int	*trintab;
-int	*trnttab;
+int	trtab[NTRTAB];
 int	lgf;
 int	copyf;
 filep	ip;
@@ -127,21 +124,26 @@ int	ralss;
 filep	nextb;
 tchar	nrbits;
 int	nform;
+int	oldmn;
+int	newmn;
 int	macerr;
 filep	apptr;
 int	diflg;
 filep	roff;
 int	wbfi;
+int	evi;
 int	vflag;
 int	noscale;
 int	po1;
+int	nlist[NTRAP];
+int	mlist[NTRAP];
+int	evlist[EVLSZ];
 int	ev;
 int	tty;
 int	sfont	= FT;	/* appears to be "standard" font; used by .ul */
 int	sv;
 int	esc;
 int	widthp;
-int	xflag = 1;
 int	xfont;
 int	setwdf;
 int	over;
@@ -149,39 +151,8 @@ int	nhyp;
 tchar	**hyp;
 tchar	*olinep;
 int	dotT;
+char	*unlkp;
 int	no_out;
-struct	widcache *widcache;
-struct	d *d;
+struct	widcache widcache[NWIDCACHE];
+struct	d d[NDI];
 struct	d *dip;
-int	mb_cur_max;
-struct env	initenv;
-int	lastkern;
-int	lasttrack;
-int	defaultpl;
-int	NCHARS;
-int	NIF;
-int	NDI;
-int	spreadwarn;
-int	spreadlimit;
-int	lastrq;
-long	realpage;
-int	tryglf;
-char	*gchtab;
-int	tailflg;
-int	minflg;
-int	minspc;
-int	blmac;
-int	rawwidth;
-int	*olt;
-int	nolt;
-int	clonef;
-size_t	olinesz;
-tchar	**chartab;
-struct charout	*charout;
-int	charoutsz;
-int	charf;
-int	fmtchar;
-int	Tflg;
-int	dl;
-int	padj;
-int	defcf;

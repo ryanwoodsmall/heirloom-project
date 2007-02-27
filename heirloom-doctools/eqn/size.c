@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)size.c	1.5 (gritter) 10/19/06
+ * Sccsid @(#)size.c	1.3 (gritter) 8/12/05
  */
 
 # include "e.h"
@@ -28,31 +28,26 @@ void
 setsize(char *p)	/* set size as found in p */
 {
 	if (*p == '+')
-		ps += atof(p+1);
+		ps += atoi(p+1);
 	else if (*p == '-')
-		ps -= atof(p+1);
+		ps -= atoi(p+1);
 	else
-		ps = atof(p);
-	if(dbg)printf(".\tsetsize %s; ps = %g\n", p, ps);
+		ps = atoi(p);
+	if(dbg)printf(".\tsetsize %s; ps = %d\n", p, ps);
 }
 
 void
-size(float p1, int p2) {
+size(int p1, int p2) {
 		/* old size in p1, new in ps */
-	float effps, effp1;
+	int effps, effp1;
 
 	yyval = p2;
-#ifndef	NEQN
-	if(dbg)printf(".\tb:sb: S%d <- \\s%s S%d \\s%s; b=%g, h=%g\n", 
-		yyval, tsize(ps), p2, tsize(p1), ebase[yyval], eht[yyval]);
-#else	/* NEQN */
-	if(dbg)printf(".\tb:sb: S%d <- \\s%s S%d \\s%s; b=%d, h=%d\n", 
-		yyval, tsize(ps), p2, tsize(p1), ebase[yyval], eht[yyval]);
-#endif	/* NEQN */
+	if(dbg)printf(".\tb:sb: S%d <- \\s%d S%d \\s%d; b=%d, h=%d\n", 
+		yyval, ps, p2, p1, ebase[yyval], eht[yyval]);
 	effps = EFFPS(ps);
 	effp1 = EFFPS(p1);
-	printf(".ds %d \\s%s\\*(%d\\s%s\n", 
-		yyval, tsize(effps), p2, tsize(effp1));
+	printf(".ds %d \\s%d\\*(%d\\s%d\n", 
+		yyval, effps, p2, effp1);
 	ps = p1;
 }
 
@@ -62,11 +57,11 @@ globsize(void) {
 
 	getstr(temp, 20);
 	if (temp[0] == '+')
-		gsize += atof(temp+1);
+		gsize += atoi(temp+1);
 	else if (temp[0] == '-')
-		gsize -= atof(temp+1);
+		gsize -= atoi(temp+1);
 	else
-		gsize = atof(temp);
+		gsize = atoi(temp);
 	yyval = eqnreg = 0;
 	setps(gsize);
 	ps = gsize;
@@ -74,27 +69,4 @@ globsize(void) {
 		deltaps = gsize / 4;
 	else
 		deltaps = gsize / 3;
-	if (gsize == (int)gsize)
-		deltaps = (int)deltaps;
-}
-
-char *
-tsize(float s)
-{
-	static char	b[5][20];
-	static int	t;
-	int	i;
-
-	t = (t + 1) % 5;
-	if ((i = s) == s) {
-		if (i < 40)
-			sprintf(b[t], "%d", i);
-		else if (i < 100)
-			sprintf(b[t], "(%d", i);
-		else
-			sprintf(b[t], "[%d]", i);
-	} else {
-		sprintf(b[t], "[%g]", s);
-	}
-	return b[t];
 }

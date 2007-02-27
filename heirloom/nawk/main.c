@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)main.c	1.14 (gritter) 12/19/04>
+   Sccsid @(#)main.c	1.12 (gritter) 5/15/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -25,7 +25,7 @@
 /*	copyright	"%c%"	*/
 
 /*	from unixsrc:usr/src/common/cmd/awk/main.c /main/uw7_nj/2	*/
-/*	from RCS Header: main.c 1.3 91/08/12 	*/
+/*	from $Header$	*/
 
 #define DEBUG
 #include <stdio.h>
@@ -83,9 +83,9 @@ int main(int argc, unsigned char *argv[], unsigned char *envp[])
 	(void)setlabel(label);
 	/*version = (char*) gettxt(":31", "version Oct 11, 1989");*/
  	if (argc == 1) {
-		if (0 /* posix */)
+		if (posix)
 			pfmt(stderr, MM_ERROR, ":32:Incorrect usage\n");
-		pfmt(stderr, MM_ACTION | (0 /* posix */ ? 0 : MM_NOSTD),
+		pfmt(stderr, MM_ACTION | (posix ? 0 : MM_NOSTD),
 			":210107:Usage: %s [-f programfile | 'program'] [-Ffieldsep] [-v var=value] [files]\n",
 			cmdname);
 		exit(1);

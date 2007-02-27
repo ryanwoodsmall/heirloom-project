@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)ps.1	1.47 (gritter) 10/13/05
+.\" Sccsid @(#)ps.1	1.39 (gritter) 9/25/04
 .\" Parts taken from ps(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,14 +32,14 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH PS 1 "10/13/05" "Heirloom Toolchest" "User Commands"
+.TH PS 1 "9/25/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ps \- process status
 .SH SYNOPSIS
 .HP
 .ad l
 .nh
-\fBps\fR [\-\fBaAcdefjlLPRy\fR]
+\fBps\fR [\-\fBaAcdefjlLPy\fR]
 [\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]], ...\fR]\ ...
 [\fB\-gGpstuU\fI\ criteria\fR, ...]\ ...
 [\fB\-r \fIsysname\fR]
@@ -52,9 +52,7 @@ prints certain indicia about active processes.
 If no options are specified,
 all processes on the current terminal are selected;
 .B /usr/5bin/posix/ps
-and
-.B /usr/5bin/posix2001/ps
-further restrict this to processes owned by the invoking user.
+further restricts this to processes owned by the invoking user.
 The selection can be changed
 by adding
 .I criteria
@@ -81,6 +79,9 @@ command accepts the following options:
 .B \-a
 Selects all processes with a controlling terminal device,
 except for session leaders.
+.TP 12
+.B \-A
+Selects all processes.
 .TP 12
 .B \-c
 Adds scheduling class and priority to the output.
@@ -110,11 +111,13 @@ all processes that belong to one of the process groups ids in
 .I pgrplist
 are selected;
 for
-.B /usr/5bin/posix/ps
-and
-.BR /usr/5bin/posix2001/ps ,
+.BR /usr/5bin/posix/ps ,
 all processes that belong to one of the session ids in
 .IR group .
+.TP 12
+\fB\-G\fI gidlist\fR
+Selects all processes that have one of the specified real \fIgroup ids\fR,
+which may be symbolic or numeric.
 .TP 12
 .B \-j
 Adds process group id and session id to the output.
@@ -130,6 +133,42 @@ priority, nice value,
 core address,
 memory size in pages and the event waited for.
 See below for the meaning of columns.
+.TP
+.B \-L
+.hw LWPs
+Prints information on lightweight processes (LWPs);
+adds lightweight process id,
+lightweight process time,
+and, if \fI\-f\fR is also present,
+the number of lightweight processes.
+See below for the meaning of columns.
+.TP 12
+\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]],...
+The output is changed to reflect the named
+.IR property .
+Multiple properties can be given,
+separated by blanks or commas;
+it is also possible to specify multiple
+.B \-o
+options.
+Normally, the default property description is
+written in the first output line.
+If the
+.B = 
+character is present, but the
+.I title
+is missing in all format specifications,
+no descriptions are printed;
+if a
+.I title
+is given, it is used instead of the default.
+See below for valid
+.I property
+strings.
+.TP 12
+.B \-P
+Prints the processor on which the process is currently running.
+Disables printing of flags and memory address.
 .TP 12
 \fB\-p\fI pidlist\fR
 Selects all processes with one of the given \fIprocess ids\fR.
@@ -168,70 +207,11 @@ The real user id is used with
 and
 .BR /usr/5bin/s42/ps ,
 the effective user id with
-.B /usr/5bin/posix/ps
-and
-.BR /usr/5bin/posix2001/ps .
-.PP
-The following options have been introduced by POSIX.2:
-.TP 12
-.B \-A
-Selects all processes.
-.TP 12
-\fB\-G\fI gidlist\fR
-Selects all processes that have one of the specified real \fIgroup ids\fR,
-which may be symbolic or numeric.
-.TP 12
-\fB\-o\fI property\fR[\fB=\fR[\fItitle\fR]],...
-The output is changed to reflect the named
-.IR property .
-Multiple properties can be given,
-separated by blanks or commas;
-it is also possible to specify multiple
-.B \-o
-options.
-Normally, the default property description is
-written in the first output line.
-If the
-.B = 
-character is present, but the
-.I title
-is missing in all format specifications,
-no descriptions are printed;
-if a
-.I title
-is given, it is used instead of the default.
-See below for valid
-.I property
-strings.
+.BR /usr/5bin/posix/ps .
 .TP 12
 \fB\-U\fI uidlist\fR
 Selects all processes with one of the given real \fIuser ids\fR,
 which may be symbolic or numeric.
-.PP
-The following options are extensions:
-.TP 12
-.B \-L
-.hw LWPs
-Prints information on lightweight processes (LWPs);
-adds lightweight process id,
-lightweight process time,
-and, if \fI\-f\fR is also present,
-the number of lightweight processes.
-See below for the meaning of columns.
-.TP 12
-.B \-P
-Prints the processor on which the process is currently running.
-Disables printing of flags and memory address.
-.TP 12
-.B \-R
-Resource usage format;
-prints process id,
-memory and resident set size,
-buffer reads and writes,
-messages sent and received,
-user and system time,
-and command.
-See below for the meaning of columns.
 .TP 12
 .B \-y
 Modifies the
@@ -283,8 +263,7 @@ S	(l)	The state of the process:
 l2 l2 l s s.
 UID	(f,l)	T{
 The real user ID of the process owner,
-or, for \fB/usr/5bin/posix/ps\fR
-and \fB/usr/5bin/posix2001/ps\fR,
+or, for \fB/usr/5bin/posix/ps\fR,
 the effective user ID.
 With the \fB\-l\fR
 option,
@@ -324,30 +303,10 @@ RSS	(ly)	T{
 The amount of memory in kilobytes
 currently present in core.
 T}
-SZ	(l,R)	T{
+SZ	(l)	T{
 The size in pages of the core image of the process.
 If the \fB\-y\fR option is also given,
 the size is printed in kilobytes.
-T}
-MRSZ	(R)	T{
-The amount of memory in pages
-currently present in core.
-T}
-PFLTS	(R)	T{
-The number of major page faults
-that have occurred with the process.
-T}
-BUFR	(R)	T{
-Buffer reads performed on behalf of the process.
-T}
-BUFW	(R)	T{
-Buffer writes performed on behalf of the process.
-T}
-MRCV	(R)	T{
-Messages received by the process.
-T}
-MSND	(R)	T{
-Messages sent by the process.
 T}
 WCHAN	(l)	T{
 The event for which the process is waiting or sleeping;
@@ -365,19 +324,12 @@ T}
 LTIME	(L)	T{
 The cumulative execution time for the lightweight process.
 T}
-UTIME	(R)	T{
-The cumulative time the process spent in user mode.
-T}
-KTIME	(R)	T{
-The cumulative time the process spent in system (kernel) mode.
-T}
 COMD	(all)	T{
 The command name;
 with the \fB\-f\fR option,
 the command line.
 The heading `CMD' is printed
-for \fB/usr/5bin/posix/ps\fR
-and \fB/usr/5bin/posix2001/ps\fR;
+for \fB/usr/5bin/posix/ps\fR;
 the heading `COMMAND' is printed
 if the \fBSYSV3\fR
 environment variable is set
@@ -397,7 +349,7 @@ option, the following properties
 can be given:
 .PP
 .TS
-l2fB l2 l.
+lfB2 l2 l.
 user	USER	Effective user name.
 ruser	RUSER	Real user name.
 group	GROUP	Effective group name.
@@ -443,10 +395,6 @@ The first eight characters of the executable file for the process.
 .ad b
 T}
 .TE
-.PP
-For those properties that correspond to user or group names,
-the numeric id is printed
-if the name does not fit into the column width.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

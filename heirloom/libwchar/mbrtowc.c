@@ -19,10 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)mbrtowc.c	1.2 (gritter) 1/15/05	*/
+/*	Sccsid @(#)mbrtowc.c	1.1 (gritter) 5/1/04	*/
 
-#include <errno.h>
 #include "wchar.h"
+#include <errno.h>
 
 size_t
 mbrtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)

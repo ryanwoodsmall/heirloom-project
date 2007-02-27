@@ -1,25 +1,53 @@
 #include "awk.h"
-#if defined (SU3)
-const char version[] = "@(#)awk_su3.sl  1.51 (gritter) 12/25/06";
-int	posix = 1;
-#elif defined (SUS)
-const char version[] = "@(#)awk_sus.sl  1.51 (gritter) 12/25/06";
-int	posix = 1;
-#else
-const char version[] = "@(#)nawk.sl  1.51 (gritter) 12/25/06";
+#ifndef	SUS
+const char version[] = "@(#)nawk.sl  1.37 (gritter) 11/21/04";
 int	posix = 0;
+#include "pfmt.h"
+#include <ctype.h>
+int
+vpfmt(FILE *stream, long flags, const char *fmt, va_list ap)
+{
+	extern char	*pfmt_label__;
+	int	n = 0;
+
+	if ((flags & MM_NOGET) == 0) {
+		if (*fmt == ':') {
+			do
+				fmt++;
+			while (*fmt != ':');
+			fmt++;
+		}
+	}
+	if ((flags & MM_NOSTD) == 0)
+		n += fprintf(stream, "%s: ", pfmt_label__);
+	if ((flags & MM_ACTION) == 0 && isupper(*fmt&0377))
+		n += fprintf(stream, "%c", tolower(*fmt++&0377));
+	n += vfprintf(stream, fmt, ap);
+	return n;
+}
+#else
+const char version[] = "@(#)awk_sus.sl  1.37 (gritter) 11/21/04";
+int	posix = 1;
 #endif
-/* SLIST */
 /*
-awk.g.y:   Sccsid @(#)awk.g.y	1.9 (gritter) 5/14/06>
-awk.h:   Sccsid @(#)awk.h	1.23 (gritter) 12/25/04>
-awk.lx.l:   Sccsid @(#)awk.lx.l	1.13 (gritter) 11/22/05>
-b.c:   Sccsid @(#)b.c	1.6 (gritter) 5/15/04>
-lib.c:   Sccsid @(#)lib.c	1.27 (gritter) 12/25/06>
-main.c:   Sccsid @(#)main.c	1.14 (gritter) 12/19/04>
-maketab.c:   Sccsid @(#)maketab.c	1.11 (gritter) 12/4/04>
-parse.c:   Sccsid @(#)parse.c	1.7 (gritter) 12/4/04>
-run.c:   Sccsid @(#)run.c	1.33 (gritter) 12/25/06>
-tran.c:   Sccsid @(#)tran.c	1.16 (gritter) 2/4/05>
-rerule.sed:# Sccsid @(#)rerule.sed	1.1 (gritter) 2/6/05
+awk.g.y:
+	awk.g.y	1.7 (gritter) 4/16/04
+awk.h:
+	awk.h	1.21 (gritter) 11/21/04
+awk.lx.l:
+	awk.lx.l	1.9 (gritter) 7/13/04
+b.c:
+	b.c	1.6 (gritter) 5/15/04
+lib.c:
+	lib.c	1.21 (gritter) 10/13/04
+main.c:
+	main.c	1.12 (gritter) 5/15/04
+maketab.c:
+	maketab.c	1.10 (gritter) 4/26/04
+parse.c:
+	parse.c	1.6 (gritter) 4/8/03
+run.c:
+	run.c	1.25 (gritter) 7/16/04
+tran.c:
+	tran.c	1.13 (gritter) 7/13/04
 */

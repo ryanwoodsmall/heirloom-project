@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)su.sl	1.25 (gritter) 2/21/06";
+static const char sccsid[] USED = "@(#)su.sl	1.23 (gritter) 10/8/04";
 
 #include	"config.h"
 #include	<sys/types.h>
@@ -53,9 +53,7 @@ static const char sccsid[] USED = "@(#)su.sl	1.25 (gritter) 2/21/06";
 #include	<termios.h>
 #include	<limits.h>
 #include	<syslog.h>
-#ifdef	__APPLE__
-#include	<pam/pam_appl.h>
-#elif	PAM
+#ifdef	PAM
 #include	<security/pam_appl.h>
 #else	/* !PAM */
 #ifdef SHADOW_PWD

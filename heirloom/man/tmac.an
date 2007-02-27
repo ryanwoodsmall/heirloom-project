@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)tmac.an	1.13 (gritter) 8/31/05
+.\" Sccsid @(#)tmac.an	1.9 (gritter) 2/18/04
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -66,7 +66,7 @@
 'sp .5i
 .ft 1
 .ps \\nS
-.tl \\*(]H\\*(]D\\*(]H
+.tl @\\*(]H@\\*(]D@\\*(]H@
 'sp .5i
 .ev
 .ns
@@ -77,11 +77,10 @@
 .ft 1
 .ps \\nS
 'sp .5i
-.tl \\*(]W\\*(]L%
+.tl @\\*(]W@\\*(]L@%@
 'bp
 .ev
 ..
-.ig
 '	# the cut mark
 .if n .ig
 .de }C
@@ -100,7 +99,6 @@
 .}N
 .pl 1
 .ll \\n(LLu
-..
 ..
 .em }K
 '	# set title and heading
@@ -134,7 +132,7 @@
 \&\\$1 \|\\$2 \|\\$3 \|\\$4 \|\\$5 \|\\$6
 '	# HP-UX compatibility macros
 .if '\\$1'NAME' \{\
-.if !'\\*()H'' \{\
+.if !'\\*)H'' \{\
 .	ie \\n(.g==1 \{\
 .		ds }c C
 .	\}
@@ -336,9 +334,9 @@
 .ll \\n(LLu
 .in \\n()Ru+\\n(INu+\\n()Iu
 .ti \\n(INu
-.ie !\\n()Iu+\\n()Ru-\w\\*(]Xu-3p \{\\*(]X
+.ie !\\n()Iu+\\n()Ru-\w@\\*(]X@u-3p \{\\*(]X
 .br\}
-.el \\*(]X\h|\\n()Iu+\\n()Ru\c
+.el \\*(]X\h@|\\n()Iu+\\n()Ru@\c
 .}f
 ..
 '	# handle end of 1-line features

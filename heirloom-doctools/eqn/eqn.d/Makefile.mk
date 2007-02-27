@@ -23,12 +23,9 @@ e.def: e.c
 
 install:
 	test -d $(ROOT)$(BINDIR) || mkdir -p $(ROOT)$(BINDIR)
-	$(INSTALL) -c eqn $(ROOT)$(BINDIR)/eqn
-	$(STRIP) $(ROOT)$(BINDIR)/eqn
+	$(INSTALL) -c -s eqn $(ROOT)$(BINDIR)/eqn
 	test -d $(ROOT)$(MANDIR)/man1b || mkdir -p $(ROOT)$(MANDIR)/man1b
-	test -d $(ROOT)$(MANDIR)/man7b || mkdir -p $(ROOT)$(MANDIR)/man7b
 	$(INSTALL) -c -m 644 eqn.1b $(ROOT)$(MANDIR)/man1b/eqn.1b
-	$(INSTALL) -c -m 644 eqnchar.7b $(ROOT)$(MANDIR)/man7b/eqnchar.7b
 
 clean:
 	rm -f $(OBJ) eqn e.c e.def core log *~

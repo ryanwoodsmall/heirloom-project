@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)gen.h	1.16 (gritter) 10/15/06
+ * Sccsid @(#)gen.h	1.4 (gritter) 8/13/05
  */
 
 /*
@@ -70,9 +70,7 @@ extern const char	creator[];
 
 
 #define ABS(A)		((A) >= 0 ? (A) : -(A))
-#undef	MIN
 #define MIN(A, B)	((A) < (B) ? (A) : (B))
-#undef	MAX
 #define MAX(A, B)	((A) > (B) ? (A) : (B))
  
 /* color.c */
@@ -81,7 +79,7 @@ void newcolor(char *);
 void setcolor(void);
 /* dpost.c */
 void init_signals(void);
-void header(FILE *);
+void header(void);
 void options(void);
 void setpaths(char *);
 void setup(void);
@@ -91,7 +89,7 @@ void account(void);
 void conv(register FILE *);
 void devcntrl(FILE *);
 void fontinit(void);
-void loadfont(int, char *, char *, int, int);
+void loadfont(int, char *, char *);
 void loadspecial(void);
 void loaddefault(void);
 void fontprint(int);
@@ -104,15 +102,13 @@ void t_init(void);
 void t_page(int);
 void t_newline(void);
 int t_size(int);
-void setsize(int, float);
-void t_fp(int, char *, char *, void *);
+void setsize(int);
+void t_fp(int, char *, char *);
 int t_font(char *);
 void setfont(int);
-void t_sf(int);
-void t_charht(int, float);
+void t_sf(void);
+void t_charht(int);
 void t_slant(int);
-void needresource(const char *, ...);
-void t_supply(char *);
 void t_reset(int);
 void t_trailer(void);
 void hgoto(int);
@@ -131,7 +127,6 @@ void addchar(int);
 void addoctal(int);
 void charlib(int);
 int doglobal(char *);
-void documentfont(const char *);
 void documentfonts(void);
 void redirect(int);
 /* draw.c */
@@ -153,20 +148,17 @@ void settext(char *);
 void error(int, char *, ...);
 void out_list(char *);
 int in_olist(int);
-int cat(char *, FILE *);
+int cat(char *);
 int str_convert(char **, int);
 char *tempname(const char *);
-int psskip(size_t, FILE *);
-char *psgetline(char **, size_t *, size_t *, FILE *);
-int sget(char *, size_t, FILE *);
 /* pictures.c */
 void picture(char *);
 FILE *picopen(char *);
 void inlinepic(FILE *, char *);
 void piccopy(FILE *, FILE *, long);
 /* ps_include.c */
-void ps_include(const char *, FILE *, FILE *, int, int, int, int,
-		double, double, double, double, double, double, double);
+void ps_include(FILE *, FILE *, int, int, int, int, double, double, double,
+		double, double, double, double);
 /* request.c */
 void saverequest(char *);
 void writerequest(int, FILE *);

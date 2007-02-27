@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)daps.c	1.8 (gritter) 7/9/06
+ * Sccsid @(#)daps.c	1.6 (gritter) 8/13/05
  */
 
 /*
@@ -1193,7 +1193,7 @@ devcntrl(
 	int		n;							/* integer used in GET_INT */
 	char	str[20];					/* used to hold different strings */
 	char	file[50];					/* load from this font file - maybe */
-	char	buf[4096];					/* buffer used in GET_LINE etc. */
+	char	buf[50];					/* buffer used in GET_LINE etc. */
 
 
 
@@ -1257,12 +1257,6 @@ devcntrl(
 					t_slant(n);				/* set the APS slant to n */
 					last_req_slant = n;		/* and remember this angle */
 					break;
-
-		case 'X':
-					GET_STR(fp, buf);
-					if (strcmp(buf, "LC_CTYPE") == 0)
-						break;
-					/*FALLTHRU*/
 
 		default:							/* don't understand the command */
 					error(FATAL, "unknown device command %c", str[0]);
@@ -2757,7 +2751,7 @@ fileinit (void)
 
 
 	sprintf(temp, "%s/dev%s/DESC.out", fontdir, devname);
-	if ( (fin = open(temp, O_RDONLY)) < 0 )	/* file didn't open - abort */
+	if ( (fin = open(temp, 0)) < 0 )	/* file didn't open - abort */
 		error(FATAL, "can't open tables for %s", temp);
 
 	READ(fin, &dev, sizeof(struct dev));	/* init dev structure */
@@ -2920,7 +2914,7 @@ loadfont (
 		 sprintf(temp, "%s/dev%s/%s.out", fontdir, devname, name);
 	else sprintf(temp, "%s/%s.out", fdir, name);
 
-	if ( (fin = open(temp, O_RDONLY)) < 0 )			/* open the font file */
+	if ( (fin = open(temp, 0)) < 0 )			/* open the font file */
 		error(FATAL, "can't open font table %s", temp);
 
 	norig = fontbase[num]->nwfont & BMASK;	/* 'space' available in pos num */
@@ -2975,7 +2969,7 @@ load_alt (
 
 	sprintf(cmd, "%s/dev%s/%s.add", fontdir, devname, fontname[font].name);
 
-	if ( (fin = open(cmd, O_RDONLY)) < 0 )	/* couldn't open the file */
+	if ( (fin = open(cmd, 0)) < 0 )		/* couldn't open the file */
 		error(FATAL, "can't open file %s", cmd);
 
 	nw = fontname[font].nwfont & BMASK;			/* number of width entries */

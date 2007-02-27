@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)date_sus.sl	1.26 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)date_sus.sl	1.22 (gritter) 11/7/04";
 #else
-static const char sccsid[] USED = "@(#)date.sl	1.26 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)date.sl	1.22 (gritter) 11/7/04";
 #endif
 
 #include	<unistd.h>
@@ -134,8 +134,7 @@ badtime:
 	return (time_t)-1;
 }
 
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 static int
 stime(time_t *t)
 {
@@ -146,7 +145,7 @@ stime(time_t *t)
 
 	return settimeofday(&tv, NULL);
 }
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
 
 static void
 settime(char *op)
@@ -231,11 +230,10 @@ printtime(const char *cp)
 					goto next;
 				case 'z': {
 						  int hour, min;
-#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__DragonFly__) \
-	|| defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__OpenBSD__)
 						  long	timezone;
 						  timezone = -tp->tm_gmtoff;
-#endif	/* __FreeBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
+#endif	/* __FreeBSD__, __OpenBSD__ */
 
 						  hour = -timezone / 3600;
 						  min = (timezone / 60) % 60;
@@ -320,9 +318,11 @@ main(int argc, char **argv)
 		case 'a':
 			adjustment = optarg;
 			break;
+#ifdef	ADDONS
 		case 'b':
 			bflag = 1;
 			break;
+#endif	/* ADDONS */
 		case 'u':
 			uflag = 1;
 			putenv("TZ=GMT");

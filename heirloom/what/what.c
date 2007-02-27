@@ -1,176 +1,106 @@
-
 /*
- * CDDL HEADER START
- *
- * The contents of this file are subject to the terms of the
- * Common Development and Distribution License (the "License").
- * You may not use this file except in compliance with the License.
- *
- * You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
- * or http://www.opensolaris.org/os/licensing.
- * See the License for the specific language governing permissions
- * and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL HEADER in each
- * file and include the License file at usr/src/OPENSOLARIS.LICENSE.
- * If applicable, add the following below this CDDL HEADER, with the
- * fields enclosed by brackets "[]" replaced with your own identifying
- * information: Portions Copyright [yyyy] [name of copyright owner]
- *
- * CDDL HEADER END
- */
-/* Copyright (c) 1988 AT&T */
-/* All Rights Reserved */
-/*
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * Use is subject to license terms.
+ * Changes by Gunnar Ritter, Freiburg i. Br., Germany, July 2003.
  */
 /*
- * from what.c 1.11 06/12/12
- */
-
-/*	from OpenSolaris "what.c"	*/
-
-/*
- * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
+ * Copyright (c) 1980, 1988, 1993
+ *	The Regents of the University of California.  All rights reserved.
  *
- * Sccsid @(#)what.c	1.10 (gritter) 2/3/07
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
-/*	from OpenSolaris "sccs:cmd/what.c"	*/
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+/* from what.c	8.1 (Berkeley) 6/6/93 */
+
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)what.sl	1.10 (gritter) 2/3/07";
+static const char sccsid[] USED = "@(#)what.sl	1.7 (gritter) 4/20/04";
 
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
 
-#define MINUS '-'
-#define MINUS_S "-s"
-#undef	TRUE
-#define TRUE  1
-#undef	FALSE
-#define FALSE 0
+#if defined (__GLIBC__)
+#if defined (_IO_get_unlocked)
+#undef	getchar
+#define	getchar()	_IO_getc_unlocked(stdin)
+#endif
+#if defined (_IO_putc_unlocked)
+#undef	putchar
+#define	putchar(c)	_IO_putc_unlocked(c, stdout)
+#endif
+#endif
 
+static void search(void);
 
-static int found = FALSE;
-static int silent = FALSE;
-
-static char	pattern[]  =  "@(#)";
-
-static void	dowhat(FILE *);
-static int	trypat(FILE *,char *);
-
-
-int 
-main(int argc, register char **argv)
+/*
+ * what
+ */
+int
+main(int argc, char **argv)
 {
-	register int i;
-	register FILE *iop;
-	int current_optind, c;
+	int	status = 0;
 
-	if (argc < 2)
-		dowhat(stdin);
-	else {
-
-		current_optind = 1;
-		optind = 1;
-		opterr = 0;
-		i = 1;
-		/*CONSTCOND*/
-		while (1) {
-			if(current_optind < optind) {
-			   current_optind = optind;
-			   argv[i] = 0;
-			   if (optind > i+1 ) {
-			      argv[i+1] = NULL;
-			   }
-			}
-			i = current_optind;
-		        c = getopt(argc, argv, "-s");
-
-				/* this takes care of options given after
-				** file names.
-				*/
-			if((c == EOF)) {
-			   if (optind < argc) {
-				/* if it's due to -- then break; */
-			       if(argv[i][0] == '-' &&
-				      argv[i][1] == '-') {
-			          argv[i] = 0;
-			          break;
-			       }
-			       optind++;
-			       current_optind = optind;
-			       continue;
-			   } else {
-			       break;
-			   }
-			}
-			switch (c) {
-			case 's' :
-				silent = TRUE;
-				break;
-			default  :
-				fprintf(stderr,
-					"Usage: what [ -s ] filename...\n");
-				exit(2);
-			}
+	if (argc <= 1)
+		search();
+	else do {
+		if (!freopen(argv[1], "r", stdin)) {
+			perror(argv[1]);
+			status = 1;
+			continue;
 		}
-		for(i=1;(i<argc );i++) {
-			if(!argv[i]) {
-			   continue;
-			}
-			if ((iop = fopen(argv[i],"r")) == NULL)
-				fprintf(stderr,"can't open %s (26)\n",
-					argv[i]);
-			else {
-				printf("%s:\n",argv[i]);
-				dowhat(iop);
-			}
-		}
-	}
-	return (!found);				/* shell return code */
+		printf("%s:\n", argv[1]);
+		search();
+	} while(++argv, --argc > 1);
+	exit(status);
 }
-
 
 static void
-dowhat(register FILE *iop)
+search(void)
 {
-	register int c;
+	register int	c;
 
-	while ((c = getc(iop)) != EOF) {
-		if (c == pattern[0])
-			if(trypat(iop, &pattern[1]) && silent) break;
-	}
-	fclose(iop);
-}
-
-
-static int
-trypat(register FILE *iop,register char *pat)
-{
-	register int c;
-
-	for (; *pat; pat++)
-		if ((c = getc(iop)) != *pat)
-			break;
-	if (!*pat) {
-		found = TRUE;
+	while ((c = getchar()) != EOF) {
+loop:		if (c != '@')
+			continue;
+		if ((c = getchar()) != '(')
+			goto loop;
+		if ((c = getchar()) != '#')
+			goto loop;
+		if ((c = getchar()) != ')')
+			goto loop;
 		putchar('\t');
-		while ((c = getc(iop)) != EOF && c &&
-				!strchr("\"\\>\n", c&0377))
+		while ((c = getchar()) != EOF && c && c != '"' &&
+		    c != '>' && c != '\n')
 			putchar(c);
 		putchar('\n');
-		if(silent)
-			return(TRUE);
 	}
-	else if (c != EOF)
-		ungetc(c, iop);
-	return(FALSE);
 }

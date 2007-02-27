@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tw.h	1.6 (gritter) 4/25/06
+ * Sccsid @(#)tw.h	1.4 (gritter) 8/8/05
  */
 
 /*
@@ -40,8 +40,6 @@
  * software developed by the University of California, Berkeley, and its
  * contributors.
  */
-
-#define	nextfp()	0
 
 /* typewriter driving table structure */
 
@@ -75,6 +73,6 @@ extern struct t {
 	char	*right;		/* ditto */
 	char	*left;		/* ditto */
 
-	char	**codetab;
-	char	*width;
+	char	*codetab[NROFFCHARS-_SPECCHAR_ST];
+	char	width[NROFFCHARS];
 } t;

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)integral.c	1.5 (gritter) 10/19/06
+ * Sccsid @(#)integral.c	1.3 (gritter) 8/12/05
  */
 
 # include "e.h"
@@ -38,13 +38,8 @@ integral(int p, int p1, int p2) {
 		bshiftb(p, SUB, p1);
 	else if (p2 != 0)
 		bshiftb(p, SUP, p2);
-#ifndef	NEQN
-	if(dbg)printf(".\tintegral: S%d; h=%g b=%g\n", 
-		p, eht[p], ebase[p]);
-#else	/* NEQN */
 	if(dbg)printf(".\tintegral: S%d; h=%d b=%d\n", 
 		p, eht[p], ebase[p]);
-#endif	/* NEQN */
 	lfont[p] = ROM;
 }
 
@@ -55,8 +50,8 @@ setintegral(void) {
 	yyval = oalloc();
 	f = "\\(is";
 #ifndef NEQN
-	printf(".ds %d \\s%s\\v'.1m'\\s+4%s\\s-4\\v'-.1m'\\s%s\n", 
-		yyval, tsize(ps), f, tsize(ps));
+	printf(".ds %d \\s%d\\v'.1m'\\s+4%s\\s-4\\v'-.1m'\\s%d\n", 
+		yyval, ps, f, ps);
 	eht[yyval] = VERT(EM(1.15, ps+4));
 	ebase[yyval] = VERT(EM(0.3, ps));
 #else /* NEQN */

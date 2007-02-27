@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)rm_sus.sl	2.23 (gritter) 11/17/05";
+static const char sccsid[] USED = "@(#)rm_sus.sl	2.15 (gritter) 7/16/04";
 #else
-static const char sccsid[] USED = "@(#)rm.sl	2.23 (gritter) 11/17/05";
+static const char sccsid[] USED = "@(#)rm.sl	2.15 (gritter) 7/16/04";
 #endif
 
 #include	<sys/types.h>
@@ -69,6 +69,8 @@ static int	fflag;			/* force */
 static int	iflag;			/* ask for confirmation */
 static int	rflag;			/* recursive */
 static char	*progname;		/* argv[0] to main() */
+static uid_t	myuid;			/* user id */
+static gid_t	mygid;			/* group id */
 static char	*path;			/* full path to current file */
 static size_t	pathsz;			/* allocated size of path */
 extern int	sysv3;			/* emulate SYSV3 behavior */
@@ -97,7 +99,7 @@ smalloc(size_t nbytes)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-fir] file ...\n", progname);
+	fprintf(stderr, "usage: %s [-fiRr] file ...\n", progname);
 	exit(2);
 }
 
@@ -206,7 +208,7 @@ rm(size_t pend, const char *base, const int olddir, int ssub, int level)
 						access(base, W_OK) < 0)
 #endif
 					)) {
-				msg("directory %s: ? ", path);
+				msg("%s: directory %s: ? ", path);
 				if (confirm() == 0)
 					return;
 			}
@@ -361,7 +363,8 @@ dotdot(const char *s)
 int
 main(int argc, char **argv)
 {
-	int i, startfd = -1, illegal = 0;
+	int i, startfd = -1;
+	char	*fn;
 
 #ifdef	__GLIBC__
 	putenv("POSIXLY_CORRECT=1");
@@ -373,12 +376,12 @@ main(int argc, char **argv)
 		switch (i) {
 		case 'f':
 			fflag = 1;
-#ifdef	SUS
+#ifndef	SUS
 			iflag = 0;
 #endif
 			break;
 		case 'i':
-#ifdef	SUS
+#ifndef	SUS
 			fflag = 0;
 #endif
 			iflag = 1;
@@ -388,27 +391,25 @@ main(int argc, char **argv)
 			rflag = 1;
 			break;
 		default:
-			illegal = 1;
+			usage();
 		}
 	}
-	if (illegal)
-		usage();
 #ifndef	SUS
-	if (argv[optind] && argv[optind][0] == '-' && argv[optind][1] == '\0' &&
-			(argv[optind-1][0] != '-' || argv[optind-1][1] != '-' ||
-			 argv[optind-1][2] != '\0'))
+	if (argv[optind] && argv[optind][0] == '-' && argv[optind][1] == '\0')
 		optind++;
 #endif
 	if (optind >= argc)
 		usage();
 	ontty = isatty(0);
+	myuid = getuid();
+	mygid = getgid();
 	if (rflag && (startfd = open(".", O_RDONLY)) < 0) {
 		fprintf(stderr, "%s: cannot open current directory\n",
 				progname);
 		exit(1);
 	}
 	while (optind < argc) {
-		if (dotdot(argv[optind]) != NULL) {
+		if ((fn = dotdot(argv[optind])) != NULL) {
 			if (fflag == 0)
 				fprintf(stderr, "%s of %s is not allowed\n",
 					progname, argv[optind]);

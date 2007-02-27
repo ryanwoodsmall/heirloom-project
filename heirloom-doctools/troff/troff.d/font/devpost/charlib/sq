@@ -1,7 +1,7 @@
-%%BeginResource: procset dpost_charsq 1.1 0
-% from OpenSolaris "lp:filter/postscript/font/devpost/charlib/sq	1.2"
+%ident	"@(#)lp:filter/postscript/font/devpost/charlib/sq	1.2"
 %
 % CDDL HEADER START
+%
 % The contents of this file are subject to the terms of the
 % Common Development and Distribution License, Version 1.0 only
 % (the "License").  You may not use this file except in compliance
@@ -20,8 +20,6 @@
 %
 % CDDL HEADER END
 %
-% Portions Copyright(c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-%
 /build_sq {
     pop
     size 2 div /side exch def
@@ -32,11 +30,5 @@
     side 0 rlineto
     0 side neg rlineto
     closepath
-    currentfont dup /FontInfo dup 3 1 roll known {
-        get dup /Weight dup 3 1 roll known {
-            get dup dup (Ultra) eq exch (Bold) eq or exch (Heavy) eq or
-	    	{fill} {stroke} ifelse
-        } {pop pop stroke} ifelse
-    } {pop pop stroke} ifelse
+    font B eq {fill} {stroke} ifelse
 } def
-%%EndResource

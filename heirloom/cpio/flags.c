@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)flags.c	1.5 (gritter) 2/24/07	*/
+/*	Sccsid @(#)flags.c	1.3 (gritter) 5/29/04	*/
 
 #include <unistd.h>
 #include <stdio.h>
@@ -37,8 +37,7 @@
 void
 flags(int ac, char **av)
 {
-	const char	optstring[] =
-		"iopaAbBcC:dDeE:fH:I:kKlLmM:O:rR:sStTuvV6";
+	const char	optstring[] = "iopaAbBcC:deE:fH:I:kKlLmM:O:rR:sStTuvV6";
 	int	i, illegal = 0;
 
 	if (getenv("SYSV3") != NULL)
@@ -48,7 +47,7 @@ flags(int ac, char **av)
 		case 'i':
 		case 'o':
 		case 'p':
-			if (action && action != i)
+			if (action)
 				illegal = 1;
 			action = i;
 			break;
@@ -77,9 +76,6 @@ flags(int ac, char **av)
 			break;
 		case 'd':
 			dflag = 1;
-			break;
-		case 'D':
-			Dflag = 1;
 			break;
 		case 'e':
 			/*

@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.h	1.11 (gritter) 9/22/06
+ * Sccsid @(#)dpost.h	1.3 (gritter) 8/9/05
  */
 
 /*
@@ -55,7 +55,7 @@
  *
  */
 
-#define NFONT		300		/* max number of font positions */
+#define NFONT		60		/* max number of font positions */
 
 /*
  *
@@ -78,7 +78,7 @@
  *
  */
 
-#define MAXINTERNAL	1536
+#define MAXINTERNAL	256
 
 /*
  *
@@ -93,7 +93,7 @@
  *
  */
 
-#define MAXENCODING	5
+#define MAXENCODING	3
 
 #ifndef DFLTENCODING
 #define DFLTENCODING	0

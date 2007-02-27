@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.49 (gritter) 11/13/06
+ * Sccsid @(#)n6.c	1.4 (gritter) 8/8/05
  */
 
 /*
@@ -46,24 +46,19 @@
  * contributors.
  */
 
-#ifdef	EUC
-#include <limits.h>
-#include <stdlib.h>
-#include <wchar.h>
-#endif
-#include <ctype.h>
 #include "tdef.h"
 #include "tw.h"
-#include "pt.h"
+#include "proto.h"
 #include "ext.h"
+#include <ctype.h>
 
 /*
  * n6.c -- width functions, sizes and fonts
 */
 
-int	initbdtab[NFONT+1] ={ 0, 0, 0, 3, 3, 0, };
+int	bdtab[NFONT+1] ={ 0, 0, 0, 3, 3, 0, };
 int	sbold = 0;
-int	initfontlab[NFONT+1] = { 0, 'R', 'I', 'B', PAIR('B','I'), 'S', 0 };
+int	fontlab[NFONT+1] = { 0, 'R', 'I', 'B', PAIR('B','I'), 'S', 0 };
 
 extern	int	nchtab;
 
@@ -72,8 +67,6 @@ width(register tchar j)
 {
 	register int i, k;
 
-	if (isadjspc(j))
-		return(0);
 	if (j & (ZBIT|MOT)) {
 		if (iszbit(j))
 			return(0);
@@ -85,8 +78,6 @@ width(register tchar j)
 		return(k);
 	}
 	i = cbits(j);
-	if (isxfunc(j, CHAR))
-		return(charout[sbits(j)].width);
 	if (i < ' ') {
 		if (i == '\b')
 			return(-widthp);
@@ -98,14 +89,24 @@ width(register tchar j)
 	if (i==ohc)
 		return(0);
 #ifdef EUC
-	if (multi_locale && i >= nchtab + _SPECCHAR_ST) {
-		i = tr2un(i, fbits(j));
-		if ((i = wcwidth(i)) < 0)
-			i = 0;
-		k = t.Char * csi_width[i];
-		widthp = k;
-		return(k);
+#ifdef NROFF
+	if (multi_locale) {
+		if ((j & MBMASK) || (j & CSMASK)) {
+			switch(j & MBMASK) {
+				case BYTE_CHR:
+				case LASTOFMB:
+					k = t.Char * csi_width[cs(j)];
+					break;
+				default:
+					k = 0;
+					break;
+			}
+			widthp = k;
+			return(k);
+		}
 	}
+	i &= 0x1ff;
+#endif /* NROFF */
 #endif /* EUC */
 	i = trtab[i];
 	if (i < 32)
@@ -117,61 +118,20 @@ width(register tchar j)
 
 
 tchar 
-setch(int delim)
+setch(void)
 {
 	register int j;
-	char	temp[40];
+	char	temp[10];
 	register char	*s;
 
 	s = temp;
-	if (delim == 'C') {
-		do {
-			j = getach();
-			if (s < &temp[sizeof temp - 1])
-				*s++ = j;
-		} while (j != 0 && (s == &temp[1] || j != temp[0]));
-		if (s - temp == 3)
-			return temp[1];
-		else if (s - temp == 4) {
-			temp[0] = temp[1];
-			temp[1] = temp[2];
-			s = &temp[2];
-		} else {
-			*s = 0;
-			if (j != temp[0])
-				nodelim(temp[0]);
-			else if (warn & WARN_CHAR) {
-				errprint("missing glyph \\C%s", temp);
-			}
-			return 0;
-		}
-	} else if (delim == '[' && (j = getach()) != ']') {
-		*s++ = j;
-		while ((j = getach()) != ']' && j != 0)
-			if (s < &temp[sizeof temp - 1])
-				*s++ = j;
-		if (s - temp == 1)
-			return temp[0];
-		else if (s - temp != 2) {
-			*s = '\0';
-			if (j != ']')
-				nodelim(']');
-			else if (warn & WARN_CHAR)
-				errprint("missing glyph \\[%s]", temp);
-			return 0;
-		}
-	} else {
-		if ((*s++ = getach()) == 0 || (*s++ = getach()) == 0)
-			return(0);
-	}
+	if ((*s++ = getach()) == 0 || (*s++ = getach()) == 0)
+		return(0);
 	*s = '\0';
 	if ((j = findch(temp)) > 0)
 		return j | chbits;
-	else {
-		if (warn & WARN_CHAR)
-			errprint("missing glyph \\%c%s", delim, temp);
+	else
 		return 0;
-	}
 }
 
 tchar 
@@ -183,37 +143,21 @@ setabs (void)		/* set absolute char from \C'...' */
 	n = 0;
 	n = inumb(&n);
 	getch();
-	if (nonumb || n + nchtab + _SPECCHAR_ST >= NCHARS)
+	if (nonumb)
 		return 0;
 	return n + nchtab + _SPECCHAR_ST;
 }
 
-int
-tr2un(tchar c, int f)
-{
-	int	k;
-
-	k = cbits(c);
-	if (k >= nchtab + _SPECCHAR_ST)
-		return k - nchtab - _SPECCHAR_ST;
-	if (k & ~0177)
-		return 0;
-	return k;
-}
-
 int 
-findft(register int i, int required)
+findft(register int i)
 {
 	register int k;
 
 	if ((k = i - '0') >= 0 && k <= nfonts && k < smnt)
 		return(k);
 	for (k = 0; fontlab[k] != i; k++)
-		if (k > nfonts) {
-			if (required && warn & WARN_FONT)
-				errprint("%s: no such font", macname(i));
+		if (k > nfonts)
 			return(-1);
-		}
 	return(k);
 }
 
@@ -229,19 +173,16 @@ mchbits(void)
 {
 	chbits = 0;
 	setfbits(chbits, font);
-	ses = sps = width(' ' | chbits);
+	sps = width(' ' | chbits);
 }
 
 
 void
 setps(void)
 {
-	tchar	c;
-	register int i, j, k;
+	register int i, j;
 
-	i = cbits(c = getch());
-	if (ismot(c) && xflag)
-		return;
+	i = cbits(getch());
 	if (ischar(i) && isdigit(i)) {		/* \sd or \sdd */
 		i -= '0';
 		if (i == 0)		/* \s0 */
@@ -254,31 +195,13 @@ setps(void)
 		getch();
 		getch();
 	} else if (i == '+' || i == '-') {	/* \s+, \s- */
-		j = cbits(c = getch());
+		j = cbits(getch());
 		if (ischar(j) && isdigit(j)) {		/* \s+d, \s-d */
 			;
 		} else if (j == '(') {		/* \s+(dd, \s-(dd */
 			getch();
 			getch();
-		} else if (xflag) {	/* \s+[dd], */
-			k = j == '[' ? ']' : j;			/* \s-'dd' */
-			setcbits(c, k);
-			atoi();
-			if (nonumb)
-				return;
-			if (!issame(getch(), c))
-				nodelim(k);
 		}
-	} else if (xflag) {  /* \s'+dd', \s[dd] */
-		if (i == '[') {
-			i = ']';
-			setcbits(c, i);
-		}
-		j = inumb(&apts);
-		if (nonumb)
-			return;
-		if (!issame(getch(), c))
-			nodelim(i);
 	}
 }
 
@@ -311,7 +234,7 @@ setslant (void)		/* set slant from \S'...' */
 void
 caseft(void)
 {
-	skip(0);
+	skip();
 	setfont(1);
 }
 
@@ -322,16 +245,16 @@ setfont(int a)
 	register int i, j;
 
 	if (a)
-		i = getrq(3);
+		i = getrq();
 	else 
-		i = getsn(0);
+		i = getsn();
 	if (!i || i == 'P') {
 		j = font1;
 		goto s0;
 	}
 	if (i == 'S' || i == '0')
 		return;
-	if ((j = findft(i, 0)) == -1)
+	if ((j = findft(i)) == -1)
 		return;
 s0:
 	font1 = font;
@@ -345,15 +268,13 @@ setwd(void)
 {
 	register int base, wid;
 	register tchar i;
-	tchar	delim;
-	int	emsz, k;
+	int	delim, emsz, k;
 	int	savhp, savapts, savapts1, savfont, savfont1, savpts, savpts1;
-	int	savlgf;
 
 	base = numtab[ST].val = numtab[ST].val = wid = numtab[CT].val = 0;
 	if (ismot(i = getch()))
 		return;
-	delim = i;
+	delim = cbits(i);
 	savhp = numtab[HP].val;
 	numtab[HP].val = 0;
 	savapts = apts;
@@ -362,10 +283,8 @@ setwd(void)
 	savfont1 = font1;
 	savpts = pts;
 	savpts1 = pts1;
-	savlgf = lgf;
-	lgf = 0;
 	setwdf++;
-	while (i = getch(), !issame(i, delim) && !nlflg) {
+	while (cbits(i = getch()) != delim && !nlflg) {
 		k = width(i);
 		wid += k;
 		numtab[HP].val += k;
@@ -384,11 +303,7 @@ setwd(void)
 		if ((k = base + emsz) > numtab[ST].val)
 			numtab[ST].val = k;
 	}
-	if (!issame(i, delim))
-		nodelim(delim);
 	setn1(wid, 0, (tchar) 0);
-	setnr("rst", 0, 0);
-	setnr("rsb", 0, 0);
 	numtab[HP].val = savhp;
 	apts = savapts;
 	apts1 = savapts1;
@@ -396,7 +311,6 @@ setwd(void)
 	font1 = savfont1;
 	pts = savpts;
 	pts1 = savpts1;
-	lgf = savlgf;
 	mchbits();
 	setwdf = 0;
 }
@@ -424,19 +338,16 @@ mot(void)
 {
 	register int j, n;
 	register tchar i;
-	tchar	c, delim;
 
 	j = HOR;
-	delim = getch(); /*eat delim*/
+	getch(); /*eat delim*/
 	if (n = atoi()) {
 		if (vflag)
 			j = VERT;
 		i = makem(quant(n, j));
 	} else
 		i = 0;
-	c = getch();
-	if (!issame(c, delim))
-		nodelim(delim);
+	getch();
 	vflag = 0;
 	dfact = 1;
 	return(i);
@@ -468,7 +379,7 @@ makem(int i)
 
 	if ((j = i) < 0)
 		j = -j;
-	j = sabsmot(j) | MOT;
+	j |= MOT;
 	if (i < 0)
 		j |= NMOT;
 	if (vflag)
@@ -489,30 +400,18 @@ caselg(void)
 {
 }
 
-void
-caseflig(void)
-{
-}
 
 void
 casefp(void)
 {
 	register int i, j;
 
-	skip(1);
+	skip();
 	if ((i = cbits(getch()) - '0') < 0 || i > nfonts)
 		return;
-	if (skip(1) || !(j = getrq(3)))
+	if (skip() || !(j = getrq()))
 		return;
 	fontlab[i] = j;
-}
-
-void
-casefps(void)
-{
-	skip(1);
-	getname();
-	casefp();
 }
 
 
@@ -529,7 +428,7 @@ casebd(void)
 
 	k = 0;
 bd0:
-	if (skip(1) || !(i = getrq(0)) || (j = findft(i, 1)) == -1) {
+	if (skip() || !(i = getrq()) || (j = findft(i)) == -1) {
 		if (k)
 			goto bd1;
 		else 
@@ -544,7 +443,7 @@ bd0:
 		j = k;
 	}
 bd1:
-	skip(0);
+	skip();
 	noscale++;
 	bdtab[j] = atoi();
 	noscale = 0;
@@ -556,7 +455,7 @@ casevs(void)
 {
 	register int i;
 
-	skip(0);
+	skip();
 	vflag++;
 	dfact = INCH; /*default scaling is points!*/
 	dfactd = 72;
@@ -564,11 +463,6 @@ casevs(void)
 	i = inumb(&lss);
 	if (nonumb)
 		i = lss1;
-	if (xflag && i < 0) {
-		if (warn & WARN_RANGE)
-			errprint("negative vertical spacing ignored");
-		i = lss1;
-	}
 	if (i < VERT)
 		i = VERT;	/* was VERT */
 	lss1 = lss;
@@ -601,59 +495,8 @@ xlss(void)
 	dfact = 1;
 	getch();
 	if (i >= 0)
-		pbbuf[pbp++] = MOT | VMOT | sabsmot(i);
+		*pbp++ = MOT | VMOT | i;
 	else
-		pbbuf[pbp++] = MOT | VMOT | NMOT | sabsmot(-i);
+		*pbp++ = MOT | VMOT | NMOT | -i;
 	return(HX);
 }
-
-tchar
-setuc0(int n)
-{
-	if (n & ~0177) {
-#ifdef	EUC
-		int	k;
-		k = n + nchtab + _SPECCHAR_ST | chbits;
-		if (k >= NCHARS)
-			morechars(k);
-		return k;
-#else
-		return 0;
-#endif
-	} else
-		return n | chbits;
-}
-
-static void
-discard(void)
-{
-	int	c, delim;
-
-	if ((delim = getach()) != 0)
-		do {
-			if ((c = getach()) == 0) {
-				if (cbits(ch) == ' ')
-					ch = 0;
-				else
-					break;
-			}
-		} while (c != delim);
-}
-
-tchar
-setanchor(void)
-{
-	discard();
-	return 0;
-}
-
-tchar
-setlink(void)
-{
-	if (linkin = !linkin)
-		discard();
-	return 0;
-}
-
-void
-casedummy(void){;}

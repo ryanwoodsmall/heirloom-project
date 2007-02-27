@@ -1,5 +1,4 @@
-%%BeginResource: procset dpost_charrh 1.1 0
-% from OpenSolaris "lp:filter/postscript/font/devpost/charlib/rh	1.2"
+%ident	"@(#)lp:filter/postscript/font/devpost/charlib/rh	1.2"
 %
 % CDDL HEADER START
 %
@@ -21,12 +20,9 @@
 %
 % CDDL HEADER END
 %
-% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
-%
 /build_rh {
 pop
 gsave
-linewidth ptsize mul resolution 720 div div scaling 10 mul div setlinewidth
 size .0022 mul dup scale
 currentpoint translate
 
@@ -181,4 +177,3 @@ stroke
 
 grestore
 } def
-%%EndResource

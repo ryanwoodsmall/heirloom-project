@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dev.h	1.15 (gritter) 9/24/06
+ * Sccsid @(#)dev.h	1.3 (gritter) 8/8/05
  */
 
 /*
@@ -50,42 +50,31 @@
 	dev.h: characteristics of a typesetter
 */
 
-#ifndef	TROFF_DEV_H
-#define	TROFF_DEV_H
-
 struct dev {
-	unsigned	filesize;	/* number of bytes in file, */
+	unsigned short	filesize;	/* number of bytes in file, */
 				/* excluding dev part */
-	int	res;		/* basic resolution in goobies/inch */
-	int	hor;		/* goobies horizontally */
-	int	vert;
-	int	unitwidth;	/* size at which widths are given, in effect */
-	int	nfonts;		/* number of fonts physically available */
-	int	nsizes;		/* number of sizes it has */
-	int	sizescale;	/* scaling for fractional point sizes */
-	int	anysize;	/* device can print any size */
-	int	allpunct;	/* all fonts contain punctuation characters */
-	int	afmfonts;	/* device uses AFM fonts by default */
-	int	paperwidth;	/* max line length in units */
-	int	paperlength;	/* max paper length in units */
-	int	nchtab;		/* number of funny names in chtab */
-	int	lchname;	/* length of chname table */
-	int	biggestfont;	/* #chars in largest ever font */
-	int	spare2;		/* in case of expansion */
-	int	lc_ctype;	/* understands x X LC_CTYPE */
-	int	encoding;	/* default output encoding */
+	short	res;		/* basic resolution in goobies/inch */
+	short	hor;		/* goobies horizontally */
+	short	vert;
+	short	unitwidth;	/* size at which widths are given, in effect */
+	short	nfonts;		/* number of fonts physically available */
+	short	nsizes;		/* number of sizes it has */
+	short	sizescale;	/* scaling for fractional point sizes */
+	short	paperwidth;	/* max line length in units */
+	short	paperlength;	/* max paper length in units */
+	short	nchtab;		/* number of funny names in chtab */
+	short	lchname;	/* length of chname table */
+	short	biggestfont;	/* #chars in largest ever font */
+	short	spare2;		/* in case of expansion */
 };
 
 struct Font {		/* characteristics of a font */
 	char	nwfont;		/* number of width entries for this font */
 	char	specfont;	/* 1 == special font */
 	char	ligfont;	/* 1 == ligatures exist on this font */
-	char	kernfont;	/* minimum kerning, 0 == no limit, -1 == off */
+	char	spare1;		/* unused for now */
 	char	namefont[10];	/* name of this font (e.g., "R" */
 	char	intname[10];	/* internal name (=number) on device, in ascii */
-	int	afmpos;		/* afmpos-1 = position in afmtab */
-	int	spacewidth;	/* width of space character */
-	int	cspacewidth;	/* custom space width */
 };
 
 /* ligatures, ORed into ligfont */
@@ -95,8 +84,3 @@ struct Font {		/* characteristics of a font */
 #define	LFL	04
 #define	LFFI	010
 #define	LFFL	020
-
-extern	void		*readdesc(const char *);
-extern	void		*readfont(const char *, struct dev *, int);
-
-#endif	/* !TROFF_DEV_H */

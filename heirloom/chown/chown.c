@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/chown.sl	1.14 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/chown.sl	1.11 (gritter) 4/20/04";
 #else
-static const char sccsid[] USED = "@(#)chown.sl	1.14 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)chown.sl	1.11 (gritter) 4/20/04";
 #endif
 
 #include	<sys/types.h>
@@ -67,13 +67,14 @@ static unsigned	errcnt;			/* count of errors */
 static int	fflag;			/* force (don't report errors) */
 static int	hflag;			/* use lchown */
 static int	Rflag;			/* recursive */
-static int	HLPflag;		/* -H, -L, -P */
 static char	*progname;		/* argv[0] to main() */
 static char	*owner;
 static char	*group;
 static uid_t	myeuid;
 static uid_t	new_uid;
 static gid_t	new_gid;
+static int	(*chownfn)(const char *, uid_t, gid_t);
+static int	(*statfn)(const char *, struct stat *);
 
 static void *
 srealloc(void *vp, size_t nbytes)
@@ -137,14 +138,10 @@ setpath(const char *base, char **file, char **filend,
 }
 
 static void
-dochown(const char *path, int level)
+dochown(const char *path)
 {
 	struct stat ost, nst, lst;
-	int	(*chownfn)(const char *, uid_t, gid_t);
-	int	(*statfn)(const char *, struct stat *);
 
-	chownfn = hflag || Rflag && HLPflag == 'P' ? lchown : chown;
-	statfn = hflag || Rflag && HLPflag == 'P' ? lstat : stat;
 	if (statfn(path, &ost) < 0) {
 		eprintf(0, "%s: cannot access %s: %s\n",
 				progname, path, strerror(errno));
@@ -154,7 +151,7 @@ dochown(const char *path, int level)
 				group ? new_gid : ost.st_gid) < 0) {
 		eprintf(0, "%s: cannot chown %s: %s\n",
 				progname, path, strerror(errno));
-		goto failed;
+		return;
 	}
 	if ((ost.st_mode & S_ISUID) || (ost.st_mode & (S_ISGID|S_IXGRP))
 				== (S_ISGID|S_IXGRP)) {
@@ -180,11 +177,10 @@ dochown(const char *path, int level)
 			}
 		}
 	} else
-	failed:	nst = ost;
+		nst = ost;
 	if (Rflag == 0)
 		return;
-	if (statfn != lstat && (HLPflag != 'H' || level > 0)
-			&& HLPflag != 'L') {
+	if (statfn != lstat) {
 		if (lstat(path, &lst) < 0) {
 			eprintf(0, "%s: cannot lstat %s: %s\n",
 					progname, path, strerror(errno));
@@ -210,7 +206,7 @@ dochown(const char *path, int level)
 						 dp->d_name[2] == '\0')))
 				continue;
 			setpath(dp->d_name, &copy, &cend, slen, &sz, &ss);
-			dochown(copy, level + 1);
+			dochown(copy);
 		}
 		free(copy);
 		closedir(Dp);
@@ -267,7 +263,7 @@ usage(void)
 		eprintf(1, "usage: %s [-fhR] owner[.group] file ...\n",
 				progname);
 #else	/* !UCB */
-		eprintf(1, "usage: %s [-h] [-R] uid file ...\n",
+		eprintf(1, "usage: %s [-h] [-R] uid[:gid] file ...\n",
 				progname);
 #endif	/* !UCB */
 		break;
@@ -283,9 +279,9 @@ int
 main(int argc, char **argv)
 {
 #ifdef	UCB
-	const char	optstring[] = "fhHLPR";
+	const char	optstring[] = "fhR";
 #else
-	const char	optstring[] = "hHLPR";
+	const char	optstring[] = "hR";
 #endif
 	int i;
 
@@ -306,11 +302,6 @@ main(int argc, char **argv)
 		case 'R':
 			Rflag = 1;
 			break;
-		case 'H':
-		case 'L':
-		case 'P':
-			HLPflag = i;
-			break;
 		default:
 			usage();
 		}
@@ -320,8 +311,10 @@ main(int argc, char **argv)
 	getowner(argv[optind++]);
 	if (optind >= argc)
 		usage();
+	chownfn = hflag ? lchown : chown;
+	statfn = hflag ? lstat : stat;
 	myeuid = geteuid();
 	while (optind < argc)
-		dochown(argv[optind++], 0);
+		dochown(argv[optind++]);
 	return errcnt;
 }

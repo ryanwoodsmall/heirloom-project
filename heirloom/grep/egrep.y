@@ -38,14 +38,14 @@
  */
 
 %{
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)egrep.sl	2.22 (gritter) 5/29/05";
+static const char sccsid[] USED = "%Z%egrep.sl	%I% (gritter) %G%";
 %}
 
 /*
@@ -725,7 +725,7 @@ init(void)
 {
 	Eflag = 1;
 	eg_select();
-	options = "bce:f:hilnrRvyz";
+	options = "bce:f:hilnrvy";
 }
 
 void

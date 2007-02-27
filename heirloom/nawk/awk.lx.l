@@ -1,8 +1,7 @@
-%{
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)awk.lx.l	1.13 (gritter) 11/22/05>
+   Sccsid @(#)awk.lx.l	1.9 (gritter) 7/13/04>
  */
 /* UNIX(R) Regular Expression Tools
  
@@ -60,11 +59,10 @@
 /*		copyright	"%c%"	*/
 
 /*	from unixsrc:usr/src/common/cmd/awk/awk.lx.l /main/uw7_nj/1	*/
-/*	from RCS Header: awk.lx.l 1.2 91/06/25 	*/
+/*	from $Header$	*/
 
 /*%Start A str sc reg comment*/
 /*%X A str sc reg comment*/
-%}
 %X A str reg
 
 %{
@@ -72,28 +70,19 @@
 #include	"awk.h"
 #include	"y.tab.h"
 #include	<pfmt.h>
-#include	<unistd.h>
 
-static void	awk_unputstr(const char *s);
-
-#ifdef	FLEX_SCANNER
-static int	awk_yytchar;
 int		awk_input(void);
 static void	awk_unput(int c);
+static void	awk_unputstr(const char *s);
+
+/*	for flex	*/
 #undef	YY_INPUT
 #define	YY_INPUT(buf, result, max_size)	{ \
 	int	c = awk_input(); \
 	result = (c == EOF || c == '\0') ? YY_NULL : (buf[0] = c, 1); \
 }
-#else	/* !FLEX_SCANNER */
-#undef	input	/* defeat lex */
-#undef	unput
-int		input(void);
-void		unput(int c);
-#define	awk_unput(c)	unput(c)
-#define	awk_yytchar	yytchar
-#endif	/* !FLEX_SCANNER */
 
+static int	awk_yytchar;
 
 extern YYSTYPE	yylval;
 extern int	infunc;
@@ -304,7 +293,6 @@ startreg(void)
 unsigned char	ebuf[300];
 unsigned char	*ep = ebuf;
 
-#ifdef	FLEX_SCANNER
 int
 awk_input(void)
 {
@@ -331,47 +319,6 @@ awk_unput(int c)
 	unput(c);
 }
 
-
-#else	/* !FLEX_SCANNER */
-int
-input(void)
-{
-	register int c;
-	extern unsigned char *lexprog;
-
-	if (yysptr > yysbuf)
-		c = U(*--yysptr) & 0377;
-	else if (lexprog != NULL) {	/* awk '...' */
-		if (c = *lexprog & 0377)
-			lexprog++;
-	} else				/* awk -f ... */
-		c = pgetc();
-	if (c == '\n')
-		yylineno++;
-	else if (c == EOF)
-		c = 0;
-	if (ep >= ebuf + sizeof ebuf)
-		ep = ebuf;
-	return *ep++ = c;
-}
-
-int
-awk_input(void)
-{
-	return input();
-}
-
-void
-unput(int c)
-{
-	yytchar = c;
-	if (yytchar == '\n')
-		yylineno--;
-	*yysptr++ = yytchar;
-	if (--ep < ebuf)
-		ep = ebuf + sizeof(ebuf) - 1;
-}
-#endif	/* !FLEX_SCANNER */
 
 static void
 awk_unputstr(const char *s)

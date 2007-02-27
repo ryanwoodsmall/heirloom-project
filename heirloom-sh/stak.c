@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)stak.c	1.5 (gritter) 6/15/05
+ * Sccsid @(#)stak.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "stak.c	1.10	05/06/08 SMI" */
 /*
@@ -43,14 +43,13 @@
 /* ========	storage allocation	======== */
 
 unsigned char *
-getstak (			/* allocate requested stack */
-    intptr_t asize
-)
+getstak(asize)			/* allocate requested stack */
+int	asize;
 {
 	register unsigned char	*oldstak;
 	register int	size;
 
-	size = round((intptr_t)asize, BYTESPERWORD);
+	size = round(asize, BYTESPERWORD);
 	oldstak = stakbot;
 	staktop = stakbot += size;
 	if (staktop >= brkend)
@@ -63,11 +62,11 @@ getstak (			/* allocate requested stack */
  * should be followed by `endstak'
  */
 unsigned char *
-locstak(void)
+locstak()
 {
 	if (brkend - stakbot < BRKINCR)
 	{
-		if (setbrk(brkincr) == (unsigned char *)-1)
+		if (setbrk(brkincr) == -1)
 			error(nostack);
 		if (brkincr < BRKMAX)
 			brkincr += 256;
@@ -75,29 +74,29 @@ locstak(void)
 	return(stakbot);
 }
 
-void 
-growstak(unsigned char *newtop)
+void
+growstak(newtop)
+unsigned char	*newtop;
 {
-	register uintptr_t	incr;
+	register unsigned	incr;
 
-	incr = (uintptr_t)round(newtop - brkend + 1, BYTESPERWORD);
+	incr = (unsigned)round(newtop - brkend + 1, BYTESPERWORD);
 	if (brkincr > incr)
 		incr = brkincr;
-	if (setbrk(incr) == (unsigned char *)-1)
+	if (setbrk(incr) == -1)
 		error(nospace);
 }
 
 unsigned char *
-savstak(void)
+savstak()
 {
 	assert(staktop == stakbot);
 	return(stakbot);
 }
 
 unsigned char *
-endstak (		/* tidy up after `locstak' */
-    register unsigned char *argp
-)
+endstak(argp)		/* tidy up after `locstak' */
+register unsigned char	*argp;
 {
 	register unsigned char	*oldstak;
 
@@ -111,10 +110,8 @@ endstak (		/* tidy up after `locstak' */
 	return(oldstak);
 }
 
-void
-tdystak (		/* try to bring stack back to x */
-    register unsigned char *x
-)
+tdystak(x)		/* try to bring stack back to x */
+register unsigned char	*x;
 {
 	while ((unsigned char *)stakbsy > x)
 	{
@@ -122,24 +119,25 @@ tdystak (		/* try to bring stack back to x */
 		stakbsy = stakbsy->word;
 	}
 	staktop = stakbot = max(x, stakbas);
-	rmtemp((struct ionod *)x);
+	rmtemp(x);
 }
 
-void
-stakchk(void)
+stakchk()
 {
 	if ((brkend - stakbas) > BRKINCR + BRKINCR)
 		setbrk(-BRKINCR);
 }
 
 unsigned char *
-cpystak(unsigned char *x)
+cpystak(x)
+unsigned char	*x;
 {
 	return(endstak(movstrstak(x, locstak())));
 }
 
 unsigned char *
-movstrstak(register const unsigned char *a, register unsigned char *b)
+movstrstak(a, b)
+register unsigned char	*a, *b;
 {
 	do
 	{
@@ -155,8 +153,9 @@ movstrstak(register const unsigned char *a, register unsigned char *b)
  * Return s1
  */
 unsigned char *
-memcpystak(register unsigned char *s1, register const unsigned char *s2,
-		register int n)
+memcpystak(s1, s2, n)
+register unsigned char *s1, *s2;
+register int n;
 {
 	register unsigned char *os1 = s1;
 

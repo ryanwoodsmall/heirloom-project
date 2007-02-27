@@ -18,13 +18,12 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tb.c	1.7 (gritter) 9/8/06
+ * Sccsid @(#)tb.c	1.5 (gritter) 8/12/05
  */
 
  /* tb.c: check which entries exist, also storage allocation */
 # include "t..c"
 # include <stdlib.h>
-# include <string.h>
 # include <inttypes.h>
 void
 checkuse(void)
@@ -85,30 +84,19 @@ if (pp == 0)
 return(pp);
 }
 void
-updspace(char *old, char *new, int area)
+updspace(char *old, char *new)
 {
-int i, j, d = new - old;
+int i;
 for (i = 0; i < spcount; i++)
 	if (spvecs[i] == old) {
 		spvecs[i] = new;
-		for (i = 0; i < nlin; i++) {
-			if (instead[i] >= old && instead[i] < &old[area])
-				instead[i] += d;
-			if (table[i])
-				for (j = 0; j <= ncol; j++)
-					if (table[i][j].col >= old &&
-					    table[i][j].col < &old[area])
-						table[i][j].col += d;
-		}
-		if (leftover >= old && leftover < &old[area])
-			leftover += d;
 		break;
 	}
 }
-static int MAXPC;
+# define MAXPC 50
 char *thisvec;
 int tpcount = -1;
-char **tpvecs;
+char *tpvecs[MAXPC];
 
 int *
 alocv(int n)
@@ -117,19 +105,13 @@ int *tp, *q;
 if (tpcount<0 || thisvec+n > tpvecs[tpcount]+MAXCHS)
 	{
 	tpcount++;
-	if (tpcount >= MAXPC) {
-		tpvecs = realloc(tpvecs, (tpcount+1) * sizeof *tpvecs);
-		if (tpvecs == 0) goto nospace;
-		memset(&tpvecs[MAXPC], 0, (tpcount+1-MAXPC) * sizeof *tpvecs);
-		MAXPC = tpcount+1;
-	}
 	if (tpvecs[tpcount]==0)
 		{
 		tpvecs[tpcount] = calloc(MAXCHS,1);
 		}
 	thisvec = tpvecs[tpcount];
 	if (thisvec == 0)
-	nospace:error("no space for vectors");
+		error("no space for vectors");
 	}
 tp=(int *)thisvec;
 thisvec+=n;

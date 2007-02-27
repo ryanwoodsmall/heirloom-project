@@ -2,8 +2,6 @@ charset
 em 1 -
 hy 1 -
 \- 1 -
-rs 1 %\134
-dq 1 %\042
 bu 1 +\bo
 sq 2 \[]
 ru 1 _

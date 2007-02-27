@@ -22,168 +22,169 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)strsig.c	1.9 (gritter) 6/30/05
+ * Sccsid @(#)main.c	1.2 (gritter) 6/14/05
+ */
+/*
+ * Sccsid @(#)strsig.c	1.3 (gritter) 6/14/05
  */
 
 #include <signal.h>
 #include <stdlib.h>
-#include <string.h>
+#include "defs.h"
+
+#define	MAXSIGVAL	32
 
 static const struct sig_strlist {
 	const int	sig_num;
 	const char	*sig_str;
-	const char	*sig_name;
 } sig_strs[] = {
-	{ 0,		"EXIT",		"UNKNOWN SIGNAL"		},
-	{ SIGHUP,	"HUP",		"Hangup"			},
-	{ SIGINT,	"INT",		"Interrupt"			},
-	{ SIGQUIT,	"QUIT",		"Quit"				},
-	{ SIGILL,	"ILL",		"Illegal Instruction"		},
-	{ SIGTRAP,	"TRAP",		"Trace/Breakpoint Trap"		},
-	{ SIGABRT,	"ABRT",		"Abort"				},
+	{ 0,		"EXIT"	},
+	{ SIGHUP,	"HUP"	},
+	{ SIGINT,	"INT"	},
+	{ SIGQUIT,	"QUIT"	},
+	{ SIGILL,	"ILL"	},
+	{ SIGTRAP,	"TRAP"	},
+	{ SIGABRT,	"ABRT"	},
 #ifdef	SIGIOT
-	{ SIGIOT,	"IOT",		"Input/Output Trap"		},
+	{ SIGIOT,	"IOT"	},
 #endif
 #ifdef	SIGEMT
-	{ SIGEMT,	"EMT",		"Emulation Trap"		},
+	{ SIGEMT,	"EMT"	},
 #endif
 #ifdef	SIGFPE
-	{ SIGFPE,	"FPE",		"Arithmetic Exception"		},
+	{ SIGFPE,	"FPE"	},
 #endif
 #ifdef	SIGKILL
-	{ SIGKILL,	"KILL",		"Killed"			},
+	{ SIGKILL,	"KILL"	},
 #endif
 #ifdef	SIGBUS
-	{ SIGBUS,	"BUS",		"Bus Error"			},
+	{ SIGBUS,	"BUS"	},
 #endif
 #ifdef	SIGSEGV
-	{ SIGSEGV,	"SEGV",		"Segmentation Fault"		},
+	{ SIGSEGV,	"SEGV"	},
 #endif
 #ifdef	SIGSYS
-	{ SIGSYS,	"SYS",		"Bad System Call"		},
+	{ SIGSYS,	"SYS"	},
 #endif
 #ifdef	SIGPIPE
-	{ SIGPIPE,	"PIPE",		"Broken Pipe"			},
+	{ SIGPIPE,	"PIPE"	},
 #endif
 #ifdef	SIGALRM
-	{ SIGALRM,	"ALRM",		"Alarm Clock"			},
+	{ SIGALRM,	"ALRM"	},
 #endif
 #ifdef	SIGTERM
-	{ SIGTERM,	"TERM",		"Terminated"			},
+	{ SIGTERM,	"TERM"	},
 #endif
 #ifdef	SIGUSR1
-	{ SIGUSR1,	"USR1",		"User Signal 1"			},
+	{ SIGUSR1,	"USR1"	},
 #endif
 #ifdef	SIGUSR2
-	{ SIGUSR2,	"USR2",		"User Signal 2"			},
+	{ SIGUSR2,	"USR2"	},
 #endif
 #ifdef	SIGCLD
-	{ SIGCLD,	"CLD",		"Child Status Changed"		},
+	{ SIGCLD,	"CLD"	},
 #endif
 #ifdef	SIGCHLD
-	{ SIGCHLD,	"CHLD",		"Child Status Changed"		},
+	{ SIGCHLD,	"CHLD"	},
 #endif
 #ifdef	SIGPWR
-	{ SIGPWR,	"PWR",		"Power-Fail/Restart"		},
+	{ SIGPWR,	"PWR"	},
 #endif
 #ifdef	SIGWINCH
-	{ SIGWINCH,	"WINCH",	"Window Size Change"		},
+	{ SIGWINCH,	"WINCH"	},
 #endif
 #ifdef	SIGURG
-	{ SIGURG,	"URG",		"Urgent Socket Condition"	},
+	{ SIGURG,	"URG"	},
 #endif
 #ifdef	SIGPOLL
-	{ SIGPOLL,	"POLL",		"Pollable Event"		},
+	{ SIGPOLL,	"POLL"	},
 #endif
 #ifdef	SIGIO
-	{ SIGIO,	"IO",		"Input/Output Now Possible"	},
+	{ SIGIO,	"IO"	},
 #endif
 #ifdef	SIGSTOP
-	{ SIGSTOP,	"STOP",		"Stopped (signal)"		},
+	{ SIGSTOP,	"STOP"	},
 #endif
 #ifdef	SIGTSTP
-	{ SIGTSTP,	"TSTP",		"Stopped (user)"		},
+	{ SIGTSTP,	"TSTP"	},
 #endif
 #ifdef	SIGCONT
-	{ SIGCONT,	"CONT",		"Continued"			},
+	{ SIGCONT,	"CONT"	},
 #endif
 #ifdef	SIGTTIN
-	{ SIGTTIN,	"TTIN",		"Stopped (tty input)"		},
+	{ SIGTTIN,	"TTIN"	},
 #endif
 #ifdef	SIGTTOU
-	{ SIGTTOU,	"TTOU",		"Stopped (tty output)"		},
+	{ SIGTTOU,	"TTOU"	},
 #endif
 #ifdef	SIGVTALRM
-	{ SIGVTALRM,	"VTALRM",	"Virtual Timer Expired"		},
+	{ SIGVTALRM,	"VTALRM"	},
 #endif
 #ifdef	SIGPROF
-	{ SIGPROF,	"PROF",		"Profiling Timer Expired"	},
+	{ SIGPROF,	"PROF"	},
 #endif
 #ifdef	SIGXCPU
-	{ SIGXCPU,	"XCPU",		"Cpu Limit Exceeded"		},
+	{ SIGXCPU,	"XCPU"	},
 #endif
 #ifdef	SIGXFSZ
-	{ SIGXFSZ,	"XFSZ",		"File Size Limit Exceeded"	},
+	{ SIGXFSZ,	"XFSZ"	},
 #endif
 #ifdef	SIGWAITING
-	{ SIGWAITING,	"WAITING",	"No runnable lwp"		},
+	{ SIGWAITING,	"WAITING"	},
 #endif
 #ifdef	SIGLWP
-	{ SIGLWP,	"LWP",		"Inter-lwp signal"		},
+	{ SIGLWP,	"LWP"	},
 #endif
 #ifdef	SIGFREEZE
-	{ SIGFREEZE,	"FREEZE",	"Checkpoint Freeze"		},
+	{ SIGFREEZE,	"FREEZE"	},
 #endif
 #ifdef	SIGTHAW
-	{ SIGTHAW,	"THAW",		"Checkpoint Thaw"		},
+	{ SIGTHAW,	"THAW"	},
 #endif
 #ifdef	SIGCANCEL
-	{ SIGCANCEL,	"CANCEL",	"Thread Cancellation"		},
+	{ SIGCANCEL,	"CANCEL"	},
 #endif
 #ifdef	SIGLOST
-	{ SIGLOST,	"LOST",		"Resource Lost"			},
+	{ SIGLOST,	"LOST"	},
 #endif
 #ifdef	SIGSTKFLT
-	{ SIGSTKFLT,	"STKFLT",	"Stack Fault On Coprocessor"	},
+	{ SIGSTKFLT,	"STKFLT"	},
 #endif
 #ifdef	SIGINFO
-	{ SIGINFO,	"INFO",		"Status Request From Keyboard"	},
+	{ SIGINFO,	"INFO"	},
 #endif
 #ifdef	SIG_2_STR_WITH_RT_SIGNALS
-	{ SIGRTMIN,	"RTMIN",	"First Realtime Signal"		},
-	{ SIGRTMIN+1,	"RTMIN+1",	"Second Realtime Signal"	},
-	{ SIGRTMIN+2,	"RTMIN+2"	"Third Realtime Signal"		},
-	{ SIGRTMIN+3,	"RTMIN+3",	"Fourth Realtime Signal"	},
-	{ SIGRTMAX-3,	"RTMAX-3",	"Fourth Last Realtime Signal"	},
-	{ SIGRTMAX-2,	"RTMAX-2",	"Third Last Realtime Signal"	},
-	{ SIGRTMAX-1,	"RTMAX-1",	"Second Last Realtime Signal"	},
-	{ SIGRTMAX,	"RTMAX"	},	"Last Realtime Signal"		},
+	{ SIGRTMIN,	"RTMIN"	},
+	{ SIGRTMIN+1,	"RTMIN+1"	},
+	{ SIGRTMIN+2,	"RTMIN+2"	},
+	{ SIGRTMIN+3,	"RTMIN+3"	},
+	{ SIGRTMAX-3,	"RTMAX-3"	},
+	{ SIGRTMAX-2,	"RTMAX-2"	},
+	{ SIGRTMAX-1,	"RTMAX-1"	},
+	{ SIGRTMAX,	"RTMAX"	},
 #endif	/* SIG_2_STR_WITH_RT_SIGNALS */
 	{ -1,		NULL	}
 };
 
-int 
-str_2_sig(const char *str, int *signum)
+int
+str_2_sig(str, signum)
+	const char *str;
+	int *signum;
 {
 	register int	i;
-	long	n;
-	char	*x;
 
 	for (i = 0; sig_strs[i].sig_str; i++)
-		if (strcmp(str, sig_strs[i].sig_str) == 0)
+		if (eq(str, sig_strs[i].sig_str))
 			break;
-	if (sig_strs[i].sig_str == NULL) {
-		n = strtol(str, &x, 10);
-		if (*x != '\0' || n < 0 || n >= i || *str == '+' || *str == '-')
-			return -1;
-		*signum = n;
-	} else
-		*signum = sig_strs[i].sig_num;
+	if (sig_strs[i].sig_str == NULL)
+		return -1;
+	*signum = sig_strs[i].sig_num;
 	return 0;
 }
 
-int 
-sig_2_str(int signum, char *str)
+int
+sig_2_str(signum, str)
+	char *str;
 {
 	register int	i;
 
@@ -192,17 +193,141 @@ sig_2_str(int signum, char *str)
 			break;
 	if (sig_strs[i].sig_str == NULL)
 		return -1;
-	strcpy(str, sig_strs[i].sig_str);
+	movstr(sig_strs[i].sig_str, str);
 	return 0;
 }
 
-char *
-str_signal(int signum)
+void
+init_sigval()
 {
-	register int	i;
+	extern void	(*(sigval[]))();
 
-	for (i = 0; sig_strs[i].sig_name; i++)
-		if (sig_strs[i].sig_num == signum)
-			break;
-	return (char *)sig_strs[i].sig_name;
+#ifdef	SIGHUP
+	if (SIGHUP < MAXSIGVAL)
+		sigval[SIGHUP] = done;
+#endif
+#ifdef	SIGINT
+	if (SIGINT < MAXSIGVAL)
+		sigval[SIGINT] = fault;
+#endif
+#ifdef	SIGQUIT
+	if (SIGQUIT < MAXSIGVAL)
+		sigval[SIGQUIT] = fault;
+#endif
+#ifdef	SIGILL
+	if (SIGILL < MAXSIGVAL)
+		sigval[SIGILL] = done;
+#endif
+#ifdef	SIGTRAP
+	if (SIGTRAP < MAXSIGVAL)
+		sigval[SIGTRAP] = done;
+#endif
+#ifdef	SIGIOT
+	if (SIGIOT < MAXSIGVAL)
+		sigval[SIGIOT] = done;
+#endif
+#ifdef	SIGBUS
+	if (SIGBUS < MAXSIGVAL)
+		sigval[SIGBUS] = done;
+#endif
+#ifdef	SIGFPE
+	if (SIGFPE < MAXSIGVAL)
+		sigval[SIGFPE] = done;
+#endif
+#ifdef	SIGKILL
+	if (SIGKILL < MAXSIGVAL)
+		sigval[SIGKILL] = 0;
+#endif
+#ifdef	SIGUSR1
+	if (SIGUSR1 < MAXSIGVAL)
+		sigval[SIGUSR1] = done;
+#endif
+#ifdef	SIGSEGV
+	if (SIGSEGV < MAXSIGVAL)
+		sigval[SIGSEGV] = done;
+#endif
+#ifdef	SIGEMT
+	if (SIGEMT < MAXSIGVAL)
+		sigval[SIGEMT] = done;
+#endif
+#ifdef	SIGUSR2
+	if (SIGUSR2 < MAXSIGVAL)
+		sigval[SIGUSR2] = done;
+#endif
+#ifdef	SIGPIPE
+	if (SIGPIPE < MAXSIGVAL)
+		sigval[SIGPIPE] = done;
+#endif
+#ifdef	SIGALRM
+	if (SIGALRM < MAXSIGVAL)
+		sigval[SIGALRM] = fault;
+#endif
+#ifdef	SIGTERM
+	if (SIGTERM < MAXSIGVAL)
+		sigval[SIGTERM] = fault;
+#endif
+#ifdef	SIGSTKFLT
+	if (SIGSTKFLT < MAXSIGVAL)
+		sigval[SIGSTKFLT] = done;
+#endif
+#ifdef	SIGCHLD
+	if (SIGCHLD < MAXSIGVAL)
+		sigval[SIGCHLD] = 0;
+#endif
+#ifdef	SIGCONT
+	if (SIGCONT < MAXSIGVAL)
+		sigval[SIGCONT] = 0;
+#endif
+#ifdef	SIGSTOP
+	if (SIGSTOP < MAXSIGVAL)
+		sigval[SIGSTOP] = 0;
+#endif
+#ifdef	SIGTSTP
+	if (SIGTSTP < MAXSIGVAL)
+		sigval[SIGTSTP] = 0;
+#endif
+#ifdef	SIGTTIN
+	if (SIGTTIN < MAXSIGVAL)
+		sigval[SIGTTIN] = 0;
+#endif
+#ifdef	SIGTTOU
+	if (SIGTTOU < MAXSIGVAL)
+		sigval[SIGTTOU] = 0;
+#endif
+#ifdef	SIGURG
+	if (SIGURG < MAXSIGVAL)
+		sigval[SIGURG] = 0;
+#endif
+#ifdef	SIGXCPU
+	if (SIGXCPU < MAXSIGVAL)
+		sigval[SIGXCPU] = done;
+#endif
+#ifdef	SIGXFSZ
+	if (SIGXFSZ < MAXSIGVAL)
+		sigval[SIGXFSZ] = done;
+#endif
+#ifdef	SIGVTALRM
+	if (SIGVTALRM < MAXSIGVAL)
+		sigval[SIGVTALRM] = done;
+#endif
+#ifdef	SIGPROF
+	if (SIGPROF < MAXSIGVAL)
+		sigval[SIGPROF] = done;
+#endif
+#ifdef	SIGWINCH
+	if (SIGWINCH < MAXSIGVAL)
+		sigval[SIGWINCH] = 0;
+#endif
+#ifdef	SIGPOLL
+	if (SIGPOLL < MAXSIGVAL)
+		sigval[SIGPOLL] = done;
+#endif
+#ifdef	SIGPWR
+	if (SIGPWR < MAXSIGVAL)
+		sigval[SIGPWR] = done;
+#endif
+#ifdef	SIGSYS
+	if (SIGSYS < MAXSIGVAL)
+		sigval[SIGSYS] = done;
+#endif
 }

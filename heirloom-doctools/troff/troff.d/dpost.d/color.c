@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)color.c	1.5 (gritter) 11/29/05
+ * Sccsid @(#)color.c	1.3 (gritter) 8/9/05
  */
 
 /*
@@ -36,10 +36,10 @@
  * Routines that handle color requests passed through as device control commands
  * in the form "x X SetColor:red". The following PostScript procedures are needed:
  *
- *	_setcolor
+ *	setcolor
  *
- *	  mark /color _setcolor mark
- *	  mark /color1 /color2 _setcolor mark
+ *	  mark /color setcolor mark
+ *	  mark /color1 /color2 setcolor mark
  *
  *	    Called whenever we want to change PostScript's current color graphics
  *	    state parameter. One or two color arguments can be given. In each case
@@ -54,7 +54,7 @@
  *	  leftx rightx drawrvbox -
  *
  *	    Fills a box that extends from leftx to rightx with the background color
- *	    that was requested when _setcolor set things up for reverse video mode.
+ *	    that was requested when setcolor set things up for reverse video mode.
  *	    The vertical extent of the box is determined using FontBBox just before
  *	    the first string is printed, and the height remains in effect until
  *	    there's an explicit color change. In otherwords font or size changes
@@ -82,12 +82,10 @@
  *	x X SetColor:color1 color2		reverse video again
  *	x X SetColor:num1 num2 num3 rgb		explicit rgb color request
  *	x X SetColor:num1 num2 num3 hsb		explicit hsb color request
- *	x X SetColor:num1 num2 num3 num4 cmyk	explicit cmyk color request
- *	x X SetColor:arbitrary PostScript commands
  *
- * In the last examples num1, num2, num3, and num4 should be numbers between 0 and
+ * In the last three examples num1, num2, and num3 should be numbers between 0 and
  * 1 inclusive and are passed on as aguments to the approrpriate PostScript color
- * command (eg. setrgbcolor). Unknown color names (ie. the ones that _setcolor
+ * command (eg. setrgbcolor). Unknown color names (ie. the ones that setcolor
  * doesn't find in colordict) are mapped into defaults. For one color the default
  * is black, while for reverse video it's white text on a black background.
  *
@@ -119,9 +117,9 @@
 
 #define DEFAULTCOLOR	"black"
 
-static char	color[500] = DEFAULTCOLOR;	/* current color */
-static int	gotcolor = FALSE;		/* TRUE after *colorfile is downloaded */
-static int	wantcolor = FALSE;		/* TRUE if we really ask for a color */
+char	color[50] = DEFAULTCOLOR;	/* current color */
+int	gotcolor = FALSE;		/* TRUE after *colorfile is downloaded */
+int	wantcolor = FALSE;		/* TRUE if we really ask for a color */
 
 
 /*
@@ -246,7 +244,7 @@ setcolor(void)
 	lastend = -1;
 	newencoding = realencoding;
 
-	if ( islower(color[0]) == 0 )		/* explicit rgb, hsb, or cmyk request */
+	if ( islower(color[0]) == 0 )		/* explicit rgb or hsb request */
 	    fprintf(tf, "%s\n", color);
 	else {
 	    putc('/', tf);
@@ -258,7 +256,7 @@ setcolor(void)
 		fprintf(tf, " /%s", p);
 		newencoding = maxencoding + 1;
 	    }	/* End if */
-	    fprintf(tf, " _setcolor\n");
+	    fprintf(tf, " setcolor\n");
 	}   /* End else */
 
 	if ( newencoding != encoding )  {

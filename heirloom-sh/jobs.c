@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)jobs.c	1.13 (gritter) 6/23/05
+ * Sccsid @(#)jobs.c	1.4 (gritter) 6/14/05
  */
 /* from OpenSolaris "jobs.c	1.25	05/06/08 SMI" */
 /*
@@ -58,9 +58,9 @@ struct job
 	pid_t  j_pid;		/* job leader's process ID */
 	pid_t  j_pgid;		/* job's process group ID */
 	pid_t  j_tgid;		/* job's foreground process group ID */
-	unsigned int   j_jid;	/* job ID */
-	unsigned short j_xval;	/* exit code, or exit or stop signal */
-	unsigned short j_flag;	/* various status flags defined below */
+	uint   j_jid;		/* job ID */
+	ushort j_xval;		/* exit code, or exit or stop signal */
+	ushort j_flag;		/* various status flags defined below */
 	char  *j_pwd;		/* job's working directory */
 	char  *j_cmd;		/* cmd used to invoke this job */
 };
@@ -102,10 +102,11 @@ static struct job 	*jobcur, /* active jobs listed in currency order */
 			*thisjob,
 			*joblst; /* active jobs listed in job ID order	 */
 
-static void	printjob(struct job *jp, int propts);
+static int	printjob(struct job *jp, int propts);
 
 static struct job *
-pgid2job(register pid_t pgid)
+pgid2job(pgid)
+register pid_t pgid;
 {
 	register struct job *jp;
 
@@ -116,10 +117,13 @@ pgid2job(register pid_t pgid)
 }
 
 static struct job *
-str2job(register char *cmd, register char *job, int mustbejob)
+str2job(cmd, job, mustbejob)
+register char *cmd;
+register char *job;
+int mustbejob;
 {
 	register struct job *jp, *njp;
-	register int i;
+	register i;
 
 	if (*job != '%')
 		jp = pgid2job(stoi(job));
@@ -132,7 +136,7 @@ str2job(register char *cmd, register char *job, int mustbejob)
 		for (jp = joblst; jp && jp->j_jid != i; jp = jp->j_nxtp)
 			continue;
 	} else if (*job == '?') {
-		register int j;
+		register j;
 		register char *p;
 		i = strlen(++job);
 		jp = 0;
@@ -168,8 +172,9 @@ str2job(register char *cmd, register char *job, int mustbejob)
 	return (jp);
 }
 
-static void 
-freejob(register struct job *jp)
+static void
+freejob(jp)
+register struct job *jp;
 {
 	register struct job **njp;
 	register struct job **cjp;
@@ -193,8 +198,7 @@ freejob(register struct job *jp)
  * to exit, but needs to wait until the fg job
  * is done.
  */
-void
-collect_fg_job(void)
+collect_fg_job()
 {
 	register struct job *jp;
 	register pid_t pid;
@@ -226,7 +230,11 @@ collect_fg_job(void)
  */
 
 static int
-statjob(register struct job *jp, int stat, int fg, int rc)
+statjob(jp, stat, fg, rc)
+register struct job *jp;
+int stat;
+int fg;
+int rc;
 {
 	pid_t tgid;
 	int done = 0;
@@ -255,7 +263,7 @@ statjob(register struct job *jp, int stat, int fg, int rc)
 			else {
 				jp->j_flag |= J_SAVETTY;
 				tcgetattr(0, &jp->j_stty);
-				tcsetattr(0, TCSANOW, &mystty);
+				(void) tcsetattr(0, TCSANOW, &mystty);
 			}
 		}
 		if (jp->j_jid) {
@@ -270,10 +278,8 @@ statjob(register struct job *jp, int stat, int fg, int rc)
 		if (WIFSIGNALED(stat)) {
 			jp->j_xval = WTERMSIG(stat);
 			jp->j_flag |= J_SIGNALED;
-#ifdef	WCOREDUMP
 			if (WCOREDUMP(stat))
 				jp->j_flag |= J_DUMPED;
-#endif	/* WCOREDUMP */
 			if (!fg || jp->j_xval != SIGINT) {
 				jp->j_flag |= J_NOTIFY;
 				jobnote++;
@@ -315,8 +321,8 @@ statjob(register struct job *jp, int stat, int fg, int rc)
  * from builtin() where chktrap() is already called.
  */
 
-static void 
-collectjobs(int wnohang)
+static void
+collectjobs(wnohang)
 {
 	pid_t pid;
 	register struct job *jp;
@@ -332,13 +338,13 @@ collectjobs(int wnohang)
 		if ((pid = waitpid(-1, &stat, wnohang|wflags)) <= 0)
 			break;
 		if (jp = pgid2job(pid))
-			statjob(jp, stat, 0, 0);
+			(void) statjob(jp, stat, 0, 0);
 	}
 
 }
 
-void 
-freejobs(void)
+void
+freejobs()
 {
 	register struct job *jp;
 
@@ -356,7 +362,7 @@ freejobs(void)
 					printjob(jp, PR_STAT|PR_PGID);
 			}
 		}
-		setb(savefd);
+		(void) setb(savefd);
 	}
 
 	if (jobdone) {
@@ -367,8 +373,9 @@ freejobs(void)
 	}
 }
 
-static void 
-waitjob(register struct job *jp)
+static void
+waitjob(jp)
+register struct job *jp;
 {
 	int stat;
 	int done;
@@ -400,18 +407,15 @@ waitjob(register struct job *jp)
 /*
  * modify the foreground process group to *new* only if the
  * current foreground process group is equal to *expected*
- * Some systems return the value of a non-existing process
- * group id with tcgetpgrp() after the last process of the
- * foreground process group has exited. In this case, behave
- * as if it had been the expected one.
  */
 
 int
-settgid(pid_t new, pid_t expected)
+settgid(new, expected)
+pid_t new, expected;
 {
 	register pid_t current = tcgetpgrp(0);
 
-	if (current != expected && (kill(-current, 0) == 0 || errno == EPERM))
+	if (current != expected)
 		return (current);
 
 	if (new != current)
@@ -420,8 +424,9 @@ settgid(pid_t new, pid_t expected)
 	return (0);
 }
 
-static void 
-restartjob(register struct job *jp, int fg)
+static void
+restartjob(jp, fg)
+register struct job *jp;
 {
 	if (jp != jobcur) {
 		register struct job *t;
@@ -438,13 +443,13 @@ restartjob(register struct job *jp, int fg)
 #ifdef	VDSUSP
 			jp->j_stty.c_cc[VDSUSP] = mystty.c_cc[VDSUSP];
 #endif	/* VDSUSP */
-			tcsetattr(0, TCSADRAIN, &jp->j_stty);
+			(void) tcsetattr(0, TCSADRAIN, &jp->j_stty);
 		}
-		settgid(jp->j_tgid, mypgid);
+		(void) settgid(jp->j_tgid, mypgid);
 	}
-	kill(-(jp->j_pgid), SIGCONT);
+	(void) kill(-(jp->j_pgid), SIGCONT);
 	if (jp->j_tgid != jp->j_pgid)
-		kill(-(jp->j_tgid), SIGCONT);
+		(void) kill(-(jp->j_tgid), SIGCONT);
 	jp->j_flag &= ~(J_STOPPED|J_SIGNALED|J_SAVETTY);
 	jp->j_flag |= J_RUNNING;
 	if (fg)  {
@@ -457,8 +462,9 @@ restartjob(register struct job *jp, int fg)
 	}
 }
 
-static void
-printjob(register struct job *jp, int propts)
+static
+printjob(jp, propts)
+register struct job *jp;
 {
 	int sp = 0;
 
@@ -498,8 +504,8 @@ printjob(register struct job *jp, int propts)
 			prc_buff(SPACE);
 		sp = 28;
 		if (jp->j_flag & J_SIGNALED) {
-			const char *sigstr;
-			if ((sigstr = str_signal(jp->j_xval)) != NULL) {
+			char *sigstr, *strsignal();
+			if ((sigstr = strsignal(jp->j_xval)) != NULL) {
 				sp -= strlen(sigstr);
 				prs_buff(sigstr);
 			} else {
@@ -561,8 +567,8 @@ printjob(register struct job *jp, int propts)
  * and after the "exec" builtin
  */
 
-void 
-startjobs(void)
+void
+startjobs()
 {
 	svpgid = mypgid;
 
@@ -579,13 +585,14 @@ startjobs(void)
 	if (mysid != mypgid) {
 		setpgid(0, 0);
 		mypgid = mypid;
-		settgid(mypgid, svpgid);
+		(void) settgid(mypgid, svpgid);
 	}
 
 }
 
-int 
-endjobs(int check_if)
+int
+endjobs(check_if)
+int check_if;
 {
 	if ((flags & (jcoff|jcflg)) != jcflg)
 		return (1);
@@ -613,7 +620,7 @@ endjobs(int check_if)
 	}
 
 	if (svpgid != mypgid) {
-		settgid(svtgid, mypgid);
+		(void) settgid(svtgid, mypgid);
 		setpgid(0, svpgid);
 	}
 
@@ -625,15 +632,18 @@ endjobs(int check_if)
  * called by the shell to reserve a job slot for a job about to be spawned
  */
 
-void 
-deallocjob(void)
+void
+deallocjob()
 {
 	free(thisjob);
 	jobcnt--;
 }
 
-void
-allocjob(register char *cmd, register unsigned char *cwd, int monitor)
+int
+allocjob(cmd, cwd, monitor)
+register char *cmd;
+register unsigned char *cwd;
+int monitor;
 {
 	register struct job *jp, **jpp;
 	register int jid, cmdlen, cwdlen;
@@ -670,8 +680,7 @@ allocjob(register char *cmd, register unsigned char *cwd, int monitor)
 	thisjob = jp;
 }
 
-void
-clearjobs(void)
+clearjobs()
 {
 	register struct job *jp, *sjp;
 
@@ -686,8 +695,8 @@ clearjobs(void)
 
 }
 
-void
-makejob(int monitor, int fg)
+makejob(monitor, fg)
+int monitor, fg;
 {
 	if (monitor) {
 		mypgid = mypid;
@@ -714,10 +723,12 @@ makejob(int monitor, int fg)
  */
 
 void
-postjob(pid_t pid, int fg)
+postjob(pid, fg)
+pid_t pid;
+int fg;
 {
 
-	register int propts;
+	register propts;
 
 	thisjob->j_nxtp = *nextjob;
 	*nextjob = thisjob;
@@ -751,20 +762,23 @@ postjob(pid_t pid, int fg)
  * the builtin "jobs" command
  */
 
-void 
-sysjobs(int argc, char *argv[])
+void
+sysjobs(argc, argv)
+int argc;
+char *argv[];
 {
 	register char *cmd = *argv;
 	register struct job *jp;
-	register int propts, c;
+	register propts, c;
+	extern int opterr, i;
 	int savoptind = optind;
 	int loptind = -1;
 	int savopterr = opterr;
-	int savsp = getopt_sp;
+	int savsp = _sp;
 	char *savoptarg = optarg;
 	optind = 1;
 	opterr = 0;
-	getopt_sp = 1;
+	_sp = 1;
 	propts = 0;
 
 	if ((flags & jcflg) == 0)
@@ -796,7 +810,7 @@ err:
 	optind = savoptind;
 	optarg = savoptarg;
 	opterr = savopterr;
-	getopt_sp = savsp;
+	_sp = savsp;
 	if (loptind == -1)
 		return;
 
@@ -845,11 +859,12 @@ err:
  * the builtin "fg" and "bg" commands
  */
 
-void
-sysfgbg(int argc, char *argv[])
+sysfgbg(argc, argv)
+int argc;
+char *argv[];
 {
 	register char *cmd = *argv;
-	register int fg;
+	register fg;
 
 	if ((flags & jcflg) == 0)
 		failed(cmd, nojc);
@@ -877,8 +892,10 @@ sysfgbg(int argc, char *argv[])
  * the builtin "wait" commands
  */
 
-void 
-syswait(int argc, char *argv[])
+void
+syswait(argc, argv)
+int argc;
+char *argv[];
 {
 	register char *cmd = *argv;
 	register struct job *jp;
@@ -899,12 +916,15 @@ syswait(int argc, char *argv[])
 			continue;
 		if (waitpid(jp->j_pid, &stat, wflags) <= 0)
 			break;
-		statjob(jp, stat, 0, 1);
+		(void) statjob(jp, stat, 0, 1);
 	}
 }
 
-static void
-sigv(char *cmd, int sig, char *args)
+static
+sigv(cmd, sig, args)
+	char *cmd;
+	int sig;
+	char *args;
 {
 	int pgrp = 0;
 	int stopme = 0;
@@ -940,7 +960,7 @@ sigv(char *cmd, int sig, char *args)
 			return;
 		}
 		if (id == mypgid && mypgid != svpgid) {
-			settgid(svtgid, mypgid);
+			(void) settgid(svtgid, mypgid);
 			setpgid(0, svpgid);
 			stopme++;
 		}
@@ -969,17 +989,18 @@ sigv(char *cmd, int sig, char *args)
 		}
 
 	} else if (sig == SIGTERM && pgrp)
-		kill(id, SIGCONT);
+		(void) kill(id, SIGCONT);
 
 	if (stopme) {
 		setpgid(0, mypgid);
-		settgid(mypgid, svpgid);
+		(void) settgid(mypgid, svpgid);
 	}
 
 }
 
-void
-sysstop(int argc, char *argv[])
+sysstop(argc, argv)
+int argc;
+char *argv[];
 {
 	char *cmd = *argv;
 	if (argc <= 1)
@@ -988,8 +1009,9 @@ sysstop(int argc, char *argv[])
 		sigv(cmd, SIGSTOP, *argv);
 }
 
-void
-syskill(int argc, char *argv[])
+syskill(argc, argv)
+int argc;
+char *argv[];
 {
 	char *cmd = *argv;
 	int sig = SIGTERM;
@@ -1003,8 +1025,8 @@ syskill(int argc, char *argv[])
 
 		if (argc == 2) {
 
-			register int i;
-			register int cnt = 0;
+			register i;
+			register cnt = 0;
 			register char sep = 0;
 			char buf[12];
 
@@ -1040,8 +1062,9 @@ syskill(int argc, char *argv[])
 
 }
 
-void
-syssusp(int argc, char *argv[])
+syssusp(argc, argv)
+int argc;
+char *argv[];
 {
 	if (argc != 1)
 		failed(argv[0], badopt);

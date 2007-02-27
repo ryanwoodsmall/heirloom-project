@@ -38,7 +38,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)draw.c	1.5 (gritter) 11/28/05
+ * Sccsid @(#)draw.c	1.3 (gritter) 8/9/05
  */
 
 /*
@@ -608,7 +608,7 @@ parsebuf (
 	    fprintf(tf, "%s setgray\n", p1);
 	} else if ( strncmp(p, "color", strlen("color")) == 0 )  {
 	    p1 = strtok(NULL, " \n");
-	    fprintf(tf, "/%s _setcolor\n", p1);
+	    fprintf(tf, "/%s setcolor\n", p1);
 	} else if ( strncmp(p, "line", strlen("line")) == 0 )  {
 	    p1 = strtok(NULL, " \n");
 	    fprintf(tf, "%s resolution mul 2 div setlinewidth\n", p1);
@@ -717,7 +717,7 @@ newbaseline (
 	endtext();
 	getbaseline();
 	fprintf(tf, "mark resolution %s newbaseline\n", p);
-	t_sf(1);
+	t_sf();
 	resetpos();
     }	/* End if */
 

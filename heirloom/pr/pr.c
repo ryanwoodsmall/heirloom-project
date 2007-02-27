@@ -40,18 +40,14 @@
  *  2+head+2+page[56]+5
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)pr_sus.sl	1.29 (gritter) 5/29/05";
-#else	/* !SUS */
-static const char sccsid[] USED = "@(#)pr.sl	1.29 (gritter) 5/29/05";
-#endif	/* !SUS */
+static const char sccsid[] USED = "@(#)pr.sl	1.24 (gritter) 10/13/04";
 
 #include <stdio.h>
 #include <signal.h>
@@ -105,6 +101,7 @@ static long	NCOL;
 static int	*icol;
 static int	*scol;
 static struct iblok	*file;
+static wint_t	*bufp;
 static long	BUFS;
 static wint_t	*buffer;	/* for multi-column output */
 #define	FF	014
@@ -114,7 +111,7 @@ static int	nofile;
 static char	isclosed[10];
 static struct iblok	*ifile[10];
 static const char	**lastarg;
-static wint_t	*peekc, *peek2c;
+static wint_t	*peekc;
 static long long	fpage;
 static long long	page;
 static int	colw;
@@ -226,7 +223,7 @@ main(int argc, char **argv)
 			case 'o':
 				if (ap[1])
 					oflg = atoi(++ap);
-				else if (ac>2) {
+				else if (ac>=2) {
 					oflg = atoi(*++av);
 					*av = NULL;
 					ac--;
@@ -236,7 +233,7 @@ main(int argc, char **argv)
 			case 'h':
 				if (ap[1])
 					header = &ap[1];
-				else if (ac>2) {
+				else if (ac>=2) {
 					header = *++av;
 					*av = NULL;
 					ac--;
@@ -250,7 +247,7 @@ main(int argc, char **argv)
 			case 'l':
 				if (ap[1])
 					length = atoi(++ap);
-				else if (ac>2) {
+				else if (ac>=2) {
 					length = atoi(*++av);
 					*av = NULL;
 					ac--;
@@ -261,15 +258,11 @@ main(int argc, char **argv)
 				wflg++;
 				if (ap[1])
 					width = atoi(++ap);
-				else if (ac>2) {
+				else if (ac>=2) {
 					width = atoi(*++av);
 					*av = NULL;
 					ac--;
 				}
-#ifdef	SUS
-				else
-					usage(0);
-#endif	/* SUS */
 				continue;
 
 			case 's':
@@ -331,8 +324,7 @@ main(int argc, char **argv)
 	if ((icol = calloc(NCOL, sizeof *icol)) == NULL ||
 			(scol = calloc(NCOL, sizeof *scol)) == NULL ||
 			(colp = calloc(NCOL, sizeof *colp)) == NULL ||
-			(peekc = calloc(NCOL, sizeof *peekc)) == NULL ||
-			(peek2c = calloc(NCOL, sizeof *peek2c)) == NULL) {
+			(peekc = calloc(NCOL, sizeof *peekc)) == NULL) {
 		free(buffer);
 		fprintf(stderr, "%s: No room for columns.\n", progname);
 		exit(1);
@@ -527,9 +519,7 @@ print(const char *fp, const char **argp)
 	page = 1;
 	for (i = 0; i<NCOL; i++)
 		scol[i] = icol[i] = 0;
-	if (buffer)
-		*buffer = 0;
-	colp[ncol] = buffer;
+	colp[ncol] = bufp = buffer;
 	while ((mflg||aflg)&&nofile || (!mflg&&!aflg)&&tpgetc(ncol)!=WEOF) {
 		if (pflg >= 0) {
 			putc('\a', stderr);
@@ -601,7 +591,7 @@ putpage(void)
 	register int lastcol, i;
 	register wint_t c = 0;
 	register wint_t *cp;
-	int j, k, l, xplength, content;
+	int j, k, l, xplength;
 
 	if (ncol==0) {
 		while (line<plength) {
@@ -672,22 +662,13 @@ putpage(void)
 	l = 0;
 	k = xplength - line;
 	while (line<xplength) {
-		content = 0;
-		if (mflg && !aflg) {
-			for (i=0; i<=ncol; i++) {
-				c = pgetc(i);
-				peek2c[i] = c;
-				if (c!='\0' && c!='\n')
-					content = i+1;
-			}
-		}
 		l++;
 		lastcol = colw+numwidth;
 		for (i=0; i<oflg; i++)
 			put(' ');
 		for (i=0; i<ncol; i++) {
 			c = pgetc(i);
-			if ((mflg==0||content&&i==0) && nflg.c_u && c!=0) {
+			if ((mflg==0||i==0) && nflg.c_u && c!=0) {
 				cnt++;
 				putnum((aflg||mflg) ? cnt : ocnt + l + k*i);
 			}
@@ -700,14 +681,6 @@ putpage(void)
 				if (aflg || mflg && nofile <= 0)
 					break;
 				continue;
-			}
-			if (aflg) {
-				c = pgetc(i+1);
-				peek2c[i+1] = c;
-				if (c == 0) {
-					put('\n');
-					continue;
-				}
 			}
 			if (tabc)
 				put(tabc);
@@ -820,11 +793,7 @@ pgetc(int ai)
 	int i;
 
 	i = aflg?0:ai;
-	if (peek2c[ai]) {
-		c = peek2c[ai];
-		peek2c[ai] = 0;
-		return c;
-	} else if (peekc[i]) {
+	if (peekc[i]) {
 		c = peekc[i];
 		peekc[i] = 0;
 	} else {
@@ -915,7 +884,7 @@ put(wint_t ac)
 	while(nspace) {
 		if (iflg.c_u && nspace >= (ns=iflg.c_g-(col-nspace)%iflg.c_g)
 #ifdef	SUS
-				&& (ns > 1 || nspace > 1)
+				&& ns > 1
 #endif	/* SUS */
 				) {
 			nspace -= ns;

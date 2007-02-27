@@ -40,7 +40,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/ta.sl	1.8 (gritter) 12/25/06";
+static const char sccsid[] USED = "@(#)ta.c	1.5 (gritter) 8/13/05";
 
 /*
  * University Copyright- Copyright (c) 1982, 1986, 1988
@@ -144,7 +144,7 @@ int	res	= 972;		/* input assumed computed according to this resolution */
 FILE	*tf;			/* output file */
 char	*fontdir	= FNTDIR;
 #define	devname	troff_devname
-char	devname[20]	= "hp2621";
+extern char devname[];
 
 FILE *fp;		/* input file pointer */
 
@@ -184,14 +184,12 @@ void vgoto(int);
 void vmot(int);
 void put1s(char *);
 void put1(int);
-void setsize(double);
+void setsize(int);
 void t_fp(int, char *);
 void setfont(int);
 void done(void);
 void callunix(char []);
 int readch(void);
-
-static int sget(char *, size_t, FILE *);
 
 int
 main(int argc, char **argv)
@@ -246,7 +244,7 @@ outlist(char *s)	/* process list of page numbers to be printed */
 	int n1, n2, i;
 
 	nolist = 0;
-	while (*s && nolist < sizeof olist/sizeof *olist - 1) {
+	while (*s) {
 		n1 = 0;
 		if (isdigit((unsigned char)*s))
 			do
@@ -294,7 +292,7 @@ conv(register FILE *fp)
 {
 	register int c, k;
 	int m, n, n1, m1;
-	char str[4096], buf[4096];
+	char str[100], buf[300];
 
 	while ((c = getc(fp)) != EOF) {
 		switch (c) {
@@ -318,7 +316,7 @@ conv(register FILE *fp)
 			put1(getc(fp));
 			break;
 		case 'C':
-			sget(str, sizeof str, fp);
+			fscanf(fp, "%s", str);
 			put1s(str);
 			break;
 		case 't':	/* straight text */
@@ -353,16 +351,11 @@ conv(register FILE *fp)
 			}
 			break;
 		case 's':
-			fscanf(fp, "%d", &n);
-			if (n == -23) {
-				float	f;
-				fscanf(fp, "%f", &f);
-				setsize(f);
-			} else
-				setsize(t_size(n));/* ignore fractional sizes */
+			fscanf(fp, "%d", &n);	/* ignore fractional sizes */
+			setsize(t_size(n));
 			break;
 		case 'f':
-			sget(str, sizeof str, fp);
+			fscanf(fp, "%s", str);
 			setfont(t_font(str));
 			break;
 		case 'H':	/* absolute horizontal motion */
@@ -424,17 +417,17 @@ conv(register FILE *fp)
 void
 devcntrl(FILE *fp)	/* interpret device control functions */
 {
-	char str[4096];
+	char str[20];
 	int n;
 
-	sget(str, sizeof str, fp);
+	fscanf(fp, "%s", str);
 	switch (str[0]) {	/* crude for now */
 	case 'i':	/* initialize */
 		fileinit();
 		t_init(0);
 		break;
 	case 'T':	/* device name */
-		sget(devname, sizeof devname, fp);
+		fscanf(fp, "%s", devname);
 		break;
 	case 't':	/* trailer */
 		t_trailer();
@@ -449,8 +442,7 @@ devcntrl(FILE *fp)	/* interpret device control functions */
 		fscanf(fp, "%d", &res);
 		break;
 	case 'f':	/* font used */
-		fscanf(fp, "%d", &n);
-		sget(str, sizeof str, fp);
+		fscanf(fp, "%d %s", &n, str);
 		loadfont(n, str);
 		break;
 	}
@@ -498,6 +490,8 @@ error(int f, const char *s, ...)
 	on the 202 (we hope).
 */
 
+
+char	devname[20]	= "hp2621";
 
 #define	ESC	033
 #define	HOME	'H'
@@ -577,7 +571,7 @@ void
 t_page(int n)	/* do whatever new page functions */
 {
 	int m, i;
-	char buf[1024], *bp;
+	char buf[100], *bp;
 
 	pgnum[np++] = n;
 	pgadr[np] = ftell(fp);
@@ -596,7 +590,7 @@ t_page(int n)	/* do whatever new page functions */
 
   next:
 	for (bp = buf; (*bp = readch()); )
-		if (*bp++ == '\n' || bp >= &buf[sizeof buf - 1])
+		if (*bp++ == '\n')
 			break;
 	*bp = 0;
 	switch (buf[0]) {
@@ -807,7 +801,7 @@ put1(int c)	/* output char c */
 }
 
 void
-setsize(double n)	/* set point size to n (internal) */
+setsize(int n)	/* set point size to n (internal) */
 {
 }
 
@@ -843,7 +837,7 @@ callunix(char line[])
 		return;
 	else{	signal(SIGINT, SIG_IGN); signal(SIGQUIT, SIG_IGN);
 		while( (rc = wait(&status)) != unixpid && rc != -1 ) ;
-		signal(SIGINT,(void(*)(int))done); signal(SIGQUIT,(void(*)(int))sigquit);
+		signal(SIGINT,(void(*)())done); signal(SIGQUIT,(void(*)())sigquit);
 	}
 }
 
@@ -866,21 +860,3 @@ char *spectab[] ={
 	"or", "|",
 	0, 0,
 };
-
-static int
-sget(char *buf, size_t size, FILE *fp)
-{
-	int	c, n = 0;
-
-	do
-		c = getc(fp);
-	while (isspace(c));
-	if (c != EOF) do {
-		if (n+1 < size)
-			buf[n++] = c;
-		c = getc(fp);
-	} while (c != EOF && !isspace(c));
-	ungetc(c, fp);
-	buf[n] = 0;
-	return n > 1 ? 1 : c == EOF ? EOF : 0;
-}

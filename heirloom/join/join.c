@@ -36,14 +36,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)join.sl	1.15 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)join.sl	1.10 (gritter) 11/10/04";
 
 /*	join F1 F2 on stuff */
 
@@ -64,8 +64,10 @@ enum {
 	F2 = 1,
 	JF = -1
 };
-#define	ppi(f, j)	((j) >= 0 && (j) < ppisize[f] ? ppibuf[f][j] : null)
-#define comp() strcoll(ppi(F1, j1),ppi(F2, j2))
+#define	ppi(f, j)	((j) >= 0 && (j) < ppisize[f] ? ppibuf[f][j] : NULL)
+#define	cpi(f, j)	((j) >= 0 && (j) < ppisize[f] ? ppibuf[f][j] : \
+		(abort(), ""))
+#define comp() strcoll(cpi(F1, j1),cpi(F2, j2))
 
 #define	next(wc, s, n)	(*(s) & 0200 ? ((n) = mbtowi(&(wc), (s), mb_cur_max), \
 		(n) = ((n) > 0 ? (n) : (n) < 0 ? (wc=WEOF, 1) : 1)) : \
@@ -99,9 +101,9 @@ static void *srealloc(void *, size_t);
 static void
 usage(void)
 {
-	fprintf(stderr,
-	"%s: usage: %s [-an] [-e s] [-jn m] [-tc] [-o list] file1 file2\n",
-		progname, progname);
+	fprintf(stderr, "\
+usage: %s [-an|-vn] [-e s] [-jn m] [-1 m] [-2 m] [-tc] [-o list] file1 file2\n",
+		progname);
 	exit(2);
 }
 
@@ -192,11 +194,6 @@ main(int argc, char **argv)
 					argv++;
 					arg = argv[2];
 				}
-			}
-			if (no == 0) {
-				fprintf(stderr, "%s: invalid file number (%s) "
-						"for -o\n", progname, arg);
-				exit(2);
 			}
 			break;
 		case 'j':
@@ -381,7 +378,7 @@ output(int on1, int on2)	/* print items from olist */
 			}
 			if (temp == 0 || *temp == 0)
 				temp = null;
-			printf("%s", temp ? temp : null);
+			printf("%s", temp);
 			if (i == no - 1)
 				printf("\n");
 			else if (mb_cur_max > 1)

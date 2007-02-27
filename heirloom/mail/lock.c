@@ -1,80 +1,161 @@
+/*	Derived from 4.2BSD mail.c	4.21 (Berkeley) 11/1/83	*/
 /*
- * CDDL HEADER START
+ * Copyright (c) 1980, 1993
+ * 	The Regents of the University of California.  All rights reserved.
  *
- * The contents of this file are subject to the terms of the
- * Common Development and Distribution License, Version 1.0 only
- * (the "License").  You may not use this file except in compliance
- * with the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ * 	This product includes software developed by the University of
+ * 	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
- * or http://www.opensolaris.org/os/licensing.
- * See the License for the specific language governing permissions
- * and limitations under the License.
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  *
- * When distributing Covered Code, include this CDDL HEADER in each
- * file and include the License file at usr/src/OPENSOLARIS.LICENSE.
- * If applicable, add the following below this CDDL HEADER, with the
- * fields enclosed by brackets "[]" replaced with your own identifying
- * information: Portions Copyright [yyyy] [name of copyright owner]
  *
- * CDDL HEADER END
+ * Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *   Redistributions of source code and documentation must retain the
+ *    above copyright notice, this list of conditions and the following
+ *    disclaimer.
+ *   Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *   All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *      This product includes software developed or owned by Caldera
+ *      International, Inc.
+ *   Neither the name of Caldera International, Inc. nor the names of
+ *    other contributors may be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * USE OF THE SOFTWARE PROVIDED FOR UNDER THIS LICENSE BY CALDERA
+ * INTERNATIONAL, INC. AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL CALDERA INTERNATIONAL, INC. BE
+ * LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*	Copyright (c) 1984, 1986, 1987, 1988, 1989 AT&T	*/
-/*	  All Rights Reserved  	*/
 
+/*	Sccsid @(#)lock.c	1.8 (gritter) 4/4/04	*/
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /*
- * Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
- * Use is subject to license terms.
+ * Lock the specified mail file by setting the file mailfile.lock.
+ * We must, of course, be careful to unlink the lock file by a call
+ * to unlock before we stop.  The algorithm used here is to see if
+ * the lock exists, and if it does, to check its modify time.  If it
+ * is older than 30 seconds, we assume error and set our own file.
+ * Otherwise, we wait for 5 seconds and try again.
  */
 
-/*	from OpenSolaris "lock.c	1.7	05/06/08 SMI"	*/
+static const char	maillock[] = ".lock";	/* Lock suffix for mailname */
+char	locktmp[30];				/* Usable lock temporary */
+static char	curlock[50];			/* Last used name of lock */
+int	locked;					/* To note that we locked it */
 
-/*
- * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
- *
- * Sccsid @(#)lock.c	1.4 (gritter) 6/22/05
- */
+extern int	flgf;
 
-#include "mail.h"
+static int	lock1(const char *, const char *);
 
-void
-lock(char *user)
+int
+lock(const char *file, const char *lockname)
 {
-	char	tbuf[80];
+	register int f;
+	struct stat sbuf;
+	time_t curtime;
+	int statfailed;
 
-	switch (maillock(user, 10)) {
-	case L_SUCCESS:
-	    return;
-	case L_NAMELEN:
-	    snprintf(tbuf, sizeof (tbuf),
-		"%s: Cannot create lock file. Username '%s' is > 13 chars\n",
-		program, user);
-	    break;
-	case L_TMPLOCK:
-	    strcpy(tbuf, "Cannot create temp lock file\n");
-	    break;
-	case L_TMPWRITE:
-	    strcpy(tbuf, "Error writing pid to lock file\n");
-	    break;
-	case L_MAXTRYS:
-	    strcpy(tbuf, "Creation of lockfile failed after 10 tries");
-	    break;
-	case L_ERROR:
-	    strcpy(tbuf, "Cannot link temp lockfile to lockfile\n");
-	    break;
-	case L_MANLOCK:
-	    strcpy(tbuf, "Cannot set mandatory file lock on temp lockfile\n");
-	    break;
+	if (locked || flgf)
+		return(0);
+	strcpy(curlock, file);
+	strcat(curlock, maillock);
+	strcpy(locktmp, lockname);
+	if (close(mkstemp(locktmp)) < 0)
+		return(-1);
+	statfailed = 0;
+	for (;;) {
+		f = lock1(locktmp, curlock);
+		if (f == 0) {
+			locked = 1;
+			return(0);
+		}
+		if (stat(curlock, &sbuf) < 0) {
+			if (statfailed++ > 5)
+				return(-1);
+			sleep(5);
+			continue;
+		}
+		statfailed = 0;
+		time(&curtime);
+		if (curtime < sbuf.st_ctime + 30) {
+			sleep(5);
+			continue;
+		}
+		unlink(curlock);
 	}
-	errmsg(E_LOCK, tbuf);
-	if (sending) {
-		goback(0);
-	}
-	done(0);
 }
 
-void 
-unlock(void) {
-	mailunlock();
+/*
+ * Remove the mail lock, and note that we no longer
+ * have it locked.
+ */
+
+void
+unlock(void)
+{
+
+	unlink(curlock);
+	locked = 0;
+}
+
+/*
+ * Attempt to set the lock by creating the temporary file,
+ * then doing a link/unlink.  If it fails, return -1 else 0
+ */
+
+static int
+lock1(const char *tempfile, const char *name)
+{
+	if (rename(tempfile, name) < 0) {
+		unlink(tempfile);
+		return(-1);
+	}
+	return(0);
 }

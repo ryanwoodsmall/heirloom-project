@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)mv.1	1.15 (gritter) 1/24/05
+.\" Sccsid @(#)mv.1	1.12 (gritter) 10/11/03
 .\" Parts taken from cp(1) and mv(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH MV 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH MV 1 "10/11/03" "Heirloom Toolchest" "User Commands"
 .SH NAME
 mv \- move or rename files and directories
 .SH SYNOPSIS
-\fBmv\fR [\fB\-f\fR] [\fB\-i\fR] [\fB\-b\ \fIsize\fR]
+\fBmv\fR [\fB\-f\fR] [\fB\-i\fR]
 \fIfile1\fR [\fIfile2\fR .\ .\ .\ ] \fItarget\fR
 .SH DESCRIPTION
 .B Mv
@@ -91,9 +91,7 @@ file do not permit writing.
 Overrides the
 .B \-i
 option in
-.B /usr/5bin/posix/mv
-and
-.BR /usr/5bin/posix2001/mv .
+.BR /usr/5bin/posix/mv .
 .TP
 .B \-i
 .B mv
@@ -108,19 +106,7 @@ if standard input is not a terminal.
 Overrides the
 .B \-f
 option in
-.B /usr/5bin/posix/mv
-and
-.BR /usr/5bin/posix2001/mv .
-.PP
-The following option is an extension:
-.TP
-\fB\-b\ \fIsize\fR
-When a regular file is moved to another file system,
-its data must be copied.
-This option overrides the automatically determined
-i/o buffer size for such copies;
-.I size
-is given in bytes.
+.BR /usr/5bin/posix/mv .
 .SH "SEE ALSO"
 cp(1),
 cat(1),
@@ -140,7 +126,7 @@ or
 .RS
 .sp
 .B mv
-.I ./\-file
+.I ./-file
 .I target
 .sp
 .RE
@@ -157,14 +143,12 @@ but
 will preserve linkage inside the moved tree.
 .B Mv
 will try to preserve access and modification times,
-user and group ownerships,
+user and group ownerships
 and file permission bits.
 Failing to preserve these modes
 is not considered an error,
 only
 .B /usr/5bin/posix/mv
-and
-.B /usr/5bin/posix2001/mv
 will print an error message.
 Special files
 such as block and character devices,

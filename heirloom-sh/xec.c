@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)xec.c	1.6 (gritter) 6/30/05
+ * Sccsid @(#)xec.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "xec.c	1.23	05/06/08 SMI" */
 /*
@@ -53,8 +53,9 @@ pid_t parent;
 /* ========	command execution	======== */
 
 
-int 
-execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
+execute(argt, xflags, errorflg, pf1, pf2)
+struct trenod	*argt;
+int	*pf1, *pf2;
 {
 	/*
 	 * `stakbot' is preserved by this routine
@@ -68,9 +69,9 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 
 	if ((t = argt) && execbrk == 0) {
 		register int treeflgs;
-		register unsigned char **com = NULL;
+		register unsigned char **com;
 		int type;
-		short pos = 0;
+		short pos;
 
 		treeflgs = t->tretyp;
 		type = treeflgs & COMMSK;
@@ -112,17 +113,17 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 
 		case TCOM:
 			{
-				unsigned char	*a1;
-				int	argn;
+				unsigned char	*a1, *name;
+				int	argn, internal;
 				struct argnod	*schain = gchain;
 				struct ionod	*io = t->treio;
-				short 	cmdhash = 0;
-				short	comtype = 0;
+				short 	cmdhash;
+				short	comtype;
 
 				exitval = 0;
 
 				gchain = 0;
-				argn = getarg((struct comnod *)t);
+				argn = getarg(t);
 				com = scan(argn);
 				a1 = com[1];
 				gchain = schain;
@@ -171,7 +172,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 					else if (comtype == FUNCTION)
 					{
 						struct dolnod *olddolh;
-						struct namnod *n;
+						struct namnod *n, *opt;
 						short index;
 						unsigned char **olddolv = dolv;
 						int olddolc = dolc;
@@ -184,7 +185,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 						execute((struct trenod *)(n->namenv), xflags, errorflg, pf1, pf2);
 						execbrk = 0;
 						restore(index);
-						restorargs(olddolh, funcnt);
+						(void) restorargs(olddolh, funcnt);
 						dolv = olddolv;
 						dolc = olddolc;
 						funcnt--;
@@ -223,7 +224,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 						savefd = setb(-1);
 						savebot = stakbot;
 						prcmd(t);
-						setb(savefd);
+						(void)setb(savefd);
 						allocjob(savebot, cwdget(), monitor);
 					} else
 						allocjob("", "", 0);
@@ -327,7 +328,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 			initio(t->treio, 0);
 
 			if (type == TFORK)
-				execute(forkptr(t)->forktre, xflags | XEC_EXECED, errorflg, NULL, NULL);
+				execute(forkptr(t)->forktre, xflags | XEC_EXECED, errorflg);
 			else if (com[0] != ENDARGS)
 			{
 				eflag = 0;
@@ -341,10 +342,9 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 
 		case TPAR:
 			/* Forked process is subshell:  may want job control */
-			if ((xflags & XEC_PIPED) == 0)
-				flags &= ~jcoff;
+			flags &= ~jcoff;
 			clearjobs();
-			execute(parptr(t)->partre, xflags, errorflg, NULL, NULL);
+			execute(parptr(t)->partre, xflags, errorflg);
 			done(0);
 
 		case TFIL:
@@ -352,7 +352,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 				int pv[2];
 
 				chkpipe(pv);
-				if (execute(lstptr(t)->lstlef, xflags & XEC_NOSTOP | XEC_PIPED, errorflg, pf1, pv) == 0)
+				if (execute(lstptr(t)->lstlef, xflags & XEC_NOSTOP, errorflg, pf1, pv) == 0)
 					execute(lstptr(t)->lstrit, xflags, errorflg, pv, pf2);
 				else
 					closepipe(pv);
@@ -360,18 +360,18 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 			break;
 
 		case TLST:
-			execute(lstptr(t)->lstlef, xflags&(XEC_NOSTOP|XEC_PIPED), errorflg, NULL, NULL);
+			execute(lstptr(t)->lstlef, xflags&XEC_NOSTOP, errorflg);
 			/* Update errorflg if set -e is invoked in the sub-sh*/
-			execute(lstptr(t)->lstrit, xflags, (errorflg | (eflag & errflg)), NULL, NULL);
+			execute(lstptr(t)->lstrit, xflags, (errorflg | (eflag & errflg)));
 			break;
 
 		case TAND:
 		case TORF:
 		{
-			register int xval;
-			xval = execute(lstptr(t)->lstlef, XEC_NOSTOP, 0, NULL, NULL);
+			register xval;
+			xval = execute(lstptr(t)->lstlef, XEC_NOSTOP, 0);
 			if ((xval == 0) == (type == TAND))
-				execute(lstptr(t)->lstrit, xflags|XEC_NOSTOP, errorflg, NULL, NULL);
+				execute(lstptr(t)->lstrit, xflags|XEC_NOSTOP, errorflg);
 			break;
 		}
 
@@ -398,7 +398,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 				while (*args != ENDARGS && execbrk == 0)
 				{
 					assign(n, *args++);
-					execute(forptr(t)->fortre, XEC_NOSTOP, errorflg, NULL, NULL);
+					execute(forptr(t)->fortre, XEC_NOSTOP, errorflg);
 					if (breakcnt < 0)
 						execbrk = (++breakcnt != 0);
 				}
@@ -418,10 +418,10 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 
 				loopcnt++;
 				while (execbrk == 0 && (execute(whptr(t)->whtre,
-				    XEC_NOSTOP, 0, NULL, NULL) == 0) == (type == TWH) &&
+				    XEC_NOSTOP, 0) == 0) == (type == TWH) &&
 				    (flags&noexec) == 0)
 {
-					i = execute(whptr(t)->dotre, XEC_NOSTOP, errorflg, NULL, NULL);
+					i = execute(whptr(t)->dotre, XEC_NOSTOP, errorflg);
 					if (breakcnt < 0)
 						execbrk = (++breakcnt != 0);
 				}
@@ -434,10 +434,10 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 			break;
 
 		case TIF:
-			if (execute(ifptr(t)->iftre, XEC_NOSTOP, 0, NULL, NULL) == 0)
-				execute(ifptr(t)->thtre, xflags|XEC_NOSTOP, errorflg, NULL, NULL);
+			if (execute(ifptr(t)->iftre, XEC_NOSTOP, 0) == 0)
+				execute(ifptr(t)->thtre, xflags|XEC_NOSTOP, errorflg);
 			else if (ifptr(t)->eltre)
-				execute(ifptr(t)->eltre, xflags|XEC_NOSTOP, errorflg, NULL, NULL);
+				execute(ifptr(t)->eltre, xflags|XEC_NOSTOP, errorflg);
 			else
 				exitval = 0;	/* force zero exit for if-then-fi */
 			break;
@@ -458,7 +458,7 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 
 						if (gmatch(r, s = macro(rex->argval)) || (trim(s), eq(r, s)))
 						{
-							execute(regp->regcom, XEC_NOSTOP, errorflg, NULL, NULL);
+							execute(regp->regcom, XEC_NOSTOP, errorflg);
 							regp = 0;
 							break;
 						}
@@ -479,8 +479,9 @@ execute(struct trenod *argt, int xflags, int errorflg, int *pf1, int *pf2)
 	return(exitval);
 }
 
-void
-execexp(unsigned char *s, intptr_t f)
+execexp(s, f)
+unsigned char	*s;
+int	f;
 {
 	struct fileblk	fb;
 
@@ -492,12 +493,12 @@ execexp(unsigned char *s, intptr_t f)
 	}
 	else if (f >= 0)
 		initf(f);
-	execute(cmd(NL, NLFLG | MTFLG), 0, (int)(flags & errflg), NULL, NULL);
+	execute(cmd(NL, NLFLG | MTFLG), 0, (int)(flags & errflg));
 	pop();
 }
 
-void
-execprint(unsigned char **com)
+execprint(com)
+	unsigned char **com;
 {
 	register int 	argn = 0;
 	unsigned char	*s;

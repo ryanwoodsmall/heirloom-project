@@ -44,14 +44,14 @@
  */
 
 /*	from 4.3BSD more.c	5.4 (Berkeley) 4/3/86	*/
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)more.sl	1.33 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)more.sl	1.27 (gritter) 11/21/04";
 
 /*
 ** more.c - General purpose tty output filter and file perusal program
@@ -86,7 +86,9 @@ static const char sccsid[] USED = "@(#)more.sl	1.33 (gritter) 5/29/05";
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
+#ifndef	TIOCGWINSZ
 #include <sys/ioctl.h>
+#endif
 
 #ifdef	USE_TERMCAP
 #include <termcap.h>
@@ -893,15 +895,12 @@ getline(register FILE *f, int *length)
 	else if (mb_cur_max > 1 && c&0200) {
 	    int w, n;
 	    wchar_t wc;
-	    int i1;
-	    i1 = i - 1;
-	    while ((n = mbrtowc(&wc, &Line[i1], i - i1, &state)) == -2) {
+	    while ((n = mbrtowc(&wc, &Line[i-1], 1, &state)) == -2) {
 		if ((c = Getc(f)) == EOF || c == '\n')
 		    break;
 		if (i >= LINSIZ-1)
 		    Line = srealloc(Line, LINSIZ+=256);
 		Line[i++] = c;
-		memset(&state, 0, sizeof state);
 	    }
 	    if (n > 0 && (w = wcwidth(wc)) > 0)
 		column += w;
@@ -1022,14 +1021,6 @@ prbuf (register const char *s, register int n)
 	    }
 	    if (c != ' ' || pstate == 0 || state != 0 || ulglitch == 0)
 	        putchar(c);
-	    if (mb_cur_max > 1 && c & 0200) {
-		    int	x = mblen(&s[-1], mb_cur_max);
-		    while (--x > 0) {
-			    putchar(*s & 0377);
-			    s++;
-			    n--;
-		    }
-	    }
 	    if (state && *chUL) {
 		pr(chBS);
 		tputs(chUL, 1, putch);
@@ -1429,8 +1420,6 @@ search (char *buf, FILE *file, register int n)
     context.line = saveln = Currline;
     context.chrctr = startline;
     lncount = 0;
-    if (buf == NULL && used == 0)
-	    error ("No previous regular expression");
     if (buf && used) {
 	regfree(&s);
 	used = 0;

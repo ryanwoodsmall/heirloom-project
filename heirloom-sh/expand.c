@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)expand.c	1.6 (gritter) 6/22/05
+ * Sccsid @(#)expand.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "expand.c	1.13	05/06/08 SMI" */
 /*
@@ -54,11 +54,10 @@
  * "[...a-z...]" in params matches a through z.
  *
  */
-static void addg(unsigned char *, unsigned char *,
-		unsigned char *, unsigned char *);
+static int	addg();
 
-int 
-expand(unsigned char *as, int rcnt)
+expand(as, rcnt)
+	unsigned char	*as;
 {
 	int	count;
 	DIR	*dirf;
@@ -85,7 +84,7 @@ expand(unsigned char *as, int rcnt)
 		open = 0;
 		do
 		{
-			if ((len = nextc(&wc, (char *)cs)) <= 0) {
+			if ((len = mbtowc(&wc, (char *)cs, MB_LEN_MAX)) <= 0) {
 				len = 1;
 				wc = (unsigned char)*cs;
 			}
@@ -190,7 +189,7 @@ expand(unsigned char *as, int rcnt)
 				count++;
 			}
 		}
-		closedir(dirf);
+		(void) closedir(dirf);
 
 		if (rescan)
 		{
@@ -217,9 +216,9 @@ expand(unsigned char *as, int rcnt)
 	return (count);
 }
 
-static void
-addg(unsigned char *as1, unsigned char *as2,
-		unsigned char *as3, unsigned char *as4)
+static int
+addg(as1, as2, as3, as4)
+unsigned char	*as1, *as2, *as3, *as4;
 {
 	register unsigned char	*s1, *s2;
 	register int	c;
@@ -249,7 +248,7 @@ addg(unsigned char *as1, unsigned char *as2,
 	s1 = as2;
 	for (;;)
 	{
-		if ((len = nextc(&wc, (char *)s1)) <= 0) {
+		if ((len = mbtowc(&wc, (char *)s1, MB_LEN_MAX)) <= 0) {
 			len = 1;
 			wc = (unsigned char)*s1;
 		}
@@ -287,11 +286,11 @@ addg(unsigned char *as1, unsigned char *as2,
 		}
 		while (*s2++ = *++s1);
 	}
-	makearg((struct argnod *)endstak(s2));
+	makearg(endstak(s2));
 }
 
-void
-makearg(register struct argnod *args)
+makearg(args)
+	register struct argnod *args;
 {
 	args->argnxt = gchain;
 	gchain = args;

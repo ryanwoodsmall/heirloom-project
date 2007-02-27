@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)grep.c	1.53 (gritter) 12/27/06>	*/
+/*	Sccsid @(#)grep.c	1.44 (gritter) 12/2/04>	*/
 
 /*
  * Code common to all grep flavors.
@@ -34,7 +34,6 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<sys/wait.h>
 #include	<fcntl.h>
 #include	<unistd.h>
 #include	<stdio.h>
@@ -45,7 +44,6 @@
 #include	<limits.h>
 #include	<ctype.h>
 #include	<dirent.h>
-#include	<errno.h>
 
 #include	"grep.h"
 #include	"alloc.h"
@@ -63,12 +61,10 @@ int		iflag;			/* ignore case */
 int		lflag;			/* print filenames only */
 int		nflag;			/* print line numbers */
 int		qflag;			/* no output at all */
-int	(*rflag)(const char *, struct stat *);	/* operate recursively */
+int		rflag;			/* operate recursively */
 int		sflag;			/* avoid error messages */
 int		vflag;			/* inverse selection */
-int		wflag;			/* search for words */
 int		xflag;			/* match entire line */
-int		zflag;			/* decompress compressed files */
 int		mb_cur_max;		/* avoid multiple calls to MB_CUR_MAX */
 unsigned	status = 1;		/* exit status */
 off_t		lmatch;			/* count of line matches */
@@ -87,26 +83,15 @@ struct expr	*e0;			/* start of expression list */
 enum matchflags	matchflags;		/* matcher flags */
 
 /*
- * To avoid link loops with -r.
- */
-static struct	visit {
-	ino_t	v_ino;
-	dev_t	v_dev;
-} *visited;
-static int	vismax;			/* number of members in visited */
-
-/*
  * Lower-case a character string.
  */
-size_t
+void
 loconv(register char *dst, register char *src, size_t sz)
 {
-	char	*odst = dst;
-
 	if (mbcode) {
 		char	mb[MB_LEN_MAX];
 		wchar_t wc;
-		int len, i, nlen;
+		int len, i;
 
 		while (sz > 0) {
 			if ((*src & 0200) == 0) {
@@ -120,8 +105,8 @@ loconv(register char *dst, register char *src, size_t sz)
 			} else {
 				wc = towlower(wc);
 				if (len >= mb_cur_max) {
-					if ((nlen = wctomb(dst, wc)) <= len) {
-						dst += nlen;
+					if (wctomb(dst, wc) == len) {
+						dst += len;
 						src += len;
 						sz -= len;
 					} else {
@@ -129,10 +114,10 @@ loconv(register char *dst, register char *src, size_t sz)
 						sz--;
 					}
 				} else {
-					if ((nlen = wctomb(mb, wc)) <= len) {
+					if (wctomb(mb, wc) == len) {
 						sz -= len;
 						src += len;
-						for (i = 0; i < nlen; i++)
+						for (i = 0; i < len; i++)
 							*dst++ = mb[i];
 					} else {
 						*dst++ = *src++;
@@ -141,118 +126,11 @@ loconv(register char *dst, register char *src, size_t sz)
 				}
 			}
 		}
-	} else {
+	} else
 		while (sz--) {
 			*dst++ = tolower(*src & 0377);
 			src++;
 		}
-	}
-	return dst - odst;
-}
-
-/*
- * Determine if pat ends with an unescaped dollar sign.
- */
-static int
-termdollar(const char *pat, long len)
-{
-	int	dollar = 1;
-
-	if (len == 0 || pat[len - 1] != '$')
-		return 0;
-	pat += --len - 1;
-	while (len-- && *pat-- == '\\')
-		dollar = !dollar;
-	return dollar;
-}
-
-/*
- * Surround the pattern with \< \>.
- */
-void
-wcomp(char **pat, long *len)
-{
-	char	*wp = smalloc(*len + 5);
-
-	memcpy(&wp[2], *pat, *len);
-	if ((*pat)[0] == '^')
-		memcpy(wp, "^\\<", 3);
-	else
-		memcpy(wp, "\\<", 2);
-	if (termdollar(*pat, *len))
-		strcpy(&wp[*len-1+2], "\\>$");
-	else
-		strcpy(&wp[*len+2], "\\>");
-	*len += 4;
-	*pat = wp;
-}
-
-static struct iblok *
-redirect(struct iblok *ip, const char *arg0, const char *arg1)
-{
-	struct iblok	*nip = NULL;
-	int	pd[2];
-	pid_t	pid;
-
-	if (pipe(pd) < 0)
-		return NULL;
-	switch (pid = fork()) {
-	case 0:
-		if (lseek(ip->ib_fd, -(ip->ib_end - ip->ib_cur),
-					SEEK_CUR) == (off_t)-1) {
-			int	xpd[2];
-			if (pipe(xpd) == 0 && fork() == 0) {
-				ssize_t	rd, wo, wt;
-				close(xpd[0]);
-				for (;;) {
-					rd = ip->ib_end - ip->ib_cur;
-					wo = wt = 0;
-					do {
-						if ((wo = write(xpd[1],
-								&ip->ib_cur[wt],
-								rd - wt))
-								<= 0) {
-							if (errno == EINTR)
-								continue;
-							_exit(0);
-						}
-						wt += wo;
-					} while (wt < rd);
-					if (ib_read(ip) == EOF)
-						break;
-					ip->ib_cur--;
-				}
-				_exit(0);
-			} else {
-				close(xpd[1]);
-				dup2(xpd[0], 0);
-				close(xpd[0]);
-			}
-		} else {
-			if (ip->ib_fd)
-				dup2(ip->ib_fd, 0);
-		}
-		if (ip->ib_fd)
-			ib_close(ip);
-		else
-			ib_free(ip);
-		dup2(pd[1], 1);
-		close(pd[0]);
-		close(pd[1]);
-		execlp(arg0, arg0, arg1, NULL);
-		fprintf(stderr, "%s: could not exec %s\n", progname, arg0);
-		_exit(0177);
-		/*NOTREACHED*/
-	case -1:
-		fprintf(stderr, "%s: cannot fork()\n", progname);
-		status = 2;
-		return NULL;
-	default:
-		close(pd[1]);
-		nip = ib_alloc(pd[0], 0);
-		nip->ib_pid = pid;
-		return nip;
-	}
 }
 
 /*
@@ -289,7 +167,6 @@ report(const char *line, size_t llen, off_t bcnt, int addnl)
 static int
 matchline(char *line, size_t sz, int putnl, struct iblok *ip)
 {
-	size_t	csz = sz;
 	int terminate = 0;
 	char lbuf[512], *abuf = NULL, *cline = line;
 
@@ -299,12 +176,12 @@ matchline(char *line, size_t sz, int putnl, struct iblok *ip)
 			cline = abuf;
 		} else
 			cline = lbuf;
-		csz = loconv(cline, line, sz);
-		cline[csz] = '\0';
+		loconv(cline, line, sz);
+		cline[sz] = '\0';
 	} else if (matchflags & MF_NULTERM)
 		cline[sz] = '\0';
 	lineno++;
-	if (match(cline, csz) ^ vflag) {
+	if (match(cline, sz) ^ vflag) {
 		lmatch++;
 		if (qflag == 0) {
 			if (status == 1)
@@ -346,7 +223,7 @@ gn_range(struct iblok *ip, char *last)
  * Main grep routine. The line buffer herein is only used for overlaps
  * between file buffer fills.
  */
-static struct iblok *
+static int
 grep(struct iblok *ip)
 {
 	char *line = NULL;		/* line buffer */
@@ -360,32 +237,6 @@ grep(struct iblok *ip)
 	if (ib_read(ip) == EOF)
 		goto endgrep;
 	ip->ib_cur--;
-	if (zflag) {
-		struct iblok	*np;
-		for (;;) {
-			sz = ip->ib_end - ip->ib_cur;
-			if (sz > 3 && memcmp(ip->ib_cur, "BZh", 3) == 0)
-				np = redirect(ip, "bzip2", "-cd");
-			else if (sz > 2 &&
-					memcmp(ip->ib_cur, "\37\235", 2) == 0)
-				np = redirect(ip, "zcat", NULL);
-			else if (sz > 2 &&
-					memcmp(ip->ib_cur, "\37\213", 2) == 0)
-				np = redirect(ip, "gzip", "-cd");
-			else
-				break;
-			if (np == NULL)
-				break;
-			if (ip->ib_fd)
-				ib_close(ip);
-			else
-				ib_free(ip);
-			ip = np;
-			if (ib_read(ip) == EOF)
-				goto endgrep;
-			ip->ib_cur--;
-		}
-	}
 	for (;;) {
 		for (lastnl = ip->ib_end - 1;
 				*lastnl != '\n' && lastnl > ip->ib_cur;
@@ -393,7 +244,7 @@ grep(struct iblok *ip)
 		if (hadnl = (ip->ib_cur < ip->ib_end && *lastnl == '\n'))
 			if (range(ip, lastnl))
 				break;
-		if (lastnl < ip->ib_end - hadnl) {
+		if (lastnl < ip->ib_end - 1) {
 			/*
 			 * Copy the partial line from file buffer to line
 			 * buffer. Allocate enough space to zero-terminate
@@ -474,7 +325,7 @@ endgrep:
 		printf("%lu\n", (long)lmatch);
 #endif
 	}
-	return ip;
+	return 0;
 }
 
 /*
@@ -484,24 +335,11 @@ static void
 fngrep(const char *fn, int level)
 {
 	struct iblok	*ip;
+#ifdef	ADDONS
 	struct stat	st;
-	int	i;
 
-	if (rflag && fn && (level ? rflag : stat)(fn, &st) == 0) {
-		if (rflag != lstat) {
-			for (i = 0; i < level; i++)
-				if (st.st_dev == visited[i].v_dev &&
-						st.st_ino == visited[i].v_ino)
-					return;
-			if (level >= vismax) {
-				vismax += 20;
-				visited = srealloc(visited, sizeof *visited *
-						vismax);
-			}
-			visited[level].v_dev = st.st_dev;
-			visited[level].v_ino = st.st_ino;
-		}
-	mode:	switch (st.st_mode&S_IFMT) {
+	if (rflag && fn && stat(fn, &st) == 0) {
+		switch (st.st_mode&S_IFMT) {
 #define	ignoring(t, s)	fprintf(stderr, "%s: ignoring %s %s\n", progname, t, s)
 		case S_IFIFO:
 			ignoring("named pipe", fn);
@@ -517,10 +355,6 @@ fngrep(const char *fn, int level)
 			ignoring("socket", fn);
 			return;
 #endif	/* S_IFSOCK */
-		case S_IFLNK:
-			if (stat(fn, &st) < 0 || (st.st_mode&S_IFMT) == S_IFDIR)
-				return;
-			goto mode;
 		default:
 			break;
 		case S_IFDIR: {
@@ -566,6 +400,7 @@ fngrep(const char *fn, int level)
 		    }
 		}
 	}
+#endif	/* ADDONS */
 	if (fn) {
 		if ((ip = ib_open(fn, 0)) == NULL) {
 			if (sflag == 0)
@@ -577,16 +412,10 @@ fngrep(const char *fn, int level)
 		}
 	} else
 		ip = ib_alloc(0, 0);
-	ip = grep(ip);
-	if (ip->ib_fd) {
+	grep(ip);
+	if (ip->ib_fd)
 		ib_close(ip);
-		if (zflag && ip->ib_pid) {
-			int	s;
-			waitpid(ip->ib_pid, &s, 0);
-			if (s)
-				status = 2;
-		}
-	} else
+	else
 		ib_free(ip);
 }
 
@@ -599,8 +428,8 @@ main(int argc, char **argv)
 	putenv("POSIXLY_CORRECT=1");
 #endif
 	progname = basename(argv[0]);
-	setlocale(LC_COLLATE, "");
 	setlocale(LC_CTYPE, "");
+	setlocale(LC_COLLATE, "");
 	mb_cur_max = MB_CUR_MAX;
 	range = gn_range;
 	init();
@@ -647,26 +476,19 @@ main(int argc, char **argv)
 		case 'q':
 			qflag = 1;
 			break;
+#ifdef	ADDONS
 		case 'r':
-			rflag = stat;
+			rflag = 1;
 			break;
-		case 'R':
-			rflag = lstat;
-			break;
+#endif	/* ADDONS */
 		case 's':
 			sflag = 1;
 			break;
 		case 'v':
 			vflag = 1;
 			break;
-		case 'w':
-			wflag = 1;
-			break;
 		case 'x':
 			xflag = 1;
-			break;
-		case 'z':
-			zflag = 1;
 			break;
 		default:
 			if (!(Fflag&2))
@@ -692,8 +514,6 @@ main(int argc, char **argv)
 		if (Fflag && status == 2)
 			usage();
 		if (Eflag == 1 && Fflag == 1 || cflag + lflag + qflag > 1)
-			usage();
-		if (wflag && (Eflag || Fflag))
 			usage();
 	}
 	if (cflag)

@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)ln.1	1.11 (gritter) 2/2/05
+.\" Sccsid @(#)ln.1	1.9 (gritter) 10/11/03
 .\" Parts taken from ln(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH LN 1 "2/2/05" "Heirloom Toolchest" "User Commands"
+.TH LN 1 "10/11/03" "Heirloom Toolchest" "User Commands"
 .SH NAME
 ln \- make a link
 .SH SYNOPSIS
@@ -81,21 +81,12 @@ If the target file exists,
 an attempt is made to unlink it
 before the new link is created,
 regardless of file permissions.
-This option is ignored with
-.B /usr/5bin/ln
-and
-.B /usr/5bin/s42/ln
-if the
-.I \-s
-option is also given.
 .TP
 .B \-n
 Do not remove an existing target file
 even if the user has write permission on it.
 This is the default for
-.B /usr/5bin/posix/ls
-and
-.BR /usr/5bin/posix2001/ls .
+.BR /usr/5bin/posix/ls .
 .TP
 .B \-s
 Create a symbolic link,

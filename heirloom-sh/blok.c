@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)blok.c	1.7 (gritter) 6/16/05
+ * Sccsid @(#)blok.c	1.4 (gritter) 6/14/05
  */
 
 /* from OpenSolaris "blok.c	1.19	05/06/08 SMI" */
@@ -54,8 +54,13 @@ struct blk *blokp;			/* current search pointer */
 struct blk *bloktop;		/* top of arena (last blok) */
 
 unsigned char		*brkbegin;
+unsigned char		*setbrk();
 
+#ifdef __STDC__
 void *
+#else
+char *
+#endif
 alloc(nbytes)
 	size_t nbytes;
 {
@@ -95,8 +100,8 @@ alloc(nbytes)
 	}
 }
 
-void
-addblok(unsigned reqd)
+addblok(reqd)
+	unsigned reqd;
 {
 	if (stakbot == 0)
 	{
@@ -182,8 +187,8 @@ free(ap)
 
 #ifdef DEBUG
 
-int 
-chkbptr(struct blk *ptr)
+chkbptr(ptr)
+	struct blk *ptr;
 {
 	int	exf = 0;
 	register struct blk *p = (struct blk *)brkbegin;
@@ -218,8 +223,7 @@ chkbptr(struct blk *ptr)
 }
 
 
-int 
-chkmem(void)
+chkmem()
 {
 	register struct blk *p = (struct blk *)brkbegin;
 	register struct blk *q;
@@ -258,7 +262,8 @@ chkmem(void)
 #endif
 
 size_t
-blklen(char *q)
+blklen(q)
+char *q;
 {
 	register struct blk *pp = (struct blk *)q;
 	register struct blk *p;

@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,11 +33,11 @@
 #define	USED
 #endif
 #if defined (SUS)
-static const char sccsid[] USED = "@(#)du_sus.sl	1.39 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)du_sus.sl	1.35 (gritter) 7/18/04";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/du.sl	1.39 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)/usr/ucb/du.sl	1.35 (gritter) 7/18/04";
 #else
-static const char sccsid[] USED = "@(#)du.sl	1.39 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)du.sl	1.35 (gritter) 7/18/04";
 #endif
 
 #include	<sys/types.h>
@@ -96,7 +96,6 @@ struct dslot {
 
 static unsigned	errcnt;			/* count of errors */
 static int		aflag;		/* report all files */
-static int		hflag;		/* human-readable sizes */
 static int		kflag;		/* sizes in kilobytes */
 static int		sflag;		/* print summary only */
 static int		xflag;		/* do not cross device boundaries */
@@ -106,7 +105,6 @@ static int		rflag = 1;	/* write error messages */
 static int		rflag;		/* write error messages */
 #endif	/* !SUS, !UCB */
 static int		oflag;		/* do not add subdirs */
-static int		HLflag;		/* -H or -L flag */
 static long		maxdepth;	/* max depth of recursion */
 static long long	*dtots;		/* size of directories on recursion */
 static struct dslot	*d0;		/* start of devices table */
@@ -161,26 +159,12 @@ pnerror(int eno, const char *string)
 static void
 report(unsigned long long sz, const char *fn)
 {
-	if (hflag || kflag) {
+	if (kflag) {
 		if (sz & 01)
 			sz++;
 		sz >>= 01;
 	}
-	if (hflag) {
-		const char	units[] = "KMGTPE", *up = units;
-		int	rest = 0;
-
-		while (sz > 1023) {
-			rest = (sz % 1024) / 128;
-			sz /= 1024;
-			up++;
-		}
-		if (sz < 10 && rest)
-			printf("%2llu.%u%c\t%s\n", sz, rest, *up, fn);
-		else
-			printf("%4llu%c\t%s\n", sz, *up, fn);
-	} else
-		printf("%llu\t%s\n", sz, fn);
+	printf("%llu\t%s\n", sz, fn);
 }
 
 /*
@@ -377,10 +361,8 @@ static void
 descend(size_t pend, const char *base, const int olddir, int ssub, int level)
 {
 	struct stat	st;
-	int	(*statfn)(const char *, struct stat *);
 
-	statfn = HLflag == 'L' || level == 0 && HLflag == 'H' ? stat : lstat;
-	if (statfn(base, &st) < 0) {
+	if (lstat(base, &st) < 0) {
 		pnerror(errno, path);
 		return;
 	}
@@ -397,24 +379,15 @@ descend(size_t pend, const char *base, const int olddir, int ssub, int level)
 		struct direc	*dp;
 		struct getdb	*db = NULL;
 		int	df, err;
-		int	oflag = O_RDONLY;
 
-		if (HLflag == 'L' && multilink(&st)) {
-			if (lstat(base, &st) < 0) {
-				pnerror(errno, path);
-				return;
-			}
-			hpfix(st.st_blocks);
-			goto done;
-		}
+		if ((df = open(base, O_RDONLY
 #ifdef	O_DIRECTORY
-		oflag |= O_DIRECTORY;
+						| O_DIRECTORY
 #endif
 #ifdef	O_NOFOLLOW
-		if (statfn == lstat)
-			oflag |= O_NOFOLLOW;
+						| O_NOFOLLOW
 #endif
-		if ((df = open(base, oflag)) < 0 ||
+			      		)) < 0 ||
 				(db = getdb_alloc(base, df)) == NULL) {
 			if (errno == EMFILE) {
 				int	sres;
@@ -500,7 +473,7 @@ du(const char *fn)
 	struct stat st;
 	int	i, startfd;
 
-	if ((HLflag ? stat : lstat)(fn, &st) < 0) {
+	if (lstat(fn, &st) < 0) {
 		pnerror(errno, fn);
 		return;
 	}
@@ -530,9 +503,9 @@ static void
 usage(void)
 {
 #ifdef	UCB
-	fprintf(stderr, "usage: %s [-as] [name ...]\n", progname);
+	fprintf(stderr, "usage: %s [-asxo] [name ...]\n", progname);
 #else
-	fprintf(stderr, "usage: %s [-ars] [name ...]\n", progname);
+	fprintf(stderr, "usage: %s [-arskxo] [name ...]\n", progname);
 #endif
 	exit(2);
 }
@@ -553,17 +526,10 @@ main(int argc, char **argv)
 #ifdef	UCB
 	kflag = 1;
 #endif
-	while ((i = getopt(argc, argv, "ahHkLosrx")) != EOF) {
+	while ((i = getopt(argc, argv, "akosrx")) != EOF) {
 		switch (i) {
 		case 'a':
 			aflag = 1;
-			break;
-		case 'h':
-			hflag = 1;
-			break;
-		case 'H':
-		case 'L':
-			HLflag = i;
 			break;
 		case 'k':
 			kflag = 1;

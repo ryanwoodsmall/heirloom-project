@@ -25,19 +25,17 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)cp_sus.sl	1.84 (gritter) 3/4/06";
-#elif defined (S42)
-static const char sccsid[] USED = "@(#)cp_s42.sl	1.84 (gritter) 3/4/06";
+#ifdef	SUS
+static const char sccsid[] USED = "@(#)cp_sus.sl	1.66 (gritter) 11/6/04";
 #else
-static const char sccsid[] USED = "@(#)cp.sl	1.84 (gritter) 3/4/06";
+static const char sccsid[] USED = "@(#)cp.sl	1.66 (gritter) 11/6/04";
 #endif
 
 #include	<sys/types.h>
@@ -59,16 +57,12 @@ static const char sccsid[] USED = "@(#)cp.sl	1.84 (gritter) 3/4/06";
 #include	<utime.h>
 #include	"sfile.h"
 #include	"memalign.h"
-#include	"alloca.h"
 
 #ifndef	S_IFDOOR
 #define	S_IFDOOR	0xD000		/* Solaris door */
 #endif
 #ifndef	S_IFNAM
 #define	S_IFNAM		0x5000		/* XENIX special named file */
-#endif
-#ifndef	S_IFNWK
-#define	S_IFNWK		0x9000		/* HP-UX network special file */
 #endif
 
 static enum {
@@ -100,9 +94,7 @@ static struct dslot	*d0;
 static unsigned	errcnt;			/* count of errors */
 static long	bflag;			/* buffer size */
 static int	dflag;			/* preserve hard links */
-#ifdef	O_DIRECT
 static int	Dflag;			/* use direct i/o */
-#endif	/* O_DIRECT */
 static int	fflag;			/* force */
 static int	iflag;			/* ask before overwriting */
 static int	nflag;			/* ln: do not remove links */
@@ -110,7 +102,6 @@ static int	pflag;			/* preserve owner and times */
 static int	rflag;			/* recursive, read FIFOs */
 static int	Rflag;			/* recursive, recreate FIFOs */
 static int	sflag;			/* make symlinks / show statistics */
-static int	HLPflag;		/* -H, -L, or -P */
 static int	ontty;			/* stdin is a terminal */
 static mode_t	umsk;			/* current umask */
 static uid_t	myuid;			/* current uid */
@@ -173,9 +164,9 @@ usage(void)
 	switch (pers) {
 	case PERS_CP:
 		fprintf(stderr, "\
-Usage: %s [-i] [-p] f1 f2\n\
-       %s [-i] [-p] f1 ... fn d1\n\
-       %s [-i] [-p] [-r] d1 d2\n",
+Usage: %s [-f] [-i] [-p] f1 f2\n\
+       %s [-f] [-i] [-p] f1 ... fn d1\n\
+       %s [-f] [-i] [-p] [-r|-R] d1 d2\n",
        			progname, progname, progname);
 		break;
 	case PERS_MV:
@@ -187,11 +178,11 @@ Usage: %s [-f] [-i] f1 f2\n\
 		break;
 	case PERS_LN:
 		{
-#if defined (SUS)
+#ifdef	SUS
 			const char nstr[] = "";
-#else	/* !SUS */
+#else
 			const char nstr[] = "[-n] ";
-#endif	/* !SUS */
+#endif
 			fprintf(stderr, "\
 Usage: %s [-f] %s[-s] f1 f2\n\
        %s [-f] %s[-s] f1 ... fn d1\n\
@@ -358,22 +349,22 @@ permissions(const char *path, const struct stat *ssp)
 		ut.actime = ssp->st_atime;
 		ut.modtime = ssp->st_mtime;
 		if (utime(path, &ut) < 0) {
-#if defined (SUS) || defined (S42)
+#ifdef	SUS
 			fprintf(stderr, "%s: cannot set times for %s\n%s: %s\n",
 					progname, path,
 					progname, strerror(errno));
-#endif /* SUS || S42 */
+#endif
 			if (pers != PERS_MV)
 				errcnt |= 010;
 		}
 		if (myuid == 0) {
 			if (chown(path, ssp->st_uid, ssp->st_gid) < 0) {
-#if defined (SUS) || defined (S42)
+#ifdef	SUS
 				fprintf(stderr,
 			"%s: cannot change owner and group of %s\n%s: %s\n",
 					progname, path,
 					progname, strerror(errno));
-#endif	/* SUS || S42 */
+#endif
 				if (pers != PERS_MV)
 					errcnt |= 010;
 				mode &= ~(mode_t)(S_ISUID|S_ISGID);
@@ -383,11 +374,11 @@ permissions(const char *path, const struct stat *ssp)
 	} else
 		mode = check_suid(ssp, mode & ~umsk);
 	if (chmod(path, mode) < 0) {
-#if defined (SUS) || defined (S42)
+#ifdef	SUS
 		fprintf(stderr, "%s: cannot set permissions for %s\n%s: %s\n",
 				progname, path,
 				progname, strerror(errno));
-#endif	/* SUS || S42 */
+#endif
 		if (pers != PERS_MV)
 			errcnt |= 010;
 	}
@@ -400,10 +391,8 @@ balign(const struct stat *ssp, const struct stat *dsp,
 	int	n, m;
 	size_t	s;
 
-	n = (ssp->st_mode&S_IFMT) == S_IFREG && ssp->st_blksize >= 0 ?
-		ssp->st_blksize : 512;
-	m = (dsp->st_mode&S_IFMT) == S_IFREG && dsp->st_blksize >= 0 ?
-		dsp->st_blksize : 512;
+	n = (ssp->st_mode&S_IFMT) == S_IFREG ? ssp->st_blksize : 512;
+	m = (dsp->st_mode&S_IFMT) == S_IFREG ? dsp->st_blksize : 512;
 	if (prefd <= size && prefd % n == 0 && prefd % m == 0)
 		return prefd;
 	else if (n % m == 0)
@@ -424,7 +413,7 @@ writerr(void *vp, int count, int written)
 {
 }
 
-static long long
+static void
 fdcopy(const char *src, const struct stat *ssp, const int sfd,
 		const char *tgt, const struct stat *dsp, const int dfd)
 {
@@ -433,7 +422,6 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 	static size_t bufsize;
 	ssize_t rsz, wo, wt;
 	size_t	blksize;
-	long long	copied = 0;
 #ifdef	O_DIRECT
 	int	sfl = 0, dfl = 0, haverest = 0, dioen = 0;
 	off_t	remsz = 0;
@@ -445,7 +433,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 
 		if ((sent = sfile(dfd, sfd, ssp->st_mode, ssp->st_size)) ==
 				ssp->st_size)
-			return sent;
+			return;
 		if (sent < 0)
 			goto err;
 	}
@@ -457,7 +445,7 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 		blksize = bflag;
 #ifdef	O_DIRECT
 	else if (Dflag)
-		blksize = balign(ssp, dsp, ssp->st_size, 1048576);
+		blksize = balign(ssp, dsp, ssp->st_size, 196608);
 #endif	/* O_DIRECT */
 	else
 		blksize = balign(ssp, dsp, ssp->st_size, 4096);
@@ -505,10 +493,9 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 				if ((dsp->st_mode&S_IFMT) == S_IFREG)
 					unlink(tgt);
 #endif	/* notdef */
-				return copied;
+				return;
 			}
 			wt += wo;
-			copied += wo;
 		} while (wt < rsz);
 #ifdef	O_DIRECT
 		if (Dflag && ssp->st_size > blksize &&
@@ -535,14 +522,13 @@ fdcopy(const char *src, const struct stat *ssp, const int sfd,
 	}
 #ifdef	O_DIRECT
 	if (haverest) {
-#if !defined (__FreeBSD__) && !defined (__DragonFly__) && !defined (__APPLE__)
+#ifndef	__FreeBSD__
 		fdatasync(dfd);
-#else	/* __FreeBSD__, __DragonFly__, __APPLE__ */
+#else	/* __FreeBSD__ */
 		fsync(dfd);
-#endif	/* __FreeBSD_, __DragonFly__, __APPLE__ */
+#endif	/* __FreeBSD__ */
 	}
 #endif	/* O_DIRECT */
-	return copied;
 }
 
 static void
@@ -552,15 +538,16 @@ filecopy(const char *src, const struct stat *ssp,
 	struct stat stbuf;
 	mode_t mode;
 	int sfd, dfd;
+#ifdef	ADDONS
 	float	f, s, t;
 	struct timeval	tv1, tv2;
 	struct rusage	ru1, ru2;
-	long long	copied = 0;
 
 	if (sflag) {
 		gettimeofday(&tv1, NULL);
 		getrusage(RUSAGE_SELF, &ru1);
 	}
+#endif	/* ADDONS */
 	if ((sfd = open(src, O_RDONLY)) < 0) {
 		fprintf(stderr, "%s: cannot open %s\n%s: %s\n",
 				progname, src,
@@ -585,7 +572,7 @@ filecopy(const char *src, const struct stat *ssp,
 		errcnt |= 04;
 		goto end2;
 	}
-	copied = fdcopy(src, ssp, sfd, tgt, &stbuf, dfd);
+	fdcopy(src, ssp, sfd, tgt, &stbuf, dfd);
 end2:
 	if (pflag)
 		permissions(tgt, ssp);
@@ -594,12 +581,13 @@ end2:
 				progname, tgt, strerror(errno));
 		errcnt |= 04;
 	}
+#ifdef	ADDONS
 	if (sflag) {
 		gettimeofday(&tv2, NULL);
 		getrusage(RUSAGE_SELF, &ru2);
 #define	tv2f(tv)	((tv).tv_sec + (float)(tv).tv_usec / 1000000)
 		f = tv2f(tv2) - tv2f(tv1);
-		s = (float)copied / (2<<19);
+		s = (float)ssp->st_size / (2<<19);
 		t = f ? s / f : s;
 		printf("                 ****** %s File Information ******\n"
 		       "        Input file              :       %s\n"
@@ -616,6 +604,7 @@ end2:
 		       s,
 		       t);
 	}
+#endif	/* ADDONS */
 end1:
 	close(sfd);
 }
@@ -624,16 +613,16 @@ static void
 ignoring(const char *type, const char *path)
 {
 	fprintf(stderr, "%s: %signoring %s %s\n", progname,
-#if defined (SUS)
+#ifdef	SUS
 			"",
-#else	/* !SUS */
+#else
 			"warning: ",
-#endif	/* !SUS */
+#endif
 			type, path);
-#if defined (SUS)
+#ifdef	SUS
 	if (pers == PERS_MV)
 		errcnt |= 020;
-#endif	/* SUS */
+#endif
 }
 
 static enum okay
@@ -704,12 +693,12 @@ symlinkcopy(const char *src, const struct stat *ssp,
 		return;
 	}
 	if (myuid == 0 && lchown(tgt, ssp->st_uid, ssp->st_gid) < 0) {
-#if defined (SUS)
+#ifdef	SUS
 		fprintf(stderr,
 			"%s: cannot change owner and group of %s\n%s: %s\n",
 				progname, tgt,
 				progname, strerror(errno));
-#endif	/* SUS */
+#endif
 		if (pers != PERS_MV)
 			errcnt |= 010;
 	}
@@ -755,7 +744,6 @@ specialcopy(const char *src, const struct stat *ssp,
 	case S_IFCHR:
 	case S_IFBLK:
 	case S_IFNAM:
-	case S_IFNWK:
 		devicecopy(src, ssp, tgt, dsp);
 		break;
 	case S_IFLNK:
@@ -946,9 +934,7 @@ cpmv(const char *src, const char *tgt, struct stat *dsp, int level,
 	struct stat sst;
 
 	if (commoncheck(src, tgt, dsp, &sst,
-			Rflag && level == 0 ?
-				pers == PERS_MV || HLPflag == 'P' ?
-					lstat : stat :
+			Rflag && level == 0 ? pers == PERS_MV ? lstat : stat :
 			statfn) != OKAY)
 		return;
 	if (pers == PERS_MV && level == 0) {
@@ -975,14 +961,6 @@ cpmv(const char *src, const char *tgt, struct stat *dsp, int level,
 			errcnt |= 01;
 			return;
 		}
-#if !defined (SUS)
-		if (pers == PERS_CP && dsp != NULL && iflag) {
-			fprintf(stderr, "%s: overwrite %s? ",
-					progname, tgt);
-			if (confirm() != OKAY)
-				return;
-		}
-#endif	/* !SUS */
 		if (dsp == NULL) {
 			if (mkdir(tgt, check_suid(&sst,
 					sst.st_mode&07777 | S_IRWXU)) < 0) {
@@ -1056,23 +1034,7 @@ ln(const char *src, const char *tgt, struct stat *dsp, int level,
 		errcnt |= 01;
 		return;
 	}
-#if (defined (SUS) || defined (S42)) && (defined (__linux__) || defined (__sun))
-	if (sflag == 0) {
-		char	*rpbuf = alloca(PATH_MAX+1);
-		if (realpath(src, rpbuf) == NULL) {
-			fprintf(stderr, "%s: cannot access %s\n",
-					progname, src);
-			errcnt |= 01;
-			return;
-		}
-		src = rpbuf;
-	}
-#endif	/* (SUS || S42) && (__linux__ || __sun) */
-	if (dsp
-#if !defined (SUS)
-			&& !sflag
-#endif	/* !SUS */
-			) {
+	if (dsp && !sflag) {
 		if (nflag && !fflag) {
 			fprintf(stderr, "%s: %s: File exists\n",
 					progname, tgt);
@@ -1122,13 +1084,13 @@ getfl(void)
 	} else if (progname[0] == 'l' && progname[1] == 'n') {
 		pers = PERS_LN;
 		optstring = "fns";
-#if defined (SUS)
+#ifdef	SUS
 		nflag = 1;
-#endif	/* SUS */
+#endif
 		go = ln;
 	} else {
 		pers = PERS_CP;
-		optstring = "ab:dDfiHLpPrRs";
+		optstring = "b:dDfiprRs";
 		go = cpmv;
 	}
 	return optstring;
@@ -1149,6 +1111,7 @@ main(int argc, char **argv)
 	optstring = getfl();
 	while ((i = getopt(argc, argv, optstring)) != EOF) {
 		switch (i) {
+#ifdef	ADDONS
 		case 'b':
 			bflag = atol(optarg);
 			break;
@@ -1157,22 +1120,21 @@ main(int argc, char **argv)
 			Dflag = 1;
 			break;
 #endif	/* O_DIRECT */
+#endif	/* ADDONS */
 		case 'd':
 			dflag = 1;
 			break;
 		case 'f':
 			fflag = 1;
-#if defined (SUS)
-			if (pers == PERS_MV)
-				iflag = 0;
-#endif	/* SUS */
+#ifdef	SUS
+			iflag = 0;
+#endif
 			break;
 		case 'i':
 			iflag = 1;
-#if defined (SUS)
-			if (pers == PERS_MV)
-				fflag = 0;
-#endif	/* SUS */
+#ifdef	SUS
+			fflag = 0;
+#endif
 			break;
 		case 'n':
 			nflag = 1;
@@ -1180,9 +1142,6 @@ main(int argc, char **argv)
 		case 'p':
 			pflag = 1;
 			break;
-		case 'a':
-			dflag = pflag = 1;
-			/*FALLTHRU*/
 		case 'R':
 			Rflag = 1;
 			/*FALLTHRU*/
@@ -1191,11 +1150,6 @@ main(int argc, char **argv)
 			break;
 		case 's':
 			sflag = 1;
-			break;
-		case 'H':
-		case 'L':
-		case 'P':
-			HLPflag = i;
 			break;
 		default:
 			illegal = 1;
@@ -1211,24 +1165,15 @@ main(int argc, char **argv)
 		usage();
 	umask(umsk = umask(0));
 	ontty = isatty(0);
-#if defined (SUS)
-	/* nothing */
-#elif defined (S42)
-	if (pers == PERS_MV && !ontty)
-		iflag = 0;
-#else	/* !SUS, !S42 */
+#ifndef	SUS
 	if (!ontty)
 		iflag = 0;
-#endif	/* !SUS, !S42 */
+#endif
 	myuid = geteuid();
 	mygid = getegid();
 	inull = scalloc(1, sizeof *inull);
 	inull->i_lln = inull->i_rln = inull;
-	statfn = (Rflag && HLPflag != 'L'
-#if !defined (SUS) && !defined (S42)
-			|| pers == PERS_LN
-#endif	/* !SUS && !S42 */
-			? lstat : stat);
+	statfn = (Rflag || pers == PERS_LN ? lstat : stat);
 	if (lstat(argv[argc-1], &dst) == 0) {
 		if ((dst.st_mode&S_IFMT) != S_IFLNK ||
 				stat(argv[argc-1], &ust) < 0)

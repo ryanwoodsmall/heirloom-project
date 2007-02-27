@@ -39,18 +39,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)file_sus.sl	1.33 (gritter) 4/14/06";
-#else	/* !SUS */
-static const char sccsid[] USED = "@(#)file.sl	1.33 (gritter) 4/14/06";
-#endif	/* !SUS */
+static const char sccsid[] USED = "@(#)file.sl	1.26 (gritter) 5/29/04";
 
 #ifdef	__GLIBC__
 #include <sys/sysmacros.h>
@@ -82,9 +78,6 @@ static const char sccsid[] USED = "@(#)file.sl	1.33 (gritter) 4/14/06";
 #endif
 #ifndef	S_INSHD
 #define	S_INSHD		0x2		/* XENIX shared data subtype of IFNAM */
-#endif
-#ifndef	S_IFNWK
-#define	S_IFNWK		0x9000		/* HP-UX network special file */
 #endif
 static int in;
 static int i  = 0;
@@ -159,7 +152,6 @@ static void	pritem(struct match *, int);
 static void	fmterr(const char *, int);
 static int	tar(void);
 static int	sccs(void);
-static int	utf8(const char *);
 static int	endianess(void);
 static int	redirect(const char *, const char *);
 
@@ -242,9 +234,7 @@ type(const char *file)
 	if(statfn(file, &mbuf) < 0) {
 		if (sysv3) {
 			printf("cannot open, %s\n", strerror(errno));
-#ifndef	SUS
 			status |= 1;
-#endif	/* !SUS */
 			return;
 		}
 		goto cant;
@@ -269,10 +259,6 @@ type(const char *file)
 
 	case S_IFDOOR:
 		printf("door\n");
-		return;
-
-	case S_IFNWK:
-		printf("network\n");
 		return;
 
 	case S_IFNAM:
@@ -308,9 +294,7 @@ spcl:
 			printf("cannot open for reading\n");
 		else
 			printf("cannot open: %s\n", strerror(errno));
-#ifndef	SUS
 		status |= 1;
-#endif	/* !SUS */
 		return;
 	}
 rd:	in = read(ifile, buf, sizeof buf);
@@ -343,8 +327,7 @@ rd:	in = read(ifile, buf, sizeof buf);
 		j = i;
 		while(buf[i++] != '\n'){
 			if(i - j > 255){
-				if (!utf8(NULL))
-					printf("data\n"); 
+				printf("data\n"); 
 				goto out;
 			}
 			if(i >= in)goto notc;
@@ -433,8 +416,7 @@ notas:
 			printf("troff output\n");
 			goto out;
 		}
-		if (!utf8(NULL))
-			printf("data\n"); 
+		printf("data\n"); 
 		goto out; 
 	}
 	if (mbuf.st_mode&0111)
@@ -447,8 +429,7 @@ notas:
 outa:
 	while(i < in)
 		if((buf[i++]&0377) > 127){
-			if (!utf8(" with utf-8 characters\n"))
-				printf(" with garbage\n");
+			printf(" with garbage\n");
 			goto out;
 		}
 	/* if next few lines in then read whole file looking for nulls ...
@@ -902,7 +883,7 @@ static void
 usage(void)
 {
 	fprintf(stderr,
-		"usage: %s [-c] [-h] [-f ffile] [-m mfile] file...\n",
+		"usage: %s [-c] [-h] [-f ffile] [-m mfile] [-z] file...\n",
 		progname);
 	exit(2);
 }
@@ -1010,44 +991,6 @@ sccs(void)
 			digitchar(buf[4]&0377) && digitchar(buf[5]&0377) &&
 			digitchar(buf[6]&0377) && buf[7] == '\n') {
 		printf("sccs\n");
-		return 1;
-	}
-	return 0;
-}
-
-static int
-utf8(const char *msg)
-{
-	int	c, d, i, j, n;
-	int	found = 0;
-
-	for (i = 0; i < in; i++) {
-		if ((c = buf[i] & 0377) & 0200) {
-			if (c == (c & 037 | 0300))
-				n = 1;
-			else if (c == (c & 017 | 0340))
-				n = 2;
-			else if (c == (c & 07 | 0360))
-				n = 3;
-			else if (c == (c & 03 | 0370))
-				n = 4;
-			else if (c == (c & 01 | 0374))
-				n = 5;
-			else
-				return 0;
-			if (i + n >= in)
-				break;
-			for (j = 1; j <= n; j++) {
-				d = buf[i+j] & 0377;
-				if (d != (d & 077 | 0200))
-					return 0;
-			}
-			i += n;
-			found++;
-		}
-	}
-	if (found) {
-		printf("%s", msg ? msg : "utf-8 text\n");
 		return 1;
 	}
 	return 0;

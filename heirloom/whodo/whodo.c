@@ -27,14 +27,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)whodo.sl	1.42 (gritter) 1/12/07";
+static const char sccsid[] USED = "@(#)whodo.sl	1.37 (gritter) 11/7/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -56,20 +56,15 @@ static const char sccsid[] USED = "@(#)whodo.sl	1.42 (gritter) 1/12/07";
 #include	<wchar.h>
 #include	<wctype.h>
 
-#if defined (__FreeBSD__) || defined (__DragonFly__)
+#ifdef	__FreeBSD__
 #include	<sys/sysctl.h>
 #endif
 
-#if defined (__NetBSD__) || defined (__OpenBSD__) || defined (__APPLE__)
-#if defined (__APPLE__)
-#include	<mach/mach_types.h>
-#include	<mach/task_info.h>
-#else	/* !__APPLE__ */
+#if defined (__NetBSD__) || defined (__OpenBSD__)
 #include	<kvm.h>
-#endif /* !__APPLE__ */
 #include	<sys/param.h>
 #include	<sys/sysctl.h>
-#endif /* __NetBSD__, __NetBSD__, __APPLE__ */
+#endif
 
 #ifdef	__hpux
 #include	<sys/param.h>
@@ -81,15 +76,13 @@ static const char sccsid[] USED = "@(#)whodo.sl	1.42 (gritter) 1/12/07";
 #endif
 
 #if !defined (__linux__) && !defined (__FreeBSD__) && !defined (__hpux) && \
-	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__) && \
-	!defined (__DragonFly__) && !defined (__APPLE__)
+	!defined (_AIX) && !defined (__NetBSD__) && !defined (__OpenBSD__)
 #ifdef	sun
 #include	<sys/loadavg.h>
 #define	_STRUCTURED_PROC	1
 #endif
 #include	<sys/procfs.h>
-#endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__,
-	!__DragonFly__, !__APPLE__ */
+#endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
 
 #ifndef	PRNODEV
 #define	PRNODEV		0
@@ -132,11 +125,10 @@ static int		uflag;			/* "uptime" format */
 static int		hz;			/* clock ticks per second */
 static char		*user;			/* look for one user only */
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__)
 static char		loadavg[64];		/* load average */
 #endif	/* __linux__ || __sun || __FreeBSD__ || __hpux || __NetBSD__ ||
-		__OpenBSD__ || __DragonFly__ || __APPLE__ */
+		__OpenBSD__ */
 static char		*progname;		/* argv0 to main */
 static const char	*unknown = " unknown";	/* unknown */
 static time_t		now;			/* time at program start */
@@ -330,8 +322,7 @@ uptime(void)
 		return unknown;
 	}
 	fclose(fp);
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	int	name[2] = { CTL_KERN, KERN_BOOTTIME };
 	struct timeval	old;
 	size_t	oldlen = sizeof old;
@@ -350,8 +341,7 @@ uptime(void)
 
 	getprocs64(&pi, sizeof pi, NULL, 0, &idx, 1);
 	upsec = now - pi.pi_start;
-#else	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__,
-	!__DragonFly__, !__APPLE__ */
+#else	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
 	FILE *fp;
 	struct psinfo	pi;
 
@@ -364,7 +354,7 @@ uptime(void)
 	fclose(fp);
 	upsec = now - pi.pr_start.tv_sec;
 #endif	/* !__linux__, !__FreeBSD__, !__hpux, !_AIX, !__NetBSD__,
-		!__OpenBSD__, !__DragonFly__, !__APPLE__ */
+		!__OpenBSD__ */
 	if (upsec > 59) {
 		upmin = upsec / 60;
 		if (upmin > 59) {
@@ -428,11 +418,10 @@ printhead(struct tslot *t0)
 		if (cmd != WHODO) {
 			printf("%u %s", users, users > 1 ? "users" : "user");
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__)
 			printf(",  load average: %s", loadavg);
 #endif	/* __linux__ || __sun || __FreeBSD__ || __hpux || __NetBSD__ ||
-	__OpenBSD__ || __DragonFly__ || __APPLE__ */
+	__OpenBSD__ */
 			printf("\n");
 		} else
 			printf("%u user(s)\n", users);
@@ -671,16 +660,16 @@ queueproc(struct tslot *t0, struct pslot *ps)
  */
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__) && !defined (__APPLE__)
+	!defined (__OpenBSD__)
 
-#if defined (__linux__) || defined (__FreeBSD__) || defined (__DragonFly__)
+#if defined (__linux__) || defined (__FreeBSD__)
 
 #define	GETVAL(a)		if ((v = getval(&cp, (a), ' ', 0)) == NULL) \
 					goto error
 
 #define	GETVAL_COMMA(a)		if ((v = getval(&cp, (a), ' ', ',')) == NULL) \
 					goto error
-#endif	/* __linux__ || __FreeBSD__ || __DragonFly__ */
+#endif	/* __linux__ || __FreeBSD__ */
 
 #if defined (__linux__)
 static struct pslot *
@@ -803,7 +792,7 @@ error:
 	return NULL;
 }
 
-#elif defined (__FreeBSD__) || defined (__DragonFly__)
+#elif defined (__FreeBSD__)
 
 enum okay {
 	OKAY,
@@ -818,7 +807,7 @@ getproc_status(char *pdir, struct pslot *p)
 	char	fn[_POSIX_PATH_MAX];
 	union value	*v;
 	FILE	*fp;
-	char	*cp, *ce, *cq;
+	char	*cp, *ce;
 	size_t	sz, sc;
 	int	mj, mi;
 
@@ -863,30 +852,12 @@ getproc_status(char *pdir, struct pslot *p)
 	/* pgid unused */
 	GETVAL(VT_INT);
 	/* sid unused */
-	if (isdigit(*cp)) {
-		GETVAL_COMMA(VT_INT);
-		mj = v->v_int;
-		GETVAL(VT_INT);
-		mi = v->v_int;
-		if (mj != -1 || mi != -1)
-			p->p_termid = makedev(mj, mi);
-	} else {
-		struct stat	st;
-		char	*dev;
-		cq = cp;
-		while (*cp != ' ') cp++;
-		*cp = '\0';
-		dev = smalloc(cp - cq + 8);
-		strcpy(dev, "/dev/");
-		strcpy(&dev[5], cq);
-		if (stat(dev, &st) < 0)
-			p->p_termid = PRNODEV;
-		else
-			p->p_termid = st.st_rdev;
-		free(dev);
-		*cp = ' ';
-		while (*cp == ' ') cp++;
-	}
+	GETVAL_COMMA(VT_INT);
+	mj = v->v_int;
+	GETVAL(VT_INT);
+	mi = v->v_int;
+	if (mj != -1 || mi != -1)
+		p->p_termid = makedev(mj, mi);
 	while (*cp != ' ') cp++; while (*cp == ' ') cp++;
 	/* skip flags */
 	GETVAL_COMMA(VT_LONG);
@@ -955,7 +926,7 @@ readproc(char *pdir)
 	return p;
 }
 
-#else	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
+#else	/* !__linux__, !__FreeBSD__ */
 static struct pslot *
 readproc(char *pdir)
 {
@@ -999,7 +970,7 @@ readproc(char *pdir)
 	return p;
 }
 
-#endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
+#endif	/* !__linux__, !__FreeBSD__ */
 
 /*
  * Convert an entry in /proc to a slot entry, if advisable.
@@ -1261,207 +1232,6 @@ findprocs(struct tslot *t0) {
 	}
 	kvm_close(kt);
 }
-#elif defined (__APPLE__)
-
-static int
-GetBSDProcessList(pid_t thepid, struct kinfo_proc **procList, size_t *procCount)
-    /* derived from http://developer.apple.com/qa/qa2001/qa1123.html */
-    /* Returns a list of all BSD processes on the system.  This routine
-       allocates the list and puts it in *procList and a count of the
-       number of entries in *procCount.  You are responsible for freeing
-       this list (use "free" from System framework).
-       all classic apps run in one process
-       On success, the function returns 0.
-       On error, the function returns a BSD errno value.
-       Preconditions:
-	assert( procList != NULL);
-	assert(*procList == NULL);
-	assert(procCount != NULL);
-       Postconditions:
-	assert( (err == 0) == (*procList != NULL) );
-    */
-{
-	int			err;
-	struct kinfo_proc	*result;
-	int			mib[4];
-	size_t			length;
-
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROC;
-	if (thepid == 0) {
-		mib[2] = KERN_PROC_ALL;
-		mib[3] = 0;
-	} else {
-		mib[2] = KERN_PROC_PID;
-		mib[3] = thepid;
-	}
-	/* We start by calling sysctl with result == NULL and length == 0.
-	   That will succeed, and set length to the appropriate length.
-	   We then allocate a buffer of that size and call sysctl again
-	   with that buffer.
-	*/
-	length = 0;
-	err = sysctl(mib, 4, NULL, &length, NULL, 0);
-	if (err == -1)
-		err = errno;
-	if (err == 0) {
-		result = smalloc(length);
-		err = sysctl(mib, 4, result, &length, NULL, 0);
-		if (err == -1)
-			err = errno;
-		if (err == ENOMEM) {
-			free(result); /* clean up */
-			result = NULL;
-		}
-	}
-	*procList = result;
-	*procCount = err == 0 ? length / sizeof **procList : 0;
-	return err;
-}
-
-static int
-getargv(struct pslot *p, struct kinfo_proc *kp)
-{
-	size_t	size, argsz;
-	char	*argbuf;
-	int	mib[3];
-	long	nargs;
-	char	*ap, *pp;
-
-	/* allocate a procargs space per process */
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_ARGMAX;
-	size = sizeof argsz;
-	if (sysctl(mib, 2, &argsz, &size, NULL, 0) == -1)
-		return 0;
-	argbuf = smalloc(argsz);
-
-	/* fetch the process arguments */
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROCARGS2;
-	mib[2] = kp->kp_proc.p_pid;
-	if (sysctl(mib, 3, argbuf, &argsz, NULL, 0) == -1)
-		goto DONE; /* process already left the system */
-
-	/* the number of args is at offset 0, this works for 32 and 64bit */
-	memcpy(&nargs, argbuf, sizeof nargs);
-	ap = argbuf + sizeof nargs;
-	pp = NULL;
-
-	/* skip the exec_path */
-	while (ap < &argbuf[argsz] && *ap != '\0')
-		ap++;
-	if (ap == &argbuf[argsz])
-		goto DONE; /* no args to show */
-	/* skip trailing '\0' chars */
-	while (ap < &argbuf[argsz] && *ap == '\0')
-		ap++;
-	if (ap == &argbuf[argsz])
-		goto DONE; /* no args to show */
-
-	/* now concat copy the arguments */
-	for (pp = p->p_cmdline; pp < &p->p_cmdline[sizeof p->p_cmdline-1]; pp++) {
-		if (*ap == '\0') {
-			if (--nargs == 0)
-				break;
-			*pp = ' ';
-			++ap;
-		} else {
-			*pp = *ap++;
-		}
-	}
-	*pp = '\0';
-
-DONE:	free(argbuf);
-	return pp != NULL;
-}
-
-static time_t
-tv2sec(time_value_t *tv, int mult)
-{
-	return tv->seconds*mult + (tv->microseconds >= 500000/mult);
-}
-
-extern	kern_return_t task_for_pid(task_port_t task, pid_t pid, task_port_t *target);
-
-static struct pslot *
-readproc(struct kinfo_proc *kp)
-{
-	kern_return_t   error;
-	unsigned int	info_count = TASK_BASIC_INFO_COUNT;
-	unsigned int 	thread_info_count = THREAD_BASIC_INFO_COUNT;
-	pid_t		pid;
-	task_port_t	task;
-	struct		task_basic_info	task_binfo;
-	struct		task_thread_times_info task_times;
-	time_value_t	total_time;
-	struct		pslot	*p;
-	char		**args;
-	char		*ap, *pp;
-
-	p = smalloc(sizeof *p);
-	p->p_next = NULL;
-	strncpy(p->p_name, kp->kp_proc.p_comm, sizeof p->p_name);
-	p->p_name[sizeof p->p_name - 1] = '\0';
-	p->p_pid = kp->kp_proc.p_pid;
-	p->p_time = 0;
-	p->p_ctime = 0;
-	if (kp->kp_proc.p_flag & P_CONTROLT)
-		p->p_termid = kp->kp_eproc.e_tdev;
-	else
-		p->p_termid = PRNODEV;
-
-	if (kp->kp_proc.p_stat == SZOMB || !getargv(p, kp)) {
-		/* fallback to p_comm */
-		strncpy(p->p_cmdline, p->p_name, sizeof p->p_name);
-		p->p_cmdline[sizeof p->p_cmdline - 1] = '\0';
-	}
-	
-	/* now try to fetch the times out of mach structures */
-	pid = kp->kp_proc.p_pid;
-	error = task_for_pid(mach_task_self(), pid, &task);
-	if (error != KERN_SUCCESS)
-		goto DONE; /* process already left the system */
-	info_count = TASK_BASIC_INFO_COUNT;
-	error = task_info(task, TASK_BASIC_INFO, &task_binfo, &info_count);
-	if (error != KERN_SUCCESS)
-		goto DONE;
-	info_count = TASK_THREAD_TIMES_INFO_COUNT;
-	error = task_info(task, TASK_THREAD_TIMES_INFO, &task_times, &info_count);
-	if (error != KERN_SUCCESS)
-		goto DONE;
-
-	total_time = task_times.user_time;
-	time_value_add(&total_time, &task_times.system_time);
-	p->p_time = tv2sec(&total_time, 1);
-
-	time_value_add(&total_time, &task_binfo.user_time);
-	time_value_add(&total_time, &task_binfo.system_time);
-	p->p_ctime = tv2sec(&total_time, 1);
-
-DONE:	mach_port_deallocate(mach_task_self(), task);	
-	return p;
-}
-
-static void
-findprocs(struct tslot *t0) {
-	struct	pslot	*p;
-	struct	kinfo_proc *kp = NULL;
-	size_t	cnt;
-	int	err;
-
-	if ((err = GetBSDProcessList(0, &kp, &cnt)) != 0) {
-		fprintf(stderr, "error getting proc list: %s\n", strerror(err));
-		exit(3);
-	}
-	while (--cnt > 0) {
-		p = readproc(&kp[cnt]);
-		queueproc(t0, p);
-	}
-	/* free the memory allocated by GetBSDProcessList */
-	free(kp);	
-}
-
 #endif	/* all */
 
 /*
@@ -1510,7 +1280,7 @@ getload(void)
 	}
 }
 #elif defined (__sun) || defined (__FreeBSD__) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 
 #ifndef	LOADAVG_NSTATS
 #define	LOADAVG_NSTATS	3
@@ -1562,12 +1332,11 @@ getlogins(void)
 	struct tslot *t, *t0 = NULL, *tprev = NULL;
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (__hpux) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if (cmd != WHODO)
 		getload();
 #endif	/* __linux__ || __sun || __FreeBSD__ || __hpux || __NetBSD__ ||
-		__OpenBSD__ ||  __DragonFly__ || __APPLE__ */
+		__OpenBSD__ */
 	setutxent();
 	while ((ut = getutxent()) != NULL) {
 		if (ut->ut_type == USER_PROCESS) {

@@ -32,8 +32,8 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\" Sccsid @(#)tar.1	1.46 (gritter) 3/1/05
-.TH TAR 1 "3/1/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)tar.1	1.43 (gritter) 5/24/04
+.TH TAR 1 "5/24/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 tar \- tape archiver
 .SH SYNOPSIS
@@ -166,7 +166,7 @@ can be used as the head or tail of a filter chain.
 .I Tar
 can also be used to move hierarchies with the command
 .sp
-    cd fromdir; tar cf \- . | (cd todir; tar xfp \-)
+    cd fromdir; tar cf - . | (cd todir; tar xfp -)
 .TP 10
 .B b
 causes
@@ -325,7 +325,7 @@ format extended headers are created by
 under the following circumstances:
 A path name exceeds 255 bytes
 or does not contain a slash character at an appropriate position,
-and does not contain non-UTF-8 characters;
+and does not contain non-ASCII characters;
 the name of a linked file exceeds 100 bytes;
 a file is larger than 8\ GB;
 a user or group ID exceeds the number 2097151.
@@ -357,31 +357,6 @@ with the
 and
 .I x
 keys.
-.PP
-The following keys are supported as extensions:
-.TP 10
-.B z
-causes
-.I tar
-to pipe its output through
-.IR gzip (1)
-when creating archives.
-When reading archives,
-this option is ignored.
-.TP 10
-.B j
-Similar to
-.IR z ,
-but using
-.IR bzip2 (1)
-as compression program.
-.TP 10
-.B Z
-Similar to
-.IR z ,
-but using
-.IR compress (1)
-as compression program.
 .SH EXAMPLES
 List the contents of a software distribution archive:
 .in +2

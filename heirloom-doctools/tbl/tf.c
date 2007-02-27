@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tf.c	1.9 (gritter) 9/9/06
+ * Sccsid @(#)tf.c	1.3 (gritter) 7/23/05
  */
 
  /* tf.c: save and restore fill mode around table */
@@ -27,14 +27,14 @@ void
 savefill(void)
 {
 /* remembers various things: fill mode, vs, ps in mac 35 (SF) */
-fprintf(tabout, ".de %d 00\n",SF);
+fprintf(tabout, ".de %d\n",SF);
 fprintf(tabout, ".ps \\n(.s\n");
 fprintf(tabout, ".vs \\n(.vu\n");
 fprintf(tabout, ".in \\n(.iu\n");
 fprintf(tabout, ".if \\n(.u .fi\n");
 fprintf(tabout, ".if \\n(.j .ad\n");
 fprintf(tabout, ".if \\n(.j=0 .na\n");
-fprintf(tabout, ".00\n");
+fprintf(tabout, "..\n");
 fprintf(tabout, ".nf\n");
 /* set obx offset if useful */
 fprintf(tabout, ".nr #~ 0\n");
@@ -49,16 +49,11 @@ void
 endoff(void)
 {
 int i;
-	warnoff();
 	for(i=0; i<MAXHEAD; i++)
 		if (linestop[i])
 			fprintf(tabout, ".nr #%c 0\n", 'a'+i);
 	for(i=0; i<texct; i++)
 		fprintf(tabout, ".rm %c+\n",texstr[i]);
-	for(i=300; i<=texct2; i++)
-		fprintf(tabout, ".do rm %d+\n",i);
-	warnon();
-fprintf(tabout,".lf %d %s\n", iline - 1, ifile);
 fprintf(tabout, "%s\n", last);
 }
 void
@@ -70,40 +65,17 @@ fprintf(tabout, ".if \\(ts\\n(.z\\(ts\\(ts .ds #d nl\n");
 void
 saveline(void)
 {
-fprintf(tabout,".lf 2 table-at-line-%d-of-%s\n", iline-1, ifile);
-fprintf(tabout, ".de 00\n..\n");
-fprintf(tabout, ".do nr w. \\n[.warn]\n");
-warnoff();
 fprintf(tabout, ".if \\n+(b.=1 .nr d. \\n(.c-\\n(c.-1\n");
-warnon();
 linstart=iline;
 }
 void
 restline(void)
 {
-warnoff();
 fprintf(tabout,".if \\n-(b.=0 .nr c. \\n(.c-\\n(d.-%d\n", iline-linstart);
-warnon();
-fprintf(tabout,".lf %d %s\n", iline, ifile);
 linstart = 0;
 }
 void
 cleanfc(void)
 {
 fprintf(tabout, ".fc\n");
-}
-void
-warnoff(void)
-{
-fprintf(tabout, ".if \\n(.X>0 .do warn -mac -reg\n");
-}
-void
-warnon(void)
-{
-fprintf(tabout, ".if \\n(.X>0 .do warn \\n(w.\n");
-}
-void
-svgraph(void)
-{
-fprintf(tabout, ".nr #D .2m\n");
 }

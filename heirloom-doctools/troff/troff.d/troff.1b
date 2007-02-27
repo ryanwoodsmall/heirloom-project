@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)troff.1b	1.22 (gritter) 9/4/06
+.\" Sccsid @(#)troff.1b	1.5 (gritter) 8/13/05
 .\" Derived from troff(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH TROFF 1B "9/4/06" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH TROFF 1B "8/13/05" "Heirloom Documentation Tools" "BSD System Compatibility"
 .SH NAME
 troff \- (BSD) typeset or format documents
 .SH SYNOPSIS
@@ -40,19 +40,15 @@ troff \- (BSD) typeset or format documents
 .ad l
 .nh
 \fB/usr/ucb/troff\fR
-[\fB\-af\&iz\fR]
-[\fB\-d\fIaS\fR]
-[\fB\-d\fIa\fB=\fIS\fR]
+[\fB\-afiz\fR]
 [\fB\-F\fIfontdir\fR]
 [\fB\-m\fIname\fR]
 [\fB\-n\fIN\fR]
 [\fB\-o\fIlist\fR]
 [\fB\-r\fIaN\fR]
-[\fB\-r\fIa\fB=\fIN\fR]
 [\fB\-s\fIN\fR]
 [\fB\-T\fIdevice\fR]
 [\fB\-u\fIN\fR]
-[\fB\-x\fIN\fR]
 .br
 .hy 1
 .ad b
@@ -65,8 +61,8 @@ Its capabilities are described in the
 .I Nroff/Troff user's manual.
 .PP
 .I troff
-generates output in an intermediate ASCII format
-which must be passed through a device-dependent post-processor
+generates output in an ASCII format
+which requires a device-dependent postprocessor
 before it can be printed;
 see the description of the
 .I \-T
@@ -115,6 +111,13 @@ Number first generated page
 Stop every
 .I N
 pages.
+.I Nroff
+will halt prior to every
+.I N
+pages (default
+.IR N =1)
+to allow paper loading or
+changing, and will resume upon receipt of a newline.
 .I Troff
 will stop the phototypesetter every
 .I N
@@ -133,24 +136,6 @@ Set register
 .I a
 (one-character) to
 .IR N .
-.TP
-.BI \-r a = N
-Set register
-.I a
-(may be more than one character) to
-.IR N .
-.TP
-.BI \-d aN
-Define string
-.I a
-(one-character) to
-.IR S .
-.TP
-.BI \-d a = N
-Define string
-.I a
-(may be more than one character) to
-.IR S .
 .TP
 .B \-i
 Read standard input after the input files are exhausted.
@@ -174,88 +159,45 @@ to
 .TP
 .BI \-T device
 Prepare output for the specified device.
-Available
+Known
 .I devices
 are:
 .RS
-.TP 8n
-.PD 0
-.B ps
-for PostScript output with 72,000\ dpi
-and AFM fonts (default),
-with
-.I dpost
-as post-processor
-.TP
-.B psmed
-for PostScript output with 3,600\ dpi
-and AFM fonts,
-with
-.I dpost
-as post-processor
-.TP
-.B pslow
-for PostScript output with 432\ dpi
-and AFM fonts,
-with
-.I dpost
-as post-processor
 .TP
 .B post
-for PostScript output with 720\ dpi
-and
-.I ditroff
-fonts,
+for PostScript output (default),
 with
 .I dpost
-as post-processor
+as postprocessor
 .TP
 .B aps
 for the Autologic APS-5,
 with
 .I daps
-as post-processor
-.PD
+as postprocessor
 .RE
+.TP
+.B \-t
+Direct output to the standard output instead
+of the phototypesetter.
 .TP
 .B \-f
 Refrain from feeding out paper and stopping
 phototypesetter at the end of the run.
 .TP
 .B \-a
-Send a printable text-only approximation
+Send a printable ASCII approximation
 of the results to the standard output.
-.TP
-.BI \-x N
-Enable extensions to previous versions of
-.I troff
-at level
-.IR N .
-Level 0 disables any extensions;
-level 1 enables all extensions
-except for long requests and request arguments;
-level 2 enables these in addition
-but executes short requests which are prefixes of undefined long requests;
-level 3 ignores undefined long requests.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL
 See
 .IR locale (7).
 .TP
-.B LC_CTYPE
-Determines the mapping
-of bytes to characters.
-.TP
 .B TYPESETTER
 Specifies a device name as with the
 .I \-T
 option.
-.TP
-.B TROFFONTS
-A colon-separated list of directory names
-to search for PostScript fonts
-before the device font directory.
 .TP
 .B TROFFMACS
 Specifies the location to search for macro files with the
@@ -284,8 +226,7 @@ from input that contains equations and tables, use
 .RE
 The resulting file can then be sent to a printer,
 displayed by a previewer,
-or passed to further post-processing utilities,
-such as a PDF distiller.
+or changed by further postprocessing utilities.
 .SH "SEE ALSO"
 J. F. Ossanna,
 .I Nroff/Troff user's manual
@@ -294,4 +235,4 @@ B. W. Kernighan,
 .I
 A TROFF Tutorial
 .br
-eqn(1B), tbl(1B)
+eqn(1), tbl(1)

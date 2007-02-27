@@ -36,14 +36,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.176 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)tar.sl	1.167 (gritter) 12/4/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -84,7 +84,7 @@ static const char sccsid[] USED = "@(#)tar.sl	1.176 (gritter) 1/22/06";
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
 #include <sys/scsi.h>
@@ -115,8 +115,7 @@ static const char sccsid[] USED = "@(#)tar.sl	1.176 (gritter) 1/22/06";
 #endif
 #endif
 
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 /*
  * For whatever reason, FreeBSD casts the return values of major() and
  * minor() to signed values so that normal limit comparisons will fail.
@@ -135,7 +134,7 @@ myminor(long dev)
 }
 #undef	minor
 #define	minor(a)	myminor(a)
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
 
 #define TBLOCK	512
 #define	MAXBLF	(SSIZE_MAX/TBLOCK)
@@ -371,9 +370,10 @@ static struct islot	*ifind(ino_t, struct islot **);
 static void	iput(struct islot *, struct islot **);
 static struct dslot	*dfind(struct dslot **, dev_t);
 static char	*sequence(void);
+#ifdef	ADDONS
 static void	docomp(const char *);
-static int	jflag, zflag, Zflag;
-static int	utf8(const char *);
+static int	jflag, zflag;
+#endif	/* ADDONS */
 
 int
 main(int argc, char *argv[])
@@ -455,11 +455,9 @@ main(int argc, char *argv[])
 			break;
 		case 'b':
 			bflag = B_USER;
-			if (*argv == NULL)
-				goto invblk;
 			nblock = atoi(*argv++);
 			if (nblock <= 0 || (long)nblock > MAXBLF) {
-			invblk:	fprintf(stderr,
+				fprintf(stderr,
 					"%s: invalid blocksize. (Max %ld)\n",
 					progname, (long)MAXBLF);
 				done(1);
@@ -516,21 +514,16 @@ main(int argc, char *argv[])
 		case 'B':
 			Bflag = 1;
 			break;
+#ifdef	ADDONS
 		case 'z':
 			zflag = 1;
 			jflag = 0;
-			Zflag = 0;
 			break;
 		case 'j':
 			jflag = 1;
 			zflag = 0;
-			Zflag = 0;
 			break;
-		case 'Z':
-			Zflag = 1;
-			jflag = 0;
-			zflag = 0;
-			break;
+#endif	/* ADDONS */
 		default:
 			fprintf(stderr, "%s: %c: unknown option\n",
 					progname, *cp & 0377);
@@ -564,12 +557,14 @@ main(int argc, char *argv[])
 					progname);
 			done(1);
 		}
-		if (cflag == 0 && (jflag || zflag || Zflag)) {
+#ifdef	ADDONS
+		if (cflag == 0 && (jflag || zflag)) {
 			fprintf(stderr, "%s: can only create "
 					"compressed archives\n",
 					progname);
 			done(1);
 		}
+#endif	/* ADDONS */
 		ckusefile();
 		if (strcmp(usefile, "-") == 0) {
 			if (cflag == 0) {
@@ -588,8 +583,10 @@ main(int argc, char *argv[])
 			}
 		}
 		domtstat();
-		if (jflag || zflag || Zflag)
-			docomp(jflag ? "bzip2" : Zflag ? "compress" : "gzip");
+#ifdef	ADDONS
+		if (jflag || zflag)
+			docomp(jflag ? "bzip2" : "gzip");
+#endif	/* ADDONS */
 		dorep(argv);
 	}
 	else if (xflag)  {
@@ -1370,10 +1367,15 @@ putsym(const char *longname, const char *shortname,
 	}
 	(*symblink)[len] = '\0';
 	if (len >= 100) {
-		if (oldflag <= 0 && gnuflag <= 0 && utf8(*symblink)) {
-			paxrec |= PR_LINKPATH;
-			strcpy(dblock.dbuf.linkname, sequence());
-			return 0;
+		if (oldflag <= 0 && gnuflag <= 0) {
+			char	c = 0, *cp;
+			for (cp = *symblink; *cp; cp++)
+				c |= *cp;
+			if ((c & 0200) == 0) {
+				paxrec |= PR_LINKPATH;
+				strcpy(dblock.dbuf.linkname, sequence());
+				return 0;
+			}
 		}
 		fprintf(stderr, "%s: %s: symbolic link too long\n",
 				progname, longname);
@@ -1399,9 +1401,7 @@ wrhdr(const char *longname, const char *symblink, struct stat *sp)
 					(wrtotal+recno*2+1023)/1024);
 		fprintf(stderr, "a %s%s ", longname,
 				(sp->st_mode&S_IFMT) == S_IFDIR ? "/" : "");
-		if (symblink)
-			fprintf(stderr, "symbolic link to %s\n", symblink);
-		else if (nflag)
+		if (nflag)
 			fprintf(stderr, "%lldK\n",
 					blocks&01?blocks|02:blocks>>1);
 		else
@@ -2080,8 +2080,7 @@ cmp(const char *b, const char *s, size_t n)
 static int
 readtape(char *buffer)
 {
-	static int rd;
-	int i = -1, j;
+	int i, j;
 
 again:	if (recno >= nblock || first == 0) {
 		if (first == 0 && nblock == 1 && bflag == 0)
@@ -2093,7 +2092,7 @@ again:	if (recno >= nblock || first == 0) {
 					"of block size.\n", progname);
 			done(1);
 		}
-		if ((rd = i = mtread(tbuf, TBLOCK*j)) < 0) {
+		if ((i = mtread(tbuf, TBLOCK*j)) < 0) {
 			fprintf(stderr, "%s: tape read error\n", progname);
 			done(3);
 		}
@@ -2101,7 +2100,7 @@ again:	if (recno >= nblock || first == 0) {
 			goto again;
 		if (first == 0 || i == 0) {
 			if ((i % TBLOCK) != 0 || i == 0) {
-			tbe:	fprintf(stderr, "%s: tape blocksize error\n",
+				fprintf(stderr, "%s: tape blocksize error\n",
 						progname);
 				done(3);
 			}
@@ -2119,8 +2118,6 @@ again:	if (recno >= nblock || first == 0) {
 		recno = 0;
 	}
 	first = 1;
-	if ((rd -= TBLOCK) < 0)
-		goto tbe;
 	memcpy(buffer, &tbuf[recno++], TBLOCK);
 	return(TBLOCK);
 }
@@ -2156,7 +2153,7 @@ tseek(int n, int rew)
 	if (tapeblock > 0 && rew) {
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 		struct mtop	mo;
 		mo.mt_op = n > 0 ? MTFSR : MTBSR;
 		mo.mt_count = (n > 0 ? n : -n) / tapeblock;
@@ -2272,18 +2269,20 @@ static int
 mkname(struct header *hp, const char *fn)
 {
 	const char	*cp, *cs = NULL;
+	char	or = 0;
 
 	if (Aflag)
 		while (*fn == '/')
 			fn++;
 	for (cp = fn; *cp; cp++) {
+		or |= *cp;
 		if (*cp == '/' && cp[1] != '\0' && cp > fn &&
 				cp - fn <= PFXSIZ &&
 				gnuflag <= 0 && oldflag <= 0)
 			cs = cp;
 	}
 	if (cp - (cs ? &cs[1] : fn) > NAMSIZ) {
-		if (oldflag <= 0 && gnuflag <= 0 && utf8(fn)) {
+		if ((or & 0200) == 0 && oldflag <= 0 && gnuflag <= 0) {
 			paxrec |= PR_PATH;
 			strcpy(hp->name, sequence());
 			return 0;
@@ -2325,13 +2324,15 @@ static int
 mklink(struct header *hp, const char *fn, const char *refname)
 {
 	const char	*cp;
+	char	or = 0;
 
 	if (Aflag)
 		while (*fn == '/')
 			fn++;
-	for (cp = fn; *cp; cp++);
+	for (cp = fn; *cp; cp++)
+		or |= *cp;
 	if (cp - fn > NAMSIZ) {
-		if (oldflag <= 0 && gnuflag <= 0 && utf8(fn)) {
+		if ((or & 0200) == 0 && oldflag <= 0 && gnuflag <= 0) {
 			paxrec |= PR_LINKPATH;
 			strcpy(hp->linkname, sequence());
 			return 0;
@@ -2672,8 +2673,7 @@ domtstat(void)
 		if (ioctl(mt,  MTIOCGETDRIVETYPE, &mr) == 0)
 			tapeblock = md.bsize;
 	}
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if ((mtstat.st_mode&S_IFMT) == S_IFCHR) {
 		struct mtget	mg;
 		if (ioctl(mt, MTIOCGET, &mg) == 0)
@@ -2702,8 +2702,7 @@ domtstat(void)
 		if (tapeblock > NBLOCK)
 			NBLOCK = tapeblock;
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
-	defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (__NetBSD__) || defined (__OpenBSD__)
 		if (bflag == 0 && cflag && twice == 0) {
 			if (nblock == 1) {
 				if ((nblock = tapeblock) > NBLOCK)
@@ -2712,14 +2711,11 @@ domtstat(void)
 					bflag = B_AUTO;
 			}
 		}
-#endif	/* __linux__ || __sun || __FreeBSD__ || __NetBSD__ || __OpenBSD__ ||
-	__DragonFly__ || __APPLE__ */
+#endif	/* __linux__ || __sun || __FreeBSD__ || __NetBSD__ || __OpenBSD__ */
 	}
 	if (twice == 0 && bflag == 0 && tapeblock < 0) {
 		if ((nblock = mtstat.st_blksize >> 9) > NBLOCK)
 			nblock = NBLOCK;
-		else if (nblock <= 0)
-			nblock = 1;
 		else if ((mtstat.st_mode&S_IFMT) != S_IFCHR)
 			bflag = B_AUTO;
 	}
@@ -3094,6 +3090,7 @@ sequence(void)
 	return buf;
 }
 
+#ifdef	ADDONS
 static void
 docomp(const char *name)
 {
@@ -3136,30 +3133,4 @@ docomp(const char *name)
 	mtstat.st_dev = ost.st_dev;
 	mtstat.st_ino = ost.st_ino;
 }
-
-static int
-utf8(const char *cp)
-{
-	int	c, n;
-
-	while (*cp) if ((c = *cp++ & 0377) & 0200) {
-		if (c == (c & 037 | 0300))
-			n = 1;
-		else if (c == (c & 017 | 0340))
-			n = 2;
-		else if (c == (c & 07 | 0360))
-			n = 3;
-		else if (c == (c & 03 | 0370))
-			n = 4;
-		else if (c == (c & 01 | 0374))
-			n = 5;
-		else
-			return 0;
-		while (n--) {
-			c = *cp++ & 0377;
-			if (c != (c & 077 | 0200))
-				return 0;
-		}
-	}
-	return 1;
-}
+#endif	/* ADDONS */

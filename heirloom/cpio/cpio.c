@@ -25,9 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*
- * Sccsid @(#)cpio.c	1.301 (gritter) 2/24/07
- */
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
+#define	USED	__attribute__ ((used))
+#elif defined __GNUC__
+#define	USED	__attribute__ ((unused))
+#else
+#define	USED
+#endif
+static const char sccsid[] USED = "@(#)cpio.sl	1.284 (gritter) 12/4/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -77,7 +82,7 @@
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
 #include <sys/scsi.h>
@@ -143,12 +148,8 @@
 #ifndef	S_INSHD
 #define	S_INSHD		0x2		/* XENIX shared data subtype of IFNAM */
 #endif
-#ifndef	S_IFNWK
-#define	S_IFNWK		0110000		/* HP-UX network special file */
-#endif
 
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 /*
  * For whatever reason, FreeBSD casts the return values of major() and
  * minor() to signed values so that normal limit comparisons will fail.
@@ -167,7 +168,7 @@ myminor(long dev)
 }
 #undef	minor
 #define	minor(a)	myminor(a)
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
 
 /*
  * Device and inode counts in cpio formats are too small to store the
@@ -504,9 +505,7 @@ union zextra {
 		char	ze_gn_tag[2];
 		char	ze_gn_tsize[2];
 	} Ze_gn;
-#define	SIZEOF_zextra_64	32		/* regular size */
-#define	SIZEOF_zextra_64_a	28		/* size without startn field */
-#define	SIZEOF_zextra_64_b	20		/* size without reloff field */
+#define	SIZEOF_zextra_64	32
 	struct	zextra_64 {
 		char	ze_64_tag[2];
 		char	ze_64_tsize[2];
@@ -748,7 +747,6 @@ int			Bflag;		/* 5120 blocking */
 int			cflag;		/* ascii format */
 int			Cflag;		/* user-defined blocking */
 int			dflag;		/* create directories */
-int			Dflag;		/* do not ask for next device */
 int			eflag;		/* DEC format */
 int			cray_eflag;	/* do not archive if values too large */
 const char		*Eflag;		/* filename for files to be extracted */
@@ -797,6 +795,7 @@ int			printsev;	/* print message severity strings */
 static int		compressed_bar;	/* this is a compressed bar archive */
 static int		formatforced;	/* -k -i -Hfmt forces a format */
 
+int			pax;		/* this is the pax command */
 int			pax_dflag;	/* directory matches only itself */
 int			pax_kflag;	/* do not overwrite files */
 int			pax_nflag;	/* select first archive member only */
@@ -837,7 +836,6 @@ static int	passdata(struct file *, const char *, int);
 static int	passfile(const char *, struct stat *);
 static int	filein(struct file *, int (*)(struct file *, const char *, int),
 			char *);
-static int	linkunlink(const char *, const char *);
 static void	tunlink(char **);
 static int	filet(struct file *, int (*)(struct file *, const char *, int));
 static void	filev(struct file *);
@@ -874,7 +872,7 @@ static int	skippad(unsigned long long, int);
 static int	allzero(const char *, int);
 static const char	*getuser(uid_t);
 static const char	*getgroup(gid_t);
-static struct glist	*want(struct file *, struct glist **);
+static int	want(struct file *);
 static void	patfile(void);
 static int	ckodd(long long, int, const char *, const char *);
 static int	rname(char **, size_t *);
@@ -930,8 +928,6 @@ static void	addrec(char **, long *, long *,
 			const char *, const char *, long long);
 static void	paxnam(struct tar_header *, const char *);
 static char	*sequence(void);
-static char	*joinpath(const char *, char *);
-static int	utf8(const char *);
 
 size_t		(*ofiles)(char **, size_t *) = ofiles_cpio;
 void		(*prtime)(time_t) = prtime_cpio;
@@ -967,7 +963,7 @@ main(int argc, char **argv)
 		fflush(stdout);
 	else if (Vflag)
 		prdot(1);
-	if (pax != PAX_TYPE_CPIO)
+	if (pax)
 		pax_onexit();
 	fprintf(stderr, "%llu blocks\n", blocks + ((bytes + 0777) >> 9));
 	mclose();
@@ -1022,12 +1018,10 @@ copyout(int (*copyfn)(const char *, struct stat *))
 			errcnt++;
 			continue;
 		}
-		if (Lflag && (st.st_mode&S_IFMT) == S_IFLNK) {
-			if (stat(np, &st) < 0) {
-				emsg(2, "Cannot follow \"%s\"", np);
-				errcnt++;
-				continue;
-			}
+		if (Lflag && stat(np, &st) < 0) {
+			emsg(2, "Cannot follow \"%s\"", np);
+			errcnt++;
+			continue;
 		}
 		/*
 		 * These file types are essentially useless in an archive
@@ -1035,19 +1029,11 @@ copyout(int (*copyfn)(const char *, struct stat *))
 		 * We thus ignore them and do not even issue a warning,
 		 * because that would only displace more important messages
 		 * on a terminal and confuse people who just want to copy
-		 * directory hierarchies.--But for pax, POSIX.1-2001 requires
-		 * us to fail!
+		 * directory hierarchies.
 		 */
 		if ((st.st_mode&S_IFMT) == S_IFSOCK ||
-				(st.st_mode&S_IFMT) == S_IFDOOR) {
-			if (pax >= PAX_TYPE_PAX2001) {
-				msg(2, 0, "Cannot handle %s \"%s\".\n",
-					(st.st_mode&S_IFMT) == S_IFSOCK ?
-						"socket" : "door", np);
-				errcnt++;
-			}
+				(st.st_mode&S_IFMT) == S_IFDOOR)
 			continue;
-		}
 		if (pax_track(np, st.st_mtime) == 0)
 			continue;
 		if ((fmttype == FMT_ZIP ||
@@ -1077,7 +1063,7 @@ dooutp(void)
 		if ((mt = Aflag ? open(Oflag, O_RDWR, 0666) :
 					creat(Oflag, 0666)) < 0) {
 			if (sysv3) {
-				emsg(013, "Cannot open <%s> for %s.", Oflag,
+				emsg(3, "Cannot open <%s> for %s.", Oflag,
 					Aflag ? "append" : "output");
 				done(1);
 			} else
@@ -1455,7 +1441,7 @@ addfile(const char *realfile, struct stat *st,
 	int	failure = 1;
 
 	file = sstrdup(realfile);
-	if (pax != PAX_TYPE_CPIO && strcmp(file, trailer)) {
+	if (pax && strcmp(file, trailer)) {
 		size_t	junk = 0;
 		if (pax_sflag && pax_sname(&file, &junk) == 0)
 			goto cleanup;
@@ -2155,8 +2141,7 @@ getbuf(char **bufp, size_t *sizep, size_t best)
 	if (size != best) {
 		if (buf)
 			free(buf);
-		size = best;
-		if (size == 0 || (buf = svalloc(size, 0)) == NULL)
+		if ((buf = svalloc(size = best, 0)) == NULL)
 			buf = svalloc(size = 512, 1);
 	}
 	*bufp = buf;
@@ -2212,11 +2197,9 @@ msg(int sev, int err, const char *fmt, ...)
 void
 emsg(int sev, const char *fmt, ...)
 {
-	char	_fmt[60];
-	int	i, fl = sev & 030, n;
+	int	i;
 	va_list	ap;
 
-	sev &= ~030;
 	i = errno;
 	if (tflag)
 		fflush(stdout);
@@ -2225,26 +2208,11 @@ emsg(int sev, const char *fmt, ...)
 	fprintf(stderr, "%s: ", progname);
 	sevprnt(sev);
 	va_start(ap, fmt);
-	if (sysv3) {
-		if (fmt[(n=strlen(fmt))-1] == '"' && fmt[n-2] == 's' &&
-				fmt[n-3] == '%' && fmt[n-4] == '"' &&
-				n < sizeof _fmt) {
-			strcpy(_fmt, fmt);
-			_fmt[n-1] = '>';
-			_fmt[n-4] = '<';
-			fmt = _fmt;
-		}
-	}
 	vfprintf(stderr, fmt, ap);
 	va_end(ap);
-	if (sysv3 > 0 && sev >= 0 && fl & 010)
+	if (sysv3 && sev >= 0)
 		fprintf(stderr, "\n\t%s\n", strerror(i));
-	else if (sysv3 < 0) {
-		if (fl & 020)
-			putc('\n', stderr);
-		else
-			fprintf(stderr, " (errno:%d)\n", i);
-	} else
+	else
 		fprintf(stderr, ", errno %d, %s\n", i, strerror(i));
 }
 
@@ -2282,8 +2250,7 @@ newmedia(int err)
 		errcnt++;
 	}
 	mfl = -1;
-	if ((mtst.st_mode&S_IFMT)!=S_IFCHR && (mtst.st_mode&S_IFMT)!=S_IFBLK ||
-			Dflag) {
+	if ((mtst.st_mode&S_IFMT)!=S_IFCHR && (mtst.st_mode&S_IFMT)!=S_IFBLK) {
 		if (action == 'o') {
 			switch (err) {
 			case 0:
@@ -2484,19 +2451,8 @@ rstime(const char *fn, struct stat *st, const char *which)
 
 	utb.actime = st->st_atime;
 	utb.modtime = st->st_mtime;
-	if (pax != PAX_TYPE_CPIO &&
-			(pax_preserve&(PAX_P_ATIME|PAX_P_MTIME)) != 0 &&
-			(pax_preserve&PAX_P_EVERY) == 0) {
-		struct stat	xst;
-		if (stat(fn, &xst) < 0)
-			goto fail;
-		if (pax_preserve&PAX_P_ATIME)
-			utb.actime = xst.st_atime;
-		if (pax_preserve&PAX_P_MTIME)
-			utb.modtime = xst.st_mtime;
-	}
 	if (utime(fn, &utb) < 0) {
-	fail:	emsg(2, "Unable to reset %s time for \"%s\"", which, fn);
+		emsg(2, "Unable to reset %s time for \"%s\"", which, fn);
 		return 1;
 	}
 	return 0;
@@ -2638,14 +2594,12 @@ dopass(const char *target)
 	struct stat	st;
 
 	if (access(target, W_OK) < 0) {
-		emsg(033, sysv3 ? "cannot write in <%s>" :
+		emsg(3, sysv3 ? "cannot write in <%s>" :
 				"Error during access() of \"%s\"", target);
-		if (sysv3)
-			done(1);
 		usage();
 	}
 	if (stat(target, &st) < 0) {
-		emsg(023, "Error during stat() of \"%s\"", target);
+		emsg(3, "Error during stat() of \"%s\"", target);
 		done(1);
 	}
 	if ((st.st_mode&S_IFMT) != S_IFDIR)
@@ -2719,7 +2673,7 @@ passfile(const char *fn, struct stat *st)
 	size_t	newsz = 0;
 
 	newfn = sstrdup(fn);
-	if (pax != PAX_TYPE_CPIO) {
+	if (pax) {
 		if (pax_sflag && pax_sname(&newfn, &newsz) == 0)
 			return 0;
 		if (rflag && rname(&newfn, &newsz) == 0)
@@ -2774,14 +2728,14 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 	struct stat	nst;
 	char	*temp = NULL;
 	size_t	len;
-	int	fd, i, j, new;
+	int	fd;
 	int	failure = 2;
 
 	if (fmttype == FMT_ZIP && (f->f_st.st_mode&S_IFMT) != S_IFREG &&
 			(f->f_st.st_mode&S_IFMT) != S_IFLNK &&
 			(f->f_csize > 0 || f->f_gflag & FG_DESC))
 		skipfile(f);
-	if ((new = lstat(tgt, &nst)) == 0) {
+	if (lstat(tgt, &nst) == 0) {
 		if (action == 'p' && f->f_st.st_dev == nst.st_dev &&
 				f->f_st.st_ino == nst.st_ino) {
 			msg(3, 0, sysv3 ?
@@ -2799,7 +2753,7 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 				goto skip;
 			}
 			if (uflag == 0 && f->f_st.st_mtime <= nst.st_mtime) {
-				if (pax == PAX_TYPE_CPIO)
+				if (pax == 0)
 					msg(-1, 0, sysv3 ?
 					"current <%s> newer or same age\n" :
 					"Existing \"%s\" same age or newer\n",
@@ -2808,65 +2762,47 @@ filein(struct file *f, int (*copydata)(struct file *, const char *, int),
 					failure = 0;
 				goto skip;
 			}
+			len = strlen(tgt);
+			temp = smalloc(len + 7);
+			strcpy(temp, tgt);
+			strcpy(&temp[len], "XXXXXX");
+			if ((fd = mkstemp(temp)) < 0 || close(fd) < 0) {
+				emsg(3, "Cannot create temporary file");
+				if (fd < 0) {
+					free(temp);
+					temp = NULL;
+				}
+				goto skip;
+			}
+			cur_ofile = tgt;
+			cur_tfile = temp;
+			if (rename(tgt, temp) < 0) {
+				emsg(3, "Cannot rename current \"%s\"", tgt);
+				tunlink(&temp);
+				goto skip;
+			}
 		}
 	} else {
 		if (imdir(tgt) < 0)
 			goto skip;
 	}
-	if (Vflag && !vflag)
+	if (vflag)
+		fprintf(stderr, "%s\n", f->f_name);
+	else if (Vflag)
 		prdot(0);
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && lflag) {
-		if (Lflag) {
-			char	*symblink, *name;
-			struct stat	xst;
-			name = f->f_name;
-			for (;;) {
-				if (lstat(name, &xst) < 0) {
-					emsg(3, "Cannot lstat \"%s\"", name);
-					if (name != f->f_name)
-						free(name);
-					goto cantlink;
-				}
-				if ((xst.st_mode&S_IFMT) != S_IFLNK)
-					break;
-				i = xst.st_size ? xst.st_size : PATH_MAX;
-				symblink = smalloc(i+1);
-				if ((j = readlink(name, symblink, i)) < 0) {
-					emsg(3, "Cannot read symbolic link "
-						"\"%s\"", name);
-					free(symblink);
-					if (name != f->f_name)
-						free(name);
-					goto cantlink;
-				}
-				symblink[j] = '\0';
-				symblink = joinpath(name, symblink);
-				if (name != f->f_name)
-					free(name);
-				name = symblink;
-			}
-			if (linkunlink(name, tgt) == 0) {
-				if (vflag)
-					fprintf(stderr, "%s\n", tgt);
-				if (name != f->f_name)
-					free(name);
-				return 0;
-			}
-			if (name != f->f_name)
-				free(name);
-		} else if (linkunlink(f->f_name, tgt) == 0) {
-			if (vflag)
-				fprintf(stderr, "%s\n", tgt);
+		if (link(f->f_name, tgt) == 0) {
+			tunlink(&temp);
 			return 0;
 		}
-cantlink:	errcnt += 1;
+		emsg(3, "Cannot link \"%s\" and \"%s\"", f->f_name, tgt);
+		errcnt += 1;
 	}
 	if ((f->f_st.st_mode&S_IFMT) != S_IFDIR && f->f_st.st_nlink > 1 &&
 			(fmttype & TYP_CPIO || fmttype == FMT_ZIP
 			 || action == 'p') &&
-			(i = canlink(tgt, &f->f_st, 1)) != 0) {
-		if (i < 0)
-			goto skip;
+			canlink(tgt, &f->f_st, 1)) {
+		tunlink(&temp);
 		/*
 		 * At this point, hard links in SVR4 cpio format have
 		 * been reordered and data is associated with the first
@@ -2874,46 +2810,28 @@ cantlink:	errcnt += 1;
 		 * overwrite the data here.
 		 */
 		if (fmttype & TYP_NCPIO && f->f_st.st_size == 0 ||
-				(f->f_st.st_mode&S_IFMT) != S_IFREG) {
-			if (vflag)
-				fprintf(stderr, "%s\n", f->f_name);
+				(f->f_st.st_mode&S_IFMT) != S_IFREG)
 			return 0;
-		}
 		/*
 		 * Make sure we can creat() this file later.
 		 */
 		chmod(tgt, 0600);
 	} else if (fmttype & TYP_TAR && f->f_st.st_nlink > 1) {
-		if (linkunlink(f->f_lnam, f->f_name) == 0) {
+		if (link(f->f_lnam, f->f_name) == 0) {
+			tunlink(&temp);
 			if (fmttype & TYP_USTAR && f->f_st.st_size > 0)
 				chmod(tgt, 0600);
-			else {
-				if (vflag)
-					fprintf(stderr, "%s\n", f->f_name);
+			else
 				return 0;
-			}
 		} else {
-			goto restore;
-		}
-	} else if (new == 0 && (f->f_st.st_mode&S_IFMT) != S_IFDIR) {
-		len = strlen(tgt);
-		temp = smalloc(len + 7);
-		strcpy(temp, tgt);
-		strcpy(&temp[len], "XXXXXX");
-		if ((fd = mkstemp(temp)) < 0 || close(fd) < 0) {
-			emsg(3, "Cannot create temporary file");
-			if (fd < 0) {
-				free(temp);
-				temp = NULL;
-			}
-			goto skip;
-		}
-		cur_ofile = tgt;
-		cur_tfile = temp;
-		if (rename(tgt, temp) < 0) {
-			emsg(3, "Cannot rename current \"%s\"", tgt);
-			tunlink(&temp);
-			goto skip;
+			emsg(3, "Cannot link \"%s\" and \"%s\"",
+					f->f_lnam, f->f_name);
+			if (fmttype & TYP_USTAR && (!formatforced ||
+					fmttype == FMT_PAX)
+					&& f->f_st.st_size > 0)
+				errcnt++;
+			else
+				goto restore;
 		}
 	}
 	switch (f->f_st.st_mode & S_IFMT) {
@@ -2931,7 +2849,7 @@ cantlink:	errcnt += 1;
 		break;
 	case S_IFLNK:
 		if (symlink(f->f_lnam, tgt) < 0) {
-			emsg(3, "Cannot create \"%s\"", tgt);
+			emsg(3, "Cannot create symbolic link \"%s\"", tgt);
 			goto restore;
 		}
 		break;
@@ -2958,7 +2876,6 @@ cantlink:	errcnt += 1;
 	case S_IFCHR:
 	case S_IFIFO:
 	case S_IFNAM:
-	case S_IFNWK:
 		if (mknod(tgt, f->f_st.st_mode&(S_IFMT|0777),
 					f->f_st.st_rdev) < 0) {
 			emsg(3, "Cannot mknod() \"%s\"", tgt);
@@ -2969,8 +2886,6 @@ cantlink:	errcnt += 1;
 		msg(-1, 0, "Impossible file type\n");
 		goto skip;
 	}
-	if (vflag)
-		fprintf(stderr, "%s\n", f->f_name);
 	tunlink(&temp);
 	return setattr(tgt, &f->f_st);
 skip:	if (copydata == indata)
@@ -2986,26 +2901,6 @@ restore:
 		cur_tfile = cur_ofile = NULL;
 	}
 	return failure;
-}
-
-static int
-linkunlink(const char *path1, const char *path2)
-{
-	int	twice = 0;
-
-	do {
-		if (link(path1, path2) == 0) {
-			if (vflag && pax == PAX_TYPE_CPIO)
-				printf("%s linked to %s\n", path1, path2);
-			return 0;
-		}
-		if (errno == EEXIST && unlink(path2) < 0)
-			emsg(3, sysv3 ? "cannot unlink <%s>" :
-					"Error cannot unlink \"%s\"", path2);
-	} while (twice++ == 0);
-	emsg(023, sysv3 ? "Cannot link <%s> & <%s>" :
-			"Cannot link \"%s\" and \"%s\"", path1, path2);
-	return -1;
 }
 
 static void
@@ -3054,7 +2949,7 @@ filev(struct file *f)
 	const char	*cp;
 	long	c;
 
-	if (pax == PAX_TYPE_CPIO && fmttype & TYP_TAR && f->f_st.st_nlink > 1)
+	if (pax == 0 && fmttype & TYP_TAR && f->f_st.st_nlink > 1)
 		printf("%s linked to %s\n", f->f_lnam, f->f_name);
 	if (sysv3)
 		printf("%-6o", (int)f->f_st.st_mode&(07777|S_IFMT));
@@ -3084,18 +2979,15 @@ filev(struct file *f)
 	}
 	if (sysv3 || (f->f_st.st_mode&S_IFMT)!=S_IFCHR &&
 			(f->f_st.st_mode&S_IFMT)!=S_IFBLK &&
-			(f->f_st.st_mode&S_IFMT)!=S_IFNAM &&
-			(f->f_st.st_mode&S_IFMT)!=S_IFNWK)
-		printf(pax != PAX_TYPE_CPIO ? "%8llu" :
-				sysv3 ? "%7llu" : " %-7llu", f->f_dsize);
+			(f->f_st.st_mode&S_IFMT)!=S_IFNAM)
+		printf(pax ? "%8llu" : sysv3 ? "%7llu" : " %-7llu", f->f_dsize);
 	else
 		printf(" %3lu,%3lu", (long)f->f_rmajor, (long)f->f_rminor);
 	prtime(f->f_st.st_mtime);
 	printf("%s", f->f_name);
 	if ((f->f_st.st_mode&S_IFMT) == S_IFLNK)
 		printf(" -> %s", f->f_lnam);
-	if (pax != PAX_TYPE_CPIO && (f->f_st.st_mode&S_IFMT) != S_IFDIR &&
-			f->f_st.st_nlink>1) {
+	if (pax && (f->f_st.st_mode&S_IFMT) != S_IFDIR && f->f_st.st_nlink>1) {
 		if (fmttype & TYP_TAR)
 			printf(" == %s", f->f_lnam);
 		else
@@ -3120,8 +3012,6 @@ typec(struct stat *st)
 		return 'b';
 	case S_IFIFO:
 		return 'p';
-	case S_IFNWK:
-		return 'n';
 	case S_IFNAM:
 		switch (st->st_rdev) {
 		case S_INSEM:
@@ -3263,15 +3153,10 @@ setattr(const char *fn, struct stat *st)
 	uid_t	uid = Rflag ? Ruid : myuid;
 	gid_t	gid = Rflag ? Rgid : mygid;
 
-	if ((pax != PAX_TYPE_CPIO || myuid == 0) &&
-			(pax == PAX_TYPE_CPIO ||
-			 pax_preserve&(PAX_P_OWNER|PAX_P_EVERY))) {
+	if (myuid == 0 && (pax == 0 || pax_preserve&PAX_P_OWNER)) {
 		if (setowner(fn, st) != 0)
 			return 1;
 	}
-	if (pax != PAX_TYPE_CPIO &&
-			(pax_preserve&(PAX_P_OWNER|PAX_P_EVERY)) == 0)
-		mode &= ~(mode_t)(S_ISUID|S_ISGID);
 	if (myuid != 0 || Rflag) {
 		if (st->st_uid != uid || st->st_gid != gid) {
 			mode &= ~(mode_t)S_ISUID;
@@ -3285,17 +3170,13 @@ setattr(const char *fn, struct stat *st)
 		return 0;
 	if (hp_Uflag)
 		mode &= ~umsk|S_IFMT;
-	if (pax != PAX_TYPE_CPIO &&
-			(pax_preserve&(PAX_P_MODE|PAX_P_OWNER|PAX_P_EVERY))==0)
+	if (pax && (pax_preserve & (PAX_P_MODE|PAX_P_OWNER)) == 0)
 		mode &= 01777|S_IFMT;
-	if ((pax == PAX_TYPE_CPIO || pax_preserve&(PAX_P_MODE|PAX_P_EVERY)) &&
-			chmod(fn, mode) < 0) {
+	if ((pax == 0 || pax_preserve&PAX_P_MODE) && chmod(fn, mode) < 0) {
 		emsg(2, "Cannot chmod() \"%s\"", fn);
 		return 1;
 	}
-	if (pax != PAX_TYPE_CPIO ?
-			(pax_preserve&(PAX_P_ATIME|PAX_P_MTIME|PAX_P_EVERY)) !=
-			(PAX_P_ATIME|PAX_P_MTIME) : mflag)
+	if (pax ? (pax_preserve&PAX_P_MTIME) == 0 : mflag)
 		return rstime(fn, st, "modification");
 	else
 		return 0;
@@ -3304,22 +3185,10 @@ setattr(const char *fn, struct stat *st)
 static int
 setowner(const char *fn, struct stat *st)
 {
-	uid_t	uid = Rflag ? Ruid : myuid ? myuid : st->st_uid;
+	uid_t	uid = Rflag ? Ruid : st->st_uid;
 	gid_t	gid = Rflag ? Rgid : st->st_gid;
 
 	if (((st->st_mode&S_IFMT)==S_IFLNK?lchown:chown)(fn, uid, gid) < 0) {
-		emsg(2, "Cannot chown() \"%s\"", fn);
-		return 1;
-	}
-	if (pax >= PAX_TYPE_PAX2001 && myuid && myuid != st->st_uid &&
-			pax_preserve & (PAX_P_OWNER|PAX_P_EVERY)) {
-		/*
-		 * Do not even try to preserve user ownership in this case.
-		 * It would either fail, or, without _POSIX_CHOWN_RESTRICTED,
-		 * leave us with a file we do not own and which we thus could
-		 * not chmod() later.
-		 */
-		errno = EPERM;
 		emsg(2, "Cannot chown() \"%s\"", fn);
 		return 1;
 	}
@@ -3368,10 +3237,13 @@ canlink(const char *path, struct stat *st, int really)
 			 */
 			if (fmttype & TYP_NCPIO && ip->i_nlk == 0)
 				return 0;
-			if (linkunlink(ip->i_name, path) == 0)
+			if (link(ip->i_name, path) == 0)
 				return 1;
-			else
-				return -1;
+			else if (pax) {
+				emsg(3, "Cannot link \"%s\" and \"%s\"",
+						ip->i_name, path);
+				errcnt++;
+			}
 		} else {
 			printf(" == %s", ip->i_name);
 			return 1;
@@ -3599,27 +3471,15 @@ flushtree(struct islot *ip, int pad)
 static int
 inpone(struct file *f, int shallskip)
 {
-	struct glist	*gp = NULL, *gb = NULL;
-	int	val = -1, selected = 0;
-
-	if ((patterns == NULL || (gp = want(f, &gb)) != NULL ^ fflag) &&
-			pax_track(f->f_name, f->f_st.st_mtime)) {
-		selected = 1;
-		if ((pax_sflag == 0 || pax_sname(&f->f_name, &f->f_nsiz)) &&
-				(rflag == 0 || rname(&f->f_name, &f->f_nsiz))) {
-			errcnt += infile(f);
-			val = 0;
-		}
+	if ((patterns == NULL || want(f) ^ fflag) &&
+			pax_track(f->f_name, f->f_st.st_mtime) &&
+			(pax_sflag == 0 || pax_sname(&f->f_name, &f->f_nsiz)) &&
+			(rflag == 0 || rname(&f->f_name, &f->f_nsiz))) {
+		errcnt += infile(f);
+		return 0;
 	} else if (shallskip)
 		errcnt += skipfile(f);
-	if (gp != NULL && selected) {
-		gp->g_gotcha = 1;
-		if (gp->g_nxt && gp->g_nxt->g_art)
-			gp->g_nxt->g_gotcha = 1;
-		else if (gp->g_art && gb)
-			gb->g_gotcha = 1;
-	}
-	return val;
+	return -1;
 }
 
 /*
@@ -4061,8 +3921,7 @@ retry2:	if (fmttype & TYP_BINARY) {
 			skipped);
 	}
 	attempts = 0;
-	if (f->f_st.st_atime == 0 || (pax_preserve&(PAX_P_ATIME|PAX_P_EVERY)) ==
-			PAX_P_ATIME)
+	if (f->f_st.st_atime == 0 || pax_preserve & PAX_P_ATIME)
 		f->f_st.st_atime = f->f_st.st_mtime;
 	if ((f->f_dsize = f->f_st.st_size) < 0)
 		goto badhdr;
@@ -4351,8 +4210,7 @@ skipfile(struct file *f)
 			(f->f_st.st_mode&S_IFMT) == S_IFCHR ||
 			(f->f_st.st_mode&S_IFMT) == S_IFBLK ||
 			(f->f_st.st_mode&S_IFMT) == S_IFIFO ||
-			(f->f_st.st_mode&S_IFMT) == S_IFNAM ||
-			(f->f_st.st_mode&S_IFMT) == S_IFNWK))
+			(f->f_st.st_mode&S_IFMT) == S_IFNAM))
 		return 0;
 	if (fmttype == FMT_ZIP && f->f_gflag & FG_DESC)
 		return zipread(f, f->f_name, -1, 0);
@@ -4388,7 +4246,6 @@ skipdata(struct file *f, int (*copydata)(struct file *, const char *, int))
 	case S_IFCHR:
 	case S_IFIFO:
 	case S_IFNAM:
-	case S_IFNWK:
 		if (fmttype != FMT_ZIP)
 			break;
 		/*FALLTHRU*/
@@ -4418,7 +4275,7 @@ tseek(off_t n)
 		int	i = (n - poffs) / tapeblock;
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 		struct mtop	mo;
 		mo.mt_op = i > 0 ? MTFSR : MTBSR;
 		mo.mt_count = i > 0 ? i : -i;
@@ -4703,8 +4560,7 @@ mstat(void)
 		if (ioctl(mt,  MTIOCGETDRIVETYPE, &mr) == 0)
 			tapeblock = md.bsize;
 	}
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if ((mtst.st_mode&S_IFMT) == S_IFCHR) {
 		struct mtget	mg;
 		if (ioctl(mt, MTIOCGET, &mg) == 0)
@@ -4730,7 +4586,7 @@ mstat(void)
 			break;
 		case S_IFCHR:
 			if (action == 'o' && !Aflag) {
-				if (pax != PAX_TYPE_CPIO) {
+				if (pax) {
 					if (fmttype & TYP_PAX)
 						blksiz = 5120;
 					else if (fmttype & TYP_TAR)
@@ -4884,13 +4740,13 @@ addg(const char *pattern, int art)
 	struct glist	*gp;
 
 	gp = scalloc(1, sizeof *gp);
-	if (pax == PAX_TYPE_CPIO && pattern[0] == '!') {
+	if (!pax && pattern[0] == '!') {
 		gp->g_not = 1;
 		pattern++;
 	}
 	gp->g_pat = sstrdup(pattern);
 	gp->g_art = art;
-	if (pax != PAX_TYPE_CPIO) {
+	if (pax) {
 		struct glist	*gb = NULL, *gc;
 		for (gc = patterns; gc; gc = gc->g_nxt)
 			gb = gc;
@@ -4907,20 +4763,25 @@ addg(const char *pattern, int art)
 /*
  * Check if the file name s matches any of the given patterns.
  */
-static struct glist *
-want(struct file *f, struct glist **gb)
+static int
+want(struct file *f)
 {
 	extern int	gmatch(const char *, const char *);
-	struct glist	*gp;
+	struct glist	*gp, *gb = NULL;
 
 	for (gp = patterns; gp; gp = gp->g_nxt) {
 		if ((gmatch(f->f_name, gp->g_pat) != 0) ^ gp->g_not &&
 				(pax_nflag == 0 || gp->g_gotcha == 0)) {
-			return gp;
+			gp->g_gotcha = 1;
+			if (gp->g_nxt && gp->g_nxt->g_art)
+				gp->g_nxt->g_gotcha = 1;
+			else if (gp->g_art && gb)
+				gb->g_gotcha = 1;
+			return 1;
 		}
-		*gb = gp;
+		gb = gp;
 	}
-	return NULL;
+	return 0;
 }
 
 static void
@@ -5114,8 +4975,10 @@ static int
 tmkname(struct tar_header *hp, const char *fn)
 {
 	const char	*cp, *cs = NULL;
+	char	or = 0;
 
 	for (cp = fn; *cp; cp++) {
+		or |= *cp;
 		if (fmttype & TYP_USTAR && *cp == '/' && cp[1] != '\0' &&
 				cp > fn && cp-fn <= TPFXSIZ)
 			cs = cp;
@@ -5124,7 +4987,7 @@ tmkname(struct tar_header *hp, const char *fn)
 		writegnuname(fn, cp - fn + 1, 'L');
 		cp = &fn[99];
 	} else if (cp - (cs ? &cs[1] : fn) > TNAMSIZ) {
-		if (fmttype & TYP_PAX && utf8(fn)) {
+		if (fmttype & TYP_PAX && (or & 0200) == 0) {
 			paxrec |= PR_PATH;
 			strcpy(hp->t_name, sequence());
 			return 0;
@@ -5173,13 +5036,15 @@ static int
 tmklink(struct tar_header *hp, const char *fn)
 {
 	const char	*cp;
+	char	or = 0;
 
-	for (cp = fn; *cp; cp++);
+	for (cp = fn; *cp; cp++)
+		or |= *cp;
 	if (fmttype == FMT_GNUTAR && cp - fn > 99) {
 		writegnuname(fn, cp - fn + 1, 'K');
 		cp = &fn[99];
 	} else if (cp - fn > TNAMSIZ) {
-		if (fmttype & TYP_PAX && utf8(fn)) {
+		if (fmttype & TYP_PAX && (or & 0200) == 0) {
 			paxrec |= PR_LINKPATH;
 			strcpy(hp->t_linkname, sequence());
 			return 0;
@@ -5649,9 +5514,7 @@ ziprxtra(struct file *f, struct zip_header *z)
 			size = (ple16(xp->Ze_gn.ze_gn_tsize)&0177777) + 4;
 			switch (tag) {
 			case mag_zip64f:	/* ZIP64 extended information */
-				if (size != SIZEOF_zextra_64 &&
-						size != SIZEOF_zextra_64_a &&
-						size != SIZEOF_zextra_64_b)
+				if (size != SIZEOF_zextra_64)
 					break;
 				if (f->f_st.st_size == 0xffffffff)
 					f->f_st.st_size =
@@ -6881,59 +6744,4 @@ pax_options(char *s, int warn)
 		}
 	} while (*s++);
 	return val;
-}
-
-/*
- * Given a symbolic link "base" and the result of readlink "name", form
- * a valid path name for the link target.
- */
-static char *
-joinpath(const char *base, char *name)
-{
-	const char	*bp = NULL, *cp;
-	char	*new, *np;
-
-	if (*name == '/')
-		return name;
-	for (cp = base; *cp; cp++)
-		if (*cp == '/')
-			bp = cp;
-	if (bp == NULL)
-		return name;
-	np = new = smalloc(bp - base + strlen(name) + 2);
-	for (cp = base; cp < bp; cp++)
-		*np++ = *cp;
-	*np++ = '/';
-	for (cp = name; *cp; cp++)
-		*np++ = *cp;
-	*np = '\0';
-	free(name);
-	return new;
-}
-
-static int
-utf8(const char *cp)
-{
-	int	c, n;
-
-	while (*cp) if ((c = *cp++ & 0377) & 0200) {
-		if (c == (c & 037 | 0300))
-			n = 1;
-		else if (c == (c & 017 | 0340))
-			n = 2;
-		else if (c == (c & 07 | 0360))
-			n = 3;
-		else if (c == (c & 03 | 0370))
-			n = 4;
-		else if (c == (c & 01 | 0374))
-			n = 5;
-		else
-			return 0;
-		while (n--) {
-			c = *cp++ & 0377;
-			if (c != (c & 077 | 0200))
-				return 0;
-		}
-	}
-	return 1;
 }

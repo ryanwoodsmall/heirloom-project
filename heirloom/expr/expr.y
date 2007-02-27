@@ -37,7 +37,7 @@
  */
 
 %{
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -45,17 +45,11 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)expr_s42.sl	1.28 (gritter) 5/29/05";
-static int	sus = 0;
-#elif defined (SU3)
-static const char sccsid[] USED = "@(#)expr_su3.sl	1.28 (gritter) 5/29/05";
-static int	sus = 3;
+static const char sccsid[] USED = "@(#)expr_s42.sl	1.24 (gritter) 7/13/04";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)expr_sus.sl	1.28 (gritter) 5/29/05";
-static int	sus = 1;
+static const char sccsid[] USED = "@(#)expr_sus.sl	1.24 (gritter) 7/13/04";
 #else
-static const char sccsid[] USED = "@(#)expr.sl	1.28 (gritter) 5/29/05";
-static int	sus = 0;
+static const char sccsid[] USED = "@(#)expr.sl	1.24 (gritter) 7/13/04";
 #endif
 
 /*	expression command */
@@ -103,12 +97,12 @@ static char	*substr(char *, const char *, const char *);
 static char	*length(const char *);
 static char	*eindex(const char *, const char *);
 
-#if defined (SUS) || defined (SU3) || defined (S42)
+#if defined (SUS) || defined (S42)
 #include	<regex.h>
 static int	nbra;
-#else	/* !SUS, !SU3, !S42 */
+#else	/* !SUS, !S42 */
 #include	<regexpr.h>
-#endif	/* !SUS, !SU3, !S42 */
+#endif	/* !SUS, !S42 */
 %}
 
 /* Yacc productions for "expr" command: */
@@ -137,13 +131,7 @@ static int	nbra;
 /* a single `expression' is evaluated and printed: */
 
 expression:	expr NOARG {
-			if (sus && numeric($1)) {
-				int64_t	n;
-				n = atoll($1);
-				printf("%lld\n", n);
-				exit(n == 0);
-			} else
-				puts($1);
+			puts($1);
 			exit((!strcmp($1,"0")||!strcmp($1,"\0"))? 1: 0);
 			}
 	;
@@ -216,7 +204,7 @@ yylex(void)
 
 	p = Av[Argi++];
 
-	if((*p == '(' || *p == ')') && p[1] == '\0')
+	if(*p == '(' || *p == ')')
 		return (int)*p;
 	for(i = 0; *operators[i]; ++i)
 		if(EQL(operators[i], p))
@@ -320,7 +308,7 @@ match(char *s, char *p)
 	return rv;
 }
 
-#if defined (SUS) || defined (SU3) || defined (S42)
+#if defined (SUS) || defined (S42)
 static int
 ematch(char *s, register char *p)
 {
@@ -332,8 +320,8 @@ ematch(char *s, register char *p)
 #ifdef	REG_ANGLES
 	reflags |= REG_ANGLES;
 #endif
-#if defined (SU3) && defined (REG_AVOIDNULL)
-	reflags |= REG_AVOIDNULL;
+#ifdef	REG_BADRANGE
+	reflags |= REG_BADRANGE;
 #endif
 	if ((num = regcomp(&re, p, reflags)) != 0)
 		errxx(0);
@@ -351,7 +339,7 @@ ematch(char *s, register char *p)
 	regfree(&re);
 	return val;
 }
-#else	/* !SUS, !SU3, !S42 */
+#else	/* !SUS, !S42 */
 static int
 ematch(char *s, register char *p)
 {
@@ -365,7 +353,7 @@ ematch(char *s, register char *p)
 	if(advance(s, expbuf)) {
 		if(nbra == 1) {
 			p = braslist[0];
-			num = braelist[0] ? braelist[0] - p : 0;
+			num = braelist[0] - p;
 			Mstring[0] = srealloc(Mstring[0], num + 1);
 			strncpy(Mstring[0], p, num);
 			Mstring[0][num] = '\0';
@@ -376,7 +364,7 @@ ematch(char *s, register char *p)
 	free(expbuf);
 	return(val);
 }
-#endif	/* !SUS, !SU3, !S42 */
+#endif	/* !SUS, !S42 */
 
 /*ARGSUSED*/
 static void

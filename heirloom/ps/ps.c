@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,21 +33,20 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)ps_s42.sl	2.114 (gritter) 1/12/07";
+static const char sccsid[] USED = "@(#)ps_s42.sl	2.99 (gritter) 11/7/04";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ps_sus.sl	2.114 (gritter) 1/12/07";
+static const char sccsid[] USED = "@(#)ps_sus.sl	2.99 (gritter) 11/7/04";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.114 (gritter) 1/12/07";
+static const char sccsid[] USED = "@(#)/usr/ucb/ps.sl	2.99 (gritter) 11/7/04";
 #else
-static const char sccsid[] USED = "@(#)ps.sl	2.114 (gritter) 1/12/07";
+static const char sccsid[] USED = "@(#)ps.sl	2.99 (gritter) 11/7/04";
 #endif
 
-static const char cacheid[] = "@(#)/tmp/ps_cache	2.114 (gritter) 1/12/07";
+static const char cacheid[] = "@(#)/tmp/ps_cache	2.99 (gritter) 11/7/04";
 
-#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
-	&& !defined (__DragonFly__)
+#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 #define	_KMEMUSER
-#endif	/* !__linux__, !__sun, !__FreeBSD__, !__DragonFly__ */
+#endif	/* !__linux__, !__sun, !__FreeBSD__ */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/utsname.h>
@@ -76,7 +75,7 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.114 (gritter) 1/12/07";
 #include 	<termios.h>
 #if defined (__linux__)
 #include	<mntent.h>
-#elif defined (__FreeBSD__) || defined (__DragonFly__)
+#elif defined (__FreeBSD__)
 #include	<kvm.h>
 #include	<sys/param.h>
 #include	<sys/ucred.h>
@@ -87,9 +86,6 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.114 (gritter) 1/12/07";
 #include	<sys/user.h>
 #define	proc	process
 #undef	p_pgid
-#undef	p_pctcpu
-#if defined (__DragonFly__)
-#endif	/* __DragonFly__ */
 #elif defined (__hpux)
 #include	<mntent.h>
 #include	<sys/param.h>
@@ -101,44 +97,16 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.114 (gritter) 1/12/07";
 #ifndef	MNTTYPE_IGNORE
 #define	MNTTYPE_IGNORE	""
 #endif
-#elif defined (__NetBSD__) || defined (__OpenBSD__) 
+#elif defined (__NetBSD__) || defined (__OpenBSD__)
 #include	<kvm.h>
 #include	<sys/param.h>
 #include	<sys/sysctl.h>
 #include	<sys/mount.h>
 #define	proc	process
 #undef	p_pgid
-#if !defined (SRUN) && defined (LSRUN)
-#define	SRUN	LSRUN
-#endif
-#if !defined (SSLEEP) && defined (LSSLEEP)
-#define	SSLEEP	LSSLEEP
-#endif
-#if !defined (SDEAD) && defined (LSDEAD)
-#define	SDEAD	LSDEAD
-#endif
-#if !defined (SONPROC) && defined (LSONPROC)
-#define	SONPROC	LSONPROC
-#endif
-#if !defined (P_INMEM) && defined (L_INMEM)
-#define	P_INMEM	L_INMEM
-#endif
-#if !defined (P_SINTR) && defined (L_SINTR)
-#define	P_SINTR	L_SINTR
-#endif
 #ifndef	SCHED_OTHER
 #define	SCHED_OTHER	1
 #endif
-#elif defined (__APPLE__)
-#include	<sys/proc.h>
-#include        <sys/sysctl.h>
-#include        <sys/mount.h>
-#include	<sys/resource.h>
-#include	<mach/mach_types.h>
-#include	<mach/task_info.h>
-#include	<mach/shared_memory_server.h>
-#define	proc	process
-#undef	p_pgid
 #else	/* SVR4 */
 #include	<sys/mnttab.h>
 #ifdef	__sun
@@ -154,11 +122,6 @@ static const char cacheid[] = "@(#)/tmp/ps_cache	2.114 (gritter) 1/12/07";
 #include	<wctype.h>
 #ifndef	TIOCGWINSZ
 #include	<sys/ioctl.h>
-#endif
-
-#if __NetBSD_Version__ >= 300000000
-#include	<sys/statvfs.h>
-#define	statfs	statvfs
 #endif
 
 #include	<mbtowi.h>
@@ -628,7 +591,7 @@ dlook(dev_type rdev, struct ditem **dt, char *str)
 }
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__) && !defined (__APPLE__)
+	!defined (__OpenBSD__)
 static void
 chdir_to_proc(void)
 {
@@ -643,7 +606,7 @@ chdir_to_proc(void)
 		exit(074);
 	}
 }
-#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__, !__APPLE__ */
+#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
 
 static union value *
 getval(char **listp, enum valtype type, int separator, int sep2)
@@ -742,24 +705,6 @@ hasnonprint(const char *s)
 		s += n;
 	}
 	return 0;
-}
-
-static int
-colwidth(const char *s)
-{
-	wint_t	wc;
-	int	i, n, w = 0;
-
-	while (*s) {
-		next(wc, s, n);
-		s += n;
-		if (mb_cur_max > 1)
-			i = iswprint(wc) ? wcwidth(wc) : 0;
-		else
-			i = isprint(wc) != 0;
-		w += i;
-	}
-	return w;
 }
 
 static void
@@ -877,15 +822,12 @@ putid(unsigned long val, unsigned len, struct trenod **troot,
 			tp->t_num = val;
 			treput(tp, troot);
 		} else
-		numeric:
 #ifdef	UCB
 			return printf("%-*lu", len, val);
 #else
 			return printf("%*lu", len, val);
 #endif
 	}
-	if (oflag && colwidth(tp->t_str) > len)
-		goto numeric;
 #ifdef	UCB
 	return printf("%-*s", len, tp->t_str);
 #else
@@ -951,8 +893,6 @@ time2(long t, unsigned len, int format)
 	char	buf[40];
 	int	days, hours, minutes, seconds;
 
-	if (t < 0)
-		t = 0;
 	if (format == 2)
 		snprintf(buf, sizeof buf, "%2lu:%02lu.%ld", t / 600,
 				(t/10) % 60,
@@ -988,7 +928,7 @@ time3(time_t t, unsigned len)
 		width++;
 	}
 	tp = localtime(&t);
-	if (now > t && now - t > 86400) {
+	if (now - t > 86400) {
 		nl_item	val;
 
 		switch (tp->tm_mon) {
@@ -1214,9 +1154,9 @@ outproc(struct proc *p)
 }
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__) && !defined (__APPLE__)
+	!defined (__OpenBSD__)
 
-#if defined (__linux__) || defined (__FreeBSD__) || defined (__DragonFly__)
+#if defined (__linux__) || defined (__FreeBSD__)
 #define	GETVAL_REQ(a)		if ((v = getval(&cp, (a), ' ', 0)) == NULL) \
 					return STOP
 
@@ -1225,7 +1165,7 @@ outproc(struct proc *p)
 
 #define	GETVAL_COMMA(a)		if ((v = getval(&cp, (a), ' ', ',')) == NULL) \
 					return STOP
-#endif	/* __linux__ || __FreeBSD__ || __DragonFly__ */
+#endif	/* __linux__ || __FreeBSD__ */
 
 #if defined (__linux__)
 static void
@@ -1372,17 +1312,16 @@ compute_priority_old(struct proc *p)
 	if (p->p_lstate[0] != 'R' && p->p_c <= 2)
 		p->p_c = 0;
 	/*
-	 * The value for C still depends on the nice value. Make 80
+	 * The value for C still depends on the nice value. Make 60
 	 * the highest possible C value for all nice values.
 	 */
-	p->p_c *= 80 / full_counter;
+	p->p_c *= 60 / full_counter;
 }
 
 /*
  * Priority calculation for Linux 2.5 and (hopefully) above, based
- * on 2.5.31. This supplies a sensible priority value, but originally
- * nothing we could use to compute "CPU usage for scheduling". More
- * recent 2.6 versions have a SleepAVG field in the "status" file.
+ * on 2.5.31. This supplies a sensible priority value, but nothing
+ * we could use to compute "CPU usage for scheduling".
  */
 static void
 compute_priority_new(struct proc *p)
@@ -1762,15 +1701,6 @@ getproc_status(struct proc *p)
 				return STOP;
 			}
 			p->p_lwp = v->v_int;
-		} else if (strncmp(line, "SleepAVG:", 9) == 0) {
-			cp = &line[9];
-			while (isspace(*cp))
-				cp++;
-			if ((v = getval(&cp, VT_INT, '%', 0)) == NULL) {
-				fclose(fp);
-				return STOP;
-			}
-			p->p_c = (100 - v->v_int) * 80 / 100;
 		}
 	}
 	fclose(fp);
@@ -1850,11 +1780,9 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 	struct dirent	*dp;
 	unsigned long	val;
 	char	*x;
-	int	fd;
 
 	if (chdir(dir) == 0 &&
-			(fd = open("task", O_RDONLY)) >= 0 &&
-			fchdir(fd) == 0 &&
+			chdir("task") == 0 &&
 			(Dp = opendir(".")) != NULL) {
 		while ((dp = readdir(Dp)) != NULL) {
 			if (dp->d_name[0] == '.' && (dp->d_name[1]=='\0' ||
@@ -1864,13 +1792,6 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 			val = strtoul(dp->d_name, &x, 10);
 			if (*x != 0)
 				continue;
-			if (fchdir(fd) < 0) {
-				fprintf(stderr,
-					"%s: cannot chdir to %s/%s/task\n",
-					progname, PROCDIR, dir);
-				errcnt = 1;
-				break;
-			}
 			if (getproc(dp->d_name, p, val, val) == OKAY) {
 				postproc(p);
 				if (selectproc(p) == OKAY) {
@@ -1880,7 +1801,6 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 			}
 		}
 		closedir(Dp);
-		close(fd);
 		return OKAY;
 	} else {
 		chdir_to_proc();
@@ -1888,7 +1808,7 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 	}
 }
 
-#elif defined (__FreeBSD__) || defined (__DragonFly__)
+#elif defined (__FreeBSD__)
 
 static unsigned long
 getmem(void)
@@ -1953,30 +1873,12 @@ getproc_status(struct proc *p, pid_t expected_pid)
 	p->p_pgid = v->v_int;
 	GETVAL_REQ(VT_INT);
 	p->p_sid = v->v_int;
-	if (isdigit(*cp)) {
-		GETVAL_COMMA(VT_INT);
-		mj = v->v_int;
-		GETVAL_REQ(VT_INT);
-		mi = v->v_int;
-		if (mj != -1 || mi != -1)
-			p->p_ttydev = makedev(mj, mi);
-	} else {
-		struct stat	st;
-		char	*dev;
-		cq = cp;
-		while (*cp != ' ') cp++;
-		*cp = '\0';
-		dev = smalloc(cp - cq + 8);
-		strcpy(dev, "/dev/");
-		strcpy(&dev[5], cq);
-		if (stat(dev, &st) < 0)
-			p->p_ttydev = PRNODEV;
-		else
-			p->p_ttydev = st.st_rdev;
-		free(dev);
-		*cp = ' ';
-		while (*cp == ' ') cp++;
-	}
+	GETVAL_COMMA(VT_INT);
+	mj = v->v_int;
+	GETVAL_REQ(VT_INT);
+	mi = v->v_int;
+	if (mj != -1 || mi != -1)
+		p->p_ttydev = makedev(mj, mi);
 	while (*cp != ' ') cp++; while (*cp == ' ') cp++;
 	/* skip flags */
 	GETVAL_COMMA(VT_LONG);
@@ -2153,7 +2055,7 @@ getproc_kvm(struct proc *p)
 	}
 	if ((kp = kvm_getprocs(kv, KERN_PROC_PID, p->p_pid, &c)) == NULL)
 		return OKAY;
-#if (__FreeBSD__) < 5 || defined (__DragonFly__)
+#if (__FreeBSD__) < 5
 	switch (kp->kp_proc.p_stat) {
 #else	/* __FreeBSD__ >= 5 */
 	switch (kp->ki_stat) {
@@ -2185,7 +2087,7 @@ getproc_kvm(struct proc *p)
 		break;
 	}
 	p->p_lstate[0] = p->p_state[0];
-#if (__FreeBSD__) < 5 || defined (__DragonFly__)
+#if (__FreeBSD__) < 5
 #define	ki_flag		kp_proc.p_flag
 #define	ki_oncpu	kp_proc.p_oncpu
 #define	ki_wchan	kp_proc.p_wchan
@@ -2195,12 +2097,10 @@ getproc_kvm(struct proc *p)
 		p->p_flag |= FL_SYS;
 	if (kp->ki_flag & P_TRACED)
 		p->p_flag |= FL_TRC;
-#if (__FreeBSD__) < 5 || defined (__DragonFly__)
-#ifndef	__DragonFly__
+#if (__FreeBSD__) < 5
 	p->p_intpri = kp->kp_proc.p_usrpri;
 	p->p_oldpri = kp->kp_proc.p_usrpri;
 	p->p_pri = kp->kp_proc.p_priority;
-#endif	/* !__DragonFly__ */
 	p->p_policy = SCHED_OTHER;
 	p->p_clname = "TS";
 #else	/* __FreeBSD__ >= 5 */
@@ -2215,10 +2115,8 @@ getproc_kvm(struct proc *p)
 	if (p->p_policy != SCHED_OTHER)
 		p->p_pri += 100;
 #endif	/* __FreeBSD__ >= 5 */
-#ifndef	__DragonFly__
 	p->p_psr = kp->ki_oncpu;
 	p->p_wchan = (unsigned long)kp->ki_wchan;
-#endif	/* !__DragonFly__ */
 	return OKAY;
 }
 
@@ -2241,7 +2139,7 @@ getproc(const char *dir, struct proc *p, pid_t expected_pid, pid_t lwp)
 	return result;
 }
 
-#else	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
+#else	/* !__linux__, !__FreeBSD__ */
 
 #ifndef	__sun
 static unsigned long
@@ -2577,7 +2475,7 @@ getLWPs(const char *dir, struct proc *p, pid_t expected_pid)
 		return STOP;
 }
 
-#endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
+#endif	/* !__linux__, !__FreeBSD__ */
 
 static void
 postproc(struct proc *p)
@@ -2592,16 +2490,15 @@ postproc(struct proc *p)
 	if (totalmem)
 		p->p_pctmem = (double)p->p_size * 100 / totalmem;
 #endif	/* !__sun */
-#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__) \
-		&& !defined (__DragonFly__)
+#if !defined (__linux__) && !defined (__sun) && !defined (__FreeBSD__)
 	p->p_oldpri = 160 - p->p_pri;
 #endif	/* !__linux__, !__sun */
-#if !defined (__linux__) && !defined (__FreeBSD__) && !defined (__DragonFly__)
+#if !defined (__linux__) && !defined (__FreeBSD__)
 	p->p_policy = p->p_clname && strcmp(p->p_clname, "TS") ?
 		SCHED_RR : SCHED_OTHER;
-#endif	/* !__linux__, !__FreeBSD__, !__DragonFly__ */
+#endif	/* !__linux__, !__FreeBSD__ */
 }
-#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__, !__APPLE__ */
+#endif	/* !__hpux, !_AIX, !__NetBSD__, !__OpenBSD__ */
 
 static enum okay
 selectproc(struct proc *p)
@@ -2699,7 +2596,7 @@ selectproc(struct proc *p)
 }
 
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-	!defined (__OpenBSD__) && !defined (__APPLE__)
+	!defined (__OpenBSD__)
 static void
 do_procs(void)
 {
@@ -2718,11 +2615,11 @@ do_procs(void)
 			val = strtoul(dp->d_name, &x, 10);
 			if (*x != 0)
 				continue;
-#if !defined (__FreeBSD__) && !defined (__DragonFly__)
+#ifndef	__FreeBSD__
 			if (Lflag)
 				if (getLWPs(dp->d_name, &p, val) == OKAY)
 					continue;
-#endif	/* !__FreeBSD__, !__DragonFly__ */
+#endif	/* !__FreeBSD__ */
 			if (getproc(dp->d_name, &p, val, -1) == OKAY) {
 				postproc(&p);
 				if (selectproc(&p) == OKAY)
@@ -3460,408 +3357,6 @@ do_procs(void)
 	kvm_close(kt);
 }
 
-#elif defined (__APPLE__)
-
-typedef struct kinfo_proc kinfo_proc;
-
-static int
-GetBSDProcessList(pid_t thepid, struct kinfo_proc **procList, size_t *procCount)
-    /* derived from http://developer.apple.com/qa/qa2001/qa1123.html */
-    /* Returns a list of all BSD processes on the system.  This routine
-       allocates the list and puts it in *procList and a count of the
-       number of entries in *procCount.  You are responsible for freeing
-       this list (use "free" from System framework).
-       all classic apps run in one process
-       On success, the function returns 0.
-       On error, the function returns a BSD errno value.
-       Preconditions:
-	assert( procList != NULL);
-	assert(*procList == NULL);
-	assert(procCount != NULL);
-       Postconditions:
-	assert( (err == 0) == (*procList != NULL) );
-    */
-{
-	int			err;
-	struct kinfo_proc	*result;
-	int			mib[4];
-	size_t			length;
-
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROC;
-	if (thepid == 0) {
-		mib[2] = KERN_PROC_ALL;
-		mib[3] = 0;
-	} else {
-		mib[2] = KERN_PROC_PID;
-		mib[3] = thepid;
-	}
-	/* We start by calling sysctl with result == NULL and length == 0.
-	   That will succeed, and set length to the appropriate length.
-	   We then allocate a buffer of that size and call sysctl again
-	   with that buffer.
-	*/
-	length = 0;
-	err = sysctl(mib, 4, NULL, &length, NULL, 0);
-	if (err == -1)
-		err = errno;
-	if (err == 0) {
-		result = smalloc(length);
-		err = sysctl(mib, 4, result, &length, NULL, 0);
-		if (err == -1)
-			err = errno;
-		if (err == ENOMEM) {
-			free(result); /* clean up */
-			result = NULL;
-		}
-	}
-	*procList = result;
-	*procCount = err == 0 ? length / sizeof **procList : 0;
-	return err;
-}
-
-static time_t
-tv2sec(time_value_t *tv, int mult)
-{
-	return tv->seconds*mult + (tv->microseconds >= 500000/mult);
-}
-
-static unsigned long
-getmem(void)
-{
-	static int	mib[] = {CTL_HW, HW_PHYSMEM, 0};
-	size_t		size;
-	unsigned long	mem;
-
-	size = sizeof mem;
-	if (sysctl(mib, 2, &mem, &size, NULL, 0) == -1) {
-		fprintf(stderr, "error in sysctl(): %s\n", strerror(errno));
-		exit(3);
-	}
-	return mem;
-}
-
-extern kern_return_t task_for_pid(task_port_t task, pid_t pid, task_port_t *target);
-
-static void
-getproc(struct proc *p, struct kinfo_proc *kp)
-{
-	kern_return_t   error;
-	unsigned int	info_count = TASK_BASIC_INFO_COUNT;
-	unsigned int 	thread_info_count = THREAD_BASIC_INFO_COUNT;
-	task_port_t	task;
-	pid_t		pid;
-	struct		task_basic_info	task_binfo;
-	struct		task_thread_times_info task_times;
-	time_value_t	total_time, system_time;
-	struct		task_events_info task_events;
-	struct		policy_timeshare_info tshare;
-	struct		policy_rr_info rr;
-	struct		policy_fifo_info fifo;
-	struct		thread_basic_info th_binfo;
-	thread_port_array_t	thread_list;
-	int		thread_count;
-	int		j, temp, curpri;
-
-	memset(p, 0, sizeof *p);
-
-	p->p_pid = kp->kp_proc.p_pid;
-	strncpy(p->p_fname, kp->kp_proc.p_comm, sizeof p->p_fname);
-	p->p_fname[sizeof p->p_fname - 1] = '\0';
-	p->p_lstate[0] = kp->kp_proc.p_stat; /* contains at least zombie info */
-	p->p_lflag = kp->kp_proc.p_flag;
-	p->p_ppid = kp->kp_eproc.e_ppid;
-	p->p_pgid = kp->kp_eproc.e_pgid;
-	p->p_sid = kp->kp_eproc.e_tpgid;
-	p->p_ttydev = kp->kp_eproc.e_tdev == -1 ? PRNODEV : kp->kp_eproc.e_tdev;
-	p->p_uid = kp->kp_eproc.e_pcred.p_ruid;
-	p->p_euid = kp->kp_eproc.e_ucred.cr_uid;
-	p->p_gid = kp->kp_eproc.e_pcred.p_rgid;
-	p->p_egid = kp->kp_eproc.e_ucred.cr_gid;
-	p->p_start = kp->kp_proc.p_starttime.tv_sec +
-		(kp->kp_proc.p_starttime.tv_usec >= 500000);
-	p->p_addr = (unsigned long)kp->kp_proc.p_addr;
-	p->p_wchan = (unsigned long)kp->kp_proc.p_wchan;
-
-	if (p->p_lstate[0] == SZOMB) {
-		p->p_lstate[0] = 7;
-		return; /* do not fetch more data for zombies */
-	}
-
-	pid = kp->kp_proc.p_pid;
-	error = task_for_pid(mach_task_self(), pid, &task);
-	if (error != KERN_SUCCESS) {
-		/* process already left the system */
-		p->p_lstate[0] = 7; /* handle exited process/task like zombie */
-		p->p_clname = "??"; /* will be used as nice value */
-		return;
-	}
-	info_count = TASK_BASIC_INFO_COUNT;
-	error = task_info(task, TASK_BASIC_INFO, &task_binfo, &info_count);
-	if (error != KERN_SUCCESS) {
-		fprintf(stderr, "Error calling task_info():%d\n", error);
-		exit(3);
-	}
-	info_count = TASK_THREAD_TIMES_INFO_COUNT;
-	error = task_info(task, TASK_THREAD_TIMES_INFO, &task_times, &info_count);
-	if (error != KERN_SUCCESS) {
-		fprintf(stderr, "Error calling task_info():%d\n", error);
-		exit(3);
-	}
-	info_count = TASK_EVENTS_INFO_COUNT;
-	error = task_info(task, TASK_EVENTS_INFO, &task_events, &info_count);
-	if (error != KERN_SUCCESS) {
-		fprintf(stderr, "Error calling task_info():%d\n", error);
-		exit(3);
-	}
-
-	total_time = task_times.user_time;
-	p->p_utime = tv2sec(&total_time, 1);
-
-	system_time = task_times.system_time;
-	p->p_ktime = tv2sec(&system_time, 1);
-
-	time_value_add(&total_time, &system_time);
-	p->p_time = tv2sec(&total_time, 1);
-
-	time_value_add(&total_time, &task_binfo.user_time);
-	time_value_add(&total_time, &task_binfo.system_time);
-	p->p_accutime = tv2sec(&total_time, 1);
-
-	switch(task_binfo.policy) {
-		case POLICY_TIMESHARE :
-			info_count = POLICY_TIMESHARE_INFO_COUNT;
-			error = task_info(task, TASK_SCHED_TIMESHARE_INFO, &tshare, &info_count);
-			if (error == KERN_SUCCESS) {
-				p->p_intpri = tshare.cur_priority;
-				p->p_rtpri = tshare.base_priority;
-				p->p_clname = "TS";
-				p->p_policy = SCHED_OTHER;
-			}
-			break;
-		case POLICY_RR :
-			info_count = POLICY_RR_INFO_COUNT;
-			error = task_info(task, TASK_SCHED_RR_INFO, &rr, &info_count);
-			if (error == KERN_SUCCESS) {
-				p->p_intpri = rr.base_priority;
-				p->p_rtpri = rr.base_priority;
-				p->p_clname = "RT";
-				p->p_policy = SCHED_RR;
-			}
-			break;
-		case POLICY_FIFO :
-			info_count = POLICY_FIFO_INFO_COUNT;
-			error = task_info(task, TASK_SCHED_FIFO_INFO, &fifo, &info_count);
-			if (error == KERN_SUCCESS) {
-				p->p_intpri = fifo.base_priority;
-				p->p_rtpri = fifo.base_priority;
-				p->p_clname = "FF";
-				p->p_policy = SCHED_FIFO;
-			}
-			break;
-	}
-	p->p_nice = kp->kp_proc.p_nice;
-
-	/* allocates a thread port array */
-	error = task_threads(task, &thread_list, &thread_count);
-	if (error != KERN_SUCCESS) {
-		mach_port_deallocate(mach_task_self(), task);
-		fprintf(stderr, "Error calling task_threads():%d\n", error);
-		exit(3);
-	}
-	p->p_nlwp = thread_count;
-	/* iterate over all threads for: cpu, state, swapped, prio */
-	/* it should also be possible to print all mach threads as LWPs */
-	p->p_lflag |= FL_SWAP; /* assume swapped */
-	curpri = p->p_intpri;
-	for (j = 0; j < thread_count; j++) {
-		info_count = THREAD_BASIC_INFO_COUNT;
-		error = thread_info(thread_list[j], THREAD_BASIC_INFO, &th_binfo, &info_count);
-		if (error != KERN_SUCCESS) {
-			fprintf(stderr, "Error calling thread_info():%d\n", error);
-			exit(3);
-		}
-		p->p_c += th_binfo.cpu_usage;
-		switch (th_binfo.run_state) {
-			case TH_STATE_RUNNING:
-				temp=1;
-				break;
-			case TH_STATE_UNINTERRUPTIBLE:
-				temp=2;
-				break;
-			case TH_STATE_WAITING:
-				temp=(th_binfo.sleep_time <= 20) ? 3 : 4;
-				break;
-			case TH_STATE_STOPPED:
-				temp=5;
-				break;
-			case TH_STATE_HALTED:
-				temp=6;
-				break;
-			default:
-				temp=8;
-		}
-		if (temp < p->p_lstate[0])
-			p->p_lstate[0] = temp;
-		if ((th_binfo.flags & TH_FLAGS_SWAPPED ) == 0)
-			p->p_lflag &= ~FL_SWAP; /* in mem */
-		switch(th_binfo.policy) {
-			case POLICY_TIMESHARE :
-				info_count = POLICY_TIMESHARE_INFO_COUNT;
-				error = thread_info(thread_list[j], THREAD_SCHED_TIMESHARE_INFO, &tshare, &info_count);
-				if (error == KERN_SUCCESS && curpri < tshare.cur_priority)
-					curpri = tshare.cur_priority;
-				break;
-			case POLICY_RR :
-				info_count = POLICY_RR_INFO_COUNT;
-				error = thread_info(thread_list[j], THREAD_SCHED_RR_INFO, &rr, &info_count);
-				if (error == KERN_SUCCESS && curpri < rr.base_priority)
-					curpri = rr.base_priority;
-				break;
-			case POLICY_FIFO :
-				info_count = POLICY_FIFO_INFO_COUNT;
-				error = thread_info(thread_list[j], THREAD_SCHED_FIFO_INFO, &fifo, &info_count);
-				if (error == KERN_SUCCESS && curpri < fifo.base_priority)
-					curpri = fifo.base_priority;
-				break;
-		}
-		mach_port_deallocate(mach_task_self(), thread_list[j]);
-	}
-	p->p_intpri = curpri;
-	/* free the thread port array */
-	error = vm_deallocate(mach_task_self(), (vm_address_t)thread_list, thread_count * sizeof(thread_port_array_t));
-	p->p_c = p->p_c / (TH_USAGE_SCALE/100);
-	p->p_pctcpu = p->p_c;
-
-	p->p_osz = task_binfo.virtual_size / pagesize;
-	p->p_orss = task_binfo.resident_size / pagesize;
-
-	p->p_pflts = task_events.pageins;
-	p->p_bufr = 0;
-	p->p_bufw = 0;
-	p->p_mrcv = task_events.messages_sent; /* Mach messages */
-	p->p_msnd = task_events.messages_received;
-	
-	mach_port_deallocate(mach_task_self(), task);
-}
-
-static void
-getargv(struct proc *p, struct kinfo_proc *kp)
-{
-	size_t	size, argsz;
-	char	*argbuf;
-	int	mib[3];
-	long	nargs;
-	char	*ap, *pp, *xp;
-
-	/* ignore kernel and zombies */
-	if (kp->kp_proc.p_pid == 0 || p->p_lstate[0] == 7)
-		return;
-
-	/* allocate a procargs space per process */
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_ARGMAX;
-	size = sizeof argsz;
-	if (sysctl(mib, 2, &argsz, &size, NULL, 0) == -1) {
-		fprintf(stderr, "error in sysctl(): %s\n", strerror(errno));
-		exit(3);
-	}
-	argbuf = smalloc(argsz);
-
-	/* fetch the process arguments */
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROCARGS2;
-	mib[2] = kp->kp_proc.p_pid;
-	if (sysctl(mib, 3, argbuf, &argsz, NULL, 0) == -1) {
-		/* process already left the system */
-		return;
-	}
-
-	/* the number of args is at offset 0, this works for 32 and 64bit */
-	memcpy(&nargs, argbuf, sizeof nargs);
-	ap = argbuf + sizeof nargs;
-
-	/* skip the exec_path */
-	while (ap < &argbuf[argsz] && *ap != '\0')
-		ap++;
-	if (ap == &argbuf[argsz])
-		goto DONE; /* no args to show */
-	/* skip trailing '\0' chars */
-	while (ap < &argbuf[argsz] && *ap == '\0')
-		ap++;
-	if (ap == &argbuf[argsz])
-		goto DONE; /* no args to show */
-
-	xp = p->p_comm; /* copy the command name also */
-	/* now concat copy the arguments */
-	for (pp = p->p_psargs; pp < &p->p_psargs[sizeof p->p_psargs-1]; pp++) {
-		if (*ap == '\0') {
-			if (xp) {
-				*xp = '\0';
-				xp = NULL;
-			}
-			if (--nargs == 0)
-				break;
-			*pp = ' ';
-			++ap;
-		} else {
-			if (xp)
-				*xp++ = *ap;
-			*pp = *ap++;
-		}
-	}
-	*pp = '\0';
-
-DONE:	free(argbuf);
-	return;
-}
-
-static void
-postproc(struct proc *p)
-{
-	cleanline(p);
-	if (p->p_lstate[0] < 0 || p->p_lstate[0] > 8) /* play safe */
-		p->p_lstate[0] = 8;
-	p->p_state[0] = " RSSITHZ?"[p->p_lstate[0]];
-	p->p_lstate[0] = p->p_state[0];
-	if (p->p_lflag & P_SYSTEM)
-		p->p_flag |= FL_SYS;
-	p->p_pri = p->p_rtpri;
-	p->p_oldpri = p->p_intpri;
-	p->p_size = p->p_osz * kbytes_per_page;
-	p->p_rssize = p->p_orss * kbytes_per_page;
-}
-
-static void
-do_procs(void)
-{
-	struct	proc p;
-	struct	kinfo_proc *kp = NULL;
-	size_t	i, cnt;
-	pid_t	pid0;
-	int	err;
-
-	/* get all processes */
-	pid0 = 0;
-	if ((err = GetBSDProcessList(pid0, &kp, &cnt)) != 0) {
-		fprintf(stderr, "error getting proc list: %s\n", strerror(err));
-		exit(3);
-	}
-	i = cnt;
-	while (--i >= 0) {
-		/* ignore trailing garbage processes with pid 0 */
-		if (kp[i].kp_proc.p_pid == 0 && pid0++ > 0)
-			break;
-		getproc(&p, &kp[i]);
-		getargv(&p, &kp[i]);
-		postproc(&p);
-		if (selectproc(&p) == OKAY)
-			outproc(&p);
-	}
-	/* free the memory allocated by GetBSDProcessList */
-	free(kp);	
-}
-
 #endif	/* all */
 
 /************************************************************************
@@ -3998,8 +3493,11 @@ muststat:
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [ -acglnrSuvwx ] [ -t term ] [ num ]\n",
-		progname);
+	fprintf(stderr, "\
+usage: %s [ -acglnrSuvwx ] [ -t term ] [ num ]\n\
+       %s [ -aA ] [ -G gidlist ] [ -p proclist ] [ -t termlist ]\n\
+        [ -U uidlist ] [ -o format ]\n",
+		progname, progname);
 	exit(2);
 }
 #else	/* !UCB */
@@ -4007,8 +3505,9 @@ static void
 usage(void)
 {
 	fprintf(stderr, "\
-usage: %s [ -edalfcj ] [ -r sysname ] [ -t termlist ]\n\
-        [ -u uidlist ] [ -p proclist ] [ -g grplist ] [ -s sidlist ]\n",
+usage: %s [ -edalfcjLPyA ] [ -r sysname ] [ -t termlist ]\n\
+        [ -u uidlist ] [ -p proclist ] [ -g grplist ] [ -s sidlist ]\n\
+        [ -U uidlist ] [ -G gidlist ] [ -o format ]\n",
 	  progname);
 	exit(2);
 }
@@ -4424,8 +3923,7 @@ sysname(int ac, char **av)
 				}
 			}
 			endmntent(fp);
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-	|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 			struct statfs	*sp = NULL;
 			int	cnt, i;
 
@@ -4786,25 +4284,17 @@ options(int ac, char **av)
 		agxsel = 0;
 		ucb_rflag = 0;
 	}
-	switch (agxsel) {
-	case 01|04:
-	case 01|02|04:
+	if (agxsel == (01|04))
 		add_criterion(CR_ALL, 0);
-		break;
-	case 02|04:
+	else if (agxsel == (02|04))
 		add_criterion(CR_WITHOUT_TTY, 0);
-		add_criterion(CR_ADD_UNINTERESTING, 0);
-		break;
-	case 01:
-	case 01|02:
-		add_criterion(CR_ALL_WITH_TTY, 0);
-		break;
-	case 02:
-		add_criterion(CR_ADD_UNINTERESTING, 0);
-		break;
-	case 04:
-		add_criterion(CR_NO_TTY_NO_SESSION_LEADER, 0);
-		break;
+	else {
+		if (agxsel & 01)
+			add_criterion(CR_ALL_WITH_TTY, 0);
+		if (agxsel & 02)
+			add_criterion(CR_ADD_UNINTERESTING, 0);
+		if (agxsel & 04)
+			add_criterion(CR_NO_TTY_NO_SESSION_LEADER, 0);
 	}
 	if (o0 == NULL) {
 		if (format == 'l') {
@@ -4814,14 +4304,12 @@ options(int ac, char **av)
 			if (nflag)
 				add_format(OU_RUID, "   UID");
 			else
-				add_format(OU_RUSER, "USER    ");
+				add_format(OU_RUSER, "USER   ");
 		}
 		if (format == 'l') {
 			add_format(OU_PID, NULL);
 			add_format(OU_PPID, NULL);
-		} else if (format == 'u')
-			add_format(OU_PID, "  PID");
-		else
+		} else
 			add_format(OU_PID, "   PID");
 		if (format == 'l' || format == 'u')
 			add_format(OU_C, "CP");
@@ -4889,7 +4377,7 @@ main(int argc, char **argv)
 	options(argc, argv);
 	devices();
 #if !defined (__hpux) && !defined (_AIX) && !defined (__NetBSD__) && \
-		!defined (__OpenBSD__) && !defined (__APPLE__)
+		!defined (__OpenBSD__)
 	chdir_to_proc();
 #endif
 #ifdef	__linux__
@@ -4904,26 +4392,14 @@ main(int argc, char **argv)
 #ifdef	__linux__
 	uptime = sysup();
 #endif	/* __linux__ */
-#ifdef __APPLE__
-	{
-		static int mib[] = {CTL_HW, HW_PAGESIZE, 0};
-		size_t size;
-		size = sizeof pagesize;
-		if (sysctl(mib, 2, &pagesize, &size, NULL, 0) == -1) {
-			fprintf(stderr, "error in sysctl(): %s\n", strerror(errno));
-			exit(3);
-		}
-	}
-#else
 	pagesize = sysconf(_SC_PAGESIZE);
-#endif
 	kbytes_per_page = (pagesize >> 10);
 #ifndef	__sun
 	totalmem = getmem();
 #endif	/* !__sun */
 #if defined (__linux__) || defined (__sun)
 	getproc("self", &myproc, getpid(), -1);
-#elif defined (__FreeBSD__) || defined (__DragonFly__)
+#elif defined (__FreeBSD__)
 	getproc("curproc", &myproc, getpid(), -1);
 #elif defined (__hpux)
 	{
@@ -4973,23 +4449,6 @@ main(int argc, char **argv)
 		if (kp != NULL)
 			getproc(&myproc, &kp[0]);
 		kvm_close(kt);
-	}
-#elif defined (__APPLE__)
-	{
-		struct kinfo_proc	*kp;
-		pid_t	mypid = getpid();
-		size_t	cnt;
-		int	err;
-
-		kp = NULL;
-		if ((err = GetBSDProcessList(mypid, &kp, &cnt)) != 0) {
-			fprintf(stderr, "error getting proc list: %s\n", strerror(err));
-			exit(3);
-		}
-		if (kp != NULL) {
-			getproc(&myproc, kp);
-			free(kp);
-		}
 	}
 #else	/* SVR4 */
 	{

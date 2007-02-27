@@ -18,11 +18,11 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.6 (gritter) 2/8/06
+ * Sccsid @(#)t6.c	1.3 (gritter) 7/23/05
  */
 
  /* t6.c: compute tab stops */
-# define tx(a) ((a)!=(char *)0 && !point((intptr_t)(a)))
+# define tx(a) (a>(char *)0 && a<(char *)128)
 # include "t..c"
 # include <inttypes.h>
 void
@@ -34,18 +34,14 @@ maktab(void)
 int icol, ilin, tsep, k, ik, vforml, il, text;
 int doubled[MAXCOL], acase[MAXCOL];
 char *s;
-char space[40];
 for(icol=0; icol <ncol; icol++)
 	{
 	doubled[icol] = acase[icol] = 0;
 	fprintf(tabout, ".nr %d 0\n", icol+CRIGHT);
    for(text=0; text<2; text++)
 	{
-	if (text) {
-		warnoff();
+	if (text)
 		fprintf(tabout, ".%02d\n.rm %02d\n", icol+80, icol+80);
-		warnon();
-	}
 	for(ilin=0; ilin<nlin; ilin++)
 		{
 		if (instead[ilin]|| fullbot[ilin]) continue;
@@ -59,13 +55,12 @@ for(icol=0; icol <ncol; icol++)
 			case 'a':
 				acase[icol]=1;
 				s = table[ilin][icol].col;
-				if (tx(s) && text)
+				if (s>(char *)0 && s<(char *)128 && text)
 					{
 					if (doubled[icol]==0)
 						fprintf(tabout, ".nr %d 0\n.nr %d 0\n",S1,S2);
 					doubled[icol]=1;
-					nreg(space, s, '-');
-					fprintf(tabout, ".if %s>\\n(%d .nr %d %s\n",space,S2,S2,space);
+					fprintf(tabout, ".if \\n(%c->\\n(%d .nr %d \\n(%c-\n",(int)s,S2,S2,(int)s);
 					}
 			case 'n':
 				if (table[ilin][icol].rcol!=0)
@@ -206,13 +201,12 @@ fprintf(tabout, ".nr TW \\n(%d\n", ncol+CRIGHT-1);
 if (boxflg || allflg || dboxflg)
 	fprintf(tabout, ".nr TW +%d*\\n(%d\n", sep[ncol-1], TMP);
 fprintf(tabout,
- ".if t .if \\n(TW>\\n(.l .tm Table at line %d file %s is too wide - \\n(TW units\n", iline-1, ifile);
+ ".if t .if \\n(TW>\\n(.li .tm Table at line %d file %s is too wide - \\n(TW units\n", iline-1, ifile);
 return;
 }
 void
 wide(char *s, char *fn, char *size)
 {
-char space[40];
 if (point((intptr_t)s))
 	{
 	fprintf(tabout, "\\w%c", F1);
@@ -224,7 +218,7 @@ if (point((intptr_t)s))
 	fprintf(tabout, "%c",F1);
 	}
 else
-	fprintf(tabout, "%s", nreg(space, s, '-'));
+	fprintf(tabout, "\\n(%c-", (int)s);
 }
 int 
 filler(char *s)

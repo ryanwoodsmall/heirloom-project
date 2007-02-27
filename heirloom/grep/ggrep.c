@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)ggrep.c	1.26 (gritter) 1/4/05>	*/
+/*	Sccsid @(#)ggrep.c	1.22 (gritter) 11/21/04>	*/
 
 /*
  * Code for generic SVID3 grep only.
@@ -104,7 +104,7 @@ static void
 st_build(void)
 {
 	if (iflag)
-		e0->e_len = loconv(e0->e_pat, e0->e_pat, e0->e_len + 1) - 1;
+		loconv(e0->e_pat, e0->e_pat, e0->e_len + 1);
 	if ((c_exp = compile(e0->e_pat, NULL, NULL)) == NULL)
 		comperr(regerrno);
 }
@@ -130,14 +130,10 @@ st_select(void)
 void
 patstring(char *pat)
 {
-	long	len = strlen(pat);
-
 	e0 = (struct expr *)smalloc(sizeof *e0);
 	e0->e_nxt = NULL;
-	if (wflag)
-		wcomp(&pat, &len);
 	e0->e_pat = pat;
-	e0->e_len = len;
+	e0->e_len = strlen(pat);
 	e0->e_flg = E_NONE;
 	if (strchr(e0->e_pat, '\n')) {
 		fprintf(stderr, "%s: newline in RE not allowed\n", progname);
@@ -149,7 +145,7 @@ void
 init(void)
 {
 	st_select();
-	options = "bchilnrRsvwyz";
+	options = "bchilnrsvy";
 }
 
 void

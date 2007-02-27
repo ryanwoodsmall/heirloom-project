@@ -27,10 +27,7 @@
 # software developed by the University of California, Berkeley, and its
 # contributors.
 #
-# from OpenSolaris "DESC	1.5	05/06/08 SMI"	/* SVr4.0 1.1	*/
-#
-# Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
-#
+#ident	"@(#)DESC	1.5	05/06/08 SMI"	/* SVr4.0 1.1	*/
 # Description file for Postscript printers. The resolution and unitwidth have
 # been selected to match, in a sense, PostScript's default coordinate system
 # and the widths given in Adobe's Font manual.
@@ -41,8 +38,6 @@
 fonts 10 R I B BI CW H HB HX S1 S
 sizes 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 24 25 26 27 28 29 30 31 32 33 34 35 36 38 40 44 48 54 60 72 0
-anysize
-lc_ctype
 res 720
 hor 1
 vert 1
@@ -51,7 +46,7 @@ biggestfont 200
 charset
 hy ct fi fl ff Fi Fl dg em 14 34 12 \- en \' aa
 \` ga ru sc dd -> \e br Sl ps cs cy as os =. ld
-rd le ge pp -+ rs dq
+rd le ge pp -+
 sq bx ci fa te ** pl mi \< eq \> ~= *A *B *X *D
 *E *F *G *Y *I *K *L *M *N *O *P *R *H *S *T *U
 *W *C *Q *Z ul \_ rn *a *b *x *d *e *f *g *y *i

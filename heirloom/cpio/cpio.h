@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)cpio.h	1.28 (gritter) 2/24/07	*/
+/*	Sccsid @(#)cpio.h	1.26 (gritter) 6/27/04	*/
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -140,7 +140,6 @@ extern int		Bflag;
 extern int		cflag;
 extern int		Cflag;
 extern int		dflag;
-extern int		Dflag;
 extern int		eflag;
 extern int		cray_eflag;
 extern const char	*Eflag;
@@ -172,11 +171,7 @@ extern int		printsev;
 extern char		*progname;
 extern struct glist	*patterns;
 
-enum {			/* type of pax command this is */
-	PAX_TYPE_CPIO		= 0,	/* not a pax command */
-	PAX_TYPE_PAX1992	= 1,	/* POSIX.2 pax command */
-	PAX_TYPE_PAX2001	= 2	/* POSIX.1-2001 pax command */
-} pax;
+extern int		pax;
 extern int		pax_dflag;
 extern int		pax_kflag;
 extern int		pax_nflag;

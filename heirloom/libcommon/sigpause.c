@@ -19,10 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)sigpause.c	1.6 (gritter) 1/22/06	*/
+/*	Sccsid @(#)sigpause.c	1.4 (gritter) 11/7/04	*/
 
 #if defined (__FreeBSD__) || defined (__dietlibc__) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 #include <signal.h>
 #include "sigset.h"
 
@@ -44,5 +44,4 @@ sigpause(int sig)
 		ret = -1;
 	return ret;
 }
-#endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __OpenBSD__ ||
-	__DragonFly__ || __APPLE__ */
+#endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __OpenBSD__ */

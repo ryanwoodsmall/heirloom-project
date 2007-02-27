@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffdir.c	1.30 (gritter) 1/22/06>	*/
+/*	Sccsid @(#)diffdir.c	1.27 (gritter) 11/7/04>	*/
 /*	from 4.3BSD diffdir.c	4.9 (Berkeley) 8/28/84	*/
 
 #include "diff.h"
@@ -105,6 +105,7 @@
 
 struct dir {
 	unsigned long long	d_ino;
+	short	d_reclen;
 	char	*d_entry;
 };
 
@@ -185,11 +186,11 @@ diffdir(char **argv)
 	snprintf(procself, sizeof procself,
 #if defined (__linux__)
 			"/proc/%d/exe",
-#elif defined (__FreeBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__)
 			"/proc/%d/file",
-#else	/* !__linux__, !__FreeBSD__, !__APPLE__ */
+#else	/* !__linux__, !__FreeBSD__ */
 			"/proc/%d/object/a.out",
-#endif	/* !__linux__, !__FreeBSD__, !__APPLE__ */
+#endif	/* !__linux__, !__FreeBSD__ */
 			i);
 	setfile(&file1, &efile1, file1);
 	setfile(&file2, &efile2, file2);
@@ -348,6 +349,7 @@ setupdir(const char *cp)
 		if (xflag && xclude(rp->d_name))
 			continue;
 		ep = &dp[nitems++];
+		ep->d_reclen = rp->d_reclen;
 		ep->d_entry = 0;
 		ep->d_flags = 0;
 		ep->d_entry = dalloc(strlen(rp->d_name) + 1);
@@ -560,7 +562,7 @@ calldiff(const char *wantpr, char **argv)
 {
 	int pid, cstatus, cstatus2, pv[2];
 
-	if (wantpr == NULL && hflag == 0) {
+	if (wantpr == NULL) {
 		stackdiff(argv);
 		return;
 	}

@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tapecntl.sl	1.38 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)tapecntl.sl	1.33 (gritter) 11/7/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,8 +45,7 @@ static const char sccsid[] USED = "@(#)tapecntl.sl	1.38 (gritter) 1/22/06";
 #include <errno.h>
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) \
 	|| defined (__hpux) || defined (_AIX) || defined (__NetBSD__) \
-	|| defined (__OpenBSD__) || defined (__DragonFly__) \
-	|| defined (__APPLE__)
+	|| defined (__OpenBSD__)
 #include <sys/ioctl.h>
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
@@ -219,7 +218,7 @@ tape v%s usage:   %s [-<tape>] [-a arg] <command> [device]\n\
         setblk     - set block size (in bytes) for device\n\
         setcomp    - set compression (0 disabled, 1 enabled)\n\
         setdensity - set density code (in hexadecimal)\n",
-        "1.38",
+        "1.33",
         progname);
         exit(1);
 }
@@ -398,7 +397,10 @@ t_options(int argc, char **argv)
 			count = atoi(optarg);
 			break;
 		default:
-		usage:	fprintf(stderr, "Usage: %s [ -etrw ] [ -p arg ]\n",
+		usage:	fprintf(stderr,
+				"Usage: %s [ -etrwaluv ] "
+				"[ -p arg ] [ -d density_in_decimal ] "
+				"[ -f arg ] [ -c arg ] [ device ]\n",
 					progname);
 			exit(1);
 		}
@@ -578,8 +580,7 @@ stats(int fd)
 	stats_flags = md.options;
 	stats_density = md.default_density;
 }
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-	|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 static int
 process(int fd, enum oper op)
 {
@@ -784,7 +785,7 @@ main(int argc, char **argv)
 	if (progname[0] == 'm' && progname[1] == 't') {
 		mt = 1;
 		m_options(argc, argv);
-	} else if (strstr(progname, "cntl") == NULL) {
+	} else if (eq(progname, "tape")) {
 		tape_options(argc, argv);
 	} else
 		t_options(argc, argv);

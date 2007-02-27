@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.99 (gritter) 12/25/06
+ * Sccsid @(#)n4.c	1.5 (gritter) 8/8/05
  */
 
 /*
@@ -46,17 +46,12 @@
  * contributors.
  */
 
-#include	<stdlib.h>
-#include	<string.h>
 #include	<ctype.h>
-#include	<locale.h>
-#include	<limits.h>
-#include	<float.h>
 #include "tdef.h"
 #ifdef NROFF
 #include "tw.h"
 #endif
-#include "pt.h"
+#include "proto.h"
 #include "ext.h"
 /*
  * troff4.c
@@ -68,75 +63,16 @@
 int	regcnt = NNAMES;
 int	falsef	= 0;	/* on if inside false branch of if */
 #define	NHASH(i)	((i>>6)^i)&0177
-struct	numtab	**nhash;	/* size must be 128 == the 0177 on line above */
+struct	numtab	*nhash[128];	/* 128 == the 0177 on line above */
 
-static void	nrehash(struct numtab *, int, struct numtab **);
-static struct numtab	*_findr(register int i, int, int, int, int *);
-static struct acc	_atoi(int);
-static struct acc	_atoi0(int);
-static struct acc	ckph(int);
-static struct acc	atoi1(tchar, int);
-static struct acc	_inumb(int *, float *, int, int *);
-
-static void *
-_grownumtab(struct numtab **numtp, int *NNp, struct numtab ***hashp)
+void
+setn(void)
 {
-	int	i, j, inc = 20;
-	struct numtab	*onc;
-
-	onc = *numtp;
-	if ((*numtp = realloc(*numtp, (*NNp+inc) * sizeof *numtab)) == NULL)
-		return NULL;
-	memset(&(*numtp)[*NNp], 0, inc * sizeof *numtab);
-	if (*NNp == 0) {
-		if (numtp == &numtab)
-			for (i = 0; initnumtab[i].r; i++)
-				(*numtp)[i] = initnumtab[i];
-		if (*hashp == NULL)
-			*hashp = calloc(128, sizeof *hashp);
-		nrehash(*numtp, *NNp + inc, *hashp);
-	} else {
-		j = (char *)(*numtp) - (char *)onc;
-		for (i = 0; i < 128; i++)
-			if ((*hashp)[i])
-				(*hashp)[i] = (struct numtab *)
-					((char *)((*hashp)[i]) + j);
-		for (i = 0; i < *NNp; i++)
-			if ((*numtp)[i].link)
-				(*numtp)[i].link = (struct numtab *)
-					((char *)((*numtp)[i].link) + j);
-	}
-	*NNp += inc;
-	return *numtp;
-}
-
-void *
-grownumtab(void)
-{
-	return _grownumtab(&numtab, &NN, &nhash);
-}
-
-#define	TMYES	if (tm) return(1)
-#define	TMNO	if (tm) return(0)
-
-static int
-_setn(int tm)	/* tm: test for presence of readonly register */
-{
-	extern const char	revision[];
-	struct numtab	*numtp;
-	char	tb[30], *cp;
-	const char	*name;
-	struct s	*s;
-	register int i;
+	register int i, j;
 	register tchar ii;
-	int	f, j;
-	float	fl;
+	int	f;
 
 	f = nform = 0;
-	if (tm) {
-		i = tm;
-		goto sl;
-	}
 	if ((i = cbits(ii = getach())) == '+')
 		f = 1;
 	else if (i == '-')
@@ -145,16 +81,12 @@ _setn(int tm)	/* tm: test for presence of readonly register */
 		ch = ii;
 	if (falsef)
 		f = 0;
-	if ((i = getsn(1)) == 0)
-		return(0);
-sl:
-	name = macname(i);
-	if (i < 65536 && (i & 0177) == '.')
+	if ((i = getsn()) == 0)
+		return;
+	if ((i & 0177) == '.')
 		switch (i >> BYTE) {
 		case 's': 
-			i = fl = u2pts(pts);
-			if (i != fl)
-				goto flt;
+			i = pts;	
 			break;
 		case 'v': 
 			i = lss;		
@@ -178,8 +110,7 @@ sl:
 			i = in;		
 			break;
 		case '$': 
-			for (s = frame; s->loopf && s != stk; s = s->pframe);
-			i = s->nargs;
+			i = frame->nargs;		
 			break;
 		case 'A': 
 			i = ascii;		
@@ -206,19 +137,15 @@ sl:
 			i = fi;		
 			break;
 		case 'j': 
-			i = ad + 2 * admod + pa * 70;
+			i = ad + 2 * admod;	
 			break;
 		case 'w': 
 			i = widthp;
 			break;
 		case 'x': 
-			if (gflag)
-				goto s0;
-			i = nel - adspc;
+			i = nel;	
 			break;
 		case 'y': 
-			if (gflag)
-				goto s0;
 			i = un;		
 			break;
 		case 'T': 
@@ -231,22 +158,7 @@ sl:
 			i = HOR;		
 			break;
 		case 'k': 
-			if ((pa || padj) && pglines == 0) {
-				/* fake a value to make -mm work */
-				i = pgne % (ll - in);
-				if (i == 0 && pgne != 0)
-					i = 1;
-			} else
-				i = ne + adspc;		
-			if (gflag) {
-				if (ce || rj || !fi ? pendnf : pendw != NULL)
-					i += wne - wsp;
-				else if (nwd || pgchars) {
-					i += sps;
-					if (seflg || spflg)
-						i += ses;
-				}
-			}
+			i = ne;		
 			break;
 		case 'P': 
 			i = print;		
@@ -258,287 +170,37 @@ sl:
 			i = NN - regcnt;	
 			break;
 		case 'z': 
-			TMYES;
-			cpushback(macname(dip->curd));
-			return(0);
+			i = dip->curd;
+			*pbp++ = (i >> BYTE) & BYTEMASK;
+			*pbp++ = i & BYTEMASK;
+			return;
 		case 'b': 
 			i = bdtab[font];
 			break;
 		case 'F':
-			TMYES;
-			cpushback(cfname[ifi] ? cfname[ifi] : "");
-			return(0);
-		case 'X':
-			if (xflag) {
-				i = xflag;
-				break;
-			}
-			/*FALLTHRU*/
-		case 'Y':
-			if (xflag) {
-				TMYES;
-				cpushback((char *)revision);
-				return(0);
-			}
-			/*FALLTHRU*/
+			cpushback(cfname[ifi]);
+			return;
 
 		default:
 			goto s0;
 		}
-	else if (name[0] == '.') {
-		if (strcmp(&name[1], "warn") == 0)
-			i = warn;
-		else if (strcmp(&name[1], "vpt") == 0)
-			i = vpt;
-		else if (strcmp(&name[1], "ascender") == 0)
-			i = getascender();
-		else if (strcmp(&name[1], "descender") == 0)
-			i = getdescender();
-		else if (strcmp(&name[1], "fp") == 0)
-			i = nextfp();
-		else if (strcmp(&name[1], "ss") == 0)
-			i = spacesz;
-		else if (strcmp(&name[1], "sss") == 0)
-			i = sesspsz;
-		else if (strcmp(&name[1], "minss") == 0)
-			i = minspsz ? minspsz : spacesz;
-		else if (strcmp(&name[1], "lshmin") == 0) {
-			i = fl = 100 - lshmin / (LAFACT/100.0);
-			if (i != fl)
-				goto flt;
-		} else if (strcmp(&name[1], "lshmax") == 0) {
-			i = fl = 100 + lshmax / (LAFACT/100.0);
-			if (i != fl)
-				goto flt;
-		} else if (strcmp(&name[1], "lspmin") == 0) {
-			i = fl = 100 - lspmin / (LAFACT/100.0);
-			if (i != fl)
-				goto flt;
-		} else if (strcmp(&name[1], "lspmax") == 0) {
-			i = fl = 100 + lspmax / (LAFACT/100.0);
-			if (i != fl)
-				goto flt;
-		} else if (strcmp(&name[1], "letss") == 0)
-			i = letspsz;
-		else if (strcmp(&name[1], "hlm") == 0)
-			i = hlm;
-		else if (strcmp(&name[1], "hlc") == 0)
-			i = hlc;
-		else if (strcmp(&name[1], "lc_ctype") == 0) {
-			if ((cp = setlocale(LC_CTYPE, NULL)) == NULL)
-				cp = "C";
-			TMYES;
-			cpushback(cp);
-			return(0);
-		} else if (strcmp(&name[1], "hylang") == 0) {
-			TMYES;
-			if (hylang)
-				cpushback(hylang);
-			return(0);
-		} else if (strcmp(&name[1], "fzoom") == 0) {
-			i = fl = getfzoom();
-			if (i != fl)
-				goto flt;
-		} else if (strcmp(&name[1], "sentchar") == 0) {
-			TMYES;
-			if (sentch[0] == IMP)
-				/*EMPTY*/;
-			else if (sentch[0] == 0)
-				cpushback(".?!:");
-			else {
-				tchar	tc[NSENT+1];
-				for (i = 0; sentch[i] && i < NSENT; i++)
-					tc[i] = sentch[i];
-				tc[i] = 0;
-				pushback(tc);
-			}
-			return(0);
-		} else if (strcmp(&name[1], "transchar") == 0) {
-			tchar	tc[NSENT+1];
-			TMYES;
-			if (transch[0] == IMP)
-				/*EMPTY*/;
-			else if (transch[0] == 0) {
-				cpushback("\"')]*");
-				tc[0] = DAGGER;
-				tc[1] = 0;
-				pushback(tc);
-			} else {
-				for (i = 0; transch[i] && i < NSENT; i++)
-					tc[i] = transch[i];
-				tc[i] = 0;
-				pushback(tc);
-			}
-			return(0);
-		} else if (strcmp(&name[1], "breakchar") == 0) {
-			tchar	tc[NSENT+1];
-			TMYES;
-			if (breakch[0] == IMP)
-				/*EMPTY*/;
-			else if (breakch[0] == 0) {
-				tc[0] = EMDASH;
-				tc[1] = '-';
-				tc[2] = 0;
-				pushback(tc);
-			} else {
-				for (i = 0; breakch[i] && i < NSENT; i++)
-					tc[i] = breakch[i];
-				tc[i] = 0;
-				pushback(tc);
-			}
-			return(0);
-		} else if (strcmp(&name[1], "nhychar") == 0) {
-			tchar	tc[NSENT+1];
-			TMYES;
-			if (nhych[0] == IMP)
-				/*EMPTY*/;
-			else if (nhych[0] == 0) {
-				if (!hyext) {
-					tc[0] = EMDASH;
-					tc[1] = '-';
-					tc[2] = 0;
-					pushback(tc);
-				}
-			} else {
-				for (i = 0; nhych[i] && i < NSENT; i++)
-					tc[i] = nhych[i];
-				tc[i] = 0;
-				pushback(tc);
-			}
-			return(0);
-		} else if (strcmp(&name[1], "shc") == 0) {
-			tchar	tc[2];
-			TMYES;
-			tc[0] = shc ? shc : HYPHEN;
-			tc[1] = 0;
-			pushback(tc);
-			return(0);
-		} else if (strcmp(&name[1], "hylen") == 0) {
-			i = hylen;
-		} else if (strcmp(&name[1], "hypp") == 0) {
-			i = hypp;
-		} else if (strcmp(&name[1], "hypp2") == 0) {
-			i = hypp2;
-		} else if (strcmp(&name[1], "hypp3") == 0) {
-			i = hypp3;
-		} else if (strcmp(&name[1], "padj") == 0) {
-			i = padj;
-		} else if (strcmp(&name[1], "ev") == 0) {
-			TMYES;
-			cpushback(evname ? evname : "0");
-			return(0);
-		} else if (strcmp(&name[1], "ps") == 0) {
-			i = pts;
-#ifdef	NROFF
-			i *= INCH / 72;
-#endif	/* NROFF */
-		} else if (strcmp(&name[1], "tabs") == 0) {
-			TMYES;
-			for (i = 0; tabtab[i]; i++);
-			while (--i >= 0) {
-				cp = tb;
-				if (i)
-					*cp++ = ' ';
-				cp = roff_sprintf(cp, "%d", tabtab[i]&TABMASK);
-				*cp++ = 'u';
-				switch (tabtab[i] & ~TABMASK) {
-				case RTAB:
-					*cp++ = 'R';
-					break;
-				case CTAB:
-					*cp++ = 'C';
-					break;
-				}
-				*cp = 0;
-				cpushback(tb);
-			}
-			return(0);
-		} else if (strcmp(&name[1], "lpfx") == 0) {
-			TMYES;
-			if (lpfx)
-				pushback(lpfx);
-			return(0);
-		} else if (strcmp(&name[1], "ce") == 0)
-			i = ce;
-		else if (strcmp(&name[1], "rj") == 0)
-			i = rj;
-		else if (strcmp(&name[1], "brnl") == 0)
-			i = brnl;
-		else if (strcmp(&name[1], "brpnl") == 0)
-			i = brpnl;
-		else if (strcmp(&name[1], "cht") == 0)
-			i = cht;
-		else if (strcmp(&name[1], "cdp") == 0)
-			i = cdp;
-		else if (strcmp(&name[1], "in") == 0)
-			i = un;
-		else if (strcmp(&name[1], "hy") == 0)
-			i = hyf;
-		else if (strcmp(&name[1], "int") == 0)
-			i = ce || rj || !fi ? pendnf : pendw != NULL;
-		else if (strcmp(&name[1], "lt") == 0)
-			i = lt;
-		else if (strcmp(&name[1], "pn") == 0)
-			i = npnflg ? npn : numtab[PN].val + 1;
-		else if (strcmp(&name[1], "psr") == 0) {
-			i = apts;
-#ifdef	NROFF
-			i *= INCH / 72;
-#endif	/* NROFF */
-		} else if (strcmp(&name[1], "sr") == 0) {
-			i = fl = u2pts(apts);
-			if (i != fl)
-				goto flt;
-		} else if (strcmp(&name[1], "kc") == 0)
-			i = wne - wsp;
-		else if (strcmp(&name[1], "dilev") == 0)
-			i = dilev;
-		else if (strcmp(&name[1], "defpenalty") == 0)
-			i = dpenal ? dpenal - INFPENALTY0 - 1 : 0;
-		else
-			goto s0;
-	} else {
+	else {
 s0:
-		TMNO;
-		if ((numtp = _findr(i, 1, 2, 0, &j)) == NULL) {
-			if (j < 0) {
-				i = -j;
-				goto sl;
-			}
+		if ((j = findr(i)) == -1)
 			i = 0;
-		} else if (numtp->fmt == -1) {
-			fl = numtp->fval = numtp->fval + numtp->finc*f;
-			if (numtp->finc)
-				prwatchn(numtp);
-			goto flt;
-		} else {
-			i = numtp->val = numtp->val + numtp->inc*f;
-			if (numtp->inc)
-				prwatchn(numtp);
-			nform = numtp->fmt;
+		else {
+			i = numtab[j].val = (numtab[j].val+numtab[j].inc*f);
+			nform = numtab[j].fmt;
 		}
 	}
-	TMYES;
 	setn1(i, nform, (tchar) 0);
-	return(0);
-flt:
-	TMYES;
-	roff_sprintf(tb, "%g", fl);
-	cpushback(tb);
-	return(0);
-}
-
-void
-setn(void)
-{
-	_setn(0);
 }
 
 tchar	numbuf[17];
 tchar	*numbufp;
 
 int 
-wrc(tchar i)
+wrc(int i)
 {
 	if (numbufp >= &numbuf[16])
 		return(0);
@@ -561,22 +223,22 @@ setn1(int i, int form, tchar bits)
 }
 
 
-static void
-nrehash(struct numtab *numtp, int n, struct numtab **hashp)
+void
+nrehash(void)
 {
 	register struct numtab *p;
 	register int i;
 
 	for (i=0; i<128; i++)
-		hashp[i] = 0;
-	for (p=numtp; p < &numtp[n]; p++)
+		nhash[i] = 0;
+	for (p=numtab; p < &numtab[NN]; p++)
 		p->link = 0;
-	for (p=numtp; p < &numtp[n]; p++) {
+	for (p=numtab; p < &numtab[NN]; p++) {
 		if (p->r == 0)
 			continue;
 		i = NHASH(p->r);
-		p->link = hashp[i];
-		hashp[i] = p;
+		p->link = nhash[i];
+		nhash[i] = p;
 	}
 }
 
@@ -585,21 +247,10 @@ nunhash(register struct numtab *rp)
 {	
 	register struct numtab *p;
 	register struct numtab **lp;
-	struct numtab	**hashp;
-	struct s	*sp;
 
 	if (rp->r == 0)
 		return;
-	if (rp >= numtab && rp < &numtab[NN])
-		hashp = nhash;
-	else {
-		sp = macframe();
-		if (rp >= sp->numtab && rp < &sp->numtab[sp->NN])
-			hashp = sp->nhash;
-		else
-			return;
-	}
-	lp = &hashp[NHASH(rp->r)];
+	lp = &nhash[NHASH(rp->r)];
 	p = *lp;
 	while (p) {
 		if (p == rp) {
@@ -612,102 +263,50 @@ nunhash(register struct numtab *rp)
 	}
 }
 
-
-/*
- * Note: Pointers returned by findr(), usedr(), etc. may
- * become invalid after a following call to getch() or another
- * call to findr() since these may result in a number register
- * creation and following grownumtab().
- */
-struct numtab *
-findr(int i)
-{
-	return _findr(i, 0, 1, 0, NULL);
-}
-
-static struct numtab *
-findr1(struct numtab **numtp, int *NNp, struct numtab ***hashp,
-		register int i, int rd, int aln, int create, int *rop)
+int 
+findr(register int i)
 {
 	register struct numtab *p;
 	register int h = NHASH(i);
 
-	if (rop)
-		*rop = 0;
-	if (i == 0 || i == -2)
-		return(NULL);
-	if (*hashp != NULL) {
-		for (p = (*hashp)[h]; p; p = p->link)
-			if (i == p->r) {
-				if (p->aln < 0) {
-					if (aln > 1) {
-						if (rop)
-							*rop = p->aln;
-						return(NULL);
-					} else if (aln)
-						continue;
-				}
-				if (aln && p->aln > 0)
-					return(&(*numtp)[p->aln - 1]);
-				return(p);
-			}
+	if (i == 0)
+		return(-1);
+	for (p = nhash[h]; p; p = p->link)
+		if (i == p->r)
+			return(p - numtab);
+	for (p = numtab; p < &numtab[NN]; p++) {
+		if (p->r == 0) {
+			p->r = i;
+			p->link = nhash[h];
+			nhash[h] = p;
+			regcnt++;
+			return(p - numtab);
+		}
 	}
-	if (create) {
-		if (rd && warn & WARN_REG)
-			errprint("no such register %s", macname(i));
-		do {
-			for (p = *numtp; p < &(*numtp)[*NNp]; p++) {
-				if (p->r == 0) {
-					p->r = i;
-					p->link = (*hashp)[h];
-					(*hashp)[h] = p;
-					regcnt++;
-					if (*numtp != numtab)
-						p->flags |= FLAG_LOCAL;
-					return(p);
-				}
-			}
-		} while (p == &(*numtp)[*NNp] &&
-				_grownumtab(numtp, NNp, hashp) != NULL);
-		errprint("too many number registers (%d).", *NNp);
-		done2(04); 
-	}
-	return(NULL);
+	errprint("too many number registers (%d).", NN);
+	done2(04); 
+	/* NOTREACHED */
+	return 0;
 }
 
-static struct numtab *
-_findr(register int i, int rd, int aln, int forcecreate, int *rop)
-{
-	struct s	*sp;
-	struct numtab	*numtp;
-
-	if ((sp = macframe()) != stk) {
-		if ((numtp = findr1(&sp->numtab, &sp->NN, &sp->nhash,
-				i, rd, aln, forcecreate == 1, rop)) != NULL)
-			return numtp;
-	}
-	return findr1(&numtab, &NN, &nhash, i, rd, aln, forcecreate >= 0, rop);
-}
-
-
-static struct numtab *
-_usedr (	/* returns NULL if nr i has never been used */
-    register int i, int aln, int *rop
+int 
+usedr (	/* returns -1 if nr i has never been used */
+    register int i
 )
 {
-	return _findr(i, 0, aln, -1, rop);
-}
+	register struct numtab *p;
 
-
-struct numtab *
-usedr(int i)
-{
-	return _usedr(i, 1, NULL);
+	if (i == 0)
+		return(-1);
+	for (p = nhash[NHASH(i)]; p; p = p->link)
+		if (i == p->r)
+			return(p - numtab);
+	return -1;
 }
 
 
 int 
-fnumb(register int i, register int (*f)(tchar))
+fnumb(register int i, register int (*f)(int))
 {
 	register int j;
 
@@ -735,7 +334,7 @@ fnumb(register int i, register int (*f)(tchar))
 
 
 int 
-decml(register int i, register int (*f)(tchar))
+decml(register int i, register int (*f)(int))
 {
 	register int j, k;
 
@@ -748,7 +347,7 @@ decml(register int i, register int (*f)(tchar))
 
 
 int 
-roman(int i, int (*f)(tchar))
+roman(int i, int (*f)(int))
 {
 
 	if (!i)
@@ -761,7 +360,7 @@ roman(int i, int (*f)(tchar))
 
 
 int 
-roman0(int i, int (*f)(tchar), char *onesp, char *fivesp)
+roman0(int i, int (*f)(int), char *onesp, char *fivesp)
 {
 	register int q, rem, k;
 
@@ -788,7 +387,7 @@ roman0(int i, int (*f)(tchar), char *onesp, char *fivesp)
 
 
 int 
-abc(int i, int (*f)(tchar))
+abc(int i, int (*f)(int))
 {
 	if (!i)
 		return((*f)('0' | nrbits));
@@ -798,7 +397,7 @@ abc(int i, int (*f)(tchar))
 
 
 int 
-abc0(int i, int (*f)(tchar))
+abc0(int i, int (*f)(int))
 {
 	register int j, k;
 
@@ -808,133 +407,20 @@ abc0(int i, int (*f)(tchar))
 	return(k + (*f)((i % 26 + nform) | nrbits));
 }
 
-static int	illscale;
-static int	parlevel;
-static int	whitexpr;
-static int	empty;
-
-static tchar
-agetch(void)
-{
-	tchar	c;
-
-	for (;;) {
-		c = getch();
-		if (xflag == 0 || parlevel == 0 || cbits(c) != ' ')
-			break;
-		whitexpr++;
-	}
-	return c;
-}
-
-int
-atoi(void)
-{
-	struct acc	a;
-
-	lgf++;
-	a = _atoi(0);
-	lgf--;
-	return a.n;
-}
-
-float
-atof(void)
-{
-	struct acc	a;
-
-	lgf++;
-	a = _atoi(1);
-	lgf--;
-	return a.f;
-}
-
-static struct acc
-_atoi(int flt)
-{
-	struct acc	n;
-	int	c;
-
-	illscale = 0;
-	whitexpr = parlevel = 0;
-	empty = 1;
-	n = _atoi0(flt);
-	c = cbits(ch);
-	if (c == RIGHT) {
-		if (!empty && (nonumb || parlevel) && warn & WARN_RIGHT_BRACE)
-			errprint("\\} terminates numerical expression");
-	} else if (nonumb && c && c != ' ' && c != '\n' &&
-			warn & WARN_NUMBER && illscale == 0) {
-		if (c == 'T' && Tflg)
-			/*EMPTY*/;
-		else if ((c & ~0177) == 0 && isprint(c))
-			errprint("illegal number, char %c", c);
-		else
-			errprint("illegal number");
-	} else if (warn & WARN_SYNTAX) {
-		if (parlevel > 0)
-			errprint("missing ')'");
-		if (parlevel < 0)
-			errprint("excess ')'");
-		if (xflag && whitexpr && parlevel)
-			nonumb = 1;
-	}
-	if (flt) {
-		if (!nonumb && (n.f<0 && n.f<-FLT_MAX || n.f>0 && n.f>FLT_MAX)) {
-			if (warn & WARN_NUMBER)
-				errprint("floating-point arithmetic overflow");
-			if (xflag)
-				nonumb = 1;
-		}
-	} else {
-		if (!nonumb && (n.n<0 && n.n <INT_MIN || n.n>0 && n.n>INT_MAX)) {
-			if (warn & WARN_NUMBER)
-				errprint("arithmetic overflow");
-			if (xflag)
-				nonumb = 1;
-		}
-	}
-	return n;
-}
-
-long long
+long 
 atoi0(void)
-{
-	struct acc	a;
-
-	whitexpr = parlevel = 0;
-	lgf++;
-	a = _atoi0(0);
-	lgf--;
-	return a.n;
-}
-
-double
-atof0(void)
-{
-	struct acc	a;
-
-	whitexpr = parlevel = 0;
-	lgf++;
-	a = _atoi0(0);
-	lgf--;
-	return a.f;
-}
-
-static struct acc
-_atoi0(int flt)
 {
 	register int c, k, cnt;
 	register tchar ii;
-	struct acc	i, acc;
+	long	i, acc;
 
-	i.f = i.n = 0; 
-	acc.f = acc.n = 0;
+	i = 0; 
+	acc = 0;
 	nonumb = 0;
 	cnt = -1;
 a0:
 	cnt++;
-	ii = agetch();
+	ii = getch();
 	c = cbits(ii);
 	switch (c) {
 	default:
@@ -942,241 +428,162 @@ a0:
 		if (cnt)
 			break;
 	case '+':
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		acc.n += i.n;
-		if (flt) acc.f += i.f;
+		acc += i;
 		goto a0;
 	case '-':
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		acc.n -= i.n;
-		if (flt) acc.f -= i.f;
+		acc -= i;
 		goto a0;
 	case '*':
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		if (!flt) acc.n *= i.n;
-		if (flt) acc.f *= i.f;
+		acc *= i;
 		goto a0;
 	case '/':
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		if (!flt && i.n == 0 || flt && i.f == 0) {
+		if (i == 0) {
 			flusho();
 			errprint("divide by zero.");
-			acc.n = 0;
-			if (flt) acc.f = 0;
-		} else  {
-			if (!flt) acc.n /= i.n;
-			if (flt) acc.f /= i.f;
-		}
+			acc = 0;
+		} else 
+			acc /= i;
 		goto a0;
 	case '%':
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		if (flt) acc.n = acc.f, i.n = i.f;
-		acc.n %= i.n;
-		if (flt) acc.f = acc.n;
+		acc %= i;
 		goto a0;
 	case '&':	/*and*/
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		if ((acc.n > 0) && (i.n > 0))
-			acc.n = 1; 
+		if ((acc > 0) && (i > 0))
+			acc = 1; 
 		else 
-			acc.n = 0;
-		if (flt) acc.f = acc.n;
+			acc = 0;
 		goto a0;
 	case ':':	/*or*/
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb)
 			break;
-		if ((acc.n > 0) || (i.n > 0))
-			acc.n = 1; 
+		if ((acc > 0) || (i > 0))
+			acc = 1; 
 		else 
-			acc.n = 0;
-		if (flt) acc.f = acc.n;
+			acc = 0;
 		goto a0;
 	case '=':
 		if (cbits(ii = getch()) != '=')
 			ch = ii;
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb) {
-			acc.n = 0; 
-			if (flt) acc.f = 0;
+			acc = 0; 
 			break;
 		}
-		acc.n = i.n == acc.n;
-		if (flt) acc.f = i.f == acc.f;
+		if (i == acc)
+			acc = 1;
+		else 
+			acc = 0;
 		goto a0;
 	case '>':
 		k = 0;
 		if (cbits(ii = getch()) == '=')
 			k++; 
-		else if (xflag && cbits(ii) == '?')
-			goto maximum;
 		else 
 			ch = ii;
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb) {
-			acc.n = 0; 
-			if (flt) acc.f = 0;
+			acc = 0; 
 			break;
 		}
-		if (!flt) {
-			if (acc.n > (i.n - k))
-				acc.n = 1; 
-			else 
-				acc.n = 0;
-		} else
-			acc.f = k ? acc.f >= i.f : acc.f > i.f;
-		goto a0;
-	maximum:
-		i = ckph(flt);
-		if (nonumb) {
-			acc.n = 0; 
-			if (flt) acc.f = 0;
-			break;
-		}
-		if (i.n > acc.n)
-			acc.n = i.n;
-		if (flt && i.f > acc.f)
-			acc.f = i.f;
+		if (acc > (i - k))
+			acc = 1; 
+		else 
+			acc = 0;
 		goto a0;
 	case '<':
 		k = 0;
 		if (cbits(ii = getch()) == '=')
 			k++; 
-		else if (xflag && cbits(ii) == '?')
-			goto minimum;
-		else if (xflag && cbits(ii) == '>')
-			goto notequal;
 		else 
 			ch = ii;
-		i = ckph(flt);
+		i = ckph();
 		if (nonumb) {
-			acc.n = 0; 
-			if (flt) acc.f = 0;
+			acc = 0; 
 			break;
 		}
-		if (!flt) {
-			if (acc.n < (i.n + k))
-				acc.n = 1; 
-			else 
-				acc.n = 0;
-		} else
-			acc.f = k ? acc.f <= i.f : acc.f < i.f;
-		goto a0;
-	minimum:
-		i = ckph(flt);
-		if (nonumb) {
-			acc.n = 0; 
-			if (flt) acc.f = 0;
-			break;
-		}
-		if (i.n < acc.n)
-			acc.n = i.n;
-		if (flt && i.f < acc.f)
-			acc.f = i.f;
-		goto a0;
-	notequal:
-		i = ckph(flt);
-		if (nonumb) {
-			acc.n = 0; 
-			if (flt) acc.f = 0;
-			break;
-		}
-		acc.n = i.n != acc.n;
-		if (flt) acc.f = i.f != acc.f;
+		if (acc < (i + k))
+			acc = 1; 
+		else 
+			acc = 0;
 		goto a0;
 	case ')': 
-		parlevel--;
 		break;
 	case '(':
-		parlevel++;
-		acc = _atoi0(flt);
+		acc = atoi0();
 		goto a0;
 	}
 	return(acc);
 }
 
 
-static struct acc
-ckph(int flt)
+long 
+ckph(void)
 {
 	register tchar i;
-	struct acc	j;
+	register long	j;
 
-	if (cbits(i = agetch()) == '(') {
-		parlevel++;
-		j = _atoi0(flt);
-	} else {
-		j = atoi1(i, flt);
+	if (cbits(i = getch()) == '(')
+		j = atoi0();
+	else {
+		j = atoi1(i);
 	}
 	return(j);
 }
 
 
-static struct acc
-atoi1(register tchar ii, int flt)
+long 
+atoi1(register tchar ii)
 {
 	register int i, j, digits;
-	struct acc	acc;
+	register long	acc;
 	int	neg, abs, field;
-	int	_noscale = 0, scale;
-	double	e, f;
 
 	neg = abs = field = digits = 0;
-	acc.f = acc.n = 0;
+	acc = 0;
 	for (;;) {
 		i = cbits(ii);
 		switch (i) {
 		default:
 			break;
 		case '+':
-			ii = agetch();
+			ii = getch();
 			continue;
 		case '-':
 			neg = 1;
-			ii = agetch();
+			ii = getch();
 			continue;
 		case '|':
 			abs = 1 + neg;
 			neg = 0;
-			ii = agetch();
+			ii = getch();
 			continue;
 		}
 		break;
-	}
-	if (xflag && i == '(') {
-		parlevel++;
-		acc = _atoi0(flt);
-		e = 1;
-		i = j = 1;
-		field = -1;
-		goto aa;
 	}
 a1:
 	while (i >= '0' && i <= '9') {
 		field++;
 		digits++;
-		if (!flt)
-			acc.n = 10 * acc.n + i - '0';
-		else if (field == digits)
-			acc.f = 10 * acc.f + i - '0';
-		else {
-			f = i - '0';
-			for (j = 0; j < digits; j++)
-				f /= 10;
-			acc.f += f;
-		}
+		acc = 10 * acc + i - '0';
 		ii = getch();
 		i = cbits(ii);
 	}
@@ -1187,37 +594,11 @@ a1:
 		i = cbits(ii);
 		goto a1;
 	}
-	e = 1;
-	if (xflag && digits && (i == 'e' || i == 'E')) {
-		if ((i = cbits(ii = getch())) == '+')
-			j = 1;
-		else if (i == '-')
-			j = -1;
-		else if (i >= '0' && i <= '9') {
-			j = 1;
-			ch = ii;
-		} else {
-			ch = ii;
-			field = 0;
-			goto a2;
-		}
-		f = 0;
-		while ((i = cbits(ii = getch())) >= '0' && i <= '9')
-			f = f * 10 + i - '0';
-		while (f-- > 0)
-			e *= 10;
-		if (j < 0)
-			e = 1/e;
-	}
-	if ((!xflag || !parlevel) && !field) {
+	if (!field) {
 		ch = ii;
 		goto a2;
 	}
-	switch (scale = i) {
-	case 's':
-		if (!xflag)
-			goto dfl;
-		/*FALLTHRU*/
+	switch (i) {
 	case 'u':
 		i = j = 1;	/* should this be related to HOR?? */
 		break;
@@ -1238,10 +619,6 @@ a1:
 		i = 1;	/*Same as Ems in NROFF*/
 #endif
 		break;
-	case 'z':
-		if (!xflag)
-			goto dfl;
-		/*FALLTHRU*/
 	case 'p':	/*Points*/
 		j = INCH;
 		i = 72;
@@ -1259,100 +636,19 @@ a1:
 		j = INCH;
 		i = 6;
 		break;
-	case 'D':	/* Didot points */
-		if (!xflag)
-			goto dfl;
-		j = INCH * 24;	/* following H. R. Bosshard, */
-		i = 1621;	/* Technische Grundlagen zur */
-		break;		/* Satzherstellung, Berne 1980, p. 17 */
-	case 'C':	/* Cicero */
-		if (!xflag)
-			goto dfl;
-		j = INCH * 24 * 12;
-		i = 1621;
-		break;
-	case 't':	/* printer's points */
-		if (!xflag)
-			goto dfl;
-		j = INCH * 100;	/* following Knuth */
-		i = 7227;
-		break;
-	case 'T':	/* printer's picas */
-		if (!xflag)
-			goto dfl;
-		j = INCH * 100 * 4;
-		i = 2409;
-		break;
-	case 'M':	/*Ems/100*/
-		if (!xflag)
-			goto dfl;
-		j = EM;
-		i = 100;
-		break;
-	case ';':
-		if (!xflag)
-			goto dfl;
-		i = j = 1;
-		_noscale = 1;
-		goto newscale;
 	default:
-	dfl:	if (!field) {
-			ch = ii;
-			goto a2;
-		}
-		if ((i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') &&
-				warn & WARN_SCALE) {
-			errprint("undefined scale indicator %c", i);
-			illscale = 1;
-		} else
-			scale = 0;
 		j = dfact;
 		ch = ii;
 		i = dfactd;
 	}
-	if (!field) {
-		tchar	t, tp[2];
-		int	f, d, n;
-		t = getch();
-		if (cbits(t) != ';') {
-			tp[0] = t;
-			tp[1] = 0;
-			pushback(tp);
-			ch = ii;
-			goto a2;
-		}
-	newscale:
-		/* (c;e) */
-		f = dfact;
-		d = dfactd;
-		n = noscale;
-		dfact = j;
-		dfactd = i;
-		noscale = _noscale;
-		acc = _atoi0(flt);
-		dfact = f;
-		dfactd = d;
-		noscale = n;
-		return(acc);
-	}
-	if (noscale && scale && warn & WARN_SYNTAX)
-		errprint("ignoring scale indicator %c", scale);
-aa:
-	if (neg) {
-		acc.n = -acc.n;
-		if (flt) acc.f = -acc.f;
-	}
+	if (neg) 
+		acc = -acc;
 	if (!noscale) {
-		if (!flt) acc.n = (acc.n * j) / i;
-		if (flt) acc.f = (acc.f * j) / i;
+		acc = (acc * j) / i;
 	}
-	if (!flt && (field != digits) && (digits > 0))
+	if ((field != digits) && (digits > 0))
 		while (digits--)
-			acc.n /= 10;
-	if (e != 1) {
-		if (!flt) acc.n = (int)(e * acc.n);
-		if (flt) acc.f *= e;
-	}
+			acc /= 10;
 	if (abs) {
 		if (dip != d)
 			j = dip->dnl; 
@@ -1363,225 +659,54 @@ aa:
 		}
 		if (abs == 2)
 			j = -j;
-		acc.n -= j;
-		if (flt) acc.f -= j;
+		acc -= j;
 	}
 a2:
 	nonumb = !field;
-	if (empty)
-		empty = !field;
 	return(acc);
 }
 
 
 void
-setnr(const char *name, int val, int inc)
+caserr(void)
 {
-	int	j;
-	struct numtab	*numtp;
+	register int i, j;
+	register struct numtab *p;
 
-	if ((j = makerq(name)) < 0)
-		return;
-	if ((numtp = findr(j)) == NULL)
-		return;
-	numtp->val = val;
-	numtp->inc = inc;
-	if (numtp->fmt == -1)
-		numtp->fmt = 0;
-	prwatchn(numtp);
-}
-
-void
-setnrf(const char *name, float val, float inc)
-{
-	int	j;
-	struct numtab	*numtp;
-
-	if ((j = makerq(name)) < 0)
-		return;
-	if ((numtp = findr(j)) == NULL)
-		return;
-	numtp->val = numtp->fval = val;
-	numtp->inc = numtp->finc = inc;
-	numtp->fmt = -1;
-	prwatchn(numtp);
-}
-
-
-static void
-clrnr(struct numtab *p)
-{
-	if (p != NULL) {
-		memset(p, 0, sizeof *p);
+	lgf++;
+	while (!skip() && (i = getrq()) ) {
+		j = usedr(i);
+		if (j < 0)
+			continue;
+		p = &numtab[j];
+		nunhash(p);
+		p->r = p->val = p->inc = p->fmt = 0;
 		regcnt--;
 	}
 }
 
-void
-caserr(void)
-{
-	register int i;
-	struct numtab	*p, *kp;
-	int cnt = 0;
-
-	lgf++;
-	while (!skip(!cnt++) && (i = getrq(2)) ) {
-		p = _usedr(i, 0, NULL);
-		if (p == NULL)
-			continue;
-		nunhash(p);
-		if (p->aln && (kp = _usedr(i, 1, NULL)) != NULL) {
-			if (--kp->nlink <= 0)
-				clrnr(kp);
-		}
-		if (p->flags & FLAG_WATCH)
-			errprint("%s: removing %sregister %s", macname(lastrq),
-					p->flags & FLAG_LOCAL ? "local " : "",
-					macname(i));
-		if (p->nlink > 0)
-			p->nlink--;
-		if (p->nlink == 0)
-			clrnr(p);
-		else
-			p->r = -1;
-	}
-}
-
-
-void
-casernn(void)
-{
-	int	i, j, flags;
-	struct numtab	*kp, *numtp;
-
-	lgf++;
-	skip(1);
-	if ((i = getrq(0)) == 0)
-		return;
-	skip(1);
-	j = getrq(1);
-	if ((kp = _usedr(i, 0, NULL)) == NULL) {
-		if (warn & WARN_REG)
-			errprint("no such register %s", macname(i));
-		return;
-	}
-	flags = kp->flags;
-	numtp = _findr(j, 0, 0, flags & FLAG_LOCAL, NULL);
-	if (numtp != NULL) {
-		if (numtp->nlink) {
-			numtp->nlink--;
-			numtp->r = -1;
-		}
-		numtp = _findr(j, 0, 0, flags & FLAG_LOCAL, NULL);
-	}
-	kp = _usedr(i, 0, NULL);
-	if (numtp != NULL) {
-		*numtp = *kp;
-		numtp->r = j;
-	}
-	clrnr(kp);
-	if (numtp->flags & FLAG_WATCH)
-		errprint("%s: renaming %sregister %s to %s", macname(lastrq),
-				numtp->flags & FLAG_LOCAL ? "local " : "",
-				macname(i), macname(j));
-}
-
-
-void
-setr(void)
-{
-	int	termc, j, rq;
-	struct numtab	*numtp;
-
-	lgf++;
-	termc = getach();
-	rq = getrq(3);
-	lgf--;
-	if (skip(1) || (numtp = findr(rq)) == NULL)
-		return;
-	j = inumb(&numtp->val);
-	if (nonumb)
-		return;
-	if (getach() != termc) {
-		nodelim(termc);
-		return;
-	}
-	numtp = findr(rq);	/* twice because of getch() before */
-	numtp->val = j;
-	if (numtp->fmt == -1)
-		numtp->fmt = 0;
-	prwatchn(numtp);
-}
-
-static void
-casnr1(int flt, int local)
-{
-	register int j, rq;
-	struct acc	a;
-	struct numtab	*numtp;
-
-	lgf++;
-	skip(1);
-	rq = getrq(3);
-	skip(!local);
-	if ((numtp = _findr(rq, 0, 1, local, NULL)) == NULL)
-		goto rtn;
-	a = _inumb(&numtp->val, flt ? &numtp->fval : NULL, flt, NULL);
-	if (nonumb)
-		goto rtn;
-	numtp = _findr(rq, 0, 1, local, NULL);
-	numtp->val = a.n;
-	if (flt) {
-		numtp->fval = a.f;
-		numtp->fmt = -1;
-	} else if (numtp->fmt == -1)
-		numtp->fmt = 0;
-	/*
-	 * It is common use in pre-processors and macro packages
-	 * to append a unit definition to a user-supplied number
-	 * in order to achieve a default scale. Catch this case
-	 * now to avoid a warning because of an illegal number.
-	 */
-	j = cbits(ch);
-	if ((j >= 'a' && j <= 'z' || j >= 'A' && j <= 'Z') &&
-			warn & WARN_SCALE)
-		goto rtns;
-	skip(0);
-	a = _atoi(flt);
-	if (nonumb)
-		goto rtns;
-	numtp = _findr(rq, 0, 1, local, NULL);
-	numtp->inc = a.n;
-	if (flt)
-		numtp->finc = a.f;
-rtns:
-	prwatchn(numtp);
-rtn:
-	return;
-}
 
 void
 casenr(void)
 {
-	casnr1(0, 0);
-}
+	register int i, j;
 
-void
-casenrf(void)
-{
-	casnr1(1, 0);
-}
-
-void
-caselnr(void)
-{
-	casnr1(0, macframe() != stk);
-}
-
-void
-caselnrf(void)
-{
-	casnr1(1, macframe() != stk);
+	lgf++;
+	skip();
+	if ((i = findr(getrq())) == -1)
+		goto rtn;
+	skip();
+	j = inumb(&numtab[i].val);
+	if (nonumb)
+		goto rtn;
+	numtab[i].val = j;
+	skip();
+	j = atoi();
+	if (nonumb)
+		goto rtn;
+	numtab[i].inc = j;
+rtn:
+	return;
 }
 
 
@@ -1590,12 +715,9 @@ caseaf(void)
 {
 	register int i, k;
 	register tchar j, jj;
-	struct numtab	*numtp;
 
 	lgf++;
-	if (skip(1) || !(i = getrq(3)))
-		return;
-	if (skip(1))
+	if (skip() || !(i = getrq()) || skip())
 		return;
 	k = 0;
 	j = getch();
@@ -1606,154 +728,22 @@ caseaf(void)
 	}
 	if (!k)
 		k = j;
-	numtp = findr(i);
-	if (numtp->fmt == -1) {
-		if (warn & WARN_RANGE)
-			errprint("cannot change format of floating-point register");
-		return;
-	}
-	numtp->fmt = k & BYTEMASK;
-	if (numtp->flags & FLAG_WATCH) {
-		char	b[40];
-		int	x;
-		if (k & BYTEMASK > ' ') {
-			b[0] = k & BYTEMASK;
-			b[1] = 0;
-		} else {
-			for (x = 0; x < k; x++)
-				b[x] = '0';
-			b[x] = 0;
-		}
-		errprint("%s: format of %sregister %s set to %s",
-				macname(lastrq),
-				numtp->flags & FLAG_LOCAL ? "local " : "",
-				macname(i), b);
-	}
+	numtab[findr(i)].fmt = k & BYTEMASK;
 }
 
 void
 setaf (void)	/* return format of number register */
 {
-	register int j;
-	struct numtab	*numtp;
+	register int i, j;
 
-	numtp = usedr(getsn(0));
-	if (numtp == NULL)
+	i = usedr(getsn());
+	if (i == -1)
 		return;
-	if (numtp->fmt > 20)	/* it was probably a, A, i or I */
-		pbbuf[pbp++] = numtp->fmt;
-	else if (numtp->fmt == -1)
-		pbbuf[pbp++] = '0';
-	else {
-		for (j = (numtp->fmt ? numtp->fmt : 1); j; j--) {
-			if (pbp >= pbsize-3)
-				if (growpbbuf() == NULL) {
-					errprint("no space for .af");
-					done(2);
-				}
-			pbbuf[pbp++] = '0';
-		}
-	}
-}
-
-
-void
-casealn(void)
-{
-	int	c, i, j, k;
-	int	flags, local = 0;
-	struct numtab	*op, *rp = NULL;
-
-	if (skip(1))
-		return;
-	i = getrq(1);
-	if (skip(1))
-		return;
-	j = getrq(1);
-	for (c = 0; ; c++) {
-		if (((op = _usedr(j, 2, &k)) == NULL)) {
-			if (k < -1)
-				/*EMPTY*/;
-			else if (_setn(j))
-				k = -j;
-			else {
-				if (warn & WARN_REG)
-					errprint("no such register %s",
-							macname(j));
-				return;
-			}
-		}
-		if (c)
-			break;
-		local = op != NULL && op->flags & FLAG_LOCAL;
-		if ((rp = _findr(i, 0, 0, local, NULL)) == NULL)
-			return;
-	}
-	if (op != NULL) {
-		rp->aln = op - (local ? macframe()->numtab : numtab) + 1;
-		if (op->nlink == 0)
-			op->nlink = 1;
-		op->nlink++;
-	} else
-		rp->aln = k;
-	flags = rp->flags;
-	if (op != NULL)
-		flags |= op->flags;
-	if (flags & FLAG_WATCH)
-		errprint("%s: creating alias %s to %sregister %s",
-				macname(lastrq), macname(i),
-				op->flags & FLAG_LOCAL ? "local " : "",
-				macname(j));
-}
-
-
-void
-casewatchn(int unwatch)
-{
-	int	j;
-	struct numtab	*numtp;
-
-	lgf++;
-	if (skip(1))
-		return;
-	do {
-		if (!(j = getrq(1)) || (numtp = findr(j)) == NULL)
-			break;
-		if (unwatch)
-			numtp->flags &= ~FLAG_WATCH;
-		else
-			numtp->flags |= FLAG_WATCH;
-	} while (!skip(0));
-}
-
-
-void
-caseunwatchn(void)
-{
-	casewatchn(1);
-}
-
-
-void
-prwatchn(struct numtab *numtp)
-{
-	char	*local;
-
-	if (numtp == NULL)
-		return;
-	local = numtp->flags & FLAG_LOCAL ? "local " : "";
-	if (numtp->flags & FLAG_WATCH) {
-		if (numtp->fmt == -1)
-			errprint("%s: %sfloating-point register %s set to %g, increment %g",
-					macname(lastrq), local,
-					macname(numtp->r),
-					numtp->fval, numtp->finc);
-		else
-			errprint("%s: %sregister %s set to %d, increment %d",
-					macname(lastrq), local,
-					macname(numtp->r),
-					numtp->val, numtp->inc);
-	}
+	if (numtab[i].fmt > 20)	/* it was probably a, A, i or I */
+		*pbp++ = numtab[i].fmt;
+	else
+		for (j = (numtab[i].fmt ? numtab[i].fmt : 1); j; j--)
+			*pbp++ = '0';
 }
 
 
@@ -1779,37 +769,11 @@ hnumb(int *i)
 int 
 inumb(int *n)
 {
-	struct acc	a;
-
-	a = _inumb(n, NULL, 0, NULL);
-	return a.n;
-}
-
-
-int
-inumb2(int *n, int *relative)
-{
-	struct acc	a;
-
-	a = _inumb(n, NULL, 0, relative);
-	return a.n;
-}
-
-static struct acc
-_inumb(int *n, float *fp, int flt, int *relative)
-{
-	struct acc	i;
-	register int j, f;
+	register int i, j, f;
 	register tchar ii;
-	int	nv = 0;
-	float	fv = 0;
 
 	f = 0;
-	lgf++;
 	if (n) {
-		nv = *n;
-		if (fp)
-			fv = *fp;
 		if ((j = cbits(ii = getch())) == '+')
 			f = 1;
 		else if (j == '-')
@@ -1817,40 +781,15 @@ _inumb(int *n, float *fp, int flt, int *relative)
 		else 
 			ch = ii;
 	}
-	i = _atoi(flt);
-	lgf--;
-	if (n && f && !flt)
-		i.n = nv + f * i.n;
-	if (fp && f && flt)
-		i.f = fv + f * i.f;
-	if (!flt) i.n = quant(i.n, res);
+	i = atoi();
+	if (n && f)
+		i = *n + f * i;
+	i = quant(i, res);
 	vflag = 0;
 	res = dfactd = dfact = 1;
-	if (nonumb) {
-		i.n = 0;
-		if (flt) i.f = 0;
-	}
-	if (relative)
-		*relative = f;
+	if (nonumb)
+		i = 0;
 	return(i);
-}
-
-
-float
-atop(void)
-{
-	float	t;
-
-	noscale++;
-	t = atof();
-	noscale--;
-	if (t < -INFPENALTY)
-		t = -INFPENALTY;
-	else if (t > INFPENALTY)
-		t = INFPENALTY;
-	else
-		t *= PENALSCALE;
-	return t;
 }
 
 
@@ -1875,10 +814,3 @@ quant(int n, int m)
 }
 
 
-tchar
-moflo(int n)
-{
-	if (warn & WARN_RANGE)
-		errprint("value too large for motion");
-	return sabsmot(MAXMOT);
-}

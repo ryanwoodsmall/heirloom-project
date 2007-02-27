@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.c	1.14 (gritter) 12/25/06
+ * Sccsid @(#)misc.c	1.3 (gritter) 8/9/05
  */
 
 /*
@@ -54,11 +54,10 @@
 #include "gen.h"			/* a few general purpose definitions */
 #include "ext.h"			/* external variable declarations */
 #include "path.h"
-#include "asciitype.h"
 
 
-static int	nolist = 0;		/* number of specified ranges */
-static int	olist[512];		/* processing range pairs */
+int	nolist = 0;			/* number of specified ranges */
+int	olist[50];			/* processing range pairs */
 
 
 void
@@ -86,8 +85,6 @@ error(int kind, char *mesg, ...)
 	    fprintf(stderr, " (line %ld)", lineno);
 	if ( position > 0 )
 	    fprintf(stderr, " (near byte %ld)", position);
-	if ( printed > 0 )
-	    fprintf(stderr, " (page %d)", printed);
 	putc('\n', stderr);
     }	/* End if */
 
@@ -101,24 +98,6 @@ error(int kind, char *mesg, ...)
 
 
 /*****************************************************************************/
-/* for the AFM handling functions from troff */
-void
-verrprint(char *fmt, va_list ap)
-{
-    fprintf(stderr, "%s: ", prog_name);
-    vfprintf(stderr, fmt, ap);
-    putc('\n', stderr);
-}
-
-void
-errprint(char *fmt, ...)
-{
-    va_list	ap;
-
-    va_start(ap, fmt);
-    verrprint(fmt, ap);
-    va_end(ap);
-}
 
 /*****************************************************************************/
 
@@ -204,8 +183,7 @@ in_olist (
 
 int 
 cat (
-    char *file,			/* copy this file to out */
-    FILE *out
+    char *file			/* copy this file to stdout */
 )
 
 
@@ -226,12 +204,12 @@ cat (
  */
 
 
-    fflush(out);
+    fflush(stdout);
 
     if ( (fd_in = open(file, O_RDONLY)) == -1 )
 	return(FALSE);
 
-    fd_out = fileno(out);
+    fd_out = fileno(stdout);
     while ( (count = read(fd_in, buf, sizeof(buf))) > 0 )
 	write(fd_out, buf, count);
 
@@ -282,10 +260,10 @@ str_convert (
 
 
 
-void interrupt(
+void interrupt(sig)
 
 
-    int		sig)			/* signal that we caught */
+    int		sig;			/* signal that we caught */
 
 
 {
@@ -312,82 +290,9 @@ void interrupt(
 char *
 tempname(const char *sfx)
 {
-    char *pat = malloc(strlen(TEMPDIR) + strlen(sfx) + 10);
-    sprintf(pat, "%s/%sXXXXXX", TEMPDIR, sfx);
-    if (close(mkstemp(pat)) < 0)
-	return NULL;
-    return pat;
-}
-
-
-/*****************************************************************************/
-
-
-#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
-#undef	getc
-#define	getc(f)		_IO_getc_unlocked(f)
-#endif
-
-#define	LSIZE	512
-
-int psskip(size_t n, FILE *fp)
-{
-    return fseek(fp, n, SEEK_CUR);
-}
-
-char *psgetline(char **line, size_t *linesize, size_t *llen, FILE *fp)
-{
-    int c;
-    size_t n = 0;
-    int nl = 0;
-
-    if (*line == NULL || *linesize < LSIZE + n + 1)
-	*line = realloc(*line, *linesize = LSIZE + n + 1);
-    for (;;) {
-	if (n >= *linesize - LSIZE / 2)
-	    *line = realloc(*line, *linesize += LSIZE);
-	c = getc(fp);
-	if (c != EOF) {
-	    if (nl && c != '\n') {
-		ungetc(c, fp);
-		break;
-	    }
-	    (*line)[n++] = c;
-	    (*line)[n] = '\0';
-	    if (c == '\n')
-		break;
-	    if (c == '\r')
-		nl = 1;
-	} else {
-	    if (n > 0)
-		break;
-	    else
+	char *pat = malloc(strlen(TEMPDIR) + strlen(sfx) + 10);
+	sprintf(pat, "%s/%sXXXXXX", TEMPDIR, sfx);
+	if (close(mkstemp(pat)) < 0)
 		return NULL;
-	}
-    }
-    if (llen)
-	*llen = n;
-    return *line;
-}
-
-
-/*****************************************************************************/
-
-
-int
-sget(char *buf, size_t size, FILE *fp)
-{
-    int	c, n = 0;
-
-    do
-	c = getc(fp);
-    while (spacechar(c));
-    if (c != EOF) do {
-	if (n+1 < size)
-	    buf[n++] = c;
-	c = getc(fp);
-    } while (c != EOF && !spacechar(c));
-    ungetc(c, fp);
-    buf[n] = 0;
-    return n > 1 ? 1 : c == EOF ? EOF : 0;
+	return pat;
 }

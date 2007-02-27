@@ -1,5 +1,5 @@
 '\" t
-.\" Sccsid @(#)grep.1	1.36 (gritter) 8/14/05
+.\" Sccsid @(#)grep.1	1.30 (gritter) 3/6/04
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,14 +32,14 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH GREP 1 "8/14/05" "Heirloom Toolchest" "User Commands"
+.TH GREP 1 "3/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 grep \- search a file for a pattern
 .SH SYNOPSIS
 .HP
 .ad l
 .nh
-\fB/usr/5bin/grep\fR [\fB\-bchilnrRsvwz\fR]
+\fB/usr/5bin/grep\fR [\fB\-bchilnsv\fR]
 \fIpattern\fR [\fIfile\fR\ ...]
 .HP
 .PD 0
@@ -47,17 +47,17 @@ grep \- search a file for a pattern
 \fB/usr/5bin/posix/grep\fR [\fB\-E\fR|\fB\-F\fR]
 \fB\-e\fI\ pattern_list\fR\ ...
 [\fB\-f\fI\ pattern_file\fR] [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR]
-[\fB\-bhinrRsvwxz\fR] [\fIfile\fR\ ...]
+[\fB\-bhinsvx\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 \fB/usr/5bin/posix/grep\fR [\fB\-E\fR|\fB\-F\fR]
 \fB\-f\fI\ pattern_file\fR
 [\fB\-e\fI\ pattern_list\fR\ ...] [\fB\-c\fR|\fB\-l\fR|\fB\-q\fR]
-[\fB\-bhinrRsvwxz\fR] [\fIfile\fR\ ...]
+[\fB\-bhinsvx\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 \fB/usr/5bin/posix/grep\fR [\fB\-E\fR|\fB\-F\fR]
-[\fB\-c\fR|\fB\-l\fR|\fB\-q\fR] [\fB\-bhinrRsvwxz\fR]
+[\fB\-c\fR|\fB\-l\fR|\fB\-q\fR] [\fB\-bhinsvx\fR]
 \fIpattern_list\fR [\fIfile\fR\ ...]
 .br
 .PD
@@ -91,9 +91,7 @@ backreferences, word delimiters, and multi-character collating elements
 cause a nondeterministic algorithm to be used.
 .PP
 .B /usr/5bin/s42/grep
-and
-.B /usr/5bin/posix2001/grep
-are identical to
+is identical to
 .BR /usr/5bin/posix/grep .
 .PP
 See the description of
@@ -101,10 +99,10 @@ See the description of
 for the specifications of simple and basic regular expressions.
 .PP
 Care should be taken when using the characters
-$ * [ ^ | ? \' " ( ) and \e in the expression
+$ * [ ^ | ? ' " ( ) and \e in the expression
 as they are also meaningful to the Shell.
 It is safest to enclose the entire expression
-argument in single quotes \' \'.
+argument in single quotes ' '.
 .PP
 Both
 .B /usr/5bin/grep
@@ -142,7 +140,7 @@ Error messages for nonexistent or unreadable files are suppressed.
 .TP
 .B \-v
 All lines but those matching are printed.
-.PP
+.SS /usr/5bin/posix/grep
 The following options are supported by
 .B /usr/5bin/posix/grep
 only:
@@ -175,44 +173,6 @@ like a regular expression surrounded by
 .I ^
 and
 .I $.
-.PP
-The following options are supported as extensions:
-.TP
-.B \-r
-With this option given,
-.I grep
-does not directly search in each given file that is a directory,
-but descends it recursively
-and scans each regular file found below it.
-Device files are ignored.
-Symbolic links are followed.
-.TP
-.B \-R
-Operates recursively as with the
-.I \-r
-option,
-but does not follow symbolic links that point to directories
-unless if they are explicitly specified as arguments.
-.TP
-.B \-w
-Searches for the patterns treated as words,
-as if they were surrounded by `\e<\ \e>'.
-Only available if neither the
-.I \-E
-nor the
-.I \-F
-option are also supplied.
-.TP
-.B \-z
-If an input file is found to be compressed with
-.IR compress (1),
-.IR gzip (1),
-or
-.IR bzip2 (1),
-the appropriate compression program is started,
-and
-.I grep
-searches for the pattern in its output.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL

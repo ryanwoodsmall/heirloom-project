@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)echo.c	1.9 (gritter) 7/2/05
+ * Sccsid @(#)echo.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "echo.c	1.16	05/06/08 SMI" */
 
@@ -38,14 +38,12 @@
  */
 #include	"defs.h"
 
-#ifndef	UCB
-#define	_iBCS2
-#endif	/* UCB */
-
 #define	exit(a)	flushb(); return (a)
 
-int
-echo(int argc, unsigned char **argv)
+extern int exitval;
+
+echo(argc, argv)
+unsigned char **argv;
 {
 	register unsigned char	*cp;
 	register int	i, wd;
@@ -110,18 +108,14 @@ echo(int argc, unsigned char **argv)
 		{
 			sigchk();
 			for (cp = argv[i]; *cp; cp++) {
-				if ((len = nextc(&wc, (char *)cp)) <= 0) {
+				if ((len = mbtowc(&wc, (char *)cp,
+						MB_LEN_MAX)) <= 0) {
 					prc_buff(*cp);
 					continue;
 				}
 
 				if (wc == '\\') {
 					switch (*++cp) {
-#ifdef	SUS
-					case 'a':
-						prc_buff('\a');
-						continue;
-#endif	/* SUS */
 					case 'b':
 						prc_buff('\b');
 						continue;

@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)tran.c	1.16 (gritter) 2/4/05>
+   Sccsid @(#)tran.c	1.13 (gritter) 7/13/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -25,7 +25,7 @@
 /*		copyright	"%c%" 	*/
 
 /*	from unixsrc:usr/src/common/cmd/awk/tran.c /main/uw7_nj/1	*/
-/*	from RCS Header: tran.c 1.2 91/06/25 	*/
+/*	from $Header$	*/
 
 
 #define	DEBUG
@@ -220,7 +220,7 @@ void freeelem(Cell *ap, unsigned char *s)
 		}
 }
 
-Cell *ssetsymtab(unsigned char *n, unsigned char *s, Awkfloat f,
+Cell *setsymtab(unsigned char *n, unsigned char *s, Awkfloat f,
 		unsigned t, Array *tp)
 {
 	register int h;
@@ -284,7 +284,7 @@ static void rehash(Array *tp)	/* rehash items in small table into big one */
 	tp->size = nsz;
 }
 
-Cell *slookup(register unsigned char *s, Array *tp)	/* look for s in tp */
+Cell *lookup(register unsigned char *s, Array *tp)	/* look for s in tp */
 {
 	register Cell *p, *prev = NULL;
 	int h;
@@ -414,7 +414,7 @@ unsigned char *r_getsval(register Cell *vp)
 			vp->tval |= STR;
 		} else {
 			snprintf((char *)s, sizeof s,
-					(char *)(posix ? *CONVFMT : *OFMT),
+					(char *)(posix ? *OFMT : *CONVFMT),
 					vp->fval);
 			/*
 			* In case CONVFMT is changed by the program,
@@ -431,7 +431,7 @@ unsigned char *r_getsval(register Cell *vp)
 	return(vp->sval);
 }
 
-unsigned char *stostring(register const unsigned char *s)
+unsigned char *tostring(register const unsigned char *s)
 {
 	register unsigned char *p;
 

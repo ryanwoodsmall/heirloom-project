@@ -19,11 +19,10 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  */
-/*	Sccsid @(#)_utmpx.h	1.9 (gritter) 1/22/06	*/
+/*	Sccsid @(#)_utmpx.h	1.7 (gritter) 11/7/04	*/
 
 #if defined (__FreeBSD__) || defined (__dietlibc__) || defined (__NetBSD__) || \
-	defined (__UCLIBC__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (__UCLIBC__) || defined (__OpenBSD__)
 #include <sys/types.h>
 #include <sys/time.h>
 #include <utmp.h>
@@ -86,4 +85,4 @@ extern void		setutxent(void);
 extern int		utmpxname(const char *);
 extern void		updwtmpx(const char *, const struct utmpx *);
 #endif	/* __FreeBSD__ || __dietlibc__ || __NetBSD__ || __UCLIBC__ ||
-	 	__OpenBSD__ || __DragonFly__ || __APPLE__ */
+	 	__OpenBSD__ */

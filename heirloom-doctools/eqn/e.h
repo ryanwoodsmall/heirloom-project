@@ -18,15 +18,10 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.10 (gritter) 12/25/06
+ * Sccsid @(#)e.h	1.5 (gritter) 8/13/05
  */
 
 #include <stdio.h>
-
-#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
-#undef	getc
-#define	getc(f)	_IO_getc_unlocked(f)
-#endif
 
 #define	FATAL	1
 #define	ROM	'1'
@@ -39,9 +34,9 @@
 #endif /* NEQN */
 
 #ifndef NEQN
-#define	VERT(n)	(n)
+#define	VERT(n)	((((n)+1)/3)*3)
 #define POINT	72
-#define EM(m, ps)	((((float)(m)*(ps) * resolution) / POINT))
+#define EM(m, ps)	(int)((((float)(m)*(ps) * resolution) / POINT))
 #else /* NEQN */
 #define	VERT(n)	(20 * (n))
 #endif /* NEQN */
@@ -51,10 +46,10 @@ extern int	dbg;
 extern int	ct;
 extern int	lp[];
 extern int	used[];	/* available registers */
-extern float	ps;	/* dflt init pt size */
-#define	resolution	72	/* was: resolution of ditroff */
-extern float	deltaps;	/* default change in ps */
-extern float	gsize;	/* global size */
+extern int	ps;	/* dflt init pt size */
+extern int	resolution;	/* resolution of ditroff */
+extern int	deltaps;	/* default change in ps */
+extern int	gsize;	/* global size */
 extern int	gfont;	/* global font */
 extern int	ft;	/* dflt font */
 extern FILE	*curfile;	/* current input file */
@@ -63,15 +58,10 @@ extern int	linect;	/* line number in current file */
 extern int	eqline;	/* line where eqn started */
 extern int	svargc;
 extern char	**svargv;
-#ifndef	NEQN
-extern float	eht[100];
-extern float	ebase[100];
-#else	/* NEQN */
-extern int	eht[100];
-extern int	ebase[100];
-#endif	/* NEQN */
-extern int	lfont[100];
-extern int	rfont[100];
+extern int	eht[];
+extern int	ebase[];
+extern int	lfont[];
+extern int	rfont[];
 extern int	yyval;
 extern int	*yypv;
 extern int	yylval;
@@ -91,7 +81,7 @@ extern  char    *spaceval;  /* use in place of normal \x (for pic) */
 /* diacrit.c */
 void diacrit(int, int);
 /* e.c */
-int yyparse(void);
+int yyparse();
 /* eqnbox.c */
 void eqnbox(int, int, int);
 /* font.c */
@@ -115,11 +105,11 @@ int eqn(int, char **);
 int getline(char **, size_t *);
 void do_inline(void);
 void putout(int);
-float max(float, float);
+int max(int, int);
 int oalloc(void);
 void ofree(int);
-void setps(float);
-void nrwid(int, float, int);
+void setps(int);
+void nrwid(int, int, int);
 void setfile(int, char **);
 void yyerror(char *);
 void init(void);
@@ -160,15 +150,14 @@ void shift(int);
 void shift2(int, int, int);
 /* size.c */
 void setsize(char *);
-void size(float, int);
+void size(int, int);
 void globsize(void);
-char *tsize(float);
 /* sqrt.c */
 #define	sqrt(n)	eqnsqrt(n)
 void sqrt(int);
 /* text.c */
 void text(int, char *);
 int trans(int, char *);
-void shim(int);
+void shim(void);
 void roman(int);
 void name4(int, int);

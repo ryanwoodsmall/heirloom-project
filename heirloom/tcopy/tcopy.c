@@ -44,14 +44,14 @@
  */
 
 /*	from 4.3BSD tcopy.c	1.2 (Berkeley) 12/11/85	*/
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tcopy.sl	1.16 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)tcopy.sl	1.13 (gritter) 11/7/04";
 
 #include <stdio.h>
 #include <signal.h>
@@ -65,7 +65,7 @@ static const char sccsid[] USED = "@(#)tcopy.sl	1.16 (gritter) 1/22/06";
 #include <sys/ioctl.h>
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 #include <sys/mtio.h>
 #else	/* SVR4.2MP */
 #include <sys/tape.h>
@@ -165,7 +165,7 @@ main(int argc, char **argv)
 			if (copy) {
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 				struct mtop op;
 				op.mt_op = MTWEOF;
 				op.mt_count = 1;

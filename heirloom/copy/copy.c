@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)copy.sl	1.15 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)copy.sl	1.11 (gritter) 7/16/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -56,9 +56,6 @@ static const char sccsid[] USED = "@(#)copy.sl	1.15 (gritter) 5/29/05";
 #endif
 #ifndef	S_IFNAM
 #define	S_IFNAM		0x5000
-#endif
-#ifndef	S_IFNWK
-#define	S_IFNWK		0x9000
 #endif
 
 #ifdef	__GLIBC__	/* old glibcs don't know _XOPEN_SOURCE=600L yet */
@@ -285,7 +282,6 @@ copy(const char *src, const char *dst, int level)
 	case S_IFBLK:
 	case S_IFCHR:
 	case S_IFNAM:
-	case S_IFNWK:
 	case S_IFREG:
 	case S_IFLNK:
 	reg:	if (aflag) {
@@ -365,8 +361,7 @@ fdcopy(const char *src, const struct stat *sp, int sfd,
 #endif	/* __linux__ */
 	if (pagesize == 0 && (pagesize = sysconf(_SC_PAGESIZE)) <= 0)
 		pagesize = 4096;
-	if ((blksize = sp->st_blksize) <= 0)
-		blksize = 512;
+	blksize = sp->st_blksize;
 	if (bufsize < blksize) {
 		free(buf);
 		if ((buf = memalign(pagesize, blksize)) == NULL)
@@ -498,7 +493,7 @@ usage(int c)
 	if (c)
 		fprintf(stderr, "Bad option - %c\n", c);
 	fprintf(stderr,
-"Usage: %s [-n] [-l] [-a[d]] [-m] [-o] [-r] [-v] src ... [dst]\n",
+"Usage: %s [-n] [-l|s] [-a[d]] [-m] [-o] [-r] [-v] [-h] src ... [dst]\n",
 		progname);
 	exit(1);
 }

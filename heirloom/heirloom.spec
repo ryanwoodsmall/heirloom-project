@@ -1,26 +1,28 @@
 #
-# Sccsid @(#)heirloom.spec	1.33 (gritter) 01/27/07
+# Sccsid @(#)heirloom.spec	1.27 (gritter) 10/14/04
 #
 Summary: Heirloom Toolchest: A collection of standard Unix utilities
 Name: heirloom
-Version: 040306
+Version: 041204
 Release: 1
 License: Other
 Source: %{name}-%{version}.tar.bz2
 Group: System Environment/Base
-Vendor: Gunnar Ritter <gunnarr@acm.org>
+Vendor: Gunnar Ritter <Gunnar.Ritter@pluto.uni-freiburg.de>
 URL: <http://heirloom.sourceforge.net>
 BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: heirloom-devtools
 
 #
 # The problem here is that package names differ between Linux distributions:
 #
+# * yacc is in package byacc on RedHat and Caldera, but in package yacc
+#   on SuSE. (Now using bison, but who knows?)
 # * libz and libbz2 are in varying development packages.
 # 
 # For this reason, we use absolute path names and assume that all of this
 # stuff is in /usr.
 #
+BuildRequires: /usr/bin/flex /usr/bin/bison
 BuildRequires: /usr/lib/libz.so /usr/lib/libbz2.so
 BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 
@@ -32,9 +34,7 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 %define	sv3bin		%{defbin}
 %define	s42bin		%{defbin}/s42
 %define	susbin		%{defbin}/posix
-%define	su3bin		%{defbin}/posix2001
 %define	ucbbin		%{usr}/ucb
-%define	ccsbin		%{usr}/ccs/bin
 %define	deflib		%{usr}/5lib
 %define	defsbin		%{defbin}
 %define	magic		%{deflib}/magic
@@ -51,8 +51,7 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 %define	cflagsu		'-O2 -fomit-frame-pointer -funroll-loops'
 %define	cflags		'-O -fomit-frame-pointer'
 %define	cppflags	'-D__NO_STRING_INLINES -D_GNU_SOURCE'
-%define	yacc		/usr/ccs/bin/yacc
-%define	lex		/usr/ccs/bin/lex
+%define	yacc		'bison -y'
 
 %define	lcurs		-lncurses
 %define	libz		-lz
@@ -60,17 +59,11 @@ BuildRequires: /usr/include/zlib.h /usr/include/bzlib.h
 %define	libbz2		-lbz2
 %define	use_bzlib	1
 
-%if %(test -x %{sv3bin}/sh && echo 1 || echo 0)
-%define	shell		%{sv3bin}/sh
-%else
-%define	shell		/bin/sh
-%endif
-
 #
 # Combine the settings defined above.
 #
-%define	p_flags	SHELL=%{shell} ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} SU3BIN=%{su3bin} UCBBIN=%{ucbbin} CCSBIN=%{ccsbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
-%define	c_flags	CC=%{xcc} CFLAGS2=%{cflags2} CFLAGSS=%{cflagss} CFLAGSU=%{cflagsu} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LCURS=%{lcurs} LIBZ=%{libz} USE_ZLIB=%{use_zlib} LIBBZ2=%{libbz2} USE_BZLIB=%{use_bzlib} TTYGRP= YACC=%{yacc} LEX=%{lex}
+%define	p_flags	SHELL=/bin/sh ROOT=%{buildroot} DEFBIN=%{defbin} SV3BIN=%{sv3bin} S42BIN=%{s42bin} SUSBIN=%{susbin} UCBBIN=%{ucbbin} DEFLIB=%{deflib} DEFSBIN=%{defsbin} MANDIR=%{mandir} DFLDIR=%{dfldir} SPELLHIST=%{spellhist} SULOG=%{sulog} MAGIC=%{magic}
+%define	c_flags	CC=%{xcc} CFLAGS2=%{cflags2} CFLAGSS=%{cflagss} CFLAGSU=%{cflagsu} CFLAGS=%{cflags} CPPFLAGS=%{cppflags} LCURS=%{lcurs} LIBZ=%{libz} USE_ZLIB=%{use_zlib} LIBBZ2=%{libbz2} USE_BZLIB=%{use_bzlib} TTYGRP= YACC=%{yacc}
 %define	makeflags %{p_flags} %{c_flags}
 
 %description
@@ -108,7 +101,7 @@ find . -name NOTES -depth | cpio -pdm _doc
 # and add attributes.
 #
 rm -f filelist.rpm
-for f in %{defbin} %{sv3bin} %{s42bin} %{susbin} %{ucbbin} %{ccsbin} \
+for f in %{defbin} %{sv3bin} %{s42bin} %{susbin} %{ucbbin} \
 	%{deflib} %{defsbin} %{magic}
 do
 	if test -d %{buildroot}/$f

@@ -19,8 +19,8 @@
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
 .\"
-.\" Sccsid @(#)nl.1	1.10 (gritter) 8/14/05
-.TH NL 1 "8/14/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)nl.1	1.8 (gritter) 10/11/03
+.TH NL 1 "10/11/03" "Heirloom Toolchest" "User Commands"
 .SH NAME
 nl \- line numbering filter
 .SH SYNOPSIS
@@ -101,8 +101,7 @@ Regular expressions are as in
 .IR ed (1);
 .B /usr/5bin/nl
 uses simple regular expressions,
-.BR /usr/5bin/posix/nl ,
-.BR /usr/5bin/posix2001/nl ,
+.B /usr/5bin/posix/nl
 and
 .B /usr/5bin/s42/nl
 use basic regular expressions.
@@ -211,10 +210,8 @@ option and option argument must not be separated;
 if an option is not immediately followed by its argument,
 the default value is used.
 .B /usr/5bin/posix/nl
-and
-.B /usr/5bin/posix2001/nl
-require an option argument
-and accept it regardless of space between option and argument.
+requires an option argument
+and accepts it regardless of space between option and argument.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 .BR LANG ", " LC_ALL
@@ -237,21 +234,21 @@ and thus the condition is never met:
 .RS
 .sp
 .nf
-nl \-ba \-d\'
-\&\' file
+nl \-ba \-d'
+\&' file
 .fi
 .sp
 .RE
 Note that there is no white space
 other than the newline character
-between \' \'.
+between ' '.
 .PP
 To number all lines that are not empty
 and contain at least one non-blank character:
 .RS
 .sp
 .nf
-nl \-bp\'[^      ]\' file
+nl \-bp'[^      ]' file
 .fi
 .sp
 .RE

@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)fold.sl	1.8 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)fold.sl	1.5 (gritter) 10/13/04";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,7 +140,8 @@ setwidth(const char *s)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-w number] file1...\n", progname);
+	fprintf(stderr, "usage: %s [-bs] [-w number | -number] file1...\n",
+			progname);
 	exit(2);
 }
 

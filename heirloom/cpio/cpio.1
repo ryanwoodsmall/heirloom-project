@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)cpio.1	1.91 (gritter) 9/5/05
-.TH CPIO 1 "9/5/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)cpio.1	1.83 (gritter) 4/11/04
+.TH CPIO 1 "4/11/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cpio \- copy file archives in and out
 .SH SYNOPSIS
@@ -410,13 +410,13 @@ Prints a dot for each archived or extracted file.
 Selects Unix 6th Edition archive format
 (only in copy-in mode).
 .PP
-.ne 37
+.ne 40
 Characteristics of archive formats are as follows:
 .sp
 .TS
 allbox;
 l r r r l
-l1fB r2 n2 r2 c.
+lfB1 r2 n2 r2 c.
 	T{
 .ad l
 maximum user/\%group id
@@ -622,7 +622,7 @@ capable of reading
 archives,
 although files may be extracted under wrong names
 and extended headers may be extracted as separate files.
-If a file name contains non-UTF-8 characters,
+If a file name contains non-ASCII characters,
 it may not be archived or extracted correctly
 because of a problem of the
 .I pax
@@ -643,7 +643,7 @@ by implementations that support only the
 format and vice-versa.
 The
 .I sun
-format has also problems with non-UTF-8 characters in file names.
+format has also problems with non-ASCII characters in file names.
 .PP
 The
 .B GNU
@@ -733,7 +733,7 @@ from the archive stored on
 overwriting recent files:
 .RS 2
 .sp
-cpio \-idmu \-I /dev/rmt/c0s0 \'[Mm]akefile\' \'*/[Mm]akefile\'
+cpio \-idmu \-I /dev/rmt/c0s0 '[Mm]akefile' '*/[Mm]akefile'
 .RE
 .PP
 List the files contained in a software distribution archive:
@@ -751,13 +751,11 @@ archive containing all files below the directory
 to the file
 .IR \%project.tar.gz ,
 excluding all directories named
-.I CVS
-or
 .I SCCS
 and their contents:
 .RS 2
 .sp
-find project \-depth \-print | egrep \-v \'/(CVS|SCCS)(/|$)\' |
+find project \-depth \-print | egrep \-v '/SCCS(/|$)' |
 .br
       cpio \-o \-H ustar | gzip \-c > project.tar.gz
 .RE
@@ -778,7 +776,7 @@ but can normally be read using the
 option, as with
 .RS 2
 .sp
-cpio \-itvk \-H zip \-I archive.exe
+cpio \-itvk -H zip -I archive.exe
 .sp
 .RE
 .SH "ENVIRONMENT VARIABLES"
@@ -814,7 +812,7 @@ tar(1)
 exits with
 .sp
 .TS
-l8fB l.
+lfB8 l.
 0	after successful operation;
 1	on usage errors;
 2	when operation was continued after minor errors;
@@ -855,7 +853,7 @@ section of
 for more information.
 .PP
 If the file names passed to
-.I "cpio \-o"
+.I "cpio -o"
 begin with a slash character,
 absolute path names are stored in the archive
 and will be extracted to these path names later

@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)paste.sl	1.11 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)paste.sl	1.8 (gritter) 7/16/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -113,8 +113,7 @@ static void
 cantopen(const char *fn)
 {
 	fprintf(stderr, "%s: cannot open %s\n", progname, fn);
-	if (sflag == 0)
-		exit(1);
+	exit(1);
 }
 
 static void
@@ -203,10 +202,8 @@ serial(const char *fn)
 	resdelim();
 	if (fn[0] == '-' && fn[1] == '\0')
 		fp = stdin;
-	else if ((fp = fopen(fn, "r")) == NULL) {
+	else if ((fp = fopen(fn, "r")) == NULL)
 		cantopen(fn);
-		return 1;
-	}
 	c = getc(fp);
 	while (c != EOF) {
 		if (c == '\n') {
@@ -227,7 +224,7 @@ static int
 paste(char **args)
 {
 	struct file	*fstart = NULL, *fp, *fq = NULL;
-	int	c, i, oneof, hadnl, delcnt;
+	int	c, i, oneof, hadnl;
 
 	for (i = 0; args[i]; i++) {
 		fp = smalloc(sizeof *fp);
@@ -246,34 +243,20 @@ paste(char **args)
 	do {
 		oneof = 1;
 		hadnl = 0;
-		delcnt = 0;
 		resdelim();
 		for (fp = fstart; fp; fp = fp->f_nxt) {
-			while ((c = getc(fp->f_fp)) != EOF && c != '\n') {
-				while (delcnt > 0) {
-					putdelim();
-					delcnt--;
-				}
+			while ((c = getc(fp->f_fp)) != EOF && c != '\n')
 				putchar(c);
-			}
 			if (c == '\n')
 				hadnl = 1;
 			if (c != EOF && (c = getc(fp->f_fp)) != EOF)
 				ungetc(c, fp->f_fp);
 			if (c != EOF)
 				oneof = 0;
-			if (fp->f_nxt) {
-				if (oneof)
-					delcnt++;
-				else
-					putdelim();
-			} else if (hadnl) {
-				while (delcnt > 0) {
-					putdelim();
-					delcnt--;
-				}
+			if (fp->f_nxt)
+				putdelim();
+			else if (hadnl)
 				putchar('\n');
-			}
 		}
 	} while (oneof == 0);
 	for (fp = fstart; fp; fp = fp->f_nxt)

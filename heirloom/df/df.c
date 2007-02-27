@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	UCB
-static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.66 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/df.sl	1.58 (gritter) 11/7/04";
 #else
-static const char sccsid[] USED = "@(#)df.sl	1.66 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)df.sl	1.58 (gritter) 11/7/04";
 #endif
 
 /*
@@ -50,17 +50,10 @@ typedef		unsigned long long	ull;
 #include	<pwd.h>
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#if defined (__dietlibc__) || defined (__OpenBSD__)
+#if defined (__dietlibc__) || defined (__NetBSD__) || defined (__OpenBSD__)
 #include	"statvfs.c"
 #elif defined (__FreeBSD__) && (__FreeBSD__) < 5
 #include	"statvfs.c"
-#elif defined (__NetBSD__)
-#include	<sys/param.h>
-#if __NetBSD_Version__ < 300000000
-#include	"statvfs.c"
-#else	/* __ __NetBSD_Version__ >= 300000000 */
-#include	<sys/statvfs.h>
-#endif	/* __ __NetBSD_Version__ >= 300000000 */
 #else
 #include	<sys/statvfs.h>
 #endif
@@ -72,8 +65,7 @@ typedef		unsigned long long	ull;
 #include	<stdlib.h>
 #if defined	(__linux__) || defined (__hpux) || defined (_AIX)
 #include	<mntent.h>
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-	|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 #include	<sys/param.h>
 #include	<sys/ucred.h>
 #include	<sys/mount.h>
@@ -93,7 +85,6 @@ typedef		unsigned long long	ull;
 
 static int	errcnt;			/* count of errors */
 static int	aflag = 1;		/* print all filesystems */
-static int	Pflag;			/* POSIX-style */
 #ifndef	UCB
 static int	fflag;			/* omit inodes in traditional form */
 static int	gflag;			/* print entire statvfs structure */
@@ -103,7 +94,6 @@ static ull	totspace;		/* total space */
 static ull	totavail;		/* total available space */
 extern int	sysv3;			/* SYSV3 variable set */
 #endif	/* !UCB */
-static int	hflag;			/* print human-readable units */
 static int	kflag;			/* select 1024-blocks */
 static int	lflag;			/* local file systems only */
 static int	dfspace;		/* this is the dfspace command */
@@ -112,14 +102,11 @@ static char	*fstype;		/* restrict to filesystem type */
 static char	*progname;		/* argv[0] to main() */
 #if defined	(__linux__) || defined (_AIX)
 static const char	*mtab = "/etc/mtab";	/* mount table */
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-	|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 /* nothing */
-#else	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__,
-	!__DragonFly__, !__APPLE__ */
+#else	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
 static const char	*mtab = "/etc/mnttab";	/* mount table */
-#endif	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__,
-	!__DragonFly__, !__APPLE__ */
+#endif	/* !__linux__, !_AIX, !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
 
 /*
  * perror()-alike.
@@ -129,26 +116,6 @@ pnerror(int eno, const char *string)
 {
 	fprintf(stderr, "%s: %s: %s\n", progname, string, strerror(eno));
 	errcnt |= 1;
-}
-
-static char *
-hfmt(ull n)
-{
-	char	*cp;
-	const char	units[] = "KMGTPE", *up = units;
-	int	rest = 0;
-
-	while (n > 1023) {
-		rest = (n % 1024) / 128;
-		n /= 1024;
-		up++;
-	}
-	cp = malloc(10);
-	if (n < 10 && rest)
-		snprintf(cp, 10, "%2llu.%u%c", n, rest, *up);
-	else
-		snprintf(cp, 10, "%4llu%c", n, *up);
-	return cp;
 }
 
 #ifndef	UCB
@@ -166,10 +133,6 @@ static void
 printhead(void)
 {
 	switch (format) {
-	case 'h':
-		printf(
-	"Filesystem             size   used  avail capacity  Mounted on\n");
-		break;
 	case 'P':
 		printf(
 		"Filesystem%s       Used  Available Capacity Mounted on\n",
@@ -234,29 +197,12 @@ procnodes(const char *dir, struct statvfs *sv)
 #endif	/* __linux__ */
 
 /*
- * Percentage computation according to POSIX.
- */
-static int
-getpct(ull m, ull n)
-{
-	int	c;
-	double	d;
-
-	d = n ? m * 100. / n : 0;
-	c = d;
-	if (d - (int)d > 0)
-		c++;
-	return c;
-}
-
-/*
  * Print per-file-system statistics. Mdir is the mount point or a file
  * contained, mdev is the file system's (block) device.
  */
 static void
 printfs(const char *mdir, const char *mdev, const char *mtype)
 {
-	const char	*cp;
 	struct statvfs sv;
 	ull total, avail, used, percent;
 	int bsize = kflag ? 1024 : 512;
@@ -272,7 +218,6 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		case 'b':
 		case 'e':
 		case 'f':
-		case 'h':
 		case 'g':
 		case 'i':
 		case 'k':
@@ -303,8 +248,7 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		return;
 	total = (ull)sv.f_blocks * sv.f_frsize / bsize;
 	avail = (ull)sv.f_bavail * sv.f_frsize / bsize;
-	used = total - (Pflag ? (ull)sv.f_bavail : (ull)sv.f_bfree)
-		* sv.f_frsize / bsize;
+	used = total - (ull)sv.f_bfree * sv.f_frsize / bsize;
 #ifdef	__linux__
 	/*
 	 * Try to estimate i-nodes for reiserfs filesystems. As the number
@@ -325,33 +269,22 @@ printfs(const char *mdir, const char *mdev, const char *mtype)
 		procnodes(mdir, &sv);
 #endif	/* __linux__ */
 	switch (format) {
-	case 'h':
-		percent = getpct(used, total);
-		if (strlen(mdev) > 20) {
-			printf("%s\n", mdev);
-			cp = "";
-		} else
-			cp = mdev;
-		printf("%-20s  %s  %s  %s   %3llu%%    %s\n",
-				cp, hfmt(total), hfmt(used), hfmt(avail),
-				percent, mdir);
-		break;
 	case 'P':
 	case 'k':
-		percent = getpct(used, total);
+		percent = total ? used * 100 / total : 0;
 		printf("%-18s  %10llu %10llu %10llu     %3llu%% %s\n",
 				mdev, total, used, avail, percent, mdir);
 		break;
 	case 'i':
 		used = sv.f_files - sv.f_ffree;
-		percent = getpct(used, sv.f_files);
+		percent = sv.f_files ? used * 100 / sv.f_files : 0;
 		printf("%-18s  %10llu %10llu %10llu   %3llu%% %s\n",
 				mdev, (ull)sv.f_files, used, (ull)sv.f_favail,
 				percent, mdir);
 		break;
 #ifndef	UCB
 	case 'v':
-		percent = getpct(used, total);
+		percent = total ? used * 100 / total : 0;
 		printf("%-10.10s %-18.18s %10llu %10llu %10llu %4u%%\n",
 				mdir, mdev, total, used, avail,
 				(unsigned)percent);
@@ -453,8 +386,7 @@ printmnt(void)
 		printfs(mp->mnt_dir, mp->mnt_fsname, mp->mnt_type);
 	}
 	endmntent(fp);
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	struct statfs	*sp = NULL;
 	int	cnt, i;
 
@@ -502,19 +434,16 @@ findfs(const char *fn)
 {
 #if defined	(__linux__) || defined (__hpux) || defined (_AIX)
 	struct mntent *mp;
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	struct statfs	*sp = NULL;
 	int	count, i;
 #else	/* SVR4 */
 	struct mnttab mt;
 #endif	/* SVR4 */
 	struct stat s1, s2;
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
-		&& !defined (__DragonFly__) && !defined (__APPLE__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
 	FILE *fp;
-#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__, !__DragonFly__,
-	   !__APPLE__ */
+#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
 	int gotcha = 0;
 	const char	*m_special, *m_mountp, *m_fstype;
 
@@ -523,8 +452,7 @@ findfs(const char *fn)
 		pnerror(errno, mtab);
 		exit(errcnt);
 	}
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if ((count = getmntinfo(&sp, MNT_WAIT)) <= 0) {
 		pnerror(errno, "getmntinfo");
 		exit(errcnt);
@@ -553,8 +481,7 @@ findfs(const char *fn)
 		m_fstype =mp->mnt_type;
 		if (strcmp(m_fstype, MNTTYPE_IGNORE) == 0)
 			continue;
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	for (i = 0; i < count; i++) {
 		m_special = sp[i].f_mntfromname;
 		m_mountp = sp[i].f_mntonname;
@@ -566,7 +493,7 @@ findfs(const char *fn)
 		m_fstype = mt.mnt_fstype;
 #endif	/* SVR4 */
 		if (S_ISBLK(s1.st_mode)) {
-			if (lstat(m_special, &s2) < 0) {
+			if (lstat(m_fstype, &s2) < 0) {
 				/*
 				 * Ignore this silently as it is most likely
 				 * something like "proc", "devpts".
@@ -620,8 +547,7 @@ findfs(const char *fn)
 	}
 #if defined	(__linux__)
 	endmntent(fp);
-#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined	(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	/* nothing */
 #else	/* SVR4 */
 	fclose(fp);
@@ -632,7 +558,8 @@ findfs(const char *fn)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [ -i ] [ -a ] [ -t type | file... ]\n",
+	fprintf(stderr,
+		"usage: %s [ -i ] [ -a ] [ -P [ -k] ] [ -M mtab ] [ -t type | file... ]\n",
 			progname);
 	exit(2);
 }
@@ -648,28 +575,21 @@ main(int argc, char **argv)
 	progname = basename(argv[0]);
 	aflag = 0;
 	format = 'k';
-	while ((i = getopt(argc, argv, "aihkM:Pt:")) != EOF) {
+	while ((i = getopt(argc, argv, "aikM:Pt:")) != EOF) {
 		switch (i) {
 		case 'a':
 			aflag = 1;
-			break;
-		case 'h':
-			hflag = 1;
 			break;
 		case 'k':
 			kflag = 1;
 			break;
 		case 'M':
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
-	&& !defined (__DragonFly__) && !defined (__APPLE__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
 			mtab = optarg;
-#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__, !__DragonFly__,
-	   !__APPLE__ */
+#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
 			break;
-		case 'P':
-			Pflag = 1;
-			/*FALLTHRU*/
 		case 'i':
+		case 'P':
 			format = i;
 			break;
 		case 't':
@@ -680,10 +600,7 @@ main(int argc, char **argv)
 			usage();
 		}
 	}
-	if (hflag) {
-		format = 'h';
-		kflag = 1;
-	} else if (format == 'k')
+	if (format == 'k')
 		kflag = 1;
 	if (fstype && optind != argc)
 		usage();
@@ -700,7 +617,7 @@ static void
 usage(void)
 {
 	fprintf(stderr, dfspace ?  "Usage: %s [file ...]\n" : "Usage:\n\
-%s [-F FSType] [-befgklntVv] [current_options] \
+%s [-F FSType] [-M mtab] [-befgiklnPtVv] [current_options] \
 [-o specific_options] [directory | special ...]\n",
 		progname);
 	exit(2);
@@ -720,16 +637,13 @@ main(int argc, char **argv)
 	putenv("POSIXLY_CORRECT=1");
 #endif
 	while ((i = getopt(argc, argv,
-			dfspace ? "F:" : "befF:ghiklM:no:PtvV")) != EOF) {
+			dfspace ? "F:" : "befF:giklM:no:PtvV")) != EOF) {
 		switch (i) {
 		case 'f':
 			fflag = 1;
 			break;
 		case 'F':
 			fstype = optarg;
-			break;
-		case 'h':
-			hflag = 1;
 			break;
 		case 'g':
 			gflag = 1;
@@ -738,11 +652,9 @@ main(int argc, char **argv)
 			lflag = 1;
 			break;
 		case 'M':
-#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__) \
-	&& !defined (__DragonFly__) && !defined (__APPLE__)
+#if !defined (__FreeBSD__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
 			mtab = optarg;
-#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__, !__DragonFly__,
-	   !__APPLE__ */
+#endif	/* !__FreeBSD__, !__NetBSD__, !__OpenBSD__ */
 			break;
 		case 't':
 			tflag = 1;
@@ -762,11 +674,9 @@ main(int argc, char **argv)
 			else
 				format = i;
 			break;
-		case 'P':
-			Pflag = 1;
-			/*FALLTHRU*/
 		case 'i':
 		case 'n':
+		case 'P':
 		case 'v':
 			format = i;
 			break;
@@ -787,10 +697,6 @@ main(int argc, char **argv)
 	if (dfspace) {
 		format = 04;
 		kflag = 1;
-	} else if (hflag) {
-		format = 'h';
-		kflag = 1;
-		tflag = 0;
 	} else if (gflag) {
 		format = 'g';
 		kflag = tflag = 0;

@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)du.1	1.26 (gritter) 1/24/05
+.\" Sccsid @(#)du.1	1.20 (gritter) 10/11/03
 .\" Parts taken from du(1), Unix 32V:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,11 +32,11 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH DU 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH DU 1 "10/11/03" "Heirloom Toolchest" "User Commands"
 .SH NAME
 du \- summarize disk usage
 .SH SYNOPSIS
-\fBdu\fR [\fB\-arshHkLxo\fR] [\fIname\fR ...]
+\fBdu\fR [\fB\-arskxo\fR] [\fIname\fR ...]
 .SH DESCRIPTION
 .I Du
 gives the number of blocks (512 bytes) contained in all files
@@ -57,53 +57,26 @@ for each file.
 Absence of either causes an entry to be generated for
 each directory only.
 .TP
+.B \-k
+Print statistics in units of 1024 bytes,
+rounded up to the next unit.
+.TP
+.B \-o
+Do not add sizes of subdirectories to parent directories.
+.TP
 .B \-r
 Show error messages.
 This is the default with
-.B /usr/5bin/posix/du
-and
-.BR /usr/5bin/posix2001/du .
+.B /usr/5bin/posix/du .
 .TP
 .B \-s
 This option causes only the grand total to
 be given.
 Overrides the \-a option.
-.PP
-The following options have been introduced by POSIX.2:
-.TP
-.B \-k
-Print statistics in units of 1024 bytes,
-rounded up to the next unit.
 .TP
 .B \-x
 Do not cross device boundaries
 when descending a directory hierarchy.
-.PP
-The following options have been introduced by POSIX.1-2001:
-.TP
-.B \-H
-Follow symbolic links given on the command line
-and count the size of the files they refer to,
-but do not follow symbolic links found during directory traversal
-and count the sizes of these symbolic links themselves.
-.TP
-.B \-L
-Always follow symbolic links
-and count the sizes of the files they refer to.
-.PP
-The following options are extensions:
-.TP
-.B \-h
-Print statistics in human-readable powers of 1024,
-i.\|e. `K' for kilobyte,
-`M' for megabyte,
-`G' for gigabyte,
-`T' for terabyte,
-`P' for petabyte,
-and `E' for exabyte.
-.TP
-.B \-o
-Do not add sizes of subdirectories to parent directories.
 .PP
 A file which has two links to it is only counted once.
 .SH "SEE ALSO"

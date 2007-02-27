@@ -44,14 +44,14 @@
  */
 
 /*	from 4.3BSD fmt.c	5.2 (Berkeley) 6/21/85	*/
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)fmt.sl	1.9 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)fmt.sl	1.7 (gritter) 11/21/04";
 
 #include <stdio.h>
 #include <string.h>
@@ -516,7 +516,7 @@ tabulate(wchar_t *line)
 	 * Toss trailing blanks in the output line.
 	 */
 
-	cp = line + wcslen(line) - 1;
+	cp = line + colwidth(line) - 1;
 	while (cp >= line && *cp == ' ')
 		cp--;
 	*++cp = '\0';

@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)sus.c	1.24 (gritter) 5/29/05>	*/
+/*	Sccsid @(#)sus.c	1.19 (gritter) 11/21/04>	*/
 
 /*
  * Code for POSIX.2 command version only.
@@ -38,19 +38,7 @@
 #include	"alloc.h"
 #include	"grep.h"
 
-#if defined (SU3)
-int		sus = 3;
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
-#define	USED	__attribute__ ((used))
-#elif defined __GNUC__
-#define	USED	__attribute__ ((unused))
-#else
-#define	USED
-#endif
-static const char su3id[] USED = "@(#)grep_su3.sl	1.24 (gritter) 5/29/05";
-#else
 int		sus = 1;
-#endif
 char		*stdinmsg = "(standard input)";
 
 /*
@@ -109,16 +97,16 @@ init(void)
 	case 'e':
 		Eflag = 2;
 		rc_select();
-		options = "EFbce:f:hilnqrRsvxyz";
+		options = "EFbce:f:hilnqrsvxy";
 		break;
 	case 'f':
 		Fflag = 2;
 		ac_select();
-		options = "Fbce:f:hilnqrRsvxyz";
+		options = "Fbce:f:hilnqrsvxy";
 		break;
 	default:
 		rc_select();
-		options = "EFbce:f:hilnqrRsvwxyz";
+		options = "EFbce:f:hilnqrsvxy";
 	}
 }
 

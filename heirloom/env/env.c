@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)env.sl	1.10 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)env.sl	1.8 (gritter) 4/20/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -46,23 +46,30 @@ static char	*progname;		/* argv[0] to main() */
 
 extern char	**environ;
 
+static void
+usage(void)
+{
+	fprintf(stderr, "usage: %s [- | -i] [name=value] [command]\n",
+			progname);
+	exit(2);
+}
+
 int
 main(int argc, char **argv)
 {
 	int	i;
 
 	progname = basename(argv[0]);
-	while ((i = getopt(argc, argv, ":i")) != EOF) {
+	while ((i = getopt(argc, argv, "i")) != EOF) {
 		switch (i) {
 		case 'i':
 			iflag = 1;
 			break;
 		default:
-			optind--;
-			goto done;
+			usage();
 		}
 	}
-done:	if (optind < argc && strcmp(argv[optind], "-") == 0 &&
+	if (optind < argc && strcmp(argv[optind], "-") == 0 &&
 			strcmp(argv[optind - 1], "--")) {
 		iflag = 1;
 		optind++;

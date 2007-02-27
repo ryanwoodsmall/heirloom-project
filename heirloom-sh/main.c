@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.11 (gritter) 8/25/06
+ * Sccsid @(#)main.c	1.4 (gritter) 6/14/05
  */
 
 
@@ -42,13 +42,10 @@
 
 #include	"defs.h"
 #include	"sym.h"
-#include	"hash.h"
 #include	"timeout.h"
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<fcntl.h>
-#include	<time.h>
 #include	"dup.h"
 
 #ifdef RES
@@ -78,21 +75,30 @@ char **execargs = (char **)(-2);
 #endif
 
 
-static void exfile(int);
+static int	exfile();
+extern unsigned char 	*simple();
 
 
-int 
-main(int c, char *v[], char *e[])
+main(c, v, e)
+int	c;
+char	*v[];
+char	*e[];
 {
 	register int	rflag = ttyflg;
 	int		rsflag = 1;	/* local restricted flag */
 	register unsigned char *flagc = flagadr;
 	struct namnod	*n;
+	extern int	init_sigval();
 
 	init_sigval();
 	mypid = getpid();
 	mypgid = getpgid(mypid);
 	mysid = getsid(mypid);
+
+	/*
+	 * Do locale processing only if /usr is mounted.
+	 */
+	localedir_exists = (access(localedir, F_OK) == 0);
 
 	/*
 	 * initialize storage allocation
@@ -127,9 +133,17 @@ main(int c, char *v[], char *e[])
 	setup_env();
 
 	/*
-	 * Do locale processing.
+	 * LC_MESSAGES is set here so that early error messages will
+	 * come out in the right style.
+	 * Note that LC_CTYPE is done later on and is *not*
+	 * taken from the previous environ
 	 */
-	setlocale(LC_CTYPE, "");
+
+	/*
+	 * Do locale processing only if /usr is mounted.
+	 */
+	if (localedir_exists)
+		(void) setlocale(LC_ALL, "");
 
 	/*
 	 * 'rsflag' is zero if SHELL variable is
@@ -166,7 +180,7 @@ main(int c, char *v[], char *e[])
 	 * look for options
 	 * dolc is $#
 	 */
-	dolc = options(c, (unsigned char **)v);
+	dolc = options(c, v);
 
 	if (dolc < 2)
 	{
@@ -241,9 +255,6 @@ main(int c, char *v[], char *e[])
 	 */
 	assign(&ifsnod, sptbnl);
 
-	dfault(&timeoutnod, "0");
-	timeoutnod.namflg |= N_RDONLY;
-
 	dfault(&mchknod, MAILCHECK);
 	mailchk = stoi(mchknod.namval);
 
@@ -255,7 +266,7 @@ main(int c, char *v[], char *e[])
 	 * make sure that option parsing starts
 	 * at first character
 	 */
-	getopt_sp = 1;
+	_sp = 1;
 
 	/* initialize multibyte information */
 	setwidth();
@@ -342,17 +353,14 @@ main(int c, char *v[], char *e[])
 
 	exfile(0);
 	done(0);
-	/*NOTREACHED*/
-	return 0;
 }
 
-static void
+static int
 exfile(prof)
 BOOL	prof;
 {
 	time_t	mailtime = 0;	/* Must not be a register variable */
 	time_t 	curtime = 0;
-	long	timeout = 0;
 
 	/*
 	 * move input
@@ -369,7 +377,7 @@ BOOL	prof;
 	if (setjmp(errshell) && prof)
 	{
 		close(input);
-		endjobs(0);
+		(void) endjobs(0);
 		return;
 	}
 	/*
@@ -412,13 +420,9 @@ BOOL	prof;
 
 			prs(ps1nod.namval);
 
-			if ((timeout = atol(timeoutnod.namval)) > 0)
-				alarm(timeout);
-
 #ifdef TIME_OUT
 			alarm(TIMEOUT);
 #endif
-			flags |= waiting;
 
 		}
 
@@ -430,14 +434,9 @@ BOOL	prof;
 			eof = 0;
 		}
 
-		if (timeout > 0) {
-			alarm(0);
-			timeout = 0;
-		}
 #ifdef TIME_OUT
 		alarm(0);
 #endif
-		flags &= ~waiting;
 
 		{
 			register struct trenod *t;
@@ -445,7 +444,7 @@ BOOL	prof;
 			if (t == NULL && flags & ttyflg)
 				freejobs();
 			else
-				execute(t, 0, eflag, NULL, NULL);
+				execute(t, 0, eflag);
 		}
 
 		eof |= (flags & oneflg);
@@ -453,15 +452,13 @@ BOOL	prof;
 	}
 }
 
-void
-chkpr(void)
+chkpr()
 {
 	if ((flags & prompt) && standin->fstak == 0)
 		prs(ps2nod.namval);
 }
 
-void
-settmp(void)
+settmp()
 {
 	int i;
 	i = ltos(mypid);
@@ -469,8 +466,8 @@ settmp(void)
 	tmpname = movstr(numbuf + i, &tmpout[TMPNAM]);
 }
 
-void
-Ldup(register int fa, register int fb)
+Ldup(fa, fb)
+register int	fa, fb;
 {
 #ifdef RES
 
@@ -484,18 +481,17 @@ Ldup(register int fa, register int fb)
 		if (fa != fb)
 		{
 			close(fb);
-			fcntl(fa, F_DUPFD, fb); /* normal dup */
+			fcntl(fa, 0, fb); /* normal dup */
 			close(fa);
 		}
-		fcntl(fb, F_SETFD, FD_CLOEXEC);	/* autoclose for fb */
+		fcntl(fb, 2, 1);	/* autoclose for fb */
 	}
 
 #endif
 }
 
 
-void
-chkmail(void)
+chkmail()
 {
 	register unsigned char 	*s = mailp;
 	register unsigned char	*save;
@@ -550,8 +546,8 @@ chkmail(void)
 }
 
 
-void
-setmail(unsigned char *mailpath)
+setmail(mailpath)
+	unsigned char *mailpath;
 {
 	register unsigned char	*s = mailpath;
 	register int 	cnt = 1;
@@ -580,23 +576,24 @@ setmail(unsigned char *mailpath)
 	}
 }
 
-void 
-setwidth(void)
+void
+setwidth()
 {
-	unsigned char *name = lookup("LC_ALL")->namval;
-	if (!name || !*name)
-		name = lookup("LC_CTYPE")->namval;
+	unsigned char *name = lookup("LC_CTYPE")->namval;
 	if (!name || !*name)
 		name = lookup("LANG")->namval;
-	if (!name || !*name)
-		setlocale(LC_CTYPE, "C");
-	else
-		setlocale(LC_CTYPE, (const char *)name);
-	mb_cur_max = MB_CUR_MAX;
+	/*
+	 * Do locale processing only if /usr is mounted.
+	 */
+	if (localedir_exists) {
+		if (!name || !*name)
+			(void) setlocale(LC_CTYPE, "C");
+		else
+			(void) setlocale(LC_CTYPE, (const char *)name);
+	}
 }
 
-void
-setmode(int prof)
+setmode(prof)
 {
 	/*
 	 * decide whether interactive

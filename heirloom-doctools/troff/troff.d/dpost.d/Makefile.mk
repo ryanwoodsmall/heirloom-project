@@ -1,8 +1,8 @@
-OBJ = dpost.o draw.o color.o pictures.o ps_include.o afm.o \
-	makedev.o glob.o misc.o request.o version.o getopt.o \
-	asciitype.o otf.o
+VPATH=..
+OBJ = dpost.o draw.o color.o pictures.o ps_include.o \
+	glob.o misc.o request.o version.o getopt.o
 
-FLAGS = -I. -I.. -DFNTDIR='"$(FNTDIR)"' -DPSTDIR='"$(PSTDIR)"' $(EUC)
+FLAGS = -DFNTDIR='"$(FNTDIR)"' -DPSTDIR='"$(PSTDIR)"'
 
 .c.o:
 	$(CC) $(CFLAGS) $(WARN) $(CPPFLAGS) $(FLAGS) -c $<
@@ -12,28 +12,22 @@ all: dpost
 dpost: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o dpost
 
+ps_include.h: ps_include.ps ps_include.awk
+	rm -f $@; awk -f ps_include.awk ps_include.ps >$@
+
 install:
-	$(INSTALL) -c dpost $(ROOT)$(BINDIR)/dpost
-	$(STRIP) $(ROOT)$(BINDIR)/dpost
-	mkdir -p $(ROOT)$(MANDIR)/man1
-	$(INSTALL) -c -m 644 dpost.1 $(ROOT)$(MANDIR)/man1/dpost.1
+	$(INSTALL) -c -s dpost $(ROOT)$(BINDIR)/dpost
 
 clean:
-	rm -f $(OBJ) dpost core log *~
+	rm -f $(OBJ) dpost core ps_include.h log *~
 
 mrproper: clean
 
 color.o: color.c gen.h ext.h
-dpost.o: dpost.c comments.h gen.h path.h ext.h ../dev.h dpost.h ../afm.h \
-	asciitype.h
+dpost.o: dpost.c comments.h gen.h path.h ext.h dev.h dpost.h
 draw.o: draw.c gen.h ext.h
 glob.o: glob.c gen.h
-misc.o: misc.c gen.h ext.h path.h asciitype.h
+misc.o: misc.c gen.h ext.h path.h
 pictures.o: pictures.c comments.h gen.h path.h
-ps_include.o: ps_include.c ext.h gen.h asciitype.h path.h
+ps_include.o: ps_include.c ps_include.h gen.h
 request.o: request.c gen.h request.h path.h
-afm.o: afm.c ../dev.h ../afm.h ../afm.c
-otf.o: otf.c ../dev.h ../afm.h ../otf.c
-makedev.o: makedev.c ../dev.h ../makedev.c
-asciitype.o: asciitype.h
-version.o: version.c ../../version.c

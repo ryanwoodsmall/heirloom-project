@@ -1,4 +1,6 @@
-OBJ = daps.o build.o draw.o getopt.o version.o
+VPATH=..
+
+OBJ = daps.o build.o draw.o getopt.o daps_version.o
 
 FONTS = B I R S CT CW CX GB GI GR GS HI HK HX PO PX S1 SC SM TX DESC \
 	C G H BI CE CI HB HL MB MI MR MX PA PB PI TB
@@ -27,10 +29,9 @@ HM.out: HB.out
 	ln -s HB.out $@
 
 install: all
-	$(INSTALL) -c daps $(ROOT)$(BINDIR)/daps
-	$(STRIP) $(ROOT)$(BINDIR)/daps
+	$(INSTALL) -c -s daps $(ROOT)$(BINDIR)/daps
 	mkdir -p $(ROOT)$(FNTDIR)/devaps
-	for i in $(FONTS) *.add *.out version; \
+	for i in *.add *.out version; \
 	do \
 		$(INSTALL) -c -m 644 $$i $(ROOT)$(FNTDIR)/devaps/$$i || exit; \
 	done
@@ -41,6 +42,5 @@ clean:
 mrproper: clean
 
 build.o: build.c daps.h
-daps.o: daps.c aps.h dev.h daps.h daps.g
-makedev.o: makedev.c dev.h
-draw.o: draw.c ../draw.c
+daps.o: daps.c aps.h ../dev.h daps.h daps.g
+makedev.o: makedev.c ../dev.h

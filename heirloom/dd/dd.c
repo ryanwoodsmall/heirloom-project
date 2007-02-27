@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)dd.sl	1.30 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)dd.sl	1.26 (gritter) 12/1/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -56,7 +56,7 @@ static const char sccsid[] USED = "@(#)dd.sl	1.30 (gritter) 1/22/06";
 
 #if defined (__linux__) || defined (__sun) || defined (__FreeBSD__) || \
 	defined (__hpux) || defined (_AIX) || defined (__NetBSD__) || \
-	defined (__OpenBSD__) || defined (__DragonFly__) || defined (__APPLE__)
+	defined (__OpenBSD__)
 #include	<sys/mtio.h>
 #else	/* SVR4.2MP */
 #include	<sys/scsi.h>
@@ -467,8 +467,7 @@ ontape(void)
 
 	if (yes == -1) {
 #if defined (__linux__) || defined (__FreeBSD__) || defined (__hpux) || \
-	defined (_AIX) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+	defined (_AIX) || defined (__NetBSD__) || defined (__OpenBSD__)
 		struct mtget	mg;
 		yes = (istat.st_mode&S_IFMT) == S_IFCHR &&
 			ioctl(iffd, MTIOCGET, &mg) == 0;
@@ -771,7 +770,7 @@ ewrite(char *data, size_t size)
 static void
 cflush(void)
 {
-	if (convs & CONV_BLOCK && cflow) {
+	if (cflow) {
 		while (cflow < cbs)
 			cblok[cflow++] = ' ';
 		ewrite(cblok, cbs);

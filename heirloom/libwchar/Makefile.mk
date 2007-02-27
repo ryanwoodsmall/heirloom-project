@@ -1,10 +1,9 @@
 all: libwchar.a
 
 OBJ = mbtowc.o wctomb.o wctype.o mbstowcs.o wcwidth.o wcslen.o wcsncmp.o \
-	mbrtowc.o wctfunc.o mblen.o
+	mbrtowc.o wctfunc.o
 libwchar.a: fake $(OBJ)
-	$(AR) -rv $@ $(OBJ)
-	$(RANLIB) $@
+	$(AR) -rv libwchar.a $(OBJ)
 
 fake:
 	if test "x$(LWCHAR)" = x; \
@@ -20,9 +19,6 @@ clean:
 
 mbtowc.o: mbtowc.c wchar.h
 	$(CC) $(CFLAGSS) $(CPPFLAGS) $(LARGEF) -I. -c mbtowc.c
-
-mblen.o: mblen.c wchar.h
-	$(CC) $(CFLAGSS) $(CPPFLAGS) $(LARGEF) -I. -c mblen.c
 
 mbrtowc.o: mbrtowc.c wchar.h
 	$(CC) $(CFLAGSS) $(CPPFLAGS) $(LARGEF) $(ICOMMON) -I. -c mbrtowc.c

@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t..c	1.19 (gritter) 9/11/06
+ * Sccsid @(#)t..c	1.7 (gritter) 8/12/05
  */
 
 /* t..c : external declarations */
@@ -31,60 +31,54 @@
 # define getc(f) _IO_getc_unlocked(f)
 # endif
 
+# define MAXLIN 200
+# define MAXHEAD 100
+# define MAXCOL 20
 # define MAXCHS 2000
 # define MAXSTR 1024
 # define MAXRPT 100
-# define CLLEN 100
+# define CLLEN 10
 # define SHORTLINE 4
 # define BIGBUF 8192
-extern int MAXLIN;
-extern int MAXCOL;
-extern int MAXHEAD;
 extern int nlin, ncol, iline, nclin, nslin;
-extern int **style;
-extern int **ctop;
-extern char ***font;
-extern char ***csize;
-extern char ***vsize;
-extern char **cll;
-extern int *stynum;
+extern int style[MAXHEAD][MAXCOL];
+extern int ctop[MAXHEAD][MAXCOL];
+extern char font[MAXHEAD][MAXCOL][2];
+extern char csize[MAXHEAD][MAXCOL][4];
+extern char vsize[MAXHEAD][MAXCOL][4];
+extern char cll[MAXCOL][CLLEN];
+extern int stynum[];
 extern int F1, F2;
-extern int **lefline;
-extern int *fullbot;
-extern char **instead;
+extern int lefline[MAXHEAD][MAXCOL];
+extern int fullbot[];
+extern char *instead[];
 extern int expflg;
 extern int ctrflg;
 extern int evenflg;
-extern int *evenup;
+extern int evenup[];
 extern int boxflg;
 extern int dboxflg;
-extern int decimalpoint;
 extern int linsize;
 extern int tab;
 extern int pr1403;
-extern int graphics;
-extern int Graphics;
 extern int linsize, delim1, delim2;
 extern int allflg;
 extern int textflg;
 extern int left1flg;
 extern int rightl;
 struct colstr {char *col, *rcol;};
-extern struct colstr **table;
-extern char *cspace, *cstore, *cbase;
+extern struct colstr *table[];
+extern char *cspace, *cstore;
 extern char *exstore, *exlim;
-extern int *sep;
-extern int *used, *lused, *rused;
-extern int *linestop;
+extern int sep[];
+extern int used[], lused[], rused[];
+extern int linestop[];
 extern char *leftover;
 extern char *last, *ifile;
-extern int *topat;
 extern int texname;
 extern int texct;
-extern int texct2;
 extern char texstr[];
 extern int linstart;
-extern int nokeep;
 
 extern const char *progname;
 
@@ -149,7 +143,7 @@ int domore(char *);
 void checkuse(void);
 int real(char *);
 char *chspace(void);
-void updspace(char *, char *, int);
+void updspace(char *, char *);
 int *alocv(int);
 void release(void);
 /* tc.c */
@@ -158,7 +152,7 @@ int point(int);
 /* te.c */
 void error(char *);
 char *errmsg(int);
-char *gets1(char **, char **, size_t *);
+char *gets1(char **, size_t *);
 void un1getc(int);
 int get1char(void);
 /* tf.c */
@@ -169,13 +163,9 @@ void ifdivert(void);
 void saveline(void);
 void restline(void);
 void cleanfc(void);
-void warnon(void);
-void warnoff(void);
-void svgraph(void);
 /* tg.c */
 int get_text(char *, int, int, char *, char *);
 void untext(void);
-char *nreg(char *, const char *, int);
 /* ti.c */
 int interv(int, int);
 int interh(int, int);

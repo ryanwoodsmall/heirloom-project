@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)lib.c	1.27 (gritter) 12/25/06>
+   Sccsid @(#)lib.c	1.21 (gritter) 10/13/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -25,7 +25,7 @@
 /*	copyright	"%c%"	*/
 
 /*	from unixsrc:usr/src/common/cmd/awk/lib.c /main/uw7_nj/1	*/
-/*	from RCS Header: lib.c 1.2 91/06/25 	*/
+/*	$Header$	*/
 
 #define DEBUG
 #include <stdio.h>
@@ -38,7 +38,6 @@
 #include <pfmt.h>
 #include <stdarg.h>
 #include <wctype.h>
-#include "asciitype.h"
 
 #undef	RS
 
@@ -60,7 +59,7 @@ int	donerec;	/* 1 = record is valid (no flds have changed) */
 Cell	**fldtab;	/* room for fields */
 
 static Cell	dollar0 = {
-	OCELL, CFLD, (unsigned char*) "$0", (unsigned char *)"", 0.0, REC|STR|DONTFREE
+	OCELL, CFLD, (unsigned char*) "$0", "", 0.0, REC|STR|DONTFREE
 };
 static Cell	FINIT = {
 	OCELL, CFLD, NULL, (unsigned char*) "", 0.0, FLD|STR|DONTFREE
@@ -71,6 +70,7 @@ static int	MAXFLD;	/* number of allocated fields */
 int	maxfld	= 0;	/* last used field */
 int	argno	= 1;	/* current input argument number */
 extern	Awkfloat *ARGC;
+extern	unsigned char	*getargv();
 
 static void growrec(unsigned char **, int *, int, unsigned char **, int);
 
@@ -405,6 +405,7 @@ void newfld(int n)	/* add field n (after end) */
 static int refldbld(unsigned char *rec,
 		unsigned char *fs)	/* build fields from reg expr in FS */
 {
+	fa *makedfa();
 	unsigned char *fr;
 	int i;
 	fa *pfa;
@@ -622,7 +623,7 @@ static void eprint(void)	/* try to print context around error */
 		;
 	while (*p == '\n')
 		p++;
-	if (0 /* posix */)
+	if (posix)
 		pfmt(stderr, MM_INFO, ":28:Context is\n\t");
 	else
 		pfmt(stderr, MM_INFO|MM_NOSTD, ":2228: context is\n\t");
@@ -685,9 +686,9 @@ int isclvar(unsigned char *s)	/* is s of form var=something? */
 	unsigned char *os = s;
 
 	for ( ; *s; s++)
-		if (!(alnumchar(*s) || *s == '_'))
+		if (!(isalnum(*s) || *s == '_'))
 			break;
-	return *s == '=' && s > os && *(s+1) != '=' && !digitchar(*os);
+	return *s == '=' && s > os && *(s+1) != '=';
 }
 
 int is2number(register unsigned char *s, Cell *p)
@@ -827,26 +828,4 @@ static void growrec(unsigned char **buf, int *bufsize, int newsize,
 	if (recloc->sval == op)
 		recloc->sval = np;
 	*buf = np;
-}
-
-int
-vpfmt(FILE *stream, long flags, const char *fmt, va_list ap)
-{
-	extern char	*pfmt_label__;
-	int	n = 0;
-
-	if ((flags & MM_NOGET) == 0) {
-		if (*fmt == ':') {
-			do
-				fmt++;
-			while (*fmt != ':');
-			fmt++;
-		}
-	}
-	if ((flags & MM_NOSTD) == 0)
-		n += fprintf(stream, "%s: ", pfmt_label__);
-	if ((flags & MM_ACTION) == 0 && isupper(*fmt&0377))
-		n += fprintf(stream, "%c", tolower(*fmt++&0377));
-	n += vfprintf(stream, fmt, ap);
-	return n;
 }

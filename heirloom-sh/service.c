@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)service.c	1.11 (gritter) 8/25/06
+ * Sccsid @(#)service.c	1.4 (gritter) 6/14/05
  */
 /* from OpenSolaris "service.c	1.23	05/06/08 SMI"	 SVr4.0 1.22.5.1 */
 
@@ -42,13 +42,12 @@
 #include	"defs.h"
 #include	<errno.h>
 #include	<fcntl.h>
-#include	<time.h>
 
 #define	ARGMK	01
 
-static unsigned char *execs(unsigned char *, register unsigned char *[]);
-static void gsort(unsigned char *[], unsigned char *[]);
-static int split(unsigned char *);
+static unsigned char	*execs();
+static int	gsort();
+static int	split();
 extern const char	*sysmsg[];
 extern short topfd;
 
@@ -57,11 +56,12 @@ extern short topfd;
 /*
  * service routines for `execute'
  */
-int 
-initio(struct ionod *iop, int save)
+initio(iop, save)
+	struct ionod	*iop;
+	int		save;
 {
 	register unsigned char	*ion;
-	register int	iof, fd = -1;
+	register int	iof, fd;
 	int		ioufd;
 	short	lastfd;
 	int	newmode;
@@ -109,7 +109,7 @@ initio(struct ionod *iop, int save)
 			} else if (flags & rshflg) {
 				failed(ion, restricted);
 			} else if (iof & IOAPP &&
-			    (fd = open((char *)ion, O_WRONLY)) >= 0) {
+			    (fd = open((char *)ion, 1)) >= 0) {
 				lseek(fd, (off_t)0, SEEK_END);
 			} else {
 				fd = create(ion);
@@ -124,7 +124,8 @@ initio(struct ionod *iop, int save)
 }
 
 unsigned char *
-simple(unsigned char *s)
+simple(s)
+unsigned char	*s;
 {
 	unsigned char	*sname;
 
@@ -139,7 +140,8 @@ simple(unsigned char *s)
 }
 
 unsigned char *
-getpath(unsigned char *s)
+getpath(s)
+	unsigned char	*s;
 {
 	register unsigned char	*path, *newpath;
 	register int pathlen;
@@ -158,36 +160,36 @@ getpath(unsigned char *s)
 		if (pathlen > 2 && path[pathlen - 1] == ':' &&
 				path[pathlen - 2] != ':') {
 			newpath = locstak();
-			memcpystak(newpath, path, pathlen);
+			(void) memcpystak(newpath, path, pathlen);
 			newpath[pathlen] = ':';
 			endstak(newpath + pathlen + 1);
 			return (newpath);
 		} else
 			return (cpystak(path));
 	}
-	/*NOTREACHED*/
-	return 0;
 }
 
-int 
-pathopen(register const unsigned char *path, register const unsigned char *name)
+pathopen(path, name)
+register unsigned char *path, *name;
 {
 	register int	f;
 
 	do
 	{
 		path = catpath(path, name);
-	} while ((f = open((char *)curstak(), O_RDONLY)) < 0 && path);
+	} while ((f = open((char *)curstak(), 0)) < 0 && path);
 	return (f);
 }
 
 unsigned char *
-catpath(register const unsigned char *path, unsigned const char *name)
+catpath(path, name)
+register unsigned char	*path;
+unsigned char	*name;
 {
 	/*
 	 * leaves result on top of stack
 	 */
-	register unsigned const char	*scanp = path;
+	register unsigned char	*scanp = path;
 	register unsigned char	*argp = locstak();
 
 	while (*scanp && *scanp != COLON)
@@ -212,13 +214,14 @@ catpath(register const unsigned char *path, unsigned const char *name)
 			growstak(argp);
 	}
 	while (*argp++ = *scanp++);
-	return (unsigned char *)(path);
+	return (path);
 }
 
 unsigned char *
-nextpath(register const unsigned char *path)
+nextpath(path)
+	register unsigned char	*path;
 {
-	register const unsigned char	*scanp = path;
+	register unsigned char	*scanp = path;
 
 	while (*scanp && *scanp != COLON)
 		scanp++;
@@ -226,14 +229,16 @@ nextpath(register const unsigned char *path)
 	if (*scanp == COLON)
 		scanp++;
 
-	return (unsigned char *)(*scanp ? scanp : 0);
+	return (*scanp ? scanp : 0);
 }
 
 static unsigned char	*xecmsg;
 static unsigned char	**xecenv;
 
-void
-execa(unsigned char *at[], int pos)
+int
+execa(at, pos)
+    unsigned char *at[];
+    short pos;
 {
 	register unsigned char	*path;
 	register unsigned char	**t = at;
@@ -263,9 +268,12 @@ execa(unsigned char *at[], int pos)
 }
 
 static unsigned char *
-execs(unsigned char *ap, register unsigned char *t[])
+execs(ap, t)
+unsigned char	*ap;
+register unsigned char	*t[];
 {
 	register unsigned char	*p, *prefix;
+	unsigned char		*savptr;
 
 	prefix = catpath(ap, t[0]);
 	trim(p = curstak());
@@ -335,8 +343,8 @@ execs(unsigned char *ap, register unsigned char *t[])
 
 BOOL		nosubst;
 
-void
-trim(unsigned char *at)
+trim(at)
+unsigned char	*at;
 {
 	register unsigned char	*last;
 	register unsigned char 	*current;
@@ -349,14 +357,15 @@ trim(unsigned char *at)
 	{
 		last = at;
 		while (c = *current) {
-			if ((len = nextc(&wc, (char *)current)) <= 0) {
+			if ((len = mbtowc(&wc, (char *)current,
+					MB_LEN_MAX)) <= 0) {
 				*last++ = c;
 				current++;
 				continue;
 			}
 
 			if (wc != '\\') {
-				memmove(last, current, len);
+				memcpy(last, current, len);
 				last += len;
 				current += len;
 				continue;
@@ -366,12 +375,13 @@ trim(unsigned char *at)
 			nosubst = 1;
 			current++;
 			if (c = *current) {
-				if ((len = nextc(&wc, (char *)current)) <= 0) {
+				if ((len = mbtowc(&wc, (char *)current,
+						MB_LEN_MAX)) <= 0) {
 					*last++ = c;
 					current++;
 					continue;
 				}
-				memmove(last, current, len);
+				memcpy(last, current, len);
 				last += len;
 				current += len;
 			} else
@@ -383,8 +393,8 @@ trim(unsigned char *at)
 }
 
 /* Same as trim, but only removes backlashes before slashes */
-void
-trims(unsigned char *at)
+trims(at)
+unsigned char	*at;
 {
 	register unsigned char	*last;
 	register unsigned char 	*current;
@@ -396,14 +406,15 @@ trims(unsigned char *at)
 	{
 		last = at;
 		while (c = *current) {
-			if ((len = nextc(&wc, (char *)current)) <= 0) {
+			if ((len = mbtowc(&wc, (char *)current,
+					MB_LEN_MAX)) <= 0) {
 				*last++ = c;
 				current++;
 				continue;
 			}
 
 			if (wc != '\\') {
-				memmove(last, current, len);
+				memcpy(last, current, len);
 				last += len; current += len;
 				continue;
 			}
@@ -422,12 +433,13 @@ trims(unsigned char *at)
 			}
 
 			*last++ = '\\';
-			if ((len = nextc(&wc, (char *)current)) <= 0) {
+			if ((len = mbtowc(&wc, (char *)current,
+					MB_LEN_MAX)) <= 0) {
 				*last++ = c;
 				current++;
 				continue;
 			}
-			memmove(last, current, len);
+			memcpy(last, current, len);
 			last += len; current += len;
 		}
 		*last = 0;
@@ -435,7 +447,8 @@ trims(unsigned char *at)
 }
 
 unsigned char *
-mactrim(unsigned char *s)
+mactrim(s)
+unsigned char	*s;
 {
 	register unsigned char	*t = macro(s);
 
@@ -444,7 +457,8 @@ mactrim(unsigned char *s)
 }
 
 unsigned char **
-scan(int argn)
+scan(argn)
+int	argn;
 {
 	register struct argnod *argp =
 			(struct argnod *)(Rcheat(gchain) & ~ARGMK);
@@ -470,8 +484,9 @@ scan(int argn)
 	return (comargn);
 }
 
-static void
-gsort(unsigned char *from[], unsigned char *to[])
+static int
+gsort(from, to)
+unsigned char	*from[], *to[];
 {
 	int	k, m, n;
 	register int	i, j;
@@ -510,8 +525,8 @@ gsort(unsigned char *from[], unsigned char *to[])
 /*
  * Argument list generation
  */
-int 
-getarg(struct comnod *ac)
+getarg(ac)
+struct comnod	*ac;
 {
 	register struct argnod	*argp;
 	register int		count = 0;
@@ -522,17 +537,16 @@ getarg(struct comnod *ac)
 		argp = c->comarg;
 		while (argp)
 		{
-			count += split(macro(argp->argval));
+			count += split(macro(argp->argval), 1);
 			argp = argp->argnxt;
 		}
 	}
 	return (count);
 }
 
-static int 
-split (		/* blank interpretation routine */
-    unsigned char *s
-)
+static int
+split(s)		/* blank interpretation routine */
+unsigned char	*s;
 {
 	register unsigned char	*argp;
 	register int	c;
@@ -544,7 +558,8 @@ split (		/* blank interpretation routine */
 		argp = locstak() + BYTESPERWORD;
 		while (c = *s) {
 			wchar_t wc;
-			if ((length = nextc(&wc, (char *)s)) <= 0) {
+			if ((length = mbtowc(&wc, (char *)s,
+					MB_LEN_MAX)) <= 0) {
 				wc = (unsigned char)*s;
 				length = 1;
 			}
@@ -555,7 +570,8 @@ split (		/* blank interpretation routine */
 				*argp++ = c;
 				s++;
 				/* get rest of multibyte character */
-				if ((length = nextc(&wc, (char *)s)) <= 0) {
+				if ((length = mbtowc(&wc, (char *)s,
+						MB_LEN_MAX)) <= 0) {
 					wc = (unsigned char)*s;
 					length = 1;
 				}
@@ -608,10 +624,10 @@ split (		/* blank interpretation routine */
 			count += c;
 		else
 		{
-			makearg((struct argnod *)argp);
+			makearg(argp);
 			count++;
 		}
-		gchain = (struct argnod *)((intptr_t)gchain | ARGMK);
+		gchain = (struct argnod *)((int)gchain | ARGMK);
 	}
 }
 
@@ -631,15 +647,16 @@ static int shaccton;	/* 0 implies do not write record on exit */
  *	suspend accounting until turned on by preacct()
  */
 
-void 
-suspacct(void)
+suspacct()
 {
 	shaccton = 0;
 }
 
-void
-preacct(unsigned char *cmdadr)
+preacct(cmdadr)
+	unsigned char *cmdadr;
 {
+	unsigned char *simple();
+
 	if (acctnod.namval && *acctnod.namval)
 	{
 		sabuf.ac_btime = time((time_t *)0);
@@ -652,8 +669,7 @@ preacct(unsigned char *cmdadr)
 }
 
 
-void
-doacct(void)
+doacct()
 {
 	int fd;
 	clock_t after;
@@ -677,11 +693,11 @@ doacct(void)
  *	with 3 bits base-8 exponent, 13 bits fraction
  */
 
-int
-compress(register clock_t t)
+compress(t)
+	register clock_t t;
 {
-	register int exp = 0;
-	register int rund = 0;
+	register exp = 0;
+	register rund = 0;
 
 	while (t >= 8192)
 	{

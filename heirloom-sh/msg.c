@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)msg.c	1.11 (gritter) 7/3/05
+ * Sccsid @(#)msg.c	1.3 (gritter) 6/14/05
  */
 /* from OpenSolaris "msg.c	1.13	05/06/08 SMI" */
 /*
@@ -45,10 +45,11 @@
 /*
  * error messages
  */
+#ifndef __STDC__
+#define const 
+#endif
 
 const char	badopt[]	= "bad option(s)";
-const char	badargs[]	= "missing argument";
-const char	badumask[]	= "bad umask";
 const char	mailmsg[]	= "you have mail\n";
 const char	nospace[]	= "no space";
 const char	nostack[]	= "no stack space";
@@ -133,14 +134,13 @@ const char	ps2name[]	= "PS2";
 const char	mchkname[]	= "MAILCHECK";
 const char	acctname[]  	= "SHACCT";
 const char	mailpname[]	= "MAILPATH";
-const char	timeoutname[]	= "TIMEOUT";
 
 /*
  * string constants
  */
 const char	nullstr[]	= "";
 const char	sptbnl[]	= " \t\n";
-const char	defpath[]	= "/usr/5bin:/bin:/usr/bin:";
+const char	defpath[]	= "/usr/bin:";
 const char	colon[]		= ": ";
 const char	minus[]		= "-";
 const char	endoffile[]	= "end of file";
@@ -153,6 +153,12 @@ const char	stdprompt[]	= "$ ";
 const char	supprompt[]	= "# ";
 const char	profile[]	= ".profile";
 const char	sysprofile[]	= "/etc/profile";
+
+/*
+ * locale testing
+ */
+const char	localedir[]	= "/usr/lib/locale";
+int		localedir_exists;
 
 /*
  * tables

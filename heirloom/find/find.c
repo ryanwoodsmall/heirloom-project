@@ -37,19 +37,17 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SU3)
-static const char sccsid[] USED = "@(#)find_su3.sl	1.45 (gritter) 5/8/06";
-#elif defined (SUS)
-static const char sccsid[] USED = "@(#)find_sus.sl	1.45 (gritter) 5/8/06";
+#ifndef	SUS
+static const char sccsid[] USED = "@(#)find.sl	1.31 (gritter) 11/7/04";
 #else
-static const char sccsid[] USED = "@(#)find.sl	1.45 (gritter) 5/8/06";
+static const char sccsid[] USED = "@(#)find_sus.sl	1.31 (gritter) 11/7/04";
 #endif
 
 #include <stdio.h>
@@ -69,14 +67,13 @@ static const char sccsid[] USED = "@(#)find.sl	1.45 (gritter) 5/8/06";
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 #include <fnmatch.h>
 #endif
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 #include <mntent.h>
 #endif
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-	defined (__DragonFly__) || defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
 #endif
@@ -86,10 +83,6 @@ static const char sccsid[] USED = "@(#)find.sl	1.45 (gritter) 5/8/06";
 #ifndef	major
 #include <sys/mkdev.h>
 #endif
-#if __NetBSD_Version__>= 300000000
-#include <sys/statvfs.h>
-#define statfs statvfs
-#endif
 #include "getdir.h"
 #include "atoll.h"
 #define A_DAY	86400L /* a day full of seconds */
@@ -97,14 +90,6 @@ static const char sccsid[] USED = "@(#)find.sl	1.45 (gritter) 5/8/06";
 
 #ifndef	MNTTYPE_IGNORE
 #define	MNTTYPE_IGNORE	""
-#endif
-
-#ifndef	S_IFDOOR
-#define	S_IFDOOR	0xD000
-#endif
-
-#ifndef	S_IFNWK
-#define	S_IFNWK		0x9000
 #endif
 
 #undef	ctime
@@ -190,9 +175,7 @@ static int	Print = 1;	/* implicit -print */
 static int	Prune;		/* -prune at this point */
 static int	Mount;		/* -mount, -xdev */
 static int	Execplus;	/* have a -exec command {} + node */
-static int	HLflag;		/* -H or -L option given */
 static char	*Statfs;	/* result of statfs() on FreeBSD */
-static int	incomplete;	/* encountered an incomplete statement */
 extern int	sysv3;
 
 static int	(*statfn)(const char *, struct stat *) = lstat;
@@ -228,8 +211,6 @@ static int	exeq(struct anode *);
 static int	ok(struct anode *);
 static int	cpio(struct anode *);
 static int	newer(struct anode *);
-static int	cnewer(struct anode *);
-static int	anewer(struct anode *);
 static int	fstype(struct anode *);
 static int	local(struct anode *);
 static int	scomp(long long, long long, char);
@@ -253,7 +234,6 @@ static void	usage(void);
 static void	*srealloc(void *, size_t);
 static void	mkcpio(struct anode *, const char *, int);
 static void	trailer(struct anode *, int);
-static void	mknewer(struct anode *, const char *, int (*)(struct anode *));
 static mode_t	newmode(const char *ms, const mode_t pm);
 
 int
@@ -263,7 +243,6 @@ main(int argc, char **argv)
 	struct anode nlist = { null, { 0 }, { 0 } };
 	int paths;
 	register char *sp = 0;
-	int	i, j;
 
 	time(&Now);
 	umask(um = umask(0));
@@ -272,23 +251,6 @@ main(int argc, char **argv)
 	setlocale(LC_CTYPE, "");
 	if (getenv("SYSV3") != NULL)
 		sysv3 = 1;
-	for (i = 1; i < argc; i++) {
-		if (argv[i][0] != '-' || argv[i][1] == '\0')
-			break;
-		if (argv[i][1] == '-') {
-			i++;
-			break;
-		}
-		for (j = 1; argv[i][j]; j++)
-			if (argv[i][j] != 'H' && argv[i][j] != 'L')
-				goto brk;
-		for (j = 1; argv[i][j]; j++)
-			HLflag = argv[i][j];
-	}
-brk:	if (HLflag == 'L')
-		statfn = stat;
-	argc -= i - 1;
-	argv += i - 1;
 	Argc = argc; Argv = argv;
 	if(argc<2) {
 		pr("insufficient number of arguments");
@@ -417,7 +379,7 @@ static struct anode *e3(void) { /* parse parens and predicates */
 	}
 	if (n.F)
 		return mk(&n);
-	b = nxtarg(2);
+	b = nxtarg(1);
 	s = *b;
 	/*if(s=='+') b++;*/
 	if(EQ(a, "-name"))
@@ -449,7 +411,7 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		while (*b == '-')
 			b++;
 		n.F = perm, n.l.per = newmode(b, 0), n.r.s = s;
-#if defined (SUS) || defined (SU3)
+#ifdef	SUS
 		if (s == '-')
 			n.l.per &= 07777;
 #endif
@@ -459,10 +421,8 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		i = i=='d' ? S_IFDIR :
 		    i=='b' ? S_IFBLK :
 		    i=='c' ? S_IFCHR :
-		    i=='D' ? S_IFDOOR :
 		    i=='f' ? S_IFREG :
 		    i=='l' ? S_IFLNK :
-		    i=='n' ? S_IFNWK :
 		    i=='p' ? S_IFIFO :
 		    i=='s' ? S_IFSOCK :
 		    0;
@@ -495,24 +455,20 @@ static struct anode *e3(void) { /* parse parens and predicates */
 		mkcpio(&n, b, 0);
 	else if(EQ(a, "-ncpio"))
 		mkcpio(&n, b, 1);
-	else if(EQ(a, "-newer"))
-		mknewer(&n, b, newer);
-	else if(EQ(a, "-anewer"))
-		mknewer(&n, b, anewer);
-	else if(EQ(a, "-cnewer"))
-		mknewer(&n, b, cnewer);
-	else if(EQ(a, "-fstype")) {
+	else if(EQ(a, "-newer")) {
+		if(stat(b, &Statb) < 0)
+			er("cannot access %s", b);
+		n.l.t = Statb.st_mtime;
+		n.F = newer;
+	} else if(EQ(a, "-fstype")) {
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 		getfstypes();
 #endif	/* __linux__ || _AIX || __hpux */
 		n.F = fstype, n.l.fstype = b;
 		Statfs = a;
 	}
-	if (n.F) {
-		if (incomplete)
-			nxtarg(1);
+	if (n.F)
 		return mk(&n);
-	}
 err:	pr("bad option %s", a);
 	usage();
 	/*NOTREACHED*/
@@ -540,12 +496,11 @@ static void oper(const char **ops)
 static char *nxtarg(int must) { /* get next arg from command line */
 	static int strikes = 0;
 
-	if(must==1 && Ai>=Argc || strikes==3)
+	if(must && Ai>=Argc || strikes==3)
 		er("incomplete statement");
 	if(Ai>=Argc) {
 		if (must >= 0)
 			strikes++;
-		incomplete = 1;
 		Ai = Argc + 1;
 		return("");
 	}
@@ -565,13 +520,13 @@ static int not(register struct anode *p)
 {
 	return( !((*p->l.L->F)(p->l.L)));
 }
-#if !defined (SUS) && !defined (SU3)
+#ifndef	SUS
 static int glob(register struct anode *p)
 {
 	extern int gmatch(const char *, const char *);
 	return(gmatch(Fname, p->l.pat));
 }
-#else	/* SUS, SU3 */
+#else	/* SUS */
 static int glob(register struct anode *p)
 {
 	int	val;
@@ -588,7 +543,7 @@ static int glob(register struct anode *p)
 #endif	/* __GLIBC__ */
 	return val;
 }
-#endif	/* SUS, SU3 */
+#endif	/* SUS */
 /*ARGSUSED*/
 static int print(register struct anode *p)
 {
@@ -724,20 +679,11 @@ static int newer(register struct anode *p)
 {
 	return Statb.st_mtime > p->l.t;
 }
-static int anewer(register struct anode *p)
-{
-	return Statb.st_atime > p->l.t;
-}
-static int cnewer(register struct anode *p)
-{
-	return Statb.st_ctime > p->l.t;
-}
 static int fstype(register struct anode *p)
 {
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 	return(EQ(fscur->fstype, p->l.fstype));
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	return(EQ(Statfs, p->l.fstype));
 #else
 	return(EQ(Statb.st_fstype, p->l.fstype));
@@ -747,8 +693,7 @@ static int local(register struct anode *p)
 {
 #if defined (__linux__) || defined (_AIX) || defined (__hpux)
 	return(strcmp(fscur->fstype, "nfs") && strcmp(fscur->fstype, "smbfs"));
-#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) \
-		|| defined (__DragonFly__) || defined (__APPLE__)
+#elif defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	return(strcmp(Statfs, "nfs") != 0);
 #else
 	return(strcmp(Statb.st_fstype, "nfs") != 0);
@@ -986,7 +931,7 @@ static int descend(char *fname, struct anode *exlist, int level)
 
 	if(statfn(fname, &Statb)<0) {
 		if (statfn != lstat && lstat(fname, &Statb) == 0)
-		nof:	c1 = "cannot follow symbolic link %s: %s";
+			c1 = "cannot follow symbolic link %s: %s";
 		else if (sysv3)
 			c1 = "stat() failed: %s: %s";
 		else if (errno == ENOENT || errno == ENOTDIR)
@@ -994,28 +939,20 @@ static int descend(char *fname, struct anode *exlist, int level)
 		else
 			c1 = "stat() error %s: %s";
 		pr(c1, Pathname, strerror(errno));
-		status = 18;
+		status |= 18;
 		return(0);
 	}
-	if (level == 0 && HLflag == 'H' && (Statb.st_mode&S_IFMT) == S_IFLNK) {
-		struct stat	nst;
-		if (stat(fname, &nst) == 0)
-			Statb = nst;
-		else if (errno == ELOOP)
-			goto nof;
-	}
-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || \
-		defined (__DragonFly__) || defined (__APPLE__)
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__)
 	if (Statfs != NULL) {
 		static struct statfs	sf;
 		if (statfs(fname, &sf) < 0) {
 			pr("statfs() error %s: %s", Pathname, strerror(errno));
-			status = 18;
+			status |= 18;
 			return(0);
 		}
 		Statfs = sf.f_fstypename;
 	}
-#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
+#endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__ */
 	if (Mount) {
 		static dev_t	curdev;
 		if (level == 0)
@@ -1038,13 +975,8 @@ static int descend(char *fname, struct anode *exlist, int level)
 	if (statfn != lstat) {
 		for (i = 0; i < level; i++)
 			if (Statb.st_dev == visited[i].v_dev &&
-					Statb.st_ino == visited[i].v_ino) {
-#ifdef	SU3
-				pr("Symbolic link loop at %s", Pathname);
-				status = 18;
-#endif	/* SU3 */
+					Statb.st_ino == visited[i].v_ino)
 				goto reg;
-			}
 	}
 	if (level >= vismax) {
 		vismax += 20;
@@ -1085,7 +1017,7 @@ static int descend1(char *fname, struct anode *exlist, int level)
 	oflags |= O_DIRECTORY;
 #endif
 #ifdef	O_NOFOLLOW
-	if (statfn == lstat && (HLflag != 'H' || level > 0))
+	if (statfn == lstat)
 		oflags |= O_NOFOLLOW;
 #endif
 	if ((dir = open(fname, oflags)) < 0 ||
@@ -1104,7 +1036,7 @@ static int descend1(char *fname, struct anode *exlist, int level)
 			 */
 			return 0;
 		pr("cannot open %s: %s", Pathname, strerror(errno));
-		status = 18;
+		status |= 18;
 		return 0;
 	}
 	if ((db = getdb_alloc(Pathname, dir)) == NULL) {
@@ -1134,7 +1066,7 @@ static int descend1(char *fname, struct anode *exlist, int level)
 	getdb_free(db);
 	if (err) {
 		pr("cannot read dir %s: %s", Pathname, strerror(errno));
-		status = 18;
+		status |= 18;
 	}
 	close(dir);
 	visited[level].v_fd = -1;
@@ -1252,8 +1184,6 @@ static void mkcpio(struct anode *p, const char *b, int ascii)
 	char	flags[20], *cp;
 
 	p->F = cpio;
-	if (*b == '\0')
-		return;
 	depth = 1;
 	Print = 0;
 	Cpio = 1;
@@ -1318,15 +1248,6 @@ trailer(register struct anode *p, int termcpio)
 	Pathname = Opath;
 }
 
-static void
-mknewer(struct anode *p, const char *b, int (*f)(struct anode *))
-{
-	if (*b && stat(b, &Statb) < 0)
-		er("cannot access %s", b);
-	p->l.t = Statb.st_mtime;
-	p->F = f;
-}
-
 /*
  * Changes by Gunnar Ritter, Freiburg i. Br., Germany, September 2003.
  */
@@ -1381,7 +1302,7 @@ mknewer(struct anode *p, const char *b, int (*f)(struct anode *))
 #endif
 
 static mode_t	absol(const char **);
-static mode_t	who(const char **, mode_t *);
+static mode_t	who(const char **);
 static int	what(const char **);
 static mode_t	where(const char **, mode_t, int *, int *, const mode_t);
 
@@ -1390,7 +1311,7 @@ newmode(const char *ms, const mode_t pm)
 {
 	register mode_t	o, m, b;
 	int	lock, setsgid = 0, cleared = 0, copy = 0;
-	mode_t	nm, om, mm;
+	mode_t	nm, om;
 	const char *mo = ms;
 
 	nm = om = pm;
@@ -1403,19 +1324,19 @@ newmode(const char *ms, const mode_t pm)
 			== 01)
 		nm &= ~(mode_t)S_ENFMT;
 	do {
-		m = who(&ms, &mm);
+		m = who(&ms);
 		while (o = what(&ms)) {
 			b = where(&ms, nm, &lock, &copy, pm);
 			switch (o) {
 			case '+':
-				nm |= b & m & ~mm;
+				nm |= b & m;
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
 					lock |= 02;
 				break;
 			case '-':
-				nm &= ~(b & m & ~mm);
+				nm &= ~(b & m);
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
@@ -1423,7 +1344,7 @@ newmode(const char *ms, const mode_t pm)
 				break;
 			case '=':
 				nm &= ~m;
-				nm |= b & m & ~mm;
+				nm |= b & m;
 				lock &= ~01;
 				if (lock & 04)
 					lock |= 02;
@@ -1437,12 +1358,10 @@ newmode(const char *ms, const mode_t pm)
 	} while (*ms++ == ',');
 	if (*--ms)
 		er("bad permissions: %s", mo);
-out:	if (pm & S_IFDIR) {
-		if ((pm & S_ISGID) && setsgid == 0)
-			nm |= S_ISGID;
-		else if ((nm & S_ISGID) && setsgid == 0)
-			nm &= ~(mode_t)S_ISGID;
-	}
+out:	if ((pm & S_ISGID) && setsgid == 0)
+		nm |= S_ISGID;
+	else if ((nm & S_ISGID) && setsgid == 0)
+		nm &= ~(mode_t)S_ISGID;
 	return(nm);
 }
 
@@ -1459,12 +1378,11 @@ absol(const char **ms)
 }
 
 static mode_t
-who(const char **ms, mode_t *mp)
+who(const char **ms)
 {
 	register int m;
 
 	m = 0;
-	*mp = 0;
 	for (;;) switch (*(*ms)++) {
 	case 'u':
 		m |= USER;
@@ -1480,10 +1398,8 @@ who(const char **ms, mode_t *mp)
 		continue;
 	default:
 		(*ms)--;
-		if (m == 0) {
-			m = ALL;
-			*mp = um;
-		}
+		if (m == 0)
+			m = ALL & ~(mode_t)um;
 		return m;
 	}
 }

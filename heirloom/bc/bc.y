@@ -43,20 +43,19 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)bc.sl	1.24 (gritter) 7/3/05";
+static const char sccsid[] USED = "@(#)bc.sl	1.21 (gritter) 7/17/04";
 #include <unistd.h>
 #include <signal.h>
 #include <limits.h>
 #include <inttypes.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 typedef	intptr_t	YYSTYPE;
 #define	YYSTYPE	YYSTYPE
@@ -95,6 +94,7 @@ typedef	intptr_t	YYSTYPE;
 %term QSTR
 
 %{
+#include <stdio.h>
 #define	THIS_BC_STRING_MAX	1000
 static FILE *in;
 static char cary[LINE_MAX + 1], *cp = { cary };
@@ -488,7 +488,7 @@ restart:
 			  gotit:     peekc = -1; return(c);
 		  }
 	case '+':	return( cpeek( '+', INCR, cpeek( '=', EQPL, '+') ) );
-	case '-':	return( cpeek( '-', DECR, cpeek( '=', EQMI, '-') ) ) ;
+	case '-':	return( cpeek( '-', DECR, cpeek( '?', EQMI, '-') ) ) ;
 	case '<':	return( cpeek( '=', LE, '<' ) );
 	case '>':	return( cpeek( '=', GE, '>' ) );
 	case '!':	return( cpeek( '=', NE, '!' ) );
@@ -611,8 +611,8 @@ conout(intptr_t p, intptr_t s) {
 static void
 yyerror(const char *s) {
 	if(ifile > sargc)ss="teletype";
-	fprintf(stderr, "%s on line %d, %s\n",
-		s ,ss?ln+1:0,ss?ss:"command line");
+	printf("c[%s on line %d, %s]pc\n", s ,ss?ln+1:0,ss?ss:"command line");
+	fflush(stdout);
 	cp = cary;
 	crs = rcrs;
 	bindx = 0;

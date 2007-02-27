@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.97 (gritter) 11/14/06
+ * Sccsid @(#)t10.c	1.3 (gritter) 8/8/05
  */
 
 /*
@@ -46,21 +46,13 @@
  * contributors.
  */
 
-#include <stdlib.h>
 #include "tdef.h"
 #include <ctype.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#ifdef	EUC
-#include <locale.h>
-#endif
 #include "ext.h"
-#include "dev.h"
-#include "afm.h"
-#include "pt.h"
-#include "troff.h"
-#include "unimap.h"
+#include "proto.h"
 /*
  * troff10.c
  * 
@@ -70,14 +62,12 @@
 int	vpos	 = 0;	/* absolute vertical position on page */
 int	hpos	 = 0;	/* ditto horizontal */
 
-int	initbdtab[NFONT+1];
-
 short	*chtab;
 char	*chname;
-int	**fontab;
-char	**kerntab;
-unsigned short	**fitab;
-unsigned short	**codetab;
+char	*fontab[NFONT+1];
+char	*kerntab[NFONT+1];
+char	*fitab[NFONT+1];
+char	*codetab[NFONT+1];
 
 int	Inch;
 int	Hor;
@@ -86,12 +76,6 @@ int	Unitwidth;
 int	nfonts;
 int	nsizes;
 int	nchtab;
-int	lettrack;
-float	horscale;
-
-static float	mzoom;
-static int	mtrack;
-static float	mhorscale;
 
 /* these characters are used as various signals or values
  * in miscellaneous places.
@@ -100,7 +84,6 @@ static float	mhorscale;
 
 int	c_hyphen;
 int	c_emdash;
-int	c_endash;
 int	c_rule;
 int	c_minus;
 int	c_fi;
@@ -116,91 +99,28 @@ int	c_boxrule;
 int	c_lefthand;
 int	c_dagger;
 
+#include "dev.h"
 struct dev dev;
-struct Font **fontbase;
-
-int Nfont;
-
-static int	okern(tchar *, tchar *, int);
-static void	pthorscale(int);
-static void	pttrack(int);
-static void	ptanchor(int);
-static void	ptlink(int);
-static void	ptyon(int);
-static void	ptchar(int, int);
-
-void
-growfonts(int n)
-{
-	int	i, j;
-
-	fontbase = realloc(fontbase, n * sizeof *fontbase);
-	memset(&fontbase[Nfont], 0, (n - Nfont) * sizeof *fontbase);
-	fontab = realloc(fontab, n * sizeof *fontab);
-	memset(&fontab[Nfont], 0, (n - Nfont) * sizeof *fontab);
-	kerntab = realloc(kerntab, n * sizeof *kerntab);
-	memset(&kerntab[Nfont], 0, (n - Nfont) * sizeof *kerntab);
-	codetab = realloc(codetab, n * sizeof *codetab);
-	memset(&codetab[Nfont], 0, (n - Nfont) * sizeof *codetab);
-	fitab = realloc(fitab, n * sizeof *fitab);
-	memset(&fitab[Nfont], 0, (n - Nfont) * sizeof *fitab);
-	fontlab = realloc(fontlab, n * sizeof *fontlab);
-	memset(&fontlab[Nfont], 0, (n - Nfont) * sizeof *fontlab);
-	cstab = realloc(cstab, n * sizeof *cstab);
-	memset(&cstab[Nfont], 0, (n - Nfont) * sizeof *cstab);
-	ccstab = realloc(ccstab, n * sizeof *ccstab);
-	memset(&ccstab[Nfont], 0, (n - Nfont) * sizeof *ccstab);
-	bdtab = realloc(bdtab, n * sizeof *bdtab);
-	memset(&bdtab[Nfont], 0, (n - Nfont) * sizeof *bdtab);
-	tracktab = realloc(tracktab, n * sizeof *tracktab);
-	memset(&tracktab[Nfont], 0, (n - Nfont) * sizeof *tracktab);
-	fallbacktab = realloc(fallbacktab, n * sizeof *fallbacktab);
-	memset(&fallbacktab[Nfont], 0, (n - Nfont) * sizeof *fallbacktab);
-	zoomtab = realloc(zoomtab, n * sizeof *zoomtab);
-	memset(&zoomtab[Nfont], 0, (n - Nfont) * sizeof *zoomtab);
-	lhangtab = realloc(lhangtab, n * sizeof *lhangtab);
-	memset(&lhangtab[Nfont], 0, (n - Nfont) * sizeof *lhangtab);
-	rhangtab = realloc(rhangtab, n * sizeof *rhangtab);
-	memset(&rhangtab[Nfont], 0, (n - Nfont) * sizeof *rhangtab);
-	kernafter = realloc(kernafter, n * sizeof *kernafter);
-	memset(&kernafter[Nfont], 0, (n - Nfont) * sizeof *kernafter);
-	kernbefore = realloc(kernbefore, n * sizeof *kernbefore);
-	memset(&kernbefore[Nfont], 0, (n - Nfont) * sizeof *kernbefore);
-	ftrtab = realloc(ftrtab, n * sizeof *ftrtab);
-	for (i = Nfont; i < n; i++) {
-		ftrtab[i] = malloc(NCHARS * sizeof **ftrtab);
-		for (j = 0; j < NCHARS; j++)
-			ftrtab[i][j] = j;
-	}
-	lgtab = realloc(lgtab, n * sizeof *lgtab);
-	memset(&lgtab[Nfont], 0, (n - Nfont) * sizeof *lgtab);
-	lgrevtab = realloc(lgrevtab, n * sizeof *lgrevtab);
-	memset(&lgrevtab[Nfont], 0, (n - Nfont) * sizeof *lgrevtab);
-	Nfont = n;
-}
+struct Font *fontbase[NFONT+1];
 
 void
 ptinit(void)
 {
-	int	i, nw;
-	char	*filebase, *p, *ap, *descp;
+	int	i, fin, nw;
+	char	*filebase, *p;
 
-	growfonts(NFONT+1);
-	memcpy(bdtab, initbdtab,
-		max((NFONT+1) * sizeof *bdtab, sizeof initbdtab));
-	uninit();
 	/* open table for device,
 	 * read in resolution, size info, font info, etc.
 	 * and set params
 	 */
-	p = malloc(strlen(termtab) + strlen(devname) + 10);
-	termtab = strcpy(p, termtab);
 	strcat(termtab, "/dev");
 	strcat(termtab, devname);
-	strcat(termtab, "/DESC");	/* makes "..../devXXX/DESC" */
-	if ((descp = readdesc(termtab)) == NULL)
+	strcat(termtab, "/DESC.out");	/* makes "..../devXXX/DESC.out" */
+	if ((fin = open(termtab, 0)) < 0) {
+		errprint("can't open tables for %s", termtab);
 		done3(1);
-	memcpy(&dev, descp, sizeof dev);
+	}
+	read(fin, (char *) &dev, sizeof(struct dev ));
 	Inch = dev.res;
 	Hor = dev.hor;
 	Vert = dev.vert;
@@ -214,12 +134,9 @@ ptinit(void)
 		done3(1);
 	}
 	filebase = setbrk(dev.filesize + 2*EXTRAFONT);	/* enough room for whole file */
-	memcpy(filebase, &descp[sizeof dev], dev.filesize); /* all at once */
-	free(descp);
-	pstab = (int *) filebase;
-	for (i = 0; pstab[i]; i++)
-		pstab[i] = pts2u(pstab[i]);
-	chtab = (short *)(pstab + nsizes + 1);
+	read(fin, filebase, dev.filesize);	/* all at once */
+	pstab = (short *) filebase;
+	chtab = pstab + nsizes + 1;
 	chname = (char *) (chtab + dev.nchtab);
 	p = chname + dev.lchname;
 	for (i = 1; i <= nfonts; i++) {
@@ -230,44 +147,29 @@ ptinit(void)
 		if (smnt == 0 && fontbase[i]->specfont == 1)
 			smnt = i;	/* first special font */
 		p += sizeof(struct Font);	/* that's what's on the beginning */
-		if ((ap = strstr(fontbase[i]->namefont, ".afm")) != NULL) {
-			*ap = 0;
-			if (ap == &fontbase[i]->namefont[1])
-				fontlab[i] &= BYTEMASK;
-			loadafm(i, fontlab[i], fontbase[i]->namefont, NULL,
-					1, SPEC_NONE);
-		} else {
-			makefont(i, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
-		}
+		fontab[i] = p;
+		kerntab[i] = p + nw;
+		codetab[i] = p + 2 * nw;
+		fitab[i] = p + 3 * nw;	/* skip width, kern, code */
 		p += 3 * nw + dev.nchtab + 128 - 32;
 	}
 	fontbase[0] = (struct Font *) p;	/* the last shall be first */
-	memset(fontbase[0], 0, sizeof *fontbase[0]);
-	nw = EXTRAFONT - dev.nchtab - (128-32) - sizeof (struct Font);
-	fontbase[0]->nwfont = nw;
-	makefont(0, p, p + nw, p + 2 * nw, p + 3 * nw, nw);
+	fontbase[0]->nwfont = EXTRAFONT - dev.nchtab - (128-32) - sizeof (struct Font);
+	fontab[0] = p + sizeof (struct Font);
+	close(fin);
 	/* there are a lot of things that used to be constant
 	 * that now require code to be executed.
 	 */
 	sps = SPS;
-	ses = SES;
+	ics = ICS;
 	for (i = 0; i < 16; i++)
 		tabtab[i] = DTAB * (i + 1);
 	pl = 11 * INCH;
 	po = PO;
 	spacesz = SS;
-	sesspsz = SSS;
 	lss = lss1 = VS;
 	ll = ll1 = lt = lt1 = LL;
-	apts = pts2u(apts);
-	apts1 = pts2u(apts1);
-	pts = pts2u(pts);
-	pts1 = pts2u(pts1);
-	ics = ICS;
 	specnames();	/* install names like "hyphen", etc. */
-	for (i = 0; i <= nfonts; i++)
-		setlig(i, fontbase[i]->ligfont);
-	kern = xflag;
 	if (ascii)
 		return;
 	fdprintf(ptid, "x T %s\n", devname);
@@ -287,9 +189,6 @@ ptinit(void)
 		fdprintf(ptid, " %s", &chname[chtab[i]]);
 	fdprintf(ptid, "\nx xxx\n");
   */
-#ifdef	EUC
-	ptlocale(setlocale(LC_CTYPE, NULL));
-#endif	/* EUC */
 }
 
 void
@@ -301,7 +200,6 @@ specnames(void)
 	} spnames[] = {
 		&c_hyphen, "hy",
 		&c_emdash, "em",
-		&c_endash, "en",
 		&c_rule, "ru",
 		&c_minus, "\\-",
 		&c_fi, "fi",
@@ -318,11 +216,8 @@ specnames(void)
 		&c_dagger, "dg",
 		0, 0
 	};
-	static int	twice;
 	int	i;
 
-	if (twice++)
-		return;
 	for (i = 0; spnames[i].n; i++)
 		*spnames[i].n = findch(spnames[i].v);
 }
@@ -345,14 +240,6 @@ ptout(register tchar i)
 	register tchar	*k;
 	int temp, a, b;
 
-	if (isadjspc(i))
-		return;
-	if (olinep >= &oline[olinesz]) {
-		olinesz += 100;
-		k = realloc(oline, olinesz * sizeof *oline);
-		olinep = (tchar *)((char *)olinep + ((char *)k-(char *)oline));
-		oline = k;
-	}
 	if (cbits(i) != '\n') {
 		*olinep++ = i;
 		return;
@@ -383,16 +270,12 @@ ptout(register tchar i)
 	b = dip->blss + lss;
 	lead += dip->blss + lss;
 	dip->blss = 0;
-	if (linkout)
-		linkhp = hpos;
 	for (k = oline; k < olinep; )
-		k = ptout0(k, olinep);	/* now passing a pointer! */
+		k = ptout0(k);	/* now passing a pointer! */
 	olinep = oline;
 	lead += dip->alss;
 	a = dip->alss;
 	dip->alss = 0;
-	if (linkout)
-		ptlink(linkout);
 	/*
 	fdprintf(ptid, "x xxx end of line: hpos=%d, vpos=%d\n", hpos, vpos);
 */
@@ -400,22 +283,16 @@ ptout(register tchar i)
 }
 
 tchar *
-ptout0(tchar *pi, tchar *pend)
+ptout0(tchar *pi)
 {
-	struct afmtab	*a;
-	register int j;
-	register int k, w = 0;
-	int	z, dx, dy, dx2, dy2, n;
+	register short j, k, w = 0;
+	short	z, dx, dy, dx2, dy2, n;
 	register tchar	i;
 	int outsize;	/* size of object being printed */
-	double	f;
-	int tfont;
 
 	outsize = 1;	/* default */
 	i = *pi;
 	k = cbits(i);
-	if (k == FILLER)
-		return(pi+outsize);
 	if (ismot(i)) {
 		j = absmot(i);
 		if (isnmot(i))
@@ -429,12 +306,10 @@ ptout0(tchar *pi, tchar *pend)
 	if (k == XON) {
 		if (xfont != mfont)
 			ptfont();
-		if (xpts != mpts || zoomtab[xfont] != mzoom)
+		if (xpts != mpts)
 			ptps();
 		if (lead)
 			ptlead();
-		if (esc)
-			ptesc();
 		fdprintf(ptid, "x X ");
 		/* 
 	     * not guaranteed of finding a XOFF if a word overflow
@@ -450,27 +325,13 @@ ptout0(tchar *pi, tchar *pend)
 	}
 			;
 	if (k == CHARHT) {
-		if (xflag) {
-			xfont = fbits(i);
-			if (xfont != mfont)
-				ptfont();
-		}
-		if (xpts != mpts || zoomtab[xfont] != mzoom)
+		if (xpts != mpts)
 			ptps();
-		j = f = u2pts(sbits(i));
-		if (j != f && xflag && dev.anysize)
-			fdprintf(ptid, "x H -23 %g\n", f);
-		else
-			fdprintf(ptid, "x H %d\n", j);
+		fdprintf(ptid, "x H %d\n", sbits(i));
 		return(pi+outsize);
 	}
 	if (k == SLANT) {
-		if (xflag) {
-			xfont = fbits(i);
-			if (xfont != mfont)
-				ptfont();
-		}
-		fdprintf(ptid, "x S %d\n", (int)sbits(i)-180);
+		fdprintf(ptid, "x S %d\n", sfbits(i)-180);
 		return(pi+outsize);
 	}
 	if (k == WORDSP) {
@@ -478,52 +339,13 @@ ptout0(tchar *pi, tchar *pend)
 		return(pi+outsize);
 	}
 	if (k == FONTPOS) {
-		n = i >> 22;
-		ptfpcmd(0, macname(n), NULL, 0);
+		char temp[3];
+		n = i >> 16;
+		temp[0] = n & BYTEMASK;
+		temp[1] = n >> BYTE;
+		temp[2] = 0;
+		ptfpcmd(0, temp);
 		return(pi+outsize);
-	}
-	if (k == XFUNC) {
-		switch (fbits(i)) {
-		case ANCHOR:
-			ptanchor(sbits(i));
-			return(pi+outsize);
-		case LINKON:
-			linkout = sbits(i);
-			linkhp = hpos + esc;
-			return(pi+outsize);
-		case LINKOFF:
-			ptlink(sbits(i));
-			linkout = 0;
-			return(pi+outsize);
-		case INDENT:
-			if (linkout)
-				linkhp += sbits(i);
-			return(pi+outsize);
-		case LETSP:
-			lettrack = sbits(i);
-			return(pi+outsize);
-		case NLETSP:
-			lettrack = -sbits(i);
-			return(pi+outsize);
-		case LETSH:
-			horscale = 1 + (double)sbits(i) / LAFACT;
-			return(pi+outsize);
-		case NLETSH:
-			horscale = 1 - (double)sbits(i) / LAFACT;
-			return(pi+outsize);
-		case YON:
-			if (&pi[outsize] >= pend)
-				return(pi+outsize);
-			ptyon(fetchrq(&pi[outsize]));
-			return(pi+outsize+1);
-		case CHAR:
-			ptchar(sbits(i), iszbit(i) != 0);
-			if (!iszbit(i))
-				esc += okern(pi, pend, outsize);
-			return(pi+outsize);
-		default:
-			return(pi+outsize);
-		}
 	}
 	if (sfbits(i) == oldbits) {
 		xfont = pfont;
@@ -533,37 +355,16 @@ ptout0(tchar *pi, tchar *pend)
 	if (k < 040 && k != DRAWFCN)
 		return(pi+outsize);
 	if (k >= 32) {
-		if (widcache[k-32].fontpts == xfont + (xpts<<8)  && !setwdf &&
-				kern == 0 && horscale == 0) {
+		if (widcache[k-32].fontpts == (xfont<<8) + xpts  && !setwdf) {
 			w = widcache[k-32].width;
-			lasttrack = widcache[k-32].track;
 			bd = 0;
 			cs = 0;
-		} else {
-			tfont = xfont;
+		} else
 			w = getcw(k-32);
-			if (tfont != xfont)
-				k = ftrans(xfont, k);
-		}
 	}
-	if (xfont != mfont)
-		ptfont();
-	if (xpts != mpts || zoomtab[xfont] != mzoom)
-		ptps();
-	if (lead)
-		ptlead();
-	if (lettrack || lasttrack || mtrack)
-		pttrack(0);
-	if (horscale || mhorscale)
-		pthorscale(0);
-	w += okern(pi, pend, outsize);
-	if (afmtab && (j = (fontbase[xfont]->afmpos) - 1) >= 0)
-		a = afmtab[j];
-	else
-		a = NULL;
 	j = z = 0;
 	if (k != DRAWFCN) {
-		if (cs && !fmtchar) {
+		if (cs) {
 			if (bd)
 				w += (bd - 1) * HOR;
 			j = (cs - w) / 2;
@@ -572,7 +373,7 @@ ptout0(tchar *pi, tchar *pend)
 				w -= (bd - 1) * HOR;
 		}
 		if (iszbit(i)) {
-			if (cs && !fmtchar)
+			if (cs)
 				w = -j; 
 			else 
 				w = 0;
@@ -580,6 +381,12 @@ ptout0(tchar *pi, tchar *pend)
 		}
 	}
 	esc += j;
+	if (xfont != mfont)
+		ptfont();
+	if (xpts != mpts)
+		ptps();
+	if (lead)
+		ptlead();
 	/* put out the real character here */
 	if (k == DRAWFCN) {
 		if (esc)
@@ -592,13 +399,11 @@ ptout0(tchar *pi, tchar *pend)
 			dy = -dy;
 		switch (cbits(pi[1])) {
 		case DRAWCIRCLE:	/* circle */
-		case DRAWCIRCLEFI:
 			fdprintf(ptid, "D%c %d\n", DRAWCIRCLE, dx);	/* dx is diameter */
 			w = 0;
 			hpos += dx;
 			break;
 		case DRAWELLIPSE:
-		case DRAWELLIPSEFI:
 			fdprintf(ptid, "D%c %d %d\n", DRAWELLIPSE, dx, dy);
 			w = 0;
 			hpos += dx;
@@ -629,7 +434,7 @@ ptout0(tchar *pi, tchar *pend)
 			break;
 		case DRAWSPLINE:	/* spline */
 		default:	/* something else; copy it like spline */
-			fdprintf(ptid, "D%c %d %d", (int)cbits(pi[1]), dx, dy);
+			fdprintf(ptid, "D%c %d %d", cbits(pi[1]), dx, dy);
 			w = 0;
 			hpos += dx;
 			vpos += dy;
@@ -675,84 +480,32 @@ ptout0(tchar *pi, tchar *pend)
 	} else {
 		if (esc)
 			ptesc();
-		if (k >= nchtab + 128) {
-			if (a && (j = a->fitab[k-nchtab-128-32]) < a->nchars &&
-					a->nametab[j] != NULL)
-				fdprintf(ptid, "CPS%s\n", a->nametab[j]);
-			else
-				fdprintf(ptid, "N%d\n", k - (nchtab+128));
-		} else
+		if (k >= nchtab + 128)
+			fdprintf(ptid, "N%d\n", k - (nchtab+128));
+		else
 			fdprintf(ptid, "C%s\n", &chname[chtab[k - 128]]);
 	}
-	if (bd && !fmtchar) {
+	if (bd) {
 		bd -= HOR;
 		if (esc += bd)
 			ptesc();
 		if (k < 128) {
 			fdprintf(ptid, "c%c\n", k);
 		} else if (k >= nchtab + 128) {
-			if (a && (j = a->fitab[k-nchtab-128-32]) < a->nchars &&
-					a->nametab[j] != NULL)
-				fdprintf(ptid, "CPS%s\n", a->nametab[j]);
-			else
-				fdprintf(ptid, "N%d\n", k - (nchtab+128));
+			fdprintf(ptid, "N%d\n", k - (nchtab+128));
 		} else
 			fdprintf(ptid, "C%s\n", &chname[chtab[k - 128]]);
 		if (z)
 			esc -= bd;
 	}
 	esc += w;
-	lettrack = 0;
-	horscale = 0;
 	return(pi+outsize);
-}
-
-static int
-okern(tchar *pi, tchar *pend, int outsize)
-{
-	int	j;
-
-	for (j = outsize; &pi[j] < pend; j++)
-		if (cbits(pi[j]) != XFUNC || fbits(pi[j]) != LETSP &&
-				fbits(pi[j]) != NLETSP &&
-				fbits(pi[j]) != LETSH &&
-				fbits(pi[j]) != NLETSH)
-			break;
-	if (&pi[j] < pend)
-		return getkw(pi[0], pi[j]);
-	else
-		return 0;
-}
-
-static void
-pthorscale(int always)
-{
-	if (horscale || mhorscale) {
-		if (always || mhorscale != horscale)
-			fdprintf(ptid, "x X HorScale %g\n",
-				horscale ? horscale : 1.0);
-		mhorscale = horscale;
-	} else
-		mhorscale = 0;
-}
-
-static void
-pttrack(int always)
-{
-	if (xflag && (lasttrack || lettrack || mtrack)) {
-		if (always || mtrack != (lasttrack + lettrack))
-			fdprintf(ptid, "x X Track %d\n", lasttrack + lettrack);
-		mtrack = lasttrack + lettrack;
-	} else
-		mtrack = 0;
 }
 
 void
 ptps(void)
 {
 	register int i, j, k;
-	double	s, z;
-	int	found;
 
 	i = xpts;
 	for (j = 0; i > (k = pstab[j]); j++)
@@ -760,20 +513,8 @@ ptps(void)
 			k = pstab[--j];
 			break;
 		}
-	found = k == i;
-	if (dev.anysize && xflag)
-		k = i;
-	s = u2pts(k);
-	if ((z = zoomtab[xfont]) != 0 && dev.anysize && xflag)
-		s *= z;
-	if (dev.anysize && xflag && (!found || z != 0 && z != 1))
-		fdprintf(ptid, "s-23 %g\n", s);
-	else
-		fdprintf(ptid, "s%d\n", (int)s);	/* really should put out string rep of size */
+	fdprintf(ptid, "s%d\n", k);	/* really should put out string rep of size */
 	mpts = i;
-	mzoom = z;
-	pttrack(0);
-	pthorscale(0);
 }
 
 void
@@ -781,23 +522,14 @@ ptfont(void)
 {
 	mfont = xfont;
 	fdprintf(ptid, "f%d\n", xfont);
-	mtrack = 0;
-	pttrack(1);
-	pthorscale(1);
 }
 
 void
-ptfpcmd(int f, char *s, char *path, int flags)
+ptfpcmd(int f, char *s)
 {
 	if (ascii)
 		return;
-	fdprintf(ptid, "x font %d %s", f, s);
-	if (path) {
-		fdprintf(ptid, " %s", path);
-		if (flags)
-			fdprintf(ptid, " %d", flags);
-	}
-	fdprintf(ptid, "\n");
+	fdprintf(ptid, "x font %d %s\n", f, s);
 	ptfont();	/* make sure that it gets noticed */
 }
 
@@ -827,220 +559,20 @@ ptesc(void)
 }
 
 void
-ptsupplyfont(char *fontname, char *file)
-{
-	if (ascii)
-		return;
-	fdprintf(ptid, "x X SupplyFont %s %s\n", fontname, file);
-}
-
-void
-ptpapersize(void)
-{
-	if (ascii || mediasize.flag == 0)
-		return;
-	fdprintf(ptid, "x X PaperSize %d %d %d\n",
-			mediasize.val[2], mediasize.val[3],
-			mediasize.flag&2?1:0);
-}
-
-static void
-cut1(const char *name, struct box *bp)
-{
-	if (bp->flag)
-		fdprintf(ptid, "x X %s %d %d %d %d\n", name,
-			bp->val[0], bp->val[1], bp->val[2], bp->val[3]);
-}
-
-void
-ptcut(void)
-{
-	if (ascii)
-		return;
-	cut1("TrimAt", &trimat);
-	cut1("BleedAt", &bleedat);
-	cut1("CropAt", &cropat);
-}
-
-void
-ptlocale(const char *cp)
-{
-	static char	*lp;
-
-	if (cp != NULL) {
-		free(lp);
-		lp = malloc(strlen(cp) + 1);
-		strcpy(lp, cp);
-	}
-	if (ascii || realpage == 0 || lp == NULL || dev.lc_ctype == 0)
-		return;
-	fdprintf(ptid, "x X LC_CTYPE %s\n", lp);
-}
-
-static void
-ptanchor(int n)
-{
-	struct ref	*rp;
-
-	if (ascii)
-		return;
-	for (rp = anchors; rp; rp = rp->next)
-		if (rp->cnt == n) {
-			fdprintf(ptid, "x X Anchor %d,%d %s\n",
-				vpos + lead - lss, hpos + esc, rp->name);
-			break;
-		}
-}
-
-static void
-ptlink(int n)
-{
-	struct ref	*rp;
-
-	if (ascii)
-		return;
-	for (rp = links; rp; rp = rp->next)
-		if (rp->cnt == n) {
-			fdprintf(ptid, "x X Link %d,%d,%d,%d %s\n",
-				linkhp, vpos + pts2u(1),
-				hpos + esc, vpos - pts * 8 / 10,
-				rp->name);
-		}
-}
-
-static void
-ptyon(int i)
-{
-	struct contab	*cp;
-	tchar	c;
-	int	k, nl;
-	filep	savip;
-
-	if ((cp = findmx(i)) == NULL || !cp->mx) {
-		nosuch(i);
-		return;
-	}
-	if (xfont != mfont)
-		ptfont();
-	if (xpts != mpts || zoomtab[xfont] != mzoom)
-		ptps();
-	if (lead)
-		ptlead();
-	if (esc)
-		ptesc();
-	fdprintf(ptid, "x X ");
-	savip = ip;
-	ip = (filep)cp->mx;
-	app = 1;
-	k = -1;
-	nl = 0;
-	while ((c = rbf()) != 0) {
-		if ((k = cbits(c)) != '\n') {
-			while (nl--)
-				oputs("\n+");
-			nl = 0;
-			outascii(c);
-		} else
-			nl++;
-	}
-	while (nl-- > 1)
-		oputs("\n+");
-	oput('\n');
-	app = 0;
-	ip = savip;
-}
-
-static void
-ptchar1(struct charout *cp, int z)
-{
-	filep	savip;
-	tchar	i, *k, *savoline, *savolinep;
-	size_t	savolinesz;
-	int	savhpos, savvpos, savlettrack;
-
-	savoline = oline;
-	savolinep = olinep;
-	savolinesz = olinesz;
-	olinep = oline = NULL;
-	olinesz = 0;
-	savlettrack = lettrack;
-	lettrack = 0;
-	savhpos = hpos + esc;
-	savvpos = vpos + lead;
-	savip = ip;
-	ip = cp->op;
-	app++;
-	fmtchar++;
-	while ((i = rbf()) != 0 && cbits(i) != '\n' && cbits(i) != FLSS)
-		pchar(i);
-	for (k = oline; k < olinep; )
-		k = ptout0(k, olinep);
-	fmtchar--;
-	app--;
-	ip = savip;
-	free(oline);
-	oline = savoline;
-	olinep = savolinep;
-	olinesz = savolinesz;
-	lettrack = savlettrack;
-	esc = savhpos - hpos;
-	if (!z)
-		esc += cs ? cs : cp->width + lettrack;
-	lead = savvpos - vpos;
-}
-
-static void
-ptchar(int n, int z)
-{
-	struct charout	*cp = &charout[n];
-	int	savbd;
-
-	ptchar1(cp, z);
-	if (bd) {
-		bd -= HOR;
-		if (esc += bd)
-			ptesc();
-		savbd = bd;
-		bd = 0;
-		ptchar1(cp, z);
-		bd = savbd;
-		if (iszbit(cp->ch))
-			esc -= bd;
-	}
-	lettrack = 0;
-}
-
-void
 newpage(int n)	/* called at end of each output page (we hope) */
 {
 	int i;
 
-	realpage++;
 	ptlead();
 	vpos = 0;
 	if (ascii)
 		return;
 	fdprintf(ptid, "p%d\n", n);	/* new page */
-	for (i = 0; i <= nfonts; i++) {
-		if (fontbase[i] == NULL)
-			continue;
-		if (afmtab && fontbase[i]->afmpos) {
-			struct afmtab	*a = afmtab[(fontbase[i]->afmpos)-1];
-			if (a->encpath == NULL)
-				a->encpath = afmencodepath(a->path);
-			fdprintf(ptid, "x font %d %s %s %d\n", i,
-				macname(fontlab[i]),
-				a->encpath, (int)a->spec);
-			if (a->supply)
-				ptsupplyfont(a->fontname, a->supply);
-		} else if (fontbase[i]->namefont && fontbase[i]->namefont[0])
-			fdprintf(ptid, "x font %d %s\n", i, macname(fontlab[i]));
-	}
+	for (i = 0; i <= nfonts; i++)
+		if (fontbase[i]->namefont && fontbase[i]->namefont[0])
+			fdprintf(ptid, "x font %d %s\n", i, fontbase[i]->namefont);
 	ptps();
 	ptfont();
-	ptpapersize();
-	ptcut();
-	ptlocale(NULL);
 }
 
 void

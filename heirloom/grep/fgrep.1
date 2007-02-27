@@ -1,5 +1,5 @@
 .\"
-.\" Sccsid @(#)fgrep.1	1.24 (gritter) 1/24/05
+.\" Sccsid @(#)fgrep.1	1.20 (gritter) 3/6/04
 .\" Parts taken from grep(1), Unix 7th edition:
 .\" Copyright(C) Caldera International Inc. 2001-2002. All rights reserved.
 .\"
@@ -32,7 +32,7 @@
 .\" WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.TH FGREP 1 "1/24/05" "Heirloom Toolchest" "User Commands"
+.TH FGREP 1 "3/6/04" "Heirloom Toolchest" "User Commands"
 .SH NAME
 fgrep \- search a file for a character string
 .SH SYNOPSIS
@@ -40,22 +40,22 @@ fgrep \- search a file for a character string
 .ad l
 .nh
 \fB/usr/5bin/fgrep\fR [\fB\-e\fI\ string_list\fR\ ...]
-[\fB\-f\fI\ string_file\fR] [\fB\-bchilnrRvxz\fR]
+[\fB\-f\fI\ string_file\fR] [\fB\-bchilnvx\fR]
 [\fIstring_list\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 .PD 0
 \fB/usr/5bin/posix/fgrep\fR \fB\-e\fI\ string_list\fR\ ...
 [\fB\-f\fI\ string_file\fR] [\fB\-c\fR|\fB\-l\fR]
-[\fB\-bhinrRvxz\fR] [\fIfile\fR\ ...]
+[\fB\-bhinvx\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
 \fB/usr/5bin/posix/fgrep\fR \fB\-f\fI\ string_file\fR
 [\fB\-e\fI\ string_list\fR\ ...] [\fB\-c\fR|\fB\-l\fR]
-[\fB\-bhinrRvxz\fR] [\fIfile\fR\ ...]
+[\fB\-bhinvx\fR] [\fIfile\fR\ ...]
 .HP
 .ad l
-\fB/usr/5bin/posix/fgrep\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-bhinrRvxz\fR]
+\fB/usr/5bin/posix/fgrep\fR [\fB\-c\fR|\fB\-l\fR] [\fB\-bhinvx\fR]
 \fIstring_list\fR [\fIfile\fR\ ...]
 .br
 .PD
@@ -123,39 +123,8 @@ All lines but those matching are printed.
 .B \-x
 (Exact) only lines matched in their entirety are printed.
 .PP
-The following options are supported as extensions:
-.TP
-.B \-r
-With this option given,
-.I fgrep
-does not directly search in each given file that is a directory,
-but descends it recursively
-and scans each regular file found below it.
-Device files are ignored.
-Symbolic links are followed.
-.TP
-.B \-R
-Operates recursively as with the
-.I \-r
-option,
-but does not follow symbolic links that point to directories
-unless if they are explicitly specified as arguments.
-.TP
-.B \-z
-If an input file is found to be compressed with
-.IR compress (1),
-.IR gzip (1),
-or
-.IR bzip2 (1),
-the appropriate compression program is started,
-and
-.I fgrep
-searches for the pattern in its output.
-.PP
 .B /usr/5bin/s42/fgrep
-and
-.B /usr/5bin/posix2001/fgrep
-are identical to
+is identical to
 .BR /usr/5bin/posix/fgrep .
 .SH "ENVIRONMENT VARIABLES"
 .TP

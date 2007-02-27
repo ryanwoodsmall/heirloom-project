@@ -25,7 +25,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)mac.h	1.6 (gritter) 6/19/05
+ * Sccsid @(#)mac.h	1.3 (gritter) 6/14/05
  */
 
 /* from OpenSolaris "mac.h	1.8	05/06/08 SMI"	 SVr4.0 1.8 */
@@ -33,20 +33,11 @@
  *	UNIX shell
  */
 
-#undef	TRUE
-#undef	FALSE
 #define TRUE	(-1)
 #define FALSE	0
 #define LOBYTE	0377
 #define QUOTE	0200
 
-/*
- * NetBSD includes stdio.h indirectly through a variety of headers; maybe
- * others do too. To make sure that we get rid of EOF, include it here
- * forcibly.
- */
-#include <stdio.h>
-#undef	EOF
 #define EOF	0
 #define NL	'\n'
 #define SPACE	' '

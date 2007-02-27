@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tg.c	1.9 (gritter) 8/6/06
+ * Sccsid @(#)tg.c	1.5 (gritter) 8/12/05
  */
 
  /* tg.c: process included text blocks */
@@ -33,20 +33,16 @@ char *line = NULL;
 size_t linesize = 0;
 int oname;
 char *vs;
-if (texname==0) texct2 = texname = 300;
-if (texct2>0 && point(texct2)) error("Too many text block diversions");
+if (texname==0) error("Too many text block diversions");
 if (textflg==0)
 	{
 	fprintf(tabout, ".nr %d \\n(.lu\n", SL); /* remember old line length */
 	textflg=1;
 	}
 fprintf(tabout, ".eo\n");
-fprintf(tabout, ".am %02d 00\n", icol+80);
+fprintf(tabout, ".am %02d\n", icol+80);
 fprintf(tabout, ".br\n");
-if (texct2 < 0)
-	fprintf(tabout, ".di %c+\n", texname);
-else
-	fprintf(tabout, ".do di %d+\n", texct2);
+fprintf(tabout, ".di %c+\n", texname);
 rstofill();
 if (fn && *fn) fprintf(tabout, ".nr %d \\n(.f\n.ft %s\n", S1, fn);
 fprintf(tabout, ".ft \\n(.f\n"); /* protect font */
@@ -68,7 +64,7 @@ fprintf(tabout,".if \\n(.l<\\n(%d .ll \\n(%du\n", icol+CRIGHT, icol+CRIGHT);
 if (ctype(ilin,icol)=='a')
 	fprintf(tabout, ".ll -2n\n");
 fprintf(tabout, ".in 0\n");
-while (gets1(&line, &line, &linesize))
+while (gets1(&line, &linesize))
 	{
 	if (line[0]=='T' && line[1]=='}' && line[2]== tab) break;
 	if (match("T}", line)) break;
@@ -78,17 +74,9 @@ if (fn && *fn) fprintf(tabout, ".ft \\n(%d\n", S1);
 if (sz && *sz) fprintf(tabout, ".br\n.ps\n.vs\n");
 fprintf(tabout, ".br\n");
 fprintf(tabout, ".di\n");
-if (texct2 < 0)
-	{
-	fprintf(tabout, ".nr %c| \\n(dn\n", texname);
-	fprintf(tabout, ".nr %c- \\n(dl\n", texname);
-	}
-else
-	{
-	fprintf(tabout, ".do nr %d| \\n(dn\n", texct2);
-	fprintf(tabout, ".do nr %d- \\n(dl\n", texct2);
-	}
-fprintf(tabout, ".00\n");
+fprintf(tabout, ".nr %c| \\n(dn\n", texname);
+fprintf(tabout, ".nr %c- \\n(dl\n", texname);
+fprintf(tabout, "..\n");
 fprintf(tabout, ".ec \\\n");
 /* copy remainder of line */
 if (line[2])
@@ -96,10 +84,7 @@ if (line[2])
 else
 	*sp=0;
 oname=texname;
-if (texct2 < 0)
-	texname = texstr[++texct];
-else
-	texname = ++texct2;
+texname = texstr[++texct];
 free(line);
 return(oname);
 }
@@ -109,14 +94,4 @@ untext(void)
 rstofill();
 fprintf(tabout, ".nf\n");
 fprintf(tabout, ".ll \\n(%du\n", SL);
-}
-char *
-nreg(char *space, const char *_n, int c)
-{
-int n = (int)_n;
-if (n < 128)
-	sprintf(space, "\\n(%c%c", n, c);
-else
-	sprintf(space, "\\n[%d%c]", n, c);
-return(space);
 }

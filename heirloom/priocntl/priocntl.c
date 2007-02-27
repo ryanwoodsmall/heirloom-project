@@ -26,7 +26,7 @@
  */
 #if defined (__linux__) || defined (__FreeBSD__)
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -34,9 +34,9 @@
 #define	USED
 #endif
 #if defined (S42)
-static const char sccsid[] USED = "@(#)priocntl_s42.sl	1.19 (gritter) 7/23/06";
+static const char sccsid[] USED = "@(#)priocntl_s42.sl	1.17 (gritter) 9/25/04";
 #else
-static const char sccsid[] USED = "@(#)priocntl.sl	1.19 (gritter) 7/23/06";
+static const char sccsid[] USED = "@(#)priocntl.sl	1.17 (gritter) 9/25/04";
 #endif
 
 #include	<sys/time.h>
@@ -842,17 +842,11 @@ selclass(const char *s)
 {
 	if (eq(s, "TS"))
 		cflag = SCHED_OTHER;
-	else if (eq(s, "B"))
+	else if (eq(s, "BA"))
 		cflag = SCHED_BATCH;
-	else if (eq(s, "BA"))	/* old */
-		cflag = SCHED_BATCH;
-	else if (eq(s, "ISO"))
+	else if (eq(s, "IS"))
 		cflag = SCHED_ISO;
-	else if (eq(s, "IS"))	/* old */
-		cflag = SCHED_ISO;
-	else if (eq(s, "FF"))
-		cflag = SCHED_FIFO;
-	else if (eq(s, "FI"))	/* old */
+	else if (eq(s, "FI"))
 		cflag = SCHED_FIFO;
 	else if (eq(s, "RT") || eq(s, "FP"))
 		cflag = SCHED_RR;

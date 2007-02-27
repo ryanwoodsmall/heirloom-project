@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)path.h	1.5 (gritter) 12/18/05
+ * Sccsid @(#)path.h	1.3 (gritter) 8/9/05
  */
 /*
  *
@@ -48,12 +48,10 @@
 
 #define BASELINE	PSTDIR "/baseline.ps"
 #define COLOR		PSTDIR "/color.ps"
-#define	CUTMARKS	PSTDIR "/cutmarks.ps"
 #define DRAW		PSTDIR "/draw.ps"
 #define FORMFILE	PSTDIR "/forms.ps"
 #define KERNING		PSTDIR "/kerning.ps"
 #define REQUESTFILE	PSTDIR "/ps.requests"
-#define	PSINCLUDEFILE	PSTDIR "/ps_include.ps"
 
 #define HOSTFONTDIR	"/usr/share/lib/hostfontdir"
 #define FONTDIR		FNTDIR

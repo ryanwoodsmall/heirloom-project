@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifndef	UCB
-static const char sccsid[] USED = "@(#)stty.sl	1.23 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)stty.sl	1.16 (gritter) 7/16/04";
 #else	/* UCB */
-static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.23 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/stty.sl	1.16 (gritter) 7/16/04";
 #endif	/* UCB */
 
 #include <sys/types.h>
@@ -527,7 +527,7 @@ static void	getattr(int);
 static void	list(int, int);
 static int	listmode(tcflag_t, struct mode, int, int);
 static int	listchar(cc_t *, struct mode, int, int);
-static const char	*baudrate(speed_t c);
+static const char	*baudrate(struct termios *);
 static void	set(void);
 static void	setmod(tcflag_t *, struct mode, int);
 static void	setchr(cc_t *, struct mode);
@@ -648,7 +648,7 @@ getattr(int fd)
 		ws.ws_xpixel = 0;
 		ws.ws_ypixel = 0;
 	}
-#if !defined (__FreeBSD__) && !defined (__DragonFly__) && !defined (__APPLE__)
+#ifndef	__FreeBSD__
 	vdis = fpathconf(fd, _PC_VDISABLE) & 0377;
 #else
 	vdis = '\377' & 0377;
@@ -659,15 +659,8 @@ static void
 list(int aflag, int hflag)
 {
 	int	i, d = 0;
-	speed_t	is, os;
 
-	is = cfgetispeed(&ts);
-	os = cfgetospeed(&ts);
-	if (is == os)
-		printf("speed %s baud;", baudrate(is));
-	else
-		printf("ispeed %s baud; ospeed %s baud;",
-				baudrate(is), baudrate(os));
+	printf("speed %s baud;", baudrate(&ts));
 	if (aflag == 0) {
 		for (i = 0; modes[i].m_name; i++) {
 			if (modes[i].m_type == M_PCFLAG)
@@ -795,10 +788,12 @@ listchar(cc_t *cc, struct mode m, int aflag, int space)
 }
 
 static const char *
-baudrate(speed_t c)
+baudrate(struct termios *tp)
 {
+	speed_t	c;
 	int	i;
 
+	c = cfgetospeed(tp);
 	for (i = 0; speeds[i].s_str; i++)
 		if (speeds[i].s_val == c)
 			return speeds[i].s_str;
@@ -808,18 +803,14 @@ baudrate(speed_t c)
 static void
 set(void)
 {
-	int	i, gotcha, not, sspeed = 0;
-	speed_t	ispeed0, ospeed0, ispeed1, ospeed1;
+	int	i, gotcha, not;
 	const char	*ap;
-	struct termios	tc;
 
-	ispeed0 = ispeed1 = cfgetispeed(&ts);
-	ospeed0 = ospeed1 = cfgetospeed(&ts);
 	while (*args) {
 		for (i = 0; speeds[i].s_str; i++)
 			if (strcmp(speeds[i].s_str, *args) == 0) {
-				ispeed1 = ospeed1 = speeds[i].s_val;
-				sspeed |= 3;
+				cfsetispeed(&ts, speeds[i].s_val);
+				cfsetospeed(&ts, speeds[i].s_val);
 				goto next;
 			}
 		gotcha = 0;
@@ -864,51 +855,26 @@ set(void)
 			goto next;
 		if (strcmp(*args, "ispeed") == 0) {
 			if (*++args == NULL)
-				break;
-			if (atol(*args) == 0) {
-				ispeed1 = ospeed1;
-				sspeed |= 1;
-				goto next;
-			} else for (i = 0; speeds[i].s_str; i++)
+				return;
+			for (i = 0; speeds[i].s_str; i++)
 				if (strcmp(speeds[i].s_str, *args) == 0) {
-					ispeed1 = speeds[i].s_val;
-					sspeed |= 1;
+					cfsetispeed(&ts, speeds[i].s_val);
 					goto next;
 				}
 			inval();
 		}
 		if (strcmp(*args, "ospeed") == 0) {
 			if (*++args == NULL)
-				break;
+				return;
 			for (i = 0; speeds[i].s_str; i++)
 				if (strcmp(speeds[i].s_str, *args) == 0) {
-					ospeed1 = speeds[i].s_val;
-					sspeed |= 2;
+					cfsetospeed(&ts, speeds[i].s_val);
 					goto next;
 				}
 			inval();
 		}
 		gset();
 	next:	args++;
-	}
-	if (sspeed) {
-		if (sspeed == 3 && ispeed1 != ospeed1 && ospeed1 != B0) {
-			tc = ts;
-			cfsetispeed(&tc, ispeed1);
-			if (cfgetospeed(&tc) == cfgetospeed(&ts)) {
-				tc = ts;
-				cfsetospeed(&tc, ospeed1);
-				if (cfgetispeed(&tc) == cfgetispeed(&ts)) {
-					cfsetispeed(&ts, ispeed1);
-					cfsetospeed(&ts, ospeed1);
-				}
-			}
-		} else {
-			if (ispeed0 != ispeed1)
-				cfsetispeed(&ts, ispeed1);
-			if (ospeed0 != ospeed1)
-				cfsetospeed(&ts, ospeed1);
-		}
 	}
 }
 
@@ -1073,15 +1039,6 @@ sane(int not)
 	ts.c_cflag = CS8|CREAD;
 	ts.c_lflag = ISIG|ICANON|ECHO|ECHOE|ECHOK|ECHOKE|IEXTEN;
 	ts.c_iflag = BRKINT|IGNPAR|ICRNL|IXON|IMAXBEL;
-#ifdef	IUTF8
-	if (MB_CUR_MAX > 1) {
-		wchar_t	wc;
-		if (mbtowc(&wc, "\303\266", 2) == 2 && wc == 0xF6 &&
-				mbtowc(&wc, "\342\202\254", 3) == 3 &&
-				wc == 0x20AC)
-			ts.c_iflag |= IUTF8;
-	}
-#endif	/* IUTF8 */
 	ts.c_oflag = OPOST|ONLCR;
 	cfsetispeed(&ts, ispeed);
 	cfsetospeed(&ts, ospeed);
@@ -1427,7 +1384,7 @@ hlist(int aflag)
 static void
 speed(void)
 {
-	printf("%s\n", baudrate(cfgetospeed(&ts)));
+	printf("%s\n", baudrate(&ts));
 }
 
 static void

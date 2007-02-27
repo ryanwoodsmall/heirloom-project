@@ -25,14 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)cut.sl	1.20 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)cut.sl	1.14 (gritter) 7/16/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -108,14 +108,14 @@ error(const char *s)
 static void
 usage(void)
 {
-	error("Usage: cut [-s] [-d<char>] {-c<list> | -f<list>} file ...");
+	error(
+	"Usage: cut [-sn] [-d<char>] {-b<list> | -c<list> | -f<list>} file...");
 }
 
 static void
 badlist(void)
 {
-	error(method == 'b' ? "bad list for b/c/f option" : 
-			"bad list for c/f option");
+	error("bad list for b/c/f option");
 }
 
 static void
@@ -174,7 +174,7 @@ setlist(const char *s)
 			n = LONG_MAX;
 			lp = &n;
 			s++;
-		} else if (*s == ',' || *s == ' ' || *s == '\t' || *s == '\0') {
+		} else if (*s == ',' || *s == ' ' || *s == '\0') {
 			if (m)
 				addrange(m, n);
 			mnreset();
@@ -282,8 +282,7 @@ cutf(struct iblok *ip)
 			n = 1;
 		}
 		if (cp == NULL || wc == '\n' || wc == wcdelim) {
-			if (have(i) && (!sflag || gotcha || wc == wcdelim) ||
-					(!sflag && i == 1 &&
+			if (have(i) || (!sflag && i == 1 &&
 						(cp == NULL || wc == '\n'))) {
 				if (gotcha)
 					for (m = 0; mbdelim[m]; m++)

@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
@@ -33,9 +33,9 @@
 #define	USED
 #endif
 #ifdef	SUS
-static const char sccsid[] USED = "@(#)who_sus.sl	1.19 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)who_sus.sl	1.17 (gritter) 7/16/04";
 #else
-static const char sccsid[] USED = "@(#)who.sl	1.19 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)who.sl	1.17 (gritter) 7/16/04";
 #endif
 
 #include	<sys/types.h>
@@ -203,13 +203,13 @@ print(const struct utmpx *u)
 #endif	/* __hpux */
 		printf("  id=%4.4s term=%-3d exit=%d",
 				u->ut_id,
-#if !defined (_AIX) || !defined (__APPLE__)
+#ifndef	_AIX
 				u->ut_exit.e_termination,
 				u->ut_exit.e_exit
-#else	/* _AIX, __APPLE__ */
+#else	/* _AIX */
 				0,
 				0
-#endif	/* _AIX, __APPLE__ */
+#endif	/* _AIX */
 				);
 	else if (u->ut_type == INIT_PROCESS && !sflag)
 		printf("  id=%4.4s", u->ut_id);

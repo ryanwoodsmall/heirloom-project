@@ -1,5 +1,4 @@
-%%BeginResource: procset dpost_charlc 1.0 0
-% from OpenSolaris "lp:filter/postscript/font/devpost/charlib/lc	1.2"
+%ident	"@(#)lp:filter/postscript/font/devpost/charlib/lc	1.2"
 %
 % CDDL HEADER START
 %
@@ -21,7 +20,6 @@
 %
 % CDDL HEADER END
 %
-% Portions Copyright 2005 Gunnar Ritter, Freiburg i. Br, Germany
 %
 % This stuff has gotten terribly complicated - sorry.
 %
@@ -58,4 +56,3 @@ currentdict /bvbbox known not {/bvbbox [0 0 0 0 0 0 0] def} if
 	closepath clip eofill
     grestore
 } def
-%%EndResource

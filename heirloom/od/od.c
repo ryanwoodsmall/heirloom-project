@@ -25,18 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SUS)
-static const char sccsid[] USED = "@(#)od_sus.sl	1.26 (gritter) 5/29/05";
-#else
-static const char sccsid[] USED = "@(#)od.sl	1.26 (gritter) 5/29/05";
-#endif
+static const char sccsid[] USED = "@(#)od.sl	1.15 (gritter) 7/24/04";
 
 #include	<unistd.h>
 #include	<stdio.h>
@@ -144,7 +140,6 @@ static long long	limit = -1;	/* print no more bytes than limit */
 static long long	total;		/* total bytes of input */
 static long long	offset;		/* offset to print */
 static int		vflag;		/* print all lines */
-static int		Cflag;		/* Cray -C option */
 static char		**files;	/* files to read */
 static const char	*skipstr;	/* skip format string for error msg */
 static FILE		*curfile;	/* current file */
@@ -233,11 +228,9 @@ nextfile(void)
 	do {
 		if (files == NULL || files[0] == NULL)
 			return NULL;
-		if (files[0][0] == '-' && files[0][1] == '\0') {
+		if (files[0][0] == '-' && files[0][1] == '\0')
 			fp = stdin;
-			if (limit >= 0)
-				setvbuf(stdin, NULL, _IONBF, 0);
-		} else {
+		else {
 			if ((fp = fopen(files[0], "r")) == NULL) {
 				fprintf(stderr, "%s: cannot open %s\n",
 						progname, files[0]);
@@ -267,10 +260,10 @@ doskip(void)
 			continue;
 		}
 		total++;
+		if (limit > 0 && total > limit)
+			exit(0);
 		skip--;
 	}
-	if (limit >= 0)
-		limit += total;
 }
 
 /*
@@ -435,7 +428,7 @@ put(const char *s)
 				printf("*\n");
 		} else {
 			prnt(offset, ob);
-			if (ol + 1 > Os)
+			if (ol > Os)
 				Ob = srealloc(Ob, Os = ol + 1);
 			strcpy(Ob, ob);
 			eq = 0;
@@ -457,7 +450,7 @@ put(const char *s)
 static void
 format(struct type *tp, struct buffer *b1, struct buffer *b2)
 {
-	char	buf[200];
+	char	buf[132];
 	int	i, j, n, l = 0;
 
 	switch (tp->t_fmt) {
@@ -595,20 +588,6 @@ format(struct type *tp, struct buffer *b1, struct buffer *b2)
 			}
 		}
 	}
-	if (Cflag && b1->bu_cnt > 0) {
-		static int	max;
-		int	c;
-		if (max == 0)
-			max = l * (BLOCK/tp->t_cnt) /
-				((b1->bu_cnt+tp->t_cnt-1) / tp->t_cnt);
-		while (l < max)
-			buf[l++] = ' ';
-		buf[l++] = ' ';
-		for (i = 0; i < b1->bu_cnt || i % 8; i++) {
-			c = i < b1->bu_cnt ? b1->bu_blk.b_c[i] & 0377 : '.';
-			buf[l++] = isprint(c) ? c : '.';
-		}
-	}
 	buf[l++] = '\n';
 	buf[l] = '\0';
 	put(buf);
@@ -664,8 +643,11 @@ od(void)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-bcdDfFoOsSvxX] [file] [[+]offset[.][b]]\n",
-               progname);
+	fprintf(stderr, "\
+usage: %s [-bcdDfFoOsSvxX] [file] [[+]offset[.][b]]\n\
+       %s [-v] [-A address_base] [-j skip]\n\
+               [-N count] [-t type_string] ... [file ...]\n",
+               progname, progname);
 	exit(2);
 }
 
@@ -677,8 +659,6 @@ setfiles(char **av)
 	else {
 		curfile = stdin;
 		hadinput = 1;
-		if (limit >= 0)
-			setvbuf(stdin, NULL, _IONBF, 0);
 	}
 }
 
@@ -867,7 +847,7 @@ setskip(const char *s)
 	int	mult = 1;
 
 	skipstr = s;
-	if (s[0] == '0' && s[1]) {
+	if (*s == '0') {
 		s++;
 		if (*s == 'x' || *s == 'X') {
 			s++;
@@ -949,7 +929,7 @@ setlimit(const char *s)
 int
 main(int argc, char **argv)
 {
-	const char	optstring[] = ":A:bcCdDfFj:N:oOsSt:vxX";
+	const char	optstring[] = ":A:bcdDfFj:N:oOsSt:vxX";
 	int	i, newopt = 0;;
 
 	setlocale(LC_CTYPE, "");
@@ -1045,9 +1025,6 @@ main(int argc, char **argv)
 				"%s: option requires an argument -- %c\n",
 				progname, optopt);
 			usage();
-		case 'C':
-			Cflag = 1;
-			break;
 		case '?':
 			fprintf(stderr, "%s: bad flag -%c\n",
 					progname, optopt);
@@ -1057,11 +1034,7 @@ main(int argc, char **argv)
 		}
 	}
 	if (newopt == 0 && ((optind>=argc-2 && argc &&argv[argc-1][0] == '+') ||
-#ifndef	SUS
-				(optind>=argc-2 && argc &&
-#else	/* SUS */
 				(optind == argc-1 &&
-#endif	/* SUS */
 				digitchar(argv[argc-1][0] & 0377))) &&
 			setoffset(argv[argc-1]) >= 0) {
 		argc--;

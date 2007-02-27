@@ -72,7 +72,7 @@
  */
 
 /*	from 4.4BSD /usr/src/old/awk/run.c	4.10 (Berkeley) 5/26/93	*/
-/*	Sccsid @(#)run.c	1.20 (gritter) 12/25/06>	*/
+/*	Sccsid @(#)run.c	1.19 (gritter) 10/13/04>	*/
 
 #include "sys/param.h"
 #include "awk.def"
@@ -176,8 +176,7 @@ obj program(node **a, int n)
 	return(true);
 }
 
-/*ARGSUSED*/
-obj getline(node **a, int n)
+obj getline(void)
 {
 	obj x;
 
@@ -977,8 +976,7 @@ obj print(node **a,int n)
 	return(false);
 }
 
-/*ARGSUSED*/
-obj nullproc(node **a, int n) {return(true);}
+obj nullproc(void) {return(true);}
 
 obj nodetoobj(node *a)
 {

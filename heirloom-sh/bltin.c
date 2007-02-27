@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)bltin.c	1.11 (gritter) 7/3/05
+ * Sccsid @(#)bltin.c	1.4 (gritter) 6/14/05
  */
 /* from OpenSolaris "bltin.c	1.14	05/06/08 SMI"	 SVr4.0 1.3.8.1 */
 /*
@@ -46,18 +46,14 @@
 #include	"sym.h"
 #include	"hash.h"
 #include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<sys/times.h>
-#include	<dirent.h>
 
 #define	setmode	sh_setmode
 
-#ifdef	SPELL
-static int	spellcheck(unsigned char *);
-#endif
-
-void
-builtin(int type, int argc, unsigned char **argv, struct trenod *t)
+builtin(type, argc, argv, t)
+int type, argc;
+unsigned char **argv;
+struct trenod	*t;
 {
 	short index = initio(t->treio, (type != SYSEXEC));
 	unsigned char *a1 = argv[1];
@@ -66,23 +62,23 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 	{
 
 	case SYSSUSP:
-		syssusp(argc,(char **)argv);
+		syssusp(argc,argv);
 		break;
 
 	case SYSSTOP:
-		sysstop(argc,(char **)argv);
+		sysstop(argc,argv);
 		break;
 
 	case SYSKILL:
-		syskill(argc,(char **)argv);
+		syskill(argc,argv);
 		break;
 
 	case SYSFGBG:
-		sysfgbg(argc,(char **)argv);
+		sysfgbg(argc,argv);
 		break;
 
 	case SYSJOBS:
-		sysjobs(argc,(char **)argv);
+		sysjobs(argc,argv);
 		break;
 
 	case SYSDOT:
@@ -145,7 +141,7 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 		break;
 
 	case SYSTRAP:
-		systrap(argc,(char **)argv);
+		systrap(argc,argv);
 		break;
 
 	case SYSEXEC:
@@ -210,31 +206,6 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 			}
 			while ((f = (chdir((const char *) curstak()) < 0)) &&
 			    cdpath);
-
-#ifdef	SPELL
-			if (flags & ttyflg && f && errno == ENOENT) {
-				int	saverrno = errno;
-				if (spellcheck(a1)) {
-					int	c, d;
-					prs_buff("cd ");
-					prs_buff(curstak());
-					prs_buff("? ");
-					flushb();
-					c = readwc();
-					if (c != NL && c != EOF)
-						while ((d = readwc()) != NL &&
-								d != EOF);
-					if (c != 'n' && c != 'N') {
-						a1 = curstak();
-						f = chdir((const char *)a1) < 0;
-						if (f == 0)
-							prs("ok\n");
-					} else
-						errno = saverrno;
-				} else
-					errno = saverrno;
-			}
-#endif	/* SPELL */
 
 			if (f) {
 				switch(errno) {
@@ -304,7 +275,7 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 		break;
 
 	case SYSWAIT:
-		syswait(argc,(char **)argv);
+		syswait(argc,argv);
 		break;
 
 	case SYSREAD:
@@ -368,17 +339,38 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 
 	case SYSEVAL:
 		if (a1)
-			execexp(a1, (intptr_t)&argv[2]);
+			execexp(a1, &argv[2]);
 		break;
 
 #ifndef RES	
 	case SYSULIMIT:
-		sysulimit(argc, (char **)argv);
+		sysulimit(argc, argv);
 		break;
 			
 	case SYSUMASK:
-		sysumask(argc, (char **)argv);
+		if (a1)
+		{ 
+			int c;
+			mode_t i;
+
+			i = 0;
+			while ((c = *a1++) >= '0' && c <= '7')
+				i = (i << 3) + c - '0';
+			umask(i);
+		}
+		else
+		{
+			mode_t i;
+			int j;
+
+			umask(i = umask(0));
+			prc_buff('0');
+			for (j = 6; j >= 0; j -= 3)
+				prc_buff(((i >> j) & 07) +'0');
+			prc_buff(NL);
+		}
 		break;
+
 #endif
 
 	case SYSTST:
@@ -452,6 +444,7 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 	case SYSGETOPT: {
 		int getoptval;
 		struct namnod *n;
+		extern unsigned char numbuf[];
 		unsigned char *varnam = argv[2];
 		unsigned char c[2];
 		if(argc < 3) {
@@ -496,138 +489,3 @@ builtin(int type, int argc, unsigned char **argv, struct trenod *t)
 	restore(index);
 	chktrap();
 }
-
-#ifdef	SPELL
-
-#define	s0(c)	((c) == '/' ? '\0' : (c))
-
-/*
- * Compare two directory names for spell checking. newpath is the best current
- * path collected so far. newcur is the best previous directory, newcand
- * is the candidate. old is the current part of the wrong path.
- */
-static int
-better(unsigned char *newpath, unsigned char *newcur,
-		unsigned char *newcand, unsigned char *old)
-{
-	unsigned char	save[PATH_MAX+1];	/* can allocate only one path */
-	unsigned char	*sp = save;		/* on the stack at a time */
-	unsigned char	*np, *cp;
-	unsigned char	*op = old;
-	struct stat	st;
-	int		val = 0, typo = 0, miss = 0;
-
-	for (np = newcur; *np; np++) {
-		if (sp >= &save[sizeof save - 2])
-			return -1;
-		*sp++ = *np;
-	}
-	*sp = '\0';
-	cp = newcur;
-	for (np = newcand; *np; np++) {
-		if (cp+1 >= brkend)
-			growstak(cp);
-		*cp++ = *np;
-	}
-	*cp = '\0';
-	if (stat(newpath, &st) < 0 || (st.st_mode&S_IFMT) != S_IFDIR ||
-			access(newpath, X_OK) != 0)
-		goto restore;
-	np = newcand;
-	do {
-		if (*np != s0(*op)) {
-			if (np[0] && s0(op[0]) && np[1] == s0(op[1]))
-				typo++;
-			else if (s0(op[0]) && np[0] == s0(op[1])) {
-				op++;
-				miss++;
-			} else if (np[0] && np[1] == s0(op[0])) {
-				np++;
-				miss++;
-			} else
-				goto restore;
-		}
-	} while (*np++ && s0(*op) && op++);
-	if (np[-1] == s0(*op)) {
-		val = miss == 1 ? 1 :
-			typo == 1 && miss == 0 ? 2 :
-			miss == 0 && typo == 0 ? 3 : 0;
-	}
-restore:
-	np = newcur;
-	for (sp = save; *sp; sp++)
-		*np++ = *sp;
-	*np = '\0';
-	return val;
-}
-
-static int
-spellcheck(unsigned char *old)
-{
-	unsigned char	*new = locstak();
-	unsigned char	*op = old, *oc, *np = new, *nc;
-	const char	*cp;
-	DIR		*dir;
-	struct dirent	*dp;
-	int		best, i, c;
-	struct stat	st;
-
-	if (*op == '/') {
-		if (np+1 > brkend)
-			growstak(np);
-		*np++ = '/';
-		*np = '\0';
-		while (*op == '/')
-			op++;
-	}
-	do {
-		oc = op;
-		nc = np;
-		while (*op && *op != '/') {
-			if (np >= brkend)
-				growstak(np);
-			*np++ = *op++;
-		}
-		while (*op == '/')
-			op++;
-		if (np >= brkend)
-			growstak(np);
-		*np = '\0';
-		if (stat(new, &st) == 0 && (st.st_mode&S_IFMT) == S_IFDIR &&
-				access(new, X_OK) == 0)
-			goto next;
-		c = *nc;
-		*nc = '\0';
-		if ((dir = opendir(nc>new?new:(unsigned char *)".")) == NULL)
-			return 0;
-		*nc = c;
-		best = 0;
-		while ((dp = readdir(dir)) != NULL) {
-			if (dp->d_name[0] == '.' && (dp->d_name[1] == '\0' ||
-						dp->d_name[1] == '.' &&
-						dp->d_name[2] == '\0'))
-				continue;
-			if ((i = better(new, nc, dp->d_name, oc)) > best) {
-				best = i;
-				np = nc;
-				for (cp = dp->d_name; *cp; cp++) {
-					if (np+1 > brkend)
-						growstak(np);
-					*np++ = *cp & 0377;
-				}
-				*np = '\0';
-			}
-		}
-		closedir(dir);
-		if (best == 0)
-			return 0;
-	next:	if (np+1 > brkend)
-			growstak(np);
-		*np++ = '/';
-		*np = '\0';
-	} while (*op);
-	if (np > new)
-		np[-1] = '\0';
-	return np > new && *new;
-}
-#endif	/* SPELL */

@@ -25,19 +25,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-#if defined (SU3)
-static const char sccsid[] USED = "@(#)pax_su3.sl	1.26 (gritter) 6/26/05";
-#else
-static const char sccsid[] USED = "@(#)pax.sl	1.26 (gritter) 6/26/05";
-#endif
-/*	Sccsid @(#)pax.c	1.26 (gritter) 6/26/05	*/
+static const char sccsid[] USED = "@(#)pax.sl	1.16 (gritter) 6/1/04";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -62,7 +57,6 @@ static int		filec;
 static struct iblok	*filinp;
 static char		*path;
 static size_t		pathsz;
-static int		pax_Hflag;
 
 static void		setpres(const char *);
 static size_t		ofiles_pax(char **, size_t *);
@@ -72,16 +66,11 @@ static void		parsesub(char *);
 void
 flags(int ac, char **av)
 {
-	const char	optstring[] = "rwab:cdf:HikKlLno:p:s:tuvx:X";
+	const char	optstring[] = "rwab:cdf:ikKlLno:p:s:tuvx:X";
 	int	i;
 	int	illegal = 0;
-	char	*x;
 
-#if defined (SU3)
-	pax = PAX_TYPE_PAX2001;
-#else
-	pax = PAX_TYPE_PAX1992;
-#endif
+	pax = 1;
 	dflag = 1;
 	uflag = 1;
 	ofiles = ofiles_pax;
@@ -104,22 +93,7 @@ flags(int ac, char **av)
 			Aflag = 1;
 			break;
 		case 'b':
-			blksiz = strtol(optarg, &x, 10);
-			switch (*x) {
-			case 'b':
-				blksiz *= 512;
-				break;
-			case 'k':
-				blksiz *= 1024;
-				break;
-			case 'm':
-				blksiz *= 1048576;
-				break;
-			case 'w':
-				blksiz *= 2;
-				break;
-			}
-			if (blksiz <= 0)
+			if ((blksiz = atol(optarg)) <= 0)
 				msg(4, -2,
 					"Illegal size given for -b option.\n");
 			Cflag = 1;
@@ -132,9 +106,6 @@ flags(int ac, char **av)
 			break;
 		case 'f':
 			Oflag = Iflag = optarg;
-			break;
-		case 'H':
-			pax_Hflag = 1;
 			break;
 		case 'i':
 			rflag = 1;
@@ -257,8 +228,8 @@ usage(void)
 {
 	fprintf(stderr, "USAGE:\n\
 \t%s [-cdnvK] [-b size] [-f file] [-s replstr] [-x hdr] [patterns]\n\
-\t%s -r[cdiknuvK] [-b size] [-f file] [-p priv] [-s replstr] [-x hdr] [patterns]\n\
-\t%s -w[adituvLX] [-b size] [-f file] [-s replstr] [-x hdr] [files]\n\
+\t%s -r[cdiknuvK] [-b size] [-f file] "/*[-o options] */"[-p priv] [-s replstr] [-x hdr] [patterns]\n\
+\t%s -w[adituvLX] [-b size] [-f file] [-o options] [-s replstr] [-x hdr] [files]\n\
 \t%s -rw[diklntuvLX] [-p priv] [-s replstr] [files] directory\n",
 		progname, progname, progname, progname);
 	exit(1);
@@ -320,7 +291,6 @@ nextfile(void)
 	size_t	linsiz = 0, linlen;
 
 	if (filinp) {
-		pax_Hflag = 0;
 		if ((linlen=ib_getlin(filinp, &line, &linsiz, srealloc)) == 0) {
 			filinp = NULL;
 			return NULL;
@@ -388,8 +358,6 @@ ofiles_pax(char **name, size_t *namsiz)
 							* dts);
 				}
 				pend[dti+1] = catpath(pend[dti], dp->d_name);
-				if (pax_Hflag)
-					Lflag = dti < 0;
 				if ((Lflag ? stat : lstat)(path, &st) < 0) {
 					emsg(2, "Error with %s of \"%s\"",
 							lflag? "stat" : "lstat",
@@ -403,16 +371,8 @@ ofiles_pax(char **name, size_t *namsiz)
 							if (st.st_dev ==
 								curdev[i] &&
 								st.st_ino ==
-								curino[i]) {
-							    if (pax ==
-							      PAX_TYPE_PAX2001)
-							     msg(4, 1,
-								"Symbolic link "
-								"loop at "
-								"\"%s\"\n",
-								path);
-							    break;
-							}
+								curino[i])
+								break;
 						if (i <= dti)
 							break;
 					}
@@ -432,15 +392,10 @@ ofiles_pax(char **name, size_t *namsiz)
 				path[pend[dti]] = '\0';
 				closedir(dt[dti]);
 				dt[dti--] = NULL;
-				if (pax_Hflag)
-					Lflag = dti < 0;
 				break;
 			}
 		} else {
-			if (pax_Hflag)
-				Lflag = 1;
-			while ((nf = nextfile()) != NULL &&
-					(Lflag ? stat : lstat)(nf, &st) < 0) {
+			while ((nf = nextfile()) != NULL && stat(nf, &st) < 0) {
 				emsg(2, "Error with stat of \"%s\"", nf);
 				errcnt++;
 			}
@@ -523,26 +478,19 @@ int
 pax_track(const char *name, time_t mtime)
 {
 	struct pax_had	*pp;
-	struct stat	st;
 
-	if (pax_uflag == 0 && (pax_nflag == 0 || patterns))
+	if ((pax_uflag == 0 || action != 'o') && (pax_nflag == 0 || patterns))
 		return 1;
-	if (action == 'i' && pax_uflag) {
-		if (lstat(name, &st) == 0 && mtime < st.st_mtime)
+	if (plook(name, &pp) != 0) {
+		if (pax_uflag == 0)
 			return 0;
-	}
-	if (action != 'i' || pax_nflag) {
-		if (plook(name, &pp) != 0) {
-			if (action != 'i' && pax_uflag == 0)
-				return 0;
-			if (mtime > pp->p_mtime) {
-				pp->p_mtime = mtime;
-				return 1;
-			}
-			return 0;
-		} else
+		if (mtime > pp->p_mtime) {
 			pp->p_mtime = mtime;
-	}
+			return 1;
+		}
+		return 0;
+	} else
+		pp->p_mtime = mtime;
 	return 1;
 }
 
@@ -605,7 +553,6 @@ parsesub(char *s)
 	wchar_t	seof = nextc(&s, &len);
 	wint_t	c, d;
 	int	nbra = 0;
-	int	reflags;
 
 	if (seof == 0)
 		goto unt;
@@ -642,10 +589,7 @@ parsesub(char *s)
 	s[-len] = '\0';
 	if (ren <= res)
 		rep = srealloc(rep, ++res * sizeof *rep);
-	reflags = REG_ANGLES;
-	if (pax >= PAX_TYPE_PAX2001)
-		reflags |= REG_AVOIDNULL;
-	if (regcomp(&rep[ren].r_re, ps, reflags) != 0)
+	if (regcomp(&rep[ren].r_re, ps, REG_ANGLES|REG_BADRANGE) != 0)
 		msg(3, -2, "Regular expression error in \"-s\" option\n");
 	rep[ren].r_rhs = s;
 	rep[ren].r_nbra = nbra;
@@ -709,7 +653,7 @@ pax_sname(char **oldp, size_t *olds)
 			if (y >= 0)
 				for (l = bralist[y].rm_so; l < bralist[y].rm_eo;
 						l++)
-					put(inp[l]);
+					put(inp[i]);
 			else
 				put(c);
 		}

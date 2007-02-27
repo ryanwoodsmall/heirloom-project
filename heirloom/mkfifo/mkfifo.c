@@ -22,14 +22,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4
 #define	USED	__attribute__ ((used))
 #elif defined __GNUC__
 #define	USED	__attribute__ ((unused))
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)mkfifo.sl	1.4 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)mkfifo.sl	1.2 (gritter) 4/20/04";
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -148,7 +148,7 @@ main(int argc, char **argv)
 #endif
 
 static mode_t	absol(const char **);
-static mode_t	who(const char **, mode_t *);
+static mode_t	who(const char **);
 static int	what(const char **);
 static mode_t	where(const char **, mode_t, int *, int *, const mode_t);
 
@@ -157,7 +157,7 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 {
 	register mode_t	o, m, b;
 	int	lock, setsgid = 0, cleared = 0, copy = 0;
-	mode_t	nm, om, mm;
+	mode_t	nm, om;
 
 	nm = om = pm;
 	m = absol(&ms);
@@ -169,19 +169,19 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 			== 01)
 		nm &= ~(mode_t)S_ENFMT;
 	do {
-		m = who(&ms, &mm);
+		m = who(&ms);
 		while (o = what(&ms)) {
 			b = where(&ms, nm, &lock, &copy, pm);
 			switch (o) {
 			case '+':
-				nm |= b & m & ~mm;
+				nm |= b & m;
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
 					lock |= 02;
 				break;
 			case '-':
-				nm &= ~(b & m & ~mm);
+				nm &= ~(b & m);
 				if (b & S_ISGID)
 					setsgid = 1;
 				if (lock & 04)
@@ -189,7 +189,7 @@ newmode(const char *ms, const mode_t pm, const char *fn)
 				break;
 			case '=':
 				nm &= ~m;
-				nm |= b & m & ~mm;
+				nm |= b & m;
 				lock &= ~01;
 				if (lock & 04)
 					lock |= 02;
@@ -225,12 +225,11 @@ absol(const char **ms)
 }
 
 static mode_t
-who(const char **ms, mode_t *mp)
+who(const char **ms)
 {
 	register int m;
 
 	m = 0;
-	*mp = 0;
 	for (;;) switch (*(*ms)++) {
 	case 'u':
 		m |= USER;
@@ -246,10 +245,8 @@ who(const char **ms, mode_t *mp)
 		continue;
 	default:
 		(*ms)--;
-		if (m == 0) {
-			m = ALL;
-			*mp = um;
-		}
+		if (m == 0)
+			m = ALL & ~(mode_t)um;
 		return m;
 	}
 }

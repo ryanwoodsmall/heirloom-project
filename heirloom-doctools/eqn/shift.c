@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)shift.c	1.5 (gritter) 10/19/06
+ * Sccsid @(#)shift.c	1.3 (gritter) 8/12/05
  */
 
 # include "e.h"
@@ -26,12 +26,10 @@
 
 void
 bshiftb(int p1, int dir, int p2) {
-#ifndef NEQN
-	float shval, d1, h1, b1, h2, b2;
-	float diffps, effps, effps2;
-	char *sh1, *sh2;
-#else	/* NEQN */
 	int shval, d1, h1, b1, h2, b2;
+#ifndef NEQN
+	int diffps, effps, effps2;
+	char *sh1, *sh2;
 #endif /* NEQN */
 
 	yyval = p1;
@@ -89,19 +87,17 @@ bshiftb(int p1, int dir, int p2) {
 		eht[yyval] = h1 + max(0, h2 - VERT(1));
 #endif /* NEQN */
 	}
-#ifndef NEQN
-	if(dbg)printf(".\tb:b shift b: S%d <- S%d vert %g S%d vert %g; b=%g, h=%g\n", 
+	if(dbg)printf(".\tb:b shift b: S%d <- S%d vert %d S%d vert %d; b=%d, h=%d\n", 
 		yyval, p1, shval, p2, -shval, ebase[yyval], eht[yyval]);
-	printf(".as %d \\v'%gp'\\s-%s%s\\*(%d\\s+%s%s\\v'%gp'\n", 
-		yyval, shval, tsize(diffps), sh1, p2, tsize(diffps), sh2, -shval);
+#ifndef NEQN
+	printf(".as %d \\v'%du'\\s-%d%s\\*(%d\\s+%d%s\\v'%du'\n", 
+		yyval, shval, diffps, sh1, p2, diffps, sh2, -shval);
 	ps += deltaps;
 	if (rfont[p2] == ITAL)
 		rfont[p1] = 0;
 	else
 		rfont[p1] = rfont[p2];
 #else /* NEQN */
-	if(dbg)printf(".\tb:b shift b: S%d <- S%d vert %d S%d vert %d; b=%d, h=%d\n", 
-		yyval, p1, shval, p2, -shval, ebase[yyval], eht[yyval]);
 	printf(".as %d \\v'%du'\\*(%d\\v'%du'\n", 
 		yyval, shval, p2, -shval);
 #endif /* NEQN */
@@ -112,17 +108,14 @@ void
 shift(int p1) {
 	ps -= deltaps;
 	yyval = p1;
-	if(dbg)printf(".\tshift: %d;ps=%g\n", yyval, ps);
+	if(dbg)printf(".\tshift: %d;ps=%d\n", yyval, ps);
 }
 
 void
 shift2(int p1, int p2, int p3) {
-	int effps, treg;
+	int effps, h1, h2, h3, b1, b2, b3, subsh, d1, d2, supsh, treg;
 #ifndef NEQN
-	float h1, h2, h3, b1, b2, b3, subsh, d1, d2, supsh;
 	int effps2;
-#else	/* NEQN */
-	int h1, h2, h3, b1, b2, b3, subsh, d1, d2, supsh;
 #endif /* NEQN */
 
 	treg = oalloc();
@@ -179,10 +172,10 @@ shift2(int p1, int p2, int p3) {
 	printf(".nr %d \\n(%d\n", treg, p3);
 	printf(".if \\n(%d>\\n(%d .nr %d \\n(%d\n", p2, treg, treg, p2);
 #ifndef NEQN
-	printf(".as %d \\v'%gp'\\s%s\\*(%d\\h'-\\n(%du'\\v'%gp'\\\n", 
-		p1, subsh, tsize(effps), p2, p2, -subsh+supsh);
-	printf("\\s%s\\*(%d\\h'-\\n(%du+\\n(%du'\\s%s\\v'%gp'\n", 
-		tsize(effps), p3, p3, treg, tsize(effps2), -supsh);
+	printf(".as %d \\v'%du'\\s%d\\*(%d\\h'-\\n(%du'\\v'%du'\\\n", 
+		p1, subsh, effps, p2, p2, -subsh+supsh);
+	printf("\\s%d\\*(%d\\h'-\\n(%du+\\n(%du'\\s%d\\v'%du'\n", 
+		effps, p3, p3, treg, effps2, -supsh);
 #else /* NEQN */
 	printf(".as %d \\v'%du'\\*(%d\\h'-\\n(%du'\\v'%du'\\\n", 
 		p1, subsh, p2, p2, -subsh+supsh);

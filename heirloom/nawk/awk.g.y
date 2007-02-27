@@ -1,7 +1,7 @@
 /*
    Changes by Gunnar Ritter, Freiburg i. Br., Germany, December 2002.
   
-   Sccsid @(#)awk.g.y	1.9 (gritter) 5/14/06>
+   Sccsid @(#)awk.g.y	1.7 (gritter) 4/16/04>
  */
 /* UNIX(R) Regular Expression Tools
 
@@ -24,12 +24,11 @@
 */
 /*		copyright	"%c%" 	*/
 
-/*	from RCS Header: awk.g.y 1.2 91/06/25 	*/
+/*	from $Header$	*/
 
 %{
 #include "awk.h"
 #include <unistd.h>
-#include <inttypes.h>
 #include <pfmt.h>
 int yywrap(void) { return(1); }
 #ifndef	DEBUG
