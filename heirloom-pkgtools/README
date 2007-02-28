@@ -38,6 +38,10 @@ signed packages, and web installation. Still, OpenSSL header
 files are required while building, although the libraries are
 not used for linking.
 
+New releases of this project are announced on Freshmeat. If you want to
+get notified by email on each release, use their subscription service at
+<http://freshmeat.net/projects/pkgtools/>.
+
 The project homepage is currently at <http://heirloom.sourceforge.net>.
 
 Report bugs to
@@ -46,4 +50,4 @@ Gunnar Ritter
 Freiburg i. Br.
 Germany
 <http://heirloom.sourceforge.net>
-<gunnarr@acm.org>                                               2/27/07
+<gunnarr@acm.org>                                               2/28/07
