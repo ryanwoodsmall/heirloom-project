@@ -9,7 +9,7 @@ OBJ = ckdate.o ckgid.o ckint.o ckitem.o ckkeywd.o ckpath.o ckrange.o \
 	putdev.o putdgrp.o puterror.o puthelp.o putprmpt.o puttext.o \
 	rdwr_vtoc.o regexp.o space.o \
 	strlcat.o strlcpy.o closefrom.o sigsend.o cftime.o getpass.o \
-	mkdirp.o
+	mkdirp.o getopt.o
 
 all: libadm.a
 

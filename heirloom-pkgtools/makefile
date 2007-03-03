@@ -3,7 +3,7 @@ SUBDIRS = version libpkgdb libadm libgendb libpkg libinst \
 	pkgcmds/installf pkgcmds/pkgadd pkgcmds/pkgchk \
 	pkgcmds/pkginstall pkgcmds/pkgname \
 	pkgcmds/pkgparam pkgcmds/pkgremove pkgcmds/pkgrm pkgcmds/pkgscripts \
-	man
+	valtools man
 
 MAKEFILES = $(SUBDIRS:=/Makefile)
 
