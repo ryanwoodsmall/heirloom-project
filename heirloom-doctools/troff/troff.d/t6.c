@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.189 (gritter) 11/26/06
+ * Sccsid @(#)t6.c	1.190 (gritter) 3/4/07
  */
 
 /*
@@ -1555,7 +1555,7 @@ casefps(void)
 		{ SPEC_NONE,	NULL }
 	};
 	char	name[NC];
-	int	c, i;
+	int	c = 0, i;
 	enum spec	s = SPEC_NONE;
 
 	if (skip(1))

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.74 (gritter) 2/23/07
+ * Sccsid @(#)n9.c	1.75 (gritter) 3/4/07
  */
 
 /*
@@ -167,7 +167,7 @@ eat(tchar c)
 void
 setov(void)
 {
-	register int j, k;
+	register int j = 0, k;
 	tchar i, delim, o[NOV];
 	int w[NOV];
 

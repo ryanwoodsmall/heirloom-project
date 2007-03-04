@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.59 (gritter) 10/5/06
+ * Sccsid @(#)otf.c	1.60 (gritter) 3/4/07
  */
 
 #include <stdio.h>
@@ -3175,6 +3175,7 @@ otfcff(const char *path,
 {
 	int	ok = 0;
 
+	(void) &ok;
 	a = NULL;
 	filename = path;
 	contents = _contents;
@@ -3352,6 +3353,7 @@ otft42(char *font, char *path, char *_contents, size_t _size, FILE *fp)
 	int	ok = 0;
 	int	i;
 
+	(void) &ok;
 	a = NULL;
 	filename = path;
 	contents = _contents;
@@ -3444,6 +3446,7 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 {
 	int	ok = 0;
 
+	(void) &ok;
 	a = _a;
 	filename = a->path;
 	contents = _contents;
