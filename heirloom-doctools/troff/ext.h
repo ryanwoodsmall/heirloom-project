@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.109 (gritter) 2/23/07
+ * Sccsid @(#)ext.h	1.110 (gritter) 3/5/07
  */
 
 /*
@@ -92,6 +92,7 @@ extern	int	dfactd;
 extern	int	diflg;
 extern	int	dilev;
 extern	int	donef;
+extern	int	donep;
 extern	int	dotT;
 extern	int	dpn;
 extern	int	dl;

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.170 (gritter) 2/6/07
+ * Sccsid @(#)n7.c	1.171 (gritter) 3/5/07
  */
 
 /*
@@ -2073,7 +2073,7 @@ parword(void)
 }
 
 static void
-pbreak(int sprd, struct s *s)
+pbreak(int sprd, int lastf, struct s *s)
 {
 	int	j;
 
@@ -2092,7 +2092,8 @@ pbreak(int sprd, struct s *s)
 		if (setjmp(*s->jmp) == 0) {
 			nlflg = 1;
 			memcpy(&savsjbuf, &sjbuf, sizeof sjbuf);
-			mainloop();
+			if (!donep || !lastf)
+				mainloop();
 		}
 		memcpy(&sjbuf, &savsjbuf, sizeof sjbuf);
 	}
@@ -2144,7 +2145,7 @@ parpr(struct s *s)
 					if (letsps)
 						storelsp(c, 0);
 				}
-				pbreak(1, s);
+				pbreak(1, i >= pgwords, s);
 				if (i >= pgwords)
 					break;
 			}
@@ -2208,7 +2209,7 @@ parpr(struct s *s)
 		nwd += stretches;
 		nw++;
 	}
-	pbreak(nel - adspc < 0 && nwd > 1 || _spread, s);
+	pbreak(nel - adspc < 0 && nwd > 1 || _spread, 1, s);
 	pgwords = pgchars = pgspacs = pglines = pgne = pglastw = 0;
 	ll = savll;
 	in = un = savin;
