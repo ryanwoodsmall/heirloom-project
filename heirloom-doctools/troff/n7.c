@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.171 (gritter) 3/5/07
+ * Sccsid @(#)n7.c	1.172 (gritter) 3/6/07
  */
 
 /*
@@ -2092,8 +2092,9 @@ pbreak(int sprd, int lastf, struct s *s)
 		if (setjmp(*s->jmp) == 0) {
 			nlflg = 1;
 			memcpy(&savsjbuf, &sjbuf, sizeof sjbuf);
-			if (!donep || !lastf)
-				mainloop();
+			if (donep && lastf)
+				donef = -1;
+			mainloop();
 		}
 		memcpy(&sjbuf, &savsjbuf, sizeof sjbuf);
 	}
