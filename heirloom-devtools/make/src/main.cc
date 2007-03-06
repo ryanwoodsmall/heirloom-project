@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.22 (gritter) 3/6/07
+ * Sccsid @(#)main.cc	1.23 (gritter) 3/6/07
  */
 
 /*
@@ -2351,9 +2351,17 @@ read_files_and_state(int argc, char **argv)
 		append_char('P', &makeflags_string);
 		append_char('P', &makeflags_string_posix);
 	}
+	if (Bflag) {
+		append_char('B', &makeflags_string);
+		append_char('B', &makeflags_string_posix);
+	}
 	if (trace_status) {
 		append_char('p', &makeflags_string);
 		append_char('p', &makeflags_string_posix);
+	}
+	if (pmake_max_jobs) {
+		append_char('P', &makeflags_string);
+		append_char('P', &makeflags_string_posix);
 	}
 	if (quest) {
 		append_char('q', &makeflags_string);
@@ -2371,7 +2379,7 @@ read_files_and_state(int argc, char **argv)
 		append_char('u', &makeflags_string);
 		append_char('u', &makeflags_string_posix);
 	}
-	if (report_cwd) {
+	if (report_cwd || wflag) {
 		append_char('w', &makeflags_string);
 		append_char('w', &makeflags_string_posix);
 	}
