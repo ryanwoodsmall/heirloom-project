@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)parallel.cc	1.5 (gritter) 01/14/07
+ * Sccsid @(#)parallel.cc	1.6 (gritter) 3/6/07
  */
 
 /*
@@ -95,7 +95,6 @@ static	char		user_name[MAXNAMELEN] = "";
 #else
 #define	local_host	"localhost"
 #endif
-static	int		pmake_max_jobs = 0;
 static	pid_t		process_running = -1;
 static	Running		*running_tail = &running_list;
 static	Name		subtree_conflict;
@@ -114,9 +113,7 @@ static	void		delete_running_struct(Running rp);
 static	Boolean		dependency_conflict(Name target);
 static	Doname		distribute_process(char **commands, Property line);
 static	void		doname_subtree(Name target, Boolean do_get, Boolean implicit);
-#ifdef TEAMWARE_MAKE_CMN
 static	void		dump_out_file(char *filename, Boolean err);
-#endif
 static	void		finish_doname(Running rp);
 static	void		maybe_reread_make_state(void);
 static	void		process_next(void);
@@ -771,7 +768,9 @@ distribute_process(char **commands, Property line)
 #ifdef TEAMWARE_MAKE_CMN
 	static unsigned	file_number = 0;
 	wchar_t		string[MAXPATHLEN];
+#endif
 	char		mbstring[MAXPATHLEN];
+#ifdef TEAMWARE_MAKE_CMN
 	int		filed;
 	int		res;
 #endif
@@ -874,18 +873,25 @@ distribute_process(char **commands, Property line)
 	}
 
 #ifdef TEAMWARE_MAKE_CMN
-	sprintf(mbstring,
-		        NOCATGETS("%s/dmake.stdout.%d.%d.XXXXXX"),
+	Bflag = true;
+#endif
+	if (Bflag) {
+#ifdef TEAMWARE_MAKE_CMN
+		sprintf(mbstring,
+		        NOCATGETS("%s/%s.stdout.%d.%d.XXXXXX"),
 			tmpdir,
 		        getpid(),
 	                file_number++);
-
-	mktemp(mbstring);
-
-	stdout_file = strdup(mbstring);
 #else
-	stdout_file = NULL;
+		sprintf(mbstring, NOCATGETS("%s/make.XXXXXX"), tmpdir);
 #endif
+
+		close(mkstemp(mbstring));
+
+		stdout_file = strdup(mbstring);
+	} else {
+		stdout_file = NULL;
+	}
 	stderr_file = NULL;
 #if defined (TEAMWARE_MAKE_CMN) && defined(REDIRECT_ERR)
 	if (!out_err_same) {
@@ -1470,12 +1476,10 @@ await_parallel(Boolean waitflg)
 void
 finish_children(Boolean docheck)
 {
-#ifdef TEAMWARE_MAKE_CMN
 	int		cmds_length;
 	Cmd_line	rule;
 	struct stat	out_buf;
 	Boolean		silent_flag;
-#endif
 	Property	line;
 	Property	line2;
 	Running		rp;
@@ -1514,7 +1518,6 @@ bypass_for_loop_inc_4:
 					send_job_result_msg(rp);
 				}
 #endif
-#ifdef TEAMWARE_MAKE_CMN
 				/*
 				 * Check if there were any job output
 				 * from the parallel build.
@@ -1544,7 +1547,6 @@ bypass_for_loop_inc_4:
 					retmem_mb(rp->stdout_file);
 					rp->stdout_file = NULL;
 				}
-#endif
 #if defined(REDIRECT_ERR)
 				if (!out_err_same && (rp->stderr_file != NULL)) {
 					if (stat(rp->stderr_file, &out_buf) < 0) {
@@ -1616,7 +1618,6 @@ bypass_for_loop_inc_4:
 	}
 }
 
-#ifdef TEAMWARE_MAKE_CMN
 /*
  *	dump_out_file(filename, err)
  *
@@ -1640,7 +1641,7 @@ dump_out_file(char *filename, Boolean err)
 		      filename,
 		      errmsg(errno));
 	}
-	if (!silent && output_mode != txt2_mode) {
+	if (!silent && output_mode != txt2_mode && sun_style) {
 		fprintf(err ? stderr : stdout,
 		               err ?
 				"%s --> Job errors\n" :
@@ -1663,7 +1664,6 @@ dump_out_file(char *filename, Boolean err)
 	close(fd);
 	unlink(filename);
 }
-#endif
 
 /*
  *	finish_doname(rp)
@@ -2040,11 +2040,30 @@ parallel_ok(Name target, Boolean line_prop_must_exists)
 	}
 	if (assign) {
 		return false;
-	} else if (target->parallel) {
+	}
+	if (target->nmutexes) {
+		int	i;
+		Name	*np;
+		for (i = 0; i < target->nmutexes; i++) {
+			for (np = mutexlist[target->mutexes[i]];
+					*np != NULL; np++) {
+				if (is_running(*np)) {
+					if (debug_level)
+						fprintf(stdout,
+						   "Serializing %s because "
+						   "%s is running\n",
+					           target->string_mb,
+					           (*np)->string_mb);
+					return false;
+				}
+			}
+		}
+	}
+	if (target->parallel) {
 		return true;
 	} else if (target->no_parallel) {
 		return false;
-	} else if (all_parallel) {
+	} if (all_parallel) {
 		return true;
 	} else if (only_parallel) {
 		return false;

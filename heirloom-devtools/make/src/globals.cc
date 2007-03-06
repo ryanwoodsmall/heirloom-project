@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)globals.cc	1.7 (gritter) 01/20/07
+ * Sccsid @(#)globals.cc	1.8 (gritter) 3/6/07
  */
 
 /*
@@ -70,6 +70,7 @@
 	Boolean		all_parallel;			/* TEAMWARE_MAKE_CMN */
 	Boolean		assign_done;
 	int foo;	
+	Boolean		Bflag;
 	Boolean		build_failed_seen;
 #ifdef DISTRIBUTED
 	Boolean		building_serial;
@@ -148,6 +149,9 @@
 #ifdef SGE_SUPPORT
 	Boolean		grid = false;			/* TEAMWARE_MAKE_CMN */
 #endif
+	Name		**mutexlist;
+	unsigned	nmutexlist;
+	Name		mutex_name;
 	Name		no_parallel_name;
 	Name		not_auto;
 	Boolean		only_parallel;			/* TEAMWARE_MAKE_CMN */
@@ -155,6 +159,7 @@
 	Name		parallel_name;
 	Name		localhost_name;
 	int		parallel_process_cnt;
+	int		pmake_max_jobs = 0;
 	Percent		percent_list;
 	Dyntarget	dyntarget_list;
 	Name		plus;

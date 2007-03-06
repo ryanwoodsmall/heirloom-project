@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.21 (gritter) 2/26/07
+ * Sccsid @(#)main.cc	1.22 (gritter) 3/6/07
  */
 
 /*
@@ -623,7 +623,8 @@ main(int argc, char *argv[])
 #endif
 
 #ifndef TEAMWARE_MAKE_CMN
-	parallel_flag = dmake_max_jobs_specified;
+	parallel_flag = dmake_max_jobs_specified || pmake_max_jobs ?
+		true : false;
 #else
 	parallel_flag = true;
 	/* XXX - This is a major hack for DMake/Licensing. */
@@ -1709,6 +1710,8 @@ parse_command_option(register char ch)
 		invert_next = 1;
 		return 0;
 	case 'B':			 /* Obsolete */
+		if (!sun_style && !svr4)
+			Bflag = true;
 		return 0;
 	case 'b':			 /* Obsolete */
 		return 0;
@@ -1848,10 +1851,23 @@ parse_command_option(register char ch)
 		}
 		return 512;
 	case 'P':			 /* Print for selected targets */
-		if (invert_this) {
-			report_dependencies_level--;
+		if (sun_style) {
+			if (invert_this) {
+				report_dependencies_level--;
+			} else {
+				report_dependencies_level++;
+			}
 		} else {
-			report_dependencies_level++;
+			char	*cp;
+
+			if ((cp = getenv("PARALLEL")) != NULL && *cp != 0) {
+				pmake_max_jobs = atoi(cp);
+				if (pmake_max_jobs < 2)
+					pmake_max_jobs = 0;
+			} else
+				pmake_max_jobs = 2;
+			if (pmake_max_jobs > 1)
+				dmake_mode_type = parallel_mode;
 		}
 		return 0;
 	case 'p':			 /* Print description */
@@ -1947,10 +1963,18 @@ parse_command_option(register char ch)
 		}
 		return 0;
 	case 'w':			 /* Unconditional flag */
-		if (invert_this) {
-			report_cwd = false;
+		if (sun_style) {
+			if (invert_this) {
+				report_cwd = false;
+			} else {
+				report_cwd = true;
+			}
 		} else {
-			report_cwd = true;
+			if (invert_this) {
+				wflag = false;
+			} else {
+				wflag = true;
+			}
 		}
 		return 0;
 #if 0

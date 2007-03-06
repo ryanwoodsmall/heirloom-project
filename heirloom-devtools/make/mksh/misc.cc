@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.8 (gritter) 2/25/07
+ * Sccsid @(#)misc.cc	1.9 (gritter) 3/6/07
  */
 
 /*
@@ -535,6 +535,8 @@ warning_mksh(char * message, ...)
 {
 	va_list args;
 
+	if (wflag)
+		return;
 	va_start(args, message);
 	fflush(stdout);
 	if (sun_style)

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.7 (gritter) 01/20/07
+ * Sccsid @(#)defs.h	1.8 (gritter) 3/6/07
  */
 
 /*
@@ -202,6 +202,7 @@ extern	Name		svr4_name;
 extern	Boolean		sdot_target;
 extern	Boolean		all_parallel;
 extern	Boolean		assign_done;
+extern	Boolean		Bflag;
 extern	Boolean		build_failed_seen;
 #ifdef DISTRIBUTED
 extern	Boolean		building_serial;
@@ -257,6 +258,9 @@ extern	char		*mbs_ptr;
 extern	char		*mbs_ptr2;
 extern	Boolean		no_action_was_taken;
 extern	int		mtool_msgs_fd;
+extern	Name		**mutexlist;
+extern	unsigned	nmutexlist;
+extern	Name		mutex_name;
 extern	Boolean		no_parallel;
 #ifdef SGE_SUPPORT
 extern	Boolean		grid;
@@ -272,6 +276,7 @@ extern	Percent		percent_list;
 extern	Dyntarget	dyntarget_list;
 extern	Name		plus;
 extern	Name		pmake_machinesfile;
+extern	int		pmake_max_jobs;
 extern	Name		precious;
 extern	Name		primary_makefile;
 extern	Boolean		quest;

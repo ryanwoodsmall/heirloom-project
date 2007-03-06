@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)globals.cc	1.3 (gritter) 01/13/07
+ * Sccsid @(#)globals.cc	1.4 (gritter) 3/6/07
  */
 
 /*
@@ -128,6 +128,7 @@ Boolean		tilde_rule;
 Name		virtual_root;
 Boolean		vpath_defined;
 Name		vpath_name;
+Boolean		wflag;
 wchar_t		wcs_buffer[MAXPATHLEN];
 Boolean		working_on_targets;
 #if defined (TEAMWARE_MAKE_CMN) && defined(REDIRECT_ERR)

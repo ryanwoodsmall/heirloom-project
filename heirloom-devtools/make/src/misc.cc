@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.10 (gritter) 2/26/07
+ * Sccsid @(#)misc.cc	1.11 (gritter) 3/6/07
  */
 
 /*
@@ -235,6 +235,8 @@ warning(const char * message, ...)
 {
 	va_list args;
 
+	if (wflag)
+		return;
 	va_start(args, message);
 	fflush(stdout);
 	if (sun_style)
@@ -669,6 +671,8 @@ load_cached_names(void)
 	makeflags = GETNAME(wcs_buffer, FIND_LENGTH);
 	MBSTOWCS(wcs_buffer, NOCATGETS(".MAKE_VERSION"));
 	make_version = GETNAME(wcs_buffer, FIND_LENGTH);
+	MBSTOWCS(wcs_buffer, NOCATGETS(".MUTEX"));
+	mutex_name = GETNAME(wcs_buffer, FIND_LENGTH);
 	MBSTOWCS(wcs_buffer, NOCATGETS(".NO_PARALLEL"));
 	no_parallel_name = GETNAME(wcs_buffer, FIND_LENGTH);
 	MBSTOWCS(wcs_buffer, NOCATGETS(".NOT_AUTO"));
@@ -728,6 +732,7 @@ load_cached_names(void)
 	dot_keep_state_file->special_reader = keep_state_file_special;
 	ignore_name->special_reader = ignore_special;
 	make_version->special_reader = make_version_special;
+	mutex_name->special_reader = mutex_special;
 	no_parallel_name->special_reader = no_parallel_special;
 	parallel_name->special_reader = parallel_special;
 	localhost_name->special_reader = localhost_special;

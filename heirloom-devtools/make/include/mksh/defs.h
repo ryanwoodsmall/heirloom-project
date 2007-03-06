@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.9 (gritter) 01/23/07
+ * Sccsid @(#)defs.h	1.10 (gritter) 3/6/07
  */
 
 /*
@@ -401,6 +401,7 @@ typedef enum {
 	keep_state_file_special,
 	keep_state_special,
 	make_version_special,
+	mutex_special,
 	no_parallel_special,
 	parallel_special,
 	posix_special,
@@ -552,6 +553,11 @@ struct _Name {
 	 * Count how many conditional macros this target has defined
 	 */
 	short			conditional_cnt;
+	/*
+	 * Mutex array and number of array members
+	 */
+	unsigned		*mutexes;
+	unsigned		nmutexes;
 	/*
 	 * A conditional macro was used when building this target
 	 */
@@ -1006,6 +1012,7 @@ extern Boolean		working_on_targets;
 extern Name		virtual_root;
 extern Boolean		vpath_defined;
 extern Name		vpath_name;
+extern Boolean		wflag;
 extern Boolean		make_state_locked;
 #if defined (TEAMWARE_MAKE_CMN) && defined(REDIRECT_ERR)
 extern Boolean		out_err_same;

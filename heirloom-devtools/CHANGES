@@ -1,4 +1,9 @@
 Release ...
+* make: The SVR4.2 syntax for parallel builds has been added. This adds
+  the "-B" and "-P" options as well as the ".MUTEX:" special target.
+* make: The SVR4.2 "-w" option has been added to suppress warnings.
+* make: The "-u" option (unconditionally make the targets, even those
+  that are not outdated) is now a documented feature.
 * make: Comments following "ifeq" and other conditionals are now handled
   correctly.
 * sccs: The commands "-R info", "-R tell", and "-R clean" now operate

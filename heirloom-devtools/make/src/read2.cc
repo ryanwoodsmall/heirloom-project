@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read2.cc	1.7 (gritter) 2/16/07
+ * Sccsid @(#)read2.cc	1.8 (gritter) 3/6/07
  */
 
 /*
@@ -1151,7 +1151,8 @@ enter_dyntarget(register Name target)
 void
 special_reader(Name target, register Name_vector depes, Cmd_line command)
 {
-	register int		n;
+	register int		k, n;
+	Name_vector		dp;
 
 	switch (target->special_reader) {
 
@@ -1302,6 +1303,40 @@ special_reader(Name target, register Name_vector depes, Cmd_line command)
 					depes->names[0]->string_mb);
 			}
 		}
+		break;
+
+	case mutex_special:
+		if(svr4 || sun_style)
+		  break;
+		if (depes->used == 0)
+			break;
+		k = 0;
+		for (dp = depes; dp != NULL; dp = dp->next)
+			for (n = 0; n < dp->used; n++)
+				k++;
+		mutexlist = (Name **)realloc(mutexlist,
+				(nmutexlist+1) * sizeof *mutexlist);
+		mutexlist[nmutexlist] = (Name *)malloc((k+1) *
+				sizeof **mutexlist);
+		k = 0;
+		for (dp = depes; dp != NULL; dp = dp->next)
+			for (n = 0; n < dp->used; n++) {
+				dp->names[n]->mutexes = (unsigned *)malloc(
+					(dp->names[n]->nmutexes+1) *
+					sizeof *dp->names[n]->mutexes);
+				dp->names[n]->mutexes[dp->names[n]->nmutexes++]
+					= nmutexlist;
+				mutexlist[nmutexlist][k++] = dp->names[n];
+			}
+		mutexlist[nmutexlist][k] = NULL;
+		if (trace_reader) {
+			printf("%s:", mutex_name->string_mb);
+			for (n = 0; n < k; n++)
+				printf(" %s",
+					mutexlist[nmutexlist][n]->string_mb);
+			printf("\n");
+		}
+		nmutexlist++;
 		break;
 
 	case no_parallel_special:

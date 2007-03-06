@@ -22,10 +22,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)make.1	1.12 (gritter) 2/8/07
+.\" Sccsid @(#)make.1	1.13 (gritter) 3/6/07
 .\"
 .\" from OpenSolaris sysV-make 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH MAKE 1 "2/8/07" "Heirloom Development Tools" "User Commands"
+.TH MAKE 1 "3/6/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 make \- maintain, update, and regenerate groups of programs
 .SH SYNOPSIS
@@ -33,7 +33,7 @@ make \- maintain, update, and regenerate groups of programs
 .ad l
 .nh
 \fBmake\fR [\fB\-f\fR\ \fImakefile\fR]
-[\fB\-j\ \fIjobs\fR] [\fB\-eiknpqrst\fR] [\fInames\fR]
+[\fB\-j\ \fIjobs\fR] [\fB\-BeiknpqPrstuw\fR] [\fInames\fR]
 .br
 .ad b
 .hy 1
@@ -74,6 +74,10 @@ with the name \fB\&.DEFAULT\fR are used if it exists.
 Same
 effect as the \fB\-i\fR option.
 .TP
+\fB\&.MUTEX:\fR
+Dependents of the same \fB\&.MUTEX\fR entry
+will not be built in parallel.
+.TP
 \fB\&.PRECIOUS:\fR
 Dependents of the \fB\&.PRECIOUS\fR entry will not be removed
 when quit or interrupt are hit.
@@ -86,6 +90,12 @@ effect as the \fB\-s\fR option.
 The options for \fImake\fR are listed below:
 .RS 2
 .TP 14
+.B \-B
+When building in parallel,
+save the output of each job
+and print it as a single block.
+This option is an extension.
+.TP
 \fB\-e\fR
 Environment variables override assignments
 within makefiles.
@@ -120,6 +130,14 @@ with an `\fB@\fR' are printed.
 Print out the
 complete set of macro definitions and target descriptions.
 .TP
+.B \-P
+Execute in parallel.
+The number of jobs is determined
+by the value of the \fBPARALLEL\fR environment variable.
+If it is not set or empty,
+the default is 2.
+This option is an extension.
+.TP
 \fB\-q\fR
 Question.
 \fImake\fR returns a zero or non\-zero status code depending
@@ -138,6 +156,16 @@ Do not print command lines before executing.
 Touch the target
 files (causing them to be updated) rather than issue the usual
 commands.
+.TP
+.B \-u
+Unconditionally build the targets,
+including those that are not outdated.
+This option is an extension.
+.TP
+.B \-w
+Suppress warning messages.
+Only fatal error messages will be printed.
+This option is an extension.
 .RE
 .SS Creating the makefile
 The makefile invoked with the \fB\-f\fR option is a carefully
@@ -521,9 +549,9 @@ we assume the source files are all C type source:
 \fBlib: lib(file1.o) lib(file2.o) lib(file3.o)
         @echo lib is now up-to-date
 \&.c.a:
-       $(CC) \fR\fB\-c\fR\fB $(CFLAGS) $<
+        $(CC) \fR\fB\-c\fR\fB $(CFLAGS) $<
         $(AR) $(ARFLAGS) $@ $*.o
-       rm \fR\fB\-f\fR\fB $*.o\fR
+        rm \fR\fB\-f\fR\fB $*.o\fR
 .fi
 .RE
 .PP
@@ -536,7 +564,7 @@ follows:
 .RS
 .nf
 \fBlib: lib(file1.o) lib(file2.o) lib(file3.o)
-       $(CC) \fR\fB\-c\fR\fB $(CFLAGS) $(?:.o=.c)
+        $(CC) \fR\fB\-c\fR\fB $(CFLAGS) $(?:.o=.c)
         $(AR) $(ARFLAGS) lib $?
         rm $?
         @echo lib is now up-to-date
