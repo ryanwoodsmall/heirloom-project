@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)tty.c	2.28 (gritter) 3/4/06";
+static char sccsid[] = "@(#)tty.c	2.29 (gritter) 3/9/07";
 #endif
 #endif /* not lint */
 
@@ -430,6 +430,7 @@ yorn(char *msg)
 		return 1;
 	do
 		cp = readtty(msg, NULL);
-	while (*cp != 'y' && *cp != 'Y' && *cp != 'n' && *cp != 'N');
+	while (cp == NULL ||
+		*cp != 'y' && *cp != 'Y' && *cp != 'n' && *cp != 'N');
 	return *cp == 'y' || *cp == 'Y';
 }
