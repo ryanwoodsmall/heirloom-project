@@ -8,6 +8,14 @@ Release ...
   again, while it would be "I" with "\fB...\fR...\fI...\fP...\fP". Inline
   environments can be used to represent constructs like "<i>...</i>" in
   HTML, which would be translated as "\@{\fI...\@}".
+* [nt]roff: A modulo zero operation (N%0) is now ignored and causes a
+  warning of the "range" type to be issued. It could previously lead to
+  a core dump because of an arithmetic exception.
+* [nt]roff: In paragraph-at-once adjustment mode, ".in" and ".ll", when
+  invoked from traps, now have a permanent effect; such settings were
+  previously discarded at the end of the paragraph. What still does not
+  work is "'in" outside a trap with a value relative to the indent set
+  inside a trap.
 * [nt]roff: An internal problem with paragraph-at-once line breaking mode
   has been fixed; it caused a ".in" or ".ll" command to be ignored under
   rare circumstances.

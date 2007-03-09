@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.160 (gritter) 2/23/07
+ * Sccsid @(#)tdef.h	1.161 (gritter) 3/9/07
  */
 
 /*
@@ -462,6 +462,12 @@ enum flags {
 	FLAG_PARAGRAPH	= 040
 };
 
+enum {
+	PG_NONE		= 00,
+	PG_NEWIN	= 01,
+	PG_NEWLL	= 02
+};
+
 struct	d {	/* diversion */
 	filep	op;
 	int	dnl;
@@ -765,6 +771,7 @@ struct inlev {
 #define	pgll	env._pgll
 #define	pgwdin	env._pgwdin
 #define	pgwdll	env._pgwdll
+#define	pgflags	env._pgflags
 #define	pglno	env._pglno
 #define	pgpenal	env._pgpenal
 #define	ninlev	env._ninlev
@@ -937,6 +944,7 @@ extern struct env {
 	int	*_pgwdin;
 	int	*_pgwdll;
 	int	*_pglno;
+	int	*_pgflags;
 	float	*_pgpenal;
 	int	_ninlev;
 	int	_ainlev;

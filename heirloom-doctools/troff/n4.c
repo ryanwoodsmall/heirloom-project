@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.99 (gritter) 12/25/06
+ * Sccsid @(#)n4.c	1.100 (gritter) 3/9/07
  */
 
 /*
@@ -981,7 +981,10 @@ a0:
 		if (nonumb)
 			break;
 		if (flt) acc.n = acc.f, i.n = i.f;
-		acc.n %= i.n;
+		if (i.n != 0)
+			acc.n %= i.n;
+		else if (warn & WARN_RANGE)
+			errprint("modulo by zero.");
 		if (flt) acc.f = acc.n;
 		goto a0;
 	case '&':	/*and*/
