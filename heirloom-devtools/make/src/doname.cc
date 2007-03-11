@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)doname.cc	1.10 (gritter) 2/16/07
+ * Sccsid @(#)doname.cc	1.11 (gritter) 3/7/07
  */
 
 /*
@@ -196,8 +196,9 @@ try_again:
 		return build_running;
 	case build_failed:
 		if (!continue_after_error) {
-			fatal("%s`%s' not remade because of errors",
-			      sun_style ? "Target " : "", target->string_mb);
+			fatal("%s`%s' not remade because of errors%s",
+			      sun_style ? "Target " : "", target->string_mb,
+			      sun_style ? "" : " (bu21)");
 		}
 		build_failed_seen = true;
 		second_pass = 0;
@@ -223,7 +224,7 @@ try_again:
 		second_pass = 0;
 		const char *dontknow = sun_style ?
 			"Don't know how to make target `%s'" :
-			"don't know how to make %s";
+			"don't know how to make %s (bu42)";
 		if (continue_after_error && !svr4) {
 			warning(dontknow, target->string_mb);
 			build_failed_seen = true;
@@ -1294,7 +1295,9 @@ check_dependencies(Doname *result, Property line, Boolean do_get, Name target, N
 	 */
 	if (line->body.line.command_template != NULL) {
 		if (line->body.line.command_template_redefined) {
-			warning("Too many rules defined for target %s",
+			warning(sun_style ?
+				"Too many rules defined for target %s" :
+				"too many command lines for `%s' (bu10)",
 				target->string_mb);
 		}
 		*command = line;
@@ -1912,7 +1915,7 @@ execute_serial(Property line)
 		    !silent &&
 		    (!rule->silent || do_not_exec_rule) &&
 		    (report_dependencies_level == 0)) {
-			printf("%s\n", rule->command_line->string_mb);
+		    	print_command(rule->command_line->string_mb);
 			SEND_MTOOL_MSG(
 				job_result_msg->appendOutput(AVO_STRDUP(rule->command_line->string_mb));
 			);
@@ -1999,7 +2002,9 @@ execute_serial(Property line)
 						fflush(mtool_msgs_fp);
 						delete job_result_msg;
 					);
-					fatal("Command failed for target `%s'",
+					fatal(sun_style ?
+					"Command failed for target `%s'" :
+					NULL,
 					      target->string_mb);
 				}
 				/*
@@ -2861,7 +2866,7 @@ touch_command(register Property line, register Name target, Doname result)
 			if (!silent ||
 			    do_not_exec_rule &&
 			    (target_group == NULL)) {
-				printf("%s\n", touch_cmd->string_mb);
+			    	print_command(touch_cmd->string_mb);
 				SEND_MTOOL_MSG(
 					job_result_msg->appendOutput(AVO_STRDUP(touch_cmd->string_mb));
 				);

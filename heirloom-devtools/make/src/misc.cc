@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)misc.cc	1.11 (gritter) 3/6/07
+ * Sccsid @(#)misc.cc	1.12 (gritter) 3/7/07
  */
 
 /*
@@ -158,19 +158,23 @@ fatal(const char * message, ...)
 
 	va_start(args, message);
 	fflush(stdout);
-	if (sun_style)
-		fprintf(stderr, "%s: Fatal error: ", progname);
-	else
-		fprintf(stderr, "%s: fatal error: ", progname);
+	if (message == NULL)
+		fprintf(stderr, "%s: fatal error.\n", progname);
+	else {
+		if (sun_style)
+			fprintf(stderr, "%s: Fatal error: ", progname);
+		else
+			fprintf(stderr, "%s: fatal error: ", progname);
 #if 0
 #ifdef DISTRIBUTED
-	fprintf(stderr, "dmake: Fatal error: ");
+		fprintf(stderr, "dmake: Fatal error: ");
 #else
-	fprintf(stderr, "make: Fatal error: ");
+		fprintf(stderr, "make: Fatal error: ");
 #endif
 #endif
-	vfprintf(stderr, message, args);
-	fprintf(stderr, "\n");
+		vfprintf(stderr, message, args);
+		fprintf(stderr, "\n");
+	}
 	va_end(args);
 	if (report_pwd) {
 		fprintf(stderr,
@@ -259,6 +263,20 @@ warning(const char * message, ...)
 			       get_current_path());
 	}
 	fflush(stderr);
+}
+
+void
+print_command(char *cp)
+{
+	int	c = '\n';
+
+	while (*cp) {
+		if (!sun_style && c == '\n')
+			putchar('\t');
+		c = *cp++ & 0377;
+		putchar(c);
+	}
+	putchar('\n');
 }
 
 /*

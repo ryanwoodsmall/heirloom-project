@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read2.cc	1.8 (gritter) 3/6/07
+ * Sccsid @(#)read2.cc	1.10 (gritter) 3/8/07
  */
 
 /*
@@ -685,7 +685,9 @@ enter_dependencies(register Name target, Chain target_group, register Name_vecto
 			target->colons = separator;
 		} else {
 			if (target->colons != separator) {
-				fatal_reader(":/:: conflict for target `%s'",
+				fatal_reader(sun_style ?
+				":/:: conflict for target `%s'" :
+				"inconsistent rules lines for `%s' (bu36)",
 					     target->string_mb);
 			}
 		}
@@ -1922,23 +1924,33 @@ void
 fatal_reader(const char * pattern, ...)
 {
 	extern const char	*progname;
+	extern short	max_include_depth;
 	va_list args;
 	char	message[1000];
 
 	va_start(args, pattern);
 	if (file_being_read != NULL) {
 		WCSTOMBS(mbs_buffer, file_being_read);
-		if (line_number != 0) {
-			snprintf(message, sizeof message,
-				       "%s, line %d: %s",
-				       mbs_buffer,
-				       line_number,
-				       pattern);
+		if (sun_style || max_include_depth > 1) {
+			if (line_number != 0) {
+				snprintf(message, sizeof message,
+				       	"%s, line %d: %s",
+				       	mbs_buffer,
+				       	line_number,
+				       	pattern);
+			} else {
+				snprintf(message, sizeof message,
+				       	"%s: %s",
+				       	mbs_buffer,
+				       	pattern);
+			}
 		} else {
-			snprintf(message, sizeof message,
-				       "%s: %s",
-				       mbs_buffer,
-				       pattern);
+			if (line_number != 0)
+				snprintf(message, sizeof message,
+					"line %d: %s", line_number, pattern);
+			else
+				snprintf(message, sizeof message,
+					"%s", pattern);
 		}
 		pattern = message;
 	}

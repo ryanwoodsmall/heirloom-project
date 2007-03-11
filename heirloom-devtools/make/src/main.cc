@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.23 (gritter) 3/6/07
+ * Sccsid @(#)main.cc	1.24 (gritter) 3/7/07
  */
 
 /*
@@ -1028,6 +1028,26 @@ if(getname_stat) {
 #endif
 }
 
+static void
+tryremove(Name np)
+{
+	if (exists(np) != file_doesnt_exist) {
+		fprintf(stderr, "\n*** %s ",
+			       np->string_mb);
+		if (np->stat.is_dir) {
+			fprintf(stderr, "%s removed.\n",
+				sun_style ? "not" : "NOT");
+		} else if (unlink(np->string_mb) == 0) {
+			fprintf(stderr, "removed.\n");
+		} else if (sun_style) {
+			fprintf(stderr, "could not be removed: %s.\n",
+				       errmsg(errno));
+		} else {
+			fprintf(stderr, "NOT removed.\n");
+		}
+	}
+}
+
 /*
  *	handle_interrupt()
  *
@@ -1104,19 +1124,7 @@ handle_interrupt(int)
 /* azv 16 Oct 95 */
 		current_target->stat.time = file_no_time; 
 
-		if (exists(current_target) != file_doesnt_exist) {
-			fprintf(stderr,
-				       "\n*** %s ",
-				       current_target->string_mb);
-			if (current_target->stat.is_dir) {
-				fprintf(stderr, "not removed.\n");
-			} else if (unlink(current_target->string_mb) == 0) {
-				fprintf(stderr, "removed.\n");
-			} else {
-				fprintf(stderr, "could not be removed: %s.\n",
-					       errmsg(errno));
-			}
-		}
+		tryremove(current_target);
 	}
 	for (rp = running_list; rp != NULL; rp = rp->next) {
 		if (rp->state != build_running) {
@@ -1133,20 +1141,7 @@ handle_interrupt(int)
 		    !(rp->target->stat.is_precious || all_precious)) {
 
 			rp->target->stat.time = file_no_time; 
-			if (exists(rp->target) != file_doesnt_exist) {
-				fprintf(stderr,
-					       "\n*** %s ",
-					       rp->target->string_mb);
-				if (rp->target->stat.is_dir) {
-					fprintf(stderr, "not removed.\n");
-				} else if (unlink(rp->target->string_mb) == 0) {
-					fprintf(stderr, "removed.\n");
-				} else {
-					fprintf(stderr,
-						"could not be removed: %s.\n",
-						       errmsg(errno));
-				}
-			}
+			tryremove(rp->target);
 		}
 	}
 
@@ -1373,9 +1368,14 @@ read_command_options(register int argc, register char **argv)
 					progname);
 				exit_status = 1;
 				exit(1);
-			} else
-				fatal("missing argument after -%c flag",
-					optopt);
+			} else {
+				if (!sun_style && optopt == 'f')
+					fatal("no description file after "
+					      "-f flag (bu1)");
+				else
+					fatal("missing argument after -%c flag",
+						optopt);
+			}
 		    }
 		}
 
@@ -3365,9 +3365,10 @@ make_targets(int argc, char **argv, Boolean parallel_flag)
 			gather_recursive_deps();
 			if (build_failed_seen) {
 				build_failed_ever_seen = true;
-				warning("%s`%s' not remade because of errors",
+				warning("%s`%s' not remade because of errors%s",
 					sun_style ? "Target " : "",
-					default_target_to_build->string_mb);
+					default_target_to_build->string_mb,
+					sun_style ? "" : " (bu21)");
 			}
 			build_failed_seen = false;
 			if (report_dependencies_level > 0) {
@@ -3417,7 +3418,7 @@ make_targets(int argc, char **argv, Boolean parallel_flag)
 			if (sun_style)
 				fatal("No arguments to build");
 			else
-				fatal("no arguments or description file");
+				fatal("no arguments or description file (bu7)");
 		}
 		commands_done = false;
 		top_level_target = get_wstring(default_target_to_build->string_mb);
@@ -3434,9 +3435,10 @@ make_targets(int argc, char **argv, Boolean parallel_flag)
 		gather_recursive_deps();
 		if (build_failed_seen) {
 			build_failed_ever_seen = true;
-			warning("%s`%s' not remade because of errors",
+			warning("%s`%s' not remade because of errors%s",
 				sun_style ? "Target " : "",
-				default_target_to_build->string_mb);
+				default_target_to_build->string_mb,
+				sun_style ? "" : " (bu21)");
 		}
 		build_failed_seen = false;
 		if (report_dependencies_level > 0) {

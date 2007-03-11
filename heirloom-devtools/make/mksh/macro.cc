@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)macro.cc	1.10 (gritter) 2/25/07
+ * Sccsid @(#)macro.cc	1.11 (gritter) 3/7/07
  */
 
 /*
@@ -163,8 +163,11 @@ expand_value(Name value, register String destination, Boolean cmd)
 	}
 
 	if (value->being_expanded) {
-		fatal_reader_mksh("Loop detected when expanding macro value `%s'",
+		if (sun_style)
+			fatal_reader_mksh("Loop detected when expanding macro value `%s'",
 			     value->string_mb);
+		else
+			fatal_reader_mksh("infinitely recursive macro?.");
 	}
 	value->being_expanded = true;
 	/* Setup the structure we read from */

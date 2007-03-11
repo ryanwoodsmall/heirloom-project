@@ -6,6 +6,8 @@ Release ...
   that are not outdated) is now a documented feature.
 * make: Comments following "ifeq" and other conditionals are now handled
   correctly.
+* make: Error messages now include message numbers for use with the
+  "help" command.
 * sccs: The commands "-R info", "-R tell", and "-R clean" now operate
   correctly. They previously terminated operation prematurely when an
   "SCCS" directory was found but other sub-directories at the current

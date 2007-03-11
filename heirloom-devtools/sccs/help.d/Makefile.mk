@@ -1,4 +1,4 @@
-DATA = ad bd cb cm cmds co de default ge he prs rc un ut vc
+DATA = ad bd bu cb cm cmds co de default ge he prs rc un ut vc
 
 all:
 

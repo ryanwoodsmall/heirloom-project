@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.11 (gritter) 2/25/07
+ * Sccsid @(#)read.cc	1.14 (gritter) 3/10/07
  */
 
 /*
@@ -106,11 +106,11 @@ static	Boolean		de_condition(wchar_t *);
  *		makefiles_used	A list of all makefiles used, appended to
  */
 
+short		max_include_depth;
 
 Boolean
 read_simple_file(register Name makefile_name, register Boolean chase_path, register Boolean doname_it, Boolean complain, Boolean must_exist, Boolean report_file, Boolean lock_makefile)
 {
-	static short		max_include_depth;
 	register Property	makefile = maybe_append_prop(makefile_name,
 							     makefile_prop);
 	Boolean			forget_after_parse = false;
@@ -303,15 +303,23 @@ read_simple_file(register Name makefile_name, register Boolean chase_path, regis
 				if (complain ||
 				    (makefile_name->stat.stat_errno != ENOENT)) {
 					if (must_exist) {
+						if (sun_style)
 						fatal("Can't find `%s': %s",
 						      makefile_name->string_mb,
 						      errmsg(makefile_name->
 							     stat.stat_errno));
+						else
+						fatal("cannot open %s.",
+						      makefile_name->string_mb);
 					} else {
+						if (sun_style)
 						warning("Can't find `%s': %s",
 							makefile_name->string_mb,
 							errmsg(makefile_name->
 							       stat.stat_errno));
+						else
+						warning("cannot open %s.",
+						      makefile_name->string_mb);
 					}
 				}
 				max_include_depth--;
@@ -1090,11 +1098,13 @@ start_new_line_no_skip:
 			if (read_simple_file(makefile_name,
 					     true,
 					     true,
-					     true,
+					     sun_style ? true : false,
 					     false,
 					     true,
 					     false) == failed) {
-				fatal_reader("Read of include file `%s' failed",
+				fatal_reader(sun_style ?
+					"Read of include file `%s' failed" :
+					"cannot get %s for including\n.",
 					     makefile_name->string_mb);
 			}
 			makefile_type = save_makefile_type;
@@ -1264,7 +1274,7 @@ case scan_name_state:
 			if (paren_count > 0) {
 				fatal_reader("Unmatched `(' on line");
 			}
-			if (brace_count > 0) {
+			if (brace_count > 0 && sun_style) {
 				fatal_reader("Unmatched `{' on line");
 			}
 			source_p++;
@@ -1318,7 +1328,6 @@ case scan_name_state:
 			if (paren_count + brace_count > 0) {
 				break;
 			}
-			fatal_reader("Unexpected comment seen");
 		case dollar_char:
 			if (source->already_expanded) {
 				break;
@@ -1353,7 +1362,8 @@ case scan_name_state:
 			break;
 		case parenright_char:
 			if (--paren_count < 0) {
-				fatal_reader("Unmatched `)' on line");
+				if (sun_style)
+					fatal_reader("Unmatched `)' on line");
 			}
 			break;
 		case braceleft_char:
@@ -1361,7 +1371,9 @@ case scan_name_state:
 			break;
 		case braceright_char:
 			if (--brace_count < 0) {
-				fatal_reader("Unmatched `}' on line");
+				fatal_reader(sun_style ?
+					"Unmatched `}' on line" :
+					"syntax error");
 			}
 			break;
 		case ampersand_char:
@@ -1390,7 +1402,8 @@ case scan_name_state:
 			}
 			goto enter_state;
 		case colon_char:
-			if (paren_count + brace_count > 0) {
+			if (sun_style ? paren_count + brace_count > 0 :
+					paren_count > 0) {
 				break;
 			}
 			if (separator == conditional_seen) {
@@ -1406,7 +1419,9 @@ case scan_name_state:
 			/* End of the target list. We now start reading */
 			/* dependencies or a conditional assignment */
 			if (separator != none_seen) {
-				fatal_reader("Extra `:', `::', or `:=' on dependency line");
+				fatal_reader(sun_style ?
+				"Extra `:', `::', or `:=' on dependency line" :
+				"syntax error");
 			}
 			/* Enter the last target */
 			if ((string_start != source_p) ||
@@ -1588,6 +1603,8 @@ case scan_name_state:
 				if(!svr4) {
 				  append = true;
 				} else {
+				  if (!sun_style)
+				    goto illegal_eoln_state;
 				  fatal_reader("Must be a separator on rules");
 				}
 				break;
@@ -2165,6 +2182,10 @@ case enter_conditional_state:
 case illegal_bytes_state:
 	fatal_reader("Invalid byte sequence");
 case illegal_eoln_state:
+illegal_eoln_state:
+	if (!sun_style)
+		fatal("Must be a separator on rules line %d (bu39)",
+			line_number);
 	if (line_number > 1) {
 		if (line_started_with_space == (line_number - 1)) {
 			line_number--;
@@ -2173,7 +2194,8 @@ case illegal_eoln_state:
 	}
 	fatal_reader("Unexpected end of line seen");
 case poorly_formed_macro_state:
-	fatal_reader("Badly formed macro assignment");
+	fatal_reader(sun_style ? "Badly formed macro assignment" :
+		"syntax error");
 case exit_state:
 	if (conditional_level > 0) {
 	    line_number = 0;

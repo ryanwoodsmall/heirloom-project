@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.8 (gritter) 3/6/07
+ * Sccsid @(#)defs.h	1.9 (gritter) 3/7/07
  */
 
 /*
@@ -431,6 +431,7 @@ extern	Boolean		parallel_ok(Name target, Boolean line_prop_must_exists);
 extern	void		print_dependencies(register Name target, register Property line);
 extern	void		send_job_start_msg(Property line);
 extern	void		send_rsrc_info_msg(int max_jobs, char *hostname, char *username);
+extern	void		print_command(char *);
 extern	void		print_value(register Name value, Daemon daemon);
 extern	timestruc_t&	read_archive(register Name target);
 extern	int		read_dir(Name dir, wchar_t *pattern, Property line, wchar_t *library);

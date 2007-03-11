@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)parallel.cc	1.6 (gritter) 3/6/07
+ * Sccsid @(#)parallel.cc	1.7 (gritter) 3/7/07
  */
 
 /*
@@ -369,7 +369,9 @@ execute_parallel(Property line, Boolean waitflg, Boolean local)
 					warning(NOCATGETS("I'm in execute_parallel. await_dist() returned build_failed"));
 #endif
 
-					fatal("Command failed for target `%s'",
+					fatal(sun_style ?
+					"Command failed for target `%s'" :
+					NULL,
 					      target->string_mb);
 				}
 				/*
@@ -1577,7 +1579,9 @@ bypass_for_loop_inc_4:
 				if (continue_after_error ||
 				    fatal_in_progress ||
 				    !docheck) {
-					warning("Command failed for target `%s'",
+					warning(sun_style ?
+					"Command failed for target `%s'" :
+					NULL,
 						rp->command ? line2->body.line.target->string_mb : rp->target->string_mb);
 					build_failed_seen = true;
 				} else {
@@ -1589,7 +1593,9 @@ bypass_for_loop_inc_4:
 					warning(NOCATGETS("I'm in finish_children. rp->state == build_failed."));
 #endif
 
-					fatal("Command failed for target `%s'",
+					fatal(sun_style ?
+					"Command failed for target `%s'" :
+					NULL,
 						rp->command ? line2->body.line.target->string_mb : rp->target->string_mb);
 				}
 			}
@@ -2282,7 +2288,7 @@ run_rule_commands(char *host, char **commands)
 			}
 			if ((command->hash.length > 0) &&
 			    !silent_flag) {
-				printf("%s\n", command->string_mb);
+				print_command(command->string_mb);
 			}
 			result = dosys(command,
 			               ignore,

@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dosys.cc	1.9 (gritter) 01/23/07
+ * Sccsid @(#)dosys.cc	1.10 (gritter) 3/7/07
  */
 
 /*
@@ -401,9 +401,12 @@ doshell(wchar_t *command, register Boolean ignore_error, Boolean redirect_out_er
 			      errmsg(errno));
 		} else {
 			execve(shell->string_mb, argv, environ);
-			fatal_mksh("Could not load Shell from `%s': %s",
-			      shell->string_mb,
-			      errmsg(errno));
+			if (sun_style)
+				fatal_mksh("Could not load Shell from `%s': %s",
+			      	shell->string_mb,
+			      	errmsg(errno));
+			else
+				fatal_mksh("couldn't load shell (bu22)");
 		}
 	}
 	if (childPid  == -1) {
@@ -594,7 +597,11 @@ doexec(register wchar_t *command, register Boolean ignore_error, Boolean redirec
 		}
 #endif
 		exec_vp(argv[1], argv, environ, ignore_error, vroot_path);
-		fatal_mksh("Cannot load command `%s': %s", argv[1], errmsg(errno));
+		if (sun_style)
+			fatal_mksh("Cannot load command `%s': %s",
+				argv[1], errmsg(errno));
+		else
+			fatal_mksh("cannot load %s (bu24).");
 	}
 	if (childPid  == -1) {
 		fatal_mksh("fork failed: %s",
@@ -711,8 +718,9 @@ await(register Boolean ignore_error, register Boolean silent_error, Name target,
 	if (!silent_error) {
 		if (exit_status != 0) {
 			fprintf(stdout,
-				       "*** Error code %d",
-				       exit_status);
+				       "*** Error code %d%s",
+				       exit_status,
+				       sun_style ? "" : " (bu21)");
 			SEND_MTOOL_MSG(
 				sprintf(&tmp_buf[strlen(tmp_buf)],
 					       "*** Error code %d",
