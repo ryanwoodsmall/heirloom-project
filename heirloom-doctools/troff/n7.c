@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.173 (gritter) 3/9/07
+ * Sccsid @(#)n7.c	1.174 (gritter) 3/12/07
  */
 
 /*
@@ -2218,11 +2218,11 @@ parpr(struct s *s)
 		nwd += stretches;
 		nw++;
 	}
+	pbreak(nel - adspc < 0 && nwd > 1 || _spread, 1, s);
 	if (pgflags[pgwords] & PG_NEWIN)
 		savin = pgwdin[pgwords];
 	if (pgflags[pgwords] & PG_NEWLL)
 		savll = pgwdll[pgwords];
-	pbreak(nel - adspc < 0 && nwd > 1 || _spread, 1, s);
 	pgwords = pgchars = pgspacs = pglines = pgne = pglastw = 0;
 	ll = savll;
 	in = un = savin;
