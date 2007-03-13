@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)read.cc	1.14 (gritter) 3/10/07
+ * Sccsid @(#)read.cc	1.15 (gritter) 3/13/07
  */
 
 /*
@@ -849,14 +849,16 @@ start_new_line_no_skip:
 			else
 			    use_this = true;
 		    }
+		    if (in_dependencies_state == false || use_this == true) {
+		    	while (*source_p == newline_char) {
+			    source_p++;
+			    if (source->fd >= 0)
+				line_number++;
+			}
+		    }
 		    if (conditional_type == ELSE && use_this == true) {
 			had_else = true;
 			goto next_conditional;
-		    }
-		    if (in_dependencies_state == false || use_this == true) {
-		        source_p++;
-			if (source->fd >= 0)
-			    line_number++;
 		    }
 		} else {
 		    if (had_else == false)
