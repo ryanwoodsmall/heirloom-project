@@ -23,6 +23,10 @@ Release ...
   make sure that any partial paragraph is flushed before executing other
   termination procedures. The previous failure to do so lead to missing
   output at the end of the document if it did not fit on the current page.
+* troff, dpost: OpenType and TrueType fonts with Unicode platformID cmap
+  tables are now supported for reading Unicode character mapping tables.
+  Previously, only Microsoft platformID cmap tables were supported, and
+  others were ignored.
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
 * -man macros: ".P" is now recognized; it is the same as ".PP".
