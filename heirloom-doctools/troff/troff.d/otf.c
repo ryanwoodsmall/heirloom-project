@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.61 (gritter) 3/14/07
+ * Sccsid @(#)otf.c	1.62 (gritter) 3/14/07
  */
 
 #include <stdio.h>
@@ -2787,22 +2787,22 @@ get_Ligature(int first, int o)
 		case 'f':
 			if (CompCount == 2) {
 				gn = GID2SID(LigGlyph);
-				if (strcmp(gn, "ff") == 0 ||
-						strcmp(gn, "f_f") == 0)
+				if (gn && (strcmp(gn, "ff") == 0 ||
+						strcmp(gn, "f_f") == 0))
 					a->Font.ligfont |= LFF;
 			} else if (CompCount == 3) {
 				gn = GID2SID(Component[1]);
 				if (gn[0] && gn[1] == 0) switch (gn[0]) {
 				case 'i':
 					gn = GID2SID(LigGlyph);
-					if (strcmp(gn, "ffi") == 0 ||
-						    strcmp(gn, "f_f_i") == 0)
+					if (gn && (strcmp(gn, "ffi") == 0 ||
+						    strcmp(gn, "f_f_i") == 0))
 						a->Font.ligfont |= LFFI;
 					break;
 				case 'l':
 					gn = GID2SID(LigGlyph);
-					if (strcmp(gn, "ffl") == 0 ||
-						    strcmp(gn, "f_f_l") == 0)
+					if (gn && (strcmp(gn, "ffl") == 0 ||
+						    strcmp(gn, "f_f_l") == 0))
 						a->Font.ligfont |= LFFL;
 					break;
 				}
@@ -2811,16 +2811,16 @@ get_Ligature(int first, int o)
 		case 'i':
 			if (CompCount == 2) {
 				gn = GID2SID(LigGlyph);
-				if (strcmp(gn, "fi") == 0 ||
-						strcmp(gn, "f_i") == 0)
+				if (gn && (strcmp(gn, "fi") == 0 ||
+						strcmp(gn, "f_i") == 0))
 					a->Font.ligfont |= LFI;
 			}
 			break;
 		case 'l':
 			if (CompCount == 2) {
 				gn = GID2SID(LigGlyph);
-				if (strcmp(gn, "fl") == 0 ||
-						strcmp(gn, "f_l") == 0)
+				if (gn && (strcmp(gn, "fl") == 0 ||
+						strcmp(gn, "f_l") == 0))
 					a->Font.ligfont |= LFL;
 			}
 			break;

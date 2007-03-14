@@ -27,6 +27,9 @@ Release ...
   tables are now supported for reading Unicode character mapping tables.
   Previously, only Microsoft platformID cmap tables were supported, and
   others were ignored.
+* troff, dpost: Fixed a null pointer dereference that occurred when an
+  illegal glyph ID was encountered in the "liga" table of an OpenType
+  font.
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
 * -man macros: ".P" is now recognized; it is the same as ".PP".
