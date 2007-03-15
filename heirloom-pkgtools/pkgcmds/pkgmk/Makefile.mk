@@ -5,7 +5,7 @@ INC = -I../../hdrs -I../../libgendb -I../../libpkg -I../../libinst \
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(INC) $(PATHS) $(WARN) $<
 
 PKGLIBS = -L../../libinst -linst -L../../libpkg -lpkg -L../../libgendb -lgendb \
-	-L../../libadm -ladm -L../../libpkgdb -lpkgdb \
+	-L../../libadm -ladm \
 	-L$(CCSDIR)/lib -ll
 
 BIN = pkgmk
@@ -27,7 +27,7 @@ clean:
 mrproper: clean
 
 $(BIN): ../../libadm/libadm.a ../../libgendb/libgendb.a \
-	../../libinst/libinst.a ../../libpkg/libpkg.a ../../libpkgdb/libpkgdb.a
+	../../libinst/libinst.a ../../libpkg/libpkg.a
 
 main.o: main.c ../../hdrs/pkgstrct.h ../../hdrs/pkgdev.h \
   ../../hdrs/pkginfo.h ../../hdrs/pkglocs.h \

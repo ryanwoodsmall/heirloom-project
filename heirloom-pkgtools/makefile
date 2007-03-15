@@ -1,4 +1,4 @@
-SUBDIRS = version libpkgdb libadm libgendb libpkg libinst \
+SUBDIRS = version libadm libgendb libpkg libinst \
 	pkgcmds/pkginfo pkgcmds/pkgproto pkgcmds/pkgmk pkgcmds/pkgtrans \
 	pkgcmds/installf pkgcmds/pkgadd pkgcmds/pkgchk \
 	pkgcmds/pkginstall pkgcmds/pkgname \

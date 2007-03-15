@@ -5,6 +5,7 @@ Release ...
   "val..." variants.
 * An OpenSolaris-derived implementation of getopt() is now included,
   defeating the argument reordering of the glibc variant.
+* Fixed a makefile error that prevented compilation on CentOS 5.
 
 Release 070227
 * Initial release.
