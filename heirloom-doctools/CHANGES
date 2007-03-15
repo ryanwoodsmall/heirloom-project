@@ -30,6 +30,8 @@ Release ...
 * troff, dpost: Fixed a null pointer dereference that occurred when an
   illegal glyph ID was encountered in the "liga" table of an OpenType
   font.
+* troff, dpost: Apple TrueType fonts with a "true" header magic are now
+  actually supported; they could previously only be read by otfdump.
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
 * -man macros: ".P" is now recognized; it is the same as ".PP".

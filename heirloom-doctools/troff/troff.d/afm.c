@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.62 (gritter) 10/30/06
+ * Sccsid @(#)afm.c	1.63 (gritter) 3/15/07
  */
 
 #include <stdlib.h>
@@ -885,7 +885,8 @@ afmget(struct afmtab *a, char *contents, size_t size)
 	a->capheight = 700;
 	unitsPerEm = 1000;
 	if (memcmp(contents, "OTTO", 4) == 0 ||
-			memcmp(contents, "\0\1\0\0", 4) == 0)
+			memcmp(contents, "\0\1\0\0", 4) == 0 ||
+			memcmp(contents, "true", 4) == 0)
 		return otfget(a, contents, size);
 	a->lineno = 1;
 	for (cp = contents; cp < &contents[size]; a->lineno++, cp++) {

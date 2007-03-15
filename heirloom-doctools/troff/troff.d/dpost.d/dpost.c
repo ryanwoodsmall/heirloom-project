@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.171 (gritter) 01/06/07
+ * Sccsid @(#)dpost.c	1.172 (gritter) 3/15/07
  */
 
 /*
@@ -2640,7 +2640,7 @@ supply1(char *font, char *file, char *type)
 	c = getc(fp);
 	ungetc(c, fp);
 	type = c == '\200' ? "pfb" : c == 'O' ? "otf" :
-		c == 0 ? "ttf" : "anything";
+		c == 0 || c == 't' ? "ttf" : "anything";
     }
     if (strcmp(type, "pfb") == 0) {
 	supplypfb(font, file, fp);
