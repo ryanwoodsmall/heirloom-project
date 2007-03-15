@@ -71,7 +71,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*	Sccsid @(#)diffreg.c	1.29 (gritter) 3/27/05>	*/
+/*	Sccsid @(#)diffreg.c	1.30 (gritter) 3/15/07>	*/
 /*	from 4.3BSD diffreg.c 4.16 3/29/86	*/
 
 #include "diff.h"
@@ -211,6 +211,8 @@ wup2low(int c)
 }
 
 static char	*copytemp(char **, const char *);
+#undef	splice
+#define	splice	xxsplice
 static char	*splice(const char *, char *);
 static void	prepare(int);
 static void	prune(void);

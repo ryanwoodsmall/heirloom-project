@@ -1,3 +1,6 @@
+Release ...
+* diff: Made it compile on CentOS 5.
+
 Release 070227
 * The directory for development utilities, by default "/usr/ccs/bin", is
   now configurable in "build/mk.config" . It is expected that the utilities
