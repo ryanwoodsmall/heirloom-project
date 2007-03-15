@@ -9,7 +9,7 @@
 # font.
 #
 
-# Sccsid @(#)showfont.sh	1.9 (gritter) 1/24/06
+# Sccsid @(#)showfont.sh	1.10 (gritter) 3/15/07
 
 pwd=`pwd`
 
@@ -110,5 +110,5 @@ do (
 	cat <<-!
 		.wh \\n(PEu
 	!
-   ) | TROFFONTS=$pwd troff -x
+   ) | TROFFONTS=/:$pwd troff -x
 done | dpost
