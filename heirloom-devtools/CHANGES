@@ -1,6 +1,8 @@
 Release ...
 * make: Macro definitions following "else" in an effective branch are
   now handled correctly.
+* make: Removed a "extern char **environ;" declaration to make it
+  compile on CentOS 5.
 
 Release 070311
 * make: The SVR4.2 syntax for parallel builds has been added. This adds
