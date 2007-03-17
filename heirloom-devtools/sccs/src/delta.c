@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)delta.c	1.7 (gritter) 2/13/07
+ * Sccsid @(#)delta.c	1.8 (gritter) 3/17/07
  */
 /*	from OpenSolaris "sccs:cmd/delta.c"	*/
 
@@ -244,7 +244,7 @@ delta(char *file)
 {
 	static int first = 1;
 	int n, linenum;
-	char type;
+	char type = 0;
 	register int ser;
 	extern char had_dir, had_standinp;
 	extern char *Sflags[];

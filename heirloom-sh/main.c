@@ -30,7 +30,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.c	1.11 (gritter) 8/25/06
+ * Sccsid @(#)main.c	1.12 (gritter) 2/26/07
  */
 
 
@@ -84,10 +84,14 @@ static void exfile(int);
 int 
 main(int c, char *v[], char *e[])
 {
-	register int	rflag = ttyflg;
+	int		rflag = ttyflg;
 	int		rsflag = 1;	/* local restricted flag */
-	register unsigned char *flagc = flagadr;
+	unsigned char *flagc = flagadr;
 	struct namnod	*n;
+
+	(void) &rflag;
+	(void) &rsflag;
+	(void) &flagc;
 
 	init_sigval();
 	mypid = getpid();
@@ -354,6 +358,8 @@ BOOL	prof;
 	time_t 	curtime = 0;
 	long	timeout = 0;
 
+	(void) &mailtime;
+	(void) &timeout;
 	/*
 	 * move input
 	 */
