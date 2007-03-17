@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.366 (gritter) 3/9/07";
+static char sccsid[] = "@(#)version.c	2.367 (gritter) 3/17/07";
 #endif
 #endif /* not lint */
 
@@ -48,13 +48,13 @@ static char sccsid[] = "@(#)version.c	2.366 (gritter) 3/9/07";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = V " 3/9/07";
+const char *version = V " 3/17/07";
 #ifndef	lint
 static const char *versionid
 #ifdef	__GNUC__
 __attribute__ ((unused))
 #endif
-= "@(#)mailx " V " (gritter) 3/9/07";
+= "@(#)mailx " V " (gritter) 3/17/07";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -76,7 +76,7 @@ getopt.c:	Sccsid @(#)getopt.c	1.6 (gritter) 10/2/04
 glob.h: *	Sccsid @(#)glob.h	2.26 (gritter) 3/4/06
 head.c:static char sccsid[] = "@(#)head.c	2.17 (gritter) 3/4/06";
 hmac.c:	Sccsid @(#)hmac.c	1.8 (gritter) 3/4/06	
-imap.c:static char sccsid[] = "@(#)imap.c	1.217 (gritter) 3/4/06";
+imap.c:static char sccsid[] = "@(#)imap.c	1.218 (gritter) 3/17/07";
 imap_gssapi.c:static char sccsid[] = "@(#)imap_gssapi.c	1.10 (gritter) 3/4/06";
 imap_search.c:static char sccsid[] = "@(#)imap_search.c	1.29 (gritter) 3/4/06";
 junk.c:static char sccsid[] = "@(#)junk.c	1.73 (gritter) 3/4/06";

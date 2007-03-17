@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.217 (gritter) 3/4/06";
+static char sccsid[] = "@(#)imap.c	1.218 (gritter) 3/17/07";
 #endif
 #endif /* not lint */
 
@@ -1148,7 +1148,7 @@ imap_setfile1(const char *xserver, int newmail, int isedit, int transparent)
 	char	*uhp, *mbx;
 	int use_ssl = 0;
 	enum	mbflags	same_flags;
-	int	prevcount;
+	int	prevcount = 0;
 
 	(void)&sp;
 	(void)&use_ssl;
