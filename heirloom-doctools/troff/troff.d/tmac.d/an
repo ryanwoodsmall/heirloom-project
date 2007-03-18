@@ -1,7 +1,7 @@
 .\"
 .\" tmac.an - macros for manual pages
 .\"
-.\" Sccsid @(#)an	2.10 (gritter) 2/18/07
+.\" Sccsid @(#)an	2.11 (gritter) 3/18/07
 .\"
 .\" from Unix 7th Edition /usr/lib/tmac/tmac.an
 .\"
@@ -140,7 +140,7 @@
 .	de C
 .		ft C
 .		it 1 }N
-.		if !"\\\\$1"" \&\\\\$1 \\\\$2 \\\\$3 \\\\$4 \\\\$5 \\\\$6
+.		if !\\\\$* \&\\\\$1 \\\\$2 \\\\$3 \\\\$4 \\\\$5 \\\\$6
 \\..
 '	# combinations with constant width
 .	de CR
@@ -232,26 +232,26 @@
 .de I
 .ft 2
 .it 1 }N
-.if !"\\$1"" \&\\$*
+.if !\\$* \&\\$*
 ..
 '	# bold
 .de B
 .ft 3
 .it 1 }N
-.if !"\\$1"" \&\\$*
+.if !\\$* \&\\$*
 ..
 '	# small
 .de SM
 .ps \\nS-1
 .it 1 }N
-.if !"\\$1"" \&\\$*
+.if !\\$* \&\\$*
 ..
 '	# small and bold
 .de SB
 .ps \\nS-1
 .it 1 }N
 .ft B
-.if !"\\$1"" \&\\$*
+.if !\\$* \&\\$*
 ..
 '	# combinations of Roman, italic, bold
 .de RI

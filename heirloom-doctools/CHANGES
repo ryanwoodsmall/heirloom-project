@@ -35,6 +35,8 @@ Release ...
 * [nt]roff: ".ev \}" has now been actually fixed (Bugreport by Dirk-Wilhelm
   Peters.)
 * -man macros: ".P" is now recognized; it is the same as ".PP".
+* -man macros: ".I \fR other-args" is not ignored anymore; same for
+  ".B", ".SM", and ".SB".
 * Unix 6th Edition manual macro packages have been added.
 * -mandoc macros: Recognize Unix 6th Edition pages.
 * showfont.sh: Font file arguments with absolute path names are now
