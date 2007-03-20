@@ -1,6 +1,9 @@
 Release ...
 * The file "grap.defines" is now installed again; it was omitted in the
   previous release.
+* When generating a RPM package, install all manual pages into
+  "/usr/share/man/5man" to avoid conflicts with manual pages of
+  packages supplied by the distribution default packages.
 
 Release 070318
 * [nt]roff: The concept of an "inline environment" has been introduced.

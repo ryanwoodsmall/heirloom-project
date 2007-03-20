@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-doctools.spec	1.17 (gritter) 3/21/06
+# Sccsid @(#)heirloom-doctools.spec	1.18 (gritter) 3/20/07
 #
 Summary: The Heirloom Documentation Tools.
 Name: heirloom-doctools
@@ -14,7 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: heirloom-devtools
 
 %define	bindir		/usr/ucb
-%define	mandir		/usr/share/man
+%define	mandir		/usr/share/man/5man
 %define	libdir		/usr/ucblib
 %define	docdir		%{libdir}/doctools
 %define	macdir		%{docdir}/tmac
