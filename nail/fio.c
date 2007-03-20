@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.71 (gritter) 01/02/07";
+static char sccsid[] = "@(#)fio.c	2.72 (gritter) 3/20/07";
 #endif
 #endif /* not lint */
 
@@ -242,7 +242,6 @@ again:
 					goto again;
 				if (n > 0) {
 					if ((*linebuf)[n - 1] != '\n') {
-						newline_appended();
 						(*linebuf)[n++] = '\n';
 						(*linebuf)[n] = '\0';
 					}
@@ -688,7 +687,6 @@ fgetline(char **line, size_t *linesize, size_t *count, size_t *llen,
 		sz = (sz <= *count ? sz : *count + 1);
 		if (sz <= 1 || fgets(&(*line)[i_llen], sz, fp) == NULL) {
 			if (appendnl) {
-				newline_appended();
 				(*line)[i_llen++] = '\n';
 				(*line)[i_llen] = '\0';
 			}
@@ -726,7 +724,6 @@ fgetline_byone(char **line, size_t *linesize, size_t *llen,
 		} else {
 			if (n > 0) {
 				if (appendnl) {
-					newline_appended();
 					(*line)[n++] = '\n';
 					(*line)[n] = '\0';
 				}
@@ -738,14 +735,6 @@ fgetline_byone(char **line, size_t *linesize, size_t *llen,
 	if (llen)
 		*llen = n;
 	return *line;
-}
-
-void
-newline_appended(void)
-{
-	fprintf(stderr, catgets(catd, CATSET, 208,
-			"warning: incomplete line - newline appended\n"));
-	exit_status |= 010;
 }
 
 static enum okay
