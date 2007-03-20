@@ -19,7 +19,7 @@ install:
 	$(INSTALL) -c grap $(ROOT)$(BINDIR)/grap
 	$(STRIP) $(ROOT)$(BINDIR)/grap
 	test -d $(ROOT)$(LIBDIR) || mkdir -p $(ROOT)$(LIBDIR)
-	$(INSTALL) -c -m 644 grap.1 $(ROOT)$(MANDIR)/man1/grap.1
+	$(INSTALL) -c -m 644 grap.defines $(ROOT)$(LIBDIR)/grap.defines
 	$(INSTALL) -c -m 644 grap.1 $(ROOT)$(MANDIR)/man1/grap.1
 
 clean:
