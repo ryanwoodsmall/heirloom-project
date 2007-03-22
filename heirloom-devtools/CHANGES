@@ -1,4 +1,5 @@
 Release ...
+* admin: A manual page is available, based on source code released by Sun.
 * make: Macro definitions following "else" in an effective branch are
   now handled correctly.
 * make: Removed a "extern char **environ;" declaration to make it

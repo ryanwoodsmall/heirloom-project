@@ -2,6 +2,7 @@ all:
 
 install: all
 	test -d $(ROOT)$(MANDIR)/man1 || mkdir -p $(ROOT)$(MANDIR)/man1
+	$(INSTALL) -c -m 644 admin.1 $(ROOT)$(MANDIR)/man1/admin.1
 	$(INSTALL) -c -m 644 cdc.1 $(ROOT)$(MANDIR)/man1/cdc.1
 	$(INSTALL) -c -m 644 comb.1 $(ROOT)$(MANDIR)/man1/comb.1
 	$(INSTALL) -c -m 644 delta.1 $(ROOT)$(MANDIR)/man1/delta.1
