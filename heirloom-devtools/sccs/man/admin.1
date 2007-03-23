@@ -20,7 +20,7 @@
 .\"  Copyright (c) 2002, Sun Microsystems, Inc. All Rights Reserved.
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)admin.1	1.5 (gritter) 3/23/07
+.\" Sccsid @(#)admin.1	1.6 (gritter) 3/23/07
 .\"
 .\" from OpenSolaris sccs-admin 1 "30 Sep 2002" "SunOS 5.11" "User Commands"
 .TH ADMIN 1 "3/23/07" "Heirloom Development Tools" "User Commands"
@@ -31,16 +31,20 @@ admin \- create and administer SCCS files
 .PD 0
 .ad l
 .nh
-\fBadmin\fR [\fB\-bhnz\fR]
-[\fB\-a\fR\fIlogin\fR]
-[\fB\-d\fR\fIflag\fR]
-[\fB\-e\fR\fIlogin\fR]
-[\fB\-f\fR\fIflag\fR[\fIvalue\fR]]
+\fBadmin\fR
+[\fB\-n\fR]
+[\fB\-b\fR]
 [\fB\-i\fR[\fIfilename\fR]]
-[\fB\-m\fR\ \fImr-list\fR]
 [\fB\-r\fR\fIrelease\fR]
 [\fB\-t\fR[\fIdescription-file\fR]]
+[\fB\-f\fR\fIflag\fR[\fIvalue\fR]]
+[\fB\-d\fR\fIflag\fR[\fIvalue\fR]]
+[\fB\-a\fR\fIlogin\fR]
+[\fB\-e\fR\fIlogin\fR]
+[\fB\-m\fR\ \fImr-list\fR]
 [\fB\-y\fR[\fIcomment\fR]]
+[\fB\-h\fR]
+[\fB\-z\fR]
 \fIs.filename\fR...
 .br
 .PD
@@ -58,9 +62,8 @@ If a directory name is used in place of the \fIs.filename\fR argument, the \fBad
 Unreadable \fBs.\fRfiles produce an error.
 The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the names of files are to be read from the standard input, one \fBs.\fRfile per line.
 .TP 7
-\fB\-a\fR\fIlogin\fR
-Adds a user name, or a numerical group \fBID\fR, to the list of users who may check deltas in or out.
-If the list is empty, any user is allowed to do so.
+\fB\-n\fR
+Creates a new SCCS history file.
 .TP
 \fB\-b\fR
 Forces encoding of binary data.
@@ -72,13 +75,26 @@ for details about
 the encoding.
 This option is normally used in conjunction with \fB\-i\fR to force \fBadmin\fR to encode initial versions not recognized as containing binary data.
 .TP
-\fB\-d\fR\fIflag\fR
-Deletes the indicated \fIflag\fR from the SCCS file.
-The \fB\-d\fR option may be specified only for existing \fBs.\fRfiles.
-See \fB\-f\fR for the list of recognized flags.
+\fB\-i\fR[\fIfilename\fR]\fR
+Initializes the history file with text from the indicated file.
+This text constitutes the initial delta, or set of checked-in changes.
+If \fIfilename\fR is omitted, the initial text is obtained from the standard input.
+Omitting the \fB\-i\fR option altogether creates an empty \fBs.\fRfile.
+You can only initialize one \fBs.\fRfile with text using \fB\-i\fR.
+This option implies the \fB\-n\fR option.
 .TP
-\fB\-e\fR\fIlogin\fR
-Erases a user name or group \fBID\fR from the list of users allowed to make deltas.
+\fB\-r\fR\fIrelease\fR
+Specifies the release for the initial delta.
+\fB\-r\fR may be used only in conjunction with \fB\-i\fR.
+The initial delta is inserted into release 1 if this option is omitted.
+The level of the initial delta is always \fB1\fR.
+Initial deltas are named \fB1.1\fR by default.
+.TP
+\fB\-t\fR\fB[\fR\fIdescription-file\fR\fB]\fR
+Inserts descriptive text from the file \fIdescription-file\fR.
+When  \fB\-t\fR is used in conjunction with \fB\-n\fR, or \fB\-i\fR to initialize a new s.file, the \fIdescription-file\fR must be supplied.
+When modifying the description for an existing file: a \fB\-t\fR option without
+a \fIdescription-file\fR removes the descriptive text, if any; a \fB\-t\fR option with a \fIdescription-file\fR replaces the existing text.
 .TP
 \fB\-f\fR\fIflag\fR[\fIvalue\fR]\fR
 Sets the indicated \fIflag\fR to the (optional) \fIvalue\fR specified.
@@ -144,45 +160,33 @@ Specifies the SCCS keywords to be expanded.
 If no \fIvalue\fR is specified, no keywords will be expanded.
 .RE
 .TP 7
-\fB\-h\fR
-Checks the structure of an existing \fBs.\fRfile (see
-.IR sccsfile (5)),
-and compares a newly computed check-sum with one stored in the first line of that file.
-\fB\-h\fR inhibits writing on the file and so nullifies the effect of any other options.
+\fB\-d\fR\fIflag\fR[\fIvalue\fR]\fR
+Deletes the indicated \fIflag\fR from the SCCS file.
+The \fB\-d\fR option may be specified only for existing \fBs.\fRfiles.
+See \fB\-f\fR for the list of recognized flags.
 .TP
-\fB\-i\fR[\fIfilename\fR]\fR
-Initializes the history file with text from the indicated file.
-This text constitutes the initial delta, or set of checked-in changes.
-If \fIfilename\fR is omitted, the initial text is obtained from the standard input.
-Omitting the \fB\-i\fR option altogether creates an empty \fBs.\fRfile.
-You can only initialize one \fBs.\fRfile with text using \fB\-i\fR.
-This option implies the \fB\-n\fR option.
+\fB\-a\fR\fIlogin\fR
+Adds a user name, or a numerical group \fBID\fR, to the list of users who may check deltas in or out.
+If the list is empty, any user is allowed to do so.
+.TP
+\fB\-e\fR\fIlogin\fR
+Erases a user name or group \fBID\fR from the list of users allowed to make deltas.
 .TP
 \fB\-m\fR \fImr-list\fR
 Inserts the indicated Modification Request (MR) numbers into the commentary for the initial version.
 When specifying more than one MR number on the command line, \fImr-list\fR takes the form of a quoted, space-separated list.
 A warning results if the \fBv\fR flag is not set or the \fBMR\fR validation fails.
 .TP
-\fB\-n\fR
-Creates a new SCCS history file.
-.TP
-\fB\-r\fR\fIrelease\fR
-Specifies the release for the initial delta.
-\fB\-r\fR may be used only in conjunction with \fB\-i\fR.
-The initial delta is inserted into release 1 if this option is omitted.
-The level of the initial delta is always \fB1\fR.
-Initial deltas are named \fB1.1\fR by default.
-.TP
-\fB\-t\fR\fB[\fR\fIdescription-file\fR\fB]\fR
-Inserts descriptive text from the file \fIdescription-file\fR.
-When  \fB\-t\fR is used in conjunction with \fB\-n\fR, or \fB\-i\fR to initialize a new s.file, the \fIdescription-file\fR must be supplied.
-When modifying the description for an existing file: a \fB\-t\fR option without
-a \fIdescription-file\fR removes the descriptive text, if any; a \fB\-t\fR option with a \fIdescription-file\fR replaces the existing text.
-.TP
 \fB\-y\fR\fB[\fR\fIcomment\fR\fB]\fR
 Inserts the indicated \fIcomment\fR in the ``\fBComments:\fR'' field for the initial delta.
 Valid only in conjunction with \fB\-i\fR or \fB\-n\fR.
 If \fB\-y\fR option is omitted, a default comment line is inserted that notes the date and time the history file was created.
+.TP
+\fB\-h\fR
+Checks the structure of an existing \fBs.\fRfile (see
+.IR sccsfile (5)),
+and compares a newly computed check-sum with one stored in the first line of that file.
+\fB\-h\fR inhibits writing on the file and so nullifies the effect of any other options.
 .TP
 \fB\-z\fR
 Recomputes the file check-sum and stores it in the first line of the \fBs.\fRfile.

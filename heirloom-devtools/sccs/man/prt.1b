@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)prt.1b	1.8 (gritter) 2/1/07
+.\" Sccsid @(#)prt.1b	1.9 (gritter) 3/23/07
 .\"
 .\" from OpenSolaris sccs-prt 1 "5 Oct 1990" "SunOS 5.11" "User Commands"
-.TH PRT 1B "2/1/07" "Heirloom Development Tools" "BSD System Compatibility"
+.TH PRT 1B "3/23/07" "Heirloom Development Tools" "BSD System Compatibility"
 .SH NAME
 prt \- (BSD) display delta table information from an SCCS file
 .SH SYNOPSIS
@@ -70,37 +70,8 @@ This option implies \fB\-d\fR, \fB\-i\fR, \fB\-u\fR, \fB\-f\fR, and \fB\-t\fR.
 .TP
 \fB\-f\fR
 Print the flags of each named \fBs.\fRfile.
-.TP
-\fB\-i\fR
-Print the serial numbers of included, excluded, and ignored deltas.
-.TP
-\fB\-s\fR
-Print only the first line of the delta table entries; that is, only up to the statistics.
-.TP
-\fB\-t\fR
-Print the descriptive text contained in the \fBs.\fRfile.
-.TP
-\fB\-u\fR
-Print the user-names and/or numerical group \s-1ID\s+1R of users allowed to make deltas.
-.TP
-\fB\-c\fR\fIdate-time\fR
-Exclude delta table entries that are specified cutoff date and time.
-Each entry is printed as a single line,
-preceded by the name of the \s-1SCCS\s+1 file.
-This format (also produced by \fB\-r\fR \fB,\fR and \fB\-y\fR) makes it easy to sort multiple delta
-tables in chronological order.
-When both \fB\-y\fR and \fB\-c\fR, or \fB\-y\fR and \fB\-r\fR are supplied, \fIprt\fR stops printing when the first of the
-two conditions is met.
-.TP
-\fB\-r\fR\fIdate-time\fR
-Exclude delta table entries that are newer than the specified cutoff date and time.
-.TP
-\fB\-y\fR\fIsid\fR
-Exclude delta table entries made prior to the \s-1SID\s+1 specified.
-If no delta in the
-table has the specified SID, the entire table is printed.
-If no \s-1SID\s+1 is specified, the most recent delta is printed.
-.SS Output Format
+.RS
+.PP
 The following format is used to print those portions of the \fBs.\fRfile that are specified by the various options.
 .TP 3
 .PD 0
@@ -164,6 +135,37 @@ List of modification requests (MRs), followed by a \fBNEWLINE\fR (only if any \f
 \(bu
 Lines of the delta commentary (if any), followed by a \fBNEWLINE.\fR
 .PD
+.RE
+.TP
+\fB\-i\fR
+Print the serial numbers of included, excluded, and ignored deltas.
+.TP
+\fB\-s\fR
+Print only the first line of the delta table entries; that is, only up to the statistics.
+.TP
+\fB\-t\fR
+Print the descriptive text contained in the \fBs.\fRfile.
+.TP
+\fB\-u\fR
+Print the user-names and/or numerical group \s-1ID\s+1R of users allowed to make deltas.
+.TP
+\fB\-c\fR\fIdate-time\fR
+Exclude delta table entries that are specified cutoff date and time.
+Each entry is printed as a single line,
+preceded by the name of the \s-1SCCS\s+1 file.
+This format (also produced by \fB\-r\fR \fB,\fR and \fB\-y\fR) makes it easy to sort multiple delta
+tables in chronological order.
+When both \fB\-y\fR and \fB\-c\fR, or \fB\-y\fR and \fB\-r\fR are supplied, \fIprt\fR stops printing when the first of the
+two conditions is met.
+.TP
+\fB\-r\fR\fIdate-time\fR
+Exclude delta table entries that are newer than the specified cutoff date and time.
+.TP
+\fB\-y\fR\fIsid\fR
+Exclude delta table entries made prior to the \s-1SID\s+1 specified.
+If no delta in the
+table has the specified SID, the entire table is printed.
+If no \s-1SID\s+1 is specified, the most recent delta is printed.
 .SH EXAMPLES
 The following command:
 .RS

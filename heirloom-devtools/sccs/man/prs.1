@@ -21,10 +21,10 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)prs.1	1.7 (gritter) 2/1/07
+.\" Sccsid @(#)prs.1	1.8 (gritter) 3/23/07
 .\"
 .\" from OpenSolaris sccs-prs 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH PRS 1 "2/1/07" "Heirloom Development Tools" "User Commands"
+.TH PRS 1 "3/23/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 prs \- display selected portions of an SCCS history
 .SH SYNOPSIS
@@ -32,8 +32,13 @@ prs \- display selected portions of an SCCS history
 .ad l
 .nh
 \fBprs\fR
-[\fB\-ael\fR] [\fB\-c\fR\fIdate-time\fR]
-[\fB\-d\fR\fIdataspec\fR] [\fB\-r\fR\fIsid\fR] \fIs.filename\fR...
+[\fB\-d\fR\fIdataspec\fR]
+[\fB\-r\fR\fIsid\fR]
+[\fB\-e\fR]
+[\fB\-l\fR]
+[\fB\-c\fR\fIdate-time\fR]
+[\fB\-a\fR]
+\fIs.filename\fR...
 .br
 .ad b
 .hy 1
@@ -49,10 +54,17 @@ line.
 .PP
 In the absence of options, \fIprs\fR displays the delta table (version log).
 In the absence of \fB\-d\fR, or \fB\-l\fR, \fIprs\fR displays the entry for each delta indicated by the other options.
+.RS 5
+.TP 15
+\fB\-d\fR\fIdataspec\fR \fR
+Produce a report according to the indicated data specification.
+\fIdataspec\fR consists of a (quoted) text string that includes embedded data keywords of the form: `\fB:\fR\fIkey\fR\fB:\fR' (see \fIData Keywords\fR, below).
+\fIprs\fR expands these keywords in the output it produces.
+To specify a \fBTAB\fR character in the output, use \fB\et\fR; to specify a NEWLINE in the output, use \fB\en\fR\&.
 .TP
-\fB\-a\fR \fR
-Includes all deltas, including those marked as removed (see 
-\fIrmdel\fR(1)).
+\fB\-r\fR\fIsid\fR \fR
+Specifies the \s-1SCCS\s+1 delta \s-1ID\s+1 (\s-1SID\s+1) of the delta for which information is desired.
+If no \s-1SID\s+1 is specified, the most recently created delta is used.
 .TP
 \fB\-e\fR \fR
 Requests information for all deltas created \fIearlier\fR than, and including, the delta indicated with \fB\-r\fR or \fB\-c\fR.
@@ -74,15 +86,10 @@ Values of \fIyy\fR in the range \fB69\(mi99\fR refer to the twentieth
 century.
 Values in the range of \fB00\(mi68\fR refer to the twenty-first century.
 .TP
-\fB\-d\fR\fIdataspec\fR \fR
-Produce a report according to the indicated data specification.
-\fIdataspec\fR consists of a (quoted) text string that includes embedded data keywords of the form: `\fB:\fR\fIkey\fR\fB:\fR' (see \fIData Keywords\fR, below).
-\fIprs\fR expands these keywords in the output it produces.
-To specify a \fBTAB\fR character in the output, use \fB\et\fR; to specify a NEWLINE in the output, use \fB\en\fR\&.
-.TP
-\fB\-r\fR\fIsid\fR \fR
-Specifies the \s-1SCCS\s+1 delta \s-1ID\s+1 (\s-1SID\s+1) of the delta for which information is desired.
-If no \s-1SID\s+1 is specified, the most recently created delta is used.
+\fB\-a\fR \fR
+Includes all deltas, including those marked as removed (see 
+\fIrmdel\fR(1)).
+.RE
 .SH "DATA KEYWORDS"
 Data keywords specify which parts of an \s-1SCCS\s+1 file are to be retrieved.
 All parts of an \s-1SCCS\s+1 file (see 

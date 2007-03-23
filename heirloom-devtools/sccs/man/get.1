@@ -21,23 +21,34 @@
 .\"
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)get.1	1.9 (gritter) 2/2/07
+.\" Sccsid @(#)get.1	1.10 (gritter) 3/23/07
 .\"
 .\" from OpenSolaris sccs-get 1 "1 Nov 1999" "SunOS 5.11" "User Commands"
-.TH GET 1 "2/2/07" "Heirloom Development Tools" "User Commands"
+.TH GET 1 "3/23/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 get \- retrieve a version of an SCCS file
 .SH SYNOPSIS
 .HP
 .ad l
 .nh
-\fBget\fR [\fB\-begkmnpst\fR]
-[\fB\-l\fR\ [p]] [\fB\-a\fR\fIsequence\fR]
-[\fB\-c\fR\fIdate\-time\fR]
-[\fB\-G\fR\fIg-file\fR] 
+\fBget\fR
+[\fB\-a\fR\fIsequence\fR]
+[\fB\-c\fR\fIdate-time\fR]
 [\fB\-i\fR\fIsid-list\fR]
-[\fB\-r\fR\ [\fIsid\fR]]
+[\fB\-r\fR[\fIsid\fR]]
+[\fB\-w\fIstring\fR]
 [\fB\-x\fR\fIsid-list\fR]
+[\fB\-l\fR[p]]
+[\fB\-G\fR\fIg-file\fR] 
+[\fB\-b\fR]
+[\fB\-e\fR]
+[\fB\-g\fR]
+[\fB\-k\fR]
+[\fB\-m\fR]
+[\fB\-n\fR]
+[\fB\-p\fR]
+[\fB\-s\fR]
+[\fB\-t\fR]
 \fIs.filename\fR...
 .br
 .ad b
@@ -53,84 +64,7 @@ The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the name
 line.
 .PP
 The retrieved file normally has the same filename base as the \fBs.\fRfile, less the prefix, and is referred to as the \fBg-\fRfile.
-.PP
-For each file processed, \fIget\fR responds (on the standard output) with the \s-1SID\s+1 being accessed, and with the number of lines retrieved from the \fBs.\fRfile.
 .TP 16
-\fB\-a\fR\fIsequence\fR
-Retrieves the version corresponding to the indicated delta sequence number.
-This option is used primarily by the SCCS \fIcomb\fR command (see 
-\fIcomb\fR(1)).
-For users, \fB\-r\fR is an easier way to specify a version.
-The \fB\-a\fR option supersedes the \fB\-r\fR option when both are used.
-.TP
-\fB\-b\fR
-Creates a new branch.
-Used with the \fB\-e\fR option to indicate that the new delta should have a \s-1SID\s+1 in a new branch.
-Instead of incrementing the level for version to be checked in, \fIget\fR indicates in the \fBp.\fRfile that the delta to be checked in should either initialize a new branch and sequence (if there is no existing branch at the current level), or
-increment the branch component of the \s-1SID\s+1.
-If the \fBb\fR flag is not set in the \fBs.\fRfile, this option is ignored.
-.TP
-\fB\-c\fR\fIdate\-time\fR
-Retrieves the latest version checked in prior to the date and time indicated by the \fIdate\-time\fR argument.
-\fIdate\-time\fR takes the form:
-.sp
- \fIyy\fR[\fImm\fR[\fIdd\fR[ \fIhh\fR[\fImm\fR[\fIss\fR]\|]\|]\|]\|]
-.sp
-Units omitted from the indicated date and time default to their maximum possible values; that is \fB\fR\fB\-c\fR\fB7502\fR is equivalent to \fB\fR\fB\-c\fR\fB750228235959\fR.
-Values of \fIyy\fR in the range \fB69\fR\(mi\fB99\fR refer to the twentieth century.
-Values in the range \fB00\fR\(mi\fB68\fR refer to the twenty-first century.
-Any number of non-numeric characters may separate
-the various 2 digit components.
-If white-space characters occur, the \fIdate-time\fR specification must be quoted.
-.TP
-\fB\-e\fR
-Retrieves a version for editing.
-With this option, \fIget\fR places a lock on the \fBs.\fRfile, so that no one else can check in changes to the version you have checked out.
-If the \fBj\fR flag is set in the \fBs.\fRfile, the lock is advisory: \fIget\fR issues a warning message.
-Concurrent use of `\fBget\fR \fB\-e\fR' for different \s-1SID\s+1s is allowed.
-However, \fIget\fR will not check out a version of the file if a writable version is present in the directory.
-All SCCS file protections stored in the \fBs.\fRfile, including the release ceiling, floor, and authorized user list, are honored by `\fBget\fR \fB\-e\fR'.
-.TP
-\fB\-g\fR
-Gets the SCCS version \s-1ID\s+1, without retrieving the version itself.
-Used to verify the existence of a particular \s-1SID\s+1.
-.TP
-\fB\-G\fR\fInewname\fR
-Uses \fInewname\fR as the name of the retrieved version.
-.TP
-\fB\-i\fR\fIsid-list\fR
-Specifies a list of deltas to include in the retrieved version.
-The included deltas are noted in the standard output message.
-\fIsid-list\fR is a comma-separated list of \s-1SID\s+1s.
-To specify a range of deltas, use a `\fB\(mi\fR' separator instead of a comma, between two \s-1SID\s+1s in the list.
-.TP
-\fB\-k\fR
-Suppresses expansion of \s-1ID\s+1 keywords.
-\fB\-k\fR is implied by the \fB\-e\fR.
-.TP
-\fB\-l\fR\|[\|\fBp\fR\|]\fR
-Retrieves a summary of the delta table (version log) and write it to a listing file, with the `\fBl.\fR' prefix (called `\fBl.\fRfile').
-When \fB\-lp\fR is used, write the summary onto the standard output.
-.TP
-\fB\-m\fR
-Precedes each retrieved line with the \s-1SID\s+1 of the delta in which it was added to the file.
-The \s-1SID\s+1 is separated from the line with a TAB.
-.TP
-\fB\-n\fR
-Precedes each line with the \fB%\&M%\fR \s-1ID\s+1 keyword and a TAB.
-When both the \fB\-m\fR and \fB\-n\fR options are used, the \s-1ID\s+1 keyword precedes the \s-1SID\s+1, and the line of text.
-.TP
-\fB\-p\fR
-Writes the text of the retrieved version to the standard output.
-All messages that normally go to the standard output are written to the standard error instead.
-.TP
-\fB\-s\fR
-Suppresses all output normally written on the standard output.
-However, fatal error messages (which always go to the standard error) remain unaffected.
-.TP
-\fB\-t\fR
-Retrieves the most recently created (top) delta in a given release (for example: \fB\-r1\fR).
-.TP
 \fB\-r\fR[\fIsid\fR]\fR
 Retrieves the version corresponding to the indicated \s-1SID\s+1 (delta).
 .sp
@@ -148,11 +82,93 @@ If that release does not exist, \fIget\fR retrieves highest level from the next-
 .sp
 Similarly with branches, if you specify a release, level and branch, \fIget\fR retrieves the highest sequence in that branch.
 .TP
+\fB\-c\fR\fIdate\-time\fR
+Retrieves the latest version checked in prior to the date and time indicated by the \fIdate\-time\fR argument.
+\fIdate\-time\fR takes the form:
+.sp
+ \fIyy\fR[\fImm\fR[\fIdd\fR[ \fIhh\fR[\fImm\fR[\fIss\fR]\|]\|]\|]\|]
+.sp
+Units omitted from the indicated date and time default to their maximum possible values; that is \fB\fR\fB\-c\fR\fB7502\fR is equivalent to \fB\fR\fB\-c\fR\fB750228235959\fR.
+Values of \fIyy\fR in the range \fB69\fR\(mi\fB99\fR refer to the twentieth century.
+Values in the range \fB00\fR\(mi\fB68\fR refer to the twenty-first century.
+Any number of non-numeric characters may separate
+the various 2 digit components.
+If white-space characters occur, the \fIdate-time\fR specification must be quoted.
+.TP
+\fB\-i\fR\fIsid-list\fR
+Specifies a list of deltas to include in the retrieved version.
+The included deltas are noted in the standard output message.
+\fIsid-list\fR is a comma-separated list of \s-1SID\s+1s.
+To specify a range of deltas, use a `\fB\(mi\fR' separator instead of a comma, between two \s-1SID\s+1s in the list.
+.TP
 \fB\-x\fR\fIsid-list\fR
 Excludes the indicated deltas from the retrieved version.
 The excluded deltas are noted in the standard output message.
 \fIsid-list\fR is a comma-separated list of \s-1SID\s+1s.
 To specify a range of deltas, use a `\fB\(mi\fR' separator instead of a comma, between two \s-1SID\s+1s in the list.
+.TP
+\fB\-e\fR
+Retrieves a version for editing.
+With this option, \fIget\fR places a lock on the \fBs.\fRfile, so that no one else can check in changes to the version you have checked out.
+If the \fBj\fR flag is set in the \fBs.\fRfile, the lock is advisory: \fIget\fR issues a warning message.
+Concurrent use of `\fBget\fR \fB\-e\fR' for different \s-1SID\s+1s is allowed.
+However, \fIget\fR will not check out a version of the file if a writable version is present in the directory.
+All SCCS file protections stored in the \fBs.\fRfile, including the release ceiling, floor, and authorized user list, are honored by `\fBget\fR \fB\-e\fR'.
+.TP
+\fB\-b\fR
+Creates a new branch.
+Used with the \fB\-e\fR option to indicate that the new delta should have a \s-1SID\s+1 in a new branch.
+Instead of incrementing the level for version to be checked in, \fIget\fR indicates in the \fBp.\fRfile that the delta to be checked in should either initialize a new branch and sequence (if there is no existing branch at the current level), or
+increment the branch component of the \s-1SID\s+1.
+.TP
+\fB\-k\fR
+Suppresses expansion of \s-1ID\s+1 keywords.
+\fB\-k\fR is implied by the \fB\-e\fR.
+If the \fBb\fR flag is not set in the \fBs.\fRfile, this option is ignored.
+.TP
+\fB\-l\fR\|[\|\fBp\fR\|]\fR
+Retrieves a summary of the delta table (version log) and write it to a listing file, with the `\fBl.\fR' prefix (called `\fBl.\fRfile').
+When \fB\-lp\fR is used, write the summary onto the standard output.
+.TP
+\fB\-p\fR
+Writes the text of the retrieved version to the standard output.
+All messages that normally go to the standard output are written to the standard error instead.
+.TP
+\fB\-s\fR
+Suppresses all output normally written on the standard output.
+However, fatal error messages (which always go to the standard error) remain unaffected.
+.TP
+\fB\-m\fR
+Precedes each retrieved line with the \s-1SID\s+1 of the delta in which it was added to the file.
+The \s-1SID\s+1 is separated from the line with a TAB.
+.TP
+\fB\-n\fR
+Precedes each line with the \fB%\&M%\fR \s-1ID\s+1 keyword and a TAB.
+When both the \fB\-m\fR and \fB\-n\fR options are used, the \s-1ID\s+1 keyword precedes the \s-1SID\s+1, and the line of text.
+.TP
+\fB\-g\fR
+Gets the SCCS version \s-1ID\s+1, without retrieving the version itself.
+Used to verify the existence of a particular \s-1SID\s+1.
+.TP
+\fB\-t\fR
+Retrieves the most recently created (top) delta in a given release (for example: \fB\-r1\fR).
+.TP
+\fB\-w\fIstring\fR
+Use
+.I string
+as substitution text for the \fB%\&W%\fR keyword.
+.TP
+\fB\-a\fR\fIsequence\fR
+Retrieves the version corresponding to the indicated delta sequence number.
+This option is used primarily by the SCCS \fIcomb\fR command (see 
+\fIcomb\fR(1)).
+For users, \fB\-r\fR is an easier way to specify a version.
+The \fB\-a\fR option supersedes the \fB\-r\fR option when both are used.
+.TP
+\fB\-G\fR\fInewname\fR
+Uses \fInewname\fR as the name of the retrieved version.
+.PP
+For each file processed, \fIget\fR responds (on the standard output) with the \s-1SID\s+1 being accessed, and with the number of lines retrieved from the \fBs.\fRfile.
 .PP
 The table below explains how the SCCS identification string is determined for retrieving and creating deltas.
 .sp
