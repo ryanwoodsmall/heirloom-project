@@ -20,10 +20,10 @@
 .\"  Copyright (c) 2002, Sun Microsystems, Inc. All Rights Reserved.
 .\" Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
 .\"
-.\" Sccsid @(#)admin.1	1.4 (gritter) 3/22/07
+.\" Sccsid @(#)admin.1	1.5 (gritter) 3/23/07
 .\"
 .\" from OpenSolaris sccs-admin 1 "30 Sep 2002" "SunOS 5.11" "User Commands"
-.TH ADMIN 1 "3/22/07" "Heirloom Development Tools" "User Commands"
+.TH ADMIN 1 "3/23/07" "Heirloom Development Tools" "User Commands"
 .SH NAME
 admin \- create and administer SCCS files
 .SH SYNOPSIS
@@ -32,15 +32,15 @@ admin \- create and administer SCCS files
 .ad l
 .nh
 \fBadmin\fR [\fB\-bhnz\fR]
-[\fB\-a\fR\ \fIusername\fR|\fIgroupid\fR]...
-[\fB\-d\fR\ \fIflag\fR]\ ...
-[\fB\-e\fR\ \fIusername\fR|\fIgroupid\fR]...
-[\fB\-f\fR\ \fIflag\fR\ [\fIvalue\fR]]\ ...
-[\fB\-i\fR\ [\fIfilename\fR]]
+[\fB\-a\fR\fIlogin\fR]
+[\fB\-d\fR\fIflag\fR]
+[\fB\-e\fR\fIlogin\fR]
+[\fB\-f\fR\fIflag\fR[\fIvalue\fR]]
+[\fB\-i\fR[\fIfilename\fR]]
 [\fB\-m\fR\ \fImr-list\fR]
 [\fB\-r\fR\fIrelease\fR]
-[\fB\-t\fR\ [\fIdescription-file\fR]]
-[\fB\-y\fR\ [\fIcomment\fR]]
+[\fB\-t\fR[\fIdescription-file\fR]]
+[\fB\-y\fR[\fIcomment\fR]]
 \fIs.filename\fR...
 .br
 .PD
@@ -58,7 +58,7 @@ If a directory name is used in place of the \fIs.filename\fR argument, the \fBad
 Unreadable \fBs.\fRfiles produce an error.
 The use of `\fB\(mi\fR' as the \fIs.filename\fR argument indicates that the names of files are to be read from the standard input, one \fBs.\fRfile per line.
 .TP 7
-\fB\-a\fR \fIusername\fR|\fIgroupid\fR
+\fB\-a\fR\fIlogin\fR
 Adds a user name, or a numerical group \fBID\fR, to the list of users who may check deltas in or out.
 If the list is empty, any user is allowed to do so.
 .TP
@@ -72,15 +72,15 @@ for details about
 the encoding.
 This option is normally used in conjunction with \fB\-i\fR to force \fBadmin\fR to encode initial versions not recognized as containing binary data.
 .TP
-\fB\-d\fR \fIflag\fR
+\fB\-d\fR\fIflag\fR
 Deletes the indicated \fIflag\fR from the SCCS file.
 The \fB\-d\fR option may be specified only for existing \fBs.\fRfiles.
 See \fB\-f\fR for the list of recognized flags.
 .TP
-\fB\-e\fR \fIusername\fR|\fIgroupid\fR
+\fB\-e\fR\fIlogin\fR
 Erases a user name or group \fBID\fR from the list of users allowed to make deltas.
 .TP
-\fB\-f\fR \fIflag\fR [\fIvalue\fR]\fR
+\fB\-f\fR\fIflag\fR[\fIvalue\fR]\fR
 Sets the indicated \fIflag\fR to the (optional) \fIvalue\fR specified.
 The following flags are recognized:
 .RS 7
@@ -109,7 +109,7 @@ Treats the `\fBNo id keywords (ge6)\fR' message issued by an SCCS \fBget\fR or \
 .B j
 Allows concurrent updates.
 .TP
-\fBl\fR \fIrelease\fR[\fB,\fR \fIrelease\fR...]\fR
+\fBl\fR\fIrelease\fR[\fB,\fR\fIrelease\fR...]\fR
 Locks the indicated list of releases against deltas.
 If \fBa\fR is used, this flag locks out deltas to all releases.
 An SCCS `\fBget\fR \fB\-e\fR' command fails when applied against a locked release.
@@ -220,7 +220,6 @@ history file in SCCS subdirectory
 temporary lock file
 .PD
 .SH SEE ALSO
-.IR sccs (1),
 .IR cdc (1),
 .IR delta (1),
 .IR get (1),
