@@ -4,6 +4,8 @@ Release ...
   now handled correctly.
 * make: Removed a "extern char **environ;" declaration to make it
   compile on CentOS 5.
+* vc: Recognizes the control character according to the LC_CTYPE locale
+  now, and has no static size limits anymore.
 
 Release 070311
 * make: The SVR4.2 syntax for parallel builds has been added. This adds

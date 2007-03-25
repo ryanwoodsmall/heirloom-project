@@ -18,10 +18,14 @@
 *
 * CDDL HEADER END
 *
-* @(#)vc 1.2 06/12/12
+* from OpenSolaris vc 1.2 06/12/12
 *
-*#ident	"@(#)sccs:help.d/vc"
+* from "sccs:help.d/vc"
 *	Messages for the vc command.
+*
+* Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
+*
+* Sccsid @(#)vc	1.2 (gritter) 3/25/07
 *
 -1
 "unknown command on line ..."
@@ -46,8 +50,9 @@ The named keyword has been redeclared
 on the indicated line.
 -6
 "out of space"
-A maximum of 40 keywords per invocation of vc are allowed.
-This limit has been exceeded.
+There have been to many keywords.
+The maximum varies per invocation of vc as it depends on
+available memory.
 -7
 "unmatched `:' on line ..."
 On the given line there is no control character

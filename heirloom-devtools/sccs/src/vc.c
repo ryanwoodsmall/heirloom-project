@@ -33,21 +33,14 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)vc.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)vc.c	1.4 (gritter) 3/25/07
  */
 /*	from OpenSolaris "sccs:cmd/vc.c"	*/
 # include	<defines.h>
+# include	<locale.h>
 
 
-/*
- * The symbol table size is set to a limit of forty keywords per input
- * file.  Should this limit be changed it should also be changed in the
- * Help file.
- */
-
-# define SYMSIZE 40
-# define PARMSIZE 10
-# define NSLOTS 32
+static int	SYMSIZE;
 
 # define USD  1
 # define DCL 2
@@ -63,20 +56,22 @@
 
 char SccsError[MAXERRORLEN];
 
-static char	Ctlchar = ':';
+static char	Ctlchar[MB_LEN_MAX+1] = ":";
+static int	Ctllen = 1;
 
 struct	symtab	{
 	int	usage;
-	char	name[PARMSIZE];
+	char	*name;
 	char	*value;
 	int	lenval;
 };
-static struct	symtab	Sym[SYMSIZE];
+static struct	symtab	*Sym;
 
 
 static char 	*sptr;
 static int	Skiptabs;
 static int	Repall;
+static int	mb_cur_max;
 
 /*
  * Delflag is used to indicate when text is to be skipped.  It is decre-
@@ -118,10 +113,12 @@ static void	numck(register char *);
 static char	*replace(char *);
 static int	lookup(char *);
 static int	putin(char *, char *);
-static void	chksize(char *);
-static char	*findch(char *, int);
+static char	*findch(char *, char *, int);
 static char	*ecopy(char *, char *);
 static char	*findstr(char *, char *);
+static int	getch(char *, char *);
+static char	*fgetline(char **, size_t *, size_t *, FILE *);
+static void	*srealloc(void *, size_t);
 
 /*
  * The main program reads a line of text and sends it to be processed
@@ -134,9 +131,12 @@ main(int argc, char *argv[])
 {
 	register  char *lineptr, *p;
 	register int i;
-	char line[1024];
+	char *line = NULL;
+	size_t	linesize = 0, linelen;
 	extern int Fflags;
 
+	setlocale(LC_CTYPE, "");
+	mb_cur_max = MB_CUR_MAX;
 	Fflags = FTLCLN | FTLMSG | FTLEXIT;
 	setsig();
 	for(i = 1; i< argc; i++) {
@@ -153,7 +153,7 @@ main(int argc, char *argv[])
 				Repall = 1;
 				break;
 			case 'c':
-				Ctlchar = p[2];
+				Ctllen = getch(&p[2], Ctlchar);
 				break;
 			}
 		else {
@@ -161,7 +161,7 @@ main(int argc, char *argv[])
 			asgfunc(p);
 		}
 	}
-	while (fgets(line,sizeof(line),stdin) != NULL) {
+	while (fgetline(&line,&linesize,&linelen,stdin) != NULL) {
 		lineptr = line;
 		Lineno++;
 
@@ -178,8 +178,9 @@ main(int argc, char *argv[])
 				lineptr = p;
 		}
 
-		if (lineptr[0] != Ctlchar) {
-			if (lineptr[0] == '\\' && lineptr[1] == Ctlchar)
+		if (strncmp(lineptr, Ctlchar, Ctllen) != 0) {
+			if (lineptr[0] == '\\' && strncmp(lineptr, Ctlchar,
+						Ctllen) == 0)
 				for (p = &lineptr[1]; *lineptr++ = *p++; )
 					;
 			if(Delflag == 0) {
@@ -193,7 +194,7 @@ main(int argc, char *argv[])
 			continue;
 		}
 
-		lineptr++;
+		lineptr += Ctllen;
 
 		if (imatch("if ", lineptr))
 			iffunc(&lineptr[3]);
@@ -208,14 +209,14 @@ main(int argc, char *argv[])
 				errfunc(&lineptr[3]);
 			else if (imatch("msg", lineptr))
 				msgfunc(&lineptr[3]);
-			else if (lineptr[0] == Ctlchar)
-				repfunc(&lineptr[1]);
+			else if (strncmp(lineptr, Ctlchar, Ctllen) == 0)
+				repfunc(&lineptr[Ctllen]);
 			else if (imatch("on", lineptr))
 				Repall = 1;
 			else if (imatch("off", lineptr))
 				Repall = 0;
 			else if (imatch("ctl ", lineptr))
-				Ctlchar = lineptr[4];
+				Ctllen = getch(&lineptr[4], Ctlchar);
 			else {
 				sprintf(SccsError,"unknown command on line %d (vc1)",
 					Lineno);
@@ -223,7 +224,7 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	for(i = 0; Sym[i].usage != 0 && i<SYMSIZE; i++) {
+	for(i = 0; i<SYMSIZE && Sym[i].usage != 0; i++) {
 		if ((Sym[i].usage&USD) == 0 && !Silent)
 			fprintf(stderr,"`%s' never used (vc2)\n",Sym[i].name);
 		if ((Sym[i].usage&DCL) == 0 && !Silent)
@@ -258,7 +259,7 @@ asgfunc(register char *aptr)
 	aptr = findstr(aptr,"= \t");
 	if (*aptr == ' ' || *aptr == '\t') {
 		*aptr++ = '\0';
-		aptr = findch(aptr,'=');
+		aptr = findch(aptr,"=",1);
 	}
 	if (aptr == end) {
 		sprintf(SccsError,"syntax on line %d (vc17)",Lineno);
@@ -266,7 +267,6 @@ asgfunc(register char *aptr)
 	}
 	*aptr++ = '\0';
 	avalue = getid(aptr);
-	chksize(aname);
 	putin(aname, avalue);
 }
 
@@ -288,9 +288,8 @@ dclfunc(register char *dptr)
 	NONBLANK(dptr);
 	while (dptr < end) {
 		name = dptr;
-		dptr = findch(dptr,',');
+		dptr = findch(dptr,",",1);
 		*dptr++ = '\0';
-		chksize(name);
 		if (Sym[i = lookup(name)].usage&DCL) {
 			sprintf(SccsError,"`%s' declared twice on line %d (vc5)", 
 				name, Lineno);
@@ -578,13 +577,16 @@ numck(register char *nptr)
  */
 
 # define INCR(int) if (++int==NSLOTS) { \
+		NSLOTS += 32; \
+		if ((slots = realloc(slots,NSLOTS*sizeof *slots)) == NULL) { \
 		sprintf(SccsError,"out of space [line %d] (vc16)",Lineno); \
-		fatal(SccsError); }
+		fatal(SccsError); } }
 
 static char *
 replace(char *ptr)
 {
-	char *slots[NSLOTS];
+	int NSLOTS = 0;
+	char **slots = NULL;
 	int i,j,newlen;
 	register char *s, *t, *p;
 
@@ -592,16 +594,18 @@ replace(char *ptr)
 	*(--s) = '\0';
 	Linend = s;
 	i = -1;
-	for (p=ptr; *(s=findch(p,Ctlchar)); p=t) {
-		*s++ = '\0';
+	for (p=ptr; *(s=findch(p,Ctlchar,Ctllen)); p=t) {
+		*s = '\0';
+		s += Ctllen;
 		INCR(i);
 		slots[i] = p;
-		if (*(t=findch(s,Ctlchar))==0) {
-			sprintf(SccsError,"unmatched `%c' on line %d (vc7)",
+		if (*(t=findch(s,Ctlchar,Ctllen))==0) {
+			sprintf(SccsError,"unmatched `%s' on line %d (vc7)",
 				Ctlchar,Lineno);
 			fatal(SccsError);
 		}
-		*t++ = '\0';
+		*t = '\0';
+		t += Ctllen;
 		INCR(i);
 		slots[i] = Sym[j = lookup(s)].value;
 		Sym[j].usage |= USD;
@@ -642,17 +646,19 @@ lookup(char *lname)
 		fatal(SccsError);
 	}
 
-	for(i =0; Sym[i].usage != 0 && i<SYMSIZE; i++)
+	for(i =0; i<SYMSIZE && Sym[i].usage != 0; i++)
 		if (equal(lname, Sym[i].name)) return(i);
-	s = &Sym[i];
-	if (s->usage == 0) {
-		copy(lname,s->name);
-		copy("",(s->value = fmalloc((unsigned int) (s->lenval = 1))));
-		return(i);
+	if (i==SYMSIZE) {
+		SYMSIZE += 40;
+		if ((Sym = realloc(Sym, SYMSIZE*sizeof *Sym)) == NULL)
+			fatal("out of space (vc6)");
+		memset(&Sym[i], 0, (SYMSIZE-i) * sizeof *Sym);
 	}
-	fatal("out of space (vc6)");
-	/*NOTREACHED*/
-	return 0;
+	s = &Sym[i];
+	free(s->name);
+	copy(lname,(s->name = fmalloc(strlen(lname) + 1)));
+	copy("",(s->value = fmalloc((unsigned int) (s->lenval = 1))));
+	return(i);
 }
 
 
@@ -676,33 +682,39 @@ putin(char *pname, char *pvalue)
 	return(i);
 }
 
-static void 
-chksize(char *s)
-{
-	if (size(s) > PARMSIZE) {
-		sprintf(SccsError,"keyword name too long on line %d (vc8)",Lineno);
-		fatal(SccsError);
-	}
-}
-
 
 static char *
-findch(char *astr, int match)
+findch(char *astr, char *match, int len)
 {
-	register char *s, *t, c;
+	register char *s, *t;
+	wchar_t	c;
+	int n;
 	char *temp;
 
-	for (s=astr; ((c = *s) != '\0') && c!=match; s++)
+	for (s=astr; *s != '\0' && strncmp(s,match,len) != 0; s++) {
+		if (*s&0200 && mb_cur_max>1) {
+			if ((n = mbtowc(&c,s,mb_cur_max)) <= 0)
+				goto synerr;
+			s += n-1;
+		} else
+			c = *s;
 		if (c=='\\') {
 			if (s[1]==0) {
+			synerr:
 				sprintf(SccsError,"syntax on line %d (vc19)",Lineno);
 				fatal(SccsError);
 			}
 			else {
 				for (t = (temp=s) + 1; *s++ = *t++;);
 				s = temp;
+				if (*s&0200 && mb_cur_max>1) {
+					if ((n = mblen(s,mb_cur_max)) <= 0)
+						goto synerr;
+					s += n-1;
+				}
 			}
 		}
+	}
 	return(s);
 }
 
@@ -743,4 +755,76 @@ findstr(char *astr, char *pat)
 void 
 clean_up(void)
 {
+}
+
+static int
+getch(char *p, char *t)
+{
+	int	i, n;
+
+	if ((*p&0200) == 0 || mb_cur_max==1) {
+		t[0] = *p;
+		t[1] = 0;
+		return(1);
+	} else {
+		if ((n = mblen(p,mb_cur_max)) <= 0) {
+			sprintf(SccsError,"syntax on line %d (vc19)",Lineno);
+			fatal(SccsError);
+		}
+		for (i = 0; i < n; i++)
+			t[i] = p[i];
+		t[i] = 0;
+		return(n);
+	}
+}
+
+/*
+ * Read a line of data from a file.  If the current buffer is not large enough
+ * to contain the line, double the size of the buffer and continue reading.
+ * Loop until either the entire line is read or until there is no more space
+ * to be malloc'd.
+ */
+
+#if defined (__GLIBC__) && defined (_IO_getc_unlocked)
+#undef	getc
+#define	getc(f)	_IO_getc_unlocked(f)
+#endif
+
+#define	LSIZE	128
+static char *
+fgetline(char **line, size_t *linesize, size_t *length, FILE *fp)
+{
+	int c;
+	size_t n = 0;
+
+	if (*line == NULL || *linesize < LSIZE + n + 1)
+		*line = srealloc(*line, *linesize = LSIZE + n + 1);
+	for (;;) {
+		if (n >= *linesize - LSIZE / 2)
+			*line = srealloc(*line, *linesize += LSIZE);
+		c = getc(fp);
+		if (c != EOF) {
+			(*line)[n++] = c;
+			(*line)[n] = '\0';
+			if (c == '\n')
+				break;
+		} else {
+			if (n > 0)
+				break;
+			else
+				return NULL;
+		}
+	}
+	*length = n;
+	return *line;
+}
+
+static void *
+srealloc(void *p, size_t n)
+{
+	if ((p = realloc(p, n)) == NULL) {
+		write(2, "Out of memory\n", 14);
+		_exit(077);
+	}
+	return p;
 }
