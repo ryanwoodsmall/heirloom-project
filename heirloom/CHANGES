@@ -1,4 +1,7 @@
 Release ...
+* cpio: A "-P" option has been introduced that allows to specify attributes
+  like the file owner when creating an archive. With it, unprivileged users
+  can set arbitrary attributes for files within an archive.
 * diff: Made it compile on CentOS 5.
 
 Release 070227

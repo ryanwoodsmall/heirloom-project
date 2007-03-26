@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)cpio.h	1.28 (gritter) 2/24/07	*/
+/*	Sccsid @(#)cpio.h	1.29 (gritter) 3/26/07	*/
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -154,6 +154,7 @@ extern int		Lflag;
 extern int		mflag;
 extern const char	*Mflag;
 extern const char	*Oflag;
+extern int		Pflag;
 extern int		rflag;
 extern const char	*Rflag;
 extern int		sflag;

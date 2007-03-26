@@ -25,7 +25,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/*	Sccsid @(#)flags.c	1.5 (gritter) 2/24/07	*/
+/*	Sccsid @(#)flags.c	1.6 (gritter) 3/26/07	*/
 
 #include <unistd.h>
 #include <stdio.h>
@@ -38,7 +38,7 @@ void
 flags(int ac, char **av)
 {
 	const char	optstring[] =
-		"iopaAbBcC:dDeE:fH:I:kKlLmM:O:rR:sStTuvV6";
+		"iopaAbBcC:dDeE:fH:I:kKlLmM:O:PrR:sStTuvV6";
 	int	i, illegal = 0;
 
 	if (getenv("SYSV3") != NULL)
@@ -129,6 +129,9 @@ flags(int ac, char **av)
 		case 'O':
 			Oflag = optarg;
 			break;
+		case 'P':
+			Pflag = 1;
+			break;
 		case 'r':
 			rflag = 1;
 			break;
@@ -166,7 +169,8 @@ flags(int ac, char **av)
 	}
 	switch (action) {
 	case 'i':
-		if (Oflag || Kflag || eflag || Lflag || lflag || aflag || Aflag)
+		if (Oflag || Kflag || eflag || Lflag || lflag || aflag ||
+				Aflag || Pflag)
 			illegal = 1;
 		for (i = optind; i < ac; i++)
 			addg(av[i], 0);

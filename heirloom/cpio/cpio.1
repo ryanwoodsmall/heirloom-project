@@ -18,8 +18,8 @@
 .\"    misrepresented as being the original software.
 .\"
 .\" 3. This notice may not be removed or altered from any source distribution.
-.\" Sccsid @(#)cpio.1	1.91 (gritter) 9/5/05
-.TH CPIO 1 "9/5/05" "Heirloom Toolchest" "User Commands"
+.\" Sccsid @(#)cpio.1	1.92 (gritter) 3/26/07
+.TH CPIO 1 "3/26/07" "Heirloom Toolchest" "User Commands"
 .SH NAME
 cpio \- copy file archives in and out
 .SH SYNOPSIS
@@ -32,11 +32,11 @@ cpio \- copy file archives in and out
 [\fB\-M\fI\ msg\fR]] [\fB\-R\fI\ id\fR] [\fIpatterns\fR]
 .HP
 .ad l
-\fBcpio\fR \fB\-o\fR[\fBacvABLV\fR] [\fB\-C\fI\ size\fR]
+\fBcpio\fR \fB\-o\fR[\fBacvABLPV\fR] [\fB\-C\fI\ size\fR]
 [\fB\-H\fI\ hdr\fR] [[\fB\-M\fI\ msg\fR] [\fB\-O\fI\ file\fR]]
 .HP
 .ad l
-\fBcpio\fR \fB\-p\fR[\fBadlmuvLV\fR] [\fB\-R\fI\ id\fR] \fIdirectory\fR
+\fBcpio\fR \fB\-p\fR[\fBadlmPuvLV\fR] [\fB\-R\fI\ id\fR] \fIdirectory\fR
 .br
 .PD
 .ad b
@@ -346,6 +346,83 @@ that is written instead of standard output
 with the
 .I \-o
 option.
+.TP
+.B \-P
+In copy-out or pass mode,
+interpret the data read from standard input
+as prototype lines
+of colon-separated fields
+of the form
+.in +3m
+.sp
+\fItype\fB:\fIuser\fB:\fIgroup\fB:\fImode\fB:\fIatime\fB:\fImtime\fB:\fImajor\fB:\fIminor\fB:\fIpath\fR
+.sp
+.in -3m
+For each non-empty field,
+the corresponding attribute of the input file is overridden.
+With this option,
+an unprivileged user can create
+an archive that contains files
+with arbitrary attributes.
+The meanings of the individual fields are:
+.RS
+.TP 6
+.PD 0
+.I type
+File type, one of:
+\fBb\fR (block device),
+\fBc\fR (character device),
+\fBd\fR (directory),
+\fBf\fR (plain file),
+\fBp\fR (named pipe),
+or
+\fBs\fR (symbolic link).
+.TP
+.I user
+The owner of the file,
+which can be a numeric user ID or a user name.
+.TP
+.I group
+The group owner of the file,
+which can be a numeric group ID or a group name.
+.TP
+.I mode
+The octal mode of the file.
+.TP
+.I atime
+The time the file was last accessed.
+Note that most archive formats cannot store this attribute,
+in which case it is ignored.
+The format is the same as that of the
+.I mtime
+field.
+.TP
+.I mtime
+The time the file was last modified.
+This is either a decimal integer
+specifying the seconds past the epoch,
+or an ISO\ 8601 date and time field
+of the format \fIYYYYMMDD\fBT\fIHHMMSS\fR,
+e.g. 20070326T190511,
+the latter being relative to the current time zone
+and with all digits past the \fBT\fR being optional.
+.TP
+.I major minor
+Major and minor device numbers as with
+.IR mknod (1M).
+These fields are only allowed for block and character devices.
+.TP
+.I path
+The name of the file to be archived.
+If the file is not a symbolic link,
+and the specification is otherwise sufficient,
+the file needs not exist
+at the time the archive is created.
+A non-existent regular file will be empty in the archive.
+.PD
+.RE
+.IP
+This option is an extension.
 .TP
 .B \-r
 Rename files interactively.

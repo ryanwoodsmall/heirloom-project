@@ -26,7 +26,7 @@
  */
 
 /*
- * Sccsid @(#)cpio.c	1.301 (gritter) 2/24/07
+ * Sccsid @(#)cpio.c	1.302 (gritter) 3/26/07
  */
 
 #include <sys/types.h>
@@ -709,6 +709,29 @@ static enum paxrec {
 	PR_SUN_DEVMINOR	= 0400
 } paxrec, globrec;
 
+/*
+ * Prototype structure, collecting user-defined information
+ * about a file.
+ */
+struct prototype {
+	mode_t	pt_mode;	/* type and permission bits */
+	uid_t	pt_uid;		/* owner */
+	gid_t	pt_gid;		/* group owner */
+	time_t	pt_atime;	/* time of last access */
+	time_t	pt_mtime;	/* time of last modification */
+	dev_t	pt_rdev;	/* device major/minor */
+	enum {
+		PT_NONE	 = 0000,
+		PT_TYPE	 = 0001,
+		PT_OWNER = 0002,
+		PT_GROUP = 0004,
+		PT_MODE  = 0010,
+		PT_ATIME = 0020,
+		PT_MTIME = 0040,
+		PT_RDEV  = 0100
+	}	pt_spec;	/* specified information */
+};
+
 static struct stat	globst;
 
 /*
@@ -762,6 +785,7 @@ int			Lflag;		/* follow symbolic links */
 int			mflag;		/* retain modification times */
 const char		*Mflag;		/* message when switching media */
 const char		*Oflag;		/* output archive name */
+int			Pflag;		/* prototype file list */
 int			rflag;		/* rename files */
 const char		*Rflag;		/* reassign ownerships */
 static uid_t		Ruid;		/* uid to assign */
@@ -796,6 +820,7 @@ static struct islot	*inull;		/* splay tree null element */
 int			printsev;	/* print message severity strings */
 static int		compressed_bar;	/* this is a compressed bar archive */
 static int		formatforced;	/* -k -i -Hfmt forces a format */
+static long long	lineno;		/* input line number */
 
 int			pax_dflag;	/* directory matches only itself */
 int			pax_kflag;	/* do not overwrite files */
@@ -932,6 +957,7 @@ static void	paxnam(struct tar_header *, const char *);
 static char	*sequence(void);
 static char	*joinpath(const char *, char *);
 static int	utf8(const char *);
+static char	*getproto(char *, struct prototype *);
 
 size_t		(*ofiles)(char **, size_t *) = ofiles_cpio;
 void		(*prtime)(time_t) = prtime_cpio;
@@ -996,11 +1022,16 @@ copyout(int (*copyfn)(const char *, struct stat *))
 	char	*name = NULL, *np;
 	size_t	namsiz = 0, namlen;
 	struct stat	st;
+	struct prototype	pt;
 
 	while ((namlen = ofiles(&name, &namsiz)) != 0) {
+		lineno++;
 		if (name[namlen-1] == '\n')
 			name[--namlen] = '\0';
-		np = name;
+		if (Pflag)
+			np = getproto(name, &pt);
+		else
+			np = name;
 		while (np[0] == '.' && np[1] == '/') {
 			np += 2;
 			while (*np == '/')
@@ -1011,7 +1042,22 @@ copyout(int (*copyfn)(const char *, struct stat *))
 			}
 		}
 		if (lstat(np, &st) < 0) {
-			if (sysv3 < 0)
+			if (Pflag && *np && ((pt.pt_spec &
+			    (PT_TYPE|PT_OWNER|PT_GROUP|PT_MODE|PT_RDEV) &&
+					((pt.pt_mode&S_IFMT) == S_IFBLK ||
+					 (pt.pt_mode&S_IFMT) == S_IFCHR)) ||
+				      (pt.pt_spec &
+		            (PT_TYPE|PT_OWNER|PT_GROUP|PT_MODE) &&
+			    		((pt.pt_mode&S_IFMT) == S_IFDIR ||
+					 (pt.pt_mode&S_IFMT) == S_IFIFO ||
+					 (pt.pt_mode&S_IFMT) == S_IFREG)))) {
+				memset(&st, 0, sizeof st);
+				st.st_mode = pt.pt_mode;
+				st.st_blksize = 4096;
+				st.st_nlink = 1;
+				goto missingok;
+			}
+			else if (sysv3 < 0)
 				msg(2, 0, "< %s > ?\n", np);
 			else if (sysv3 > 0)
 				msg(2, 0, "Cannot obtain information "
@@ -1022,6 +1068,7 @@ copyout(int (*copyfn)(const char *, struct stat *))
 			errcnt++;
 			continue;
 		}
+	missingok:
 		if (Lflag && (st.st_mode&S_IFMT) == S_IFLNK) {
 			if (stat(np, &st) < 0) {
 				emsg(2, "Cannot follow \"%s\"", np);
@@ -1047,6 +1094,32 @@ copyout(int (*copyfn)(const char *, struct stat *))
 				errcnt++;
 			}
 			continue;
+		}
+		if (Pflag) {
+			if (pt.pt_spec & PT_TYPE)
+				if ((st.st_mode&S_IFMT) != (pt.pt_mode&S_IFMT))
+					msg(4, 0, "line %lld: types "
+						"do not match\n", lineno);
+			if (pt.pt_spec & PT_OWNER)
+				st.st_uid = pt.pt_uid;
+			if (pt.pt_spec & PT_GROUP)
+				st.st_gid = pt.pt_gid;
+			if (pt.pt_spec & PT_MODE) {
+				st.st_mode &= ~(mode_t)07777;
+				st.st_mode |= pt.pt_mode;
+			}
+			if (pt.pt_spec & PT_ATIME)
+				st.st_atime = pt.pt_atime;
+			if (pt.pt_spec & PT_MTIME)
+				st.st_mtime = pt.pt_mtime;
+			if (pt.pt_spec & PT_RDEV) {
+				if ((st.st_mode&S_IFMT) != S_IFBLK &&
+				    (st.st_mode&S_IFMT) != S_IFCHR)
+					msg(4, 0, "line %lld: device type "
+						"specified for non-device "
+						"file\n", lineno);
+				st.st_rdev = pt.pt_rdev;
+			}
 		}
 		if (pax_track(np, st.st_mtime) == 0)
 			continue;
@@ -6936,4 +7009,170 @@ utf8(const char *cp)
 		}
 	}
 	return 1;
+}
+
+static time_t
+fetchtime(const char *cp)
+{
+	struct tm	tm;
+	time_t	t;
+	char	*xp;
+	int	n;
+
+	t = strtoll(cp, &xp, 10);
+	if (*xp == '\0')
+		return t;
+	memset(&tm, 0, sizeof tm);
+	n = sscanf(cp, "%4d%2d%2dT%2d%2d%2d",
+			&tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+			&tm.tm_hour, &tm.tm_min, &tm.tm_sec);
+	tm.tm_year -= 1900;
+	tm.tm_mon--;
+	tm.tm_isdst = -1;
+	t = mktime(&tm);
+	if (n < 3 || t == (time_t)-1)
+		msg(4, 1, "line %lld: illegal time \"%s\"\n",
+				lineno, cp);
+	return t;
+}
+
+static char *
+nextfield(char *cp, const char *fieldname)
+{
+	while (*cp && *cp != ':')
+		cp++;
+	if (*cp == 0)
+		msg(4, 1, "line %lld: unterminated \"%s\" field\n",
+				lineno, fieldname);
+	*cp++ = 0;
+	return cp;
+}
+
+static char *
+getproto(char *np, struct prototype *pp)
+{
+	char	*tp, *xp;
+	long long	t, u;
+
+	memset(pp, 0, sizeof *pp);
+	if (*np == ':')
+		np++;
+	else {
+		tp = nextfield(np, "type");
+		if (np[1]) 
+			goto notype;
+		switch (np[0]) {
+		case 'b':
+			pp->pt_mode |= S_IFBLK;
+			break;
+		case 'c':
+			pp->pt_mode |= S_IFCHR;
+			break;
+		case 'd':
+			pp->pt_mode |= S_IFDIR;
+			break;
+		case 'f':
+			pp->pt_mode |= S_IFREG;
+			break;
+		case 'p':
+			pp->pt_mode |= S_IFIFO;
+			break;
+		case 's':
+			pp->pt_mode |= S_IFLNK;
+			break;
+		default:
+		notype:
+			msg(4, 1, "line %lld: unknown type \"%s\"\n",
+					lineno, np);
+		}
+		pp->pt_spec |= PT_TYPE;
+		np = tp;
+	}
+	if (*np == ':')
+		np++;
+	else {
+		struct passwd	*pwd;
+		tp = nextfield(np, "owner");
+		t = strtoll(np, &xp, 10);
+		if (*xp == '\0')
+			pp->pt_uid = t;
+		else {
+			if ((pwd = getpwnam(np)) == NULL)
+				msg(4, 1, "line %lld: unknown user \"%s\"\n",
+						lineno, np);
+			pp->pt_uid = pwd->pw_uid;
+		}
+		pp->pt_spec |= PT_OWNER;
+		np = tp;
+	}
+	if (*np == ':')
+		np++;
+	else {
+		struct group	*grp;
+		tp = nextfield(np, "group");
+		t = strtoll(np, &xp, 10);
+		if (*xp == '\0')
+			pp->pt_gid = t;
+		else {
+			if ((grp = getgrnam(np)) == NULL)
+				msg(4, 1, "line %lld: unknown group \"%s\"\n",
+						lineno, np);
+			pp->pt_gid = grp->gr_gid;
+		}
+		pp->pt_spec |= PT_GROUP;
+		np = tp;
+	}
+	if (*np == ':')
+		np++;
+	else {
+		tp = nextfield(np, "mode");
+		t = strtol(np, &xp, 8);
+		if (t & ~07777 || *xp)
+			msg(4, 1, "line %lld: illegal mode \"%s\"\n",
+					lineno, np);
+		pp->pt_mode |= t;
+		pp->pt_spec |= PT_MODE;
+		np = tp;
+	}
+	if (*np == ':')
+		np++;
+	else {
+		tp = nextfield(np, "access time");
+		pp->pt_atime = fetchtime(np);
+		pp->pt_spec |= PT_ATIME;
+		np = tp;
+	}
+	if (*np == ':')
+		np++;
+	else {
+		tp = nextfield(np, "modification time");
+		pp->pt_mtime = fetchtime(np);
+		pp->pt_spec |= PT_MTIME;
+		np = tp;
+	}
+	if (*np == ':') {
+		np++;
+		if (*np++ != ':')
+		majmin:	msg(4, 1, "line %lld: need either both major and "
+				"minor or none\n",
+				lineno);
+	} else {
+		tp = nextfield(np, "major");
+		t = strtoll(np, &xp, 10);
+		if (*xp)
+			msg(4, 1, "line %lld: illegal major \"%s\"\n",
+					lineno, np);
+		np = tp;
+		if (*np == ':')
+			goto majmin;
+		tp = nextfield(np, "minor");
+		u = strtoll(np, &xp, 10);
+		if (*xp)
+			msg(4, 1, "line %lld: illegal minor \"%s\"\n",
+					lineno, np);
+		np = tp;
+		pp->pt_rdev = makedev(t, u);
+		pp->pt_spec |= PT_RDEV;
+	}
+	return np;
 }
