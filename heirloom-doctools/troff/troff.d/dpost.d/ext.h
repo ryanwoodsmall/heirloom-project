@@ -28,7 +28,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.5 (gritter) 1/6/06
+ * Sccsid @(#)ext.h	1.6 (gritter) 3/27/07
  */
 
 /*
@@ -52,3 +52,5 @@ extern char	*prog_name;		/* and program name - for errors */
 extern char	*temp_file;		/* temporary file - for some programs */
 
 extern int	LanguageLevel;		/* language level of generated PS */
+
+extern FILE	*gf;			/* global PostScript goes here */

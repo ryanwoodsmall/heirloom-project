@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.172 (gritter) 3/15/07
+ * Sccsid @(#)dpost.c	1.173 (gritter) 3/27/07
  */
 
 /*
@@ -196,9 +196,7 @@
  * The PostScript procedures that support troff's drawing commands have been moved
  * out of *prologue and put in a separate file (ie. DRAW as defined in path.h).
  * The procedures are used by the routines in file draw.c, and are copied to the
- * output file at most once and only when needed. Yet another convenient violation
- * of page independence. If you don't approve append *drawfile to *prologue and
- * make sure *drawfile can't be read when DPOST runs.
+ * prologue.
  *
  * Many default values, like the magnification and orientation, are defined in 
  * the prologue, which is where they belong. If they're changed (by options), an

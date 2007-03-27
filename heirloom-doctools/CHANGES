@@ -1,4 +1,7 @@
 Release ...
+* dpost: Using drawing procedures (as with pic) now works after a picture
+  has been included on the current page; this previously caused a PostScript
+  error.
 * The file "grap.defines" is now installed again; it was omitted in the
   previous release.
 * When generating a RPM package, install all manual pages into
