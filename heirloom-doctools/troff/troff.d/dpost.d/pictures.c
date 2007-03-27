@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pictures.c	1.6 (gritter) 11/29/05
+ * Sccsid @(#)pictures.c	1.7 (gritter) 3/27/07
  */
 
 /*
@@ -199,14 +199,14 @@ picture (
 			  rot += 90;
 	}   /* End switch */
 
-    fprintf(tf, "cleartomark restore\n");
+    fprintf(tf, "save mark\n");
     fprintf(tf, "[ /NamespacePush pdfmark\n");
 
     ps_include(name, fp_in, tf, page, whiteout, outline, scaleboth,
 		frame[3]+frame[1]/2, -vpos-frame[2]-frame[0]/2, frame[1], frame[0], adjx, adjy, -rot);
 
     fprintf(tf, "[ /NamespacePop pdfmark\n");
-    fprintf(tf, "save mark\n");
+    fprintf(tf, "cleartomark restore\n");
     xymove(hpos, vpos);
     t_sf(1);
 
