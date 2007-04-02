@@ -26,7 +26,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
+ * Sccsid @(#)getopt.c	1.9 (gritter) 4/2/07
  */
 /* from OpenSolaris "getopt.c	1.23	05/06/08 SMI" */
 
@@ -47,6 +47,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+
+char	*optarg = NULL;
+int	optind = 1;
+int	opterr = 1;
+int	optopt = 0;
 
 #define	ERR(s, c)	err(s, c, optstring, argv[0])
 static void
