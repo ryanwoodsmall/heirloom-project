@@ -4,7 +4,7 @@
  * Gunnar Ritter, Freiburg i. Br., Germany, March 2002.
  */
 
-/*	Sccsid @(#)getopt.c	1.4 (gritter) 9/21/03	*/
+/*	Sccsid @(#)getopt.c	1.5 (gritter) 4/2/07	*/
 
 #include	<sys/types.h>
 #include	<alloca.h>
@@ -21,10 +21,10 @@
  *   with ':' as first optstring character at all.
  */
 
-char	*optarg;
+char	*optarg = 0;
 int	optind = 1;
 int	opterr = 1;
-int	optopt;
+int	optopt = 0;
 extern char	*pfmt_label__;
 
 static void

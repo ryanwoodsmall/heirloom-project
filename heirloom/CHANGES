@@ -3,6 +3,8 @@ Release ...
   like the file owner when creating an archive. With it, unprivileged users
   can set arbitrary attributes for files within an archive.
 * diff: Made it compile on CentOS 5.
+* Static linking against glibc is now possible since "optopt" is no longer
+  a common symbol, and there is no conflict anymore with "getopt.o".
 
 Release 070227
 * The directory for development utilities, by default "/usr/ccs/bin", is
