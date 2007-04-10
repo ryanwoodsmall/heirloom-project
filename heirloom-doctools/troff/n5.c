@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n5.c	1.127 (gritter) 3/9/07
+ * Sccsid @(#)n5.c	1.128 (gritter) 4/10/07
  */
 
 /*
@@ -530,7 +530,7 @@ casein(void)
 {
 	register int i;
 
-	if (pa || padj)
+	if ((pa || padj) && pglines == 0 && pgchars)
 		tbreak();
 	if (skip(0))
 		i = in1;
@@ -591,7 +591,7 @@ caseti(void)
 
 	if (skip(1))
 		return;
-	if (pa || padj)
+	if ((pa || padj) && pglines == 0 && pgchars)
 		tbreak();
 	i = max(hnumb(&in), 0);
 	tbreak();

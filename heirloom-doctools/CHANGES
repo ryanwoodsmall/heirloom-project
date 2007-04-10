@@ -5,6 +5,9 @@ Release ...
   Thus, graphics attributes such as colors were reset to the state
   before page initialization, and drawing (as with pic) did not work
   afterwards but resulted in a PostScript error.
+* [nt]roff: With paragraph-at-once adjustment, if a ".in" was encountered
+  before any input, its argument was ignored. This lead to zero indent in
+  combination with the 6h Edition manual page macros, and has been fixed.
 * The file "grap.defines" is now installed again; it was omitted in the
   previous release.
 * When generating a RPM package, install all manual pages into
