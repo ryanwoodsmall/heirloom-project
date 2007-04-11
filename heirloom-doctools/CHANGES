@@ -8,6 +8,8 @@ Release ...
 * [nt]roff: With paragraph-at-once adjustment, if a ".in" was encountered
   before any input, its argument was ignored. This lead to zero indent in
   combination with the 6h Edition manual page macros, and has been fixed.
+* [nt]roff: Using ".hy" or ".nh" is now effective for the last word of a
+  "\@{...\@}" inline environment.
 * The file "grap.defines" is now installed again; it was omitted in the
   previous release.
 * When generating a RPM package, install all manual pages into

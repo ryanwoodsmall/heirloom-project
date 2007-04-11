@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.174 (gritter) 3/12/07
+ * Sccsid @(#)n7.c	1.175 (gritter) 4/11/07
  */
 
 /*
@@ -909,10 +909,10 @@ ishyp(tchar *wp)
 	tp = (tchar *)((intptr_t)*hyp & ~(intptr_t)03);
 	if (hyoff != 1 && tp == wp) {
 		if (!wdstart || (wp > wdstart + 1 && wp < wdend &&
-		   (!(hyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
-		   (!(hyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
-		   (hyf & 020 && wp == wdend) ||		/* 020 = allow last */
-		   (hyf & 040 && wp == wdstart + 1))		/* 040 = allow first */
+		   (!(wdhyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
+		   (!(wdhyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
+		   (wdhyf & 020 && wp == wdend) ||		/* 020 = allow last */
+		   (wdhyf & 040 && wp == wdstart + 1))		/* 040 = allow first */
 			yes = 1;
 		hyp++;
 	}
@@ -960,11 +960,13 @@ movword(void)
 			wne -= kernadjust(wp[-1], wp[0]);
 		leftend(*wp, admod != 1 && admod != 2, 1);
 	}
+	if (wdhyf == -1)
+		wdhyf = hyf;
 	wsp = 0;
-	if (wne > nel - adspc && !hyoff && hyf && (hlm < 0 || hlc < hlm) &&
+	if (wne > nel - adspc && !hyoff && wdhyf && (hlm < 0 || hlc < hlm) &&
 	   (!nwd || nel + lsplow + lshlow - adspc >
 	    3 * (minsps && ad && !admod ? minsps : sps)) &&
-	   (!(hyf & 02) || (findt1() > lss)))
+	   (!(wdhyf & 02) || (findt1() > lss)))
 		hyphen(wp);
 	savwch = wch;
 	hyp = hyptr;
@@ -1200,6 +1202,7 @@ getword(int x)
 	wordp = word;
 	over = wne = wch = 0;
 	hyoff = 0;
+	wdhyf = -1;
 	memset(wdpenal, 0, wdsize * sizeof *wdpenal);
 	n = 0;
 	while (1) {	/* picks up 1st char of word */
@@ -1301,6 +1304,8 @@ a0:
 	if (!nwd)
 		wsp = wne;
 g0:
+	if (ninlev)
+		wdhyf = hyf;
 	if (j == CONT) {
 		pendw = wordp;
 		nflush = 0;
@@ -1976,7 +1981,9 @@ parword(void)
 	pgne += pgspacw[pgwords];
 	parlgzero(pgwords);
 	parlgzero(pgwords+1);
-	if (!hyoff && hyf && hlm)
+	if (wdhyf == -1)
+		wdhyf = hyf;
+	if (!hyoff && wdhyf && hlm)
 		hyphen(wp);
 	hyp = hyptr;
 	nhyp = 0;

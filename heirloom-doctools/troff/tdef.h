@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.161 (gritter) 3/9/07
+ * Sccsid @(#)tdef.h	1.162 (gritter) 4/11/07
  */
 
 /*
@@ -742,6 +742,7 @@ struct inlev {
 #define	cdp	env._cdp
 #define	maxcht	env._maxcht
 #define	maxcdp	env._maxcdp
+#define	wdhyf	env._wdhyf
 #define	hyptr	env._hyptr
 #define	tabtab	env._tabtab
 #define	line	env._line
@@ -914,6 +915,7 @@ extern struct env {
 	int	_cdp;
 	int	_maxcht;
 	int	_maxcdp;
+	int	_wdhyf;
 	tchar	*_hyptr[NHYP];
 	int	_tabtab[NTAB];
 	int	_sentch[NSENT];
