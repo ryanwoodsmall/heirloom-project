@@ -34,7 +34,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)what.c	1.11 (gritter) 3/17/07
+ * Sccsid @(#)what.c	1.12 (gritter) 4/14/07
  */
 /*	from OpenSolaris "sccs:cmd/what.c"	*/
 
@@ -45,7 +45,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)what.sl	1.11 (gritter) 3/17/07";
+static const char sccsid[] USED = "@(#)what.sl	1.12 (gritter) 4/14/07";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -157,7 +157,7 @@ dowhat(register FILE *iop)
 static int
 trypat(register FILE *iop,register char *pat)
 {
-	register int c;
+	register int c = 0;
 
 	for (; *pat; pat++)
 		if ((c = getc(iop)) != *pat)
