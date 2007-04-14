@@ -1,4 +1,4 @@
-static const char id[] = "@(#)sccs.sl	1.28 (gritter) 3/25/07";
+static const char id[] = "@(#)sccs.sl	1.29 (gritter) 4/14/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.5 (gritter) 2/26/07
@@ -13,7 +13,7 @@ sccs.c: * Sccsid @(#)sccs.c	1.14 (gritter) 2/25/07
 unget.c: * Sccsid @(#)unget.c	1.6 (gritter) 01/21/07
 val.c: * Sccsid @(#)val.c	1.5 (gritter) 01/21/07
 vc.c: * Sccsid @(#)vc.c	1.4 (gritter) 3/25/07
-what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
+what.c: * Sccsid @(#)what.c	1.4 (gritter) 4/14/07
 ../cassi/cmrcheck.c: * Sccsid @(#)cmrcheck.c	1.5 (gritter) 2/26/07
 ../cassi/deltack.c: * Sccsid @(#)deltack.c	1.5 (gritter) 2/26/07
 ../cassi/error.c: * Sccsid @(#)error.c	1.4 (gritter) 12/20/06
@@ -69,7 +69,7 @@ what.c: * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
 ../mpwlib/fatal.c: * Sccsid @(#)fatal.c	1.4 (gritter) 12/25/06
 ../mpwlib/fdfopen.c: * Sccsid @(#)fdfopen.c	1.3 (gritter) 12/20/06
 ../mpwlib/fmalloc.c: * Sccsid @(#)fmalloc.c	1.3 (gritter) 12/20/06
-../mpwlib/getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
+../mpwlib/getopt.c: * Sccsid @(#)getopt.c	1.9 (gritter) 4/2/07
 ../mpwlib/had.c: * Sccsid @(#)had.c	1.3 (gritter) 12/20/06
 ../mpwlib/imatch.c: * Sccsid @(#)imatch.c	1.3 (gritter) 12/20/06
 ../mpwlib/index.c: * Sccsid @(#)index.c	1.3 (gritter) 12/20/06

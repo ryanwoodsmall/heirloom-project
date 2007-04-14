@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2006 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)what.c	1.3 (gritter) 12/20/06
+ * Sccsid @(#)what.c	1.4 (gritter) 4/14/07
  */
 /*	from OpenSolaris "sccs:cmd/what.c"	*/
 # include	<defines.h>
@@ -140,7 +140,7 @@ dowhat(register FILE *iop)
 static int
 trypat(register FILE *iop,register char *pat)
 {
-	register int c;
+	register int c = 0;
 
 	for (; *pat; pat++)
 		if ((c = getc(iop)) != *pat)
