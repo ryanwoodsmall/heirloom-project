@@ -26,7 +26,7 @@
  */
 
 /*
- * Sccsid @(#)cpio.c	1.302 (gritter) 3/26/07
+ * Sccsid @(#)cpio.c	1.303 (gritter) 4/14/07
  */
 
 #include <sys/types.h>
@@ -38,6 +38,9 @@
 #include <linux/fd.h>
 #undef	WNOHANG
 #undef	WUNTRACED
+#undef	P_ALL
+#undef	P_PID
+#undef	P_PGID
 #ifdef	__dietlibc__
 #undef	NR_OPEN
 #undef	PATH_MAX
