@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.175 (gritter) 4/11/07
+ * Sccsid @(#)n7.c	1.176 (gritter) 4/14/07
  */
 
 /*
@@ -2117,7 +2117,7 @@ pbreak(int sprd, int lastf, struct s *s)
 void
 parpr(struct s *s)
 {
-	int	i, j, k = 0, nw, w, stretches, _spread = spread, hc;
+	int	i, j, k = 0, nw = 0, w, stretches, _spread = spread, hc;
 	int	savll, savin, savcd, lastin, lastll, curin, curll;
 	tchar	c, e, lastc, lgs;
 

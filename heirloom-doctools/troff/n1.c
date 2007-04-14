@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n1.c	1.141 (gritter) 2/23/07
+ * Sccsid @(#)n1.c	1.142 (gritter) 4/14/07
  */
 
 /*
@@ -2136,8 +2136,10 @@ caserecursionlimit(void)
 void
 casechar(int flag)
 {
+#ifndef	NROFF
 	extern int	ps2cc(const char *);
 	extern int	nchtab;
+#endif
 	char	name[NC];
 	int	i, k, size = 0;
 	tchar	c, *tp = NULL;
