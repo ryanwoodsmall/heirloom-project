@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Sccsid @(#)makeconfig	1.42 (gritter) 2/8/07
+# Sccsid @(#)makeconfig	1.43 (gritter) 4/14/07
 #
 
 tmp=___build$$
@@ -41,8 +41,9 @@ msg() {
 }
 
 compile_check() {
-	topic=$1
-	define=$2
+	variable=$1
+	topic=$2
+	define=$3
 
 	echo '************************************************************'
 	msg "checking $topic ... "
@@ -58,18 +59,21 @@ compile_check() {
 	then
 		msg "okay\\n"
 		echo "$define" >>$out
+		eval have_$variable=yes
 		return 0
 	else
 		echo "/* $define */" >>$out
 		msg "no\\n"
+		eval unset have_$variable
 		return 1
 	fi
 }
 
 link_check() {
-	topic=$1
-	define=$2
-	libs=$3
+	variable=$1
+	topic=$2
+	define=$3
+	libs=$4
 
 	echo '************************************************************'
 	msg "checking $topic ... "
@@ -88,15 +92,17 @@ link_check() {
 		echo "$define" >>$out
 		echo "$libs" >$lib
 		cat $tmp2 >>$lib
+		eval have_$variable=yes
 		return 0
 	else
 		msg "no\\n"
 		echo "/* $define */" >>$out
+		eval unset have_$variable
 		return 1
 	fi
 }
 
-link_check 'if a hello world program can be built' <<\! || { \
+link_check hello 'if a hello world program can be built' <<\! || { \
     echo 'This problem is most certainly not specific to this software.' >&5; \
     echo "Read the file '$log' and check your compiler installation." >&5; \
     rm $out; exit 1; \
@@ -110,11 +116,11 @@ int main(int argc, char *argv[])
 }
 !
 
-compile_check 'for <alloca.h>' '#define HAVE_ALLOCA_H' <<\!
+compile_check alloca_h 'for <alloca.h>' '#define HAVE_ALLOCA_H' <<\!
 #include <alloca.h>
 !
 
-link_check 'for alloca()' '#define HAVE_ALLOCA' <<\!
+link_check alloca 'for alloca()' '#define HAVE_ALLOCA' <<\!
 #include "rcv.h"
 int main(void)
 {
@@ -123,7 +129,7 @@ int main(void)
 }
 !
 
-compile_check 'for ssize_t' '#define HAVE_SSIZE_T' <<\!
+compile_check ssize_t 'for ssize_t' '#define HAVE_SSIZE_T' <<\!
 #include <sys/types.h>
 #include <unistd.h>
 int main(void)
@@ -134,7 +140,7 @@ int main(void)
 }
 !
 
-link_check 'for snprintf()' '#define HAVE_SNPRINTF' <<\!
+link_check snprintf 'for snprintf()' '#define HAVE_SNPRINTF' <<\!
 #include <stdio.h>
 int main(void)
 {
@@ -144,7 +150,7 @@ int main(void)
 }
 !
 
-link_check 'for fchdir()' '#define HAVE_FCHDIR' <<\!
+link_check fchdir 'for fchdir()' '#define HAVE_FCHDIR' <<\!
 #include <unistd.h>
 int main(void)
 {
@@ -153,7 +159,7 @@ int main(void)
 }
 !
 
-link_check 'for mmap()' '#define HAVE_MMAP' <<\!
+link_check mmap 'for mmap()' '#define HAVE_MMAP' <<\!
 #include <sys/types.h>
 #include <sys/mman.h>
 int main(void)
@@ -163,7 +169,7 @@ int main(void)
 }
 !
 
-link_check 'for mremap()' '#define HAVE_MREMAP' <<\!
+link_check mremap 'for mremap()' '#define HAVE_MREMAP' <<\!
 #include <sys/types.h>
 #include <sys/mman.h>
 int main(void)
@@ -183,11 +189,11 @@ int main(void)
 	return 0;
 }
 !
-<$tmp2.c link_check 'for iconv functionality' '#define HAVE_ICONV' ||
-	<$tmp2.c link_check 'for iconv functionality in libiconv' \
+<$tmp2.c link_check iconv 'for iconv functionality' '#define HAVE_ICONV' ||
+	<$tmp2.c link_check iconv 'for iconv functionality in libiconv' \
 		'#define HAVE_ICONV' '-liconv'
 
-link_check 'for wctype functionality' '#define HAVE_WCTYPE_H' <<\!
+link_check wctype 'for wctype functionality' '#define HAVE_WCTYPE_H' <<\!
 #include <wctype.h>
 int main(void)
 {
@@ -197,7 +203,7 @@ int main(void)
 }
 !
 
-link_check 'for wcwidth() ' '#define HAVE_WCWIDTH' <<\!
+link_check wcwidth 'for wcwidth() ' '#define HAVE_WCWIDTH' <<\!
 #include <wchar.h>
 int main(void)
 {
@@ -206,7 +212,7 @@ int main(void)
 }
 !
 
-link_check 'for mbtowc()' '#define HAVE_MBTOWC' <<\!
+link_check mbtowc 'for mbtowc()' '#define HAVE_MBTOWC' <<\!
 #include <stdlib.h>
 int main(void)
 {
@@ -216,7 +222,7 @@ int main(void)
 }
 !
 
-link_check 'for setlocale()' '#define HAVE_SETLOCALE' <<\!
+link_check setlocale 'for setlocale()' '#define HAVE_SETLOCALE' <<\!
 #include <locale.h>
 int main(void)
 {
@@ -225,7 +231,7 @@ int main(void)
 }
 !
 
-link_check 'for nl_langinfo()' '#define HAVE_NL_LANGINFO' <<\!
+link_check nl_langinfo 'for nl_langinfo()' '#define HAVE_NL_LANGINFO' <<\!
 #include <langinfo.h>
 int main(void)
 {
@@ -234,7 +240,7 @@ int main(void)
 }
 !
 
-link_check 'for mkstemp()' '#define HAVE_MKSTEMP' <<\!
+link_check mkstemp 'for mkstemp()' '#define HAVE_MKSTEMP' <<\!
 #include <stdlib.h>
 int main(void)
 {
@@ -243,7 +249,7 @@ int main(void)
 }
 !
 
-link_check 'for fpathconf()' '#define HAVE_FPATHCONF' <<\!
+link_check fpathconf 'for fpathconf()' '#define HAVE_FPATHCONF' <<\!
 #include <unistd.h>
 int main(void)
 {
@@ -252,7 +258,7 @@ int main(void)
 }
 !
 
-link_check 'for wordexp()' '#define HAVE_WORDEXP' <<\!
+link_check wordexp 'for wordexp()' '#define HAVE_WORDEXP' <<\!
 #include <wordexp.h>
 int main(void)
 {
@@ -261,7 +267,7 @@ int main(void)
 }
 !
 
-compile_check 'for <arpa/inet.h>' '#define HAVE_ARPA_INET_H' <<\!
+compile_check arpa_inet_h 'for <arpa/inet.h>' '#define HAVE_ARPA_INET_H' <<\!
 #include "config.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -290,15 +296,15 @@ int main(void)
 }
 !
 
-<$tmp2.c link_check 'for socket functionality in libc' \
+<$tmp2.c link_check sockets 'for socket functionality in libc' \
 		'#define HAVE_SOCKETS' ||
-	<$tmp2.c link_check 'for socket functionality in libnsl' \
+	<$tmp2.c link_check sockets 'for socket functionality in libnsl' \
 			'#define HAVE_SOCKETS' '-lnsl' ||
-		<$tmp2.c link_check \
+		<$tmp2.c link_check sockets \
 			'for socket functionality in libsocket and libnsl' \
 			'#define HAVE_SOCKETS' '-lsocket -lnsl'
 
-#link_check 'for IPv6 functionality' '#define HAVE_IPv6_FUNCS' <<\!
+#link_check ipv6 'for IPv6 functionality' '#define HAVE_IPv6_FUNCS' <<\!
 ##include "config.h"
 ##include <sys/types.h>
 ##include <sys/socket.h>
@@ -316,9 +322,10 @@ int main(void)
 #}
 #!
 
-link_check 'for Network Security Services (NSS)' '#define USE_SSL
+link_check nss 'for Network Security Services (NSS)' '#define USE_SSL
 #define USE_NSS' '-lsmime3 -lnss3 -lssl3 -lnspr4 -lplc4' <<\! || \
-		link_check 'for sufficiently recent OpenSSL' '#define USE_SSL
+		link_check openssl 'for sufficiently recent OpenSSL' \
+			'#define USE_SSL
 #define USE_OPENSSL' '-lssl -lcrypto' <<\%
 #include <nss.h>
 #include <ssl.h>
@@ -352,6 +359,40 @@ int main(void)
 	return 0;
 }
 %
+if test x$have_nss = xyes
+then
+	compile_check genname_h 'for genname.h' '#define HAVE_GENNAME_H' <<\!
+#include <genname.h>
+!
+	compile_check xconst_h 'for xconst.h' '#define HAVE_XCONST_H' <<\!
+#include <xconst.h>
+!
+	compile_check CERTAltNameEncodedContext \
+		'for CERTAltNameEncodedContext type' \
+		'#define HAVE_CERTAltNameEncodedContext' <<\!
+#include "config.h"
+#include <nss.h>
+#include <ssl.h>
+#include <prinit.h>
+#include <prmem.h>
+#include <pk11func.h>
+#include <prtypes.h>
+#include <prerror.h>
+#include <secerr.h>
+#include <smime.h>
+#include <ciferfam.h>
+#ifdef HAVE_XCONST_H
+#include <xconst.h>
+#endif
+#ifdef HAVE_GENNAME_H
+#include <genname.h>
+#endif
+#include <private/pprio.h>
+
+CERTAltNameEncodedContext	foo;
+!
+fi
+
 
 cat >$tmp2.c <<\!
 #include <gssapi/gssapi.h>
@@ -364,13 +405,14 @@ int main(void)
 }
 !
 
-<$tmp2.c link_check 'for GSSAPI in libgss' '#define USE_GSSAPI' '-lgss' ||
-	<$tmp2.c link_check 'for GSSAPI in libgssapi_krb5' \
+<$tmp2.c link_check gssapi 'for GSSAPI in libgss' \
+		'#define USE_GSSAPI' '-lgss' ||
+	<$tmp2.c link_check gssapi 'for GSSAPI in libgssapi_krb5' \
 			'#define USE_GSSAPI' '-lgssapi_krb5' ||
-		link_check 'for GSSAPI in libgssapi_krb5, old-style' \
+		link_check gssapi 'for GSSAPI in libgssapi_krb5, old-style' \
 				'#define USE_GSSAPI
 #define GSSAPI_OLD_STYLE' '-lgssapi_krb5' <<\! || \
-			link_check 'for GSSAPI in libgssapi' \
+			link_check gssapi 'for GSSAPI in libgssapi' \
 				'#define USE_GSSAPI
 #define	GSSAPI_REG_INCLUDE' '-lgssapi' <<\%
 #include <gssapi/gssapi.h>

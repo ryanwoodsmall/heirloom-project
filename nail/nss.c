@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.45 (gritter) 12/25/06";
+static char sccsid[] = "@(#)nss.c	1.46 (gritter) 4/14/07";
 #endif
 #endif /* not lint */
 
@@ -64,11 +64,25 @@ static sigjmp_buf	nssjmp;
 #include <secerr.h>
 #include <smime.h>
 #include <ciferfam.h>
+#ifdef HAVE_XCONST_H
 #include <xconst.h>
+#endif
+#ifdef HAVE_GENNAME_H
 #include <genname.h>
+#endif
 #include <private/pprio.h>
 
 #include "extern.h"
+
+#ifndef	HAVE_CERTAltNameEncodedContext
+/*
+ * NSS 3.11.5 neither installs genname.h nor provides this
+ * structure otherwise, so define it here.
+ */
+typedef struct CERTAltNameEncodedContextStr {
+	SECItem	**encodedGenName;
+} CERTAltNameEncodedContext;
+#endif	/* !HAVE_CERTAltNameEncodedContext */
 
 #include "nsserr.c"
 

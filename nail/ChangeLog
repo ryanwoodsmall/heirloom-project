@@ -8,6 +8,7 @@
 * Build without socket support again (patch by Andreas Niederl).
 * Fixed a single quote in "makeconfig" that could cause a problem with
   the C preprocessor (patch by Martin Neitzel).
+* Building with recent versions of Mozilla NSS is now possible.
 
 [12.2] released 1/7/07
 * When a MIME message part is not of the "text/" content type, always
