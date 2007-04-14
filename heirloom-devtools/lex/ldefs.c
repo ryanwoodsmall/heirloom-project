@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ldefs.c	1.6 (gritter) 01/23/07
+ * Sccsid @(#)ldefs.c	1.7 (gritter) 4/14/07
  */
 
 #include <stdio.h>
@@ -302,5 +302,8 @@ extern wint_t lex_getwc(FILE *);
 #undef	putwc
 #define	putwc(c, f)	lex_putwc(c, f)
 extern wint_t lex_putwc(wchar_t, FILE *);
+
+#undef	index
+#define	index		lex_index
 
 extern int isArray;		/* XCU4: for %array %pointer */

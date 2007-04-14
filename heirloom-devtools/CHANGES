@@ -6,6 +6,8 @@ Release ...
   compile on CentOS 5.
 * vc: Recognizes the control character according to the LC_CTYPE locale
   now, and has no static size limits anymore.
+* lex: Avoid a symbol conflict with the index() function that caused the
+  build to fail on some platforms.
 
 Release 070311
 * make: The SVR4.2 syntax for parallel builds has been added. This adds
