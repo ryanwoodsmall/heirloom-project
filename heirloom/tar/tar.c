@@ -43,7 +43,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)tar.sl	1.176 (gritter) 1/22/06";
+static const char sccsid[] USED = "@(#)tar.sl	1.177 (gritter) 4/14/07";
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -54,6 +54,9 @@ static const char sccsid[] USED = "@(#)tar.sl	1.176 (gritter) 1/22/06";
 #endif	/* !__UCLIBC__, !__dietlibc__ */
 #undef	WNOHANG
 #undef	WUNTRACED
+#undef	P_ALL
+#undef	P_PID
+#undef	P_PGID
 #ifdef	__dietlibc__
 #undef	NR_OPEN
 #undef	PATH_MAX

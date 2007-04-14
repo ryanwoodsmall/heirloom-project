@@ -5,7 +5,7 @@ Release ...
 * diff: Made it compile on CentOS 5.
 * Static linking against glibc is now possible since "optopt" is no longer
   a common symbol, and there is no conflict anymore with "getopt.o".
-* cpio: A compilation problem on some Linux systems has been fixed.
+* cpio, tar: A compilation problem on some Linux systems has been fixed.
 
 Release 070227
 * The directory for development utilities, by default "/usr/ccs/bin", is
