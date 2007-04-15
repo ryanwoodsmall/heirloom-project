@@ -5,6 +5,9 @@
 * A null pointer dereference that lead to a segmentation fault when
   the user hit return at a yes/no question has been fixed (patch by
   Martin Neitzel).
+* If no proper boundary is present in a MIME multipart message, print
+  a notification message since otherwise no content is shown at all
+  (problem reported by Thomas Wolff).
 * Build without socket support again (patch by Andreas Niederl).
 * Fixed a single quote in "makeconfig" that could cause a problem with
   the C preprocessor (patch by Martin Neitzel).

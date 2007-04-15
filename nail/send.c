@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.83 (gritter) 3/4/06";
+static char sccsid[] = "@(#)send.c	2.84 (gritter) 4/15/07";
 #endif
 #endif /* not lint */
 
@@ -480,7 +480,19 @@ skip:	switch (ip->m_mimecontent) {
 		case SEND_TOSRCH:
 		case SEND_TOFLTR:
 		case SEND_DECRYPT:
-		multi:	for (np = ip->m_multipart; np; np = np->m_nextpart) {
+		multi:
+			if ((action == SEND_TODISP ||
+					action == SEND_TODISP_ALL) &&
+			    ip->m_multipart != NULL &&
+			    ip->m_multipart->m_mimecontent == MIME_DISCARD &&
+			    ip->m_multipart->m_nextpart == NULL) {
+				cp = "[Missing multipart boundary - "
+				     "use \"show\" to display "
+				     "the raw message]\n\n";
+				out(cp, strlen(cp), obuf, CONV_NONE, SEND_MBOX,
+						prefix, prefixlen, stats);
+			}
+			for (np = ip->m_multipart; np; np = np->m_nextpart) {
 				if (np->m_mimecontent == MIME_DISCARD &&
 						action != SEND_DECRYPT)
 					continue;
