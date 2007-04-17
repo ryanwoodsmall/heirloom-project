@@ -46,13 +46,13 @@
 #define	USED
 #endif
 #if defined (SU3)
-static const char sccsid[] USED = "@(#)ls_su3.sl	1.77 (gritter) 5/29/05>";
+static const char sccsid[] USED = "@(#)ls_su3.sl	1.78 (gritter) 4/17/07>";
 #elif defined (SUS)
-static const char sccsid[] USED = "@(#)ls_sus.sl	1.77 (gritter) 5/29/05>";
+static const char sccsid[] USED = "@(#)ls_sus.sl	1.78 (gritter) 4/17/07>";
 #elif defined (UCB)
-static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.77 (gritter) 5/29/05>";
+static const char sccsid[] USED = "@(#)/usr/ucb/ls.sl	1.78 (gritter) 4/17/07>";
 #else
-static const char sccsid[] USED = "@(#)ls.sl	1.77 (gritter) 5/29/05>";
+static const char sccsid[] USED = "@(#)ls.sl	1.78 (gritter) 4/17/07>";
 #endif
 
 /*
@@ -108,6 +108,7 @@ static char ifmt_c[] = "-pc-d-b--nl-SD--";
 #include <ctype.h>
 #include <libgen.h>
 #include <wchar.h>
+#include <wctype.h>
 #include "config.h"
 #ifndef	USE_TERMCAP
 #ifndef	sun
