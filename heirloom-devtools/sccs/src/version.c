@@ -1,4 +1,11 @@
-static const char id[] = "@(#)sccs.sl	1.29 (gritter) 4/14/07";
+#if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
+#define USED    __attribute__ ((used))
+#elif defined __GNUC__
+#define USED    __attribute__ ((unused))
+#else
+#define USED
+#endif
+static const char id[] USED = "@(#)sccs.sl	1.30 (gritter) 4/23/07";
 /* SLIST */
 /*
 admin.c: * Sccsid @(#)admin.c	1.5 (gritter) 2/26/07
