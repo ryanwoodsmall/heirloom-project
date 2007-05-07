@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.63 (gritter) 3/15/07
+ * Sccsid @(#)afm.c	1.64 (gritter) 5/7/07
  */
 
 #include <stdlib.h>
@@ -238,24 +238,29 @@ static const struct charlib {
 	int		kern;
 	int		code;
 	int		symbol;
+	enum {
+		NEEDS_F = 01,
+		NEEDS_I = 02,
+		NEEDS_L = 04
+	}		needs;
 } charlib[] = {
-	{ "bx",	 500,	2,	1,	0 },
-	{ "ci",	 750,	0,	1,	0 },
-	{ "sq",	 500,	2,	1,	0 },
-	{ "ff",	 600,	2,	1,	0 },	/* widths of the ligatures */
-	{ "Fi",	 840,	2,	1,	0 },	/* are likely wrong, but */
-	{ "Fl",	 840,	2,	1,	0 },	/* they are normally not used */
-	{ "~=",	 550,	0,	1,	1 },
-	{ "L1", 1100,	1,	2,	1 },
-	{ "LA",	1100,	1,	2,	1 },
-	{ "LV",	1100,	3,	2,	1 },
-	{ "LH",	2100,	1,	2,	1 },
-	{ "Lb",	2100,	1,	2,	1 },
-	{ "lh",	1000,	0,	2,	1 },
-	{ "rh",	1000,	0,	2,	1 },
-	{ "Sl",	 500,	2,	1,	1 },
-	{ "ob",	 380,	0,	1,	1 },
-	{    0,	   0,	0,	0,	0 }
+	{ "bx",	 500, 2, 1, 0, 0 },
+	{ "ci",	 750, 0, 1, 0, 0 },
+	{ "sq",	 500, 2, 1, 0, 0 },
+	{ "ff",	 600, 2, 1, 0, 1 },	/* widths of the ligatures */
+	{ "Fi",	 840, 2, 1, 0, 3 },	/* are likely wrong, but */
+	{ "Fl",	 840, 2, 1, 0, 5 },	/* they are normally not used */
+	{ "~=",	 550, 0, 1, 1, 0 },
+	{ "L1", 1100, 1, 2, 1, 0 },
+	{ "LA",	1100, 1, 2, 1, 0 },
+	{ "LV",	1100, 3, 2, 1, 0 },
+	{ "LH",	2100, 1, 2, 1, 0 },
+	{ "Lb",	2100, 1, 2, 1, 0 },
+	{ "lh",	1000, 0, 2, 1, 0 },
+	{ "rh",	1000, 0, 2, 1, 0 },
+	{ "Sl",	 500, 2, 1, 1, 0 },
+	{ "ob",	 380, 0, 1, 1, 0 },
+	{    0,	   0, 0, 0, 0, 0 }
 };
 
 /*
@@ -729,7 +734,7 @@ afmaddchar(struct afmtab *a, int C, int tp, int cl, int WX, int B[4], char *N,
 }
 
 /*
- * Add charlib figues to the "S" font.
+ * Add charlib figues.
  */
 static void
 addcharlib(struct afmtab *a, int symbol)
@@ -740,6 +745,12 @@ addcharlib(struct afmtab *a, int symbol)
 	for (j = 0; j < nchtab; j++)
 		for (i = 0; charlib[i].name; i++) {
 			if (charlib[i].symbol && !symbol)
+				continue;
+			if (charlib[i].needs & NEEDS_F && a->fitab['f'-32] == 0)
+				continue;
+			if (charlib[i].needs & NEEDS_I && a->fitab['i'-32] == 0)
+				continue;
+			if (charlib[i].needs & NEEDS_L && a->fitab['l'-32] == 0)
 				continue;
 			if (strcmp(charlib[i].name, &chname[chtab[j]]) == 0) {
 				B[1] = charlib[i].kern & 1 ? -11 : 0;

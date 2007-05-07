@@ -8,6 +8,14 @@ Release ...
 * [nt]roff: With paragraph-at-once adjustment, if a ".in" was encountered
   before any input, its argument was ignored. This lead to zero indent in
   combination with the 6h Edition manual page macros, and has been fixed.
+* troff: The ".flig" request can now use the \[] names for ff, ffi, and
+  ffl ligatures properly, i.e. ".flig R ff \[ff]" works (bug reported by
+  Sebastian Leusch).
+* troff: Pseudo-ligatures for ff, ffi, and ffl are no longer added to fonts
+  that do not contain the respective base characters. This makes it possible
+  to use a fallback sequence like ".fallback R XX FF", where XX does not
+  contain ff ligatures, but FF does, and to get the ligatures from font FF
+  as expected (bug reported by Sebastian Leusch).
 * [nt]roff: Using ".hy" or ".nh" is now effective for the last word of a
   "\@{...\@}" inline environment.
 * The file "grap.defines" is now installed again; it was omitted in the
