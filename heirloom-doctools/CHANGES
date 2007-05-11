@@ -8,6 +8,8 @@ Release ...
 * [nt]roff: With paragraph-at-once adjustment, if a ".in" was encountered
   before any input, its argument was ignored. This lead to zero indent in
   combination with the 6h Edition manual page macros, and has been fixed.
+* troff: Do not break a line at a zero-width character, as e.g. inside a
+  "\X'...'" or "\z'...'".
 * troff: The ".flig" request can now use the \[] names for ff, ffi, and
   ffl ligatures properly, i.e. ".flig R ff \[ff]" works (bug reported by
   Sebastian Leusch).

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.176 (gritter) 4/14/07
+ * Sccsid @(#)n7.c	1.177 (gritter) 5/11/07
  */
 
 /*
@@ -867,6 +867,8 @@ maybreak(tchar c)
 
 	if (c & BLBIT)
 		return 1;
+	if (iszbit(c))
+		return 0;
 	switch (breakch[0]) {
 	case IMP:
 		return 0;
@@ -907,7 +909,7 @@ ishyp(tchar *wp)
 	int	yes = 0;
 
 	tp = (tchar *)((intptr_t)*hyp & ~(intptr_t)03);
-	if (hyoff != 1 && tp == wp) {
+	if (hyoff != 1 && tp == wp && !iszbit(*wp)) {
 		if (!wdstart || (wp > wdstart + 1 && wp < wdend &&
 		   (!(wdhyf & 04) || wp < wdend - 1) &&		/* 04 => last 2 */
 		   (!(wdhyf & 010) || wp > wdstart + 2)) ||	/* 010 => 1st 2 */
