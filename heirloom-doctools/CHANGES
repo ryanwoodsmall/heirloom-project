@@ -1,4 +1,6 @@
 Release ...
+* [nt]roff: Fixed an endless loop that occurred when ".ns" was active at
+  the end of a document and ".bp" was called from the page trap macro.
 * dpost: When including a picture, the PostScript "save" and "restore"
   operators are now executed in correct order. Previously, the state
   before page initialization was restored before including a picture.
