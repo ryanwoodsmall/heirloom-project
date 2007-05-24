@@ -1,4 +1,4 @@
-Release ...
+Release 070524
 * [nt]roff: Fixed an endless loop that occurred when ".ns" was active at
   the end of a document and ".bp" was called from the page trap macro.
 * dpost: When including a picture, the PostScript "save" and "restore"
