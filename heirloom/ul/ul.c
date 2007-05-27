@@ -52,7 +52,7 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)ul.sl	1.12 (gritter) 5/29/05";
+static const char sccsid[] USED = "@(#)ul.sl	1.13 (gritter) 5/27/07";
 
 #ifndef	USE_TERMCAP
 #include <curses.h>
@@ -129,6 +129,9 @@ static void	outc(wchar_t);
 static void	putchr(wchar_t);
 static void	setmod(int);
 static void	obaccs(long);
+#ifdef USE_TERMCAP
+static void	initcap(void);
+#endif
 
 int
 main(int argc, char **argv)
@@ -136,7 +139,6 @@ main(int argc, char **argv)
 	int c;
 	char *termtype;
 #ifdef	USE_TERMCAP
-	static void	initcap(void);
 	char termcap[2048];
 #endif
 	struct iblok *f;

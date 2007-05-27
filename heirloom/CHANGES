@@ -6,6 +6,8 @@ Release ...
 * Static linking against glibc is now possible since "optopt" is no longer
   a common symbol, and there is no conflict anymore with "getopt.o".
 * cpio, tar: A compilation problem on some Linux systems has been fixed.
+* ul: A compilation problem for NetBSD and other systems that use termcap
+  instead of curses has been fixed (patch by Aleksey Cheusov).
 
 Release 070227
 * The directory for development utilities, by default "/usr/ccs/bin", is
