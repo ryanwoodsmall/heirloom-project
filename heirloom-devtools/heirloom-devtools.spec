@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)heirloom-devtools.spec	1.6 (gritter) 01/19/07
+# Sccsid @(#)heirloom-devtools.spec	1.7 (gritter) 5/27/07
 #
 Summary: The Heirloom Development Tools.
 Name: heirloom-devtools
@@ -49,7 +49,9 @@ for f in %{bindir} %{susdir} %{libdir} %{prefix}/share
 do
 	if test -d %{buildroot}/$f
 	then
-		(cd %{buildroot}/$f; find * -type f -o -type l) | sed "s:^:$f/:"
+		(cd %{buildroot}/$f; find * -type f -o -type l) |
+			sed "s:^:$f/:" |
+			fgrep -v %{mandir}
 	else
 		echo $f
 	fi
