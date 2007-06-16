@@ -1,4 +1,8 @@
 [12.3] released ...
+* Multibyte characters are now handled correctly when printing texts
+  encoded in base64. Previously, if a multibyte character spanned
+  across a line in the base64-encoded representation, it was not
+  recognized, and substitution characters were printed instead.
 * In an SMTP exchange, ignore if the server closes the connection
   following the QUIT command instead of sending a proper response code,
   fixing a problem with GMail (Dr. Gary E. Rafe).

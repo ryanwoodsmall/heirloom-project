@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.94 (gritter) 01/07/07";
+static char sccsid[] = "@(#)sendout.c	2.95 (gritter) 6/16/07";
 #endif
 #endif /* not lint */
 
@@ -171,8 +171,8 @@ put_signature(FILE *fo, int convert)
 	}
 	while ((sz = fread(buf, sizeof *buf, INFIX_BUF, fsig)) != 0) {
 		c = buf[sz - 1];
-		if (mime_write(buf, sizeof *buf, sz, fo, convert, TD_NONE,
-					NULL, (size_t)0)
+		if (mime_write(buf, sz, fo, convert, TD_NONE,
+					NULL, (size_t)0, NULL, NULL)
 				== 0) {
 			perror(sig);
 			Fclose(fsig);
@@ -240,8 +240,8 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 		" filename=\"",
 		getencoding(convert),
 		ap->a_content_disposition);
-	mime_write(basename, sizeof *basename, strlen(basename), fo,
-			CONV_TOHDR, TD_NONE, NULL, (size_t)0);
+	mime_write(basename, strlen(basename), fo,
+			CONV_TOHDR, TD_NONE, NULL, (size_t)0, NULL, NULL);
 	fwrite("\"\n", sizeof (char), 2, fo);
 	if (ap->a_content_id)
 		fprintf(fo, "Content-ID: %s\n", ap->a_content_id);
@@ -294,8 +294,8 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 				break;
 		}
 		lastc = buf[sz-1];
-		if (mime_write(buf, sizeof *buf, sz, fo, convert, TD_ICONV,
-					NULL, (size_t)0) == 0)
+		if (mime_write(buf, sz, fo, convert, TD_ICONV,
+					NULL, (size_t)0, NULL, NULL) == 0)
 			err = -1;
 	}
 	if (convert == CONV_TOQP && lastc != '\n')
@@ -370,8 +370,9 @@ make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
 					break;
 			}
 			c = buf[sz - 1];
-			if (mime_write(buf, sizeof *buf, sz, fo, convert,
-					TD_ICONV, NULL, (size_t)0) == 0) {
+			if (mime_write(buf, sz, fo, convert,
+					TD_ICONV, NULL, (size_t)0,
+					NULL, NULL) == 0) {
 				free(buf);
 				return -1;
 			}
@@ -524,8 +525,9 @@ infix(struct header *hp, FILE *fi, int dosign)
 					break;
 			}
 			lastc = buf[sz - 1];
-			if (mime_write(buf, sizeof *buf, sz, nfo, convert,
-					TD_ICONV, NULL, (size_t)0) == 0) {
+			if (mime_write(buf, sz, nfo, convert,
+					TD_ICONV, NULL, (size_t)0,
+					NULL, NULL) == 0) {
 				Fclose(nfo);
 				Fclose(nfi);
 #ifdef	HAVE_ICONV
@@ -1165,12 +1167,13 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		if ((addr = hp->h_organization) != NULL ||
 				(addr = value("ORGANIZATION")) != NULL) {
 			fwrite("Organization: ", sizeof (char), 14, fo);
-			if (mime_write(addr, sizeof *addr, strlen(addr), fo,
+			if (mime_write(addr, strlen(addr), fo,
 					action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
 					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
-					NULL, (size_t)0) == 0)
+					NULL, (size_t)0,
+					NULL, NULL) == 0)
 				return 1;
 			gotcha++;
 			putc('\n', fo);
@@ -1211,22 +1214,24 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		fwrite("Subject: ", sizeof (char), 9, fo);
 		if (ascncasecmp(hp->h_subject, "re: ", 4) == 0) {
 			fwrite("Re: ", sizeof (char), 4, fo);
-			if (mime_write(hp->h_subject + 4, sizeof *hp->h_subject,
+			if (mime_write(hp->h_subject + 4,
 					strlen(hp->h_subject + 4),
 					fo, action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
 					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
-					NULL, (size_t)0) == 0)
+					NULL, (size_t)0,
+					NULL, NULL) == 0)
 				return 1;
 		} else if (*hp->h_subject) {
-			if (mime_write(hp->h_subject, sizeof *hp->h_subject,
+			if (mime_write(hp->h_subject,
 					strlen(hp->h_subject),
 					fo, action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
 					action == SEND_TODISP ?
 					TD_ISPR|TD_ICONV:TD_ICONV,
-					NULL, (size_t)0) == 0)
+					NULL, (size_t)0,
+					NULL, NULL) == 0)
 				return 1;
 		}
 		gotcha++;
@@ -1308,10 +1313,11 @@ fmt(char *str, struct name *np, FILE *fo, int flags, int dropinvalid,
 			col = 1;
 		} else
 			putc(' ', fo);
-		len = mime_write(np->n_fullname, sizeof *np->n_fullname,
+		len = mime_write(np->n_fullname,
 				len, fo,
 				domime?CONV_TOHDR_A:CONV_NONE,
-				TD_ICONV, NULL, (size_t)0);
+				TD_ICONV, NULL, (size_t)0,
+				NULL, NULL);
 		if (comma && !(is_to && is_fileaddr(np->n_flink->n_name)))
 			putc(',', fo);
 		col += len + comma;
@@ -1363,9 +1369,10 @@ infix_resend(FILE *fi, FILE *fo, struct message *mp, struct name *to,
 			}
 			fwrite("Resent-Reply-To: ", sizeof (char),
 					17, fo);
-			mime_write(cp, sizeof *cp, strlen(cp), fo,
+			mime_write(cp, strlen(cp), fo,
 					CONV_TOHDR_A, TD_ICONV,
-					NULL, (size_t)0);
+					NULL, (size_t)0,
+					NULL, NULL);
 			putc('\n', fo);
 		}
 #endif	/* notdef */

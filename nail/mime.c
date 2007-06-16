@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.67 (gritter) 01/06/07";
+static char sccsid[]  = "@(#)mime.c	2.68 (gritter) 6/16/07";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -1529,9 +1529,10 @@ fwrite_td(void *ptr, size_t size, size_t nmemb, FILE *f, enum tdflags flags,
  * fwrite performing the given MIME conversion.
  */
 size_t
-mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
+mime_write(void *ptr, size_t size, FILE *f,
 		enum conversion convert, enum tdflags dflags,
-		char *prefix, size_t prefixlen)
+		char *prefix, size_t prefixlen,
+		char **restp, size_t *restsizep)
 {
 	struct str in, out;
 	size_t sz, csize;
@@ -1542,9 +1543,9 @@ mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
 	size_t inleft, outleft;
 #endif
 
-	if (size == 0 || nmemb == 0)
+	if (size == 0)
 		return 0;
-	csize = size * nmemb / sizeof (char);
+	csize = size;
 #ifdef	HAVE_ICONV
 	if (csize < sizeof mptr && (dflags & TD_ICONV)
 			&& iconvd != (iconv_t)-1
@@ -1590,8 +1591,14 @@ mime_write(void *ptr, size_t size, size_t nmemb, FILE *f,
 		/*FALLTHROUGH*/
 	case CONV_FROMB64:
 		mime_fromb64_b(&in, &out, is_text, f);
-		sz = fwrite_td(out.s, sizeof *out.s, out.l, f, dflags,
+		if (is_text && out.s[out.l-1] != '\n' && restp && restsizep) {
+			*restp = ptr;
+			*restsizep = size;
+			sz = 0;
+		} else {
+			sz = fwrite_td(out.s, sizeof *out.s, out.l, f, dflags,
 				prefix, prefixlen);
+		}
 		free(out.s);
 		break;
 	case CONV_TOB64:

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.84 (gritter) 4/15/07";
+static char sccsid[] = "@(#)send.c	2.85 (gritter) 6/16/07";
 #endif
 #endif /* not lint */
 
@@ -79,7 +79,8 @@ static void parsepkcs7(struct message *zmp, struct mimepart *ip,
 		enum parseflags pf, int level);
 static size_t out(char *buf, size_t len, FILE *fp,
 		enum conversion convert, enum sendaction action,
-		char *prefix, size_t prefixlen, off_t *stats);
+		char *prefix, size_t prefixlen, off_t *stats,
+		char **restp, size_t *restsizep);
 static void addstats(off_t *stats, off_t lines, off_t bytes);
 static FILE *newfile(struct mimepart *ip, int *ispipe,
 		sighandler_type *oldpipe);
@@ -198,6 +199,9 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 	int	rt = 0;
 	long	lineno = 0;
 	int ispipe = 0;
+	char	*rest;
+	size_t	restsize;
+	int	eof;
 
 	(void)&ibuf;
 	(void)&pbuf;
@@ -252,7 +256,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 				xstatusput(zmp, obuf, prefix, stats);
 			if (doign != allignore)
 				out("\n", 1, obuf, CONV_NONE, SEND_MBOX,
-						prefix, prefixlen, stats);
+						prefix, prefixlen, stats,
+						NULL, NULL);
 			break;
 		}
 		isenc &= ~1;
@@ -289,7 +294,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 					xstatusput(zmp, obuf, prefix, stats);
 				if (doign != allignore)
 					out("\n", 1, obuf, CONV_NONE, SEND_MBOX,
-						prefix, prefixlen, stats);
+						prefix, prefixlen, stats,
+						NULL, NULL);
 				break;
 			}
 			/*
@@ -368,7 +374,8 @@ sendpart(struct message *zmp, struct mimepart *ip, FILE *obuf,
 					len--;
 			}
 			out(start, len, obuf, convert,
-					action, prefix, prefixlen, stats);
+					action, prefix, prefixlen, stats,
+					NULL, NULL);
 			if (ferror(obuf)) {
 				free(line);
 				return -1;
@@ -439,7 +446,8 @@ skip:	switch (ip->m_mimecontent) {
 			if (level == 0 && count) {
 				cp = "[Binary content]\n\n";
 				out(cp, strlen(cp), obuf, CONV_NONE, SEND_MBOX,
-						prefix, prefixlen, stats);
+						prefix, prefixlen, stats,
+						NULL, NULL);
 			}
 			/*FALLTHRU*/
 		case SEND_TOFLTR:
@@ -490,7 +498,8 @@ skip:	switch (ip->m_mimecontent) {
 				     "use \"show\" to display "
 				     "the raw message]\n\n";
 				out(cp, strlen(cp), obuf, CONV_NONE, SEND_MBOX,
-						prefix, prefixlen, stats);
+						prefix, prefixlen, stats,
+						NULL, NULL);
 			}
 			for (np = ip->m_multipart; np; np = np->m_nextpart) {
 				if (np->m_mimecontent == MIME_DISCARD &&
@@ -528,7 +537,8 @@ skip:	switch (ip->m_mimecontent) {
 						out(cp, strlen(cp), obuf,
 							CONV_NONE, SEND_MBOX,
 							prefix, prefixlen,
-							stats);
+							stats,
+							NULL, NULL);
 						ac_free(cp);
 					}
 					break;
@@ -632,15 +642,21 @@ skip:	switch (ip->m_mimecontent) {
 		}
 	} else
 		pbuf = qbuf = obuf;
-	while (foldergets(&line, &linesize, &count, &linelen, ibuf)) {
+	eof = 0;
+	while (!eof && foldergets(&line, &linesize, &count, &linelen, ibuf)) {
 		lineno++;
 		while (convert == CONV_FROMQP && linelen >= 2 &&
 				line[linelen-2] == '=') {
-			char	*line2 = NULL;
-			size_t	linesize2 = 0, linelen2;
+			char	*line2;
+			size_t	linesize2, linelen2;
+		nextl:
+			line2 = NULL;
+			linesize2 = 0;
 			if (foldergets(&line2, &linesize2, &count, &linelen2,
-						ibuf) == NULL)
+						ibuf) == NULL) {
+				eof = 1;
 				break;
+			}
 			if (linelen + linelen2 + 1 > linesize)
 				line = srealloc(line, linesize = linelen +
 						linelen2 + 1);
@@ -648,13 +664,22 @@ skip:	switch (ip->m_mimecontent) {
 			linelen += linelen2;
 			free(line2);
 		}
+		rest = NULL;
+		restsize = 0;
 		out(line, linelen, pbuf, convert, action,
 				pbuf == origobuf ? prefix : NULL,
 				pbuf == origobuf ? prefixlen : 0,
-				pbuf == origobuf ? stats : NULL);
+				pbuf == origobuf ? stats : NULL,
+				eof ? NULL : &rest, eof ? NULL : &restsize);
 		if (ferror(pbuf)) {
 			rt = -1;
 			break;
+		}
+		if (restsize) {
+			if (line != rest)
+				memmove(line, rest, restsize);
+			linelen = restsize;
+			goto nextl;
 		}
 	}
 end:	free(line);
@@ -923,7 +948,8 @@ parsepkcs7(struct message *zmp, struct mimepart *ip, enum parseflags pf,
 static size_t
 out(char *buf, size_t len, FILE *fp,
 		enum conversion convert, enum sendaction action,
-		char *prefix, size_t prefixlen, off_t *stats)
+		char *prefix, size_t prefixlen, off_t *stats,
+		char **restp, size_t *restsizep)
 {
 	size_t	sz, n;
 	char	*cp;
@@ -941,7 +967,7 @@ out(char *buf, size_t len, FILE *fp,
 			sz++;
 		}
 	}
-	sz += mime_write(buf, 1, len, fp,
+	sz += mime_write(buf, len, fp,
 			action == SEND_MBOX ? SEND_MBOX : convert,
 			action == SEND_TODISP || action == SEND_TODISP_ALL ||
 					action == SEND_QUOTE ||
@@ -953,10 +979,11 @@ out(char *buf, size_t len, FILE *fp,
 					TD_DELCTRL :
 				action == SEND_SHOW ?
 					TD_ISPR : TD_NONE,
-			prefix, prefixlen);
+			prefix, prefixlen,
+			restp, restsizep);
 	lines = 0;
 	if (stats && stats[0] != -1) {
-		for (cp = buf; cp < &buf[len]; cp++)
+		for (cp = buf; cp < &buf[sz]; cp++)
 			if (*cp == '\n')
 				lines++;
 	}
