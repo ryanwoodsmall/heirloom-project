@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.11 (gritter) 3/15/07
+ * Sccsid @(#)defs.h	1.12 (gritter) 6/16/07
  */
 
 /*
@@ -982,7 +982,7 @@ extern Boolean		do_not_exec_rule;		/* `-n' */
 extern Boolean		dollarget_seen;
 extern Boolean		dollarless_flag;
 extern Name		dollarless_value;
-#ifdef __sun
+#if defined(__sun) || defined(__APPLE__)
 extern char		**environ;
 #endif
 extern Envvar		envvar;

@@ -1,3 +1,6 @@
+Release ...
+* make: Mac OS X compilation fix (Stefan Tramm).
+
 Release 070527
 * admin: A manual page is available, based on source code released by Sun.
 * make: Macro definitions following "else" in an effective branch are
