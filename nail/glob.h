@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)glob.h	2.26 (gritter) 3/4/06
+ *	Sccsid @(#)glob.h	2.27 (gritter) 6/16/07
  */
 
 /*
@@ -133,6 +133,7 @@ _E int		interrupts;
 _E sighandler_type	handlerstacktop;
 #define	handlerpush(f)	(savedtop = handlerstacktop, handlerstacktop = (f))
 #define	handlerpop()	(handlerstacktop = savedtop)
+extern sighandler_type	dflpipe;
 
 /*
  * The pointers for the string allocation routines,

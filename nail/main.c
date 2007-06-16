@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.49 (gritter) 7/7/06";
+static char sccsid[] = "@(#)main.c	2.50 (gritter) 6/16/07";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -79,6 +79,7 @@ static char sccsid[] = "@(#)main.c	2.49 (gritter) 7/7/06";
 
 static sigjmp_buf	hdrjmp;
 char	*progname;
+sighandler_type	dflpipe = SIG_DFL;
 
 static void hdrstop(int signo);
 static void setscreensize(int dummy);
@@ -124,8 +125,11 @@ main(int argc, char *argv[])
 	safe_signal(SIGCHLD, sigchild);
 	is_a_tty[0] = isatty(0);
 	is_a_tty[1] = isatty(1);
-	if (is_a_tty[0])
+	if (is_a_tty[0]) {
 		assign("interactive", "");
+		if (is_a_tty[1])
+			safe_signal(SIGPIPE, dflpipe = SIG_IGN);
+	}
 	assign("header", "");
 	assign("save", "");
 #ifdef	HAVE_SETLOCALE

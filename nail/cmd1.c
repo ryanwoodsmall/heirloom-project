@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd1.c	2.96 (gritter) 3/4/06";
+static char sccsid[] = "@(#)cmd1.c	2.97 (gritter) 6/16/07";
 #endif
 #endif /* not lint */
 
@@ -320,7 +320,7 @@ endpipe:
 	if (obuf != stdout) {
 		safe_signal(SIGPIPE, SIG_IGN);
 		Pclose(obuf);
-		safe_signal(SIGPIPE, SIG_DFL);
+		safe_signal(SIGPIPE, dflpipe);
 	}
 	return(0);
 }
@@ -816,7 +816,7 @@ close_pipe:
 		 */
 		safe_signal(SIGPIPE, SIG_IGN);
 		Pclose(obuf);
-		safe_signal(SIGPIPE, SIG_DFL);
+		safe_signal(SIGPIPE, dflpipe);
 	}
 	return(0);
 }

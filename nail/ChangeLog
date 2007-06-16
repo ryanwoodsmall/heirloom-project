@@ -8,6 +8,11 @@
 * If no proper boundary is present in a MIME multipart message, print
   a notification message since otherwise no content is shown at all
   (problem reported by Thomas Wolff).
+* When both standard input and standard output refer to a terminal,
+  ignore SIGPIPE since there is no reason why it should ever terminate
+  mailx then. This fixes problems with mailx terminating when reading
+  a message and ^C is typed in the pager under some circumstances
+  (analysis by Stephen Isard and Perry Hutchison).
 * Build without socket support again (patch by Andreas Niederl).
 * Fixed a single quote in "makeconfig" that could cause a problem with
   the C preprocessor (patch by Martin Neitzel).
