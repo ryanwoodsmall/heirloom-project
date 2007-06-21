@@ -1,3 +1,9 @@
+Release ...
+* [nt]roff: When converting floating point values in exponential notation
+  (1.234e5 etc.) to integers, apply the exponent before computing the final
+  position of the decimal point for better rounding behavior (bug reported
+  by Dirk-Wilhelm Peters).
+
 Release 070524
 * [nt]roff: Fixed an endless loop that occurred when ".ns" was active at
   the end of a document and ".bp" was called from the page trap macro.

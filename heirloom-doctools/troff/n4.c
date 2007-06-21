@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n4.c	1.100 (gritter) 3/9/07
+ * Sccsid @(#)n4.c	1.101 (gritter) 6/21/07
  */
 
 /*
@@ -1349,10 +1349,11 @@ aa:
 		if (!flt) acc.n = (acc.n * j) / i;
 		if (flt) acc.f = (acc.f * j) / i;
 	}
-	if (!flt && (field != digits) && (digits > 0))
+	if (!flt && (field != digits) && (digits > 0)) {
+		if (e != 1) acc.n = e * acc.n;
 		while (digits--)
 			acc.n /= 10;
-	if (e != 1) {
+	} else if (e != 1) {
 		if (!flt) acc.n = (int)(e * acc.n);
 		if (flt) acc.f *= e;
 	}
