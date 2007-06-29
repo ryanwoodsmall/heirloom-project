@@ -8,6 +8,7 @@ Release ...
 * cpio, tar: A compilation problem on some Linux systems has been fixed.
 * ul: A compilation problem for NetBSD and other systems that use termcap
   instead of curses has been fixed (patch by Aleksey Cheusov).
+* bfs: An OpenSolaris-derived manual page is now included.
 
 Release 070227
 * The directory for development utilities, by default "/usr/ccs/bin", is
