@@ -1,4 +1,4 @@
-[12.3] released ...
+[12.3] released 7/15/07
 * Multibyte characters are now handled correctly when printing texts
   encoded in base64. Previously, if a multibyte character spanned
   across a line in the base64-encoded representation, it was not

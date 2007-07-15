@@ -1,4 +1,4 @@
-#define	V	"12.3pre"
+#define	V	"12.3"
 /*
  * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.373 (gritter) 6/16/07";
+static char sccsid[] = "@(#)version.c	2.374 (gritter) 7/15/07";
 #endif
 #endif /* not lint */
 
@@ -48,7 +48,7 @@ static char sccsid[] = "@(#)version.c	2.373 (gritter) 6/16/07";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = V " 6/16/07";
+const char *version = V " 7/15/07";
 #ifndef	lint
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define USED    __attribute__ ((used))
@@ -57,7 +57,7 @@ const char *version = V " 6/16/07";
 #else
 #define USED
 #endif
-static const char *versionid USED = "@(#)mailx " V " (gritter) 6/16/07";
+static const char *versionid USED = "@(#)mailx " V " (gritter) 7/15/07";
 #endif	/* !lint */
 /* SLIST */
 /*
