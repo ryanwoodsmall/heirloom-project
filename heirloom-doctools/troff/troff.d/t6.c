@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.191 (gritter) 5/7/07
+ * Sccsid @(#)t6.c	1.192 (gritter) 8/4/07
  */
 
 /*
@@ -1987,6 +1987,7 @@ loadafm(int nf, int rq, char *file, char *supply, int required, enum spec spec)
 	int	i, have = 0;
 	struct namecache	*np;
 
+	zapwcache(0);
 	if (nf < 0)
 		nf = nextfp();
 	path = getfontpath(file, "afm");
