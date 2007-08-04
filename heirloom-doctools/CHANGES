@@ -1,4 +1,8 @@
 Release ...
+* troff: Hyphenate correctly when a hyphenation point occurs inside a
+  ligature that follows a non-ASCII character. Previously, the word was
+  actually hyphenated too early in this situation (bug reported by
+  Dirk-Wilhelm Peters).
 * troff: Clear the font width cache before mounting a Type 1, TrueType,
   or OpenType font. The previous failure to do so could lead to improper
   alignment of lines when a font was mounted on the same font position
