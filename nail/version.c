@@ -1,4 +1,4 @@
-#define	V	"12.3"
+#define	V	"12.4pre"
 /*
  * Heirloom mailx - a mail user agent derived from Berkeley Mail.
  *
@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.374 (gritter) 7/15/07";
+static char sccsid[] = "@(#)version.c	2.376 (gritter) 8/4/07";
 #endif
 #endif /* not lint */
 
@@ -48,7 +48,7 @@ static char sccsid[] = "@(#)version.c	2.374 (gritter) 7/15/07";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = V " 7/15/07";
+const char *version = V " 8/4/07";
 #ifndef	lint
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define USED    __attribute__ ((used))
@@ -57,7 +57,7 @@ const char *version = V " 7/15/07";
 #else
 #define USED
 #endif
-static const char *versionid USED = "@(#)mailx " V " (gritter) 7/15/07";
+static const char *versionid USED = "@(#)mailx " V " (gritter) 8/4/07";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -93,8 +93,8 @@ md5.c:	Sccsid @(#)md5.c	1.8 (gritter) 3/4/06
 md5.h:	Sccsid @(#)md5.h	1.8 (gritter) 3/4/06	
 mime.c:static char sccsid[]  = "@(#)mime.c	2.68 (gritter) 6/16/07";
 names.c:static char sccsid[] = "@(#)names.c	2.22 (gritter) 3/4/06";
-nss.c:static char sccsid[] = "@(#)nss.c	1.47 (gritter) 6/16/07";
-openssl.c:static char sccsid[] = "@(#)openssl.c	1.24 (gritter) 3/4/06";
+nss.c:static char sccsid[] = "@(#)nss.c	1.48 (gritter) 8/4/07";
+openssl.c:static char sccsid[] = "@(#)openssl.c	1.25 (gritter) 8/4/07";
 pop3.c:static char sccsid[] = "@(#)pop3.c	2.43 (gritter) 3/4/06";
 popen.c:static char sccsid[] = "@(#)popen.c	2.20 (gritter) 3/4/06";
 quit.c:static char sccsid[] = "@(#)quit.c	2.28 (gritter) 3/4/06";

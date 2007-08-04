@@ -1,3 +1,7 @@
+[12.4] released ...
+* Print an error message when an attempt is made to S/MIME sign a
+  message but no "from" address can be determined (Georgi Stanojevski).
+
 [12.3] released 7/15/07
 * Multibyte characters are now handled correctly when printing texts
   encoded in base64. Previously, if a multibyte character spanned

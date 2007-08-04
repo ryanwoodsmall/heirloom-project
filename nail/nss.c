@@ -33,7 +33,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)nss.c	1.47 (gritter) 6/16/07";
+static char sccsid[] = "@(#)nss.c	1.48 (gritter) 8/4/07";
 #endif
 #endif /* not lint */
 
@@ -372,8 +372,10 @@ smime_sign(FILE *ip, struct header *headp)
 
 	if (nss_init() != OKAY)
 		return NULL;
-	if ((addr = myorigin(headp)) == NULL)
+	if ((addr = myorigin(headp)) == NULL) {
+		fprintf(stderr, "No \"from\" address for signing specified\n");
 		return NULL;
+	}
 	if ((cert = get_signer_cert(addr)) == NULL)
 		return NULL;
 	handle = CERT_GetDefaultCertDB();
