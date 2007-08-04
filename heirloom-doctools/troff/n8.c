@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n8.c	1.42 (gritter) 8/4/07
+ * Sccsid @(#)n8.c	1.43 (gritter) 8/4/07
  */
 
 /*
@@ -237,6 +237,7 @@ casehw(void)
 	tchar t;
 	int	cnt = 0;
 
+	lgf++;
 	if (nexth == NULL)
 		growhbuf(NULL);
 	k = 0;
@@ -286,19 +287,61 @@ exword(void)
 		if (e == NULL || *e == 0)
 			return(0);
 		w = wdstart;
-		while (*e && w <= hyend && (*e&~HY_BIT2) == maplow(*w)) {
-			e++; 
-			w++;
-		};
-		if (!*e) {
+		while (*e && w <= hyend) {
+#ifndef NROFF
+			int	i, m, f;
+			m = cbits(*w);
+			f = fbits(*w);
+			if (islig(*w) && lgrevtab && lgrevtab[f] &&
+					lgrevtab[f][m]) {
+				for (i = 0; lgrevtab[f][m][i]; i++) {
+					if ((*e&~HY_BIT2) ==
+					  maplow(lgrevtab[f][m][i])) {
+						e++;
+					} else
+						goto end;
+				}
+				w++;
+			} else
+#endif
+			{
+				if ((*e&~HY_BIT2) == maplow(*w)) {
+					e++; 
+					w++;
+				} else
+					goto end;
+			}
+		}
+	end:	if (!*e) {
 			if (w-1 == hyend || (w == wdend && maplow(*w) == 's')) {
 				w = wdstart;
 				for (e = save; *e; e++) {
-					if (*e & HY_BIT2)
-						*hyp++ = w;
+#ifndef NROFF
+					int	i, m, f;
+					m = cbits(*w);
+					f = fbits(*w);
+					if (islig(*w) && lgrevtab &&
+							lgrevtab[f] &&
+							lgrevtab[f][m]) {
+						for (i = 0; lgrevtab[f][m][i];
+								i++) {
+							if (*e++ & HY_BIT2) {
+								*hyp = (void *)
+								  ((intptr_t)w |
+								   i);
+								hyp++;
+							}
+						}
+						e--;
+					} else
+#endif
+					{
+						if (*e & HY_BIT2)
+							*hyp++ = w;
+					}
+					w++;
 					if (hyp > (hyptr + NHYP - 1))
 						hyp = hyptr + NHYP - 1;
-					w++;
 				}
 				return(1);
 			} else {

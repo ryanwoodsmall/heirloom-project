@@ -1,4 +1,6 @@
 Release ...
+* troff: The ".hw" request now works correctly for words that contain
+  ligatures (bug reported by Dirk-Wilhelm Peters).
 * troff: Hyphenate correctly when a hyphenation point occurs inside a
   ligature that follows a non-ASCII character. Previously, the word was
   actually hyphenated too early in this situation (bug reported by
