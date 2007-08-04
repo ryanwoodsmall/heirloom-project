@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)smtp.c	2.42 (gritter) 01/12/07";
+static char sccsid[] = "@(#)smtp.c	2.43 (gritter) 8/4/07";
 #endif
 #endif /* not lint */
 
@@ -258,11 +258,13 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 	char *b = NULL, o[LINESIZE];
 	size_t blen, bsize = 0, count;
 	char	*b64, *authstr, *cp;
-	enum	{ AUTH_NONE, AUTH_LOGIN, AUTH_CRAM_MD5 } auth;
+	enum	{ AUTH_NONE, AUTH_PLAIN, AUTH_LOGIN, AUTH_CRAM_MD5 } auth;
 	int	inhdr = 1, inbcc = 0;
 
 	if ((authstr = smtp_auth_var("", skinned)) == NULL)
 		auth = user && password ? AUTH_LOGIN : AUTH_NONE;
+	else if (strcmp(authstr, "plain") == 0)
+		auth = AUTH_PLAIN;
 	else if (strcmp(authstr, "login") == 0)
 		auth = AUTH_LOGIN;
 	else if (strcmp(authstr, "cram-md5") == 0)
@@ -319,6 +321,16 @@ talk_smtp(struct name *to, FILE *fi, struct sock *sp,
 			b64 = strtob64(password);
 			snprintf(o, sizeof o, "%s\r\n", b64);
 			free(b64);
+			SMTP_OUT(o);
+			SMTP_ANSWER(2);
+			break;
+		case AUTH_PLAIN:
+			SMTP_OUT("AUTH PLAIN\r\n");
+			SMTP_ANSWER(3);
+			snprintf(o, sizeof o, "%c%s%c%s", '\0', user, '\0',
+							  password);
+			b64 = memtob64(o, strlen(user)+strlen(password)+2);
+			snprintf(o, sizeof o, "%s\r\n", b64);
 			SMTP_OUT(o);
 			SMTP_ANSWER(2);
 			break;

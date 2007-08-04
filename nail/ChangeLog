@@ -1,4 +1,6 @@
 [12.4] released ...
+* Support for SMTP AUTH PLAIN has been added (contributed by Joe Feise).
+  Set "smtp-auth=plain" to use it.
 * Print an error message when an attempt is made to S/MIME sign a
   message but no "from" address can be determined (Georgi Stanojevski).
 

@@ -34,7 +34,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)mailx.1	2.324 (gritter) 8/4/07
+.\"     Sccsid: @(#)mailx.1	2.325 (gritter) 8/4/07
 .\"
 .TH MAILX 1 "8/4/07" "Heirloom mailx 12.4" "User Commands"
 .SH NAME
@@ -3430,7 +3430,9 @@ If set to `login',
 or if unset and smtp-auth-user is set,
 AUTH LOGIN is used.
 If set to `cram-md5',
-AUTH CRAM-MD5 is used.
+AUTH CRAM-MD5 is used;
+if set to `plain',
+AUTH PLAIN is used.
 Otherwise,
 no SMTP authentication is performed.
 .TP
