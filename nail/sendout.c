@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.95 (gritter) 6/16/07";
+static char sccsid[] = "@(#)sendout.c	2.96 (gritter) 9/7/07";
 #endif
 #endif /* not lint */
 
@@ -1087,13 +1087,13 @@ mkdate(FILE *fo, const char *field)
 	tmptr = localtime(&t);
 	if (tmptr->tm_isdst > 0)
 		tzdiff_hour++;
-	return fprintf(fo, "%s: %s, %02d %s %04d %02d:%02d:%02d %+03d%02d\n",
+	return fprintf(fo, "%s: %s, %02d %s %04d %02d:%02d:%02d %+05d\n",
 			field,
 			weekday_names[tmptr->tm_wday],
 			tmptr->tm_mday, month_names[tmptr->tm_mon],
 			tmptr->tm_year + 1900, tmptr->tm_hour,
 			tmptr->tm_min, tmptr->tm_sec,
-			tzdiff_hour, tzdiff_min);
+			tzdiff_hour * 100 + tzdiff_min);
 }
 
 static enum okay

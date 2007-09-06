@@ -1,6 +1,9 @@
 [12.4] released ...
 * Support for SMTP AUTH PLAIN has been added (contributed by Joe Feise).
   Set "smtp-auth=plain" to use it.
+* Fixed the format of the timezone in "Date" header fields for zones in
+  the Western Hemisphere whose offsets are not an integral number of hours
+  (patch by Matthew Fischer).
 * Print an error message when an attempt is made to S/MIME sign a
   message but no "from" address can be determined (Georgi Stanojevski).
 
