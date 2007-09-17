@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.181 (gritter) 2/23/07
+.\" Sccsid @(#)doc.tr	1.182 (gritter) 9/17/07
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -105,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 2/23/07
+.ds Sccsdate 9/17/07
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1995,6 +1995,7 @@ Reference	Sequence	Meaning
 \T'e_acute'2.1\T	\T'e_acute'\fB\e\'\fR\T	\T'e_acute'\' (acute accent); equivalent to \fB\e(aa\fR\T
 \T'e_grave'2.1\T	\T'e_grave'\fB\e\`\fR\T	\T'e_grave'\` (grave accent); equivalent to \fB\e(ga\fR\T
 \T'e_-'2.1\T	\T'e_-'\fB\e\-\fR\T	\T'e_-'\- Minus sign in the \fIcurrent\fR font\T
+\T'e__'12.4\T	\T'e__'\fB\e_\fR\T	\T'e__'\_ (underrule character); equivalent to \fB\e(ul\fR\T
 \T'e_.'7\T	\T'e_.'\fB\e\^.\fR\T	\T'e_.'Period (dot) (see \fBde\fR)\T
 \T'e_ '4.1\T	\T'e_ '\fB\e\fR(space)\T	\T'e_ 'Unpaddable space-size space character\T
 \T'e_~'4.1\T	\T'e_~'\fB\e\(ap\fR\T	\T'e_~'Paddable no-break space character\T
