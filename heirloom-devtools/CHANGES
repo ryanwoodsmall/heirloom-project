@@ -1,5 +1,6 @@
 Release ...
 * make: Mac OS X compilation fix (Stefan Tramm).
+* make: Compilation fix for 64-bit environments.
 
 Release 070527
 * admin: A manual page is available, based on source code released by Sun.
