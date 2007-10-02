@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lex.c	1.5 (gritter) 9/11/06
+ * Sccsid @(#)lex.c	1.6 (gritter) 10/2/07
  */
 
 #include "e.h"
@@ -84,7 +84,7 @@ pbstr(register char *str)
 		putbak(*--p);
 }
 
-int
+YYSTYPE
 yylex(void) {
 	register int c;
 	tbl *tp;
@@ -153,7 +153,7 @@ yylex(void) {
 	else if (tp->defn == (char *) SPACE)
 		space();
 	else {
-		return((int) tp->defn);
+		return((intptr_t) tp->defn);
 	}
 	goto beg;
 }
@@ -183,7 +183,7 @@ getstr(char *s, register int n) {
 	if (c=='{' || c=='}' || c=='"' || c=='~' || c=='^' || c=='\t' || c==righteq)
 		putbak(c);
 	*p = '\0';
-	yylval = (int) s;
+	yylval = (intptr_t) s;
 }
 
 int

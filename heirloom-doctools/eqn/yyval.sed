@@ -1,5 +1,5 @@
 #
-# Sccsid @(#)yyval.sed	1.3 (gritter) 4/27/04
+# Sccsid @(#)yyval.sed	1.2 (gritter) 10/2/07
 #
 # bison has a yacc-compatible yyval, but it is a local variable inside
 # yyparse(). Making the variable global is necessary to make bc work
@@ -8,7 +8,7 @@
 	/Bison/ {
 	:look
 		/YYSTYPE/ {
-			a\
+			i\
 			YYSTYPE yyval;
 		:repl
 			s/^[ 	]*YYSTYPE[ 	]*yyval;//

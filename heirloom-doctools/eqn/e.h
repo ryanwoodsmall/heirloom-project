@@ -18,10 +18,14 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.10 (gritter) 12/25/06
+ * Sccsid @(#)e.h	1.11 (gritter) 10/2/07
  */
 
 #include <stdio.h>
+#include <inttypes.h>
+
+typedef	intptr_t	YYSTYPE;
+#define	YYSTYPE	YYSTYPE
 
 #if defined (__GLIBC__) && defined (_IO_getc_unlocked)
 #undef	getc
@@ -72,9 +76,9 @@ extern int	ebase[100];
 #endif	/* NEQN */
 extern int	lfont[100];
 extern int	rfont[100];
-extern int	yyval;
+extern YYSTYPE	yyval;
 extern int	*yypv;
-extern int	yylval;
+extern YYSTYPE	yylval;
 extern int	eqnreg, eqnht;
 extern int	lefteq, righteq;
 extern int	lastchar;	/* last character read by lex */
@@ -128,7 +132,7 @@ void error(int, const char *, ...);
 int gtc(void);
 int openinfile(void);
 void pbstr(register char *);
-int yylex(void);
+YYSTYPE yylex(void);
 void getstr(char *, register int);
 int cstr(char *, int, int);
 void define(int);

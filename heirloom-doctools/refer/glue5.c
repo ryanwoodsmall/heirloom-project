@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glue5.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)glue5.c	1.4 (gritter) 10/2/07
  */
 
 
@@ -26,6 +26,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "refer..c"
 /*
  * fgrep -- print all lines containing any of a set of keywords
@@ -88,12 +89,12 @@ fgrep(int argc, char **argv)
 				rflag++;
 				break;
 			case 'n': /* number of answers needed */
-				need = (int) xargv[1];
+				need = (intptr_t) xargv[1];
 				xargv++; xargc--;
 				break;
 			case 'i':
 				instr = xargv[1];
-				inct = (int) xargv[2]+2;
+				inct = (intptr_t) xargv[2]+2;
 # if D2
 fprintf(stderr,"inct %d xargv.2. %o %d\n",inct, xargv[2],xargv[2]);
 # endif

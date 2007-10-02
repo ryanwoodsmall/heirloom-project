@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.162 (gritter) 4/11/07
+ * Sccsid @(#)tdef.h	1.163 (gritter) 10/2/07
  */
 
 /*
@@ -352,10 +352,13 @@ extern	int	NCHARS;	/* maximum size of troff character set */
  * filep must be a signed integer since the value -1
  * is special (it indicates that input is read from tty).
 
+ * filep must be an int for LP64 platforms since it is
+ * casted to unsigned at some places (or changed there)
+
  * BLK must be a power of 2
  */
 
-typedef long filep;
+typedef int filep;
 
 #define	BLK	128	/* alloc block in tchars */
 

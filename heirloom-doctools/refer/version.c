@@ -5,21 +5,21 @@
 #else
 #define	USED
 #endif
-static const char sccsid[] USED = "@(#)/usr/ucb/refer.sl	5.3 (gritter) 01/12/07";
+static const char sccsid[] USED = "@(#)/usr/ucb/refer.sl	5.4 (gritter) 10/2/07";
 /* SLIST */
 /*
 addbib.c: * Sccsid @(#)addbib.c	1.3 (gritter) 10/22/05
 deliv2.c: * Sccsid @(#)deliv2.c	1.3 (gritter) 10/22/05
 glue1.c: * Sccsid @(#)glue1.c	1.3 (gritter) 10/22/05
 glue2.c: * Sccsid @(#)glue2.c	1.3 (gritter) 10/22/05
-glue3.c: * Sccsid @(#)glue3.c	1.3 (gritter) 10/22/05
+glue3.c: * Sccsid @(#)glue3.c	1.4 (gritter) 10/2/07
 glue4.c: * Sccsid @(#)glue4.c	1.3 (gritter) 10/22/05
-glue5.c: * Sccsid @(#)glue5.c	1.3 (gritter) 10/22/05
+glue5.c: * Sccsid @(#)glue5.c	1.4 (gritter) 10/2/07
 hunt1.c: * Sccsid @(#)hunt1.c	1.3 (gritter) 10/22/05
 hunt2.c: * Sccsid @(#)hunt2.c	1.3 (gritter) 10/22/05
 hunt3.c: * Sccsid @(#)hunt3.c	1.3 (gritter) 10/22/05
 hunt5.c: * Sccsid @(#)hunt5.c	1.3 (gritter) 10/22/05
-hunt6.c: * Sccsid @(#)hunt6.c	1.3 (gritter) 10/22/05
+hunt6.c: * Sccsid @(#)hunt6.c	1.4 (gritter) 10/2/07
 hunt7.c: * Sccsid @(#)hunt7.c	1.3 (gritter) 10/22/05
 hunt8.c: * Sccsid @(#)hunt8.c	1.4 (gritter) 01/12/07
 hunt9.c: * Sccsid @(#)hunt9.c	1.3 (gritter) 10/22/05

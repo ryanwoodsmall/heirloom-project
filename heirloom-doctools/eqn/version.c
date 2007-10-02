@@ -6,15 +6,15 @@
 #define	USED
 #endif
 #ifdef	NEQN
-static const char sccsid[] USED = "@(#)/usr/ucb/neqn.sl	5.8 (gritter) 12/25/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/neqn.sl	5.9 (gritter) 10/2/07";
 #else
-static const char sccsid[] USED = "@(#)/usr/ucb/eqn.sl	5.8 (gritter) 12/25/06";
+static const char sccsid[] USED = "@(#)/usr/ucb/eqn.sl	5.9 (gritter) 10/2/07";
 #endif
 /* SLIST */
 /*
 diacrit.c: * Sccsid @(#)diacrit.c	1.5 (gritter) 10/19/06
-e.h: * Sccsid @(#)e.h	1.10 (gritter) 12/25/06
-e.y: * Sccsid @(#)e.y	1.6 (gritter) 10/19/06
+e.h: * Sccsid @(#)e.h	1.11 (gritter) 10/2/07
+e.y: * Sccsid @(#)e.y	1.7 (gritter) 10/2/07
 eqnbox.c: * Sccsid @(#)eqnbox.c	1.6 (gritter) 10/19/06
 font.c: * Sccsid @(#)font.c	1.4 (gritter) 10/29/05
 fromto.c: * Sccsid @(#)fromto.c	1.5 (gritter) 10/19/06
@@ -22,7 +22,7 @@ funny.c: * Sccsid @(#)funny.c	1.6 (gritter) 10/19/06
 glob.c: * Sccsid @(#)glob.c	1.8 (gritter) 10/19/06
 integral.c: * Sccsid @(#)integral.c	1.5 (gritter) 10/19/06
 io.c: * Sccsid @(#)io.c	1.12 (gritter) 11/23/06
-lex.c: * Sccsid @(#)lex.c	1.5 (gritter) 9/11/06
+lex.c: * Sccsid @(#)lex.c	1.6 (gritter) 10/2/07
 lookup.c: * Sccsid @(#)lookup.c	1.5 (gritter) 9/18/05
 mark.c: * Sccsid @(#)mark.c	1.3 (gritter) 8/12/05
 matrix.c: * Sccsid @(#)matrix.c	1.4 (gritter) 10/29/05

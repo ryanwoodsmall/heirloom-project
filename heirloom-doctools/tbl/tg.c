@@ -18,12 +18,13 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tg.c	1.9 (gritter) 8/6/06
+ * Sccsid @(#)tg.c	1.10 (gritter) 10/2/07
  */
 
  /* tg.c: process included text blocks */
 # include "t..c"
 # include <stdlib.h>
+# include <inttypes.h>
 /* get_text was originally gettext and was renamed */
 int 
 get_text(char *sp, int ilin, int icol, char *fn, char *sz)
@@ -113,7 +114,7 @@ fprintf(tabout, ".ll \\n(%du\n", SL);
 char *
 nreg(char *space, const char *_n, int c)
 {
-int n = (int)_n;
+int n = (intptr_t)_n;
 if (n < 128)
 	sprintf(space, "\\n(%c%c", n, c);
 else

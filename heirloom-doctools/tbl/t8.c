@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t8.c	1.11 (gritter) 9/9/06
+ * Sccsid @(#)t8.c	1.12 (gritter) 10/2/07
  */
 
  /* t8.c: write out one line of output table */
@@ -100,7 +100,7 @@ for(c=0; c<ncol; c++)
 	{
 	s = table[nl][c].col;
 	if (s==0) continue;
-	chfont |= (int)(font[stynum[nl]][c]);
+	chfont |= (intptr_t)(font[stynum[nl]][c]);
 	if (point((intptr_t)s) ) continue;
 	lf=prev(nl);
 	nreg(space,s,'|');
@@ -286,14 +286,15 @@ void
 funnies(int stl, int lin)
 {
 /* write out funny diverted things */
-int c, s, pl, lwid, dv, lf, ct = 0;
+int c, pl, lwid, dv, lf, ct = 0;
+intptr_t s;
 char *fn;
 char space[40];
 fprintf(tabout, ".mk ##\n"); /* rmember current vertical position */
 fprintf(tabout, ".nr %d \\n(##\n", S1); /* bottom position */
 for(c=0; c<ncol; c++)
 	{
-	s = (int)table[lin][c].col;
+	s = (intptr_t)table[lin][c].col;
 	if (point(s)) continue;
 	if (s==0) continue;
 	fprintf(tabout, ".sp |\\n(##u-1v\n");

@@ -31,15 +31,14 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.y	1.6 (gritter) 10/19/06
+ * Sccsid @(#)e.y	1.7 (gritter) 10/2/07
  */
 #include "e.h"
 #include <stdlib.h>
+#include <inttypes.h>
 #
 int	fromflg;
 
-typedef	int	YYSTYPE;
-#define	YYSTYPE	YYSTYPE
 #define	__YYSCLASS	/* to get external access to yyval with HP-UX yacc */
 %}
 %term	CONTIG QTEXT SPACE THIN TAB

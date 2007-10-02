@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glue3.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)glue3.c	1.4 (gritter) 10/2/07
  */
 
 
@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #define move(x, y) close(y); dup(x); close(x);
 
 int
@@ -87,12 +88,12 @@ callhunt(char *in, char *out, char *arg, int outlen)
 	argv[2] = in;
 	argv[3] = "-t";
 	argv[4] = out;
-	argv[5] = (char *)outlen;
+	argv[5] = (char *)(intptr_t)outlen;
 	argv[6] = "-T";
 	argv[7] = "-F1";
 	argv[8] = "-o";
 	argv[9] = one;
-	argv[10] = (char *)onelen;
+	argv[10] = (char *)(intptr_t)onelen;
 	argv[11] = abuff; 
 	strcpy (abuff,arg);
 	if (strlen(abuff) > ALEN)

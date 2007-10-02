@@ -18,13 +18,14 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hunt6.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)hunt6.c	1.4 (gritter) 10/2/07
  */
 
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "refer..c"
 #define TXTLEN 1000
 
@@ -120,10 +121,10 @@ baddrop(unsigned *mptr, int nf, FILE *fc, int nitem, char **qitem,
 		ar[na++] = "fgrep";
 		ar[na++] = "-r";
 		ar[na++] = "-n";
-		ar[na++] = (char *) need;
+		ar[na++] = (char *)(intptr_t) need;
 		ar[na++] = "-i";
 		ar[na++] = output;
-		ar[na++] = (char *) len;
+		ar[na++] = (char *)(intptr_t) len;
 		for(j=0; j<nitem; j++)
 			ar[na++] = qitem[j];
 # ifdef D1
