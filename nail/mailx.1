@@ -34,16 +34,16 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)mailx.1	2.325 (gritter) 8/4/07
+.\"     Sccsid: @(#)mailx.1	2.326 (gritter) 10/1/07
 .\"
-.TH MAILX 1 "8/4/07" "Heirloom mailx 12.4" "User Commands"
+.TH MAILX 1 "10/1/07" "Heirloom mailx 12.4" "User Commands"
 .SH NAME
 mailx \- send and receive Internet mail
 .SH SYNOPSIS
 .PD 0
 .HP
 .ad l
-\fBmailx\fR [\fB\-BDdFintv~\fR]
+\fBmailx\fR [\fB\-BDdEFintv~\fR]
 [\fB\-s\fI\ subject\fR] [\fB\-a\fI\ attachment\fR ]
 [\fB\-c\fI\ cc-addr\fR] [\fB\-b\fI\ bcc-addr\fR] [\fB\-r\fI\ from-addr\fR]
 [\fB\-h\fI\ hops\fR]
@@ -52,13 +52,13 @@ mailx \- send and receive Internet mail
 \fIto-addr\fR .\ .\ .
 .HP
 .ad l
-\fBmailx\fR [\fB\-BDdeHiInNRv~\fR] [\fB\-T\fI\ name\fR]
+\fBmailx\fR [\fB\-BDdeEHiInNRv~\fR] [\fB\-T\fI\ name\fR]
 [\fB\-A\fI\ account\fR]
 [\fB\-S\fI\ variable\fR[\fB=\fIvalue\fR]]
 \fB\-f\fR [\fIname\fR]
 .HP
 .ad l
-\fBmailx\fR [\fB\-BDdeinNRv~\fR]
+\fBmailx\fR [\fB\-BDdeEinNRv~\fR]
 [\fB\-A\fI\ account\fR]
 [\fB\-S\fI\ variable\fR[\fB=\fIvalue\fR]]
 [\fB\-u\fI\ user\fR]
@@ -124,6 +124,17 @@ development only.
 Just check if mail is present in the system mailbox.
 If yes, return an exit status of zero,
 else, a non-zero value.
+.TP
+.B \-E
+If an outgoing message does not contain any text
+in its first or only message part,
+do not send it but discard it silently,
+effectively setting the
+.I skipemptybody
+variable at program startup.
+This is useful for sending messages
+from scripts started by
+.IR cron (8).
 .TP
 \fB\-f\fR [\fIfile\fR]
 Read in the contents of the user's mbox
@@ -2629,6 +2640,14 @@ in the header field summary and in message specifications.
 .B showto
 Causes the recipient of the message to be shown in the header summary
 if the message was sent by the user.
+.TP
+.B skipemptybody
+If an outgoing message does not contain any text
+in its first or only message part,
+do not send it but discard it silently
+(see also the
+.I \-E
+option).
 .TP
 .B smime-force-encryption
 Causes

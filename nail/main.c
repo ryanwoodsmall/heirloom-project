@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 1980, 1993 The Regents of the University of California.  All rights reserved.\n";
-static char sccsid[] = "@(#)main.c	2.50 (gritter) 6/16/07";
+static char sccsid[] = "@(#)main.c	2.51 (gritter) 10/1/07";
 #endif	/* DOSCCS */
 #endif /* not lint */
 
@@ -87,13 +87,13 @@ static void setscreensize(int dummy);
 int 
 main(int argc, char *argv[])
 {
-	const char optstr[] = "A:BHFINVT:RS:a:b:c:dDefh:inqr:s:tu:v~";
+	const char optstr[] = "A:BHEFINVT:RS:a:b:c:dDefh:inqr:s:tu:v~";
 	int i, existonly = 0, headersonly = 0, sendflag = 0;
 	struct name *to, *cc, *bcc, *smopts;
 	struct attachment *attach;
 	char *subject, *cp, *ef, *qf = NULL, *fromaddr = NULL, *Aflag = NULL;
 	char nosrc = 0;
-	int Fflag = 0, Nflag = 0, tflag = 0;
+	int Eflag = 0, Fflag = 0, Nflag = 0, tflag = 0;
 	sighandler_type prevint;
 
 	(void)&Nflag;
@@ -191,6 +191,9 @@ main(int argc, char *argv[])
 			break;
 		case 'H':
 			headersonly = 1;
+			break;
+		case 'E':
+			Eflag = 1;
 			break;
 		case 'F':
 			Fflag = 1;
@@ -350,7 +353,7 @@ main(int argc, char *argv[])
 		case '?':
 usage:
 			fprintf(stderr, catgets(catd, CATSET, 135,
-"Usage: %s -eiIUdFntBDNHRV~ -T FILE -u USER -h hops -r address -s SUBJECT -a FILE -q FILE -f FILE -A ACCOUNT -b USERS -c USERS -S OPTION users\n"), progname);
+"Usage: %s -eiIUdEFntBDNHRV~ -T FILE -u USER -h hops -r address -s SUBJECT -a FILE -q FILE -f FILE -A ACCOUNT -b USERS -c USERS -S OPTION users\n"), progname);
 			exit(2);
 		}
 	}
@@ -424,6 +427,12 @@ usage:
 		account(a);
 	}
 
+	/*
+	 * Override 'skipemptybody' if '-E' flag was given.
+	 */
+	if (Eflag)
+		assign("skipemptybody", "");
+
 	starting = 0;
 
 	/*
@@ -432,7 +441,8 @@ usage:
 	if (fromaddr)
 		assign("from", fromaddr);
 	if (!rcvmode) {
-		mail(to, cc, bcc, smopts, subject, attach, qf, Fflag, tflag);
+		mail(to, cc, bcc, smopts, subject, attach, qf, Fflag, tflag,
+		    Eflag);
 		/*
 		 * why wait?
 		 */

@@ -1,4 +1,7 @@
 [12.4] released ...
+* With the "-E" command line option or if the "skipemptybody" variable is
+  set, outgoing messages that contain no text in their first or only part
+  are not sent but silently discarded (contributed by Eygene Ryabinkin).
 * Support for SMTP AUTH PLAIN has been added (contributed by Joe Feise).
   Set "smtp-auth=plain" to use it.
 * Fixed the format of the timezone in "Date" header fields for zones in

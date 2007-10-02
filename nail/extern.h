@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.160 (gritter) 6/16/07
+ *	Sccsid @(#)extern.h	2.161 (gritter) 10/1/07
  */
 
 /* aux.c */
@@ -457,11 +457,12 @@ int send(struct message *mp, FILE *obuf, struct ignoretab *doign,
 char *makeboundary(void);
 int mail(struct name *to, struct name *cc, struct name *bcc,
 		struct name *smopts, char *subject, struct attachment *attach,
-		char *quotefile, int recipient_record, int tflag);
+		char *quotefile, int recipient_record, int tflag, int Eflag);
 int sendmail(void *v);
 int Sendmail(void *v);
 enum okay mail1(struct header *hp, int printheaders, struct message *quote,
-		char *quotefile, int recipient_record, int doprefix, int tflag);
+		char *quotefile, int recipient_record, int doprefix, int tflag,
+		int Eflag);
 int mkdate(FILE *fo, const char *field);
 int puthead(struct header *hp, FILE *fo, enum gfield w,
 		enum sendaction action, enum conversion convert,

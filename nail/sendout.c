@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.96 (gritter) 9/7/07";
+static char sccsid[] = "@(#)sendout.c	2.97 (gritter) 10/1/07";
 #endif
 #endif /* not lint */
 
@@ -675,7 +675,7 @@ savemail(char *name, FILE *fi)
 int 
 mail(struct name *to, struct name *cc, struct name *bcc,
 		struct name *smopts, char *subject, struct attachment *attach,
-		char *quotefile, int recipient_record, int tflag)
+		char *quotefile, int recipient_record, int tflag, int Eflag)
 {
 	struct header head;
 	struct str in, out;
@@ -695,7 +695,7 @@ mail(struct name *to, struct name *cc, struct name *bcc,
 	}
 	head.h_attach = attach;
 	head.h_smopts = smopts;
-	mail1(&head, 0, NULL, quotefile, recipient_record, 0, tflag);
+	mail1(&head, 0, NULL, quotefile, recipient_record, 0, tflag, Eflag);
 	if (subject != NULL)
 		free(out.s);
 	return(0);
@@ -708,12 +708,14 @@ mail(struct name *to, struct name *cc, struct name *bcc,
 static int 
 sendmail_internal(void *v, int recipient_record)
 {
+	int Eflag;
 	char *str = v;
 	struct header head;
 
 	memset(&head, 0, sizeof head);
 	head.h_to = extract(str, GTO|GFULL);
-	mail1(&head, 0, NULL, NULL, recipient_record, 0, 0);
+	Eflag = value("skipemptybody") != NULL;
+	mail1(&head, 0, NULL, NULL, recipient_record, 0, 0, Eflag);
 	return(0);
 }
 
@@ -910,7 +912,8 @@ mightrecord(FILE *fp, struct name *to, int recipient_record)
  */
 enum okay 
 mail1(struct header *hp, int printheaders, struct message *quote,
-		char *quotefile, int recipient_record, int doprefix, int tflag)
+		char *quotefile, int recipient_record, int doprefix, int tflag,
+		int Eflag)
 {
 	struct name *to;
 	FILE *mtf, *nmtf;
@@ -956,6 +959,8 @@ mail1(struct header *hp, int printheaders, struct message *quote,
 		}
 	}
 	if (fsize(mtf) == 0) {
+		if (Eflag)
+			goto out;
 		if (hp->h_subject == NULL)
 			printf(catgets(catd, CATSET, 184,
 				"No message, no subject; hope that's ok\n"));
