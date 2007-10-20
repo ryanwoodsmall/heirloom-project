@@ -1,6 +1,9 @@
 Release ...
 * troff, nroff: A type definition problem that caused an endless loop
   on 64-bit systems has been fixed.
+* -mg macros: When reading the output of "ls" to emulate ".mso", use
+  nofill mode to avoid artifacts from paragraph adjustment that cause
+  the request to fail.
 
 Release 070908
 * troff: The ".hw" request now works correctly for words that contain

@@ -3,7 +3,7 @@
 .\"
 .\" Gunnar Ritter, Freiburg i. Br., Germany, August 2006
 .\"
-.\" Sccsid @(#)g.in	1.12 (gritter) 9/9/06
+.\" Sccsid @(#)g.in	1.13 (gritter) 10/20/07
 .\"
 .cp 0
 .lc_ctype en_US
@@ -23,6 +23,7 @@
 .rm ftr
 .de mso_tryone
 .	ev mso_env
+.	nf
 .	di mso_out
 .	cc 
 	pso ls \\$1 2>/dev/null
