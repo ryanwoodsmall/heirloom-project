@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.75 (gritter) 3/4/07
+ * Sccsid @(#)n9.c	1.76 (gritter) 10/20/07
  */
 
 /*
@@ -1108,16 +1108,17 @@ static const struct {
 static void
 warn1(void)
 {
-	char	name[NC], *xp;
-	int	c, i, sign;
+	char	name[NC];
+	int	i, n, sign;
+	tchar	c;
 
-	switch (c = getach()) {
+	switch (cbits(c = getch())) {
 	case '-':
-		c = getach();
+		c = getch();
 		sign = -1;
 		break;
 	case '+':
-		c = getach();
+		c = getch();
 		sign = 1;
 		break;
 	default:
@@ -1126,17 +1127,23 @@ warn1(void)
 	case 0:
 		return;
 	}
-	for (i = 0; i < sizeof name - 2; i++) {
-		name[i] = c;
-		if ((c = getach()) == 0)
-			break;
-	}
-	name[i+1] = 0;
-	c = strtol(name, &xp, 0);
-	if (*xp) {
+	ch = c;
+	n = atoi0();
+	if ((i = cbits(ch)) != 0 && i != ' ' && i != '\n') {
+		if (c != ch) {
+			while (getach());
+			errprint("illegal number, char %c", i);
+			return;
+		}
+		for (i = 0; i < sizeof name - 2; i++) {
+			if ((c = getach()) == 0)
+				break;
+			name[i] = c;
+		}
+		name[i] = 0;
 		for (i = 0; warnnames[i].s; i++)
 			if (strcmp(name, warnnames[i].s) == 0) {
-				c = warnnames[i].n;
+				n = warnnames[i].n;
 				break;
 			}
 		if (warnnames[i].s == NULL) {
@@ -1146,13 +1153,13 @@ warn1(void)
 	}
 	switch (sign) {
 	case 1:
-		warn |= c;
+		warn |= n;
 		break;
 	case -1:
-		warn &= ~c;
+		warn &= ~n;
 		break;
 	default:
-		warn = c;
+		warn = n;
 	}
 }
 

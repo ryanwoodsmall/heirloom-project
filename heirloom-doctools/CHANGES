@@ -1,6 +1,8 @@
 Release ...
-* troff, nroff: A type definition problem that caused an endless loop
-  on 64-bit systems has been fixed.
+* [nt]roff: A type definition problem that caused an endless loop on
+  64-bit systems has been fixed.
+* [nt]roff: The ".warn" request now accepts full numeric expressions
+  instead of plain numbers only.
 * -mg macros: When reading the output of "ls" to emulate ".mso", use
   nofill mode to avoid artifacts from paragraph adjustment that cause
   the request to fail.
