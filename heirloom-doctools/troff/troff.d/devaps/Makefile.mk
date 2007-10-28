@@ -26,6 +26,8 @@ HM.out: HB.out
 	rm -f $@
 	ln -s HB.out $@
 
+HB.out: fonts
+
 install: all
 	$(INSTALL) -c daps $(ROOT)$(BINDIR)/daps
 	$(STRIP) $(ROOT)$(BINDIR)/daps
