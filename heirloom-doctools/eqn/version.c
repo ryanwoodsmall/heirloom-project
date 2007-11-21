@@ -22,7 +22,7 @@ funny.c: * Sccsid @(#)funny.c	1.6 (gritter) 10/19/06
 glob.c: * Sccsid @(#)glob.c	1.8 (gritter) 10/19/06
 integral.c: * Sccsid @(#)integral.c	1.5 (gritter) 10/19/06
 io.c: * Sccsid @(#)io.c	1.12 (gritter) 11/23/06
-lex.c: * Sccsid @(#)lex.c	1.6 (gritter) 10/2/07
+lex.c: * Sccsid @(#)lex.c	1.7 (gritter) 11/21/07
 lookup.c: * Sccsid @(#)lookup.c	1.5 (gritter) 9/18/05
 mark.c: * Sccsid @(#)mark.c	1.3 (gritter) 8/12/05
 matrix.c: * Sccsid @(#)matrix.c	1.4 (gritter) 10/29/05

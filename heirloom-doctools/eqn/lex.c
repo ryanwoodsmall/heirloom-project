@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)lex.c	1.6 (gritter) 10/2/07
+ * Sccsid @(#)lex.c	1.7 (gritter) 11/21/07
  */
 
 #include "e.h"
@@ -84,7 +84,7 @@ pbstr(register char *str)
 		putbak(*--p);
 }
 
-YYSTYPE
+int
 yylex(void) {
 	register int c;
 	tbl *tp;
