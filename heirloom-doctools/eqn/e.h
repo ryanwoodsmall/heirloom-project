@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.11 (gritter) 10/2/07
+ * Sccsid @(#)e.h	1.12 (gritter) 11/21/07
  */
 
 #include <stdio.h>
@@ -77,7 +77,7 @@ extern int	ebase[100];
 extern int	lfont[100];
 extern int	rfont[100];
 extern YYSTYPE	yyval;
-extern int	*yypv;
+extern YYSTYPE	*yypv;
 extern YYSTYPE	yylval;
 extern int	eqnreg, eqnht;
 extern int	lefteq, righteq;
@@ -132,7 +132,7 @@ void error(int, const char *, ...);
 int gtc(void);
 int openinfile(void);
 void pbstr(register char *);
-YYSTYPE yylex(void);
+int yylex(void);
 void getstr(char *, register int);
 int cstr(char *, int, int);
 void define(int);

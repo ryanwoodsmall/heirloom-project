@@ -6,6 +6,7 @@ Release ...
 * -mg macros: When reading the output of "ls" to emulate ".mso", use
   nofill mode to avoid artifacts from paragraph adjustment that cause
   the request to fail.
+* eqn: Fixed the types of yylex() and yypv.
 
 Release 070908
 * troff: The ".hw" request now works correctly for words that contain
