@@ -4,6 +4,9 @@
   are not sent but silently discarded (contributed by Eygene Ryabinkin).
 * Support for SMTP AUTH PLAIN has been added (contributed by Joe Feise).
   Set "smtp-auth=plain" to use it.
+* Fixed a bug that caused messages to be truncated with IMAP servers that
+  use LF as line ending in message data, such as Google Mail (reported by 
+  Matthew L. Shobe).
 * Fixed the format of the timezone in "Date" header fields for zones in
   the Western Hemisphere whose offsets are not an integral number of hours
   (patch by Matthew Fischer).

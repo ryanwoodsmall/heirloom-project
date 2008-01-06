@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.218 (gritter) 3/17/07";
+static char sccsid[] = "@(#)imap.c	1.219 (gritter) 1/6/08";
 #endif
 #endif /* not lint */
 
@@ -1334,10 +1334,12 @@ imap_fetchdata(struct mailbox *mp, struct message *m, size_t expected,
 		if (lp[linelen-1] == '\n' && (linelen == 1 ||
 					lp[linelen-2] == '\r')) {
 			emptyline = linelen <= 2;
-			if (linelen > 2)
+			if (linelen > 2) {
 				fwrite(lp, 1, linelen - 2, mp->mb_otf);
+				size += linelen - 1;
+			} else
+				size++;
 			fputc('\n', mp->mb_otf);
-			size += linelen - 1;
 		} else {
 			emptyline = 0;
 			fwrite(lp, 1, linelen, mp->mb_otf);
