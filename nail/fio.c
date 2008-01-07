@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.72 (gritter) 3/20/07";
+static char sccsid[] = "@(#)fio.c	2.73 (gritter) 1/7/08";
 #endif
 #endif /* not lint */
 
@@ -471,7 +471,10 @@ next:
 	}
 	if (!anyof(name, "|&;<>~{}()[]*?$`'\"\\"))
 		return name;
-	return globname(name);
+	if (which_protocol(name) == PROTO_FILE)
+		return globname(name);
+	else
+		return name;
 }
 
 static char *

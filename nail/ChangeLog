@@ -7,6 +7,9 @@
 * Fixed a bug that caused messages to be truncated with IMAP servers that
   use LF as line ending in message data, such as Google Mail (reported by 
   Matthew L. Shobe).
+* Do not run filename expansion for IMAP or POP3 mailboxes names, making
+  it possible to select mailboxes that contain both brackets and spaces
+  in their names (reported by Matthew L. Shobe).
 * Fixed the format of the timezone in "Date" header fields for zones in
   the Western Hemisphere whose offsets are not an integral number of hours
   (patch by Matthew Fischer).
