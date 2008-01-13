@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)diacrit.c	1.6 (gritter) 1/10/08
+ * Sccsid @(#)diacrit.c	1.7 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -103,7 +103,7 @@ diacrit(int p1, int type) {
 		}
 	nrwid(c, ps, c);
 #ifndef NEQN
-	if (lfont[p1] != ITAL)
+	if (!ital(lfont[p1]))
 		printf(".nr %d 0\n", t);
 	printf(".as %d \\h'-\\n(%du-\\n(%du/2u+\\n(%du'\\v'0-\\n(10u'\\*(%d", 
 		p1, p1, c, t, c);

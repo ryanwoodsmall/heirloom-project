@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)io.c	1.12 (gritter) 11/23/06
+ * Sccsid @(#)io.c	1.13 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -199,7 +199,7 @@ putout(int p1) {
 		printf("\\x'0-%du'", before);
 #endif	/* NEQN */
 	printf("\\f%c\\s%s\\*(%d%s\n",
-		gfont, tsize(gsize), p1, rfont[p1] == ITAL ? "\\|" : "");
+		gfont, tsize(gsize), p1, ital(rfont[p1]) ? "\\|" : "");
 	printf(".ie \\n(.X=0 .as %d \\s\\n(99\n", p1);
 	printf(".el .as %d \\s[\\n(99]\n", p1);
 	printf(".as %d \\f\\n(98", p1);

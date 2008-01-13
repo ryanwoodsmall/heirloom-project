@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)text.c	1.7 (gritter) 11/6/05
+ * Sccsid @(#)text.c	1.8 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -115,11 +115,13 @@ trans(int c,char *p1) {
 		if (rf == ITAL)
 			shim(0);
 		name4('e','q');
+		f |= OP;
 		break;
 	case '+':
 		if (rf == ITAL)
 			shim(0);
 		name4('p', 'l');
+		f |= OP;
 		break;
 	case '>': case '<':
 		if (rf == ITAL)
@@ -130,6 +132,7 @@ trans(int c,char *p1) {
 		} else {
 			cs[csp++] = c;  
 		}
+		f |= OP;
 		break;
 	case '-':
 		if (rf == ITAL)
@@ -139,11 +142,13 @@ trans(int c,char *p1) {
 		} else {
 			name4('m','i');
 		}
+		f |= OP;
 		break;
 	case '/':
 		if (rf == ITAL)
 			shim(0);
 		name4('s','l');
+		f |= OP;
 		break;
 	case '~': case ' ':
 		shim(0); shim(0); break;

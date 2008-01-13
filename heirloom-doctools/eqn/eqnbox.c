@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)eqnbox.c	1.6 (gritter) 10/19/06
+ * Sccsid @(#)eqnbox.c	1.7 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -44,9 +44,12 @@ eqnbox(int p1, int p2, int lu) {
 	if(dbg)printf(".\te:eb: S%d <- S%d S%d; b=%d, h=%d\n", 
 		yyval, p1, p2, b, h);
 #endif	/* NEQN */
-	if (rfont[p1] == ITAL && lfont[p2] == ROM)
-		sh = "\\^";
-	else
+	if (ital(rfont[p1]) && rom(lfont[p2])) {
+		if (op(lfont[p2]))
+			sh = "\\|";
+		else
+			sh = "\\^";
+	} else
 		sh = "";
 	if (lu) {
 		printf(".nr %d \\w'\\s%s\\*(%d%s'\n", p1, tsize(ps), p1, sh);

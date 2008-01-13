@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)e.h	1.12 (gritter) 11/21/07
+ * Sccsid @(#)e.h	1.13 (gritter) 1/13/08
  */
 
 #include <stdio.h>
@@ -41,6 +41,13 @@ typedef	intptr_t	YYSTYPE;
 #define	ITAL	'1'
 #define	BLD	'1'
 #endif /* NEQN */
+
+#define	rom(c)	(((c) & 0177) == ROM)
+#define	ital(c)	(((c) & 0177) == ITAL)
+#define	bld(c)	(((c) & 0177) == BLD)
+
+#define	OP	0200
+#define	op(c)	((c) & OP)
 
 #ifndef NEQN
 #define	VERT(n)	(n)

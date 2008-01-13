@@ -6,6 +6,10 @@ Release ...
 * -mg macros: When reading the output of "ls" to emulate ".mso", use
   nofill mode to avoid artifacts from paragraph adjustment that cause
   the request to fail.
+* eqn: Before an equation or binary operator, print a "\|" instead of
+  a "\^" if the preceding character is italic. The previous behavior
+  resulted from a too far-reaching change in release 051107. (Bug
+  reported by Joerg van den Hoff.)
 * eqn: Do not displace "hat" and "tilde" horizontally (bug reported by
   Joerg van den Hoff).
 * eqn: Fixed the types of yylex() and yypv.

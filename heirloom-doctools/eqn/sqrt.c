@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)sqrt.c	1.5 (gritter) 10/19/06
+ * Sccsid @(#)sqrt.c	1.6 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -35,7 +35,7 @@ sqrt(int p2) {
 	eht[yyval] = VERT(EM(1.2, nps));
 	if(dbg)printf(".\tsqrt: S%d <- S%d;b=%g, h=%g\n", 
 		yyval, p2, ebase[yyval], eht[yyval]);
-	if (rfont[yyval] == ITAL)
+	if (ital(rfont[yyval]))
 		printf(".as %d \\|\n", yyval);
 #endif /* NEQN */
 	nrwid(p2, ps, p2);

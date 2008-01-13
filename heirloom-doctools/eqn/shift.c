@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)shift.c	1.5 (gritter) 10/19/06
+ * Sccsid @(#)shift.c	1.6 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -58,9 +58,9 @@ bshiftb(int p1, int dir, int p2) {
 		ebase[yyval] = b1 + max(0, h2-b1-d1);
 		eht[yyval] = h1 + max(0, h2-b1-d1);
 #ifndef NEQN
-		if (rfont[p1] == ITAL && lfont[p2] == ROM)
+		if (ital(rfont[p1]) && rom(lfont[p2]))
 			sh1 = "\\|";
-		if (rfont[p2] == ITAL)
+		if (ital(rfont[p2]))
 			sh2 = "\\|";
 #endif /* NEQN */
 	} else {	/* superscript */
@@ -81,9 +81,9 @@ bshiftb(int p1, int dir, int p2) {
 			shval = -(h1-b1) + h2-b2 - d1;
 #ifndef NEQN
 		eht[yyval] = h1 + max(0, h2-VERT((6*(h1-b1))/10));
-		if (rfont[p1] == ITAL)
+		if (ital(rfont[p1]))
 			sh1 = "\\|";
-		if (rfont[p2] == ITAL)
+		if (ital(rfont[p2]))
 			sh2 = "\\|";
 #else /* NEQN */
 		eht[yyval] = h1 + max(0, h2 - VERT(1));
@@ -95,7 +95,7 @@ bshiftb(int p1, int dir, int p2) {
 	printf(".as %d \\v'%gp'\\s-%s%s\\*(%d\\s+%s%s\\v'%gp'\n", 
 		yyval, shval, tsize(diffps), sh1, p2, tsize(diffps), sh2, -shval);
 	ps += deltaps;
-	if (rfont[p2] == ITAL)
+	if (ital(rfont[p2]))
 		rfont[p1] = 0;
 	else
 		rfont[p1] = rfont[p2];
@@ -163,14 +163,14 @@ shift2(int p1, int p2, int p3) {
 #endif /* NEQN */
 	ebase[yyval] = b1+max(0, h2-b1-d1);
 #ifndef NEQN
-	if (rfont[p1] == ITAL && lfont[p2] == ROM)
+	if (ital(rfont[p1]) && rom(lfont[p2]))
 		printf(".ds %d \\|\\*(%d\n", p2, p2);
-	if (rfont[p2] == ITAL)
+	if (ital(rfont[p2]))
 		printf(".as %d \\|\n", p2);
 #endif /* NEQN */
 	nrwid(p2, effps, p2);
 #ifndef NEQN
-	if (rfont[p1] == ITAL && lfont[p3] == ROM)
+	if (ital(rfont[p1]) && rom(lfont[p3]))
 		printf(".ds %d \\|\\|\\*(%d\n", p3, p3);
 	else
 		printf(".ds %d \\|\\*(%d\n", p3, p3);
@@ -191,7 +191,7 @@ shift2(int p1, int p2, int p3) {
 #endif /* NEQN */
 	ps += deltaps;
 #ifndef NEQN
-	if (rfont[p2] == ITAL)
+	if (ital(rfont[p2]))
 		rfont[yyval] = 0;	/* lie */
 #endif /* NEQN */
 	ofree(p2); ofree(p3); ofree(treg);

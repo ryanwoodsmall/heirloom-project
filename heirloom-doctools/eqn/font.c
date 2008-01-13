@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)font.c	1.4 (gritter) 10/29/05
+ * Sccsid @(#)font.c	1.5 (gritter) 1/13/08
  */
 
 # include "e.h"
@@ -47,7 +47,7 @@ void
 font(int p1, int p2) {
 		/* old font in p1, new in ft */
 	yyval = p2;
-	lfont[yyval] = rfont[yyval] = ft==ITAL ? ITAL : ROM;
+	lfont[yyval] = rfont[yyval] = ital(ft) ? ITAL : ROM;
 #ifndef	NEQN
 	if(dbg)printf(".\tb:fb: S%d <- \\f%c S%d \\f%c b=%g,h=%g,lf=%c,rf=%c\n", 
 		yyval, ft, p2, p1, ebase[yyval], eht[yyval], lfont[yyval], rfont[yyval]);
