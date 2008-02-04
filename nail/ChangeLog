@@ -17,6 +17,7 @@
   message but no "from" address can be determined (Georgi Stanojevski).
 * Made the getopt() substitute work with the getopt$UNIX2003() function
   redirection mechanism on Mac OS X Leopard.
+* Fixed an incorrect type of enum (patch by Matthew Fischer).
 
 [12.3] released 7/15/07
 * Multibyte characters are now handled correctly when printing texts

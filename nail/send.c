@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)send.c	2.85 (gritter) 6/16/07";
+static char sccsid[] = "@(#)send.c	2.86 (gritter) 2/4/08";
 #endif
 #endif /* not lint */
 
@@ -968,7 +968,7 @@ out(char *buf, size_t len, FILE *fp,
 		}
 	}
 	sz += mime_write(buf, len, fp,
-			action == SEND_MBOX ? SEND_MBOX : convert,
+			action == SEND_MBOX ? CONV_NONE : convert,
 			action == SEND_TODISP || action == SEND_TODISP_ALL ||
 					action == SEND_QUOTE ||
 					action == SEND_QUOTE_ALL ?
