@@ -1,4 +1,4 @@
-Release ...
+Release 080407
 * [nt]roff: A type definition problem that caused an endless loop on
   64-bit systems has been fixed.
 * [nt]roff: The ".warn" request now accepts full numeric expressions
