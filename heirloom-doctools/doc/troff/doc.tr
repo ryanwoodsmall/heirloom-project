@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.182 (gritter) 9/17/07
+.\" Sccsid @(#)doc.tr	1.183 (gritter) 4/21/08
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -105,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 9/17/07
+.ds Sccsdate 4/21/08
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -5366,8 +5366,9 @@ to \fIname\fR, which is one of
 \fBen_US\fR,
 \fBfr_FR\fR,
 \fBit_IT\fR,
+\fBla_VA\fR,
 or
-\fBla_VA\fR.
+\fBnl_NL\fR.
 Other languages can be made available by adding hyphenation
 files to the directory
 \fB/usr/ucblib/doctools/hyphen\fR.
