@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n2.c	1.46 (gritter) 3/5/07
+ * Sccsid @(#)n2.c	1.47 (gritter) 5/25/08
  */
 
 /*
@@ -80,6 +80,7 @@ pchar(register tchar i)
 	register int j;
 	static int hx = 0;	/* records if have seen HX */
 	static int xon = 0;	/* records if have seen XON */
+	static int drawfcn = 0;	/* records if have seen DRAWFCN */
 
 	if (hx) {
 		hx = 0;
@@ -121,6 +122,9 @@ pchar(register tchar i)
 	case XOFF:
 		xon = 0;
 		goto dfl;
+	case DRAWFCN:
+		drawfcn = !drawfcn;
+		goto dfl;
 	case PRESC:
 		if (dip == &d[0])
 			j = eschar;	/* fall through */
@@ -128,7 +132,7 @@ pchar(register tchar i)
 	dfl:
 		if (!xflag || !isdi(i)) {
 			setcbits(i, tflg ? trnttab[j] : trtab[j]);
-			if (xon == 0)
+			if (xon == 0 && drawfcn == 0)
 				setcbits(i, ftrans(fbits(i), cbits(i)));
 		}
 	}

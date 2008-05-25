@@ -1,6 +1,9 @@
 Release ...
 * [nt]roff: Hyphenation patterns for Dutch have been added (contributed
   by Erwin Koning).
+* troff: Do not apply font-specific character translation inside \D,
+  which led to wrong output e.g. with \D'l' with an OpenType font with
+  the small caps feature activated (bug reported by Russ Cox).
 
 Release 080407
 * [nt]roff: A type definition problem that caused an endless loop on

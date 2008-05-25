@@ -7,22 +7,22 @@
 #endif
 #if defined (DUMP)
 static const char sccsid[] USED =
-	"@(#)/usr/ucb/otfdump.sl	8.59 (gritter) 10/20/07";
+	"@(#)/usr/ucb/otfdump.sl	8.60 (gritter) 5/25/08";
 #elif defined (DPOST)
-static const char sccsid[] USED = "@(#)dpost.sl  8.59 (gritter) 10/20/07";
-const char creator[] = "Heirloom Documentation Tools - dpost 8.59 (gritter) 10/20/07";
+static const char sccsid[] USED = "@(#)dpost.sl  8.60 (gritter) 5/25/08";
+const char creator[] = "Heirloom Documentation Tools - dpost 8.60 (gritter) 5/25/08";
 #elif defined (NROFF)
-static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	8.59 (gritter) 10/20/07";
+static const char sccsid[] USED = "@(#)/usr/ucb/nroff.sl	8.60 (gritter) 5/25/08";
 #else	/* !DUMP, !NROFF */
-static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	8.59 (gritter) 10/20/07";
+static const char sccsid[] USED = "@(#)/usr/ucb/troff.sl	8.60 (gritter) 5/25/08";
 #endif	/* !DUMP, !NROFF */
-const char revision[] = "8.59";
+const char revision[] = "8.60";
 /* SLIST */
 /*
 ext.h: * Sccsid @(#)ext.h	1.110 (gritter) 3/5/07
 hytab.c: * Sccsid @(#)hytab.c	1.4 (gritter) 8/16/05
 n1.c: * Sccsid @(#)n1.c	1.142 (gritter) 4/14/07
-n2.c: * Sccsid @(#)n2.c	1.46 (gritter) 3/5/07
+n2.c: * Sccsid @(#)n2.c	1.47 (gritter) 5/25/08
 n3.c: * Sccsid @(#)n3.c	1.180 (gritter) 12/17/06
 n4.c: * Sccsid @(#)n4.c	1.101 (gritter) 6/21/07
 n5.c: * Sccsid @(#)n5.c	1.129 (gritter) 5/16/07
@@ -64,7 +64,7 @@ troff.d/dpost.d/dpost.h: * Sccsid @(#)dpost.h	1.11 (gritter) 9/22/06
 troff.d/dpost.d/draw.c: * Sccsid @(#)draw.c	1.7 (gritter) 3/27/07
 troff.d/dpost.d/ext.h: * Sccsid @(#)ext.h	1.7 (gritter) 3/27/07
 troff.d/dpost.d/gen.h: * Sccsid @(#)gen.h	1.16 (gritter) 10/15/06
-troff.d/dpost.d/getopt.c: * Sccsid @(#)getopt.c	1.9 (gritter) 4/2/07
+troff.d/dpost.d/getopt.c: * Sccsid @(#)getopt.c	1.10 (gritter) 12/16/07
 troff.d/dpost.d/glob.c: * Sccsid @(#)glob.c	1.3 (gritter) 8/9/05
 troff.d/dpost.d/makedev.c: * Sccsid @(#)makedev.c	1.1 (gritter) 9/4/05
 troff.d/dpost.d/misc.c: * Sccsid @(#)misc.c	1.14 (gritter) 12/25/06
