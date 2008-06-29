@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.97 (gritter) 10/1/07";
+static char sccsid[] = "@(#)sendout.c	2.98 (gritter) 6/29/08";
 #endif
 #endif /* not lint */
 
@@ -62,6 +62,7 @@ static char	*send_boundary;
 static char *getencoding(enum conversion convert);
 static struct name *fixhead(struct header *hp, struct name *tolist);
 static int put_signature(FILE *fo, int convert);
+static int attach_file1(struct attachment *ap, FILE *fo, int dosign);
 static int attach_file(struct attachment *ap, FILE *fo, int dosign);
 static int attach_message(struct attachment *ap, FILE *fo, int dosign);
 static int make_multipart(struct header *hp, int convert, FILE *fi, FILE *fo,
@@ -194,7 +195,7 @@ put_signature(FILE *fo, int convert)
  * Write an attachment to the file buffer, converting to MIME.
  */
 static int
-attach_file(struct attachment *ap, FILE *fo, int dosign)
+attach_file1(struct attachment *ap, FILE *fo, int dosign)
 {
 	FILE *fi;
 	char *charset = NULL, *contenttype = NULL, *basename;
@@ -258,7 +259,7 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR)) == 0 &&
 			ascncasecmp(contenttype, "text/", 5) == 0 &&
 			isclean & MIME_HIGHBIT &&
-			charset != NULL && asccasecmp(charset, tcs)) {
+			charset != NULL) {
 		if ((iconvd = iconv_open_ft(charset, tcs)) == (iconv_t)-1 &&
 				errno != 0) {
 			if (errno == EINVAL)
@@ -305,6 +306,45 @@ attach_file(struct attachment *ap, FILE *fo, int dosign)
 	Fclose(fi);
 	free(buf);
 	return err;
+}
+
+/*
+ * Try out different character set conversions to attach a file.
+ */
+static int
+attach_file(struct attachment *ap, FILE *fo, int dosign)
+{
+	char	*_wantcharset, *charsets, *ncs;
+	size_t	offs = ftell(fo);
+
+	if (ap->a_charset || (charsets = value("sendcharsets")) == NULL)
+		return attach_file1(ap, fo, dosign);
+	_wantcharset = wantcharset;
+	wantcharset = savestr(charsets);
+loop:	if ((ncs = strchr(wantcharset, ',')) != NULL)
+		*ncs++ = '\0';
+try:	if (attach_file1(ap, fo, dosign) != 0) {
+		if (errno == EILSEQ || errno == EINVAL) {
+			if (ncs && *ncs) {
+				wantcharset = ncs;
+				clearerr(fo);
+				fseek(fo, offs, SEEK_SET);
+				goto loop;
+			}
+			if (wantcharset) {
+				if (wantcharset == (char *)-1)
+					wantcharset = NULL;
+				else {
+					wantcharset = (char *)-1;
+					clearerr(fo);
+					fseek(fo, offs, SEEK_SET);
+					goto try;
+				}
+			}
+		}
+	}
+	wantcharset = _wantcharset;
+	return 0;
 }
 
 /*
@@ -431,8 +471,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 			&isclean, dosign);
 #ifdef	HAVE_ICONV
 	tcs = gettcharset();
-	if ((convhdr = need_hdrconv(hp, GTO|GSUBJECT|GCC|GBCC|GIDENT)) != 0 &&
-			asccasecmp(convhdr, tcs)) {
+	if ((convhdr = need_hdrconv(hp, GTO|GSUBJECT|GCC|GBCC|GIDENT)) != 0) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if ((iconvd = iconv_open_ft(convhdr, tcs)) == (iconv_t)-1
@@ -469,7 +508,7 @@ infix(struct header *hp, FILE *fi, int dosign)
 	if ((isclean & (MIME_HASNUL|MIME_CTRLCHAR)) == 0 &&
 			ascncasecmp(contenttype, "text/", 5) == 0 &&
 			isclean & MIME_HIGHBIT &&
-			charset != NULL && asccasecmp(charset, tcs)) {
+			charset != NULL) {
 		if (iconvd != (iconv_t)-1)
 			iconv_close(iconvd);
 		if ((iconvd = iconv_open_ft(charset, tcs)) == (iconv_t)-1
@@ -1001,10 +1040,21 @@ try:	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
 			hp->h_charset = NULL;
 			goto hloop;
 		}
-		if (ncs && *ncs && (errno == EILSEQ || errno == EINVAL)) {
-			rewind(mtf);
-			wantcharset = ncs;
-			goto loop;
+		if (errno == EILSEQ || errno == EINVAL) {
+			if (ncs && *ncs) {
+				rewind(mtf);
+				wantcharset = ncs;
+				goto loop;
+			}
+			if (wantcharset && value("interactive") != NULL) {
+				if (wantcharset == (char *)-1)
+					wantcharset = NULL;
+				else {
+					rewind(mtf);
+					wantcharset = (char *)-1;
+					goto try;
+				}
+			}
 		}
 		/* fprintf(stderr, ". . . message lost, sorry.\n"); */
 		perror("");

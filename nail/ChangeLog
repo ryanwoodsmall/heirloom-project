@@ -4,6 +4,18 @@
   are not sent but silently discarded (contributed by Eygene Ryabinkin).
 * Support for SMTP AUTH PLAIN has been added (contributed by Joe Feise).
   Set "smtp-auth=plain" to use it.
+* When the text of an outgoing message contains illegal byte sequences
+  in non-interactive mode, do not refuse sending it but send it with
+  the "application/octet-stream" content type instead (thanks for the
+  report and further help to Hilko Bengen).
+* When an attachment that would have a "text/something" content type
+  contains illegal byte sequences, it is now reliably sent out with the
+  "application/octet-stream" content type instead (bugreport by
+  Hilko Bengen).
+* The values of the "sendcharsets" variable are now separately traversed
+  for each part of a multipart message, so that if e.g. the main body can
+  be represented in ISO-8859-1 but an attachment text needs UTF-8, these
+  two encodings will be chosen, respectively.
 * Fixed a bug that caused messages to be truncated with IMAP servers that
   use LF as line ending in message data, such as Google Mail (reported by 
   Matthew L. Shobe).

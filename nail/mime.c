@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.68 (gritter) 6/16/07";
+static char sccsid[]  = "@(#)mime.c	2.69 (gritter) 6/29/08";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -258,7 +258,8 @@ getcharset(int isclean)
 	if (isclean & (MIME_CTRLCHAR|MIME_HASNUL))
 		charset = NULL;
 	else if (isclean & MIME_HIGHBIT) {
-		charset = wantcharset ? wantcharset : value("charset");
+		charset = (wantcharset && wantcharset != (char *)-1) ?
+			wantcharset : value("charset");
 		if (charset == NULL) {
 			charset = defcharset;
 		}
@@ -381,10 +382,6 @@ iconv_open_ft(const char *tocode, const char *fromcode)
 	iconv_t id;
 	char *t, *f;
 
-	if (strcmp(tocode, fromcode) == 0) {
-		errno = 0;
-		return (iconv_t)-1;
-	}
 	/*
 	 * On Linux systems, this call may succeed.
 	 */
@@ -403,10 +400,6 @@ iconv_open_ft(const char *tocode, const char *fromcode)
 		fromcode += 3;
 	if (*tocode == '\0' || *fromcode == '\0')
 		return (iconv_t) -1;
-	if (strcmp(tocode, fromcode) == 0) {
-		errno = 0;
-		return (iconv_t)-1;
-	}
 	if ((id = iconv_open(tocode, fromcode)) != (iconv_t)-1)
 		return id;
 	/*
@@ -416,10 +409,6 @@ iconv_open_ft(const char *tocode, const char *fromcode)
 	uppercopy(t, tocode);
 	f = salloc(strlen(fromcode) + 1);
 	uppercopy(f, fromcode);
-	if (strcmp(t, f) == 0) {
-		errno = 0;
-		return (iconv_t)-1;
-	}
 	if ((id = iconv_open(t, f)) != (iconv_t)-1)
 		return id;
 	/*
@@ -427,16 +416,22 @@ iconv_open_ft(const char *tocode, const char *fromcode)
 	 */
 	stripdash(t);
 	stripdash(f);
-	if (strcmp(t, f) == 0) {
-		errno = 0;
-		return (iconv_t)-1;
-	}
 	if ((id = iconv_open(t, f)) != (iconv_t)-1)
 		return id;
 	/*
-	 * Add you vendor's sillynesses here.
+	 * Add your vendor's sillynesses here.
 	 */
-	return id;
+	/*
+	 * If the encoding names are equal at this point, they
+	 * are just not understood by iconv(), and we cannot
+	 * sensibly use it in any way. We do not perform this
+	 * as an optimization above since iconv() can otherwise
+	 * be used to check the validity of the input even with
+	 * identical encoding names.
+	 */
+	if (strcmp(t, f) == 0)
+		errno = 0;
+	return (iconv_t)-1;
 }
 
 /*
@@ -807,8 +802,13 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 		convert = gettextconversion();
 	else
 		convert = CONV_7BIT;
-	if (*contenttype == NULL) {
-		if (*isclean & MIME_CTRLCHAR) {
+	if (*contenttype == NULL ||
+			ascncasecmp(*contenttype, "text/", 5) == 0) {
+		*charset = getcharset(*isclean);
+		if (wantcharset == (char *)-1) {
+			*contenttype = "application/octet-stream";
+			*charset = NULL;
+		} if (*isclean & MIME_CTRLCHAR) {
 			/*
 			 * RFC 2046 forbids control characters other than
 			 * ^I or ^L in text/plain bodies. However, some
@@ -817,9 +817,8 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 			 */
 			if ((*contenttype = value("contenttype-cntrl")) == NULL)
 				*contenttype = "application/octet-stream";
-		} else
+		} else if (*contenttype == NULL)
 			*contenttype = "text/plain";
-		*charset = getcharset(*isclean);
 	}
 	return convert;
 }
