@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.98 (gritter) 6/29/08";
+static char sccsid[] = "@(#)sendout.c	2.99 (gritter) 7/4/08";
 #endif
 #endif /* not lint */
 
@@ -1046,7 +1046,7 @@ try:	if ((nmtf = infix(hp, mtf, dosign)) == NULL) {
 				wantcharset = ncs;
 				goto loop;
 			}
-			if (wantcharset && value("interactive") != NULL) {
+			if (wantcharset && value("interactive") == NULL) {
 				if (wantcharset == (char *)-1)
 					wantcharset = NULL;
 				else {
