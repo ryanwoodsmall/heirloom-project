@@ -6,7 +6,7 @@ Release ...
   the small caps feature activated (bug reported by Russ Cox).
 * troff: The "\X" and "\Y" escape sequences are no longer interpreted
   in copy mode, as there is no case when this would be useful, and the
-  behavior now matches groff and Plan 9 troff.
+  behavior now matches groff and Plan 9 troff (thanks to Russ Cox).
 * dpost: Fixed a case in which invalid backslash sequences were generated
   when insane sizes appeared in intermediate troff input (bug reported by
   Russ Cox).
