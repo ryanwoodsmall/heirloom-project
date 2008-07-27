@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.183 (gritter) 4/21/08
+.\" Sccsid @(#)doc.tr	1.184 (gritter) 7/27/08
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -105,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 4/21/08
+.ds Sccsdate 7/27/08
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -2088,8 +2088,6 @@ The escape sequences
 \fB\T'e_n'\en\T\fR,
 \fB\T'e_t'\et\T\fR,
 \fB\T'e_V'\eV\T\fR,
-\fB\T'e_X'\eX\T\fR,
-\fB\T'e_Y'\eY\T\fR,
 and
 \fB\T'e_newline'\e\fR(newline)\T are interpreted
 in \T'copy mode'\fIcopy mode\fR (\(sc7.2).\T
@@ -3991,7 +3989,6 @@ The input is copied without interpretation
 \*+ Strings indicated by \T'e_*'\fB\e\(**\fR\T are interpolated.
 \*+ Arguments indicated by \T'e_$'\fB\e$\fR\T are interpolated.
 \*+ Environment variables indicated by \T'e_V'\fB\eV\fR\T are interpolated.
-\*+ Device control functions indicated by \T'e_X'\fB\eX\fR\T and \T'e_Y'\fB\eY\fR\T are executed.
 \*+ Concealed newlines indicated by \T'e_newline'\fB\e\fR\T(newline) are eliminated.
 \*+ Comments indicated by \T'e_"'\fB\e"\fR\T or \T'e_#'\fB\e#\fR\T are eliminated.
 \*+ \T'e_t'\fB\et\fR\T and \T'e_a'\fB\ea\fR\T are interpreted as \s-1ASCII\s+1 horizontal tab and \s-1SOH\s+1 respectively \T's_tabs'(\(sc9).\T
