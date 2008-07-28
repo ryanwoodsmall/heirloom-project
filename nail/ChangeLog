@@ -1,4 +1,4 @@
-[12.4] released ...
+[12.4] released 7/29/08
 * With the "-E" command line option or if the "skipemptybody" variable is
   set, outgoing messages that contain no text in their first or only part
   are not sent but silently discarded (contributed by Eygene Ryabinkin).
