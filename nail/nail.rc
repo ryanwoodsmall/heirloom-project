@@ -4,7 +4,7 @@
 # This file is not overwritten when 'make install' is run in
 # the mailx build process again.
 
-# Sccsid @(#)nail.rc	2.10 (gritter) 3/4/06
+# Sccsid @(#)nail.rc	2.11 (gritter) 8/2/08
 
 # Do not forward to mbox by default since this is likely to be
 # irritating for most users today.
@@ -54,6 +54,9 @@ set newmail=nopoll
 
 # If threaded mode is activated, automatically collapse thread.
 set autocollapse
+
+# Mark messages that have been answered.
+set markanswered
 
 # Hide some header fields which are uninteresting for most human readers.
 ignore received in-reply-to message-id references
