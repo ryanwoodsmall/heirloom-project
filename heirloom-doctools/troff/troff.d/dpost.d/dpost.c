@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.174 (gritter) 7/27/08
+ * Sccsid @(#)dpost.c	1.175 (gritter) 8/18/08
  */
 
 /*
@@ -4083,7 +4083,7 @@ addchar (
     static int	lastc;
 
     subfont = 0;
-    if (c != '\\' && lastc != '\\')
+    if (lastc != '\\')
     	oprep(1);
     lastc = c;
     switch ( encoding )  {
