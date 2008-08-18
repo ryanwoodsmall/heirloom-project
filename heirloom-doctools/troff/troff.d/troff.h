@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)troff.h	1.26 (gritter) 8/12/06
+ * Sccsid @(#)troff.h	1.27 (gritter) 8/19/08
  */
 
 extern struct tracktab {
@@ -42,7 +42,7 @@ extern struct ref {
 	struct ref	*next;
 	char	*name;
 	int	cnt;
-} *anchors, *links;
+} *anchors, *links, *ulinks;
 
 extern	struct dev	dev;
 extern	int		Nfont;

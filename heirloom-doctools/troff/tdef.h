@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.163 (gritter) 10/2/07
+ * Sccsid @(#)tdef.h	1.164 (gritter) 8/19/08
  */
 
 /*
@@ -164,6 +164,8 @@
 #define	INDENT	0023	/* current indent (informational only, no move) */
 #define	PENALTY	0024	/* line breaking penalty */
 #define	DPENAL	0025	/* default line breaking penalty change */
+#define	ULINKON	0026	/* ulink start */
+#define	ULINKOFF 0027	/* ulink end */
 
 #define	isxfunc(c, x)	(cbits(c) == XFUNC && fbits(c) == (x))
 

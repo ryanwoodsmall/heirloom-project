@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.184 (gritter) 7/27/08
+.\" Sccsid @(#)doc.tr	1.185 (gritter) 8/19/08
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -105,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 7/27/08
+.ds Sccsdate 8/19/08
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -558,6 +558,7 @@ Form	Value\\$2	Argument	Notes\\$1	Explanation
 ..
 .\" from file m0
 \X'SetLinkBorder: 0 0 0'
+\X'SetULinkBorder: 0 0 0'
 \X'PDFMark: Author Gunnar Ritter'
 \X,PDFMark: Title Nroff/Troff User's Manual,
 \X'PS: [ {Catalog} << /ViewerPreferences << /DisplayDocTitle true >> >> /PUT pdfmark'
@@ -887,7 +888,8 @@ Availability and Contact Information
 .pg
 The source code of the \fIHeirloom Documentation Tools\fR
 and accompanying materials
-are freely available from <http://heirloom.sourceforge.net/\:doctools.html>.
+are freely available from
+<\W'http://heirloom.sourceforge.net/doctools.html'http://heirloom.sourceforge.net/\:doctools.html\W>.
 Comments and bug reports should be sent to Gunnar Ritter,
 <gunnarr@acm.org>.
 .pg
@@ -911,7 +913,7 @@ Vol.\|2,
 AT\[ampersand]T Bell Laboratories,
 Murray Hill,
 \s-1NJ\s+1 07974, 1979;
-<http://plan9.bell-labs.com/7thEdMan/index.html>.
+<\W'http://plan9.bell-labs.com/7thEdMan/index.html'http://plan9.bell-labs.com/7thEdMan/index.html\W>.
 .ref 2
 B. W. Kernighan, L. L. Cherry,
 ``Typesetting Mathematics \(em User's Guide (Second Edition)'',
@@ -927,7 +929,7 @@ in [1].
 J. F. Ossanna, ``Nroff/Troff User's Manual'',
 in [1].
 .ref 6
-<http://www.opensolaris.org>
+<\W'http://www.opensolaris.org'http://www.opensolaris.org\W>
 .ref 7
 D. E. Knuth, M. F. Plass,
 ``Breaking paragraphs into lines'',
@@ -946,11 +948,11 @@ Stanford University, \s-1CA\s0 94305,
 Report No. \s-1STAN\s0-\s-1CS\s0-83-977,
 1983.
 .ref 10
-<http://groff.ffii.org>
+<\W'http://groff.ffii.org'http://groff.ffii.org\W>
 .ref 11
-<http://www.tuhs.org/Archive/Caldera-license.pdf>
+<\W'http://www.tuhs.org/Archive/Caldera-license.pdf'http://www.tuhs.org/Archive/Caldera-license.pdf\W>
 .ref 12
-<http://plan9.bell-labs.com/plan9>
+<\W'http://plan9.bell-labs.com/plan9'http://plan9.bell-labs.com/plan9\W>
 .in 0
 .pg
 .nr nosave 1
@@ -2057,12 +2059,13 @@ Reference	Sequence	Meaning
 T}	\T'e_s'Point-size change function\T
 \T'e_S'2.2\T	\T'e_S'\fB\eS\fI\'N\'\fR\T	\T'e_S'Slant output \fIN\fP degrees\T
 \T'e_t'9.1\T	\T'e_t'\fB\et\fR\T	\T'e_t'Non-interpreted horizontal tab\T
-\T'e_T'24.6\T	\T'e_T'\fB\eT\fI\'string\'\fR\T	\T'e_T'Link definition\T
+\T'e_T'24.6\T	\T'e_T'\fB\eT\fI\'string\'\fR\T	\T'e_T'Intra-document link definition\T
 \T'e_u'11.1\T	\T'e_u'\fB\eu\fR\T	\T'e_u'Reverse (up) 1/2\|em vertical motion (1/2 line in \*(NR)\T
 \T'e_U'2.1\T	\T'e_U'\fB\eU\fI\'X\'\fR\T	\T'e_U'Character at Unicode position U+\fIX\fR\T
 \T'e_v'11.1\T	\T'e_v'\fB\ev\fI\'N\'\fR\T	\T'e_v'Local vertical motion; move down \fIN\fR \fI(negative up)\fR\T
 \T'e_V'20\T	\T'e_V'\fB\eV\fIx\fR,\fB\eV(\fIxx\fR,\fB\eV[\fIxxx\fB]\fR\T	\T'e_V'Environment variable \fIx\fP, \fIxx\fR, or \fIxxx\fR\T
 \T'e_w'11.2\T	\T'e_w'\fB\ew\fI\'string\'\fR\T	\T'e_w'Interpolate width of \fIstring\fR\T
+\T'e_W'24.6\T	\T'e_W'\fB\eW\fI\'string\'\fR\T	\T'e_W'URI link definition\T
 \T'e_x'5.2\T	\T'e_x'\fB\ex\fI\'N\'\fR\T	\T'e_x'Extra line-space function \fI(negative before, positive after)\fR\T
 \T'e_X'10.7\T	\T'e_X'\fB\eX\fI\'string\'\fR\T	\T'e_X'Output \fIstring\fP as device control function\T
 \T'e_Y'10.7\T	\T'e_Y'\fB\eY\fIx\fR,\fB\eY(\fIxx\fR,\fB\eY[\fIxxx\fB]\fR\T	\T'e_Y'Output contents of macro \fIx\fP, \fIxx\fR, or \fIxxx\fR\T as device control function
@@ -6629,7 +6632,8 @@ there is no difference to a regular bookmark.
 Links.
 \*[PDF] documents can contain links
 that cause the viewer to jump to a certain location
-when the user clicks on an area of the page.
+when the user clicks on an area of the page,
+as well as links to external documents in URI form.
 In \*[TR,] such links can be built as follows:
 .pg
 The \A'e_A'\fB\eA\fI\'string\'\fR escape sequence defines an anchor,
@@ -6643,6 +6647,14 @@ e.g.: \fB\eT\fI\'string\'text of link\fB\eT\fR.
 \fIstring\fR must correspond to an anchor
 anywhere in the document.
 .pg
+An URI link is built likewise using two \A'e_W'\fB\eW\fR escape sequences:
+\fB\eW\fI\'uri\'text of link\fB\eW\fR.
+The \fIuri\fR part is not interpreted by \*(TR,
+but just written to the generated output.
+Typically, this will be a link to a web page,
+as in
+<\W'http://heirloom.sourceforge.net/doctools.html'\eW'http://heirloom.sourceforge.net/doctools.html'http://heirloom.sourceforge.net/\:doctools.html\eW\W>.
+.pg
 The appearance of links can be changed;
 links are normally surrounded by an 1 point wide blue border.
 The color can be set using
@@ -6653,6 +6665,10 @@ The border can be set using
 where \fIbx\fR and \fIby\fR define the horizontal
 and vertical corner radius, respectively,
 and \fIwidth\fR defines the width.
+.pg
+Likewise,
+\fBSetULinkColor\fR and \fBSetULinkBorder\fR
+are available for URI links.
 .\"""
 .pg
 .mha s_groff

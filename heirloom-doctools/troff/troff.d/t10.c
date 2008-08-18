@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t10.c	1.97 (gritter) 11/14/06
+ * Sccsid @(#)t10.c	1.98 (gritter) 8/19/08
  */
 
 /*
@@ -126,6 +126,7 @@ static void	pthorscale(int);
 static void	pttrack(int);
 static void	ptanchor(int);
 static void	ptlink(int);
+static void	ptulink(int);
 static void	ptyon(int);
 static void	ptchar(int, int);
 
@@ -493,6 +494,14 @@ ptout0(tchar *pi, tchar *pend)
 			return(pi+outsize);
 		case LINKOFF:
 			ptlink(sbits(i));
+			linkout = 0;
+			return(pi+outsize);
+		case ULINKON:
+			linkout = sbits(i);
+			linkhp = hpos + esc;
+			return(pi+outsize);
+		case ULINKOFF:
+			ptulink(sbits(i));
 			linkout = 0;
 			return(pi+outsize);
 		case INDENT:
@@ -893,19 +902,32 @@ ptanchor(int n)
 }
 
 static void
-ptlink(int n)
+_ptlink(int n, struct ref *rstart, const char *type)
 {
 	struct ref	*rp;
 
 	if (ascii)
 		return;
-	for (rp = links; rp; rp = rp->next)
+	for (rp = rstart; rp; rp = rp->next)
 		if (rp->cnt == n) {
-			fdprintf(ptid, "x X Link %d,%d,%d,%d %s\n",
+			fdprintf(ptid, "x X %s %d,%d,%d,%d %s\n",
+				type,
 				linkhp, vpos + pts2u(1),
 				hpos + esc, vpos - pts * 8 / 10,
 				rp->name);
 		}
+}
+
+static void
+ptlink(int n)
+{
+	_ptlink(n, links, "Link");
+}
+
+static void
+ptulink(int n)
+{
+	_ptlink(n, ulinks, "ULink");
 }
 
 static void

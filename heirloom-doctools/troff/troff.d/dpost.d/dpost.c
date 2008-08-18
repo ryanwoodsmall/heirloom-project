@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)dpost.c	1.175 (gritter) 8/18/08
+ * Sccsid @(#)dpost.c	1.176 (gritter) 8/19/08
  */
 
 /*
@@ -677,6 +677,9 @@ static void	t_anchor(char *);
 static void	t_link(char *);
 static void	t_linkcolor(char *);
 static void	t_linkborder(char *);
+static void	t_ulink(char *);
+static void	t_ulinkcolor(char *);
+static void	t_ulinkborder(char *);
 
 static int	mb_cur_max;
 
@@ -1765,6 +1768,12 @@ devcntrl(
 		    t_linkcolor(buf);
 		else if ( strcmp(str, "SetLinkBorder") == 0 )
 		    t_linkborder(buf);
+		else if ( strcmp(str, "ULink") == 0 )
+		    t_ulink(buf);
+		else if ( strcmp(str, "SetULinkColor") == 0 )
+		    t_ulinkcolor(buf);
+		else if ( strcmp(str, "SetULinkBorder") == 0 )
+		    t_ulinkborder(buf);
 		else if ( strcmp(str, "HorScale") == 0 )
 		    sethorscale(buf);
 		else if ( strcmp(str, "BeginPath") == 0 )
@@ -4616,6 +4625,17 @@ pref(const char *lp, FILE *fp)
 }
 
 static void
+pref_uri(const char *lp, FILE *fp)
+{
+    int	c;
+
+    /* Don't do any escaping here to avoid double-escaping. */
+    while ((c = *lp++ & 0377) != 0 && c != '\n') {
+	    putc(c, fp);
+    }
+}
+
+static void
 t_anchor(char *lp)
 {
     int	v;
@@ -4693,4 +4713,67 @@ t_linkborder(char *lp)
     by = strtod(lp, &lp);
     c = strtod(lp, &lp);
     snprintf(linkborder, sizeof linkborder, "%g %g %g", bx, by, c);
+}
+
+static char ulinkcolor[60] = "0 0 1";
+static char ulinkborder[60] = "0 0 1";
+
+static void
+t_ulink(char *lp)
+{
+    int	llx, lly, urx, ury;
+
+    llx = strtol(lp, &lp, 10);
+    if (*lp) {
+	while (*lp == ',')
+	    lp++;
+	lly = strtol(lp, &lp, 10);
+	if (*lp) {
+	    while (*lp == ',')
+		lp++;
+	    urx = strtol(lp, &lp, 10);
+	    if (*lp) {
+		while (*lp == ',')
+		    lp++;
+		ury = strtol(lp, &lp, 10);
+		if ((lp = strchr(lp, ' ')) != NULL) {
+		    lp++;
+		    endtext();
+		    fprintf(tf, "[ /Rect [%d %d %d %d]\n"
+			    "/Color [%s]\n"
+			    "/Border [%s]\n",
+			    llx, -lly, urx, -ury,
+			    ulinkcolor, ulinkborder);
+		    fprintf(tf, "/Action << /Subtype /URI\n"
+			    "/URI (");
+		    pref_uri(lp, tf);
+		    fprintf(tf, ") >>\n"
+			    "/Subtype /Link\n"
+			    "/ANN pdfmark\n");
+		}
+	    }
+	}
+    }
+}
+
+static void
+t_ulinkcolor(char *lp)
+{
+    float	r, g, b;
+
+    r = strtod(lp, &lp);
+    g = strtod(lp, &lp);
+    b = strtod(lp, &lp);
+    snprintf(ulinkcolor, sizeof ulinkcolor, "%g %g %g", r, g, b);
+}
+
+static void
+t_ulinkborder(char *lp)
+{
+    float	bx, by, c;
+
+    bx = strtod(lp, &lp);
+    by = strtod(lp, &lp);
+    c = strtod(lp, &lp);
+    snprintf(ulinkborder, sizeof ulinkborder, "%g %g %g", bx, by, c);
 }

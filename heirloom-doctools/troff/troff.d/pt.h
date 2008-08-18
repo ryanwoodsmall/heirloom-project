@@ -1,7 +1,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pt.h	1.53 (gritter) 9/11/06
+ * Sccsid @(#)pt.h	1.54 (gritter) 8/19/08
  */
 
 /* t6.c */
@@ -74,6 +74,7 @@ extern int	tr2un(tchar, int);
 extern tchar	setuc0(int);
 extern tchar	setanchor(void);
 extern tchar	setlink(void);
+extern tchar	setulink(void);
 extern int	pts2u(int);
 extern double	u2pts(int);
 /* t10.c */

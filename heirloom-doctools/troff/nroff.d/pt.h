@@ -1,7 +1,7 @@
 /*
  *	Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- *	Sccsid @(#)pt.h	1.42 (gritter) 12/25/06
+ *	Sccsid @(#)pt.h	1.43 (gritter) 8/19/08
  */
 
 /* n10.c */
@@ -51,6 +51,7 @@ extern tchar	xlss(void);
 extern tchar	setuc0(int);
 extern tchar	setanchor(void);
 extern tchar	setlink(void);
+extern tchar	setulink(void);
 extern void	casedummy(void);
 #define	casetrack	casedummy
 #define	casefallback	casedummy

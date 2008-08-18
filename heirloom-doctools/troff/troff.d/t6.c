@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)t6.c	1.192 (gritter) 8/4/07
+ * Sccsid @(#)t6.c	1.193 (gritter) 8/19/08
  */
 
 /*
@@ -91,7 +91,7 @@ int	sbold = 0;
 int	kern = 0;
 struct box	mediasize, bleedat, trimat, cropat;
 int	psmaxcode;
-struct ref	*anchors, *links;
+struct ref	*anchors, *links, *ulinks;
 static int	_minflg;
 int	lastrst;
 int	lastrsb;
@@ -2856,10 +2856,9 @@ setanchor(void)
 		return mkxfunc(ANCHOR, 0);
 }
 
-tchar
-setlink(void)
+static tchar
+_setlink(struct ref **rstart, int oncode, int offcode, int *cnt)
 {
-	static int	cnt;
 	struct ref	*rp;
 	char	*np;
 	int	sv;
@@ -2868,18 +2867,34 @@ setlink(void)
 	if (linkin = !linkin) {
 		if ((np = getref()) != NULL) {
 			rp = calloc(1, sizeof *rp);
-			rp->cnt = ++cnt;
+			rp->cnt = ++*cnt;
 			rp->name = np;
-			rp->next = links;
-			links = rp;
-			linkin = cnt;
-			return mkxfunc(LINKON, cnt);
+			rp->next = *rstart;
+			*rstart = rp;
+			linkin = *cnt;
+			return mkxfunc(oncode, *cnt);
 		} else {
 			linkin = -1;
-			return mkxfunc(LINKON, 0);
+			return mkxfunc(oncode, 0);
 		}
 	} else
-		return mkxfunc(LINKOFF, sv > 0 ? sv : 0);
+		return mkxfunc(offcode, sv > 0 ? sv : 0);
+}
+
+tchar
+setlink(void)
+{
+	static int	cnt;
+
+	return _setlink(&links, LINKON, LINKOFF, &cnt);
+}
+
+tchar
+setulink(void)
+{
+	static int	cnt;
+
+	return _setlink(&ulinks, ULINKON, ULINKOFF, &cnt);
 }
 
 int

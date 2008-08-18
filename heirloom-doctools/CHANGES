@@ -1,4 +1,6 @@
 Release ...
+* troff/dpost: Support for URI links in PDF documents has been added
+  (contributed by Michael Piotrowski).
 * [nt]roff: Hyphenation patterns for Dutch have been added (contributed
   by Erwin Koning).
 * troff: Do not apply font-specific character translation inside \D,
