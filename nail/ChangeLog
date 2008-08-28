@@ -1,3 +1,8 @@
+[12.5] released . . .
+* When classifying messages with the junk filter, when selecting the most
+  representative tokens, prefer non-junk tokens over junk tokens if both
+  have the same (reversed) probability, in order to avoid false positives.
+
 [12.4] released 7/29/08
 * With the "-E" command line option or if the "skipemptybody" variable is
   set, outgoing messages that contain no text in their first or only part
