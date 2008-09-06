@@ -12,6 +12,8 @@ Release ...
 * dpost: Fixed a case in which invalid backslash sequences were generated
   when insane sizes appeared in intermediate troff input (bug reported by
   Russ Cox).
+* lookbib: This version does not support the "-n" option, which was
+  described in the BSD-derived manual page (thanks to Michael Piotrowski).
 
 Release 080407
 * [nt]roff: A type definition problem that caused an endless loop on

@@ -67,19 +67,19 @@
 .\" OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 .\" EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\" Sccsid @(#)lookbib.1b	1.4 (gritter) 12/12/05
+.\" Sccsid @(#)lookbib.1b	1.5 (gritter) 9/6/08
 .\"
 .\"	from 4.3BSD-Tahoe lookbib.1	6.1 (Berkeley) 4/29/85
 .\"
 .\".TH LOOKBIB 1 "April 29, 1985"
-.TH LOOKBIB 1B "12/12/05" "Heirloom Documentation Tools" "BSD System Compatibility"
+.TH LOOKBIB 1B "9/6/08" "Heirloom Documentation Tools" "BSD System Compatibility"
 .UC 5
 .SH NAME
 indxbib, lookbib \- (BSD) build inverted index for a bibliography, find references in a bibliography
 .SH SYNOPSIS
 \fB/usr/ucb/indxbib\fR \fIdatabase\fR ...
 .br
-\fB/usr/ucb/lookbib\fR [\fB\-n\fR] \fIdatabase\fR
+\fB/usr/ucb/lookbib\fR \fIdatabase\fR
 .SH DESCRIPTION
 .I Indxbib
 makes an inverted index to the named
@@ -127,7 +127,7 @@ If nothing matches, nothing is returned except another ``>'' prompt.
 .PP
 .I Lookbib
 will ask if you need instructions, and will print some brief information if
-you reply ``y''.  The ``\-n'' flag turns off the prompt for instructions.
+you reply ``y''.
 .PP
 It is possible to search multiple databases,
 as long as they have a common index made by
