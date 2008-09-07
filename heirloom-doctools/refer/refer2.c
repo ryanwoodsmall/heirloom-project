@@ -18,15 +18,16 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)refer2.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)refer2.c	1.4 (gritter) 9/7/08
  */
 
 #include "refer..c"
 #include <locale.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #define NFLD 30
-#define TLEN 512
+#define TLEN PATH_MAX
 
 extern FILE *in;
 char one[ANSLEN];

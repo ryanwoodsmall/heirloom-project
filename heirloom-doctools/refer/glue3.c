@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glue3.c	1.4 (gritter) 10/2/07
+ * Sccsid @(#)glue3.c	1.5 (gritter) 9/7/08
  */
 
 
@@ -95,9 +95,9 @@ callhunt(char *in, char *out, char *arg, int outlen)
 	argv[9] = one;
 	argv[10] = (char *)(intptr_t)onelen;
 	argv[11] = abuff; 
+	if (strlen(arg) > ALEN)
+		err("abuff not big enough %d", strlen(arg));
 	strcpy (abuff,arg);
-	if (strlen(abuff) > ALEN)
-		err("abuff not big enough %d", strlen(abuff));
 	argc = 6;
 	huntmain (argc,argv);
 	return(0);

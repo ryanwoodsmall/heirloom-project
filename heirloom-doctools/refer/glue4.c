@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glue4.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)glue4.c	1.4 (gritter) 9/7/08
  */
 
 
@@ -32,6 +32,7 @@
 #include "refer..c"
 
 extern char gfile[];
+extern char usedir[];
 
 int
 grepcall (char *in, char *out, char *arg)
@@ -104,8 +105,13 @@ grepcall (char *in, char *out, char *arg)
 			*s++ = '\n';
 			*s++ = 0;
 		}
-		if (line[0])
+		if (line[0]) {
+			if (usedir[0]) {
+				strcat(out, usedir);
+				strcat(out, "/");
+			}
 			strcat(out, line);
+		}
 # if D1
 		fprintf(stderr, "out now /%s/\n",out);
 # endif

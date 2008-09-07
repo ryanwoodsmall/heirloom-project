@@ -19,7 +19,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)glue1.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)glue1.c	1.4 (gritter) 9/7/08
  */
 
 #include <stdio.h>
@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 #include "refer..c"
 #define unopen(fil) {if (fil!=NULL) {fclose(fil); fil=NULL;}}
 
@@ -44,7 +45,7 @@ int iflong;
 extern char *fgnames[], **fgnamp;
 int prfreqs = 0;
 int typeindex = 0;
-char usedir[100];
+char usedir[PATH_MAX];
 static int full = 1000;
 static int tags = 0;
 char *sinput, *soutput, *tagout;
@@ -57,7 +58,7 @@ huntmain(int argc,char **argv)
 {
 	/* read query from stdin, expect name of indexes in argv[1] */
 	static FILE *fa, *fb, *fc;
-	char indexname[100], *qitem[100], *rprog = 0;
+	char indexname[PATH_MAX], *qitem[100], *rprog = 0;
 	char grepquery[200];
 	static char oldname[30] ;
 	static int nhash = 0;

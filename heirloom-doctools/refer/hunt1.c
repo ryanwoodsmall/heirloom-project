@@ -18,7 +18,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)hunt1.c	1.3 (gritter) 10/22/05
+ * Sccsid @(#)hunt1.c	1.4 (gritter) 9/7/08
  */
 
 # include <locale.h>
@@ -28,6 +28,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <string.h>
+# include <limits.h>
 # include "refer..c"
 extern char refdir[];
 extern int keepold;
@@ -42,7 +43,7 @@ int soutlen =1000;
 int reached =0;
 int iflong =0;
 int prfreqs =0;
-char usedir[100];
+char usedir[PATH_MAX];
 char gfile[50];
 static int full =1000;
 static int tags =0;
@@ -54,8 +55,9 @@ main(int argc,char **argv)
 {
 	/* read query from stdin, expect name of indexes in argv[1] */
 	static FILE *fa, *fb, *fc;
-	char nma[100], nmb[100], nmc[100], *qitem[100], *rprog = NULL;
-	char nmd[100], grepquery[256];
+	char nma[PATH_MAX], nmb[PATH_MAX], nmc[PATH_MAX],
+	     *qitem[100], *rprog = NULL;
+	char nmd[PATH_MAX], grepquery[256];
 	static char oldname[30] ;
 	static int was =0;
 	/* these pointers are unions of pointer to int and pointer to long */
