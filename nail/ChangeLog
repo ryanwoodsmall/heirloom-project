@@ -2,6 +2,9 @@
 * When classifying messages with the junk filter, when selecting the most
   representative tokens, prefer non-junk tokens over junk tokens if both
   have the same (reversed) probability, in order to avoid false positives.
+* When calculating the probabilities of tokens that have occurred only in
+  good messages or only in junk messages so far, and these tokens occurred
+  less than ten times, give them slightly less than the minimum/maximum.
 
 [12.4] released 7/29/08
 * With the "-E" command line option or if the "skipemptybody" variable is

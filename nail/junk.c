@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)junk.c	1.74 (gritter) 8/29/08";
+static char sccsid[] = "@(#)junk.c	1.75 (gritter) 9/14/08";
 #endif
 #endif /* not lint */
 
@@ -920,6 +920,10 @@ getprob(char *n)
 			 smin(1.0, nbad ? (float)b/nbad : 0.0));
 		p = smin(TOP, p);
 		p = smax(BOT, p);
+		if (p == TOP && b <= 10 && g == 0)
+			p -= BOT;
+		else if (p == BOT && g <= 10 && b == 0)
+			p += BOT;
 	} else if (g == 0 && b == 0)
 		p = DFL;
 	else
