@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)quit.c	2.28 (gritter) 3/4/06";
+static char sccsid[] = "@(#)quit.c	2.29 (gritter) 10/1/08";
 #endif
 #endif /* not lint */
 
@@ -584,4 +584,47 @@ edstop(void)
 
 done:
 	relsesigs();
+}
+
+enum quitflags {
+	QUITFLAG_HOLD      = 001,
+	QUITFLAG_KEEPSAVE  = 002,
+	QUITFLAG_APPEND    = 004,
+	QUITFLAG_EMPTYBOX  = 010
+};
+
+static const struct quitnames {
+	enum quitflags	flag;
+	const char	*name;
+} const quitnames[] = {
+	{ QUITFLAG_HOLD,	"hold" },
+	{ QUITFLAG_KEEPSAVE,	"keepsave" },
+	{ QUITFLAG_APPEND,	"append" },
+	{ QUITFLAG_EMPTYBOX,	"emptybox" },
+	{ 0,			NULL }
+};
+
+int
+savequitflags(void)
+{
+	enum quitflags	qf = 0;
+	int	i;
+
+	for (i = 0; quitnames[i].name; i++)
+		if (value(quitnames[i].name))
+			qf |= quitnames[i].flag;
+	return qf;
+}
+
+void
+restorequitflags(int qf)
+{
+	int	i;
+
+	for (i = 0; quitnames[i].name; i++)
+		if (qf & quitnames[i].flag) {
+			if (value(quitnames[i].name) == NULL)
+				assign(quitnames[i].name, "");
+		} else if (value(quitnames[i].name))
+			unset_internal(quitnames[i].name);
 }

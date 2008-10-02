@@ -1,4 +1,8 @@
 [12.5] released . . .
+* When executing an "account" command, ensure that the values of the "hold",
+  "keepsave", "append", and "emptybox" variables remain those of the previous
+  account for all outstanding operations on that account (bug reported by
+  Jeff Woodall).
 * When classifying messages with the junk filter, when selecting the most
   representative tokens, prefer non-junk tokens over junk tokens if both
   have the same (reversed) probability, in order to avoid false positives.

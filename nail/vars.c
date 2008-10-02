@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)vars.c	2.11 (gritter) 3/4/06";
+static char sccsid[] = "@(#)vars.c	2.12 (gritter) 10/1/08";
 #endif
 #endif /* not lint */
 
@@ -81,7 +81,7 @@ canonify(const char *vn)
  * Assign a value to a variable.
  */
 void 
-assign(char *name, char *value)
+assign(const char *name, const char *value)
 {
 	struct var *vp;
 	int h;
@@ -221,7 +221,7 @@ hash(const char *name)
 }
 
 int 
-unset_internal(char *name)
+unset_internal(const char *name)
 {
 	struct var *vp, *vp2;
 	int h;

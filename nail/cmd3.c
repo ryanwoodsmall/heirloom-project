@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd3.c	2.86 (gritter) 10/1/07";
+static char sccsid[] = "@(#)cmd3.c	2.87 (gritter) 10/1/08";
 #endif
 #endif /* not lint */
 
@@ -1311,7 +1311,7 @@ account(void *v)
 	char	**args = (char **)v;
 	struct oldaccount	*a;
 	char	*cp;
-	int	i, mc;
+	int	i, mc, oqf, nqf;
 	FILE	*fp = stdout;
 
 	if (args[0] == NULL) {
@@ -1345,6 +1345,7 @@ account(void *v)
 		return define1(args[0], 1);
 	}
 	strncpy(mboxname, expand("&"), sizeof mboxname)[sizeof mboxname-1]='\0';
+	oqf = savequitflags();
 	if ((a = get_oldaccount(args[0])) == NULL) {
 		if (args[1]) {
 			a = scalloc(1, sizeof *a);
@@ -1368,8 +1369,13 @@ account(void *v)
 		unset_allow_undefined = 1;
 		set(a->ac_vars);
 		unset_allow_undefined = 0;
-	setf:	if (!starting)
-			return file1("%");
+	setf:	if (!starting) {
+			nqf = savequitflags();
+			restorequitflags(oqf);
+			i = file1("%");
+			restorequitflags(nqf);
+			return i;
+		}
 	}
 	return 0;
 }

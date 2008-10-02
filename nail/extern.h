@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	Sccsid @(#)extern.h	2.161 (gritter) 10/1/07
+ *	Sccsid @(#)extern.h	2.162 (gritter) 10/1/08
  */
 
 /* aux.c */
@@ -446,6 +446,8 @@ int quitcmd(void *v);
 void quit(void);
 int holdbits(void);
 enum okay makembox(void);
+int savequitflags(void);
+void restorequitflags(int);
 /* send.c */
 char *foldergets(char **s, size_t *size, size_t *count, size_t *llen,
 		FILE *stream);
@@ -513,12 +515,12 @@ void findmail(char *user, int force, char *buf, int size);
 void demail(void);
 char *username(void);
 /* vars.c */
-void assign(char *name, char *value);
+void assign(const char *name, const char *value);
 char *vcopy(const char *str);
 char *value(const char *name);
 struct grouphead *findgroup(char *name);
 void printgroup(char *name);
 int hash(const char *name);
-int unset_internal(char *name);
+int unset_internal(const char *name);
 void remove_group(const char *name);
 /* version.c */
