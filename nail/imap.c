@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.219 (gritter) 1/6/08";
+static char sccsid[] = "@(#)imap.c	1.220 (gritter) 10/4/08";
 #endif
 #endif /* not lint */
 
@@ -2571,6 +2571,7 @@ imap_copy1(struct mailbox *mp, struct message *m, int n, const char *name)
 	const char	*qname;
 	enum okay	ok = STOP;
 	int	twice = 0;
+	int	stored = 0;
 	FILE	*queuefp = NULL;
 
 	if (mp->mb_type == MB_CACHE) {
@@ -2629,20 +2630,38 @@ again:	if (m->m_uid)
 	 * ... and reset the flag to its initial value so that
 	 * the 'exit' command still leaves the message unread.
 	 */
-out:	if ((m->m_flag&(MREAD|MSTATUS)) == (MREAD|MSTATUS))
+out:	if ((m->m_flag&(MREAD|MSTATUS)) == (MREAD|MSTATUS)) {
 		imap_store(mp, m, n, '-', "\\Seen", 0);
-	if (m->m_flag&MFLAG)
+		stored++;
+	}
+	if (m->m_flag&MFLAG) {
 		imap_store(mp, m, n, '-', "\\Flagged", 0);
-	if (m->m_flag&MUNFLAG)
+		stored++;
+	}
+	if (m->m_flag&MUNFLAG) {
 		imap_store(mp, m, n, '+', "\\Flagged", 0);
-	if (m->m_flag&MANSWER)
+		stored++;
+	}
+	if (m->m_flag&MANSWER) {
 		imap_store(mp, m, n, '-', "\\Answered", 0);
-	if (m->m_flag&MUNANSWER)
+		stored++;
+	}
+	if (m->m_flag&MUNANSWER) {
 		imap_store(mp, m, n, '+', "\\Answered", 0);
-	if (m->m_flag&MDRAFT)
+		stored++;
+	}
+	if (m->m_flag&MDRAFT) {
 		imap_store(mp, m, n, '-', "\\Draft", 0);
-	if (m->m_flag&MUNDRAFT)
+		stored++;
+	}
+	if (m->m_flag&MUNDRAFT) {
 		imap_store(mp, m, n, '+', "\\Draft", 0);
+		stored++;
+	}
+	if (stored) {
+		mp->mb_active |= MB_COMD;
+		imap_finish(mp);
+	}
 	return ok;
 }
 
