@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)m4macs.c	1.5 (gritter) 11/27/05
+ * Sccsid @(#)m4macs.c	1.6 (gritter) 11/2/08
  */
 
 #include	<inttypes.h>
@@ -124,10 +124,10 @@ dodefn(wchar_t **ap, int c)
 
 	while (c > 0)
 		if ((d = lookup(ap[c--])->def) != NULL) {
-			putbak(*rquote);
+			pbstr(rquote);
 			while (*d)
 				putbak(*d++);
-			putbak(*lquote);
+			pbstr(lquote);
 		}
 }
 

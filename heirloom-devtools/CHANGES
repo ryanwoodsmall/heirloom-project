@@ -1,4 +1,6 @@
 Release ...
+* m4: Handle multibyte quote characters with defn() correctly (patch by
+  Joe Krahn).
 * make: Mac OS X compilation fix (Stefan Tramm).
 * make: Compilation fix for 64-bit environments.
 
