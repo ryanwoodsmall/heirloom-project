@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)quit.c	2.29 (gritter) 10/1/08";
+static char sccsid[] = "@(#)quit.c	2.30 (gritter) 11/11/08";
 #endif
 #endif /* not lint */
 
@@ -596,7 +596,7 @@ enum quitflags {
 static const struct quitnames {
 	enum quitflags	flag;
 	const char	*name;
-} const quitnames[] = {
+} quitnames[] = {
 	{ QUITFLAG_HOLD,	"hold" },
 	{ QUITFLAG_KEEPSAVE,	"keepsave" },
 	{ QUITFLAG_APPEND,	"append" },
