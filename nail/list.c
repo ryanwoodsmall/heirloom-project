@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)list.c	2.61 (gritter) 01/07/07";
+static char sccsid[] = "@(#)list.c	2.62 (gritter) 12/11/08";
 #endif
 #endif /* not lint */
 
@@ -438,7 +438,7 @@ number:
 			if (!inhook)
 				printf(tback ?
 					"No previously marked messages.\n" :
-					"No messages satify (criteria).\n");
+					"No messages satisfy (criteria).\n");
 			markall_ret(-1)
 		}
 	}
