@@ -1,4 +1,6 @@
 [12.5] released . . .
+* Fixed a message corruption that occurred when the "inc" command was used
+  after encrypted messages had been viewed (reported by Martin Neitzel).
 * Fixed a condition that caused mailx to hang when looking at a message,
   copying that message, and issuing a "z" command evaluating an uncached
   portion of an IMAP folder.
