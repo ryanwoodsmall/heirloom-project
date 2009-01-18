@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)fault.c	1.12 (gritter) 12/25/06
+ * Sccsid @(#)fault.c	1.13 (gritter) 1/18/09
  */
 /* from OpenSolaris "fault.c	1.27	05/06/08 SMI"	 SVr4.0 1.13.17.1 */
 /*
@@ -39,7 +39,6 @@
  */
 
 #include	"defs.h"
-#include	<ucontext.h>
 #include	<errno.h>
 #include	<string.h>
 
