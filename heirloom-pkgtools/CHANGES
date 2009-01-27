@@ -1,4 +1,5 @@
 Release ...
+* Fixed "?" for owner and group entries (Dave Grothe).
 * The user input validation tools "ckgid", "ckint", "ckitem", "ckkeywd",
   "ckpath", "ckrange", "ckstr", "cktime", "ckuid", and "ckyorn" have been
   added along with their "get...", "disp...", "err...", "help...", and

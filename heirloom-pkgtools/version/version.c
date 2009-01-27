@@ -5,7 +5,7 @@
 #else
 #define	USED
 #endif
-static const char id[] USED = "@(#)pkgtools.sl	1.10 (gritter) 3/5/07";
+static const char id[] USED = "@(#)pkgtools.sl	1.11 (gritter) 1/28/09";
 /* SLIST */
 /*
 ./hdrs/archives.h: * Sccsid @(#)archives.h	1.3 (gritter) 2/24/07
@@ -49,7 +49,7 @@ static const char id[] USED = "@(#)pkgtools.sl	1.10 (gritter) 3/5/07";
 ./libadm/getdev.c: * Sccsid @(#)getdev.c	1.3 (gritter) 2/25/07
 ./libadm/getdgrp.c: * Sccsid @(#)getdgrp.c	1.3 (gritter) 2/25/07
 ./libadm/getinput.c: * Sccsid @(#)getinput.c	1.2 (gritter) 2/24/07
-./libadm/getopt.c: * Sccsid @(#)getopt.c	1.8 (gritter) 8/2/05
+./libadm/getopt.c: * Sccsid @(#)getopt.c	1.10 (gritter) 12/16/07
 ./libadm/getpass.c: * Sccsid @(#)getpass.c	1.4 (gritter) 2/25/07
 ./libadm/getvol.c: * Sccsid @(#)getvol.c	1.2 (gritter) 2/24/07
 ./libadm/listdev.c: * Sccsid @(#)listdev.c	1.2 (gritter) 2/24/07
@@ -96,7 +96,7 @@ static const char id[] USED = "@(#)pkgtools.sl	1.10 (gritter) 3/5/07";
 ./libinst/ocfile.c: * Sccsid @(#)ocfile.c	1.4 (gritter) 2/26/07
 ./libinst/open_package_datastream.c: * Sccsid @(#)open_package_datastream.c	1.2 (gritter) 2/24/07
 ./libinst/pathdup.c: * Sccsid @(#)pathdup.c	1.4 (gritter) 2/25/07
-./libinst/pkgdbmerg.c: * Sccsid @(#)pkgdbmerg.c	1.3 (gritter) 2/25/07
+./libinst/pkgdbmerg.c: * Sccsid @(#)pkgdbmerg.c	1.4 (gritter) 1/28/09
 ./libinst/pkgobjmap.c: * Sccsid @(#)pkgobjmap.c	1.3 (gritter) 2/25/07
 ./libinst/pkgops.c: * Sccsid @(#)pkgops.c	1.5 (gritter) 2/26/07
 ./libinst/pkgpatch.c: * Sccsid @(#)pkgpatch.c	1.4 (gritter) 2/25/07

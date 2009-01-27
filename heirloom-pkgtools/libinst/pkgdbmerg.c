@@ -32,7 +32,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)pkgdbmerg.c	1.3 (gritter) 2/25/07
+ * Sccsid @(#)pkgdbmerg.c	1.4 (gritter) 1/28/09
  */
 
 #include <stdio.h>
@@ -673,12 +673,17 @@ do_new_ent(VFP_T *vfpo, struct cfextra *el_ent, int ctrl)
 		    (int)el_ent->cf_ent.ainfo.mode);
 	}
 
+#if 0
+	/*
+	 * This defeats the handling of "?" in other places.
+	 */
 	if (strcmp(el_ent->cf_ent.ainfo.owner, DB_UNDEFINED_ENTRY) == 0)
 		(void) strcpy(el_ent->cf_ent.ainfo.owner,
 				DEFAULT_OWNER);
 	if (strcmp(el_ent->cf_ent.ainfo.group, DB_UNDEFINED_ENTRY) == 0)
 		(void) strcpy(el_ent->cf_ent.ainfo.group,
 				DEFAULT_GROUP);
+#endif
 
 	/*
 	 * Do not allow installation if nocnflct is set and this pathname is

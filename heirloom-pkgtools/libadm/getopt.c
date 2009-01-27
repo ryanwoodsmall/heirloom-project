@@ -26,7 +26,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)getopt.c	1.9 (gritter) 4/2/07
+ * Sccsid @(#)getopt.c	1.10 (gritter) 12/16/07
  */
 /* from OpenSolaris "getopt.c	1.23	05/06/08 SMI" */
 
@@ -44,9 +44,11 @@
  * ([a-z][A-Z][0-9]).
  */
 
-#include <unistd.h>
+#include <sys/types.h>
 #include <string.h>
 #include <stdio.h>
+
+extern ssize_t	write(int, const void *, size_t);
 
 char	*optarg = NULL;
 int	optind = 1;
@@ -202,3 +204,19 @@ getopt(int argc, char *const *argv, const char *optstring)
 	}
 	return (c);
 } /* getopt() */
+
+#ifdef __APPLE__
+/*
+ * Starting with Mac OS 10.5 Leopard, <unistd.h> turns getopt()
+ * into getopt$UNIX2003() by default. Consequently, this function
+ * is called instead of the one defined above. However, optind is
+ * still taken from this file, so in effect, options are not
+ * properly handled. Defining an own getopt$UNIX2003() function
+ * works around this issue.
+ */
+int
+getopt$UNIX2003(int argc, char *const argv[], const char *optstring)
+{
+	return getopt(argc, argv, optstring);
+}
+#endif	/* __APPLE__ */
