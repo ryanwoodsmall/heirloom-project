@@ -9,6 +9,9 @@
   "keepsave", "append", and "emptybox" variables remain those of the previous
   account for all outstanding operations on that account (bug reported by
   Jeff Woodall).
+* When the ORGANIZATION variable has an empty value, do not generate an
+  "Organization:" header field. Previously, this condition resulted in
+  mailx refusing to send mail (Thomas E. Kammeyer).
 * When classifying messages with the junk filter, when selecting the most
   representative tokens, prefer non-junk tokens over junk tokens if both
   have the same (reversed) probability, in order to avoid false positives.

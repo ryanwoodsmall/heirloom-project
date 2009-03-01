@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)sendout.c	2.99 (gritter) 7/4/08";
+static char sccsid[] = "@(#)sendout.c	2.100 (gritter) 3/1/09";
 #endif
 #endif /* not lint */
 
@@ -1219,8 +1219,9 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 			if (putname(addr, w, action, &gotcha, "From:", fo,
 						&fromfield))
 				return 1;
-		if ((addr = hp->h_organization) != NULL ||
-				(addr = value("ORGANIZATION")) != NULL) {
+		if (((addr = hp->h_organization) != NULL ||
+				(addr = value("ORGANIZATION")) != NULL)
+				&& strlen(addr) > 0) {
 			fwrite("Organization: ", sizeof (char), 14, fo);
 			if (mime_write(addr, strlen(addr), fo,
 					action == SEND_TODISP ?
@@ -1269,7 +1270,8 @@ puthead(struct header *hp, FILE *fo, enum gfield w,
 		fwrite("Subject: ", sizeof (char), 9, fo);
 		if (ascncasecmp(hp->h_subject, "re: ", 4) == 0) {
 			fwrite("Re: ", sizeof (char), 4, fo);
-			if (mime_write(hp->h_subject + 4,
+			if (strlen(hp->h_subject + 4) > 0 &&
+				mime_write(hp->h_subject + 4,
 					strlen(hp->h_subject + 4),
 					fo, action == SEND_TODISP ?
 					CONV_NONE:CONV_TOHDR,
