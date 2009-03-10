@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.69 (gritter) 6/29/08";
+static char sccsid[]  = "@(#)mime.c	2.70 (gritter) 3/10/09";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -1048,12 +1048,22 @@ mime_fromhdr(struct str *in, struct str *out, enum tdflags flags)
 				uptr = nptr + outleft;
 				iptr = cout.s;
 				if (iconv_ft(fhicd, &iptr, &inleft,
-						&nptr, &outleft) != 0 &&
+					&nptr, &outleft) == (size_t)-1 &&
 						errno == E2BIG) {
 					iconv(fhicd, NULL, NULL, NULL, NULL);
 					mime_fromhdr_inc(inleft);
 					goto again;
 				}
+				/*
+				 * For state-dependent encodings,
+				 * reset the state here, assuming
+				 * that states are restricted to
+				 * single encoded-word parts.
+				 */
+				while (iconv(fhicd, NULL, NULL,
+					&nptr, &outleft) == (size_t)-1 &&
+						errno == E2BIG)
+					mime_fromhdr_inc(16);
 				out->l += uptr - mptr - outleft;
 				q += uptr - mptr - outleft;
 			} else {
@@ -1295,7 +1305,7 @@ convhdra(char *str, size_t len, FILE *fp)
 		isz = len;
 		op = cbuf;
 		osz = cbufsz;
-		if (iconv(iconvd, &ip, &isz, &op, &osz) != 0) {
+		if (iconv(iconvd, &ip, &isz, &op, &osz) == (size_t)-1) {
 			if (errno != E2BIG) {
 				ac_free(cbuf);
 				return 0;
@@ -1489,7 +1499,8 @@ fwrite_td(void *ptr, size_t size, size_t nmemb, FILE *f, enum tdflags flags,
 		outleft = mptrsz;
 		nptr = mptr;
 		iptr = ptr;
-		if (iconv_ft(iconvd, &iptr, &inleft, &nptr, &outleft) != 0 &&
+		if (iconv_ft(iconvd, &iptr, &inleft, &nptr, &outleft) ==
+					(size_t)-1 &&
 				errno == E2BIG) {
 			iconv(iconvd, NULL, NULL, NULL, NULL);
 			ac_free(mptr);

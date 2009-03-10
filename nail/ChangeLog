@@ -14,6 +14,8 @@
   other flags. This caused mails that had been read and then deleted to appear
   as unread in Gmail's "All Mail". Now, flags besides "\Deleted" are also set,
   so that they are kept in the archived copy (reported by Jeremy O'Brien).
+* For RFC 2047 MIME "encoded-word" parts in headers, assume that the end of
+  each word resets the conversion state (Yedidyah Bar-David).
 * When the ORGANIZATION variable has an empty value, do not generate an
   "Organization:" header field. Previously, this condition resulted in
   mailx refusing to send mail (Thomas E. Kammeyer).
