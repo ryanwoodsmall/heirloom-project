@@ -9,6 +9,11 @@
   "keepsave", "append", and "emptybox" variables remain those of the previous
   account for all outstanding operations on that account (bug reported by
   Jeff Woodall).
+* Support Gmail IMAP semantics of "delete" turning into "archive". Previously,
+  when mailx was setting the "\Deleted" flag on a message, it did not set any
+  other flags. This caused mails that had been read and then deleted to appear
+  as unread in Gmail's "All Mail". Now, flags besides "\Deleted" are also set,
+  so that they are kept in the archived copy (reported by Jeremy O'Brien).
 * When the ORGANIZATION variable has an empty value, do not generate an
   "Organization:" header field. Previously, this condition resulted in
   mailx refusing to send mail (Thomas E. Kammeyer).
