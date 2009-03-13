@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)imap.c	1.221 (gritter) 3/10/09";
+static char sccsid[] = "@(#)imap.c	1.222 (gritter) 3/13/09";
 #endif
 #endif /* not lint */
 
@@ -1863,7 +1863,11 @@ imap_update(struct mailbox *mp)
 					'-', "\\Draft", needstat);
 			stored++;
 		}
-		if (mp->mb_type != MB_CACHE ||
+		if (dodel) {
+			imap_delete(mp, m-message+1, m, needstat);
+			stored++;
+			gotcha++;
+		} else if (mp->mb_type != MB_CACHE ||
 			!edit && (!(m->m_flag&(MBOXED|MSAVED|MDELETED))
 				|| (m->m_flag &
 					(MBOXED|MPRESERVE|MTOUCH)) ==
@@ -1873,11 +1877,6 @@ imap_update(struct mailbox *mp)
 		if (m->m_flag & MNEW) {
 			m->m_flag &= ~MNEW;
 			m->m_flag |= MSTATUS;
-		}
-		if (dodel) {
-			imap_delete(mp, m-message+1, m, needstat);
-			stored++;
-			gotcha++;
 		}
 	}
 bypass:	if (readstat != NULL)
