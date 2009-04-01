@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.62 (gritter) 3/14/07
+ * Sccsid @(#)otf.c	1.63 (gritter) 4/2/09
  */
 
 #include <stdio.h>
@@ -2189,8 +2189,11 @@ ttfname(void)
 		if (PostScript_name && strchr(PostScript_name, ' ') == NULL)
 			a->fontname = strdup(PostScript_name);
 		else {
-			a->fontname = malloc(strlen(a->base) + 5);
-			strcpy(a->fontname, a->base);
+			const char *base = a->Font.namefont[0] ?
+				a->Font.namefont :
+				a->base;
+			a->fontname = malloc(strlen(base) + 5);
+			strcpy(a->fontname, base);
 			strcat(a->fontname, ".TTF");
 		}
 #ifdef	DUMP

@@ -3,6 +3,8 @@ Release ...
   (contributed by Michael Piotrowski).
 * [nt]roff: Hyphenation patterns for Dutch have been added (contributed
   by Erwin Koning).
+* troff/dpost: Embed TrueType fonts without a PostScript field correctly
+  (bug reported by FENG Yu Ning).
 * troff: Do not apply font-specific character translation inside \D,
   which led to wrong output e.g. with \D'l' with an OpenType font with
   the small caps feature activated (bug reported by Russ Cox).
