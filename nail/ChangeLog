@@ -5,6 +5,7 @@
 * Fixed a condition that caused mailx to hang when looking at a message,
   copying that message, and issuing a "z" command evaluating an uncached
   portion of an IMAP folder.
+* Make it compile with OpenSSL 1.0.0-beta2 (patch by Bernhard Rosenkränzer).
 * When executing an "account" command, ensure that the values of the "hold",
   "keepsave", "append", and "emptybox" variables remain those of the previous
   account for all outstanding operations on that account (bug reported by
