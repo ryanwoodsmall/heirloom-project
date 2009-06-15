@@ -34,9 +34,9 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"     Sccsid: @(#)mailx.1	2.327 (gritter) 8/29/08
+.\"     Sccsid: @(#)mailx.1	2.328 (gritter) 6/15/09
 .\"
-.TH MAILX 1 "8/29/08" "Heirloom mailx 12.5" "User Commands"
+.TH MAILX 1 "6/15/09" "Heirloom mailx 12.5" "User Commands"
 .SH NAME
 mailx \- send and receive Internet mail
 .SH SYNOPSIS
@@ -418,6 +418,21 @@ the string from the previous specification of that type is used again.
 .I address
 All messages from
 .IR address .
+By default, this is a case-sensitive search
+for the complete email address.
+If the
+.I allnet
+variable is set,
+only the local part of the addresses is evaluated for the comparison.
+Otherwise if the
+.I showname
+variable is set,
+a case-sensitive search for the complete real name
+of a sender is performed.
+The IMAP-style
+.BI (from\  address)
+expression can be used instead
+if substring matches are desired.
 .TP
 .BI ( criterion )
 All messages that satisfy the given IMAP-style SEARCH
