@@ -29,7 +29,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)scriptvfy.l	1.4 (gritter) 2/25/07
+ * Sccsid @(#)scriptvfy.l	1.5 (gritter) 6/27/09
  */
 
 /*
@@ -43,11 +43,21 @@
 %p 3500
 %s WHROOT
 %{
+FILE *scr_fp;
+
+#ifdef FLEX_SCANNER
+#undef	YY_INPUT
+#define	YY_INPUT(buf, result, max_size)	{ \
+	int	c = getc(scr_fp); \
+	result = (c == EOF || c == '\0') ? YY_NULL : (buf[0] = c, 1); \
+}
+#else
 #undef	input
 #undef	unput
-FILE *scr_fp;
 #define	input()		(((yytchar=yysptr>yysbuf?U(*--yysptr):getc(scr_fp))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
 #define	unput(p)	ungetc(p, scr_fp)
+
+#endif
 
 #define	INTERACT_D	0x00000001	/* definitely */
 #define	ROOT_D		0x00000002

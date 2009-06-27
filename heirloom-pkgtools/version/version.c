@@ -5,7 +5,7 @@
 #else
 #define	USED
 #endif
-static const char id[] USED = "@(#)pkgtools.sl	1.11 (gritter) 1/28/09";
+static const char id[] USED = "@(#)pkgtools.sl	1.12 (gritter) 6/27/09";
 /* SLIST */
 /*
 ./hdrs/archives.h: * Sccsid @(#)archives.h	1.3 (gritter) 2/24/07
@@ -107,7 +107,7 @@ static const char id[] USED = "@(#)pkgtools.sl	1.11 (gritter) 1/28/09";
 ./libinst/qreason.c: * Sccsid @(#)qreason.c	1.2 (gritter) 2/24/07
 ./libinst/qstrdup.c: * Sccsid @(#)qstrdup.c	1.2 (gritter) 2/24/07
 ./libinst/resolvepath.c: * Sccsid @(#)resolvepath.c	1.1 (gritter) 2/24/07
-./libinst/scriptvfy.l: * Sccsid @(#)scriptvfy.l	1.4 (gritter) 2/25/07
+./libinst/scriptvfy.l: * Sccsid @(#)scriptvfy.l	1.5 (gritter) 6/27/09
 ./libinst/setadmin.c: * Sccsid @(#)setadmin.c	1.3 (gritter) 2/25/07
 ./libinst/setlist.c: * Sccsid @(#)setlist.c	1.2 (gritter) 2/24/07
 ./libinst/setup_temporary_directory.c: * Sccsid @(#)setup_temporary_directory.c	1.3 (gritter) 2/25/07
