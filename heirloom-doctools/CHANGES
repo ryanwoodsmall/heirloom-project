@@ -18,6 +18,8 @@ Release ...
   current directory (bug reported by Michael Piotrowski).
 * lookbib: This version does not support the "-n" option, which was
   described in the BSD-derived manual page (thanks to Michael Piotrowski).
+* [nt]roff: Do not go into an infinite loop if a tab character appears in
+  the arguments to ".warn" (bug reported by Russ Cox).
 
 Release 080407
 * [nt]roff: A type definition problem that caused an endless loop on

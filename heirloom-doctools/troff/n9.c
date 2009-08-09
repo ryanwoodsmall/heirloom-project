@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.76 (gritter) 10/20/07
+ * Sccsid @(#)n9.c	1.77 (gritter) 8/9/09
  */
 
 /*
@@ -1105,7 +1105,7 @@ static const struct {
 	{ 0,		NULL }
 };
 
-static void
+static int
 warn1(void)
 {
 	char	name[NC];
@@ -1125,7 +1125,7 @@ warn1(void)
 		sign = 0;
 		break;
 	case 0:
-		return;
+		return 1;
 	}
 	ch = c;
 	n = atoi0();
@@ -1133,7 +1133,7 @@ warn1(void)
 		if (c != ch) {
 			while (getach());
 			errprint("illegal number, char %c", i);
-			return;
+			return 1;
 		}
 		for (i = 0; i < sizeof name - 2; i++) {
 			if ((c = getach()) == 0)
@@ -1148,7 +1148,7 @@ warn1(void)
 			}
 		if (warnnames[i].s == NULL) {
 			errprint("unknown warning category %s", name);
-			return;
+			return 1;
 		}
 	}
 	switch (sign) {
@@ -1161,6 +1161,7 @@ warn1(void)
 	default:
 		warn = n;
 	}
+	return 0;
 }
 
 void
@@ -1168,11 +1169,8 @@ casewarn(void)
 {
 	if (skip(0))
 		warn = WARN_W;
-	else {
-		do
-			warn1();
-		while (!skip(0));
-	}
+	else
+		while (!warn1() && !skip(0));
 }
 
 void
