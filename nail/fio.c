@@ -1070,26 +1070,25 @@ sopen(const char *xserver, struct sock *sp, int use_ssl,
 	freeaddrinfo(res0);
 #else	/* !HAVE_IPv6_FUNCS */
 	if (port == 0) {
-		if ((ep = getservbyname((char *)portstr, "tcp")) == NULL) {
-			if (equal(portstr, "smtp"))
-				port = htons(25);
-			else if (equal(portstr, "smtps"))
-				port = htons(465);
-			else if (equal(portstr, "imap"))
-				port = htons(143);
-			else if (equal(portstr, "imaps"))
-				port = htons(993);
-			else if (equal(portstr, "pop3"))
-				port = htons(110);
-			else if (equal(portstr, "pop3s"))
-				port = htons(995);
-			else {
-				fprintf(stderr, catgets(catd, CATSET, 251,
-					"Unknown service: %s\n"), portstr);
-				return STOP;
-			}
-		} else
+		if (equal(portstr, "smtp"))
+			port = htons(25);
+		else if (equal(portstr, "smtps"))
+			port = htons(465);
+		else if (equal(portstr, "imap"))
+			port = htons(143);
+		else if (equal(portstr, "imaps"))
+			port = htons(993);
+		else if (equal(portstr, "pop3"))
+			port = htons(110);
+		else if (equal(portstr, "pop3s"))
+			port = htons(995);
+		else if ((ep = getservbyname((char *)portstr, "tcp")) != NULL)
 			port = ep->s_port;
+		else {
+			fprintf(stderr, catgets(catd, CATSET, 251,
+				"Unknown service: %s\n"), portstr);
+			return STOP;
+		}
 	} else
 		port = htons(port);
 	if (verbose)
