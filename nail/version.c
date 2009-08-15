@@ -39,7 +39,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)version.c	2.398 (gritter) 5/26/09";
+static char sccsid[] = "@(#)version.c	2.399 (gritter) 8/15/09";
 #endif
 #endif /* not lint */
 
@@ -48,7 +48,7 @@ static char sccsid[] = "@(#)version.c	2.398 (gritter) 5/26/09";
  * Load this file first to get a "total" Mail version.
  */
 /*char	*version = "8.1 6/6/93";*/
-const char *version = V " 5/26/09";
+const char *version = V " 8/15/09";
 #ifndef	lint
 #if __GNUC__ >= 3 && __GNUC_MINOR__ >= 4 || __GNUC__ >= 4
 #define USED    __attribute__ ((used))
@@ -57,7 +57,7 @@ const char *version = V " 5/26/09";
 #else
 #define USED
 #endif
-static const char *versionid USED = "@(#)mailx " V " (gritter) 5/26/09";
+static const char *versionid USED = "@(#)mailx " V " (gritter) 8/15/09";
 #endif	/* !lint */
 /* SLIST */
 /*
@@ -73,7 +73,7 @@ def.h: *	Sccsid @(#)def.h	2.104 (gritter) 3/4/06
 dotlock.c:static char sccsid[] = "@(#)dotlock.c	2.9 (gritter) 3/20/06";
 edit.c:static char sccsid[] = "@(#)edit.c	2.24 (gritter) 3/4/06";
 extern.h: *	Sccsid @(#)extern.h	2.162 (gritter) 10/1/08
-fio.c:static char sccsid[] = "@(#)fio.c	2.74 (gritter) 12/21/08";
+fio.c:static char sccsid[] = "@(#)fio.c	2.75 (gritter) 8/15/09";
 getname.c:static char sccsid[] = "@(#)getname.c	2.5 (gritter) 3/4/06";
 getopt.c:	Sccsid @(#)getopt.c	1.7 (gritter) 12/16/07	
 glob.h: *	Sccsid @(#)glob.h	2.27 (gritter) 6/16/07

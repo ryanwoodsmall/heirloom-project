@@ -20,6 +20,8 @@
 * When the ORGANIZATION variable has an empty value, do not generate an
   "Organization:" header field. Previously, this condition resulted in
   mailx refusing to send mail (Thomas E. Kammeyer).
+* A missing htons() caused POP/IMAP/SMTP connections on certain platforms
+  to fail; this has been fixed.
 * When classifying messages with the junk filter, when selecting the most
   representative tokens, prefer non-junk tokens over junk tokens if both
   have the same (reversed) probability, in order to avoid false positives.

@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.74 (gritter) 12/21/08";
+static char sccsid[] = "@(#)fio.c	2.75 (gritter) 8/15/09";
 #endif
 #endif /* not lint */
 
@@ -1051,7 +1051,8 @@ sopen(const char *xserver, struct sock *sp, int use_ssl,
 						NI_NUMERICHOST) != 0)
 				strcpy(hbuf, "unknown host");
 			fprintf(stderr, catgets(catd, CATSET, 192,
-					"Connecting to %s . . ."), hbuf);
+					"Connecting to %s:%s . . ."),
+					hbuf, portstr);
 		}
 		if ((sockfd = socket(res->ai_family, res->ai_socktype,
 				res->ai_protocol)) >= 0) {
@@ -1106,11 +1107,12 @@ sopen(const char *xserver, struct sock *sp, int use_ssl,
 	}
 	memset(&servaddr, 0, sizeof servaddr);
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = port;
+	servaddr.sin_port = htons(port);
 	memcpy(&servaddr.sin_addr, *pptr, sizeof(struct in_addr));
 	if (verbose)
 		fprintf(stderr, catgets(catd, CATSET, 192,
-				"Connecting to %s . . ."), inet_ntoa(**pptr));
+				"Connecting to %s:%d . . ."),
+				inet_ntoa(**pptr), port);
 	if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof servaddr)
 			!= 0) {
 		perror(catgets(catd, CATSET, 254, "could not connect"));
