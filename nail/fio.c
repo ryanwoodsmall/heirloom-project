@@ -1107,7 +1107,7 @@ sopen(const char *xserver, struct sock *sp, int use_ssl,
 	}
 	memset(&servaddr, 0, sizeof servaddr);
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(port);
+	servaddr.sin_port = port;
 	memcpy(&servaddr.sin_addr, *pptr, sizeof(struct in_addr));
 	if (verbose)
 		fprintf(stderr, catgets(catd, CATSET, 192,
