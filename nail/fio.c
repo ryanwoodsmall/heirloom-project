@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)fio.c	2.75 (gritter) 8/15/09";
+static char sccsid[] = "@(#)fio.c	2.76 (gritter) 9/16/09";
 #endif
 #endif /* not lint */
 
@@ -1111,7 +1111,7 @@ sopen(const char *xserver, struct sock *sp, int use_ssl,
 	if (verbose)
 		fprintf(stderr, catgets(catd, CATSET, 192,
 				"Connecting to %s:%d . . ."),
-				inet_ntoa(**pptr), port);
+				inet_ntoa(**pptr), ntohs(port));
 	if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof servaddr)
 			!= 0) {
 		perror(catgets(catd, CATSET, 254, "could not connect"));
