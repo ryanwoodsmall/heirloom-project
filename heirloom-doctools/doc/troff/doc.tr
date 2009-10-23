@@ -43,7 +43,7 @@
 .\"
 .\"
 .\" Changes by Gunnar Ritter, Freiburg i. Br., Germany, February 2006.
-.\" Sccsid @(#)doc.tr	1.185 (gritter) 8/19/08
+.\" Sccsid @(#)doc.tr	1.186 (gritter) 10/23/09
 .\"
 .\" from file m.mac
 .do xflag 3
@@ -105,7 +105,7 @@
 .fallback BI BIE
 .flig BI 31
 ..
-.ds Sccsdate 8/19/08
+.ds Sccsdate 10/23/09
 .ds Str \*[Sccsdate]
 .substring Str 0 0
 .if '\*[Str]'%' \{\
@@ -1560,6 +1560,8 @@ on if \fIN\fR>0.
 Local Horizontal and Vertical Motions, and the Width Function
 .mht s_draw
 Overstrike, Bracket, Line-drawing, Graphics, and Zero-width Functions
+.bt
+\T'connectchar'\fB&connectchar\fI|c..\fR	\fB"\e(ru\e(ul\e(rn\fR	off	E	Connected characters for line drawing.\T
 .mht s_hyphen
 Hyphenation.
 .bt
@@ -1789,6 +1791,7 @@ refer to the detailed description on how to include it.
 \T'chop'chop	7\T
 \T'close'close	19\T
 \T'CL'CL	22\T
+\T'connectchar'connectchar	12\T
 \T'continue'continue	16\T
 \T'cp'cp	25\T
 \T'cropat'cropat	3\T
@@ -2165,6 +2168,7 @@ using \fB\ex\fI\'N\'\fR.\T
 \T'n_.cdp'11.2\T	\T'n_.cdp'\fB&cdp\fR\T	\T'n_.cdp'Visual depth below base line of previous character.\T
 \T'n_.ce'4.1\T	\T'n_.ce'\fB&ce\fR\T	\T'n_.ce'Remaining number of lines to be centered.\T
 \T'n_.cht'11.2\T	\T'n_.cht'\fB&cht\fR\T	\T'n_.cht'Visual height above base line of previous character.\T
+\T'n_.connectchar'12.4\T	\T'n_.connectchar'\fB&connectchar\fR\T	\T'n_.connectchar'Current characters connected for line drawing [sic].\T
 \T'n_.d'7.4\T	\T'n_.d'\fB&d\fR\T	\T'n_.d'Current vertical place in current diversion; equal to \fBnl\fR, if no diversion.\T
 \T'n_.defpenalty'4.1\T	\T'n_.defpenalty'\fB&defpenalty\fR\T	\T'n_.defpenalty'Default line breaking penalty.\T
 \T'n_.descender'5.4\T	\T'n_.descender'\fB&descender\fR\T	\T'n_.descender'Descender of current font and point size.\T
@@ -5177,7 +5181,9 @@ baseline-rule\ \fB\(ru\fR\|,
 underrule\ \fB\(ul\fR\|,
 and
 root-en\ \fB\(rn\fR\|,
-the remainder space is covered by over-lapping.
+the remainder space is covered by over-lapping;
+the set of these characters can be customized with the
+\T'connectchar'\fBconnectchar\fR\T request described below.
 If \fIN\fR is \fIless\fR than the width of \fIc\fR,
 a single \fIc\fR is centered on a distance \fIN\fR.
 As an example, a macro to underscore a string can be written
@@ -5273,6 +5279,13 @@ saved in number register \fIa\fR
 (e.g. using \fB.mk|a\fR)
 as done for this paragraph.
 .eb
+.h1
+.bta connectchar
+\fB&connectchar\fI|c..\fR	\h'-4m'\fB"\e(ru\e(ul\e(rn\fR	\h'-4m'off	E	Connected characters for line drawing.
+If there is a remainder to be drawn for a horizontal line,
+these characters are drawn over-lapping.
+The current set is available
+in the \A'n_.connectchar'\fB&connectchar\fR number register.
 .sc
 \A's_graphics'Graphics.
 The function \A'e_D'\fB\eD\fI\'c...\'\fR

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n9.c	1.77 (gritter) 8/9/09
+ * Sccsid @(#)n9.c	1.78 (gritter) 10/23/09
  */
 
 /*
@@ -96,6 +96,21 @@ setz(void)
 	return(i);
 }
 
+static int
+connectchar(tchar i)
+{
+	int	*cp, c;
+
+	c = cbits(i);
+	if (*connectch) {
+		for (cp = connectch; *cp; cp++)
+			if (c == *cp)
+				return 1;
+		return 0;
+	}
+	return c == RULE || c == UNDERLINE || c == ROOTEN;
+}
+
 void
 setline(void)
 {
@@ -135,7 +150,7 @@ s0:
 		goto s1;
 	}
 	if (rem = length % w) {
-		if (cbits(c) == RULE || cbits(c) == UNDERLINE || cbits(c) == ROOTEN)
+		if (connectchar(c))
 			*i++ = c | ZBIT;
 		*i++ = makem(rem);
 	}

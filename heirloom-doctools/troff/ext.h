@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)ext.h	1.110 (gritter) 3/5/07
+ * Sccsid @(#)ext.h	1.111 (gritter) 10/23/09
  */
 
 /*
@@ -500,6 +500,7 @@ extern	void	casesentchar(void);
 extern	void	casetranschar(void);
 extern	void	casebreakchar(void);
 extern	void	casenhychar(void);
+extern	void	caseconnectchar(void);
 extern	void	casemk(void);
 extern	void	casesv(void);
 extern	void	caseos(void);

@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)tdef.h	1.164 (gritter) 8/19/08
+ * Sccsid @(#)tdef.h	1.165 (gritter) 10/23/09
  */
 
 /*
@@ -757,6 +757,7 @@ struct inlev {
 #define	transch	env._transch
 #define	breakch	env._breakch
 #define	nhych	env._nhych
+#define	connectch	env._connectch
 #define	para	env._para
 #define	parsp	env._parsp
 #define	pgwordp	env._pgwordp
@@ -927,6 +928,7 @@ extern struct env {
 	int	_transch[NSENT];
 	int	_breakch[NSENT];
 	int	_nhych[NSENT];
+	int	_connectch[NSENT];
 	tchar	*_line;
 	tchar	*_word;
 	int	*_wdpenal;
