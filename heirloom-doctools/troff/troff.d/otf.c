@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.64 (gritter) 1/8/10
+ * Sccsid @(#)otf.c	1.65 (gritter) 1/8/10
  */
 
 #include <stdio.h>
@@ -2128,7 +2128,8 @@ get_cmap(int addchar)
 		platformID = pbe16(&contents[o+4+8*i]);
 		encodingID = pbe16(&contents[o+4+8*i+2]);
 		offset = pbe32(&contents[o+4+8*i+4]);
-		if (platformID == 3 && encodingID == 1 || platformID == 0)
+		if (platformID == 3 && (encodingID == 0 || encodingID == 1) ||
+				platformID == 0)
 			gotit |= get_ms_unicode_cmap(o + offset, addchar);
 	}
 	return gotit;

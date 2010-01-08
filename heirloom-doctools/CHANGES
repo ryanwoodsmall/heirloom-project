@@ -10,6 +10,8 @@ Release ...
 * troff/dpost: Include the last character in a TrueType "post" 2.0 table
   which was previously omitted; same for the last entry of the last subtable
   in the "cmap" table (patch by Matthew Fischer).
+* troff/dpost: Accept "cmap" entries with Platform ID 3, Encoding ID 0
+  (Symbol) as Unicode tables (patch by Matthew Fischer).
 * troff: Do not apply font-specific character translation inside \D,
   which led to wrong output e.g. with \D'l' with an OpenType font with
   the small caps feature activated (bug reported by Russ Cox).
