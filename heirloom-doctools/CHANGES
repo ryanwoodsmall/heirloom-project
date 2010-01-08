@@ -7,6 +7,9 @@ Release ...
   of characters that are drawn as overlapping with the "\l" function.
 * troff/dpost: Embed TrueType fonts without a PostScript field correctly
   (bug reported by FENG Yu Ning).
+* troff/dpost: Include the last character in a TrueType "post" 2.0 table
+  which was previously omitted; same for the last entry of the last subtable
+  in the "cmap" table (patch by Matthew Fischer).
 * troff: Do not apply font-specific character translation inside \D,
   which led to wrong output e.g. with \D'l' with an OpenType font with
   the small caps feature activated (bug reported by Russ Cox).

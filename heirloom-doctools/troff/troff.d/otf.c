@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.63 (gritter) 4/2/09
+ * Sccsid @(#)otf.c	1.64 (gritter) 1/8/10
  */
 
 #include <stdio.h>
@@ -1961,8 +1961,8 @@ get_ttf_post_2_0(int o)
 		n = pbe16(&contents[o+34+2*i]);
 		if (n >= 258) {
 			n -= 258;
-			if (n > numberNewGlyphs)
-				numberNewGlyphs = n;
+			if (n >= numberNewGlyphs)
+				numberNewGlyphs = n + 1;
 		}
 	}
 	ExtraStrings = calloc(numberNewGlyphs, sizeof *ExtraStrings);
@@ -2070,7 +2070,7 @@ get_ms_unicode_cmap(int o, int addchar)
 		for (c = s; c <= e; c++) {
 			if (r) {
 				x = r + 2*(c - s) + idRangeOffset+2*i;
-				if (x+2 >=
+				if (x+1 >=
 					    table_directories[pos_cmap].offset +
 					    table_directories[pos_cmap].length)
 					continue;
