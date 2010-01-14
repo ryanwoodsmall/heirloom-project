@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.66 (gritter) 1/14/10
+ * Sccsid @(#)otf.c	1.67 (gritter) 1/14/10
  */
 
 #include <stdio.h>
@@ -2081,11 +2081,12 @@ get_ms_unicode_cmap(int o, int addchar)
 				gid = c + d;
 			gid &= 0xffff;
 			if (gid != 0) {
-				if (addchar) {
+				if (gid >= nc || got_gid[gid] > 0)
+					/*EMPTY*/;
+				else if (addchar) {
 					unichar(gid, c);
-					if (got_gid && gid < nc)
-						got_gid[gid] = 1;
-				} else if (gid < nc) {
+					got_gid[gid] = 1;
+				} else {
 					addunitab(a->gid2tr[gid].ch1, c);
 					addunitab(a->gid2tr[gid].ch2, c);
 				}
@@ -2124,6 +2125,8 @@ get_cmap(int addchar)
 	}
 	if (addchar)
 		otfalloc(numGlyphs);
+	else
+		got_gid = calloc(numGlyphs, sizeof *got_gid);
 	for (i = 0; i < numTables; i++) {
 		platformID = pbe16(&contents[o+4+8*i]);
 		encodingID = pbe16(&contents[o+4+8*i+2]);
@@ -2131,6 +2134,10 @@ get_cmap(int addchar)
 		if (platformID == 3 && (encodingID == 0 || encodingID == 1) ||
 				platformID == 0)
 			gotit |= get_ms_unicode_cmap(o + offset, addchar);
+	}
+	if (addchar == 0) {
+		free(got_gid);
+		got_gid = NULL;
 	}
 	return gotit;
 }
@@ -2181,6 +2188,7 @@ get_ttf_post_3_0(int o)
 			}
 	}
 	free(got_gid);
+	got_gid = NULL;
 }
 
 static void
