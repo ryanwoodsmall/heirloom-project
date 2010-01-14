@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)afm.c	1.64 (gritter) 5/7/07
+ * Sccsid @(#)afm.c	1.65 (gritter) 1/14/10
  */
 
 #include <stdlib.h>
@@ -666,7 +666,7 @@ thisword(const char *text, const char *wrd)
 int
 unitconv(int i)
 {
-	if (unitsPerEm * 72 > dev.unitwidth * dev.res)
+	if (unitsPerEm * 72 != dev.unitwidth * dev.res)
 		i = i * dev.unitwidth * dev.res / 72 / unitsPerEm;
 	return i;
 }
