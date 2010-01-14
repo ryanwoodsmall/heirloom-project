@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.65 (gritter) 1/8/10
+ * Sccsid @(#)otf.c	1.66 (gritter) 1/14/10
  */
 
 #include <stdio.h>
@@ -3087,11 +3087,11 @@ get_kern_subtable(int o)
 	got_kern = 1;
 	nPairs = pbe16(&contents[o+6]);
 	for (i = 0; i < nPairs; i++) {
-		if (o + 14 + 3 * (i+1) > o + length)
+		if (o + 14 + 6 * (i+1) > o + length)
 			break;
-		left = pbe16(&contents[o+14+3*i]);
-		right = pbe16(&contents[o+14+3*i+2]);
-		value = (int16_t)pbe16(&contents[o+14+3*i+4]);
+		left = pbe16(&contents[o+14+6*i]);
+		right = pbe16(&contents[o+14+6*i+2]);
+		value = (int16_t)pbe16(&contents[o+14+6*i+4]);
 		kernpair(left, right, value);
 	}
 }
@@ -3111,7 +3111,7 @@ get_kern(void)
 	nTables = pbe16(&contents[o+2]);
 	o += 4;
 	for (i = 0; i < nTables; i++) {
-		if (o > table_directories[pos_kern].offset +
+		if (o + 6 > table_directories[pos_kern].offset +
 				table_directories[pos_kern].length)
 			return;
 		length = pbe16(&contents[o+2]);

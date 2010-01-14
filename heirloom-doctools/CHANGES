@@ -3,6 +3,9 @@ Release ...
   (contributed by Michael Piotrowski).
 * [nt]roff: Hyphenation patterns for Dutch have been added (contributed
   by Erwin Koning).
+* troff/dpost: "kern" tables in TrueType fonts were indexed wrongly, which
+  mostly led to missing kerning pairs but might have led to completely wrong
+  kerning pairs under rare circumstances (patch by Matthew Fischer).
 * troff: The ".connectchar" request has been added to customize the set
   of characters that are drawn as overlapping with the "\l" function.
 * troff/dpost: Embed TrueType fonts without a PostScript field correctly
