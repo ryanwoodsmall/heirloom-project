@@ -8,6 +8,7 @@ Release ...
   kerning pairs under rare circumstances (patch by Matthew Fischer).
 * troff: The ".connectchar" request has been added to customize the set
   of characters that are drawn as overlapping with the "\l" function.
+* troff: Allow "\~" to shrink, not just to stretch (bugreport by Roy Fisher).
 * troff/dpost: Embed TrueType fonts without a PostScript field correctly
   (bug reported by FENG Yu Ning).
 * troff/dpost: Include the last character in a TrueType "post" 2.0 table

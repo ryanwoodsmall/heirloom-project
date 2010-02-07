@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.177 (gritter) 5/11/07
+ * Sccsid @(#)n7.c	1.178 (gritter) 2/7/10
  */
 
 /*
@@ -1184,6 +1184,7 @@ getword(int x)
 	register int j, k = 0, w;
 	register tchar i = 0, *wp, nexti, gotspc = 0, t;
 	int noword, n, inword = 0;
+	int lastsp = ' ';
 #if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 	wchar_t *wddelim;
 	char mbbuf3[MB_LEN_MAX + 1];
@@ -1222,7 +1223,8 @@ getword(int x)
 			hyoff = 1;	/* 1 => don't hyphenate */
 			continue;
 		}
-		if (j == ' ' && !iszbit(i)) {
+		if ((j == ' ' || padj && j == STRETCH) && !iszbit(i)) {
+			lastsp = j;
 			n++;
 			if (isadjspc(i))
 				w = 0;
@@ -1231,12 +1233,12 @@ getword(int x)
 				w = 0;
 			} else if (xflag && seflg && sesspsz && n == 1) {
 				if (spbits) {
-					i = ' ' | SENTSP | spbits;
+					i = lastsp | SENTSP | spbits;
 					w = width(i);
 				} else
 					w = ses;
 			} else if (spbits && xflag) {
-				i = ' ' | spbits;
+				i = lastsp | spbits;
 				w = width(i);
 			} else
 				w = sps;
@@ -1290,10 +1292,10 @@ getword(int x)
 a0:
 #endif /* EUC && NROFF && ZWDELIMS */
 	if (spbits && xflag) {
-		t = ' ' | spbits;
+		t = lastsp | spbits;
 		w = width(t);
 	} else {
-		t = ' ' | chbits;
+		t = lastsp | chbits;
 		w = sps;
 	}
 	cdp = cht = 0;
@@ -1371,7 +1373,8 @@ g1:		nexti = GETCH();
 		static int transchar[] =
 			{ '"', '\'', ')', ']', '*', 0, 0 };
 		transchar[5] = DAGGER;
-		if (j != '\n' && j != ' ' || ismot(i) || iszbit(i) ||
+		if (j != '\n' && j != ' ' && (!padj || j != STRETCH) ||
+				ismot(i) || iszbit(i) ||
 				isadjspc(i))
 #if defined (EUC) && defined (NROFF) && defined (ZWDELIMS)
 			if (!multi_locale)
@@ -1948,7 +1951,7 @@ parword(void)
 	if (pgwords == 0)
 		pgflags[pgwords] = 0;
 	un1 = -1;
-	while ((c = cbits(i = *wp++)) == ' ') {
+	while ((c = cbits(i = *wp++)) == ' ' || c == STRETCH) {
 		if (iszbit(i))
 			break;
 		wch--;
@@ -1965,7 +1968,9 @@ parword(void)
 			}
 		}
 		parsp[pgspacs++] = i;
-		if (wdpenal[wp-word-1])
+		if (c == STRETCH)
+			pgpenal[pgwords] = INFPENALTY;
+		else if (wdpenal[wp-word-1])
 			pgpenal[pgwords] = makepgpenal(wdpenal[wp-word-1]);
 	}
 	if (wch == 0)
