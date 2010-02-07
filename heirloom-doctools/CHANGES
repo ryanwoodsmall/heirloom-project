@@ -23,6 +23,9 @@ Release ...
 * troff: Do not apply font-specific character translation inside \D,
   which led to wrong output e.g. with \D'l' with an OpenType font with
   the small caps feature activated (bug reported by Russ Cox).
+* dpost: Fixed the width of the "\(ul" character such that the lines of
+  wide boxed tables do not stick out at the right end anymore (bugreport
+  by Roy Fisher).
 * troff: The "\X" and "\Y" escape sequences are no longer interpreted
   in copy mode, as there is no case when this would be useful, and the
   behavior now matches groff and Plan 9 troff (thanks to Russ Cox).
