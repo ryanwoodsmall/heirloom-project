@@ -16,6 +16,8 @@ Release ...
   in the "cmap" table (patch by Matthew Fischer).
 * troff/dpost: Accept "cmap" entries with Platform ID 3, Encoding ID 0
   (Symbol) as Unicode tables (patch by Matthew Fischer).
+* troff/dpost: Handle TrueType fonts with format 12 cmap tables (UCS-4)
+  (patch by Matthew Fischer).
 * troff/dpost: Handle TrueType fonts in which glyphs appear multiple times
   in Unicode tables gracefully (bugreport by Matthew Fischer).
 * troff/dpost: Handle TrueType files with a unitsPerEm value less than

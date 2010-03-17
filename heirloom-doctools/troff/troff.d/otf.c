@@ -23,7 +23,7 @@
 /*
  * Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)otf.c	1.67 (gritter) 1/14/10
+ * Sccsid @(#)otf.c	1.68 (gritter) 3/17/10
  */
 
 #include <stdio.h>
@@ -2019,11 +2019,40 @@ unichar(int gid, int c)
 	if (ExtraStringSpace == NULL)
 		ExtraStringSpace = malloc(nc * 12);
 	sp = &ExtraStringSpace[ExtraStringSpacePos];
-	ExtraStringSpacePos += 8;
 	ExtraStrings[nExtraStrings] = sp;
-	snprintf(sp, 8, "uni%04X", c);
+	ExtraStringSpacePos += snprintf(sp, 10, "uni%04X", c) + 1;
 	onechar(gid, nWGL + nExtraStrings++);
 }
+
+#if !defined (DPOST) && !defined (DUMP)
+
+#include "unimap.h"
+
+static void
+addunimap(int gid, int c)
+{
+	struct unimap	***up, *u, *ut;
+	int	x, y;
+
+	if (c != 0 && (c&~0xffff) == 0) {
+		if (a->unimap == NULL)
+			a->unimap = calloc(256, sizeof *up);
+		up = a->unimap;
+		x = c >> 8;
+		y = c & 0377;
+		if (up[x] == NULL)
+			up[x] = calloc(256, sizeof **up);
+		u = calloc(1, sizeof *u);
+		u->u.code = gid;
+		if (up[x][y] != NULL) {
+			for (ut = up[x][y]; ut->next;
+					ut = ut->next);
+			ut->next = u;
+		} else
+			up[x][y] = u;
+	}
+}
+#endif	/* !DPOST && !DUMP */
 
 static void
 addunitab(int c, int u)
@@ -2036,13 +2065,31 @@ addunitab(int c, int u)
 		a->nunitab = c+1;
 	}
 	a->unitab[c] = u;
+
+	addunimap(c, u);
 #endif
 }
 
 static char	*got_gid;
 
+static void
+got_mapping(int c, int gid, int addchar)
+{
+	if (gid < nc) {
+		if (addchar) {
+			if (!got_gid[gid]) {
+				unichar(gid, c);
+				got_gid[gid] = 1;
+			}
+		} else {
+			addunitab(a->gid2tr[gid].ch1, c);
+			addunitab(a->gid2tr[gid].ch2, c);
+		}
+	}
+}
+
 static int
-get_ms_unicode_cmap(int o, int addchar)
+get_ms_unicode_cmap4(int o, int addchar)
 {
 	int	length;
 	int	segCount;
@@ -2053,8 +2100,6 @@ get_ms_unicode_cmap(int o, int addchar)
 	int	glyphIdArray;
 	int	c, e, i, d, r, s, gid, x;
 
-	if (pbe16(&contents[o]) != 4)
-		return 0;
 	length = pbe16(&contents[o+2]);
 	segCount = pbe16(&contents[o+6]) / 2;
 	endCount = o + 14;
@@ -2080,20 +2125,51 @@ get_ms_unicode_cmap(int o, int addchar)
 			} else
 				gid = c + d;
 			gid &= 0xffff;
-			if (gid != 0) {
-				if (gid >= nc || got_gid[gid] > 0)
-					/*EMPTY*/;
-				else if (addchar) {
-					unichar(gid, c);
-					got_gid[gid] = 1;
-				} else {
-					addunitab(a->gid2tr[gid].ch1, c);
-					addunitab(a->gid2tr[gid].ch2, c);
-				}
-			}
+			if (gid != 0)
+				got_mapping(c, gid, addchar);
 		}
 	}
 	return 1;
+}
+
+static int
+get_ms_unicode_cmap12(int o, int addchar)
+{
+	int	length;
+	int	nGroups;
+	int	startCharCode;
+	int	endCharCode;
+	int	startGlyphID;
+	int	c, i, gid;
+
+	length = pbe32(&contents[o+4]);
+	nGroups = pbe32(&contents[o+12]);
+	o += 16;
+	for (i = 0; i < nGroups; i++) {
+		startCharCode = pbe32(&contents[o]);
+		endCharCode = pbe32(&contents[o+4]);
+		startGlyphID = pbe32(&contents[o+8]);
+		for (c = startCharCode, gid = startGlyphID; c <= endCharCode; c++, gid++)
+			got_mapping(c, gid, addchar);
+		o += 12;
+	}
+	return 1;
+}
+
+static int
+get_ms_unicode_cmap(int o, int addchar)
+{
+	int	format;
+
+	format = pbe16(&contents[o]);
+	switch (format) {
+	case 4:
+		return get_ms_unicode_cmap4(o, addchar);
+	case 12:
+		return get_ms_unicode_cmap12(o, addchar);
+	default:
+		return 0;
+	}
 }
 
 static int
@@ -2104,6 +2180,7 @@ get_cmap(int addchar)
 	int	encodingID;
 	int	offset;
 	int	i, o;
+	int	want_tbl;
 	int	gotit = 0;
 
 	if (pos_cmap < 0) {
@@ -2125,19 +2202,19 @@ get_cmap(int addchar)
 	}
 	if (addchar)
 		otfalloc(numGlyphs);
-	else
-		got_gid = calloc(numGlyphs, sizeof *got_gid);
+	want_tbl = -1;
 	for (i = 0; i < numTables; i++) {
 		platformID = pbe16(&contents[o+4+8*i]);
 		encodingID = pbe16(&contents[o+4+8*i+2]);
-		offset = pbe32(&contents[o+4+8*i+4]);
-		if (platformID == 3 && (encodingID == 0 || encodingID == 1) ||
-				platformID == 0)
-			gotit |= get_ms_unicode_cmap(o + offset, addchar);
+		if (platformID == 3 && encodingID == 10 ||
+				want_tbl < 0 &&
+				(platformID == 3 && (encodingID == 0 || encodingID == 1) ||
+				platformID == 0))
+			want_tbl = i;
 	}
-	if (addchar == 0) {
-		free(got_gid);
-		got_gid = NULL;
+	if (want_tbl >= 0) {
+		offset = pbe32(&contents[o+4+8*want_tbl+4]);
+		gotit |= get_ms_unicode_cmap(o + offset, addchar);
 	}
 	return gotit;
 }
@@ -2295,28 +2372,39 @@ get_maxp(void)
 }
 
 static char *
-build_string(int o, int length)
+build_string(int o, int length, int ucs)
 {
 	char	*string, *sp;
 	int	i;
+	int	ch;
 
 	sp = string = malloc(3*length + 1);
-	for (i = 0; i < length; i++)
-		if ((contents[o+i] & 0200) == 0) {
-			switch (contents[o+i]) {
+	for (i = 0; i < length; i++) {
+		if (ucs) {
+			ch = pbe16(&contents[o+i]);
+			i++;
+		} else
+			ch = contents[o+i]&0377;
+		if ((ch & 0200) == 0) {
+			switch (ch) {
 			case '\\':
 			case '(':
 			case ')':
 				*sp++ = '\\';
 				/*FALLTHRU*/
 			default:
-				*sp++ = contents[o+i];
+				*sp++ = ch;
 			}
-		} else if ((contents[o+i]&0377) == 169) {
+		} else if (ch == 169) {
+			/*
+			 * 169 happens to be COPYRIGHT SIGN in both MacRoman and
+			 * Unicode.
+			 */
 			*sp++ = '(';
 			*sp++ = 'c';
 			*sp++ = ')';
 		}
+	}
 	*sp = 0;
 	return string;
 }
@@ -2350,22 +2438,24 @@ get_name(void)
 		nameID = pbe16(&contents[o+6+12*i+6]);
 		length = pbe16(&contents[o+6+12*i+8]);
 		offset = pbe16(&contents[o+6+12*i+10]);
-		if (platformID == 1 && encodingID == 0 && languageID == 0) {
-			switch (nameID) {
-			case 0:
-				sp = &Copyright;
-				break;
-			case 6:
-				sp = &PostScript_name;
-				break;
-			case 7:
-				sp = &Notice;
-				break;
-			default:
-				sp = NULL;
-			}
-			if (sp)
-				*sp = build_string(stringOffset+offset, length);
+		switch (nameID) {
+		case 0:
+			sp = &Copyright;
+			break;
+		case 6:
+			sp = &PostScript_name;
+			break;
+		case 7:
+			sp = &Notice;
+			break;
+		default:
+			sp = NULL;
+		}
+		if (sp != NULL && *sp == NULL) {
+			if (platformID == 1 && encodingID == 0 && languageID == 0)
+				*sp = build_string(stringOffset+offset, length, 0);
+			else if (platformID == 3 && languageID == 0x409)
+				*sp = build_string(stringOffset+offset, length, 1);
 		}
 	}
 }
@@ -3133,36 +3223,6 @@ get_kern(void)
 
 #endif	/* !DPOST */
 
-#if !defined (DPOST) && !defined (DUMP)
-
-#include "unimap.h"
-
-static void
-mkunimap(void)
-{
-	struct unimap	***up, *u, *ut;
-	int	i, x, y;
-
-	up = calloc(256, sizeof *up);
-	for (i = 1; i < a->nunitab; i++)
-		if (a->unitab[i] != 0 && (a->unitab[i]&~0xffff) == 0) {
-			x = a->unitab[i] >> 8;
-			y = a->unitab[i] & 0377;
-			if (up[x] == NULL)
-				up[x] = calloc(256, sizeof **up);
-			u = calloc(1, sizeof *u);
-			u->u.code = i;
-			if (up[x][y] != NULL) {
-				for (ut = up[x][y]; ut->next;
-						ut = ut->next);
-				ut->next = u;
-			} else
-				up[x][y] = u;
-		}
-	a->unimap = up;
-}
-#endif	/* !DPOST && !DUMP */
-
 #ifdef	DPOST
 static void
 checkembed(void)
@@ -3488,9 +3548,6 @@ otfget(struct afmtab *_a, char *_contents, size_t _size)
 			get_kern();
 		kernfinish();
 		get_cmap(0);
-#ifndef	DUMP
-		mkunimap();
-#endif	/* !DUMP */
 #endif	/* !DPOST */
 		a->Font.nwfont = a->nchars > 255 ? 255 : a->nchars;
 	} else
