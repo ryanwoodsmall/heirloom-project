@@ -38,7 +38,7 @@
 
 #ifndef lint
 #ifdef	DOSCCS
-static char sccsid[] = "@(#)cmd2.c	2.46 (gritter) 3/4/06";
+static char sccsid[] = "@(#)cmd2.c	2.47 (gritter) 5/9/10";
 #endif
 #endif /* not lint */
 
@@ -803,16 +803,17 @@ unignore_one(const char *name, struct ignoretab *tab)
 	int h = hash(name);
 
 	for (ip = tab->i_head[h]; ip; ip = ip->i_link) {
-		if (asccasecmp(ip->i_field, name)) {
+		if (asccasecmp(ip->i_field, name) == 0) {
 			free(ip->i_field);
 			if (iq != NULL)
 				iq->i_link = ip->i_link;
 			else
-				tab->i_head[h] = NULL;
+				tab->i_head[h] = ip->i_link;
 			free(ip);
 			tab->i_count--;
 			break;
 		}
+		iq = ip;
 	}
 }
 

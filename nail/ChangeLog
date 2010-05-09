@@ -26,6 +26,8 @@
 * When calculating the probabilities of tokens that have occurred only in
   good messages or only in junk messages so far, and these tokens occurred
   less than ten times, give them slightly less than the minimum/maximum.
+* Fixed "unignore" and similar commands; they did not work at all so far
+  (http://www.freebsd.org/cgi/query-pr.cgi?pr=146280).
 
 [12.4] released 7/29/08
 * With the "-E" command line option or if the "skipemptybody" variable is
