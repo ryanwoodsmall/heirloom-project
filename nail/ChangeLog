@@ -1,4 +1,4 @@
-[12.5] released . . .
+[12.5] as of 6/20/10
 * Fixed a message corruption that occurred when the "inc" command was used
   with a mbox format mailbox after encrypted messages had been viewed
   (reported by Martin Neitzel).
