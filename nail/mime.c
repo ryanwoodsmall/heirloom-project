@@ -40,7 +40,7 @@
 #ifdef	DOSCCS
 static char copyright[]
 = "@(#) Copyright (c) 2000, 2002 Gunnar Ritter. All rights reserved.\n";
-static char sccsid[]  = "@(#)mime.c	2.70 (gritter) 3/10/09";
+static char sccsid[]  = "@(#)mime.c	2.71 (gritter) 7/5/10";
 #endif /* DOSCCS */
 #endif /* not lint */
 
@@ -788,8 +788,7 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 
 	*isclean = mime_isclean(fp);
 	if (*isclean & MIME_HASNUL ||
-			*contenttype && ascncasecmp(*contenttype, "text/", 5) ||
-			*contenttype == NULL && *isclean & MIME_CTRLCHAR) {
+			*contenttype && ascncasecmp(*contenttype, "text/", 5)) {
 		convert = CONV_TOB64;
 		if (*contenttype == NULL ||
 				ascncasecmp(*contenttype, "text/", 5) == 0)
@@ -809,6 +808,7 @@ get_mime_convert(FILE *fp, char **contenttype, char **charset,
 			*contenttype = "application/octet-stream";
 			*charset = NULL;
 		} if (*isclean & MIME_CTRLCHAR) {
+			convert = CONV_TOB64;
 			/*
 			 * RFC 2046 forbids control characters other than
 			 * ^I or ^L in text/plain bodies. However, some
