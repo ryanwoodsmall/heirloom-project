@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.24 (gritter) 3/7/07
+ * Sccsid @(#)main.cc	1.25 (gritter) 8/7/10
  */
 
 /*
@@ -1529,7 +1529,7 @@ unquote_str(char *str, char *qstr)
 
 	to = qstr;
 	for (from = str; *from; from++) {
-		if (*from == '\\') {
+		if (*from == '\\' && from[1]) {
 			from++;
 		}
 		*to++ = *from;

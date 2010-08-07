@@ -3,6 +3,8 @@ Release ...
   Joe Krahn).
 * make: Mac OS X compilation fix (Stefan Tramm).
 * make: Compilation fix for 64-bit environments.
+* make: Do not crash if a backslash appears at the end of the value of
+  the MAKEFLAGS environment variable (bug reported by Stefano Lattarini).
 
 Release 070527
 * admin: A manual page is available, based on source code released by Sun.
