@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n7.c	1.179 (gritter) 2/14/10
+ * Sccsid @(#)n7.c	1.180 (gritter) 8/7/10
  */
 
 /*
@@ -1450,7 +1450,8 @@ storeword(register tchar c, register int w)
 
 	if (wordp == NULL || wordp >= &word[wdsize - 3]) {
 		tchar	*k, **h;
-		int	j, *pp, owdsize;
+		ptrdiff_t	j;
+		int	*pp, owdsize;
 		if (over)
 			return;
 		owdsize = wdsize;
