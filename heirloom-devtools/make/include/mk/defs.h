@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)defs.h	1.9 (gritter) 3/7/07
+ * Sccsid @(#)defs.h	1.10 (gritter) 8/7/10
  */
 
 /*
@@ -88,6 +88,9 @@
 #define SETVAR(name, value, append) \
 				setvar_daemon(name, value, append, no_daemon, \
 					      true, debug_level)
+#define SETVAR_KEEP_TRAILING_SPACES(name, value, append) \
+				setvar_daemon(name, value, append, no_daemon, \
+					      false, debug_level)
 #define MAX(a,b)		(((a)>(b))?(a):(b))
 /*
  * New feature added to SUN5_0 make,  invoke the vanilla svr4 make when

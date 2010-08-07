@@ -31,7 +31,7 @@
 /*
  * Portions Copyright (c) 2007 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)main.cc	1.25 (gritter) 8/7/10
+ * Sccsid @(#)main.cc	1.26 (gritter) 8/7/10
  */
 
 /*
@@ -2460,13 +2460,15 @@ read_files_and_state(int argc, char **argv)
 	if (makeflags_string.buffer.start[1] != (int) nul_char) {
 		if (makeflags_string.buffer.start[1] != (int) space_char) {
 			MBSTOWCS(wcs_buffer, NOCATGETS("MFLAGS"));
-			SETVAR(GETNAME(wcs_buffer, FIND_LENGTH),
+			SETVAR_KEEP_TRAILING_SPACES(
+			              GETNAME(wcs_buffer, FIND_LENGTH),
 				      GETNAME(makeflags_string.buffer.start,
 					      FIND_LENGTH),
 				      false);
 		} else {
 			MBSTOWCS(wcs_buffer, NOCATGETS("MFLAGS"));
-			SETVAR(GETNAME(wcs_buffer, FIND_LENGTH),
+			SETVAR_KEEP_TRAILING_SPACES(
+			              GETNAME(wcs_buffer, FIND_LENGTH),
 				      GETNAME(makeflags_string.buffer.start + 2,
 					      FIND_LENGTH),
 				      false);
@@ -2515,7 +2517,7 @@ read_files_and_state(int argc, char **argv)
 				       );
 		}
 	}
-	SETVAR( makeflags
+	SETVAR_KEEP_TRAILING_SPACES( makeflags
 	             , makeflags_value_saved
 	             , false
 	             );
@@ -2676,18 +2678,18 @@ read_files_and_state(int argc, char **argv)
 	 && (!strcmp(mf_val->string_mb, makeflags_value_saved->string_mb)))
 	{
 		if (makeflags_string_posix.buffer.start[1] == (int) nul_char) {
-			SETVAR(makeflags,
+			SETVAR_KEEP_TRAILING_SPACES(makeflags,
 				      GETNAME(makeflags_string_posix.buffer.start + 1,
 					      FIND_LENGTH),
 				      false);
 		} else {
 			if (makeflags_string_posix.buffer.start[1] != (int) space_char) {
-				SETVAR(makeflags,
+				SETVAR_KEEP_TRAILING_SPACES(makeflags,
 					      GETNAME(makeflags_string_posix.buffer.start,
 						      FIND_LENGTH),
 					      false);
 			} else {
-				SETVAR(makeflags,
+				SETVAR_KEEP_TRAILING_SPACES(makeflags,
 					      GETNAME(makeflags_string_posix.buffer.start + 2,
 						      FIND_LENGTH),
 					      false);
@@ -3027,7 +3029,8 @@ enter_argv_values(int argc, char *argv[], ASCII_Dyn_Array *makeflags_and_macro)
 		} else {
 			macro = maybe_append_prop(name, macro_prop);
 			macro->body.macro.exported = true;
-			SETVAR(name, value, false)->body.macro.read_only = true;
+			SETVAR_KEEP_TRAILING_SPACES(name, value,
+				false)->body.macro.read_only = true;
 		}
 	}
 }
