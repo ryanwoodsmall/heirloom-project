@@ -41,7 +41,8 @@ Release ...
 * [nt]roff: Do not go into an infinite loop if a tab character appears in
   the arguments to ".warn" (bug reported by Russ Cox).
 * [nt]roff: Fixed a possible crash on 64-bit machines due to the choice
-  of an int for ptrdiff_t in paragraph-at-once justification (Steve Kargl).
+  of an int for ptrdiff_t in paragraph-at-once justification (Steve Kargl),
+  and another one in the hyphenation code (Sean Jensen).
 
 Release 080407
 * [nt]roff: A type definition problem that caused an endless loop on
