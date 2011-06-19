@@ -1,4 +1,7 @@
 Release ...
+* [nt]roff: Fix the execution order of output line traps to be left-to-right,
+  and execute them before page traps, as documented (bug report by
+  Pierre-Jean Fichet).
 * troff/dpost: Support for URI links in PDF documents has been added
   (contributed by Michael Piotrowski).
 * [nt]roff: Hyphenation patterns for Dutch have been added (contributed

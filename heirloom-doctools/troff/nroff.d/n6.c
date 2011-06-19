@@ -33,7 +33,7 @@
 /*
  * Portions Copyright (c) 2005 Gunnar Ritter, Freiburg i. Br., Germany
  *
- * Sccsid @(#)n6.c	1.50 (gritter) 8/19/08
+ * Sccsid @(#)n6.c	1.51 (gritter) 6/19/11
  */
 
 /*
@@ -350,7 +350,7 @@ setwd(void)
 	int	savhp, savapts, savapts1, savfont, savfont1, savpts, savpts1;
 	int	savlgf;
 
-	base = numtab[ST].val = numtab[ST].val = wid = numtab[CT].val = 0;
+	base = numtab[ST].val = wid = numtab[CT].val = 0;
 	if (ismot(i = getch()))
 		return;
 	delim = i;
