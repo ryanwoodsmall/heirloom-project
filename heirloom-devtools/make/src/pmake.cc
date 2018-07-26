@@ -46,7 +46,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
-#include <rpc/rpc.h>		/* host2netname(), netname2host() */
+//#include <rpc/rpc.h>		/* host2netname(), netname2host() */
 #include <unistd.h>		/* getdomainname() */
 
 /*
@@ -95,7 +95,7 @@ read_make_machines(Name make_machines_name)
 	wchar_t			local_host[MAX_HOSTNAMELEN + 1];
 	char			local_host_mb[MAX_HOSTNAMELEN + 1] = "";
 	int			local_host_wslen;
-	wchar_t			full_host[MAXNETNAMELEN + 1];
+	wchar_t			full_host[MAX_HOSTNAMELEN + 1];
 	int			full_host_wslen = 0;
 	char			*homedir;
 	Name			MAKE_MACHINES;
@@ -209,11 +209,11 @@ read_make_machines(Name make_machines_name)
 	// And netname2host() function does not work on Linux.
 	// So we have to use different APIs.
 #ifndef __sun
-	if (getdomainname(mbs_buffer, MAXNETNAMELEN+1) == 0) {
+	if (getdomainname(mbs_buffer, MAX_HOSTNAMELEN+1) == 0) {
 		sprintf(mbs_buffer2, "%s.%s", local_host_mb, mbs_buffer);
 #else
 	if (host2netname(mbs_buffer, NULL, NULL) &&
-	    netname2host(mbs_buffer, mbs_buffer2, MAXNETNAMELEN+1)) {
+	    netname2host(mbs_buffer, mbs_buffer2, MAX_HOSTNAMELEN+1)) {
 #endif
 		MBSTOWCS(full_host, mbs_buffer2);
 		full_host_wslen = wslen(full_host);

@@ -51,6 +51,8 @@
 #if defined(sun) || defined(HP_UX)
 extern	char		*sys_errlist[];
 extern	int		sys_nerr;
+#else
+extern	int		sys_nerr;
 #endif
 
 static	void		file_lock_error(char *msg, char *file, char *str, const char *arg1, const char *arg2);

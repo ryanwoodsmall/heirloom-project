@@ -48,10 +48,10 @@
  * LP64 libc.  Use strerror(3C) instead.
  */
 #else  /* #_LP64 */
-#if defined (__sun) || defined (__hpux)
+//#if defined (__sun) || defined (__hpux)
 extern	char *		sys_errlist[];
 extern	int		sys_nerr;
-#endif
+//#endif
 #endif /* #_LP64 */
 
 static	void		file_lock_error(char *, char *, const char *, char *, char *);
