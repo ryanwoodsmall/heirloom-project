@@ -59,7 +59,7 @@ extern int	getdents(int, struct dirent *, size_t);
 #ifdef	__hpux
 #define		_KERNEL
 #endif	/* __hpux */
-#include	<sys/dirent.h>
+#include	<dirent.h>
 #ifdef		__hpux
 #ifndef	_INO64_T
 typedef	unsigned long long	uint64_t;
