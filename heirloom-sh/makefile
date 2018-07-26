@@ -5,14 +5,20 @@
 ROOT=
 
 #
+# TOP
+#
+TOPDIR = /usr/local/crosware
+INSTDIR = $(TOPDIR)/tmp/heirloom-built
+
+#
 # The destination directory for the "sh" and "jsh" binaries.
 #
-SV3BIN=/usr/5bin
+SV3BIN=$(INSTDIR)/usr/5bin
 
 #
 # Location for manual pages (with man1 below).
 #
-MANDIR=/usr/share/man/5man
+MANDIR=$(INSTDIR)/usr/share/man/5man
 
 #
 # Enable this definition if spell checking should be done for the
@@ -23,7 +29,7 @@ SPELL=-DSPELL
 #
 # A BSD-compatible install command.
 #
-UCBINST=/usr/ucb/install
+UCBINST=$(INSTDIR)/usr/ucb/install
 
 #
 # The strip command that is used at installation time.
@@ -44,7 +50,7 @@ LNS=ln -s
 #
 # Compiler flags.
 #
-CFLAGS=-O
+CFLAGS=-O -Wl,-static
 
 #
 # Flags for the C preprocessor.
@@ -60,6 +66,8 @@ LARGEF=-D_FILE_OFFSET_BITS=64L
 # The compiler warning options.
 #
 #WARN=
+
+LDFLAGS=-static
 
 #
 # End of adjustable settings.
