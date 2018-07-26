@@ -40,6 +40,22 @@
 
 #include	"defs.h"
 
+/*
+ * fudge a version of sbrk() from old musl code
+ *   http://git.musl-libc.org/cgit/musl/commit/src/linux/sbrk.c?id=7a995fe706e519a4f55399776ef0df9596101f93
+ */
+#include	<sys/syscall.h>
+#include	<errno.h>
+
+void *muslsbrk(intptr_t inc)
+{
+	unsigned long cur = syscall(SYS_brk, 0);
+	if (inc && syscall(SYS_brk, cur+inc) != cur+inc) {
+		errno = ENOMEM;
+		return (void *)-1;
+	}
+	return (void *)cur;
+}
 
 unsigned char *
 setbrk(int incr)
@@ -47,7 +63,7 @@ setbrk(int incr)
 
 	// XXX - using sbrk as a growable stack (i think)
 	// XXX - won't work on musl or with straight malloc replacement?
-	register unsigned char *a = (unsigned char *)sbrk(incr);
+	register unsigned char *a = (unsigned char *)muslsbrk(incr);
 
 	brkend = a + incr;
 	return(a);
