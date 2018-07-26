@@ -45,7 +45,9 @@ unsigned char *
 setbrk(int incr)
 {
 
-	register unsigned char *a = (unsigned char *)malloc(incr);
+	// XXX - using sbrk as a growable stack (i think)
+	// XXX - won't work on musl or with straight malloc replacement?
+	register unsigned char *a = (unsigned char *)sbrk(incr);
 
 	brkend = a + incr;
 	return(a);

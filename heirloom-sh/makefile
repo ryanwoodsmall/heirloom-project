@@ -50,12 +50,12 @@ LNS=ln -s
 #
 # Compiler flags.
 #
-CFLAGS=-O -Wl,-static
+CFLAGS=-O -Wl,-static -fomit-frame-pointer
 
 #
 # Flags for the C preprocessor.
 #
-CPPFLAGS=-D_GNU_SOURCE
+CPPFLAGS=-D_GNU_SOURCE -D__NO_STRING_INLINES -DSUS -DUCB -DDEBUG
 
 #
 # A define for large file support, if necessary.

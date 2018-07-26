@@ -198,7 +198,7 @@ chkbptr(struct blk *ptr)
 			exf++;
 
 		if (q < (struct blk *)brkbegin || q > bloktop)
-			abort(3);
+			abort();
 
 		if (p == bloktop)
 			break;
@@ -209,12 +209,12 @@ chkbptr(struct blk *ptr)
 			un += q - p;
 
 		if (p >= q)
-			abort(4);
+			abort();
 
 		p = q;
 	}
 	if (exf == 0)
-		abort(1);
+		abort();
 }
 
 
@@ -229,7 +229,7 @@ chkmem(void)
 		q = (struct blk *)(Rcheat(p->word) & ~BUSY);
 
 		if (q < (struct blk *)brkbegin || q > bloktop)
-			abort(3);
+			abort();
 
 		if (p == bloktop)
 			break;
@@ -240,7 +240,7 @@ chkmem(void)
 			un += q - p;
 
 		if (p >= q)
-			abort(4);
+			abort();
 
 		p = q;
 	}
@@ -250,7 +250,7 @@ chkmem(void)
 	blank();
 	prn(us);
 	blank();
-	prn((char *)bloktop - brkbegin - (un + us));
+	prn((unsigned char *)bloktop - brkbegin - (un + us));
 	newline();
 
 }
