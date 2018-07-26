@@ -62,10 +62,10 @@
  * must be avoided.
  */
 
-///*
+/*
 #define debug
 #define longdebug
-//*/
+*/
 
 #ifdef debug
 #define ASSERT(p) if(!(p))botch("p");else

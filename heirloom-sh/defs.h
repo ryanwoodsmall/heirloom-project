@@ -148,8 +148,7 @@ extern "C" {
 #define		ENDARGS		0
 
 /* enable shell accounting */
-//#define		ACCT
-#undef		ACCT
+#define		ACCT
 
 #include	<unistd.h>
 #include	"mac.h"
