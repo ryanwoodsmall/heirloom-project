@@ -4,15 +4,73 @@ the heirloom project provides traditional unix tools
 
 original site: http://heirloom.sourceforge.net/
 
-## repo info
-
-this is a git import of an rsync export of a cvs repository
-
 ## reason
 
 i'd like to try to get this working with static compiled musl libc
 
 sourceforge has been getting progressively flakier and cvs access/locking is hit or mess at best
+
+## status
+
+### what works
+
+compiling with a [musl-cross-make toolchain](https://github.com/richfelker/musl-cross-make) should work for:
+
+- heirloom
+- heirloom-sh
+- heirloom-devtools
+- heirloom-doctools
+
+build in that order - should just be a ```make && make install```
+
+compilation is static, meaning you need musl libc, libstdc++, etc, .a libs
+
+### layout
+
+everything is installed under ```/usr/local/heirloom``` by default
+
+item                              | original path       | new path
+--------------------------------- | ------------------- | --------
+default (no personality) bin      | /usr/5bin           | /usr/local/heirloom/bin
+default sbin                      | /usr/5bin           | /usr/local/heirloom/sbin
+default lib directory             | /usr/5lib           | /usr/local/heirloom/lib
+defualt man directory             | /usr/share/man/5man | /usr/local/heirloom/share/man
+default files                     | /etc/default        | /usr/local/heirloom/etc/default
+SVID3/SVR4-style binaries         | /usr/5bin           | /usr/local/heirloom/5bin/sv3
+SVID4/SVR4.2-style binaries       | /usr/5bin/s42       | /usr/local/heirloom/5bin/s42
+POSIX.2/SUS-style binaries        | /usr/5bin/posix     | /usr/local/heirloom/5bin/posix
+POSIX.1-2001/SUSv3-style binaries | /usr/5bin/posix2001 | /usr/local/heirloom/5bin/posix2001
+SVR4 UCB-style binaries           | /usr/ucb            | /usr/local/heirloom/ucb
+UCB-style libraries               | /usr/ucblib         | /usr/local/heirloom/ucblib
+development binaries              | /usr/ccs/bin        | /usr/local/heirloom/ccs/bin
+development lib directory         | /usr/ccs/lib        | /usr/local/heirloom/ccs/lib
+development man directory         | /usr/ccs/share/man  | /usr/local/heirloom/ccs/share/man
+
+#### path precedence
+
+probably something like (suit ```5bin``` subdir order to taste for your environment):
+
+```
+PATH=${PATH}:/usr/local/heirloom/5bin/posix2001
+PATH=${PATH}:/usr/local/heirloom/5bin/posix
+PATH=${PATH}:/usr/local/heirloom/ucb
+PATH=${PATH}:/usr/local/heirloom/ccs/bin
+PATH=${PATH}:/usr/local/heirloom/5bin/s42
+PATH=${PATH}:/usr/local/heirloom/5bin/sv3
+PATH=${PATH}:/usr/local/heirloom/sbin
+PATH=${PATH}:/usr/local/heirloom/bin
+export PATH
+```
+
+### what doesn't work
+
+- **heirloom-pkgtools** does _not_ work and frankly i might not bother
+- ```settime``` is a broken symlink to ```touch```
+- ```troff``` and ```nroff``` probably need work 
+
+## repo info
+
+this is a git import of an rsync export of a cvs repository
 
 ### initial import
 
