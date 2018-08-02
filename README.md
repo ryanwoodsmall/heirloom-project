@@ -66,7 +66,7 @@ export PATH
 
 - **heirloom-pkgtools** does _not_ work and frankly i might not bother
 - ```settime``` is a broken symlink to ```touch```
-- ```troff``` and ```nroff``` probably need work 
+- ```troff``` and ```nroff``` probably need work
 
 ## repo info
 
@@ -97,11 +97,18 @@ cd heirloom
 git remote remove origin
 git remote add origin git@github.com:ryanwoodsmall/heirloom-project.git
 git push -u origin master
-git tag -a -m 'initial checkin of heirloom project from sourceforge rsync of cvs repos - cvs2git - github' 20180622-sf-rsync-cvs2git                                                           
+git tag -a -m 'initial checkin of heirloom project from sourceforge rsync of cvs repos - cvs2git - github' 20180622-sf-rsync-cvs2git
 git push origin --tags
 ```
 
-#### links
+## what isn't here
+
+- mailx : http://heirloom.sourceforge.net/mailx.html
+  - i mean... use something else
+- traditional vi : http://heirloom.sourceforge.net/vi.html
+  - vim, neovim, elvis nvi, busybox vi, ...
+
+## links
 
 - https://sourceforge.net/p/forge/documentation/CVS/
 - https://sourceforge.net/p/forge/documentation/rsync%20Backups/
