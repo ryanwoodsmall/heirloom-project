@@ -7,18 +7,17 @@ ROOT=
 #
 # TOP
 #
-TOPDIR = /usr/local/crosware
-INSTDIR = $(TOPDIR)/tmp/heirloom-built
+INSTDIR = /usr/local/heirloom
 
 #
 # The destination directory for the "sh" and "jsh" binaries.
 #
-SV3BIN=$(INSTDIR)/usr/5bin
+SV3BIN=$(INSTDIR)/bin
 
 #
 # Location for manual pages (with man1 below).
 #
-MANDIR=$(INSTDIR)/usr/share/man/5man
+MANDIR=$(INSTDIR)/share/man
 
 #
 # Enable this definition if spell checking should be done for the
@@ -29,7 +28,7 @@ SPELL=-DSPELL
 #
 # A BSD-compatible install command.
 #
-UCBINST=$(INSTDIR)/usr/ucb/install
+UCBINST=$(INSTDIR)/ucb/install
 
 #
 # The strip command that is used at installation time.
