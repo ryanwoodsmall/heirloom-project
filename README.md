@@ -67,6 +67,8 @@ export PATH
 - **heirloom-pkgtools** does _not_ work and frankly i might not bother
 - ```settime``` is a broken symlink to ```touch```
 - ```troff``` and ```nroff``` probably need work
+  - apply NROFF/TROFF base settings from **heirloom-doctools/README** in **heirloom/man/man.dfl.in**
+- ```htemp2``` in **heirloom/spell** breaks parallel make
 
 ## repo info
 
