@@ -74,6 +74,15 @@ export PATH
 - include **bzip2**: http://www.bzip.org/
 - unify _SUSBIN_ into _DEFBIN_?
 
+## what isn't here
+
+- mailx (aka **nail**): http://heirloom.sourceforge.net/mailx.html
+  - initial import at: https://github.com/ryanwoodsmall/heirloom-nail.git
+  - but i mean... use something else
+- traditional vi (aka **ex-vi**): http://heirloom.sourceforge.net/vi.html
+  - initial import at: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
+  - in the meantime: vim, neovim, elvis nvi, busybox vi, ...
+
 ## repo info
 
 this is a git import of an rsync export of a cvs repository
@@ -88,10 +97,11 @@ cd heirloom
 mkdir -p cvs
 rsync -ai a.cvs.sourceforge.net::cvsroot/heirloom/. ./cvs/.
 mkdir -p git
-cd git
 mkdir -p cvs2git-tmp
-cvs2git --blobfile=cvs2git-tmp/git-blob.dat --dumpfile=cvs2git-tmp/git-dump.dat --username=cvs2git
-git init --bar heirloom.git
+cd cvs
+cvs2git --blobfile=../cvs2git-tmp/git-blob.dat --dumpfile=../cvs2git-tmp/git-dump.dat --username=cvs2git
+cd ../git
+git init --bare heirloom.git
 cd heirloom.git
 cat ../cvs2git-tmp/git-blob.dat ../cvs2git-tmp/git-dump.dat | git fast-import
 git gc --prune=now
@@ -106,13 +116,6 @@ git push -u origin master
 git tag -a -m 'initial checkin of heirloom project from sourceforge rsync of cvs repos - cvs2git - github' 20180622-sf-rsync-cvs2git
 git push origin --tags
 ```
-
-## what isn't here
-
-- mailx : http://heirloom.sourceforge.net/mailx.html
-  - i mean... use something else
-- traditional vi : http://heirloom.sourceforge.net/vi.html
-  - vim, neovim, elvis nvi, busybox vi, ...
 
 ## links
 
