@@ -79,11 +79,11 @@
 # Destinations for installation. $(PRESERVEDIR) is used for recovery files.
 # It will get mode 1777.
 #
-PREFIX		= /usr/local
+PREFIX		= /usr/local/heirloom
 BINDIR		= $(PREFIX)/bin
 LIBEXECDIR	= $(PREFIX)/libexec
 MANDIR		= $(PREFIX)/share/man
-PRESERVEDIR	= /var/preserve
+PRESERVEDIR	= $(PREFIX)/var/preserve
 
 #
 # DESTDIR is prepended to the installation paths. It is mostly useful
@@ -94,16 +94,18 @@ DESTDIR		=
 #
 # A BSD-like install program. GNU install will fit well here, too.
 #
-INSTALL		= /usr/ucb/install
+#INSTALL		= /usr/ucb/install
+#INSTALL		= $(PREFIX)/ucb/install
+INSTALL		= install
 
 #
 # Compiler and linker flags.
 #
 # On HP-UX, add -D_INCLUDE__STDC_A1_SOURCE to CPPFLAGS.
 #
-#CFLAGS	=
+CFLAGS	= -Wl,-static
 #CPPFLAGS =
-#LDFLAGS	=
+LDFLAGS	= -static
 #LDADD	=
 
 #
@@ -190,8 +192,9 @@ OSTYPE	= -DVMUNIX
 # raises this limit to around 1 GB, but ex will consume much more of core
 # and temp file space then.
 #
-#LARGEF	= -DLARGEF
+LARGEF	= -DLARGEF
 
+# XXX - use ncurses or netbsd-curses here
 # 
 # The next setting is a crucial one since it determines the way ex
 # gets its knowledge about the terminal's capabilities. If you get
