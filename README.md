@@ -77,12 +77,13 @@ export PATH
 
 ## what isn't here
 
+- traditional vi (aka **ex-vi**): http://heirloom.sourceforge.net/vi.html
+  - initial import at: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
+  - **musl** branch has sbrk() fixes, setup for ncurses, and is configured to install in ```/usr/local/heirloom``
+  - in the meantime: vim, neovim, elvis nvi, busybox vi, ...
 - mailx (aka **nail**): http://heirloom.sourceforge.net/mailx.html
   - initial import at: https://github.com/ryanwoodsmall/heirloom-nail.git
   - but i mean... use something else
-- traditional vi (aka **ex-vi**): http://heirloom.sourceforge.net/vi.html
-  - initial import at: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
-  - in the meantime: vim, neovim, elvis nvi, busybox vi, ...
 
 ## repo info
 
