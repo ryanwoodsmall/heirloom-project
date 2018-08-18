@@ -88,6 +88,8 @@ static char sccsid[] = "@(#)ex.c	1.37 (gritter) 8/4/05";
 #include "ex_temp.h"
 #include "ex_tty.h"
 
+#include "muslsbrk.h"
+
 #ifdef TRACE
 char	tttrace[]	= { '/','d','e','v','/','t','t','y','x','x',0 };
 #endif
@@ -529,7 +531,7 @@ argend:
 	 * this as ed does, saving a little core, but it will probably
 	 * not often make much difference.
 	 */
-	fendcore = (line *) sbrk(0);
+	fendcore = (line *) muslsbrk(0);
 	endcore = fendcore - 2;
 
 #ifdef SIGTSTP

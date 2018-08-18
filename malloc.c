@@ -47,6 +47,8 @@
 
 #include "config.h"
 
+#include "muslsbrk.h"
+
 #ifdef	LANGMSG
 #include <nl_types.h>
 extern	nl_catd	catd;
@@ -144,7 +146,7 @@ poolsbrk(intptr_t inc)
 	intptr_t os, ns;
 
 	if (pool == NULL)
-		if ((pool = sbrk(POOL)) == (char *)-1)
+		if ((pool = muslsbrk(POOL)) == (char *)-1)
 			error(catgets(catd, 1, 241,
 				"No memory pool"));
 	if (inc == 0)

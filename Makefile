@@ -76,6 +76,13 @@
 #
 
 #
+# crosware stuff
+#
+CWDIR = /usr/local/crosware
+SWDIR = $(CWDIR)/software
+CURSDIR = $(SWDIR)/ncurses/current
+
+#
 # Destinations for installation. $(PRESERVEDIR) is used for recovery files.
 # It will get mode 1777.
 #
@@ -104,8 +111,8 @@ INSTALL		= install
 # On HP-UX, add -D_INCLUDE__STDC_A1_SOURCE to CPPFLAGS.
 #
 CFLAGS	= -Wl,-static
-#CPPFLAGS =
-LDFLAGS	= -static
+CPPFLAGS = -I$(CURSDIR)/include -I$(CURSDIR)/include/ncurses
+LDFLAGS	= -L$(CURSDIR)/lib -static
 #LDADD	=
 
 #
@@ -208,13 +215,13 @@ LARGEF	= -DLARGEF
 #
 # You may also get terminfo access by using the ncurses library.
 #
-#TERMLIB	= ncurses
+TERMLIB	= ncurses
 #
 # The preferred choice for ex on Linux distributions, other systems that
 # provide a good termcap file, or when setting the TERMCAP environment
 # variable is deemed sufficient, is the included 2.11BSD termcap library.
 #
-TERMLIB	= termlib
+#TERMLIB	= termlib
 
 #
 # Since ex uses sbrk() internally, a conflict with the libc's version of
@@ -229,6 +236,11 @@ TERMLIB	= termlib
 # usually work unless you are compiling for a vector machine or another
 # unusual enviroment.
 MALLOC=mapmalloc.o
+
+#
+# musl sbrk() implementation
+#
+MALLOC += muslsbrk.o
 
 ###############################################################################
 #                                                                             #
@@ -252,7 +264,8 @@ OBJS	= ex.o ex_addr.o ex_cmds.o ex_cmds2.o ex_cmdsub.o \
 		ex_vops.o ex_vops2.o ex_vops3.o ex_vput.o ex_vwind.o \
 		printf.o ex_version.o $(MALLOC)
 HDRS	= ex.h ex_argv.h ex_re.h ex_temp.h ex_tty.h ex_tune.h ex_vars.h \
-		ex_vis.h libterm/libterm.h
+		ex_vis.h libterm/libterm.h \
+		muslsbrk.h
 SRC1	= ex.c ex_addr.c ex_cmds.c ex_cmds2.c ex_cmdsub.c
 SRC2	= ex_data.c ex_get.c ex_io.c ex_put.c ex_re.c
 SRC3	= ex_set.c ex_subr.c ex_tagio.c ex_temp.c ex_tty.c ex_unix.c
@@ -289,7 +302,7 @@ uxre:
 
 clean:
 	@cd libterm && $(MAKE) clean
-	@test ! -d libuxre || (cd libuxre && $(MAKE) clean)
+	@cd libuxre && $(MAKE) clean
 #	If we dont have ex we cant make it so don't rm ex_vars.h
 	-rm -f ex exrecover expreserve *.o x*.[cs] core errs trace
 

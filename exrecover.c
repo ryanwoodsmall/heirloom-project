@@ -109,6 +109,8 @@ extern int	vsprintf(char *, const char *, va_list);
 #include <dirent.h>
 #include <time.h>
 
+#include "muslsbrk.h"
+
 #ifndef	MAXNAMLEN
 #ifdef	FNSIZE
 #define	MAXNAMLEN	FNSIZE
@@ -220,7 +222,7 @@ main(int argc, char *argv[])
 	/*
 	 * Initialize as though the editor had just started.
 	 */
-	fendcore = (line *) sbrk(0);
+	fendcore = (line *) muslsbrk(0);
 	dot = zero = dol = fendcore;
 	one = zero + 1;
 	endcore = fendcore - 2;
@@ -259,7 +261,7 @@ main(int argc, char *argv[])
 	/*
 	 * Allocate space for the line pointers from the temp file.
 	 */
-	if ((char *) sbrk(H.Flines * sizeof (line)) == (char *) -1)
+	if ((char *) muslsbrk(H.Flines * sizeof (line)) == (char *) -1)
 		/*
 		 * Good grief.
 		 */

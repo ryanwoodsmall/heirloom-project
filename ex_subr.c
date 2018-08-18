@@ -84,6 +84,8 @@ static char sccsid[] = "@(#)ex_subr.c	1.41 (gritter) 12/25/06";
 #include "ex_tty.h"
 #include "ex_vis.h"
 
+#include "muslsbrk.h"
+
 short	lastsc;
 
 /*
@@ -490,12 +492,12 @@ morelines(void)
 			pg = 4096;
 		pg /= sizeof (line);
 	}
-	if ((char *)sbrk(pg * sizeof (line)) == (char *)-1)
+	if ((char *)muslsbrk(pg * sizeof (line)) == (char *)-1)
 		return (-1);
 	endcore += pg;
 	return (0);
 #else	/* !_SC_PAGESIZE */
-	if (sbrk(1024 * sizeof (line)) == (char *)-1)
+	if (muslsbrk(1024 * sizeof (line)) == (char *)-1)
 		return (-1);
 	endcore += 1024;
 	return (0);
