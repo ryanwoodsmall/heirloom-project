@@ -70,9 +70,11 @@ export PATH
   - apply NROFF/TROFF base settings from **heirloom-doctools/README** in **heirloom/man/man.dfl.in**
 - ```htemp2``` in **heirloom/spell** breaks parallel make
 - git submodules
+  - **won't work with "releases"**; i.e., a tag wouldn't include (necessary) submodules
   - include dedicated **netbsd-curses**: https://github.com/sabotage-linux/netbsd-curses
   - include sortix **libz**: https://sortix.org/libz/
   - include **bzip2**: http://www.bzip.org/
+  - include **heirloom-ex-vi**: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
 - unify _SUSBIN_ into _DEFBIN_?
 
 ## what isn't here
@@ -80,7 +82,8 @@ export PATH
 - traditional vi (aka **ex-vi**): http://heirloom.sourceforge.net/vi.html
   - initial import at: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
   - **musl** branch has sbrk() fixes, setup for ncurses, and is configured to install in ```/usr/local/heirloom```
-  - in the meantime: vim, neovim, elvis nvi, busybox vi, ...
+  - works for normal editing tasks but isn't extensively tested
+  - for something else: vim, neovim, elvis, nvi, busybox vi, ...
 - mailx (aka **nail**): http://heirloom.sourceforge.net/mailx.html
   - initial import at: https://github.com/ryanwoodsmall/heirloom-nail.git
   - but i mean... use something else
