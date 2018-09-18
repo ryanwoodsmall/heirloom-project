@@ -72,6 +72,10 @@ export PATH
 ### what doesn't work / todo
 
 - **heirloom-pkgtools** does _not_ work and frankly i might not bother
+- **heirloom-nail** does _not_ work
+  - mailx (aka **nail**) was from: http://heirloom.sourceforge.net/mailx.html
+  - this doesn't work right now, not sure it ever will 
+  - use something else, preferably something newer
 - ```settime``` is a broken symlink to ```touch```
 - ```troff``` and ```nroff``` probably need work
   - apply NROFF/TROFF base settings from **heirloom-doctools/README** in **heirloom/man/man.dfl.in**
@@ -83,12 +87,6 @@ export PATH
   - include **bzip2**: http://www.bzip.org/
   - include **heirloom-ex-vi**: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
 - unify _SUSBIN_ into _DEFBIN_?
-
-## what isn't here
-
-- mailx (aka **nail**): http://heirloom.sourceforge.net/mailx.html
-  - initial import at: https://github.com/ryanwoodsmall/heirloom-nail.git
-  - but i mean... use something else
 
 ## repo info
 
