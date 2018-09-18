@@ -87,6 +87,8 @@ export PATH
   - include **bzip2**: http://www.bzip.org/
   - include **heirloom-ex-vi**: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
 - unify _SUSBIN_ into _DEFBIN_?
+- ```bison -y```, ```flex```, etc., vars/calls should be replaced with standard ```yacc```, ```lex```, etc.
+- internal **/usr/local/heirloom** paths should be avoided for ```install```, etc.
 
 ## repo info
 
