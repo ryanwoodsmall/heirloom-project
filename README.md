@@ -12,6 +12,8 @@ sourceforge has been getting progressively flakier and cvs access/locking is hit
 
 ## status
 
+use the **musl** branch
+
 ### what works
 
 compiling with a [musl-cross-make toolchain](https://github.com/richfelker/musl-cross-make) should work for:
@@ -20,6 +22,11 @@ compiling with a [musl-cross-make toolchain](https://github.com/richfelker/musl-
 - heirloom-sh
 - heirloom-devtools
 - heirloom-doctools
+- heirloom-ex-vi
+  - traditional vi (aka **ex-vi**): http://heirloom.sourceforge.net/vi.html
+  - **musl** branch has sbrk() fixes, setup for ncurses, and is configured to install in ```/usr/local/heirloom```
+  - works for normal editing tasks but isn't extensively tested
+  - for something else: vim, neovim, elvis, nvi, busybox vi, ...
 
 build in that order - should just be a ```make && make install```
 
@@ -79,11 +86,6 @@ export PATH
 
 ## what isn't here
 
-- traditional vi (aka **ex-vi**): http://heirloom.sourceforge.net/vi.html
-  - initial import at: https://github.com/ryanwoodsmall/heirloom-ex-vi.git
-  - **musl** branch has sbrk() fixes, setup for ncurses, and is configured to install in ```/usr/local/heirloom```
-  - works for normal editing tasks but isn't extensively tested
-  - for something else: vim, neovim, elvis, nvi, busybox vi, ...
 - mailx (aka **nail**): http://heirloom.sourceforge.net/mailx.html
   - initial import at: https://github.com/ryanwoodsmall/heirloom-nail.git
   - but i mean... use something else
