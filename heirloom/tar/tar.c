@@ -101,7 +101,7 @@ static const char sccsid[] USED = "@(#)tar.sl	1.180 (gritter) 10/9/10";
 #endif
 
 #if !defined (major) && !defined (__G__)
-#include <sys/mkdev.h>
+#include <sys/sysmacros.h>
 #endif	/* !major */
 
 #include <getdir.h>

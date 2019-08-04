@@ -98,7 +98,7 @@
 #endif	/* _AIX */
 
 #if !defined (major) && !defined (__G__)
-#include <sys/mkdev.h>
+#include <sys/sysmacros.h>
 #endif	/* !major */
 
 #include "cpio.h"

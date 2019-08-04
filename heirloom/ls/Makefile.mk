@@ -66,11 +66,11 @@ config.h:
 	fi ; \
 	rm -f ___build$$$$.o ___build$$$$.c
 	-echo '#include <sys/types.h>' >___build$$$$.c ; \
-	echo '#include <sys/mkdev.h>' >>___build$$$$.c ; \
+	echo '#include <sys/sysmacros.h>' >>___build$$$$.c ; \
 	echo 'int main(void) { major(0); return 0; }' >>___build$$$$.c ; \
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LARGEF) $(IWCHAR) -o ___build$$$$  ___build$$$$.c >/dev/null 2>&1 ; \
 	if test $$? = 0 && test -f ___build$$$$ ; \
-	then	echo '#include	<sys/mkdev.h>' >>config.h ; \
+	then	echo '#include	<sys/sysmacros.h>' >>config.h ; \
 	fi ; \
 	rm -f ___build$$$$ ___build$$$$.c
 	-echo 'long long foo;' >___build$$$$.c ; \

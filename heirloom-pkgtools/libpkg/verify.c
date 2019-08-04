@@ -57,7 +57,7 @@
 #include <pkglibmsgs.h>
 #include <fcntl.h>
 #ifdef __sun
-#include <sys/mkdev.h>
+#include <sys/sysmacros.h>
 #endif
 #include "pkglocale.h"
 

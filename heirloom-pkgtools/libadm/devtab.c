@@ -58,7 +58,7 @@
  *
  *	<sys/sysmacros.h>	System macro definitions
  *	<sys/types.h>		System data types
- *	<sys/mkdev.h>		Device Macros
+ *	<sys/sysmacros.h>		Device Macros
  *	<unistd.h>		System Symbolic Constants
  *	<stdio.h>		Standard I/O definitions
  *	<string.h>		String handling definitions
@@ -72,7 +72,7 @@
 #include	<sys/sysmacros.h>
 #include	<sys/types.h>
 #if defined (__sun) && !defined (SUNOS41)
-#include	<sys/mkdev.h>
+#include	<sys/sysmacros.h>
 #endif
 #include	<unistd.h>
 #include	<stdio.h>
