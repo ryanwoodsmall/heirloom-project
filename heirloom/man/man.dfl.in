@@ -28,4 +28,5 @@ NEQN=neqn
 TBL=tbl
 
 # Macro set. Default is -man
-MACSET=-mandoc
+#MACSET=-mandoc
+MACSET=-man
