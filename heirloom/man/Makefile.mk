@@ -9,28 +9,27 @@ catman: bang.ksh man.ksh catman.ksh common.ksh
 	chmod 755 catman
 
 bang.ksh:
-	@IFS=: ;\
-	if test "`uname`" = HP-UX ;\
-	then \
-		order='bash ksh';\
-	else \
-		order='ksh bash';\
-	fi ;\
-	for shell in ksh bash ;\
-	do \
-		for dir in /bin /usr/bin $$PATH ;\
-		do \
-			if test -x "$$dir"/$$shell ;\
-			then \
-				echo "selected $$dir/$$shell" ;\
-				echo "#!$$dir/$$shell" > bang.ksh ;\
-				echo "DFLDIR=$(DFLDIR)" >> bang.ksh ;\
-				exit ;\
-			fi ;\
-		done ;\
-	done ;\
-	echo 'no bash or ksh found' >&2;\
-	exit 1
+	#@IFS=: ;\
+	#for shell in mksh bash ksh ;\
+	#do \
+	#	for dir in /bin /usr/bin $$PATH ;\
+	#	do \
+	#		if test -x "$$dir"/$$shell ;\
+	#		then \
+	#			echo "selected $$dir/$$shell" ;\
+	#			echo "#!$$dir/$$shell" > bang.ksh ;\
+	#			echo "DFLDIR=$(DFLDIR)" >> bang.ksh ;\
+	#			exit ;\
+	#		fi ;\
+	#	done ;\
+	#done ;\
+	#echo 'no bash or ksh found' >&2;\
+	#exit 1
+	echo -n > bang.ksh
+	#which ksh >/dev/null 2>&1 && echo '#!/usr/bin/env ksh' > bang.ksh || true
+	#which bash >/dev/null 2>&1 && echo '#!/usr/bin/env bash' >> bang.ksh || true
+	if `which ksh >/dev/null 2>&1` ; then echo '#!/usr/bin/env ksh' > bang.ksh ; else echo '#!/usr/bin/env bash' > bang.ksh ; fi
+	echo "DFLDIR=$(DFLDIR)" >> bang.ksh
 
 man.dfl: man.dfl.in
 	case `uname` in \
