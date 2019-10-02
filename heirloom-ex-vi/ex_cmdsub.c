@@ -1350,7 +1350,8 @@ addmac1(register char *src,register char *dest,register char *dname,
 		 * linefeed, and escape, he can screw himself. This is
 		 * so weird I don't bother to check for it.
 		 */
-		if (isalpha(src[0]&0377) && src[1] || any(src[0],":"))
+		/* XXX - come on man */
+		if (strncmp(src,"gg",2) != 0 && isalpha(src[0]&0377) && src[1] || any(src[0],":"))
 			error(catgets(catd, 1, 64,
 						"Too dangerous to map that"));
 	}

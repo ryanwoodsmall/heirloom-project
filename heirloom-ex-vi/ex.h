@@ -128,6 +128,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef	BIT8
 #ifndef	ISO8859_1
