@@ -809,7 +809,7 @@ sh_command2string(register String command, register String destination)
 	int			status;
 	Boolean			command_generated_output = false;
 
-	command->text.p = (int) nul_char;
+	command->text.p = NULL;
 	WCSTOMBS(mbs_buffer, command->buffer.start);
 	if ((fd = popen(mbs_buffer, "r")) == NULL) {
 		WCSTOMBS(mbs_buffer, command->buffer.start);
