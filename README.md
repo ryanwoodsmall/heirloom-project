@@ -8,7 +8,7 @@ original site: http://heirloom.sourceforge.net/
 
 i'd like to try to get this working with static compiled musl libc
 
-sourceforge has been getting progressively flakier and cvs access/locking is hit or mess at best
+sourceforge has been getting progressively flakier and cvs access/locking is hit or miss at best
 
 ## status
 
